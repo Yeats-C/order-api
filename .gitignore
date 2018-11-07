@@ -1,0 +1,12 @@
+target/
+.idea/
+APP_HOME_IS_UNDEFINED/
+
+*.bak
+*.iml
+*.versionsBackup
+.DS_Store
+.project
+.settings
+.classpath
+.sonar/
