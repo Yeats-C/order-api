@@ -18,6 +18,7 @@ mall-api
 ├── dao                 // dao层
 ├── domain              // 存放与数据库对应的实体
 │   ├── constant        // 存放常量和枚举类
+│   ├── common          // 通用的请求类
 │   ├── request         // 请求封装类
 │   ├── response        // 响应封装类
 ├── jobs                // 定时任务包
