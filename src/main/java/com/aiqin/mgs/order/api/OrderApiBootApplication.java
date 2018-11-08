@@ -40,7 +40,7 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan
 @GroundBoot
 @GroundDataSource
-@MapperScan(basePackages = {"com.aiqin.bms.merchant.api.dao"})
+@MapperScan(basePackages = {"com.aiqin.mgs.order.api.dao"})
 public class OrderApiBootApplication extends SpringBootServletInitializer {
 
     private static Logger LOGGER = LoggerFactory.getLogger(OrderApiBootApplication.class);
