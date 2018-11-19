@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.OrderAfterDao">
+    
+    <!-- 插入订单表 -->
+    <insert id="insertOrder" >
+        
+        insert into 
+    </insert>
+    
+    <!-- 售后订单查询 -->
+    <select id="selectOrderAfter"  >
+    
+         SELECT * FROM order_after_sale
+		 WHERE 1=1
+		 <if test="distributorId!=null ">
+         and distributor_id = #{distributorId}
+         </if>
+         <if test="afterSaleCode!=null ">
+		 and after_sale_code like concat(#{afterSaleCode,jdbcType=VARCHAR},'%') 
+		 </if>
+		 <if test="orderCode!=null and orderCode!=''">
+		 and order_code like concat(#{orderCode,jdbcType=VARCHAR},'%') 
+		 </if>
+		 <if test="memberPhone!=null and memberPhone!=''">
+		 and member_phone like concat(#{memberPhone,jdbcType=VARCHAR},'%') 
+         </if>
+         <if test="beginTime!=null ">
+         and create_time &gt;= #{beginTime}
+         </if>
+         <if test="endTime!=null ">
+         and create_time &lt;= #{endTime}
+         </if>
+         <if test="payType!=null ">
+         and pay_type = #{payType}
+         </if>
+         <if test="afterSaleStatus!=null ">
+         and after_sale_status = #{afterSaleStatus}
+         </if>
+         <if test="originType!=null ">
+         and origin_type =#{originType}
+         </if>
+    </select>
+    
+    
+        <!-- 售后订单明细查询 -->
+    <select id="selectOrderAfterDetail"  >
+    
+         SELECT * FROM order_after_sale
+		 WHERE 1=1
+		 <if test="afterSaleId!=null and afterSaleId!=''">
+		 and after_sale_id like concat(#{afterSaleId,jdbcType=VARCHAR},'%') 
+		 </if>
+    </select>
+    
+</mapper>
+

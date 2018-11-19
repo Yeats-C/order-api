@@ -3,6 +3,9 @@
  */
 package com.aiqin.mgs.order.api.base;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -46,4 +49,15 @@ public class PagesRequest {
     public void setBeginIndex(Integer beginIndex) {
         this.beginIndex = beginIndex;
     }
+    
+    /**
+     *  实体类自动重写toString()方法
+     */
+    
+	public String toString() {
+
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+
+	}
+	
 }

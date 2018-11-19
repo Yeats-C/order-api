@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.FrozenDao">
+    <resultMap id="FrozenInfoMapping" type="com.aiqin.mgs.order.api.domain.FrozenInfo">
+    <result column="frozen_id" jdbcType="VARCHAR" property="frozenId"/>
+    <result column="member_id" jdbcType="VARCHAR" property="memberId"/>
+    <result column="member_name" jdbcType="VARCHAR" property="memberName"/>
+    <result column="member_phone" jdbcType="VARCHAR" property="memberPhone"/>
+    <result column="distributor_id" jdbcType="VARCHAR" property="distributorId"/>
+    <result column="distributor_code" jdbcType="VARCHAR" property="distributorCode"/>
+    <result column="distributor_name" jdbcType="VARCHAR" property="distributorName"/>
+    <result column="product_name" jdbcType="VARCHAR" property="productName"/>
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+    <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+    <result column="sale_byid" jdbcType="VARCHAR" property="SaleById"/>
+    </resultMap>
+
+
+
+    <!-- 挂单入库 -->
+    <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.FrozenInfo">
+        
+        insert into frozen 
+			(frozen_id,distributor_id,distributor_code,distributor_name,member_id,member_name,product_id,product_name,sku_code,orig_price,
+			curr_price,amount,price,create_by,create_time,memo)
+		values
+		    (#{frozenId},#{distributorId},#{distributorCode},#{distributorName},#{memberId},#{memberName},#{productId},#{productName},#{skuCode},#{origPrice},
+		    #{currPrice},#{amount},#{price},#{createBy},#{createTime},#{memo})
+    
+    </insert>
+    
+    
+    <!-- 解卦 -->
+	<delete id="deleteByFrozenId" >
+		
+		delete from frozen where frozen_id = #{frozenId}
+        
+     </delete>
+     
+    <!-- 查询挂单明细 -->
+    <select id="selectDetailByFrozenId" resultMap="FrozenInfoMapping" resultType="java.util.List" >
+    
+		select * from frozen where frozen_id = #{frozenId}
+         
+    </select>
+    
+     <!-- 查询挂单汇总 -->
+    <select id="selectSumByFrozenId" resultMap="FrozenInfoMapping" resultType="java.util.List">
+    
+        select frozen_id,member_name,SUM(amount) AS amount,SUM(price) AS price from frozen where 1=1
+        
+        <if test=" saleById != null ">
+        and sale_byid = #{saleById}
+        </if>
+        <if test=" distributorId != null ">
+        and distributor_id = #{distributorId}
+        </if>
+        group by frozen_id
+         
+    </select>
+    
+</mapper>
+
