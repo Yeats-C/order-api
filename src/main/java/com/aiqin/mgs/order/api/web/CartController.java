@@ -93,11 +93,11 @@ public class CartController {
      * @return
      */
     @DeleteMapping("/deletecartinfobyid")
-    @ApiOperation(value = "根据商品SKU删除购物车购物清单")
-    public HttpResponse deleteCartInfoById(@Valid @RequestBody CartInfo cartInfo) {
+    @ApiOperation(value = "根据商品SKU删除购物车购物清单") 
+    public HttpResponse deleteCartInfoById(@Valid @RequestParam(name = "member_id", required = true) String memberId,@RequestParam(name = "sku_code", required = true) String skuCode) {
         
         LOGGER.info("删除购物车购物清单......");
-        return cartService.deleteCartInfoById(cartInfo);
+        return cartService.deleteCartInfoById(memberId,skuCode);
     }
     
     
@@ -108,7 +108,10 @@ public class CartController {
      */
     @GetMapping("/selectcartbymemberid")
     @ApiOperation(value = "购物车展示列表")
-    public HttpResponse selectCartByMemberId(@Valid @RequestParam(name = "member_id", required = true) String memberId,@RequestParam(name = "agio_type", required = true) String agioType) {
+    public HttpResponse selectCartByMemberId(@Valid @RequestParam(name = "member_id", required = true) String memberId,@RequestParam(name = "agio_type", required = true) String agioType,
+    		@Valid @RequestParam(name = "page_no", required = true) String pageNo,
+    		@Valid @RequestParam(name = "page_size", required = true) String pageSize
+    		) {
         
     	
     	LOGGER.info("购物车展示列表......");    	

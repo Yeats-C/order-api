@@ -26,7 +26,7 @@ public interface CartService {
     
 	HttpResponse deleteCartInfo(String memberId);  //清空购物车
 	
-	HttpResponse deleteCartInfoById(CartInfo cartInfo);  //删除购物车购物清单
+	HttpResponse deleteCartInfoById(String memberId,String skuCode);  //删除购物车购物清单
 
 	HttpResponse updateCartByMemberId(@Valid CartInfo cartInfo);  //更新购物车清单
 }

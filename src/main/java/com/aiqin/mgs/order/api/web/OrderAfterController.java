@@ -10,6 +10,7 @@ package com.aiqin.mgs.order.api.web;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.FrozenInfo;
 import com.aiqin.mgs.order.api.domain.OrderAfterSaleInfo;
+import com.aiqin.mgs.order.api.domain.OrderAfterSaleQuery;
 import com.aiqin.mgs.order.api.domain.OrderInfo;
 import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.OrderAfterService;
@@ -42,43 +43,26 @@ public class OrderAfterController {
     private OrderAfterService orderAfterService;    
     
     /**
-     * 条件查询售后维权列表
+     * 支持-模糊查询售后维权列表 /条件查询退货信息
      * @param 
      * @return
      */
-    @GetMapping("/selectorderafter")
-    @ApiOperation(value = "查询售后维权列表")
-    public HttpResponse selectOrderAfter(@Valid @RequestBody OrderAfterSaleInfo orderAfterInfo) {
+    @PostMapping("/selectorderafter")
+    @ApiOperation(value = "支持-条件查询售后维权列表 /条件查询退货信息")
+    public HttpResponse selectOrderAfter(@Valid @RequestBody OrderAfterSaleQuery orderAfterSaleQuery) {
         
     	
-    	LOGGER.info("查询售后维权列表......");    	
-        return orderAfterService.selectOrderAfter(orderAfterInfo);//查询售后维权列表
+    	LOGGER.info("支持-条件查询售后维权列表 /条件查询退货信息......");    	
+        return orderAfterService.selectOrderAfter(orderAfterSaleQuery);//支持-条件查询售后维权列表 /条件查询退货信息
     }
     
     
-    /**
-     * 条件查询售后维权明细列表
-     * @param 
-     * @return
-     */
-    @GetMapping("/selectorderafterdetail")
-    @ApiOperation(value = "条件查询售后维权明细列表")
-    public HttpResponse selectOrderAfterDetail(@PathVariable(name = "after_sale_id") String afterSaleId) {
-        
-    	
-    	LOGGER.info("条件查询售后维权明细列表......");    	
-        return orderAfterService.selectOrderAfterDetail(afterSaleId);//条件查询售后维权明细列表
+    @PostMapping("")
+    @ApiOperation(value = "添加新的订单售后数据")
+    public HttpResponse addAfterOrder(@Valid @RequestBody OrderAfterSaleInfo orderAfterSaleInfo) {
+        LOGGER.info("添加新的订单售后数据......");
+        return orderAfterService.addAfterOrder(orderAfterSaleInfo);
     }
-    
-    
-  //1.退货退款 一期
-  @PostMapping("")
-  @ApiOperation(value = "添加退货退款信息")
-  public HttpResponse addOrderAfter(@Valid @RequestBody OrderInfo orderInfo) {
-  	
-  	
-  	return null;
-  }
     
     
     

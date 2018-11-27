@@ -3,6 +3,7 @@
  */
 package com.aiqin.mgs.order.api.base;
 
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
@@ -50,11 +51,7 @@ public class PagesRequest {
         this.beginIndex = beginIndex;
     }
     
-    /**
-     *  实体类自动重写toString()方法
-     */
-    
-	public String toString() {
+    public String toString() {
 
 		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
 

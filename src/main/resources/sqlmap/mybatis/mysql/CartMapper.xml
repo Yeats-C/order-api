@@ -32,8 +32,8 @@
     <!-- 查询会员下的购物车 -->
     <select id="selectCartByMemberId" parameterType="java.lang.String" resultMap="CartInfoMapping" resultType="java.util.List">
     
-         SELECT (@rowNO := @rowNo+1) AS rowno,a.*
-		 FROM cart a,(SELECT @rowNO :=0) b
+         SELECT (@rowNO := @rowNo+1) AS rowno,a.* FROM
+         cart a,(SELECT @rowNO :=0) b
 		 where 1=1
 		 and a.member_id = #{memberId}
 		 ORDER BY rowno DESC 

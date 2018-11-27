@@ -107,17 +107,16 @@ public class CartServiceImpl implements CartService{
 			if(memberId !=null && !memberId.equals("")) {
 				
 				//购物车数据
-				List<CartInfo> cartInfoList=getCartInfoList(memberId,agioType);
+				List<CartInfo> cartInfoList= getCartInfoList(memberId,agioType);
 				
 				//避免二次查询数据库 总数据量-分页
+				int total = 0;
 				if(cartInfoList !=null && cartInfoList.size()>0) {
 					CartInfo cartInfo = cartInfoList.get(0);
-					int total = cartInfo.getRowno();  
-
-				return HttpResponse.success(new PageResData(total,cartInfoList));
+					total = cartInfo.getRowno();  
 				}
-				
-				return HttpResponse.success();
+				return HttpResponse.success(new PageResData(total,cartInfoList));
+			
 			}else {
 				LOGGER.error("根据会员ID查询购物车数据失败", memberId);
 				return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
@@ -178,34 +177,37 @@ public class CartServiceImpl implements CartService{
         
         
         
-        
-		for(CartInfo cart : cartInfoList) {
-			
-			//测试字段  未完成
-			cart.setRetailPrice(50);
-			
-			
-			//总数量
-			acountAmount += cart.getAmount();
-			
-			//总应付金额
-			int productTotalprice =cart.getRetailPrice()*cart.getAmount(); 
-			acountTotalprice +=productTotalprice;
-			
-			//总优惠   限时折扣 （商品*折扣）*数量  （商品实际金额*数量） -优惠金额
-			activityDiscount= 0;
-			
-			//总实际金额
-			acountActualprice = acountTotalprice - activityDiscount;
-			
-		}
+        if(cartInfoList !=null && cartInfoList.size()>0) {
+        	for(CartInfo cart : cartInfoList) {
+    			
+    			//测试字段  未完成
+    			cart.setRetailPrice(50);
+    			
+    			
+    			//总数量
+    			acountAmount += cart.getAmount();
+    			
+    			//总应付金额
+    			int productTotalprice =cart.getRetailPrice()*cart.getAmount(); 
+    			acountTotalprice +=productTotalprice;
+    			
+    			//总优惠   限时折扣 （商品*折扣）*数量  （商品实际金额*数量） -优惠金额
+    			activityDiscount= 0;
+    			
+    			//总实际金额
+    			acountActualprice = acountTotalprice - activityDiscount;
+    			
+    		}
+        	
+        	cartInfo.setAcountAmount(acountAmount);
+    		cartInfo.setAcountActualprice(acountActualprice);
+    		cartInfo.setActivityDiscount(activityDiscount);
+    		cartInfo.setAcountActualprice(acountActualprice);
+    		
+    		cartInfoList.set(0, cartInfo);
+        }
 		
-		cartInfo.setAcountAmount(acountAmount);
-		cartInfo.setAcountActualprice(acountActualprice);
-		cartInfo.setActivityDiscount(activityDiscount);
-		cartInfo.setAcountActualprice(acountActualprice);
 		
-		cartInfoList.set(0, cartInfo);
 		
 	}
 
@@ -234,22 +236,23 @@ public class CartServiceImpl implements CartService{
 
 	@Override
 	@Transactional
-	public HttpResponse deleteCartInfoById(CartInfo cartInfo) {
+	public HttpResponse deleteCartInfoById(String memberId,String skuCode) {
 		
 		try {
-			LOGGER.error("删除购物清单",cartInfo);
-			if(cartInfo !=null) {
-				if(cartInfo.getMemberId() !=null && !cartInfo.equals("") && 
-				   cartInfo.getSkuCode() !=null && !cartInfo.getSkuCode().equals("")) {
+			LOGGER.error("删除购物清单",memberId);
+				if(memberId !=null && !memberId.equals("") && 
+						skuCode !=null && !skuCode.equals("")) {
+					CartInfo cartInfo = new CartInfo();
+					cartInfo.setMemberId(memberId);
+					cartInfo.setSkuCode(skuCode);
 					cartDao.deleteCartInfoById(cartInfo);
 				}else {
 					return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
 				}
-			}
 			
 			return HttpResponse.success();
 		} catch (Exception e) {
-			LOGGER.error("删除购物清单失败",cartInfo);
+			LOGGER.error("删除购物清单失败",e);
 			return HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
 		}
 		

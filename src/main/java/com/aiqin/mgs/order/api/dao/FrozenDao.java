@@ -21,6 +21,7 @@ public interface FrozenDao {
 
 	List<FrozenInfo> selectDetailByFrozenId(String frozenId) throws Exception; //查询挂单明细
 
-	List<FrozenInfo> selectSumByFrozenId(@Param("saleById")String saleById,@Param("distributorId")String distributorId) throws Exception; //查询挂单汇总
+	List<FrozenInfo> selectSumByFrozenId(@Param("createBy")String createBy,@Param("distributorId")String distributorId) throws Exception; //查询挂单汇总
 	
+	List<FrozenInfo> selectDetail(@Param("createBy")String createBy,@Param("distributorId")String distributorId) throws Exception;
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aiqin.mgs.order.api.dao.OrderDao">
-    <resultMap id="OrderInfoMapping" type="com.aiqin.mgs.order.api.domain.OrderInfo">
+<resultMap id="OrderInfoMapping" type="com.aiqin.mgs.order.api.domain.OrderInfo">
 <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
 <result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
 <result column="member_id" jdbcType="VARCHAR" property="memberId"/>
@@ -18,7 +18,6 @@
 <result column="pay_type" jdbcType="TINYINT" property="payType"/>
 <result column="actual_price" jdbcType="BIGINT" property="actualPrice"/>
 <result column="total_price" jdbcType="BIGINT" property="totalPrice"/>
-
 <result column="custom_note" jdbcType="VARCHAR" property="customNote"/>
 <result column="business_note" jdbcType="VARCHAR" property="businessNote"/>
 <result column="cashier_id" jdbcType="VARCHAR" property="cashierId"/>
@@ -29,44 +28,38 @@
 <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
 <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
 <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
-    </resultMap>
+</resultMap>
     
     <!-- 插入订单表 -->
-    <insert id="insertOrder" >
-        
-        insert into 
+    <insert id="addOrderInfo" >
+        insert into order_info
+        (order_id,order_code,member_id,member_name,member_phone,distributor_id,distributor_code,distributor_name,origin_type,receive_type,order_status,return_status,pay_status,pay_type,actual_price,total_price,custom_note,business_note,cashier_id,cashier_name,guide_id,guide_name,create_time,update_time,create_by,update_by)
+        values
+        (#{orderId},#{orderCode},#{memberId},#{memberName},#{memberPhone},#{distributorId},#{distributorCode},#{distributorName},#{originType},#{receiveType},#{orderStatus},#{returnStatus},#{payStatus},#{payType},#{actualPrice},#{totalPrice},#{customNote},#{businessNote},#{cashierId},#{cashierName},#{guideId},#{guideName},#{createTime},#{updateTime},#{createBy},#{updateBy})
     </insert>
     
+    <!-- 订单查询byorderid -->
+    <select id="selecOrderById"  resultMap="OrderInfoMapping">
     
-    <!-- 插入订单明细表 -->
-    <insert id="insertOrderDetail" >
-        
-        insert into 
-    </insert>
-    
-    
-    <!-- 插入订单日志表-->
-    <insert id="inserOrderLog" >
-        
-        insert into 
-    </insert>
-    
-    <!-- 订单明细查询 -->
-    <select id="selectOrderSKUId"  >
-    
-         select amount from cart where 1=1
+         SELECT * FROM order_info
+         where 1=1
+         <if test="orderId!=null and orderId!=''">
+		 and order_id = #{orderId}
+		 </if>
    
     </select>
-    <!-- 订单查询 -->
-    <select id="selectOrder"  >
     
+    <!-- 模糊订单查询 -->
+    <select id="selectOrder"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="OrderInfoMapping" resultType="java.util.List">
+    
+         SELECT (@rowNO := @rowNo+1) AS rowno,a.* from(
          SELECT * FROM order_info
 		 WHERE 1=1
 		 <if test="orderId!=null and orderId!=''">
-		 and order_id like concat(#{orderId,jdbcType=VARCHAR},'%') 
+		 and order_id = #{orderId}
 		 </if>
 		 <if test="memberPhone!=null and memberPhone!=''">
-		 and member_phone like concat(#{memberPhone,jdbcType=VARCHAR},'%') 
+		 and member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%') 
          </if>
          <if test="beginTime!=null ">
          and create_time &gt;= #{beginTime}
@@ -83,9 +76,84 @@
          <if test="originType!=null ">
          and origin_type =#{originType}
          </if>
-         <if test="distributorId!=null ">
+         <if test="distributorId!=null and distributorId!='' ">
          and distributor_id = #{distributorId}
          </if>
+         )a,(SELECT @rowNO :=0) b
+         ORDER BY rowno DESC 
     </select>
+    
+
+    <!-- 接口-分销机构维度-总销售额 返回INT -->
+    <select id="selectOrderAmt" resultType="java.lang.Integer">
+         SELECT SUM(a.order_actual) AS total_price FROM  settlement_info a ,order_info b
+         WHERE  
+         a.order_id = b.order_id
+         <if test="distributorId!=null and distributorId!='' ">
+         and b.distributor_id = #{distributorId}
+         </if>
+         <if test="originType!=null ">
+         and b.origin_type =#{originType}
+         </if>
+    </select>  
+    
+    <!-- 接口-分销机构+当月维度-当月销售额 -->
+    <select id="selectByMonthAllAmt" resultType="java.lang.Integer">
+         SELECT SUM(a.order_actual) AS total_price FROM  settlement_info a ,order_info b
+         WHERE  
+         a.order_id = b.order_id
+         <if test="distributorId!=null and distributorId!='' ">
+         and b.distributor_id = #{distributorId}
+         </if>
+         <if test="originType!=null ">
+         and b.origin_type =#{originType}
+         </if>
+         <if test="year!=null ">
+         and DATE_FORMAT(a.create_time,"%Y") =#{year}
+         </if>
+         <if test="month!=null ">
+         and DATE_FORMAT(a.create_time,"%m") =#{month}
+         </if>
+    </select>
+    
+    <!-- 接口-分销机构+当月维度-当月实收  -->
+    <select id="selectbByMonthRetailAmt" resultType="java.lang.Integer">
+         SELECT SUM(a.order_actual) AS total_price FROM  settlement_info a ,order_info b
+         WHERE  
+         a.order_id = b.order_id
+         <if test="distributorId!=null and distributorId!='' ">
+         and b.distributor_id = #{distributorId}
+         </if>
+         <if test="originType!=null ">
+         and b.origin_type =#{originType}
+         </if>
+         <if test="year!=null ">
+         and DATE_FORMAT(a.create_time,"%Y") =#{year}
+         </if>
+         <if test="month!=null ">
+         and DATE_FORMAT(a.create_time,"%m") =#{month}
+         </if>
+    </select>
+    
+    
+    <!-- 接口-分销机构+当月维度-当月支付订单数 -->
+    <select id="selectByMonthAcount" resultType="java.lang.Integer">
+         SELECT count(b.order_id) AS total_acount from order_info b
+         WHERE  
+         1=1
+         <if test="distributorId!=null and distributorId!='' ">
+         and b.distributor_id = #{distributorId}
+         </if>
+         <if test="originType!=null ">
+         and b.origin_type =#{originType}
+         </if>
+         <if test="year!=null ">
+         and DATE_FORMAT(b.create_time,"%Y") =#{year}
+         </if>
+         <if test="month!=null ">
+         and DATE_FORMAT(b.create_time,"%m") =#{month}
+         </if>
+    </select>
+    
 </mapper>
 

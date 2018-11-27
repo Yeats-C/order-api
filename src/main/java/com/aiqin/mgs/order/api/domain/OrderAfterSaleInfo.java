@@ -1,6 +1,6 @@
 /*****************************************************************
 
-* 模块名称：订单支付-实体类
+* 模块名称：订单售后后台-实体类
 * 开发人员: 黄祉壹
 * 开发时间: 2018-11-05 
 
@@ -15,15 +15,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel("订单操作日志")
+@ApiModel("订单售后后台")
 public class OrderAfterSaleInfo extends PagesRequest {
     
+	@ApiModelProperty(value = "数据是总条数倒序")
+    @JsonProperty("rowno")
+    private Integer rowno;
 	
 	@ApiModelProperty(value="售后id")
 	@JsonProperty("after_sale_id")
 	private String afterSaleId ;
-	
-	
+
 	@ApiModelProperty(value="售后编号")
 	@JsonProperty("after_sale_code")
 	private String afterSaleCode ;
@@ -65,12 +67,12 @@ public class OrderAfterSaleInfo extends PagesRequest {
 	
 	@ApiModelProperty(value="退款金额")
 	@JsonProperty("return_price")
-	private String returnPrice ;
+	private Integer returnPrice ;
 	
 	
 	@ApiModelProperty(value="退货状态")
 	@JsonProperty("after_sale_status")
-	private String afterSaleStatus ;
+	private Integer afterSaleStatus ;
 	
 	
 	@ApiModelProperty(value="售后备注信息")
@@ -80,12 +82,12 @@ public class OrderAfterSaleInfo extends PagesRequest {
 	
 	@ApiModelProperty(value="售后类型")
 	@JsonProperty("after_sale_type")
-	private String afterSaleType ;
+	private Integer afterSaleType ;
 	
 	
 	@ApiModelProperty(value="处理方式")
 	@JsonProperty("process_type")
-	private String processType ;
+	private Integer processType ;
 	
 	
 	@ApiModelProperty(value="收货人姓名")
@@ -99,27 +101,27 @@ public class OrderAfterSaleInfo extends PagesRequest {
 	
 	@ApiModelProperty(value="订单支付方式")
 	@JsonProperty("pay_type")
-	private String payType;
+	private Integer payType;
 	
 	@ApiModelProperty(value="订单来源类型")
 	@JsonProperty("origin_type")
-	private String originType;
+	private Integer originType;
 	
 	
-	@ApiModelProperty(value="申请开始时间")
+	@ApiModelProperty(value="申请开始时间",example = "2001-01-01 01:01:01")
 	@JsonProperty("begin_time")
 	private Date beginTime;
 	
-	@ApiModelProperty(value="申请结束时间")
+	@ApiModelProperty(value="申请结束时间",example = "2001-01-01 01:01:01")
 	@JsonProperty("end_time")
 	private Date endTime;
 	
-	@ApiModelProperty(value="申请时间")
+	@ApiModelProperty(value="申请时间",example = "2001-01-01 01:01:01")
 	@JsonProperty("create_time")
 	private Date createTime;
 	
 	
-	@ApiModelProperty(value="修改时间")
+	@ApiModelProperty(value="修改时间",example = "2001-01-01 01:01:01")
 	@JsonProperty("update_time")
 	private Date updateTime;
 	
@@ -132,6 +134,16 @@ public class OrderAfterSaleInfo extends PagesRequest {
 	@ApiModelProperty(value="修改员")
 	@JsonProperty("update_by")
 	private String updateBy;
+
+
+	public Integer getRowno() {
+		return rowno;
+	}
+
+
+	public void setRowno(Integer rowno) {
+		this.rowno = rowno;
+	}
 
 
 	public String getAfterSaleId() {
@@ -234,26 +246,6 @@ public class OrderAfterSaleInfo extends PagesRequest {
 	}
 
 
-	public String getReturnPrice() {
-		return returnPrice;
-	}
-
-
-	public void setReturnPrice(String returnPrice) {
-		this.returnPrice = returnPrice;
-	}
-
-
-	public String getAfterSaleStatus() {
-		return afterSaleStatus;
-	}
-
-
-	public void setAfterSaleStatus(String afterSaleStatus) {
-		this.afterSaleStatus = afterSaleStatus;
-	}
-
-
 	public String getAfterSaleContent() {
 		return afterSaleContent;
 	}
@@ -261,26 +253,6 @@ public class OrderAfterSaleInfo extends PagesRequest {
 
 	public void setAfterSaleContent(String afterSaleContent) {
 		this.afterSaleContent = afterSaleContent;
-	}
-
-
-	public String getAfterSaleType() {
-		return afterSaleType;
-	}
-
-
-	public void setAfterSaleType(String afterSaleType) {
-		this.afterSaleType = afterSaleType;
-	}
-
-
-	public String getProcessType() {
-		return processType;
-	}
-
-
-	public void setProcessType(String processType) {
-		this.processType = processType;
 	}
 
 
@@ -324,26 +296,6 @@ public class OrderAfterSaleInfo extends PagesRequest {
 	}
 
 
-	public String getPayType() {
-		return payType;
-	}
-
-
-	public void setPayType(String payType) {
-		this.payType = payType;
-	}
-
-
-	public String getOriginType() {
-		return originType;
-	}
-
-
-	public void setOriginType(String originType) {
-		this.originType = originType;
-	}
-
-
 	public Date getBeginTime() {
 		return beginTime;
 	}
@@ -383,7 +335,64 @@ public class OrderAfterSaleInfo extends PagesRequest {
 		this.updateTime = updateTime;
 	}
 	
-	
+	public Integer getReturnPrice() {
+		return returnPrice;
+	}
+
+
+	public void setReturnPrice(Integer returnPrice) {
+		this.returnPrice = returnPrice;
+	}
+
+
+	public Integer getAfterSaleStatus() {
+		return afterSaleStatus;
+	}
+
+
+	public void setAfterSaleStatus(Integer afterSaleStatus) {
+		this.afterSaleStatus = afterSaleStatus;
+	}
+
+
+	public Integer getAfterSaleType() {
+		return afterSaleType;
+	}
+
+
+	public void setAfterSaleType(Integer afterSaleType) {
+		this.afterSaleType = afterSaleType;
+	}
+
+
+	public Integer getProcessType() {
+		return processType;
+	}
+
+
+	public void setProcessType(Integer processType) {
+		this.processType = processType;
+	}
+
+
+	public Integer getPayType() {
+		return payType;
+	}
+
+
+	public void setPayType(Integer payType) {
+		this.payType = payType;
+	}
+
+
+	public Integer getOriginType() {
+		return originType;
+	}
+
+
+	public void setOriginType(Integer originType) {
+		this.originType = originType;
+	}
 	
     
 }

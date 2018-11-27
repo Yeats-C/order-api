@@ -18,14 +18,15 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel("结算")
 public class SettlementInfo extends PagesRequest {
     
-	@ApiModelProperty(value = "自增主键")
-    @JsonProperty("id")
-    private Long id;
 
     @ApiModelProperty(value = "订单id")
     @JsonProperty("order_id")
     @NotBlank
     private String orderId;
+    
+    @ApiModelProperty(value = "结算id")
+    @JsonProperty("settlementId")
+    private String settlement_id;
     
     @ApiModelProperty(value = "商品合计")
     @JsonProperty("product_sum")
@@ -71,6 +72,11 @@ public class SettlementInfo extends PagesRequest {
     private Integer orderChange;
     
     
+    @ApiModelProperty(value = "订单舍零")
+    @JsonProperty("order_abandon")
+    private Integer orderAbandon;
+    
+    
     @ApiModelProperty(value = "使用积分数")
     @JsonProperty("points")
     private Integer points;
@@ -83,68 +89,77 @@ public class SettlementInfo extends PagesRequest {
     
     @ApiModelProperty(value = "订单创建时间")
     @JsonProperty("create_time")
-    @NotBlank
     private String createTime;
     
     
     @ApiModelProperty(value = "订单操作员")
     @JsonProperty("create_by")
-    @NotBlank
     private String createBy;
     
-    @ApiModelProperty(value = "支付方式")
-    @JsonProperty("pay_type")
-    private Integer payType;
-    
-    @ApiModelProperty(value = "输入现金金额")
-    @JsonProperty("input_amt")
-    private Integer inputAmt;
-    
-    @ApiModelProperty(value = "输入积分")
-    @JsonProperty("input_points")
-    private Integer inputPoints;
+    @ApiModelProperty(value = "订单修改时间")
+    @JsonProperty("update_time")
+    private String updateTime;
     
     
-    @ApiModelProperty(value = "是否舍零")
-    @JsonProperty("is_abandon")
-    private Integer isAbandon;
+    @ApiModelProperty(value = "订单修改员")
+    @JsonProperty("update_by")
+    private String updateBy;
+    
+    
+//    @ApiModelProperty(value = "支付方式")
+//    @JsonProperty("pay_type")
+//    private Integer payType;
+//    
+//    @ApiModelProperty(value = "输入现金金额")
+//    @JsonProperty("input_amt")
+//    private Integer inputAmt;
+//    
+//    @ApiModelProperty(value = "输入积分")
+//    @JsonProperty("input_points")
+//    private Integer inputPoints;
+//    
+//    
+//    @ApiModelProperty(value = "是否舍零")
+//    @JsonProperty("is_abandon")
+//    private Integer isAbandon;
     
     
 
-	public Integer getIsAbandon() {
-		return isAbandon;
+
+	public String getSettlement_id() {
+		return settlement_id;
 	}
 
-	public void setIsAbandon(Integer isAbandon) {
-		this.isAbandon = isAbandon;
+	public void setSettlement_id(String settlement_id) {
+		this.settlement_id = settlement_id;
 	}
 
-	public Integer getInputAmt() {
-		return inputAmt;
+	public String getUpdateTime() {
+		return updateTime;
 	}
 
-	public void setInputAmt(Integer inputAmt) {
-		this.inputAmt = inputAmt;
+	public void setUpdateTime(String updateTime) {
+		this.updateTime = updateTime;
 	}
 
-	public Integer getInputPoints() {
-		return inputPoints;
+	public String getUpdateBy() {
+		return updateBy;
 	}
 
-	public void setInputPoints(Integer inputPoints) {
-		this.inputPoints = inputPoints;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
+	public void setUpdateBy(String updateBy) {
+		this.updateBy = updateBy;
 	}
 
 	public String getOrderId() {
 		return orderId;
+	}
+
+	public Integer getOrderAbandon() {
+		return orderAbandon;
+	}
+
+	public void setOrderAbandon(Integer orderAbandon) {
+		this.orderAbandon = orderAbandon;
 	}
 
 	public void setOrderId(String orderId) {
@@ -253,16 +268,7 @@ public class SettlementInfo extends PagesRequest {
 
 	public void setCreateBy(String createBy) {
 		this.createBy = createBy;
-	}
-
-	public Integer getPayType() {
-		return payType;
-	}
-
-	public void setPayType(Integer payType) {
-		this.payType = payType;
 	}    
-    
 }
 
 

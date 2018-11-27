@@ -1,47 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aiqin.mgs.order.api.dao.SettlementDao">
+<resultMap id="SettlementMapping" type="com.aiqin.mgs.order.api.domain.SettlementInfo">
+<result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+<result column="product_sum" jdbcType="INTEGER" property="productSum"/>
+<result column="freight" jdbcType="INTEGER" property="freight"/>
+<result column="total_coupons_discount" jdbcType="INTEGER" property="totalCouponsDiscount"/>
+<result column="point_percentage" jdbcType="INTEGER" property="pointPercentage"/>
+<result column="activity_discount" jdbcType="INTEGER" property="activityDiscount"/>
+<result column="order_sum" jdbcType="INTEGER" property="orderSum"/>
+<result column="order_receivable" jdbcType="INTEGER" property="orderReceivable"/>
+<result column="order_actual" jdbcType="INTEGER" property="orderActual"/>
+<result column="order_change" jdbcType="INTEGER" property="orderChange"/>
+<result column="order_abandon" jdbcType="INTEGER" property="orderAbandon"/>
+<result column="points" jdbcType="INTEGER" property="points"/>
+<result column="point_discount" jdbcType="BIGINT" property="pointDiscount"/>
+<result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+<result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+<result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+<result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+</resultMap>
 
-
-    <!-- 计算购物车-限时折扣 -->
-    <select id="acountDiscount" >
-    
-         select * from cart where 1=1
-         
-    </select>
-    
-    <!-- 计算购物车-优惠券 -->
-    <select id="acountCoupon" >
-    
-         select * from cart where 1=1
-         
-    </select>
-    
-    <!-- 计算购物车-无优惠 -->
-    <select id="acountCart" >
-    
-         select * from cart where 1=1
-         
-    </select>
-    
-    
+   
     <!-- 插入结算信息表 -->
-    <insert id="insertSettlement" >
+    <insert id="addSettlement" >
         insert into settlement_info 
-        (order_id,product_sum,freight,total_coupons_discount,point_percentage,activity_discount,order_sum,order_receivable,order_actual,order_change,points,point_discount,create_time,update_time,create_by,update_by)
+        (order_id,product_sum,freight,total_coupons_discount,point_percentage,activity_discount,order_sum,order_receivable,order_actual,order_change,order_abandon,points,point_discount,create_time,update_time,create_by,update_by)
 		values(
-		#{orderId},#{productSum},#{freight},#{totalCouponsDiscount},#{pointPercentage},#{activityDiscount},#{orderSum},#{orderReceivable},#{orderActual},#{orderChange},#{points},#{pointDiscount},#{createTime},#{updateTime},#{createBy},#{updateBy})
+		#{orderId},#{productSum},#{freight},#{totalCouponsDiscount},#{pointPercentage},#{activityDiscount},#{orderSum},#{orderReceivable},#{orderActual},#{orderChange},#{orderAbandon},#{points},#{pointDiscount},#{createTime},#{updateTime},#{createBy},#{updateBy})
     </insert>
+        
+    <!-- 接口-结算数据查询 -->
+    <select id="jkselectsettlement" resultMap="SettlementMapping" resultType="java.util.List">
     
-    <!-- 插入订单支付表 -->
-    <insert id="insertOrderPay" >
-        insert into order_pay 
-        (order_id,pay_type,pay_name,pay_status,pay_price,create_time,update_time,create_by,update_by)
-        values(
-        #{order_id},#{pay_type},#{pay_name},#{pay_status},#{pay_price},#{create_time},#{update_time},#{create_by},#{update_by})
-    </insert>
-    
-    
+         SELECT * FROM settlement_info where 1=1
+         
+         <if test="orderId!=null and orderId!=''">
+		 and order_id =#{orderId}
+		 </if>
+         
+    </select>
     
     
     

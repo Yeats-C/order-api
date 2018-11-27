@@ -99,17 +99,33 @@ public class FrozenServiceImpl implements FrozenService{
 
 
 	@Override
-	public HttpResponse selectSumByFrozenId(String saleById,String distributorId) {
+	public HttpResponse selectSumByFrozenId(String createBy,String distributorId) {
 		
 		try {
 			
-			LOGGER.info("查询挂单汇总...", distributorId+"."+saleById);
-			return HttpResponse.success(frozenDao.selectSumByFrozenId(saleById,distributorId));
+			LOGGER.info("查询挂单汇总...", distributorId+"."+createBy);
+			return HttpResponse.success(frozenDao.selectSumByFrozenId(createBy,distributorId));
 			
 			
 		} catch (Exception e) {
 			
 			LOGGER.info("查询挂单汇总",e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}
+	}
+
+
+	@Override
+	public HttpResponse selectDetail(String createBy, String distributorId) {
+		 
+
+		try {
+			
+			LOGGER.info("查询挂单明细...", createBy);
+			return HttpResponse.success(frozenDao.selectDetail(createBy,distributorId));
+		} catch (Exception e) {
+			
+			LOGGER.info("查询挂单明细失败", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}

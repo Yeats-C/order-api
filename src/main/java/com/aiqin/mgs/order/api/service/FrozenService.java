@@ -22,6 +22,7 @@ public interface FrozenService {
 
 	HttpResponse deleteByFrozenId(String frozenId);  //解卦
 	
-	HttpResponse selectSumByFrozenId(String saleById,String distributorId);  //查询挂单汇总
+	HttpResponse selectSumByFrozenId(String createBy,String distributorId);  //查询挂单汇总
 
+	HttpResponse selectDetail(String createBy,String distributorId);
 }

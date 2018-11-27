@@ -15,6 +15,9 @@
     <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
     <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
     <result column="sale_byid" jdbcType="VARCHAR" property="SaleById"/>
+    <result column="sum_amount" jdbcType="INTEGER" property="sumAmount"/>
+    <result column="sum_sale" jdbcType="INTEGER" property="sumSale"/>
+    <result column="sum_price" jdbcType="INTEGER" property="sumPrice"/>
     </resultMap>
 
 
@@ -46,19 +49,32 @@
          
     </select>
     
+    <!-- 查询挂单明细 -->
+    <select id="selectDetail" resultMap="FrozenInfoMapping" resultType="java.util.List" >
+    
+		select * from frozen where 1=1
+		<if test=" createBy != null ">
+		and create_by = #{createBy}
+		</if>
+		<if test=" distributorId != null ">
+		and distributor_id = #{distributorId} 
+        </if>
+         
+    </select>
+    
      <!-- 查询挂单汇总 -->
     <select id="selectSumByFrozenId" resultMap="FrozenInfoMapping" resultType="java.util.List">
     
-        select frozen_id,member_name,SUM(amount) AS amount,SUM(price) AS price from frozen where 1=1
-        
-        <if test=" saleById != null ">
-        and sale_byid = #{saleById}
+        SELECT a.*,b.member_name,b.create_time,b.create_by FROM (
+        SELECT frozen_id,ROUND(COUNT(frozen_id)) AS sum_sale, ROUND(SUM(amount)) AS sum_amount,ROUND(SUM(price)) AS sum_price FROM frozen WHERE 1=1
+        <if test=" createBy != null ">
+        and create_by = #{createBy}
         </if>
         <if test=" distributorId != null ">
         and distributor_id = #{distributorId}
         </if>
-        group by frozen_id
-         
+        GROUP BY frozen_id)a ,frozen b 
+        WHERE a.frozen_id = b.frozen_id
     </select>
     
 </mapper>

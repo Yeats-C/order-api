@@ -19,6 +19,10 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel("订单支付")
 public class OrderPayInfo extends PagesRequest {
     
+	@ApiModelProperty(value="支付id")
+	@JsonProperty("pay_id")
+	private String payId="";
+	
 	
 	@ApiModelProperty(value="订单id")
 	@JsonProperty("order_id")
@@ -65,6 +69,16 @@ public class OrderPayInfo extends PagesRequest {
 	@JsonProperty("update_by")
 	@NotBlank
 	private String updateBy;
+
+
+	public String getPayId() {
+		return payId;
+	}
+
+
+	public void setPayId(String payId) {
+		this.payId = payId;
+	}
 
 
 	public String getOrderId() {

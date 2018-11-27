@@ -3,7 +3,7 @@ package com.aiqin.mgs.order.api.domain;
 import com.aiqin.mgs.order.api.base.PagesRequest;
 
 /**
- * 预订单
+ * 支付---1
  * 
  * @author 黄祉壹
  *

@@ -1,6 +1,6 @@
 /*****************************************************************
 
-* 模块名称：购物车后台-入口
+* 模块名称：结算后台-入口
 * 开发人员: 黄祉壹
 * 开发时间: 2018-11-05 
 
@@ -10,7 +10,8 @@ package com.aiqin.mgs.order.api.web;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.CartInfo;
 import com.aiqin.mgs.order.api.domain.FrozenInfo;
-import com.aiqin.mgs.order.api.domain.OrderConditionInfo;
+import com.aiqin.mgs.order.api.domain.OrderPayInfo;
+import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.SettlementInfo;
 import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.SettlementService;
@@ -48,46 +49,85 @@ public class SettlementController {
     @Resource
     private SettlementService settlementService;
     
-    @Resource
-    private CartService cartService;
+//    @Resource
+//    private CartService cartService;
     
     
-    //1.結算頁面列表  仅支持 购物车跳转结账页面/选择优惠类型.
-    @GetMapping("/selectsettlement")
-    @ApiOperation(value = "結算頁面列表")
-    public HttpResponse selectSettlement(@Valid @RequestParam(name = "member_id", required = true) String memberId,@RequestParam(name = "agio_type", required = true) String agioType) {
-        
-    	LOGGER.info("結算頁面列表......");
 
-    	List<CartInfo> infolist = cartService.getCartInfoList(memberId,agioType);//购物车展示列表
-    	
-        return settlementService.selectSettlement(infolist);
     
-    }
-    
-    //2.结算页面动态刷新元素  支持 输入金额/输入积分/舍零 返回结算信息
-    @GetMapping("/ajaxsettlement")
-    @ApiOperation(value = "结算页面动态刷新元素")
-    public HttpResponse ajaxsettlement(@Valid @RequestBody SettlementInfo settlementInfo) {
+    //1.接口-结算数据查询
+    @PostMapping("/jkselectsettlement")
+    @ApiOperation(value = "接口-结算数据查询")
+    public HttpResponse jkselectsettlement(@Valid @RequestBody OrderQuery orderQuery) {
         
-    	LOGGER.info("结算页面动态刷新元素......");
+    	LOGGER.info("接口-结算数据查询......");
     	
-        return settlementService.ajaxsettlement(settlementInfo);
+        return settlementService.jkselectsettlement(orderQuery);
     
     }
     
     
-    //5.跟据前端传过来的支付方式,如果是现金支付 直接存库生成已支付订单, 非现金支付调用第三方判断生成什么类型的订单.
-    @PostMapping("/settlement")
-    @ApiOperation(value = "去结账......")
-    public HttpResponse settlement(@Valid @RequestBody SettlementInfo info,@Valid @RequestBody List<CartInfo> cartInfoList,
-    		 OrderConditionInfo conditionInfo) {
-        
-    	LOGGER.info("去结账......");
+    //添加新的结算数据
+    @PostMapping("")
+    @ApiOperation(value = "添加新的结算数据....")
+    public HttpResponse addSettlement(@Valid @RequestBody SettlementInfo settlementInfo,@Valid @RequestParam(name = "order_id", required = false) String orderId) {
     	
-        return settlementService.settlement(info,cartInfoList,conditionInfo);
+    	
+        LOGGER.info("添加新的结算数据...");
+        return settlementService.addSettlement(settlementInfo,orderId);
     
     }
+    
+    
+    //添加新的支付数据
+    @PostMapping("/addorderpaylist")
+    @ApiOperation(value = "添加新的支付数据....")
+    public HttpResponse addOrderPayList(@Valid @RequestBody List<OrderPayInfo> OrderPayList,@Valid @RequestParam(name = "order_id", required = false) String orderId) {
+    	
+    	
+        LOGGER.info("添加新的支付数据...");
+        return settlementService.addOrderPayList(OrderPayList,orderId);
+    
+    }
+    
+    
+    
+    
+//    //1.結算頁面列表  仅支持 购物车跳转结账页面/选择优惠类型.
+//    @GetMapping("/selectsettlement")
+//    @ApiOperation(value = "結算頁面列表")
+//    public HttpResponse selectSettlement(@Valid @RequestParam(name = "member_id", required = true) String memberId,@RequestParam(name = "agio_type", required = true) String agioType) {
+//        
+//    	LOGGER.info("結算頁面列表......");
+//
+//    	List<CartInfo> infolist = cartService.getCartInfoList(memberId,agioType);//购物车展示列表
+//    	
+//        return settlementService.selectSettlement(infolist);
+//    
+//    }    
+//    //3.结算页面动态刷新元素  支持 输入金额/输入积分/舍零 返回结算信息
+//    @PostMapping("/ajaxsettlement")
+//    @ApiOperation(value = "结算页面动态刷新元素")
+//    public HttpResponse ajaxsettlement(@Valid @RequestBody SettlementInfo settlementInfo) {
+//        
+//    	LOGGER.info("结算页面动态刷新元素......");
+//    	
+//        return settlementService.ajaxsettlement(settlementInfo);
+//    
+//    }
+    
+    
+//    //5.跟据前端传过来的支付方式,如果是现金支付 直接存库生成已支付订单, 非现金支付调用第三方判断生成什么类型的订单.
+//    @PostMapping("/settlement")
+//    @ApiOperation(value = "去结账......")
+//    public HttpResponse settlement(@Valid @RequestBody SettlementInfo info,@Valid @RequestBody List<CartInfo> cartInfoList,
+//    		 OrderQuery conditionInfo) {
+//        
+//    	LOGGER.info("去结账......");
+//    	
+//        return settlementService.settlement(info,cartInfoList,conditionInfo);
+//    
+//    }
     
 //    @GetMapping("/TEST1")
 //    @ApiOperation(value = "测试工具")

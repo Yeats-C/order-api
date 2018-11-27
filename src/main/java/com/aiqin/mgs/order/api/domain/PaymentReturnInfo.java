@@ -1,5 +1,11 @@
 package com.aiqin.mgs.order.api.domain;
 
+/**
+ * 支付---2
+ * 
+ * @author 黄祉壹
+ *
+ */
 public class PaymentReturnInfo {
     private String return_code;
     private String return_msg;

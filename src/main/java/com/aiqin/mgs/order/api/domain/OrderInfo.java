@@ -21,6 +21,12 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel("订单")
 public class OrderInfo extends PagesRequest {
     
+	
+	@ApiModelProperty(value = "数据是总条数倒序")
+    @JsonProperty("rowno")
+    private Integer rowno;
+	
+	
 	@ApiModelProperty(value="订单id")
 	@JsonProperty("order_id")
 	@NotBlank
@@ -67,7 +73,6 @@ public class OrderInfo extends PagesRequest {
 	
 	@ApiModelProperty(value="来源类型")
 	@JsonProperty("origin_type")
-	@NotBlank
 	private Integer originType;
 	
 	
@@ -173,6 +178,16 @@ public class OrderInfo extends PagesRequest {
 	private String endTime;
 
 	
+
+
+	public Integer getRowno() {
+		return rowno;
+	}
+
+
+	public void setRowno(Integer rowno) {
+		this.rowno = rowno;
+	}
 
 
 	public String getOrderId() {

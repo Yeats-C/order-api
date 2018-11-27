@@ -97,17 +97,32 @@ public class FrozenController {
     
     
     
-    /**
-     * 查询解卦列表
-     * @param frozenId
-     * @return
-     */
-    @GetMapping("/selectsumbyfrozenId")
-    @ApiOperation(value = "查询解卦列表")
-    public HttpResponse selectSumByFrozenId(@Valid @RequestParam(name = "sale_byid", required = false) String saleById,@RequestParam(name = "distributor_id", required = false) String distributorId) {
-        
-    	
-    	LOGGER.info("查询挂单汇总......");    	
-        return frozenService.selectSumByFrozenId(saleById,distributorId);//返回挂单数据
-    }
+//    /**
+//     * 查询解卦列表
+//     * @param frozenId
+//     * @return
+//     */
+//    @GetMapping("/selectsumbyfrozenId")
+//    @ApiOperation(value = "查询解卦列表")
+//    public HttpResponse selectSumByFrozenId(@Valid @RequestParam(name = "create_by", required = false) String createBy,@RequestParam(name = "distributor_id", required = false) String distributorId) {
+//        
+//    	
+//    	LOGGER.info("查询挂单汇总......");    	
+//        return frozenService.selectSumByFrozenId(createBy,distributorId);//返回挂单数据
+//    }
+  /**
+  * 查询挂单明细列表
+  * @param frozenId
+  * @return
+  */
+ @GetMapping("/selectsumbyfrozenId")
+ @ApiOperation(value = "查询挂单明细...")
+ public HttpResponse selectSumByFrozenId(@Valid @RequestParam(name = "create_by", required = false) String createBy,@RequestParam(name = "distributor_id", required = false) String distributorId) {
+     
+ 	
+ 	LOGGER.info("查询挂单明细......");    	
+     return frozenService.selectDetail(createBy,distributorId);//返回挂单数据
+ }
+    
+    
 }

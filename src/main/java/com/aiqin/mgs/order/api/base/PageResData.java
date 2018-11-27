@@ -7,9 +7,9 @@ package com.aiqin.mgs.order.api.base;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class PageResData {
-    @JsonProperty("total_count")
+    @JsonProperty("totalCount")
     private Integer totalCount;
-    @JsonProperty("data_list")
+    @JsonProperty("dataList")
     private Object dataList;
 
     public PageResData() {

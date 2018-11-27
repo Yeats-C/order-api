@@ -13,32 +13,30 @@ import javax.validation.Valid;
 
 import com.aiqin.mgs.order.api.domain.*;
 
+import io.lettuce.core.dynamic.annotation.Param;
+
 public interface OrderDao {
 
 	
 	//订单查询
-    List<OrderInfo> selectOrder(OrderInfo orderInfo);
-    //订单明细查询
-  	List<OrderDetailInfo> selectOrderSKUId(String string);
-		
-	//插入订单表
-	void insertOrder(OrderInfo orderInfo);
-	//插入订单明细表
-	void insertOrderDetail(OrderDetailInfo orderDetailInfo);
-	//插入订单日志表
-	void inserOrderLog(SettlementInfo info);
+    List<OrderInfo> selectOrder(OrderQuery OrderQuery) throws Exception;
     
-	
-	
-	//导出
-	//根据门店查询订单列表
-	
-	//查询订单详细列表-带结算、退货信息......
-	void selectorderDetail(@Valid OrderInfo orderInfo);
-	
-	
-	
-	
+    //订单查询byorderid
+    OrderInfo selecOrderById(OrderDetailQuery orderDetailQuery) throws Exception;
+    
+    //添加新的订单主数据
+    void addOrderInfo(@Valid OrderInfo orderInfo) throws Exception;
 
-	
+    //接口-分销机构维度-总销售额 返回INT
+	int selectOrderAmt(@Param("distributorId")String distributorId, @Param("originType")String originType)throws Exception;
+
+	//接口-分销机构+当月维度-当月销售额
+	void selectByMonthAllAmt(@Param("distributorId")String distributorId, @Param("originType")String originType,@Param("year")String year, @Param("month")String month);
+
+    //接口-分销机构+当月维度-当月实收
+    void selectbByMonthRetailAmt(@Param("distributorId")String distributorId, @Param("originType")String originType,@Param("year")String year, @Param("month")String month);
+
+    //接口-分销机构+当月维度-当月支付订单数
+    void selectByMonthAcount(@Param("distributorId")String distributorId, @Param("originType")String originType,@Param("year")String year, @Param("month")String month);
+
 }

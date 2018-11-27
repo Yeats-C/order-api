@@ -8,7 +8,9 @@
 package com.aiqin.mgs.order.api.util;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.UUID;
 
 public class OrderPublic {
 	
@@ -98,12 +100,13 @@ public class OrderPublic {
 	  return randomNumber;
  }
  
- 
- 
+ static SimpleDateFormat sdf2 = new SimpleDateFormat("yyMMddHHmmss");
+ static SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd"); 
+ static SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
 	/**
 	 * 获取当前系统日期 yyMMddHHmmss
 	 */
-    static SimpleDateFormat sdf2 = new SimpleDateFormat("yyMMddHHmmss");
+
 	public static String currentDate() {
 		Date date = new Date();
 		String sysDate = sdf2.format(date);
@@ -121,14 +124,91 @@ public class OrderPublic {
 		return sysDate;
 	}
 	
-//	/**
-//	 * TEST
-//	 * @param args
-//	 */
-//	public static void main(String[] args) {
-//
-//		System.out.println(currentDate());
-//	}
+	
+	/**
+	 * 获取当前系统日期 yyyy
+	 */
+	public static String sysDateyyyy() {
+    	SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy");
+		Date date = new Date();
+		String sysDate = sdf2.format(date);
+		return sysDate;
+	}
+	
+	
+	/**
+	 * 获取当前系统日期 MM
+	 */
+	public static String sysDatemm() {
+    	SimpleDateFormat sdf2 = new SimpleDateFormat("MM");
+		Date date = new Date();
+		String sysDate = sdf2.format(date);
+		return sysDate;
+	}
+	
+	
+	/**
+	 * 格式化日期
+	 * 
+	 * @return String
+	 */
+	public static String formatDate(Date date) {
+		String strDate = sdf1.format(date);
+		return strDate;
+	}
+	
+	/**
+	 * 格式化日期
+	 * 
+	 * @return Date
+	 */
+	public static Date formatDate(String strDate) {
+		Date date = null;
+		try {
+			date = sdf1.parse(strDate);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return date;
+	}
+	
+	
+	/**
+	 * 获取当前系统日期
+	 * 
+	 * @return Date
+	 */
+	public static Date getCurrentDate() {
+		Date date = new Date();
+		String sysDate = sdf1.format(date);
+		return formatDate(sysDate);
+	}
+	
+	/**
+	 * 获取多少天后的日期
+	 */
+	public static Date afterThirdMonth(int i) {
+		Date date = getCurrentDate();
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.add(Calendar.DAY_OF_MONTH, i);
+		date = cal.getTime();
+		String stringDate = sdf3.format(date);
+		return formatDate(stringDate);
+	}
+	
+	public static String getUUID(){ 
+	
+        String uuid = UUID.randomUUID().toString().trim().replaceAll("-", "").toUpperCase(); 
+	
+	return uuid; 
+	}
+
+	
+	public static void main(String[] args) {
+
+		System.out.println(sysDatemm());
+	}
 	
 }
 

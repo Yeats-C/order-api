@@ -7,7 +7,6 @@
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.domain;
 
-import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 
 import com.aiqin.mgs.order.api.base.PagesRequest;
@@ -25,23 +24,20 @@ public class CartInfo extends PagesRequest {
     @JsonProperty("id")
     private Long id;
 	
-	@ApiModelProperty(value = "总页数")
+	@ApiModelProperty(value = "数据是总条数倒序")
     @JsonProperty("rowno")
     private Integer rowno;
 
     @ApiModelProperty(value = "会员id")
     @JsonProperty("member_id")
-    @NotBlank
     private String memberId="";
     
     @ApiModelProperty(value = "会员名称")
     @JsonProperty("member_name")
-    @NotBlank
     private String memberName="";
     
     @ApiModelProperty(value = "会员手机号")
     @JsonProperty("member_phone")
-    @NotBlank
     private String memberPhone;
     
     @ApiModelProperty(value = "商品id")
@@ -79,15 +75,14 @@ public class CartInfo extends PagesRequest {
     
     @ApiModelProperty(value = "操作员")
     @JsonProperty("create_by")
-    @NotBlank
+
     private String createBy="";
     
     @ApiModelProperty(value = "修改员")
     @JsonProperty("update_by")
-    @NotBlank
     private String updateBy="";
     
-    @ApiModelProperty(value = "折扣类型")
+    @ApiModelProperty(value = "折扣类型  1:限时折扣 2:优惠券")
     @JsonProperty("agio_type")
     private Integer agioType;
     

@@ -1,6 +1,6 @@
 /*****************************************************************
 
-* 模块名称：订单后台-实体类
+* 模块名称：订单查询条件-实体类
 * 开发人员: 黄祉壹
 * 开发时间: 2018-11-05 
 
@@ -18,39 +18,37 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 
-@ApiModel("订单参数实体类")
-public class OrderConditionInfo extends PagesRequest {
+@ApiModel("订单查询条件")
+public class OrderQuery extends PagesRequest {
     
+	@ApiModelProperty(value = "订单id")
+    @JsonProperty("order_id")
+    private String orderId="";
+	
     @ApiModelProperty(value = "会员id")
     @JsonProperty("member_id")
-    @NotBlank
     private String memberId="";
     
     @ApiModelProperty(value = "会员名称")
     @JsonProperty("member_name")
-    @NotBlank
     private String memberName="";
     
     @ApiModelProperty(value = "会员手机号")
     @JsonProperty("member_phone")
-    @NotBlank
     private String memberPhone;
     
     @ApiModelProperty(value="分销机构id")
 	@JsonProperty("distributor_id")
-	@NotBlank
 	private String distributorId="";
 	
 	
 	@ApiModelProperty(value="分销机构编码")
 	@JsonProperty("distributor_code")
-	@NotBlank
 	private String distributorCode="";
 	
 	
 	@ApiModelProperty(value="分销机构名称")
 	@JsonProperty("distributor_name")
-	@NotBlank
 	private String distributorName="";
 	
 	
@@ -60,28 +58,114 @@ public class OrderConditionInfo extends PagesRequest {
 	
 	@ApiModelProperty(value="收银员id")
 	@JsonProperty("cashier_id")
-	@NotBlank
 	private String cashierId;
 	
 	
 	@ApiModelProperty(value="收银员名称")
 	@JsonProperty("cashier_name")
-	@NotBlank
 	private String cashierName;
 	
 	
 	@ApiModelProperty(value="导购id")
 	@JsonProperty("guide_id")
-	@NotBlank
 	private String guideId;
 	
 	
 	@ApiModelProperty(value="导购名称")
 	@JsonProperty("guide_name")
-	@NotBlank
 	private String guideName;
 	
+	@ApiModelProperty(value="创建时间",example = "2001-01-01 01:01:01")
+	@JsonProperty("create_time")
+	private Date create_time;
 	
+	@ApiModelProperty(value="创建开始时间",example = "2001-01-01 01:01:01")
+	@JsonProperty("begin_time")
+	private Date beginTime;
+	
+	
+	@ApiModelProperty(value="创建结束时间",example = "2001-01-01 01:01:01")
+	@JsonProperty("end_time")
+	private Date endTime;
+	
+	
+	@ApiModelProperty(value="订单状态")
+	@JsonProperty("order_status")
+	private Integer orderStatus;
+	
+	@ApiModelProperty(value="订单支付方式")
+	@JsonProperty("pay_type")
+	private Integer payType;
+	
+	
+	@ApiModelProperty("收货方式，0为到店自提，1为快递;扩展字段")
+    @JsonProperty("receive_type")
+    private Integer receiveType;
+
+	
+	
+	
+	
+	public Integer getPayType() {
+		return payType;
+	}
+
+
+	public void setPayType(Integer payType) {
+		this.payType = payType;
+	}
+
+
+	public String getOrderId() {
+		return orderId;
+	}
+
+
+	public void setOrderId(String orderId) {
+		this.orderId = orderId;
+	}
+
+
+	public Date getCreate_time() {
+		return create_time;
+	}
+
+
+	public void setCreate_time(Date create_time) {
+		this.create_time = create_time;
+	}
+
+
+	public Date getBeginTime() {
+		return beginTime;
+	}
+
+
+	public void setBeginTime(Date beginTime) {
+		this.beginTime = beginTime;
+	}
+
+
+	public Date getEndTime() {
+		return endTime;
+	}
+
+
+	public void setEndTime(Date endTime) {
+		this.endTime = endTime;
+	}
+
+
+	public Integer getOrderStatus() {
+		return orderStatus;
+	}
+
+
+	public void setOrderStatus(Integer orderStatus) {
+		this.orderStatus = orderStatus;
+	}
+
+
 	public String getMemberId() {
 		return memberId;
 	}

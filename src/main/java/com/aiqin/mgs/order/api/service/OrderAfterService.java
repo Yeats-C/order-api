@@ -14,14 +14,17 @@ import javax.validation.Valid;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.CartInfo;
 import com.aiqin.mgs.order.api.domain.OrderAfterSaleInfo;
+import com.aiqin.mgs.order.api.domain.OrderAfterSaleQuery;
 import com.aiqin.mgs.order.api.domain.OrderInfo;
 
 @SuppressWarnings("all")
 public interface OrderAfterService {
 
-	HttpResponse selectOrderAfter(@Valid OrderAfterSaleInfo orderAfterInfo);
+	HttpResponse selectOrderAfter(@Valid OrderAfterSaleQuery orderAfterSaleQuery);
 
-	HttpResponse selectOrderAfterDetail(String afterSaleId);
+//	HttpResponse selectOrderAfterDetail(@Valid OrderAfterSaleQuery orderAfterSaleQuery);
+
+	HttpResponse addAfterOrder(@Valid OrderAfterSaleInfo orderAfterSaleInfo); //添加新的订单售后数据
 
 
 
