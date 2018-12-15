@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.OrderCouponDao">
+    <resultMap id="OrderInfoDetailMapping" type="com.aiqin.mgs.order.api.domain.OrderDetailInfo">
+<result column="ordercoupon_id" jdbcType="VARCHAR" property="ordercouponId"/>
+<result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+<result column="order_detail_id" jdbcType="VARCHAR" property="orderDetailId"/>
+<result column="coupon_id" jdbcType="VARCHAR" property="couponId"/>
+<result column="coupon_name" jdbcType="VARCHAR" property="couponName"/>
+<result column="coupon_discount" jdbcType="INTEGER" property="couponDiscount"/>
+<result column="coupon_status" jdbcType="TINYINT" property="couponStatus"/>
+<result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+<result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+<result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+<result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+
+</resultMap>
+    
+    <!-- 插入订单优惠券关系表 -->
+    <insert id="addOrderCoupon" >
+        insert into order_relation_coupon
+        (ordercoupon_id,order_id,order_detail_id,coupon_id,coupon_name,coupon_discount,coupon_status,create_time,update_time,create_by,update_by)
+        values
+        (#{ordercouponId},#{orderId},#{orderDetailId},#{couponId},#{couponName},#{couponDiscount},#{couponStatus},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy})
+    </insert>
+    
+</mapper>
+
