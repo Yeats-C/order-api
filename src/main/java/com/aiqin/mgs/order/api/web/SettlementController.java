@@ -15,7 +15,6 @@ import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.SettlementInfo;
 import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.SettlementService;
-import com.aiqin.mgs.order.api.util.StreamUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -67,26 +66,38 @@ public class SettlementController {
     }
     
     
-    //添加新的结算数据
-    @PostMapping("")
-    @ApiOperation(value = "添加新的结算数据....")
-    public HttpResponse addSettlement(@Valid @RequestBody SettlementInfo settlementInfo,@Valid @RequestParam(name = "order_id", required = false) String orderId) {
-    	
-    	
-        LOGGER.info("添加新的结算数据...");
-        return settlementService.addSettlement(settlementInfo,orderId);
+//    //添加新的结算数据
+//    @PostMapping("")
+//    @ApiOperation(value = "添加新的结算数据....")
+//    public HttpResponse addSettlement(@Valid @RequestBody SettlementInfo settlementInfo,@Valid @RequestParam(name = "order_id", required = false) String orderId) {
+//    	
+//    	
+//        LOGGER.info("添加新的结算数据...");
+//        return settlementService.addSettlement(settlementInfo,orderId);
+//    
+//    }
     
-    }
+    
+//    //添加新的支付数据
+//    @PostMapping("/addorderpaylist")
+//    @ApiOperation(value = "添加新的支付数据....")
+//    public HttpResponse addOrderPayList(@Valid @RequestBody List<OrderPayInfo> OrderPayList,@Valid @RequestParam(name = "order_id", required = false) String orderId) {
+//    	
+//    	
+//        LOGGER.info("添加新的支付数据...");
+//        return settlementService.addOrderPayList(OrderPayList,orderId);
+//    
+//    }
     
     
-    //添加新的支付数据
-    @PostMapping("/addorderpaylist")
-    @ApiOperation(value = "添加新的支付数据....")
-    public HttpResponse addOrderPayList(@Valid @RequestBody List<OrderPayInfo> OrderPayList,@Valid @RequestParam(name = "order_id", required = false) String orderId) {
+  //查询支付数据通过Order_id
+    @GetMapping("/pay")
+    @ApiOperation(value = "查询支付数据通过Order_id....")
+    public HttpResponse pay(@Valid @RequestParam(name = "order_id", required = true) String orderId) {
     	
     	
-        LOGGER.info("添加新的支付数据...");
-        return settlementService.addOrderPayList(OrderPayList,orderId);
+        LOGGER.info("查询支付数据通过Order_id...");
+        return settlementService.pay(orderId);
     
     }
     
@@ -145,6 +156,8 @@ public class SettlementController {
 //	}
     
     
+    
+    	
     
     
 

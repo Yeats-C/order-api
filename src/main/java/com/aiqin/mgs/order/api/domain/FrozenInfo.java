@@ -58,7 +58,6 @@ public class FrozenInfo extends PagesRequest {
     
     @ApiModelProperty(value = "销售员id")
     @JsonProperty("sale_byid")
-    @NotBlank
     private String SaleById="";
     
     @ApiModelProperty(value = "销售员名称")
@@ -133,16 +132,18 @@ public class FrozenInfo extends PagesRequest {
     
     @ApiModelProperty(value = "备注")
     @JsonProperty("memo")
-    private Integer memo;
+    private String memo;
     
     
 
     
-	public Integer getMemo() {
+
+
+	public String getMemo() {
 		return memo;
 	}
 
-	public void setMemo(Integer memo) {
+	public void setMemo(String memo) {
 		this.memo = memo;
 	}
 

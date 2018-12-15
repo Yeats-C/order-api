@@ -1,7 +1,7 @@
 /*****************************************************************
 
 * 模块名称：购物车后台-接口层
-* 开发人员: 黄祉壹
+* 开发人员: hzy
 * 开发时间: 2018-11-05 
 
 * ****************************************************************************/
@@ -16,17 +16,19 @@ import com.aiqin.mgs.order.api.domain.CartInfo;
 
 @SuppressWarnings("all")
 public interface CartService {
-
 	
-    HttpResponse addCartInfo(CartInfo cartInfo);  //添加购物车
+	//微商城-添加/修改购物车信息0:添加1:修改....
+	HttpResponse addCartInfo(CartInfo cartInfo);    
+    
+	//根据会员ID查询购物车
+    HttpResponse selectCartByMemberId(String memberId,String distributorId,Integer pageNo,Integer pageSize);   
 
-    HttpResponse selectCartByMemberId(String memberId,String agioType);   //根据会员ID查询购物车
-    
-    List<CartInfo> getCartInfoList(String memberId,String agioType);   //根据会员ID查询购物车
-    
-	HttpResponse deleteCartInfo(String memberId);  //清空购物车
+    //清空购物车
+	HttpResponse deleteCartInfo(String memberId);  
 	
-	HttpResponse deleteCartInfoById(String memberId,String skuCode);  //删除购物车购物清单
+	//删除购物车购物清单
+	HttpResponse deleteCartInfoById(String memberId,List<String> skuCodes,String distributorId);  
 
-	HttpResponse updateCartByMemberId(@Valid CartInfo cartInfo);  //更新购物车清单
+	//更新购物车清单
+	HttpResponse updateCartByMemberId(@Valid CartInfo cartInfo);  
 }

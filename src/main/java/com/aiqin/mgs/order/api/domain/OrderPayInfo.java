@@ -27,7 +27,7 @@ public class OrderPayInfo extends PagesRequest {
 	@ApiModelProperty(value="订单id")
 	@JsonProperty("order_id")
 	@NotBlank
-	private String orderId="";
+	private String orderId;
 	
 	@ApiModelProperty(value="支付类型")
 	@JsonProperty("pay_type")
@@ -35,7 +35,6 @@ public class OrderPayInfo extends PagesRequest {
 	
 	@ApiModelProperty(value="支付描述")
 	@JsonProperty("pay_name")
-	@NotBlank
 	private String payName="";
 	
 	@ApiModelProperty(value="支付状态")
@@ -69,6 +68,22 @@ public class OrderPayInfo extends PagesRequest {
 	@JsonProperty("update_by")
 	@NotBlank
 	private String updateBy;
+
+	
+	@JsonProperty("pay_way")
+    @ApiModelProperty("支付方式，1.现金、2微信  3.支付宝、4银联")
+    private Integer payWay;
+	
+	
+
+	public Integer getPayWay() {
+		return payWay;
+	}
+
+
+	public void setPayWay(Integer payWay) {
+		this.payWay = payWay;
+	}
 
 
 	public String getPayId() {

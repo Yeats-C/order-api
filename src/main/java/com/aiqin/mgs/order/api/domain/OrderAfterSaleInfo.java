@@ -8,6 +8,7 @@
 package com.aiqin.mgs.order.api.domain;
 
 import java.util.Date;
+import java.util.List;
 
 import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,10 +18,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel("订单售后后台")
 public class OrderAfterSaleInfo extends PagesRequest {
-    
-	@ApiModelProperty(value = "数据是总条数倒序")
-    @JsonProperty("rowno")
-    private Integer rowno;
+  
 	
 	@ApiModelProperty(value="售后id")
 	@JsonProperty("after_sale_id")
@@ -134,17 +132,32 @@ public class OrderAfterSaleInfo extends PagesRequest {
 	@ApiModelProperty(value="修改员")
 	@JsonProperty("update_by")
 	private String updateBy;
+	
+	@ApiModelProperty(value="售后明细数据")
+	@JsonProperty("detail_list")
+	private List<OrderAfterSaleDetailInfo> detailList;
 
 
-	public Integer getRowno() {
-		return rowno;
+
+
+	public List<OrderAfterSaleDetailInfo> getDetailList() {
+		return detailList;
 	}
 
 
-	public void setRowno(Integer rowno) {
-		this.rowno = rowno;
+	public void setDetailList(List<OrderAfterSaleDetailInfo> detailList) {
+		this.detailList = detailList;
 	}
 
+
+	public Integer getPayType() {
+		return payType;
+	}
+
+
+	public void setPayType(Integer payType) {
+		this.payType = payType;
+	}
 
 	public String getAfterSaleId() {
 		return afterSaleId;
@@ -372,16 +385,6 @@ public class OrderAfterSaleInfo extends PagesRequest {
 
 	public void setProcessType(Integer processType) {
 		this.processType = processType;
-	}
-
-
-	public Integer getPayType() {
-		return payType;
-	}
-
-
-	public void setPayType(Integer payType) {
-		this.payType = payType;
 	}
 
 

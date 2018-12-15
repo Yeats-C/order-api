@@ -34,7 +34,7 @@
         insert into order_after_sale
         (after_sale_id,after_sale_code,order_id,order_code,member_id,member_name,member_phone,distributor_id,distributor_code,distributor_name,return_price,after_sale_status,after_sale_content,after_sale_type,process_type,receive_name,receive_phone,pay_type,origin_type,create_time,update_time,create_by,update_by)
         values
-        (#{afterSaleId},#{afterSaleCode},#{orderId},#{orderCode},#{memberId},#{memberName},#{memberPhone},#{distributorId},#{distributorCode},#{distributorName},#{returnPrice},#{afterSaleStatus},#{afterSaleContent},#{afterSaleType},#{processType},#{receiveName},#{receivePhone},#{payType},#{originType},#{createTime},#{updateTime},#{createBy},#{updateBy})
+        (#{afterSaleId},#{afterSaleCode},#{orderId},#{orderCode},#{memberId},#{memberName},#{memberPhone},#{distributorId},#{distributorCode},#{distributorName},#{returnPrice},#{afterSaleStatus},#{afterSaleContent},#{afterSaleType},#{processType},#{receiveName},#{receivePhone},#{payType},#{originType},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy})
     </insert>
     
     
@@ -52,14 +52,12 @@
     
     <!-- 售后订单查询 -->
     <select id="selectOrderAfter"  resultMap="OrderAfterMapping" resultType="java.util.List">
-    
-         SELECT (@rowNO := @rowNo+1) AS rowno,a.* FROM (
          SELECT * FROM order_after_sale
 		 WHERE 1=1
-		 <if test="distributorId!=null ">
+		 <if test="distributorId!=null and distributorId!='' ">
          and distributor_id = #{distributorId}
          </if>
-         <if test="afterSaleCode!=null ">
+         <if test="afterSaleCode!=null and afterSaleCode!='' ">
 		 and after_sale_code like concat('%',#{afterSaleCode,jdbcType=VARCHAR},'%') 
 		 </if>
 		 <if test="orderCode!=null and orderCode!=''">
@@ -69,10 +67,16 @@
 		 and member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%') 
          </if>
          <if test="beginTime!=null ">
-         and create_time &gt;= #{beginTime}
+         and DATE_FORMAT(create_time,"%Y-%m-%d") &gt;= DATE_FORMAT(#{beginTime},"%Y-%m-%d") 
          </if>
          <if test="endTime!=null ">
-         and create_time &lt;= #{endTime}
+         and DATE_FORMAT(create_time,"%Y-%m-%d") &lt;= DATE_FORMAT(#{endTime},"%Y-%m-%d")
+         </if>
+         <if test="beginDate!=null ">
+         and DATE_FORMAT(create_time,"%Y-%m-%d")  &gt;= #{beginDate}
+         </if>
+         <if test="endDate!=null ">
+         and DATE_FORMAT(create_time,"%Y-%m-%d") &lt;= #{endDate}
          </if>
          <if test="payType!=null ">
          and pay_type = #{payType}
@@ -83,11 +87,13 @@
          <if test="originType!=null ">
          and origin_type =#{originType}
          </if>
-         
-         )a,(SELECT @rowNO :=0) b
-         ORDER BY rowno DESC 
+         limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
     </select>
     
+    <!-- 个性化接口-通过ID更改售后表退货状态/修改员  -->
+	<update id="returnStatus" >
+		update order_after_sale set update_by=#{updateBy},update_time=CURRENT_TIMESTAMP,after_sale_status=#{afterSaleStatus} where after_sale_id = #{afterSaleId}
+	</update>
     
 </mapper>
 

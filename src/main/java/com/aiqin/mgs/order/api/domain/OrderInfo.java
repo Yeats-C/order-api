@@ -8,8 +8,7 @@
 package com.aiqin.mgs.order.api.domain;
 
 import java.util.Date;
-
-import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -20,54 +19,49 @@ import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel("订单")
 public class OrderInfo extends PagesRequest {
-    
-	
-	@ApiModelProperty(value = "数据是总条数倒序")
-    @JsonProperty("rowno")
-    private Integer rowno;
 	
 	
 	@ApiModelProperty(value="订单id")
 	@JsonProperty("order_id")
-	@NotBlank
+
 	private String orderId="";
 	
 	@ApiModelProperty(value="订单编号")
 	@JsonProperty("order_code")
-	@NotBlank
+
 	private String orderCode="";
 	
 	@ApiModelProperty(value="会员id")
 	@JsonProperty("member_id")
-	@NotBlank
+
 	private String memberId="";
 	
 	@ApiModelProperty(value="会员名称")
 	@JsonProperty("member_name")
-	@NotBlank
+
 	private String memberName="";
 	
 	@ApiModelProperty(value="会员手机号")
 	@JsonProperty("member_phone")
-	@NotBlank
+
 	private String memberPhone="";
 	
 	
 	@ApiModelProperty(value="分销机构id")
 	@JsonProperty("distributor_id")
-	@NotBlank
+
 	private String distributorId="";
 	
 	
 	@ApiModelProperty(value="分销机构编码")
 	@JsonProperty("distributor_code")
-	@NotBlank
+
 	private String distributorCode="";
 	
 	
 	@ApiModelProperty(value="分销机构名称")
 	@JsonProperty("distributor_name")
-	@NotBlank
+
 	private String distributorName="";
 	
 	
@@ -80,6 +74,13 @@ public class OrderInfo extends PagesRequest {
 	@JsonProperty("receive_type")
 	private Integer receiveType;
 	
+	@ApiModelProperty(value="提货码")
+	@JsonProperty("receive_code")
+	private String receiveCode ="";
+	
+	@ApiModelProperty(value="提货码生成时间",example = "2001-01-01 01:01:01")
+	@JsonProperty("receive_time")
+	private Date receiveTime;
 	
 	@ApiModelProperty(value="订单状态")
 	@JsonProperty("order_status")
@@ -98,7 +99,7 @@ public class OrderInfo extends PagesRequest {
 	
 	@ApiModelProperty(value="支付方式")
 	@JsonProperty("pay_type")
-	private Integer payType;
+	private String payType;
 	
 	
 	@ApiModelProperty(value="实际金额")
@@ -113,36 +114,36 @@ public class OrderInfo extends PagesRequest {
 	
 	@ApiModelProperty(value="客户备注")
 	@JsonProperty("custom_note")
-	@NotBlank
+
 	private String customNote;
 	
 	
 	@ApiModelProperty(value="商家备注")
 	@JsonProperty("business_note")
-	@NotBlank
+
 	private String businessNote;
 	
 	@ApiModelProperty(value="收银员id")
 	@JsonProperty("cashier_id")
-	@NotBlank
+
 	private String cashierId;
 	
 	
 	@ApiModelProperty(value="收银员名称")
 	@JsonProperty("cashier_name")
-	@NotBlank
+
 	private String cashierName;
 	
 	
 	@ApiModelProperty(value="导购id")
 	@JsonProperty("guide_id")
-	@NotBlank
+
 	private String guideId;
 	
 	
 	@ApiModelProperty(value="导购名称")
 	@JsonProperty("guide_name")
-	@NotBlank
+
 	private String guideName;
 	
 	
@@ -158,37 +159,64 @@ public class OrderInfo extends PagesRequest {
 	
 	@ApiModelProperty(value="操作员")
 	@JsonProperty("create_by")
-	@NotBlank
-	private String createBy;
+
+	private String createBy="";
 	
 	
 	@ApiModelProperty(value="修改员")
 	@JsonProperty("update_by")
-	@NotBlank
-	private String updateBy;
-	
-	@ApiModelProperty(value="下单时间开始时间")
-	@JsonProperty("begin_time")
-	@NotBlank
-	private String beginTime;
-	
-	@ApiModelProperty(value="下单时间结束时间")
-	@JsonProperty("end_time")
-	@NotBlank
-	private String endTime;
 
+	private String updateBy="";
+	
+	@ApiModelProperty(value="个性化-订单明细")
+	@JsonProperty("orderdetail_list")
+	private List<OrderDetailInfo> orderdetailList;
+	
+	@ApiModelProperty(value="订单下SKU数量")
+	@JsonProperty("sku_sum")
+	private Integer skuSum;
+	
 	
 
 
-	public Integer getRowno() {
-		return rowno;
+	public Integer getSkuSum() {
+		return skuSum;
 	}
 
 
-	public void setRowno(Integer rowno) {
-		this.rowno = rowno;
+	public void setSkuSum(Integer skuSum) {
+		this.skuSum = skuSum;
 	}
 
+
+	public String getReceiveCode() {
+		return receiveCode;
+	}
+
+
+	public void setReceiveCode(String receiveCode) {
+		this.receiveCode = receiveCode;
+	}
+
+
+	public String getPayType() {
+		return payType;
+	}
+
+
+	public void setPayType(String payType) {
+		this.payType = payType;
+	}
+
+
+	public List<OrderDetailInfo> getOrderdetailList() {
+		return orderdetailList;
+	}
+
+
+	public void setOrderdetailList(List<OrderDetailInfo> orderdetailList) {
+		this.orderdetailList = orderdetailList;
+	}
 
 	public String getOrderId() {
 		return orderId;
@@ -319,15 +347,6 @@ public class OrderInfo extends PagesRequest {
 		this.payStatus = payStatus;
 	}
 
-	public Integer getPayType() {
-		return payType;
-	}
-
-
-	public void setPayType(Integer payType) {
-		this.payType = payType;
-	}
-
 
 	public Integer getActualPrice() {
 		return actualPrice;
@@ -448,27 +467,15 @@ public class OrderInfo extends PagesRequest {
 	}
 
 
-	public String getBeginTime() {
-		return beginTime;
+	public Date getReceiveTime() {
+		return receiveTime;
 	}
 
 
-	public void setBeginTime(String beginTime) {
-		this.beginTime = beginTime;
-	}
-
-
-	public String getEndTime() {
-		return endTime;
-	}
-
-
-	public void setEndTime(String endTime) {
-		this.endTime = endTime;
+	public void setReceiveTime(Date receiveTime) {
+		this.receiveTime = receiveTime;
 	}
 	
-	
-    
 }
 
 

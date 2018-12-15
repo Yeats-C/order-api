@@ -9,6 +9,7 @@ package com.aiqin.mgs.order.api.web;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.FrozenInfo;
+import com.aiqin.mgs.order.api.domain.OrderAfteIListInfo;
 import com.aiqin.mgs.order.api.domain.OrderAfterSaleInfo;
 import com.aiqin.mgs.order.api.domain.OrderAfterSaleQuery;
 import com.aiqin.mgs.order.api.domain.OrderInfo;
@@ -43,32 +44,78 @@ public class OrderAfterController {
     private OrderAfterService orderAfterService;    
     
     /**
-     * 支持-模糊查询售后维权列表 /条件查询退货信息
+     * 模糊查询售后维权列表 /条件查询退货信息
      * @param 
      * @return
      */
     @PostMapping("/selectorderafter")
-    @ApiOperation(value = "支持-条件查询售后维权列表 /条件查询退货信息")
+    @ApiOperation(value = "条件查询售后维权列表 /条件查询退货信息")
     public HttpResponse selectOrderAfter(@Valid @RequestBody OrderAfterSaleQuery orderAfterSaleQuery) {
         
     	
     	LOGGER.info("支持-条件查询售后维权列表 /条件查询退货信息......");    	
-        return orderAfterService.selectOrderAfter(orderAfterSaleQuery);//支持-条件查询售后维权列表 /条件查询退货信息
+        return orderAfterService.selectOrderAfter(orderAfterSaleQuery);//条件查询售后维权列表 /条件查询退货信息
     }
     
     
-    @PostMapping("")
-    @ApiOperation(value = "添加新的订单售后数据")
-    public HttpResponse addAfterOrder(@Valid @RequestBody OrderAfterSaleInfo orderAfterSaleInfo) {
-        LOGGER.info("添加新的订单售后数据......");
-        return orderAfterService.addAfterOrder(orderAfterSaleInfo);
-    }
-    
-    
-    
-
-    
-    
-    
-
-}
+  /**
+   * 添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表
+   * @param orderAfteIListInfo
+   * @return
+   */
+  @PostMapping("")
+  @ApiOperation(value = "添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表...")
+  public HttpResponse addAfterOrder(@Valid @RequestBody OrderAfterSaleInfo orderAfterSaleInfo) {
+      LOGGER.info("添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表...");
+      return orderAfterService.addAfterOrder(orderAfterSaleInfo);
+  }
+  
+  
+  /**
+   * 查询BYorderid-返回订单订单数据、退货数据、退货明细数据
+   * @param 
+   * @return
+   */
+  @GetMapping("/detail")
+  @ApiOperation(value = "查询BYorderid-返回订单订单数据、退货数据、退货明细数据...")
+  public HttpResponse selectDetail(@Valid @RequestParam(name = "after_sale_id", required = true) String afterSaleId) {
+      
+  	
+  	  LOGGER.info("返回订单订单数据、退货数据、退货明细数据......");    	
+      return orderAfterService.selectDetail(afterSaleId);
+      
+  }
+  
+  
+//  /**
+//   * 更改退货状态(售后明细表+售后表+订单表+订单明细表) 扩展
+//   * @param 
+//   * @return
+//   */
+//  @PutMapping("/return_status")
+//  @ApiOperation(value = "更改退货状态(售后明细表+售后表+订单表+订单明细表)....")
+//  public HttpResponse returus(@Valid @RequestParam(name = "after_sale_id", required = true) String afterSaleId,
+//  		@RequestParam(name = "after_sale_status", required = true) Integer afterSaleStatus,
+//  		@RequestParam(name = "update_by", required = true) String updateBy
+//  		) {
+//
+//  	LOGGER.info("更改退货状态(售后明细表+售后表+订单表+订单明细表) ...");    	
+//      return orderAfterService.returus(afterSaleId,afterSaleStatus,updateBy);
+//  }
+  
+  /**
+   * 更改退货状态(售后表)
+   * @param 
+   * @return
+   */
+   @PutMapping("/return_status")
+   @ApiOperation(value = "更改退货状态(售后表+订单表)....")
+   public HttpResponse returus(@Valid @RequestParam(name = "after_sale_id", required = true) String afterSaleId,
+		@RequestParam(name = "after_sale_status", required = true) Integer afterSaleStatus,
+		@RequestParam(name = "update_by", required = true) String updateBy
+		) {
+       //前台逻辑,退货的时候 先插入退货数据退款成功后修改退货状态.
+	   LOGGER.info("更改退货状态(售后表)...");    	
+       return orderAfterService.returus(afterSaleId,afterSaleStatus,updateBy);
+   }  
+   }

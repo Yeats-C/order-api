@@ -6,15 +6,13 @@
 
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.domain;
-
-import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel("订单操作日志")
-public class OrderLog extends PagesRequest {
+public class OrderLog{
     
 	@ApiModelProperty(value="日志id")
 	@JsonProperty("log_id")

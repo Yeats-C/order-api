@@ -10,11 +10,21 @@ package com.aiqin.mgs.order.api.util;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+
+import javax.annotation.Resource;
+
+import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.domain.OrderAfterSaleQuery;
+import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
+import com.aiqin.mgs.order.api.domain.OrderLog;
+import com.aiqin.mgs.order.api.domain.OrderQuery;
+import com.aiqin.mgs.order.api.domain.constant.Global;
+import com.aiqin.mgs.order.api.service.OrderService;
 
 public class OrderPublic {
 	
-
 	 /**
 	  * 
 	  * @return 5位数的随机数
@@ -56,6 +66,49 @@ public class OrderPublic {
 	  }
 	  return randomNumber;
  }
+ 
+ 
+ /**
+  * 
+  * @return 8位数的随机数
+  */
+public static String randomNumberE() {
+ 
+ String randomNumber = ""; //随机数
+ 
+ final int num = 8; //8位
+  
+  int Random[] = new int[num];
+  for(int i = 0 ; i < num ; i++)
+  {
+  // int ran=-1;
+   while(true)
+   {
+    int ran = (int)(num*Math.random());
+    for(int j = 0 ; j < i ; j++)
+    {
+     if(Random[j] == ran) 
+     {
+      ran = -1;
+      break;
+     } 
+    }
+    if(ran != -1) 
+    {
+     Random[i] = ran;
+     break;
+    }
+    
+   }
+   
+  }
+  
+  for(int i = 0 ; i < num ; i ++)
+  {
+	  randomNumber +=Random[i];
+  }
+  return randomNumber;
+}
  
  
  /**
@@ -103,7 +156,9 @@ public class OrderPublic {
  static SimpleDateFormat sdf2 = new SimpleDateFormat("yyMMddHHmmss");
  static SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd"); 
  static SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
-	/**
+ static SimpleDateFormat sdf4 = new SimpleDateFormat("yyyy-MM"); 
+	
+    /**
 	 * 获取当前系统日期 yyMMddHHmmss
 	 */
 
@@ -126,26 +181,15 @@ public class OrderPublic {
 	
 	
 	/**
-	 * 获取当前系统日期 yyyy
+	 * 获取当前系统日期 yyyy-MM
 	 */
-	public static String sysDateyyyy() {
-    	SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy");
+	public static String sysDateyyyyMM() {
+    	SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM");
 		Date date = new Date();
 		String sysDate = sdf2.format(date);
 		return sysDate;
 	}
-	
-	
-	/**
-	 * 获取当前系统日期 MM
-	 */
-	public static String sysDatemm() {
-    	SimpleDateFormat sdf2 = new SimpleDateFormat("MM");
-		Date date = new Date();
-		String sysDate = sdf2.format(date);
-		return sysDate;
-	}
-	
+
 	
 	/**
 	 * 格式化日期
@@ -197,6 +241,36 @@ public class OrderPublic {
 		return formatDate(stringDate);
 	}
 	
+	/**
+	 * 获取多少月后的日期
+	 */
+	public static String afterMonth(int i) {
+		Date date = getCurrentDate();
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.add(Calendar.MONTH, i);
+		date = cal.getTime();
+		String strDate = sdf4.format(date);
+		return strDate;
+	}
+	
+	/*****
+	 * 得到多少天之后的数
+	 * @param i
+	 * @return
+	 */
+		public static String NextDate(int i) {
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");  
+	    Date date=new Date();  
+	    Calendar calendar = Calendar.getInstance();  
+	    calendar.setTime(date);  
+	    calendar.add(Calendar.DAY_OF_MONTH,i);  
+	    String str = sdf1.format(calendar.getTime());
+	    return str;
+	}
+	
+	
+    //生成32位编码
 	public static String getUUID(){ 
 	
         String uuid = UUID.randomUUID().toString().trim().replaceAll("-", "").toUpperCase(); 
@@ -205,9 +279,221 @@ public class OrderPublic {
 	}
 
 	
+	//调用订单日志
+	public static OrderLog addOrderLog(String orderId,String status,String statusCode,String detailStatus,
+			String createBy) throws Exception{ 
+		OrderPublic orderPublic = new OrderPublic();
+		OrderLog orderLog = orderPublic.OrderLog(orderId,status,statusCode,detailStatus,createBy);
+		
+		return orderLog;
+	}
+	
+
+	public OrderLog OrderLog(String orderId,String status,String statusCode,String detailStatus,
+			String createBy) throws Exception{
+		
+		OrderLog logInfo = new OrderLog();
+		logInfo.setOrderId(orderId);
+		logInfo.setLogId(getUUID());
+		logInfo.setStatus(status);
+		logInfo.setStatusCode(statusCode);
+		logInfo.setStatusContent(detailStatus);
+		logInfo.setCreateBy(createBy);
+
+		return logInfo;
+	}
+	
+
+	//订单  - 处理字典项："全部" 查询条件.
+	public static OrderQuery getOrderQuery(OrderQuery query){
+		
+		if(query !=null && query.getReceiveType() !=null && query.getReceiveType().equals(Global.RECEIVE_TYPE_2)) {
+			query.setReceiveType(null);
+		}
+		if(query !=null && query.getOriginType() !=null && query.getOriginType().equals(Global.ORIGIN_TYPE_2)) {
+			query.setOriginType(null);
+		}
+			return query;
+		}
+	
+	
+	//订单明细  - 处理字典项："全部" 查询条件.
+	public static OrderDetailQuery getOrderDetailQuery(OrderDetailQuery query){
+			
+		if(query !=null && query.getOriginType() !=null && query.getOriginType().equals(Global.ORIGIN_TYPE_2)) {
+			query.setOriginType(null);
+		}	
+		return query;		
+	}	
+	
+	//订单售后  - 处理字典项："全部" 查询条件.
+	public static OrderAfterSaleQuery getOrderAfterSaleQuery(OrderAfterSaleQuery query){
+		
+		if(query !=null && query.getOriginType() !=null && query.getOriginType().equals(Global.ORIGIN_TYPE_2)) {
+			query.setOriginType(null);
+		}
+		
+		return query;		
+	}	
+	
+	//list集合转 分页对象
+	public static PageResData getData(List list){
+		
+		PageResData data =  new PageResData();
+		int total = 0;
+		if(list !=null && list.size()>0) {
+			total = list.size();
+			data.setTotalCount(total);
+			data.setDataList(list);
+		}
+		return data;
+	}
+
+	
+	public static String getStatus(String statusType,Integer status) {
+		String content = "";
+		
+		//订单状态
+		if(statusType.equals(Global.STATUS_0)) {
+			if(status == 0) {
+				content = Global.STATUS_CONTENT_0;
+			}else if(status == 1) {
+				content = Global.STATUS_CONTENT_1;
+			}else if(status == 2) {
+				content = Global.STATUS_CONTENT_2;
+			}else if(status == 3) {
+				content = Global.STATUS_CONTENT_3;
+			}else if(status == 4) {
+				content = Global.STATUS_CONTENT_4;
+			}else if(status == 5) {
+				content = Global.STATUS_CONTENT_5;
+			}else if(status == 6) {
+				content = Global.STATUS_CONTENT_6;
+			}else {
+				content = Global.STATUS_CONTENT_0;
+			}
+		}
+		
+		//退货状态
+		if(statusType.equals(Global.STATUS_2)) {
+			if(status == 0) {
+				content = Global.STATUS_CONTENT_00;
+			}else if(status == 1) {
+				content = Global.STATUS_CONTENT_11;
+			}else if(status == 2) {
+				content = Global.STATUS_CONTENT_22;
+			}else if(status == 3) {
+				content = Global.STATUS_CONTENT_33;
+			}else if(status == 4) {
+				content = Global.STATUS_CONTENT_44;
+			}else if(status == 5) {
+				content = Global.STATUS_CONTENT_55;
+			}else if(status == 6) {
+				content = Global.STATUS_CONTENT_66;
+			}else {
+				content = Global.STATUS_CONTENT_00;
+			}
+		}
+		
+		//支付状态
+		if(statusType.equals(Global.STATUS_1)) {
+			if(status == 0) {
+				content = Global.STATUS_CONTENT_000;
+			}else if(status == 1) {
+				content = Global.STATUS_CONTENT_111;
+			}else {
+				content = Global.STATUS_CONTENT_000;
+			}
+		}		
+		return content;
+	}
+	
+	
+	
+	
+	public static Date geLastWeekMonday(Date date) {
+
+		Calendar cal = Calendar.getInstance();
+
+		cal.setTime(getThisWeekMonday(date));
+
+		cal.add(Calendar.DATE, -7);
+
+		return cal.getTime();
+
+	}
+
+ 
+
+	public static Date getThisWeekMonday(Date date) {
+
+		Calendar cal = Calendar.getInstance();
+
+		cal.setTime(date);
+
+		// 获得当前日期是一个星期的第几天
+
+		int dayWeek = cal.get(Calendar.DAY_OF_WEEK);
+
+		if (1 == dayWeek) {
+
+			cal.add(Calendar.DAY_OF_MONTH, -1);
+
+		}
+
+		// 设置一个星期的第一天，按中国的习惯一个星期的第一天是星期一
+
+		cal.setFirstDayOfWeek(Calendar.MONDAY);
+
+		// 获得当前日期是一个星期的第几天
+
+		int day = cal.get(Calendar.DAY_OF_WEEK);
+
+		// 根据日历的规则，给当前日期减去星期几与一个星期第一天的差值
+
+		cal.add(Calendar.DATE, cal.getFirstDayOfWeek() - day);
+
+		return cal.getTime();
+
+	}
+
+ 
+
+	public static Date getNextWeekMonday(Date date) {
+
+		Calendar cal = Calendar.getInstance();
+
+		cal.setTime(getThisWeekMonday(date));
+
+		cal.add(Calendar.DATE, 7);
+
+		return cal.getTime();
+
+	}
+
+ 
+
 	public static void main(String[] args) {
 
-		System.out.println(sysDatemm());
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+		try {
+
+			Date date = sdf.parse("2018-12-13");
+
+			System.out.println("今天是" + sdf.format(date));
+
+			System.out.println("上周一" + sdf.format(geLastWeekMonday(date)));
+
+			System.out.println("本周一" + sdf.format(getThisWeekMonday(date)));
+
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+		}
+
 	}
 	
 }

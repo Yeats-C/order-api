@@ -13,16 +13,26 @@ public interface Global {
     String USER_ON = "1";
     
     /**
-     * 订单来源
+     * 修改状态
      */
-    Integer ORIGIN_TYPE_3 = 3;  //pos
-    Integer ORIGIN_TYPE_4 = 4;  //微商城
+    String MODIFY_TYPE_0 = "0";  //添加
+    String MODIFY_TYPE_1 = "1";  //修改
+    
     
     /**
-     * 销售渠道标识-生成订单号
+     * 订单来源
      */
-    Integer ORDERID_channel_3 = 3;  //总部向门店销售
-    Integer ORDERID_channel_4 = 4;  //门店像会员销售
+    Integer ORIGIN_TYPE_0 = 0;  //pos
+    Integer ORIGIN_TYPE_1 = 1;  //微商城
+    Integer ORIGIN_TYPE_2 = 2;  //全部 作为查询条件
+    
+    /**
+     * 生成订单号 - 销售渠道标识、订单来源(避免与老系统重复)
+     */
+    Integer ORDERID_CHANNEL_3 = 3;  //总部向门店销售
+    Integer ORDERID_CHANNEL_4 = 4;  //门店像会员销售
+    String  ORIGIN_COME_3 = "3";  //pos
+    String  ORIGIN_COME_4 = "4";  //微商城
     
     
     /**
@@ -30,6 +40,7 @@ public interface Global {
      */
     Integer RECEIVE_TYPE_0 = 0;  //自提
     Integer RECEIVE_TYPE_1 = 1;  //快递
+    Integer RECEIVE_TYPE_2 = 2;  //全部 作为查询条件
     
     
     /**
@@ -96,6 +107,12 @@ public interface Global {
     Integer YES = 0;  //是
     Integer NO = 1;  //否
     
+    /**
+     * 是否发生退货
+     */
+    Integer IS_RETURN_0 = 0;  //否
+    Integer IS_RETURN_1 = 1;  //是
+    
     
     /**
      * 优惠券状态
@@ -105,11 +122,11 @@ public interface Global {
     
     
     /**
-     * 状态
+     * 日志表-状态
      */
-    Integer STATUS_0 = 0;  //订单状态
-    Integer STATUS_1 = 1;  //支付状态
-    Integer STATUS_2 = 2;  //退货状态
+    String STATUS_0 = "订单状态";  //订单状态
+    String STATUS_1 = "支付状态";  //支付状态
+    String STATUS_2 = "退货状态";  //退货状态
     
     
     /**
@@ -122,24 +139,27 @@ public interface Global {
     String STATUS_CONTENT_4 = "已取消";
     String STATUS_CONTENT_5 = "已完成";
     String STATUS_CONTENT_6 = "已提货";
-    String STATUS_CONTENT_7 = "审批中";
-    String STATUS_CONTENT_8 = "处理中";
-    String STATUS_CONTENT_9 = "退款中";
-    String STATUS_CONTENT_10 = "已完成";
-    String STATUS_CONTENT_11 = "已付款";
-    String STATUS_CONTENT_12 = "未付款";
-    String STATUS_CONTENT_13 = "已退款";
+    String STATUS_CONTENT_00 = "审批中";
+    String STATUS_CONTENT_11 = "处理中";
+    String STATUS_CONTENT_22 = "退款中";
+    String STATUS_CONTENT_33 = "已完成";
+    String STATUS_CONTENT_44 = "已取消";
+    String STATUS_CONTENT_55 = "已关闭";
+    String STATUS_CONTENT_66 = "未发生退货";
+    String STATUS_CONTENT_000 = "待支付";
+    String STATUS_CONTENT_111 = "支付完成";
+    
 
 
     /**
      * 退货状态
      */
-//    Integer AFTER_SALE_STATUS_0 = 0;  //"审批中"
-//    Integer AFTER_SALE_STATUS_1 = 1;  //处理中
-//    Integer AFTER_SALE_STATUS_2 = 2;  //退款中
+    Integer AFTER_SALE_STATUS_0 = 0;  //"审批中"
+    Integer AFTER_SALE_STATUS_1 = 1;  //处理中
+    Integer AFTER_SALE_STATUS_2 = 2;  //退款中
     Integer AFTER_SALE_STATUS_3 = 3;  //已完成
-//    Integer AFTER_SALE_STATUS_4 = 4;  //已取消
-//    Integer AFTER_SALE_STATUS_5 = 5;  //已关闭
+    Integer AFTER_SALE_STATUS_4 = 4;  //已取消
+    Integer AFTER_SALE_STATUS_5 = 5;  //已关闭
     
     
     /**

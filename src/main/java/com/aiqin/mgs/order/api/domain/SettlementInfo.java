@@ -18,8 +18,12 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel("结算")
 public class SettlementInfo extends PagesRequest {
     
-
-    @ApiModelProperty(value = "订单id")
+	
+	@ApiModelProperty(value = "结算id")
+    @JsonProperty("settlement_id")
+    private String settlementId;
+	
+	@ApiModelProperty(value = "订单id")
     @JsonProperty("order_id")
     @NotBlank
     private String orderId;
@@ -105,6 +109,13 @@ public class SettlementInfo extends PagesRequest {
     @JsonProperty("update_by")
     private String updateBy;
     
+    public String getSettlementId() {
+		return settlementId;
+	}
+
+	public void setSettlementId(String settlementId) {
+		this.settlementId = settlementId;
+	}
     
 //    @ApiModelProperty(value = "支付方式")
 //    @JsonProperty("pay_type")

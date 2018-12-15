@@ -1,7 +1,7 @@
 /*****************************************************************
 
 * 模块名称：挂单解挂后台-接口层
-* 开发人员: 黄祉壹
+* 开发人员: hzy
 * 开发时间: 2018-11-05 
 
 * ****************************************************************************/
@@ -15,14 +15,17 @@ import com.aiqin.mgs.order.api.domain.FrozenInfo;
 @SuppressWarnings("all")
 public interface FrozenService {
 
-	
-    HttpResponse addFrozenInfo(List<FrozenInfo> frozenInfolist);  //挂单入库
+	// 挂单入库
+	HttpResponse addFrozenInfo(List<FrozenInfo> frozenInfolist);
 
-    HttpResponse selectDetailByFrozenId(String frozenId);   //查询挂单明细
+	// 查询挂单明细
+	HttpResponse selectDetailByFrozenId(String frozenId);
 
-	HttpResponse deleteByFrozenId(String frozenId);  //解卦
-	
-	HttpResponse selectSumByFrozenId(String createBy,String distributorId);  //查询挂单汇总
+	// 解卦
+	HttpResponse deleteByFrozenId(String frozenId);
 
-	HttpResponse selectDetail(String createBy,String distributorId);
+	// 查询挂单汇总
+	HttpResponse selectSumByFrozenId(String createBy, String distributorId);
+
+	HttpResponse selectDetail(String createBy, String distributorId);
 }

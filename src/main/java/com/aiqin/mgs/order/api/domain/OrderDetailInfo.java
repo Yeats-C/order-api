@@ -17,11 +17,10 @@ import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel("订单明细实体类")
 public class OrderDetailInfo extends PagesRequest {
-    
 	
-	@ApiModelProperty(value = "数据是总条数倒序")
-    @JsonProperty("rowno")
-    private Integer rowno;
+	@ApiModelProperty(value="排序")
+	@JsonProperty("rowno")
+	private String rowno ;
 	
 	@ApiModelProperty(value="订单id")
 	@JsonProperty("order_id")
@@ -194,7 +193,32 @@ public class OrderDetailInfo extends PagesRequest {
     @JsonProperty("receive_type")
     private String receiveType;
     
+    @ApiModelProperty(value="优惠券实体类")
+    @JsonProperty("coupon_info")
+    private OrderRelationCouponInfo couponInfo;
     
+    
+    
+	public String getRowno() {
+		return rowno;
+	}
+
+
+	public void setRowno(String rowno) {
+		this.rowno = rowno;
+	}
+
+
+	public OrderRelationCouponInfo getCouponInfo() {
+		return couponInfo;
+	}
+
+
+	public void setCouponInfo(OrderRelationCouponInfo couponInfo) {
+		this.couponInfo = couponInfo;
+	}
+
+
 	public String getReceiveType() {
 		return receiveType;
 	}
@@ -223,17 +247,6 @@ public class OrderDetailInfo extends PagesRequest {
 	public void setCycleenddate(Date cycleenddate) {
 		this.cycleenddate = cycleenddate;
 	}
-
-
-	public Integer getRowno() {
-		return rowno;
-	}
-
-
-	public void setRowno(Integer rowno) {
-		this.rowno = rowno;
-	}
-
 
 	public String getMemberId() {
 		return memberId;

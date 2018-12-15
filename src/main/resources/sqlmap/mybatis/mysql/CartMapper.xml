@@ -6,6 +6,9 @@
     <result column="member_id" jdbcType="VARCHAR" property="memberId"/>
     <result column="member_name" jdbcType="VARCHAR" property="memberName"/>
     <result column="member_phone" jdbcType="VARCHAR" property="memberPhone"/>
+    <result column="distributor_id" jdbcType="VARCHAR" property="distributorId"/>
+    <result column="distributor_code" jdbcType="VARCHAR" property="distributorCode"/>
+    <result column="distributor_name" jdbcType="VARCHAR" property="distributorName"/>
     <result column="product_id" jdbcType="VARCHAR" property="productId"/>
     <result column="product_name" jdbcType="VARCHAR" property="productName"/>
     <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
@@ -22,51 +25,40 @@
     <insert id="insertCart" parameterType="com.aiqin.mgs.order.api.domain.CartInfo">
         
         insert into cart 
-			(member_id,member_name,product_id,product_name,sku_code,amount,logo,create_time,update_time,create_by,update_by)
+			(member_id,member_name,distributor_id,distributor_code,distributor_name,product_id,product_name,sku_code,amount,logo,create_time,update_time,create_by,update_by)
 		values
-		    (#{memberId},#{memberName},#{productId},#{productName},#{skuCode},#{amount},#{logo},#{createTime},#{updateTime},#{createBy},#{updateBy})
+		    (#{memberId},#{memberName},#{distributorId},#{distributorCode},#{distributorName},#{productId},#{productName},#{skuCode},#{amount},#{logo},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy})
     
     </insert>
     
     
     <!-- 查询会员下的购物车 -->
-    <select id="selectCartByMemberId" parameterType="java.lang.String" resultMap="CartInfoMapping" resultType="java.util.List">
+    <select id="selectCartByMemberId" parameterType="com.aiqin.mgs.order.api.domain.CartInfo" resultMap="CartInfoMapping" resultType="java.util.List">
     
-         SELECT (@rowNO := @rowNo+1) AS rowno,a.* FROM
-         cart a,(SELECT @rowNO :=0) b
+         SELECT * FROM
+         cart a
 		 where 1=1
 		 and a.member_id = #{memberId}
-		 ORDER BY rowno DESC 
-         
+		 <if test=" distributorId != '' ">
+         and distributor_id = #{distributorId}
+         </if>
+         limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
     </select>
-    
-    
-    <!-- 查询该SKU的数量  不完善 -->
-    <select id="selectCartBySkuCode" resultType="java.lang.Integer" >
-    
-         select * from cart where 1=1
-         
-         <if test=" memberId != '' ">
-         and member_id = #{memberId}
-         </if>
-         
-         <if test=" productId != '' ">
-         and product_id = #{productId}
-         </if>
-         <if test=" skuCode != '' ">
-         and sku_code = #{skuCode}
-         </if>
-         
-    </select>
-    
-    
+
+
     <!-- 删除购物车购物清单 -->
 	<delete id="deleteCartInfoById" parameterType="com.aiqin.mgs.order.api.domain.CartInfo">
 		
 		delete from cart where 1=1
 		and member_id = #{memberId}
-		and sku_code = #{skuCode}
-		
+		<if test="skuCodes != null" >
+		     and sku_code in (
+		  <foreach collection="skuCodes" item="sku_code" separator=",">
+			 '${sku_code}'
+		  </foreach>
+			)
+          </if>
+         and distributor_id = #{distributorId}
      </delete>
      
     
@@ -90,12 +82,13 @@
     
 	<!-- 更新购物车 -->
     <update id="updateCartById" parameterType="com.aiqin.mgs.order.api.domain.CartInfo">
-    
           update cart set amount=#{amount} where 1=1
           and member_id = #{memberId}
+          <if test=" distributorId != '' ">
+          and distributor_id = #{distributorId}
+          </if>
           and product_id = #{productId}
           and sku_code = #{skuCode}
-          
     </update>
     
 </mapper>

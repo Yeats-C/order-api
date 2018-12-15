@@ -7,8 +7,6 @@
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.domain;
 
-import javax.validation.constraints.NotBlank;
-
 import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -16,6 +14,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
+import java.util.List;
 
 @ApiModel("购物车")
 public class CartInfo extends PagesRequest {
@@ -23,10 +22,6 @@ public class CartInfo extends PagesRequest {
 	@ApiModelProperty(value = "自增主键")
     @JsonProperty("id")
     private Long id;
-	
-	@ApiModelProperty(value = "数据是总条数倒序")
-    @JsonProperty("rowno")
-    private Integer rowno;
 
     @ApiModelProperty(value = "会员id")
     @JsonProperty("member_id")
@@ -42,17 +37,14 @@ public class CartInfo extends PagesRequest {
     
     @ApiModelProperty(value = "商品id")
     @JsonProperty("product_id")
-    @NotBlank
     private String productId="";
     
     @ApiModelProperty(value = "商品名称")
     @JsonProperty("product_name")
-    @NotBlank
     private String productName="";
     
     @ApiModelProperty(value = "sku code")
     @JsonProperty("sku_code")
-    @NotBlank
     private String skuCode="";
     
     @ApiModelProperty(value = "商品数量")
@@ -62,7 +54,6 @@ public class CartInfo extends PagesRequest {
     
     @ApiModelProperty(value = "logo图片")
     @JsonProperty("logo")
-    @NotBlank
     private String logo="";
     
     @ApiModelProperty(value = "创建时间",example = "2001-01-01 01:01:01")
@@ -75,7 +66,6 @@ public class CartInfo extends PagesRequest {
     
     @ApiModelProperty(value = "操作员")
     @JsonProperty("create_by")
-
     private String createBy="";
     
     @ApiModelProperty(value = "修改员")
@@ -111,6 +101,69 @@ public class CartInfo extends PagesRequest {
     private Integer acountTotalprice;
     
     
+    @ApiModelProperty(value = "分销机构id")
+    @JsonProperty("distributor_id")
+    private String distributorId="";
+	
+	@ApiModelProperty(value = "分销机构编码")
+    @JsonProperty("distributor_code")
+    private String distributorCode="";
+	
+	@ApiModelProperty(value = "分销机构名称")
+    @JsonProperty("distributor_name")
+    private String distributorName="";
+	
+	@ApiModelProperty(value = "0:添加1:修改")
+    @JsonProperty("modity_type")
+    private String modityType="";
+	
+	
+	@ApiModelProperty(value = "SKUCODE查询条件")
+    @JsonProperty("sku_codes")
+    private List<String> skuCodes;
+    
+    
+	
+	public List<String> getSkuCodes() {
+		return skuCodes;
+	}
+
+	public void setSkuCodes(List<String> skuCodes) {
+		this.skuCodes = skuCodes;
+	}
+
+	public String getModityType() {
+		return modityType;
+	}
+
+	public void setModityType(String modityType) {
+		this.modityType = modityType;
+	}
+
+	public String getDistributorId() {
+		return distributorId;
+	}
+
+	public void setDistributorId(String distributorId) {
+		this.distributorId = distributorId;
+	}
+
+	public String getDistributorCode() {
+		return distributorCode;
+	}
+
+	public void setDistributorCode(String distributorCode) {
+		this.distributorCode = distributorCode;
+	}
+
+	public String getDistributorName() {
+		return distributorName;
+	}
+
+	public void setDistributorName(String distributorName) {
+		this.distributorName = distributorName;
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -207,14 +260,6 @@ public class CartInfo extends PagesRequest {
 		this.updateBy = updateBy;
 	}
 
-	public Integer getRowno() {
-		return rowno;
-	}
-
-	public void setRowno(Integer rowno) {
-		this.rowno = rowno;
-	}
-
 	public String getMemberPhone() {
 		return memberPhone;
 	}
@@ -278,10 +323,6 @@ public class CartInfo extends PagesRequest {
 	public void setAcountTotalprice(Integer acountTotalprice) {
 		this.acountTotalprice = acountTotalprice;
 	}
-
-
-    
-    
 }
 
 

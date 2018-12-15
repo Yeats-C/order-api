@@ -62,9 +62,9 @@ public class FrozenController {
      * @param frozenId
      * @return
      */
-    @DeleteMapping("/deletedetailbyfrozenId/{frozenId}")
+    @DeleteMapping("/deletedetailbyfrozenId/{frozen_id}")
     @ApiOperation(value = "删除解卦信息")
-    public HttpResponse deleteDetailByFrozenId(@Valid @PathVariable(name = "frozen_id") String frozenId) {
+    public HttpResponse deleteDetailByFrozenId(@Valid @PathVariable(name = "frozen_id",required = true) String frozenId) {
         
     	
     	LOGGER.info("删除挂单数据......");
@@ -79,7 +79,7 @@ public class FrozenController {
      */
     @GetMapping("/selectdetailbyfrozenId/{frozen_id}")
     @ApiOperation(value = "将挂单数据解卦")
-    public HttpResponse selectDetailByFrozenId(@Valid @PathVariable(name = "frozen_id") String frozenId) {
+    public HttpResponse selectDetailByFrozenId(@Valid @PathVariable(name = "frozen_id",required = true) String frozenId) {
         
     	LOGGER.info("解卦......");
     	
@@ -117,7 +117,7 @@ public class FrozenController {
   */
  @GetMapping("/selectsumbyfrozenId")
  @ApiOperation(value = "查询挂单明细...")
- public HttpResponse selectSumByFrozenId(@Valid @RequestParam(name = "create_by", required = false) String createBy,@RequestParam(name = "distributor_id", required = false) String distributorId) {
+ public HttpResponse selectSumByFrozenId(@Valid @RequestParam(name = "create_by", required = true) String createBy,@RequestParam(name = "distributor_id", required = true) String distributorId) {
      
  	
  	LOGGER.info("查询挂单明细......");    	

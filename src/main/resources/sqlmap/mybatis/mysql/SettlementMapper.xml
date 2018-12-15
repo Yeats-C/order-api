@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aiqin.mgs.order.api.dao.SettlementDao">
 <resultMap id="SettlementMapping" type="com.aiqin.mgs.order.api.domain.SettlementInfo">
+<result column="settlement_id" jdbcType="VARCHAR" property="settlementId"/>
 <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
 <result column="product_sum" jdbcType="INTEGER" property="productSum"/>
 <result column="freight" jdbcType="INTEGER" property="freight"/>
@@ -25,23 +26,19 @@
     <!-- 插入结算信息表 -->
     <insert id="addSettlement" >
         insert into settlement_info 
-        (order_id,product_sum,freight,total_coupons_discount,point_percentage,activity_discount,order_sum,order_receivable,order_actual,order_change,order_abandon,points,point_discount,create_time,update_time,create_by,update_by)
+        (settlement_id,order_id,product_sum,freight,total_coupons_discount,point_percentage,activity_discount,order_sum,order_receivable,order_actual,order_change,order_abandon,points,point_discount,create_time,update_time,create_by,update_by)
 		values(
-		#{orderId},#{productSum},#{freight},#{totalCouponsDiscount},#{pointPercentage},#{activityDiscount},#{orderSum},#{orderReceivable},#{orderActual},#{orderChange},#{orderAbandon},#{points},#{pointDiscount},#{createTime},#{updateTime},#{createBy},#{updateBy})
+		#{settlementId},#{orderId},#{productSum},#{freight},#{totalCouponsDiscount},#{pointPercentage},#{activityDiscount},#{orderSum},#{orderReceivable},#{orderActual},#{orderChange},#{orderAbandon},#{points},#{pointDiscount},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy})
     </insert>
         
     <!-- 接口-结算数据查询 -->
-    <select id="jkselectsettlement" resultMap="SettlementMapping" resultType="java.util.List">
+    <select id="jkselectsettlement" resultMap="SettlementMapping" >
     
          SELECT * FROM settlement_info where 1=1
          
          <if test="orderId!=null and orderId!=''">
 		 and order_id =#{orderId}
-		 </if>
-         
+		 </if> 
     </select>
-    
-    
-    
 </mapper>
 

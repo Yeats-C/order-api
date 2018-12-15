@@ -46,11 +46,9 @@ import com.aiqin.mgs.order.api.domain.PaymentInfo;
 import com.aiqin.mgs.order.api.domain.PaymentReturnInfo;
 import com.aiqin.mgs.order.api.domain.SettlementInfo;
 import com.aiqin.mgs.order.api.domain.constant.Global;
+import com.aiqin.mgs.order.api.service.OrderLogService;
 import com.aiqin.mgs.order.api.service.SettlementService;
-import com.aiqin.mgs.order.api.util.HttpRequest;
 import com.aiqin.mgs.order.api.util.OrderPublic;
-import com.aiqin.mgs.order.api.util.Signature;
-import com.aiqin.mgs.order.api.util.Xiadan;
 import com.alibaba.fastjson.JSONObject;
 import com.thoughtworks.xstream.XStream;
 
@@ -67,41 +65,42 @@ public class SettlementServiceImpl implements SettlementService{
 	@Resource
     private OrderPayDao orderPayDao;
 	
-//	@Resource
-//    private CartDao cartDao;
-//	
-//	@Resource
-//    private OrderDao orderDao;
+	@Resource
+    private OrderLogService orderLogService;
 	
-	
+	//查询结算
 	@Override
 	public HttpResponse jkselectsettlement(@Valid OrderQuery orderQuery) {
 		
-		return HttpResponse.success(settlementDao.jkselectsettlement(orderQuery));
+		try {
+			return HttpResponse.success(settlementDao.jkselectsettlement(orderQuery));
+		
+		} catch (Exception e) {
+
+			LOGGER.info("查询结算信息失败......", e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}
 	}
 
 
     //添加新的结算数据
 	@Override
-	public HttpResponse addSettlement(@Valid SettlementInfo settlementInfo, @Valid String orderId) {
+	public void addSettlement(@Valid SettlementInfo settlementInfo, @Valid String orderId) throws Exception {
 
-		
 		if(settlementInfo !=null) {
 			   settlementInfo.setOrderId(orderId);
 			   settlementInfo.setSettlement_id(OrderPublic.getUUID());
-			   try {
-				settlementDao.addSettlement(settlementInfo);
-			} catch (Exception e) {
-				LOGGER.info("添加新的结算数据失败......", e);
-				return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
-			}
+				
+				   settlementDao.addSettlement(settlementInfo);
+		}else {
+			LOGGER.info("未获取到结算数据......");
 		}
-		return HttpResponse.success();
 	}
 
+	
     //添加新的支付数据
 	@Override
-	public HttpResponse addOrderPayList(@Valid List<OrderPayInfo> orderPayList, @Valid String orderId) {
+	public void addOrderPayList(@Valid List<OrderPayInfo> orderPayList, @Valid String orderId) throws Exception {
 		
 		if(orderPayList !=null && orderPayList.size()>0) {
 			for(OrderPayInfo info :orderPayList) {
@@ -110,15 +109,27 @@ public class SettlementServiceImpl implements SettlementService{
 				info.setOrderId(orderId);
 				info.setPayId(OrderPublic.getUUID());
 				
-				try {
-					orderPayDao.orderPayList(info);
-				} catch (Exception e) {
-					LOGGER.info("添加新的支付数据失败......", e);
-					return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
-				}
+			    orderPayDao.orderPayList(info);
 			}
+		}else {
+			LOGGER.info("未获取到支付数据......");
 		}
-		return HttpResponse.success();
+		
+	}
+
+	
+	//查询支付数据通过Order_id
+	@Override
+	public HttpResponse pay(@Valid String orderId) {
+		try {
+			OrderPayInfo info = new OrderPayInfo();
+			info.setOrderId(orderId);
+			List<OrderPayInfo> list = orderPayDao.pay(info);
+			return HttpResponse.success(list);
+		} catch (Exception e) {
+			LOGGER.info("查询支付数据通过Order_id报错......",e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}
 	}
 	
 

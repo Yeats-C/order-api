@@ -52,7 +52,7 @@ public class OrderQuery extends PagesRequest {
 	private String distributorName="";
 	
 	
-	@ApiModelProperty(value="来源类型")
+	@ApiModelProperty(value="来源类型3-pos，4-微商城, 5-全部")
 	@JsonProperty("origin_type")
 	private Integer originType;
 	
@@ -79,14 +79,23 @@ public class OrderQuery extends PagesRequest {
 	@JsonProperty("create_time")
 	private Date create_time;
 	
-	@ApiModelProperty(value="创建开始时间",example = "2001-01-01 01:01:01")
+	@ApiModelProperty(value="创建开始时间Date类型",example = "2001-01-01 01:01:01")
 	@JsonProperty("begin_time")
 	private Date beginTime;
 	
 	
-	@ApiModelProperty(value="创建结束时间",example = "2001-01-01 01:01:01")
+	@ApiModelProperty(value="创建结束时间Date类型",example = "2001-01-01 01:01:01")
 	@JsonProperty("end_time")
 	private Date endTime;
+	
+	@ApiModelProperty(value="开始时间String类型、格式YYYY-MM-DD")
+	@JsonProperty("begin_date")
+	private String beginDate;
+	
+	
+	@ApiModelProperty(value="结束时间String类型、格式YYYY-MM-DD")
+	@JsonProperty("end_date")
+	private String endDate;
 	
 	
 	@ApiModelProperty(value="订单状态")
@@ -95,24 +104,79 @@ public class OrderQuery extends PagesRequest {
 	
 	@ApiModelProperty(value="订单支付方式")
 	@JsonProperty("pay_type")
-	private Integer payType;
+	private String payType;
 	
 	
-	@ApiModelProperty("收货方式，0为到店自提，1为快递;扩展字段")
+	@ApiModelProperty("收货方式，0-到店自提，1-快递; 2:全部  扩展字段")
     @JsonProperty("receive_type")
-    private Integer receiveType;
+    private Integer receiveType;	
+	
+	@ApiModelProperty(value="8位提货码")
+	@JsonProperty("receive_code")
+	private String receiveCode;
+	
+	@ApiModelProperty(value="扩展查询条件")
+	@JsonProperty("any")
+	private Integer any;
+	
 
-	
-	
-	
-	
-	public Integer getPayType() {
+	public Integer getAny() {
+		return any;
+	}
+
+
+	public void setAny(Integer any) {
+		this.any = any;
+	}
+
+
+	public String getReceiveCode() {
+		return receiveCode;
+	}
+
+
+	public void setReceiveCode(String receiveCode) {
+		this.receiveCode = receiveCode;
+	}
+
+
+	public String getBeginDate() {
+		return beginDate;
+	}
+
+
+	public void setBeginDate(String beginDate) {
+		this.beginDate = beginDate;
+	}
+
+
+	public String getEndDate() {
+		return endDate;
+	}
+
+
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
+	}
+
+
+	public String getPayType() {
 		return payType;
 	}
 
 
-	public void setPayType(Integer payType) {
+	public void setPayType(String payType) {
 		this.payType = payType;
+	}
+
+
+	public Integer getReceiveType() {
+		return receiveType;
+	}
+
+
+	public void setReceiveType(Integer receiveType) {
+		this.receiveType = receiveType;
 	}
 
 

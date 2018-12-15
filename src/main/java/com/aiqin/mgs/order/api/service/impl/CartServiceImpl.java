@@ -1,7 +1,7 @@
 /*****************************************************************
 
 * 模块名称：购物车后台-实现层
-* 开发人员: 黄祉壹
+* 开发人员: hzy
 * 开发时间: 2018-11-05 
 
 * ****************************************************************************/
@@ -27,6 +27,7 @@ import com.aiqin.mgs.order.api.dao.CartDao;
 import com.aiqin.mgs.order.api.domain.CartInfo;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.service.CartService;
+import com.aiqin.mgs.order.api.util.OrderPublic;
 
 @SuppressWarnings("all")
 @Service
@@ -39,34 +40,48 @@ public class CartServiceImpl implements CartService{
     private CartDao cartDao;
 	
 	
+	//微商城-添加/修改购物车信息0:添加 1:修改....
 	@Override
 	@Transactional
 	public HttpResponse addCartInfo(CartInfo cartInfo) {
 		
-		try {
+	    try {
+		    if(cartInfo !=null) {
+		    	if(cartInfo.getModityType()!=null && cartInfo.getModityType().equals(Global.MODIFY_TYPE_1)) {
+		    		
+		    		//调用购物车修改逻辑
+		    		cartDao.updateCartById(cartInfo);
+					return HttpResponse.success();
+		    	}else {
+		    		
+		    		//调用添加购物车逻辑
+		    		LOGGER.info("判断SKU商品是否已存在购物车中", cartInfo);
+					String OldAount = cartDao.isYesCart(cartInfo);
+					
+					if(OldAount !=null && !OldAount.equals("")) {
+						
+						//已存在购物车的、新添加+已存在购物车的数量=真实数量
+						LOGGER.info("更新购物车", cartInfo);
+						int newAount = Integer.valueOf(OldAount)+cartInfo.getAmount();
+						cartInfo.setAmount(newAount);
+						
+						//更新购物车
+						cartDao.updateCartById(cartInfo);
+						
+					}else {
+						
+						//添加购物车
+						LOGGER.info("添加购物车", cartInfo);
+						cartDao.insertCart(cartInfo);
+					}
+		    	}
 			
-			LOGGER.info("判断SKU商品是否已存在购物车中", cartInfo);
-			String OldAount = cartDao.isYesCart(cartInfo);
+		    	return HttpResponse.success();
 			
-			if(OldAount !=null && !OldAount.equals("")) {
-				
-				//已存在购物车的、新添加+已存在购物车的数量=真实数量
-				LOGGER.info("更新购物车", cartInfo);
-				int newAount = Integer.valueOf(OldAount)+cartInfo.getAmount();
-				cartInfo.setAmount(newAount);
-				
-				//更新购物车
-				cartDao.updateCartById(cartInfo);
-				
-			}else {
-				
-				//添加购物车
-				LOGGER.info("添加购物车", cartInfo);
-				cartDao.insertCart(cartInfo);
+		    }else {
+				LOGGER.error("购物车信息为空!");
+				return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
 			}
-			
-			
-			return HttpResponse.success();
 			
 		}catch(Exception e) {
 			
@@ -77,6 +92,7 @@ public class CartServiceImpl implements CartService{
 	}
 
 	
+	//更新购物车清单
 	@Override
 	@Transactional
 	public HttpResponse updateCartByMemberId(CartInfo cartInfo) {
@@ -95,32 +111,27 @@ public class CartServiceImpl implements CartService{
 	
 		
 	}
-
 	
 	
+	//根据会员ID查询购物车
 	@Override
-	public HttpResponse selectCartByMemberId(String memberId,String agioType) {
+	public HttpResponse selectCartByMemberId(String memberId,String distributorId,Integer pageNo,Integer pageSize) {
 		
 		try {
 			
 			LOGGER.info("根据会员ID查询购物车数据", memberId);
-			if(memberId !=null && !memberId.equals("")) {
+			
+			CartInfo cartInfo = new CartInfo();
+			
+			cartInfo.setMemberId(memberId);
+			cartInfo.setPageNo(pageNo);
+			cartInfo.setPageSize(pageSize);
+			cartInfo.setDistributorId(distributorId);
 				
 				//购物车数据
-				List<CartInfo> cartInfoList= getCartInfoList(memberId,agioType);
+				List<CartInfo> cartInfoList= cartDao.selectCartByMemberId(cartInfo);
 				
-				//避免二次查询数据库 总数据量-分页
-				int total = 0;
-				if(cartInfoList !=null && cartInfoList.size()>0) {
-					CartInfo cartInfo = cartInfoList.get(0);
-					total = cartInfo.getRowno();  
-				}
-				return HttpResponse.success(new PageResData(total,cartInfoList));
-			
-			}else {
-				LOGGER.error("根据会员ID查询购物车数据失败", memberId);
-				return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
-			}
+				return HttpResponse.success(OrderPublic.getData(cartInfoList));
 			
 		} catch (Exception e) {
 			
@@ -129,89 +140,9 @@ public class CartServiceImpl implements CartService{
 		}
 		
 	}
+	
 
-
-	public List<CartInfo> getCartInfoList(String memberId, String agioType){
-
-		
-		//购物车数据
-		List<CartInfo> cartInfoList=null;
-		
-		try {
-			cartInfoList = cartDao.selectCartByMemberId(memberId);
-			
-		} catch (Exception e) {
-			
-			LOGGER.error("根据会员ID查询购物车数据失败", e);
-		}
-		CartInfo cartInfo = new CartInfo();
-		if(cartInfoList !=null && cartInfoList.size()>0) {
-			cartInfo = cartInfoList.get(0);
-		}
-		
-	    //调用商品接口 返回商品信息
-		//未完成cartInfoList = null; 
-			
-		if(agioType !=null && !agioType.equals("")) {
-			
-		}else {
-           agioType =Global.AGIOTYPE_1;
-		}	
-		//调用优惠券接口  返回 优惠券信息   
-	    //未完成cartInfoList = cartInfoList,agioType; 
-
-		
-		//得到总数量、总应付金额、总优惠、总实际金额
-        getAcount(cartInfo,cartInfoList);
-		
-		return cartInfoList;
-	}
-
-
-	private void getAcount(CartInfo cartInfo,List<CartInfo> cartInfoList) {
-		
-		int acountAmount = 0 ; 
-        int acountTotalprice =0 ;
-        int activityDiscount = 0 ;
-        int acountActualprice = 0;
-        
-        
-        
-        if(cartInfoList !=null && cartInfoList.size()>0) {
-        	for(CartInfo cart : cartInfoList) {
-    			
-    			//测试字段  未完成
-    			cart.setRetailPrice(50);
-    			
-    			
-    			//总数量
-    			acountAmount += cart.getAmount();
-    			
-    			//总应付金额
-    			int productTotalprice =cart.getRetailPrice()*cart.getAmount(); 
-    			acountTotalprice +=productTotalprice;
-    			
-    			//总优惠   限时折扣 （商品*折扣）*数量  （商品实际金额*数量） -优惠金额
-    			activityDiscount= 0;
-    			
-    			//总实际金额
-    			acountActualprice = acountTotalprice - activityDiscount;
-    			
-    		}
-        	
-        	cartInfo.setAcountAmount(acountAmount);
-    		cartInfo.setAcountActualprice(acountActualprice);
-    		cartInfo.setActivityDiscount(activityDiscount);
-    		cartInfo.setAcountActualprice(acountActualprice);
-    		
-    		cartInfoList.set(0, cartInfo);
-        }
-		
-		
-		
-	}
-
-
+	//清空购物车
 	@Override
 	@Transactional
 	public HttpResponse deleteCartInfo(String memberId) {
@@ -233,22 +164,20 @@ public class CartServiceImpl implements CartService{
 
 	}
 
-
+	
+	//删除购物车购物清单
 	@Override
 	@Transactional
-	public HttpResponse deleteCartInfoById(String memberId,String skuCode) {
+	public HttpResponse deleteCartInfoById(String memberId,List<String> skuCodes,String distributorId) {
 		
 		try {
 			LOGGER.error("删除购物清单",memberId);
-				if(memberId !=null && !memberId.equals("") && 
-						skuCode !=null && !skuCode.equals("")) {
+			
 					CartInfo cartInfo = new CartInfo();
 					cartInfo.setMemberId(memberId);
-					cartInfo.setSkuCode(skuCode);
+					cartInfo.setSkuCodes(skuCodes);
+					cartInfo.setDistributorId(distributorId);
 					cartDao.deleteCartInfoById(cartInfo);
-				}else {
-					return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
-				}
 			
 			return HttpResponse.success();
 		} catch (Exception e) {

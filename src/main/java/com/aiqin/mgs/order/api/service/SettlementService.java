@@ -1,7 +1,7 @@
 /*****************************************************************
 
 * 模块名称：结算后台-接口层
-* 开发人员: 黄祉壹
+* 开发人员: hzy
 * 开发时间: 2018-11-05 
 
 * ****************************************************************************/
@@ -23,17 +23,16 @@ import com.aiqin.mgs.order.api.domain.SettlementInfo;
 @SuppressWarnings("all")
 public interface SettlementService {
 
-	
-//	HttpResponse selectSettlement(List<CartInfo> cartInfo);    //結算頁面列表
-//
-//	HttpResponse settlement(SettlementInfo info,List<CartInfo> cartInfoList, OrderQuery conditionInfo); //去结账
-//
-//	HttpResponse ajaxsettlement(@Valid SettlementInfo settlementInfo);  //结算页面动态刷新元素
+	//结算数据查询
+	HttpResponse jkselectsettlement(@Valid OrderQuery orderQuery); 
 
-	HttpResponse jkselectsettlement(@Valid OrderQuery orderQuery); //结算数据查询
+	//添加新的结算数据
+	void addSettlement(@Valid SettlementInfo settlementInfo, @Valid String orderId)throws Exception; 
 
-	HttpResponse addSettlement(@Valid SettlementInfo settlementInfo, @Valid String orderId); //添加新的结算数据
+	//添加新的支付数据
+	void addOrderPayList(@Valid List<OrderPayInfo> orderPayList, @Valid String orderId)throws Exception; 
 
-	HttpResponse addOrderPayList(@Valid List<OrderPayInfo> orderPayList, @Valid String orderId);//添加新的支付数据
+	//查询支付数据通过
+	HttpResponse pay(@Valid String orderId);
 
 }

@@ -19,10 +19,6 @@ import io.swagger.annotations.ApiModelProperty;
 public class OrderAfterSaleDetailInfo extends PagesRequest {
     
 	
-	@ApiModelProperty(value = "数据是总条数倒序")
-    @JsonProperty("rowno")
-    private Integer rowno;
-	
 	@ApiModelProperty(value="退货明细id")
 	@JsonProperty("after_sale_detail_id")
 	private String afterSaleDetailId;
@@ -51,6 +47,10 @@ public class OrderAfterSaleDetailInfo extends PagesRequest {
 	@JsonProperty("spu_code")
 	private String spuCode;
 	
+	@ApiModelProperty(value="条形码")
+	@JsonProperty("bar_code")
+	private String barCode;
+	
 	@ApiModelProperty(value="单价")
 	@JsonProperty("price")
 	private Integer price;
@@ -73,7 +73,7 @@ public class OrderAfterSaleDetailInfo extends PagesRequest {
 	
 	@ApiModelProperty(value="商品类别id")
 	@JsonProperty("type_id")
-	private String typeId ;
+	private Integer typeId ;
 	
 	@ApiModelProperty(value="商品类别名称")
 	@JsonProperty("type_name")
@@ -94,15 +94,65 @@ public class OrderAfterSaleDetailInfo extends PagesRequest {
 	@ApiModelProperty(value="修改员")
 	@JsonProperty("update_by")
 	private String updateBy ;
+	
+	
+	@ApiModelProperty(value="非入库字段-零售价格")
+	@JsonProperty("retail_price")
+    private Integer retailPrice;
+	
+    @ApiModelProperty("非入库字段-实际")
+    @JsonProperty("actual_price")
+    private Integer actualPrice;
+    
+    
+    @ApiModelProperty("非入库字段-规格")
+    @JsonProperty("spec")
+    private String spec;
+    
+    @ApiModelProperty("非入库字段-单位")
+    @JsonProperty("unit")
+    private String unit;
 
 	
 	
-	public Integer getRowno() {
-		return rowno;
+	public Integer getRetailPrice() {
+		return retailPrice;
 	}
 
-	public void setRowno(Integer rowno) {
-		this.rowno = rowno;
+	public void setRetailPrice(Integer retailPrice) {
+		this.retailPrice = retailPrice;
+	}
+
+	public Integer getActualPrice() {
+		return actualPrice;
+	}
+
+	public void setActualPrice(Integer actualPrice) {
+		this.actualPrice = actualPrice;
+	}
+
+	public String getSpec() {
+		return spec;
+	}
+
+	public void setSpec(String spec) {
+		this.spec = spec;
+	}
+
+	public String getUnit() {
+		return unit;
+	}
+
+	public void setUnit(String unit) {
+		this.unit = unit;
+	}
+
+	public String getBarCode() {
+		return barCode;
+	}
+
+	public void setBarCode(String barCode) {
+		this.barCode = barCode;
 	}
 
 	public String getAfterSaleDetailId() {
@@ -201,14 +251,6 @@ public class OrderAfterSaleDetailInfo extends PagesRequest {
 		this.returnReasonContent = returnReasonContent;
 	}
 
-	public String getTypeId() {
-		return typeId;
-	}
-
-	public void setTypeId(String typeId) {
-		this.typeId = typeId;
-	}
-
 	public String getTypeName() {
 		return typeName;
 	}
@@ -247,6 +289,14 @@ public class OrderAfterSaleDetailInfo extends PagesRequest {
 
 	public void setUpdateBy(String updateBy) {
 		this.updateBy = updateBy;
+	}
+
+	public Integer getTypeId() {
+		return typeId;
+	}
+
+	public void setTypeId(Integer typeId) {
+		this.typeId = typeId;
 	}
 	
 	
