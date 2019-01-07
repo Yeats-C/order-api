@@ -58,5 +58,14 @@ public interface OrderDetailDao {
 
 	//订单中商品sku数量
 	Integer getSkuSum(OrderDetailQuery query)throws Exception;
+	
+	//删除订单明细数据
+	void deleteOrderDetailInfo(OrderInfo orderInfo) throws Exception;
+
+	//sku销量统计
+	Integer getSkuAmount(@Param("skuCode")String skuCode,@Param("nextDate")String nextDate) throws Exception;
+
+	//sku金额统计
+	Integer getSkuPrice(@Param("skuCode")String skuCode,@Param("nextDate")String nextDate) throws Exception;
 
 }

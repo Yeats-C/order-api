@@ -26,4 +26,7 @@ public interface OrderPayDao {
 	//更新支付状态
 	void usts(@Valid OrderPayInfo info)throws Exception;
 
+	//已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)
+	void deleteOrderPayList(@Param("orderId")String orderId)throws Exception;
+
 }

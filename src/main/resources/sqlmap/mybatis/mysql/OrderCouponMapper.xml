@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aiqin.mgs.order.api.dao.OrderCouponDao">
-    <resultMap id="OrderInfoDetailMapping" type="com.aiqin.mgs.order.api.domain.OrderDetailInfo">
+    <resultMap id="OrderRelationCouponMapping" type="com.aiqin.mgs.order.api.domain.OrderRelationCouponInfo">
 <result column="ordercoupon_id" jdbcType="VARCHAR" property="ordercouponId"/>
 <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
 <result column="order_detail_id" jdbcType="VARCHAR" property="orderDetailId"/>
@@ -23,6 +23,16 @@
         values
         (#{ordercouponId},#{orderId},#{orderDetailId},#{couponId},#{couponName},#{couponDiscount},#{couponStatus},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy})
     </insert>
-    
+
+    <!-- 根据明细ID查询订单优惠券关系表-->
+    <select id="soupon"  resultMap="OrderRelationCouponMapping" resultType="java.util.List">
+   
+         SELECT * FROM order_relation_coupon  WHERE 1=1
+
+         <if test="orderId!=null">
+		 and order_id =#{orderId}
+		 </if>
+		 ORDER BY create_time DESC
+    </select>    
 </mapper>
 

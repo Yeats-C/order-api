@@ -1,7 +1,7 @@
 /*****************************************************************
 
 * 模块名称：挂单解挂后台-入口
-* 开发人员: 黄祉壹
+* 开发人员: hzy
 * 开发时间: 2018-11-05 
 
 * ****************************************************************************/
@@ -35,7 +35,6 @@ public class FrozenController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FrozenController.class);
     
-    
     @Resource
     private FrozenService frozenService;
     
@@ -49,7 +48,6 @@ public class FrozenController {
     @PostMapping("")
     @ApiOperation(value = "将商品列表挂起")
     public HttpResponse addFrozenInfo(@Valid @RequestBody List<FrozenInfo> frozenInfolist) {
-    	
     	
         LOGGER.info("将商品列表挂起...");
         return frozenService.addFrozenInfo(frozenInfolist);
@@ -68,7 +66,7 @@ public class FrozenController {
         
     	
     	LOGGER.info("删除挂单数据......");
-        return frozenService.deleteByFrozenId(frozenId);//返回挂单数据
+        return frozenService.deleteByFrozenId(frozenId);
     }
     
     
@@ -91,38 +89,36 @@ public class FrozenController {
     	
     	frozenService.deleteByFrozenId(frozenId);
     	
-    	
         return rs;//返回挂单数据
+    }
+
+    
+    /**
+     * 查询挂单明细列表
+     * @param frozenId
+     * @return
+     */
+    @GetMapping("/selectsumbyfrozenId")
+    @ApiOperation(value = "查询挂单明细...")
+    public HttpResponse selectSumByFrozenId(@Valid @RequestParam(name = "create_by", required = true) String createBy,@RequestParam(name = "distributor_id", required = true) String distributorId) {
+     
+ 	   LOGGER.info("查询挂单明细......");    	
+       return frozenService.selectDetail(createBy,distributorId);
     }
     
     
-    
-//    /**
-//     * 查询解卦列表
-//     * @param frozenId
-//     * @return
-//     */
-//    @GetMapping("/selectsumbyfrozenId")
-//    @ApiOperation(value = "查询解卦列表")
-//    public HttpResponse selectSumByFrozenId(@Valid @RequestParam(name = "create_by", required = false) String createBy,@RequestParam(name = "distributor_id", required = false) String distributorId) {
-//        
-//    	
-//    	LOGGER.info("查询挂单汇总......");    	
-//        return frozenService.selectSumByFrozenId(createBy,distributorId);//返回挂单数据
-//    }
-  /**
-  * 查询挂单明细列表
-  * @param frozenId
-  * @return
-  */
- @GetMapping("/selectsumbyfrozenId")
- @ApiOperation(value = "查询挂单明细...")
- public HttpResponse selectSumByFrozenId(@Valid @RequestParam(name = "create_by", required = true) String createBy,@RequestParam(name = "distributor_id", required = true) String distributorId) {
+    /**
+     * 查询挂单数量
+     * @param frozenId
+     * @return
+     */
+    @GetMapping("/sfc")
+    @ApiOperation(value = "查询挂单数量...")
+    public HttpResponse sfc(@Valid @RequestParam(name = "create_by", required = true) String createBy,@RequestParam(name = "distributor_id", required = true) String distributorId) {
      
- 	
- 	LOGGER.info("查询挂单明细......");    	
-     return frozenService.selectDetail(createBy,distributorId);//返回挂单数据
- }
+ 	   LOGGER.info("查询挂单数量......");    	
+       return frozenService.selectSumByParam(createBy,distributorId);
+    }
     
     
 }

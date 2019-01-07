@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,28 +36,25 @@ public class FrozenServiceImpl implements FrozenService{
     private FrozenDao frozenDao;
 
 
+	//挂单入库
 	@Override
 	@Transactional
 	public HttpResponse addFrozenInfo(List<FrozenInfo> frozenInfolist) {
-		
-		
-		
+
 		try {
-			
 			//生成挂单ID
 			String frozenId =OrderPublic.sysDate()+OrderPublic.randomNumberF();
 			
+			if(frozenInfolist !=null && frozenInfolist.size()>0) {
 			for(FrozenInfo info : frozenInfolist ) {
 				LOGGER.info("挂单入库...", frozenInfolist);
 				
 				info.setFrozenId(frozenId);
 				frozenDao.insert(info);
 			}
-			
-			
+			}
 			return HttpResponse.success();
 		} catch (Exception e) {
-			
 			
 			LOGGER.info("挂单入库失败", e);
 			return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
@@ -65,11 +63,11 @@ public class FrozenServiceImpl implements FrozenService{
 	}
 
 
+	//查询挂单明细
 	@Override
 	public HttpResponse selectDetailByFrozenId(String frozenId) {
 		
 		try {
-			
 			LOGGER.info("查询挂单明细...", frozenId);
 			return HttpResponse.success(frozenDao.selectDetailByFrozenId(frozenId));
 		} catch (Exception e) {
@@ -81,12 +79,12 @@ public class FrozenServiceImpl implements FrozenService{
 	}
 
 
+	//解挂
 	@Override
 	@Transactional
 	public HttpResponse deleteByFrozenId(String frozenId) {
 		
 		try {
-			
 			LOGGER.info("解挂...", frozenId);
 			frozenDao.deleteByFrozenId(frozenId);
 			return HttpResponse.success();
@@ -98,14 +96,13 @@ public class FrozenServiceImpl implements FrozenService{
 	}
 
 
+	//查询挂单汇总
 	@Override
 	public HttpResponse selectSumByFrozenId(String createBy,String distributorId) {
 		
 		try {
-			
 			LOGGER.info("查询挂单汇总...", distributorId+"."+createBy);
 			return HttpResponse.success(frozenDao.selectSumByFrozenId(createBy,distributorId));
-			
 			
 		} catch (Exception e) {
 			
@@ -126,6 +123,24 @@ public class FrozenServiceImpl implements FrozenService{
 		} catch (Exception e) {
 			
 			LOGGER.info("查询挂单明细失败", e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}
+	}
+
+
+	//查询挂单数量
+	@Override
+	public HttpResponse selectSumByParam(@Valid String createBy, String distributorId) {
+		try {
+			Integer frozenSum = null;
+			frozenSum = frozenDao.selectSumByParam(createBy,distributorId);
+			if(frozenSum == null) {
+				frozenSum =0;
+			}
+			return HttpResponse.success(frozenSum);
+		} catch (Exception e) {
+			
+			LOGGER.info("查询挂单数量失败", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}

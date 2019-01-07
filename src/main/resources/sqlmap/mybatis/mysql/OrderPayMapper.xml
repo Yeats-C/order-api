@@ -31,6 +31,7 @@
          <if test="orderId!=null and orderId!='' ">
 		 and order_id = #{orderId}
 		 </if>
+		 ORDER BY create_time DESC
     </select>
     
     <!-- 更改订单状态/支付状态/修改员... -->
@@ -38,6 +39,11 @@
 		UPDATE order_pay SET pay_status=#{payStatus},update_by=#{updateBy},update_time=CURRENT_TIMESTAMP 
 		where order_id = #{orderId}
 	</update>
+	
+	<!-- 已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表) -->
+	<delete id="deleteOrderPayList" >
+		delete from order_pay WHERE order_id =#{orderId}
+     </delete>
     
 </mapper>
 

@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.aiqin.ground.util.http.HttpClient;
@@ -50,6 +51,7 @@ import com.aiqin.mgs.order.api.domain.request.OrderDetailRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderDetailByMemberResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderProductsResponse;
 import com.aiqin.mgs.order.api.domain.response.ProdisorResponse;
+import com.aiqin.mgs.order.api.domain.response.SkuSumResponse;
 import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.OrderDetailService;
 import com.aiqin.mgs.order.api.service.OrderLogService;
@@ -92,15 +94,26 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 	@Override
 	public HttpResponse selectorderDetail(@Valid OrderDetailQuery orderDetailQuery) {
 		
+		
+		try {
 		LOGGER.info("查询模糊查询订单明细列表开始......", orderDetailQuery);
 		List<OrderDetailInfo> orderDetailList =null;
-		try {
+		
 			orderDetailList = orderDetailDao.selectorderDetail(orderDetailQuery);
+			
+			//计算总数据量
+			Integer totalCount = 0;
+			Integer icount =null;
+			orderDetailQuery.setIcount(icount);
+			List<OrderDetailInfo> Icount_list= orderDetailDao.selectorderDetail(orderDetailQuery);
+			if(Icount_list !=null && Icount_list.size()>0) {
+				totalCount = Icount_list.size();
+			}
+			return HttpResponse.success(new PageResData(totalCount,orderDetailList));
 		} catch (Exception e) {
 			LOGGER.info("查询模糊查询订单明细列表失败......", e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
-			
-		return HttpResponse.success(OrderPublic.getData(orderDetailList));
 	}
 
 
@@ -216,22 +229,47 @@ public class OrderDetailServiceImpl implements OrderDetailService{
               List<Map> listmap =  (List<Map>) result.getData();
               
               //获取consumecycle并且计算周期结束时间
-              for(Map map : listmap) {
-            	  String product_id = String.valueOf(map.get("product_id"));
-            	  for(int i=0;i<list.size();i++) {
-            		  info = list.get(i);
-            		  if(info.getProductId().equals(product_id)) {
-            			  int cycle = Integer.valueOf(String.valueOf(map.get("cycle")));
-            			  info.setConsumecycle(cycle);
-            			  int amount = info.getAmount();
-            			  int countenddate = cycle*amount;
-            			  info.setCycleenddate(OrderPublic.afterThirdMonth(countenddate));           			  
-            			  list.set(i, info);
-            		  }
-            	  }
+              if(listmap !=null && listmap.size()>0) {
+            	  for(Map map : listmap) {
+                	  String product_id = String.valueOf(map.get("product_id"));
+                	  String cycleString = String.valueOf(map.get("cycle"));
+                	  
+                	  if(list !=null && list.size()>0) {
+                	  for(int i=0;i<list.size();i++) {
+                		  info = list.get(i);
+                		  if(info.getProductId() !=null && info.getProductId().equals(product_id)) {
+                			  
+                			  Integer cycle =0;
+                			  if(cycleString !=null && !cycleString.equals("")) {
+                				  cycle = Integer.valueOf(cycleString);
+                        	  }
+                			  info.setConsumecycle(cycle);
+                			  
+                			  Integer amount = 0;
+                			  if(info.getAmount() !=null ) {
+                				  amount = info.getAmount();
+                			  }
+                			  Integer countenddate = cycle*amount;
+                			  
+                			  info.setCycleenddate(OrderPublic.afterThirdMonth(countenddate));           			  
+                			  list.set(i, info);
+                		  }
+                	  }
+                	  }
+                  } 
               }
               
-              return HttpResponse.success(OrderPublic.getData(list)); 
+  			//计算总数据量
+  			Integer totalCount = 0;
+  			Integer icount =null;
+  			orderDetailQuery.setIcount(icount);
+  			List<OrderDetailByMemberResponse> Icount_list= orderDetailDao.byMemberOrder(orderDetailQuery);
+  			if(Icount_list !=null && Icount_list.size()>0) {
+  				totalCount = Icount_list.size();
+  			}
+              
+//              return HttpResponse.success(OrderPublic.getData(list)); 
+              return HttpResponse.success(new PageResData(totalCount,list));
               
           } catch (Exception e) {
               LOGGER.error("查询接口--会员管理-会员消费记录异常",e);
@@ -287,7 +325,6 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			orderQuery.setOrderId(orderId);
 			info.setSettlementInfo(settlementDao.jkselectsettlement(orderQuery));
 			
-			System.out.println(info);
 			return HttpResponse.success(info);
 			} catch (Exception e) {
 				LOGGER.error("查询BYorderid-返回订单结算信息",e);
@@ -297,6 +334,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 
 
 	@Override
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
 	public List<OrderDetailInfo> addDetailList(@Valid List<OrderDetailInfo> detailList, @Valid String orderId) throws Exception {
 		
 		List<OrderDetailInfo> list = new ArrayList();
@@ -338,18 +376,32 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 
 	//查询BY会员ID,订单状态
 	@Override
-	public HttpResponse selectorderdbumemberid(@Valid String memberId, @Valid Integer orderStatus) {
-		
-
+	public HttpResponse selectorderdbumemberid(@Valid String memberId, @Valid Integer orderStatus,@Valid String pageSize, @Valid String pageNo) {
 		
 		try {
 			OrderQuery orderQuery = new OrderQuery();
 			OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
 			orderQuery.setMemberId(memberId);
 			orderQuery.setOrderStatus(orderStatus);
-			
+			if(pageSize !=null && !pageSize.equals("")) {
+				orderQuery.setPageSize(Integer.valueOf(pageSize));
+			}
+			if(pageNo !=null && !pageNo.equals("")) {
+				orderQuery.setPageNo(Integer.valueOf(pageNo));
+			}
+
 			List<OrderInfo> order_list= orderDao.selectOrder(orderQuery);
 			
+			//计算总数据量
+			Integer totalCount = 0;
+			Integer icount =null;
+			orderQuery.setIcount(icount);
+			List<OrderInfo> Icount_list= orderDao.selectOrder(orderQuery);
+			if(Icount_list !=null && Icount_list.size()>0) {
+				totalCount = Icount_list.size();
+			}
+			
+			if(order_list !=null && order_list.size()>0) {
 			for(int i=0;i<order_list.size();i++){
 				OrderInfo OrderInfo = order_list.get(i);
 				orderDetailQuery.setOrderId(OrderInfo.getOrderId());
@@ -357,8 +409,10 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 				OrderInfo.setOrderdetailList(detail_list);
 				order_list.set(i, OrderInfo);
 			}
+			}
 
-			return HttpResponse.success(OrderPublic.getData(order_list));
+//			return HttpResponse.success(OrderPublic.getData(order_list));
+			return HttpResponse.success(new PageResData(totalCount,order_list));
 					
 		} catch (Exception e) {
 			LOGGER.error("查询BY会员ID,订单状态失败",e);
@@ -369,9 +423,8 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 
 	//修改订单明细退货数据
 	@Override
-	public HttpResponse returnStatus(@Valid String orderDetailId,Integer returnStatus,Integer returnAmount, String updateBy) {
+	public void returnStatus(@Valid String orderDetailId,Integer returnStatus,Integer returnAmount, String updateBy) throws Exception {
 		
-		try {
 		OrderDetailInfo info = new OrderDetailInfo();
 		
 		info.setOrderDetailId(orderDetailId);
@@ -386,11 +439,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 	    OrderLog rderLog = OrderPublic.addOrderLog(orderDetailId,Global.STATUS_2,"OrderDetailServiceImpl.returnStatus()",
 	  	OrderPublic.getStatus(Global.STATUS_2,returnStatus),updateBy);
 	    orderLogService.addOrderLog(rderLog);
-	       return HttpResponse.success();
-		} catch (Exception e) {
-			LOGGER.error("修改订单明细退货数据失败",e);
-			return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
-		}
+
 	}
 
 
@@ -435,6 +484,48 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		}
 		return acount;
 		
+	}
+
+	//sku销量统计
+	@Override
+	public HttpResponse skuSum(@Valid List<String> sukList) {
+		
+		try {
+		List<SkuSumResponse> list = new ArrayList();
+		if(sukList !=null) {
+			
+			//销量
+			Integer amount = null;
+			//金额
+			Integer price = null;
+			//交易日期
+			String transDate = "";
+			
+            for(String skuCode : sukList) {
+            	
+            	for(int i=-14;i<1;i++) {
+            		amount = orderDetailDao.getSkuAmount(skuCode,OrderPublic.NextDate(i));
+            		price = orderDetailDao.getSkuPrice(skuCode,OrderPublic.NextDate(i));
+            		transDate = OrderPublic.NextDate(i);
+               	    
+            		SkuSumResponse skuSumResponse = new SkuSumResponse();
+            		skuSumResponse.setAmount(amount==null?0:amount);
+               	    skuSumResponse.setPrice(price==null?0:price);
+               	    skuSumResponse.setSkuCode(skuCode);
+               	    skuSumResponse.setTransDate(transDate);
+               	    
+               	    list.add(skuSumResponse);
+            	}
+            	 
+            }
+		 }
+		
+		return HttpResponse.success(list);
+		
+		} catch (Exception e) {
+			LOGGER.error("订单中商品sku数量失败",e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}
 	}
 
 

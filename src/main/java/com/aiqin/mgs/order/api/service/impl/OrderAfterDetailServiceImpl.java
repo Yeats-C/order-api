@@ -36,7 +36,7 @@ import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.OrderAfterDetailService;
 import com.aiqin.mgs.order.api.service.OrderAfterService;
-import com.aiqin.mgs.order.api.service.OrderLogService;
+//import com.aiqin.mgs.order.api.service.OrderLogService;
 import com.aiqin.mgs.order.api.service.OrderService;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 
@@ -52,15 +52,13 @@ public class OrderAfterDetailServiceImpl implements OrderAfterDetailService{
 	@Resource
     private OrderAfterDetailDao orderAfterDetailDao;
 	
-	@Resource
-    private OrderLogService orderLogService;
+//	@Resource
+//    private OrderLogService orderLogService;
 
 	//添加新的订单售后明细数据
 	@Override
-	public HttpResponse addAfterOrderDetail(@Valid List<OrderAfterSaleDetailInfo> afterDetailList,String afterSaleId) {
+	public void addAfterOrderDetail(@Valid List<OrderAfterSaleDetailInfo> afterDetailList,String afterSaleId) throws Exception {
 		
-		try {
-			
 		 if(afterDetailList !=null && afterDetailList.size()>0) {
 			for(OrderAfterSaleDetailInfo info : afterDetailList) {
 				
@@ -72,21 +70,12 @@ public class OrderAfterDetailServiceImpl implements OrderAfterDetailService{
 				orderAfterDetailDao.addAfterOrderDetail(info);
 			}
 		 }
-		 
-		 return HttpResponse.success();
-		 
-		} catch (Exception e) {
-			LOGGER.info("添加新的订单售后明细数据報錯", e);
-			return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
-		}
-		
 	}
 
 
     //售后id、门店查询售后维权明细列表
 	@Override
 	public HttpResponse OrderAfteIList(@Valid OrderAfterSaleQuery orderAfterSaleQuery) {
-		
 		
 		//返回对象
 		OrderAfteIListInfo list = new OrderAfteIListInfo();
@@ -95,13 +84,15 @@ public class OrderAfterDetailServiceImpl implements OrderAfterDetailService{
 			
 			//组装订单售后主表
 			OrderAfterSaleInfo afterinfo = new OrderAfterSaleInfo();
-			afterinfo = orderAfterDao.selectOrderAfterById(orderAfterSaleQuery);
-			list.setOrderaftersaleinfo(afterinfo);
-			
-			//组装订单售后明细表
-			List<OrderAfterSaleDetailInfo> orderAfterSaleDetailInfolist = new ArrayList();
-			orderAfterSaleDetailInfolist = orderAfterDetailDao.selectOrderAfterDetail(orderAfterSaleQuery);
-			list.setOrderAfterDetailList(orderAfterSaleDetailInfolist);
+			if(orderAfterSaleQuery.getAfterSaleId()!=null && !orderAfterSaleQuery.getAfterSaleId().equals("")) {
+				afterinfo = orderAfterDao.selectOrderAfterById(orderAfterSaleQuery);
+				list.setOrderaftersaleinfo(afterinfo);
+				
+				//组装订单售后明细表
+				List<OrderAfterSaleDetailInfo> orderAfterSaleDetailInfolist = new ArrayList();
+				orderAfterSaleDetailInfolist = orderAfterDetailDao.selectOrderAfterDetail(orderAfterSaleQuery);
+				list.setOrderAfterDetailList(orderAfterSaleDetailInfolist);
+			}
 			
 			return HttpResponse.success(list);
 			
@@ -111,7 +102,4 @@ public class OrderAfterDetailServiceImpl implements OrderAfterDetailService{
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}
-
-	
-
 }

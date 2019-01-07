@@ -28,7 +28,7 @@ import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 public interface OrderLogService {
 
     //添加日志
-	HttpResponse addOrderLog(@Valid OrderLog logInfo);
+	public void addOrderLog(@Valid OrderLog logInfo) throws Exception;
 
 	//查询日志
 	HttpResponse orog(@Valid String orderId);

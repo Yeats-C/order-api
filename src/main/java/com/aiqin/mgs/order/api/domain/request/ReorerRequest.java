@@ -12,6 +12,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Api("参数-可退货的订单查询")
 public class ReorerRequest extends PagesRequest{
 	
+	
+	@ApiModelProperty(value="不传参不返回 0:全部")
+	@JsonProperty("icount")
+	private Integer icount = 0;
+	
+
+	public Integer getIcount() {
+		return icount;
+	}
+
+
+	public void setIcount(Integer icount) {
+		this.icount = icount;
+	}
+	
 	@ApiModelProperty(value = "订单id")
     @JsonProperty("order_id")
     private String orderId;

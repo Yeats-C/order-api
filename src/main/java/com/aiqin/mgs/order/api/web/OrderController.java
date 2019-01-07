@@ -52,6 +52,49 @@ public class OrderController {
     @Resource
     private OrderService orderService;
     
+    /**
+     * 添加订单主数据+添加订单明细数据+返回订单编号
+     * @param 
+     * @return
+     */
+    @PostMapping("/addordta")
+    @ApiOperation(value = "添加订单主数据+添加订单明细数据+返回订单编号")
+    public HttpResponse addOrdta(@Valid @RequestBody OrderAndSoOnRequest orderAndSoOnRequest){
+        LOGGER.info("添加新的订单主数据以及其他订单关联数据......");
+		
+        return orderService.addOrdta(orderAndSoOnRequest);
+    }
+    
+    
+    /**
+     * 添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据
+     * @param 
+     * @return
+     */
+    @PostMapping("/addpamo")
+    @ApiOperation(value = "添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据")
+    public HttpResponse addPamo(@Valid @RequestBody OrderAndSoOnRequest orderAndSoOnRequest){
+        LOGGER.info("添加新的订单主数据以及其他订单关联数据......");
+		
+        return orderService.addPamo(orderAndSoOnRequest);
+    }
+    
+    
+    /**
+     * 删除订单主数据+删除订单明细数据
+     * @param 
+     * @return
+     */
+    @GetMapping("/deordta")
+    @ApiOperation(value = "删除订单主数据+删除订单明细数据")
+    public HttpResponse deordta(@Valid @RequestParam(name = "order_id", required = true) String orderId){
+        LOGGER.info("删除订单主数据+删除订单明细数据......");
+		
+        return orderService.deordta(orderId);
+    }
+    
+    
+    
     
     /**
      * 模糊查询订单列表
@@ -65,6 +108,21 @@ public class OrderController {
     	
     	LOGGER.info("查询订单列表...");    	
         return orderService.selectOrder(orderQuery);
+    }
+    
+    
+    /**
+     * 导出订单列表
+     * @param 
+     * @return
+     */
+    @PostMapping("/exorder")
+    @ApiOperation(value = "导出订单列表....")
+    public HttpResponse exorder(@Valid @RequestBody OrderQuery orderQuery) {
+        
+    	
+    	LOGGER.info("导出订单列表...");    	
+        return orderService.exorder(orderQuery);
     }
     
     
@@ -87,25 +145,30 @@ public class OrderController {
      * 添加新的订单主数据以及其他订单关联数据
      * @param orderAndSoOnRequest
      * @return
+     * @throws Exception 
      */
     @PostMapping("")
     @ApiOperation(value = "添加新的订单主数据以及其他订单关联数据")
-    public HttpResponse addOrderList(@Valid @RequestBody OrderAndSoOnRequest orderAndSoOnRequest) {
+    public HttpResponse addOrderList(@Valid @RequestBody OrderAndSoOnRequest orderAndSoOnRequest){
         LOGGER.info("添加新的订单主数据以及其他订单关联数据......");
+		
         return orderService.addOrderList(orderAndSoOnRequest);
     }
     
-//    /**
-//     * 已存在订单更新支付方式、重新生成支付数据(更改订单表、删除新增支付表)
-//     * @param orderAndSoOnRequest
-//     * @return
-//     */
-//    @PostMapping("/repast")
-//    @ApiOperation(value = "已存在订单更新支付方式、重新生成支付数据")
-//    public HttpResponse repast(@Valid @RequestBody OrderAndSoOnRequest orderAndSoOnRequest) {
-//        LOGGER.info("已存在订单更新支付方式、重新生成支付数据.....");
-//        return orderService.addOrderList(orderAndSoOnRequest);
-//    }
+    /**
+     * 已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)
+     * @param orderAndSoOnRequest
+     * @return
+     */
+    @PostMapping("/repast")
+    @ApiOperation(value = "已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)")
+    public HttpResponse repast(@Valid @RequestParam(name = "order_id", required = true) String orderId,
+    		@Valid @RequestParam(name = "pay_type", required = true) String payType,
+    		@Valid @RequestBody List<OrderPayInfo> orderPayList
+    		) {
+        LOGGER.info("已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表).....");
+        return orderService.repast(orderId,payType,orderPayList);
+    }
     
     
 //    @PostMapping("")
@@ -117,18 +180,18 @@ public class OrderController {
 //    }
     
 
-    /**
-     * 添加新的订单日志数据
-     * @param logInfo
-     * @param orderId
-     * @return
-     */
-    @PostMapping("/addorderlog")
-    @ApiOperation(value = "添加新的订单日志数据")
-    public HttpResponse addOrderLog(@Valid @RequestBody OrderLog logInfo) {
-        LOGGER.info("添加新的订单日志数据......");
-        return orderService.addOrderLog(logInfo);
-    }
+//    /**
+//     * 添加新的订单日志数据
+//     * @param logInfo
+//     * @param orderId
+//     * @return
+//     */
+//    @PostMapping("/addorderlog")
+//    @ApiOperation(value = "添加新的订单日志数据")
+//    public HttpResponse addOrderLog(@Valid @RequestBody OrderLog logInfo) {
+//        LOGGER.info("添加新的订单日志数据......");
+//        return orderService.addOrderLog(logInfo);
+//    }
     
     /**
      * 查询订单日志数据
@@ -275,7 +338,7 @@ public class OrderController {
     		@RequestParam(name = "order_status", required = true) Integer orderStatus,
     		@RequestParam(name = "pay_status", required = true) Integer payStatus,
     		@RequestParam(name = "pay_type", required = false) String payType,
-    		@RequestParam(name = "update_by", required = true) String updateBy
+    		@RequestParam(name = "update_by", required = false) String updateBy
     		) {
         
     	
@@ -411,5 +474,33 @@ public class OrderController {
     	LOGGER.info("接口-可退货的订单查询....");    	
         return orderService.reorer(reorerRequest);
     }   
+    
+    
+    /**
+     * 
+     * 微商城-销售总览
+     * @param 
+     * @return
+     */
+    @GetMapping("/wssev")
+    @ApiOperation(value = "微商城-销售总览....")
+    public HttpResponse wssev(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId) {
 
+    	LOGGER.info("微商城-销售总览....");    	
+        return orderService.wssev(distributorId);
+    }
+    
+    /**
+     * 
+     * 微商城-事务总览
+     * @param 
+     * @return
+     */
+    @GetMapping("/wsswv")
+    @ApiOperation(value = "微商城-事务总览....")
+    public HttpResponse wsswv(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId) {
+
+    	LOGGER.info("微商城-事务总览....");    	
+        return orderService.wsswv(distributorId);
+    }
 }

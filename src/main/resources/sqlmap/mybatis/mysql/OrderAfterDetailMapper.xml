@@ -15,7 +15,7 @@
 <result column="return_price" jdbcType="INTEGER" property="returnPrice"/>
 <result column="return_reason_type" jdbcType="TINYINT" property="returnReasonType"/>
 <result column="return_reason_content" jdbcType="VARCHAR" property="returnReasonContent"/>
-<result column="type_id" jdbcType="TINYINT" property="typeId"/>
+<result column="type_id" jdbcType="BIGINT" property="typeId"/>
 <result column="type_name" jdbcType="VARCHAR" property="typeName"/>
 <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
 <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
@@ -46,19 +46,23 @@
 		 <if test="afterSaleId!=null and afterSaleId!=''">
 		 and after_sale_id = #{afterSaleId}
 		 </if>
+		 ORDER BY create_time DESC
+         <if test="icount!=null ">
          limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+         </if>
     </select>
     
     
     <!-- 售后订单售后明细查询 (不带分页)-->
     <select id="selectDetailbyId"  parameterType="com.aiqin.mgs.order.api.domain.OrderAfterSaleQuery" resultMap="OrderAfterDetailMapping" resultType="java.util.List">
              
-         SELECT a.*,b.retail_price,b.actual_price,b.spec,b.unit FROM order_after_sale_detail a
+         SELECT a.*,b.retail_price,b.actual_price,b.spec,b.unit,b.logo FROM order_after_sale_detail a
          LEFT JOIN order_detail b ON a.order_detail_id = b.order_detail_id
 		 WHERE 1=1
 		 <if test="afterSaleId!=null and afterSaleId!=''">
 		 and a.after_sale_id = #{afterSaleId}
 		 </if>
+		 ORDER BY a.create_time DESC
     </select>    
     
 </mapper>

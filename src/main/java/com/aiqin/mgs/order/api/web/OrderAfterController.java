@@ -44,7 +44,7 @@ public class OrderAfterController {
     private OrderAfterService orderAfterService;    
     
     /**
-     * 模糊查询售后维权列表 /条件查询退货信息
+     * 模糊查询售后维权列表 /条件查询退货信息-不带其他信息
      * @param 
      * @return
      */
@@ -72,19 +72,35 @@ public class OrderAfterController {
   
   
   /**
-   * 查询BYorderid-返回订单订单数据、退货数据、退货明细数据
+   * 查询BYorderid-返回订单订单主数据、退货数据、退货明细数据、订单明细数据、优惠券数据、
    * @param 
    * @return
    */
   @GetMapping("/detail")
-  @ApiOperation(value = "查询BYorderid-返回订单订单数据、退货数据、退货明细数据...")
+  @ApiOperation(value = "查询BYorderid-返回订单订单主数据、退货数据、退货明细数据、订单明细数据、优惠券数据...")
   public HttpResponse selectDetail(@Valid @RequestParam(name = "after_sale_id", required = true) String afterSaleId) {
       
   	
-  	  LOGGER.info("返回订单订单数据、退货数据、退货明细数据......");    	
+  	  LOGGER.info("查询BYorderid-返回订单订单主数据、退货数据、退货明细数据、订单明细数据、优惠券数据......");    	
       return orderAfterService.selectDetail(afterSaleId);
       
   }
+  
+  /**
+   * 模糊查询查询退货信息+退货明细+订单明细信息
+   * @param 
+   * @return
+   */
+  @PostMapping("/aftlst")
+  @ApiOperation(value = "模糊查询查询退货信息+退货明细+订单明细信息...")
+  public HttpResponse aftlst(@Valid @RequestBody OrderAfterSaleQuery orderAfterSaleQuery) {
+      
+  	
+  	LOGGER.info("模糊查询查询退货信息+退货明细+订单明细信息...");    	
+      return orderAfterService.aftlst(orderAfterSaleQuery);
+  }
+  
+  
   
   
 //  /**

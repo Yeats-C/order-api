@@ -25,8 +25,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.aiqin.ground.util.exception.GroundRuntimeException;
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
@@ -58,6 +60,8 @@ import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
+import com.aiqin.mgs.order.api.domain.response.WscSaleResponse;
+import com.aiqin.mgs.order.api.domain.response.WscWorkViewResponse;
 import com.aiqin.mgs.order.api.domain.response.LastBuyResponse;
 import com.aiqin.mgs.order.api.domain.response.MevBuyResponse;
 import com.aiqin.mgs.order.api.domain.response.OradskuResponse;
@@ -97,8 +101,13 @@ public class OrderServiceImpl implements OrderService{
 	@Resource
     private OrderLogService orderLogService;
 	
-
+	@Resource
+    private CartService cartService;
 	
+	@Resource
+    private OrderDetailDao orderDetailDao;
+	
+
 	//模糊查询订单列表
 	@Override
 	public HttpResponse selectOrder(OrderQuery orderQuery) {
@@ -108,8 +117,31 @@ public class OrderServiceImpl implements OrderService{
 			try {
 				
 				List<OrderInfo> OrderInfolist = orderDao.selectOrder(OrderPublic.getOrderQuery(orderQuery));
+				if(OrderInfolist !=null && OrderInfolist.size()>0) {
+					for(int i=0;i<OrderInfolist.size();i++) {
+						OrderInfo info = new OrderInfo();
+						info = OrderInfolist.get(i);
+						
+						//订单明细数据
+						OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
+						orderDetailQuery.setOrderId(info.getOrderId());
+					    List<OrderDetailInfo> detailList = orderDetailDao.selectDetailById(orderDetailQuery);
+					    info.setOrderdetailList(detailList);
+					    OrderInfolist.set(i,info);
+					}
+				}
 				
-				return HttpResponse.success(OrderPublic.getData(OrderInfolist));
+				//计算总数据量
+				Integer totalCount = 0;
+				Integer icount =null;
+				orderQuery.setIcount(icount);
+				List<OrderInfo> Icount_list= orderDao.selectOrder(OrderPublic.getOrderQuery(orderQuery));
+				if(Icount_list !=null && Icount_list.size()>0) {
+					totalCount = Icount_list.size();
+				}
+				
+//				return HttpResponse.success(OrderPublic.getData(OrderInfolist));
+				return HttpResponse.success(new PageResData(totalCount,OrderInfolist));
 				
 			} catch (Exception e) {
 				LOGGER.info("模糊查询订单列表報錯", e);
@@ -121,7 +153,6 @@ public class OrderServiceImpl implements OrderService{
 
 	//添加新的订单主数据
 	@Override
-	@Transactional
 	public String addOrderInfo(@Valid OrderInfo orderInfo) throws Exception {
 		
 		String orderId = "";
@@ -134,16 +165,27 @@ public class OrderServiceImpl implements OrderService{
 		
 		//生成订单号
 		String logo = "";
-		if(orderInfo.getOriginType() ==Global.ORIGIN_TYPE_0) {
+		if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_0) {
 			logo = Global.ORIGIN_COME_3;
-		}else {
+		}
+		if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_1) {
 			logo = Global.ORIGIN_COME_4;
 		}
-		
-		orderCode = OrderPublic.currentDate()+logo+String.valueOf(Global.ORDERID_CHANNEL_4)+OrderPublic.randomNumberF();
+		if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_3) {
+			logo = Global.ORIGIN_COME_5;
+		}
+		//公司标识
+		String companyCode = "";
+		if(orderInfo.getCompanyCode() !=null && orderInfo.getCompanyCode().equals(Global.COMPANY_01)) {
+			companyCode = Global.COMPANY_01;
+		}else {
+			companyCode = Global.COMPANY_01;
+		}
+		//yyMMddHHmmss+订单来源+销售渠道标识+公司标识+4位数的随机数
+		orderCode = OrderPublic.currentDate()+logo+String.valueOf(Global.ORDERID_CHANNEL_4)+companyCode+OrderPublic.randomNumberF();
 		orderInfo.setOrderCode(orderCode);
 		
-//		//初始化提货码
+		//初始化提货码
 		if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_1) {
 			if(orderInfo.getReceiveType().equals(Global.RECEIVE_TYPE_0)) {
 				receiveCode =OrderPublic.randomNumberE();
@@ -151,14 +193,10 @@ public class OrderServiceImpl implements OrderService{
 			}
 		}
 		
-		
 		//订单主数据
 		orderDao.addOrderInfo(orderInfo);
 		
 		return orderId;
-		
-
-		
 	}
 
 
@@ -181,15 +219,16 @@ public class OrderServiceImpl implements OrderService{
 
 	//添加新的订单优惠券关系表数据
 	@Override
-	@Transactional
 	public void addOrderCoupon(@Valid List<OrderRelationCouponInfo> orderCouponList, @Valid String orderId) throws Exception {
             
-			for(OrderRelationCouponInfo info : orderCouponList) {
-        	    info.setOrderId(orderId);
-        	    info.setOrdercouponId(OrderPublic.getUUID());
-                //保存优惠券信息
-				orderCouponDao.addOrderCoupon(info);
-            }
+		   if(orderCouponList !=null && orderCouponList.size()>0) {
+			   for(OrderRelationCouponInfo info : orderCouponList) {
+	        	    info.setOrderId(orderId);
+	        	    info.setOrdercouponId(OrderPublic.getUUID());
+	                //保存优惠券信息
+					orderCouponDao.addOrderCoupon(info);
+	            } 
+		   }
 	}
 
 	//接口-分销机构维度-总销售额 返回INT
@@ -222,8 +261,10 @@ public class OrderServiceImpl implements OrderService{
 		
 		OrderOverviewMonthResponse info = new OrderOverviewMonthResponse();
 		
-		if(Integer.valueOf(originType) == Global.ORIGIN_TYPE_2) {
-			originType =null;
+		if(originType !=null && !originType.equals("")) {
+			if(Integer.valueOf(originType) == Global.ORIGIN_TYPE_2) {
+				originType =null;
+			}
 		}
 		
 		//总销售额：包含退货、不包含取消、未付款的订单
@@ -245,7 +286,7 @@ public class OrderServiceImpl implements OrderService{
 		Integer monthreal_amt=0;
 		
 		//昨日实收：不包含退货、未付款、取消的订单
-        Integer yesdayreal_amt=0;
+        Integer yesdayreal_amt;
 
 		
 		try {
@@ -384,10 +425,10 @@ public class OrderServiceImpl implements OrderService{
 	}
 
 
-	//添加新的订单主数据以及其他订单关联数据
+	//添加新的订单主数据以及其他订单关联数据 事务未生效 暂不处理
 	@Override
 	@Transactional
-	public HttpResponse addOrderList(@Valid OrderAndSoOnRequest orderAndSoOnRequest) {
+	public HttpResponse addOrderList(@Valid OrderAndSoOnRequest orderAndSoOnRequest){
 		
 	 try {
 		OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
@@ -399,7 +440,8 @@ public class OrderServiceImpl implements OrderService{
 		//新增订单主数据
 		String orderId = "";
 		if(orderInfo !=null ) {
-			orderId = addOrderInfo(orderInfo);
+			
+				orderId = addOrderInfo(orderInfo);
 			if(orderId.equals("")) {
 				return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
 			}
@@ -442,12 +484,42 @@ public class OrderServiceImpl implements OrderService{
         	}
         	addOrderCoupon(orderCouponList,orderId);
 		}
-
+        
+        //删除购物车数据
+        String memberId = "";
+        List<String> skuCodes = new ArrayList();
+        String distributorId = "";
+        if(orderInfo !=null ) {
+        	
+        	//微商城删除购物车
+        	if(orderInfo.getOriginType() !=null && orderInfo.getOriginType().equals(Global.ORIGIN_TYPE_1)) {
+        		if(orderInfo.getMemberId()!=null ) {
+        			memberId = orderInfo.getMemberId();
+            	}
+        		if(orderInfo.getDistributorId() !=null ) {
+        			distributorId = orderInfo.getDistributorId();
+        		}
+        		if(detailList !=null && detailList.size()>0) {
+        			for(OrderDetailInfo info :detailList) {
+            			if(info !=null && info.getSkuCode()!=null) {
+            				skuCodes.add(info.getSkuCode());
+            			}
+            		}
+        		}
+        		
+        		//删除
+        		System.out.println("开始删除购物车======");
+        		cartService.deleteCartInfoById(memberId, skuCodes, distributorId);
+        	
+        	}
+        	
+        }
+        
         String order_id = orderId;
 		return HttpResponse.success(order_id);
 	 }catch (Exception e){
 		 LOGGER.info("添加新的订单主数据以及其他订单关联数据報錯", e);
-		 return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+		 throw new RuntimeException("添加新的订单主数据以及其他订单关联数据報錯");
 		}
 	}
 
@@ -532,10 +604,8 @@ public class OrderServiceImpl implements OrderService{
 
     //仅更改退货状态-订单主表
 	@Override
-	@Transactional
-	public HttpResponse retustus(@Valid String orderId, Integer returnStatus, String updateBy) {
-		
-		try {
+	public void retustus(@Valid String orderId, Integer returnStatus, String updateBy) throws Exception {
+
 			OrderInfo orderInfo = new OrderInfo();
 			orderInfo.setOrderId(orderId);
 			orderInfo.setReturnStatus(returnStatus);
@@ -548,12 +618,6 @@ public class OrderServiceImpl implements OrderService{
 			OrderLog rderLog = OrderPublic.addOrderLog(orderId,Global.STATUS_2,"OrderServiceImpl.returnStatus()",
 			OrderPublic.getStatus(Global.STATUS_2,returnStatus),updateBy);
 			orderLogService.addOrderLog(rderLog);
-			
-			return HttpResponse.success();
-		} catch (Exception e) {
-			LOGGER.info("更改退货状态/修改员報錯", e);
-			return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
-		}
 	}
 
 
@@ -606,28 +670,30 @@ public class OrderServiceImpl implements OrderService{
 		
 		//获取退款金额、退款订单数、销售额、销售订单数
 		OrderbyReceiptSumResponse receiptSum= orderDao.byCashierSum(orderQuery);
-		
-		for(int i=0;i<list.size();i++) {
-			OrderbyReceiptSumResponse info = new OrderbyReceiptSumResponse();
-			info = list.get(i);
-			
-			receiptSumInfo.setCashierId(info.getCashierId());
-			receiptSumInfo.setCashierName(info.getCashierId());
-			if(info.getPayType().equals(Global.P_TYPE_3)) {
-				receiptSumInfo.setCash(info.getPayPrice());
-			}else if(info.getPayType().equals(Global.P_TYPE_4)) {
-				receiptSumInfo.setWeChat(info.getPayPrice());
-			}
-			else if(info.getPayType().equals(Global.P_TYPE_5)) {
-				receiptSumInfo.setAliPay(info.getPayPrice());
-			}
-			else if(info.getPayType().equals(Global.P_TYPE_6)) {
-				receiptSumInfo.setBankCard(info.getPayPrice());
-			}
-			else {
-				receiptSumInfo.setCash(info.getPayPrice());
+		if(list !=null && list.size()>0) {
+			for(int i=0;i<list.size();i++) {
+				OrderbyReceiptSumResponse info = new OrderbyReceiptSumResponse();
+				info = list.get(i);
+				
+				receiptSumInfo.setCashierId(info.getCashierId());
+				receiptSumInfo.setCashierName(info.getCashierId());
+				if(info.getPayType().equals(Global.P_TYPE_3)) {
+					receiptSumInfo.setCash(info.getPayPrice());
+				}else if(info.getPayType().equals(Global.P_TYPE_4)) {
+					receiptSumInfo.setWeChat(info.getPayPrice());
+				}
+				else if(info.getPayType().equals(Global.P_TYPE_5)) {
+					receiptSumInfo.setAliPay(info.getPayPrice());
+				}
+				else if(info.getPayType().equals(Global.P_TYPE_6)) {
+					receiptSumInfo.setBankCard(info.getPayPrice());
+				}
+				else {
+					receiptSumInfo.setCash(info.getPayPrice());
+				}
 			}
 		}
+		
 		
 		receiptSumInfo.setReturnOrderAmount(receiptSum.getReturnOrderAmount());
 		receiptSumInfo.setReturnPrice(receiptSum.getReturnPrice());
@@ -709,7 +775,17 @@ public class OrderServiceImpl implements OrderService{
 			List<OrderInfo> list = new ArrayList();
 			list = orderDao.reorer(reorerRequest);
 			
-			return HttpResponse.success(OrderPublic.getData(list));
+			//计算总数据量
+			Integer totalCount = 0;
+			Integer icount =null;
+			reorerRequest.setIcount(icount);
+			List<OrderInfo> Icount_list= orderDao.reorer(reorerRequest);
+			if(Icount_list !=null && Icount_list.size()>0) {
+				totalCount = Icount_list.size();
+			}
+			
+//			return HttpResponse.success(OrderPublic.getData(list));
+			return HttpResponse.success(new PageResData(totalCount,list));
 		} catch (Exception e) {
 			LOGGER.info("接口-可退货的订单查询報錯", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
@@ -721,7 +797,6 @@ public class OrderServiceImpl implements OrderService{
 	@Override
 	@Transactional
 	public HttpResponse reded(@Valid String orderId) {
-		
 		
 		 try {
 			OrderQuery orderQuery = new OrderQuery();
@@ -736,7 +811,6 @@ public class OrderServiceImpl implements OrderService{
 
 	//未付款订单30分钟后自动取消
 	@Override
-	@Transactional
 	public List<String> nevder() {
 		
 		List<String> list= null;
@@ -752,7 +826,6 @@ public class OrderServiceImpl implements OrderService{
 
 	//提货码10分钟后失效.
 	@Override
-	@Transactional
 	public List<String> nevred() {
 		List<String> list= null;
 		try {
@@ -796,54 +869,56 @@ public class OrderServiceImpl implements OrderService{
 	//返回值处理  通过当前门店,等级会员list、 统计订单使用的会员数、返回7天内的统计.
 	private MevBuyResponse getMevBuyResponse(List<DevelRequest> list) {
 		MevBuyResponse info = new MevBuyResponse();
-		for(DevelRequest develRequest :list) {
-			if(develRequest.getTrante().equals(OrderPublic.NextDate(0))) {
-				info.setSysDate(develRequest.getTrante());
-			    if(develRequest.getAcount() !=null) {
-			    	info.setSysNumber(develRequest.getAcount());
-			    }
-			}
-			if(develRequest.getTrante().equals(OrderPublic.NextDate(-1))) {
-				info.setOneDate(develRequest.getTrante());
-			    if(develRequest.getAcount() !=null) {
-			    	info.setOneNumber(develRequest.getAcount());
-			    }
-			}
-			if(develRequest.getTrante().equals(OrderPublic.NextDate(-2))) {
-				info.setTwoDate(develRequest.getTrante());
-			    if(develRequest.getAcount() !=null) {
-			    	info.setTwoNumber(develRequest.getAcount());
-			    }
-			}
-			if(develRequest.getTrante().equals(OrderPublic.NextDate(-3))) {
-				info.setThreeDate(develRequest.getTrante());
-			    if(develRequest.getAcount() !=null) {
-			    	info.setThreeNumber(develRequest.getAcount());
-			    }
-			}
-			if(develRequest.getTrante().equals(OrderPublic.NextDate(-4))) {
-				info.setFourDate(develRequest.getTrante());
-			    if(develRequest.getAcount() !=null) {
-			    	info.setFourNumber(develRequest.getAcount());
-			    }
-			}
-			if(develRequest.getTrante().equals(OrderPublic.NextDate(-5))) {
-				info.setFiveDate(develRequest.getTrante());
-			    if(develRequest.getAcount() !=null) {
-			    	info.setFiveNumber(develRequest.getAcount());
-			    }
-			}
-			if(develRequest.getTrante().equals(OrderPublic.NextDate(-6))) {
-				info.setSixDate(develRequest.getTrante());
-			    if(develRequest.getAcount() !=null) {
-			    	info.setSixNumber(develRequest.getAcount());
-			    }
-			}
-			if(develRequest.getTrante().equals(OrderPublic.NextDate(-7))) {
-				info.setSevenDate(develRequest.getTrante());
-			    if(develRequest.getAcount() !=null) {
-			    	info.setSevenNumber(develRequest.getAcount());
-			    }
+		if(list !=null && list.size()>0) {
+			for(DevelRequest develRequest :list) {
+				if(develRequest.getTrante().equals(OrderPublic.NextDate(0))) {
+					info.setSysDate(develRequest.getTrante());
+				    if(develRequest.getAcount() !=null) {
+				    	info.setSysNumber(develRequest.getAcount());
+				    }
+				}
+				if(develRequest.getTrante().equals(OrderPublic.NextDate(-1))) {
+					info.setOneDate(develRequest.getTrante());
+				    if(develRequest.getAcount() !=null) {
+				    	info.setOneNumber(develRequest.getAcount());
+				    }
+				}
+				if(develRequest.getTrante().equals(OrderPublic.NextDate(-2))) {
+					info.setTwoDate(develRequest.getTrante());
+				    if(develRequest.getAcount() !=null) {
+				    	info.setTwoNumber(develRequest.getAcount());
+				    }
+				}
+				if(develRequest.getTrante().equals(OrderPublic.NextDate(-3))) {
+					info.setThreeDate(develRequest.getTrante());
+				    if(develRequest.getAcount() !=null) {
+				    	info.setThreeNumber(develRequest.getAcount());
+				    }
+				}
+				if(develRequest.getTrante().equals(OrderPublic.NextDate(-4))) {
+					info.setFourDate(develRequest.getTrante());
+				    if(develRequest.getAcount() !=null) {
+				    	info.setFourNumber(develRequest.getAcount());
+				    }
+				}
+				if(develRequest.getTrante().equals(OrderPublic.NextDate(-5))) {
+					info.setFiveDate(develRequest.getTrante());
+				    if(develRequest.getAcount() !=null) {
+				    	info.setFiveNumber(develRequest.getAcount());
+				    }
+				}
+				if(develRequest.getTrante().equals(OrderPublic.NextDate(-6))) {
+					info.setSixDate(develRequest.getTrante());
+				    if(develRequest.getAcount() !=null) {
+				    	info.setSixNumber(develRequest.getAcount());
+				    }
+				}
+				if(develRequest.getTrante().equals(OrderPublic.NextDate(-7))) {
+					info.setSevenDate(develRequest.getTrante());
+				    if(develRequest.getAcount() !=null) {
+				    	info.setSevenNumber(develRequest.getAcount());
+				    }
+				}
 			}
 		}
 		
@@ -865,14 +940,26 @@ public class OrderServiceImpl implements OrderService{
 			
 			//订单中商品sku数量
 			Integer skuSum = 0;
-			for(int i=0;i<OrderInfolist.size();i++) {
-				oradskuResponse = OrderInfolist.get(i);
-				skuSum = orderDetailService.getSkuSum(oradskuResponse.getOrderId());
-				oradskuResponse.setSkuSum(skuSum);
-				OrderInfolist.set(i, oradskuResponse);
+            if(OrderInfolist !=null && OrderInfolist.size()>0) {
+            	for(int i=0;i<OrderInfolist.size();i++) {
+    				oradskuResponse = OrderInfolist.get(i);
+    				skuSum = orderDetailService.getSkuSum(oradskuResponse.getOrderId());
+    				oradskuResponse.setSkuSum(skuSum);
+    				OrderInfolist.set(i, oradskuResponse);
+    			}
 			}
 			
-			return HttpResponse.success(OrderPublic.getData(OrderInfolist));
+          //计算总数据量
+			Integer totalCount = 0;
+			Integer icount =null;
+			orderQuery.setIcount(icount);
+			List<OradskuResponse> Icount_list= orderDao.selectskuResponse(OrderPublic.getOrderQuery(orderQuery));
+			if(Icount_list !=null && Icount_list.size()>0) {
+				totalCount = Icount_list.size();
+			}
+            
+//			return HttpResponse.success(OrderPublic.getData(OrderInfolist));
+			return HttpResponse.success(new PageResData(totalCount,OrderInfolist));
 			
 		} catch (Exception e) {
 			LOGGER.info("模糊查询订单列表+订单中商品sku数量報錯", e);
@@ -886,6 +973,374 @@ public class OrderServiceImpl implements OrderService{
 		
 		return orderLogService.orog(orderId);
 	}
+
+
+	//导出订单列表
+	@Override
+	public HttpResponse exorder(@Valid OrderQuery orderQuery) {
+
+		try {
+			Integer icount =null;
+			orderQuery.setIcount(icount);
+			List<OrderInfo> OrderInfolist = orderDao.selectOrder(OrderPublic.getOrderQuery(orderQuery));
+			
+			return HttpResponse.success(OrderInfolist);
+			
+		} catch (Exception e) {
+			LOGGER.info("导出订单列表報錯", e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}
+	}
+	
+	
+	//添加订单主数据+添加订单明细数据+返回订单编号
+	@Override
+	@Transactional
+	public HttpResponse addOrdta(@Valid OrderAndSoOnRequest orderAndSoOnRequest){
+		
+	 try {
+		OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
+		List<OrderDetailInfo> detailList = orderAndSoOnRequest.getDetailList();
+		
+		//新增订单主数据
+		String orderId = "";
+		if(orderInfo !=null ) {
+			
+			orderId = addOrderInfo(orderInfo);
+		  if(orderId !=null && !orderId.equals("")) {
+				
+			//生成订单日志
+			OrderLog rderLog = OrderPublic.addOrderLog(orderId,Global.STATUS_0,"OrderServiceImpl.addOrderInfo()",
+	      	OrderPublic.getStatus(Global.STATUS_0,orderInfo.getOrderStatus()),orderInfo.getCreateBy());
+			orderLogService.addOrderLog(rderLog);
+			
+		//新增订单明细数据
+		if(detailList !=null && detailList.size()>0) {
+			detailList = orderDetailService.addDetailList(detailList,orderId);
+		}
+        
+        //删除购物车数据
+        String memberId = "";
+        List<String> skuCodes = new ArrayList();
+        String distributorId = "";
+        if(orderInfo !=null ) {
+        	
+        	//微商城删除购物车
+        	if(orderInfo.getOriginType() !=null && orderInfo.getOriginType().equals(Global.ORIGIN_TYPE_1)) {
+        		if(orderInfo.getMemberId()!=null ) {
+        			memberId = orderInfo.getMemberId();
+            	}
+        		if(orderInfo.getDistributorId() !=null ) {
+        			distributorId = orderInfo.getDistributorId();
+        		}
+        		if(detailList !=null && detailList.size()>0) {
+        			for(OrderDetailInfo info :detailList) {
+            			if(info !=null && info.getSkuCode()!=null) {
+            				skuCodes.add(info.getSkuCode());
+            			}
+            		}
+        		}
+        		
+        		//删除
+        		System.out.println("开始删除购物车======");
+        		cartService.deleteCartInfoById(memberId, skuCodes, distributorId);
+        	
+        	}	
+        }
+       } 
+	  }
+        String order_id = orderId;
+        
+		return HttpResponse.success(order_id);
+	 }catch (Exception e){
+		 LOGGER.info("添加新的订单主数据以及其他订单关联数据報錯", e);
+		 throw new RuntimeException("添加新的订单主数据以及其他订单关联数据報錯");
+		}
+	}
+	
+	
+	//添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据
+	@Override
+	@Transactional
+	public HttpResponse addPamo(@Valid OrderAndSoOnRequest orderAndSoOnRequest){
+		
+	 try {
+		OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
+		List<OrderDetailInfo> detailList = orderAndSoOnRequest.getDetailList();
+		SettlementInfo settlementInfo = orderAndSoOnRequest.getSettlementInfo();
+		List<OrderPayInfo> orderPayList = orderAndSoOnRequest.getOrderPayList();
+		List<OrderRelationCouponInfo> orderCouponList = orderAndSoOnRequest.getOrderCouponList();
+		
+		//修改订单主数据
+		String orderId = "";
+		if(orderInfo !=null ) {
+			orderId = orderInfo.getOrderId();
+			if(orderId !=null && !orderId.equals("")) {
+			
+			//生成订单号
+		    String logo = "";
+			if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_0) {
+				logo = Global.ORIGIN_COME_3;
+			}
+			if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_1) {
+				logo = Global.ORIGIN_COME_4;
+			}
+			if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_3) {
+				logo = Global.ORIGIN_COME_5;
+			}
+			//公司标识
+			String companyCode = "";
+			if(orderInfo.getCompanyCode() !=null && orderInfo.getCompanyCode().equals(Global.COMPANY_01)) {
+				companyCode = Global.COMPANY_01;
+			}else {
+				companyCode = Global.COMPANY_01;
+			}
+			//yyMMddHHmmss+订单来源+销售渠道标识+公司标识+4位数的随机数
+			String orderCode = "";
+			orderCode = OrderPublic.currentDate()+logo+String.valueOf(Global.ORDERID_CHANNEL_4)+companyCode+OrderPublic.randomNumberF();
+			orderInfo.setOrderCode(orderCode);
+			
+			//初始化提货码
+			if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_1) {
+				if(orderInfo.getReceiveType().equals(Global.RECEIVE_TYPE_0)) {
+					orderInfo.setReceiveCode(OrderPublic.randomNumberE());
+				}
+			}
+			
+			//删除订单主数据
+			orderDao.deleteOrderInfo(orderInfo);
+			
+			
+			//新增订单主数据
+			orderDao.addOrderInfo(orderInfo);
+	        
+			//生成订单日志
+			OrderLog rderLog = OrderPublic.addOrderLog(orderId,Global.STATUS_0,"OrderServiceImpl.addOrderInfo()",
+	      	OrderPublic.getStatus(Global.STATUS_0,orderInfo.getOrderStatus()),orderInfo.getCreateBy());
+			orderLogService.addOrderLog(rderLog);
+			
+			//删除订单明细数据
+			orderDetailDao.deleteOrderDetailInfo(orderInfo); 
+			
+		//新增订单明细数据
+		if(detailList !=null && detailList.size()>0) {
+			detailList = orderDetailService.addDetailList(detailList,orderId);
+		}
+		//新增订单结算数据
+		if(settlementInfo !=null) {
+            settlementService.addSettlement(settlementInfo,orderId);
+		}
+		//新增订单支付数据
+        if(orderPayList != null && orderPayList.size()>0) {
+        	settlementService.addOrderPayList(orderPayList,orderId);
+		}
+        //新增订单与优惠券关系数据
+        if(orderCouponList !=null && orderCouponList.size()>0) {
+        	addOrderCoupon(orderCouponList,orderId);
+        }
+        //新增订单明细与优惠券关系数据
+        if(detailList !=null && detailList.size()>0) {
+        	
+        	for(OrderDetailInfo orderDetailInfo : detailList) {
+        		OrderRelationCouponInfo info = new OrderRelationCouponInfo();
+        		info = orderDetailInfo.getCouponInfo();
+        		if(info !=null ) {
+        			if(orderDetailInfo.getOrderDetailId() !=null) {
+        				info.setOrderDetailId(orderDetailInfo.getOrderDetailId());
+        			}
+        			orderCouponList.add(info);
+        		}
+        		
+        	}
+        	addOrderCoupon(orderCouponList,orderId);
+		}
+	   }
+	  }
+		
+		return HttpResponse.success();
+	 }catch (Exception e){
+		 LOGGER.info("添加新的订单主数据以及其他订单关联数据報錯", e);
+		 throw new RuntimeException("添加新的订单主数据以及其他订单关联数据報錯");
+		}
+	}
+
+
+	//删除订单主数据+删除订单明细数据
+	@Override
+	public HttpResponse deordta(@Valid String orderId) {
+		
+		OrderInfo orderInfo = new OrderInfo();
+		orderInfo.setOrderId(orderId);
+		try {
+			//删除订单主数据
+			orderDao.deleteOrderInfo(orderInfo);
+			
+			//删除订单明细数据
+			orderDetailDao.deleteOrderDetailInfo(orderInfo); 
+			
+			return HttpResponse.success();
+		} catch (Exception e) {
+			LOGGER.info("删除订单主数据+删除订单明细数据報錯", e);
+			return HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
+		}
+	
+	}
+
+
+	//微商城-销售总览
+	@Override
+	public HttpResponse wssev(@Valid String distributorId) {
+		
+		
+	  try {
+		WscSaleResponse wscSaleResponse = new WscSaleResponse();
+		String beginDate = "";
+        String endDate = "";
+		
+        //今日订单数
+        Integer todayCount = null;
+		//昨日订单数
+        Integer yesterdayCount = null;
+		//近七日数据订单数
+        Integer weekCount = null;
+        
+        OrderQuery orderQuery = new OrderQuery();
+        orderQuery.setDistributorId(distributorId);
+        
+        orderQuery.setBeginDate(OrderPublic.NextDate(0));
+        orderQuery.setEndDate(OrderPublic.NextDate(0));
+		todayCount = orderDao.selectAcountByEcshop(orderQuery);
+		
+		orderQuery.setBeginDate(OrderPublic.NextDate(-1));
+        orderQuery.setEndDate(OrderPublic.NextDate(-1));
+        yesterdayCount = orderDao.selectAcountByEcshop(orderQuery);
+        
+        orderQuery.setBeginDate(OrderPublic.NextDate(-7));
+        orderQuery.setEndDate(OrderPublic.NextDate(0));
+        weekCount = orderDao.selectAcountByEcshop(orderQuery);
+        
+        //昨日订单金额
+        Integer todayAmount = null;
+        //今日订单金额
+        Integer yesterdayAmount = null;
+        //近七日数据订单金额
+        Integer weekAmount = null;
+        
+        orderQuery.setBeginDate(OrderPublic.NextDate(0));
+        orderQuery.setEndDate(OrderPublic.NextDate(0));
+        todayAmount = orderDao.selectAmountByEcshop(orderQuery);
+        
+        orderQuery.setBeginDate(OrderPublic.NextDate(-1));
+        orderQuery.setEndDate(OrderPublic.NextDate(-1));
+        yesterdayAmount = orderDao.selectAmountByEcshop(orderQuery);
+        
+        orderQuery.setBeginDate(OrderPublic.NextDate(-7));
+        orderQuery.setEndDate(OrderPublic.NextDate(0));
+        weekAmount = orderDao.selectAmountByEcshop(orderQuery);
+		
+		//今日成交客户
+        Integer todayMembers = null;
+        orderQuery.setBeginDate(OrderPublic.NextDate(0));
+        orderQuery.setEndDate(OrderPublic.NextDate(0));
+        todayMembers = orderDao.selectMembersByEcshop(orderQuery);
+        
+	    //昨日成交客户
+        Integer yesterdayMembers = null;
+        orderQuery.setBeginDate(OrderPublic.NextDate(-1));
+        orderQuery.setEndDate(OrderPublic.NextDate(-1));
+        yesterdayMembers = orderDao.selectMembersByEcshop(orderQuery);
+		
+        wscSaleResponse.setTodayAmount(todayAmount);
+        wscSaleResponse.setTodayCount(todayCount);
+        wscSaleResponse.setTodayMembers(todayMembers);
+        wscSaleResponse.setWeekAmount(weekAmount);
+        wscSaleResponse.setWeekCount(weekCount);
+        wscSaleResponse.setYesterdayAmount(yesterdayAmount);
+        wscSaleResponse.setYesterdayCount(yesterdayCount);
+        wscSaleResponse.setYesterdayMembers(yesterdayMembers);
+        
+        return HttpResponse.success(wscSaleResponse);
+        
+		} catch (Exception e) {
+			LOGGER.info("微商城-销售总览報錯", e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}
+	}
+
+
+	//微商城-事务总览
+	@Override
+	public HttpResponse wsswv(@Valid String distributorId) {
+		
+	  try {
+		 WscWorkViewResponse wscWorkViewResponse = new WscWorkViewResponse();
+		
+		 //待付款订单
+		 Integer unPaid = null;
+		 //待提货订单
+		 Integer notPick = null;
+		 //待发货订单
+		 Integer notDelivery = null;
+		 //待确认售后单
+		 Integer notSure = null;
+		 //待处理退款申请
+		 Integer notRefund = null;
+		 
+		 OrderQuery orderQuery = new OrderQuery();
+	     orderQuery.setDistributorId(distributorId);
+	     
+	     orderQuery.setOrderStatus(Global.ORDER_STATUS_0);
+	     unPaid = orderDao.selectCountByStatus(orderQuery);
+	     
+	     orderQuery.setOrderStatus(Global.ORDER_STATUS_2);
+	     notPick = orderDao.selectCountByStatus(orderQuery);
+	     
+	     orderQuery.setOrderStatus(Global.ORDER_STATUS_1);
+	     notDelivery = orderDao.selectCountByStatus(orderQuery);
+	     
+	     
+	     wscWorkViewResponse.setNotDelivery(notDelivery);
+	     wscWorkViewResponse.setNotPick(notPick);
+	     wscWorkViewResponse.setNotRefund(notRefund);
+	     wscWorkViewResponse.setNotSure(notSure);
+	     wscWorkViewResponse.setUnPaid(unPaid);
+	     
+		return HttpResponse.success(wscWorkViewResponse);
+	        
+	  } catch (Exception e) {
+		LOGGER.info("微商城-事务总览報錯", e);
+		return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+	  }
+	}
+
+
+	//已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)
+	@Override
+	public HttpResponse repast(@Valid String orderId, @Valid String payType, @Valid List<OrderPayInfo> orderPayList) {
+		
+		try {
+			
+		  //删除订单支付数据
+			settlementService.deleteOrderPayList(orderId);
+	      //新增订单支付数据
+          if(orderPayList != null && orderPayList.size()>0) {
+        	settlementService.addOrderPayList(orderPayList,orderId);
+		  }
+          
+          //修改订单支付方式信息
+          OrderQuery orderQuery = new OrderQuery();
+          orderQuery.setOrderId(orderId);
+          orderQuery.setPayType(payType);
+          orderDao.onlyPayType(orderQuery);
+          
+        return HttpResponse.success();
+        
+	    } catch (Exception e) {
+		  LOGGER.info("已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)報錯", e);
+		  return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+	    }
+	}
+	
 }
 
 

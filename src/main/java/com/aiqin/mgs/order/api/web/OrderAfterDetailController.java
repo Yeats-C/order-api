@@ -45,33 +45,17 @@ public class OrderAfterDetailController {
     private OrderAfterDetailService orderAfterDetailService;    
     
     
-    /**
-     * 售后id、门店查询售后维权明细列表
-     * @param 
-     * @return
-     */
-    @PostMapping("/selectorderafterdetail")
-    @ApiOperation(value = "售后id、门店查询售后维权明细列表")
-    public HttpResponse OrderAfteIList(@Valid @RequestBody OrderAfterSaleQuery orderAfterSaleQuery) {
-        
-    	
-    	LOGGER.info("售后id、门店查询售后维权明细列表......");    	
-        return orderAfterDetailService.OrderAfteIList(orderAfterSaleQuery);//售后id、门店查询售后维权明细列表
-    }
-    
-    
-//    @PostMapping("")
-//    @ApiOperation(value = "添加新的订单售后明细数据")
-//    public HttpResponse addAfterOrderDetail(@Valid @RequestBody List<OrderAfterSaleDetailInfo> AfterDetailList,@Valid @RequestParam(name = "after_sale_id", required = false) String afterSaleId) {
-//        LOGGER.info("添加新的订单售后明细数据......");
-//        return orderAfterDetailService.addAfterOrderDetail(AfterDetailList,afterSaleId);
+//    /**
+//     * 售后id、门店查询售后维权明细列表
+//     * @param 
+//     * @return
+//     */
+//    @PostMapping("/selectorderafterdetail")
+//    @ApiOperation(value = "售后id、门店查询售后维权明细列表")
+//    public HttpResponse OrderAfteIList(@Valid @RequestBody OrderAfterSaleQuery orderAfterSaleQuery) {
+//        
+//    	
+//    	LOGGER.info("售后id、门店查询售后维权明细列表......");    	
+//        return orderAfterDetailService.OrderAfteIList(orderAfterSaleQuery);//售后id、门店查询售后维权明细列表
 //    }
-    
-    
-    
-
-    
-    
-    
-
 }

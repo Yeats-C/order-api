@@ -11,6 +11,9 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.CartInfo;
 import com.aiqin.mgs.order.api.domain.OrderDetailInfo;
@@ -42,22 +45,25 @@ public interface OrderDetailService {
 	HttpResponse selectorderany(@Valid String orderId);
 
 	//添加新的订单明细数据
-	List<OrderDetailInfo> addDetailList(@Valid List<OrderDetailInfo> detailList, @Valid String orderId) throws Exception; 
+	public List<OrderDetailInfo> addDetailList(@Valid List<OrderDetailInfo> detailList, @Valid String orderId) throws Exception; 
 
 	//查询会员下的所有订单ID下的商品集合...
 	HttpResponse selectproductbyorders(@Valid List<String> orderidslList, @Valid String memberId); 
 
 	//查询会员下的全部订单 返回订单主数据+订单详细列表
-	HttpResponse selectorderdbumemberid(@Valid String memberId, @Valid Integer orderStatus);  
+	HttpResponse selectorderdbumemberid(@Valid String memberId, @Valid Integer orderStatus, @Valid String pageSize, @Valid String pageNo);  
 
     //修改订单明细退货数据
-	HttpResponse returnStatus(@Valid String orderDetailId,Integer returnStatus,Integer returnAmount, String updateBy);
+	void returnStatus(@Valid String orderDetailId,Integer returnStatus,Integer returnAmount, String updateBy)throws Exception;
 
 	//接口-统计商品在各个渠道的订单数.
 	HttpResponse prodisor(@Valid List<String> sukList,@Valid Integer originType);
 
 	//订单中商品sku数量
 	Integer getSkuSum(@Valid String orderId);
+
+	//sku销量统计
+	HttpResponse skuSum(@Valid List<String> sukList);
 	
 
 

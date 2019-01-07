@@ -73,7 +73,12 @@ public class SettlementServiceImpl implements SettlementService{
 	public HttpResponse jkselectsettlement(@Valid OrderQuery orderQuery) {
 		
 		try {
-			return HttpResponse.success(settlementDao.jkselectsettlement(orderQuery));
+			SettlementInfo settlementInfo = new SettlementInfo();
+			if(orderQuery !=null && orderQuery.getOrderId() !=null && !orderQuery.getOrderId().equals("")) {
+				settlementInfo = settlementDao.jkselectsettlement(orderQuery);
+			}
+			
+			return HttpResponse.success(settlementInfo);
 		
 		} catch (Exception e) {
 
@@ -114,7 +119,6 @@ public class SettlementServiceImpl implements SettlementService{
 		}else {
 			LOGGER.info("未获取到支付数据......");
 		}
-		
 	}
 
 	
@@ -130,6 +134,15 @@ public class SettlementServiceImpl implements SettlementService{
 			LOGGER.info("查询支付数据通过Order_id报错......",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
+	}
+
+
+	//已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)
+	@Override
+	public void deleteOrderPayList(@Valid String orderId) throws Exception {
+		
+	   orderPayDao.deleteOrderPayList(orderId);
+		
 	}
 	
 

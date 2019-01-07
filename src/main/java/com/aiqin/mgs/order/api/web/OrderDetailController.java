@@ -89,7 +89,7 @@ public class OrderDetailController {
         
     	
     	LOGGER.info("查询会员下的全部订单 返回订单主数据+订单详细列表...");    	
-        return orderDetailService.selectorderdbumemberid(memberId,orderStatus);//查询会员下的全部订单 返回订单主数据+订单详细列表
+        return orderDetailService.selectorderdbumemberid(memberId,orderStatus,pageSize,pageNo);//查询会员下的全部订单 返回订单主数据+订单详细列表
     }
     
     
@@ -218,6 +218,20 @@ public class OrderDetailController {
 
     	LOGGER.info("商品总库菜单-统计商品在各个渠道的订单数....");    	
         return orderDetailService.prodisor(sukList,originType);
+    }
+    
+    /**
+     * 
+     * sku销量统计
+     * @param 
+     * @return
+     */
+    @GetMapping("/sksm")
+    @ApiOperation(value = "sku销量统计....")
+    public HttpResponse sksm(@Valid @RequestParam(required = true) List<String> sukList) {
+
+    	LOGGER.info("sku销量统计....");    	
+        return orderDetailService.skuSum(sukList);
     }
 
 }

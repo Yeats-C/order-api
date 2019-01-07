@@ -27,13 +27,13 @@ public class OrderPublic {
 	
 	 /**
 	  * 
-	  * @return 5位数的随机数
+	  * @return 4位数的随机数
 	  */
  public static String randomNumberF() {
 	 
 	 String randomNumber = ""; //随机数
 	 
-	 final int num = 5; //5位
+	 final int num = 4; //4位
 	  
 	  int Random[] = new int[num];
 	  for(int i = 0 ; i < num ; i++)
@@ -356,7 +356,7 @@ public static String randomNumberE() {
 		//订单状态
 		if(statusType.equals(Global.STATUS_0)) {
 			if(status == 0) {
-				content = Global.STATUS_CONTENT_0;
+				content = Global.STATUS_CONTENT_10;
 			}else if(status == 1) {
 				content = Global.STATUS_CONTENT_1;
 			}else if(status == 2) {
@@ -370,14 +370,14 @@ public static String randomNumberE() {
 			}else if(status == 6) {
 				content = Global.STATUS_CONTENT_6;
 			}else {
-				content = Global.STATUS_CONTENT_0;
+				content = Global.STATUS_CONTENT_10;
 			}
 		}
 		
 		//退货状态
 		if(statusType.equals(Global.STATUS_2)) {
 			if(status == 0) {
-				content = Global.STATUS_CONTENT_00;
+				content = Global.STATUS_CONTENT_100;
 			}else if(status == 1) {
 				content = Global.STATUS_CONTENT_11;
 			}else if(status == 2) {
@@ -391,18 +391,18 @@ public static String randomNumberE() {
 			}else if(status == 6) {
 				content = Global.STATUS_CONTENT_66;
 			}else {
-				content = Global.STATUS_CONTENT_00;
+				content = Global.STATUS_CONTENT_100;
 			}
 		}
 		
 		//支付状态
 		if(statusType.equals(Global.STATUS_1)) {
 			if(status == 0) {
-				content = Global.STATUS_CONTENT_000;
+				content = Global.STATUS_CONTENT_1000;
 			}else if(status == 1) {
 				content = Global.STATUS_CONTENT_111;
 			}else {
-				content = Global.STATUS_CONTENT_000;
+				content = Global.STATUS_CONTENT_1000;
 			}
 		}		
 		return content;
@@ -475,24 +475,26 @@ public static String randomNumberE() {
 
 	public static void main(String[] args) {
 
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
-		try {
-
-			Date date = sdf.parse("2018-12-13");
-
-			System.out.println("今天是" + sdf.format(date));
-
-			System.out.println("上周一" + sdf.format(geLastWeekMonday(date)));
-
-			System.out.println("本周一" + sdf.format(getThisWeekMonday(date)));
-
-
-		} catch (Exception e) {
-
-			e.printStackTrace();
-
-		}
+//		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//
+//		try {
+//
+//			Date date = sdf.parse("2018-12-13");
+//
+//			System.out.println("今天是" + sdf.format(date));
+//
+//			System.out.println("上周一" + sdf.format(geLastWeekMonday(date)));
+//
+//			System.out.println("本周一" + sdf.format(getThisWeekMonday(date)));
+//
+//
+//		} catch (Exception e) {
+//
+//			e.printStackTrace();
+//
+//		}
+		System.out.println(NextDate(-7));
+		System.out.println(NextDate(0));
 
 	}
 	

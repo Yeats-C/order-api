@@ -18,6 +18,7 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
     <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+    <result column="price" jdbcType="BIGINT" property="price"/>
     </resultMap>
 
 
@@ -25,9 +26,9 @@
     <insert id="insertCart" parameterType="com.aiqin.mgs.order.api.domain.CartInfo">
         
         insert into cart 
-			(member_id,member_name,distributor_id,distributor_code,distributor_name,product_id,product_name,sku_code,amount,logo,create_time,update_time,create_by,update_by)
+			(member_id,member_name,distributor_id,distributor_code,distributor_name,product_id,product_name,sku_code,amount,logo,create_time,update_time,create_by,update_by,price)
 		values
-		    (#{memberId},#{memberName},#{distributorId},#{distributorCode},#{distributorName},#{productId},#{productName},#{skuCode},#{amount},#{logo},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy})
+		    (#{memberId},#{memberName},#{distributorId},#{distributorCode},#{distributorName},#{productId},#{productName},#{skuCode},#{amount},#{logo},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},#{price})
     
     </insert>
     
@@ -42,7 +43,10 @@
 		 <if test=" distributorId != '' ">
          and distributor_id = #{distributorId}
          </if>
+         ORDER BY a.create_time DESC 
+         <if test="icount!=null ">
          limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+         </if>	
     </select>
 
 

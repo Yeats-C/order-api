@@ -112,9 +112,21 @@ public class OrderAfterSaleDetailInfo extends PagesRequest {
     @ApiModelProperty("非入库字段-单位")
     @JsonProperty("unit")
     private String unit;
+    
+    @ApiModelProperty("非入库字段-列表图")
+    @JsonProperty("logo")
+    private String logo;
 
 	
 	
+	public String getLogo() {
+		return logo;
+	}
+
+	public void setLogo(String logo) {
+		this.logo = logo;
+	}
+
 	public Integer getRetailPrice() {
 		return retailPrice;
 	}

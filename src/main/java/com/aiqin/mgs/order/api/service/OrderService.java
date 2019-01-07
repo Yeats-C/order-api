@@ -11,6 +11,9 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.CartInfo;
 import com.aiqin.mgs.order.api.domain.OrderDetailInfo;
@@ -29,6 +32,9 @@ public interface OrderService {
 
 	
 	HttpResponse selectOrder(@Valid OrderQuery OrderQuery);
+	
+	//导出订单列表
+	HttpResponse exorder(@Valid OrderQuery OrderQuery);
 
 	HttpResponse addOrderLog(@Valid OrderLog logInfo);
 
@@ -54,6 +60,12 @@ public interface OrderService {
 	
 	//添加新的订单主数据以及其他订单关联数据
 	HttpResponse addOrderList(@Valid OrderAndSoOnRequest orderAndSoOnRequest);
+	
+	//添加订单主数据+添加订单明细数据+返回订单编号
+	HttpResponse addOrdta(@Valid OrderAndSoOnRequest orderAndSoOnRequest);
+	
+	//添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据
+    HttpResponse addPamo(@Valid OrderAndSoOnRequest orderAndSoOnRequest);
 
 	//接口-关闭订单
 	HttpResponse closeorder(@Valid String orderId, String updateBy);
@@ -66,7 +78,7 @@ public interface OrderService {
 			String updateBy);
 
 	//仅更改退货状态-订单主表
-	HttpResponse retustus(@Valid String orderId, Integer returnStatus, String updateBy);
+	void retustus(@Valid String orderId, Integer returnStatus, String updateBy)throws Exception;
 
 	//仅变更订单状态
 	HttpResponse onlyStatus(@Valid String orderId, Integer orderStatus, String updateBy);
@@ -100,4 +112,16 @@ public interface OrderService {
 
 	//查询订单日志数据
 	HttpResponse orog(@Valid String orderId);
+
+	//删除订单主数据+删除订单明细数据
+	HttpResponse deordta(@Valid String orderId);
+
+	//微商城-销售总览
+	HttpResponse wssev(@Valid String distributorId);
+
+	//微商城-事务总览
+	HttpResponse wsswv(@Valid String distributorId);
+
+	//已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)
+	HttpResponse repast(@Valid String orderId, @Valid String payType, @Valid List<OrderPayInfo> orderPayList);
 }

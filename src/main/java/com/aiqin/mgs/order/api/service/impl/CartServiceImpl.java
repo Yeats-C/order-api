@@ -44,7 +44,6 @@ public class CartServiceImpl implements CartService{
 	@Override
 	@Transactional
 	public HttpResponse addCartInfo(CartInfo cartInfo) {
-		
 	    try {
 		    if(cartInfo !=null) {
 		    	if(cartInfo.getModityType()!=null && cartInfo.getModityType().equals(Global.MODIFY_TYPE_1)) {
@@ -74,20 +73,16 @@ public class CartServiceImpl implements CartService{
 						LOGGER.info("添加购物车", cartInfo);
 						cartDao.insertCart(cartInfo);
 					}
+					return HttpResponse.success();
 		    	}
-			
-		    	return HttpResponse.success();
-			
 		    }else {
 				LOGGER.error("购物车信息为空!");
 				return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
 			}
-			
 		}catch(Exception e) {
 			
 			LOGGER.error("添加购物车失败", e);
 			return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
-			
 		}
 	}
 
@@ -128,10 +123,19 @@ public class CartServiceImpl implements CartService{
 			cartInfo.setPageSize(pageSize);
 			cartInfo.setDistributorId(distributorId);
 				
-				//购物车数据
-				List<CartInfo> cartInfoList= cartDao.selectCartByMemberId(cartInfo);
+			//购物车数据
+			List<CartInfo> cartInfoList= cartDao.selectCartByMemberId(cartInfo);
 				
-				return HttpResponse.success(OrderPublic.getData(cartInfoList));
+			//计算总数据量
+			Integer totalCount = 0;
+			Integer icount =null;
+			cartInfo.setIcount(icount);
+			List<CartInfo> Icount_list= cartDao.selectCartByMemberId(cartInfo);
+			if(Icount_list !=null && Icount_list.size()>0) {
+				totalCount = Icount_list.size();
+			}
+				
+			return HttpResponse.success(new PageResData(totalCount,cartInfoList));
 			
 		} catch (Exception e) {
 			
@@ -151,12 +155,11 @@ public class CartServiceImpl implements CartService{
 			LOGGER.error("清空购物车",memberId);
 			if(memberId !=null && !memberId.equals("")) {
 				cartDao.deleteCartInfo(memberId);
+				return HttpResponse.success();
 			}else {
 				LOGGER.error("清空购物车-找不到会员ID",memberId);
 				return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
 			}
-			
-			return HttpResponse.success();
 		} catch (Exception e) {
 			LOGGER.error("清空购物车失败",e);
 			return HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
@@ -173,11 +176,14 @@ public class CartServiceImpl implements CartService{
 		try {
 			LOGGER.error("删除购物清单",memberId);
 			
-					CartInfo cartInfo = new CartInfo();
-					cartInfo.setMemberId(memberId);
-					cartInfo.setSkuCodes(skuCodes);
-					cartInfo.setDistributorId(distributorId);
-					cartDao.deleteCartInfoById(cartInfo);
+			CartInfo cartInfo = new CartInfo();
+			cartInfo.setMemberId(memberId);
+            if(skuCodes !=null && skuCodes.size()>0) {
+            	cartInfo.setSkuCodes(skuCodes);
+            }
+			cartInfo.setDistributorId(distributorId);
+			System.out.println("cartInfo==="+cartInfo);
+			cartDao.deleteCartInfoById(cartInfo);
 			
 			return HttpResponse.success();
 		} catch (Exception e) {

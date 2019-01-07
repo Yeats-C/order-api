@@ -46,7 +46,7 @@
 		 <if test="afterSaleId!=null ">
          and after_sale_id = #{afterSaleId}
          </if>
-
+         ORDER BY create_time DESC
     </select>
     
     
@@ -57,8 +57,14 @@
 		 <if test="distributorId!=null and distributorId!='' ">
          and distributor_id = #{distributorId}
          </if>
+         <if test="distributorName!=null and distributorName!='' ">
+		 and distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%') 
+		 </if>
          <if test="afterSaleCode!=null and afterSaleCode!='' ">
 		 and after_sale_code like concat('%',#{afterSaleCode,jdbcType=VARCHAR},'%') 
+		 </if>
+		 <if test="afterSaleId!=null and afterSaleId!='' ">
+		 and after_sale_id like concat('%',#{afterSaleId,jdbcType=VARCHAR},'%') 
 		 </if>
 		 <if test="orderCode!=null and orderCode!=''">
 		 and order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%') 
@@ -66,6 +72,11 @@
 		 <if test="memberPhone!=null and memberPhone!=''">
 		 and member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%') 
          </if>
+         
+         <if test="codeAndPhone!=null and codeAndPhone!=''">
+		 and (member_phone like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%') or after_sale_code like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%'))
+         </if>
+         
          <if test="beginTime!=null ">
          and DATE_FORMAT(create_time,"%Y-%m-%d") &gt;= DATE_FORMAT(#{beginTime},"%Y-%m-%d") 
          </if>
@@ -87,7 +98,10 @@
          <if test="originType!=null ">
          and origin_type =#{originType}
          </if>
+         ORDER BY create_time DESC
+         <if test="icount!=null ">
          limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+         </if>
     </select>
     
     <!-- 个性化接口-通过ID更改售后表退货状态/修改员  -->

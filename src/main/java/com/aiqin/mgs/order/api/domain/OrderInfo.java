@@ -176,7 +176,21 @@ public class OrderInfo extends PagesRequest {
 	@JsonProperty("sku_sum")
 	private Integer skuSum;
 	
+	@ApiModelProperty(value="公司编码")
+	@JsonProperty("company_code")
+	private String companyCode;
+
 	
+
+
+	public String getCompanyCode() {
+		return companyCode;
+	}
+
+
+	public void setCompanyCode(String companyCode) {
+		this.companyCode = companyCode;
+	}
 
 
 	public Integer getSkuSum() {

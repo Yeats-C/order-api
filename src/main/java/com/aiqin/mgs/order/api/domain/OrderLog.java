@@ -49,8 +49,20 @@ public class OrderLog{
 	@ApiModelProperty(value="修改员")
 	@JsonProperty("update_by")
 	private String updateBy ;
+	
+	@ApiModelProperty(value="状态字典项")
+	@JsonProperty("status_type")
+	private Integer statusType ;
 
 	
+	public Integer getStatusType() {
+		return statusType;
+	}
+
+	public void setStatusType(Integer statusType) {
+		this.statusType = statusType;
+	}
+
 	public String getLogId() {
 		return logId;
 	}

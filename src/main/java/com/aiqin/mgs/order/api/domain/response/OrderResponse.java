@@ -17,17 +17,17 @@ import io.swagger.annotations.ApiModelProperty;
 public class OrderResponse {
     
 	@ApiModelProperty(value="实际金额")
-	@JsonProperty("actualprice")
+	@JsonProperty("actual_price")
 	private Integer actualPrice;
 	
 	
 	@ApiModelProperty(value="统计日期 返回值 日：YYYY-MM-DD 月:YYYY-MM 周:0-8 0为当前周 ")
-	@JsonProperty("createtime")
-	private String createtime;
+	@JsonProperty("create_time")
+	private String createTime;
 	
 	@ApiModelProperty(value="订单笔数")
-	@JsonProperty("ordercount")
-	private Integer ordercount;
+	@JsonProperty("order_count")
+	private Integer orderCount;
 
 	public Integer getActualPrice() {
 		return actualPrice;
@@ -37,21 +37,22 @@ public class OrderResponse {
 		this.actualPrice = actualPrice;
 	}
 
-	public Integer getOrdercount() {
-		return ordercount;
+	public String getCreateTime() {
+		return createTime;
 	}
 
-	public void setOrdercount(Integer ordercount) {
-		this.ordercount = ordercount;
+	public void setCreateTime(String createTime) {
+		this.createTime = createTime;
 	}
 
-	public String getCreatetime() {
-		return createtime;
+	public Integer getOrderCount() {
+		return orderCount;
 	}
 
-	public void setCreatetime(String createtime) {
-		this.createtime = createtime;
+	public void setOrderCount(Integer orderCount) {
+		this.orderCount = orderCount;
 	}
+
 }
 
 

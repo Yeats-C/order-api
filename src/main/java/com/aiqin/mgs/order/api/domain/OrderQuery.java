@@ -25,6 +25,10 @@ public class OrderQuery extends PagesRequest {
     @JsonProperty("order_id")
     private String orderId="";
 	
+	@ApiModelProperty(value = "订单code")
+    @JsonProperty("order_code")
+    private String orderCode="";
+	
     @ApiModelProperty(value = "会员id")
     @JsonProperty("member_id")
     private String memberId="";
@@ -52,7 +56,7 @@ public class OrderQuery extends PagesRequest {
 	private String distributorName="";
 	
 	
-	@ApiModelProperty(value="来源类型3-pos，4-微商城, 5-全部")
+	@ApiModelProperty(value="来源类型0-pos，1-微商城, 2-全部 ,3:web")
 	@JsonProperty("origin_type")
 	private Integer originType;
 	
@@ -119,6 +123,34 @@ public class OrderQuery extends PagesRequest {
 	@JsonProperty("any")
 	private Integer any;
 	
+	@ApiModelProperty(value="不传参不返回 0:全部")
+	@JsonProperty("icount")
+	private Integer icount = 0;
+	
+	@ApiModelProperty(value="订单号/手机号")
+	@JsonProperty("code_and_phone")
+	private String codeAndPhone;
+	
+
+	public String getOrderCode() {
+		return orderCode;
+	}
+
+
+	public void setOrderCode(String orderCode) {
+		this.orderCode = orderCode;
+	}
+
+
+	public Integer getIcount() {
+		return icount;
+	}
+
+
+	public void setIcount(Integer icount) {
+		this.icount = icount;
+	}
+
 
 	public Integer getAny() {
 		return any;
@@ -337,6 +369,16 @@ public class OrderQuery extends PagesRequest {
 
 	public void setGuideName(String guideName) {
 		this.guideName = guideName;
+	}
+
+
+	public String getCodeAndPhone() {
+		return codeAndPhone;
+	}
+
+
+	public void setCodeAndPhone(String codeAndPhone) {
+		this.codeAndPhone = codeAndPhone;
 	}
 
 

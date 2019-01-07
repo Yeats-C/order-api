@@ -154,11 +154,4 @@ public class SettlementController {
 //		StringBuffer sb = new StringBuffer("<xml><return_code>SUCCESS</return_code><return_msg>OK</return_msg></xml>");
 //		response.getWriter().append(sb.toString());
 //	}
-    
-    
-    
-    	
-    
-    
-
 }

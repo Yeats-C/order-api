@@ -27,10 +27,13 @@ public interface SettlementService {
 	HttpResponse jkselectsettlement(@Valid OrderQuery orderQuery); 
 
 	//添加新的结算数据
-	void addSettlement(@Valid SettlementInfo settlementInfo, @Valid String orderId)throws Exception; 
+	public void addSettlement(@Valid SettlementInfo settlementInfo, @Valid String orderId)throws Exception; 
 
 	//添加新的支付数据
-	void addOrderPayList(@Valid List<OrderPayInfo> orderPayList, @Valid String orderId)throws Exception; 
+	public void addOrderPayList(@Valid List<OrderPayInfo> orderPayList, @Valid String orderId)throws Exception;
+	
+	//删除支付数据
+    public void deleteOrderPayList(@Valid String orderId)throws Exception;
 
 	//查询支付数据通过
 	HttpResponse pay(@Valid String orderId);

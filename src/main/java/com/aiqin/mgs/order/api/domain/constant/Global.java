@@ -18,6 +18,8 @@ public interface Global {
     String MODIFY_TYPE_0 = "0";  //添加
     String MODIFY_TYPE_1 = "1";  //修改
     
+    //是否计算数据量
+    Integer ICOUNT_0 = 0;  //计算数据量
     
     /**
      * 订单来源
@@ -25,14 +27,16 @@ public interface Global {
     Integer ORIGIN_TYPE_0 = 0;  //pos
     Integer ORIGIN_TYPE_1 = 1;  //微商城
     Integer ORIGIN_TYPE_2 = 2;  //全部 作为查询条件
+    Integer ORIGIN_TYPE_3 = 3;  //web
     
     /**
-     * 生成订单号 - 销售渠道标识、订单来源(避免与老系统重复)
+     * 生成订单号专用字典项 - 销售渠道标识、订单来源(避免与老系统重复)
      */
     Integer ORDERID_CHANNEL_3 = 3;  //总部向门店销售
     Integer ORDERID_CHANNEL_4 = 4;  //门店像会员销售
     String  ORIGIN_COME_3 = "3";  //pos
     String  ORIGIN_COME_4 = "4";  //微商城
+    String  ORIGIN_COME_5 = "5";  //web
     
     
     /**
@@ -132,22 +136,39 @@ public interface Global {
     /**
      * 状态描述
      */
-    String STATUS_CONTENT_0 = "未付款";
+    String STATUS_CONTENT_10 = "未付款";
     String STATUS_CONTENT_1 = "待发货";
     String STATUS_CONTENT_2 = "待提货";
     String STATUS_CONTENT_3 = "已发货";
     String STATUS_CONTENT_4 = "已取消";
     String STATUS_CONTENT_5 = "已完成";
     String STATUS_CONTENT_6 = "已提货";
-    String STATUS_CONTENT_00 = "审批中";
+    String STATUS_CONTENT_100 = "审批中";
     String STATUS_CONTENT_11 = "处理中";
     String STATUS_CONTENT_22 = "退款中";
     String STATUS_CONTENT_33 = "已完成";
     String STATUS_CONTENT_44 = "已取消";
     String STATUS_CONTENT_55 = "已关闭";
     String STATUS_CONTENT_66 = "未发生退货";
-    String STATUS_CONTENT_000 = "待支付";
+    String STATUS_CONTENT_1000 = "待支付";
     String STATUS_CONTENT_111 = "支付完成";
+    
+    Integer STATUS_TYPE_10 = 10;
+    Integer STATUS_TYPE_1 = 1;
+    Integer STATUS_TYPE_2 = 2;
+    Integer STATUS_TYPE_3 = 3;
+    Integer STATUS_TYPE_4 = 4;
+    Integer STATUS_TYPE_5 = 5;
+    Integer STATUS_TYPE_6 = 6;
+    Integer STATUS_TYPE_100 = 100;
+    Integer STATUS_TYPE_11 = 11;
+    Integer STATUS_TYPE_22 = 22;
+    Integer STATUS_TYPE_33 = 33;
+    Integer STATUS_TYPE_44 = 44;
+    Integer STATUS_TYPE_55 = 55;
+    Integer STATUS_TYPE_66 = 66;
+    Integer STATUS_TYPE_1000 = 1000;
+    Integer STATUS_TYPE_111 = 111;
     
 
 
@@ -187,4 +208,7 @@ public interface Global {
     String AGIOTYPE_3 = "3"; //满减
     String AGIOTYPE_4 = "4"; //积分
     
+    //公司编码
+    //爱亲
+    String COMPANY_01 = "1";    
 }

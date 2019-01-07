@@ -27,7 +27,7 @@ public interface OrderAfterService {
 	//添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表....
 	HttpResponse addAfterOrder(@Valid OrderAfterSaleInfo orderAfterSaleInfo);
 
-	//返回订单订单数据、退货数据、退货明细数据....
+	//查询BYorderid-返回订单订单主数据、退货数据、退货明细数据、订单明细数据、优惠券数据
 	HttpResponse selectDetail(@Valid String afterSaleId);
 
 	//更改退货状态(售后明细表+售后表+订单表+订单明细表) 扩展
@@ -35,5 +35,8 @@ public interface OrderAfterService {
 	
 	//更改退货状态(售后表)
 	HttpResponse returus(@Valid String afterSaleId, Integer afterSaleStatus, String updateBy);
+
+	//模糊查询查询退货信息+退货明细+订单明细信息
+	HttpResponse aftlst(@Valid OrderAfterSaleQuery orderAfterSaleQuery);
 
 }

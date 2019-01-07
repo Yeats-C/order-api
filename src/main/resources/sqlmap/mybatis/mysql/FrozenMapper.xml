@@ -51,7 +51,7 @@
     <select id="selectDetailByFrozenId" resultMap="FrozenInfoMapping" resultType="java.util.List" >
     
 		select * from frozen where frozen_id = #{frozenId}
-         
+        ORDER BY create_time DESC 
     </select>
     
     <!-- 查询挂单明细 -->
@@ -64,6 +64,7 @@
 		<if test=" distributorId != null and distributorId!='' ">
 		and distributor_id = #{distributorId} 
         </if>
+        ORDER BY create_time DESC 
     </select>
     
      <!-- 查询挂单汇总 -->
@@ -79,6 +80,20 @@
         </if>
         GROUP BY frozen_id)a ,frozen b 
         WHERE a.frozen_id = b.frozen_id
+        ORDER BY b.create_time DESC
+    </select>
+    
+    <!-- 查询挂单数量 -->
+    <select id="selectSumByParam" resultType="java.lang.Integer" >
+    
+        SELECT COUNT(DISTINCT(frozen_id)) AS frozensum FROM frozen where 1=1
+        <if test=" createBy != null and createBy!='' ">
+        and create_by = #{createBy}
+        </if>
+        <if test=" distributorId != null and distributorId!='' ">
+        and distributor_id = #{distributorId}
+        </if>
+       
     </select>
     
 </mapper>

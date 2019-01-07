@@ -19,6 +19,20 @@ import java.util.List;
 @ApiModel("购物车")
 public class CartInfo extends PagesRequest {
     
+	@ApiModelProperty(value="不传参不返回 0:全部")
+	@JsonProperty("icount")
+	private Integer icount = 0;
+	
+
+	public Integer getIcount() {
+		return icount;
+	}
+
+
+	public void setIcount(Integer icount) {
+		this.icount = icount;
+	}
+	
 	@ApiModelProperty(value = "自增主键")
     @JsonProperty("id")
     private Long id;

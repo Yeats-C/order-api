@@ -21,11 +21,8 @@ import com.aiqin.mgs.order.api.domain.OrderInfo;
 @SuppressWarnings("all")
 public interface OrderAfterDetailService {
 
-	HttpResponse addAfterOrderDetail(@Valid List<OrderAfterSaleDetailInfo> afterDetailList, String afterSaleId);
+	void addAfterOrderDetail(@Valid List<OrderAfterSaleDetailInfo> afterDetailList, String afterSaleId)throws Exception;
 
 	HttpResponse OrderAfteIList(@Valid OrderAfterSaleQuery orderAfterSaleQuery);
-
-
-
 
 }

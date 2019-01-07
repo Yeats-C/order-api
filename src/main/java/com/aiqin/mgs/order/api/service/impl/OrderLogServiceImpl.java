@@ -77,18 +77,61 @@ public class OrderLogServiceImpl implements OrderLogService{
 
 	//添加订单日志
 	@Override
-	@Transactional
-	public HttpResponse addOrderLog(@Valid OrderLog logInfo) {
-		try {
-			
+	public void addOrderLog(@Valid OrderLog logInfo) throws Exception {
+
 			//生成日志ID
+			String status = logInfo.getStatusContent();
+			if(status !=null && !status.equals("")) {
+				if(status.equals(Global.STATUS_CONTENT_10)) {
+					logInfo.setStatusType(Global.STATUS_TYPE_10);
+				}
+				if(status.equals(Global.STATUS_CONTENT_1)) {
+					logInfo.setStatusType(Global.STATUS_TYPE_1);
+				}
+				if(status.equals(Global.STATUS_CONTENT_2)) {
+					logInfo.setStatusType(Global.STATUS_TYPE_2);
+				}
+				if(status.equals(Global.STATUS_CONTENT_3)) {
+					logInfo.setStatusType(Global.STATUS_TYPE_3);
+				}
+				if(status.equals(Global.STATUS_CONTENT_4)) {
+					logInfo.setStatusType(Global.STATUS_TYPE_4);
+				}
+				if(status.equals(Global.STATUS_CONTENT_5)) {
+					logInfo.setStatusType(Global.STATUS_TYPE_5);
+				}
+				if(status.equals(Global.STATUS_CONTENT_6)) {
+					logInfo.setStatusType(Global.STATUS_TYPE_6);
+				}
+				if(status.equals(Global.STATUS_CONTENT_100)) {
+					logInfo.setStatusType(Global.STATUS_TYPE_100);
+				}
+				if(status.equals(Global.STATUS_CONTENT_11)) {
+					logInfo.setStatusType(Global.STATUS_TYPE_11);
+				}
+				if(status.equals(Global.STATUS_CONTENT_22)) {
+					logInfo.setStatusType(Global.STATUS_TYPE_22);
+				}
+				if(status.equals(Global.STATUS_CONTENT_33)) {
+					logInfo.setStatusType(Global.STATUS_TYPE_33);
+				}
+				if(status.equals(Global.STATUS_CONTENT_44)) {
+					logInfo.setStatusType(Global.STATUS_TYPE_44);
+				}
+				if(status.equals(Global.STATUS_CONTENT_55)) {
+					logInfo.setStatusType(Global.STATUS_TYPE_55);
+				}
+				if(status.equals(Global.STATUS_CONTENT_66)) {
+					logInfo.setStatusType(Global.STATUS_TYPE_66);
+				}
+				if(status.equals(Global.STATUS_CONTENT_1000)) {
+					logInfo.setStatusType(Global.STATUS_TYPE_1000);
+				}
+				if(status.equals(Global.STATUS_CONTENT_111)) {
+					logInfo.setStatusType(Global.STATUS_TYPE_111);
+				}
+			}
 			orderLogDao.addOrderLog(logInfo);
-			return HttpResponse.success();
-		
-		} catch (Exception e) {
-			LOGGER.info("添加订单日志報錯", e);
-			return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
-		}
 	}
 
 

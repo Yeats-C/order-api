@@ -9,6 +9,8 @@ package com.aiqin.mgs.order.api.service;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.FrozenInfo;
 
@@ -28,4 +30,7 @@ public interface FrozenService {
 	HttpResponse selectSumByFrozenId(String createBy, String distributorId);
 
 	HttpResponse selectDetail(String createBy, String distributorId);
+
+	//查询挂单数量
+	HttpResponse selectSumByParam(@Valid String createBy, String distributorId);
 }

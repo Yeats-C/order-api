@@ -17,6 +17,19 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel("订单售后查询条件")
 public class OrderAfterSaleQuery extends PagesRequest {
     
+	@ApiModelProperty(value="不传参不返回 0:全部")
+	@JsonProperty("icount")
+	private Integer icount = 0;
+	
+
+	public Integer getIcount() {
+		return icount;
+	}
+
+
+	public void setIcount(Integer icount) {
+		this.icount = icount;
+	}
 	
 	@ApiModelProperty(value="售后编号")
 	@JsonProperty("after_sale_code")
@@ -37,6 +50,10 @@ public class OrderAfterSaleQuery extends PagesRequest {
 	@ApiModelProperty(value="分销机构id")
 	@JsonProperty("distributor_id")
 	private String distributorId;
+	
+	@ApiModelProperty(value="分销机构name")
+	@JsonProperty("distributor_name")
+	private String distributorName;
 	
 	@ApiModelProperty(value="售后id")
 	@JsonProperty("after_sale_id")
@@ -76,7 +93,21 @@ public class OrderAfterSaleQuery extends PagesRequest {
 	@JsonProperty("end_date")
 	private String endDate ;
 	
+	@ApiModelProperty(value="订单号/手机号")
+	@JsonProperty("code_and_phone")
+	private String codeAndPhone;
 	
+	
+	public String getCodeAndPhone() {
+		return codeAndPhone;
+	}
+
+
+	public void setCodeAndPhone(String codeAndPhone) {
+		this.codeAndPhone = codeAndPhone;
+	}
+
+
 	public String getBeginDate() {
 		return beginDate;
 	}

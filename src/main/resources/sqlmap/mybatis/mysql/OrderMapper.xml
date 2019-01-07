@@ -90,9 +90,9 @@
 </resultMap>
 
 <resultMap id="selectOrderByNineDateMapping" type="com.aiqin.mgs.order.api.domain.response.OrderResponse">
-<result column="actualprice" jdbcType="INTEGER" property="actualPrice"/>
-<result column="createtime" jdbcType="VARCHAR" property="createtime"/>
-<result column="ordercount" jdbcType="INTEGER" property="ordercount"/>
+<result column="actual_price" jdbcType="INTEGER" property="actualPrice"/>
+<result column="create_time" jdbcType="VARCHAR" property="createTime"/>
+<result column="order_count" jdbcType="INTEGER" property="orderCount"/>
 </resultMap>
 
     
@@ -110,6 +110,7 @@
          SELECT * FROM order_info
          where 1=1
 		 and order_id = #{orderId}
+		 ORDER BY create_time DESC
     </select>
     
         
@@ -121,11 +122,17 @@
 		 <if test="orderId!=null and orderId!=''">
 		 and a.order_id = #{orderId}
 		 </if>
+		 <if test="orderCode!=null and orderCode!=''">
+		 and a.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%') 
+         </if>
 		 <if test="memberId!=null and memberId!=''">
 		 and a.member_id =#{memberId}
          </if>
 		 <if test="memberPhone!=null and memberPhone!=''">
 		 and a.member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%') 
+         </if>
+         <if test="codeAndPhone!=null and codeAndPhone!=''">
+		 and (a.member_phone like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%') or a.order_code like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%'))
          </if>
          <if test="beginTime!=null ">
          and DATE_FORMAT(a.create_time,"%Y-%m-%d")  &gt;= DATE_FORMAT(#{beginTime},"%Y-%m-%d")
@@ -154,10 +161,16 @@
          <if test="distributorId!=null and distributorId!='' ">
          and a.distributor_id = #{distributorId}
          </if>
-         <if test="payType!=null ">
+         <if test="distributorName!=null and distributorName!=''">
+		 and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
+         </if>
+         <if test="payType!=null and payType!='' ">
          and b.pay_type = #{payType}
          </if>
+         ORDER BY a.create_time DESC
+         <if test="icount!=null ">
          limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+         </if>
     </select>
     
 
@@ -230,7 +243,7 @@
     <!-- 接口-分销机构+当月维度-当月实收    当月实收：不包含退货、未付款、取消的订单 -->
     <select id="selectbByMonthRetailAmt" resultType="java.lang.Integer">
       SELECT CASE WHEN b.return_price IS NULL  THEN a.real_amt ELSE a.real_amt-b.return_price END AS real_amt FROM (
-      SELECT DATE_FORMAT(b.create_time,"%Y-%m") AS create_time,SUM(actual_price) AS real_amt FROM order_info b
+      SELECT any_value(DATE_FORMAT(b.create_time,"%Y-%m")) AS create_time,SUM(actual_price) AS real_amt FROM order_info b
       WHERE 1=1
       AND b.order_status NOT IN ('0','4')
       AND b.pay_status='1'
@@ -243,7 +256,7 @@
       )a
       LEFT JOIN 
       (
-      SELECT DATE_FORMAT(b.create_time,"%Y-%m") AS create_time,SUM(return_price)AS return_price FROM order_after_sale b
+      SELECT any_value(DATE_FORMAT(b.create_time,"%Y-%m")) AS create_time,SUM(return_price)AS return_price FROM order_after_sale b
       WHERE 
       1=1
       AND b.after_sale_status='3'
@@ -270,6 +283,7 @@
       and b.origin_type =#{arg1}
       </if>
       AND DATE_FORMAT(b.create_time,"%Y-%m-%d") = #{arg2}
+      GROUP BY DATE_FORMAT(b.create_time,"%Y-%m-%d")
       )a
       LEFT JOIN 
       (
@@ -282,13 +296,14 @@
       and b.origin_type =#{arg1}
       </if>
       AND DATE_FORMAT(b.create_time,"%Y-%m-%d") = #{arg2}
+      GROUP BY DATE_FORMAT(b.create_time,"%Y-%m-%d")
       )b 
       ON a.create_time = b.create_time
     </select>
        
     <!-- 接口-订单概览-分销机构、小于当前日期9天内的实付金额、订单数量 -->
     <select id="selectOrderByNineDate" resultMap="selectOrderByNineDateMapping" resultType="java.util.List">
-      SELECT a.`create_time` as createtime ,a.order_acount as ordercount,CASE WHEN b.return_price IS NULL  THEN a.real_amt ELSE a.real_amt-b.return_price END  AS actualprice FROM (
+      SELECT a.`create_time` as create_time ,a.order_acount as order_count,CASE WHEN b.return_price IS NULL  THEN a.real_amt ELSE a.real_amt-b.return_price END  AS actual_price FROM (
       SELECT DATE_FORMAT(b.create_time,"%Y-%m-%d") AS create_time,COUNT(b.order_id) AS order_acount,SUM(actual_price) AS real_amt FROM order_info b
       WHERE 1=1
       AND b.order_status NOT IN ('0','4')
@@ -314,12 +329,12 @@
       GROUP BY DATE_FORMAT(b.create_time,"%Y-%m-%d")
       )b 
       ON a.create_time = b.create_time
-    </select>  
+    </select> 
     
     
     <!-- 接口-订单概览-分销机构、小于当前日期9周内的实付金额、订单数量 -->
-    <select id="selectOrderByNineWeek" resultType="com.aiqin.mgs.order.api.domain.response.OrderResponse">
-    SELECT #{any} AS createtime ,a.order_acount AS ordercount,CASE WHEN b.return_price IS NULL  THEN a.real_amt ELSE a.real_amt-b.return_price END  AS actualprice FROM (
+    <select id="selectOrderByNineWeek" resultMap="selectOrderByNineDateMapping">
+    SELECT #{any} AS create_time ,a.order_acount AS order_count,CASE WHEN b.return_price IS NULL  THEN a.real_amt ELSE a.real_amt-b.return_price END  AS actual_price FROM (
       SELECT YEARWEEK(DATE_FORMAT(b.create_time,'%Y-%m-%d')) AS create_time,COUNT(b.order_id) AS order_acount,SUM(actual_price) AS real_amt FROM order_info b
       WHERE 1=1
       AND b.order_status NOT IN ('0','4')
@@ -348,7 +363,7 @@
     
     <!-- 接口-订单概览-分销机构、小于当前日期9个月内的实付金额、订单数量 -->
      <select id="selectOrderByNineMonth" resultMap="selectOrderByNineDateMapping" resultType="java.util.List">
-      SELECT a.`create_time` AS createtime ,a.order_acount AS ordercount,CASE WHEN b.return_price IS NULL  THEN a.real_amt ELSE a.real_amt-b.return_price END  AS actualprice FROM (
+      SELECT a.`create_time` AS create_time ,a.order_acount AS order_count,CASE WHEN b.return_price IS NULL  THEN a.real_amt ELSE a.real_amt-b.return_price END  AS actual_price FROM (
       SELECT DATE_FORMAT(b.create_time,"%Y-%m") AS create_time,COUNT(b.order_id) AS order_acount,SUM(actual_price) AS real_amt FROM order_info b
       WHERE 1=1
       AND b.order_status NOT IN ('0','4')
@@ -374,7 +389,7 @@
       GROUP BY DATE_FORMAT(b.create_time,"%Y-%m")
       )b 
       ON a.create_time = b.create_time
-    </select> 
+    </select>
 	    
     <!-- 接口-关闭订单 -->
     <update id="closeOrder" >
@@ -401,6 +416,11 @@
 	<update id="onlyStatus" >
 		update order_info set update_by=#{updateBy},update_time=CURRENT_TIMESTAMP,order_status=#{orderStatus} where order_id = #{orderId}
 	</update>
+	
+	<!-- 仅变更订单支付方式-->
+	<update id="onlyPayType" >
+		update order_info set update_time=CURRENT_TIMESTAMP,pay_type=#{payType} where order_id = #{orderId}
+	</update>
 
     <!-- 接口-收银员交班收银情况统计  获取收银员、支付类型金额 -->
     <select id="cashier" resultMap="ReceiptSumMapping" resultType="java.util.List">
@@ -422,6 +442,7 @@
        AND b.create_time &lt;= #{endDate}
       </if>
        GROUP BY a.pay_type,b.cashier_id,b.cashier_name
+       ORDER BY b.create_time DESC
     </select>
     
     <!-- 接口-收银员交班收银情况统计   获取退款金额、退款订单数、销售额、销售订单数-->
@@ -510,7 +531,10 @@
 		  </foreach>
 			)
           </if>
+          ORDER BY create_time DESC
+         <if test="icount!=null ">
          limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+         </if>
     </select>
     
     <!-- 未付款订单30分钟后自动取消 -->
@@ -556,6 +580,9 @@
 		 <if test="orderId!=null and orderId!=''">
 		 and a.order_id = #{orderId}
 		 </if>
+		 <if test="orderCode!=null and orderCode!=''">
+		 and a.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%') 
+         </if>
 		 <if test="memberId!=null and memberId!=''">
 		 and a.member_id =#{memberId}
          </if>
@@ -589,10 +616,64 @@
          <if test="distributorId!=null and distributorId!='' ">
          and a.distributor_id = #{distributorId}
          </if>
-         <if test="payType!=null ">
+         <if test="payType!=null and payType!='' ">
          and b.pay_type = #{payType}
          </if>
+         ORDER BY a.create_time DESC
+         <if test="icount!=null ">
          limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+         </if>
+    </select>
+    
+    <!-- 删除订单主数据 -->
+	<delete id="deleteOrderInfo" >
+		delete from order_info WHERE order_id =#{orderId}
+     </delete>
+     
+     
+    <!-- 订单数 -->
+    <select id="selectAcountByEcshop"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultType="java.lang.Integer">
+         SELECT COUNT(order_id) FROM order_info  
+		 WHERE 1=1
+		 and DATE_FORMAT(create_time,"%Y-%m-%d") &gt;= #{beginDate}  
+		 AND DATE_FORMAT(create_time,"%Y-%m-%d") &lt;= #{endDate}
+         <if test="distributorId!=null and distributorId!='' ">
+         and distributor_id = #{distributorId}
+         </if>
+    </select>
+   
+    <!-- 订单金额 -->
+    <select id="selectAmountByEcshop"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultType="java.lang.Integer">
+         SELECT COUNT(actual_price) FROM order_info  
+		 WHERE 1=1
+		 and DATE_FORMAT(create_time,"%Y-%m-%d") &gt;= #{beginDate}  
+		 AND DATE_FORMAT(create_time,"%Y-%m-%d") &lt;= #{endDate}
+         <if test="distributorId!=null and distributorId!='' ">
+         and distributor_id = #{distributorId}
+         </if>
+    </select>
+    
+    <!-- 成交客户 -->
+    <select id="selectMembersByEcshop"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultType="java.lang.Integer">
+         SELECT COUNT(DISTINCT member_id) FROM order_info  
+		 WHERE 1=1
+		 and DATE_FORMAT(create_time,"%Y-%m-%d") &gt;= #{beginDate}  
+		 AND DATE_FORMAT(create_time,"%Y-%m-%d") &lt;= #{endDate}
+         <if test="distributorId!=null and distributorId!='' ">
+         and distributor_id = #{distributorId}
+         </if>
+    </select>
+    
+    <!--根据状态查询订单 -->
+    <select id="selectCountByStatus"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultType="java.lang.Integer">
+         SELECT COUNT(order_id) FROM order_info  
+		 WHERE 1=1
+         <if test="orderStatus!=null ">
+         and order_status = #{orderStatus}
+         </if>
+         <if test="distributorId!=null and distributorId!='' ">
+         and distributor_id = #{distributorId}
+         </if>
     </select>
     
 </mapper>

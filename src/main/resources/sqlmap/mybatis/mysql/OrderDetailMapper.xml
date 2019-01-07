@@ -110,6 +110,7 @@
          <if test="orderId!=null">
 		 and a.order_id =#{orderId}
 		 </if>
+		 ORDER BY a.create_time DESC
     </select>
     
     <!-- 查询会员下的所有订单ID下的商品集合... -->
@@ -128,6 +129,7 @@
 		  </foreach>
 			)
           </if>
+          ORDER BY a.create_time DESC
     </select>
     
 
@@ -178,12 +180,15 @@
 		  </foreach>
 			)
           </if>
-		 limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+          ORDER BY a.create_time DESC
+		 <if test="icount!=null ">
+         limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+         </if>
     </select>
     
 
 
-    <!-- 查询订单明细部分汇总-（支持活动ID汇总、） -->
+    <!-- 查询订单明细部分汇总-（支持活动ID汇总、） 暂时注销待确认：GROUP BY order_id-->
     <select id="selectorderdetailsum"  resultMap="OrderInfoDetailMapping" >
     SELECT SUM(actual_price) AS actual_price,count(order_id) AS amount FROM order_detail WHERE order_id IN (
 	SELECT DISTINCT order_id FROM order_detail WHERE 1=1
@@ -191,7 +196,6 @@
 	AND activity_id =#{activityId}
 	</if>
 	)
-	GROUP BY order_id
     </select>
     
     
@@ -212,7 +216,7 @@
     <select id="productOverviewByOrderTop"  resultMap="OrderInfoDetailMapping" resultType="java.util.List">
     SELECT c.* FROM (
     SELECT (@rowNO := @rowNo+1) AS rowno,a.* FROM(
-    SELECT product_id,product_name,SUM(a.amount) AS amount,SUM(a.actual_price) AS actual_price FROM order_detail a
+    SELECT any_value(product_id),any_value(product_name),SUM(a.amount) AS amount,SUM(a.actual_price) AS actual_price FROM order_detail a
     LEFT JOIN order_info b ON a.order_id = b.order_id
     WHERE 1=1
     and b.order_status NOT IN ('0','4')
@@ -277,8 +281,10 @@
          <if test="endDate!=null ">
          and DATE_FORMAT(b.create_time,"%Y-%m-%d") &lt;= DATE_FORMAT(#{endDate},"%Y-%m-%d")
          </if>
-         
-        limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+         ORDER BY a.create_time DESC
+        <if test="icount!=null ">
+         limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+         </if>
     </select>     
     
     <!--接口-统计商品在各个渠道的订单数.-->
@@ -288,12 +294,12 @@
          WHERE 1=1
          <if test="sukList != null" >
 		     and a.sku_code in (
-		<foreach collection="sukList" item="sku_code" separator=",">
+		 <foreach collection="sukList" item="sku_code" separator=",">
 			 '${sku_code}'
-		</foreach>
+		 </foreach>
 			)
-        </if>
-        <if test="originType!=null ">
+         </if>
+         <if test="originType!=null ">
          and b.origin_type = #{originType}
          </if>
            AND b.order_status NOT IN (0,4)
@@ -305,13 +311,43 @@
     <select id="setail"  resultMap="OrderInfoDetailMapping" >
          SELECT * FROM order_detail where 1=1
          <if test="orderDetailId!=null and orderDetailId!='' ">
-		 and b.order_detail_id =#{orderDetailId}
+		 and order_detail_id =#{orderDetailId}
 		 </if>
+		 ORDER BY create_time DESC
     </select> 
     
     <!--订单中商品sku数量-->
     <select id="getSkuSum"  parameterType="com.aiqin.mgs.order.api.domain.OrderDetailQuery" resultType="java.lang.Integer" >
          SELECT COUNT(order_detail_id) AS acount FROM order_detail WHERE order_id=#{orderId}
     </select> 
+    
+    <!-- 删除订单明细数据 -->
+	<delete id="deleteOrderDetailInfo" >
+		delete from order_detail WHERE order_id =#{orderId}
+    </delete>
+    
+    
+    <!--sku销量统计：包含退货、不包含取消、未付款的订单-->
+    <select id="getSkuAmount" resultType="java.lang.Integer">
+         SELECT SUM(a.amount) FROM order_detail a 
+         LEFT JOIN  order_info b ON a.order_id = b.order_id
+         WHERE 1=1
+           AND a.sku_code =#{skuCode} 
+           AND b.order_status NOT IN ('0','4')
+           AND b.pay_status='1' 
+           AND DATE_FORMAT(a.create_time,'%Y-%m-%d')  = #{nextDate}
+    </select>
+    
+    <!--sku金额统计：包含退货、不包含取消、未付款的订单-->
+    <select id="getSkuPrice" resultType="java.lang.Integer">
+         SELECT SUM(a.actual_price*a.amount) FROM order_detail a 
+         LEFT JOIN  order_info b ON a.order_id = b.order_id
+         WHERE 1=1
+           AND a.sku_code =#{skuCode} 
+           AND b.order_status NOT IN ('0','4')
+           AND b.pay_status='1' 
+           AND DATE_FORMAT(a.create_time,'%Y-%m-%d')  = #{nextDate}
+    </select>
+     
 </mapper>
 

@@ -33,7 +33,7 @@ public interface OrderDao {
     OrderInfo selecOrderById(OrderDetailQuery orderDetailQuery) throws Exception;
     
     //添加新的订单主数据
-    void addOrderInfo(@Valid OrderInfo orderInfo) throws Exception;
+    public void addOrderInfo(@Valid OrderInfo orderInfo) throws Exception;
 
     //接口-分销机构维度-总销售额 返回INT
 	Integer selectOrderAmt(@Param("distributorId")String distributorId,@Param("originType") String originType)throws Exception;
@@ -112,5 +112,24 @@ public interface OrderDao {
 
 	//模糊查询订单列表+订单中商品sku数量分页
 	List<OradskuResponse> selectskuResponse(OrderQuery orderQuery) throws Exception;
+
+	//删除订单主数据
+	void deleteOrderInfo(@Valid OrderInfo orderInfo) throws Exception;
+
+	//订单数
+	Integer selectAcountByEcshop(@Valid OrderQuery orderQuery) throws Exception;
+
+	//订单金额
+	Integer selectAmountByEcshop(OrderQuery orderQuery) throws Exception;
+
+	//成交客户
+	Integer selectMembersByEcshop(OrderQuery orderQuery) throws Exception;
+
+	//根据状态查询订单
+	Integer selectCountByStatus(OrderQuery orderQuery) throws Exception;
+
+	//修改订单支付方式信息
+	void onlyPayType(OrderQuery orderQuery)throws Exception;
+
 	
 }

@@ -21,6 +21,20 @@ import io.swagger.annotations.ApiModelProperty;
 public class OrderDetailQuery extends PagesRequest {
     
 	
+	@ApiModelProperty(value="不传参不返回 0:全部")
+	@JsonProperty("icount")
+	private Integer icount = 0;
+	
+
+	public Integer getIcount() {
+		return icount;
+	}
+
+
+	public void setIcount(Integer icount) {
+		this.icount = icount;
+	}
+	
 	//订单ID查询明细
 	@ApiModelProperty(value="订单id")
 	@JsonProperty("order_id")
