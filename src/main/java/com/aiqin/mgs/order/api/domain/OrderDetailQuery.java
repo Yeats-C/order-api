@@ -25,15 +25,9 @@ public class OrderDetailQuery extends PagesRequest {
 	@JsonProperty("icount")
 	private Integer icount = 0;
 	
-
-	public Integer getIcount() {
-		return icount;
-	}
-
-
-	public void setIcount(Integer icount) {
-		this.icount = icount;
-	}
+	@ApiModelProperty(value="订单code")
+	@JsonProperty("order_code")
+	private String orderCode ;
 	
 	//订单ID查询明细
 	@ApiModelProperty(value="订单id")
@@ -96,9 +90,26 @@ public class OrderDetailQuery extends PagesRequest {
 //	@ApiModelProperty(value="月份")
 //	@JsonProperty("month")
 //	private String month ;
+	
 
 	public Integer getOriginType() {
 		return originType;
+	}
+
+	public Integer getIcount() {
+		return icount;
+	}
+
+	public void setIcount(Integer icount) {
+		this.icount = icount;
+	}
+
+	public String getOrderCode() {
+		return orderCode;
+	}
+
+	public void setOrderCode(String orderCode) {
+		this.orderCode = orderCode;
 	}
 
 	public void setOriginType(Integer originType) {

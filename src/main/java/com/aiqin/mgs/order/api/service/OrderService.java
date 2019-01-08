@@ -38,7 +38,7 @@ public interface OrderService {
 
 	HttpResponse addOrderLog(@Valid OrderLog logInfo);
 
-	String addOrderInfo(@Valid OrderInfo orderInfo) throws Exception;
+	OrderInfo addOrderInfo(@Valid OrderInfo orderInfo) throws Exception;
 	
 	//添加新的订单优惠券关系表数据
 	void addOrderCoupon(@Valid List<OrderRelationCouponInfo> orderCouponList, @Valid String orderId)throws Exception;

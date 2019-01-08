@@ -2,7 +2,11 @@
 
 * 模块名称：订单后台-实现层
 * 开发人员: 黄祉壹
-* 开发时间: 2018-11-05 
+* 开发时间: 2018-11-05
+* 
+* 2019-01-08 调整接口addordta;返回值由order_id 调整为order_code
+*            调整接口addOrderList;返回值由order_id 调整为order_code
+*            调整接口addpamo;orderId 通过后台查询出来
 
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.service.impl;
@@ -153,7 +157,7 @@ public class OrderServiceImpl implements OrderService{
 
 	//添加新的订单主数据
 	@Override
-	public String addOrderInfo(@Valid OrderInfo orderInfo) throws Exception {
+	public OrderInfo addOrderInfo(@Valid OrderInfo orderInfo) throws Exception {
 		
 		String orderId = "";
 		String orderCode = "";
@@ -196,7 +200,7 @@ public class OrderServiceImpl implements OrderService{
 		//订单主数据
 		orderDao.addOrderInfo(orderInfo);
 		
-		return orderId;
+		return orderInfo;
 	}
 
 
@@ -439,9 +443,11 @@ public class OrderServiceImpl implements OrderService{
 		
 		//新增订单主数据
 		String orderId = "";
+		String orderCode = "";
 		if(orderInfo !=null ) {
-			
-				orderId = addOrderInfo(orderInfo);
+			orderInfo = addOrderInfo(orderInfo);
+			orderId = orderInfo.getOrderId();
+			orderCode = orderInfo.getOrderCode();
 			if(orderId.equals("")) {
 				return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
 			}
@@ -451,7 +457,7 @@ public class OrderServiceImpl implements OrderService{
 	      	OrderPublic.getStatus(Global.STATUS_0,orderInfo.getOrderStatus()),orderInfo.getCreateBy());
 			orderLogService.addOrderLog(rderLog);
 			
-		}
+		
 		//新增订单明细数据
 		if(detailList !=null && detailList.size()>0) {
 			detailList = orderDetailService.addDetailList(detailList,orderId);
@@ -514,9 +520,9 @@ public class OrderServiceImpl implements OrderService{
         	}
         	
         }
-        
-        String order_id = orderId;
-		return HttpResponse.success(order_id);
+	  }  
+        String order_code = orderCode;
+		return HttpResponse.success(order_code);
 	 }catch (Exception e){
 		 LOGGER.info("添加新的订单主数据以及其他订单关联数据報錯", e);
 		 throw new RuntimeException("添加新的订单主数据以及其他订单关联数据報錯");
@@ -1004,9 +1010,15 @@ public class OrderServiceImpl implements OrderService{
 		
 		//新增订单主数据
 		String orderId = "";
+		String orderCode = "";
 		if(orderInfo !=null ) {
+			orderInfo = addOrderInfo(orderInfo);
+			orderId = orderInfo.getOrderId();
+			orderCode = orderInfo.getOrderCode();
+			if(orderId.equals("")) {
+				return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+			}
 			
-			orderId = addOrderInfo(orderInfo);
 		  if(orderId !=null && !orderId.equals("")) {
 				
 			//生成订单日志
@@ -1049,9 +1061,8 @@ public class OrderServiceImpl implements OrderService{
         }
        } 
 	  }
-        String order_id = orderId;
-        
-		return HttpResponse.success(order_id);
+        String order_code = orderCode;
+		return HttpResponse.success(order_code);
 	 }catch (Exception e){
 		 LOGGER.info("添加新的订单主数据以及其他订单关联数据報錯", e);
 		 throw new RuntimeException("添加新的订单主数据以及其他订单关联数据報錯");
@@ -1073,32 +1084,41 @@ public class OrderServiceImpl implements OrderService{
 		
 		//修改订单主数据
 		String orderId = "";
+		String orderCode = "";
 		if(orderInfo !=null ) {
-			orderId = orderInfo.getOrderId();
+			orderCode = orderInfo.getOrderCode();
+//			orderId = orderInfo.getOrderId();
+			//通过订单编码查询订单ID
+			try {
+			orderId = orderDao.getOrderIdByCode(orderCode);
+			}catch (Exception e){
+				 LOGGER.info("orderDao.getOrderIdByCode(orderCode)", e);
+		    }
+			orderInfo.setOrderId(orderId);
 			if(orderId !=null && !orderId.equals("")) {
 			
-			//生成订单号
-		    String logo = "";
-			if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_0) {
-				logo = Global.ORIGIN_COME_3;
-			}
-			if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_1) {
-				logo = Global.ORIGIN_COME_4;
-			}
-			if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_3) {
-				logo = Global.ORIGIN_COME_5;
-			}
-			//公司标识
-			String companyCode = "";
-			if(orderInfo.getCompanyCode() !=null && orderInfo.getCompanyCode().equals(Global.COMPANY_01)) {
-				companyCode = Global.COMPANY_01;
-			}else {
-				companyCode = Global.COMPANY_01;
-			}
-			//yyMMddHHmmss+订单来源+销售渠道标识+公司标识+4位数的随机数
-			String orderCode = "";
-			orderCode = OrderPublic.currentDate()+logo+String.valueOf(Global.ORDERID_CHANNEL_4)+companyCode+OrderPublic.randomNumberF();
-			orderInfo.setOrderCode(orderCode);
+//			//生成订单号
+//		    String logo = "";
+//			if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_0) {
+//				logo = Global.ORIGIN_COME_3;
+//			}
+//			if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_1) {
+//				logo = Global.ORIGIN_COME_4;
+//			}
+//			if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_3) {
+//				logo = Global.ORIGIN_COME_5;
+//			}
+//			//公司标识
+//			String companyCode = "";
+//			if(orderInfo.getCompanyCode() !=null && orderInfo.getCompanyCode().equals(Global.COMPANY_01)) {
+//				companyCode = Global.COMPANY_01;
+//			}else {
+//				companyCode = Global.COMPANY_01;
+//			}
+//			//yyMMddHHmmss+订单来源+销售渠道标识+公司标识+4位数的随机数
+//			String orderCode = "";
+//			orderCode = OrderPublic.currentDate()+logo+String.valueOf(Global.ORDERID_CHANNEL_4)+companyCode+OrderPublic.randomNumberF();
+//			orderInfo.setOrderCode(orderCode);
 			
 			//初始化提货码
 			if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_1) {
@@ -1108,31 +1128,56 @@ public class OrderServiceImpl implements OrderService{
 			}
 			
 			//删除订单主数据
+			try {
 			orderDao.deleteOrderInfo(orderInfo);
-			
+			}catch (Exception e){
+				 LOGGER.info("orderDao.deleteOrderInfo(orderInfo)", e);
+		    }
 			
 			//新增订单主数据
+			try {
 			orderDao.addOrderInfo(orderInfo);
+			}catch (Exception e){
+				 LOGGER.info("orderDao.addOrderInfo(orderInfo)", e);
+		    }
 	        
 			//生成订单日志
 			OrderLog rderLog = OrderPublic.addOrderLog(orderId,Global.STATUS_0,"OrderServiceImpl.addOrderInfo()",
 	      	OrderPublic.getStatus(Global.STATUS_0,orderInfo.getOrderStatus()),orderInfo.getCreateBy());
+			try {
 			orderLogService.addOrderLog(rderLog);
-			
+			}catch (Exception e){
+				 LOGGER.info("orderLogService.addOrderLog(rderLog)1", e);
+		    }
 			//删除订单明细数据
+			try {
 			orderDetailDao.deleteOrderDetailInfo(orderInfo); 
-			
+			}catch (Exception e){
+				 LOGGER.info("orderLogService.addOrderLog(rderLog)1", e);
+		    }
 		//新增订单明细数据
 		if(detailList !=null && detailList.size()>0) {
+			try {
 			detailList = orderDetailService.addDetailList(detailList,orderId);
+		    }catch (Exception e){
+			 LOGGER.info("orderLogService.addOrderLog(rderLog)1", e);
+	        }
 		}
 		//新增订单结算数据
 		if(settlementInfo !=null) {
+			try {
             settlementService.addSettlement(settlementInfo,orderId);
+		    }catch (Exception e){
+			 LOGGER.info("orderLogService.addOrderLog(rderLog)1", e);
+	        }
 		}
 		//新增订单支付数据
         if(orderPayList != null && orderPayList.size()>0) {
+        	try {
         	settlementService.addOrderPayList(orderPayList,orderId);
+            }catch (Exception e){
+			 LOGGER.info("orderLogService.addOrderLog(rderLog)1", e);
+	        }
 		}
         //新增订单与优惠券关系数据
         if(orderCouponList !=null && orderCouponList.size()>0) {

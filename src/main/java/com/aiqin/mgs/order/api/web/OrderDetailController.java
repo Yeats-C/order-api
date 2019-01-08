@@ -3,6 +3,8 @@
 * 模块名称：订单后台-入口
 * 开发人员: 黄祉壹
 * 开发时间: 2018-11-05 
+* 
+* 2019-01-08 添加接口 -查询BYordercode-返回订单明细数据、订单数据、收货信息、结算数据 
 
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.web;
@@ -72,6 +74,21 @@ public class OrderDetailController {
     	
     	LOGGER.info("查询BYorderid-返回订单明细数据、订单数据、收货信息...");    	
         return orderDetailService.selectorderany(orderId);
+    }
+    
+    
+    /**
+     * 查询BYordercode-返回订单明细数据、订单数据、收货信息、结算数据
+     * @param 
+     * @return
+     */
+    @GetMapping("/selde")
+    @ApiOperation(value = "查询BYordercode-返回订单明细数据、订单数据、收货信息、结算数据....")
+    public HttpResponse selde(@Valid @RequestParam(name = "order_code", required = true) String orderCode) {
+        
+    	
+    	LOGGER.info("查询BYorderid-返回订单明细数据、订单数据、收货信息...");    	
+        return orderDetailService.selectorderSelde(orderCode);
     }
     
     
@@ -232,6 +249,21 @@ public class OrderDetailController {
 
     	LOGGER.info("sku销量统计....");    	
         return orderDetailService.skuSum(sukList);
+    }
+    
+    
+    /**
+     * 
+     * 批量添加sku销量
+     * @param 
+     * @return
+     */
+    @GetMapping("/savtch")
+    @ApiOperation(value = "批量添加sku销量....")
+    public HttpResponse savtch(@Valid @RequestParam(required = true) List<String> sukList) {
+
+    	LOGGER.info("sku销量统计....");    	
+        return orderDetailService.saveBatch(sukList);
     }
 
 }

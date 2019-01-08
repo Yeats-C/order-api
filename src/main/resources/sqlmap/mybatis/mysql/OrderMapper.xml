@@ -109,8 +109,20 @@
     
          SELECT * FROM order_info
          where 1=1
+         <if test="orderId!=null and orderId!=''">
 		 and order_id = #{orderId}
+		 </if>
+		 <if test="orderCode!=null and orderCode!=''">
+		 and order_code = #{orderCode}
+		 </if>
 		 ORDER BY create_time DESC
+    </select>
+    
+    <!-- 通过订单编码查询订单ID -->
+    <select id="getOrderIdByCode" parameterType="java.lang.String" resultType="java.lang.String">
+         SELECT order_id FROM order_info
+         where 1=1
+		 and order_code = #{orderCode,jdbcType=VARCHAR}
     </select>
     
         

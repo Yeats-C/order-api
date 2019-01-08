@@ -64,6 +64,12 @@ public interface OrderDetailService {
 
 	//sku销量统计
 	HttpResponse skuSum(@Valid List<String> sukList);
+
+	//批量添加sku销量
+	HttpResponse saveBatch(@Valid List<String> sukList);
+
+	//查询BYordercode-返回订单明细数据、订单数据、收货信息、结算数据
+	HttpResponse selectorderSelde(@Valid String orderCode);
 	
 
 
