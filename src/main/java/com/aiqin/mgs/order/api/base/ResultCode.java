@@ -14,4 +14,19 @@ public interface ResultCode {
     MessageId NOT_LOGIN_INFO = MessageId.create(Project.STORE_API, 7, "登录人账号或密码错误");
     MessageId SOSO_CONNECT_ERROR = MessageId.create(Project.STORE_API, 8, "调用腾讯地图异常");
     MessageId NO_HAVE_STORE_ERROR = MessageId.create(Project.STORE_API, 9, "未查询到对应门店信息");
+    
+    /** 黄祉壹   2018-11-05 开始     */
+    
+    MessageId ADD_EXCEPTION = MessageId.create(Project.ORDER_API, 10, "新增异常");
+    MessageId UPDATE_EXCEPTION = MessageId.create(Project.ORDER_API, 11, "更新异常");
+    MessageId DELETE_EXCEPTION = MessageId.create(Project.ORDER_API, 12, "删除异常");
+    MessageId SELECT_EXCEPTION = MessageId.create(Project.ORDER_API, 13, "查询异常");
+    MessageId PARAMETER_EXCEPTION = MessageId.create(Project.ORDER_API, 14, "参数异常");
+    
+    String CART = "购物车";
+    String ORDER = "订单";
+    
+    
+    
+    /** 黄祉壹   2018-11-05 结束     */
 }

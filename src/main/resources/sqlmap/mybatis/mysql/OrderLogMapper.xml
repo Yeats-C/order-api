@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.OrderLogDao">
+<resultMap id="OrderLogMapping" type="com.aiqin.mgs.order.api.domain.OrderLog">
+<result column="log_id" jdbcType="VARCHAR" property="logId"/>
+<result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+<result column="status_type" jdbcType="TINYINT" property="statusType"/>
+<result column="status" jdbcType="VARCHAR" property="status"/>
+<result column="status_code" jdbcType="VARCHAR" property="statusCode"/>
+<result column="status_content" jdbcType="VARCHAR" property="statusContent"/>
+<result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+<result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+<result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+<result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+</resultMap>
+    
+    <!-- 插入订单日志表 -->
+    <insert id="addOrderLog" >
+        insert into order_operation_log
+        (log_id,order_id,status,status_code,status_content,create_time,update_time,create_by,update_by,status_type)
+        values
+        (#{logId},#{orderId},#{status},#{statusCode},#{statusContent},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},#{statusType})
+    </insert>
+    
+    <!-- 查询订单日志表  -->
+    <select id="orog"  resultMap="OrderLogMapping" resultType="java.util.List">
+         SELECT * FROM order_operation_log
+         where 1=1
+		 and order_id = #{orderId}
+		 ORDER BY create_time DESC
+    </select>
+</mapper>
+

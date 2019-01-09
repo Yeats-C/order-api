@@ -15,7 +15,6 @@
     <name>order-api</name>
 
     <dependencies>
-
         <dependency>
             <groupId>com.aiqin.ground</groupId>
             <artifactId>ground-web</artifactId>
@@ -31,6 +30,12 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+		<dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.7</version>
+        </dependency>
+        
         
     </dependencies>
 
