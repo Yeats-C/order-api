@@ -538,8 +538,10 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 	@Override
 	public HttpResponse saveBatch(@Valid List<String> sukList) {
 		
+		//商品库存
+		String url = product_ip+product_sku;
+		
 		if(sukList !=null && sukList.size()>0) {
-			String url = product_ip+product_sku;
 			
 		}
 		
