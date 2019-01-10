@@ -13,7 +13,9 @@
 <result column="price" jdbcType="INTEGER" property="price"/>
 <result column="return_amount" jdbcType="INTEGER" property="returnAmount"/>
 <result column="return_price" jdbcType="INTEGER" property="returnPrice"/>
-<result column="return_reason_type" jdbcType="TINYINT" property="returnReasonType"/>
+<!-- <result column="return_reason_type" jdbcType="TINYINT" property="returnReasonType"/> -->
+<result column="return_reason_name" jdbcType="VARCHAR" property="returnReasonName"/>
+<result column="return_reason_code" jdbcType="VARCHAR" property="returnReasonCode"/>
 <result column="return_reason_content" jdbcType="VARCHAR" property="returnReasonContent"/>
 <result column="type_id" jdbcType="BIGINT" property="typeId"/>
 <result column="type_name" jdbcType="VARCHAR" property="typeName"/>
@@ -33,9 +35,9 @@
     <insert id="addAfterOrderDetail" >
         
         insert into order_after_sale_detail
-        (after_sale_detail_id,after_sale_id,order_code,order_detail_id,product_name,sku_code,spu_code,bar_code,price,return_amount,return_price,return_reason_type,return_reason_content,type_id,type_name,create_time,update_time,create_by,update_by)
+        (after_sale_detail_id,after_sale_id,order_code,order_detail_id,product_name,sku_code,spu_code,bar_code,price,return_amount,return_price,return_reason_name,return_reason_code,return_reason_content,type_id,type_name,create_time,update_time,create_by,update_by)
         values
-        (#{afterSaleDetailId},#{afterSaleId},#{orderCode},#{orderDetailId},#{productName},#{skuCode},#{spuCode},#{barCode},#{price},#{returnAmount},#{returnPrice},#{returnReasonType},#{returnReasonContent},#{typeId},#{typeName},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy})
+        (#{afterSaleDetailId},#{afterSaleId},#{orderCode},#{orderDetailId},#{productName},#{skuCode},#{spuCode},#{barCode},#{price},#{returnAmount},#{returnPrice},#{returnReasonName},#{returnReasonCode},#{returnReasonContent},#{typeId},#{typeName},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy})
         
     </insert>    
     

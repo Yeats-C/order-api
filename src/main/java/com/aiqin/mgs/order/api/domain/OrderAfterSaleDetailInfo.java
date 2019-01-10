@@ -3,6 +3,8 @@
 * 模块名称：订单售后明细-实体类
 * 开发人员: 黄祉壹
 * 开发时间: 2018-11-05 
+* 
+* 2019-01-10 退货原因编码、名称数据源变更为运营中心统一管理
 
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.domain;
@@ -63,9 +65,17 @@ public class OrderAfterSaleDetailInfo extends PagesRequest {
 	@JsonProperty("return_price")
 	private Integer returnPrice;
 	
-	@ApiModelProperty(value="退款原因类型")
-	@JsonProperty("return_reason_type")
-	private Integer returnReasonType ;
+//	@ApiModelProperty(value="退款原因类型")
+//	@JsonProperty("return_reason_type")
+//	private Integer returnReasonType ;
+	
+	@ApiModelProperty("退货原因名称")
+	@JsonProperty("return_reason_name")
+	private String returnReasonName;
+
+	@ApiModelProperty("退货原因编码")
+	@JsonProperty("return_reason_code")
+    private String returnReasonCode;
 	
 	@ApiModelProperty(value="退款原因详情")
 	@JsonProperty("return_reason_content")
@@ -247,12 +257,20 @@ public class OrderAfterSaleDetailInfo extends PagesRequest {
 		this.returnPrice = returnPrice;
 	}
 
-	public Integer getReturnReasonType() {
-		return returnReasonType;
+	public String getReturnReasonName() {
+		return returnReasonName;
 	}
 
-	public void setReturnReasonType(Integer returnReasonType) {
-		this.returnReasonType = returnReasonType;
+	public void setReturnReasonName(String returnReasonName) {
+		this.returnReasonName = returnReasonName;
+	}
+
+	public String getReturnReasonCode() {
+		return returnReasonCode;
+	}
+
+	public void setReturnReasonCode(String returnReasonCode) {
+		this.returnReasonCode = returnReasonCode;
 	}
 
 	public String getReturnReasonContent() {
