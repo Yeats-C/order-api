@@ -522,27 +522,29 @@
 	<!-- 接口-可退货的订单查询 分页 -->
     <select id="reorer"  resultMap="OrderInfoMapping" resultType="java.util.List">
     
-         SELECT * FROM order_info
+         SELECT * FROM order_info a
+         LEFT JOIN (SELECT order_id,SUM(IFNULL(return_price,0)) AS return_price  FROM order_after_sale GROUP BY order_id) b ON a.order_id = b.order_id
 		 WHERE 1=1
 		 <if test="orderId!=null and orderId!=''">
-		 and order_id = #{orderId}
+		 and a.order_id = #{orderId}
 		 </if>
 		 <if test="orderCode!=null and orderCode!=''">
-		 and order_code = #{orderCode}
+		 and a.order_code = #{orderCode}
 		 </if>
          <if test="beginTime!=null ">
-         and DATE_FORMAT(create_time,"%Y-%m-%d") = #{beginTime}
+         and DATE_FORMAT(a.create_time,"%Y-%m-%d") = #{beginTime}
          </if>
          <if test="distributorId!=null and distributorId!='' ">
-         and distributor_id = #{distributorId}
+         and a.distributor_id = #{distributorId}
          </if>
          <if test="statusList != null" >
-		     and order_status in (
+		     and a.order_status in (
 		  <foreach collection="statusList" item="order_status" separator=",">
 			 '${order_status}'
 		  </foreach>
 			)
           </if>
+          and IFNULL(a.actual_price,0)-IFNULL(b.return_price,0) >0
           ORDER BY create_time DESC
          <if test="icount!=null ">
          limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
