@@ -138,11 +138,8 @@ public class OrderServiceImpl implements OrderService{
 				//计算总数据量
 				Integer totalCount = 0;
 				Integer icount =null;
-				orderQuery.setIcount(icount);
-				List<OrderInfo> Icount_list= orderDao.selectOrder(OrderPublic.getOrderQuery(orderQuery));
-				if(Icount_list !=null && Icount_list.size()>0) {
-					totalCount = Icount_list.size();
-				}
+//				orderQuery.setIcount(icount);
+				totalCount = orderDao.selectOrderCount(OrderPublic.getOrderQuery(orderQuery));
 				
 //				return HttpResponse.success(OrderPublic.getData(OrderInfolist));
 				return HttpResponse.success(new PageResData(totalCount,OrderInfolist));

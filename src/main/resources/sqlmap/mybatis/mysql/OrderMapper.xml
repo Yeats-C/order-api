@@ -152,10 +152,10 @@
          <if test="endTime!=null ">
          and DATE_FORMAT(a.create_time,"%Y-%m-%d") &lt;= DATE_FORMAT(#{endTime},"%Y-%m-%d")
          </if>
-         <if test="beginDate!=null ">
+         <if test="beginDate!=null and beginDate!='' ">
          and DATE_FORMAT(a.create_time,"%Y-%m-%d")  &gt;= #{beginDate}
          </if>
-         <if test="endDate!=null ">
+         <if test="endDate!=null and endDate!='' ">
          and DATE_FORMAT(a.create_time,"%Y-%m-%d") &lt;= #{endDate}
          </if>
          <if test="orderStatus!=null ">
@@ -182,6 +182,61 @@
          ORDER BY a.create_time DESC
          <if test="icount!=null ">
          limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+         </if>
+    </select>
+    
+    <!-- 总条数 -->
+    <select id="selectOrderCount"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultType="java.lang.Integer">
+         SELECT count(*) FROM order_info a
+         left join order_pay b on a.order_id = b.order_id
+		 WHERE 1=1
+		 <if test="orderId!=null and orderId!=''">
+		 and a.order_id = #{orderId}
+		 </if>
+		 <if test="orderCode!=null and orderCode!=''">
+		 and a.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%') 
+         </if>
+		 <if test="memberId!=null and memberId!=''">
+		 and a.member_id =#{memberId}
+         </if>
+		 <if test="memberPhone!=null and memberPhone!=''">
+		 and a.member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%') 
+         </if>
+         <if test="codeAndPhone!=null and codeAndPhone!=''">
+		 and (a.member_phone like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%') or a.order_code like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%'))
+         </if>
+         <if test="beginTime!=null ">
+         and DATE_FORMAT(a.create_time,"%Y-%m-%d")  &gt;= DATE_FORMAT(#{beginTime},"%Y-%m-%d")
+         </if>
+         <if test="endTime!=null ">
+         and DATE_FORMAT(a.create_time,"%Y-%m-%d") &lt;= DATE_FORMAT(#{endTime},"%Y-%m-%d")
+         </if>
+         <if test="beginDate!=null and beginDate!='' ">
+         and DATE_FORMAT(a.create_time,"%Y-%m-%d")  &gt;= #{beginDate}
+         </if>
+         <if test="endDate!=null and endDate!='' ">
+         and DATE_FORMAT(a.create_time,"%Y-%m-%d") &lt;= #{endDate}
+         </if>
+         <if test="orderStatus!=null ">
+         and a.order_status = #{orderStatus}
+         </if>
+         <if test="originType!=null ">
+         and a.origin_type =#{originType}
+         </if>
+         <if test="receiveType!=null ">
+         and a.receive_type =#{receiveType}
+         </if>
+         <if test="receiveCode!=null and receiveCode!='' ">
+         and a.receive_code =#{receiveCode}
+         </if>
+         <if test="distributorId!=null and distributorId!='' ">
+         and a.distributor_id = #{distributorId}
+         </if>
+         <if test="distributorName!=null and distributorName!=''">
+		 and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
+         </if>
+         <if test="payType!=null and payType!='' ">
+         and b.pay_type = #{payType}
          </if>
     </select>
     
@@ -447,10 +502,10 @@
        AND b.cashier_id =#{cashierId}
        AND b.order_status NOT IN (0,4)
        AND a.pay_type IN (3,4,5,6)
-      <if test="beginDate!=null ">
+      <if test="beginDate!=null and beginDate!='' ">
        AND b.create_time &gt;= #{beginDate}
       </if>
-      <if test="endDate!=null ">
+      <if test="endDate!=null and endDate!='' ">
        AND b.create_time &lt;= #{endDate}
       </if>
        GROUP BY a.pay_type,b.cashier_id,b.cashier_name
@@ -470,10 +525,10 @@
            AND a.cashier_id =#{cashierId}
            AND b.return_status = '3'
            AND c.pay_type IN (3,4,5,6)
-           <if test="beginDate!=null ">
+           <if test="beginDate!=null and beginDate!='' ">
            and b.update_time &gt;= #{beginDate}
            </if>
-           <if test="endDate!=null ">
+           <if test="endDate!=null and endDate!='' ">
            and b.update_time &lt;= #{endDate}
            </if>
            )a,
@@ -487,10 +542,10 @@
            AND a.cashier_id =#{cashierId}
            AND a.order_status NOT IN (0,4)
            AND c.pay_type IN (3,4,5,6)
-           <if test="beginDate!=null ">
+           <if test="beginDate!=null and beginDate!='' ">
            and a.create_time &gt;= #{beginDate}
            </if>
-           <if test="endDate!=null ">
+           <if test="endDate!=null and endDate!='' ">
            and a.create_time &lt;= #{endDate}
            </if>
            ) b
@@ -609,10 +664,10 @@
          <if test="endTime!=null ">
          and DATE_FORMAT(a.create_time,"%Y-%m-%d") &lt;= DATE_FORMAT(#{endTime},"%Y-%m-%d")
          </if>
-         <if test="beginDate!=null ">
+         <if test="beginDate!=null and beginDate!='' ">
          and DATE_FORMAT(a.create_time,"%Y-%m-%d")  &gt;= #{beginDate}
          </if>
-         <if test="endDate!=null ">
+         <if test="endDate!=null and endDate!='' ">
          and DATE_FORMAT(a.create_time,"%Y-%m-%d") &lt;= #{endDate}
          </if>
          <if test="orderStatus!=null ">
@@ -624,7 +679,7 @@
          <if test="receiveType!=null ">
          and a.receive_type =#{receiveType}
          </if>
-         <if test="receiveCode!=null ">
+         <if test="receiveCode!=null and receiveCode!='' ">
          and a.receive_code =#{receiveCode}
          </if>
          <if test="distributorId!=null and distributorId!='' ">
