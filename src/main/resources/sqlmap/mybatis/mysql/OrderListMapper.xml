@@ -165,7 +165,7 @@
     store_type storeType, total_orders totalOrders, actual_amount_paid actualAmountPaid, activity_amount activityAmount, preferential_quota preferentialQuota,
     logistics_remission_ratio logisticsRemissionRatio, place_order_by placeOrderBy, place_order_time placeOrderTime, account_balance accountBalance, line_credit lineCredit,
     receiving_address receivingAddress, arrival_time arrivalTime, consignee, consignee_phone consigneePhone, company_code companyCode, company_name companyName,
-    create_by createBy,  update_by updateBy
+    create_by createBy,  update_by updateBy,original
       from order_list
       where  order_code=#{code}
     </select>
@@ -508,7 +508,9 @@
         <if test="createBy != null">
           create_by,
         </if>
-
+        <if test="original!=null">
+          original
+        </if>
 
 
       </trim>
@@ -588,7 +590,9 @@
         <if test="createBy != null">
           #{createBy,jdbcType=VARCHAR},
         </if>
-
+        <if test="original!= null">
+          #{original}
+        </if>
 
 
       </trim>

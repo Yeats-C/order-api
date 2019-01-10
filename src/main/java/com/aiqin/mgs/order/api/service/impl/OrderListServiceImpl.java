@@ -95,7 +95,7 @@ public class OrderListServiceImpl implements OrderListService {
         for (OrderListDetailsVo param : paramList) {
             //验证添加数据
             ParamUnit.isNotNull(param, "orderType", "orderStatus", "paymentStatus", "storeId", "storeCode", "storeName", "storeType", "totalOrders",
-                    "logisticsRemissionRatio", "placeOrderBy", "receivingAddress", "consignee", "consigneePhone", "companyCode", "orderListProductList",  "createBy"
+                  "orderCode",  "logisticsRemissionRatio", "placeOrderBy", "receivingAddress", "consignee", "consigneePhone", "companyCode","original", "orderListProductList",  "createBy"
             );
 
             List<OrderListProduct> orderListProductList = param.getOrderListProductList();
@@ -105,8 +105,9 @@ public class OrderListServiceImpl implements OrderListService {
             for (OrderListProduct orderListProduct : orderListProductList) {
                 ParamUnit.isNotNull(orderListProduct, "skuCode", "skuName", "productPrice", "originalProductPrice", "productNumber", "gift", "specifications", "unit");
             }
-           String orderCode= sequenceService.generateOrderCode(param.getCompanyCode(), param.getOrderType());
-            param.setOrderCode(orderCode);
+//           String orderCode= sequenceService.generateOrderCode(param.getCompanyCode(), param.getOrderType());
+//            param.setOrderCode(orderCode);
+            String orderCode=param.getOrderCode();
             String orderId = IdUtil.uuid();
             param.setId(orderId);
             Boolean re = orderListDao.insertOrderListDetailsVo(param);

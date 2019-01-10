@@ -117,6 +117,10 @@ public class OrderListDetailsVo {
     private String companyName;
 
 
+    @ApiModelProperty(value = "原单标识code")
+    @JsonProperty("original")
+    private String original;
+
     @ApiModelProperty(value = "创建人")
     @JsonProperty("create_by")
     private String createBy;

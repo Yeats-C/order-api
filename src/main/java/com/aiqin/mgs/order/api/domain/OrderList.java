@@ -105,6 +105,10 @@ public class OrderList extends PagesRequest {
     @JsonProperty("company_name")
     private String companyName;
 
+    @ApiModelProperty(value = "原单标识code")
+    @JsonProperty("original")
+    private String original;
+
     @ApiModelProperty(value = "创建人")
     @JsonProperty("create_by")
     private String createBy;
