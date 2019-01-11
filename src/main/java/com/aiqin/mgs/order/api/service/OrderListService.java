@@ -6,8 +6,11 @@ import com.aiqin.mgs.order.api.domain.OrderListLogistics;
 import com.aiqin.mgs.order.api.domain.request.orderList.OrderListDetailsVo;
 import com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo;
 import com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo2;
+import com.aiqin.mgs.order.api.domain.request.orderList.OrderStockVo;
+import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 描述:
@@ -27,4 +30,6 @@ public interface OrderListService {
     Boolean addLogistics(OrderListLogistics param);
 
     Boolean updateOrderStatus(String code, Integer status);
+
+    List<OrderStockReVo> getStockValue(OrderStockVo vo);
 }

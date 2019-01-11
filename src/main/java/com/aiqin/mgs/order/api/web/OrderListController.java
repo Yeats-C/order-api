@@ -6,6 +6,8 @@ import com.aiqin.mgs.order.api.domain.OrderListLogistics;
 import com.aiqin.mgs.order.api.domain.request.orderList.OrderListDetailsVo;
 import com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo;
 import com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo2;
+import com.aiqin.mgs.order.api.domain.request.orderList.OrderStockVo;
+import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
 import com.aiqin.mgs.order.api.service.OrderListService;
 import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.Project;
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 描述:
@@ -25,9 +28,9 @@ import java.util.List;
  * @author zhujunchao
  * @create 2019-01-04 15:25
  */
-@RestController
-@Api(tags = "订单控制器")
-@RequestMapping("/order/list")
+//@RestController
+//@Api(tags = "订单B控制器")
+//@RequestMapping("/order/list")
 @Slf4j
 public class OrderListController {
     @Autowired
@@ -107,7 +110,7 @@ public class OrderListController {
     /**
      * 修改订单状态
      */
-    @PostMapping("update/Order/status")
+    @GetMapping("update/Order/status")
     @ApiOperation("修改订单状态")
     public HttpResponse<Boolean> updateOrderStatus(@ApiParam("订单code")@RequestParam("code") String code,@ApiParam("订单状态")@RequestParam("status") Integer status) {
         log.info("Search  purchasingTarget list:{}", code,status);
@@ -118,4 +121,14 @@ public class OrderListController {
             return HttpResponse.failure(MessageId.create(Project.OMS_API,400,e.getMessage()));
         }
     }
+
+    /**
+     * 查询一段时间进货进度量
+     */
+      @PostMapping("get/stock/value")
+      @ApiOperation("查询一段时间进货进度量")
+      public HttpResponse<List<OrderStockReVo>> getStockValue(OrderStockVo vo){
+          return  HttpResponse.success(orderListService.getStockValue(vo));
+
+      }
 }

@@ -4,9 +4,12 @@ import com.aiqin.mgs.order.api.domain.OrderList;
 import com.aiqin.mgs.order.api.domain.request.orderList.OrderListDetailsVo;
 import com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo;
 import com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo2;
+import com.aiqin.mgs.order.api.domain.request.orderList.OrderStockVo;
+import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OrderListDao {
 
@@ -40,4 +43,6 @@ public interface OrderListDao {
     int searchOrderReceptionListCount(OrderListVo2 param);
 
     Boolean updateByCode(@Param("code") String code, @Param("status") Integer status, @Param("paymentStatus") Integer paymentStatus);
+
+    List<OrderStockReVo> getStockValue(@Param("vo")OrderStockVo vo);
 }

@@ -14,6 +14,8 @@ import com.aiqin.mgs.order.api.domain.OrderStatus;
 import com.aiqin.mgs.order.api.domain.request.orderList.OrderListDetailsVo;
 import com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo;
 import com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo2;
+import com.aiqin.mgs.order.api.domain.request.orderList.OrderStockVo;
+import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
 import com.aiqin.mgs.order.api.service.OrderListService;
 import com.aiqin.ground.util.id.IdUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 描述:
@@ -42,6 +45,12 @@ public class OrderListServiceImpl implements OrderListService {
     private SequenceService sequenceService;
     @Autowired
     private OrderStatusDao orderStatusDao;
+
+    /**
+     * 订单列表后台
+     * @param param
+     * @return
+     */
     @Override
     public PageResData<OrderList> searchOrderList(OrderListVo param) {
         List<OrderList> inventories = orderListDao.searchOrderList(param);
@@ -49,6 +58,11 @@ public class OrderListServiceImpl implements OrderListService {
         return new PageResData<>(count, inventories);
     }
 
+    /**
+     * 订单列表后台
+     * @param param
+     * @return
+     */
     @Override
     public PageResData<OrderList> searchOrderReceptionList(OrderListVo2 param) {
         ParamUnit.isNotNull(param,"storeId");
@@ -75,6 +89,11 @@ public class OrderListServiceImpl implements OrderListService {
         }
 
         return orderListDao.updateByCode(code,status,orderStatus.getPaymentStatus());
+    }
+
+    @Override
+    public List<OrderStockReVo> getStockValue(OrderStockVo vo) {
+        return orderListDao.getStockValue(vo);
     }
 
     @Override

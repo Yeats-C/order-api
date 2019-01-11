@@ -228,7 +228,18 @@
       and order_code=#{orderCode}
     </if>
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    <select id="getStockValue" resultType="com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo">
+      select store_code,count(actual_amount_paid) from order_list
+      where
+      and   place_order_time>#{vo.startPlaceOrderTime}
+      and  #{vo.endPlaceOrderTime}> place_order_time
+      and  store_code in
+      <foreach collection="vo.storeCode" index="index" item="code" open="(" separator="," close=")">
+            #{code}
+      </foreach>
+      group by store_code
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from order_list
     where id = #{id,jdbcType=BIGINT}
   </delete>
