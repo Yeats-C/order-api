@@ -99,9 +99,6 @@
             <properties>
                 <profile.name>dev</profile.name>
             </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
         </profile>
         <profile>
             <id>release</id>
@@ -114,6 +111,9 @@
             <properties>
                 <profile.name>test</profile.name>
             </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
         </profile>
     </profiles>
 </project>

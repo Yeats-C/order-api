@@ -28,9 +28,9 @@ import java.util.Map;
  * @author zhujunchao
  * @create 2019-01-04 15:25
  */
-//@RestController
-//@Api(tags = "订单B控制器")
-//@RequestMapping("/order/list")
+@RestController
+@Api(tags = "订单B控制器")
+@RequestMapping("/order/list")
 @Slf4j
 public class OrderListController {
     @Autowired
@@ -127,7 +127,7 @@ public class OrderListController {
      */
       @PostMapping("get/stock/value")
       @ApiOperation("查询一段时间进货进度量")
-      public HttpResponse<List<OrderStockReVo>> getStockValue(OrderStockVo vo){
+      public HttpResponse<List<OrderStockReVo>> getStockValue(@RequestBody OrderStockVo vo){
           return  HttpResponse.success(orderListService.getStockValue(vo));
 
       }
