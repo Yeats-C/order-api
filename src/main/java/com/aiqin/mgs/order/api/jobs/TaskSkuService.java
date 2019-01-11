@@ -25,7 +25,7 @@ public class TaskSkuService{
     private OrderService orderService;
 	
 	
-    @Scheduled(cron = "0/5 * * * * ?") // 设置每2小时执行一次
+//    @Scheduled(cron = "0/5 * * * * ?") // 设置每2小时执行一次
 
     public void getTask() {
 

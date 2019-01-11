@@ -25,7 +25,9 @@ public class TaskService{
     private OrderService orderService;
 	
 	
-    @Scheduled(cron = "0/5 * * * * ?") // 设置每5秒执行一次
+//    @Scheduled(cron = "0/5 * * * * ?") // 设置每5秒执行一次
+	//支持测试.生产需变更
+	@Scheduled(cron = "0 0/30 * * * ? ") // 设置每半小时执行一次
 
     public void getTask() {
 
