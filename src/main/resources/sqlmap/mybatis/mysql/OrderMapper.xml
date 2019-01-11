@@ -607,18 +607,18 @@
     </select>
     
     <!-- 未付款订单30分钟后自动取消 -->
-    <select id="nevder"   resultType="java.util.List">
+    <select id="nevder"   resultType="java.lang.String">
     SELECT order_id FROM order_info 
     WHERE 1=1 
     AND order_status=0
-    AND DATE_ADD(create_time,INTERVAL 30 MINUTE) >= NOW()
+    AND DATE_ADD(create_time,INTERVAL 30 MINUTE) &lt;= NOW()
     </select>
     
     <!-- 提货码10分钟后失效. -->
-    <select id="nevred"   resultType="java.util.List">
+    <select id="nevred"   resultType="java.lang.String">
         SELECT order_id FROM order_info 
         WHERE 1=1
-        AND DATE_ADD(receive_time,INTERVAL 10 MINUTE) >= NOW()
+        AND DATE_ADD(receive_time,INTERVAL 10 MINUTE) &lt;= NOW()
         AND order_status = 2
         AND receive_code !='@zx'
     </select>
