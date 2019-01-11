@@ -94,7 +94,7 @@ public class SettlementServiceImpl implements SettlementService{
 
 		if(settlementInfo !=null) {
 			   settlementInfo.setOrderId(orderId);
-			   settlementInfo.setSettlement_id(OrderPublic.getUUID());
+			   settlementInfo.setSettlementId(OrderPublic.getUUID());
 				
 				   settlementDao.addSettlement(settlementInfo);
 		}else {

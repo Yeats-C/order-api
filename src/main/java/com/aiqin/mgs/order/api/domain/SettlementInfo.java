@@ -28,9 +28,9 @@ public class SettlementInfo extends PagesRequest {
     @NotBlank
     private String orderId;
     
-    @ApiModelProperty(value = "结算id")
-    @JsonProperty("settlementId")
-    private String settlement_id;
+//    @ApiModelProperty(value = "结算id")
+//    @JsonProperty("settlementId")
+//    private String settlement_id;
     
     @ApiModelProperty(value = "商品合计")
     @JsonProperty("product_sum")
@@ -137,13 +137,13 @@ public class SettlementInfo extends PagesRequest {
     
 
 
-	public String getSettlement_id() {
-		return settlement_id;
-	}
-
-	public void setSettlement_id(String settlement_id) {
-		this.settlement_id = settlement_id;
-	}
+//	public String getSettlement_id() {
+//		return settlement_id;
+//	}
+//
+//	public void setSettlement_id(String settlement_id) {
+//		this.settlement_id = settlement_id;
+//	}
 
 	public String getUpdateTime() {
 		return updateTime;
