@@ -129,6 +129,14 @@ public class OrderListDetailsVo {
     @JsonProperty("update_by")
     private String updateBy;
 
+    @ApiModelProperty(value = "出仓code")
+    @JsonProperty("out_warehouse_code")
+    private String outWarehouseCode;
+
+    @ApiModelProperty(value = "出仓仓库名称")
+    @JsonProperty("out_warehouse_name")
+    private String outWarehouseName;
+
     @ApiModelProperty(value = "物流List")
     @JsonProperty("order_list_logistics_list")
     private List<OrderListLogistics> orderListLogisticsList;

@@ -229,7 +229,7 @@
     </if>
   </select>
     <select id="getStockValue" resultType="com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo">
-      select store_code,count(actual_amount_paid) from order_list
+      select store_code storeCode,count(actual_amount_paid) stockValue from order_list
       where 1=1
       and   place_order_time>#{vo.startPlaceOrderTime}
       and  #{vo.endPlaceOrderTime}> place_order_time
