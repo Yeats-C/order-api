@@ -202,14 +202,13 @@
       line_number, sku_code, sku_name,
       product_price, product_number, activity_code,
       activity_name, is_gift, out_warehouse_code,
-      out_warehouse_name,original_product_price,specifications,unit)
+      specifications,unit)
     values
         <foreach collection ="list" item="product" index= "index" separator =",">
     (#{product.id}, #{product.orderListId}, #{product.orderCode},
       #{product.lineNumber}, #{product.skuCode}, #{product.skuName},
       #{product.productPrice}, #{product.productNumber}, #{product.activityCode},
-      #{product.activityName}, #{product.gift}, #{product.outWarehouseCode},
-      #{product.outWarehouseName},#{originalProductPrice},#{specifications},#{unit})
+      #{product.activityName}, #{product.gift}, #{originalProductPrice},#{specifications},#{unit})
         </foreach>
     </insert>
 

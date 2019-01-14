@@ -21,4 +21,6 @@ public class OrderStockReVo {
     @ApiModelProperty(value = "门店code")
     @JsonProperty("store_code")
     private String storeCode;
+
+
 }

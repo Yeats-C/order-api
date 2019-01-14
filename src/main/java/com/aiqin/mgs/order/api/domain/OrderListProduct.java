@@ -60,14 +60,6 @@ public class OrderListProduct {
     @JsonProperty("invoice_code")
     private String invoiceCode;
 
-    @ApiModelProperty(value = "出仓code")
-    @JsonProperty("out_warehouse_code")
-    private String outWarehouseCode;
-
-    @ApiModelProperty(value = "出仓仓库名称")
-    @JsonProperty("out_warehouse_name")
-    private String outWarehouseName;
-
     @ApiModelProperty(value = "规格")
     @JsonProperty("specifications")
     private String specifications;
