@@ -745,5 +745,16 @@
          </if>
     </select>
     
+    <!-- 销售目标管理-分销机构-月销售额-->
+    <select id="selectDistributorMonth" resultType="java.lang.Integer">
+         SELECT SUM(IFNULL(b.actual_price,0)) AS total_price FROM order_info b
+         WHERE  1=1 
+         AND b.order_status NOT IN ('0','4')
+         AND b.pay_status='1'
+         and b.distributor_code = #{arg0}
+         and DATE_FORMAT(b.create_time,"%Y-%m-%d") &gt;= DATE_FORMAT(#{arg1},"%Y-%m-%d")  
+		 AND DATE_FORMAT(b.create_time,"%Y-%m-%d") &lt;= DATE_FORMAT(#{arg2},"%Y-%m-%d")
+    </select>
+    
 </mapper>
 

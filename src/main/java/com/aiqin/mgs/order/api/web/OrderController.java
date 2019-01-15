@@ -23,6 +23,7 @@ import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
 import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.OrderDetailService;
 import com.aiqin.mgs.order.api.service.OrderService;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,9 +37,10 @@ import org.springframework.web.context.request.WebRequest;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.sql.Date;
+//import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -503,4 +505,20 @@ public class OrderController {
     	LOGGER.info("微商城-事务总览....");    	
         return orderService.wsswv(distributorId);
     }
+    
+    /**
+     * 销售目标管理-分销机构-月销售额
+     * @param 
+     * @return
+     */
+    @PostMapping("/sdm")
+    @ApiOperation(value = "销售目标管理-分销机构-月销售额")
+    public HttpResponse sdm(@Valid @RequestBody(required = true) List<String> distributorCodeList,
+    		 @Valid @RequestParam(name = "begin_time", required = true) String beginTime,
+    		 @Valid @RequestParam(name = "end_time", required = true) String endTime
+    		) {
+        
+    	
+        return orderService.selectDistributorMonth(distributorCodeList,beginTime,endTime);
+    } 
 }

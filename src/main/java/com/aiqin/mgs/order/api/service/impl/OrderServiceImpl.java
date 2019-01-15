@@ -66,6 +66,7 @@ import com.aiqin.mgs.order.api.domain.response.OrderResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
 import com.aiqin.mgs.order.api.domain.response.WscSaleResponse;
 import com.aiqin.mgs.order.api.domain.response.WscWorkViewResponse;
+import com.aiqin.mgs.order.api.domain.response.DistributorMonthResponse;
 import com.aiqin.mgs.order.api.domain.response.LastBuyResponse;
 import com.aiqin.mgs.order.api.domain.response.MevBuyResponse;
 import com.aiqin.mgs.order.api.domain.response.OradskuResponse;
@@ -1381,6 +1382,33 @@ public class OrderServiceImpl implements OrderService{
 		  LOGGER.info("已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)報錯", e);
 		  return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
 	    }
+	}
+
+	//销售目标管理-分销机构-月销售额
+	@Override
+	public HttpResponse selectDistributorMonth(@Valid List<String> distributorCodeList,String beginTime,String endTime) {
+		try {
+			List<DistributorMonthResponse> list = new ArrayList();
+			//当月销售额：包含退货、不包含取消、未付款的订单
+			Integer monthtotalPrice=0;
+			if(distributorCodeList !=null && distributorCodeList.size()>0) {
+				for(String distributorCode : distributorCodeList) {
+					DistributorMonthResponse info = new DistributorMonthResponse();
+					monthtotalPrice = orderDao.selectDistributorMonth(distributorCode,beginTime,endTime);
+					info.setDistributorCode(distributorCode);
+					if(monthtotalPrice ==null) {
+						info.setPrice(0);
+					}else {
+						info.setPrice(monthtotalPrice);
+					}
+					list.add(info);
+				}
+			}
+		return HttpResponse.success(list);
+    } catch (Exception e) {
+	  LOGGER.info("销售目标管理-分销机构-月销售额報錯", e);
+	  return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+    }
 	}
 	
 }

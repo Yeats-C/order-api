@@ -6,7 +6,7 @@
 
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.service;
-
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -124,4 +124,8 @@ public interface OrderService {
 
 	//已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)
 	HttpResponse repast(@Valid String orderId, @Valid String payType, @Valid List<OrderPayInfo> orderPayList);
+
+	//销售目标管理-分销机构-月销售额
+	HttpResponse selectDistributorMonth(@Valid List<String> distributorCodeList,@Valid String beginTime,
+			@Valid String endTime);
 }

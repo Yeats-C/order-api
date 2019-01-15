@@ -136,5 +136,8 @@ public interface OrderDao {
 
 	Integer selectOrderCount(OrderQuery orderQuery)throws Exception;
 
+	//销售目标管理-分销机构-月销售额
+	Integer selectDistributorMonth(@Valid @Param("distributorCode")String distributorCode,@Valid @Param("beginTime")String beginTime,@Valid @Param("endTime")String endTime)throws Exception;
+
 	
 }
