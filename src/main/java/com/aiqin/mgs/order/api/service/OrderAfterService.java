@@ -34,7 +34,7 @@ public interface OrderAfterService {
 //	HttpResponse returus(@Valid String afterSaleId, Integer afterSaleStatus, String updateBy);
 	
 	//更改退货状态(售后表)
-	HttpResponse returus(@Valid String afterSaleId, Integer afterSaleStatus, String updateBy);
+	HttpResponse returus(@Valid String afterSaleId, Integer afterSaleStatus, String updateBy,String updateByName);
 
 	//模糊查询查询退货信息+退货明细+订单明细信息
 	HttpResponse aftlst(@Valid OrderAfterSaleQuery orderAfterSaleQuery);

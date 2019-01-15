@@ -364,7 +364,7 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 	//更改退货状态(售后表)
 	@Override
 	@Transactional
-	public HttpResponse returus(@Valid String afterSaleId, Integer afterSaleStatus, String updateBy) {
+	public HttpResponse returus(@Valid String afterSaleId, Integer afterSaleStatus, String updateBy,String updateByName) {
 		
 		try {
 		   
@@ -373,6 +373,7 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 		    orderAfterSaleInfo.setAfterSaleId(afterSaleId);
 		    orderAfterSaleInfo.setAfterSaleStatus(afterSaleStatus);
 		    orderAfterSaleInfo.setUpdateBy(updateBy);
+		    orderAfterSaleInfo.setUpdateByName(updateByName);
 			orderAfterDao.returnStatus(orderAfterSaleInfo);
 			
 			//生成订单日志

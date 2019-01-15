@@ -128,10 +128,11 @@ public class OrderAfterController {
    @ApiOperation(value = "更改退货状态(售后表+订单表)....")
    public HttpResponse returus(@Valid @RequestParam(name = "after_sale_id", required = true) String afterSaleId,
 		@RequestParam(name = "after_sale_status", required = true) Integer afterSaleStatus,
-		@RequestParam(name = "update_by", required = true) String updateBy
+		@RequestParam(name = "update_by", required = true) String updateBy,
+		@RequestParam(name = "update_by_name", required = true) String updateByName
 		) {
        //前台逻辑,退货的时候 先插入退货数据退款成功后修改退货状态.
 	   LOGGER.info("更改退货状态(售后表)...");    	
-       return orderAfterService.returus(afterSaleId,afterSaleStatus,updateBy);
+       return orderAfterService.returus(afterSaleId,afterSaleStatus,updateBy,updateByName);
    }  
    }
