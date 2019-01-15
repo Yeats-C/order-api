@@ -133,11 +133,40 @@ public class OrderAfterSaleInfo extends PagesRequest {
 	@JsonProperty("update_by")
 	private String updateBy;
 	
+	@ApiModelProperty(value="操作员名称")
+	@JsonProperty("create_by_name")
+	private String createByName;
+	
+	
+	@ApiModelProperty(value="修改员名称")
+	@JsonProperty("update_by_name")
+	private String updateByName;
+	
 	@ApiModelProperty(value="售后明细数据")
 	@JsonProperty("detail_list")
 	private List<OrderAfterSaleDetailInfo> detailList;
 
 
+
+
+	public String getCreateByName() {
+		return createByName;
+	}
+
+
+	public void setCreateByName(String createByName) {
+		this.createByName = createByName;
+	}
+
+
+	public String getUpdateByName() {
+		return updateByName;
+	}
+
+
+	public void setUpdateByName(String updateByName) {
+		this.updateByName = updateByName;
+	}
 
 
 	public List<OrderAfterSaleDetailInfo> getDetailList() {

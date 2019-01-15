@@ -28,6 +28,8 @@
 <result column="actual_price" jdbcType="INTEGER" property="actualPrice"/>
 <result column="spec" jdbcType="VARCHAR" property="spec"/>
 <result column="unit" jdbcType="VARCHAR" property="unit"/>
+<result column="create_by_name" jdbcType="VARCHAR" property="createByName"/>
+<result column="update_by_name" jdbcType="VARCHAR" property="updateByName"/>
 </resultMap>
 
     
@@ -35,9 +37,11 @@
     <insert id="addAfterOrderDetail" >
         
         insert into order_after_sale_detail
-        (after_sale_detail_id,after_sale_id,order_code,order_detail_id,product_name,sku_code,spu_code,bar_code,price,return_amount,return_price,return_reason_name,return_reason_code,return_reason_content,type_id,type_name,create_time,update_time,create_by,update_by)
+        (after_sale_detail_id,after_sale_id,order_code,order_detail_id,product_name,sku_code,spu_code,bar_code,price,return_amount,return_price,return_reason_name,return_reason_code,return_reason_content,type_id,type_name,create_time,update_time,create_by,update_by,
+        create_by_name,update_by_name)
         values
-        (#{afterSaleDetailId},#{afterSaleId},#{orderCode},#{orderDetailId},#{productName},#{skuCode},#{spuCode},#{barCode},#{price},#{returnAmount},#{returnPrice},#{returnReasonName},#{returnReasonCode},#{returnReasonContent},#{typeId},#{typeName},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy})
+        (#{afterSaleDetailId},#{afterSaleId},#{orderCode},#{orderDetailId},#{productName},#{skuCode},#{spuCode},#{barCode},#{price},#{returnAmount},#{returnPrice},#{returnReasonName},#{returnReasonCode},#{returnReasonContent},#{typeId},#{typeName},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},
+        #{createByName},#{updateByName})
         
     </insert>    
     
