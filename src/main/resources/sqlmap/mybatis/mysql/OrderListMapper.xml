@@ -111,7 +111,7 @@
     receiving_address receivingAddress, arrival_time arrivalTime, consignee, consignee_phone consigneePhone, company_code companyCode, company_name companyName,
     create_by createBy,  update_by updateBy
       from order_list
-      where 1=1 and split in (0,2)
+      where 1=1
       <if test="storeCode !=null">
       and  (store_code  LIKE CONCAT('%',#{storeCode}, '%')
         or   store_name  LIKE CONCAT('%',#{storeCode}, '%'))
@@ -137,7 +137,7 @@
         select
     count(*)
       from order_list
-      where 1=1 and split in (0,2)
+      where 1=1
     <if test="storeCode !=null">
       and  (store_code  LIKE CONCAT('%',#{storeCode}, '%')
       or   store_name  LIKE CONCAT('%',#{storeCode}, '%'))
@@ -178,7 +178,7 @@
       receiving_address receivingAddress, arrival_time arrivalTime, consignee, consignee_phone consigneePhone, company_code companyCode, company_name companyName,
       create_by createBy,  update_by updateBy
       from order_list
-      where 1=1 and split in (0,2)
+      where 1=1
 
         and  store_id=#{storeId}
 
@@ -206,7 +206,7 @@
        select
     count(*)
       from order_list
-      where 1=1 and split in (0,2)
+      where 1=1
     and  store_id=#{storeId}
 
     <if test="startPlaceOrderTime !=null">
