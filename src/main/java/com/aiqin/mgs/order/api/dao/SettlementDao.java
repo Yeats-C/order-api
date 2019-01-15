@@ -17,6 +17,6 @@ public interface SettlementDao {
 	SettlementInfo jkselectsettlement(@Valid OrderQuery orderQuery)throws Exception; 
 
 	//添加新的结算数据
-	void addSettlement(SettlementInfo info) throws Exception; 
+	void addSettlement(@Valid SettlementInfo info) throws Exception; 
 	
 }

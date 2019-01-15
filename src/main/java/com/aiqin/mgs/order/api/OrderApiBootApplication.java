@@ -36,7 +36,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * </pre>
  * <p>
  */
-//@EnableScheduling //定时任务
+@EnableScheduling //定时任务
 @SuppressWarnings("ALL")
 @Configuration
 @ComponentScan

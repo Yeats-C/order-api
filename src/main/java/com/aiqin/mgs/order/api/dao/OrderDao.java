@@ -134,5 +134,7 @@ public interface OrderDao {
 	//通过订单编码查询订单ID
 	String getOrderIdByCode(@Valid @Param("orderCode") String orderCode)throws Exception;
 
+	Integer selectOrderCount(OrderQuery orderQuery)throws Exception;
+
 	
 }
