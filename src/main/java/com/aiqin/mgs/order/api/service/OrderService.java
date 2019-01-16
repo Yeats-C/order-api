@@ -43,20 +43,20 @@ public interface OrderService {
 	//添加新的订单优惠券关系表数据
 	void addOrderCoupon(@Valid List<OrderRelationCouponInfo> orderCouponList, @Valid String orderId)throws Exception;
 
-	//接口-分销机构维度-总销售额
-	HttpResponse selectOrderAmt(String distributorId, String originType);
+	//接口-分销机构维度-总销售额  废弃
+//	HttpResponse selectOrderAmt(String distributorId, String originType);
 
 	//接口-分销机构+当月维度-当月销售额、当月实收、当月支付订单数
-	HttpResponse selectorderbymonth(@Valid String distributorId, String originType);
+	HttpResponse selectorderbymonth(@Valid String distributorId,@Valid List<Integer> originTypeList);
 
 	//接口-订单概览-分销机构、小于当前日期9天内的实付金额、订单数量
-	HttpResponse selectOrderByNineDate(@Valid String distributorId, String originType);
+	HttpResponse selectOrderByNineDate(@Valid String distributorId,@Valid List<Integer> originTypeList);
 
 	//接口-订单概览-分销机构、小于当前日期9周内的实付金额、订单数量
-	HttpResponse selectOrderByNineWeek(@Valid String distributorId, String originType);
+	HttpResponse selectOrderByNineWeek(@Valid String distributorId,@Valid List<Integer> originTypeList);
 
 	//接口-订单概览-分销机构、小于当前日期9个月内的实付金额、订单数量
-	HttpResponse selectOrderByNineMonth(@Valid String distributorId, String originType);
+	HttpResponse selectOrderByNineMonth(@Valid String distributorId,@Valid List<Integer> originTypeList);
 	
 	//添加新的订单主数据以及其他订单关联数据
 	HttpResponse addOrderList(@Valid OrderAndSoOnRequest orderAndSoOnRequest);

@@ -57,7 +57,7 @@ public interface OrderDetailService {
 	void returnStatus(@Valid String orderDetailId,Integer returnStatus,Integer returnAmount, String updateBy)throws Exception;
 
 	//接口-统计商品在各个渠道的订单数.
-	HttpResponse prodisor(@Valid List<String> sukList,@Valid Integer originType);
+	HttpResponse prodisor(@Valid List<String> sukList,@Valid List<Integer> originTypeList);
 
 	//订单中商品sku数量
 	Integer getSkuSum(@Valid String orderId);

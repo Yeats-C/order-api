@@ -98,9 +98,13 @@
          <if test="afterSaleStatus!=null ">
          and after_sale_status = #{afterSaleStatus}
          </if>
-         <if test="originType!=null ">
-         and origin_type =#{originType}
-         </if>
+         <if test="originTypeList != null" >
+		     and origin_type in (
+		  <foreach collection="originTypeList" item="origin_type" separator=",">
+			 '${origin_type}'
+		  </foreach>
+			)
+          </if>
          ORDER BY create_time DESC
          <if test="icount!=null ">
          limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}

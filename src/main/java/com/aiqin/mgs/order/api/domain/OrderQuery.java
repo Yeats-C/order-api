@@ -8,6 +8,7 @@
 package com.aiqin.mgs.order.api.domain;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.validation.constraints.NotBlank;
 
@@ -56,9 +57,13 @@ public class OrderQuery extends PagesRequest {
 	private String distributorName="";
 	
 	
-	@ApiModelProperty(value="来源类型0-pos，1-微商城, 2-全部 ,3:web")
-	@JsonProperty("origin_type")
-	private Integer originType;
+//	@ApiModelProperty(value="来源类型0-pos，1-微商城, 2-全部 ,3:web")
+//	@JsonProperty("origin_type")
+//	private Integer originType;
+	
+	@ApiModelProperty(value="来源类型:2||null-全部;0&&3-门店;1-微商城;0-pos;3:web")
+	@JsonProperty("origin_type_list")
+	private List<Integer> originTypeList;
 	
 	@ApiModelProperty(value="收银员id")
 	@JsonProperty("cashier_id")
@@ -131,6 +136,16 @@ public class OrderQuery extends PagesRequest {
 	@JsonProperty("code_and_phone")
 	private String codeAndPhone;
 	
+
+	public List<Integer> getOriginTypeList() {
+		return originTypeList;
+	}
+
+
+	public void setOriginTypeList(List<Integer> originTypeList) {
+		this.originTypeList = originTypeList;
+	}
+
 
 	public String getOrderCode() {
 		return orderCode;
@@ -322,14 +337,14 @@ public class OrderQuery extends PagesRequest {
 	}
 
 
-	public Integer getOriginType() {
-		return originType;
-	}
-
-
-	public void setOriginType(Integer originType) {
-		this.originType = originType;
-	}
+//	public Integer getOriginType() {
+//		return originType;
+//	}
+//
+//
+//	public void setOriginType(Integer originType) {
+//		this.originType = originType;
+//	}
 
 
 	public String getCashierId() {

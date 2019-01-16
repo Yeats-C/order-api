@@ -7,6 +7,7 @@
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.domain;
 import java.util.Date;
+import java.util.List;
 
 import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -59,9 +60,13 @@ public class OrderAfterSaleQuery extends PagesRequest {
 	@JsonProperty("after_sale_id")
 	private String afterSaleId ;
 	
-	@ApiModelProperty(value="订单来源类型")
-	@JsonProperty("origin_type")
-	private Integer originType;
+//	@ApiModelProperty(value="订单来源类型")
+//	@JsonProperty("origin_type")
+//	private Integer originType;
+	
+	@ApiModelProperty(value="来源类型:2||null-全部;0&&3-门店;1-微商城;0-pos;3:web")
+	@JsonProperty("origin_type_list")
+	private List<Integer> originTypeList;
 	
 	@ApiModelProperty(value="订单支付方式")
 	@JsonProperty("pay_type")
@@ -98,6 +103,26 @@ public class OrderAfterSaleQuery extends PagesRequest {
 	private String codeAndPhone;
 	
 	
+	public String getDistributorName() {
+		return distributorName;
+	}
+
+
+	public void setDistributorName(String distributorName) {
+		this.distributorName = distributorName;
+	}
+
+
+	public List<Integer> getOriginTypeList() {
+		return originTypeList;
+	}
+
+
+	public void setOriginTypeList(List<Integer> originTypeList) {
+		this.originTypeList = originTypeList;
+	}
+
+
 	public String getCodeAndPhone() {
 		return codeAndPhone;
 	}
@@ -148,13 +173,13 @@ public class OrderAfterSaleQuery extends PagesRequest {
 		this.afterSaleStatus = afterSaleStatus;
 	}
 
-	public Integer getOriginType() {
-		return originType;
-	}
-
-	public void setOriginType(Integer originType) {
-		this.originType = originType;
-	}
+//	public Integer getOriginType() {
+//		return originType;
+//	}
+//
+//	public void setOriginType(Integer originType) {
+//		this.originType = originType;
+//	}
 
 	public String getOrderCode() {
 		return orderCode;

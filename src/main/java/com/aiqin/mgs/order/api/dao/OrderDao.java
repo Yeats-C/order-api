@@ -36,25 +36,25 @@ public interface OrderDao {
     public void addOrderInfo(@Valid OrderInfo orderInfo) throws Exception;
 
     //接口-分销机构维度-总销售额 返回INT
-	Integer selectOrderAmt(@Param("distributorId")String distributorId,@Param("originType") String originType)throws Exception;
+	Integer selectOrderAmt(@Param("distributorId")String distributorId,@Param("originTypeList")List<Integer> originTypeList)throws Exception;
 
 	//接口-分销机构+当月维度-当月销售额
-	Integer selectByMonthAllAmt(@Param("distributorId")String distributorId, @Param("originType")String originType,@Param("yearMonth")String yearMonth)throws Exception;
+	Integer selectByMonthAllAmt(@Param("distributorId")String distributorId, @Param("originTypeList")List<Integer> originTypeList,@Param("yearMonth")String yearMonth)throws Exception;
 
     //接口-分销机构+当月维度-当月实收
-	Integer selectbByMonthRetailAmt(@Param("distributorId")String distributorId, @Param("originType")String originType,@Param("yearMonth")String yearMonth)throws Exception;
+	Integer selectbByMonthRetailAmt(@Param("distributorId")String distributorId, @Param("originTypeList")List<Integer> originTypeList,@Param("yearMonth")String yearMonth)throws Exception;
 
     //接口-分销机构+当月维度-当月支付订单数
-	Integer selectByMonthAcount(@Param("distributorId")String distributorId, @Param("originType")String originType,@Param("yearMonth")String yearMonth)throws Exception;
+	Integer selectByMonthAcount(@Param("distributorId")String distributorId, @Param("originTypeList")List<Integer> originTypeList,@Param("yearMonth")String yearMonth)throws Exception;
 
 	//接口-分销机构+日维度-日销售额
-	Integer selectByYesdayAllAmt(@Param("distributorId")String distributorId, @Param("originType")String originType,@Param("yesterday")String yesterday)throws Exception;
+	Integer selectByYesdayAllAmt(@Param("distributorId")String distributorId,@Param("originTypeList")List<Integer> originTypeList,@Param("yesterday")String yesterday)throws Exception;
 
     //接口-分销机构+日维度-日实收
-	Integer selectbByYesdayRetailAmt(@Param("distributorId")String distributorId, @Param("originType")String originType,@Param("yesterday")String yesterday)throws Exception;
+	Integer selectbByYesdayRetailAmt(@Param("distributorId")String distributorId, @Param("originTypeList")List<Integer> originTypeList,@Param("yesterday")String yesterday)throws Exception;
 
     //接口-分销机构+日维度-日支付订单数
-	Integer selectByYesdayAcount(@Param("distributorId")String distributorId, @Param("originType")String originType,@Param("yesterday")String yesterday)throws Exception;
+	Integer selectByYesdayAcount(@Param("distributorId")String distributorId, @Param("originTypeList")List<Integer> originTypeList,@Param("yesterday")String yesterday)throws Exception;
 
 	//接口-订单概览-分销机构、小于当前日期9天内的实付金额、订单数量
 	List<OrderResponse> selectOrderByNineDate(@Valid OrderQuery OrderQuery)throws Exception;

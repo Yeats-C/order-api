@@ -231,10 +231,11 @@ public class OrderDetailController {
      */
     @PostMapping("/prodisor")
     @ApiOperation(value = "商品总库菜单-统计商品在各个渠道的订单数....")
-    public HttpResponse prodisor(@Valid @RequestBody(required = true) List<String> sukList,@Valid @RequestParam(name = "origin_type", required = true) Integer originType) {
+    public HttpResponse prodisor(@Valid @RequestBody(required = true) List<String> sukList,
+    		@Valid @RequestBody List<Integer> originTypeList) {
 
     	LOGGER.info("商品总库菜单-统计商品在各个渠道的订单数....");    	
-        return orderDetailService.prodisor(sukList,originType);
+        return orderDetailService.prodisor(sukList,originTypeList);
     }
     
     /**

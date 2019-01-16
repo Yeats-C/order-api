@@ -77,9 +77,13 @@ public class OrderDetailQuery extends PagesRequest {
 	@JsonProperty("suk_list")
 	private List<String>  sukList;
 	
-	@ApiModelProperty(value="来源类型")
-	@JsonProperty("origin_type")
-	private Integer originType;
+//	@ApiModelProperty(value="来源类型")
+//	@JsonProperty("origin_type")
+//	private Integer originType;
+	
+	@ApiModelProperty(value="来源类型:2||null-全部;0&&3-门店;1-微商城;0-pos;3:web")
+	@JsonProperty("origin_type_list")
+	private List<Integer> originTypeList;
 	
 	
 //	//接口--商品概览 月销量/产品销量
@@ -90,14 +94,17 @@ public class OrderDetailQuery extends PagesRequest {
 //	@ApiModelProperty(value="月份")
 //	@JsonProperty("month")
 //	private String month ;
-	
-
-	public Integer getOriginType() {
-		return originType;
-	}
 
 	public Integer getIcount() {
 		return icount;
+	}
+
+	public List<Integer> getOriginTypeList() {
+		return originTypeList;
+	}
+
+	public void setOriginTypeList(List<Integer> originTypeList) {
+		this.originTypeList = originTypeList;
 	}
 
 	public void setIcount(Integer icount) {
@@ -110,10 +117,6 @@ public class OrderDetailQuery extends PagesRequest {
 
 	public void setOrderCode(String orderCode) {
 		this.orderCode = orderCode;
-	}
-
-	public void setOriginType(Integer originType) {
-		this.originType = originType;
 	}
 
 	public List<String> getSukList() {

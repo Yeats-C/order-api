@@ -161,9 +161,13 @@
          <if test="orderStatus!=null ">
          and a.order_status = #{orderStatus}
          </if>
-         <if test="originType!=null ">
-         and a.origin_type =#{originType}
-         </if>
+         <if test="originTypeList != null" >
+		  and a.origin_type in (
+		  <foreach collection="originTypeList" item="origin_type" separator=",">
+			 '${origin_type}'
+		  </foreach>
+			)
+          </if>
          <if test="receiveType!=null ">
          and a.receive_type =#{receiveType}
          </if>
@@ -219,10 +223,14 @@
          </if>
          <if test="orderStatus!=null ">
          and a.order_status = #{orderStatus}
-         </if>
-         <if test="originType!=null ">
-         and a.origin_type =#{originType}
-         </if>
+         </if>         
+         <if test="originTypeList != null" >
+		  and a.origin_type in (
+		  <foreach collection="originTypeList" item="origin_type" separator=",">
+			 '${origin_type}'
+		  </foreach>
+			)
+          </if>
          <if test="receiveType!=null ">
          and a.receive_type =#{receiveType}
          </if>
@@ -248,9 +256,13 @@
          AND b.order_status NOT IN ('0','4')
          AND b.pay_status='1'
          and b.distributor_id =#{arg0}
-         <if test="arg1!=null ">
-         and b.origin_type =#{arg1}
-         </if>
+         <if test="arg1!=null" >
+		  and b.origin_type in (
+		  <foreach collection="arg1" item="origin_type" separator=",">
+			 '${origin_type}'
+		  </foreach>
+			)
+          </if>
     </select>  
     
     <!-- 接口-分销机构+当月维度-当月销售额  当月销售额：包含退货、不包含取消、未付款的订单-->
@@ -260,9 +272,13 @@
          AND b.order_status NOT IN ('0','4')
          AND b.pay_status='1'
          and b.distributor_id = #{arg0}
-         <if test="arg1!=null ">
-         AND b.origin_type =#{arg1}
-         </if>
+         <if test="arg1!=null" >
+		  and b.origin_type in (
+		  <foreach collection="arg1" item="origin_type" separator=",">
+			 '${origin_type}'
+		  </foreach>
+			)
+          </if>
          and DATE_FORMAT(b.create_time,"%Y-%m") =#{arg2}
     </select>
     
@@ -273,9 +289,13 @@
          AND b.order_status NOT IN ('0','4')
          AND b.pay_status='1'
          and b.distributor_id = #{arg0}
-         <if test="arg1!=null ">
-         and b.origin_type =#{arg1}
-         </if>
+         <if test="arg1!=null" >
+		  and b.origin_type in (
+		  <foreach collection="arg1" item="origin_type" separator=",">
+			 '${origin_type}'
+		  </foreach>
+			)
+          </if>
          and DATE_FORMAT(b.create_time,"%Y-%m-%d") =#{arg2}
     </select>
     
@@ -287,9 +307,13 @@
          AND b.order_status NOT IN ('0','4')
          AND b.pay_status='1'
          and b.distributor_id = #{arg0}
-         <if test="arg1!=null ">
-         and b.origin_type =#{arg1}
-         </if>
+         <if test="arg1!=null" >
+		  and b.origin_type in (
+		  <foreach collection="arg1" item="origin_type" separator=",">
+			 '${origin_type}'
+		  </foreach>
+			)
+          </if>
          and DATE_FORMAT(b.create_time,"%Y-%m") =#{arg2}
     </select>
     
@@ -301,8 +325,12 @@
          AND b.order_status NOT IN ('0','4')
          AND b.pay_status='1'
          and b.distributor_id = #{arg0}
-         <if test="arg1!=null ">
-         and b.origin_type =#{arg1}
+         <if test="arg1!=null" >
+		  and b.origin_type in (
+		  <foreach collection="arg1" item="origin_type" separator=",">
+			 '${origin_type}'
+		  </foreach>
+			)
          </if>
          and DATE_FORMAT(b.create_time,"%Y-%m-%d") =#{arg2}
     </select>
@@ -315,9 +343,13 @@
       AND b.order_status NOT IN ('0','4')
       AND b.pay_status='1'
       AND b.distributor_id = #{arg0}
-      <if test="arg1!=null ">
-      and b.origin_type =#{arg1}
-      </if>
+      <if test="arg1!=null" >
+		  and b.origin_type in (
+		  <foreach collection="arg1" item="origin_type" separator=",">
+			 '${origin_type}'
+		  </foreach>
+			)
+       </if>
       AND DATE_FORMAT(b.create_time,"%Y-%m") =#{arg2}
       GROUP BY DATE_FORMAT(b.create_time,"%Y-%m")
       )a
@@ -328,9 +360,13 @@
       1=1
       AND b.after_sale_status='3'
       AND b.distributor_id = #{arg0}
-      <if test="arg1!=null ">
-      and b.origin_type =#{arg1}
-      </if>
+      <if test="arg1!=null" >
+		  and b.origin_type in (
+		  <foreach collection="arg1" item="origin_type" separator=",">
+			 '${origin_type}'
+		  </foreach>
+			)
+       </if>
       AND DATE_FORMAT(b.create_time,"%Y-%m") =#{arg2}
       GROUP BY DATE_FORMAT(b.create_time,"%Y-%m")
       )b 
@@ -346,9 +382,13 @@
       AND b.order_status NOT IN ('0','4')
       AND b.pay_status='1'
       AND b.distributor_id = #{arg0}
-      <if test="arg1!=null ">
-      and b.origin_type =#{arg1}
-      </if>
+      <if test="arg1!=null" >
+		  and b.origin_type in (
+		  <foreach collection="arg1" item="origin_type" separator=",">
+			 '${origin_type}'
+		  </foreach>
+			)
+       </if>
       AND DATE_FORMAT(b.create_time,"%Y-%m-%d") = #{arg2}
       GROUP BY DATE_FORMAT(b.create_time,"%Y-%m-%d")
       )a
@@ -359,9 +399,13 @@
       1=1
       AND b.after_sale_status='3'
       AND b.distributor_id = #{arg0}
-      <if test="arg1!=null ">
-      and b.origin_type =#{arg1}
-      </if>
+      <if test="arg1!=null" >
+		  and b.origin_type in (
+		  <foreach collection="arg1" item="origin_type" separator=",">
+			 '${origin_type}'
+		  </foreach>
+			)
+       </if>
       AND DATE_FORMAT(b.create_time,"%Y-%m-%d") = #{arg2}
       GROUP BY DATE_FORMAT(b.create_time,"%Y-%m-%d")
       )b 
@@ -376,8 +420,12 @@
       AND b.order_status NOT IN ('0','4')
       AND b.pay_status='1'
       AND b.distributor_id = #{distributorId}
-      <if test="originType!=null ">
-      AND b.origin_type =#{originType}
+      <if test="originTypeList != null" >
+		AND b.origin_type in (
+		<foreach collection="originTypeList" item="origin_type" separator=",">
+		'${origin_type}'
+		</foreach>
+		)
       </if>
       AND DATE_FORMAT(b.create_time,"%Y-%m-%d") &gt;= #{beginDate}
       GROUP BY DATE_FORMAT(b.create_time,"%Y-%m-%d")
@@ -389,8 +437,12 @@
       1=1
       AND b.after_sale_status='3'
       AND b.distributor_id = #{distributorId}
-      <if test="originType!=null ">
-      AND b.origin_type =#{originType}
+      <if test="originTypeList != null" >
+		AND b.origin_type in (
+		<foreach collection="originTypeList" item="origin_type" separator=",">
+		'${origin_type}'
+		</foreach>
+		)
       </if>
       AND DATE_FORMAT(b.create_time,"%Y-%m-%d") &gt;= #{beginDate}
       GROUP BY DATE_FORMAT(b.create_time,"%Y-%m-%d")
@@ -407,8 +459,12 @@
       AND b.order_status NOT IN ('0','4')
       AND b.pay_status='1'
       AND b.distributor_id = #{distributorId}
-      <if test="originType!=null ">
-      AND b.origin_type =#{originType}
+      <if test="originTypeList != null" >
+		AND b.origin_type in (
+		<foreach collection="originTypeList" item="origin_type" separator=",">
+		'${origin_type}'
+		</foreach>
+		)
       </if>
       AND YEARWEEK(DATE_FORMAT(b.create_time,'%Y-%m-%d')) = YEARWEEK(NOW())-#{any}
       )a
@@ -419,8 +475,12 @@
       1=1
       AND b.after_sale_status='3'
       AND b.distributor_id = #{distributorId}
-      <if test="originType!=null ">
-      AND b.origin_type =#{originType}
+      <if test="originTypeList != null" >
+		AND b.origin_type in (
+		<foreach collection="originTypeList" item="origin_type" separator=",">
+		'${origin_type}'
+		</foreach>
+		)
       </if>
       AND YEARWEEK(DATE_FORMAT(b.create_time,'%Y-%m-%d')) = YEARWEEK(NOW())-#{any}
       )b 
@@ -436,8 +496,12 @@
       AND b.order_status NOT IN ('0','4')
       AND b.pay_status='1'
       AND b.distributor_id = #{distributorId}
-      <if test="originType!=null ">
-      AND b.origin_type =#{originType}
+      <if test="originTypeList != null" >
+		AND b.origin_type in (
+		<foreach collection="originTypeList" item="origin_type" separator=",">
+		'${origin_type}'
+		</foreach>
+		)
       </if>
       AND DATE_FORMAT(b.create_time,"%Y-%m") &gt;= #{beginDate}
       GROUP BY DATE_FORMAT(b.create_time,"%Y-%m")
@@ -449,8 +513,12 @@
       1=1
       AND b.after_sale_status='3'
       AND b.distributor_id = #{distributorId}
-      <if test="originType!=null ">
-      AND b.origin_type =#{originType}
+      <if test="originTypeList != null" >
+		AND b.origin_type in (
+		<foreach collection="originTypeList" item="origin_type" separator=",">
+		'${origin_type}'
+		</foreach>
+		)
       </if>
       AND DATE_FORMAT(b.create_time,"%Y-%m") &gt;= #{beginDate}
       GROUP BY DATE_FORMAT(b.create_time,"%Y-%m")
@@ -673,9 +741,13 @@
          <if test="orderStatus!=null ">
          and a.order_status = #{orderStatus}
          </if>
-         <if test="originType!=null ">
-         and a.origin_type =#{originType}
-         </if>
+         <if test="originTypeList != null" >
+		  and a.origin_type in (
+		  <foreach collection="originTypeList" item="origin_type" separator=",">
+			 '${origin_type}'
+		  </foreach>
+			)
+          </if>
          <if test="receiveType!=null ">
          and a.receive_type =#{receiveType}
          </if>

@@ -304,14 +304,21 @@ public static String randomNumberE() {
 	}
 	
 
-	//订单  - 处理字典项："全部" 查询条件.
+	//订单  - 处理必传字段字典项："全部" 查询条件. 
 	public static OrderQuery getOrderQuery(OrderQuery query){
 		
+		//收货方式
 		if(query !=null && query.getReceiveType() !=null && query.getReceiveType().equals(Global.RECEIVE_TYPE_2)) {
 			query.setReceiveType(null);
 		}
-		if(query !=null && query.getOriginType() !=null && query.getOriginType().equals(Global.ORIGIN_TYPE_2)) {
-			query.setOriginType(null);
+		
+		//来源类型
+		if(query !=null && query.getOriginTypeList() !=null) {
+			for(Integer originType : query.getOriginTypeList()) {
+				if(originType.equals(Global.ORIGIN_TYPE_2)) {
+					query.setOriginTypeList(null);
+				}
+			}
 		}
 			return query;
 		}
@@ -320,19 +327,28 @@ public static String randomNumberE() {
 	//订单明细  - 处理字典项："全部" 查询条件.
 	public static OrderDetailQuery getOrderDetailQuery(OrderDetailQuery query){
 			
-		if(query !=null && query.getOriginType() !=null && query.getOriginType().equals(Global.ORIGIN_TYPE_2)) {
-			query.setOriginType(null);
-		}	
+		//来源类型
+		if(query !=null && query.getOriginTypeList() !=null) {
+			for(Integer originType : query.getOriginTypeList()) {
+			    if(originType.equals(Global.ORIGIN_TYPE_2)) {
+				  query.setOriginTypeList(null);
+				}
+			}
+		}
 		return query;		
 	}	
 	
 	//订单售后  - 处理字典项："全部" 查询条件.
 	public static OrderAfterSaleQuery getOrderAfterSaleQuery(OrderAfterSaleQuery query){
 		
-		if(query !=null && query.getOriginType() !=null && query.getOriginType().equals(Global.ORIGIN_TYPE_2)) {
-			query.setOriginType(null);
+		//来源类型
+		if(query !=null && query.getOriginTypeList() !=null) {
+		    for(Integer originType : query.getOriginTypeList()) {
+		      if(originType.equals(Global.ORIGIN_TYPE_2)) {
+				query.setOriginTypeList(null);
+			  }
+			}
 		}
-		
 		return query;		
 	}	
 	

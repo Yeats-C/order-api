@@ -247,10 +247,11 @@ public class OrderController {
      */
     @GetMapping("/selectorderbyoverview")
     @ApiOperation(value = "概览菜单-分销机构+当月维度-总销售额\\当月销售额、当月实收、当月支付订单数 ....")
-    public HttpResponse selectorderbyoverview(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,@RequestParam(name = "origin_type", required = false) String originType) {
+    public HttpResponse selectorderbyoverview(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,
+    		@Valid @RequestParam List<Integer> originTypeList) {
         
     	
-        return orderService.selectorderbymonth(distributorId,originType);
+        return orderService.selectorderbymonth(distributorId,originTypeList);
     } 
     
     
@@ -261,11 +262,12 @@ public class OrderController {
      */
     @GetMapping("/selectorderbyninedate")
     @ApiOperation(value = "概览菜单-订单概览-分销机构、小于当前日期9天内的实付金额、订单数量....")
-    public HttpResponse selectOrderByNineDate(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,@RequestParam(name = "origin_type", required = true) String originType) {
+    public HttpResponse selectOrderByNineDate(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,
+    		@Valid @RequestParam List<Integer> originTypeList) {
         
     	
     	LOGGER.info("概览菜单-订单概览-分销机构、小于当前日期9天内的实付金额、订单数量...");    	
-        return orderService.selectOrderByNineDate(distributorId,originType);
+        return orderService.selectOrderByNineDate(distributorId,originTypeList);
     } 
     
     
@@ -276,11 +278,12 @@ public class OrderController {
      */
     @GetMapping("/selectorderbynineweek")
     @ApiOperation(value = "概览菜单-订单概览-分销机构、小于当前日期9周内的实付金额、订单数量....")
-    public HttpResponse selectOrderByNineWeek(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,@RequestParam(name = "origin_type", required = true) String originType) {
+    public HttpResponse selectOrderByNineWeek(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,
+    		@Valid @RequestParam List<Integer> originTypeList) {
         
     	
     	LOGGER.info("概览菜单-订单概览-分销机构、小于当前日期9周内的实付金额、订单数量...");    	
-        return orderService.selectOrderByNineWeek(distributorId,originType);
+        return orderService.selectOrderByNineWeek(distributorId,originTypeList);
     } 
     
     
@@ -291,11 +294,12 @@ public class OrderController {
      */
     @GetMapping("/selectorderbyninemonth")
     @ApiOperation(value = "概览菜单-订单概览-分销机构、小于当前日期9个月内的实付金额、订单数量....")
-    public HttpResponse selectOrderByNineMonth(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,@RequestParam(name = "origin_type", required = true) String originType) {
+    public HttpResponse selectOrderByNineMonth(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,
+    		@Valid @RequestParam List<Integer> originTypeList) {
         
     	
     	LOGGER.info("概览菜单-订单概览-分销机构、小于当前日期9个月内的实付金额、订单数量...");    	
-        return orderService.selectOrderByNineMonth(distributorId,originType);
+        return orderService.selectOrderByNineMonth(distributorId,originTypeList);
     } 
     
     

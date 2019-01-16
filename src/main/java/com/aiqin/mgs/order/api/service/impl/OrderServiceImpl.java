@@ -233,27 +233,27 @@ public class OrderServiceImpl implements OrderService{
 		   }
 	}
 
-	//接口-分销机构维度-总销售额 返回INT
-	@Override
-	public HttpResponse selectOrderAmt(String distributorId, String originType) {
-		
-		try {
-			Integer  total_price = orderDao.selectOrderAmt(distributorId,originType);
-			
-			return HttpResponse.success(total_price);
-		} catch (Exception e) {
-
-			LOGGER.info("接口-分销机构维度-总销售额 返回INT報錯", e);
-			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
-		}
-		
-		
-	}
+//	//接口-分销机构维度-总销售额 返回INT
+//	@Override
+//	public HttpResponse selectOrderAmt(String distributorId, String originType) {
+//		
+//		try {
+//			Integer  total_price = orderDao.selectOrderAmt(distributorId,originType);
+//			
+//			return HttpResponse.success(total_price);
+//		} catch (Exception e) {
+//
+//			LOGGER.info("接口-分销机构维度-总销售额 返回INT報錯", e);
+//			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+//		}
+//		
+//		
+//	}
 
 
 	//接口-分销机构+当月维度-当月销售额、当月实收、当月支付订单数
 	@Override
-	public HttpResponse selectorderbymonth(@Valid String distributorId, String originType) {
+	public HttpResponse selectorderbymonth(@Valid String distributorId,List<Integer> originTypeList) {
 
 		//系统日期:年月
 		String yearMonth = OrderPublic.sysDateyyyyMM();
@@ -263,9 +263,11 @@ public class OrderServiceImpl implements OrderService{
 		
 		OrderOverviewMonthResponse info = new OrderOverviewMonthResponse();
 		
-		if(originType !=null && !originType.equals("")) {
-			if(Integer.valueOf(originType) == Global.ORIGIN_TYPE_2) {
-				originType =null;
+		if(originTypeList !=null && originTypeList.size()>0) {
+			for(Integer originType :originTypeList) {
+				if(originType.equals(Global.ORIGIN_TYPE_2)) {
+					originTypeList =null;
+				}
 			}
 		}
 		
@@ -293,19 +295,19 @@ public class OrderServiceImpl implements OrderService{
 		
 		try {
 			System.out.println("总销售额：包含退货、取消的订单==");
-			total_price = orderDao.selectOrderAmt(distributorId,originType);
+			total_price = orderDao.selectOrderAmt(distributorId,originTypeList);
 			System.out.println("当月销售额：包含退货、取消的订单==");
-			monthtotal_price = orderDao.selectByMonthAllAmt(distributorId,originType,yearMonth);
+			monthtotal_price = orderDao.selectByMonthAllAmt(distributorId,originTypeList,yearMonth);
 			System.out.println("昨日销售额：包含退货、取消的订单==");
-			yesdaytotal_price = orderDao.selectByYesdayAllAmt(distributorId,originType,yesterday);
+			yesdaytotal_price = orderDao.selectByYesdayAllAmt(distributorId,originTypeList,yesterday);
 			System.out.println("当月支付订单数：包含退货、取消的订单==");
-			monthorder_acount = orderDao.selectByMonthAcount(distributorId,originType,yearMonth);
+			monthorder_acount = orderDao.selectByMonthAcount(distributorId,originTypeList,yearMonth);
 			System.out.println("昨日支付订单数：包含退货、取消的订单==");
-			yesdayorder_acount = orderDao.selectByYesdayAcount(distributorId,originType,yesterday);
+			yesdayorder_acount = orderDao.selectByYesdayAcount(distributorId,originTypeList,yesterday);
 			System.out.println("当月实收：不包含退货、取消的订单==");
-			monthreal_amt = orderDao.selectbByMonthRetailAmt(distributorId,originType,yearMonth);
+			monthreal_amt = orderDao.selectbByMonthRetailAmt(distributorId,originTypeList,yearMonth);
 			System.out.println("昨日实收：不包含退货、取消的订单==");
-			yesdayreal_amt = orderDao.selectbByYesdayRetailAmt(distributorId,originType,yesterday);
+			yesdayreal_amt = orderDao.selectbByYesdayRetailAmt(distributorId,originTypeList,yesterday);
 			
 			
 			
@@ -356,14 +358,14 @@ public class OrderServiceImpl implements OrderService{
 
 	//接口-订单概览-分销机构、小于当前日期9天内的实付金额、订单数量
 	@Override
-	public HttpResponse selectOrderByNineDate(@Valid String distributorId, String originType) {
+	public HttpResponse selectOrderByNineDate(@Valid String distributorId,List<Integer> originTypeList) {
 		
 		String  beginDate= OrderPublic.NextDate(-8);
 		System.out.println("小于当前日期的第9天日期:"+beginDate);
 		try {
 			OrderQuery orderQuery = new OrderQuery();
 			orderQuery.setDistributorId(distributorId);
-			orderQuery.setOriginType(Integer.valueOf(originType));
+			orderQuery.setOriginTypeList(originTypeList);
 			orderQuery.setBeginDate(beginDate);
 			List<OrderResponse> list = new ArrayList();
 			list = orderDao.selectOrderByNineDate(OrderPublic.getOrderQuery(orderQuery));
@@ -380,14 +382,14 @@ public class OrderServiceImpl implements OrderService{
 	
 	//接口-订单概览-分销机构、小于当前日期9周内的实付金额、订单数量
 	@Override
-	public HttpResponse selectOrderByNineWeek(@Valid String distributorId, String originType) {
+	public HttpResponse selectOrderByNineWeek(@Valid String distributorId,List<Integer> originTypeList) {
 		
 		try {
 			
 			//查询条件
 			OrderQuery orderQuery = new OrderQuery();
 			orderQuery.setDistributorId(distributorId);
-			orderQuery.setOriginType(Integer.valueOf(originType));
+			orderQuery.setOriginTypeList(originTypeList);
 			
 			//返回
 			List<OrderResponse> list = new ArrayList();
@@ -407,13 +409,13 @@ public class OrderServiceImpl implements OrderService{
 	
 	//接口-订单概览-分销机构、小于当前日期9个月内的实付金额、订单数量
 	@Override
-	public HttpResponse selectOrderByNineMonth(@Valid String distributorId, String originType) {
+	public HttpResponse selectOrderByNineMonth(@Valid String distributorId,List<Integer> originTypeList) {
 
         String  beginDate = OrderPublic.afterMonth(-8); //YYYY-MM
         
         OrderQuery orderQuery = new OrderQuery();
 		orderQuery.setDistributorId(distributorId);
-		orderQuery.setOriginType(Integer.valueOf(originType));
+		orderQuery.setOriginTypeList(originTypeList);
 		orderQuery.setBeginDate(beginDate);
 		
 		try {

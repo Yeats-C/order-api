@@ -164,9 +164,13 @@
 		 <if test="orderStatus!=null">
 		 and b.order_status =#{orderStatus}
 		 </if>
-		 <if test="originType!=null">
-		 and b.origin_type =#{originType}
-		 </if>
+		 <if test="originTypeList != null" >
+		     and b.origin_type in (
+		  <foreach collection="originTypeList" item="origin_type" separator=",">
+			 '${origin_type}'
+		  </foreach>
+			)
+          </if>
 		 <if test="distributorId!=null">
 		 and b.distributor_id =#{distributorId}
 		 </if>
@@ -299,9 +303,13 @@
 		 </foreach>
 			)
          </if>
-         <if test="originType!=null ">
-         and b.origin_type = #{originType}
-         </if>
+         <if test="originTypeList != null" >
+		     and b.origin_type in (
+		  <foreach collection="originTypeList" item="origin_type" separator=",">
+			 '${origin_type}'
+		  </foreach>
+			)
+          </if>
            AND b.order_status NOT IN (0,4)
       GROUP BY a.sku_code
     </select> 

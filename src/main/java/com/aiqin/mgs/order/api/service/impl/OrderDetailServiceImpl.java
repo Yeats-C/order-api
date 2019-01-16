@@ -146,13 +146,13 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		try {
 			//月销售额
 			Integer actualPrice = 0;
-			String originType = null;
+			List<Integer> originTypeList = null;
 			String yearMonth = year+"-"+month; //"YYYY-MM"
-			actualPrice = orderDao.selectByMonthAllAmt(distributorId,originType,yearMonth);
+			actualPrice = orderDao.selectByMonthAllAmt(distributorId,originTypeList,yearMonth);
 			
 			//月销量
 			Integer amount = 0;
-			amount = orderDao.selectByMonthAcount(distributorId,originType,yearMonth);
+			amount = orderDao.selectByMonthAcount(distributorId,originTypeList,yearMonth);
 			
 			OrderDetailInfo info = new OrderDetailInfo();
 			info.setActualPrice(actualPrice);
@@ -450,7 +450,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 
 	//接口-统计商品在各个渠道的订单数.
 	@Override
-	public HttpResponse prodisor(@Valid List<String> sukList,Integer originType) {
+	public HttpResponse prodisor(@Valid List<String> sukList,@Valid List<Integer> originTypeList) {
 
 		try {
 			//返回
@@ -461,7 +461,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 				//查询条件
 				OrderDetailQuery query = new OrderDetailQuery();
 				query.setSukList(sukList);
-				query.setOriginType(originType);
+				query.setOriginTypeList(originTypeList);
 				list = orderDetailDao.prodisor(OrderPublic.getOrderDetailQuery(query));
 			}else {
 				
