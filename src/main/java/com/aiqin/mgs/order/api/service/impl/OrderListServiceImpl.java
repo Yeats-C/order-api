@@ -1,5 +1,7 @@
 package com.aiqin.mgs.order.api.service.impl;
 
+import com.aiqin.ground.util.http.HttpClient;
+import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.component.ParamUnit;
 import com.aiqin.mgs.order.api.component.SequenceService;
@@ -18,13 +20,17 @@ import com.aiqin.mgs.order.api.domain.request.orderList.OrderStockVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
 import com.aiqin.mgs.order.api.service.OrderListService;
 import com.aiqin.ground.util.id.IdUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 描述:
@@ -32,19 +38,26 @@ import java.util.Map;
  * @author zhujunchao
  * @create 2019-01-04 15:27
  */
+@SuppressWarnings("all")
 @Service
 @Slf4j
 public class OrderListServiceImpl implements OrderListService {
-    @Autowired
+    @Resource
     private OrderListDao orderListDao;
-    @Autowired
+    @Resource
     private OrderListLogisticsDao orderListLogisticsDao;
-    @Autowired
+    @Resource
     private OrderListProductDao orderListProductDao;
-    @Autowired
+    @Resource
     private SequenceService sequenceService;
-    @Autowired
+    @Resource
     private OrderStatusDao orderStatusDao;
+
+
+
+    //商品项目地址
+    @Value("${product_ip}")
+    public String product_ip;
 
     /**
      * 订单列表后台
@@ -88,7 +101,21 @@ public class OrderListServiceImpl implements OrderListService {
             throw new IllegalArgumentException( "状态值未找到");
         }
 
-        return orderListDao.updateByCode(code,status,orderStatus.getPaymentStatus());
+        Boolean br=  orderListDao.updateByCode(code,status,orderStatus.getPaymentStatus());
+        //将订单状态改完支付,将订单发送给供应链
+        if (status==2 && br==true){
+            //获取订单信息
+            OrderListDetailsVo vo = orderListDao.searchOrderByCode(code);
+            List<OrderListProduct> list2 = orderListProductDao.searchOrderListProductByCode(code);
+            vo.setOrderListProductList(list2);
+
+
+            HttpClient httpPost = HttpClient.post(product_ip+"/purchase/order/add").json("1");
+            httpPost.action().status();
+            HttpResponse result = httpPost.action().result(new TypeReference<HttpResponse>(){});
+            String c =   result.getCode();
+        }
+        return br;
     }
 
     @Override

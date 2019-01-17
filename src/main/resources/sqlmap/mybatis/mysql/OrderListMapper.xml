@@ -114,7 +114,7 @@
       activity_amount activityAmount, preferential_quota preferentialQuota, logistics_remission_ratio logisticsRemissionRatio, logistics_remission_type logisticsRemissionType,
       place_order_code placeOrderCode, place_order_time placeOrderTime, account_balance accountBalance, line_credit lineCredit, receiving_address receivingAddress,
       arrival_time arrivalTime, consignee, consignee_phone consigneePhone, company_code companyCode, company_name companyName, original, province_code provinceCode,
-      provinceName province_name, city_code cityCode, city_name cityName, district_code districtCode, district_name districtName, invoice_title invoiceTitle,
+      province_name provinceName, city_code cityCode, city_name cityName, district_code districtCode, district_name districtName, invoice_title invoiceTitle,
       invoice_type invoiceType, order_original orderOriginal, product_num productNum,  supplier_code supplierCode, supplier_name supplierName,
       transport_center_code transportCenterCode, transport_centerName transportCenterName, warehouse_code warehouseCode, warehouse_name warehouseName, weight,
       zip_code zipCode, remake, update_by updateBy, create_by createBy, update_time updateTime, create_time createTime, application_gifts applicationGifts,
@@ -175,7 +175,7 @@
       activity_amount activityAmount, preferential_quota preferentialQuota, logistics_remission_ratio logisticsRemissionRatio, logistics_remission_type logisticsRemissionType,
       place_order_code placeOrderCode, place_order_time placeOrderTime, account_balance accountBalance, line_credit lineCredit, receiving_address receivingAddress,
       arrival_time arrivalTime, consignee, consignee_phone consigneePhone, company_code companyCode, company_name companyName, original, province_code provinceCode,
-      provinceName province_name, city_code cityCode, city_name cityName, district_code districtCode, district_name districtName, invoice_title invoiceTitle,
+      province_name provinceName, city_code cityCode, city_name cityName, district_code districtCode, district_name districtName, invoice_title invoiceTitle,
       invoice_type invoiceType, order_original orderOriginal, product_num productNum,  supplier_code supplierCode, supplier_name supplierName,
       transport_center_code transportCenterCode, transport_centerName transportCenterName, warehouse_code warehouseCode, warehouse_name warehouseName, weight,
       zip_code zipCode, remake, update_by updateBy, create_by createBy, update_time updateTime, create_time createTime, application_gifts applicationGifts,
@@ -191,7 +191,7 @@
       activity_amount activityAmount, preferential_quota preferentialQuota, logistics_remission_ratio logisticsRemissionRatio, logistics_remission_type logisticsRemissionType,
       place_order_code placeOrderCode, place_order_time placeOrderTime, account_balance accountBalance, line_credit lineCredit, receiving_address receivingAddress,
       arrival_time arrivalTime, consignee, consignee_phone consigneePhone, company_code companyCode, company_name companyName, original, province_code provinceCode,
-      provinceName province_name, city_code cityCode, city_name cityName, district_code districtCode, district_name districtName, invoice_title invoiceTitle,
+      province_name provinceName, city_code cityCode, city_name cityName, district_code districtCode, district_name districtName, invoice_title invoiceTitle,
       invoice_type invoiceType, order_original orderOriginal, product_num productNum,  supplier_code supplierCode, supplier_name supplierName,
       transport_center_code transportCenterCode, transport_centerName transportCenterName, warehouse_code warehouseCode, warehouse_name warehouseName, weight,
       zip_code zipCode, remake, update_by updateBy, create_by createBy, update_time updateTime, create_time createTime, application_gifts applicationGifts,
@@ -468,6 +468,15 @@
         <if test="paymentStatus != null">
           payment_status,
         </if>
+        <if test="paymentTime != null">
+          payment_time,
+        </if>
+        <if test="paymentType != null">
+          payment_type,
+        </if>
+        <if test="paymentTypeCode != null">
+          payment_type_code,
+        </if>
         <if test="storeId != null">
           store_id,
         </if>
@@ -495,7 +504,12 @@
         <if test="logisticsRemissionRatio != null">
           logistics_remission_ratio,
         </if>
-
+        <if test="logisticsRemissionType != null">
+          logistics_remission_type,
+        </if>
+        <if test="placeOrderCode != null">
+          place_order_code,
+        </if>
         <if test="placeOrderTime != null">
           place_order_time,
         </if>
@@ -523,18 +537,89 @@
         <if test="companyName != null">
           company_name,
         </if>
+        <if test="original != null">
+          original,
+        </if>
+        <if test="provinceCode != null">
+          province_code,
+        </if>
+        <if test="provinceName != null">
+          province_name,
+        </if>
+        <if test="cityCode != null">
+          city_code,
+        </if>
+        <if test="cityName != null">
+          city_name,
+        </if>
+        <if test="districtCode != null">
+          district_code,
+        </if>
+        <if test="districtName != null">
+          district_name,
+        </if>
+        <if test="invoiceTitle != null">
+          invoice_title,
+        </if>
+        <if test="invoiceType != null">
+          invoice_type,
+        </if>
+        <if test="orderOriginal != null">
+          order_original,
+        </if>
+        <if test="productNum != null">
+          product_num,
+        </if>
+
+        <if test="supplierCode != null">
+          supplier_code,
+        </if>
+        <if test="supplierName != null">
+          supplier_name,
+        </if>
+        <if test="transportCenterCode != null">
+          transport_center_code,
+        </if>
+        <if test="transportCentername != null">
+          transport_centerName,
+        </if>
+        <if test="warehouseCode != null">
+          warehouse_code,
+        </if>
+        <if test="warehouseName != null">
+          warehouse_name,
+        </if>
+        <if test="weight != null">
+          weight,
+        </if>
+        <if test="zipCode != null">
+          zip_code,
+        </if>
+        <if test="remake != null">
+          remake,
+        </if>
+        <if test="updateBy != null">
+          update_by,
+        </if>
         <if test="createBy != null">
           create_by,
         </if>
-        <if test="original!=null">
-          original
+        <if test="updateTime != null">
+          update_time,
         </if>
-
-
+        <if test="createTime != null">
+          create_time,
+        </if>
+        <if test="applicationGifts != null">
+          application_gifts,
+        </if>
+        <if test="applyCoupons != null">
+          apply_coupons,
+        </if>
       </trim>
       <trim prefix="values (" suffix=")" suffixOverrides=",">
         <if test="id != null">
-          #{id},
+          #{id,jdbcType=VARCHAR},
         </if>
         <if test="orderCode != null">
           #{orderCode,jdbcType=VARCHAR},
@@ -547,6 +632,15 @@
         </if>
         <if test="paymentStatus != null">
           #{paymentStatus,jdbcType=BIT},
+        </if>
+        <if test="paymentTime != null">
+          #{paymentTime,jdbcType=TIMESTAMP},
+        </if>
+        <if test="paymentType != null">
+          #{paymentType,jdbcType=VARCHAR},
+        </if>
+        <if test="paymentTypeCode != null">
+          #{paymentTypeCode,jdbcType=VARCHAR},
         </if>
         <if test="storeId != null">
           #{storeId,jdbcType=VARCHAR},
@@ -561,31 +655,34 @@
           #{storeType,jdbcType=VARCHAR},
         </if>
         <if test="totalOrders != null">
-          #{totalOrders,jdbcType=INTEGER},
+          #{totalOrders,jdbcType=BIGINT},
         </if>
         <if test="actualAmountPaid != null">
-          #{actualAmountPaid,jdbcType=INTEGER},
+          #{actualAmountPaid,jdbcType=BIGINT},
         </if>
         <if test="activityAmount != null">
-          #{activityAmount,jdbcType=INTEGER},
+          #{activityAmount,jdbcType=BIGINT},
         </if>
         <if test="preferentialQuota != null">
-          #{preferentialQuota,jdbcType=INTEGER},
+          #{preferentialQuota,jdbcType=BIGINT},
         </if>
         <if test="logisticsRemissionRatio != null">
           #{logisticsRemissionRatio,jdbcType=INTEGER},
         </if>
-        <if test="placeOrderBy != null">
-          #{placeOrderBy,jdbcType=VARCHAR},
+        <if test="logisticsRemissionType != null">
+          #{logisticsRemissionType,jdbcType=BIT},
+        </if>
+        <if test="placeOrderCode != null">
+          #{placeOrderCode,jdbcType=VARCHAR},
         </if>
         <if test="placeOrderTime != null">
           #{placeOrderTime,jdbcType=TIMESTAMP},
         </if>
         <if test="accountBalance != null">
-          #{accountBalance,jdbcType=INTEGER},
+          #{accountBalance,jdbcType=BIGINT},
         </if>
         <if test="lineCredit != null">
-          #{lineCredit,jdbcType=INTEGER},
+          #{lineCredit,jdbcType=BIGINT},
         </if>
         <if test="receivingAddress != null">
           #{receivingAddress,jdbcType=VARCHAR},
@@ -605,14 +702,85 @@
         <if test="companyName != null">
           #{companyName,jdbcType=VARCHAR},
         </if>
+        <if test="original != null">
+          #{original,jdbcType=VARCHAR},
+        </if>
+        <if test="provinceCode != null">
+          #{provinceCode,jdbcType=VARCHAR},
+        </if>
+        <if test="provinceName != null">
+          #{provinceName,jdbcType=VARCHAR},
+        </if>
+        <if test="cityCode != null">
+          #{cityCode,jdbcType=VARCHAR},
+        </if>
+        <if test="cityName != null">
+          #{cityName,jdbcType=VARCHAR},
+        </if>
+        <if test="districtCode != null">
+          #{districtCode,jdbcType=VARCHAR},
+        </if>
+        <if test="districtName != null">
+          #{districtName,jdbcType=VARCHAR},
+        </if>
+        <if test="invoiceTitle != null">
+          #{invoiceTitle,jdbcType=VARCHAR},
+        </if>
+        <if test="invoiceType != null">
+          #{invoiceType,jdbcType=BIT},
+        </if>
+        <if test="orderOriginal != null">
+          #{orderOriginal,jdbcType=VARCHAR},
+        </if>
+        <if test="productNum != null">
+          #{productNum,jdbcType=INTEGER},
+        </if>
+
+        <if test="supplierCode != null">
+          #{supplierCode,jdbcType=VARCHAR},
+        </if>
+        <if test="supplierName != null">
+          #{supplierName,jdbcType=VARCHAR},
+        </if>
+        <if test="transportCenterCode != null">
+          #{transportCenterCode,jdbcType=VARCHAR},
+        </if>
+        <if test="transportCentername != null">
+          #{transportCentername,jdbcType=VARCHAR},
+        </if>
+        <if test="warehouseCode != null">
+          #{warehouseCode,jdbcType=VARCHAR},
+        </if>
+        <if test="warehouseName != null">
+          #{warehouseName,jdbcType=VARCHAR},
+        </if>
+        <if test="weight != null">
+          #{weight,jdbcType=INTEGER},
+        </if>
+        <if test="zipCode != null">
+          #{zipCode,jdbcType=VARCHAR},
+        </if>
+        <if test="remake != null">
+          #{remake,jdbcType=VARCHAR},
+        </if>
+        <if test="updateBy != null">
+          #{updateBy,jdbcType=VARCHAR},
+        </if>
         <if test="createBy != null">
           #{createBy,jdbcType=VARCHAR},
         </if>
-        <if test="original!= null">
-          #{original}
+        <if test="updateTime != null">
+          #{updateTime,jdbcType=TIMESTAMP},
         </if>
-
-
+        <if test="createTime != null">
+          #{createTime,jdbcType=TIMESTAMP},
+        </if>
+        <if test="applicationGifts != null">
+          #{applicationGifts,jdbcType=BIT},
+        </if>
+        <if test="applyCoupons != null">
+          #{applyCoupons,jdbcType=BIT},
+        </if>
       </trim>
     </insert>
 
