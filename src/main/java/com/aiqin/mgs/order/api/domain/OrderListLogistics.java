@@ -13,9 +13,7 @@ import java.util.Date;
 public class OrderListLogistics {
     private String id;
 
-    @ApiModelProperty(value = "订单id")
-    @JsonProperty("order_list_id")
-    private Long orderListId;
+
 
     @ApiModelProperty(value = "订单编号")
     @JsonProperty("order_code")

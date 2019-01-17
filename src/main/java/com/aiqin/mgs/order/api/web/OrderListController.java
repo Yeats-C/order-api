@@ -111,7 +111,7 @@ public class OrderListController {
      * 修改订单状态
      */
     @GetMapping("update/Order/status")
-    @ApiOperation("修改订单状态")
+    @ApiOperation("修改订单状态(非支付使用)")
     public HttpResponse<Boolean> updateOrderStatus(@ApiParam("订单code")@RequestParam("code") String code,@ApiParam("订单状态")@RequestParam("status") Integer status) {
         log.info("Search  purchasingTarget list:{}", code,status);
         try {

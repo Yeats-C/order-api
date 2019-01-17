@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.OrderStatusDao">
+    <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.OrderStatus">
+        <id column="id"  property="id" />
+        <result column="order_status_code"  property="orderStatusCode" />
+        <result column="payment_status"  property="paymentStatus" />
+        <result column="reception_order_status"  property="receptionOrderStatus" />
+        <result column="backstage_order_status"  property="backstageOrderStatus" />
+        <result column="explain"  property="explain" />
+        <result column="standard_description"  property="standardDescription" />
+    </resultMap>
+    <select id="searchStatus" resultMap="BaseResultMap">
+        select * from order_status where order_status_code=#{status}
+    </select>
+
+</mapper>
