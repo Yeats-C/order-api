@@ -272,11 +272,11 @@
          and b.distributor_id =#{arg0}
          <if test="arg1!=null" >
 		  and b.origin_type in (
-		  <foreach collection="arg1" item="origin_type" separator=",">
+		 <foreach collection="arg1" item="origin_type" separator=",">
 			 '${origin_type}'
-		  </foreach>
+		 </foreach>
 			)
-          </if>
+         </if>
     </select>  
     
     <!-- 接口-分销机构+当月维度-当月销售额  当月销售额：包含退货、不包含取消、未付款的订单-->

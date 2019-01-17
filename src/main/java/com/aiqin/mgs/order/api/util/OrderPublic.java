@@ -304,7 +304,7 @@ public static String randomNumberE() {
 	}
 	
 
-	//订单  - 处理必传字段字典项："全部" 查询条件. 
+	//订单  - 封装查询条件. 
 	public static OrderQuery getOrderQuery(OrderQuery query){
 		
 		//收货方式
@@ -312,42 +312,85 @@ public static String randomNumberE() {
 			query.setReceiveType(null);
 		}
 		
-		//来源类型
-		if(query !=null && query.getOriginTypeList() !=null) {
-			for(Integer originType : query.getOriginTypeList()) {
+		if(query !=null ) {
+			
+			//来源类型
+			if(query.getOriginTypeList() !=null && query.getOriginTypeList().size()>0) {
+			  for(Integer originType : query.getOriginTypeList()) {
 				if(originType.equals(Global.ORIGIN_TYPE_2)) {
 					query.setOriginTypeList(null);
 				}
+			  }
+			}else {
+				query.setOriginTypeList(null);
 			}
+			
+			//查询条件:订单状态集合
+			if(query.getOrderStatusList() !=null && query.getOrderStatusList().size()>0) {
+			
+			}else {
+				query.setOrderStatusList(null);
+			}	
 		}
 			return query;
 		}
 	
 	
-	//订单明细  - 处理字典项："全部" 查询条件.
+	//订单明细  - 封装查询条件.
 	public static OrderDetailQuery getOrderDetailQuery(OrderDetailQuery query){
 			
-		//来源类型
-		if(query !=null && query.getOriginTypeList() !=null) {
+		
+		if(query !=null) {
+			
+		 //来源类型		
+		 if(query.getOriginTypeList() !=null && query.getOriginTypeList().size()>0) {
 			for(Integer originType : query.getOriginTypeList()) {
 			    if(originType.equals(Global.ORIGIN_TYPE_2)) {
 				  query.setOriginTypeList(null);
 				}
 			}
+		  }else {
+			  query.setOriginTypeList(null);
+		  }
+		 
+		  //查询条件:订单状态集合
+		  if(query.getActivityIdList() !=null && query.getActivityIdList().size()>0) {
+			
+		  }else {
+			 query.setActivityIdList(null);
+		  }
+		  
+		  //查询条件:会员IDlist
+		  if(query.getMemberidList() !=null && query.getMemberidList().size()>0) {
+			
+		  }else {
+			 query.setMemberidList(null);
+		  }
+		  
+		  //sku集合
+		  if(query.getSukList() !=null && query.getSukList().size()>0) {
+			
+		  }else {
+			 query.setSukList(null);
+		  }
 		}
 		return query;		
 	}	
 	
-	//订单售后  - 处理字典项："全部" 查询条件.
+	//订单售后  - 封装查询条件.
 	public static OrderAfterSaleQuery getOrderAfterSaleQuery(OrderAfterSaleQuery query){
 		
 		//来源类型
-		if(query !=null && query.getOriginTypeList() !=null) {
-		    for(Integer originType : query.getOriginTypeList()) {
-		      if(originType.equals(Global.ORIGIN_TYPE_2)) {
-				query.setOriginTypeList(null);
+		if(query !=null) {
+			if(query.getOriginTypeList() !=null && query.getOriginTypeList().size()>0) {
+				for(Integer originType : query.getOriginTypeList()) {
+				    if(originType.equals(Global.ORIGIN_TYPE_2)) {
+					  query.setOriginTypeList(null);
+					}
+				}
+			  }else {
+				  query.setOriginTypeList(null);
 			  }
-			}
 		}
 		return query;		
 	}	

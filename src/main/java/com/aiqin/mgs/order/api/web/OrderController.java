@@ -166,7 +166,7 @@ public class OrderController {
     @ApiOperation(value = "已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)")
     public HttpResponse repast(@Valid @RequestParam(name = "order_id", required = true) String orderId,
     		@Valid @RequestParam(name = "pay_type", required = true) String payType,
-    		@Valid @RequestBody List<OrderPayInfo> orderPayList
+    		@Valid @RequestBody(required = true) List<OrderPayInfo> orderPayList
     		) {
         LOGGER.info("已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表).....");
         return orderService.repast(orderId,payType,orderPayList);
@@ -434,7 +434,12 @@ public class OrderController {
     		@Valid @RequestBody List<String> detailList
     		) {
 
-    	LOGGER.info("接口-通过当前门店,等级会员list、 查询会员数、返回7天内的统计....");    	
+    	LOGGER.info("接口-通过当前门店,等级会员list、 查询会员数、返回7天内的统计....");  
+    	if(detailList !=null && detailList.size()>0) {
+    		
+    	}else {
+    		detailList =null;
+    	}   	
         return orderService.devel(distributorId,detailList);
     }
     
