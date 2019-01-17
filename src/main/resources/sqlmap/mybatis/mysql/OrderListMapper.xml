@@ -16,7 +16,6 @@
     <result column="activity_amount" jdbcType="INTEGER" property="activityAmount" />
     <result column="preferential_quota" jdbcType="INTEGER" property="preferentialQuota" />
     <result column="logistics_remission_ratio" jdbcType="INTEGER" property="logisticsRemissionRatio" />
-    <result column="place_order_by" jdbcType="VARCHAR" property="placeOrderBy" />
     <result column="place_order_time" jdbcType="TIMESTAMP" property="placeOrderTime" />
     <result column="account_balance" jdbcType="INTEGER" property="accountBalance" />
     <result column="line_credit" jdbcType="INTEGER" property="lineCredit" />
@@ -92,7 +91,7 @@
   <sql id="Base_Column_List">
     id, order_code, order_type, order_status, payment_status, store_id, store_code, store_name, 
     store_type, total_orders, actual_amount_paid, activity_amount, preferential_quota, 
-    logistics_remission_ratio, place_order_by, place_order_time, account_balance, line_credit, 
+    logistics_remission_ratio, place_order_time, account_balance, line_credit,
     receiving_address, arrival_time, consignee, consignee_phone, company_code, company_name, 
     create_by, create_time, update_by, update_time
   </sql>
@@ -105,11 +104,21 @@
   </select>
     <select id="searchOrderList" resultType="com.aiqin.mgs.order.api.domain.OrderList">
       select
-      id, order_code orderCode, order_type orderType, order_status orderStatus, payment_status paymentStatus, store_id storeId, store_code storeCode, store_name storeName,
-    store_type storeType, total_orders totalOrders, actual_amount_paid actualAmountPaid, activity_amount activityAmount, preferential_quota preferentialQuota,
-    logistics_remission_ratio logisticsRemissionRatio, place_order_by placeOrderBy, place_order_time placeOrderTime, account_balance accountBalance, line_credit lineCredit,
-    receiving_address receivingAddress, arrival_time arrivalTime, consignee, consignee_phone consigneePhone, company_code companyCode, company_name companyName,
-    create_by createBy,  update_by updateBy
+--       id, order_code orderCode, order_type orderType, order_status orderStatus, payment_status paymentStatus, store_id storeId, store_code storeCode, store_name storeName,
+--     store_type storeType, total_orders totalOrders, actual_amount_paid actualAmountPaid, activity_amount activityAmount, preferential_quota preferentialQuota,
+--     logistics_remission_ratio logisticsRemissionRatio, place_order_time placeOrderTime, account_balance accountBalance, line_credit lineCredit,
+--     receiving_address receivingAddress, arrival_time arrivalTime, consignee, consignee_phone consigneePhone, company_code companyCode, company_name companyName,
+--     create_by createBy,  update_by updateBy
+      id, order_code orderCode, order_type orderType, order_status orderStatus, payment_status paymentStatus, payment_time paymentTime, payment_type paymentType,
+      payment_type_code paymentTypeCode, store_id storeId, store_code storeCode, store_name storeName, store_type storeType, total_orders totalOrders, actual_amount_paid actualAmountPaid,
+      activity_amount activityAmount, preferential_quota preferentialQuota, logistics_remission_ratio logisticsRemissionRatio, logistics_remission_type logisticsRemissionType,
+      place_order_code placeOrderCode, place_order_time placeOrderTime, account_balance accountBalance, line_credit lineCredit, receiving_address receivingAddress,
+      arrival_time arrivalTime, consignee, consignee_phone consigneePhone, company_code companyCode, company_name companyName, original, province_code provinceCode,
+      provinceName province_name, city_code cityCode, city_name cityName, district_code districtCode, district_name districtName, invoice_title invoiceTitle,
+      invoice_type invoiceType, order_original orderOriginal, product_num productNum,  supplier_code supplierCode, supplier_name supplierName,
+      transport_center_code transportCenterCode, transport_centerName transportCenterName, warehouse_code warehouseCode, warehouse_name warehouseName, weight,
+      zip_code zipCode, remake, update_by updateBy, create_by createBy, update_time updateTime, create_time createTime, application_gifts applicationGifts,
+      apply_coupons applyCoupons
       from order_list
       where 1=1
       <if test="storeCode !=null">
@@ -161,22 +170,32 @@
     <select id="searchOrderByCode"
             resultType="com.aiqin.mgs.order.api.domain.request.orderList.OrderListDetailsVo">
         select
-      id, order_code orderCode, order_type orderType, order_status orderStatus, payment_status paymentStatus, store_id storeId, store_code storeCode, store_name storeName,
-    store_type storeType, total_orders totalOrders, actual_amount_paid actualAmountPaid, activity_amount activityAmount, preferential_quota preferentialQuota,
-    logistics_remission_ratio logisticsRemissionRatio, place_order_by placeOrderBy, place_order_time placeOrderTime, account_balance accountBalance, line_credit lineCredit,
-    receiving_address receivingAddress, arrival_time arrivalTime, consignee, consignee_phone consigneePhone, company_code companyCode, company_name companyName,
-    create_by createBy,  update_by updateBy,original
+       id, order_code orderCode, order_type orderType, order_status orderStatus, payment_status paymentStatus, payment_time paymentTime, payment_type paymentType,
+      payment_type_code paymentTypeCode, store_id storeId, store_code storeCode, store_name storeName, store_type storeType, total_orders totalOrders, actual_amount_paid actualAmountPaid,
+      activity_amount activityAmount, preferential_quota preferentialQuota, logistics_remission_ratio logisticsRemissionRatio, logistics_remission_type logisticsRemissionType,
+      place_order_code placeOrderCode, place_order_time placeOrderTime, account_balance accountBalance, line_credit lineCredit, receiving_address receivingAddress,
+      arrival_time arrivalTime, consignee, consignee_phone consigneePhone, company_code companyCode, company_name companyName, original, province_code provinceCode,
+      provinceName province_name, city_code cityCode, city_name cityName, district_code districtCode, district_name districtName, invoice_title invoiceTitle,
+      invoice_type invoiceType, order_original orderOriginal, product_num productNum,  supplier_code supplierCode, supplier_name supplierName,
+      transport_center_code transportCenterCode, transport_centerName transportCenterName, warehouse_code warehouseCode, warehouse_name warehouseName, weight,
+      zip_code zipCode, remake, update_by updateBy, create_by createBy, update_time updateTime, create_time createTime, application_gifts applicationGifts,
+      apply_coupons applyCoupons
       from order_list
       where  order_code=#{code}
     </select>
     <select id="searchOrderReceptionList" resultType="com.aiqin.mgs.order.api.domain.OrderList">
 
       select
-      id, order_code orderCode, order_type orderType, order_status orderStatus, payment_status paymentStatus, store_id storeId, store_code storeCode, store_name storeName,
-      store_type storeType, total_orders totalOrders, actual_amount_paid actualAmountPaid, activity_amount activityAmount, preferential_quota preferentialQuota,
-      logistics_remission_ratio logisticsRemissionRatio, place_order_by placeOrderBy, place_order_time placeOrderTime, account_balance accountBalance, line_credit lineCredit,
-      receiving_address receivingAddress, arrival_time arrivalTime, consignee, consignee_phone consigneePhone, company_code companyCode, company_name companyName,
-      create_by createBy,  update_by updateBy
+      id, order_code orderCode, order_type orderType, order_status orderStatus, payment_status paymentStatus, payment_time paymentTime, payment_type paymentType,
+      payment_type_code paymentTypeCode, store_id storeId, store_code storeCode, store_name storeName, store_type storeType, total_orders totalOrders, actual_amount_paid actualAmountPaid,
+      activity_amount activityAmount, preferential_quota preferentialQuota, logistics_remission_ratio logisticsRemissionRatio, logistics_remission_type logisticsRemissionType,
+      place_order_code placeOrderCode, place_order_time placeOrderTime, account_balance accountBalance, line_credit lineCredit, receiving_address receivingAddress,
+      arrival_time arrivalTime, consignee, consignee_phone consigneePhone, company_code companyCode, company_name companyName, original, province_code provinceCode,
+      provinceName province_name, city_code cityCode, city_name cityName, district_code districtCode, district_name districtName, invoice_title invoiceTitle,
+      invoice_type invoiceType, order_original orderOriginal, product_num productNum,  supplier_code supplierCode, supplier_name supplierName,
+      transport_center_code transportCenterCode, transport_centerName transportCenterName, warehouse_code warehouseCode, warehouse_name warehouseName, weight,
+      zip_code zipCode, remake, update_by updateBy, create_by createBy, update_time updateTime, create_time createTime, application_gifts applicationGifts,
+      apply_coupons applyCoupons
       from order_list
       where 1=1
 
@@ -188,11 +207,8 @@
       <if test="endPlaceOrderTime !=null">
         and  #{endPlaceOrderTime}> place_order_time
       </if>
-      <if test="placeOrderBy!=null">
-         and  place_order_by =#{placeOrderBy}
-      </if>
-      <if test="placeOrderBy!=null">
-        and  place_order_by =#{placeOrderBy}
+      <if test="placeOrderBy">
+        and create_by=#{placeOrderBy}
       </if>
       <if test="orderStatus !=null">
         and order_status=#{orderStatus}
@@ -215,12 +231,7 @@
     <if test="endPlaceOrderTime !=null">
       and  #{endPlaceOrderTime}> place_order_time
     </if>
-    <if test="placeOrderBy!=null">
-      and  place_order_by =#{placeOrderBy}
-    </if>
-    <if test="placeOrderBy!=null">
-      and  place_order_by =#{placeOrderBy}
-    </if>
+
     <if test="orderStatus !=null">
       and order_status=#{orderStatus}
     </if>
@@ -250,7 +261,7 @@
       store_code, store_name, store_type, 
       total_orders, actual_amount_paid, activity_amount, 
       preferential_quota, logistics_remission_ratio, 
-      place_order_by, place_order_time, account_balance, 
+     place_order_time, account_balance,
       line_credit, receiving_address, arrival_time, 
       consignee, consignee_phone, company_code, 
       company_name, create_by, create_time, 
@@ -311,9 +322,7 @@
       <if test="logisticsRemissionRatio != null">
         logistics_remission_ratio,
       </if>
-      <if test="placeOrderBy != null">
-        place_order_by,
-      </if>
+
       <if test="placeOrderTime != null">
         place_order_time,
       </if>
@@ -486,9 +495,7 @@
         <if test="logisticsRemissionRatio != null">
           logistics_remission_ratio,
         </if>
-        <if test="placeOrderBy != null">
-          place_order_by,
-        </if>
+
         <if test="placeOrderTime != null">
           place_order_time,
         </if>
@@ -651,9 +658,7 @@
       <if test="logisticsRemissionRatio != null">
         logistics_remission_ratio = #{logisticsRemissionRatio,jdbcType=INTEGER},
       </if>
-      <if test="placeOrderBy != null">
-        place_order_by = #{placeOrderBy,jdbcType=VARCHAR},
-      </if>
+
       <if test="placeOrderTime != null">
         place_order_time = #{placeOrderTime,jdbcType=TIMESTAMP},
       </if>
@@ -711,7 +716,6 @@
       activity_amount = #{activityAmount,jdbcType=INTEGER},
       preferential_quota = #{preferentialQuota,jdbcType=INTEGER},
       logistics_remission_ratio = #{logisticsRemissionRatio,jdbcType=INTEGER},
-      place_order_by = #{placeOrderBy,jdbcType=VARCHAR},
       place_order_time = #{placeOrderTime,jdbcType=TIMESTAMP},
       account_balance = #{accountBalance,jdbcType=INTEGER},
       line_credit = #{lineCredit,jdbcType=INTEGER},

@@ -88,9 +88,9 @@
   </select>
     <select id="searchOrderListLogisticsByCode" resultType="com.aiqin.mgs.order.api.domain.OrderListLogistics">
       select
-      id, order_list_id orderListId, order_code orderCode, invoice_code invoiceCode, logistics_centre_code logisticsCentreCode, logistics_centre_name logisticsCentreName,
-       delivery_time deliveryTime, implement_by implementBy, implement_time implementTime, implement_content implementContent, create_by createBy, update_by updateBy
-
+     id,  order_code orderCode, invoice_code invoiceCode, logistics_centre_code logisticsCentreCode, logistics_centre_name logisticsCentreName,
+    implement_by implementBy, implement_time implementTime, implement_content implementContent, create_by createBy, update_by updateBy, create_time createTime,
+    update_time updateTime
       from order_list_logistics
       where order_code = #{code}
     </select>
