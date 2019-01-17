@@ -201,17 +201,28 @@
         </trim>
     </insert>
     <insert id="insertList">
-      insert into order_list_product (id, order_list_id, order_code,
-      line_number, sku_code, sku_name,
-      product_price, product_number, activity_code,
-      activity_name, is_gift, out_warehouse_code,
-      specifications,unit)
+      insert into order_list_product (id, order_product_id, order_code,
+        sku_code, sku_name, product_number,
+        activity_code, activity_name, gift,
+        original_product_id, specifications, unit,
+        color_code, color_name, model_number,
+        actual_deliver_num, product_price, original_product_price,
+        subtotal_price, discount_money, promotion_discount,
+        amount, picture_url, preferential_allocation,
+        return_num, supply_company_code, supply_company_name,
+        discount_code)
     values
         <foreach collection ="list" item="product" index= "index" separator =",">
-    (#{product.id}, #{product.orderListId}, #{product.orderCode},
-      #{product.lineNumber}, #{product.skuCode}, #{product.skuName},
-      #{product.productPrice}, #{product.productNumber}, #{product.activityCode},
-      #{product.activityName}, #{product.gift}, #{originalProductPrice},#{specifications},#{unit})
+            (#{product.id,jdbcType=VARCHAR}, #{product.orderProductId,jdbcType=VARCHAR}, #{product.orderCode,jdbcType=VARCHAR},
+            #{product.skuCode,jdbcType=VARCHAR}, #{product.skuName,jdbcType=VARCHAR}, #{product.productNumber,jdbcType=INTEGER},
+            #{product.activityCode,jdbcType=VARCHAR}, #{product.activityName,jdbcType=VARCHAR}, #{product.gift,jdbcType=BIT},
+            #{product.originalProductId,jdbcType=VARCHAR}, #{product.specifications,jdbcType=VARCHAR}, #{product.unit,jdbcType=VARCHAR},
+            #{product.colorCode,jdbcType=VARCHAR}, #{product.colorName,jdbcType=VARCHAR}, #{product.modelNumber,jdbcType=VARCHAR},
+            #{product.actualDeliverNum,jdbcType=INTEGER}, #{product.productPrice,jdbcType=BIGINT}, #{product.originalProductPrice,jdbcType=BIGINT},
+            #{product.subtotalPrice,jdbcType=BIGINT}, #{product.discountMoney,jdbcType=BIGINT}, #{product.promotionDiscount,jdbcType=BIGINT},
+            #{product.amount,jdbcType=INTEGER}, #{product.pictureUrl,jdbcType=VARCHAR}, #{product.preferentialAllocation,jdbcType=INTEGER},
+            #{product.returnNum,jdbcType=INTEGER}, #{product.supplyCompanyCode,jdbcType=VARCHAR}, #{product.supplyCompanyName,jdbcType=VARCHAR},
+            #{product.discountCode,jdbcType=VARCHAR})
         </foreach>
     </insert>
 
