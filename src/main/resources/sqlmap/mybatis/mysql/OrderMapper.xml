@@ -161,6 +161,13 @@
          <if test="orderStatus!=null ">
          and a.order_status = #{orderStatus}
          </if>
+         <if test="orderStatusList != null" >
+		  and a.order_status in (
+		  <foreach collection="orderStatusList" item="order_status" separator=",">
+			 '${order_status}'
+		  </foreach>
+			)
+         </if>
          <if test="originTypeList != null" >
 		  and a.origin_type in (
 		  <foreach collection="originTypeList" item="origin_type" separator=",">
@@ -223,6 +230,13 @@
          </if>
          <if test="orderStatus!=null ">
          and a.order_status = #{orderStatus}
+         </if>
+         <if test="orderStatusList != null" >
+		  and a.order_status in (
+		  <foreach collection="orderStatusList" item="order_status" separator=",">
+			 '${order_status}'
+		  </foreach>
+			)
          </if>         
          <if test="originTypeList != null" >
 		  and a.origin_type in (
@@ -740,6 +754,13 @@
          </if>
          <if test="orderStatus!=null ">
          and a.order_status = #{orderStatus}
+         </if>
+         <if test="orderStatusList != null" >
+		  and a.order_status in (
+		  <foreach collection="orderStatusList" item="order_status" separator=",">
+			 '${order_status}'
+		  </foreach>
+			)
          </if>
          <if test="originTypeList != null" >
 		  and a.origin_type in (

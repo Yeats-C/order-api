@@ -101,7 +101,7 @@ public class OrderAfterSaleInfo extends PagesRequest {
 	@JsonProperty("pay_type")
 	private Integer payType;
 	
-	@ApiModelProperty(value="订单来源类型")
+	@ApiModelProperty(value="来源类型:2||null-全部;0&&3-门店;1-微商城;0-pos;3:web")
 	@JsonProperty("origin_type")
 	private Integer originType;
 	
