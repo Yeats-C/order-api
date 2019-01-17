@@ -203,14 +203,14 @@
     </trim>
   </insert>
     <insert id="insertLogistics">
-        insert into order_list_logistics (id, order_list_id, order_code,
+        insert into order_list_logistics (id,  order_code,
       Invoice_code, logistics_centre_code, logistics_centre_name,
       implement_by, implement_time,
-      implement_content)
-    values (replace(UUID(),"-",""), #{orderListId}, #{orderCode},
+      implement_content,create_by)
+    values (replace(UUID(),"-",""), #{orderCode},
       #{invoiceCode}, #{logisticsCentreCode}, #{logisticsCentreName},
        #{implementBy}, #{implementTime},
-      #{implementContent})
+      #{implementContent},#{createBy})
 
 
     </insert>

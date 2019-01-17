@@ -111,7 +111,7 @@ public class OrderListController {
      * 修改订单状态
      */
     @GetMapping("update/Order/status")
-    @ApiOperation("修改订单状态(非支付使用)")
+    @ApiOperation("修改订单状态(非支付使用,仅改状态)")
     public HttpResponse<Boolean> updateOrderStatus(@ApiParam("订单code")@RequestParam("code") String code,@ApiParam("订单状态")@RequestParam("status") Integer status) {
         log.info("Search  purchasingTarget list:{}", code,status);
         try {
@@ -121,6 +121,21 @@ public class OrderListController {
             return HttpResponse.failure(MessageId.create(Project.OMS_API,400,e.getMessage()));
         }
     }
+
+//    /**
+//     * 修改订单状态
+//     */
+//    @GetMapping("update/Order/status/payment")
+//    @ApiOperation("修改订单状态(支付使用)")
+//    public HttpResponse<Boolean> updateOrderStatus(@ApiParam("订单code")@RequestParam("code") String code,@ApiParam("订单状态")@RequestParam("status") Integer status) {
+//        log.info("Search  purchasingTarget list:{}", code,status);
+//        try {
+//            return HttpResponse.success(this.orderListService.updateOrderStatus(code,status));
+//        } catch (Exception e) {
+//            log.error("Get purchasingTarget list failed", e);
+//            return HttpResponse.failure(MessageId.create(Project.OMS_API,400,e.getMessage()));
+//        }
+//    }
 
     /**
      * 查询一段时间进货进度量

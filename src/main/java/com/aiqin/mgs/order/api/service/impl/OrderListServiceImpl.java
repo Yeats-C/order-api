@@ -73,7 +73,7 @@ public class OrderListServiceImpl implements OrderListService {
 
     @Override
     public Boolean addLogistics(OrderListLogistics param) {
-        ParamUnit.isNotNull(param,"orderListId","orderCode","invoiceCode","logisticsCentreCode","logisticsCentreName","deliveryTime","implementBy","implementTime","implementContent");
+        ParamUnit.isNotNull(param,"orderCode","invoiceCode","logisticsCentreCode","logisticsCentreName","implementBy","implementTime","implementContent");
 
         return orderListLogisticsDao.insertLogistics(param);
     }
@@ -113,17 +113,15 @@ public class OrderListServiceImpl implements OrderListService {
         List<String> reList=new ArrayList<>();
         for (OrderListDetailsVo param : paramList) {
             //验证添加数据
-//            ParamUnit.isNotNull(param, "orderType", "orderStatus", "paymentStatus", "storeId", "storeCode", "storeName", "storeType", "totalOrders",
-//                  "orderCode",  "logisticsRemissionRatio", "placeOrderBy", "receivingAddress", "consignee", "consigneePhone", "companyCode","original", "orderListProductList",  "createBy"
-//            );
+            ParamUnit.isNotNull(param, "orderCode","orderType","orderStatus","storeId","storeCode","placeOrderTime");
 
             List<OrderListProduct> orderListProductList = param.getOrderListProductList();
-//            if (orderListProductList == null || orderListProductList.size() == 0) {
-//                throw new IllegalArgumentException("商品不可为空");
-//            }
-//            for (OrderListProduct orderListProduct : orderListProductList) {
-//                ParamUnit.isNotNull(orderListProduct, "skuCode", "skuName", "productPrice", "originalProductPrice", "productNumber", "gift", "specifications", "unit");
-//            }
+            if (orderListProductList == null || orderListProductList.size() == 0) {
+                throw new IllegalArgumentException("商品不可为空");
+            }
+            for (OrderListProduct orderListProduct : orderListProductList) {
+                ParamUnit.isNotNull(orderListProduct, "skuCode", "skuName","productNumber","gift");
+            }
 //           String orderCode= sequenceService.generateOrderCode(param.getCompanyCode(), param.getOrderType());
 //            param.setOrderCode(orderCode);
             String orderCode=param.getOrderCode();
@@ -132,7 +130,6 @@ public class OrderListServiceImpl implements OrderListService {
             Boolean re = orderListDao.insertOrderListDetailsVo(param);
             for (OrderListProduct orderListProduct : orderListProductList) {
                 orderListProduct.setId(IdUtil.uuid());
-//                orderListProduct.setOrderListId(orderId);
                 orderListProduct.setOrderCode(orderCode);
             }
             Boolean re2 = orderListProductDao.insertList(param.getOrderListProductList());
