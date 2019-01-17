@@ -269,6 +269,8 @@ public class OrderServiceImpl implements OrderService{
 					originTypeList =null;
 				}
 			}
+		}else {
+			originTypeList =null;
 		}
 		
 		//总销售额：包含退货、不包含取消、未付款的订单
