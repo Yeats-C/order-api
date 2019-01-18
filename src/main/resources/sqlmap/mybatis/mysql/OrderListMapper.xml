@@ -406,9 +406,6 @@
       <if test="logisticsRemissionRatio != null">
         #{logisticsRemissionRatio,jdbcType=INTEGER},
       </if>
-      <if test="placeOrderBy != null">
-        #{placeOrderBy,jdbcType=VARCHAR},
-      </if>
       <if test="placeOrderTime != null">
         #{placeOrderTime,jdbcType=TIMESTAMP},
       </if>

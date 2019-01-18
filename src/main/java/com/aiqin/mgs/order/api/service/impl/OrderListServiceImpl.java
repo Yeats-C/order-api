@@ -212,7 +212,7 @@ public class OrderListServiceImpl implements OrderListService {
                 StockLockRespVo stockLock = lockRespVoList.get(i);
                 OrderListProduct productDTO = new OrderListProduct();
                 BeanUtils.copyProperties(product, productDTO);
-                productDTO.setOrderProductId(IdUtil.uuid());
+                productDTO.setId(IdUtil.uuid());
                 //重新计算价格
                 productDTO.setProductNumber(stockLock.getLockNum());
                 productDTO.setAmount(stockLock.getLockNum() * product.getOriginalProductPrice());
@@ -274,11 +274,19 @@ public class OrderListServiceImpl implements OrderListService {
                 order.setProductNum(productNum);
                 int weight = products.stream().mapToInt(product -> product.getWeight() * product.getProductNumber()).sum();
                 chirldOrderCodes.add(chirldOrderCode);
+                products.forEach(product -> {
+                    product.setOrderCode(chirldOrderCode);
+                });
             } else {
                 order.setOrderCode(orderCode);
+                products.forEach(product -> {
+                    product.setOrderCode(orderCode);
+                });
             }
+            order.setId(IdUtil.uuid());
             order.setOriginal(orderCode);
             orderListProducts.addAll(products);
+            orders.add(order);
         });
         orders.forEach(order -> {
             orderListDao.insertSelective(order);
