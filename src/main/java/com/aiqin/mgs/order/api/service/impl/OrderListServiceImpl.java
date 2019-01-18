@@ -16,11 +16,13 @@ import com.aiqin.mgs.order.api.domain.OrderStatus;
 import com.aiqin.mgs.order.api.domain.request.orderList.*;
 import com.aiqin.mgs.order.api.domain.request.stock.StockLockReqVo;
 import com.aiqin.mgs.order.api.domain.request.stock.StockLockSkuReqVo;
+import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderSaveRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
 import com.aiqin.mgs.order.api.domain.response.stock.StockLockRespVo;
 import com.aiqin.mgs.order.api.service.BridgeStockService;
 import com.aiqin.mgs.order.api.service.OrderListService;
 import com.aiqin.ground.util.id.IdUtil;
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -29,7 +31,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -175,45 +179,115 @@ public class OrderListServiceImpl implements OrderListService {
         return reList;
     }
 
+    @Transactional
     @Override
-    public Boolean save(OrderReqVo reqVo) {
-//        List<StockLockSkuReqVo> skuReqVos = reqVo.getProducts().stream().map(product -> {
-//            StockLockSkuReqVo skuReqVo = new StockLockSkuReqVo();
-//            skuReqVo.setNum(product.getProductNumber());
-//            skuReqVo.setSku_code(product.getSkuCode());
-//            return skuReqVo;
-//        }).collect(Collectors.toList());
-//        StockLockReqVo stockLockReqVo = new StockLockReqVo();
-//        stockLockReqVo.setSkuList(skuReqVos);
-//        stockLockReqVo.setCityId(reqVo.getCityCode());
-//        stockLockReqVo.setCompanyCode(reqVo.getCompanyCode());
-//        stockLockReqVo.setProvinceId(reqVo.getProvinceCode());
-//        stockLockReqVo.setOrderCode(reqVo.getOriginal());
-//        List<StockLockRespVo> lockRespVos = bridgeStockService.lock(stockLockReqVo);
-//        Map<String, List<StockLockRespVo>> stockMap = lockRespVos.stream().collect(Collectors.toMap(StockLockRespVo::getSkuCode, Lists::newArrayList, (l1, l2) -> {
-//            l1.addAll(l2);
-//            return l1;
-//        }));
-//        Map<String, OrderListProduct> productMap = Maps.newLinkedHashMap();
-//        reqVo.getProducts().forEach(product -> {
-//            List<StockLockRespVo> lockRespVoList = stockMap.get(product.getSkuCode());
-//            Assert.notEmpty(lockRespVoList, "锁定库存异常");
-//            //商品价格（单品合计成交价)
-//            long totalProductPrice = 0L;
-//            long pr
-//            for (int i = 0; i < lockRespVoList.size() - 1; i++) {
-//                StockLockRespVo stockLock = lockRespVoList.get(i);
-//                OrderListProduct productDTO = new OrderListProduct();
-//                BeanUtils.copyProperties(product, productDTO);
-//                //重新计算价格
-//                productDTO.setProductNumber(stockLock.getLockNum());
-//                long productPrice = stockLock.getLockNum() * product.getProductPrice() / product.getProductNumber();
-//                productDTO.setProductPrice(productPrice);
-//                totalProductPrice += productPrice;
-//                productDTO.setAmount();
-//            }
-//
-//        });
-        return null;
+    public OrderSaveRespVo save(OrderReqVo reqVo) {
+        String orderCode = sequenceService.generateOrderCode(reqVo.getCompanyCode(), reqVo.getOrderType());
+        List<StockLockSkuReqVo> skuReqVos = reqVo.getProducts().stream().map(product -> {
+            StockLockSkuReqVo skuReqVo = new StockLockSkuReqVo();
+            skuReqVo.setNum(product.getProductNumber());
+            skuReqVo.setSku_code(product.getSkuCode());
+            return skuReqVo;
+        }).collect(Collectors.toList());
+        StockLockReqVo stockLockReqVo = new StockLockReqVo();
+        stockLockReqVo.setSkuList(skuReqVos);
+        stockLockReqVo.setCityId(reqVo.getCityCode());
+        stockLockReqVo.setCompanyCode(reqVo.getCompanyCode());
+        stockLockReqVo.setProvinceId(reqVo.getProvinceCode());
+        stockLockReqVo.setOrderCode(orderCode);
+        List<StockLockRespVo> lockRespVos = bridgeStockService.lock(stockLockReqVo);
+        Map<String, List<StockLockRespVo>> stockMap = lockRespVos.stream().collect(Collectors.toMap(StockLockRespVo::getSkuCode, Lists::newArrayList, (l1, l2) -> {
+            l1.addAll(l2);
+            return l1;
+        }));
+        Map<String, List<OrderListProduct>> productMap = Maps.newLinkedHashMap();
+        for (OrderProductReqVo product : reqVo.getProducts()) {
+            List<StockLockRespVo> lockRespVoList = stockMap.get(product.getSkuCode());
+            Assert.notEmpty(lockRespVoList, "锁定库存异常");
+            //商品价格（单品合计成交价)
+            long totalProductPrice = 0L;
+            long totalDiscountMoney = 0L;
+            long totalPreferentialAllocation = 0;
+            for (int i = 0; i < lockRespVoList.size(); i++) {
+                StockLockRespVo stockLock = lockRespVoList.get(i);
+                OrderListProduct productDTO = new OrderListProduct();
+                BeanUtils.copyProperties(product, productDTO);
+                productDTO.setOrderProductId(IdUtil.uuid());
+                //重新计算价格
+                productDTO.setProductNumber(stockLock.getLockNum());
+                productDTO.setAmount(stockLock.getLockNum() * product.getOriginalProductPrice());
+                //单品合计成交价
+                long productPrice;
+                //优惠额度抵扣金额（单品合计）
+                long discountMoney;
+                //优惠分摊
+                long preferentialAllocation;
+                if (i < lockRespVoList.size() - 1) {
+                    productPrice = stockLock.getLockNum() * product.getProductPrice() / product.getProductNumber();
+                    totalProductPrice += productPrice;
+                    discountMoney = stockLock.getLockNum() * product.getDiscountMoney() / product.getProductNumber();
+                    totalDiscountMoney += discountMoney;
+                    preferentialAllocation = stockLock.getLockNum() * product.getPreferentialAllocation() / product.getProductNumber();
+                    totalPreferentialAllocation += preferentialAllocation;
+                } else {
+                    productPrice = product.getProductPrice() - totalProductPrice;
+                    discountMoney = product.getDiscountMoney() - totalDiscountMoney;
+                    preferentialAllocation = product.getPreferentialAllocation() - totalPreferentialAllocation;
+                }
+                productDTO.setProductPrice(productPrice);
+                productDTO.setDiscountMoney(discountMoney);
+                productDTO.setPreferentialAllocation(preferentialAllocation);
+                //优惠明细分摊
+                List<DiscountAmountInfo> infos = product.getDiscountAmountInfo().stream().map(info -> {
+                    DiscountAmountInfo newInfo = new DiscountAmountInfo();
+                    newInfo.setCode(info.getCode());
+                    newInfo.setAmount(info.getAmount() * stockLock.getLockNum() / product.getProductNumber());
+                    return newInfo;
+                }).collect(Collectors.toList());
+                productDTO.setDiscountAmountInfo(JSON.toJSONString(infos));
+                List<OrderListProduct> orderListProducts = productMap.get(stockLock.getWarehouseCode());
+                if (CollectionUtils.isEmpty(orderListProducts)) {
+                    productMap.put(stockLock.getWarehouseCode(), Lists.newArrayList(productDTO));
+                } else {
+                    orderListProducts.add(productDTO);
+                }
+            }
+        }
+        List<OrderListProduct> orderListProducts = Lists.newLinkedList();
+        List<OrderList> orders = Lists.newArrayList();
+        List<String> chirldOrderCodes = Lists.newArrayList();
+        productMap.forEach((warehouseCode, products) -> {
+            OrderList order = new OrderList();
+            BeanUtils.copyProperties(reqVo, order);
+            if (productMap.size() > 1) {
+                String chirldOrderCode = sequenceService.generateOrderCode(reqVo.getCompanyCode(), reqVo.getOrderType());
+                order.setOrderCode(chirldOrderCode);
+                long totalOrders = products.stream().mapToLong(OrderListProduct::getAmount).sum();
+                order.setTotalOrders(totalOrders);
+                long actualAmountPaid = products.stream().mapToLong(OrderListProduct::getProductPrice).sum();
+                order.setActualAmountPaid(actualAmountPaid);
+                long activityAmount = products.stream().mapToLong(OrderListProduct::getPreferentialAllocation).sum();
+                order.setActivityAmount(activityAmount);
+                long preferentialQuota = products.stream().mapToLong(OrderListProduct::getDiscountMoney).sum();
+                order.setPreferentialQuota(preferentialQuota);
+                int productNum = products.stream().mapToInt(OrderListProduct::getProductNumber).sum();
+                order.setProductNum(productNum);
+                int weight = products.stream().mapToInt(product -> product.getWeight() * product.getProductNumber()).sum();
+                chirldOrderCodes.add(chirldOrderCode);
+            } else {
+                order.setOrderCode(orderCode);
+            }
+            order.setOriginal(orderCode);
+            orderListProducts.addAll(products);
+        });
+        orders.forEach(order -> {
+            orderListDao.insertSelective(order);
+        });
+        orderListProductDao.insertList(orderListProducts);
+        OrderSaveRespVo respVo = new OrderSaveRespVo();
+        respVo.setOrderCode(orderCode);
+        respVo.setSplitOrder(orders.size() > 1);
+        respVo.setChildOrderCode(chirldOrderCodes);
+        return respVo;
     }
 }

@@ -4,6 +4,7 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.OrderList;
 import com.aiqin.mgs.order.api.domain.OrderListLogistics;
 import com.aiqin.mgs.order.api.domain.request.orderList.*;
+import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderSaveRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public interface OrderListService {
 
     List<String> add(List<OrderListDetailsVo> param);
 
-    Boolean save(OrderReqVo reqVo);
+    OrderSaveRespVo save(OrderReqVo reqVo);
 
     PageResData<OrderList> searchOrderReceptionList(OrderListVo2 param);
 

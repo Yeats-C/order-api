@@ -1,14 +1,15 @@
 package com.aiqin.mgs.order.api.web;
 
+import com.aiqin.ground.util.protocol.MessageId;
+import com.aiqin.ground.util.protocol.Project;
+import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.OrderList;
 import com.aiqin.mgs.order.api.domain.OrderListLogistics;
 import com.aiqin.mgs.order.api.domain.request.orderList.*;
+import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderSaveRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
 import com.aiqin.mgs.order.api.service.OrderListService;
-import com.aiqin.ground.util.protocol.MessageId;
-import com.aiqin.ground.util.protocol.Project;
-import com.aiqin.ground.util.protocol.http.HttpResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -17,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 描述:
@@ -40,7 +40,7 @@ public class OrderListController {
      * @return
      */
     @PostMapping("/save")
-    public HttpResponse<Boolean> save(@RequestBody OrderReqVo reqVo) {
+    public HttpResponse<OrderSaveRespVo> save(@RequestBody OrderReqVo reqVo) {
         return HttpResponse.success(orderListService.save(reqVo));
     }
 //    /**
