@@ -5,6 +5,7 @@ import com.aiqin.mgs.order.api.domain.request.stock.StockLockReqVo;
 import com.aiqin.mgs.order.api.domain.response.stock.StockLockRespVo;
 import com.aiqin.mgs.order.api.service.BridgeStockService;
 import com.google.common.collect.Lists;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
  * @createTime 2019-01-18
  * @description
  */
+@Service
 public class BridgeStockServiceImpl implements BridgeStockService {
     @Resource
     private UrlProperties urlProperties;
