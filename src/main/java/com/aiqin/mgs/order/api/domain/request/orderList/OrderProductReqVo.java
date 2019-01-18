@@ -75,17 +75,17 @@ public class OrderProductReqVo implements Serializable {
     @JsonProperty("original_product_price")
     private Long originalProductPrice;
 
-    @ApiModelProperty(value = "商品总额（单价*数量）")
-    @JsonProperty("subtotal_price")
-    private Long subtotalPrice;
+//    @ApiModelProperty(value = "商品总额（单价*数量）")
+//    @JsonProperty("subtotal_price")
+//    private Long subtotalPrice;
 
     @ApiModelProperty(value = "优惠额度抵扣金额（单品合计）")
     @JsonProperty("discount_money")
     private Long discountMoney;
 
-    @ApiModelProperty(value = "促销活动抵扣金额（单品合计）")
-    @JsonProperty("promotion_discount")
-    private Long promotionDiscount;
+//    @ApiModelProperty(value = "促销活动抵扣金额（单品合计）")
+//    @JsonProperty("promotion_discount")
+//    private Long promotionDiscount;
 
     @ApiModelProperty(value = "总价")
     @JsonProperty("amount")

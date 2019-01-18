@@ -91,9 +91,9 @@
       select
        id, order_product_id orderProductId, order_code orderCode, sku_code skuCode, sku_name skuName, product_number productNumber, activity_code activityCode,
     activity_name activityName, gift, original_product_id originalProductId, specifications, unit, color_code colorCode, color_name colorName,
-    model_number modelNumber, actual_deliver_num actualDeliverNum, product_price productPrice, original_product_price originalProductPrice, subtotal_price subtotalPrice,
-    discount_money discountMoney, promotion_discount promotionDiscount, amount, picture_url pictureUrl,  preferential_allocation preferentialAllocation,
-    return_num returnNum, supply_company_code supplyCompanyCode, supply_company_name supplyCompanyName, discount_code discountCode
+    model_number modelNumber, actual_deliver_num actualDeliverNum, product_price productPrice, original_product_price originalProductPrice,
+    discount_money discountMoney,  amount, picture_url pictureUrl,  preferential_allocation preferentialAllocation,
+    return_num returnNum, supply_company_code supplyCompanyCode, supply_company_name supplyCompanyName, use_discount_amount useDiscountAmount,discount_amount_info discountAmountInfo
       from order_list_product
       where order_code = #{code}
 
@@ -207,10 +207,10 @@
         original_product_id, specifications, unit,
         color_code, color_name, model_number,
         actual_deliver_num, product_price, original_product_price,
-        subtotal_price, discount_money, promotion_discount,
+         discount_money,
         amount, picture_url, preferential_allocation,
         return_num, supply_company_code, supply_company_name,
-        discount_code)
+        use_discount_amount, discount_amount_info)
     values
         <foreach collection ="list" item="product" index= "index" separator =",">
             (#{product.id,jdbcType=VARCHAR}, #{product.orderProductId,jdbcType=VARCHAR}, #{product.orderCode,jdbcType=VARCHAR},
@@ -219,10 +219,10 @@
             #{product.originalProductId,jdbcType=VARCHAR}, #{product.specifications,jdbcType=VARCHAR}, #{product.unit,jdbcType=VARCHAR},
             #{product.colorCode,jdbcType=VARCHAR}, #{product.colorName,jdbcType=VARCHAR}, #{product.modelNumber,jdbcType=VARCHAR},
             #{product.actualDeliverNum,jdbcType=INTEGER}, #{product.productPrice,jdbcType=BIGINT}, #{product.originalProductPrice,jdbcType=BIGINT},
-            #{product.subtotalPrice,jdbcType=BIGINT}, #{product.discountMoney,jdbcType=BIGINT}, #{product.promotionDiscount,jdbcType=BIGINT},
+            #{product.discountMoney,jdbcType=BIGINT},
             #{product.amount,jdbcType=INTEGER}, #{product.pictureUrl,jdbcType=VARCHAR}, #{product.preferentialAllocation,jdbcType=INTEGER},
             #{product.returnNum,jdbcType=INTEGER}, #{product.supplyCompanyCode,jdbcType=VARCHAR}, #{product.supplyCompanyName,jdbcType=VARCHAR},
-            #{product.discountCode,jdbcType=VARCHAR})
+            #{product.useDiscountAmount},#{product.discountAmountInfo})
         </foreach>
     </insert>
 
