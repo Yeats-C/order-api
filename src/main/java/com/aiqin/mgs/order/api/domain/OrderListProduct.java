@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.domain;
 
 import com.aiqin.mgs.order.api.domain.request.orderList.DiscountAmountInfo;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -95,7 +96,7 @@ public class OrderListProduct {
 
     @ApiModelProperty(value = "总价")
     @JsonProperty("amount")
-    private Integer amount;
+    private Long amount;
 
     @ApiModelProperty(value = "图片地址")
     @JsonProperty("picture_url")
@@ -103,7 +104,7 @@ public class OrderListProduct {
 
     @ApiModelProperty(value = "优惠分摊")
     @JsonProperty("preferential_allocation")
-    private Integer preferentialAllocation;
+    private Long preferentialAllocation;
 
     @ApiModelProperty(value = "退货数量")
     @JsonProperty("return_num")
@@ -128,4 +129,8 @@ public class OrderListProduct {
     @ApiModelProperty(value = "优惠额度信息（json）")
     @JsonProperty("discount_amount_info")
     private String discountAmountInfo;
+
+    @ApiModelProperty(value = "商品单位重量，不存入数据库也不进行json序列化")
+    @JSONField(serialize = false)
+    private Integer weight;
 }

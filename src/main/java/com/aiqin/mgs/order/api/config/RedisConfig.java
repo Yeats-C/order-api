@@ -15,6 +15,8 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
+import javax.annotation.Resource;
+
 /**
  * AppConfig
  *
@@ -26,7 +28,7 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 @EnableConfigurationProperties(RedisProperties.class)
 public class RedisConfig {
 
-    @Autowired
+    @Resource
     private RedisProperties redisProperties;
 
     @Bean
