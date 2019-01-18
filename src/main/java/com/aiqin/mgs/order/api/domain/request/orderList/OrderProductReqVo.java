@@ -43,9 +43,9 @@ public class OrderProductReqVo implements Serializable {
     @JsonProperty("gift")
     private Integer gift;
 
-    @ApiModelProperty(value = "赠送赠品商品ID")
-    @JsonProperty("original_product_id")
-    private String originalProductId;
+    @ApiModelProperty(value = "赠送赠品商品SKU")
+    @JsonProperty("original_product_sku")
+    private String originalProductSku;
 
     @ApiModelProperty(value = "规格")
     @JsonProperty("specifications")
@@ -87,17 +87,9 @@ public class OrderProductReqVo implements Serializable {
     @JsonProperty("promotion_discount")
     private Long promotionDiscount;
 
-    @ApiModelProperty(value = "总价")
-    @JsonProperty("amount")
-    private Integer amount;
-
     @ApiModelProperty(value = "图片地址")
     @JsonProperty("picture_url")
     private String pictureUrl;
-
-    @ApiModelProperty(value = "优惠分摊")
-    @JsonProperty("preferential_allocation")
-    private Integer preferentialAllocation;
 
     @ApiModelProperty(value = "供应单位编码")
     @JsonProperty("supply_company_code")

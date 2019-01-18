@@ -3,10 +3,7 @@ package com.aiqin.mgs.order.api.web;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.OrderList;
 import com.aiqin.mgs.order.api.domain.OrderListLogistics;
-import com.aiqin.mgs.order.api.domain.request.orderList.OrderListDetailsVo;
-import com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo;
-import com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo2;
-import com.aiqin.mgs.order.api.domain.request.orderList.OrderStockVo;
+import com.aiqin.mgs.order.api.domain.request.orderList.*;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
 import com.aiqin.mgs.order.api.service.OrderListService;
 import com.aiqin.ground.util.protocol.MessageId;
@@ -38,12 +35,22 @@ public class OrderListController {
 
     /**
      * 订单新增
+     *
+     * @param reqVo
+     * @return
      */
-    @PostMapping("/add")
-    @ApiOperation(value = "订单新增")
-    public HttpResponse<List<String>> add(@RequestBody List<OrderListDetailsVo> param) {
-          return HttpResponse.success(orderListService.add(param));
+    @PostMapping("/save")
+    public HttpResponse<Boolean> save(@RequestBody OrderReqVo reqVo) {
+        return HttpResponse.success(orderListService.save(reqVo));
     }
+//    /**
+//     * 订单新增
+//     */
+//    @PostMapping("/add")
+//    @ApiOperation(value = "订单新增")
+//    public HttpResponse<List<String>> add(@RequestBody List<OrderListDetailsVo> param) {
+//          return HttpResponse.success(orderListService.add(param));
+//    }
 
     /**
      * 订单列表后台
@@ -59,7 +66,7 @@ public class OrderListController {
             return HttpResponse.success(this.orderListService.searchOrderList(param));
         } catch (Exception e) {
             log.error("Get purchasingTarget list failed", e);
-            return HttpResponse.failure(MessageId.create(Project.OMS_API,400,e.getMessage()));
+            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
         }
     }
 
@@ -78,7 +85,7 @@ public class OrderListController {
             return HttpResponse.success(this.orderListService.searchOrderReceptionList(param));
         } catch (Exception e) {
             log.error("Get purchasingTarget list failed", e);
-            return HttpResponse.failure(MessageId.create(Project.OMS_API,400,e.getMessage()));
+            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
         }
     }
 
@@ -88,8 +95,8 @@ public class OrderListController {
 
     @GetMapping("/get/orderbycode")
     @ApiOperation(value = "获取订单信息")
-    public HttpResponse<OrderListDetailsVo> getOrderByCode(@ApiParam("订单code")@RequestParam("code") String code) {
-       return HttpResponse.success(orderListService.getOrderByCode(code));
+    public HttpResponse<OrderListDetailsVo> getOrderByCode(@ApiParam("订单code") @RequestParam("code") String code) {
+        return HttpResponse.success(orderListService.getOrderByCode(code));
     }
 
     /**
@@ -103,7 +110,7 @@ public class OrderListController {
             return HttpResponse.success(this.orderListService.addLogistics(param));
         } catch (Exception e) {
             log.error("Get purchasingTarget list failed", e);
-            return HttpResponse.failure(MessageId.create(Project.OMS_API,400,e.getMessage()));
+            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
         }
     }
 
@@ -112,25 +119,24 @@ public class OrderListController {
      */
     @GetMapping("update/Order/status")
     @ApiOperation("修改订单状态")
-    public HttpResponse<Boolean> updateOrderStatus(@ApiParam("订单code")@RequestParam("code") String code,@ApiParam("订单状态")@RequestParam("status") Integer status) {
-        log.info("Search  purchasingTarget list:{}", code,status);
+    public HttpResponse<Boolean> updateOrderStatus(@ApiParam("订单code") @RequestParam("code") String code, @ApiParam("订单状态") @RequestParam("status") Integer status) {
+        log.info("Search  purchasingTarget list:{}", code, status);
         try {
-            return HttpResponse.success(this.orderListService.updateOrderStatus(code,status));
+            return HttpResponse.success(this.orderListService.updateOrderStatus(code, status));
         } catch (Exception e) {
             log.error("Get purchasingTarget list failed", e);
-            return HttpResponse.failure(MessageId.create(Project.OMS_API,400,e.getMessage()));
+            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
         }
     }
-
 
 
     /**
      * 查询一段时间进货进度量
      */
-      @PostMapping("get/stock/value")
-      @ApiOperation("查询一段时间进货进度量")
-      public HttpResponse<List<OrderStockReVo>> getStockValue(@RequestBody OrderStockVo vo){
-          return  HttpResponse.success(orderListService.getStockValue(vo));
+    @PostMapping("get/stock/value")
+    @ApiOperation("查询一段时间进货进度量")
+    public HttpResponse<List<OrderStockReVo>> getStockValue(@RequestBody OrderStockVo vo) {
+        return HttpResponse.success(orderListService.getStockValue(vo));
 
-      }
+    }
 }

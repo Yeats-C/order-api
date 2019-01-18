@@ -20,6 +20,10 @@ import java.util.List;
 @ApiModel("订单保存请求数据")
 public class OrderReqVo {
 
+    @ApiModelProperty(value = "原单标识code(uuid)")
+    @JsonProperty("original")
+    private String original;
+
     @ApiModelProperty(value = "订单类型(1:配送补货、2:直送补货、3:首单、4:首单赠送)")
     @JsonProperty("order_type")
     private Integer orderType;

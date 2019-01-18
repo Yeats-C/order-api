@@ -3,10 +3,7 @@ package com.aiqin.mgs.order.api.service;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.OrderList;
 import com.aiqin.mgs.order.api.domain.OrderListLogistics;
-import com.aiqin.mgs.order.api.domain.request.orderList.OrderListDetailsVo;
-import com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo;
-import com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo2;
-import com.aiqin.mgs.order.api.domain.request.orderList.OrderStockVo;
+import com.aiqin.mgs.order.api.domain.request.orderList.*;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
 
 import java.util.List;
@@ -24,6 +21,8 @@ public interface OrderListService {
     OrderListDetailsVo getOrderByCode(String code);
 
     List<String> add(List<OrderListDetailsVo> param);
+
+    Boolean save(OrderReqVo reqVo);
 
     PageResData<OrderList> searchOrderReceptionList(OrderListVo2 param);
 
