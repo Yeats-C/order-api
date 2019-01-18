@@ -13,10 +13,7 @@ import com.aiqin.mgs.order.api.domain.OrderList;
 import com.aiqin.mgs.order.api.domain.OrderListLogistics;
 import com.aiqin.mgs.order.api.domain.OrderListProduct;
 import com.aiqin.mgs.order.api.domain.OrderStatus;
-import com.aiqin.mgs.order.api.domain.request.orderList.OrderListDetailsVo;
-import com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo;
-import com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo2;
-import com.aiqin.mgs.order.api.domain.request.orderList.OrderStockVo;
+import com.aiqin.mgs.order.api.domain.request.orderList.*;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
 import com.aiqin.mgs.order.api.service.OrderListService;
 import com.aiqin.ground.util.id.IdUtil;
@@ -100,17 +97,33 @@ public class OrderListServiceImpl implements OrderListService {
         if (orderStatus==null){
             throw new IllegalArgumentException( "状态值未找到");
         }
+//        //查询此code为父订单标示还是子订单
+//        List<OrderList> orderLists=orderListDao.searchFZ(code);
+//        if (orderLists==null||orderLists.size()==0){
+//            throw new IllegalArgumentException( "code不存在");
+//        }
+//        String orderCode=orderLists.get(0).getOrderCode();
+//        String original=orderLists.get(0).getOriginal();
 
         Boolean br=  orderListDao.updateByCode(code,status,orderStatus.getPaymentStatus());
         //将订单状态改完支付,将订单发送给供应链
+        //todo  判断状态 待更新
         if (status==2 && br==true){
             //获取订单信息
-            OrderListDetailsVo vo = orderListDao.searchOrderByCode(code);
-            List<OrderListProduct> list2 = orderListProductDao.searchOrderListProductByCode(code);
-            vo.setOrderListProductList(list2);
-
-
-            HttpClient httpPost = HttpClient.post(product_ip+"/purchase/order/add").json("1");
+            List<SupplyOrderInfoReqVO> vo = orderListDao.searchOrderByCodeOrOriginal(code);
+            List<SupplyOrderProductItemReqVO> list2 = orderListProductDao.searchOrderListProductByCodeOrOriginal(code);
+            for (SupplyOrderInfoReqVO reqVO : vo) {
+                List<SupplyOrderProductItemReqVO> supplylist=new ArrayList<>();
+                for (SupplyOrderProductItemReqVO itemReqVO : list2) {
+                      if (reqVO.getOrderCode().equals(itemReqVO.getOrderCode())){
+                          supplylist.add(itemReqVO);
+                      }
+                }
+                reqVO.setOrderItems(supplylist);
+            }
+            SupplyOrderMainReqVO svo  =new  SupplyOrderMainReqVO();
+            svo.setSubOrderInfo(vo);
+            HttpClient httpPost = HttpClient.post(product_ip+"/purchase/order/add").json(svo);
             httpPost.action().status();
             HttpResponse result = httpPost.action().result(new TypeReference<HttpResponse>(){});
             String c =   result.getCode();

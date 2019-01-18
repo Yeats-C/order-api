@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.OrderListProduct;
+import com.aiqin.mgs.order.api.domain.request.orderList.SupplyOrderProductItemReqVO;
 
 import java.util.List;
 
@@ -26,4 +27,6 @@ public interface OrderListProductDao {
     List<OrderListProduct> searchOrderListProductByCode(String code);
 
     Boolean insertList(List<OrderListProduct> orderListProductList);
+
+    List<SupplyOrderProductItemReqVO> searchOrderListProductByCodeOrOriginal(String code);
 }

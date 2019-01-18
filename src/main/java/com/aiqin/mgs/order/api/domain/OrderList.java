@@ -184,8 +184,8 @@ public class OrderList extends PagesRequest {
     private String transportCenterCode;
 
     @ApiModelProperty(value = "物流中心名称")
-    @JsonProperty("transport_centername")
-    private String transportCentername;
+    @JsonProperty("transport_center_name")
+    private String transportCenterName;
 
     @ApiModelProperty(value = "仓库编码")
     @JsonProperty("warehouse_code")
