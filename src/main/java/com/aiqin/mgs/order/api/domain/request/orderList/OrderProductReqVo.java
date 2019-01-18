@@ -1,25 +1,23 @@
-package com.aiqin.mgs.order.api.domain;
+package com.aiqin.mgs.order.api.domain.request.orderList;
 
-import com.aiqin.mgs.order.api.domain.request.orderList.DiscountAmountInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
-@ApiModel("订单商品从表")
+/**
+ * OrderProductReqVo
+ *
+ * @author zhangtao
+ * @createTime 2019-01-18
+ * @description
+ */
 @Data
-public class OrderListProduct {
-    private String id;
+public class OrderProductReqVo implements Serializable {
 
-    @ApiModelProperty(value = "订单商品ID")
-    @JsonProperty("order_product_id")
-    private String orderProductId;
-
-    @ApiModelProperty(value = "订单编号")
-    @JsonProperty("order_code")
-    private String orderCode;
+    private static final long serialVersionUID = -1223728764746461137L;
 
     @ApiModelProperty(value = "商品sku码")
     @JsonProperty("sku_code")
@@ -69,10 +67,6 @@ public class OrderListProduct {
     @JsonProperty("model_number")
     private String modelNumber;
 
-    @ApiModelProperty(value = "实发数量")
-    @JsonProperty("actual_deliver_num")
-    private Integer actualDeliverNum;
-
     @ApiModelProperty(value = "商品价格（单品合计成交价)")
     @JsonProperty("product_price")
     private Long productPrice;
@@ -105,10 +99,6 @@ public class OrderListProduct {
     @JsonProperty("preferential_allocation")
     private Integer preferentialAllocation;
 
-    @ApiModelProperty(value = "退货数量")
-    @JsonProperty("return_num")
-    private Integer returnNum;
-
     @ApiModelProperty(value = "供应单位编码")
     @JsonProperty("supply_company_code")
     private String supplyCompanyCode;
@@ -117,15 +107,11 @@ public class OrderListProduct {
     @JsonProperty("supply_company_name")
     private String supplyCompanyName;
 
-//    @ApiModelProperty(value = "优惠额度编号")
-//    @JsonProperty("discount_code")
-//    private String discountCode;
-
-    @ApiModelProperty(value = "是否使用优惠额度,true-使用了优惠额度，false-没使用")
+    @ApiModelProperty(value = "是否使用优惠额度")
     @JsonProperty("use_discount_amount")
-    private Boolean useDiscountAmount;
+    private String useDiscountAmount;
 
-    @ApiModelProperty(value = "优惠额度信息（json）")
+    @ApiModelProperty(value = "优惠额度信息")
     @JsonProperty("discount_amount_info")
-    private String discountAmountInfo;
+    private List<DiscountAmountInfo> discountAmountInfo;
 }
