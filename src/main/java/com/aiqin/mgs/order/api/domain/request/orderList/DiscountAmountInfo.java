@@ -16,5 +16,5 @@ public class DiscountAmountInfo {
     private String code;
 
     @ApiModelProperty("优惠额抵扣金额")
-    private String amount;
+    private Long amount;
 }

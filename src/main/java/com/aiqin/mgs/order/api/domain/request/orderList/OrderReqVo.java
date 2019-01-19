@@ -120,9 +120,9 @@ public class OrderReqVo {
     @JsonProperty("product_num")
     private Integer productNum;
 
-    @ApiModelProperty(value = "重量")
-    @JsonProperty("weight")
-    private Integer weight;
+//    @ApiModelProperty(value = "重量")
+//    @JsonProperty("weight")
+//    private Integer weight;
 
     @ApiModelProperty(value = "邮编")
     @JsonProperty("zip_code")
@@ -148,6 +148,10 @@ public class OrderReqVo {
     @ApiModelProperty(value = "是否使用优惠券(0是1否)")
     @JsonProperty("apply_coupons")
     private Integer applyCoupons;
+
+    @ApiModelProperty(value = "发票抬头类型 0不开、1开")
+    @JsonProperty("invoice_type")
+    private Integer invoiceType;
 
     @ApiModelProperty(value = "订单商品")
     private List<OrderProductReqVo> products;
