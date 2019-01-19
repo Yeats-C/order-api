@@ -79,6 +79,9 @@ public class SupplyOrderInfoReqVO {
     @ApiModelProperty("配送方式")
     private String distributionMode;
 
+    @ApiModelProperty("物流减免比例")
+    private String logisticsRemissionRatio;
+
     @ApiModelProperty("配送方式编码")
     private String distributionModeCode;
 

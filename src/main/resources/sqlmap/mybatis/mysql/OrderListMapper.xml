@@ -262,7 +262,7 @@
 
     order_code orderCode,order_type orderType,store_name customerName,store_code customerCode,create_time createDate,
 order_status orderStatus,payment_status paymentStatus,transport_center_name transportCenterName,transport_center_code transportCenterCode,
- warehouse_name warehouseName,warehouse_code warehouseCode,supplier_name supplierName,supplier_code supplierCode,logistics_remission_type  distributionMode,
+ warehouse_name warehouseName,warehouse_code warehouseCode,supplier_name supplierName,supplier_code supplierCode,logistics_remission_type  distributionMode,logistics_remission_ratio logisticsRemissionRatio,
 consignee, consignee_phone consigneePhone,province_code provinceCode,province_name provinceName, city_code cityCode,
  city_name cityName,district_code districtCode,district_name districtName,receiving_address detailAddress,
   zip_code zipCode,payment_type paymentType, payment_type_code paymentTypeCode,total_orders productTotalAmount,
