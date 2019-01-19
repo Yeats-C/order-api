@@ -134,7 +134,7 @@ public class OrderListController {
      * 查询一段时间进货进度量
      */
     @PostMapping("get/stock/value")
-    @ApiOperation("查询一段时间进货进度量1")
+    @ApiOperation("查询一段时间进货进度量")
     public HttpResponse<List<OrderStockReVo>> getStockValue(@RequestBody OrderStockVo vo) {
         return HttpResponse.success(orderListService.getStockValue(vo));
 

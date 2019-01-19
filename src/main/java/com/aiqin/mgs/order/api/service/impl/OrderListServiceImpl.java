@@ -68,8 +68,8 @@ public class OrderListServiceImpl implements OrderListService {
 
 
     //商品项目地址
-    @Value("${product_ip}")
-    public String product_ip;
+    @Value("${purchase_ip}")
+    public String purchase_ip;
 
     /**
      * 订单列表后台
@@ -133,7 +133,7 @@ public class OrderListServiceImpl implements OrderListService {
             }
             SupplyOrderMainReqVO svo  =new  SupplyOrderMainReqVO();
             svo.setSubOrderInfo(vo);
-            HttpClient httpPost = HttpClient.post("http://"+product_ip+"/purchase/order/add").json(svo);
+            HttpClient httpPost = HttpClient.post("http://"+purchase_ip+"/purchase/order/add").json(svo);
             HttpResponse<List<OrderStockReVo>> result =
                     httpPost.action().result(new TypeReference<HttpResponse<Boolean>>() {
                     });
