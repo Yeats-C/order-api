@@ -91,11 +91,21 @@
       select
        id, order_product_id orderProductId, order_code orderCode, sku_code skuCode, sku_name skuName, product_number productNumber, activity_code activityCode,
     activity_name activityName, gift, original_product_id originalProductId, specifications, unit, color_code colorCode, color_name colorName,
-    model_number modelNumber, actual_deliver_num actualDeliverNum, product_price productPrice, original_product_price originalProductPrice, subtotal_price subtotalPrice,
-    discount_money discountMoney, promotion_discount promotionDiscount, amount, picture_url pictureUrl,  preferential_allocation preferentialAllocation,
-    return_num returnNum, supply_company_code supplyCompanyCode, supply_company_name supplyCompanyName, discount_code discountCode
+    model_number modelNumber, actual_deliver_num actualDeliverNum, product_price productPrice, original_product_price originalProductPrice,
+    discount_money discountMoney,  amount, picture_url pictureUrl,  preferential_allocation preferentialAllocation,
+    return_num returnNum, supply_company_code supplyCompanyCode, supply_company_name supplyCompanyName, use_discount_amount useDiscountAmount,discount_amount_info discountAmountInfo
       from order_list_product
       where order_code = #{code}
+
+    </select>
+    <select id="searchOrderListProductByCodeOrOriginal"
+            resultType="com.aiqin.mgs.order.api.domain.request.orderList.SupplyOrderProductItemReqVO">
+      select
+    order_code orderCode, sku_code skuCode, sku_name skuName,color_name colorName,color_code colorCode,unit  unitName,gift givePromotion,product_number num,amount ,original_product_price  price,
+  preferential_allocation  preferentialAllocation,actual_deliver_num actualDeliverNum,specifications spec, return_num returnNum,supply_company_name supplyCompanyName,supply_company_code supplyCompanyCode,
+preferential_allocation activityApportionment,activity_code activityCode, picture_url pictureUrl
+      from order_list_product
+      where order_code in (select order_code from order_list where   order_code=#{code} or original=#{code})
 
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
@@ -201,17 +211,28 @@
         </trim>
     </insert>
     <insert id="insertList">
-      insert into order_list_product (id, order_list_id, order_code,
-      line_number, sku_code, sku_name,
-      product_price, product_number, activity_code,
-      activity_name, is_gift, out_warehouse_code,
-      specifications,unit)
+      insert into order_list_product (id, order_product_id, order_code,
+        sku_code, sku_name, product_number,
+        activity_code, activity_name, gift,
+        original_product_id, specifications, unit,
+        color_code, color_name, model_number,
+        actual_deliver_num, product_price, original_product_price,
+         discount_money,
+        amount, picture_url, preferential_allocation,
+        return_num, supply_company_code, supply_company_name,
+        use_discount_amount, discount_amount_info)
     values
         <foreach collection ="list" item="product" index= "index" separator =",">
-    (#{product.id}, #{product.orderListId}, #{product.orderCode},
-      #{product.lineNumber}, #{product.skuCode}, #{product.skuName},
-      #{product.productPrice}, #{product.productNumber}, #{product.activityCode},
-      #{product.activityName}, #{product.gift}, #{originalProductPrice},#{specifications},#{unit})
+            (#{product.id,jdbcType=VARCHAR}, #{product.orderProductId,jdbcType=VARCHAR}, #{product.orderCode,jdbcType=VARCHAR},
+            #{product.skuCode,jdbcType=VARCHAR}, #{product.skuName,jdbcType=VARCHAR}, #{product.productNumber,jdbcType=INTEGER},
+            #{product.activityCode,jdbcType=VARCHAR}, #{product.activityName,jdbcType=VARCHAR}, #{product.gift,jdbcType=BIT},
+            #{product.originalProductId,jdbcType=VARCHAR}, #{product.specifications,jdbcType=VARCHAR}, #{product.unit,jdbcType=VARCHAR},
+            #{product.colorCode,jdbcType=VARCHAR}, #{product.colorName,jdbcType=VARCHAR}, #{product.modelNumber,jdbcType=VARCHAR},
+            #{product.actualDeliverNum,jdbcType=INTEGER}, #{product.productPrice,jdbcType=BIGINT}, #{product.originalProductPrice,jdbcType=BIGINT},
+            #{product.discountMoney,jdbcType=BIGINT},
+            #{product.amount,jdbcType=INTEGER}, #{product.pictureUrl,jdbcType=VARCHAR}, #{product.preferentialAllocation,jdbcType=INTEGER},
+            #{product.returnNum,jdbcType=INTEGER}, #{product.supplyCompanyCode,jdbcType=VARCHAR}, #{product.supplyCompanyName,jdbcType=VARCHAR},
+            #{product.useDiscountAmount},#{product.discountAmountInfo})
         </foreach>
     </insert>
 

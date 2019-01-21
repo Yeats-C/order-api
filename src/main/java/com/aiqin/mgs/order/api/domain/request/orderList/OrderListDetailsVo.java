@@ -142,8 +142,8 @@ public class OrderListDetailsVo {
     private String provinceCode;
 
     @ApiModelProperty(value = "省名称")
-    @JsonProperty("provincename")
-    private String provincename;
+    @JsonProperty("province_name")
+    private String provinceName;
 
     @ApiModelProperty(value = "市编码")
     @JsonProperty("cityCode")
@@ -192,8 +192,8 @@ public class OrderListDetailsVo {
     private String transportCenterCode;
 
     @ApiModelProperty(value = "物流中心名称")
-    @JsonProperty("transport_centername")
-    private String transportCentername;
+    @JsonProperty("transport_center_name")
+    private String transportCenterName;
 
     @ApiModelProperty(value = "仓库编码")
     @JsonProperty("warehouse_code")

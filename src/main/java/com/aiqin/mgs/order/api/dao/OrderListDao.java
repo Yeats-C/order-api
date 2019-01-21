@@ -1,10 +1,7 @@
 package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.OrderList;
-import com.aiqin.mgs.order.api.domain.request.orderList.OrderListDetailsVo;
-import com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo;
-import com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo2;
-import com.aiqin.mgs.order.api.domain.request.orderList.OrderStockVo;
+import com.aiqin.mgs.order.api.domain.request.orderList.*;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -45,4 +42,8 @@ public interface OrderListDao {
     Boolean updateByCode(@Param("code") String code, @Param("status") Integer status, @Param("paymentStatus") Integer paymentStatus);
 
     List<OrderStockReVo> getStockValue(@Param("vo")OrderStockVo vo);
+
+    List<OrderList> searchFZ(String code);
+
+    List<SupplyOrderInfoReqVO> searchOrderByCodeOrOriginal(String code);
 }

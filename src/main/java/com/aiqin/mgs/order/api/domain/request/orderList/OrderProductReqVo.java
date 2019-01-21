@@ -1,26 +1,23 @@
-package com.aiqin.mgs.order.api.domain;
+package com.aiqin.mgs.order.api.domain.request.orderList;
 
-import com.aiqin.mgs.order.api.domain.request.orderList.DiscountAmountInfo;
-import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
-@ApiModel("订单商品从表")
+/**
+ * OrderProductReqVo
+ *
+ * @author zhangtao
+ * @createTime 2019-01-18
+ * @description
+ */
 @Data
-public class OrderListProduct {
-    private String id;
+public class OrderProductReqVo implements Serializable {
 
-    @ApiModelProperty(value = "订单商品ID")
-    @JsonProperty("order_product_id")
-    private String orderProductId;
-
-    @ApiModelProperty(value = "订单编号")
-    @JsonProperty("order_code")
-    private String orderCode;
+    private static final long serialVersionUID = -1223728764746461137L;
 
     @ApiModelProperty(value = "商品sku码")
     @JsonProperty("sku_code")
@@ -46,9 +43,9 @@ public class OrderListProduct {
     @JsonProperty("gift")
     private Integer gift;
 
-    @ApiModelProperty(value = "赠送赠品商品ID")
-    @JsonProperty("original_product_id")
-    private String originalProductId;
+    @ApiModelProperty(value = "赠送赠品商品SKU")
+    @JsonProperty("original_product_sku")
+    private String originalProductSku;
 
     @ApiModelProperty(value = "规格")
     @JsonProperty("specifications")
@@ -70,10 +67,6 @@ public class OrderListProduct {
     @JsonProperty("model_number")
     private String modelNumber;
 
-    @ApiModelProperty(value = "实发数量")
-    @JsonProperty("actual_deliver_num")
-    private Integer actualDeliverNum;
-
     @ApiModelProperty(value = "商品价格（单品合计成交价)")
     @JsonProperty("product_price")
     private Long productPrice;
@@ -82,33 +75,21 @@ public class OrderListProduct {
     @JsonProperty("original_product_price")
     private Long originalProductPrice;
 
-//    @ApiModelProperty(value = "商品总额（单价*数量）")
-//    @JsonProperty("subtotal_price")
-//    private Long subtotalPrice;
-
     @ApiModelProperty(value = "优惠额度抵扣金额（单品合计）")
     @JsonProperty("discount_money")
     private Long discountMoney;
 
-//    @ApiModelProperty(value = "促销活动抵扣金额（单品合计）")
-//    @JsonProperty("promotion_discount")
-//    private Long promotionDiscount;
-
     @ApiModelProperty(value = "总价")
     @JsonProperty("amount")
-    private Long amount;
+    private Integer amount;
+
+    @ApiModelProperty(value = "优惠分摊")
+    @JsonProperty("preferential_allocation")
+    private Integer preferentialAllocation;
 
     @ApiModelProperty(value = "图片地址")
     @JsonProperty("picture_url")
     private String pictureUrl;
-
-    @ApiModelProperty(value = "优惠分摊")
-    @JsonProperty("preferential_allocation")
-    private Long preferentialAllocation;
-
-    @ApiModelProperty(value = "退货数量")
-    @JsonProperty("return_num")
-    private Integer returnNum;
 
     @ApiModelProperty(value = "供应单位编码")
     @JsonProperty("supply_company_code")
@@ -118,19 +99,15 @@ public class OrderListProduct {
     @JsonProperty("supply_company_name")
     private String supplyCompanyName;
 
-//    @ApiModelProperty(value = "优惠额度编号")
-//    @JsonProperty("discount_code")
-//    private String discountCode;
-
-    @ApiModelProperty(value = "是否使用优惠额度,1-使用了优惠额度，0-没使用")
+    @ApiModelProperty(value = "是否使用优惠额度")
     @JsonProperty("use_discount_amount")
-    private Integer useDiscountAmount;
+    private String useDiscountAmount;
 
-    @ApiModelProperty(value = "优惠额度信息（json）")
-    @JsonProperty("discount_amount_info")
-    private String discountAmountInfo;
-
-    @ApiModelProperty(value = "商品单位重量，不存入数据库也不进行json序列化")
-    @JSONField(serialize = false)
+    @ApiModelProperty(value = "商品单位重量")
+    @JsonProperty("weight")
     private Integer weight;
+
+    @ApiModelProperty(value = "优惠额度信息")
+    @JsonProperty("discount_amount_info")
+    private List<DiscountAmountInfo> discountAmountInfo;
 }
