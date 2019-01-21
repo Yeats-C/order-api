@@ -64,6 +64,7 @@ import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
+import com.aiqin.mgs.order.api.domain.response.SelectByMemberPayCountResponse;
 import com.aiqin.mgs.order.api.domain.response.WscSaleResponse;
 import com.aiqin.mgs.order.api.domain.response.WscWorkViewResponse;
 import com.aiqin.mgs.order.api.domain.response.DistributorMonthResponse;
@@ -1413,6 +1414,98 @@ public class OrderServiceImpl implements OrderService{
 	  LOGGER.info("销售目标管理-分销机构-月销售额報錯", e);
 	  return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
     }
+	}
+
+
+	//会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、日周月.
+	@Override
+	public HttpResponse selectByMemberPayCount(@Valid String distributorId, @Valid Integer dateType) {
+		
+	    //会员数量统计
+		List<SelectByMemberPayCountResponse> list = new ArrayList();
+		if(dateType !=null && distributorId !=null && !distributorId.equals("")) {
+			//日计算会员数
+			if(dateType.equals(Global.DATE_TYPE_1)) {
+				
+				for(int i=0;i>-7;i--) {
+					Integer countMember = null;
+					String countDate = "";
+					countDate = OrderPublic.NextDate(i);
+					System.out.println(countDate);
+					SelectByMemberPayCountResponse info = new SelectByMemberPayCountResponse();
+					info.setCountDate(countDate);
+					try {
+						countMember = orderDao.selectByMemberPayCountDay(info);
+					} catch (Exception e) {
+						LOGGER.info("会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、日报错", e);
+						return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+					}
+					if(countMember == null) {
+						info.setCountMember(0);
+					}else {
+						info.setCountMember(countMember);
+					}
+					list.add(info);
+				}
+				
+				return HttpResponse.success(list);
+				
+			//周计算会员数
+			}else if(dateType.equals(Global.DATE_TYPE_2)) {
+                
+				for(int i=0;i<7;i++) {
+					Integer countMember = null;
+					String countDate = "";
+					SelectByMemberPayCountResponse info = new SelectByMemberPayCountResponse();
+					try {
+						countMember = orderDao.selectByMemberPayCountWeek(i);
+					} catch (Exception e) {
+						LOGGER.info("会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、周报错", e);
+						return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+					}
+					info.setCountDate(String.valueOf(i)); 
+					if(countMember == null) {
+						info.setCountMember(0);
+					}else {
+						info.setCountMember(countMember);
+					}
+					list.add(info);
+				}
+				
+				return HttpResponse.success(list);
+				
+			}
+			//月计算会员数
+			else {
+                
+				for(int i=0;i>-7;i--) {
+					Integer countMember = null;
+					String countDate = "";
+					countDate = OrderPublic.afterMonth(i);
+					System.out.println(countDate);
+					SelectByMemberPayCountResponse info = new SelectByMemberPayCountResponse();
+					info.setCountDate(countDate);
+					try {
+						countMember = orderDao.selectByMemberPayCountMonth(info);
+					} catch (Exception e) {
+						LOGGER.info("会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、月报错", e);
+						return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+					}
+					if(countMember == null) {
+						info.setCountMember(0);
+					}else {
+						info.setCountMember(countMember);
+					}
+					list.add(info);
+				}
+				
+				return HttpResponse.success(list);
+
+			}
+		}else {
+			 LOGGER.info("会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、日周月.参数确实报错");
+			 return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}
 	}
 	
 }

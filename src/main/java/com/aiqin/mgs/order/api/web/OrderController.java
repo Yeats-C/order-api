@@ -446,6 +446,23 @@ public class OrderController {
     
     /**
      * 
+     * 会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、日周月.
+     * @param 
+     * @return
+     */
+    @PostMapping("/hydjm")
+    @ApiOperation(value = "会员活跃情况-日周月date_type 1：日 2：周 3：月 ....")
+    public HttpResponse hydjm(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,
+    		@Valid @RequestParam(name = "date_type", required = true) Integer dateType
+    		) {
+
+    	
+        return orderService.selectByMemberPayCount(distributorId,dateType);
+    }
+    
+    
+    /**
+     * 
      * 接口-生成提货码
      * @param 
      * @return

@@ -211,4 +211,9 @@ public interface Global {
     //公司编码
     //爱亲
     String COMPANY_01 = "1";    
+    
+    //日周月.
+    Integer DATE_TYPE_1 = 1;  //日
+    Integer DATE_TYPE_2 = 2;  //周
+    Integer DATE_TYPE_3 = 3;  //月
 }

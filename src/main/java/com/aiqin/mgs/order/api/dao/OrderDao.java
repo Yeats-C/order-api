@@ -17,6 +17,7 @@ import com.aiqin.mgs.order.api.domain.request.DevelRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
+import com.aiqin.mgs.order.api.domain.response.SelectByMemberPayCountResponse;
 import com.aiqin.mgs.order.api.domain.response.LastBuyResponse;
 import com.aiqin.mgs.order.api.domain.response.MevBuyResponse;
 import com.aiqin.mgs.order.api.domain.response.OradskuResponse;
@@ -138,6 +139,17 @@ public interface OrderDao {
 
 	//销售目标管理-分销机构-月销售额
 	Integer selectDistributorMonth(@Valid @Param("distributorCode")String distributorCode,@Valid @Param("beginTime")String beginTime,@Valid @Param("endTime")String endTime)throws Exception;
+
+	//会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、日
+	Integer selectByMemberPayCountDay(SelectByMemberPayCountResponse info)throws Exception;
+
+	//会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、周
+	Integer selectByMemberPayCountWeek(@Valid @Param("countDate")Integer countDate)throws Exception;
+	
+	//会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、月
+	Integer selectByMemberPayCountMonth(SelectByMemberPayCountResponse info)throws Exception;
+
+	
 
 	
 }

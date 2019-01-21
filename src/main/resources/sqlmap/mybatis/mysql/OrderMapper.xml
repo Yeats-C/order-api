@@ -849,5 +849,24 @@
 		 AND DATE_FORMAT(b.create_time,"%Y-%m-%d") &lt;= DATE_FORMAT(#{arg2},"%Y-%m-%d")
     </select>
     
+    <!-- 会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、7日内 -->
+    <select id="selectByMemberPayCountDay" resultType="java.lang.Integer">
+         SELECT COUNT(DISTINCT member_id) AS count_member FROM order_info  
+         WHERE 1=1 
+         AND DATE_FORMAT(create_time,"%Y-%m-%d") =#{countDate}
+    </select>
+    <!-- 会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、7周内 -->
+    <select id="selectByMemberPayCountWeek" resultType="java.lang.Integer">
+         SELECT COUNT(DISTINCT member_id) AS count_member FROM order_info  
+         WHERE 1=1 
+         AND YEARWEEK(DATE_FORMAT(create_time,'%Y-%m-%d')) = YEARWEEK(NOW())-#{countDate}
+    </select>
+    <!-- 会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、7月内 -->
+    <select id="selectByMemberPayCountMonth" resultType="java.lang.Integer">
+         SELECT COUNT(DISTINCT member_id) AS count_member FROM order_info  
+         WHERE 1=1
+         AND DATE_FORMAT(create_time,"%Y-%m") = #{countDate}
+    </select>
+    
 </mapper>
 
