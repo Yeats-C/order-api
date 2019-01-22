@@ -450,7 +450,7 @@ public class OrderController {
      * @param 
      * @return
      */
-    @PostMapping("/hydjm")
+    @GetMapping("/hydjm")
     @ApiOperation(value = "会员活跃情况-日周月date_type 1：日 2：周 3：月 ....")
     public HttpResponse hydjm(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,
     		@Valid @RequestParam(name = "date_type", required = true) Integer dateType
