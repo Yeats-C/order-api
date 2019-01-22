@@ -57,7 +57,9 @@ import com.aiqin.mgs.order.api.domain.OrderodrInfo;
 import com.aiqin.mgs.order.api.domain.ProductCycle;
 import com.aiqin.mgs.order.api.domain.SettlementInfo;
 import com.aiqin.mgs.order.api.domain.constant.Global;
+import com.aiqin.mgs.order.api.domain.request.DetailCouponRequest;
 import com.aiqin.mgs.order.api.domain.request.DevelRequest;
+import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderDetailRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
@@ -1391,15 +1393,36 @@ public class OrderServiceImpl implements OrderService{
 
 	//销售目标管理-分销机构-月销售额
 	@Override
-	public HttpResponse selectDistributorMonth(@Valid List<String> distributorCodeList,String beginTime,String endTime) {
+	public HttpResponse selectDistributorMonth(@Valid DistributorMonthRequest detailCouponRequest) {
 		try {
 			List<DistributorMonthResponse> list = new ArrayList();
 			//当月销售额：包含退货、不包含取消、未付款的订单
 			Integer monthtotalPrice=0;
-			if(distributorCodeList !=null && distributorCodeList.size()>0) {
-				for(String distributorCode : distributorCodeList) {
+			
+			//处理参数
+			if(detailCouponRequest.getDistributorCodeList() !=null && detailCouponRequest.getDistributorCodeList().size()>0) {
+				
+			}else {
+				detailCouponRequest.setDistributorCodeList(null);
+			}
+			
+            if(detailCouponRequest.getBeginTime() !=null && !detailCouponRequest.getBeginTime().equals("")) {
+            	
+            }else {
+            	detailCouponRequest.setBeginTime(null);
+            }
+            
+            if(detailCouponRequest.getEndTime() !=null && !detailCouponRequest.getEndTime().equals("")) {
+            	
+            }else {
+            	detailCouponRequest.setEndTime(null);
+            }
+			
+			//查询结果
+			if(detailCouponRequest.getDistributorCodeList() !=null && detailCouponRequest.getDistributorCodeList().size()>0) {
+				for(String distributorCode : detailCouponRequest.getDistributorCodeList()) {
 					DistributorMonthResponse info = new DistributorMonthResponse();
-					monthtotalPrice = orderDao.selectDistributorMonth(distributorCode,beginTime,endTime);
+					monthtotalPrice = orderDao.selectDistributorMonth(distributorCode,detailCouponRequest.getBeginTime(),detailCouponRequest.getEndTime());
 					info.setDistributorCode(distributorCode);
 					if(monthtotalPrice ==null) {
 						info.setPrice(0);

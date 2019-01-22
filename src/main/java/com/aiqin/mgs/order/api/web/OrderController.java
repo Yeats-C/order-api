@@ -17,6 +17,8 @@ import com.aiqin.mgs.order.api.domain.OrderPayInfo;
 import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.OrderRelationCouponInfo;
 import com.aiqin.mgs.order.api.domain.SettlementInfo;
+import com.aiqin.mgs.order.api.domain.request.DetailCouponRequest;
+import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
@@ -539,12 +541,9 @@ public class OrderController {
      */
     @PostMapping("/sdm")
     @ApiOperation(value = "销售目标管理-分销机构-月销售额")
-    public HttpResponse sdm(@Valid @RequestBody(required = true) List<String> distributorCodeList,
-    		 @Valid @RequestParam(name = "begin_time", required = true) String beginTime,
-    		 @Valid @RequestParam(name = "end_time", required = true) String endTime
-    		) {
+    public HttpResponse sdm(@Valid @RequestBody DistributorMonthRequest DistributorMonthRequest) {
         
     	
-        return orderService.selectDistributorMonth(distributorCodeList,beginTime,endTime);
+        return orderService.selectDistributorMonth(DistributorMonthRequest);
     } 
 }

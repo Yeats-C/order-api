@@ -844,9 +844,15 @@
          WHERE  1=1 
          AND b.order_status NOT IN ('0','4')
          AND b.pay_status='1'
+         <if test="arg0!=null and arg0!=''">
          and b.distributor_code = #{arg0}
+         </if>
+         <if test="arg1!=null and arg0!=''">
          and DATE_FORMAT(b.create_time,"%Y-%m-%d") &gt;= DATE_FORMAT(#{arg1},"%Y-%m-%d")  
-		 AND DATE_FORMAT(b.create_time,"%Y-%m-%d") &lt;= DATE_FORMAT(#{arg2},"%Y-%m-%d")
+         </if>
+         <if test="arg2!=null and arg0!=''">
+         AND DATE_FORMAT(b.create_time,"%Y-%m-%d") &lt;= DATE_FORMAT(#{arg2},"%Y-%m-%d")
+         </if>
     </select>
     
     <!-- 会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、7日内 -->
