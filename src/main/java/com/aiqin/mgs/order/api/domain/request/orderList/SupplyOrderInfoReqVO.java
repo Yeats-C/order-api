@@ -24,7 +24,7 @@ public class SupplyOrderInfoReqVO {
     @ApiModelProperty("订单编码(订单号)")
     private String orderCode;
 
-    @ApiModelProperty("类型：直送、配送、首单、首单赠送")
+    @ApiModelProperty("1:配送补货、2:直送补货、3:首单、4:首单赠送")
     private Byte orderType;
 
     @ApiModelProperty("订单类型编码")
@@ -76,7 +76,7 @@ public class SupplyOrderInfoReqVO {
     @ApiModelProperty("供应商编码")
     private String supplierCode;
 
-    @ApiModelProperty("配送方式")
+    @ApiModelProperty("配送方式{物流减免类型(0:送货上门,1:送货市级市,2:无减免)}")
     private String distributionMode;
 
     @ApiModelProperty("物流减免比例")
