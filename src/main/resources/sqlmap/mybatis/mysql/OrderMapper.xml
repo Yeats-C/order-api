@@ -636,7 +636,7 @@
     
     <!-- 接口-通过会员查询最后一次的消费记录. -->
     <select id="last" resultMap="LastBuyMapping" resultType="java.util.List">
-         SELECT a.product_name as product,b.create_time as new_consume_time FROM order_detail a,
+         SELECT distinct a.product_name as product,b.create_time as new_consume_time FROM order_detail a,
          (SELECT order_id,create_time FROM  order_info WHERE member_id=#{memberId} 
          AND order_status NOT IN ('0','4')
          AND pay_status='1'

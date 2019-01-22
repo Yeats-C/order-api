@@ -734,11 +734,18 @@ public class OrderServiceImpl implements OrderService{
 			if(list !=null && list.size()>0) {
 				lastBuyResponse = list.get(0);
 				List<String> prodcuts = new ArrayList();
-				for(LastBuyResponse lastBuyInfo : list) {
-					if(lastBuyInfo !=null && lastBuyInfo.getProduct() !=null) {
-						prodcuts.add(lastBuyInfo.getProduct());
-					}
-				}
+//				for(LastBuyResponse lastBuyInfo : list) {
+//					if(lastBuyInfo !=null && lastBuyInfo.getProduct() !=null) {
+//						prodcuts.add(lastBuyInfo.getProduct());
+//					}
+//				}
+				for(int i=0;i<2;i++) {
+					LastBuyResponse lastBuyInfo = new LastBuyResponse();
+					lastBuyInfo = list.get(i);
+				    if(lastBuyInfo !=null && lastBuyInfo.getProduct() !=null) {
+					    prodcuts.add(lastBuyInfo.getProduct());
+				    }
+			    }
 				lastBuyResponse.setNewConsumeProduct(prodcuts);
 				lastBuyResponse.setProduct("");
 			}
