@@ -128,4 +128,7 @@ public interface OrderService {
 	//销售目标管理-分销机构-月销售额
 	HttpResponse selectDistributorMonth(@Valid List<String> distributorCodeList,@Valid String beginTime,
 			@Valid String endTime);
+
+	//会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、日周月.
+	HttpResponse selectByMemberPayCount(@Valid String distributorId, @Valid Integer dateType);
 }
