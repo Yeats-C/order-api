@@ -67,7 +67,7 @@ public class OrderListServiceImpl implements OrderListService {
     private BridgeStockService bridgeStockService;
 
 
-    //商品项目地址
+    //供应链项目地址
     @Value("${purchase_ip}")
     public String purchase_ip;
 
