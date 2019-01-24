@@ -46,4 +46,8 @@ public interface OrderListDao {
     List<OrderList> searchFZ(String code);
 
     List<SupplyOrderInfoReqVO> searchOrderByCodeOrOriginal(String code);
+
+    List<OrderListFather> searchOrderReceptionListFather(OrderListVo2 param);
+
+    int searchOrderReceptionListFatherCount(OrderListVo2 param);
 }

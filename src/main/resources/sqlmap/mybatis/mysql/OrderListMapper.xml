@@ -97,7 +97,7 @@
   </sql>
 
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from order_list
     where id = #{id,jdbcType=BIGINT}
@@ -272,7 +272,90 @@ activity_amount activityDiscount,weight,original  fatherOrderCode, order_origina
 from order_list
       where   order_code=#{code} or original=#{code}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+
+
+
+
+
+    <resultMap type="com.aiqin.mgs.order.api.domain.request.orderList.OrderListFather" id="countryMapper2">
+        <id column="orderCodeFather" property="orderCodeFather"/>
+        <result column="actualAmountPaidFather" property="actualAmountPaidFather"/>
+        <result column="createTimeFather" property="createTimeFather"/>
+        <collection property="orderList"
+                    ofType="com.aiqin.mgs.order.api.domain.OrderList"
+                    select="selectOrderListByFather"
+                    column="orderCodeFather" />
+    </resultMap>
+    <select id="selectOrderListByFather" resultType="com.aiqin.mgs.order.api.domain.OrderList">
+		  select
+      id, order_code orderCode, order_type orderType, order_status orderStatus, payment_status paymentStatus, payment_time paymentTime, payment_type paymentType,
+      payment_type_code paymentTypeCode, store_id storeId, store_code storeCode, store_name storeName, store_type storeType, total_orders totalOrders, actual_amount_paid actualAmountPaid,
+      activity_amount activityAmount, preferential_quota preferentialQuota, logistics_remission_ratio logisticsRemissionRatio, logistics_remission_type logisticsRemissionType,
+      place_order_code placeOrderCode, place_order_time placeOrderTime, account_balance accountBalance, line_credit lineCredit, receiving_address receivingAddress,
+      arrival_time arrivalTime, consignee, consignee_phone consigneePhone, company_code companyCode, company_name companyName, original, province_code provinceCode,
+      province_name provinceName, city_code cityCode, city_name cityName, district_code districtCode, district_name districtName, invoice_title invoiceTitle,
+      invoice_type invoiceType, order_original orderOriginal, product_num productNum,  supplier_code supplierCode, supplier_name supplierName,
+      transport_center_code transportCenterCode, transport_center_name transportCenterName, warehouse_code warehouseCode, warehouse_name warehouseName, weight,
+      zip_code zipCode, remake, update_by updateBy, create_by createBy, update_time updateTime, create_time createTime, application_gifts applicationGifts,
+      apply_coupons applyCoupons
+      from order_list
+      where original=#{orderCodeFather}
+	</select>
+
+    <select id="searchOrderReceptionListFather" resultMap="countryMapper2">
+         select  original orderCodeFather,
+            count(actual_amount_paid)     actualAmountPaidFather,create_time createTimeFather
+      from order_list
+      where 1=1
+        <if test="startPlaceOrderTime !=null">
+            and   place_order_time>#{startPlaceOrderTime}
+        </if>
+        <if test="endPlaceOrderTime !=null">
+            and  #{endPlaceOrderTime}> place_order_time
+        </if>
+        <if test="placeOrderBy">
+            and create_by=#{placeOrderBy}
+        </if>
+        <if test="orderStatus !=null">
+            and order_status=#{orderStatus}
+        </if>
+        <if test="orderCode!= null">
+            and order_code=#{orderCode}
+        </if>
+        group by  original
+        LIMIT #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+
+
+
+
+    </select>
+    <select id="searchOrderReceptionListFatherCount" resultType="java.lang.Integer">
+
+        select
+        count(*)
+        from order_list
+        where 1=1
+        <if test="startPlaceOrderTime !=null">
+            and   place_order_time>#{startPlaceOrderTime}
+        </if>
+        <if test="endPlaceOrderTime !=null">
+            and  #{endPlaceOrderTime}> place_order_time
+        </if>
+        <if test="placeOrderBy">
+            and create_by=#{placeOrderBy}
+        </if>
+        <if test="orderStatus !=null">
+            and order_status=#{orderStatus}
+        </if>
+        <if test="orderCode!= null">
+            and order_code=#{orderCode}
+        </if>
+        group by  original
+
+    </select>
+
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from order_list
     where id = #{id,jdbcType=BIGINT}
   </delete>

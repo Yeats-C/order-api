@@ -150,6 +150,14 @@ public class OrderListServiceImpl implements OrderListService {
     }
 
     @Override
+    public PageResData<OrderListFather> searchOrderReceptionListFather(OrderListVo2 param) {
+        ParamUnit.isNotNull(param, "storeId");
+        List<OrderListFather> inventories = orderListDao.searchOrderReceptionListFather(param);
+        int count = orderListDao.searchOrderReceptionListFatherCount(param);
+        return new PageResData<>(count, inventories);
+    }
+
+    @Override
     public OrderListDetailsVo getOrderByCode(String code) {
         //todo
         OrderListDetailsVo vo = orderListDao.searchOrderByCode(code);
