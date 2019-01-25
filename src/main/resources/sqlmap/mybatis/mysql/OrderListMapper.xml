@@ -104,11 +104,6 @@
   </select>
     <select id="searchOrderList" resultType="com.aiqin.mgs.order.api.domain.OrderList">
       select
---       id, order_code orderCode, order_type orderType, order_status orderStatus, payment_status paymentStatus, store_id storeId, store_code storeCode, store_name storeName,
---     store_type storeType, total_orders totalOrders, actual_amount_paid actualAmountPaid, activity_amount activityAmount, preferential_quota preferentialQuota,
---     logistics_remission_ratio logisticsRemissionRatio, place_order_time placeOrderTime, account_balance accountBalance, line_credit lineCredit,
---     receiving_address receivingAddress, arrival_time arrivalTime, consignee, consignee_phone consigneePhone, company_code companyCode, company_name companyName,
---     create_by createBy,  update_by updateBy
       id, order_code orderCode, order_type orderType, order_status orderStatus, payment_status paymentStatus, payment_time paymentTime, payment_type paymentType,
       payment_type_code paymentTypeCode, store_id storeId, store_code storeCode, store_name storeName, store_type storeType, total_orders totalOrders, actual_amount_paid actualAmountPaid,
       activity_amount activityAmount, preferential_quota preferentialQuota, logistics_remission_ratio logisticsRemissionRatio, logistics_remission_type logisticsRemissionType,
@@ -324,10 +319,6 @@ from order_list
         </if>
         group by  original
         LIMIT #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
-
-
-
-
     </select>
     <select id="searchOrderReceptionListFatherCount" resultType="java.lang.Integer">
 
@@ -353,9 +344,66 @@ from order_list
         group by  original
 
     </select>
+  <select id="searchOrderListFather"
+          resultMap="countryMapper2">
+    select
+    original orderCodeFather,
+    count(actual_amount_paid)     actualAmountPaidFather,create_time createTimeFather
+    from order_list
+    where 1=1
+    <if test="storeCode !=null">
+      and  (store_code  LIKE CONCAT('%',#{storeCode}, '%')
+      or   store_name  LIKE CONCAT('%',#{storeCode}, '%'))
+    </if>
+    <if test="startPlaceOrderTime !=null">
+      and   place_order_time>#{startPlaceOrderTime}
+    </if>
+    <if test="endPlaceOrderTime !=null">
+      and  #{endPlaceOrderTime}> place_order_time
+    </if>
+    <if test="paymentStatus !=null">
+      and   payment_status=#{paymentStatus}
+    </if>
+    <if test="orderStatus !=null">
+      and   order_status=#{orderStatus}
+    </if>
+    <if test="storeType !=null">
+      and   store_type=#{storeType}
+    </if>
+    group by  original
+    LIMIT #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+
+  </select>
+  <select id="searchOrderListFatherCount" resultType="java.lang.Integer">
+    select
+    count(*)
+    from order_list
+    where 1=1
+    <if test="storeCode !=null">
+      and  (store_code  LIKE CONCAT('%',#{storeCode}, '%')
+      or   store_name  LIKE CONCAT('%',#{storeCode}, '%'))
+    </if>
+    <if test="startPlaceOrderTime !=null">
+      and   place_order_time>#{startPlaceOrderTime}
+    </if>
+    <if test="endPlaceOrderTime !=null">
+      and  #{endPlaceOrderTime}> place_order_time
+    </if>
+    <if test="paymentStatus !=null">
+      and   payment_status=#{paymentStatus}
+    </if>
+    <if test="orderStatus !=null">
+      and   order_status=#{orderStatus}
+    </if>
+    <if test="storeType !=null">
+      and   store_type=#{storeType}
+    </if>
+    group by  original
+
+  </select>
 
 
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from order_list
     where id = #{id,jdbcType=BIGINT}
   </delete>

@@ -50,4 +50,8 @@ public interface OrderListDao {
     List<OrderListFather> searchOrderReceptionListFather(OrderListVo2 param);
 
     int searchOrderReceptionListFatherCount(OrderListVo2 param);
+
+    List<OrderListFather> searchOrderListFather(OrderListVo param);
+
+    int searchOrderListFatherCount(OrderListVo param);
 }

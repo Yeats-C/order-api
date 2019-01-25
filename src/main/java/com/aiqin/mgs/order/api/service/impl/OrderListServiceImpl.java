@@ -158,8 +158,15 @@ public class OrderListServiceImpl implements OrderListService {
     }
 
     @Override
+    public PageResData<OrderListFather> searchOrderListFather(OrderListVo param) {
+        List<OrderListFather> inventories = orderListDao.searchOrderListFather(param);
+        int count = orderListDao.searchOrderListFatherCount(param);
+        return new PageResData<>(count, inventories);
+    }
+
+    @Override
     public OrderListDetailsVo getOrderByCode(String code) {
-        //todo
+
         OrderListDetailsVo vo = orderListDao.searchOrderByCode(code);
 
         List<OrderListLogistics> list1 = orderListLogisticsDao.searchOrderListLogisticsByCode(code);

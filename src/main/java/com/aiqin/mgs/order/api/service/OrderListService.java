@@ -34,4 +34,6 @@ public interface OrderListService {
     List<OrderStockReVo> getStockValue(OrderStockVo vo);
 
     PageResData<OrderListFather> searchOrderReceptionListFather(OrderListVo2 param);
+
+    PageResData<OrderListFather> searchOrderListFather(OrderListVo param);
 }
