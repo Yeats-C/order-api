@@ -12,208 +12,182 @@ public interface Global {
      */
     String USER_ON = "1";
     
-    /**
-     * 修改状态
-     */
-    String MODIFY_TYPE_0 = "0";  //添加
-    String MODIFY_TYPE_1 = "1";  //修改
+    //对接通联-成功状态 
+    String SUCCESS_STATUS = "OK";
+    String FAIL_STATUS = "error";
     
-    //是否计算数据量
-    Integer ICOUNT_0 = 0;  //计算数据量
-    
-    /**
-     * 订单来源
-     */
-    Integer ORIGIN_TYPE_0 = 0;  //pos
-    Integer ORIGIN_TYPE_1 = 1;  //微商城
-    Integer ORIGIN_TYPE_2 = 2;  //全部 作为查询条件
-    Integer ORIGIN_TYPE_3 = 3;  //web
-    
-    /**
-     * 生成订单号专用字典项 - 销售渠道标识、订单来源(避免与老系统重复)
-     */
-    Integer ORDERID_CHANNEL_3 = 3;  //总部向门店销售
-    Integer ORDERID_CHANNEL_4 = 4;  //门店像会员销售
-    String  ORIGIN_COME_3 = "3";  //pos
-    String  ORIGIN_COME_4 = "4";  //微商城
-    String  ORIGIN_COME_5 = "5";  //web
+    //会员类型（2.企业会员，3个人会员）
+    Integer MEMBER_TYPE_2 = 2;
+    Integer MEMBER_TYPE_3 = 3;
     
     
-    /**
-     * 收货方式
-     */
-    Integer RECEIVE_TYPE_0 = 0;  //自提
-    Integer RECEIVE_TYPE_1 = 1;  //快递
-    Integer RECEIVE_TYPE_2 = 2;  //全部 作为查询条件
+//    //访问终端类型(1, Mobile ，2pc)
+//    String SOURCE_TYPE_1 = "1";
+//    String SOURCE_TYPE_2 = "2";
+    
+    //审核结果 2：审核成功 3：审核失败
+    Long RESULT_2 = 2L; 
+    Long RESULT_3 = 3L;
+    
+    //是否为安全卡(1.是，2不是)
+    Integer ISSAFETYBANK_1 = 1;
+    Integer ISSAFETYBANK_2 = 2;
+    
+    //是否已设置支付密码 1:未设置 2：已设置
+    Integer IS_PASSWORD_1 = 1;
+    Integer IS_PASSWORD_2 = 2;
+    
+    //银行卡类型 1:储蓄卡 2：信用卡
+    Long CARD_TYPE_1 = 1L;
+    Long CARD_TYPE_2 = 2L;
+    
+    //通联接口类型
+    String INTERFACE_TYPE_0="MemberService";
+    
+    //通联接口-创建会员
+    String CREATE_MEMBER="createMember";
+    //通联接口-个人实名认证
+    String SET_REAL_NAME="setRealName";
+    
+    //通联接口-设置企业信息
+    String SET_COMPANY_INFO="setCompanyInfo";
+    
+    //通联接口-发送短信验证码
+    String SEND_VERIFICATION_CODE="sendVerificationCode";
+    
+    //通联接口-请求绑定银行卡 
+    String APPLY_BIND_BAK_CARD ="applyBindBankCard";
+    
+    //对接通联-锁定会员
+    String LOCK_MEMBER ="lockMember";
+    
+    //对接通联-解锁会员
+    String UN_LOCK_MEMBER ="unlockMember"; 
+    
+    //对接通联-会员电子协议签约
+    String SIGN_CONTRACT ="signContract"; 
+    
+    //对接通联-绑定手机
+    String BIND_PHONE ="bindPhone"; 
+    
+    //对接通联-解绑银行卡
+    String UN_BIND_CARD ="unbindBankCard"; 
+    
+    //对接通联-修改绑定手机
+    String CHANGE_BIND_PHONE ="changeBindPhone"; 
+    
+    //对接通联-设置安全卡
+    String SET_SAFE_CARD ="setSafeCard"; 
+    
+    //手机验证码类型
+    Long PHONE_CHECK_TYPE = 9L;
     
     
-    /**
-     * 订单状态
-     */
-    Integer ORDER_STATUS_0 = 0;  //未付款
-    Integer ORDER_STATUS_1 = 1;  //待发货
-    Integer ORDER_STATUS_2 = 2;  //待提货
-    Integer ORDER_STATUS_3 = 3;  //已发货
-    Integer ORDER_STATUS_4 = 4;  //已取消
-    Integer ORDER_STATUS_5 = 5;  //已完成
-    Integer ORDER_STATUS_6 = 6;  //已提货
+    //证件类型
+    
+    //会员状态(1正常，2冻结,3待审批,4审批中,5审批失败)
+    Integer MEMBER_STATUS_1 = 1;
+    Integer MEMBER_STATUS_2 = 2;
+    Integer MEMBER_STATUS_3 = 3;
+    Integer MEMBER_STATUS_4 = 4;
+    Integer MEMBER_STATUS_5 = 5;
     
     
-    /**
-     * 退货状态
-     */
-    Integer RETURN_STATUS_0 = 0;  //审批中
-    Integer RETURN_STATUS_1 = 1;  //处理中
-    Integer RETURN_STATUS_2 = 2;  //退款中
-    Integer RETURN_STATUS_3 = 3;  //已完成
-    Integer RETURN_STATUS_4 = 4;  //未操作
+    //反馈结果
+    Integer RETRURN_RESULT_1 = 1; //审核成功
+    Integer RETRURN_RESULT_2 = 2; //审核失败
+    Integer RETRURN_RESULT_4 = 4; //签约成功
+    Integer RETRURN_RESULT_5 = 5; //签约失败
+    
+    //银行卡绑定状态(1.已绑定，2已解除，3.未绑定)
+    Integer BANK_STATUS_1 = 1;
+    Integer BANK_STATUS_2 = 2;
+    Integer BANK_STATUS_3 = 3;
+    
+    //用户来源类型(1.爱亲总账户,2门店,3导购)
+    Integer USER_SOURCE_1 = 1;
+    Integer USER_SOURCE_2 = 2;
+    Integer USER_SOURCE_3 = 3;
+    
+    //银行卡账户类型 1.对公账户，2个人账户
+    Integer BANK_TYPE_1 = 1;
+    Integer BANK_TYPE_2 = 2;
+    
+    //手机绑定状态 1:未绑定,2:已绑定
+    Integer BIND_PHONE_STATUS_1 = 1;
+    Integer BIND_PHONE_STATUS_2 = 2;
+    
+    //签约状态(1.未签约，2.已签约)
+    Integer SIGNING_STATUS_1 = 1;
+    Integer SIGNING_STATUS_2 = 2;
     
     
-    /**
-     * 支付状态
-     */
-    Integer PAY_STATUS_0 = 0;  //待支付
-    Integer PAY_STATUS_1 = 1;  //支付完成
+    //爱亲总账户
+    String AIQIN_USER_CODE ="ZH0001";
+    String AIQIN_USER_NAME ="爱亲总账户";
+    
+    //门店接口地址
+    String STORE_URL = "store.api.aiqin.com";
+    
+    //门店接口地址
+    String CONTROL_URL = "control.api.aiqin.com";
     
     
+    //接口目录-查询门店数据
+    String STORE_LIST = "/backstage/store/lists?"; 
     
-    /**
-     * 订单-支付方式
-     */
-    Integer PAY_TYPE_0 = 0;  //微信
-    Integer PAY_TYPE_1 = 1;  //支付宝
-    Integer PAY_TYPE_2 = 2;  //现金
-    Integer PAY_TYPE_3 = 3;  //银联
-    
-    
-    /**
-     * 订单支付-支付类型
-     */
-    Integer P_TYPE_0 = 0;  //在线支付-微信
-    Integer P_TYPE_1 = 1;  //在线支付-支付宝
-    Integer P_TYPE_2 = 2;  //在线支付-银联
-    Integer P_TYPE_3 = 3;  //到店支付-现金支付
-    Integer P_TYPE_4 = 4;  //到店支付-微信
-    Integer P_TYPE_5 = 5;  //到店支付-支付宝
-    Integer P_TYPE_6 = 6;  //到店支付-银联
-    
-    
-    /**
-     * 发货方状态
-     */
-    Integer DELIVERY_STATUS_0 = 0;  //未发货
-    Integer DELIVERY_STATUS_1 = 1;  //已发货
-    
-    
-    /**
-     * 是否
-     */
-    Integer YES = 0;  //是
-    Integer NO = 1;  //否
-    
-    /**
-     * 是否发生退货
-     */
-    Integer IS_RETURN_0 = 0;  //否
-    Integer IS_RETURN_1 = 1;  //是
-    
-    
-    /**
-     * 优惠券状态
-     */
-    Integer COUPON_STATUS_0 = 0;  //使用
-    Integer COUPON_STATUS_1 = 1;  //退
-    
-    
-    /**
-     * 日志表-状态
-     */
-    String STATUS_0 = "订单状态";  //订单状态
-    String STATUS_1 = "支付状态";  //支付状态
-    String STATUS_2 = "退货状态";  //退货状态
-    
-    
-    /**
-     * 状态描述
-     */
-    String STATUS_CONTENT_10 = "未付款";
-    String STATUS_CONTENT_1 = "待发货";
-    String STATUS_CONTENT_2 = "待提货";
-    String STATUS_CONTENT_3 = "已发货";
-    String STATUS_CONTENT_4 = "已取消";
-    String STATUS_CONTENT_5 = "已完成";
-    String STATUS_CONTENT_6 = "已提货";
-    String STATUS_CONTENT_100 = "审批中";
-    String STATUS_CONTENT_11 = "处理中";
-    String STATUS_CONTENT_22 = "退款中";
-    String STATUS_CONTENT_33 = "已完成";
-    String STATUS_CONTENT_44 = "已取消";
-    String STATUS_CONTENT_55 = "已关闭";
-    String STATUS_CONTENT_66 = "未发生退货";
-    String STATUS_CONTENT_1000 = "待支付";
-    String STATUS_CONTENT_111 = "支付完成";
-    
-    Integer STATUS_TYPE_10 = 10;
-    Integer STATUS_TYPE_1 = 1;
-    Integer STATUS_TYPE_2 = 2;
-    Integer STATUS_TYPE_3 = 3;
-    Integer STATUS_TYPE_4 = 4;
-    Integer STATUS_TYPE_5 = 5;
-    Integer STATUS_TYPE_6 = 6;
-    Integer STATUS_TYPE_100 = 100;
-    Integer STATUS_TYPE_11 = 11;
-    Integer STATUS_TYPE_22 = 22;
-    Integer STATUS_TYPE_33 = 33;
-    Integer STATUS_TYPE_44 = 44;
-    Integer STATUS_TYPE_55 = 55;
-    Integer STATUS_TYPE_66 = 66;
-    Integer STATUS_TYPE_1000 = 1000;
-    Integer STATUS_TYPE_111 = 111;
-    
-
-
-    /**
-     * 退货状态
-     */
-    Integer AFTER_SALE_STATUS_0 = 0;  //"审批中"
-    Integer AFTER_SALE_STATUS_1 = 1;  //处理中
-    Integer AFTER_SALE_STATUS_2 = 2;  //退款中
-    Integer AFTER_SALE_STATUS_3 = 3;  //已完成
-    Integer AFTER_SALE_STATUS_4 = 4;  //已取消
-    Integer AFTER_SALE_STATUS_5 = 5;  //已关闭
-    
+    //接口目录-查询门店数据
+    String CONTROL_LIST = "/backstage/store/all/person?"; 
     
     /**
-     * 售后类型
-     */
-    Integer AFTER_SALE_TYPE_0 = 0;  //赔偿
-    Integer AFTER_SALE_TYPE_1 = 1;  //退货
-    Integer AFTER_SALE_TYPE_2 = 2;  //换货
-    
-    
-    /**
-     * 处理方式
-     */
-    Integer PROCESS_TYPE_0 = 0;  //整单退
-    Integer PROCESS_TYPE_1 = 0;  //部分退
-    Integer PROCESS_TYPE_2 = 0;  //补差价
-    Integer PROCESS_TYPE_3 = 0;  //折价退
-    
-    /**
-     * 折扣方式
-     */
-    String AGIOTYPE_0 = "0"; //无优惠
-    String AGIOTYPE_1 = "1"; //限时折扣
-    String AGIOTYPE_2 = "2"; //优惠券
-    String AGIOTYPE_3 = "3"; //满减
-    String AGIOTYPE_4 = "4"; //积分
-    
-    //公司编码
-    //爱亲
-    String COMPANY_01 = "1";    
-    
-    //日周月.
-    Integer DATE_TYPE_1 = 1;  //日
-    Integer DATE_TYPE_2 = 2;  //周
-    Integer DATE_TYPE_3 = 3;  //月
+	 * 企业信息审核结果通知
+	 */
+	public static final String COMPANY_CHECK_RESULT_URL = "http://39.96.90.159:9001//member/comgz?";
+	
+	/**
+	 * 签约审核结果通知
+	 */
+	public static final String SINGNING_STATUS_URL = "http://39.96.90.159:9001//member/touqy?";
+	
+	
+	//财务类型：
+	//1）pos收银消费转入：to c 订单，渠道来源为“pos收银台的”订单，对方信息为付款者的手机号和姓名，如未填则“-” 表示；
+	//2）微商城消费转入：to c 订单, 渠道来源为“微商城”订单，对方信息为付款者的手机号和姓名，如未填则“-” 表示；
+	//3）web收银：to c 订单, 渠道来源为“web收银台”的订单，对方信息为付款者的手机号和姓名，如未填则“-” 表示；
+	//4）线上提现：每一次提现记录都需要记录，提现列表里没有“订单号”和“对方信息”，用-表示；
+	//5）手续费：提现会产生手续费，手续费到爱亲的手续费账户里，没有订单号，对方信息为入账的账户商户名。如：爱亲科技股份有限公司。
+	//6）充值到配送账户：客户每一次充值要生成一个订单，取订单类型为“配送充值”的订单支付信息，充值订单号生成xxxx，对方信息为充值方的账户信息，比如支付宝账号+姓名
+	//7）客户取消退货：to B 退货单，取退单类型为“客户取消”的订单支付信息；
+	//8）缺货取消退货：to B 退货单，取退单类型为“缺货取消”的订单支付信息；
+	//9）售后退货：to B 退货单，取退单类型为“售后退货”的订单支付信息；
+	//10）配送订单：to B 订单，取配送订货单里，订单类型为“配送订货”的订单支付信息。
+	//11）直送订单：to B 订单，取直送订货单里，订单类型为“直送订货”的订单支付信息。
+	Integer TRANS_TYPE_1 =1; //pos收银消费转入
+	Integer TRANS_TYPE_2 =2; //微商城消费转入
+	Integer TRANS_TYPE_3 =3; //web收银
+	Integer TRANS_TYPE_4 =4; //线上提现
+	Integer TRANS_TYPE_5 =5; //手续费
+	Integer TRANS_TYPE_6 =6; //充值到配送账户
+	Integer TRANS_TYPE_7 =7; //客户取消退货
+	Integer TRANS_TYPE_8 =8; //缺货取消退货
+	Integer TRANS_TYPE_9 =9; //售后退货
+	Integer TRANS_TYPE_10 =10; //配送订单
+	Integer TRANS_TYPE_11 =11; //直送订单
+	
+	//交易类型 1:付款账户,2:普通账户,3：手续费账户
+	Integer TRANS_1 = 1;
+	Integer TRANS_2 = 2;
+	Integer TRANS_3 = 3;
+	
+	//账户类型 1：无 2:配送账户,3:直送账户
+	Integer ACCOUNT_TYPE_1=1;
+	Integer ACCOUNT_TYPE_2=2;
+	Integer ACCOUNT_TYPE_3=3;
+	//业务场景: 0 TO C,1 TO B
+    Integer SERVICESCENE_TOB=1;
+    Integer SERVICESCENE_TOC=0;
 }
+
+
+
+
