@@ -32,4 +32,8 @@ public interface OrderListService {
     Boolean updateOrderStatus(String code, Integer status);
 
     List<OrderStockReVo> getStockValue(OrderStockVo vo);
+
+    PageResData<OrderListFather> searchOrderReceptionListFather(OrderListVo2 param);
+
+    PageResData<OrderListFather> searchOrderListFather(OrderListVo param);
 }
