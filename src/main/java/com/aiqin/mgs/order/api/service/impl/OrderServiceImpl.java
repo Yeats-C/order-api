@@ -739,17 +739,21 @@ public class OrderServiceImpl implements OrderService{
 //						prodcuts.add(lastBuyInfo.getProduct());
 //					}
 //				}
-				for(int i=0;i<2;i++) {
-					LastBuyResponse lastBuyInfo = new LastBuyResponse();
-					lastBuyInfo = list.get(i);
-				    if(lastBuyInfo !=null && lastBuyInfo.getProduct() !=null) {
-					    prodcuts.add(lastBuyInfo.getProduct());
-				    }
+				for(int i=0;i<list.size();i++) {
+					if(i<2) {
+						LastBuyResponse lastBuyInfo = new LastBuyResponse();
+						lastBuyInfo = list.get(i);
+					    if(lastBuyInfo !=null && lastBuyInfo.getProduct() !=null) {
+						    prodcuts.add(lastBuyInfo.getProduct());
+					    }
+					}
 			    }
 				lastBuyResponse.setNewConsumeProduct(prodcuts);
 				lastBuyResponse.setProduct("");
+				return HttpResponse.success(lastBuyResponse);
+			}else {
+				return HttpResponse.success(null);
 			}
-		    return HttpResponse.success(lastBuyResponse);
 		} catch (Exception e) {
 			LOGGER.info("接口-通过会员查询最后一次的消费记录報錯", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
