@@ -429,7 +429,16 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 				}	
 			}
 			
-			return HttpResponse.success(orderAfterSaleInfolist);
+			//计算总数据量
+			Integer totalCount = 0;
+			Integer icount =null;
+			orderAfterSaleQuery.setIcount(icount);
+			List<OrderAfterSaleInfo> IcountList= orderAfterDao.selectOrderAfter(OrderPublic.getOrderAfterSaleQuery(orderAfterSaleQuery));
+			if(IcountList !=null && IcountList.size()>0) {
+				totalCount = IcountList.size();
+			}
+
+			return HttpResponse.success(new PageResData(totalCount,orderAfterSaleInfolist));
 			
 		} catch (Exception e) {
 			LOGGER.info("模糊查询查询退货信息+退货明细+订单明细信息报错", e);
