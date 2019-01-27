@@ -321,8 +321,8 @@ from order_list
         LIMIT #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
     </select>
     <select id="searchOrderReceptionListFatherCount" resultType="java.lang.Integer">
-
-        select
+SELECT IFNULL(
+        (select
         count(*)
         from order_list
         where 1=1
@@ -341,7 +341,7 @@ from order_list
         <if test="orderCode!= null">
             and order_code=#{orderCode}
         </if>
-        group by  original
+        group by  original),0)
 
     </select>
   <select id="searchOrderListFather"
@@ -375,6 +375,7 @@ from order_list
 
   </select>
   <select id="searchOrderListFatherCount" resultType="java.lang.Integer">
+  SELECT IFNULL((
     select
     count(*)
     from order_list
@@ -399,7 +400,7 @@ from order_list
       and   store_type=#{storeType}
     </if>
     group by  original
-
+),0)
   </select>
 
 

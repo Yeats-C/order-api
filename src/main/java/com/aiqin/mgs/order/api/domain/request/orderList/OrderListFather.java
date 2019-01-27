@@ -19,7 +19,7 @@ import java.util.List;
  */
 @ApiModel("父订单")
 @Data
-public class OrderListFather  extends PagesRequest {
+public class OrderListFather   {
 
     @ApiModelProperty(value = "父订单编号")
     @JsonProperty("order_code_father")
