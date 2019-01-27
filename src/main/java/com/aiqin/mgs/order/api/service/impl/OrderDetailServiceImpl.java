@@ -48,6 +48,7 @@ import com.aiqin.mgs.order.api.domain.OrderodrInfo;
 import com.aiqin.mgs.order.api.domain.ProductCycle;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.request.OrderDetailRequest;
+import com.aiqin.mgs.order.api.domain.request.ProdisorRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderDetailByMemberResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderProductsResponse;
 import com.aiqin.mgs.order.api.domain.response.ProdisorResponse;
@@ -450,9 +451,15 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 
 	//接口-统计商品在各个渠道的订单数.
 	@Override
-	public HttpResponse prodisor(@Valid List<String> sukList,@Valid List<Integer> originTypeList) {
+	public HttpResponse prodisor(@Valid ProdisorRequest prodisorRequest) {
 
 		try {
+			List<String> sukList = new ArrayList();
+			List<Integer> originTypeList = new ArrayList();
+			if(prodisorRequest !=null) {
+				sukList = prodisorRequest.getSkuList();
+				originTypeList = prodisorRequest.getOriginTypeList();
+			}
 			//返回
 			List<ProdisorResponse> list = new ArrayList();
 			
@@ -464,7 +471,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 				query.setOriginTypeList(originTypeList);
 				list = orderDetailDao.prodisor(OrderPublic.getOrderDetailQuery(query));
 			}else {
-				
+				return HttpResponse.success(null);
 			}
 			
 			return HttpResponse.success(list);

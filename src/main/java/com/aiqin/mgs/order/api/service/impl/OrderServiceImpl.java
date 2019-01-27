@@ -57,13 +57,16 @@ import com.aiqin.mgs.order.api.domain.OrderodrInfo;
 import com.aiqin.mgs.order.api.domain.ProductCycle;
 import com.aiqin.mgs.order.api.domain.SettlementInfo;
 import com.aiqin.mgs.order.api.domain.constant.Global;
+import com.aiqin.mgs.order.api.domain.request.DetailCouponRequest;
 import com.aiqin.mgs.order.api.domain.request.DevelRequest;
+import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderDetailRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
+import com.aiqin.mgs.order.api.domain.response.SelectByMemberPayCountResponse;
 import com.aiqin.mgs.order.api.domain.response.WscSaleResponse;
 import com.aiqin.mgs.order.api.domain.response.WscWorkViewResponse;
 import com.aiqin.mgs.order.api.domain.response.DistributorMonthResponse;
@@ -731,15 +734,26 @@ public class OrderServiceImpl implements OrderService{
 			if(list !=null && list.size()>0) {
 				lastBuyResponse = list.get(0);
 				List<String> prodcuts = new ArrayList();
-				for(LastBuyResponse lastBuyInfo : list) {
-					if(lastBuyInfo !=null && lastBuyInfo.getProduct() !=null) {
-						prodcuts.add(lastBuyInfo.getProduct());
+//				for(LastBuyResponse lastBuyInfo : list) {
+//					if(lastBuyInfo !=null && lastBuyInfo.getProduct() !=null) {
+//						prodcuts.add(lastBuyInfo.getProduct());
+//					}
+//				}
+				for(int i=0;i<list.size();i++) {
+					if(i<2) {
+						LastBuyResponse lastBuyInfo = new LastBuyResponse();
+						lastBuyInfo = list.get(i);
+					    if(lastBuyInfo !=null && lastBuyInfo.getProduct() !=null) {
+						    prodcuts.add(lastBuyInfo.getProduct());
+					    }
 					}
-				}
+			    }
 				lastBuyResponse.setNewConsumeProduct(prodcuts);
 				lastBuyResponse.setProduct("");
+				return HttpResponse.success(lastBuyResponse);
+			}else {
+				return HttpResponse.success(null);
 			}
-		    return HttpResponse.success(lastBuyResponse);
 		} catch (Exception e) {
 			LOGGER.info("接口-通过会员查询最后一次的消费记录報錯", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
@@ -1390,15 +1404,36 @@ public class OrderServiceImpl implements OrderService{
 
 	//销售目标管理-分销机构-月销售额
 	@Override
-	public HttpResponse selectDistributorMonth(@Valid List<String> distributorCodeList,String beginTime,String endTime) {
+	public HttpResponse selectDistributorMonth(@Valid DistributorMonthRequest detailCouponRequest) {
 		try {
 			List<DistributorMonthResponse> list = new ArrayList();
 			//当月销售额：包含退货、不包含取消、未付款的订单
 			Integer monthtotalPrice=0;
-			if(distributorCodeList !=null && distributorCodeList.size()>0) {
-				for(String distributorCode : distributorCodeList) {
+			
+			//处理参数
+			if(detailCouponRequest.getDistributorCodeList() !=null && detailCouponRequest.getDistributorCodeList().size()>0) {
+				
+			}else {
+				detailCouponRequest.setDistributorCodeList(null);
+			}
+			
+            if(detailCouponRequest.getBeginTime() !=null && !detailCouponRequest.getBeginTime().equals("")) {
+            	
+            }else {
+            	detailCouponRequest.setBeginTime(null);
+            }
+            
+            if(detailCouponRequest.getEndTime() !=null && !detailCouponRequest.getEndTime().equals("")) {
+            	
+            }else {
+            	detailCouponRequest.setEndTime(null);
+            }
+			
+			//查询结果
+			if(detailCouponRequest.getDistributorCodeList() !=null && detailCouponRequest.getDistributorCodeList().size()>0) {
+				for(String distributorCode : detailCouponRequest.getDistributorCodeList()) {
 					DistributorMonthResponse info = new DistributorMonthResponse();
-					monthtotalPrice = orderDao.selectDistributorMonth(distributorCode,beginTime,endTime);
+					monthtotalPrice = orderDao.selectDistributorMonth(distributorCode,detailCouponRequest.getBeginTime(),detailCouponRequest.getEndTime());
 					info.setDistributorCode(distributorCode);
 					if(monthtotalPrice ==null) {
 						info.setPrice(0);
@@ -1413,6 +1448,98 @@ public class OrderServiceImpl implements OrderService{
 	  LOGGER.info("销售目标管理-分销机构-月销售额報錯", e);
 	  return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
     }
+	}
+
+
+	//会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、日周月.
+	@Override
+	public HttpResponse selectByMemberPayCount(@Valid String distributorId, @Valid Integer dateType) {
+		
+	    //会员数量统计
+		List<SelectByMemberPayCountResponse> list = new ArrayList();
+		if(dateType !=null && distributorId !=null && !distributorId.equals("")) {
+			//日计算会员数
+			if(dateType.equals(Global.DATE_TYPE_1)) {
+				
+				for(int i=0;i>-7;i--) {
+					Integer countMember = null;
+					String countDate = "";
+					countDate = OrderPublic.NextDate(i);
+					System.out.println(countDate);
+					SelectByMemberPayCountResponse info = new SelectByMemberPayCountResponse();
+					info.setCountDate(countDate);
+					try {
+						countMember = orderDao.selectByMemberPayCountDay(info);
+					} catch (Exception e) {
+						LOGGER.info("会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、日报错", e);
+						return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+					}
+					if(countMember == null) {
+						info.setCountMember(0);
+					}else {
+						info.setCountMember(countMember);
+					}
+					list.add(info);
+				}
+				
+				return HttpResponse.success(list);
+				
+			//周计算会员数
+			}else if(dateType.equals(Global.DATE_TYPE_2)) {
+                
+				for(int i=0;i<7;i++) {
+					Integer countMember = null;
+					String countDate = "";
+					SelectByMemberPayCountResponse info = new SelectByMemberPayCountResponse();
+					try {
+						countMember = orderDao.selectByMemberPayCountWeek(i);
+					} catch (Exception e) {
+						LOGGER.info("会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、周报错", e);
+						return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+					}
+					info.setCountDate(String.valueOf(i)); 
+					if(countMember == null) {
+						info.setCountMember(0);
+					}else {
+						info.setCountMember(countMember);
+					}
+					list.add(info);
+				}
+				
+				return HttpResponse.success(list);
+				
+			}
+			//月计算会员数
+			else {
+                
+				for(int i=0;i>-7;i--) {
+					Integer countMember = null;
+					String countDate = "";
+					countDate = OrderPublic.afterMonth(i);
+					System.out.println(countDate);
+					SelectByMemberPayCountResponse info = new SelectByMemberPayCountResponse();
+					info.setCountDate(countDate);
+					try {
+						countMember = orderDao.selectByMemberPayCountMonth(info);
+					} catch (Exception e) {
+						LOGGER.info("会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、月报错", e);
+						return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+					}
+					if(countMember == null) {
+						info.setCountMember(0);
+					}else {
+						info.setCountMember(countMember);
+					}
+					list.add(info);
+				}
+				
+				return HttpResponse.success(list);
+
+			}
+		}else {
+			 LOGGER.info("会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、日周月.参数确实报错");
+			 return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}
 	}
 	
 }

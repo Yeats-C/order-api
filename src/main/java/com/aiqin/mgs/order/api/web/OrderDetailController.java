@@ -15,6 +15,7 @@ import com.aiqin.mgs.order.api.domain.OrderDetailInfo;
 import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
 import com.aiqin.mgs.order.api.domain.OrderInfo;
 import com.aiqin.mgs.order.api.domain.OrderQuery;
+import com.aiqin.mgs.order.api.domain.request.ProdisorRequest;
 import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.OrderDetailService;
 
@@ -231,11 +232,10 @@ public class OrderDetailController {
      */
     @PostMapping("/prodisor")
     @ApiOperation(value = "商品总库菜单-统计商品在各个渠道的订单数....")
-    public HttpResponse prodisor(@Valid @RequestBody(required = true) List<String> sukList,
-    		@Valid @RequestBody List<Integer> originTypeList) {
+    public HttpResponse prodisor(@Valid @RequestBody ProdisorRequest info) {
 
     	LOGGER.info("商品总库菜单-统计商品在各个渠道的订单数....");    	
-        return orderDetailService.prodisor(sukList,originTypeList);
+        return orderDetailService.prodisor(info);
     }
     
     /**

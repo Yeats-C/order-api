@@ -17,6 +17,7 @@ import com.aiqin.mgs.order.api.domain.request.orderList.*;
 import com.aiqin.mgs.order.api.domain.request.stock.StockLockReqVo;
 import com.aiqin.mgs.order.api.domain.request.stock.StockLockSkuReqVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderSaveRespVo;
+import com.aiqin.mgs.order.api.domain.request.orderList.*;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
 import com.aiqin.mgs.order.api.domain.response.stock.StockLockRespVo;
 import com.aiqin.mgs.order.api.service.BridgeStockService;
@@ -66,9 +67,9 @@ public class OrderListServiceImpl implements OrderListService {
     private BridgeStockService bridgeStockService;
 
 
-    //商品项目地址
-    @Value("${product_ip}")
-    public String product_ip;
+    //供应链项目地址
+    @Value("${purchase_ip}")
+    public String purchase_ip;
 
     /**
      * 订单列表后台
@@ -116,18 +117,29 @@ public class OrderListServiceImpl implements OrderListService {
 
         Boolean br = orderListDao.updateByCode(code, status, orderStatus.getPaymentStatus());
         //将订单状态改完支付,将订单发送给供应链
-        if (status == 2 && br == true) {
+        //todo  判断状态 待更新
+        if (status==2 && br==true){
             //获取订单信息
-            OrderListDetailsVo vo = orderListDao.searchOrderByCode(code);
-            List<OrderListProduct> list2 = orderListProductDao.searchOrderListProductByCode(code);
-            vo.setOrderListProductList(list2);
-
-
-            HttpClient httpPost = HttpClient.post(product_ip + "/purchase/order/add").json("1");
-            httpPost.action().status();
-            HttpResponse result = httpPost.action().result(new TypeReference<HttpResponse>() {
-            });
-            String c = result.getCode();
+            List<SupplyOrderInfoReqVO> vo = orderListDao.searchOrderByCodeOrOriginal(code);
+            List<SupplyOrderProductItemReqVO> list2 = orderListProductDao.searchOrderListProductByCodeOrOriginal(code);
+            for (SupplyOrderInfoReqVO reqVO : vo) {
+                List<SupplyOrderProductItemReqVO> supplylist=new ArrayList<>();
+                for (SupplyOrderProductItemReqVO itemReqVO : list2) {
+                      if (reqVO.getOrderCode().equals(itemReqVO.getOrderCode())){
+                          supplylist.add(itemReqVO);
+                      }
+                }
+                reqVO.setOrderItems(supplylist);
+            }
+            SupplyOrderMainReqVO svo  =new  SupplyOrderMainReqVO();
+            svo.setSubOrderInfo(vo);
+            HttpClient httpPost = HttpClient.post("http://"+purchase_ip+"/purchase/order/add").json(svo);
+            HttpResponse<List<OrderStockReVo>> result =
+                    httpPost.action().result(new TypeReference<HttpResponse<Boolean>>() {
+                    });
+//            httpPost.action().status();
+//            HttpResponse result = httpPost.action().result(new TypeReference<HttpResponse>(){});
+            String c =   result.getCode();
         }
         return br;
     }
@@ -138,8 +150,23 @@ public class OrderListServiceImpl implements OrderListService {
     }
 
     @Override
+    public PageResData<OrderListFather> searchOrderReceptionListFather(OrderListVo2 param) {
+        ParamUnit.isNotNull(param, "storeId");
+        List<OrderListFather> inventories = orderListDao.searchOrderReceptionListFather(param);
+        int count = orderListDao.searchOrderReceptionListFatherCount(param);
+        return new PageResData<>(count, inventories);
+    }
+
+    @Override
+    public PageResData<OrderListFather> searchOrderListFather(OrderListVo param) {
+        List<OrderListFather> inventories = orderListDao.searchOrderListFather(param);
+        int count = orderListDao.searchOrderListFatherCount(param);
+        return new PageResData<>(count, inventories);
+    }
+
+    @Override
     public OrderListDetailsVo getOrderByCode(String code) {
-        //todo
+
         OrderListDetailsVo vo = orderListDao.searchOrderByCode(code);
 
         List<OrderListLogistics> list1 = orderListLogisticsDao.searchOrderListLogisticsByCode(code);
@@ -151,21 +178,21 @@ public class OrderListServiceImpl implements OrderListService {
 
     @Override
     public List<String> add(List<OrderListDetailsVo> paramList) {
-        List<String> reList = new ArrayList<>();
+        List<String> reList=new ArrayList<>();
         for (OrderListDetailsVo param : paramList) {
             //验证添加数据
-            ParamUnit.isNotNull(param, "orderCode", "orderType", "orderStatus", "storeId", "storeCode", "placeOrderTime");
+            ParamUnit.isNotNull(param, "orderCode","orderType","orderStatus","storeId","storeCode","placeOrderTime");
 
             List<OrderListProduct> orderListProductList = param.getOrderListProductList();
             if (orderListProductList == null || orderListProductList.size() == 0) {
                 throw new IllegalArgumentException("商品不可为空");
             }
             for (OrderListProduct orderListProduct : orderListProductList) {
-                ParamUnit.isNotNull(orderListProduct, "skuCode", "skuName", "productNumber", "gift");
+                ParamUnit.isNotNull(orderListProduct, "skuCode", "skuName","productNumber","gift");
             }
 //           String orderCode= sequenceService.generateOrderCode(param.getCompanyCode(), param.getOrderType());
 //            param.setOrderCode(orderCode);
-            String orderCode = param.getOrderCode();
+            String orderCode=param.getOrderCode();
             String orderId = IdUtil.uuid();
             param.setId(orderId);
             Boolean re = orderListDao.insertOrderListDetailsVo(param);

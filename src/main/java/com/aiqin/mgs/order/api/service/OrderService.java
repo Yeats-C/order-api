@@ -13,6 +13,7 @@ import javax.validation.Valid;
 
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.CartInfo;
@@ -24,6 +25,8 @@ import com.aiqin.mgs.order.api.domain.OrderPayInfo;
 import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.OrderRelationCouponInfo;
 import com.aiqin.mgs.order.api.domain.SettlementInfo;
+import com.aiqin.mgs.order.api.domain.request.DetailCouponRequest;
+import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 
@@ -126,6 +129,8 @@ public interface OrderService {
 	HttpResponse repast(@Valid String orderId, @Valid String payType, @Valid List<OrderPayInfo> orderPayList);
 
 	//销售目标管理-分销机构-月销售额
-	HttpResponse selectDistributorMonth(@Valid List<String> distributorCodeList,@Valid String beginTime,
-			@Valid String endTime);
+	HttpResponse selectDistributorMonth(@Valid DistributorMonthRequest detailCouponRequest);
+
+	//会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、日周月.
+	HttpResponse selectByMemberPayCount(@Valid String distributorId, @Valid Integer dateType);
 }

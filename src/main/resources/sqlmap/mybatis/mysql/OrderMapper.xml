@@ -636,7 +636,7 @@
     
     <!-- 接口-通过会员查询最后一次的消费记录. -->
     <select id="last" resultMap="LastBuyMapping" resultType="java.util.List">
-         SELECT a.product_name as product,b.create_time as new_consume_time FROM order_detail a,
+         SELECT distinct a.product_name as product,b.create_time as new_consume_time FROM order_detail a,
          (SELECT order_id,create_time FROM  order_info WHERE member_id=#{memberId} 
          AND order_status NOT IN ('0','4')
          AND pay_status='1'
@@ -844,9 +844,34 @@
          WHERE  1=1 
          AND b.order_status NOT IN ('0','4')
          AND b.pay_status='1'
+         <if test="arg0!=null and arg0!=''">
          and b.distributor_code = #{arg0}
+         </if>
+         <if test="arg1!=null and arg0!=''">
          and DATE_FORMAT(b.create_time,"%Y-%m-%d") &gt;= DATE_FORMAT(#{arg1},"%Y-%m-%d")  
-		 AND DATE_FORMAT(b.create_time,"%Y-%m-%d") &lt;= DATE_FORMAT(#{arg2},"%Y-%m-%d")
+         </if>
+         <if test="arg2!=null and arg0!=''">
+         AND DATE_FORMAT(b.create_time,"%Y-%m-%d") &lt;= DATE_FORMAT(#{arg2},"%Y-%m-%d")
+         </if>
+    </select>
+    
+    <!-- 会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、7日内 -->
+    <select id="selectByMemberPayCountDay" resultType="java.lang.Integer">
+         SELECT COUNT(DISTINCT member_id) AS count_member FROM order_info  
+         WHERE 1=1 
+         AND DATE_FORMAT(create_time,"%Y-%m-%d") =#{countDate}
+    </select>
+    <!-- 会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、7周内 -->
+    <select id="selectByMemberPayCountWeek" resultType="java.lang.Integer">
+         SELECT COUNT(DISTINCT member_id) AS count_member FROM order_info  
+         WHERE 1=1 
+         AND YEARWEEK(DATE_FORMAT(create_time,'%Y-%m-%d')) = YEARWEEK(NOW())-#{countDate}
+    </select>
+    <!-- 会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、7月内 -->
+    <select id="selectByMemberPayCountMonth" resultType="java.lang.Integer">
+         SELECT COUNT(DISTINCT member_id) AS count_member FROM order_info  
+         WHERE 1=1
+         AND DATE_FORMAT(create_time,"%Y-%m") = #{countDate}
     </select>
     
 </mapper>

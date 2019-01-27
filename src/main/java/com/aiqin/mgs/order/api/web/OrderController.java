@@ -17,6 +17,8 @@ import com.aiqin.mgs.order.api.domain.OrderPayInfo;
 import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.OrderRelationCouponInfo;
 import com.aiqin.mgs.order.api.domain.SettlementInfo;
+import com.aiqin.mgs.order.api.domain.request.DetailCouponRequest;
+import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
@@ -446,6 +448,23 @@ public class OrderController {
     
     /**
      * 
+     * 会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、日周月.
+     * @param 
+     * @return
+     */
+    @GetMapping("/hydjm")
+    @ApiOperation(value = "会员活跃情况-日周月date_type 1：日 2：周 3：月 ....")
+    public HttpResponse hydjm(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,
+    		@Valid @RequestParam(name = "date_type", required = true) Integer dateType
+    		) {
+
+    	
+        return orderService.selectByMemberPayCount(distributorId,dateType);
+    }
+    
+    
+    /**
+     * 
      * 接口-生成提货码
      * @param 
      * @return
@@ -522,12 +541,9 @@ public class OrderController {
      */
     @PostMapping("/sdm")
     @ApiOperation(value = "销售目标管理-分销机构-月销售额")
-    public HttpResponse sdm(@Valid @RequestBody(required = true) List<String> distributorCodeList,
-    		 @Valid @RequestParam(name = "begin_time", required = true) String beginTime,
-    		 @Valid @RequestParam(name = "end_time", required = true) String endTime
-    		) {
+    public HttpResponse sdm(@Valid @RequestBody DistributorMonthRequest DistributorMonthRequest) {
         
     	
-        return orderService.selectDistributorMonth(distributorCodeList,beginTime,endTime);
+        return orderService.selectDistributorMonth(DistributorMonthRequest);
     } 
 }

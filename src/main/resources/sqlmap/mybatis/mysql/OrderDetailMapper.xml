@@ -220,7 +220,7 @@
     <select id="productOverviewByOrderTop"  resultMap="OrderInfoDetailMapping" resultType="java.util.List">
     SELECT c.* FROM (
     SELECT (@rowNO := @rowNo+1) AS rowno,a.* FROM(
-    SELECT any_value(product_id),any_value(product_name),SUM(a.amount) AS amount,SUM(a.actual_price) AS actual_price FROM order_detail a
+    SELECT any_value(product_id),any_value(product_name) as product_name,SUM(a.amount) AS amount,SUM(a.actual_price) AS actual_price FROM order_detail a
     LEFT JOIN order_info b ON a.order_id = b.order_id
     WHERE 1=1
     and b.order_status NOT IN ('0','4')

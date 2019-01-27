@@ -98,6 +98,16 @@
       where order_code = #{code}
 
     </select>
+    <select id="searchOrderListProductByCodeOrOriginal"
+            resultType="com.aiqin.mgs.order.api.domain.request.orderList.SupplyOrderProductItemReqVO">
+      select
+    order_code orderCode, sku_code skuCode, sku_name skuName,color_name colorName,color_code colorCode,unit  unitName,gift givePromotion,product_number num,amount ,original_product_price  price,
+  preferential_allocation  preferentialAllocation,actual_deliver_num actualDeliverNum,specifications spec, return_num returnNum,supply_company_name supplyCompanyName,supply_company_code supplyCompanyCode,
+preferential_allocation activityApportionment,activity_code activityCode, picture_url pictureUrl
+      from order_list_product
+      where order_code in (select order_code from order_list where   order_code=#{code} or original=#{code})
+
+    </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from order_list_product
     where id = #{id,jdbcType=BIGINT}

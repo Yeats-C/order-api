@@ -72,7 +72,7 @@ public class OrderListController {
 
 
     /**
-     * 订单列表后台
+     * 订单列表前台
      *
      * @param param 请求参数
      * @return 响应结果
@@ -88,6 +88,43 @@ public class OrderListController {
             return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
         }
     }
+
+    /**
+     * 订单列表后台
+     *
+     * @param param 请求参数
+     * @return 响应结果
+     */
+    @PostMapping("/list/father")
+    @ApiOperation(value = "订单列表后台(包含父订单)")
+    public HttpResponse<PageResData<OrderListFather>> listFather(@RequestBody OrderListVo param) {
+        log.info("Search  purchasingTarget list:{}", param);
+        try {
+            return HttpResponse.success(this.orderListService.searchOrderListFather(param));
+        } catch (Exception e) {
+            log.error("Get purchasingTarget list failed", e);
+            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
+        }
+    }
+
+    /**
+     * 订单列表前台
+     *
+     * @param param 请求参数
+     * @return 响应结果
+     */
+    @PostMapping("/list/reception/father")
+    @ApiOperation(value = "订单列表前台(包含父订单)")
+    public HttpResponse<PageResData<OrderListFather>> listReceptionFather(@RequestBody OrderListVo2 param) {
+        log.info("Search  purchasingTarget list:{}", param);
+        try {
+            return HttpResponse.success(this.orderListService.searchOrderReceptionListFather(param));
+        } catch (Exception e) {
+            log.error("Get purchasingTarget list failed", e);
+            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
+        }
+    }
+
 
     /**
      * 获取订单信息
@@ -117,7 +154,7 @@ public class OrderListController {
     /**
      * 修改订单状态
      */
-    @GetMapping("update/Order/status")
+    @GetMapping("update/order/status")
     @ApiOperation("修改订单状态")
     public HttpResponse<Boolean> updateOrderStatus(@ApiParam("订单code") @RequestParam("code") String code, @ApiParam("订单状态") @RequestParam("status") Integer status) {
         log.info("Search  purchasingTarget list:{}", code, status);

@@ -20,6 +20,7 @@ import com.aiqin.mgs.order.api.domain.OrderDetailInfo;
 import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
 import com.aiqin.mgs.order.api.domain.OrderInfo;
 import com.aiqin.mgs.order.api.domain.OrderQuery;
+import com.aiqin.mgs.order.api.domain.request.ProdisorRequest;
 
 @SuppressWarnings("all")
 public interface OrderDetailService {
@@ -57,7 +58,7 @@ public interface OrderDetailService {
 	void returnStatus(@Valid String orderDetailId,Integer returnStatus,Integer returnAmount, String updateBy)throws Exception;
 
 	//接口-统计商品在各个渠道的订单数.
-	HttpResponse prodisor(@Valid List<String> sukList,@Valid List<Integer> originTypeList);
+	HttpResponse prodisor(@Valid ProdisorRequest info);
 
 	//订单中商品sku数量
 	Integer getSkuSum(@Valid String orderId);
