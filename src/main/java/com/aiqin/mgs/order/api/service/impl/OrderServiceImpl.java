@@ -60,6 +60,7 @@ import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.request.DetailCouponRequest;
 import com.aiqin.mgs.order.api.domain.request.DevelRequest;
 import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
+import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderDetailRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
@@ -1540,6 +1541,30 @@ public class OrderServiceImpl implements OrderService{
 			 LOGGER.info("会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、日周月.参数确实报错");
 			 return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
+	}
+
+
+	//判断会员是否在当前门店时候有过消费记录
+	@Override
+	public HttpResponse selectMemberByDistributor(@Valid MemberByDistributorRequest memberByDistributorRequest) {
+        if(memberByDistributorRequest !=null) {
+        	if(memberByDistributorRequest.getMemberList()!=null && memberByDistributorRequest.getMemberList().size()>0) {
+        		
+        	}else {
+        		memberByDistributorRequest.setMemberList(null);
+        	}
+        	List<String> list = new ArrayList();
+        	try {
+				list = orderDao.selectMemberByDistributor(memberByDistributorRequest);
+				return HttpResponse.success(list);
+			} catch (Exception e) {
+				LOGGER.info("判断会员是否在当前门店时候有过消费记录  查询异常");
+				return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+			}
+        }else {
+        	LOGGER.info("判断会员是否在当前门店时候有过消费记录 参数异常");
+			return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
+        }
 	}
 	
 }

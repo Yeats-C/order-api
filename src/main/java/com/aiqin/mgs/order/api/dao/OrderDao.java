@@ -14,6 +14,7 @@ import javax.validation.Valid;
 
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.request.DevelRequest;
+import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
@@ -148,6 +149,9 @@ public interface OrderDao {
 	
 	//会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、月
 	Integer selectByMemberPayCountMonth(SelectByMemberPayCountResponse info)throws Exception;
+
+	//判断会员是否在当前门店时候有过消费记录
+	List<String> selectMemberByDistributor(@Valid MemberByDistributorRequest memberByDistributorRequest)throws Exception;
 
 	
 

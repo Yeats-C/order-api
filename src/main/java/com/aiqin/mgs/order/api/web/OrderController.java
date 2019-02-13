@@ -19,6 +19,7 @@ import com.aiqin.mgs.order.api.domain.OrderRelationCouponInfo;
 import com.aiqin.mgs.order.api.domain.SettlementInfo;
 import com.aiqin.mgs.order.api.domain.request.DetailCouponRequest;
 import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
+import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
@@ -545,5 +546,18 @@ public class OrderController {
         
     	
         return orderService.selectDistributorMonth(DistributorMonthRequest);
+    } 
+    
+    /**
+     * 判断会员是否在当前门店时候有过消费记录
+     * @param 
+     * @return
+     */
+    @PostMapping("/bmpy")
+    @ApiOperation(value = "判断会员是否在当前门店时候有过消费记录")
+    public HttpResponse bmpy(@Valid @RequestBody MemberByDistributorRequest memberByDistributorRequest) {
+        
+    	
+        return orderService.selectMemberByDistributor(memberByDistributorRequest);
     } 
 }
