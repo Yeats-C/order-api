@@ -58,7 +58,7 @@ public class OrderController {
     private OrderService orderService;
     
     /**
-     * 添加订单主数据+添加订单明细数据+返回订单编号
+     * 门店新增TOC订单step1-添加订单主数据+添加订单明细数据+返回订单编号
      * @param 
      * @return
      */
@@ -72,7 +72,7 @@ public class OrderController {
     
     
     /**
-     * 添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据
+     * 门店新增TOC订单step2-添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据
      * @param 
      * @return
      */
@@ -161,7 +161,7 @@ public class OrderController {
     }
     
     /**
-     * 已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)
+     * 门店新增TOC订单step3-已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)
      * @param orderAndSoOnRequest
      * @return
      */
