@@ -54,4 +54,8 @@ public interface OrderListDao {
     List<OrderListFather> searchOrderListFather(OrderListVo param);
 
     int searchOrderListFatherCount(OrderListVo param);
+
+    Boolean updateStatusByCode(@Param("code") String code, @Param("status") Integer status);
+
+    Boolean updateOrderPaymentStatus(@Param("code") String code,@Param("paymentStatus") Integer paymentStatus);
 }

@@ -1059,4 +1059,14 @@ SELECT IFNULL(
     where order_code=#{code} or original=#{code}
 
   </update>
+  <update id="updateStatusByCode">
+     update order_list
+    set order_status=#{status}
+    where order_code=#{code} or original=#{code}
+  </update>
+  <update id="updateOrderPaymentStatus">
+    update order_list
+     set   payment_status=#{paymentStatus}
+    where order_code=#{code}
+  </update>
 </mapper>
