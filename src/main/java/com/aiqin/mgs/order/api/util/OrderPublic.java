@@ -534,27 +534,9 @@ public static String randomNumberE() {
 
 	public static void main(String[] args) {
 
-//		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-//
-//		try {
-//
-//			Date date = sdf.parse("2018-12-13");
-//
-//			System.out.println("今天是" + sdf.format(date));
-//
-//			System.out.println("上周一" + sdf.format(geLastWeekMonday(date)));
-//
-//			System.out.println("本周一" + sdf.format(getThisWeekMonday(date)));
-//
-//
-//		} catch (Exception e) {
-//
-//			e.printStackTrace();
-//
-//		}
-		System.out.println(NextDate(-7));
-		System.out.println(NextDate(0));
-
+		OrderPublic orderPublic = new OrderPublic();
+		String method = Thread.currentThread().getStackTrace()[1].getMethodName();
+		System.out.println(method);
 	}
 	
 }
