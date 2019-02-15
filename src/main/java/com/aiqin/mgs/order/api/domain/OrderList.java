@@ -26,6 +26,10 @@ public class OrderList extends PagesRequest {
     @JsonProperty("order_status")
     private String orderStatus;
 
+    @ApiModelProperty(value = "订单状态显示")
+    @JsonProperty("order_status_show")
+    private String orderStatusShow;
+
     @ApiModelProperty(value = "支付状态(0:未支付 1:已支付 2:已退款)")
     @JsonProperty("payment_status")
     private Integer paymentStatus;

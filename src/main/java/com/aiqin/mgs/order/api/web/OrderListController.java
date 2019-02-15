@@ -166,6 +166,21 @@ public class OrderListController {
         }
     }
 
+    /**
+     * 修改订单状态
+     */
+    @GetMapping("update/order/refund")
+    @ApiOperation("修改订单支付状态为已退款")
+    public HttpResponse<Boolean> updateOrderRefund(@ApiParam("订单code") @RequestParam("code") String code) {
+        log.info("Search  purchasingTarget list:{}", code);
+        try {
+            return HttpResponse.success(this.orderListService.updateOrderRefund(code));
+        } catch (Exception e) {
+            log.error("Get purchasingTarget list failed", e);
+            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
+        }
+    }
+
 
     /**
      * 查询一段时间进货进度量
