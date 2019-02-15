@@ -8,11 +8,13 @@
 package com.aiqin.mgs.order.api.web;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.FrozenInfo;
 import com.aiqin.mgs.order.api.domain.OrderAfteIListInfo;
 import com.aiqin.mgs.order.api.domain.OrderAfterSaleInfo;
 import com.aiqin.mgs.order.api.domain.OrderAfterSaleQuery;
 import com.aiqin.mgs.order.api.domain.OrderInfo;
+import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.OrderAfterService;
 
@@ -59,15 +61,42 @@ public class OrderAfterController {
     
     
   /**
-   * 添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表
+   * TOC订单-添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表
    * @param orderAfteIListInfo
    * @return
    */
   @PostMapping("")
-  @ApiOperation(value = "添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表...")
+  @ApiOperation(value = "TOC订单-添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表...")
   public HttpResponse addAfterOrder(@Valid @RequestBody OrderAfterSaleInfo orderAfterSaleInfo) {
       LOGGER.info("添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表...");
-      return orderAfterService.addAfterOrder(orderAfterSaleInfo);
+      
+      //添加TOC订单标识
+      if(orderAfterSaleInfo !=null) {
+    	  orderAfterSaleInfo.setOrderType(Global.ORDER_TYPE_1);
+      	  return orderAfterService.addAfterOrder(orderAfterSaleInfo);
+      }else {
+      	return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
+      }
+  }
+  
+  
+  /**
+   * 服务订单-添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表
+   * @param orderAfteIListInfo
+   * @return
+   */
+  @PostMapping("/zaaf")
+  @ApiOperation(value = "服务订单-添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表...")
+  public HttpResponse zaaf(@Valid @RequestBody OrderAfterSaleInfo orderAfterSaleInfo) {
+      LOGGER.info("添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表...");
+      
+      //添加服务订单标识
+      if(orderAfterSaleInfo !=null) {
+    	  orderAfterSaleInfo.setOrderType(Global.ORDER_TYPE_3);
+      	  return orderAfterService.addAfterOrder(orderAfterSaleInfo);
+      }else {
+      	return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
+      }
   }
   
   

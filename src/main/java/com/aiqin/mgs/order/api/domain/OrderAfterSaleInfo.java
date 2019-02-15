@@ -105,6 +105,10 @@ public class OrderAfterSaleInfo extends PagesRequest {
 	@JsonProperty("origin_type")
 	private Integer originType;
 	
+	//20190214
+	@ApiModelProperty(value="订单类型 1：TOC订单 2: TOB订单 3：服务商品")
+	@JsonProperty("order_type")
+	private Integer orderType;
 	
 	@ApiModelProperty(value="申请开始时间",example = "2001-01-01 01:01:01")
 	@JsonProperty("begin_time")
@@ -147,6 +151,16 @@ public class OrderAfterSaleInfo extends PagesRequest {
 	private List<OrderAfterSaleDetailInfo> detailList;
 
 
+
+
+	public Integer getOrderType() {
+		return orderType;
+	}
+
+
+	public void setOrderType(Integer orderType) {
+		this.orderType = orderType;
+	}
 
 
 	public String getCreateByName() {

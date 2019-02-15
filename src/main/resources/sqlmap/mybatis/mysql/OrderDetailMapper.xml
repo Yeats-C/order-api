@@ -118,7 +118,7 @@
     
          SELECT a.* FROM order_detail a
          LEFT JOIN order_info b ON a.order_id = b.order_id
-         where 1=1
+         where 1=1 and order_type = 1
          <if test="memberId!= null and memberId!='' " >
 		     and b.member_id =#{memberId}
           </if>
@@ -137,7 +137,7 @@
     <select id="selectorderDetail"  resultMap="OrderInfoDetailMapping" resultType="java.util.List">
          SELECT a.*,b.member_id,b.member_name,b.member_phone,b.origin_type,b.receive_type FROM order_detail a
 		 LEFT JOIN order_info b ON a.order_id =b.order_id
-         WHERE 1=1
+         WHERE 1=1 and order_type = 1
          <if test="memberidList != null" >
 		     and b.member_id in (
 		  <foreach collection="memberidList" item="member_id" separator=",">
@@ -195,7 +195,8 @@
     <!-- 查询订单明细部分汇总-（支持活动ID汇总、） 暂时注销待确认：GROUP BY order_id-->
     <select id="selectorderdetailsum"  resultMap="OrderInfoDetailMapping" >
     SELECT SUM(actual_price) AS actual_price,count(order_id) AS amount FROM order_detail WHERE order_id IN (
-	SELECT DISTINCT order_id FROM order_detail WHERE 1=1
+	SELECT DISTINCT order_id FROM order_detail 
+	WHERE 1=1 and order_type = 1
 	<if test="activityId!=null and activityId!=''">
 	AND activity_id =#{activityId}
 	</if>
@@ -207,7 +208,7 @@
     <select id="productOverviewByMonth"  resultMap="OrderInfoDetailMapping" >
 	SELECT SUM(a.amount) AS amount,SUM(a.actual_price) AS actual_price FROM order_detail a
     LEFT JOIN order_info b ON a.order_id = b.order_id
-    WHERE 1=1 
+    WHERE 1=1 and order_type = 1 
     and b.order_status NOT IN ('0','4')
     and b.pay_status='1'
     and DATE_FORMAT(a.create_time,"%Y") =#{year}
@@ -222,7 +223,7 @@
     SELECT (@rowNO := @rowNo+1) AS rowno,a.* FROM(
     SELECT any_value(product_id),any_value(product_name) as product_name,SUM(a.amount) AS amount,SUM(a.actual_price) AS actual_price FROM order_detail a
     LEFT JOIN order_info b ON a.order_id = b.order_id
-    WHERE 1=1
+    WHERE 1=1 and order_type = 1
     and b.order_status NOT IN ('0','4')
     and b.pay_status='1'
     and DATE_FORMAT(a.create_time,"%Y") =#{year}
@@ -241,7 +242,7 @@
     SELECT (@rowNO := @rowNo+1) AS rowno,a.* FROM(
     SELECT product_id,product_name,SUM(a.amount) AS amount,SUM(a.actual_price) AS actual_price FROM order_detail a
     LEFT JOIN order_info b ON a.order_id = b.order_id
-    WHERE 1=1
+    WHERE 1=1 and order_type = 1
     and b.order_status NOT IN ('0','4')
     and b.pay_status='1'
     and DATE_FORMAT(a.create_time,"%Y") =#{year}
@@ -262,7 +263,7 @@
 		  FROM  
 		      order_detail a
         LEFT JOIN order_info b ON a.order_id=b.order_id
-        where 1=1
+        where 1=1 and order_type = 1
         <if test="memberidList != null" >
 		     and b.member_id in (
 		<foreach collection="memberidList" item="member_id" separator=",">
@@ -295,7 +296,7 @@
     <select id="prodisor"  resultMap="ProdisorMapping" resultType="java.util.List">
 		SELECT a.sku_code AS CODE,SUM(amount) AS amount FROM order_detail a
         LEFT JOIN order_info b ON a.order_id = b.order_id 
-         WHERE 1=1
+         WHERE 1=1 and order_type = 1
          <if test="sukList != null" >
 		     and a.sku_code in (
 		 <foreach collection="sukList" item="sku_code" separator=",">
@@ -339,7 +340,7 @@
     <select id="getSkuAmount" resultType="java.lang.Integer">
          SELECT SUM(a.amount) FROM order_detail a 
          LEFT JOIN  order_info b ON a.order_id = b.order_id
-         WHERE 1=1
+         WHERE 1=1 and order_type = 1
            AND a.sku_code =#{skuCode} 
            AND b.order_status NOT IN ('0','4')
            AND b.pay_status='1' 
@@ -350,7 +351,7 @@
     <select id="getSkuPrice" resultType="java.lang.Integer">
          SELECT SUM(a.actual_price*a.amount) FROM order_detail a 
          LEFT JOIN  order_info b ON a.order_id = b.order_id
-         WHERE 1=1
+         WHERE 1=1 and order_type = 1
            AND a.sku_code =#{skuCode} 
            AND b.order_status NOT IN ('0','4')
            AND b.pay_status='1' 

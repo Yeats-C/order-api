@@ -216,4 +216,9 @@ public interface Global {
     Integer DATE_TYPE_1 = 1;  //日
     Integer DATE_TYPE_2 = 2;  //周
     Integer DATE_TYPE_3 = 3;  //月
+    
+    //订单类型 1：TOC订单 2: TOB订单 3：服务商品
+    Integer ORDER_TYPE_1 = 1;  //TOC订单
+    Integer ORDER_TYPE_2 = 2;  //TOB订单
+    Integer ORDER_TYPE_3 = 3;  //服务商品
 }

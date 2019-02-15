@@ -8,6 +8,7 @@
 package com.aiqin.mgs.order.api.web;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.CartInfo;
 import com.aiqin.mgs.order.api.domain.OrderDetailInfo;
 import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
@@ -17,6 +18,7 @@ import com.aiqin.mgs.order.api.domain.OrderPayInfo;
 import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.OrderRelationCouponInfo;
 import com.aiqin.mgs.order.api.domain.SettlementInfo;
+import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.request.DetailCouponRequest;
 import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
 import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
@@ -67,7 +69,18 @@ public class OrderController {
     public HttpResponse addOrdta(@Valid @RequestBody OrderAndSoOnRequest orderAndSoOnRequest){
         LOGGER.info("添加新的订单主数据以及其他订单关联数据......");
 		
-        return orderService.addOrdta(orderAndSoOnRequest);
+        //添加TOC订单标识
+        if(orderAndSoOnRequest !=null) {
+        	OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
+          if(orderInfo !=null) {
+        	  orderInfo.setOrderType(Global.ORDER_TYPE_1);
+        	  return orderService.addOrdta(orderAndSoOnRequest);
+          }else {
+        	  return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
+          }
+        }else {
+        	return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
+        }
     }
     
     
@@ -81,7 +94,18 @@ public class OrderController {
     public HttpResponse addPamo(@Valid @RequestBody OrderAndSoOnRequest orderAndSoOnRequest){
         LOGGER.info("添加新的订单主数据以及其他订单关联数据......");
 		
-        return orderService.addPamo(orderAndSoOnRequest);
+        //添加TOC订单标识
+        if(orderAndSoOnRequest !=null) {
+        	OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
+          if(orderInfo !=null) {
+        	  orderInfo.setOrderType(Global.ORDER_TYPE_1);
+        	  return orderService.addPamo(orderAndSoOnRequest);
+          }else {
+        	  return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
+          }
+        }else {
+        	return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
+        }
     }
     
     
@@ -98,6 +122,55 @@ public class OrderController {
     		) {
         LOGGER.info("已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表).....");
         return orderService.repast(orderId,payType,orderPayList);
+    }
+    
+    /**
+     * 门店新增服务订单step1-添加订单主数据+添加订单明细数据+返回订单编号
+     * @param 
+     * @return
+     */
+    @PostMapping("/zaao")
+    @ApiOperation(value = "门店新增服务订单step1-添加订单主数据+添加订单明细数据+返回订单编号")
+    public HttpResponse zaao(@Valid @RequestBody OrderAndSoOnRequest orderAndSoOnRequest){
+        LOGGER.info("添加新的订单主数据以及其他订单关联数据......");
+		
+        //添加TOC订单标识
+        if(orderAndSoOnRequest !=null) {
+        	OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
+          if(orderInfo !=null) {
+        	  orderInfo.setOrderType(Global.ORDER_TYPE_3);
+        	  return orderService.addOrdta(orderAndSoOnRequest);
+          }else {
+        	  return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
+          }
+        }else {
+        	return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
+        }
+    }
+    
+    
+    /**
+     * 门店新增服务订单step2-添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据
+     * @param 
+     * @return
+     */
+    @PostMapping("/zabo")
+    @ApiOperation(value = "门店新增TOC订单step2-添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据")
+    public HttpResponse zabo(@Valid @RequestBody OrderAndSoOnRequest orderAndSoOnRequest){
+        LOGGER.info("添加新的订单主数据以及其他订单关联数据......");
+		
+        //添加TOC订单标识
+        if(orderAndSoOnRequest !=null) {
+        	OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
+          if(orderInfo !=null) {
+        	  orderInfo.setOrderType(Global.ORDER_TYPE_3);
+        	  return orderService.addPamo(orderAndSoOnRequest);
+          }else {
+        	  return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
+          }
+        }else {
+        	return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
+        }
     }
     
     

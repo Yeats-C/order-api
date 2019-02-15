@@ -21,6 +21,7 @@
 <result column="receive_phone" jdbcType="VARCHAR" property="receivePhone"/>
 <result column="pay_type" jdbcType="TINYINT" property="payType"/>
 <result column="origin_type" jdbcType="TINYINT" property="originType"/>
+<result column="order_type" jdbcType="TINYINT" property="orderType"/>
 <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
 <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
 <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
@@ -34,9 +35,9 @@
     <!-- 添加新的订单售后数据 --> 
     <insert id="addAfterOrder" >
         insert into order_after_sale
-        (after_sale_id,after_sale_code,order_id,order_code,member_id,member_name,member_phone,distributor_id,distributor_code,distributor_name,return_price,after_sale_status,after_sale_content,after_sale_type,process_type,receive_name,receive_phone,pay_type,origin_type,create_time,update_time,create_by,update_by,create_by_name,update_by_name)
+        (after_sale_id,after_sale_code,order_id,order_code,member_id,member_name,member_phone,distributor_id,distributor_code,distributor_name,return_price,after_sale_status,after_sale_content,after_sale_type,process_type,receive_name,receive_phone,pay_type,origin_type,order_type,create_time,update_time,create_by,update_by,create_by_name,update_by_name)
         values
-        (#{afterSaleId},#{afterSaleCode},#{orderId},#{orderCode},#{memberId},#{memberName},#{memberPhone},#{distributorId},#{distributorCode},#{distributorName},#{returnPrice},#{afterSaleStatus},#{afterSaleContent},#{afterSaleType},#{processType},#{receiveName},#{receivePhone},#{payType},#{originType},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},
+        (#{afterSaleId},#{afterSaleCode},#{orderId},#{orderCode},#{memberId},#{memberName},#{memberPhone},#{distributorId},#{distributorCode},#{distributorName},#{returnPrice},#{afterSaleStatus},#{afterSaleContent},#{afterSaleType},#{processType},#{receiveName},#{receivePhone},#{payType},#{originType},#{orderType},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},
         #{createByName},#{updateByName})
     </insert>
     
@@ -45,7 +46,7 @@
     <select id="selectOrderAfterById"  resultMap="OrderAfterMapping" >
          
          SELECT * FROM order_after_sale
-		 WHERE 1=1
+		 WHERE 1=1 and order_type = 1
 		 <if test="afterSaleId!=null ">
          and after_sale_id = #{afterSaleId}
          </if>
@@ -56,7 +57,7 @@
     <!-- 售后订单查询 -->
     <select id="selectOrderAfter"  resultMap="OrderAfterMapping" resultType="java.util.List">
          SELECT * FROM order_after_sale
-		 WHERE 1=1
+		 WHERE 1=1 and order_type = 1
 		 <if test="distributorId!=null and distributorId!='' ">
          and distributor_id = #{distributorId}
          </if>

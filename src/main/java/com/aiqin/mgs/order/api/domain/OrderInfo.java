@@ -114,38 +114,36 @@ public class OrderInfo extends PagesRequest {
 	
 	@ApiModelProperty(value="客户备注")
 	@JsonProperty("custom_note")
-
 	private String customNote;
 	
 	
 	@ApiModelProperty(value="商家备注")
 	@JsonProperty("business_note")
-
 	private String businessNote;
 	
 	@ApiModelProperty(value="收银员id")
 	@JsonProperty("cashier_id")
-
 	private String cashierId;
 	
 	
 	@ApiModelProperty(value="收银员名称")
 	@JsonProperty("cashier_name")
-
 	private String cashierName;
 	
 	
 	@ApiModelProperty(value="导购id")
 	@JsonProperty("guide_id")
-
 	private String guideId;
 	
 	
 	@ApiModelProperty(value="导购名称")
 	@JsonProperty("guide_name")
-
 	private String guideName;
 	
+	//20190214
+	@ApiModelProperty(value="订单类型 1：TOC订单 2: TOB订单 3：服务商品")
+	@JsonProperty("order_type")
+	private Integer orderType;
 	
 	@ApiModelProperty(value="下单时间",example = "2001-01-01 01:01:01")
 	@JsonProperty("create_time")
@@ -181,6 +179,16 @@ public class OrderInfo extends PagesRequest {
 	private String companyCode;
 
 	
+
+
+	public Integer getOrderType() {
+		return orderType;
+	}
+
+
+	public void setOrderType(Integer orderType) {
+		this.orderType = orderType;
+	}
 
 
 	public String getCompanyCode() {
