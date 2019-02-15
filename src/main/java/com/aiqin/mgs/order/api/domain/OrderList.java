@@ -24,7 +24,7 @@ public class OrderList extends PagesRequest {
 
     @ApiModelProperty(value = "订单状态")
     @JsonProperty("order_status")
-    private String orderStatus;
+    private Integer orderStatus = 1;
 
     @ApiModelProperty(value = "订单状态显示")
     @JsonProperty("order_status_show")
@@ -172,7 +172,6 @@ public class OrderList extends PagesRequest {
     @ApiModelProperty(value = "订单商品数量")
     @JsonProperty("product_num")
     private Integer productNum;
-
 
 
     @ApiModelProperty(value = "供应商编码")

@@ -162,7 +162,7 @@ public class OrderListServiceImpl implements OrderListService {
         List<OrderListFather> inventories = orderListDao.searchOrderReceptionListFather(param);
         for (OrderListFather inventory : inventories) {
             for (OrderList orderList : inventory.getOrderList()) {
-                orderList.setOrderStatusShow(OrderStatusEnum.getOrderStatusEnum(Integer.parseInt(orderList.getOrderStatus())).getReceptionStatus());
+                orderList.setOrderStatusShow(OrderStatusEnum.getOrderStatusEnum(orderList.getOrderStatus()).getReceptionStatus());
             }
         }
         int count = orderListDao.searchOrderReceptionListFatherCount(param);
@@ -174,7 +174,7 @@ public class OrderListServiceImpl implements OrderListService {
         List<OrderListFather> inventories = orderListDao.searchOrderListFather(param);
         for (OrderListFather inventory : inventories) {
             for (OrderList orderList : inventory.getOrderList()) {
-                orderList.setOrderStatusShow(OrderStatusEnum.getOrderStatusEnum(Integer.parseInt(orderList.getOrderStatus())).getBackstageStatus());
+                orderList.setOrderStatusShow(OrderStatusEnum.getOrderStatusEnum(orderList.getOrderStatus()).getBackstageStatus());
             }
         }
         int count = orderListDao.searchOrderListFatherCount(param);
