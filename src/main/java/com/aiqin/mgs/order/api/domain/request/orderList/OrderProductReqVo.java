@@ -99,9 +99,9 @@ public class OrderProductReqVo implements Serializable {
     @JsonProperty("supply_company_name")
     private String supplyCompanyName;
 
-    @ApiModelProperty(value = "是否使用优惠额度")
+    @ApiModelProperty(value = "是否使用优惠额度,1-使用了优惠额度，0-没使用")
     @JsonProperty("use_discount_amount")
-    private String useDiscountAmount;
+    private Integer useDiscountAmount = 0;
 
     @ApiModelProperty(value = "商品单位重量")
     @JsonProperty("weight")

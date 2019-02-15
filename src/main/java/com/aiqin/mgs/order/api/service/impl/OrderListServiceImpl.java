@@ -111,22 +111,22 @@ public class OrderListServiceImpl implements OrderListService {
         if (code == null || code.length() == 0 || status == null) {
             throw new IllegalArgumentException("参数不能为空");
         }
-        OrderStatusEnum orderStatus= OrderStatusEnum.getOrderStatusEnum(status);
+        OrderStatusEnum orderStatus = OrderStatusEnum.getOrderStatusEnum(status);
 //        OrderStatus orderStatus = orderStatusDao.searchStatus(status);
         if (orderStatus == null) {
             throw new IllegalArgumentException("状态值未找到");
         }
-        Boolean br=false;
-        if (status!=2){
-             br = orderListDao.updateStatusByCode(code, status);
+        Boolean br = false;
+        if (status != 2) {
+            br = orderListDao.updateStatusByCode(code, status);
         }
 
 
         //将订单状态改完支付,将订单发送给供应链
         //todo  判断状态 待更新
-        if (status==2 ){
+        if (status == 2) {
             br = orderListDao.updateByCode(code, status, 1);
-            if (br==true) {
+            if (br == true) {
                 //获取订单信息
                 List<SupplyOrderInfoReqVO> vo = orderListDao.searchOrderByCodeOrOriginal(code);
                 List<SupplyOrderProductItemReqVO> list2 = orderListProductDao.searchOrderListProductByCodeOrOriginal(code);
@@ -161,7 +161,7 @@ public class OrderListServiceImpl implements OrderListService {
         ParamUnit.isNotNull(param, "storeId");
         List<OrderListFather> inventories = orderListDao.searchOrderReceptionListFather(param);
         for (OrderListFather inventory : inventories) {
-            for (OrderList orderList :  inventory.getOrderList()) {
+            for (OrderList orderList : inventory.getOrderList()) {
                 orderList.setOrderStatusShow(OrderStatusEnum.getOrderStatusEnum(Integer.parseInt(orderList.getOrderStatus())).getReceptionStatus());
             }
         }
@@ -173,7 +173,7 @@ public class OrderListServiceImpl implements OrderListService {
     public PageResData<OrderListFather> searchOrderListFather(OrderListVo param) {
         List<OrderListFather> inventories = orderListDao.searchOrderListFather(param);
         for (OrderListFather inventory : inventories) {
-            for (OrderList orderList :  inventory.getOrderList()) {
+            for (OrderList orderList : inventory.getOrderList()) {
                 orderList.setOrderStatusShow(OrderStatusEnum.getOrderStatusEnum(Integer.parseInt(orderList.getOrderStatus())).getBackstageStatus());
             }
         }
@@ -183,7 +183,7 @@ public class OrderListServiceImpl implements OrderListService {
 
     @Override
     public Boolean updateOrderRefund(String code) {
-        return  orderListDao.updateOrderPaymentStatus(code,2);
+        return orderListDao.updateOrderPaymentStatus(code, 2);
     }
 
     @Override
@@ -200,21 +200,21 @@ public class OrderListServiceImpl implements OrderListService {
 
     @Override
     public List<String> add(List<OrderListDetailsVo> paramList) {
-        List<String> reList=new ArrayList<>();
+        List<String> reList = new ArrayList<>();
         for (OrderListDetailsVo param : paramList) {
             //验证添加数据
-            ParamUnit.isNotNull(param, "orderCode","orderType","orderStatus","storeId","storeCode","placeOrderTime");
+            ParamUnit.isNotNull(param, "orderCode", "orderType", "orderStatus", "storeId", "storeCode", "placeOrderTime");
 
             List<OrderListProduct> orderListProductList = param.getOrderListProductList();
             if (orderListProductList == null || orderListProductList.size() == 0) {
                 throw new IllegalArgumentException("商品不可为空");
             }
             for (OrderListProduct orderListProduct : orderListProductList) {
-                ParamUnit.isNotNull(orderListProduct, "skuCode", "skuName","productNumber","gift");
+                ParamUnit.isNotNull(orderListProduct, "skuCode", "skuName", "productNumber", "gift");
             }
 //           String orderCode= sequenceService.generateOrderCode(param.getCompanyCode(), param.getOrderType());
 //            param.setOrderCode(orderCode);
-            String orderCode=param.getOrderCode();
+            String orderCode = param.getOrderCode();
             String orderId = IdUtil.uuid();
             param.setId(orderId);
             Boolean re = orderListDao.insertOrderListDetailsVo(param);
@@ -287,13 +287,15 @@ public class OrderListServiceImpl implements OrderListService {
                 productDTO.setDiscountMoney(discountMoney);
                 productDTO.setPreferentialAllocation(preferentialAllocation);
                 //优惠明细分摊
-                List<DiscountAmountInfo> infos = product.getDiscountAmountInfo().stream().map(info -> {
-                    DiscountAmountInfo newInfo = new DiscountAmountInfo();
-                    newInfo.setCode(info.getCode());
-                    newInfo.setAmount(info.getAmount() * stockLock.getLockNum() / product.getProductNumber());
-                    return newInfo;
-                }).collect(Collectors.toList());
-                productDTO.setDiscountAmountInfo(JSON.toJSONString(infos));
+                if (productDTO.getUseDiscountAmount() == 1) {
+                    List<DiscountAmountInfo> infos = product.getDiscountAmountInfo().stream().map(info -> {
+                        DiscountAmountInfo newInfo = new DiscountAmountInfo();
+                        newInfo.setCode(info.getCode());
+                        newInfo.setAmount(info.getAmount() * stockLock.getLockNum() / product.getProductNumber());
+                        return newInfo;
+                    }).collect(Collectors.toList());
+                    productDTO.setDiscountAmountInfo(JSON.toJSONString(infos));
+                }
                 List<OrderListProduct> orderListProducts = productMap.get(stockLock.getWarehouseCode());
                 if (CollectionUtils.isEmpty(orderListProducts)) {
                     productMap.put(stockLock.getWarehouseCode(), Lists.newArrayList(productDTO));
