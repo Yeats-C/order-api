@@ -19,6 +19,7 @@ import com.aiqin.mgs.order.api.domain.OrderRelationCouponInfo;
 import com.aiqin.mgs.order.api.domain.SettlementInfo;
 import com.aiqin.mgs.order.api.domain.request.DetailCouponRequest;
 import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
+import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
@@ -57,12 +58,12 @@ public class OrderController {
     private OrderService orderService;
     
     /**
-     * 添加订单主数据+添加订单明细数据+返回订单编号
+     * 门店新增TOC订单step1-添加订单主数据+添加订单明细数据+返回订单编号
      * @param 
      * @return
      */
     @PostMapping("/addordta")
-    @ApiOperation(value = "添加订单主数据+添加订单明细数据+返回订单编号")
+    @ApiOperation(value = "门店新增TOC订单step1-添加订单主数据+添加订单明细数据+返回订单编号")
     public HttpResponse addOrdta(@Valid @RequestBody OrderAndSoOnRequest orderAndSoOnRequest){
         LOGGER.info("添加新的订单主数据以及其他订单关联数据......");
 		
@@ -71,16 +72,32 @@ public class OrderController {
     
     
     /**
-     * 添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据
+     * 门店新增TOC订单step2-添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据
      * @param 
      * @return
      */
     @PostMapping("/addpamo")
-    @ApiOperation(value = "添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据")
+    @ApiOperation(value = "门店新增TOC订单step2-添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据")
     public HttpResponse addPamo(@Valid @RequestBody OrderAndSoOnRequest orderAndSoOnRequest){
         LOGGER.info("添加新的订单主数据以及其他订单关联数据......");
 		
         return orderService.addPamo(orderAndSoOnRequest);
+    }
+    
+    
+    /**
+     * 门店新增TOC订单step3-已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)
+     * @param orderAndSoOnRequest
+     * @return
+     */
+    @PostMapping("/repast")
+    @ApiOperation(value = "门店新增TOC订单step3-已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)")
+    public HttpResponse repast(@Valid @RequestParam(name = "order_id", required = true) String orderId,
+    		@Valid @RequestParam(name = "pay_type", required = true) String payType,
+    		@Valid @RequestBody(required = true) List<OrderPayInfo> orderPayList
+    		) {
+        LOGGER.info("已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表).....");
+        return orderService.repast(orderId,payType,orderPayList);
     }
     
     
@@ -96,8 +113,6 @@ public class OrderController {
 		
         return orderService.deordta(orderId);
     }
-    
-    
     
     
     /**
@@ -146,32 +161,17 @@ public class OrderController {
     
  
     /**
-     * 添加新的订单主数据以及其他订单关联数据
+     * 微商城新增TOC订单-添加新的订单主数据以及其他订单关联数据
      * @param orderAndSoOnRequest
      * @return
      * @throws Exception 
      */
     @PostMapping("")
-    @ApiOperation(value = "添加新的订单主数据以及其他订单关联数据")
+    @ApiOperation(value = "微商城新增TOC订单-添加新的订单主数据以及其他订单关联数据")
     public HttpResponse addOrderList(@Valid @RequestBody OrderAndSoOnRequest orderAndSoOnRequest){
         LOGGER.info("添加新的订单主数据以及其他订单关联数据......");
 		
         return orderService.addOrderList(orderAndSoOnRequest);
-    }
-    
-    /**
-     * 已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)
-     * @param orderAndSoOnRequest
-     * @return
-     */
-    @PostMapping("/repast")
-    @ApiOperation(value = "已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)")
-    public HttpResponse repast(@Valid @RequestParam(name = "order_id", required = true) String orderId,
-    		@Valid @RequestParam(name = "pay_type", required = true) String payType,
-    		@Valid @RequestBody(required = true) List<OrderPayInfo> orderPayList
-    		) {
-        LOGGER.info("已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表).....");
-        return orderService.repast(orderId,payType,orderPayList);
     }
     
     
@@ -545,5 +545,18 @@ public class OrderController {
         
     	
         return orderService.selectDistributorMonth(DistributorMonthRequest);
+    } 
+    
+    /**
+     * 判断会员是否在当前门店时候有过消费记录
+     * @param 
+     * @return
+     */
+    @PostMapping("/bmpy")
+    @ApiOperation(value = "判断会员是否在当前门店时候有过消费记录")
+    public HttpResponse bmpy(@Valid @RequestBody MemberByDistributorRequest memberByDistributorRequest) {
+        
+    	
+        return orderService.selectMemberByDistributor(memberByDistributorRequest);
     } 
 }

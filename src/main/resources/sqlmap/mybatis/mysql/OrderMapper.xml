@@ -874,5 +874,21 @@
          AND DATE_FORMAT(create_time,"%Y-%m") = #{countDate}
     </select>
     
+    <!-- 判断会员是否在当前门店时候有过消费记录 -->
+    <select id="selectMemberByDistributor" resultType="java.lang.String">
+        SELECT 
+              DISTINCT member_id FROM order_info
+        WHERE 1=1
+          <if test="distributorId!=null and distributorId!='' ">
+          AND Distributor_id =#{distributorId}
+          </if>
+          <if test="memberList != null" >
+		     and member_id in (
+		  <foreach collection="memberList" item="member_id" separator=",">
+			 '${member_id}'
+		  </foreach>
+			)
+          </if>
+    </select>
 </mapper>
 

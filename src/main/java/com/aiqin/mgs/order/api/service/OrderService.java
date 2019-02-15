@@ -27,6 +27,7 @@ import com.aiqin.mgs.order.api.domain.OrderRelationCouponInfo;
 import com.aiqin.mgs.order.api.domain.SettlementInfo;
 import com.aiqin.mgs.order.api.domain.request.DetailCouponRequest;
 import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
+import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 
@@ -133,4 +134,7 @@ public interface OrderService {
 
 	//会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、日周月.
 	HttpResponse selectByMemberPayCount(@Valid String distributorId, @Valid Integer dateType);
+
+    //判断会员是否在当前门店时候有过消费记录
+	HttpResponse selectMemberByDistributor(@Valid MemberByDistributorRequest memberByDistributorRequest);
 }

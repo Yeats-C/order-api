@@ -58,8 +58,8 @@ public class OrderListController {
      * @param param 请求参数
      * @return 响应结果
      */
-    @PostMapping("/list")
-    @ApiOperation(value = "订单列表后台")
+//    @PostMapping("/list")
+//    @ApiOperation(value = "订单列表后台(过时)")
     public HttpResponse<PageResData<OrderList>> list(@RequestBody OrderListVo param) {
         log.info("Search  purchasingTarget list:{}", param);
         try {
@@ -77,8 +77,8 @@ public class OrderListController {
      * @param param 请求参数
      * @return 响应结果
      */
-    @PostMapping("/list/reception")
-    @ApiOperation(value = "订单列表前台")
+//    @PostMapping("/list/reception")
+//    @ApiOperation(value = "订单列表前台(过时)")
     public HttpResponse<PageResData<OrderList>> listReception(@RequestBody OrderListVo2 param) {
         log.info("Search  purchasingTarget list:{}", param);
         try {
@@ -160,6 +160,21 @@ public class OrderListController {
         log.info("Search  purchasingTarget list:{}", code, status);
         try {
             return HttpResponse.success(this.orderListService.updateOrderStatus(code, status));
+        } catch (Exception e) {
+            log.error("Get purchasingTarget list failed", e);
+            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
+        }
+    }
+
+    /**
+     * 修改订单状态
+     */
+    @GetMapping("update/order/refund")
+    @ApiOperation("修改订单支付状态为已退款")
+    public HttpResponse<Boolean> updateOrderRefund(@ApiParam("订单code") @RequestParam("code") String code) {
+        log.info("Search  purchasingTarget list:{}", code);
+        try {
+            return HttpResponse.success(this.orderListService.updateOrderRefund(code));
         } catch (Exception e) {
             log.error("Get purchasingTarget list failed", e);
             return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));

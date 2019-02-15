@@ -36,4 +36,6 @@ public interface OrderListService {
     PageResData<OrderListFather> searchOrderReceptionListFather(OrderListVo2 param);
 
     PageResData<OrderListFather> searchOrderListFather(OrderListVo param);
+
+    Boolean updateOrderRefund(String code);
 }
