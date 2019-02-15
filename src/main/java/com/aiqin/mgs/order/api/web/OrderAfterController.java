@@ -66,7 +66,7 @@ public class OrderAfterController {
    * @return
    */
   @PostMapping("")
-  @ApiOperation(value = "添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表...")
+  @ApiOperation(value = "TOC订单-添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表...")
   public HttpResponse addAfterOrder(@Valid @RequestBody OrderAfterSaleInfo orderAfterSaleInfo) {
       LOGGER.info("添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表...");
       
@@ -86,7 +86,7 @@ public class OrderAfterController {
    * @return
    */
   @PostMapping("/zaaf")
-  @ApiOperation(value = "添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表...")
+  @ApiOperation(value = "服务订单-添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表...")
   public HttpResponse zaaf(@Valid @RequestBody OrderAfterSaleInfo orderAfterSaleInfo) {
       LOGGER.info("添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表...");
       

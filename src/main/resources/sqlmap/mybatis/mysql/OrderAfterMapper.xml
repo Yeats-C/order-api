@@ -46,7 +46,7 @@
     <select id="selectOrderAfterById"  resultMap="OrderAfterMapping" >
          
          SELECT * FROM order_after_sale
-		 WHERE 1=1
+		 WHERE 1=1 and order_type = 1
 		 <if test="afterSaleId!=null ">
          and after_sale_id = #{afterSaleId}
          </if>
@@ -57,7 +57,7 @@
     <!-- 售后订单查询 -->
     <select id="selectOrderAfter"  resultMap="OrderAfterMapping" resultType="java.util.List">
          SELECT * FROM order_after_sale
-		 WHERE 1=1
+		 WHERE 1=1 and order_type = 1
 		 <if test="distributorId!=null and distributorId!='' ">
          and distributor_id = #{distributorId}
          </if>
