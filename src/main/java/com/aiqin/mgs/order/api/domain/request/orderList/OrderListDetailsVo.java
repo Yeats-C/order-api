@@ -32,7 +32,15 @@ public class OrderListDetailsVo {
 
     @ApiModelProperty(value = "订单状态")
     @JsonProperty("order_status")
-    private String orderStatus;
+    private Integer orderStatus;
+
+    @ApiModelProperty(value = "前台订单状态")
+    @JsonProperty("reception_status")
+    private String receptionStatus;
+
+    @ApiModelProperty(value = "后台订单状态")
+    @JsonProperty("backstage_status")
+    private String backstageStatus;
 
     @ApiModelProperty(value = "支付状态(0:未支付 1:已支付 2:已退款)")
     @JsonProperty("payment_status")
