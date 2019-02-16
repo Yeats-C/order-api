@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.OrderNoCodeDao">
+<resultMap id="OrderInfoMapping" type="com.aiqin.mgs.order.api.domain.OrderInfo">
+<result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+<result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
+<result column="member_id" jdbcType="VARCHAR" property="memberId"/>
+<result column="member_name" jdbcType="VARCHAR" property="memberName"/>
+<result column="member_phone" jdbcType="VARCHAR" property="memberPhone"/>
+<result column="distributor_id" jdbcType="VARCHAR" property="distributorId"/>
+<result column="distributor_code" jdbcType="VARCHAR" property="distributorCode"/>
+<result column="distributor_name" jdbcType="VARCHAR" property="distributorName"/>
+<result column="origin_type" jdbcType="TINYINT" property="originType"/>
+<result column="receive_type" jdbcType="TINYINT" property="receiveType"/>
+<result column="receive_code" jdbcType="VARCHAR" property="receiveCode"/>
+<result column="receiveTime" jdbcType="TIMESTAMP" property="receive_time"/>
+<result column="order_status" jdbcType="TINYINT" property="orderStatus"/>
+<result column="return_status" jdbcType="TINYINT" property="returnStatus"/>
+<result column="pay_status" jdbcType="TINYINT" property="payStatus"/>
+<result column="pay_type" jdbcType="VARCHAR" property="payType"/>
+<result column="actual_price" jdbcType="BIGINT" property="actualPrice"/>
+<result column="total_price" jdbcType="BIGINT" property="totalPrice"/>
+<result column="custom_note" jdbcType="VARCHAR" property="customNote"/>
+<result column="business_note" jdbcType="VARCHAR" property="businessNote"/>
+<result column="cashier_id" jdbcType="VARCHAR" property="cashierId"/>
+<result column="cashier_name" jdbcType="VARCHAR" property="cashierName"/>
+<result column="guide_id" jdbcType="VARCHAR" property="guideId"/>
+<result column="guide_name" jdbcType="VARCHAR" property="guideName"/>
+<result column="order_type" jdbcType="TINYINT" property="orderType"/>
+<result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+<result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+<result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+<result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+<result column="sku_sum" jdbcType="INTEGER" property="skuSum"/>
+</resultMap>
+
+    <!-- 总销售金额 -->
+    <select id="getIncomePrice" resultType="java.lang.Integer">
+         SELECT SUM(IFNULL(actual_price,0)) FROM order_info a 
+          WHERE 1=1 AND order_type=2
+            AND order_status NOT IN ('0','4')
+          <if test="arg0!=null and arg0!='' ">
+            AND distributor_id =#{arg0}
+          </if>
+          <if test="arg1!=null and arg1!='' ">
+            AND DATE_FORMAT(create_time,"%Y-%m-%d") &gt;= #{arg1}
+          </if>
+          <if test="arg2!=null and arg2!='' ">
+            AND DATE_FORMAT(create_time,"%Y-%m-%d") &lt;= #{arg2}
+          </if>
+    </select>
+    
+    <!-- 总退次金额 -->
+    <select id="getReturnPrice" resultType="java.lang.Integer">
+         SELECT SUM(IFNULL(return_price,0)) FROM order_after_sale
+          WHERE 1=1 AND order_type=2
+            AND after_sale_status='3'
+          <if test="arg0!=null and arg0!='' ">
+            AND distributor_id =#{arg0}
+          </if>
+          <if test="arg1!=null and arg1!='' ">
+            AND DATE_FORMAT(create_time,"%Y-%m-%d") &gt;= #{arg1}
+          </if>
+          <if test="arg2!=null and arg2!='' ">
+            AND DATE_FORMAT(create_time,"%Y-%m-%d") &lt;= #{arg2}
+          </if>
+    </select>
+    
+    <!-- 总销量 -->
+    <select id="getIncomeCount" resultType="java.lang.Integer">
+         SELECT COUNT(1) FROM order_info a 
+          WHERE 1=1 AND order_type=2
+            AND order_status NOT IN ('0','4')
+          <if test="arg0!=null and arg0!='' ">
+            AND distributor_id =#{arg0}
+          </if>
+          <if test="arg1!=null and arg1!='' ">
+            AND DATE_FORMAT(create_time,"%Y-%m-%d") &gt;= #{arg1}
+          </if>
+          <if test="arg2!=null and arg2!='' ">
+            AND DATE_FORMAT(create_time,"%Y-%m-%d") &lt;= #{arg2}
+          </if>
+    </select>
+    
+    <!-- 总退货量 -->
+    <select id="getReturnCount" resultType="java.lang.Integer">
+         SELECT COUNT(1) FROM order_after_sale
+          WHERE 1=1 AND order_type=2
+            AND after_sale_status='3'
+          <if test="arg0!=null and arg0!='' ">
+            AND distributor_id =#{arg0}
+          </if>
+          <if test="arg1!=null and arg1!='' ">
+            AND DATE_FORMAT(create_time,"%Y-%m-%d") &gt;= #{arg1}
+          </if>
+          <if test="arg2!=null and arg2!='' ">
+            AND DATE_FORMAT(create_time,"%Y-%m-%d") &lt;= #{arg2}
+          </if>
+    </select>
+    
+    <!-- 当月客流量 -->
+    <select id="getPassengerFlow" resultType="java.lang.Integer">
+         SELECT COUNT(DISTINCT member_id) FROM order_info a 
+          WHERE 1=1 AND order_type=2
+          <if test="arg0!=null and arg0!='' ">
+            AND distributor_id =#{arg0}
+          </if>
+          <if test="arg1!=null and arg1!='' ">
+            AND DATE_FORMAT(create_time,"%Y-%m-%d") &gt;= #{arg1}
+          </if>
+          <if test="arg2!=null and arg2!='' ">
+            AND DATE_FORMAT(create_time,"%Y-%m-%d") &lt;= #{arg2}
+          </if>
+    </select>
+    
+    <!-- 昨日订单的当天退货金额 -->
+    <select id="getYesterdayReturnPrice" resultType="java.lang.Integer">
+         SELECT SUM(IFNULL(return_price,0)) FROM order_after_sale
+          WHERE 1=1 AND order_type=2
+            AND after_sale_status='3'
+            AND order_id in (
+            SELECT order_id FROM order_info a 
+             WHERE 1=1 AND order_type=2
+               AND order_status NOT IN ('0','4')
+             <if test="arg0!=null and arg0!='' ">
+            AND distributor_id =#{arg0}
+          </if>
+          <if test="arg1!=null and arg1!='' ">
+            AND DATE_FORMAT(create_time,"%Y-%m-%d") &gt;= #{arg1}
+          </if>
+          <if test="arg2!=null and arg2!='' ">
+            AND DATE_FORMAT(create_time,"%Y-%m-%d") &lt;= #{arg2}
+          </if>
+          )
+    </select>
+    
+    <!-- 昨日订单的当天退货量 -->
+    <select id="getYesterdayReturnCount" resultType="java.lang.Integer">
+         SELECT COUNT(1) FROM order_after_sale
+          WHERE 1=1 AND order_type=2
+            AND after_sale_status='3'
+            AND order_id in (
+            SELECT order_id FROM order_info a 
+             WHERE 1=1 AND order_type=2
+               AND order_status NOT IN ('0','4')
+             <if test="arg0!=null and arg0!='' ">
+            AND distributor_id =#{arg0}
+          </if>
+          <if test="arg1!=null and arg1!='' ">
+            AND DATE_FORMAT(create_time,"%Y-%m-%d") &gt;= #{arg1}
+          </if>
+          <if test="arg2!=null and arg2!='' ">
+            AND DATE_FORMAT(create_time,"%Y-%m-%d") &lt;= #{arg2}
+          </if>
+          )
+    </select>
+    
+</mapper>
+
