@@ -25,6 +25,8 @@ import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
+import com.aiqin.mgs.order.api.domain.response.OrderNoCodeResponse.SelectSaleViewResonse;
+import com.aiqin.mgs.order.api.domain.response.OrderNoCodeResponse.SelectSumByStoreIdResonse;
 import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.OrderDetailService;
 import com.aiqin.mgs.order.api.service.OrderNoCodeService;
@@ -68,21 +70,23 @@ public class OrderNoCodeController {
      */
     @GetMapping("/ncass")
     @ApiOperation(value = "订单概览统计")
-    public HttpResponse ncass(@Valid @RequestParam(name = "distributor_id", required = false) String distributorId){
+    public HttpResponse<SelectSumByStoreIdResonse> ncass(@Valid @RequestParam(name = "distributor_id", required = false) String distributorId){
         LOGGER.info("订单概览统计.");
         return HttpResponse.success(orderNoCodeService.selectSumByStoreId(distributorId));
     }
     
-//    /**
-//     * 订单概览统计
-//     * @param 
-//     * @return
-//     */
-//    @GetMapping("/ncbss")
-//    @ApiOperation(value = "订单概览统计")
-//    public HttpResponse ncbss(@Valid @RequestParam(name = "distributor_id", required = false) String distributorId){
-//        LOGGER.info("订单概览统计.");
-//        return HttpResponse.success(orderNoCodeService.selectSumByStoreId(distributorId));
-//    }
+    /**
+     * 商品类别销售概况
+     * @param 
+     * @return
+     */
+    @GetMapping("/ncbss")
+    @ApiOperation(value = "商品类别销售概况")
+    public HttpResponse<SelectSaleViewResonse> ncbss(@Valid @RequestParam(name = "distributor_id", required = false) String distributorId,
+    		@Valid @RequestParam(name = "begin_date", required = false) String beginDate,
+    		@Valid @RequestParam(name = "end_date", required = false) String endDate){
+        LOGGER.info("商品类别销售概况.");
+        return HttpResponse.success(orderNoCodeService.selectSaleView(distributorId,beginDate,endDate));
+    }
     
 }

@@ -67,6 +67,7 @@ import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
 import com.aiqin.mgs.order.api.domain.response.SelectByMemberPayCountResponse;
 import com.aiqin.mgs.order.api.domain.response.WscSaleResponse;
 import com.aiqin.mgs.order.api.domain.response.WscWorkViewResponse;
+import com.aiqin.mgs.order.api.domain.response.OrderNoCodeResponse.SelectSaleViewResonse;
 import com.aiqin.mgs.order.api.domain.response.OrderNoCodeResponse.SelectSumByStoreIdResonse;
 import com.aiqin.mgs.order.api.domain.response.DistributorMonthResponse;
 import com.aiqin.mgs.order.api.domain.response.LastBuyResponse;
@@ -189,6 +190,139 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 		info.setYesterdayPassengerFlow(yesterdayPassengerFlow);
 		
 		return HttpResponse.success(info);
+	}
+
+	
+	//商品类别销售概况
+	@Override
+	public HttpResponse selectSaleView(@Valid String distributorId, @Valid String beginDate, @Valid String endDate) {
+		
+		//返回参数
+		List<SelectSaleViewResonse> list = new ArrayList();
+		
+		//订单所涉及到的商品类别
+		list = orderNoCodeDao.getTypeId(distributorId,beginDate,endDate);
+		
+		Integer price = null;
+		Integer count = null;
+		Integer passengerFlow = null;
+						
+		//拼接商品类别销售额
+		  //订单的销售额
+		  List<SelectSaleViewResonse> IncomePriceList = new ArrayList();
+		  IncomePriceList = orderNoCodeDao.getIncomePriceGroupByTypeId(distributorId,beginDate,endDate);
+		
+		  //订单的退货金额
+		  List<SelectSaleViewResonse> ReturnPriceList = new ArrayList();
+		  ReturnPriceList = orderNoCodeDao.getReturnPriceGroupByTypeId(distributorId,beginDate,endDate);
+		
+		  if(IncomePriceList != null && IncomePriceList.size() >0) {
+			   if(ReturnPriceList == null || ReturnPriceList.size()<=0) {
+
+			   }else {
+				   for(SelectSaleViewResonse info : ReturnPriceList) {
+					   String typeId = info.getTypeId();
+					   Integer returnPrice = info.getPrice();
+					   for(int i = 0;i<IncomePriceList.size();i++) {
+						   SelectSaleViewResonse saleInfo = new SelectSaleViewResonse();
+						   saleInfo = IncomePriceList.get(i);
+						   if(saleInfo.getTypeId().equals(typeId)) {
+							   //销售额
+							   saleInfo.setPrice(saleInfo.getPrice().intValue()-returnPrice.intValue());
+							   IncomePriceList.set(i, saleInfo);
+						   }
+					   }
+				   }
+			   }
+		   }
+		  
+	    //拼接商品类别销量
+		  //订单销量
+		  List<SelectSaleViewResonse> incomeCountList = new ArrayList();
+		  incomeCountList = orderNoCodeDao.getIncomeCountGroupByTypeId(distributorId,beginDate,endDate);
+		  //订单的退货量
+		  List<SelectSaleViewResonse> returnCountList = new ArrayList();
+		  returnCountList = orderNoCodeDao.getReturnCountGroupByTypeId(distributorId,beginDate,endDate);
+          
+		  if(incomeCountList != null && incomeCountList.size() >0) {
+			   if(returnCountList == null || returnCountList.size()<=0) {
+
+			   }else {
+				   for(SelectSaleViewResonse info : returnCountList) {
+					   String typeId = info.getTypeId();
+					   Integer returnCount = info.getCount();
+					   for(int i = 0;i<incomeCountList.size();i++) {
+						   SelectSaleViewResonse saleInfo = new SelectSaleViewResonse();
+						   saleInfo = incomeCountList.get(i);
+						   if(saleInfo.getTypeId().equals(typeId)) {
+							   //销量
+							   saleInfo.setCount(saleInfo.getCount().intValue()-returnCount.intValue());
+							   incomeCountList.set(i, saleInfo);
+						   }
+					   }
+				   }
+			   }
+		   }
+		  
+
+	     //组装商品类别销售额
+			if(IncomePriceList !=null && IncomePriceList.size()>0){
+			    for(SelectSaleViewResonse priceInfo : IncomePriceList) {
+			    	String typeId = priceInfo.getTypeId();
+			    	for(int i=0;i<list.size();i++) {
+			    		SelectSaleViewResonse info = new SelectSaleViewResonse();
+			    		info = list.get(i);
+			    		if(info.getTypeId().equals(typeId)) {
+			    			info.setPrice(priceInfo.getPrice());
+			    			list.set(i, info);
+			    		}
+			    	}
+		        }	
+			}
+			
+		  //组装商品类别客流量
+			if(incomeCountList !=null && incomeCountList.size()>0){
+			    for(SelectSaleViewResonse priceInfo : incomeCountList) {
+			    	String typeId = priceInfo.getTypeId();
+			    	for(int i=0;i<list.size();i++) {
+			    		SelectSaleViewResonse info = new SelectSaleViewResonse();
+			    		info = list.get(i);
+			    		if(info.getTypeId().equals(typeId)) {
+			    			info.setCount(priceInfo.getCount());
+			    			list.set(i, info);
+			    		}
+			    	}
+		        }	
+			}
+			
+		   //组装商品类别销量
+			if(incomeCountList !=null && incomeCountList.size()>0){
+			    for(SelectSaleViewResonse priceInfo : incomeCountList) {
+			    	String typeId = priceInfo.getTypeId();
+			    	for(int i=0;i<list.size();i++) {
+			    		SelectSaleViewResonse info = new SelectSaleViewResonse();
+			    		info = list.get(i);
+			    		if(info.getTypeId().equals(typeId)) {
+			    			info.setCount(priceInfo.getCount());
+			    			list.set(i, info);
+			    		}
+			    	}
+		        }	
+			}
+			
+			
+			//客流量
+			if(list !=null && list.size()>0) {
+				for(int i=0;i<list.size();i++) {
+					SelectSaleViewResonse info = new SelectSaleViewResonse();
+					info = list.get(i);
+					passengerFlow = orderNoCodeDao.getPassengerFlowGroupByTypeId(distributorId,beginDate,endDate,info.getTypeId());
+					info.setPassengerFlow(passengerFlow);
+					list.set(i, info);
+				}
+			}
+			
+		return HttpResponse.success(list);
 	}
 }
 

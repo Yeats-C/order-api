@@ -19,6 +19,7 @@ import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
 import com.aiqin.mgs.order.api.domain.response.SelectByMemberPayCountResponse;
+import com.aiqin.mgs.order.api.domain.response.OrderNoCodeResponse.SelectSaleViewResonse;
 import com.aiqin.mgs.order.api.domain.response.LastBuyResponse;
 import com.aiqin.mgs.order.api.domain.response.MevBuyResponse;
 import com.aiqin.mgs.order.api.domain.response.OradskuResponse;
@@ -41,5 +42,18 @@ public interface OrderNoCodeDao {
 	Integer getYesterdayReturnPrice(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate);
 	//昨日订单的当天退货量
 	Integer getYesterdayReturnCount(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate);
-
+	
+	//订单所涉及到的商品类别
+    List<SelectSaleViewResonse> getTypeId(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate);
+	//订单的销售额
+	List<SelectSaleViewResonse> getIncomePriceGroupByTypeId(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate);
+	//订单的退货金额
+	List<SelectSaleViewResonse> getReturnPriceGroupByTypeId(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate);
+	//订单销量
+	List<SelectSaleViewResonse> getIncomeCountGroupByTypeId(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate);
+	//订单的退货量
+	List<SelectSaleViewResonse> getReturnCountGroupByTypeId(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate);
+	//客流量
+	Integer getPassengerFlowGroupByTypeId(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate,@Param("typeId")String typeId);
+	
 }

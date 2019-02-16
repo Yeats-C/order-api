@@ -37,5 +37,7 @@ public interface OrderNoCodeService {
 	//订单概览统计
 	HttpResponse selectSumByStoreId(@Valid String distributorId);
 
-	
+	//服务销售概况
+	HttpResponse selectSaleView(@Valid String distributorId, @Valid String beginDate, @Valid String endDate);
+
 	}
