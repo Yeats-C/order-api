@@ -97,7 +97,7 @@ public class OrderReqVo {
     private String provinceName;
 
     @ApiModelProperty(value = "市编码")
-    @JsonProperty("cityCode")
+    @JsonProperty("city_code")
     private String cityCode;
 
     @ApiModelProperty(value = "市名称")
