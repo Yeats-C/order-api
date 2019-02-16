@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.OrderListProduct;
 import com.aiqin.mgs.order.api.domain.request.orderList.SupplyOrderProductItemReqVO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -29,4 +30,6 @@ public interface OrderListProductDao {
     Boolean insertList(List<OrderListProduct> orderListProductList);
 
     List<SupplyOrderProductItemReqVO> searchOrderListProductByCodeOrOriginal(String code);
+
+    List<OrderListProduct> searchOrderListProductByCodeList(@Param("orderCode") List<String> orderCode);
 }

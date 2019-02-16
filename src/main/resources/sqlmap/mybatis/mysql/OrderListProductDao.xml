@@ -108,6 +108,20 @@ preferential_allocation activityApportionment,activity_code activityCode, pictur
       where order_code in (select order_code from order_list where   order_code=#{code} or original=#{code})
 
     </select>
+    <select id="searchOrderListProductByCodeList" resultType="com.aiqin.mgs.order.api.domain.OrderListProduct">
+              select
+       id, order_product_id orderProductId, order_code orderCode, sku_code skuCode, sku_name skuName, product_number productNumber, activity_code activityCode,
+    activity_name activityName, gift, original_product_id originalProductId, specifications, unit, color_code colorCode, color_name colorName,
+    model_number modelNumber, actual_deliver_num actualDeliverNum, product_price productPrice, original_product_price originalProductPrice,
+    discount_money discountMoney,  amount, picture_url pictureUrl,  preferential_allocation preferentialAllocation,
+    return_num returnNum, supply_company_code supplyCompanyCode, supply_company_name supplyCompanyName, use_discount_amount useDiscountAmount,discount_amount_info discountAmountInfo
+      from order_list_product
+      where order_code in
+        <foreach close=")" collection="orderCode" item="code" open="(" separator=",">
+            #{code}
+        </foreach>
+
+    </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from order_list_product
     where id = #{id,jdbcType=BIGINT}
