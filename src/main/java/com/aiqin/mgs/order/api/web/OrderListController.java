@@ -137,6 +137,16 @@ public class OrderListController {
     }
 
     /**
+     * 获取通过父订单code获取所有子订单信息
+     */
+
+    @GetMapping("/get/orderbycode/father")
+    @ApiOperation(value = "获取通过父订单code获取所有子订单信息")
+    public HttpResponse<List<OrderListDetailsVo>> getOrderByCodeFather(@ApiParam("父订单code") @RequestParam("code") String code) {
+        return HttpResponse.success(orderListService.getOrderByCodeFather(code));
+    }
+
+    /**
      * 添加物流信息
      */
     @PostMapping("add/logistics")

@@ -38,4 +38,6 @@ public interface OrderListService {
     PageResData<OrderListFather> searchOrderListFather(OrderListVo param);
 
     Boolean updateOrderRefund(String code);
+
+    List<OrderListDetailsVo> getOrderByCodeFather(String code);
 }

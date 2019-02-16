@@ -24,7 +24,7 @@ public class OrderList extends PagesRequest {
 
     @ApiModelProperty(value = "订单状态")
     @JsonProperty("order_status")
-    private String orderStatus;
+    private Integer orderStatus = 1;
 
     @ApiModelProperty(value = "订单状态显示")
     @JsonProperty("order_status_show")
@@ -68,7 +68,7 @@ public class OrderList extends PagesRequest {
     private Long totalOrders;
 
     @ApiModelProperty(value = "实付金额")
-    @JsonProperty("actual_amountPaid")
+    @JsonProperty("actual_amount_paid")
     private Long actualAmountPaid;
 
     @ApiModelProperty(value = "活动金额")
@@ -142,7 +142,7 @@ public class OrderList extends PagesRequest {
     private String provinceName;
 
     @ApiModelProperty(value = "市编码")
-    @JsonProperty("cityCode")
+    @JsonProperty("city_code")
     private String cityCode;
 
     @ApiModelProperty(value = "市名称")
@@ -172,7 +172,6 @@ public class OrderList extends PagesRequest {
     @ApiModelProperty(value = "订单商品数量")
     @JsonProperty("product_num")
     private Integer productNum;
-
 
 
     @ApiModelProperty(value = "供应商编码")

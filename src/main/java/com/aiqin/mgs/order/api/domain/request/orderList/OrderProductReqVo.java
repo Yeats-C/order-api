@@ -29,7 +29,7 @@ public class OrderProductReqVo implements Serializable {
 
     @ApiModelProperty(value = "商品数量")
     @JsonProperty("product_number")
-    private Integer productNumber;
+    private Integer productNumber = 0;
 
     @ApiModelProperty(value = "参与活动编号")
     @JsonProperty("activity_code")
@@ -41,7 +41,7 @@ public class OrderProductReqVo implements Serializable {
 
     @ApiModelProperty(value = "是否赠品(0:不是赠品 1:是赠品)")
     @JsonProperty("gift")
-    private Integer gift;
+    private Integer gift = 0;
 
     @ApiModelProperty(value = "赠送赠品商品SKU")
     @JsonProperty("original_product_sku")
@@ -69,23 +69,23 @@ public class OrderProductReqVo implements Serializable {
 
     @ApiModelProperty(value = "商品价格（单品合计成交价)")
     @JsonProperty("product_price")
-    private Long productPrice;
+    private Long productPrice = 0L;
 
     @ApiModelProperty(value = "商品单价")
     @JsonProperty("original_product_price")
-    private Long originalProductPrice;
+    private Long originalProductPrice = 0L;
 
     @ApiModelProperty(value = "优惠额度抵扣金额（单品合计）")
     @JsonProperty("discount_money")
-    private Long discountMoney;
+    private Long discountMoney = 0L;
 
     @ApiModelProperty(value = "总价")
     @JsonProperty("amount")
-    private Integer amount;
+    private Long amount = 0L;
 
     @ApiModelProperty(value = "优惠分摊")
     @JsonProperty("preferential_allocation")
-    private Integer preferentialAllocation;
+    private Long preferentialAllocation = 0L;
 
     @ApiModelProperty(value = "图片地址")
     @JsonProperty("picture_url")
@@ -99,13 +99,13 @@ public class OrderProductReqVo implements Serializable {
     @JsonProperty("supply_company_name")
     private String supplyCompanyName;
 
-    @ApiModelProperty(value = "是否使用优惠额度")
+    @ApiModelProperty(value = "是否使用优惠额度,1-使用了优惠额度，0-没使用")
     @JsonProperty("use_discount_amount")
-    private String useDiscountAmount;
+    private Integer useDiscountAmount = 0;
 
     @ApiModelProperty(value = "商品单位重量")
     @JsonProperty("weight")
-    private Integer weight;
+    private Integer weight = 0;
 
     @ApiModelProperty(value = "优惠额度信息")
     @JsonProperty("discount_amount_info")

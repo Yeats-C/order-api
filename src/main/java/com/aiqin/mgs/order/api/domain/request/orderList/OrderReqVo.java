@@ -42,27 +42,27 @@ public class OrderReqVo {
 
     @ApiModelProperty(value = "订单总额")
     @JsonProperty("total_orders")
-    private Long totalOrders;
+    private Long totalOrders = 0L;
 
     @ApiModelProperty(value = "实付金额")
-    @JsonProperty("actual_amountPaid")
-    private Long actualAmountPaid;
+    @JsonProperty("actual_amount_paid")
+    private Long actualAmountPaid = 0L;
 
     @ApiModelProperty(value = "活动金额")
     @JsonProperty("activity_amount")
-    private Long activityAmount;
+    private Long activityAmount = 0L;
 
     @ApiModelProperty(value = "优惠额度")
     @JsonProperty("preferential_quota")
-    private Long preferentialQuota;
+    private Long preferentialQuota = 0L;
 
     @ApiModelProperty(value = "物流减免比例")
     @JsonProperty("logistics_remission_ratio")
-    private Integer logisticsRemissionRatio;
+    private Integer logisticsRemissionRatio = 0;
 
     @ApiModelProperty(value = "物流减免类型(0:送货上门,1:送货市级市,2:无减免)")
     @JsonProperty("logistics_remission_type")
-    private Integer logisticsRemissionType;
+    private Integer logisticsRemissionType = 2;
 
     @ApiModelProperty(value = "下单人编码")
     @JsonProperty("place_order_code")
@@ -97,7 +97,7 @@ public class OrderReqVo {
     private String provinceName;
 
     @ApiModelProperty(value = "市编码")
-    @JsonProperty("cityCode")
+    @JsonProperty("city_code")
     private String cityCode;
 
     @ApiModelProperty(value = "市名称")
@@ -118,7 +118,7 @@ public class OrderReqVo {
 
     @ApiModelProperty(value = "订单商品数量")
     @JsonProperty("product_num")
-    private Integer productNum;
+    private Integer productNum = 0;
 
 //    @ApiModelProperty(value = "重量")
 //    @JsonProperty("weight")
@@ -143,15 +143,15 @@ public class OrderReqVo {
 
     @ApiModelProperty(value = "是否包含赠品(0是1否)")
     @JsonProperty("application_gifts")
-    private Integer applicationGifts;
+    private Integer applicationGifts = 1;
 
     @ApiModelProperty(value = "是否使用优惠券(0是1否)")
     @JsonProperty("apply_coupons")
-    private Integer applyCoupons;
+    private Integer applyCoupons = 1;
 
     @ApiModelProperty(value = "发票抬头类型 0不开、1开")
     @JsonProperty("invoice_type")
-    private Integer invoiceType;
+    private Integer invoiceType = 0;
 
     @ApiModelProperty(value = "订单商品")
     private List<OrderProductReqVo> products;
