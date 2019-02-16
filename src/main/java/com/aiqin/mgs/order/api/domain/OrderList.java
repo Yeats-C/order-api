@@ -68,7 +68,7 @@ public class OrderList extends PagesRequest {
     private Long totalOrders;
 
     @ApiModelProperty(value = "实付金额")
-    @JsonProperty("actual_amountPaid")
+    @JsonProperty("actual_amount_paid")
     private Long actualAmountPaid;
 
     @ApiModelProperty(value = "活动金额")

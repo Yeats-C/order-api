@@ -192,8 +192,6 @@ public class OrderListServiceImpl implements OrderListService {
         for (OrderListDetailsVo vo : list) {
             vo.setReceptionStatus( OrderStatusEnum.getOrderStatusEnum(vo.getOrderStatus()).getReceptionStatus());
             vo.setBackstageStatus( OrderStatusEnum.getOrderStatusEnum(vo.getOrderStatus()).getBackstageStatus());
-//            List<OrderListLogistics> list1 = orderListLogisticsDao.searchOrderListLogisticsByCode(vo.getOrderCode());
-//            vo.setOrderListLogisticsList(list1);
             List<OrderListProduct> list2 = orderListProductDao.searchOrderListProductByCode(vo.getOrderCode());
             vo.setOrderListProductList(list2);
         }
