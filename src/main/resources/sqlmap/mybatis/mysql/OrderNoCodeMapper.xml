@@ -36,10 +36,9 @@
 
 <resultMap id="SaleViewMapping" type="com.aiqin.mgs.order.api.domain.response.OrderNoCodeResponse.SelectSaleViewResonse">
 <result column="type_id" jdbcType="VARCHAR" property="typeId"/>
+<result column="type_name" jdbcType="VARCHAR" property="typeName"/>
 <result column="product_code" jdbcType="VARCHAR" property="productCode"/>
 <result column="product_name" jdbcType="VARCHAR" property="productName"/>
-<result column="type_id" jdbcType="VARCHAR" property="typeId"/>
-<result column="type_name" jdbcType="VARCHAR" property="typeName"/>
 <result column="price" jdbcType="INTEGER" property="price"/>
 <result column="count" jdbcType="INTEGER" property="count"/>
 <result column="passenger_flow" jdbcType="INTEGER" property="passengerFlow"/>
@@ -169,7 +168,7 @@
     
     <!-- 订单所涉及到的商品类别 -->
     <select id="getTypeId" resultMap="SaleViewMapping" resultType="java.util.List">
-         SELECT distinct b.type_id FROM order_info a,order_detail b 
+         SELECT distinct b.type_id,b.type_name FROM order_info a,order_detail b 
           WHERE 1=1 AND order_type=2
             AND a.order_id = b.order_id
             AND a.order_status NOT IN ('0','4')
