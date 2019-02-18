@@ -38,10 +38,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -243,6 +240,7 @@ public class OrderListServiceImpl implements OrderListService {
     @Transactional
     @Override
     public OrderSaveRespVo save(OrderReqVo reqVo) {
+        Date now = new Date();
         String orderCode = sequenceService.generateOrderCode(reqVo.getCompanyCode(), reqVo.getOrderType());
         List<StockLockSkuReqVo> skuReqVos = reqVo.getProducts().stream().map(product -> {
             StockLockSkuReqVo skuReqVo = new StockLockSkuReqVo();
@@ -348,6 +346,7 @@ public class OrderListServiceImpl implements OrderListService {
             }
             order.setId(IdUtil.uuid());
             order.setOriginal(orderCode);
+            order.setPlaceOrderTime(now);
             orderListProducts.addAll(products);
             orders.add(order);
         });
