@@ -32,7 +32,15 @@ public class OrderListDetailsVo {
 
     @ApiModelProperty(value = "订单状态")
     @JsonProperty("order_status")
-    private String orderStatus;
+    private Integer orderStatus;
+
+    @ApiModelProperty(value = "前台订单状态")
+    @JsonProperty("reception_status")
+    private String receptionStatus;
+
+    @ApiModelProperty(value = "后台订单状态")
+    @JsonProperty("backstage_status")
+    private String backstageStatus;
 
     @ApiModelProperty(value = "支付状态(0:未支付 1:已支付 2:已退款)")
     @JsonProperty("payment_status")
@@ -72,7 +80,7 @@ public class OrderListDetailsVo {
     private Long totalOrders;
 
     @ApiModelProperty(value = "实付金额")
-    @JsonProperty("actual_amountPaid")
+    @JsonProperty("actual_amount_paid")
     private Long actualAmountPaid;
 
     @ApiModelProperty(value = "活动金额")
@@ -146,7 +154,7 @@ public class OrderListDetailsVo {
     private String provinceName;
 
     @ApiModelProperty(value = "市编码")
-    @JsonProperty("cityCode")
+    @JsonProperty("city_code")
     private String cityCode;
 
     @ApiModelProperty(value = "市名称")

@@ -184,10 +184,23 @@ public class OrderListServiceImpl implements OrderListService {
     }
 
     @Override
+    public List<OrderListDetailsVo> getOrderByCodeFather(String code) {
+        List<OrderListDetailsVo> list = orderListDao.searchOrderByCodeFather(code);
+        for (OrderListDetailsVo vo : list) {
+            vo.setReceptionStatus( OrderStatusEnum.getOrderStatusEnum(vo.getOrderStatus()).getReceptionStatus());
+            vo.setBackstageStatus( OrderStatusEnum.getOrderStatusEnum(vo.getOrderStatus()).getBackstageStatus());
+            List<OrderListProduct> list2 = orderListProductDao.searchOrderListProductByCode(vo.getOrderCode());
+            vo.setOrderListProductList(list2);
+        }
+        return list;
+    }
+
+    @Override
     public OrderListDetailsVo getOrderByCode(String code) {
 
         OrderListDetailsVo vo = orderListDao.searchOrderByCode(code);
-
+        vo.setReceptionStatus( OrderStatusEnum.getOrderStatusEnum(vo.getOrderStatus()).getReceptionStatus());
+        vo.setBackstageStatus( OrderStatusEnum.getOrderStatusEnum(vo.getOrderStatus()).getBackstageStatus());
         List<OrderListLogistics> list1 = orderListLogisticsDao.searchOrderListLogisticsByCode(code);
         vo.setOrderListLogisticsList(list1);
         List<OrderListProduct> list2 = orderListProductDao.searchOrderListProductByCode(code);
@@ -209,8 +222,7 @@ public class OrderListServiceImpl implements OrderListService {
             for (OrderListProduct orderListProduct : orderListProductList) {
                 ParamUnit.isNotNull(orderListProduct, "skuCode", "skuName", "productNumber", "gift");
             }
-//           String orderCode= sequenceService.generateOrderCode(param.getCompanyCode(), param.getOrderType());
-//            param.setOrderCode(orderCode);
+
             String orderCode = param.getOrderCode();
             String orderId = IdUtil.uuid();
             param.setId(orderId);

@@ -45,7 +45,7 @@ public class OrderReqVo {
     private Long totalOrders = 0L;
 
     @ApiModelProperty(value = "实付金额")
-    @JsonProperty("actual_amountPaid")
+    @JsonProperty("actual_amount_paid")
     private Long actualAmountPaid = 0L;
 
     @ApiModelProperty(value = "活动金额")
@@ -97,7 +97,7 @@ public class OrderReqVo {
     private String provinceName;
 
     @ApiModelProperty(value = "市编码")
-    @JsonProperty("cityCode")
+    @JsonProperty("city_code")
     private String cityCode;
 
     @ApiModelProperty(value = "市名称")

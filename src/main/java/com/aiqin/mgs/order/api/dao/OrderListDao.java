@@ -58,4 +58,6 @@ public interface OrderListDao {
     Boolean updateStatusByCode(@Param("code") String code, @Param("status") Integer status);
 
     Boolean updateOrderPaymentStatus(@Param("code") String code,@Param("paymentStatus") Integer paymentStatus);
+
+    List<OrderListDetailsVo> searchOrderByCodeFather(String code);
 }
