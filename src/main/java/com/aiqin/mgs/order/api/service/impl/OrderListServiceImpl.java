@@ -102,8 +102,8 @@ public class OrderListServiceImpl implements OrderListService {
     @Override
     public Boolean addLogistics(OrderListLogistics param) {
         ParamUnit.isNotNull(param, "orderCode", "invoiceCode", "logisticsCentreCode", "logisticsCentreName", "implementBy", "implementTime", "implementContent");
-
-        return orderListLogisticsDao.insertLogistics(param);
+        Boolean re= orderListLogisticsDao.insertLogistics(param);
+        return re;
     }
 
     @Override
