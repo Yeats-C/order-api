@@ -90,6 +90,7 @@ public class SettlementServiceImpl implements SettlementService{
 
     //添加新的结算数据
 	@Override
+	@Transactional
 	public void addSettlement(@Valid SettlementInfo settlementInfo, @Valid String orderId) throws Exception {
 
 		if(settlementInfo !=null) {
@@ -105,6 +106,7 @@ public class SettlementServiceImpl implements SettlementService{
 	
     //添加新的支付数据
 	@Override
+	@Transactional
 	public void addOrderPayList(@Valid List<OrderPayInfo> orderPayList, @Valid String orderId) throws Exception {
 		
 		if(orderPayList !=null && orderPayList.size()>0) {
@@ -139,6 +141,7 @@ public class SettlementServiceImpl implements SettlementService{
 
 	//已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)
 	@Override
+	@Transactional
 	public void deleteOrderPayList(@Valid String orderId) throws Exception {
 		
 	   orderPayDao.deleteOrderPayList(orderId);
