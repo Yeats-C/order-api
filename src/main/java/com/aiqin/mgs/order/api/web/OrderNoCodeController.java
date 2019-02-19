@@ -14,6 +14,7 @@ import com.aiqin.mgs.order.api.domain.OrderDetailInfo;
 import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
 import com.aiqin.mgs.order.api.domain.OrderInfo;
 import com.aiqin.mgs.order.api.domain.OrderLog;
+import com.aiqin.mgs.order.api.domain.OrderNoCodeInfo;
 import com.aiqin.mgs.order.api.domain.OrderPayInfo;
 import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.OrderRelationCouponInfo;
@@ -23,6 +24,7 @@ import com.aiqin.mgs.order.api.domain.request.DetailCouponRequest;
 import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
 import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
+import com.aiqin.mgs.order.api.domain.request.OrderNoCodeRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderNoCodeResponse.SelectSaleViewResonse;
@@ -87,6 +89,33 @@ public class OrderNoCodeController {
     		@Valid @RequestParam(name = "end_date", required = false) String endDate){
         LOGGER.info("商品类别销售概况.");
         return HttpResponse.success(orderNoCodeService.selectSaleView(distributorId,beginDate,endDate));
+    }
+    
+    /**
+     * 订单列表
+     * @param 
+     * @return
+     */
+    @PostMapping("/nccss")
+    @ApiOperation(value = "订单列表")
+    public HttpResponse<List<OrderNoCodeInfo>> ncbss(@Valid @RequestBody OrderNoCodeRequest orderNoCodeBuyRequest){
+        LOGGER.info("订单列表.");
+        return HttpResponse.success(orderNoCodeService.selectNoCodeList(orderNoCodeBuyRequest));
+    }
+    
+    
+    /**
+     * 编号查询订单
+     * @param 
+     * @return
+     */
+    @GetMapping("/ncdss")
+    @ApiOperation(value = "编号查询订单.")
+    public HttpResponse<OrderInfo> selde(@Valid @RequestParam(name = "order_code", required = true) String orderCode) {
+        
+    	
+    	LOGGER.info("编号查询订单.");    	
+        return orderNoCodeService.selectorderByCode(orderCode);
     }
     
 }
