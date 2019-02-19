@@ -100,16 +100,46 @@
     <!-- 插入订单表 -->
     <insert id="addOrderInfo" >
         insert into order_info
-        (order_id,order_code,member_id,member_name,member_phone,distributor_id,distributor_code,distributor_name,origin_type,receive_type,order_status,return_status,pay_status,pay_type,actual_price,total_price,custom_note,business_note,cashier_id,cashier_name,guide_id,guide_name,order_type,create_time,update_time,create_by,update_by,receive_code,receive_time)
+        (order_id,order_code,member_id,member_name,member_phone,distributor_id,distributor_code,distributor_name,origin_type,receive_type,order_status,
+        <if test="returnStatus!=null">
+        return_status,
+        </if>
+        pay_status,pay_type,
+        <if test="actualPrice!=null">
+        actual_price,
+        </if>
+        <if test="totalPrice!=null">
+        total_price,
+        </if>
+        custom_note,business_note,cashier_id,cashier_name,guide_id,guide_name,order_type,create_time,update_time,create_by,update_by,receive_code,receive_time)
         values
-        (#{orderId},#{orderCode},#{memberId},#{memberName},#{memberPhone},#{distributorId},#{distributorCode},#{distributorName},#{originType},#{receiveType},#{orderStatus},#{returnStatus},#{payStatus},#{payType},#{actualPrice},#{totalPrice},#{customNote},#{businessNote},#{cashierId},#{cashierName},#{guideId},#{orderType},#{guideName},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},#{receiveCode},CURRENT_TIMESTAMP)
+        (#{orderId},#{orderCode},#{memberId},#{memberName},#{memberPhone},#{distributorId},#{distributorCode},#{distributorName},#{originType},#{receiveType},#{orderStatus},
+        <if test="returnStatus!=null">
+        #{returnStatus},
+        </if>
+        #{payStatus},#{payType},
+        <if test="actualPrice!=null">
+        #{actualPrice},
+        </if>
+        <if test="totalPrice!=null">
+        #{totalPrice},
+        </if>
+        #{customNote},#{businessNote},#{cashierId},#{cashierName},#{guideId},#{guideName},#{orderType},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},#{receiveCode},CURRENT_TIMESTAMP)
     </insert>
     
     <!-- 订单查询byorderid -->
     <select id="selecOrderById"  resultMap="OrderInfoMapping">
     
          SELECT * FROM order_info
-         where 1=1 and order_type = 1
+         where 1=1 
+         <choose>
+            <when test="orderType != null ">
+                   and order_type =#{orderType}
+            </when>
+            <otherwise>
+                   and order_type = 1
+            </otherwise>
+         </choose>
          <if test="orderId!=null and orderId!=''">
 		 and order_id = #{orderId}
 		 </if>

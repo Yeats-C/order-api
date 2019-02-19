@@ -159,7 +159,7 @@ public static String randomNumberE() {
  static SimpleDateFormat sdf4 = new SimpleDateFormat("yyyy-MM"); 
 	
     /**
-	 * 获取当前系统日期 yyMMddHHmmss
+	 * 获取当前系统时间戳 yyMMddHHmmss
 	 */
 
 	public static String currentDate() {
@@ -181,7 +181,7 @@ public static String randomNumberE() {
 	
 	
 	/**
-	 * 获取当前系统日期 yyyy-MM
+	 * 获取当前月份 yyyy-MM
 	 */
 	public static String sysDateyyyyMM() {
     	SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM");
@@ -229,20 +229,18 @@ public static String randomNumberE() {
 	}
 	
 	/**
-	 * 获取多少天后的日期
+	 * 获取月初日期
 	 */
-	public static Date afterThirdMonth(int i) {
-		Date date = getCurrentDate();
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(date);
-		cal.add(Calendar.DAY_OF_MONTH, i);
-		date = cal.getTime();
-		String stringDate = sdf3.format(date);
-		return formatDate(stringDate);
+	public static String getMonth(int i) {
+		Calendar cale = Calendar.getInstance();
+		cale.add(Calendar.MONTH, i); //0:当月  1:下月
+		cale.set(Calendar.DAY_OF_MONTH, 1);  //第几天
+		String firstday = sdf1.format(cale.getTime());
+		return firstday;
 	}
 	
 	/**
-	 * 获取多少月后的日期
+	 * 获取多少月后的日期  YYYY-MM
 	 */
 	public static String afterMonth(int i) {
 		Date date = getCurrentDate();
@@ -255,7 +253,7 @@ public static String randomNumberE() {
 	}
 	
 	/*****
-	 * 得到多少天之后的数
+	 * 得到多少天之后的数 yyyy-MM-dd
 	 * @param i
 	 * @return
 	 */
@@ -268,6 +266,19 @@ public static String randomNumberE() {
 	    String str = sdf1.format(calendar.getTime());
 	    return str;
 	}
+		
+	/**
+	 * 得到多少天之后的数 yyyy-MM-dd HH:mm:ss
+	 */
+	public static Date afterThirdMonth(int i) {
+		Date date = getCurrentDate();
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.add(Calendar.DAY_OF_MONTH, i);
+		date = cal.getTime();
+		String stringDate = sdf3.format(date);
+		return formatDate(stringDate);
+		}
 	
 	
     //生成32位编码
@@ -533,10 +544,8 @@ public static String randomNumberE() {
  
 
 	public static void main(String[] args) {
-
-		OrderPublic orderPublic = new OrderPublic();
-		String method = Thread.currentThread().getStackTrace()[1].getMethodName();
-		System.out.println(method);
+		System.out.println(NextDate(0));
+	 
 	}
 	
 }

@@ -581,8 +581,9 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			Integer skuSum =0;
 			skuSum = getSkuSum(orderId);
 			orderInfo.setSkuSum(skuSum);
-			info.setOrderInfo(orderInfo);
-			
+			if(orderInfo !=null) {
+				info.setOrderInfo(orderInfo);
+			}
 		} catch (Exception e) {
 			LOGGER.error("查询BYorderid-返回订单主数据",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
