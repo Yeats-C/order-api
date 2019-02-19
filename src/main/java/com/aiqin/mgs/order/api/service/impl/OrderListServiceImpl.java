@@ -99,8 +99,8 @@ public class OrderListServiceImpl implements OrderListService {
     @Override
     public Boolean addLogistics(OrderListLogistics param) {
         ParamUnit.isNotNull(param, "orderCode", "invoiceCode", "logisticsCentreCode", "logisticsCentreName", "implementBy", "implementTime", "implementContent");
-
-        return orderListLogisticsDao.insertLogistics(param);
+        Boolean re= orderListLogisticsDao.insertLogistics(param);
+        return re;
     }
 
     @Override
@@ -120,7 +120,6 @@ public class OrderListServiceImpl implements OrderListService {
 
 
         //将订单状态改完支付,将订单发送给供应链
-        //todo  判断状态 待更新
         if (status == 2) {
             br = orderListDao.updateByCode(code, status, 1);
             if (br == true) {
@@ -186,11 +185,25 @@ public class OrderListServiceImpl implements OrderListService {
     @Override
     public List<OrderListDetailsVo> getOrderByCodeFather(String code) {
         List<OrderListDetailsVo> list = orderListDao.searchOrderByCodeFather(code);
+        List<String> orderCode=new ArrayList<>();
         for (OrderListDetailsVo vo : list) {
-            vo.setReceptionStatus( OrderStatusEnum.getOrderStatusEnum(vo.getOrderStatus()).getReceptionStatus());
-            vo.setBackstageStatus( OrderStatusEnum.getOrderStatusEnum(vo.getOrderStatus()).getBackstageStatus());
-            List<OrderListProduct> list2 = orderListProductDao.searchOrderListProductByCode(vo.getOrderCode());
-            vo.setOrderListProductList(list2);
+            OrderStatusEnum statusEnum =OrderStatusEnum.getOrderStatusEnum(vo.getOrderStatus());
+            vo.setReceptionStatus( statusEnum.getReceptionStatus());
+            vo.setBackstageStatus( statusEnum.getBackstageStatus());
+            orderCode.add(vo.getOrderCode());
+        }
+        if (orderCode.size()>0) {
+            List<OrderListProduct> orderListProducts = orderListProductDao.searchOrderListProductByCodeList(orderCode);
+            for (OrderListDetailsVo vo : list) {
+                for (OrderListProduct orderListProduct : orderListProducts) {
+                    if (vo.getOrderCode().equals(orderListProduct.getOrderCode())){
+                        if (vo.getOrderListProductList()==null){
+                            vo.setOrderListProductList(new ArrayList<>());
+                        }
+                        vo.getOrderListProductList().add(orderListProduct);
+                    }
+                }
+            }
         }
         return list;
     }
