@@ -24,8 +24,11 @@ public interface OrderAfterService {
 	//模糊查询售后维权列表 /条件查询退货信息
 	HttpResponse selectOrderAfter(@Valid OrderAfterSaleQuery orderAfterSaleQuery);
 
-	//添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表....
+	//TOC-添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表....
 	HttpResponse addAfterOrder(@Valid OrderAfterSaleInfo orderAfterSaleInfo);
+	
+	//服务商品-添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表....
+	HttpResponse addAfterNoCodeOrder(@Valid OrderAfterSaleInfo orderAfterSaleInfo);
 
 	//查询BYorderid-返回订单订单主数据、退货数据、退货明细数据、订单明细数据、优惠券数据
 	HttpResponse selectDetail(@Valid String afterSaleId);
