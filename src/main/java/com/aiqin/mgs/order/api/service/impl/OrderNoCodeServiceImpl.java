@@ -91,8 +91,10 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 	
 	@Resource
     private OrderNoCodeDao orderNoCodeDao;
-
-
+	
+	@Resource
+    private OrderDao orderDao;
+	
 	//订单概览统计
 	@Override
 	public HttpResponse selectSumByStoreId(@Valid String distributorId) {
@@ -321,6 +323,28 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 					list.set(i, info);
 				}
 			}
+			
+			
+			//有码商品的销售金额
+			Integer codeOrderPrice = null;  
+			try {
+				codeOrderPrice = orderDao.selectDistributorMonth(distributorId,beginDate,endDate);
+				
+				if(codeOrderPrice !=null && codeOrderPrice != 0) {
+					SelectSaleViewResonse info = new SelectSaleViewResonse();
+					info.setTypeId("000000");
+					info.setTypeName("有码商品");
+					info.setPrice(codeOrderPrice);
+					info.setCount(0);
+					info.setPassengerFlow(0);
+					list.add(info);
+				}
+			} catch (Exception e) {
+				LOGGER.info("有码商品的销售金额查询异常");
+				return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+			}
+			
+			
 			
 		return HttpResponse.success(list);
 	}

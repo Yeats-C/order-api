@@ -89,9 +89,37 @@
     <!-- 插入订单明细表 -->
     <insert id="addDetailList" >
         insert into order_detail
-        (order_id,order_detail_id,product_id,product_code,product_name,list_name,sku_code,spu_code,bar_code,spec,unit,retail_price,actual_price,amount,product_status,logo,type_id,type_name,gift_status,return_status,return_amount,activity_id,activity_name,coupon_discount,create_time,update_time,create_by,update_by)
+        (order_id,order_detail_id,product_id,product_code,product_name,list_name,sku_code,spu_code,bar_code,spec,unit,retail_price,actual_price,amount,product_status,logo,type_id,type_name,
+        <if test="giftStatus!=null">
+        gift_status,
+        </if>
+        <if test="returnStatus!=null">
+        return_status,
+        </if>
+        <if test="returnAmount!=null">
+        return_amount,
+        </if>
+        activity_id,activity_name,
+        <if test="couponDiscount!=null">
+        coupon_discount,
+        </if>
+        create_time,update_time,create_by,update_by)
         values
-        (#{orderId},#{orderDetailId},#{productId},#{productCode},#{productName},#{listName},#{skuCode},#{spuCode},#{barCode},#{spec},#{unit},#{retailPrice},#{actualPrice},#{amount},#{productStatus},#{logo},#{typeId},#{typeName},#{giftStatus},#{returnStatus},#{returnAmount},#{activityId},#{activityName},#{couponDiscount},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy})
+        (#{orderId},#{orderDetailId},#{productId},#{productCode},#{productName},#{listName},#{skuCode},#{spuCode},#{barCode},#{spec},#{unit},#{retailPrice},#{actualPrice},#{amount},#{productStatus},#{logo},#{typeId},#{typeName},
+        <if test="giftStatus!=null">
+        #{giftStatus},
+        </if>
+        <if test="returnStatus!=null">
+        #{returnStatus},
+        </if>
+        <if test="returnAmount!=null">
+        #{returnAmount},
+        </if>
+        #{activityId},#{activityName},
+        <if test="couponDiscount!=null">
+        #{couponDiscount},
+        </if>
+        CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy})
     </insert>
     
     <!-- 修改订单明细退货数据-->

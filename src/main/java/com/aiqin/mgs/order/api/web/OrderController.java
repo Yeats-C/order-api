@@ -74,6 +74,7 @@ public class OrderController {
         	OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
           if(orderInfo !=null) {
         	  orderInfo.setOrderType(Global.ORDER_TYPE_1);
+        	  orderAndSoOnRequest.setOrderInfo(orderInfo);
         	  return orderService.addOrdta(orderAndSoOnRequest);
           }else {
         	  return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
@@ -99,6 +100,7 @@ public class OrderController {
         	OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
           if(orderInfo !=null) {
         	  orderInfo.setOrderType(Global.ORDER_TYPE_1);
+        	  orderAndSoOnRequest.setOrderInfo(orderInfo);
         	  return orderService.addPamo(orderAndSoOnRequest);
           }else {
         	  return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
@@ -139,6 +141,7 @@ public class OrderController {
         	OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
           if(orderInfo !=null) {
         	  orderInfo.setOrderType(Global.ORDER_TYPE_3);
+        	  orderAndSoOnRequest.setOrderInfo(orderInfo);
         	  return orderService.addOrdta(orderAndSoOnRequest);
           }else {
         	  return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
@@ -164,6 +167,7 @@ public class OrderController {
         	OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
           if(orderInfo !=null) {
         	  orderInfo.setOrderType(Global.ORDER_TYPE_3);
+        	  orderAndSoOnRequest.setOrderInfo(orderInfo);
         	  return orderService.addPamo(orderAndSoOnRequest);
           }else {
         	  return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
