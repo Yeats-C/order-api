@@ -29,6 +29,7 @@ import com.aiqin.mgs.order.api.domain.request.DetailCouponRequest;
 import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
 import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
+import com.aiqin.mgs.order.api.domain.request.OrderNoCodeRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 
 @SuppressWarnings("all")
@@ -39,5 +40,11 @@ public interface OrderNoCodeService {
 
 	//服务销售概况
 	HttpResponse selectSaleView(@Valid String distributorId, @Valid String beginDate, @Valid String endDate);
+
+	//订单列表
+	HttpResponse<List<OrderInfo>> selectNoCodeList(@Valid OrderNoCodeRequest orderNoCodeBuyRequest);
+
+	//编号查询订单.
+	HttpResponse selectorderByCode(@Valid String orderCode);
 
 	}

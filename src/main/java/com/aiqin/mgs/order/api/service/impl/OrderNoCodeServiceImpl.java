@@ -47,6 +47,7 @@ import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
 import com.aiqin.mgs.order.api.domain.OrderInfo;
 import com.aiqin.mgs.order.api.domain.OrderListInfo;
 import com.aiqin.mgs.order.api.domain.OrderLog;
+import com.aiqin.mgs.order.api.domain.OrderNoCodeInfo;
 import com.aiqin.mgs.order.api.domain.OrderPayInfo;
 import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.OrderRelationCouponInfo;
@@ -60,6 +61,7 @@ import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
 import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderDetailRequest;
+import com.aiqin.mgs.order.api.domain.request.OrderNoCodeRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderResponse;
@@ -94,6 +96,9 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 	
 	@Resource
     private OrderDao orderDao;
+	
+	@Resource
+    private OrderDetailDao orderDetailDao;
 	
 	//订单概览统计
 	@Override
@@ -347,6 +352,103 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 			
 			
 		return HttpResponse.success(list);
+	}
+
+
+	//订单列表
+	@Override
+	public HttpResponse<List<OrderInfo>> selectNoCodeList(@Valid OrderNoCodeRequest orderNoCodeBuyRequest) {
+		
+		//购买.退货
+		try {
+			Integer orderFlow = null;
+            if(orderNoCodeBuyRequest !=null) {
+            	 if(orderNoCodeBuyRequest.getOrderFlow() !=null) {
+            		 orderFlow = orderNoCodeBuyRequest.getOrderFlow();
+            	 }else {
+            		 orderFlow = 0;
+            	 }
+            }
+			
+			//返回结果
+			List<OrderNoCodeInfo> list = new ArrayList();
+			
+			//分页
+			Integer totalCount = 0;
+			
+			if(orderFlow != Global.ORDER_FLOW_2) {
+				//购买订单列表
+				List<OrderNoCodeInfo> buyList = new ArrayList();
+				buyList = orderNoCodeDao.selectNoCodeOrderList(orderNoCodeBuyRequest);
+				if(buyList !=null && buyList.size()>0) {
+					for(OrderNoCodeInfo info : buyList) {
+						list.add(info);
+					}	
+				}
+				//订单列表总数据条数
+				totalCount += orderNoCodeDao.selectNoCodeOrderListCount(orderNoCodeBuyRequest);
+			}
+			if(orderFlow != Global.ORDER_FLOW_1) {
+			    //退货订单列表
+				List<OrderNoCodeInfo> returnList = new ArrayList();
+				returnList = orderNoCodeDao.selectNoCodeReturnList(orderNoCodeBuyRequest);	
+				if(returnList !=null && returnList.size()>0) {
+					for(OrderNoCodeInfo info : returnList) {
+						list.add(info);
+					}	
+				}
+				//退货订单列表总数据条数
+				totalCount += orderNoCodeDao.selectNoCodeReturnListCount(orderNoCodeBuyRequest);
+			}
+			
+			return HttpResponse.success(new PageResData(totalCount,list));
+	
+		} catch (Exception e) {
+			LOGGER.info("订单列表查询异常",e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}
+		
+	}
+
+
+	//编号查询订单.
+	@Override
+	public HttpResponse selectorderByCode(@Valid String orderCode) {
+		
+		//返回数据
+		OrderodrInfo info = new OrderodrInfo();
+		
+		//查询条件
+		OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
+		orderDetailQuery.setOrderCode(orderCode);
+		//服务商品
+		orderDetailQuery.setOrderType(Global.ORDER_TYPE_3);
+		
+		try {
+			//订单主数据
+			OrderInfo orderInfo = new OrderInfo();
+			orderInfo = orderDao.selecOrderById(orderDetailQuery);
+			if(orderInfo !=null && orderInfo.getOrderId() !=null ) {
+				orderDetailQuery.setOrderId(orderInfo.getOrderId());
+			}
+			info.setOrderInfo(orderInfo);
+		} catch (Exception e) {
+			LOGGER.error("查询BYorderid-返回订单主数据",e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}
+		
+		try {
+		//订单明细数据
+	    List<OrderDetailInfo> detailList = orderDetailDao.selectDetailById(orderDetailQuery);
+		
+		info.setDetailList(detailList);
+		
+		   return HttpResponse.success(info);
+
+		} catch (Exception e) {
+			LOGGER.error("查询BYorderid-返回订单明细数据",e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}	
 	}
 }
 

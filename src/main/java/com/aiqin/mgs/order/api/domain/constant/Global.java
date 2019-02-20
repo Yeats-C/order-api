@@ -42,9 +42,10 @@ public interface Global {
     /**
      * 收货方式
      */
-    Integer RECEIVE_TYPE_0 = 0;  //自提
+    Integer RECEIVE_TYPE_0 = 0;  //到店自提
     Integer RECEIVE_TYPE_1 = 1;  //快递
     Integer RECEIVE_TYPE_2 = 2;  //全部 作为查询条件
+    Integer RECEIVE_TYPE_3 = 3;  //到店 
     
     
     /**
@@ -221,4 +222,12 @@ public interface Global {
     Integer ORDER_TYPE_1 = 1;  //TOC订单
     Integer ORDER_TYPE_2 = 2;  //TOB订单
     Integer ORDER_TYPE_3 = 3;  //服务商品
+    
+    //销售流向:1:购买 2:退次
+    Integer ORDER_FLOW_1=1;
+    Integer ORDER_FLOW_2=2;
+    
+    //会员类型:1:会员 2:非会员
+    Integer MEMBER_TYPE_1=1;
+    Integer MEMBER_TYPE_2=2;
 }

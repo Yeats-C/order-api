@@ -15,6 +15,7 @@ import com.aiqin.mgs.order.api.domain.OrderAfterSaleInfo;
 import com.aiqin.mgs.order.api.domain.OrderAfterSaleQuery;
 import com.aiqin.mgs.order.api.domain.OrderInfo;
 import com.aiqin.mgs.order.api.domain.constant.Global;
+import com.aiqin.mgs.order.api.domain.response.OrderNoCodeResponse.AddReturnOrderResonse;
 import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.OrderAfterService;
 
@@ -87,13 +88,13 @@ public class OrderAfterController {
    */
   @PostMapping("/zaaf")
   @ApiOperation(value = "服务订单-添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表...")
-  public HttpResponse zaaf(@Valid @RequestBody OrderAfterSaleInfo orderAfterSaleInfo) {
+  public HttpResponse<AddReturnOrderResonse> zaaf(@Valid @RequestBody OrderAfterSaleInfo orderAfterSaleInfo) {
       LOGGER.info("添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表...");
       
       //添加服务订单标识
       if(orderAfterSaleInfo !=null) {
     	  orderAfterSaleInfo.setOrderType(Global.ORDER_TYPE_3);
-      	  return orderAfterService.addAfterOrder(orderAfterSaleInfo);
+      	  return orderAfterService.addAfterNoCodeOrder(orderAfterSaleInfo);
       }else {
       	return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
       }

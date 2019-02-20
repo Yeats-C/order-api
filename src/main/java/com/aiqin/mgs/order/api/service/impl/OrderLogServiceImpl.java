@@ -77,6 +77,7 @@ public class OrderLogServiceImpl implements OrderLogService{
 
 	//添加订单日志
 	@Override
+	@Transactional
 	public void addOrderLog(@Valid OrderLog logInfo) throws Exception {
 
 			//生成日志ID

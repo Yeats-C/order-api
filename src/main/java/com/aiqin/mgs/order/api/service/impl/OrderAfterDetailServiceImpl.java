@@ -57,6 +57,7 @@ public class OrderAfterDetailServiceImpl implements OrderAfterDetailService{
 
 	//添加新的订单售后明细数据
 	@Override
+	@Transactional
 	public void addAfterOrderDetail(@Valid List<OrderAfterSaleDetailInfo> afterDetailList,String afterSaleId) throws Exception {
 		
 		 if(afterDetailList !=null && afterDetailList.size()>0) {

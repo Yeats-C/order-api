@@ -40,6 +40,7 @@ import com.aiqin.mgs.order.api.domain.OrderLog;
 import com.aiqin.mgs.order.api.domain.OrderRelationCouponInfo;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.response.OrderJoinResponse;
+import com.aiqin.mgs.order.api.domain.response.OrderNoCodeResponse.AddReturnOrderResonse;
 import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.OrderAfterDetailService;
 import com.aiqin.mgs.order.api.service.OrderAfterService;
@@ -111,7 +112,7 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 	}
 
 	
-	//添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表
+	//TOC订单-添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表
 	@Override
 	@Transactional
 	public HttpResponse addAfterOrder(@Valid OrderAfterSaleInfo orderAfterSaleInfo) {
@@ -194,6 +195,103 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 			//返回售后编号
 			String after_sale_code = afterSaleId;
 			return HttpResponse.success(after_sale_code);
+		
+		} catch (Exception e) {
+			LOGGER.info("添加新的订单售后数据報錯", e);
+			return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+		}
+	}
+	
+	
+	//服务商品-添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表
+	@Override
+	@Transactional
+	public HttpResponse addAfterNoCodeOrder(@Valid OrderAfterSaleInfo orderAfterSaleInfo) {
+		
+		String afterSaleId = "";
+		String afterSaleCode = "";
+		
+		//返回参数
+		AddReturnOrderResonse addReturnOrderResonse = new AddReturnOrderResonse();
+		
+		try {
+			//生成订单售后ID
+			afterSaleId = OrderPublic.getUUID();
+			orderAfterSaleInfo.setAfterSaleId(afterSaleId);
+			
+			//生成订单售后编号
+			String logo = "";
+			if(orderAfterSaleInfo.getOriginType() == Global.ORIGIN_TYPE_0) {
+				logo = Global.ORIGIN_COME_3;
+			}
+			if(orderAfterSaleInfo.getOriginType() == Global.ORIGIN_TYPE_1) {
+				logo = Global.ORIGIN_COME_4;
+			}
+			if(orderAfterSaleInfo.getOriginType() == Global.ORIGIN_TYPE_3) {
+				logo = Global.ORIGIN_COME_5;
+			}
+			afterSaleCode = OrderPublic.currentDate()+logo+String.valueOf(Global.ORDERID_CHANNEL_4)+OrderPublic.randomNumberF();
+			orderAfterSaleInfo.setAfterSaleCode(afterSaleCode);
+			
+			//保存订单售后
+			orderAfterDao.addAfterOrder(orderAfterSaleInfo);
+			
+			//保存订单售后明细
+			List<OrderAfterSaleDetailInfo> orderAfterDetailList = orderAfterSaleInfo.getDetailList();
+			orderAfterDetailService.addAfterOrderDetail(orderAfterDetailList,afterSaleId);   
+			
+			
+			//修改订单表
+			String orderId = "";
+			Integer returnStatus;
+			String updateBy = "";
+			orderId = orderAfterSaleInfo.getOrderId();
+			returnStatus = Global.IS_RETURN_1;
+			updateBy = orderAfterSaleInfo.getCreateBy();
+			
+			orderService.retustus(orderId,returnStatus,updateBy);
+			
+			
+			//修改订单表明细表
+			if(orderAfterDetailList !=null && orderAfterDetailList.size()>0) {
+				for(OrderAfterSaleDetailInfo info :orderAfterDetailList) {
+					
+					String orderDetailId = info.getOrderDetailId();
+					Integer returnAmount = info.getReturnAmount();
+					
+					OrderDetailInfo orderDetailInfo = new OrderDetailInfo();
+					orderDetailInfo.setOrderDetailId(orderDetailId);
+					orderDetailInfo.setReturnAmount(returnAmount);
+					orderDetailInfo.setUpdateBy(updateBy);
+					orderDetailInfo.setReturnStatus(returnStatus);
+					
+					//是否已有退货如果存在退货  
+					if(orderDetailInfo !=null) {
+						OrderDetailInfo detailInfo = new OrderDetailInfo();
+						detailInfo = orderDetailDao.setail(orderDetailInfo);
+						//已退数量+现退数量 = 正确的退货数量
+						if(detailInfo !=null && detailInfo.getReturnAmount() !=null) {
+							returnAmount = detailInfo.getReturnAmount()+returnAmount;
+							orderDetailInfo.setReturnAmount(returnAmount);
+						}
+					}
+					//更新数据
+					orderDetailService.returnStatus(orderDetailId,returnStatus,returnAmount,updateBy);
+					
+				}
+			}
+			
+			//生成订单日志
+			OrderLog rderLog = OrderPublic.addOrderLog(afterSaleId,Global.STATUS_2,"OrderServiceAfterImpl.addAfterOrder()",
+			OrderPublic.getStatus(Global.STATUS_2,returnStatus),updateBy);
+			
+			orderLogService.addOrderLog(rderLog);
+			
+			
+			addReturnOrderResonse.setAfterSaleId(afterSaleId);
+			addReturnOrderResonse.setAfterSaleCode(afterSaleCode);
+			
+			return HttpResponse.success(addReturnOrderResonse);
 		
 		} catch (Exception e) {
 			LOGGER.info("添加新的订单售后数据報錯", e);

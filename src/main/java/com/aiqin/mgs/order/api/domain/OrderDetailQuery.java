@@ -85,6 +85,9 @@ public class OrderDetailQuery extends PagesRequest {
 	@JsonProperty("origin_type_list")
 	private List<Integer> originTypeList;
 	
+	@ApiModelProperty(value="订单类型 1：TOC订单 2: TOB订单 3：服务商品")
+	@JsonProperty("order_type")
+	private Integer orderType;
 	
 //	//接口--商品概览 月销量/产品销量
 //	@ApiModelProperty(value="年份")
@@ -94,6 +97,14 @@ public class OrderDetailQuery extends PagesRequest {
 //	@ApiModelProperty(value="月份")
 //	@JsonProperty("month")
 //	private String month ;
+
+	public Integer getOrderType() {
+		return orderType;
+	}
+
+	public void setOrderType(Integer orderType) {
+		this.orderType = orderType;
+	}
 
 	public Integer getIcount() {
 		return icount;
