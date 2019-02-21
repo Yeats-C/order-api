@@ -203,7 +203,7 @@ public class OrderListController {
 
     }
 
-    @PostMapping("first/order/time")
+    @GetMapping("first/order/time")
     @ApiOperation("查询门店首单时间")
     public HttpResponse<List<FirstOrderTimeRespVo>> selectFirstOrderTime(@RequestParam("store_ids") List<String> storeIds) {
         return HttpResponse.success(orderListService.selectFirstOrderTime(storeIds));
