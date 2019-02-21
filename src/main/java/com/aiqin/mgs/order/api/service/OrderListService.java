@@ -4,6 +4,7 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.OrderList;
 import com.aiqin.mgs.order.api.domain.OrderListLogistics;
 import com.aiqin.mgs.order.api.domain.request.orderList.*;
+import com.aiqin.mgs.order.api.domain.response.orderlistre.FirstOrderTimeRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderSaveRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
 
@@ -40,4 +41,6 @@ public interface OrderListService {
     Boolean updateOrderRefund(String code);
 
     List<OrderListDetailsVo> getOrderByCodeFather(String code);
+
+    List<FirstOrderTimeRespVo> selectFirstOrderTime(List<String> storeIds);
 }

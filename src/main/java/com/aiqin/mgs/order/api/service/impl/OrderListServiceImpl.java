@@ -17,6 +17,7 @@ import com.aiqin.mgs.order.api.domain.OrderStatus;
 import com.aiqin.mgs.order.api.domain.request.orderList.*;
 import com.aiqin.mgs.order.api.domain.request.stock.StockLockReqVo;
 import com.aiqin.mgs.order.api.domain.request.stock.StockLockSkuReqVo;
+import com.aiqin.mgs.order.api.domain.response.orderlistre.FirstOrderTimeRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderSaveRespVo;
 import com.aiqin.mgs.order.api.domain.request.orderList.*;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
@@ -99,7 +100,7 @@ public class OrderListServiceImpl implements OrderListService {
     @Override
     public Boolean addLogistics(OrderListLogistics param) {
         ParamUnit.isNotNull(param, "orderCode", "invoiceCode", "logisticsCentreCode", "logisticsCentreName", "implementBy", "implementTime", "implementContent");
-        Boolean re= orderListLogisticsDao.insertLogistics(param);
+        Boolean re = orderListLogisticsDao.insertLogistics(param);
         return re;
     }
 
@@ -185,19 +186,19 @@ public class OrderListServiceImpl implements OrderListService {
     @Override
     public List<OrderListDetailsVo> getOrderByCodeFather(String code) {
         List<OrderListDetailsVo> list = orderListDao.searchOrderByCodeFather(code);
-        List<String> orderCode=new ArrayList<>();
+        List<String> orderCode = new ArrayList<>();
         for (OrderListDetailsVo vo : list) {
-            OrderStatusEnum statusEnum =OrderStatusEnum.getOrderStatusEnum(vo.getOrderStatus());
-            vo.setReceptionStatus( statusEnum.getReceptionStatus());
-            vo.setBackstageStatus( statusEnum.getBackstageStatus());
+            OrderStatusEnum statusEnum = OrderStatusEnum.getOrderStatusEnum(vo.getOrderStatus());
+            vo.setReceptionStatus(statusEnum.getReceptionStatus());
+            vo.setBackstageStatus(statusEnum.getBackstageStatus());
             orderCode.add(vo.getOrderCode());
         }
-        if (orderCode.size()>0) {
+        if (orderCode.size() > 0) {
             List<OrderListProduct> orderListProducts = orderListProductDao.searchOrderListProductByCodeList(orderCode);
             for (OrderListDetailsVo vo : list) {
                 for (OrderListProduct orderListProduct : orderListProducts) {
-                    if (vo.getOrderCode().equals(orderListProduct.getOrderCode())){
-                        if (vo.getOrderListProductList()==null){
+                    if (vo.getOrderCode().equals(orderListProduct.getOrderCode())) {
+                        if (vo.getOrderListProductList() == null) {
                             vo.setOrderListProductList(new ArrayList<>());
                         }
                         vo.getOrderListProductList().add(orderListProduct);
@@ -212,8 +213,8 @@ public class OrderListServiceImpl implements OrderListService {
     public OrderListDetailsVo getOrderByCode(String code) {
 
         OrderListDetailsVo vo = orderListDao.searchOrderByCode(code);
-        vo.setReceptionStatus( OrderStatusEnum.getOrderStatusEnum(vo.getOrderStatus()).getReceptionStatus());
-        vo.setBackstageStatus( OrderStatusEnum.getOrderStatusEnum(vo.getOrderStatus()).getBackstageStatus());
+        vo.setReceptionStatus(OrderStatusEnum.getOrderStatusEnum(vo.getOrderStatus()).getReceptionStatus());
+        vo.setBackstageStatus(OrderStatusEnum.getOrderStatusEnum(vo.getOrderStatus()).getBackstageStatus());
         List<OrderListLogistics> list1 = orderListLogisticsDao.searchOrderListLogisticsByCode(code);
         vo.setOrderListLogisticsList(list1);
         List<OrderListProduct> list2 = orderListProductDao.searchOrderListProductByCode(code);
@@ -372,5 +373,10 @@ public class OrderListServiceImpl implements OrderListService {
         respVo.setSplitOrder(orders.size() > 1);
         respVo.setChildOrderCode(chirldOrderCodes);
         return respVo;
+    }
+
+    @Override
+    public List<FirstOrderTimeRespVo> selectFirstOrderTime(List<String> storeIds) {
+        return orderListDao.selectFirstOrderTime(storeIds);
     }
 }

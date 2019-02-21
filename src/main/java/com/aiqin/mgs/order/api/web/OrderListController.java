@@ -7,6 +7,7 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.OrderList;
 import com.aiqin.mgs.order.api.domain.OrderListLogistics;
 import com.aiqin.mgs.order.api.domain.request.orderList.*;
+import com.aiqin.mgs.order.api.domain.response.orderlistre.FirstOrderTimeRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderSaveRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
 import com.aiqin.mgs.order.api.service.OrderListService;
@@ -200,5 +201,11 @@ public class OrderListController {
     public HttpResponse<List<OrderStockReVo>> getStockValue(@RequestBody OrderStockVo vo) {
         return HttpResponse.success(orderListService.getStockValue(vo));
 
+    }
+
+    @PostMapping("first/order/time")
+    @ApiOperation("查询门店首单时间")
+    public HttpResponse<List<FirstOrderTimeRespVo>> selectFirstOrderTime(@RequestParam("store_ids") List<String> storeIds) {
+        return HttpResponse.success(orderListService.selectFirstOrderTime(storeIds));
     }
 }
