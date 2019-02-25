@@ -35,7 +35,7 @@ public class OrderodrInfo {
 	
 	
 	@ApiModelProperty(value = "支付信息")
-	@JsonProperty("pay_list")
+	@JsonProperty("order_pay_detail")
 	private List<OrderPayInfo> payList;
 	
 	
