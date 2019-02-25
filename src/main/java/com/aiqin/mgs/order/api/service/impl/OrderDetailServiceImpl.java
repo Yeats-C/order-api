@@ -340,7 +340,8 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 
 
 	@Override
-	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+//	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+	@Transactional
 	public List<OrderDetailInfo> addDetailList(@Valid List<OrderDetailInfo> detailList, @Valid String orderId) throws Exception {
 		
 		List<OrderDetailInfo> list = new ArrayList();
@@ -429,6 +430,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 
 	//修改订单明细退货数据
 	@Override
+	@Transactional
 	public void returnStatus(@Valid String orderDetailId,Integer returnStatus,Integer returnAmount, String updateBy) throws Exception {
 		
 		OrderDetailInfo info = new OrderDetailInfo();

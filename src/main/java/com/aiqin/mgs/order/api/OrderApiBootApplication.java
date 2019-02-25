@@ -11,6 +11,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * <pre>
@@ -42,6 +43,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @ComponentScan
 @GroundBoot
 @GroundDataSource
+@EnableTransactionManagement
 @MapperScan(basePackages = {"com.aiqin.mgs.order.api.dao"})
 public class OrderApiBootApplication extends SpringBootServletInitializer {
 

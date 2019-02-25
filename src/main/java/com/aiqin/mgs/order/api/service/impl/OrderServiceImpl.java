@@ -159,6 +159,7 @@ public class OrderServiceImpl implements OrderService{
 
 	//添加新的订单主数据
 	@Override
+	@Transactional
 	public OrderInfo addOrderInfo(@Valid OrderInfo orderInfo) throws Exception {
 		
 		String orderId = "";
@@ -225,6 +226,7 @@ public class OrderServiceImpl implements OrderService{
 
 	//添加新的订单优惠券关系表数据
 	@Override
+	@Transactional
 	public void addOrderCoupon(@Valid List<OrderRelationCouponInfo> orderCouponList, @Valid String orderId) throws Exception {
             
 		   if(orderCouponList !=null && orderCouponList.size()>0) {
@@ -435,7 +437,7 @@ public class OrderServiceImpl implements OrderService{
 	}
 
 
-	//添加新的订单主数据以及其他订单关联数据 事务未生效 暂不处理
+	//添加新的订单主数据以及其他订单关联数据
 	@Override
 	@Transactional
 	public HttpResponse addOrderList(@Valid OrderAndSoOnRequest orderAndSoOnRequest){
@@ -616,6 +618,7 @@ public class OrderServiceImpl implements OrderService{
 
     //仅更改退货状态-订单主表
 	@Override
+	@Transactional
 	public void retustus(@Valid String orderId, Integer returnStatus, String updateBy) throws Exception {
 
 			OrderInfo orderInfo = new OrderInfo();
@@ -1107,7 +1110,13 @@ public class OrderServiceImpl implements OrderService{
 //			orderId = orderInfo.getOrderId();
 			//通过订单编码查询订单ID
 			try {
-			orderId = orderDao.getOrderIdByCode(orderCode);
+		    //判断订单类型
+			if(orderInfo.getOrderType().equals(Global.ORDER_TYPE_3)) {
+				orderId = orderDao.getNoCodeOrderIdByCode(orderCode);
+			}else {
+				orderId = orderDao.getOrderIdByCode(orderCode);
+			}
+			
 			}catch (Exception e){
 				 LOGGER.info("orderDao.getOrderIdByCode(orderCode)", e);
 		    }
@@ -1229,6 +1238,7 @@ public class OrderServiceImpl implements OrderService{
 
 	//删除订单主数据+删除订单明细数据
 	@Override
+	@Transactional
 	public HttpResponse deordta(@Valid String orderId) {
 		
 		OrderInfo orderInfo = new OrderInfo();
@@ -1378,6 +1388,7 @@ public class OrderServiceImpl implements OrderService{
 
 	//已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)
 	@Override
+	@Transactional
 	public HttpResponse repast(@Valid String orderId, @Valid String payType, @Valid List<OrderPayInfo> orderPayList) {
 		
 		try {

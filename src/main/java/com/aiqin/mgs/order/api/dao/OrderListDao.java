@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.OrderList;
 import com.aiqin.mgs.order.api.domain.request.orderList.*;
+import com.aiqin.mgs.order.api.domain.response.orderlistre.FirstOrderTimeRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -60,4 +61,6 @@ public interface OrderListDao {
     Boolean updateOrderPaymentStatus(@Param("code") String code,@Param("paymentStatus") Integer paymentStatus);
 
     List<OrderListDetailsVo> searchOrderByCodeFather(String code);
+
+    List<FirstOrderTimeRespVo> selectFirstOrderTime(List<String> storeIds);
 }

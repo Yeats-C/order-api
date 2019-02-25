@@ -93,7 +93,7 @@ public class OrderController {
     @PostMapping("/addpamo")
     @ApiOperation(value = "门店新增TOC订单step2-添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据")
     public HttpResponse addPamo(@Valid @RequestBody OrderAndSoOnRequest orderAndSoOnRequest){
-        LOGGER.info("添加新的订单主数据以及其他订单关联数据......");
+        LOGGER.info("门店新增TOC订单step2-添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据......");
 		
         //添加TOC订单标识
         if(orderAndSoOnRequest !=null) {
@@ -134,7 +134,7 @@ public class OrderController {
     @PostMapping("/zaao")
     @ApiOperation(value = "门店新增服务订单step1-添加订单主数据+添加订单明细数据+返回订单编号")
     public HttpResponse zaao(@Valid @RequestBody OrderAndSoOnRequest orderAndSoOnRequest){
-        LOGGER.info("添加新的订单主数据以及其他订单关联数据......");
+        LOGGER.info("门店新增服务订单step1-添加订单主数据+添加订单明细数据+返回订单编号....");
 		
         //添加TOC订单标识
         if(orderAndSoOnRequest !=null) {
@@ -160,7 +160,7 @@ public class OrderController {
     @PostMapping("/zabo")
     @ApiOperation(value = "门店新增TOC订单step2-添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据")
     public HttpResponse zabo(@Valid @RequestBody OrderAndSoOnRequest orderAndSoOnRequest){
-        LOGGER.info("添加新的订单主数据以及其他订单关联数据......");
+        LOGGER.info("门店新增服务订单step2-添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据.....");
 		
         //添加TOC订单标识
         if(orderAndSoOnRequest !=null) {

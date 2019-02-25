@@ -1248,4 +1248,12 @@ SELECT IFNULL(
      set   payment_status=#{paymentStatus}
     where order_code=#{code}
   </update>
+
+  <select id="selectFirstOrderTime" parameterType="list" resultType="com.aiqin.mgs.order.api.domain.response.orderlistre.FirstOrderTimeRespVo">
+    select store_id as storeId,min(place_order_time) as firstOrderTime from order_list where order_type=3 and store_id in
+      <foreach collection="list" index="index" item="storeId" open="(" separator="," close=")">
+          #{storeId}
+      </foreach>
+    group by store_id;
+  </select>
 </mapper>
