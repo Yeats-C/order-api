@@ -41,6 +41,7 @@ import com.aiqin.mgs.order.api.dao.OrderLogDao;
 import com.aiqin.mgs.order.api.dao.OrderNoCodeDao;
 import com.aiqin.mgs.order.api.dao.OrderPayDao;
 import com.aiqin.mgs.order.api.dao.OrderReceivingDao;
+import com.aiqin.mgs.order.api.dao.SettlementDao;
 import com.aiqin.mgs.order.api.domain.CartInfo;
 import com.aiqin.mgs.order.api.domain.OrderDetailInfo;
 import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
@@ -99,6 +100,13 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 	
 	@Resource
     private OrderDetailDao orderDetailDao;
+	
+	@Resource
+    private SettlementDao settlementDao;
+	
+	@Resource
+    private OrderPayDao orderPayDao;
+	
 	
 	//订单概览统计
 	@Override
@@ -424,12 +432,14 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 		//服务商品
 		orderDetailQuery.setOrderType(Global.ORDER_TYPE_3);
 		
+		//组装订单主数据
+		OrderInfo orderInfo = new OrderInfo();
 		try {
-			//订单主数据
-			OrderInfo orderInfo = new OrderInfo();
 			orderInfo = orderDao.selecOrderById(orderDetailQuery);
 			if(orderInfo !=null && orderInfo.getOrderId() !=null ) {
 				orderDetailQuery.setOrderId(orderInfo.getOrderId());
+			}else {
+				return HttpResponse.success(null);
 			}
 			info.setOrderInfo(orderInfo);
 		} catch (Exception e) {
@@ -437,16 +447,46 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 		
+		
+		//组装订单明细数据
 		try {
-		//订单明细数据
 	    List<OrderDetailInfo> detailList = orderDetailDao.selectDetailById(orderDetailQuery);
 		
-		info.setDetailList(detailList);
-		
-		   return HttpResponse.success(info);
-
+	        if(detailList !=null && detailList.size()>0) {
+	    	    info.setDetailList(detailList);
+	        }
 		} catch (Exception e) {
-			LOGGER.error("查询BYorderid-返回订单明细数据",e);
+			LOGGER.error("组装订单明细数据失败",e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}	
+		
+		//组装订单结算数据
+		try {
+	    OrderQuery orderQuery = new OrderQuery();
+	    orderQuery.setOrderId(orderInfo.getOrderId());
+		SettlementInfo settlementInfo = settlementDao.jkselectsettlement(orderQuery);
+	        if(settlementInfo !=null) {
+	    	    info.setSettlementInfo(settlementInfo);
+	        }
+	        
+		} catch (Exception e) {
+			LOGGER.error("组装订单结算数据失败",e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}	
+		
+		//组装订单支付数据
+		try {
+		OrderPayInfo orderPayInfo = new OrderPayInfo();
+		orderPayInfo.setOrderId(orderInfo.getOrderId());
+		List<OrderPayInfo> payList = orderPayDao.pay(orderPayInfo);
+	        if(payList !=null && payList.size()>0) {
+	    	    info.setPayList(payList);
+	        }		
+			
+	        return HttpResponse.success(info);
+	        
+		} catch (Exception e) {
+			LOGGER.error("组装订单支付数据失败",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}	
 	}

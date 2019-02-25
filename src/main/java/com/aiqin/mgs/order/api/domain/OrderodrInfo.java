@@ -32,7 +32,21 @@ public class OrderodrInfo {
 	@ApiModelProperty(value = "结算信息")
 	@JsonProperty("settlement_info")
 	private SettlementInfo settlementInfo;
+	
+	
+	@ApiModelProperty(value = "支付信息")
+	@JsonProperty("pay_list")
+	private List<OrderPayInfo> payList;
+	
+	
 
+	public List<OrderPayInfo> getPayList() {
+		return payList;
+	}
+
+	public void setPayList(List<OrderPayInfo> payList) {
+		this.payList = payList;
+	}
 
 	public OrderReceivingInfo getReceivingInfo() {
 		return receivingInfo;
