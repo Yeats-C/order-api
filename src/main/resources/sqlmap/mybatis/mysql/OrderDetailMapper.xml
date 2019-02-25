@@ -224,7 +224,7 @@
     <select id="selectorderdetailsum"  resultMap="OrderInfoDetailMapping" >
     SELECT SUM(actual_price) AS actual_price,count(order_id) AS amount FROM order_detail WHERE order_id IN (
 	SELECT DISTINCT order_id FROM order_detail 
-	WHERE 1=1 and order_type = 1
+	WHERE 1=1
 	<if test="activityId!=null and activityId!=''">
 	AND activity_id =#{activityId}
 	</if>
