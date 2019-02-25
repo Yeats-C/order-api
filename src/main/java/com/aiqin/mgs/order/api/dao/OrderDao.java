@@ -133,8 +133,11 @@ public interface OrderDao {
 	//修改订单支付方式信息
 	void onlyPayType(OrderQuery orderQuery)throws Exception;
 
-	//通过订单编码查询订单ID
+	//TOC-通过订单编码查询订单ID
 	String getOrderIdByCode(@Valid @Param("orderCode") String orderCode)throws Exception;
+	
+	//服务商品-通过订单编码查询订单ID
+	String getNoCodeOrderIdByCode(@Valid @Param("orderCode") String orderCode)throws Exception;
 
 	Integer selectOrderCount(OrderQuery orderQuery)throws Exception;
 

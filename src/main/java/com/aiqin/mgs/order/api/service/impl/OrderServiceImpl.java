@@ -1110,7 +1110,13 @@ public class OrderServiceImpl implements OrderService{
 //			orderId = orderInfo.getOrderId();
 			//通过订单编码查询订单ID
 			try {
-			orderId = orderDao.getOrderIdByCode(orderCode);
+		    //判断订单类型
+			if(orderInfo.getOrderType().equals(Global.ORDER_TYPE_3)) {
+				orderId = orderDao.getNoCodeOrderIdByCode(orderCode);
+			}else {
+				orderId = orderDao.getOrderIdByCode(orderCode);
+			}
+			
 			}catch (Exception e){
 				 LOGGER.info("orderDao.getOrderIdByCode(orderCode)", e);
 		    }
