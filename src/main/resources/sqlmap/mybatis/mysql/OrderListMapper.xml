@@ -235,7 +235,7 @@
     </if>
   </select>
     <select id="getStockValue" resultType="com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo">
-      select store_code storeCode,count(actual_amount_paid) stockValue from order_list
+      select store_code storeCode,sum(actual_amount_paid) stockValue from order_list
       where 1=1
       and   place_order_time>#{vo.startPlaceOrderTime}
       and  #{vo.endPlaceOrderTime}> place_order_time
@@ -299,7 +299,7 @@ from order_list
 
     <select id="searchOrderReceptionListFather" resultMap="countryMapper2">
          select  original orderCodeFather,
-            count(actual_amount_paid)     actualAmountPaidFather,create_time createTimeFather
+      sum(actual_amount_paid)     actualAmountPaidFather,create_time createTimeFather
       from order_list
       where 1=1
         <if test="startPlaceOrderTime !=null">
@@ -350,7 +350,7 @@ SELECT IFNULL(
           resultMap="countryMapper2">
     select
     original orderCodeFather,
-    count(actual_amount_paid)     actualAmountPaidFather,create_time createTimeFather
+    sum(actual_amount_paid)     actualAmountPaidFather,create_time createTimeFather
     from order_list
     where 1=1
     <if test="storeCode !=null">
