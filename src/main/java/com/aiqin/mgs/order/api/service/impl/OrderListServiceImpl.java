@@ -375,6 +375,32 @@ public class OrderListServiceImpl implements OrderListService {
         return respVo;
     }
 
+
+    @Override
+    public Boolean saveOrder(OrderReqVo reqVo) {
+        Date now = new Date();
+        String orderCode = sequenceService.generateOrderCode(reqVo.getCompanyCode(), reqVo.getOrderType());
+        OrderList order = new OrderList();
+        BeanUtils.copyProperties(reqVo, order);
+        order.setOrderCode(orderCode);
+
+        order.setId(IdUtil.uuid());
+        order.setOriginal(orderCode);
+        order.setPlaceOrderTime(now);
+        List<OrderListProduct> products = reqVo.getProducts().stream().map(product -> {
+            OrderListProduct productDTO = new OrderListProduct();
+            BeanUtils.copyProperties(product, productDTO);
+            productDTO.setId(IdUtil.uuid());
+            return productDTO;
+        }).collect(Collectors.toList());
+        products.forEach(product -> {
+            product.setOrderCode(orderCode);
+        });
+        orderListDao.insertSelective(order);
+        orderListProductDao.insertList(products);
+        return true;
+    }
+
     @Override
     public List<FirstOrderTimeRespVo> selectFirstOrderTime(List<String> storeIds) {
         return orderListDao.selectFirstOrderTime(storeIds);
