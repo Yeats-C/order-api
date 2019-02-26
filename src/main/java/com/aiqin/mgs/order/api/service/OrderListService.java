@@ -43,4 +43,6 @@ public interface OrderListService {
     List<OrderListDetailsVo> getOrderByCodeFather(String code);
 
     List<FirstOrderTimeRespVo> selectFirstOrderTime(List<String> storeIds);
+
+    PageResData<OrderListFather> searchOrderReceptionListFatherProduct(OrderListVo2 param);
 }
