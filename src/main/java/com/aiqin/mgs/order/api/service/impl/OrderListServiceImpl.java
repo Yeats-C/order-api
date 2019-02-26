@@ -167,6 +167,35 @@ public class OrderListServiceImpl implements OrderListService {
     }
 
     @Override
+    public PageResData<OrderListFather> searchOrderReceptionListFatherProduct(OrderListVo2 param) {
+        ParamUnit.isNotNull(param, "storeId");
+        List<OrderListFather> inventories = orderListDao.searchOrderReceptionListFather(param);
+        List<String> codeList=new ArrayList<>();
+        for (OrderListFather inventory : inventories) {
+            for (OrderList orderList : inventory.getOrderList()) {
+                orderList.setOrderStatusShow(OrderStatusEnum.getOrderStatusEnum(orderList.getOrderStatus()).getReceptionStatus());
+                codeList.add(orderList.getOrderCode());
+            }
+        }
+        //查询所有订单下的商品数据
+        if (codeList.size()!=0){
+            List<OrderListProduct> list2 = orderListProductDao.searchOrderListProductByCodeList(codeList);
+            for (OrderListFather inventory : inventories) {
+                for (OrderList orderList : inventory.getOrderList()) {
+                    orderList.setOrderListProductList(new ArrayList<OrderListProduct>());
+                    for (OrderListProduct product : list2) {
+                        if (product.getOrderCode().equals(orderList.getOrderCode())){
+                            orderList.getOrderListProductList().add(product);
+                        }
+                    }
+                }
+            }
+        }
+        int count = orderListDao.searchOrderReceptionListFatherCount(param);
+        return new PageResData<>(count, inventories);
+    }
+
+    @Override
     public PageResData<OrderListFather> searchOrderListFather(OrderListVo param) {
         List<OrderListFather> inventories = orderListDao.searchOrderListFather(param);
         for (OrderListFather inventory : inventories) {

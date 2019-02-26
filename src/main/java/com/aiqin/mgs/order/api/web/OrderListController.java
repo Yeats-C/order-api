@@ -132,6 +132,25 @@ public class OrderListController {
         }
     }
 
+    /**
+     * 订单列表前台
+     *
+     * @param param 请求参数
+     * @return 响应结果
+     */
+    @PostMapping("/list/reception/father/product")
+    @ApiOperation(value = "订单列表前台(包含父订单包含商品)")
+    public HttpResponse<PageResData<OrderListFather>> listReceptionFatherProduct(@RequestBody OrderListVo2 param) {
+        log.info("Search  purchasingTarget list:{}", param);
+        try {
+            return HttpResponse.success(this.orderListService.searchOrderReceptionListFatherProduct(param));
+        } catch (Exception e) {
+            log.error("Get purchasingTarget list failed", e);
+            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
+        }
+    }
+
+
 
     /**
      * 获取订单信息

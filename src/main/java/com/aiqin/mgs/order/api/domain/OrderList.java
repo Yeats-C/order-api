@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @ApiModel("订单主表")
 @Data
@@ -236,4 +237,7 @@ public class OrderList extends PagesRequest {
     @JsonProperty("apply_coupons")
     private Integer applyCoupons;
 
+    @ApiModelProperty(value = "商品List")
+    @JsonProperty("order_list_product_list")
+    private List<OrderListProduct> orderListProductList;
 }
