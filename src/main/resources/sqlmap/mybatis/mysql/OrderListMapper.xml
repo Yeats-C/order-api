@@ -311,8 +311,13 @@ from order_list
         <if test="placeOrderBy">
             and create_by=#{placeOrderBy}
         </if>
-        <if test="orderStatus !=null">
-            and order_status=#{orderStatus}
+        <if test="orderStatusList !=null">
+            and order_status
+          in
+          <foreach collection="orderStatusList" index="index" item="status" open="(" separator="," close=")">
+            #{status}
+          </foreach>
+
         </if>
         <if test="orderCode!= null">
             and order_code=#{orderCode}
@@ -337,9 +342,14 @@ SELECT IFNULL(
         <if test="placeOrderBy">
             and create_by=#{placeOrderBy}
         </if>
-        <if test="orderStatus !=null">
-            and order_status=#{orderStatus}
-        </if>
+      <if test="orderStatusList !=null">
+        and order_status
+        in
+        <foreach collection="orderStatusList" index="index" item="status" open="(" separator="," close=")">
+          #{status}
+        </foreach>
+
+      </if>
         <if test="orderCode!= null">
             and order_code=#{orderCode}
         </if>
@@ -366,8 +376,13 @@ SELECT IFNULL(
     <if test="paymentStatus !=null">
       and   payment_status=#{paymentStatus}
     </if>
-    <if test="orderStatus !=null">
-      and   order_status=#{orderStatus}
+    <if test="orderStatusList !=null">
+      and order_status
+      in
+      <foreach collection="orderStatusList" index="index" item="status" open="(" separator="," close=")">
+        #{status}
+      </foreach>
+
     </if>
     <if test="storeType !=null">
       and   store_type=#{storeType}
@@ -397,8 +412,13 @@ SELECT IFNULL(
     <if test="paymentStatus !=null">
       and   payment_status=#{paymentStatus}
     </if>
-    <if test="orderStatus !=null">
-      and   order_status=#{orderStatus}
+    <if test="orderStatusList !=null">
+      and order_status
+      in
+      <foreach collection="orderStatusList" index="index" item="status" open="(" separator="," close=")">
+        #{status}
+      </foreach>
+
     </if>
     <if test="storeType !=null">
       and   store_type=#{storeType}
