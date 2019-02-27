@@ -44,6 +44,12 @@ public class OrderListController {
     public HttpResponse<OrderSaveRespVo> save(@RequestBody OrderReqVo reqVo) {
         return HttpResponse.success(orderListService.save(reqVo));
     }
+
+    @ApiOperation("保存订单（只保存，不支付也不锁库和拆单）")
+    @PostMapping("/saveOrder")
+    public HttpResponse<Boolean> saveOrder(@RequestBody OrderReqVo reqVo) {
+        return new HttpResponse<>(orderListService.saveOrder(reqVo));
+    }
 //    /**
 //     * 订单新增
 //     */
