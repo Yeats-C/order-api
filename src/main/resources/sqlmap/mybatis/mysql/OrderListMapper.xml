@@ -311,7 +311,7 @@ from order_list
         <if test="placeOrderBy">
             and create_by=#{placeOrderBy}
         </if>
-        <if test="orderStatusList !=null">
+        <if test="orderStatusList !=null and orderStatusList.size>0">
             and order_status
           in
           <foreach collection="orderStatusList" index="index" item="status" open="(" separator="," close=")">
@@ -342,7 +342,7 @@ SELECT IFNULL(
         <if test="placeOrderBy">
             and create_by=#{placeOrderBy}
         </if>
-      <if test="orderStatusList !=null">
+      <if test="orderStatusList !=null and orderStatusList.size>0">
         and order_status
         in
         <foreach collection="orderStatusList" index="index" item="status" open="(" separator="," close=")">
@@ -376,7 +376,7 @@ SELECT IFNULL(
     <if test="paymentStatus !=null">
       and   payment_status=#{paymentStatus}
     </if>
-    <if test="orderStatusList !=null">
+    <if test="orderStatusList !=null and orderStatusList.size>0">
       and order_status
       in
       <foreach collection="orderStatusList" index="index" item="status" open="(" separator="," close=")">
@@ -412,7 +412,7 @@ SELECT IFNULL(
     <if test="paymentStatus !=null">
       and   payment_status=#{paymentStatus}
     </if>
-    <if test="orderStatusList !=null">
+    <if test="orderStatusList !=null and orderStatusList.size>0">
       and order_status
       in
       <foreach collection="orderStatusList" index="index" item="status" open="(" separator="," close=")">
