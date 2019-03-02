@@ -700,7 +700,8 @@
     <select id="reorer"  resultMap="OrderInfoMapping" resultType="java.util.List">
     
          SELECT * FROM order_info a
-         LEFT JOIN (SELECT order_id,SUM(IFNULL(return_price,0)) AS return_price  FROM order_after_sale GROUP BY order_id) b ON a.order_id = b.order_id
+         LEFT JOIN (SELECT order_id,SUM(IFNULL(amount,0)) AS amount FROM order_detail GROUP BY order_id) b ON a.order_id = b.order_id
+         LEFT JOIN (SELECT order_code,SUM(IFNULL(return_amount,0)) AS return_amount FROM `order_after_sale_detail` GROUP BY order_code) c ON a.order_code = c.order_code
 		 WHERE 1=1 and order_type = 1
 		 <if test="orderId!=null and orderId!=''">
 		 and a.order_id = #{orderId}
@@ -721,7 +722,7 @@
 		  </foreach>
 			)
           </if>
-          and IFNULL(a.actual_price,0)-IFNULL(b.return_price,0) >0
+          AND IFNULL(b.amount,0)-IFNULL(c.return_amount,0) >0
           ORDER BY create_time DESC
          <if test="icount!=null ">
          limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
