@@ -26,6 +26,13 @@ public interface OrderListService {
 
     OrderSaveRespVo save(OrderReqVo reqVo);
 
+    /**
+     * 保存订单（只保存，不支付也不锁库和拆单）
+     * @param reqVo
+     * @return
+     */
+    Boolean saveOrder(OrderReqVo reqVo);
+
     PageResData<OrderList> searchOrderReceptionList(OrderListVo2 param);
 
     Boolean addLogistics(OrderListLogistics param);
@@ -43,4 +50,6 @@ public interface OrderListService {
     List<OrderListDetailsVo> getOrderByCodeFather(String code);
 
     List<FirstOrderTimeRespVo> selectFirstOrderTime(List<String> storeIds);
+
+    PageResData<OrderListFather> searchOrderReceptionListFatherProduct(OrderListVo2 param);
 }

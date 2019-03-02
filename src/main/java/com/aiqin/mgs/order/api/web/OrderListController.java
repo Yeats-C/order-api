@@ -44,6 +44,12 @@ public class OrderListController {
     public HttpResponse<OrderSaveRespVo> save(@RequestBody OrderReqVo reqVo) {
         return HttpResponse.success(orderListService.save(reqVo));
     }
+
+    @ApiOperation("保存订单（只保存，不支付也不锁库和拆单）")
+    @PostMapping("/saveOrder")
+    public HttpResponse<Boolean> saveOrder(@RequestBody OrderReqVo reqVo) {
+        return new HttpResponse<>(orderListService.saveOrder(reqVo));
+    }
 //    /**
 //     * 订单新增
 //     */
@@ -125,6 +131,25 @@ public class OrderListController {
             return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
         }
     }
+
+    /**
+     * 订单列表前台
+     *
+     * @param param 请求参数
+     * @return 响应结果
+     */
+    @PostMapping("/list/reception/father/product")
+    @ApiOperation(value = "订单列表前台(包含父订单包含商品)")
+    public HttpResponse<PageResData<OrderListFather>> listReceptionFatherProduct(@RequestBody OrderListVo2 param) {
+        log.info("Search  purchasingTarget list:{}", param);
+        try {
+            return HttpResponse.success(this.orderListService.searchOrderReceptionListFatherProduct(param));
+        } catch (Exception e) {
+            log.error("Get purchasingTarget list failed", e);
+            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
+        }
+    }
+
 
 
     /**

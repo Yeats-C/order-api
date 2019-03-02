@@ -155,4 +155,7 @@ public class OrderReqVo {
 
     @ApiModelProperty(value = "订单商品")
     private List<OrderProductReqVo> products;
+
+    @ApiModelProperty(value = "订单是否需要支付")
+    private Boolean needPaid = true;
 }

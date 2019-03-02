@@ -167,6 +167,51 @@ public class OrderListServiceImpl implements OrderListService {
     }
 
     @Override
+    public PageResData<OrderListFather> searchOrderReceptionListFatherProduct(OrderListVo2 param) {
+        ParamUnit.isNotNull(param, "storeId");
+        List<OrderListFather> inventories = orderListDao.searchOrderReceptionListFather(param);
+        List<String> codeList=new ArrayList<>();
+        for (OrderListFather inventory : inventories) {
+            for (OrderList orderList : inventory.getOrderList()) {
+                orderList.setOrderStatusShow(OrderStatusEnum.getOrderStatusEnum(orderList.getOrderStatus()).getReceptionStatus());
+                codeList.add(orderList.getOrderCode());
+            }
+        }
+        //查询所有订单下的商品数据
+        if (codeList.size()!=0){
+            List<OrderListProduct> list2 = orderListProductDao.searchOrderListProductByCodeList(codeList);
+            for (OrderListFather inventory : inventories) {
+                for (OrderList orderList : inventory.getOrderList()) {
+                    orderList.setSkuNum(0);
+                    int skuNum=0;
+                    List<String> skuList=new ArrayList<>();
+                    orderList.setOrderListProductList(new ArrayList<OrderListProduct>());
+                    for (OrderListProduct product : list2) {
+                        if (product.getOrderCode().equals(orderList.getOrderCode())){
+                            if (skuNum<3) {
+                                orderList.getOrderListProductList().add(product);
+                            }
+                            Boolean flag=false;
+                            for (String sku : skuList) {
+                                if (sku.equals(product.getSkuCode())){
+                                    flag=true;
+                                }
+                            }
+                            if (!flag){
+                                skuList.add(product.getSkuCode());
+                                orderList.setSkuNum(orderList.getSkuNum()+1);
+                            }
+                            skuNum++;
+                        }
+                    }
+                }
+            }
+        }
+        int count = orderListDao.searchOrderReceptionListFatherCount(param);
+        return new PageResData<>(count, inventories);
+    }
+
+    @Override
     public PageResData<OrderListFather> searchOrderListFather(OrderListVo param) {
         List<OrderListFather> inventories = orderListDao.searchOrderListFather(param);
         for (OrderListFather inventory : inventories) {
@@ -373,6 +418,32 @@ public class OrderListServiceImpl implements OrderListService {
         respVo.setSplitOrder(orders.size() > 1);
         respVo.setChildOrderCode(chirldOrderCodes);
         return respVo;
+    }
+
+
+    @Override
+    public Boolean saveOrder(OrderReqVo reqVo) {
+        Date now = new Date();
+        String orderCode = sequenceService.generateOrderCode(reqVo.getCompanyCode(), reqVo.getOrderType());
+        OrderList order = new OrderList();
+        BeanUtils.copyProperties(reqVo, order);
+        order.setOrderCode(orderCode);
+
+        order.setId(IdUtil.uuid());
+        order.setOriginal(orderCode);
+        order.setPlaceOrderTime(now);
+        List<OrderListProduct> products = reqVo.getProducts().stream().map(product -> {
+            OrderListProduct productDTO = new OrderListProduct();
+            BeanUtils.copyProperties(product, productDTO);
+            productDTO.setId(IdUtil.uuid());
+            return productDTO;
+        }).collect(Collectors.toList());
+        products.forEach(product -> {
+            product.setOrderCode(orderCode);
+        });
+        orderListDao.insertSelective(order);
+        orderListProductDao.insertList(products);
+        return true;
     }
 
     @Override
