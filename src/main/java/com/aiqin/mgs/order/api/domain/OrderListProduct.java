@@ -133,4 +133,8 @@ public class OrderListProduct {
     @ApiModelProperty(value = "商品单位重量，不存入数据库也不进行json序列化")
     @JSONField(serialize = false)
     private Integer weight;
+
+    @ApiModelProperty(value = "商品类型，0-正常品，1-效期品")
+    @JsonProperty("product_type")
+    private Integer productType;
 }

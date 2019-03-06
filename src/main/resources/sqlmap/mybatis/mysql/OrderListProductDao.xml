@@ -93,7 +93,8 @@
     activity_name activityName, gift, original_product_id originalProductId, specifications, unit, color_code colorCode, color_name colorName,
     model_number modelNumber, actual_deliver_num actualDeliverNum, product_price productPrice, original_product_price originalProductPrice,
     discount_money discountMoney,  amount, picture_url pictureUrl,  preferential_allocation preferentialAllocation,
-    return_num returnNum, supply_company_code supplyCompanyCode, supply_company_name supplyCompanyName, use_discount_amount useDiscountAmount,discount_amount_info discountAmountInfo
+    return_num returnNum, supply_company_code supplyCompanyCode, supply_company_name supplyCompanyName, use_discount_amount useDiscountAmount,discount_amount_info discountAmountInfo,
+    product_type  productType
       from order_list_product
       where order_code = #{code}
 
@@ -114,7 +115,8 @@ preferential_allocation activityApportionment,activity_code activityCode, pictur
     activity_name activityName, gift, original_product_id originalProductId, specifications, unit, color_code colorCode, color_name colorName,
     model_number modelNumber, actual_deliver_num actualDeliverNum, product_price productPrice, original_product_price originalProductPrice,
     discount_money discountMoney,  amount, picture_url pictureUrl,  preferential_allocation preferentialAllocation,
-    return_num returnNum, supply_company_code supplyCompanyCode, supply_company_name supplyCompanyName, use_discount_amount useDiscountAmount,discount_amount_info discountAmountInfo
+    return_num returnNum, supply_company_code supplyCompanyCode, supply_company_name supplyCompanyName, use_discount_amount useDiscountAmount,discount_amount_info discountAmountInfo,
+        product_type  productType
       from order_list_product
       where order_code in
         <foreach close=")" collection="orderCode" item="code" open="(" separator=",">
