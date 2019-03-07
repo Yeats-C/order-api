@@ -33,21 +33,13 @@ public class BridgeStockServiceImpl implements BridgeStockService {
         List<StockLockRespVo> lockRespVos = Lists.newLinkedList();
         reqVo.getSkuList().forEach(skuReqVo -> {
             StockLockRespVo respVo = new StockLockRespVo();
-            respVo.setLockNum(skuReqVo.getNum() / 2);
+            respVo.setLockNum(skuReqVo.getNum());
             respVo.setSkuCode(skuReqVo.getSku_code());
-            respVo.setTransportCenterCode("TransportCenter1");
-            respVo.setTransportCenterName("物流中心1");
-            respVo.setWarehouseCode("Warehouse1");
-            respVo.setWarehouseName("库房1");
+            respVo.setTransportCenterCode("1010");
+            respVo.setTransportCenterName("测试物流中心-门店订货");
+            respVo.setWarehouseCode("1020");
+            respVo.setWarehouseName("测试库存-门店订货");
             lockRespVos.add(respVo);
-            StockLockRespVo respVo2 = new StockLockRespVo();
-            respVo2.setLockNum(skuReqVo.getNum() - respVo.getLockNum());
-            respVo2.setSkuCode(skuReqVo.getSku_code());
-            respVo2.setTransportCenterCode("TransportCenter2");
-            respVo2.setTransportCenterName("物流中心2");
-            respVo2.setWarehouseCode("Warehouse2");
-            respVo2.setWarehouseName("库房2");
-            lockRespVos.add(respVo2);
         });
         return lockRespVos.stream().filter(vo -> vo.getLockNum() > 0).collect(Collectors.toList());
     }

@@ -40,6 +40,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -170,7 +171,7 @@ public class OrderListServiceImpl implements OrderListService {
     public PageResData<OrderListFather> searchOrderReceptionListFatherProduct(OrderListVo2 param) {
         ParamUnit.isNotNull(param, "storeId");
         List<OrderListFather> inventories = orderListDao.searchOrderReceptionListFather(param);
-        List<String> codeList=new ArrayList<>();
+        List<String> codeList = new ArrayList<>();
         for (OrderListFather inventory : inventories) {
             for (OrderList orderList : inventory.getOrderList()) {
                 orderList.setOrderStatusShow(OrderStatusEnum.getOrderStatusEnum(orderList.getOrderStatus()).getReceptionStatus());
@@ -178,28 +179,28 @@ public class OrderListServiceImpl implements OrderListService {
             }
         }
         //查询所有订单下的商品数据
-        if (codeList.size()!=0){
+        if (codeList.size() != 0) {
             List<OrderListProduct> list2 = orderListProductDao.searchOrderListProductByCodeList(codeList);
             for (OrderListFather inventory : inventories) {
                 for (OrderList orderList : inventory.getOrderList()) {
                     orderList.setSkuNum(0);
-                    int skuNum=0;
-                    List<String> skuList=new ArrayList<>();
+                    int skuNum = 0;
+                    List<String> skuList = new ArrayList<>();
                     orderList.setOrderListProductList(new ArrayList<OrderListProduct>());
                     for (OrderListProduct product : list2) {
-                        if (product.getOrderCode().equals(orderList.getOrderCode())){
-                            if (skuNum<3) {
+                        if (product.getOrderCode().equals(orderList.getOrderCode())) {
+                            if (skuNum < 3) {
                                 orderList.getOrderListProductList().add(product);
                             }
-                            Boolean flag=false;
+                            Boolean flag = false;
                             for (String sku : skuList) {
-                                if (sku.equals(product.getSkuCode())){
-                                    flag=true;
+                                if (sku.equals(product.getSkuCode())) {
+                                    flag = true;
                                 }
                             }
-                            if (!flag){
+                            if (!flag) {
                                 skuList.add(product.getSkuCode());
-                                orderList.setSkuNum(orderList.getSkuNum()+1);
+                                orderList.setSkuNum(orderList.getSkuNum() + 1);
                             }
                             skuNum++;
                         }
@@ -366,6 +367,7 @@ public class OrderListServiceImpl implements OrderListService {
             l1.addAll(l2);
             return l1;
         }));
+        Map<String, StockLockRespVo> warehouseMap = lockRespVos.stream().collect(Collectors.toMap(StockLockRespVo::getWarehouseCode, Function.identity(), (o1, o2) -> o1));
         Map<String, List<OrderListProduct>> productMap = Maps.newLinkedHashMap();
         for (OrderProductReqVo product : reqVo.getProducts()) {
             List<StockLockRespVo> lockRespVoList = stockMap.get(product.getSkuCode());
@@ -379,6 +381,7 @@ public class OrderListServiceImpl implements OrderListService {
                 OrderListProduct productDTO = new OrderListProduct();
                 BeanUtils.copyProperties(product, productDTO);
                 productDTO.setId(IdUtil.uuid());
+                productDTO.setOrderProductId(IdUtil.uuid());
                 //重新计算价格
                 productDTO.setProductNumber(stockLock.getLockNum());
                 productDTO.setAmount(stockLock.getLockNum() * product.getOriginalProductPrice());
@@ -454,6 +457,13 @@ public class OrderListServiceImpl implements OrderListService {
             order.setId(IdUtil.uuid());
             order.setOriginal(orderCode);
             order.setPlaceOrderTime(now);
+            StockLockRespVo respVo = warehouseMap.get(warehouseCode);
+            if (respVo != null) {
+                order.setWarehouseCode(warehouseCode);
+                order.setWarehouseName(respVo.getWarehouseName());
+                order.setTransportCenterCode(respVo.getTransportCenterCode());
+                order.setTransportCenterName(respVo.getTransportCenterName());
+            }
             orderListProducts.addAll(products);
             orders.add(order);
         });

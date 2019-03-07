@@ -30,6 +30,7 @@ import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
 import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
+import com.aiqin.mgs.order.api.domain.response.SkuSaleResponse;
 
 @SuppressWarnings("all")
 public interface OrderService {
@@ -137,4 +138,10 @@ public interface OrderService {
 
     //判断会员是否在当前门店时候有过消费记录
 	HttpResponse selectMemberByDistributor(@Valid MemberByDistributorRequest memberByDistributorRequest);
+
+	//查询未统计销量的已完成订单 
+	List<String> selectsukReturn();
+
+	//修改统计销量状态
+	void updateSukReturn(@Valid String orderId);
 }

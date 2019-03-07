@@ -19,6 +19,7 @@ import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
 import com.aiqin.mgs.order.api.domain.response.SelectByMemberPayCountResponse;
+import com.aiqin.mgs.order.api.domain.response.SkuSaleResponse;
 import com.aiqin.mgs.order.api.domain.response.LastBuyResponse;
 import com.aiqin.mgs.order.api.domain.response.MevBuyResponse;
 import com.aiqin.mgs.order.api.domain.response.OradskuResponse;
@@ -156,7 +157,9 @@ public interface OrderDao {
 	//判断会员是否在当前门店时候有过消费记录
 	List<String> selectMemberByDistributor(@Valid MemberByDistributorRequest memberByDistributorRequest)throws Exception;
 
-	
+	//查询未统计销量的已完成订单 
+	List<String> selectsukReturn()throws Exception;
 
-	
+	//修改统计销量状态
+	void updateSukReturn(@Param("orderId")String orderId)throws Exception;
 }
