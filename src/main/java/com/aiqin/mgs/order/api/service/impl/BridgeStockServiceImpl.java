@@ -37,8 +37,8 @@ public class BridgeStockServiceImpl implements BridgeStockService {
             respVo.setSkuCode(skuReqVo.getSku_code());
             respVo.setTransportCenterCode("1010");
             respVo.setTransportCenterName("测试物流中心-门店订货");
-            respVo.setWarehouseCode("1022");
-            respVo.setWarehouseName("测试301");
+            respVo.setWarehouseCode("1020");
+            respVo.setWarehouseName("测试库存-门店订货");
             lockRespVos.add(respVo);
         });
         return lockRespVos.stream().filter(vo -> vo.getLockNum() > 0).collect(Collectors.toList());
