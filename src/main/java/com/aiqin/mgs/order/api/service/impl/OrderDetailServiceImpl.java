@@ -52,6 +52,7 @@ import com.aiqin.mgs.order.api.domain.request.ProdisorRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderDetailByMemberResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderProductsResponse;
 import com.aiqin.mgs.order.api.domain.response.ProdisorResponse;
+import com.aiqin.mgs.order.api.domain.response.SkuSaleResponse;
 import com.aiqin.mgs.order.api.domain.response.SkuSumResponse;
 import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.OrderDetailService;
@@ -223,10 +224,14 @@ public class OrderDetailServiceImpl implements OrderDetailService{
       	}
     	
       }
-      String url = product_ip+product_cycle;
-      LOGGER.info("请求会员管理-会员消费记录，url为{}，参数为{}", url, projectList);
+
+      
+      StringBuilder sb = new StringBuilder();
+      sb.append(product_ip).append(product_cycle);
+      
+      LOGGER.info("请求会员管理-会员消费记录，url为{}，参数为{}", sb.toString(), projectList);
           try {
-        	  HttpClient httpPost = HttpClient.post("http://"+url).json(projectList); 
+        	  HttpClient httpPost = HttpClient.post("http://"+sb.toString()).json(projectList); 
         	  httpPost.action().status();
         	  System.out.println("status=========="+httpPost.action().status());
         	  HttpResponse result = httpPost.action().result(new TypeReference<HttpResponse>(){});
@@ -620,6 +625,18 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 				LOGGER.error("查询BYorderid-返回订单结算信息",e);
 				return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 			}				
+	}
+
+
+	@Override
+	public List<SkuSaleResponse> selectSkuSale(@Valid List<String> orderList) {
+		
+		try {
+			return orderDetailDao.selectSkuSale(orderList);
+		} catch (Exception e) {
+			LOGGER.error("查询SKU+销量 异常",e);
+			return null;
+		}
 	}
 
 

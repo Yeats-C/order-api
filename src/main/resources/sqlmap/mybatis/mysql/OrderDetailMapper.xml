@@ -84,6 +84,11 @@
 <result column="amount" jdbcType="INTEGER" property="amount"/>
 </resultMap>
 
+<resultMap id="SkuSaleMapping" type="com.aiqin.mgs.order.api.domain.response.SkuSaleResponse">
+<result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
+<result column="sale_volume" jdbcType="INTEGER" property="saleVolume"/>
+</resultMap>
+
 
     
     <!-- 插入订单明细表 -->
@@ -384,6 +389,13 @@
            AND b.order_status NOT IN ('0','4')
            AND b.pay_status='1' 
            AND DATE_FORMAT(a.create_time,'%Y-%m-%d')  = #{nextDate}
+    </select>
+    
+    
+    <!--sku销量统计：订单-->
+    <select id="selectSkuSale" resultMap="SkuSaleMapping" resultType="java.util.List">
+         SELECT SUM(a.amount) as sale_volume,sku_code FROM order_detail a 
+          WHERE 1=1 GROUP BY sku_code
     </select>
      
 </mapper>
