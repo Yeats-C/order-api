@@ -40,6 +40,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -51,6 +52,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("all")
 @Service
 @Slf4j
+@Transactional(rollbackFor = Exception.class)
 public class OrderListServiceImpl implements OrderListService {
     @Resource
     private OrderListDao orderListDao;
@@ -110,7 +112,6 @@ public class OrderListServiceImpl implements OrderListService {
             throw new IllegalArgumentException("参数不能为空");
         }
         OrderStatusEnum orderStatus = OrderStatusEnum.getOrderStatusEnum(status);
-//        OrderStatus orderStatus = orderStatusDao.searchStatus(status);
         if (orderStatus == null) {
             throw new IllegalArgumentException("状态值未找到");
         }
@@ -118,16 +119,15 @@ public class OrderListServiceImpl implements OrderListService {
         if (status != 2) {
             br = orderListDao.updateStatusByCode(code, status);
         }
-
-
         //将订单状态改完支付,将订单发送给供应链
         if (status == 2) {
-            br = orderListDao.updateByCode(code, status, 1);
+            br = orderListDao.updateByCode(code, 2, 1);
             if (br == true) {
                 //获取订单信息
                 List<SupplyOrderInfoReqVO> vo = orderListDao.searchOrderByCodeOrOriginal(code);
                 List<SupplyOrderProductItemReqVO> list2 = orderListProductDao.searchOrderListProductByCodeOrOriginal(code);
                 for (SupplyOrderInfoReqVO reqVO : vo) {
+                    reqVO.setOrderStatus(4);
                     List<SupplyOrderProductItemReqVO> supplylist = new ArrayList<>();
                     for (SupplyOrderProductItemReqVO itemReqVO : list2) {
                         if (reqVO.getOrderCode().equals(itemReqVO.getOrderCode())) {
@@ -145,6 +145,7 @@ public class OrderListServiceImpl implements OrderListService {
                 String c = result.getCode();
             }
         }
+
         return br;
     }
 
@@ -170,7 +171,7 @@ public class OrderListServiceImpl implements OrderListService {
     public PageResData<OrderListFather> searchOrderReceptionListFatherProduct(OrderListVo2 param) {
         ParamUnit.isNotNull(param, "storeId");
         List<OrderListFather> inventories = orderListDao.searchOrderReceptionListFather(param);
-        List<String> codeList=new ArrayList<>();
+        List<String> codeList = new ArrayList<>();
         for (OrderListFather inventory : inventories) {
             for (OrderList orderList : inventory.getOrderList()) {
                 orderList.setOrderStatusShow(OrderStatusEnum.getOrderStatusEnum(orderList.getOrderStatus()).getReceptionStatus());
@@ -178,28 +179,28 @@ public class OrderListServiceImpl implements OrderListService {
             }
         }
         //查询所有订单下的商品数据
-        if (codeList.size()!=0){
+        if (codeList.size() != 0) {
             List<OrderListProduct> list2 = orderListProductDao.searchOrderListProductByCodeList(codeList);
             for (OrderListFather inventory : inventories) {
                 for (OrderList orderList : inventory.getOrderList()) {
                     orderList.setSkuNum(0);
-                    int skuNum=0;
-                    List<String> skuList=new ArrayList<>();
+                    int skuNum = 0;
+                    List<String> skuList = new ArrayList<>();
                     orderList.setOrderListProductList(new ArrayList<OrderListProduct>());
                     for (OrderListProduct product : list2) {
-                        if (product.getOrderCode().equals(orderList.getOrderCode())){
-                            if (skuNum<3) {
+                        if (product.getOrderCode().equals(orderList.getOrderCode())) {
+                            if (skuNum < 3) {
                                 orderList.getOrderListProductList().add(product);
                             }
-                            Boolean flag=false;
+                            Boolean flag = false;
                             for (String sku : skuList) {
-                                if (sku.equals(product.getSkuCode())){
-                                    flag=true;
+                                if (sku.equals(product.getSkuCode())) {
+                                    flag = true;
                                 }
                             }
-                            if (!flag){
+                            if (!flag) {
                                 skuList.add(product.getSkuCode());
-                                orderList.setSkuNum(orderList.getSkuNum()+1);
+                                orderList.setSkuNum(orderList.getSkuNum() + 1);
                             }
                             skuNum++;
                         }
@@ -209,6 +210,54 @@ public class OrderListServiceImpl implements OrderListService {
         }
         int count = orderListDao.searchOrderReceptionListFatherCount(param);
         return new PageResData<>(count, inventories);
+    }
+
+    @Override
+    public Boolean updateOrderActualDeliver(List<ActualDeliverVo> actualDeliverVos) {
+        for (ActualDeliverVo vo : actualDeliverVos) {
+            orderListProductDao.updateByOrderProductId(vo);
+        }
+        return true;
+    }
+
+    @Override
+    public Boolean updateOrderStatusDeliver(DeliverVo deliverVo) {
+       Boolean br = orderListDao.updateStatusByCode(deliverVo.getOrderCode(), 11);
+        List<ActualDeliverVo> actualDeliverVos=deliverVo.getActualDeliverVos();
+        for (ActualDeliverVo vo : actualDeliverVos) {
+            orderListProductDao.updateByOrderProductId(vo);
+        }
+        OrderListDetailsVo orderListDetailsVo = orderListDao.searchOrderByCode(deliverVo.getOrderCode());
+        OrderListLogistics param=new  OrderListLogistics();
+        param.setOrderCode(orderListDetailsVo.getOrderCode());
+        param.setInvoiceCode(deliverVo.getInvoiceCode());
+        param.setLogisticsCentreCode(orderListDetailsVo.getTransportCenterCode());
+        param.setLogisticsCentreName(orderListDetailsVo.getTransportCenterName());
+        param.setImplementBy(deliverVo.getImplementBy());
+        param.setImplementTime(new Date());
+        param.setImplementContent("发货完成");
+        Boolean re = orderListLogisticsDao.insertLogistics(param);
+        return br;
+    }
+
+    @Override
+    public Boolean updateOrderStatusReceiving(String code, String name) {
+        Boolean br = orderListDao.updateStatusByCode(code, 12);
+        List<OrderListLogistics> listLogistics= orderListLogisticsDao.searchOrderListLogisticsByCode(code);
+        if (listLogistics==null){
+            throw new IllegalArgumentException( "数据异常");
+        }
+        OrderListLogistics lo= listLogistics.get(0);
+        OrderListLogistics param=new  OrderListLogistics();
+        param.setOrderCode(lo.getOrderCode());
+        param.setInvoiceCode(lo.getInvoiceCode());
+        param.setLogisticsCentreCode(lo.getLogisticsCentreCode());
+        param.setLogisticsCentreName(lo.getLogisticsCentreName());
+        param.setImplementBy(name);
+        param.setImplementTime(new Date());
+        param.setImplementContent("签收完成");
+        Boolean re = orderListLogisticsDao.insertLogistics(param);
+        return re;
     }
 
     @Override
@@ -318,6 +367,7 @@ public class OrderListServiceImpl implements OrderListService {
             l1.addAll(l2);
             return l1;
         }));
+        Map<String, StockLockRespVo> warehouseMap = lockRespVos.stream().collect(Collectors.toMap(StockLockRespVo::getWarehouseCode, Function.identity(), (o1, o2) -> o1));
         Map<String, List<OrderListProduct>> productMap = Maps.newLinkedHashMap();
         for (OrderProductReqVo product : reqVo.getProducts()) {
             List<StockLockRespVo> lockRespVoList = stockMap.get(product.getSkuCode());
@@ -331,6 +381,7 @@ public class OrderListServiceImpl implements OrderListService {
                 OrderListProduct productDTO = new OrderListProduct();
                 BeanUtils.copyProperties(product, productDTO);
                 productDTO.setId(IdUtil.uuid());
+                productDTO.setOrderProductId(IdUtil.uuid());
                 //重新计算价格
                 productDTO.setProductNumber(stockLock.getLockNum());
                 productDTO.setAmount(stockLock.getLockNum() * product.getOriginalProductPrice());
@@ -406,6 +457,13 @@ public class OrderListServiceImpl implements OrderListService {
             order.setId(IdUtil.uuid());
             order.setOriginal(orderCode);
             order.setPlaceOrderTime(now);
+            StockLockRespVo respVo = warehouseMap.get(warehouseCode);
+            if (respVo != null) {
+                order.setWarehouseCode(warehouseCode);
+                order.setWarehouseName(respVo.getWarehouseName());
+                order.setTransportCenterCode(respVo.getTransportCenterCode());
+                order.setTransportCenterName(respVo.getTransportCenterName());
+            }
             orderListProducts.addAll(products);
             orders.add(order);
         });

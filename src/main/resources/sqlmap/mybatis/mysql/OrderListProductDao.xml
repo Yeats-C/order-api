@@ -310,4 +310,11 @@ preferential_allocation activityApportionment,activity_code activityCode, pictur
       out_warehouse_name = #{outWarehouseName,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
+    <update id="updateByOrderProductId">
+        update order_list_product
+    set actual_deliver_num = #{actualDeliverNum}
+
+    where order_product_id = #{orderProductId}
+
+    </update>
 </mapper>

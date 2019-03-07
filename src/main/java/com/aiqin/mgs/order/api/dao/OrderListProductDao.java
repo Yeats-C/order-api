@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.OrderListProduct;
+import com.aiqin.mgs.order.api.domain.request.orderList.ActualDeliverVo;
 import com.aiqin.mgs.order.api.domain.request.orderList.SupplyOrderProductItemReqVO;
 import org.apache.ibatis.annotations.Param;
 
@@ -32,4 +33,6 @@ public interface OrderListProductDao {
     List<SupplyOrderProductItemReqVO> searchOrderListProductByCodeOrOriginal(String code);
 
     List<OrderListProduct> searchOrderListProductByCodeList(@Param("orderCode") List<String> orderCode);
+
+    Boolean updateByOrderProductId(ActualDeliverVo vo);
 }

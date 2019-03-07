@@ -175,8 +175,8 @@ public class OrderListController {
     /**
      * 添加物流信息
      */
-    @PostMapping("add/logistics")
-    @ApiOperation("添加物流信息")
+//    @PostMapping("add/logistics")
+//    @ApiOperation("添加物流信息")
     public HttpResponse<Boolean> addLogistics(@RequestBody OrderListLogistics param) {
         log.info("Search  purchasingTarget list:{}", param);
         try {
@@ -204,6 +204,50 @@ public class OrderListController {
 
     /**
      * 修改订单状态
+     */
+    @PostMapping("update/order/status/deliver")
+    @ApiOperation("修改订单为发货状态")
+    public HttpResponse<Boolean> updateOrderStatusDeliver(@RequestBody DeliverVo vo) {
+        try {
+            return HttpResponse.success(this.orderListService.updateOrderStatusDeliver(vo));
+        } catch (Exception e) {
+            log.error("Get purchasingTarget list failed", e);
+            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
+        }
+    }
+
+    /**
+     * 修改订单状态
+     */
+    @GetMapping("update/order/status/receiving")
+    @ApiOperation("修改订单为收货状态")
+    public HttpResponse<Boolean> updateOrderStatusReceiving(@ApiParam("订单code") @RequestParam("code") String code,@ApiParam("执行人") @RequestParam("name") String name) {
+        try {
+            return HttpResponse.success(this.orderListService.updateOrderStatusReceiving(code,name));
+        } catch (Exception e) {
+            log.error("Get purchasingTarget list failed", e);
+            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
+        }
+    }
+
+    /**
+     * 修改订单状态
+     */
+//    @PostMapping("update/order/actual/deliver")
+//    @ApiOperation("添加商品实发数量")
+    public HttpResponse<Boolean> updateOrderActualDeliver(@RequestBody List<ActualDeliverVo> actualDeliverVos) {
+
+        try {
+            return HttpResponse.success(this.orderListService.updateOrderActualDeliver(actualDeliverVos));
+        } catch (Exception e) {
+            log.error("Get purchasingTarget list failed", e);
+            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
+        }
+    }
+
+
+    /**
+     * 修改订单支付状态为已退款
      */
     @GetMapping("update/order/refund")
     @ApiOperation("修改订单支付状态为已退款")
