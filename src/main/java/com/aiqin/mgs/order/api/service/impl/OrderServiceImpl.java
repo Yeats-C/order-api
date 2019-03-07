@@ -1473,7 +1473,8 @@ public class OrderServiceImpl implements OrderService{
 			//日计算会员数
 			if(dateType.equals(Global.DATE_TYPE_1)) {
 				
-				for(int i=0;i>-7;i--) {
+//				for(int i=0;i>-7;i--) {
+				for(int i=-6;i<=0;i++) {
 					Integer countMember = null;
 					String countDate = "";
 					countDate = OrderPublic.NextDate(i);
@@ -1499,7 +1500,8 @@ public class OrderServiceImpl implements OrderService{
 			//周计算会员数
 			}else if(dateType.equals(Global.DATE_TYPE_2)) {
                 
-				for(int i=0;i<7;i++) {
+//				for(int i=0;i<7;i++) {
+				for(int i=6;i>=0;i--) {
 					Integer countMember = null;
 					String countDate = "";
 					SelectByMemberPayCountResponse info = new SelectByMemberPayCountResponse();
@@ -1524,7 +1526,8 @@ public class OrderServiceImpl implements OrderService{
 			//月计算会员数
 			else {
                 
-				for(int i=0;i>-7;i--) {
+//				for(int i=0;i>-7;i--) {
+				for(int i=-6;i<=0;i++) {
 					Integer countMember = null;
 					String countDate = "";
 					countDate = OrderPublic.afterMonth(i);

@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 描述:
@@ -33,8 +34,8 @@ public class OrderListVo2 extends PagesRequest {
     private String orderCode;
 
     @ApiModelProperty(value = "订单状态")
-    @JsonProperty("order_status")
-    private String orderStatus;
+    @JsonProperty("order_status_list")
+    private List<Integer> orderStatusList;
 
     @ApiModelProperty(value = "下单人")
     @JsonProperty("place_order_by")

@@ -182,10 +182,26 @@ public class OrderListServiceImpl implements OrderListService {
             List<OrderListProduct> list2 = orderListProductDao.searchOrderListProductByCodeList(codeList);
             for (OrderListFather inventory : inventories) {
                 for (OrderList orderList : inventory.getOrderList()) {
+                    orderList.setSkuNum(0);
+                    int skuNum=0;
+                    List<String> skuList=new ArrayList<>();
                     orderList.setOrderListProductList(new ArrayList<OrderListProduct>());
                     for (OrderListProduct product : list2) {
                         if (product.getOrderCode().equals(orderList.getOrderCode())){
-                            orderList.getOrderListProductList().add(product);
+                            if (skuNum<3) {
+                                orderList.getOrderListProductList().add(product);
+                            }
+                            Boolean flag=false;
+                            for (String sku : skuList) {
+                                if (sku.equals(product.getSkuCode())){
+                                    flag=true;
+                                }
+                            }
+                            if (!flag){
+                                skuList.add(product.getSkuCode());
+                                orderList.setSkuNum(orderList.getSkuNum()+1);
+                            }
+                            skuNum++;
                         }
                     }
                 }
