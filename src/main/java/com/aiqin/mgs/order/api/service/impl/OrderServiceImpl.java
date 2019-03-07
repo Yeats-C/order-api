@@ -68,6 +68,7 @@ import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
 import com.aiqin.mgs.order.api.domain.response.SelectByMemberPayCountResponse;
+import com.aiqin.mgs.order.api.domain.response.SkuSaleResponse;
 import com.aiqin.mgs.order.api.domain.response.WscSaleResponse;
 import com.aiqin.mgs.order.api.domain.response.WscWorkViewResponse;
 import com.aiqin.mgs.order.api.domain.response.DistributorMonthResponse;
@@ -1580,7 +1581,31 @@ public class OrderServiceImpl implements OrderService{
 			return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
         }
 	}
-	
+
+
+	//查询未统计销量的已完成订单 
+	@Override
+	public List<String> selectsukReturn() {
+		
+		try {
+			return orderDao.selectsukReturn();
+		} catch (Exception e) {
+			LOGGER.info("查询未统计销量的已完成订单异常",e);
+			return null;
+		}
+	}
+
+
+	//修改统计销量状态
+	@Override
+	public void updateSukReturn(@Valid String orderId) {
+		
+		try {
+			orderDao.updateSukReturn(orderId);
+		} catch (Exception e) {
+			LOGGER.info("修改统计销量状态异常",e);
+		}
+	}
 }
 
 

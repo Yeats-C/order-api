@@ -931,5 +931,21 @@
 			)
           </if>
     </select>
+    <!-- 查询未统计销量的已完成订单  -->
+    <select id="selectsukReturn" resultType="java.lang.String">
+         SELECT order_id FROM order_info  
+          WHERE 1=1 AND order_type = 1
+            AND order_status IN ('0','4')
+            AND suk_return IS NULL
+            AND DATE_FORMAT(create_time,"%Y-%m-%d") =DATE_FORMAT(NOW(),"%Y-%m-%d") 
+    </select>
+    
+    <!-- 修改统计销量状态 -->
+    <update id="updateSukReturn" parameterType="java.lang.String">
+		update order_info set suk_return=1 where 1=1 
+		<if test="_parameter!=null and _parameter!=''">
+		 and order_id = #{_parameter,jdbcType=VARCHAR}
+		 </if>
+	</update>
 </mapper>
 

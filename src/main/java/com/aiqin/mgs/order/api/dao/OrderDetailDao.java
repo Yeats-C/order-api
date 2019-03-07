@@ -17,6 +17,7 @@ import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.response.OrderDetailByMemberResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderProductsResponse;
 import com.aiqin.mgs.order.api.domain.response.ProdisorResponse;
+import com.aiqin.mgs.order.api.domain.response.SkuSaleResponse;
 
 public interface OrderDetailDao {
 
@@ -67,5 +68,7 @@ public interface OrderDetailDao {
 
 	//sku金额统计
 	Integer getSkuPrice(@Param("skuCode")String skuCode,@Param("nextDate")String nextDate) throws Exception;
+
+	List<SkuSaleResponse> selectSkuSale(@Valid List<String> orderList)throws Exception;
 
 }
