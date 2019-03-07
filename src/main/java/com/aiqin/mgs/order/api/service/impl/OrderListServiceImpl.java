@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.service.impl;
 
+import com.aiqin.ground.util.exception.GroundRuntimeException;
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
@@ -30,6 +31,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -142,7 +144,9 @@ public class OrderListServiceImpl implements OrderListService {
                 HttpResponse<List<OrderStockReVo>> result =
                         httpPost.action().result(new TypeReference<HttpResponse<Boolean>>() {
                         });
-                String c = result.getCode();
+                if (result == null || StringUtils.equals(result.getCode(), "0")) {
+                    throw new GroundRuntimeException("推送订单失败");
+                }
             }
         }
 
@@ -222,13 +226,13 @@ public class OrderListServiceImpl implements OrderListService {
 
     @Override
     public Boolean updateOrderStatusDeliver(DeliverVo deliverVo) {
-       Boolean br = orderListDao.updateStatusByCode(deliverVo.getOrderCode(), 11);
-        List<ActualDeliverVo> actualDeliverVos=deliverVo.getActualDeliverVos();
+        Boolean br = orderListDao.updateStatusByCode(deliverVo.getOrderCode(), 11);
+        List<ActualDeliverVo> actualDeliverVos = deliverVo.getActualDeliverVos();
         for (ActualDeliverVo vo : actualDeliverVos) {
             orderListProductDao.updateByOrderProductId(vo);
         }
         OrderListDetailsVo orderListDetailsVo = orderListDao.searchOrderByCode(deliverVo.getOrderCode());
-        OrderListLogistics param=new  OrderListLogistics();
+        OrderListLogistics param = new OrderListLogistics();
         param.setOrderCode(orderListDetailsVo.getOrderCode());
         param.setInvoiceCode(deliverVo.getInvoiceCode());
         param.setLogisticsCentreCode(orderListDetailsVo.getTransportCenterCode());
@@ -243,12 +247,12 @@ public class OrderListServiceImpl implements OrderListService {
     @Override
     public Boolean updateOrderStatusReceiving(String code, String name) {
         Boolean br = orderListDao.updateStatusByCode(code, 12);
-        List<OrderListLogistics> listLogistics= orderListLogisticsDao.searchOrderListLogisticsByCode(code);
-        if (listLogistics==null){
-            throw new IllegalArgumentException( "数据异常");
+        List<OrderListLogistics> listLogistics = orderListLogisticsDao.searchOrderListLogisticsByCode(code);
+        if (listLogistics == null) {
+            throw new IllegalArgumentException("数据异常");
         }
-        OrderListLogistics lo= listLogistics.get(0);
-        OrderListLogistics param=new  OrderListLogistics();
+        OrderListLogistics lo = listLogistics.get(0);
+        OrderListLogistics param = new OrderListLogistics();
         param.setOrderCode(lo.getOrderCode());
         param.setInvoiceCode(lo.getInvoiceCode());
         param.setLogisticsCentreCode(lo.getLogisticsCentreCode());
