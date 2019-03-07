@@ -137,8 +137,25 @@ public class OrderServiceImpl implements OrderService{
 						orderDetailQuery.setOrderId(info.getOrderId());
 					    List<OrderDetailInfo> detailList = orderDetailDao.selectDetailById(orderDetailQuery);
 					    info.setOrderdetailList(detailList);
-					    OrderInfolist.set(i,info);
+					    
+					    
+					    //特殊处理   (前端控制退货按钮使用字段:1:订单已全数退完)
+						ReorerRequest reorerRequest = new ReorerRequest();
+						reorerRequest.setOrderId(info.getOrderId());
+						List<OrderInfo> list = new ArrayList();
+						list = orderDao.reorer(reorerRequest);
+						if(list !=null && list.size()>0) {
+
+						}else {
+							info.setTurnReturnView(1);
+						}
+						
+						
+						OrderInfolist.set(i,info);
+						
 					}
+					
+					
 				}
 				
 				//计算总数据量
@@ -146,6 +163,7 @@ public class OrderServiceImpl implements OrderService{
 				Integer icount =null;
 //				orderQuery.setIcount(icount);
 				totalCount = orderDao.selectOrderCount(OrderPublic.getOrderQuery(orderQuery));
+				
 				
 //				return HttpResponse.success(OrderPublic.getData(OrderInfolist));
 				return HttpResponse.success(new PageResData(totalCount,OrderInfolist));
@@ -972,7 +990,21 @@ public class OrderServiceImpl implements OrderService{
     				oradskuResponse = OrderInfolist.get(i);
     				skuSum = orderDetailService.getSkuSum(oradskuResponse.getOrderId());
     				oradskuResponse.setSkuSum(skuSum);
-    				OrderInfolist.set(i, oradskuResponse);
+    				
+
+    				//特殊处理   (前端控制退货按钮使用字段:1:订单已全数退完)
+					ReorerRequest reorerRequest = new ReorerRequest();
+					reorerRequest.setOrderId(oradskuResponse.getOrderId());
+					List<OrderInfo> list = new ArrayList();
+					list = orderDao.reorer(reorerRequest);
+					if(list !=null && list.size()>0) {
+					}else {
+						oradskuResponse.setTurnReturnView(1);
+					}
+					
+					
+					OrderInfolist.set(i, oradskuResponse);
+					
     			}
 			}
 			

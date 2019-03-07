@@ -175,6 +175,19 @@ public class OradskuResponse extends PagesRequest {
 	private Date payTime;
 	
 	
+	@ApiModelProperty(value="前端控制退货按钮使用字段:1:订单已全数退完")
+	@JsonProperty("turn_return_view")
+	private Integer turnReturnView;
+	
+	
+
+	public Integer getTurnReturnView() {
+		return turnReturnView;
+	}
+
+	public void setTurnReturnView(Integer turnReturnView) {
+		this.turnReturnView = turnReturnView;
+	}
 
 	public Date getPayTime() {
 		return payTime;

@@ -177,8 +177,22 @@ public class OrderInfo extends PagesRequest {
 	@ApiModelProperty(value="公司编码")
 	@JsonProperty("company_code")
 	private String companyCode;
-
 	
+	@ApiModelProperty(value="前端控制退货按钮使用字段:1:订单已全数退完")
+	@JsonProperty("turn_return_view")
+	private Integer turnReturnView;
+	
+	
+
+
+	public Integer getTurnReturnView() {
+		return turnReturnView;
+	}
+
+
+	public void setTurnReturnView(Integer turnReturnView) {
+		this.turnReturnView = turnReturnView;
+	}
 
 
 	public Integer getOrderType() {
