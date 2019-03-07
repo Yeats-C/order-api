@@ -108,6 +108,7 @@ public class OrderListServiceImpl implements OrderListService {
         return re;
     }
 
+    @Transactional
     @Override
     public Boolean updateOrderStatus(String code, Integer status) {
         if (code == null || code.length() == 0 || status == null) {
