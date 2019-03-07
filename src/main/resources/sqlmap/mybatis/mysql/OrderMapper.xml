@@ -699,7 +699,7 @@
 	<!-- 接口-可退货的订单查询 分页 -->
     <select id="reorer"  resultMap="OrderInfoMapping" resultType="java.util.List">
     
-         SELECT * FROM order_info a
+         SELECT a.* FROM order_info a
          LEFT JOIN (SELECT order_id,SUM(IFNULL(amount,0)) AS amount FROM order_detail GROUP BY order_id) b ON a.order_id = b.order_id
          LEFT JOIN (SELECT order_code,SUM(IFNULL(return_amount,0)) AS return_amount FROM `order_after_sale_detail` GROUP BY order_code) c ON a.order_code = c.order_code
 		 WHERE 1=1 and order_type = 1
