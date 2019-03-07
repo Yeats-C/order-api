@@ -123,7 +123,7 @@ public class OrderListServiceImpl implements OrderListService {
 
         //将订单状态改完支付,将订单发送给供应链
         if (status == 2) {
-            br = orderListDao.updateByCode(code, status, 1);
+            br = orderListDao.updateByCode(code, 4, 1);
             if (br == true) {
                 //获取订单信息
                 List<SupplyOrderInfoReqVO> vo = orderListDao.searchOrderByCodeOrOriginal(code);

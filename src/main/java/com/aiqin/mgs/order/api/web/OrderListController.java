@@ -203,7 +203,7 @@ public class OrderListController {
     }
 
     /**
-     * 修改订单状态
+     * 修改订单支付状态为已退款
      */
     @GetMapping("update/order/refund")
     @ApiOperation("修改订单支付状态为已退款")
