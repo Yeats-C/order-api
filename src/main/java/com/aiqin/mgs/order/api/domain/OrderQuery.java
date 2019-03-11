@@ -140,6 +140,20 @@ public class OrderQuery extends PagesRequest {
 	@JsonProperty("order_status_list")
 	private List<Integer> orderStatusList;
 	
+	@ApiModelProperty(value="查询条件:订单状态集合")
+	@JsonProperty("order_id_list")
+	private List<String> orderIdList;
+	
+
+	public List<String> getOrderIdList() {
+		return orderIdList;
+	}
+
+
+	public void setOrderIdList(List<String> orderIdList) {
+		this.orderIdList = orderIdList;
+	}
+
 
 	public List<Integer> getOrderStatusList() {
 		return orderStatusList;
