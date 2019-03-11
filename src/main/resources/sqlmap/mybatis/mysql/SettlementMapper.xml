@@ -39,7 +39,7 @@
          <if test="orderId!=null and orderId!=''">
 		 and order_id =#{orderId}
 		 </if>
-		 ORDER BY create_time DESC 
+		 ORDER BY create_time DESC LIMIT 1 
     </select>
 </mapper>
 
