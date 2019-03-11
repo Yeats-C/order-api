@@ -167,7 +167,6 @@
     <!-- 模糊订单查询分页 -->
     <select id="selectOrder"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="OrderInfoMapping" resultType="java.util.List">
          SELECT a.* FROM order_info a
-         left join order_pay b on a.order_id = b.order_id
 		 WHERE 1=1 and order_type = 1
 		 <if test="orderId!=null and orderId!=''">
 		 and a.order_id = #{orderId}
@@ -213,6 +212,13 @@
 		  </foreach>
 			)
           </if>
+          <if test="orderIdList != null" >
+		  and a.order_id in (
+		  <foreach collection="orderIdList" item="order_id" separator=",">
+			 '${order_id}'
+		  </foreach>
+			)
+          </if>
          <if test="receiveType!=null ">
          and a.receive_type =#{receiveType}
          </if>
@@ -225,9 +231,6 @@
          <if test="distributorName!=null and distributorName!=''">
 		 and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
          </if>
-         <if test="payType!=null and payType!='' ">
-         and b.pay_type = #{payType}
-         </if>
          ORDER BY a.create_time DESC
          <if test="icount!=null ">
          limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
@@ -237,7 +240,6 @@
     <!-- 总条数 -->
     <select id="selectOrderCount"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultType="java.lang.Integer">
          SELECT count(*) FROM order_info a
-         left join order_pay b on a.order_id = b.order_id
 		 WHERE 1=1 and order_type = 1
 		 <if test="orderId!=null and orderId!=''">
 		 and a.order_id = #{orderId}
@@ -283,6 +285,13 @@
 		  </foreach>
 			)
           </if>
+          <if test="orderIdList != null" >
+		  and a.order_id in (
+		  <foreach collection="orderIdList" item="order_id" separator=",">
+			 '${order_id}'
+		  </foreach>
+			)
+          </if>
          <if test="receiveType!=null ">
          and a.receive_type =#{receiveType}
          </if>
@@ -294,9 +303,6 @@
          </if>
          <if test="distributorName!=null and distributorName!=''">
 		 and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
-         </if>
-         <if test="payType!=null and payType!='' ">
-         and b.pay_type = #{payType}
          </if>
     </select>
     
@@ -766,8 +772,7 @@
     
     <!-- 模糊查询订单列表+订单中商品sku数量分页 -->
     <select id="selectskuResponse"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="OradskuMapping" resultType="java.util.List">
-         SELECT a.*,b.create_time as pay_time FROM order_info a
-         left join order_pay b on a.order_id = b.order_id
+         SELECT a.*,a.create_time AS pay_time FROM order_info a
 		 WHERE 1=1 and order_type = 1
 		 <if test="orderId!=null and orderId!=''">
 		 and a.order_id = #{orderId}
@@ -810,6 +815,13 @@
 		  </foreach>
 			)
           </if>
+          <if test="orderIdList != null" >
+		  and a.order_id in (
+		  <foreach collection="orderIdList" item="order_id" separator=",">
+			 '${order_id}'
+		  </foreach>
+			)
+          </if>
          <if test="receiveType!=null ">
          and a.receive_type =#{receiveType}
          </if>
@@ -818,9 +830,6 @@
          </if>
          <if test="distributorId!=null and distributorId!='' ">
          and a.distributor_id = #{distributorId}
-         </if>
-         <if test="payType!=null and payType!='' ">
-         and b.pay_type = #{payType}
          </if>
          ORDER BY a.create_time DESC
          <if test="icount!=null ">

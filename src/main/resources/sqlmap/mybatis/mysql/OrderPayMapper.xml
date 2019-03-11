@@ -44,6 +44,15 @@
 	<delete id="deleteOrderPayList" >
 		delete from order_pay WHERE order_id =#{orderId}
      </delete>
-    
+     
+     
+    <!--查询支付订单号 -->
+    <select id="orderIDListPay"  resultType="java.lang.String">
+         SELECT order_id FROM order_pay
+         where 1=1
+         <if test="payType!=null ">
+         and pay_type = #{payType}
+         </if>
+    </select>
 </mapper>
 

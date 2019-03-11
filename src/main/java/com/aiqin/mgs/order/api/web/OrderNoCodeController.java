@@ -91,17 +91,17 @@ public class OrderNoCodeController {
         return HttpResponse.success(orderNoCodeService.selectSaleView(distributorId,beginDate,endDate));
     }
     
-    /**
-     * 订单列表
-     * @param 
-     * @return
-     */
-    @PostMapping("/nccss")
-    @ApiOperation(value = "订单列表")
-    public HttpResponse<List<OrderNoCodeInfo>> ncbss(@Valid @RequestBody OrderNoCodeRequest orderNoCodeBuyRequest){
-        LOGGER.info("订单列表.");
-        return HttpResponse.success(orderNoCodeService.selectNoCodeList(orderNoCodeBuyRequest));
-    }
+//    /**
+//     * 订单列表  --如打开使用请分析SQL
+//     * @param 
+//     * @return
+//     */
+//    @PostMapping("/nccss")
+//    @ApiOperation(value = "订单列表")
+//    public HttpResponse<List<OrderNoCodeInfo>> ncbss(@Valid @RequestBody OrderNoCodeRequest orderNoCodeBuyRequest){
+//        LOGGER.info("订单列表.");
+//        return HttpResponse.success(orderNoCodeService.selectNoCodeList(orderNoCodeBuyRequest));
+//    }
     
     
     /**
