@@ -58,7 +58,7 @@ public class OrderDetailController {
     public HttpResponse selectorderDetail(@Valid @RequestBody OrderDetailQuery orderDetailQuery) {
         
     	
-    	LOGGER.info("查询订单明细列表...");    	
+    	LOGGER.info("查询订单明细列表参数： {}",orderDetailQuery);    	
         return orderDetailService.selectorderDetail(orderDetailQuery);
     }
     
@@ -73,7 +73,7 @@ public class OrderDetailController {
     public HttpResponse selectorderany(@Valid @RequestParam(name = "order_id", required = true) String orderId) {
         
     	
-    	LOGGER.info("查询BYorderid-返回订单明细数据、订单数据、收货信息...");    	
+    	LOGGER.info("查询BYorderid-返回订单明细数据、订单数据、收货信息参数orderId: {}",orderId);    	
         return orderDetailService.selectorderany(orderId);
     }
     
@@ -88,7 +88,7 @@ public class OrderDetailController {
     public HttpResponse selde(@Valid @RequestParam(name = "order_code", required = true) String orderCode) {
         
     	
-    	LOGGER.info("查询BYorderid-返回订单明细数据、订单数据、收货信息...");    	
+    	LOGGER.info("查询BYorderid-返回订单明细数据、订单数据、收货信息参数：{}",orderCode);    	
         return orderDetailService.selectorderSelde(orderCode);
     }
     
@@ -106,7 +106,7 @@ public class OrderDetailController {
     		) {
         
     	
-    	LOGGER.info("查询会员下的全部订单 返回订单主数据+订单详细列表...");    	
+    	LOGGER.info("查询会员下的全部订单 返回订单主数据+订单详细列表 参数 memberId:{},orderStatus:{}",memberId,orderStatus);    	
         return orderDetailService.selectorderdbumemberid(memberId,orderStatus,pageSize,pageNo);//查询会员下的全部订单 返回订单主数据+订单详细列表
     }
     
@@ -121,7 +121,7 @@ public class OrderDetailController {
     public HttpResponse selectorderdetailsum(@Valid @RequestBody OrderDetailQuery orderDetailQuery) {
         
     	
-    	LOGGER.info("查询订单明细部分汇总-（支持活动ID汇总、）......");    	
+    	LOGGER.info("查询订单明细部分汇总-（支持活动ID汇总、）参数：{}",orderDetailQuery);    	
         return orderDetailService.selectorderdetailsum(orderDetailQuery);//查询订单明细部分汇总-（支持活动ID汇总、）
     }
     
@@ -138,7 +138,7 @@ public class OrderDetailController {
     public HttpResponse productOverviewByMonth(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,@Valid @RequestParam(name = "year", required = true) String year,@RequestParam(name = "month", required = true) String month) {
         
     	
-    	LOGGER.info("商品概览菜单-月销量、月销售额(产品确认：统计维度为订单)......");    	
+    	LOGGER.info("商品概览菜单-月销量、月销售额(产品确认：统计维度为订单)参数distributorId：{},year：{},month：{}",distributorId,year,month);    	
         return orderDetailService.productOverviewByMonth(distributorId,year,month);
     }
     
@@ -152,10 +152,11 @@ public class OrderDetailController {
      */
     @GetMapping("/productoverviewbyskuordertop")
     @ApiOperation(value = "商品概览菜单-产品销量、销售额-前5名")
-    public HttpResponse productOverviewByOrderTop(@Valid @RequestParam(name = "distributor_id", required = true) String distributor_id,@Valid @RequestParam(name = "year", required = true) String year,@RequestParam(name = "month", required = true) String month) {
+    public HttpResponse productOverviewByOrderTop(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,@Valid @RequestParam(name = "year", required = true) String year,@RequestParam(name = "month", required = true) String month) {
         
-    	LOGGER.info("商品概览菜单-产品销量、销售额-前5名......");    	
-        return orderDetailService.productOverviewByOrderTop(distributor_id,year,month);//商品概览产品销量
+    	
+    	LOGGER.info("商品概览菜单-产品销量、销售额-前5名参数 distributor_id:{},year:{},month:{}",distributorId,year,month);    	
+        return orderDetailService.productOverviewByOrderTop(distributorId,year,month);//商品概览产品销量
     }
     
     
@@ -168,10 +169,11 @@ public class OrderDetailController {
      */
     @GetMapping("/productoverviewbyskuorderlast")
     @ApiOperation(value = "商品概览菜单-产品销量、销售额-后5名")
-    public HttpResponse productOverviewByOrderLast(@Valid @RequestParam(name = "distributor_id", required = true) String distributor_id,@Valid @RequestParam(name = "year", required = true) String year,@RequestParam(name = "month", required = true) String month) {
-               	
-    	LOGGER.info("商品概览菜单-产品销量、销售额-后5名......");    	
-        return orderDetailService.productOverviewByOrderLast(distributor_id,year,month);//商品概览产品销量
+    public HttpResponse productOverviewByOrderLast(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,@Valid @RequestParam(name = "year", required = true) String year,@RequestParam(name = "month", required = true) String month) {
+            
+    	
+    	LOGGER.info("商品概览菜单-产品销量、销售额-后5名参数 distributorId：{},year：{},month：{}",distributorId,year,month);    	
+        return orderDetailService.productOverviewByOrderLast(distributorId,year,month);//商品概览产品销量
     }
     
     
@@ -185,44 +187,10 @@ public class OrderDetailController {
     public HttpResponse byMemberOrder(@Valid @RequestBody OrderDetailQuery orderDetailQuery) {
         
     	
-    	LOGGER.info("接口--会员管理-会员消费记录......");    	
-        
+    	LOGGER.info("接口--会员管理-会员消费记录参数 {}",orderDetailQuery);    	
     	return orderDetailService.byMemberOrder(orderDetailQuery);//接口--会员管理-会员消费记录
     }
-    
-    
-//    /**
-//     * 添加新的订单明细数据
-//     * @param detailList
-//     * @param orderId
-//     * @return
-//     */
-//    @PostMapping("")
-//    @ApiOperation(value = "添加新的订单明细数据")
-//    public HttpResponse addDetailList(@Valid @RequestBody List<OrderDetailInfo> detailList,@Valid @RequestParam(name = "order_id", required = false) String orderId) {
-//        
-//    	
-//    	LOGGER.info("添加新的订单明细数据......");
-//        
-//        return orderDetailService.addDetailList(detailList,orderId);
-//    }
-    
-    
-//    /**
-//     * 查询会员下的所有订单ID下的商品集合...
-//     * @param orderidslList
-//     * @param memberId
-//     * @return
-//     */
-//    @PostMapping("/selectproductbyorders")
-//    @ApiOperation(value = "查询会员下的所有订单ID下的商品集合..")
-//    public HttpResponse selectproductbyorders(@Valid @RequestBody List<String> orderidslList,@Valid @RequestParam(name = "member_id", required = true) String memberId) {
-//        
-//    	
-//    	LOGGER.info("查询会员下的所有订单ID下的商品集合....");    	
-//        
-//    	return orderDetailService.selectproductbyorders(orderidslList,memberId);//查询会员下的所有订单ID下的商品集合...
-//    }
+
      
     /**
      * 
@@ -234,9 +202,11 @@ public class OrderDetailController {
     @ApiOperation(value = "商品总库菜单-统计商品在各个渠道的订单数....")
     public HttpResponse prodisor(@Valid @RequestBody ProdisorRequest info) {
 
-    	LOGGER.info("商品总库菜单-统计商品在各个渠道的订单数....");    	
+    	
+    	LOGGER.info("商品总库菜单-统计商品在各个渠道的订单数参数 {}",info);    	
         return orderDetailService.prodisor(info);
     }
+    
     
     /**
      * 
@@ -248,7 +218,8 @@ public class OrderDetailController {
     @ApiOperation(value = "sku销量统计....")
     public HttpResponse sksm(@Valid @RequestParam(required = true) List<String> sukList) {
 
-    	LOGGER.info("sku销量统计....");    	
+    	
+    	LOGGER.info("sku销量统计参数 sukList：{}",sukList);    	
         return orderDetailService.skuSum(sukList);
     }
     
@@ -263,7 +234,8 @@ public class OrderDetailController {
     @ApiOperation(value = "批量添加sku销量....")
     public HttpResponse savtch(@Valid @RequestParam(required = true) List<String> sukList) {
 
-    	LOGGER.info("sku销量统计....");    	
+    	
+    	LOGGER.info("sku销量统计参数sukList {}",sukList);    	
         return orderDetailService.saveBatch(sukList);
     }
 

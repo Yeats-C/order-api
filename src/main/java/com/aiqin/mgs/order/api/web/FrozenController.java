@@ -49,7 +49,8 @@ public class FrozenController {
     @ApiOperation(value = "将商品列表挂起")
     public HttpResponse addFrozenInfo(@Valid @RequestBody List<FrozenInfo> frozenInfolist) {
     	
-        LOGGER.info("将商品列表挂起...");
+    	
+        LOGGER.info("将商品列表挂起参数：{}",frozenInfolist);
         return frozenService.addFrozenInfo(frozenInfolist);
     
     }
@@ -65,7 +66,7 @@ public class FrozenController {
     public HttpResponse deleteDetailByFrozenId(@Valid @PathVariable(name = "frozen_id",required = true) String frozenId) {
         
     	
-    	LOGGER.info("删除挂单数据......");
+    	LOGGER.info("删除挂单数据参数:{}",frozenId);
         return frozenService.deleteByFrozenId(frozenId);
     }
     
@@ -79,14 +80,12 @@ public class FrozenController {
     @ApiOperation(value = "将挂单数据解卦")
     public HttpResponse selectDetailByFrozenId(@Valid @PathVariable(name = "frozen_id",required = true) String frozenId) {
         
-    	LOGGER.info("解卦......");
     	
-    	LOGGER.info("查询挂单明细......");
-    	
+    	LOGGER.info("查询挂单明细参数：{}",frozenId);
     	HttpResponse rs = frozenService.selectDetailByFrozenId(frozenId);
     	
-    	LOGGER.info("删除挂单数据......");
     	
+    	LOGGER.info("删除挂单数据参数：{}",frozenId);
     	frozenService.deleteByFrozenId(frozenId);
     	
         return rs;//返回挂单数据
@@ -102,7 +101,8 @@ public class FrozenController {
     @ApiOperation(value = "查询挂单明细...")
     public HttpResponse selectSumByFrozenId(@Valid @RequestParam(name = "create_by", required = true) String createBy,@RequestParam(name = "distributor_id", required = true) String distributorId) {
      
- 	   LOGGER.info("查询挂单明细......");    	
+    	
+ 	   LOGGER.info("查询挂单明细: distributorId :{},createBy: {}",distributorId,createBy);    	
        return frozenService.selectDetail(createBy,distributorId);
     }
     
@@ -116,7 +116,8 @@ public class FrozenController {
     @ApiOperation(value = "查询挂单数量...")
     public HttpResponse sfc(@Valid @RequestParam(name = "create_by", required = true) String createBy,@RequestParam(name = "distributor_id", required = true) String distributorId) {
      
- 	   LOGGER.info("查询挂单数量......");    	
+    	
+ 	   LOGGER.info("查询挂单数量参数: distributorId: {},createBy: {}",distributorId,createBy);    	
        return frozenService.selectSumByParam(createBy,distributorId);
     }
     

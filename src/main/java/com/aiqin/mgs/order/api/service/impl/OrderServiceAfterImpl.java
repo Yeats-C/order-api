@@ -106,7 +106,7 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 			return HttpResponse.success(new PageResData(totalCount,OrderAfterSaleInfolist));
 		} catch (Exception e) {
 			
-			LOGGER.info("条件查询售后维权列表 /条件查询退货信息報錯", e);
+			LOGGER.error("条件查询售后维权列表 /条件查询退货信息报错 {}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}
@@ -197,7 +197,7 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 			return HttpResponse.success(after_sale_code);
 		
 		} catch (Exception e) {
-			LOGGER.info("添加新的订单售后数据報錯", e);
+			LOGGER.error("添加新的订单售后数据报错 {}", e);
 			return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
 		}
 	}
@@ -294,7 +294,7 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 			return HttpResponse.success(addReturnOrderResonse);
 		
 		} catch (Exception e) {
-			LOGGER.info("添加新的订单售后数据報錯", e);
+			LOGGER.error("添加新的订单售后数据报错 {}", e);
 			return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
 		}
 	}
@@ -380,7 +380,7 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 			
 		} catch (Exception e) {
 			
-			LOGGER.info("查询BYorderid-返回订单订单数据、退货数据、退货明细数据報錯", e);
+			LOGGER.error("查询BYorderid-返回订单订单数据、退货数据、退货明细数据报错 {}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 		
@@ -481,7 +481,7 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 			
 			return HttpResponse.success();
 		} catch (Exception e) {
-			LOGGER.info("更改退货状态(售后表+订单表)报错", e);
+			LOGGER.error("更改退货状态(售后表+订单表)报错 {}", e);
 			return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
 		}
 	}
@@ -539,7 +539,7 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 			return HttpResponse.success(new PageResData(totalCount,orderAfterSaleInfolist));
 			
 		} catch (Exception e) {
-			LOGGER.info("模糊查询查询退货信息+退货明细+订单明细信息报错", e);
+			LOGGER.error("模糊查询查询退货信息+退货明细+订单明细信息报错 {}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}

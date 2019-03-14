@@ -51,7 +51,7 @@ public class CartController {
     public HttpResponse addNewCart(@Valid @RequestBody CartInfo cartInfo) {
  	
  	
-        LOGGER.info("微商城-添加/修改购物车信息0:添加1:修改......",cartInfo);
+        LOGGER.info("微商城-添加/修改购物车信息0:添加1:修改 参数：{}",cartInfo);
         return cartService.addCartInfo(cartInfo);
  
     }    
@@ -66,7 +66,8 @@ public class CartController {
     @ApiOperation(value = "清空购物车")
     public HttpResponse deleteCartInfo(@Valid @PathVariable(name = "member_id") String memberId) {
         
-        LOGGER.info("清空购物车......");
+    	
+        LOGGER.info("清空购物车参数：{}",memberId);
         return cartService.deleteCartInfo(memberId);
     }
     
@@ -82,7 +83,8 @@ public class CartController {
     		@Valid @RequestBody List<String> skuCodes,
     		@RequestParam(name = "distributor_id", required = true) String distributorId) {
         
-        LOGGER.info("删除购物车购物清单......");
+    	
+        LOGGER.info("删除购物车购物清单参数：memberId: {},skuCodes :{},distributorId: {}",memberId,skuCodes,distributorId);
         return cartService.deleteCartInfoById(memberId,skuCodes,distributorId);
     }
 
@@ -100,7 +102,8 @@ public class CartController {
  		@Valid @RequestParam(name = "page_size", required = true) Integer pageSize
  		) {
      
- 	    LOGGER.info("购物车展示列表......");    	
+    	
+ 	    LOGGER.info("购物车展示列表参数：{},{}",memberId,distributorId);    	
         return cartService.selectCartByMemberId(memberId,distributorId,pageNo,pageSize);//购物车展示列表
     }
     

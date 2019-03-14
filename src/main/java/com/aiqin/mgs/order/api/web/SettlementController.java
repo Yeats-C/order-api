@@ -48,19 +48,14 @@ public class SettlementController {
     @Resource
     private SettlementService settlementService;
     
-//    @Resource
-//    private CartService cartService;
-    
-    
-
     
     //1.接口-结算数据查询
     @PostMapping("/jkselectsettlement")
     @ApiOperation(value = "接口-结算数据查询")
     public HttpResponse jkselectsettlement(@Valid @RequestBody OrderQuery orderQuery) {
         
-    	LOGGER.info("接口-结算数据查询......");
     	
+    	LOGGER.info("接口-结算数据查询参数: {}",orderQuery);
         return settlementService.jkselectsettlement(orderQuery);
     
     }
@@ -90,13 +85,13 @@ public class SettlementController {
 //    }
     
     
-  //查询支付数据通过Order_id
+    //查询支付数据通过Order_id
     @GetMapping("/pay")
     @ApiOperation(value = "查询支付数据通过Order_id....")
     public HttpResponse pay(@Valid @RequestParam(name = "order_id", required = true) String orderId) {
     	
     	
-        LOGGER.info("查询支付数据通过Order_id...");
+        LOGGER.info("查询支付数据通过Order_id: {}",orderId);
         return settlementService.pay(orderId);
     
     }
@@ -150,7 +145,6 @@ public class SettlementController {
 //    @ApiOperation(value = "支付结果测试工具")
 //    public void PayResult(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 //    	String reqParams = StreamUtil.read(request.getInputStream());
-//		System.out.println("-------支付结果:"+reqParams);
 //		StringBuffer sb = new StringBuffer("<xml><return_code>SUCCESS</return_code><return_msg>OK</return_msg></xml>");
 //		response.getWriter().append(sb.toString());
 //	}

@@ -12,6 +12,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,8 @@ import com.aiqin.mgs.order.api.service.OrderService;
 
 @Service
 public class TaskService{
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(TaskService.class);
 
 	@Resource
     private OrderService orderService;
@@ -39,7 +43,7 @@ public class TaskService{
     			Integer orderStatus = Global.ORDER_STATUS_4;
             	String updateBy = "system";
             	orderService.onlyStatus(orderId,orderStatus,updateBy);
-            	System.out.println(updateBy);
+            	LOGGER.info("未付款订单30分钟后自动取消:{}", orderId);
     		}    		
     	}
     	

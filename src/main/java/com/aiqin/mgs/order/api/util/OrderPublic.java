@@ -544,8 +544,6 @@ public static String randomNumberE() {
  
 
 	public static void main(String[] args) {
-		System.out.println(NextDate(0));
-	 
 	}
 	
 }
