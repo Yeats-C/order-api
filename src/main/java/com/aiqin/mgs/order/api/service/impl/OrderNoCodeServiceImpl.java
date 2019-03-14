@@ -364,59 +364,59 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 
 
 	//订单列表
-	@Override
-	public HttpResponse<List<OrderInfo>> selectNoCodeList(@Valid OrderNoCodeRequest orderNoCodeBuyRequest) {
-		
-		//购买.退货
-		try {
-			Integer orderFlow = null;
-            if(orderNoCodeBuyRequest !=null) {
-            	 if(orderNoCodeBuyRequest.getOrderFlow() !=null) {
-            		 orderFlow = orderNoCodeBuyRequest.getOrderFlow();
-            	 }else {
-            		 orderFlow = 0;
-            	 }
-            }
-			
-			//返回结果
-			List<OrderNoCodeInfo> list = new ArrayList();
-			
-			//分页
-			Integer totalCount = 0;
-			
-			if(orderFlow != Global.ORDER_FLOW_2) {
-				//购买订单列表
-				List<OrderNoCodeInfo> buyList = new ArrayList();
-				buyList = orderNoCodeDao.selectNoCodeOrderList(orderNoCodeBuyRequest);
-				if(buyList !=null && buyList.size()>0) {
-					for(OrderNoCodeInfo info : buyList) {
-						list.add(info);
-					}	
-				}
-				//订单列表总数据条数
-				totalCount += orderNoCodeDao.selectNoCodeOrderListCount(orderNoCodeBuyRequest);
-			}
-			if(orderFlow != Global.ORDER_FLOW_1) {
-			    //退货订单列表
-				List<OrderNoCodeInfo> returnList = new ArrayList();
-				returnList = orderNoCodeDao.selectNoCodeReturnList(orderNoCodeBuyRequest);	
-				if(returnList !=null && returnList.size()>0) {
-					for(OrderNoCodeInfo info : returnList) {
-						list.add(info);
-					}	
-				}
-				//退货订单列表总数据条数
-				totalCount += orderNoCodeDao.selectNoCodeReturnListCount(orderNoCodeBuyRequest);
-			}
-			
-			return HttpResponse.success(new PageResData(totalCount,list));
-	
-		} catch (Exception e) {
-			LOGGER.info("订单列表查询异常",e);
-			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
-		}
-		
-	}
+//	@Override
+//	public HttpResponse<List<OrderInfo>> selectNoCodeList(@Valid OrderNoCodeRequest orderNoCodeBuyRequest) {
+//		
+//		//购买.退货
+//		try {
+//			Integer orderFlow = null;
+//            if(orderNoCodeBuyRequest !=null) {
+//            	 if(orderNoCodeBuyRequest.getOrderFlow() !=null) {
+//            		 orderFlow = orderNoCodeBuyRequest.getOrderFlow();
+//            	 }else {
+//            		 orderFlow = 0;
+//            	 }
+//            }
+//			
+//			//返回结果
+//			List<OrderNoCodeInfo> list = new ArrayList();
+//			
+//			//分页
+//			Integer totalCount = 0;
+//			
+//			if(orderFlow != Global.ORDER_FLOW_2) {
+//				//购买订单列表
+//				List<OrderNoCodeInfo> buyList = new ArrayList();
+//				buyList = orderNoCodeDao.selectNoCodeOrderList(orderNoCodeBuyRequest);
+//				if(buyList !=null && buyList.size()>0) {
+//					for(OrderNoCodeInfo info : buyList) {
+//						list.add(info);
+//					}	
+//				}
+//				//订单列表总数据条数
+//				totalCount += orderNoCodeDao.selectNoCodeOrderListCount(orderNoCodeBuyRequest);
+//			}
+//			if(orderFlow != Global.ORDER_FLOW_1) {
+//			    //退货订单列表
+//				List<OrderNoCodeInfo> returnList = new ArrayList();
+//				returnList = orderNoCodeDao.selectNoCodeReturnList(orderNoCodeBuyRequest);	
+//				if(returnList !=null && returnList.size()>0) {
+//					for(OrderNoCodeInfo info : returnList) {
+//						list.add(info);
+//					}	
+//				}
+//				//退货订单列表总数据条数
+//				totalCount += orderNoCodeDao.selectNoCodeReturnListCount(orderNoCodeBuyRequest);
+//			}
+//			
+//			return HttpResponse.success(new PageResData(totalCount,list));
+//	
+//		} catch (Exception e) {
+//			LOGGER.info("订单列表查询异常",e);
+//			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+//		}
+//		
+//	}
 
 
 	//编号查询订单.

@@ -277,8 +277,8 @@
     
     <!-- 以上为概览查询 -->
     <!-- 购买订单列表 -->
-    <select id="selectNoCodeOrderList" resultMap="OrderInfoMapping" resultType="java.util.List">
-         SELECT a.order_id, a.order_code,a.distributor_id,a.distributor_code,a.distributor_name,
+    <!--<select id="selectNoCodeOrderList" resultMap="OrderInfoMapping" resultType="java.util.List">
+           SELECT a.order_id, a.order_code,a.distributor_id,a.distributor_code,a.distributor_name,
                 a.member_phone,a.create_time,b.type_id,b.product_id,
                 
                 a.member_id,a.member_name,CONVERT(CASE WHEN a.member_id IS NULL OR a.member_id=''  THEN 2 ELSE 1 END,SIGNED) AS member_type,
@@ -321,9 +321,10 @@
             AND b.product_id =#{productId}
           </if>
     </select>
+    -->
     
     <!-- 订单列表总数据条数-->
-    <select id="selectNoCodeOrderListCount" resultType="java.lang.Integer">
+    <!--<select id="selectNoCodeOrderListCount" resultType="java.lang.Integer">
          SELECT count(1)
          FROM order_info a
          left join order_detail b on a.order_id = b.order_id
@@ -362,9 +363,9 @@
             AND b.product_id =#{productId}
           </if>
     </select>
-    
+    -->
     <!-- 退货订单列表 -->
-    <select id="selectNoCodeReturnList" resultMap="OrderInfoMapping" resultType="java.util.List">
+    <!--<select id="selectNoCodeReturnList" resultMap="OrderInfoMapping" resultType="java.util.List">
          SELECT a.order_id, a.order_code,a.distributor_id,a.distributor_code,a.distributor_name,
                 a.member_phone,a.create_time,b.type_id,b.product_id,
                 
@@ -372,7 +373,7 @@
                 a.cashier_id,a.cashier_name,a.guide_id,a.guide_name,b.product_code,b.product_name,b.type_name,a.actual_price
          FROM order_after_sale c
          left join order_detail b on c.order_id = b.order_id
-         left join order_info a on c.order_id = b.order_id
+         left join order_info a on c.order_id = a.order_id
           WHERE 1=1 AND c.order_type=3
           <if test="orderId!=null and orderId!='' ">
             AND a.order_id =#{orderId}
@@ -408,13 +409,13 @@
             AND b.product_id =#{productId}
           </if>
     </select>
-    
+    -->
     <!-- 退货订单列表总数据条数-->
-    <select id="selectNoCodeReturnListCount" resultType="java.lang.Integer">
+    <!--<select id="selectNoCodeReturnListCount" resultType="java.lang.Integer">
          SELECT count(1)
          FROM order_after_sale c
          left join order_detail b on c.order_id = b.order_id
-         left join order_info a on c.order_id = b.order_id
+         left join order_info a on c.order_id = a.order_id
           WHERE 1=1 AND c.order_type=3
           <if test="orderId!=null and orderId!='' ">
             AND a.order_id =#{orderId}
@@ -450,5 +451,6 @@
             AND b.product_id =#{productId}
           </if>
     </select>
+    -->
 </mapper>
 

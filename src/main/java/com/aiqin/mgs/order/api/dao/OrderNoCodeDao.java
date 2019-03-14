@@ -56,13 +56,13 @@ public interface OrderNoCodeDao {
 	List<SelectSaleViewResonse> getReturnCountGroupByTypeId(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate);
 	//客流量
 	Integer getPassengerFlowGroupByTypeId(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate,@Param("typeId")String typeId);
-	//购买订单列表
-	List<OrderNoCodeInfo> selectNoCodeOrderList(@Valid OrderNoCodeRequest orderNoCodeBuyRequest) throws Exception;
-	//订单列表总数据条数
-	Integer selectNoCodeOrderListCount(@Valid OrderNoCodeRequest orderNoCodeBuyRequest)throws Exception;
-	//退货订单列表
-	List<OrderNoCodeInfo> selectNoCodeReturnList(@Valid OrderNoCodeRequest orderNoCodeBuyRequest)throws Exception;
-	//退货订单列表总数据条数
-	Integer selectNoCodeReturnListCount(@Valid OrderNoCodeRequest orderNoCodeBuyRequest)throws Exception;
-	
+
+//	//购买订单列表
+//	List<OrderNoCodeInfo> selectNoCodeOrderList(@Valid OrderNoCodeRequest orderNoCodeBuyRequest) throws Exception;
+//	//订单列表总数据条数
+//	Integer selectNoCodeOrderListCount(@Valid OrderNoCodeRequest orderNoCodeBuyRequest)throws Exception;
+//	//退货订单列表
+//	List<OrderNoCodeInfo> selectNoCodeReturnList(@Valid OrderNoCodeRequest orderNoCodeBuyRequest)throws Exception;
+//	//退货订单列表总数据条数
+//	Integer selectNoCodeReturnListCount(@Valid OrderNoCodeRequest orderNoCodeBuyRequest)throws Exception;
 }

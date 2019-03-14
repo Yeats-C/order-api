@@ -122,8 +122,12 @@ public class OrderServiceImpl implements OrderService{
 	@Override
 	public HttpResponse selectOrder(OrderQuery orderQuery) {
 		
-			LOGGER.info("模糊查询订单列表", orderQuery);
-
+	   LOGGER.info("模糊查询订单列表", orderQuery);
+	   
+	   
+	   //根据支付类型查询订单
+	   payOrderIdList(orderQuery);
+	   
 			try {
 				
 				List<OrderInfo> OrderInfolist = orderDao.selectOrder(OrderPublic.getOrderQuery(orderQuery));
@@ -149,23 +153,15 @@ public class OrderServiceImpl implements OrderService{
 						}else {
 							info.setTurnReturnView(1);
 						}
-						
-						
 						OrderInfolist.set(i,info);
-						
 					}
-					
-					
 				}
 				
 				//计算总数据量
 				Integer totalCount = 0;
 				Integer icount =null;
-//				orderQuery.setIcount(icount);
 				totalCount = orderDao.selectOrderCount(OrderPublic.getOrderQuery(orderQuery));
 				
-				
-//				return HttpResponse.success(OrderPublic.getData(OrderInfolist));
 				return HttpResponse.success(new PageResData(totalCount,OrderInfolist));
 				
 			} catch (Exception e) {
@@ -173,6 +169,28 @@ public class OrderServiceImpl implements OrderService{
 				return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 			}
 			
+	}
+
+
+	private void payOrderIdList(OrderQuery orderQuery) {
+		
+		if(orderQuery !=null) {
+			  if(orderQuery.getPayType() !=null && !orderQuery.getPayType().equals("")){
+				  
+				  List<String> orderIdList = new ArrayList();
+				  try {
+					OrderPayInfo info = new OrderPayInfo();
+					info.setPayType(Integer.valueOf(orderQuery.getPayType()));
+					orderIdList = orderPayDao.orderIDListPay(info);
+					if(orderIdList !=null && orderIdList.size()>0) {
+						orderQuery.setOrderIdList(orderIdList);
+					}
+				} catch (Exception e) {
+					LOGGER.info("查询支付订单号异常", e);
+				}
+			  } 
+		   }
+		
 	}
 
 
@@ -979,6 +997,9 @@ public class OrderServiceImpl implements OrderService{
 
 		try {
 			
+			//根据支付类型查询订单
+			payOrderIdList(orderQuery);
+			
 			//订单列表
 			List<OradskuResponse> OrderInfolist = orderDao.selectskuResponse(OrderPublic.getOrderQuery(orderQuery));
 			OradskuResponse oradskuResponse = new OradskuResponse();
@@ -1039,6 +1060,10 @@ public class OrderServiceImpl implements OrderService{
 	public HttpResponse exorder(@Valid OrderQuery orderQuery) {
 
 		try {
+			
+			//根据支付类型查询订单
+			payOrderIdList(orderQuery);
+			   
 			Integer icount =null;
 			orderQuery.setIcount(icount);
 			List<OrderInfo> OrderInfolist = orderDao.selectOrder(OrderPublic.getOrderQuery(orderQuery));
