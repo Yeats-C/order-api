@@ -273,6 +273,7 @@ public class OrderListServiceImpl implements OrderListService {
         for (OrderListFather inventory : inventories) {
             for (OrderList orderList : inventory.getOrderList()) {
                 orderList.setOrderStatusShow(OrderStatusEnum.getOrderStatusEnum(orderList.getOrderStatus()).getBackstageStatus());
+                inventory.setCanUpdate(orderList.getOrderStatus() == 1 && (orderList.getOrderType() == 3 || orderList.getOrderType() == 4));
             }
         }
         int count = orderListDao.searchOrderListFatherCount(param);
