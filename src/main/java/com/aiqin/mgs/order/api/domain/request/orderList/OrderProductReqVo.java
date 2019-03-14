@@ -107,6 +107,10 @@ public class OrderProductReqVo implements Serializable {
     @JsonProperty("weight")
     private Integer weight = 0;
 
+    @JsonProperty("product_type")
+    @ApiModelProperty("商品类型，1-正常品，0-效期品")
+    private Integer productType=1;
+
     @ApiModelProperty(value = "优惠额度信息")
     @JsonProperty("discount_amount_info")
     private List<DiscountAmountInfo> discountAmountInfo;
