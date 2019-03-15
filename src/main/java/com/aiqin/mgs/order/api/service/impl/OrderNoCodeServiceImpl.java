@@ -352,14 +352,13 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 					info.setPassengerFlow(0);
 					list.add(info);
 				}
+				
+				return HttpResponse.success(list);
+				
 			} catch (Exception e) {
-				LOGGER.info("有码商品的销售金额查询异常");
+				LOGGER.error("有码商品的销售金额查询异常 {}",e);
 				return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 			}
-			
-			
-			
-		return HttpResponse.success(list);
 	}
 
 
@@ -443,7 +442,7 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 			}
 			info.setOrderInfo(orderInfo);
 		} catch (Exception e) {
-			LOGGER.error("查询BYorderid-返回订单主数据",e);
+			LOGGER.error("查询BYorderid-返回订单主数据 {}",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 		
@@ -456,7 +455,7 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 	    	    info.setDetailList(detailList);
 	        }
 		} catch (Exception e) {
-			LOGGER.error("组装订单明细数据失败",e);
+			LOGGER.error("组装订单明细数据失败 {}",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}	
 		
@@ -470,7 +469,7 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 	        }
 	        
 		} catch (Exception e) {
-			LOGGER.error("组装订单结算数据失败",e);
+			LOGGER.error("组装订单结算数据失败 {}",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}	
 		
@@ -486,7 +485,7 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 	        return HttpResponse.success(info);
 	        
 		} catch (Exception e) {
-			LOGGER.error("组装订单支付数据失败",e);
+			LOGGER.error("组装订单支付数据失败 {}",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}	
 	}

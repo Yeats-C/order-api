@@ -141,10 +141,11 @@ public class OrderLogServiceImpl implements OrderLogService{
 	public HttpResponse orog(@Valid String orderId) {
 		
 		try {
+			LOGGER.info("查询订单日志参数 {}", orderId);
 			List<OrderLog> list = orderLogDao.orog(orderId);
 			return HttpResponse.success(list);
 		} catch (Exception e) {
-			LOGGER.info("查询订单日志報錯", e);
+			LOGGER.error("查询订单日志报错 {}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}

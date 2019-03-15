@@ -44,6 +44,7 @@ import com.aiqin.mgs.order.api.domain.OrderInfo;
 import com.aiqin.mgs.order.api.domain.OrderListInfo;
 import com.aiqin.mgs.order.api.domain.OrderLog;
 import com.aiqin.mgs.order.api.domain.OrderQuery;
+import com.aiqin.mgs.order.api.domain.OrderReceivingInfo;
 import com.aiqin.mgs.order.api.domain.OrderodrInfo;
 import com.aiqin.mgs.order.api.domain.ProductCycle;
 import com.aiqin.mgs.order.api.domain.constant.Global;
@@ -103,7 +104,6 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		
 		
 		try {
-		LOGGER.info("查询模糊查询订单明细列表开始......", orderDetailQuery);
 		List<OrderDetailInfo> orderDetailList =null;
 		
 			orderDetailList = orderDetailDao.selectorderDetail(orderDetailQuery);
@@ -118,7 +118,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			}
 			return HttpResponse.success(new PageResData(totalCount,orderDetailList));
 		} catch (Exception e) {
-			LOGGER.info("查询模糊查询订单明细列表失败......", e);
+			LOGGER.error("查询模糊查询订单明细列表失败 {}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}
@@ -128,14 +128,13 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 	@Override
 	public HttpResponse selectorderdetailsum(@Valid OrderDetailQuery orderDetailQuery) {
 		
-		LOGGER.info("查询订单明细部分汇总-（支持活动ID汇总、）......", orderDetailQuery);
 		try {
 			
 			return HttpResponse.success(orderDetailDao.selectorderdetailsum(orderDetailQuery));
 		
 		} catch (Exception e) {
 			
-			LOGGER.info("查询订单明细部分汇总-（支持活动ID汇总、）失败......", e);
+			LOGGER.error("查询订单明细部分汇总-（支持活动ID汇总、）失败 {}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}
@@ -146,22 +145,25 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 	public HttpResponse productOverviewByMonth(@Valid String distributorId,String year, String month) {
 		
 		try {
-			//月销售额
-			Integer actualPrice = 0;
+			
 			List<Integer> originTypeList = null;
 			String yearMonth = year+"-"+month; //"YYYY-MM"
+			
+			//月销售额
+			Integer actualPrice = null;
 			actualPrice = orderDao.selectByMonthAllAmt(distributorId,originTypeList,yearMonth);
 			
 			//月销量
-			Integer amount = 0;
+			Integer amount = null;
 			amount = orderDao.selectByMonthAcount(distributorId,originTypeList,yearMonth);
 			
 			OrderDetailInfo info = new OrderDetailInfo();
-			info.setActualPrice(actualPrice);
-			info.setAmount(amount);
+			info.setActualPrice(actualPrice !=null ? actualPrice :0);
+			info.setAmount(amount !=null ?amount :0);
 			return HttpResponse.success(info);
+			
 		} catch (Exception e) {
-			LOGGER.info("商品概览菜单-月销量、月销售额(产品确认：统计维度为订单)......", e);
+			LOGGER.error("商品概览菜单-月销量、月销售额(产品确认：统计维度为订单) 异常 {}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 		
@@ -182,7 +184,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		try {
 			return HttpResponse.success(orderDetailDao.productOverviewByOrderTop(distributor_id,year,month));
 		} catch (Exception e) {
-			LOGGER.info("接口--商品概览产品销量、销售额-前5名失败......", e);
+			LOGGER.error("接口--商品概览产品销量、销售额-前5名失败 {}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}
@@ -195,7 +197,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		try {
 			return HttpResponse.success(orderDetailDao.productOverviewByOrderLast(distributor_id,year,month));
 		} catch (Exception e) {
-			LOGGER.info("接口--商品概览产品销量、销售额-后5名失败......", e);
+			LOGGER.error("接口--商品概览产品销量、销售额-后5名失败 {}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}
@@ -209,7 +211,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 	   try {
 		   list = orderDetailDao.byMemberOrder(orderDetailQuery);
 	   } catch (Exception e1) {
-		   LOGGER.error("查询接口--会员管理-会员消费记录异常",e1);
+		   LOGGER.error("查询接口--会员管理-会员消费记录异常: {}",e1);
 	   }
       
       List<String> projectList = new ArrayList();
@@ -233,7 +235,6 @@ public class OrderDetailServiceImpl implements OrderDetailService{
           try {
         	  HttpClient httpPost = HttpClient.post("http://"+sb.toString()).json(projectList); 
         	  httpPost.action().status();
-        	  System.out.println("status=========="+httpPost.action().status());
         	  HttpResponse result = httpPost.action().result(new TypeReference<HttpResponse>(){});
               
         	  LOGGER.info("请求结果，result为{}", result.getData());
@@ -274,9 +275,9 @@ public class OrderDetailServiceImpl implements OrderDetailService{
   			Integer totalCount = 0;
   			Integer icount =null;
   			orderDetailQuery.setIcount(icount);
-  			List<OrderDetailByMemberResponse> Icount_list= orderDetailDao.byMemberOrder(orderDetailQuery);
-  			if(Icount_list !=null && Icount_list.size()>0) {
-  				totalCount = Icount_list.size();
+  			List<OrderDetailByMemberResponse> icountList= orderDetailDao.byMemberOrder(orderDetailQuery);
+  			if(icountList !=null && icountList.size()>0) {
+  				totalCount = icountList.size();
   			}
               
 //              return HttpResponse.success(OrderPublic.getData(list)); 
@@ -361,7 +362,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 				list.add(info);
 			}
 		}else {
-			LOGGER.error("为获取到订单明细数据....");
+			LOGGER.warn("未获取订单明细数据.orderId: {}",orderId);
 		}
 		return list;
 	}
@@ -417,8 +418,8 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			for(int i=0;i<order_list.size();i++){
 				OrderInfo OrderInfo = order_list.get(i);
 				orderDetailQuery.setOrderId(OrderInfo.getOrderId());
-				List<OrderDetailInfo> detail_list = orderDetailDao.selectDetailById(orderDetailQuery);
-				OrderInfo.setOrderdetailList(detail_list);
+				List<OrderDetailInfo> detailList = orderDetailDao.selectDetailById(orderDetailQuery);
+				OrderInfo.setOrderdetailList(detailList);
 				order_list.set(i, OrderInfo);
 			}
 			}
@@ -446,11 +447,14 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		info.setUpdateBy(updateBy);
 		
 		//更新数据
+		LOGGER.info("更新退货状态参数：{}",info);
 	    orderDetailDao.returnStatus(info);
 	    
 	    //生成订单日志
 	    OrderLog rderLog = OrderPublic.addOrderLog(orderDetailId,Global.STATUS_2,"OrderDetailServiceImpl.returnStatus()",
 	  	OrderPublic.getStatus(Global.STATUS_2,returnStatus),updateBy);
+	    
+	    LOGGER.info("生成订单日志参数：{}",rderLog);
 	    orderLogService.addOrderLog(rderLog);
 
 	}
@@ -483,7 +487,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			
 			return HttpResponse.success(list);
 		} catch (Exception e) {
-			LOGGER.error("接口-统计商品在各个渠道的订单数失败",e);
+			LOGGER.error("接口-统计商品在各个渠道的订单数失败 {}",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}
@@ -492,16 +496,16 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 	//订单中商品sku数量
 	@Override
 	public Integer getSkuSum(@Valid String orderId) {
-		Integer acount = 0;
+		Integer acount = null;
 		OrderDetailQuery query = new OrderDetailQuery();
 		query.setOrderId(orderId);
 		try {
 			acount = orderDetailDao.getSkuSum(query);
 			
 		} catch (Exception e) {
-			LOGGER.error("订单中商品sku数量失败",e);
+			LOGGER.error("订单中商品sku数量失败 {}",e);
 		}
-		return acount;
+		return acount!=null?acount:0;
 		
 	}
 
@@ -542,7 +546,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		return HttpResponse.success(list);
 		
 		} catch (Exception e) {
-			LOGGER.error("订单中商品sku数量失败",e);
+			LOGGER.error("订单中商品sku数量失败 {}",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}
@@ -552,12 +556,12 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 	@Override
 	public HttpResponse saveBatch(@Valid List<String> sukList) {
 		
-		//商品库存
-		String url = product_ip+product_sku;
-		
-		if(sukList !=null && sukList.size()>0) {
-			
-		}
+//		//商品库存
+//		String url = product_ip+product_sku;
+//		
+//		if(sukList !=null && sukList.size()>0) {
+//			
+//		}
 		
 		return null;
 	}
@@ -585,14 +589,14 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			}
 			
 			//获取SKU数量
-			Integer skuSum =0;
+			Integer skuSum =null;
 			skuSum = getSkuSum(orderId);
-			orderInfo.setSkuSum(skuSum);
+			orderInfo.setSkuSum(skuSum!=null?skuSum:0);
 			if(orderInfo !=null) {
 				info.setOrderInfo(orderInfo);
 			}
 		} catch (Exception e) {
-			LOGGER.error("查询BYorderid-返回订单主数据",e);
+			LOGGER.error("查询BYorderid-返回订单主数据 {}",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 		
@@ -600,18 +604,26 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		//订单明细数据
 	    List<OrderDetailInfo> detailList = orderDetailDao.selectDetailById(orderDetailQuery);
 		
-		info.setDetailList(detailList);
-
+	    if(detailList !=null && detailList.size()>0) {
+	    	info.setDetailList(detailList);
+	    }
+		
 		} catch (Exception e) {
-			LOGGER.error("查询BYorderid-返回订单明细数据",e);
+			LOGGER.error("查询BYorderid-返回订单明细数据 {}",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 		try {
 		//收货信息
-		info.setReceivingInfo(orderReceivingDao.selecReceivingById(orderDetailQuery));
-		     
+			
+	    OrderReceivingInfo orderReceivingInfo = new OrderReceivingInfo();
+	    orderReceivingInfo=orderReceivingDao.selecReceivingById(orderDetailQuery);
+
+	    if(orderReceivingInfo !=null ) {
+	    	info.setReceivingInfo(orderReceivingInfo);
+	    }
+	     
 		} catch (Exception e) {
-			LOGGER.error("查询BYorderid-返回订单收货信息",e);
+			LOGGER.error("查询BYorderid-返回订单收货信息异常 {}",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 		try {
@@ -622,7 +634,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			
 			return HttpResponse.success(info);
 			} catch (Exception e) {
-				LOGGER.error("查询BYorderid-返回订单结算信息",e);
+				LOGGER.error("查询BYorderid-返回订单结算信息异常 {}",e);
 				return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 			}				
 	}
@@ -634,7 +646,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		try {
 			return orderDetailDao.selectSkuSale(orderList);
 		} catch (Exception e) {
-			LOGGER.error("查询SKU+销量 异常",e);
+			LOGGER.error("查询SKU+销量 异常 {}",e);
 			return null;
 		}
 	}
@@ -669,7 +681,6 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 //		    //组装收货信息
 //		    info.setOrderReceivingInfo(orderReceivingDao.selecReceivingById(orderDetailQuery));
 //		
-//		    System.out.println(info);
 //		     
 //		} catch (Exception e) {
 //			LOGGER.error("查询BYorderid-返回订单收货信息",e);
@@ -681,7 +692,6 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 //			orderQuery.setOrderId(orderId);
 //			info.setSettlementInfo(settlementDao.jkselectsettlement(orderQuery));
 //			
-//			System.out.println(info);
 //			return HttpResponse.success(info);
 //		} catch (Exception e) {
 //			LOGGER.error("查询BYorderid-返回订单结算信息",e);
