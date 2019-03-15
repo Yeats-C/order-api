@@ -355,6 +355,8 @@ public class OrderListServiceImpl implements OrderListService {
     @Transactional
     @Override
     public OrderSaveRespVo save(OrderReqVo reqVo) {
+        log.info("===============保存订单======================");
+        log.info(JSON.toJSONString(reqVo));
         Date now = new Date();
         String orderCode = sequenceService.generateOrderCode(reqVo.getCompanyCode(), reqVo.getOrderType());
         List<StockLockSkuReqVo> skuReqVos = reqVo.getProducts().stream().map(product -> {
