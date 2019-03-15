@@ -2,7 +2,7 @@ package com.aiqin.mgs.order.api.service.impl;
 
 import com.aiqin.ground.util.exception.GroundRuntimeException;
 import com.aiqin.ground.util.http.HttpClient;
-import com.aiqin.ground.util.json.JsonUtil;
+import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.component.OrderStatusEnum;
@@ -15,18 +15,15 @@ import com.aiqin.mgs.order.api.dao.OrderStatusDao;
 import com.aiqin.mgs.order.api.domain.OrderList;
 import com.aiqin.mgs.order.api.domain.OrderListLogistics;
 import com.aiqin.mgs.order.api.domain.OrderListProduct;
-import com.aiqin.mgs.order.api.domain.OrderStatus;
 import com.aiqin.mgs.order.api.domain.request.orderList.*;
 import com.aiqin.mgs.order.api.domain.request.stock.StockLockReqVo;
 import com.aiqin.mgs.order.api.domain.request.stock.StockLockSkuReqVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.FirstOrderTimeRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderSaveRespVo;
-import com.aiqin.mgs.order.api.domain.request.orderList.*;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
 import com.aiqin.mgs.order.api.domain.response.stock.StockLockRespVo;
 import com.aiqin.mgs.order.api.service.BridgeStockService;
 import com.aiqin.mgs.order.api.service.OrderListService;
-import com.aiqin.ground.util.id.IdUtil;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
@@ -34,7 +31,6 @@ import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +38,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -490,11 +489,13 @@ public class OrderListServiceImpl implements OrderListService {
     @Override
     public Boolean saveOrder(OrderReqVo reqVo) {
         Date now = new Date();
-        String orderCode = sequenceService.generateOrderCode(reqVo.getCompanyCode(), reqVo.getOrderType());
         OrderList order = new OrderList();
+        String orderCode = reqVo.getOrderCode();
         BeanUtils.copyProperties(reqVo, order);
+        if (StringUtils.isNotBlank(reqVo.getOrderCode())) {
+            orderCode = sequenceService.generateOrderCode(reqVo.getCompanyCode(), reqVo.getOrderType());
+        }
         order.setOrderCode(orderCode);
-
         order.setId(IdUtil.uuid());
         order.setOriginal(orderCode);
         order.setPlaceOrderTime(now);
@@ -504,9 +505,9 @@ public class OrderListServiceImpl implements OrderListService {
             productDTO.setId(IdUtil.uuid());
             return productDTO;
         }).collect(Collectors.toList());
-        products.forEach(product -> {
+        for (OrderListProduct product : products) {
             product.setOrderCode(orderCode);
-        });
+        }
         orderListDao.insertSelective(order);
         orderListProductDao.insertList(products);
         return true;
