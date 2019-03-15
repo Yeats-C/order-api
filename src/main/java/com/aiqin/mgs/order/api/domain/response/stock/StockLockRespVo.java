@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.domain.response.stock;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -33,4 +34,8 @@ public class StockLockRespVo implements Serializable {
 
     @JsonProperty("warehouse_name")
     private String warehouseName;
+
+    @JsonProperty("product_type")
+    @ApiModelProperty("商品类型，1-正常品，0-效期品")
+    private Integer productType = 1;
 }

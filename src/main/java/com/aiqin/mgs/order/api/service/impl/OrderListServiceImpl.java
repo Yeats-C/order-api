@@ -360,7 +360,8 @@ public class OrderListServiceImpl implements OrderListService {
         List<StockLockSkuReqVo> skuReqVos = reqVo.getProducts().stream().map(product -> {
             StockLockSkuReqVo skuReqVo = new StockLockSkuReqVo();
             skuReqVo.setNum(product.getProductNumber());
-            skuReqVo.setSku_code(product.getSkuCode());
+            skuReqVo.setSkuCode(product.getSkuCode());
+            skuReqVo.setProductType(product.getProductType());
             return skuReqVo;
         }).collect(Collectors.toList());
         StockLockReqVo stockLockReqVo = new StockLockReqVo();
