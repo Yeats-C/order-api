@@ -35,4 +35,6 @@ public interface OrderListProductDao {
     List<OrderListProduct> searchOrderListProductByCodeList(@Param("orderCode") List<String> orderCode);
 
     Boolean updateByOrderProductId(ActualDeliverVo vo);
+
+    Integer deleteByOrderCode(String orderCode);
 }

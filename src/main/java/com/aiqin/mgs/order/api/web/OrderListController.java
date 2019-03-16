@@ -42,13 +42,23 @@ public class OrderListController {
      */
     @PostMapping("/save")
     public HttpResponse<OrderSaveRespVo> save(@RequestBody OrderReqVo reqVo) {
-        return HttpResponse.success(orderListService.save(reqVo));
+        try {
+            return HttpResponse.success(orderListService.save(reqVo));
+        } catch (Exception e) {
+            log.error("Get purchasingTarget list failed", e);
+            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
+        }
     }
 
     @ApiOperation("保存订单（只保存，不支付也不锁库和拆单）")
     @PostMapping("/saveOrder")
     public HttpResponse<Boolean> saveOrder(@RequestBody OrderReqVo reqVo) {
-        return new HttpResponse<>(orderListService.saveOrder(reqVo));
+        try {
+            return new HttpResponse<>(orderListService.saveOrder(reqVo));
+        } catch (Exception e) {
+            log.error("Get purchasingTarget list failed", e);
+            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
+        }
     }
 //    /**
 //     * 订单新增
@@ -151,7 +161,6 @@ public class OrderListController {
     }
 
 
-
     /**
      * 获取订单信息
      */
@@ -221,9 +230,9 @@ public class OrderListController {
      */
     @GetMapping("update/order/status/receiving")
     @ApiOperation("修改订单为收货状态")
-    public HttpResponse<Boolean> updateOrderStatusReceiving(@ApiParam("订单code") @RequestParam("code") String code,@ApiParam("执行人") @RequestParam("name") String name) {
+    public HttpResponse<Boolean> updateOrderStatusReceiving(@ApiParam("订单code") @RequestParam("code") String code, @ApiParam("执行人") @RequestParam("name") String name) {
         try {
-            return HttpResponse.success(this.orderListService.updateOrderStatusReceiving(code,name));
+            return HttpResponse.success(this.orderListService.updateOrderStatusReceiving(code, name));
         } catch (Exception e) {
             log.error("Get purchasingTarget list failed", e);
             return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));

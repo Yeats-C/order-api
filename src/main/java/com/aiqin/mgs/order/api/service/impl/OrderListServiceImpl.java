@@ -495,6 +495,7 @@ public class OrderListServiceImpl implements OrderListService {
     }
 
 
+    @Transactional
     @Override
     public Boolean saveOrder(OrderReqVo reqVo) {
         Date now = new Date();
@@ -503,6 +504,14 @@ public class OrderListServiceImpl implements OrderListService {
         BeanUtils.copyProperties(reqVo, order);
         if (StringUtils.isBlank(reqVo.getOrderCode())) {
             orderCode = sequenceService.generateOrderCode(reqVo.getCompanyCode(), reqVo.getOrderType());
+        } else {
+            //查询原订单
+            OrderListDetailsVo detailsVo = orderListDao.searchOrderByCode(reqVo.getOrderCode());
+            Assert.notNull(detailsVo, "编辑失败，订单不存在！");
+            Assert.isTrue(detailsVo.getOrderStatus() == 1, "编辑失败，只能编辑待支付订单");
+            //删除原订单
+            orderListDao.deleteByOrderCode(reqVo.getOrderCode());
+            orderListProductDao.deleteByOrderCode(reqVo.getOrderCode());
         }
         order.setOrderCode(orderCode);
         order.setId(IdUtil.uuid());
