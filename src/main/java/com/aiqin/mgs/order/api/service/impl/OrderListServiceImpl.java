@@ -501,7 +501,7 @@ public class OrderListServiceImpl implements OrderListService {
         OrderList order = new OrderList();
         String orderCode = reqVo.getOrderCode();
         BeanUtils.copyProperties(reqVo, order);
-        if (StringUtils.isNotBlank(reqVo.getOrderCode())) {
+        if (StringUtils.isBlank(reqVo.getOrderCode())) {
             orderCode = sequenceService.generateOrderCode(reqVo.getCompanyCode(), reqVo.getOrderType());
         }
         order.setOrderCode(orderCode);
