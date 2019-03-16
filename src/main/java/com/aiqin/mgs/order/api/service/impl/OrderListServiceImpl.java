@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -363,7 +364,18 @@ public class OrderListServiceImpl implements OrderListService {
             OrderProductReqVo orderProductReqVo = reqVo.getProducts().get(i);
             orderProductReqVo.setOrderProductId(String.valueOf(i + 1));
         }
-        String orderCode = sequenceService.generateOrderCode(reqVo.getCompanyCode(), reqVo.getOrderType());
+        AtomicReference<String> orderCode = new AtomicReference<>(reqVo.getOrderCode());
+        if (StringUtils.isBlank(reqVo.getOrderCode())) {
+            orderCode.set(sequenceService.generateOrderCode(reqVo.getCompanyCode(), reqVo.getOrderType()));
+        } else {
+            //查询原订单
+            OrderListDetailsVo detailsVo = orderListDao.searchOrderByCode(reqVo.getOrderCode());
+            Assert.notNull(detailsVo, "编辑失败，订单不存在！");
+            Assert.isTrue(detailsVo.getOrderStatus() == 1, "编辑失败，只能编辑待支付订单");
+            //删除原订单
+            orderListDao.deleteByOrderCode(reqVo.getOrderCode());
+            orderListProductDao.deleteByOrderCode(reqVo.getOrderCode());
+        }
         List<StockLockSkuReqVo> skuReqVos = reqVo.getProducts().stream().map(product -> {
             StockLockSkuReqVo skuReqVo = new StockLockSkuReqVo();
             skuReqVo.setNum(product.getProductNumber());
@@ -377,7 +389,7 @@ public class OrderListServiceImpl implements OrderListService {
         stockLockReqVo.setCityId(reqVo.getCityCode());
         stockLockReqVo.setCompanyCode(reqVo.getCompanyCode());
         stockLockReqVo.setProvinceId(reqVo.getProvinceCode());
-        stockLockReqVo.setOrderCode(orderCode);
+        stockLockReqVo.setOrderCode(orderCode.get());
         List<StockLockRespVo> lockRespVos = bridgeStockService.lock(stockLockReqVo);
         Map<String, List<StockLockRespVo>> stockMap = lockRespVos.stream().collect(Collectors.toMap(StockLockRespVo::getLineNum, Lists::newArrayList, (l1, l2) -> {
             l1.addAll(l2);
@@ -465,13 +477,13 @@ public class OrderListServiceImpl implements OrderListService {
                     product.setOrderCode(chirldOrderCode);
                 });
             } else {
-                order.setOrderCode(orderCode);
+                order.setOrderCode(orderCode.get());
                 products.forEach(product -> {
-                    product.setOrderCode(orderCode);
+                    product.setOrderCode(orderCode.get());
                 });
             }
             order.setId(IdUtil.uuid());
-            order.setOriginal(orderCode);
+            order.setOriginal(orderCode.get());
             order.setPlaceOrderTime(now);
             StockLockRespVo respVo = warehouseMap.get(warehouseCode);
             if (respVo != null) {
@@ -488,7 +500,7 @@ public class OrderListServiceImpl implements OrderListService {
         });
         orderListProductDao.insertList(orderListProducts);
         OrderSaveRespVo respVo = new OrderSaveRespVo();
-        respVo.setOrderCode(orderCode);
+        respVo.setOrderCode(orderCode.get());
         respVo.setSplitOrder(orders.size() > 1);
         respVo.setChildOrderCode(chirldOrderCodes);
         return respVo;
