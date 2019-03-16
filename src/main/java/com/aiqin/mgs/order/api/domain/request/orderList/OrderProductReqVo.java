@@ -19,6 +19,9 @@ public class OrderProductReqVo implements Serializable {
 
     private static final long serialVersionUID = -1223728764746461137L;
 
+    @ApiModelProperty(value = "商品行号", hidden = true)
+    private String orderProductId;
+
     @ApiModelProperty(value = "商品sku码")
     @JsonProperty("sku_code")
     private String skuCode;

@@ -33,6 +33,7 @@ public class BridgeStockServiceImpl implements BridgeStockService {
         List<StockLockRespVo> lockRespVos = Lists.newLinkedList();
         reqVo.getSkuList().forEach(skuReqVo -> {
             StockLockRespVo respVo = new StockLockRespVo();
+            respVo.setLineNum(skuReqVo.getLineNum());
             respVo.setLockNum(skuReqVo.getNum());
             respVo.setSkuCode(skuReqVo.getSkuCode());
             respVo.setTransportCenterCode("1025");

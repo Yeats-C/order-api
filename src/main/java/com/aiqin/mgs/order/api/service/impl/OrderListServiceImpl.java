@@ -358,12 +358,18 @@ public class OrderListServiceImpl implements OrderListService {
         log.info("===============保存订单======================");
         log.info(JSON.toJSONString(reqVo));
         Date now = new Date();
+        //设置行号
+        for (int i = 0; i < reqVo.getProducts().size(); i++) {
+            OrderProductReqVo orderProductReqVo = reqVo.getProducts().get(i);
+            orderProductReqVo.setOrderProductId(String.valueOf(i + 1));
+        }
         String orderCode = sequenceService.generateOrderCode(reqVo.getCompanyCode(), reqVo.getOrderType());
         List<StockLockSkuReqVo> skuReqVos = reqVo.getProducts().stream().map(product -> {
             StockLockSkuReqVo skuReqVo = new StockLockSkuReqVo();
             skuReqVo.setNum(product.getProductNumber());
             skuReqVo.setSkuCode(product.getSkuCode());
             skuReqVo.setProductType(product.getProductType());
+            skuReqVo.setLineNum(product.getOrderProductId());
             return skuReqVo;
         }).collect(Collectors.toList());
         StockLockReqVo stockLockReqVo = new StockLockReqVo();
@@ -373,14 +379,14 @@ public class OrderListServiceImpl implements OrderListService {
         stockLockReqVo.setProvinceId(reqVo.getProvinceCode());
         stockLockReqVo.setOrderCode(orderCode);
         List<StockLockRespVo> lockRespVos = bridgeStockService.lock(stockLockReqVo);
-        Map<String, List<StockLockRespVo>> stockMap = lockRespVos.stream().collect(Collectors.toMap(StockLockRespVo::getSkuCode, Lists::newArrayList, (l1, l2) -> {
+        Map<String, List<StockLockRespVo>> stockMap = lockRespVos.stream().collect(Collectors.toMap(StockLockRespVo::getLineNum, Lists::newArrayList, (l1, l2) -> {
             l1.addAll(l2);
             return l1;
         }));
         Map<String, StockLockRespVo> warehouseMap = lockRespVos.stream().collect(Collectors.toMap(StockLockRespVo::getWarehouseCode, Function.identity(), (o1, o2) -> o1));
         Map<String, List<OrderListProduct>> productMap = Maps.newLinkedHashMap();
         for (OrderProductReqVo product : reqVo.getProducts()) {
-            List<StockLockRespVo> lockRespVoList = stockMap.get(product.getSkuCode());
+            List<StockLockRespVo> lockRespVoList = stockMap.get(product.getOrderProductId());
             Assert.notEmpty(lockRespVoList, "锁定库存异常");
             //商品价格（单品合计成交价)
             long totalProductPrice = 0L;

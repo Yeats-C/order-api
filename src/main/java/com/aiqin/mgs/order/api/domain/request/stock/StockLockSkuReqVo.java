@@ -14,6 +14,10 @@ import lombok.Data;
 @Data
 public class StockLockSkuReqVo {
 
+    @ApiModelProperty("商品行号")
+    @JsonProperty("line_num")
+    private String lineNum;
+
     @ApiModelProperty("sku编码")
     @JsonProperty("sku_code")
     private String skuCode;

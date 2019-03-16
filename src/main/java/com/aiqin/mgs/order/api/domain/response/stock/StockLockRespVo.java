@@ -17,6 +17,10 @@ import java.io.Serializable;
 public class StockLockRespVo implements Serializable {
     private static final long serialVersionUID = -34661368734853365L;
 
+    @ApiModelProperty("商品行号")
+    @JsonProperty("line_num")
+    private String lineNum;
+
     @JsonProperty("lock_num")
     private Integer lockNum;
 
