@@ -23,6 +23,7 @@ import com.aiqin.mgs.order.api.dao.FrozenDao;
 import com.aiqin.mgs.order.api.domain.FrozenInfo;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.service.FrozenService;
+import com.aiqin.mgs.order.api.util.DateUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 
 @SuppressWarnings("all")
@@ -43,7 +44,7 @@ public class FrozenServiceImpl implements FrozenService{
 
 		try {
 			//生成挂单ID
-			String frozenId =OrderPublic.sysDate()+OrderPublic.randomNumberF();
+			String frozenId =DateUtil.sysDate()+OrderPublic.randomNumberF();
 			
 			if(frozenInfolist !=null && frozenInfolist.size()>0) {
 			for(FrozenInfo info : frozenInfolist ) {

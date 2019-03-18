@@ -184,16 +184,10 @@
 		 and (a.member_phone like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%') or a.order_code like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%'))
          </if>
          <if test="beginTime!=null ">
-         and DATE_FORMAT(a.create_time,"%Y-%m-%d")  &gt;= DATE_FORMAT(#{beginTime},"%Y-%m-%d")
+         and a.create_time  &gt;= #{beginTime}
          </if>
          <if test="endTime!=null ">
-         and DATE_FORMAT(a.create_time,"%Y-%m-%d") &lt;= DATE_FORMAT(#{endTime},"%Y-%m-%d")
-         </if>
-         <if test="beginDate!=null and beginDate!='' ">
-         and DATE_FORMAT(a.create_time,"%Y-%m-%d")  &gt;= #{beginDate}
-         </if>
-         <if test="endDate!=null and endDate!='' ">
-         and DATE_FORMAT(a.create_time,"%Y-%m-%d") &lt;= #{endDate}
+         and a.create_time &lt;= #{endTime}
          </if>
          <if test="orderStatus!=null ">
          and a.order_status = #{orderStatus}
@@ -257,16 +251,10 @@
 		 and (a.member_phone like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%') or a.order_code like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%'))
          </if>
          <if test="beginTime!=null ">
-         and DATE_FORMAT(a.create_time,"%Y-%m-%d")  &gt;= DATE_FORMAT(#{beginTime},"%Y-%m-%d")
+         and a.create_time  &gt;= #{beginTime}
          </if>
          <if test="endTime!=null ">
-         and DATE_FORMAT(a.create_time,"%Y-%m-%d") &lt;= DATE_FORMAT(#{endTime},"%Y-%m-%d")
-         </if>
-         <if test="beginDate!=null and beginDate!='' ">
-         and DATE_FORMAT(a.create_time,"%Y-%m-%d")  &gt;= #{beginDate}
-         </if>
-         <if test="endDate!=null and endDate!='' ">
-         and DATE_FORMAT(a.create_time,"%Y-%m-%d") &lt;= #{endDate}
+         and a.create_time &lt;= #{endTime}
          </if>
          <if test="orderStatus!=null ">
          and a.order_status = #{orderStatus}
@@ -787,16 +775,10 @@
 		 and a.member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%') 
          </if>
          <if test="beginTime!=null ">
-         and DATE_FORMAT(a.create_time,"%Y-%m-%d")  &gt;= DATE_FORMAT(#{beginTime},"%Y-%m-%d")
+         and a.create_time  &gt;= #{beginTime}
          </if>
          <if test="endTime!=null ">
-         and DATE_FORMAT(a.create_time,"%Y-%m-%d") &lt;= DATE_FORMAT(#{endTime},"%Y-%m-%d")
-         </if>
-         <if test="beginDate!=null and beginDate!='' ">
-         and DATE_FORMAT(a.create_time,"%Y-%m-%d")  &gt;= #{beginDate}
-         </if>
-         <if test="endDate!=null and endDate!='' ">
-         and DATE_FORMAT(a.create_time,"%Y-%m-%d") &lt;= #{endDate}
+         and a.create_time &lt;= #{endTime}
          </if>
          <if test="orderStatus!=null ">
          and a.order_status = #{orderStatus}
@@ -847,8 +829,8 @@
     <select id="selectAcountByEcshop"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultType="java.lang.Integer">
          SELECT COUNT(order_id) FROM order_info  
 		 WHERE 1=1 and order_type = 1
-		 and DATE_FORMAT(create_time,"%Y-%m-%d") &gt;= #{beginDate}  
-		 AND DATE_FORMAT(create_time,"%Y-%m-%d") &lt;= #{endDate}
+		 AND create_time &gt;= #{beginTime}  
+		 AND create_time &lt;= #{endTime}
          <if test="distributorId!=null and distributorId!='' ">
          and distributor_id = #{distributorId}
          </if>
@@ -858,8 +840,8 @@
     <select id="selectAmountByEcshop"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultType="java.lang.Integer">
          SELECT COUNT(actual_price) FROM order_info  
 		 WHERE 1=1 and order_type = 1
-		 and DATE_FORMAT(create_time,"%Y-%m-%d") &gt;= #{beginDate}  
-		 AND DATE_FORMAT(create_time,"%Y-%m-%d") &lt;= #{endDate}
+		 AND create_time &gt;= #{beginTime}  
+		 AND create_time &lt;= #{endTime}
          <if test="distributorId!=null and distributorId!='' ">
          and distributor_id = #{distributorId}
          </if>
@@ -869,8 +851,8 @@
     <select id="selectMembersByEcshop"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultType="java.lang.Integer">
          SELECT COUNT(DISTINCT member_id) FROM order_info  
 		 WHERE 1=1 and order_type = 1
-		 and DATE_FORMAT(create_time,"%Y-%m-%d") &gt;= #{beginDate}  
-		 AND DATE_FORMAT(create_time,"%Y-%m-%d") &lt;= #{endDate}
+		 AND create_time &gt;= #{beginTime}  
+		 AND create_time &lt;= #{endTime}
          <if test="distributorId!=null and distributorId!='' ">
          and distributor_id = #{distributorId}
          </if>

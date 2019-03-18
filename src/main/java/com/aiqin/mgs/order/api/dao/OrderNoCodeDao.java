@@ -30,32 +30,32 @@ import io.lettuce.core.dynamic.annotation.Param;
 public interface OrderNoCodeDao {
 
 	//总销售金额
-	Integer getIncomePrice(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate);
+	Integer getIncomePrice(@Valid @Param("distributorId")String distributorId,@Param("beginDate")Date beginDate,@Param("endDate")Date endDate);
 	//总退次金额
-	Integer getReturnPrice(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate);
+	Integer getReturnPrice(@Valid @Param("distributorId")String distributorId,@Param("beginDate")Date beginDate,@Param("endDate")Date endDate);
 	//总销量
-	Integer getIncomeCount(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate);
+	Integer getIncomeCount(@Valid @Param("distributorId")String distributorId,@Param("beginDate")Date beginDate,@Param("endDate")Date endDate);
 	//总退货量
-	Integer getReturnCount(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate);
+	Integer getReturnCount(@Valid @Param("distributorId")String distributorId,@Param("beginDate")Date beginDate,@Param("endDate")Date endDate);
 	//当月客流量
-	Integer getPassengerFlow(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate);
+	Integer getPassengerFlow(@Valid @Param("distributorId")String distributorId,@Param("beginDate")Date beginDate,@Param("endDate")Date endDate);
 	//昨日订单的当天退货金额
-	Integer getYesterdayReturnPrice(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate);
+	Integer getYesterdayReturnPrice(@Valid @Param("distributorId")String distributorId,@Param("beginDate")Date beginDate,@Param("endDate")Date endDate);
 	//昨日订单的当天退货量
-	Integer getYesterdayReturnCount(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate);
+	Integer getYesterdayReturnCount(@Valid @Param("distributorId")String distributorId,@Param("beginDate")Date beginDate,@Param("endDate")Date endDate);
 	
 	//订单所涉及到的商品类别
-    List<SelectSaleViewResonse> getTypeId(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate);
+    List<SelectSaleViewResonse> getTypeId(@Valid @Param("distributorId")String distributorId,@Param("beginDate")Date beginDate,@Param("endDate")Date endDate);
 	//订单的销售额
-	List<SelectSaleViewResonse> getIncomePriceGroupByTypeId(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate);
+	List<SelectSaleViewResonse> getIncomePriceGroupByTypeId(@Valid @Param("distributorId")String distributorId,@Param("beginDate")Date beginDate,@Param("endDate")Date endDate);
 	//订单的退货金额
-	List<SelectSaleViewResonse> getReturnPriceGroupByTypeId(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate);
+	List<SelectSaleViewResonse> getReturnPriceGroupByTypeId(@Valid @Param("distributorId")String distributorId,@Param("beginDate")Date beginDate,@Param("endDate")Date endDate);
 	//订单销量
-	List<SelectSaleViewResonse> getIncomeCountGroupByTypeId(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate);
+	List<SelectSaleViewResonse> getIncomeCountGroupByTypeId(@Valid @Param("distributorId")String distributorId,@Param("beginDate")Date beginDate,@Param("endDate")Date endDate);
 	//订单的退货量
-	List<SelectSaleViewResonse> getReturnCountGroupByTypeId(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate);
+	List<SelectSaleViewResonse> getReturnCountGroupByTypeId(@Valid @Param("distributorId")String distributorId,@Param("beginDate")Date beginDate,@Param("endDate")Date endDate);
 	//客流量
-	Integer getPassengerFlowGroupByTypeId(@Valid @Param("distributorId")String distributorId,@Param("beginDate")String beginDate,@Param("endDate")String endDate,@Param("typeId")String typeId);
+	Integer getPassengerFlowGroupByTypeId(@Valid @Param("distributorId")String distributorId,@Param("beginDate")Date beginDate,@Param("endDate")Date endDate,@Param("typeId")String typeId);
 
 //	//购买订单列表
 //	List<OrderNoCodeInfo> selectNoCodeOrderList(@Valid OrderNoCodeRequest orderNoCodeBuyRequest) throws Exception;
