@@ -19,9 +19,7 @@ public interface OrderListDao {
     int insertSelective(OrderList record);
 
 
-
     OrderList selectByPrimaryKey(Long id);
-
 
 
     int updateByPrimaryKeySelective(OrderList record);
@@ -42,7 +40,7 @@ public interface OrderListDao {
 
     Boolean updateByCode(@Param("code") String code, @Param("status") Integer status, @Param("paymentStatus") Integer paymentStatus);
 
-    List<OrderStockReVo> getStockValue(@Param("vo")OrderStockVo vo);
+    List<OrderStockReVo> getStockValue(@Param("vo") OrderStockVo vo);
 
     List<OrderList> searchFZ(String code);
 
@@ -58,9 +56,11 @@ public interface OrderListDao {
 
     Boolean updateStatusByCode(@Param("code") String code, @Param("status") Integer status);
 
-    Boolean updateOrderPaymentStatus(@Param("code") String code,@Param("paymentStatus") Integer paymentStatus);
+    Boolean updateOrderPaymentStatus(@Param("code") String code, @Param("paymentStatus") Integer paymentStatus);
 
     List<OrderListDetailsVo> searchOrderByCodeFather(String code);
 
     List<FirstOrderTimeRespVo> selectFirstOrderTime(List<String> storeIds);
+
+    Integer deleteByOrderCode(String orderCode);
 }

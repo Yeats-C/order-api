@@ -1,13 +1,10 @@
 package com.aiqin.mgs.order.api.domain;
 
-import com.aiqin.mgs.order.api.domain.request.orderList.DiscountAmountInfo;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
-import java.util.List;
 
 @ApiModel("订单商品从表")
 @Data

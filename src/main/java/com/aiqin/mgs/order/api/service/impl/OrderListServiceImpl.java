@@ -2,7 +2,7 @@ package com.aiqin.mgs.order.api.service.impl;
 
 import com.aiqin.ground.util.exception.GroundRuntimeException;
 import com.aiqin.ground.util.http.HttpClient;
-import com.aiqin.ground.util.json.JsonUtil;
+import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.component.OrderStatusEnum;
@@ -15,18 +15,15 @@ import com.aiqin.mgs.order.api.dao.OrderStatusDao;
 import com.aiqin.mgs.order.api.domain.OrderList;
 import com.aiqin.mgs.order.api.domain.OrderListLogistics;
 import com.aiqin.mgs.order.api.domain.OrderListProduct;
-import com.aiqin.mgs.order.api.domain.OrderStatus;
 import com.aiqin.mgs.order.api.domain.request.orderList.*;
 import com.aiqin.mgs.order.api.domain.request.stock.StockLockReqVo;
 import com.aiqin.mgs.order.api.domain.request.stock.StockLockSkuReqVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.FirstOrderTimeRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderSaveRespVo;
-import com.aiqin.mgs.order.api.domain.request.orderList.*;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
 import com.aiqin.mgs.order.api.domain.response.stock.StockLockRespVo;
 import com.aiqin.mgs.order.api.service.BridgeStockService;
 import com.aiqin.mgs.order.api.service.OrderListService;
-import com.aiqin.ground.util.id.IdUtil;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
@@ -34,7 +31,6 @@ import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +38,11 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -356,12 +356,32 @@ public class OrderListServiceImpl implements OrderListService {
     @Transactional
     @Override
     public OrderSaveRespVo save(OrderReqVo reqVo) {
+        log.info("===============保存订单======================");
+        log.info(JSON.toJSONString(reqVo));
         Date now = new Date();
-        String orderCode = sequenceService.generateOrderCode(reqVo.getCompanyCode(), reqVo.getOrderType());
+        //设置行号
+        for (int i = 0; i < reqVo.getProducts().size(); i++) {
+            OrderProductReqVo orderProductReqVo = reqVo.getProducts().get(i);
+            orderProductReqVo.setOrderProductId(String.valueOf(i + 1));
+        }
+        AtomicReference<String> orderCode = new AtomicReference<>(reqVo.getOrderCode());
+        if (StringUtils.isBlank(reqVo.getOrderCode())) {
+            orderCode.set(sequenceService.generateOrderCode(reqVo.getCompanyCode(), reqVo.getOrderType()));
+        } else {
+            //查询原订单
+            OrderListDetailsVo detailsVo = orderListDao.searchOrderByCode(reqVo.getOrderCode());
+            Assert.notNull(detailsVo, "编辑失败，订单不存在！");
+            Assert.isTrue(detailsVo.getOrderStatus() == 1, "编辑失败，只能编辑待支付订单");
+            //删除原订单
+            orderListDao.deleteByOrderCode(reqVo.getOrderCode());
+            orderListProductDao.deleteByOrderCode(reqVo.getOrderCode());
+        }
         List<StockLockSkuReqVo> skuReqVos = reqVo.getProducts().stream().map(product -> {
             StockLockSkuReqVo skuReqVo = new StockLockSkuReqVo();
             skuReqVo.setNum(product.getProductNumber());
-            skuReqVo.setSku_code(product.getSkuCode());
+            skuReqVo.setSkuCode(product.getSkuCode());
+            skuReqVo.setProductType(product.getProductType());
+            skuReqVo.setLineNum(product.getOrderProductId());
             return skuReqVo;
         }).collect(Collectors.toList());
         StockLockReqVo stockLockReqVo = new StockLockReqVo();
@@ -369,16 +389,16 @@ public class OrderListServiceImpl implements OrderListService {
         stockLockReqVo.setCityId(reqVo.getCityCode());
         stockLockReqVo.setCompanyCode(reqVo.getCompanyCode());
         stockLockReqVo.setProvinceId(reqVo.getProvinceCode());
-        stockLockReqVo.setOrderCode(orderCode);
+        stockLockReqVo.setOrderCode(orderCode.get());
         List<StockLockRespVo> lockRespVos = bridgeStockService.lock(stockLockReqVo);
-        Map<String, List<StockLockRespVo>> stockMap = lockRespVos.stream().collect(Collectors.toMap(StockLockRespVo::getSkuCode, Lists::newArrayList, (l1, l2) -> {
+        Map<String, List<StockLockRespVo>> stockMap = lockRespVos.stream().collect(Collectors.toMap(StockLockRespVo::getLineNum, Lists::newArrayList, (l1, l2) -> {
             l1.addAll(l2);
             return l1;
         }));
         Map<String, StockLockRespVo> warehouseMap = lockRespVos.stream().collect(Collectors.toMap(StockLockRespVo::getWarehouseCode, Function.identity(), (o1, o2) -> o1));
         Map<String, List<OrderListProduct>> productMap = Maps.newLinkedHashMap();
         for (OrderProductReqVo product : reqVo.getProducts()) {
-            List<StockLockRespVo> lockRespVoList = stockMap.get(product.getSkuCode());
+            List<StockLockRespVo> lockRespVoList = stockMap.get(product.getOrderProductId());
             Assert.notEmpty(lockRespVoList, "锁定库存异常");
             //商品价格（单品合计成交价)
             long totalProductPrice = 0L;
@@ -457,13 +477,13 @@ public class OrderListServiceImpl implements OrderListService {
                     product.setOrderCode(chirldOrderCode);
                 });
             } else {
-                order.setOrderCode(orderCode);
+                order.setOrderCode(orderCode.get());
                 products.forEach(product -> {
-                    product.setOrderCode(orderCode);
+                    product.setOrderCode(orderCode.get());
                 });
             }
             order.setId(IdUtil.uuid());
-            order.setOriginal(orderCode);
+            order.setOriginal(orderCode.get());
             order.setPlaceOrderTime(now);
             StockLockRespVo respVo = warehouseMap.get(warehouseCode);
             if (respVo != null) {
@@ -480,21 +500,32 @@ public class OrderListServiceImpl implements OrderListService {
         });
         orderListProductDao.insertList(orderListProducts);
         OrderSaveRespVo respVo = new OrderSaveRespVo();
-        respVo.setOrderCode(orderCode);
+        respVo.setOrderCode(orderCode.get());
         respVo.setSplitOrder(orders.size() > 1);
         respVo.setChildOrderCode(chirldOrderCodes);
         return respVo;
     }
 
 
+    @Transactional
     @Override
     public Boolean saveOrder(OrderReqVo reqVo) {
         Date now = new Date();
-        String orderCode = sequenceService.generateOrderCode(reqVo.getCompanyCode(), reqVo.getOrderType());
         OrderList order = new OrderList();
+        String orderCode = reqVo.getOrderCode();
         BeanUtils.copyProperties(reqVo, order);
+        if (StringUtils.isBlank(reqVo.getOrderCode())) {
+            orderCode = sequenceService.generateOrderCode(reqVo.getCompanyCode(), reqVo.getOrderType());
+        } else {
+            //查询原订单
+            OrderListDetailsVo detailsVo = orderListDao.searchOrderByCode(reqVo.getOrderCode());
+            Assert.notNull(detailsVo, "编辑失败，订单不存在！");
+            Assert.isTrue(detailsVo.getOrderStatus() == 1, "编辑失败，只能编辑待支付订单");
+            //删除原订单
+            orderListDao.deleteByOrderCode(reqVo.getOrderCode());
+            orderListProductDao.deleteByOrderCode(reqVo.getOrderCode());
+        }
         order.setOrderCode(orderCode);
-
         order.setId(IdUtil.uuid());
         order.setOriginal(orderCode);
         order.setPlaceOrderTime(now);
@@ -504,9 +535,9 @@ public class OrderListServiceImpl implements OrderListService {
             productDTO.setId(IdUtil.uuid());
             return productDTO;
         }).collect(Collectors.toList());
-        products.forEach(product -> {
+        for (OrderListProduct product : products) {
             product.setOrderCode(orderCode);
-        });
+        }
         orderListDao.insertSelective(order);
         orderListProductDao.insertList(products);
         return true;
