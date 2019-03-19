@@ -41,8 +41,8 @@ public interface OrderNoCodeService {
 	//服务销售概况
 	HttpResponse selectSaleView(@Valid String distributorId, @Valid String beginDate, @Valid String endDate);
 
-	//订单列表
-	HttpResponse<List<OrderInfo>> selectNoCodeList(@Valid OrderNoCodeRequest orderNoCodeBuyRequest);
+//	//订单列表
+//	HttpResponse<List<OrderInfo>> selectNoCodeList(@Valid OrderNoCodeRequest orderNoCodeBuyRequest);
 
 	//编号查询订单.
 	HttpResponse selectorderByCode(@Valid String orderCode);

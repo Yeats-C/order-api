@@ -44,7 +44,8 @@ public class CartServiceImpl implements CartService{
 	@Override
 	@Transactional
 	public HttpResponse addCartInfo(CartInfo cartInfo) {
-	    try {
+	    
+		try {
 		    if(cartInfo !=null) {
 		    	if(cartInfo.getModityType()!=null && cartInfo.getModityType().equals(Global.MODIFY_TYPE_1)) {
 		    		
@@ -54,13 +55,13 @@ public class CartServiceImpl implements CartService{
 		    	}else {
 		    		
 		    		//调用添加购物车逻辑
-		    		LOGGER.info("判断SKU商品是否已存在购物车中", cartInfo);
+		    		LOGGER.info("判断SKU商品是否已存在购物车中:{}", cartInfo);
 					String OldAount = cartDao.isYesCart(cartInfo);
 					
 					if(OldAount !=null && !OldAount.equals("")) {
 						
 						//已存在购物车的、新添加+已存在购物车的数量=真实数量
-						LOGGER.info("更新购物车", cartInfo);
+						LOGGER.info("更新购物车:{}", cartInfo);
 						int newAount = Integer.valueOf(OldAount)+cartInfo.getAmount();
 						cartInfo.setAmount(newAount);
 						
@@ -70,18 +71,19 @@ public class CartServiceImpl implements CartService{
 					}else {
 						
 						//添加购物车
-						LOGGER.info("添加购物车", cartInfo);
+						LOGGER.info("添加购物车:{}", cartInfo);
 						cartDao.insertCart(cartInfo);
 					}
 					return HttpResponse.success();
 		    	}
 		    }else {
-				LOGGER.error("购物车信息为空!");
+		    	
+				LOGGER.warn("购物车信息为空!");
 				return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
 			}
 		}catch(Exception e) {
 			
-			LOGGER.error("添加购物车失败", e);
+			LOGGER.error("添加购物车异常：{}", e);
 			return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
 		}
 	}
@@ -91,17 +93,16 @@ public class CartServiceImpl implements CartService{
 	@Override
 	@Transactional
 	public HttpResponse updateCartByMemberId(CartInfo cartInfo) {
-		LOGGER.info("更新购物车", cartInfo);
+		
+		LOGGER.info("更新购物车清单参数：{}",cartInfo);
 		
 		try {
-			
 			cartDao.updateCartById(cartInfo);
 			return HttpResponse.success();
-			
 		} catch (Exception e) {
 			
-			LOGGER.info("更新购物车失败", cartInfo);
-			return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
+			LOGGER.error("更新购物车异常：{}", cartInfo);
+			return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
 		}
 	
 		
@@ -113,11 +114,7 @@ public class CartServiceImpl implements CartService{
 	public HttpResponse selectCartByMemberId(String memberId,String distributorId,Integer pageNo,Integer pageSize) {
 		
 		try {
-			
-			LOGGER.info("根据会员ID查询购物车数据", memberId);
-			
 			CartInfo cartInfo = new CartInfo();
-			
 			cartInfo.setMemberId(memberId);
 			cartInfo.setPageNo(pageNo);
 			cartInfo.setPageSize(pageSize);
@@ -139,7 +136,7 @@ public class CartServiceImpl implements CartService{
 			
 		} catch (Exception e) {
 			
-			LOGGER.error("根据会员ID查询购物车数据失败", e);
+			LOGGER.error("根据会员ID查询购物车数据异常：{}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 		
@@ -152,14 +149,15 @@ public class CartServiceImpl implements CartService{
 	public HttpResponse deleteCartInfo(String memberId) {
 		
 		try {
-			LOGGER.error("清空购物车",memberId);
+
 			if(memberId !=null && !memberId.equals("")) {
 				cartDao.deleteCartInfo(memberId);
 				return HttpResponse.success();
 			}else {
-				LOGGER.error("清空购物车-找不到会员ID",memberId);
+				LOGGER.warn("清空购物车-找不到会员ID");
 				return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
 			}
+			
 		} catch (Exception e) {
 			LOGGER.error("清空购物车失败",e);
 			return HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
@@ -174,7 +172,7 @@ public class CartServiceImpl implements CartService{
 	public HttpResponse deleteCartInfoById(String memberId,List<String> skuCodes,String distributorId) {
 		
 		try {
-			LOGGER.error("删除购物清单",memberId);
+			LOGGER.info("删除购物清单会员: {}",memberId);
 			
 			CartInfo cartInfo = new CartInfo();
 			cartInfo.setMemberId(memberId);
@@ -182,12 +180,11 @@ public class CartServiceImpl implements CartService{
             	cartInfo.setSkuCodes(skuCodes);
             }
 			cartInfo.setDistributorId(distributorId);
-			System.out.println("cartInfo==="+cartInfo);
 			cartDao.deleteCartInfoById(cartInfo);
 			
 			return HttpResponse.success();
 		} catch (Exception e) {
-			LOGGER.error("删除购物清单失败",e);
+			LOGGER.error("删除购物清单失败 ： {}",e);
 			return HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
 		}
 		

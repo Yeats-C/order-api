@@ -99,7 +99,7 @@ public class OrderAfterDetailServiceImpl implements OrderAfterDetailService{
 			
 		} catch (Exception e) {
 			
-			LOGGER.info("售后id、门店查询售后维权明细列表報錯", e);
+			LOGGER.error("售后id、门店查询售后维权明细列表報錯 {}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}

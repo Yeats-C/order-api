@@ -1,6 +1,5 @@
 package com.aiqin.mgs.order.api.domain.request.orderList;
 
-import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.aiqin.mgs.order.api.domain.OrderList;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -19,7 +18,7 @@ import java.util.List;
  */
 @ApiModel("父订单")
 @Data
-public class OrderListFather   {
+public class OrderListFather {
 
     @ApiModelProperty(value = "父订单编号")
     @JsonProperty("order_code_father")
@@ -37,4 +36,8 @@ public class OrderListFather   {
     @ApiModelProperty(value = "子订单")
     @JsonProperty("order_list")
     private List<OrderList> orderList;
+
+    @ApiModelProperty(value = "是否能编辑")
+    @JsonProperty("can_update")
+    private Boolean canUpdate = false;
 }

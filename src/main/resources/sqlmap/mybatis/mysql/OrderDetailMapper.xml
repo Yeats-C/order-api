@@ -314,10 +314,10 @@
 		 and b.distributor_id = #{distributorId}
 		 </if>
          <if test="beginDate!=null ">
-         and DATE_FORMAT(b.create_time,"%Y-%m-%d") &gt;= DATE_FORMAT(#{beginDate},"%Y-%m-%d") 
+         and create_time &gt;= #{beginDate}
          </if>
          <if test="endDate!=null ">
-         and DATE_FORMAT(b.create_time,"%Y-%m-%d") &lt;= DATE_FORMAT(#{endDate},"%Y-%m-%d")
+         and create_time &lt;= #{endDate}
          </if>
          ORDER BY a.create_time DESC
         <if test="icount!=null ">

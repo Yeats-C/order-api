@@ -59,6 +59,7 @@ public class OrderController {
     @Resource
     private OrderService orderService;
     
+    
     /**
      * 门店新增TOC订单step1-添加订单主数据+添加订单明细数据+返回订单编号
      * @param 
@@ -67,9 +68,11 @@ public class OrderController {
     @PostMapping("/addordta")
     @ApiOperation(value = "门店新增TOC订单step1-添加订单主数据+添加订单明细数据+返回订单编号")
     public HttpResponse addOrdta(@Valid @RequestBody OrderAndSoOnRequest orderAndSoOnRequest){
-        LOGGER.info("添加新的订单主数据以及其他订单关联数据......");
-		
-        //添加TOC订单标识
+        
+    	
+    	LOGGER.info("添加新的订单主数据以及其他订单关联数据参数：{}",orderAndSoOnRequest);
+        
+    	//添加TOC订单标识
         if(orderAndSoOnRequest !=null) {
         	OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
           if(orderInfo !=null) {
@@ -77,9 +80,11 @@ public class OrderController {
         	  orderAndSoOnRequest.setOrderInfo(orderInfo);
         	  return orderService.addOrdta(orderAndSoOnRequest);
           }else {
+        	  LOGGER.warn("添加新的订单主数据以及其他订单关联数据为null：{}",orderAndSoOnRequest);
         	  return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
           }
         }else {
+        	LOGGER.warn("添加新的订单主数据以及其他订单关联数据为null：{}",orderAndSoOnRequest);
         	return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
         }
     }
@@ -93,7 +98,9 @@ public class OrderController {
     @PostMapping("/addpamo")
     @ApiOperation(value = "门店新增TOC订单step2-添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据")
     public HttpResponse addPamo(@Valid @RequestBody OrderAndSoOnRequest orderAndSoOnRequest){
-        LOGGER.info("门店新增TOC订单step2-添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据......");
+        
+    	
+    	LOGGER.info("门店新增TOC订单step2-添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据参数：{}",orderAndSoOnRequest);
 		
         //添加TOC订单标识
         if(orderAndSoOnRequest !=null) {
@@ -103,9 +110,11 @@ public class OrderController {
         	  orderAndSoOnRequest.setOrderInfo(orderInfo);
         	  return orderService.addPamo(orderAndSoOnRequest);
           }else {
+        	  LOGGER.warn("门店新增TOC订单step2-添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据为null：{}",orderAndSoOnRequest);
         	  return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
           }
         }else {
+        	LOGGER.warn("门店新增TOC订单step2-添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据为null：{}",orderAndSoOnRequest);
         	return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
         }
     }
@@ -122,9 +131,12 @@ public class OrderController {
     		@Valid @RequestParam(name = "pay_type", required = true) String payType,
     		@Valid @RequestBody(required = true) List<OrderPayInfo> orderPayList
     		) {
-        LOGGER.info("已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表).....");
+    	
+    	
+        LOGGER.info("已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)参数orderId:{},payType:{},orderPayList:{}",orderId,payType,orderPayList);
         return orderService.repast(orderId,payType,orderPayList);
     }
+    
     
     /**
      * 门店新增服务订单step1-添加订单主数据+添加订单明细数据+返回订单编号
@@ -134,7 +146,9 @@ public class OrderController {
     @PostMapping("/zaao")
     @ApiOperation(value = "门店新增服务订单step1-添加订单主数据+添加订单明细数据+返回订单编号")
     public HttpResponse zaao(@Valid @RequestBody OrderAndSoOnRequest orderAndSoOnRequest){
-        LOGGER.info("门店新增服务订单step1-添加订单主数据+添加订单明细数据+返回订单编号....");
+        
+    	
+    	LOGGER.info("门店新增服务订单step1-添加订单主数据+添加订单明细数据+返回订单编号参数：{}",orderAndSoOnRequest);
 		
         //添加TOC订单标识
         if(orderAndSoOnRequest !=null) {
@@ -144,9 +158,11 @@ public class OrderController {
         	  orderAndSoOnRequest.setOrderInfo(orderInfo);
         	  return orderService.addOrdta(orderAndSoOnRequest);
           }else {
+        	  LOGGER.warn("门店新增服务订单step1-订单主数据为null：{}",orderAndSoOnRequest);
         	  return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
           }
         }else {
+        	LOGGER.warn("门店新增服务订单step1-参数为null：{}",orderAndSoOnRequest);
         	return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
         }
     }
@@ -160,7 +176,9 @@ public class OrderController {
     @PostMapping("/zabo")
     @ApiOperation(value = "门店新增TOC订单step2-添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据")
     public HttpResponse zabo(@Valid @RequestBody OrderAndSoOnRequest orderAndSoOnRequest){
-        LOGGER.info("门店新增服务订单step2-添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据.....");
+        
+    	
+    	LOGGER.info("门店新增服务订单step2-添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据参数：{}",orderAndSoOnRequest);
 		
         //添加TOC订单标识
         if(orderAndSoOnRequest !=null) {
@@ -170,9 +188,11 @@ public class OrderController {
         	  orderAndSoOnRequest.setOrderInfo(orderInfo);
         	  return orderService.addPamo(orderAndSoOnRequest);
           }else {
+        	  LOGGER.warn("门店新增TOC订单step2-订单主数据为null：{}",orderAndSoOnRequest);
         	  return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
           }
         }else {
+        	LOGGER.warn("门店新增TOC订单step2-数据为null：{}",orderAndSoOnRequest);
         	return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
         }
     }
@@ -186,8 +206,9 @@ public class OrderController {
     @GetMapping("/deordta")
     @ApiOperation(value = "删除订单主数据+删除订单明细数据")
     public HttpResponse deordta(@Valid @RequestParam(name = "order_id", required = true) String orderId){
-        LOGGER.info("删除订单主数据+删除订单明细数据......");
-		
+        
+    	
+    	LOGGER.info("删除订单主数据+删除订单明细数据参数orderId: {}",orderId);
         return orderService.deordta(orderId);
     }
     
@@ -202,7 +223,7 @@ public class OrderController {
     public HttpResponse selectOrder(@Valid @RequestBody OrderQuery orderQuery) {
         
     	
-    	LOGGER.info("查询订单列表...");    	
+    	LOGGER.info("查询订单列表参数：{}",orderQuery);    	
         return orderService.selectOrder(orderQuery);
     }
     
@@ -217,7 +238,7 @@ public class OrderController {
     public HttpResponse exorder(@Valid @RequestBody OrderQuery orderQuery) {
         
     	
-    	LOGGER.info("导出订单列表...");    	
+    	LOGGER.info("导出订单列表参数：{}",orderQuery);    	
         return orderService.exorder(orderQuery);
     }
     
@@ -232,7 +253,7 @@ public class OrderController {
     public HttpResponse oradsku(@Valid @RequestBody OrderQuery orderQuery) {
         
     	
-    	LOGGER.info("模糊查询订单列表+订单中商品sku数量...");    	
+    	LOGGER.info("模糊查询订单列表+订单中商品sku数量参数：{}",orderQuery);    	
         return orderService.oradsku(orderQuery);
     }
     
@@ -246,33 +267,12 @@ public class OrderController {
     @PostMapping("")
     @ApiOperation(value = "微商城新增TOC订单-添加新的订单主数据以及其他订单关联数据")
     public HttpResponse addOrderList(@Valid @RequestBody OrderAndSoOnRequest orderAndSoOnRequest){
-        LOGGER.info("添加新的订单主数据以及其他订单关联数据......");
-		
+        
+    	
+    	LOGGER.info("添加新的订单主数据以及其他订单关联数据参数：{}",orderAndSoOnRequest);
         return orderService.addOrderList(orderAndSoOnRequest);
     }
     
-    
-//    @PostMapping("")
-//    @ApiOperation(value = "添加新的订单主数据以及其他订单关联数据")
-//    public HttpResponse addOrderList(@Valid @RequestBody OrderInfo orderInfo
-//    		) {
-//        LOGGER.info("添加新的订单主数据以及其他订单关联数据......");
-//        return orderService.addOrderInfo(orderInfo);
-//    }
-    
-
-//    /**
-//     * 添加新的订单日志数据
-//     * @param logInfo
-//     * @param orderId
-//     * @return
-//     */
-//    @PostMapping("/addorderlog")
-//    @ApiOperation(value = "添加新的订单日志数据")
-//    public HttpResponse addOrderLog(@Valid @RequestBody OrderLog logInfo) {
-//        LOGGER.info("添加新的订单日志数据......");
-//        return orderService.addOrderLog(logInfo);
-//    }
     
     /**
      * 查询订单日志数据
@@ -283,41 +283,12 @@ public class OrderController {
     @PostMapping("/orog")
     @ApiOperation(value = "查询订单日志数据")
     public HttpResponse orog(@Valid @RequestParam(name = "order_id", required = true) String orderId) {
-        LOGGER.info("查询订单日志数据......");
+        
+    	
+    	LOGGER.info("查询订单日志数据参数orderId：{}",orderId);
         return orderService.orog(orderId);
     }
-    
-    
-//    /**
-//     * 添加新的订单优惠券关系表数据
-//     * @param orderCouponList
-//     * @param orderId
-//     * @return
-//     */
-//    @PostMapping("/addordercoupon")
-//    @ApiOperation(value = "添加新的订单优惠券关系表数据")
-//    public void addOrderCoupon(@Valid @RequestBody List<OrderRelationCouponInfo> orderCouponList,@Valid @RequestParam(name = "order_id", required = false) String orderId) {
-//        
-//    	
-//    	LOGGER.info("添加新的订单优惠券关系表数据......");
-//    	orderService.addOrderCoupon(orderCouponList,orderId);
-//    }
-    
-    
-//    /**
-//     * 接口-分销机构维度-总销售额 返回INT
-//     * @param 
-//     * @return
-//     */
-//    @GetMapping("/selectorderamt")
-//    @ApiOperation(value = "接口-分销机构维度-总销售额 返回INT....")
-//    public HttpResponse selectOrderAmt(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,@RequestParam(name = "origin_type", required = true) String originType) {
-//        
-//    	
-//    	LOGGER.info("接口-分销机构维度-总销售额 返回INT...");    	
-//        return orderService.selectOrderAmt(distributorId,originType);
-//    } 
-    
+     
     
     /**
      * 概览菜单-分销机构+当月维度-总销售额\当月销售额、当月实收、当月支付订单数
@@ -330,6 +301,7 @@ public class OrderController {
     		@Valid @RequestBody List<Integer> originTypeList) {
         
     	
+    	LOGGER.info("概览菜单-分销机构+当月维度-总销售额当月销售额、当月实收、当月支付订单数参数distributorId :{},originTypeList: {}",distributorId,originTypeList);
         return orderService.selectorderbymonth(distributorId,originTypeList);
     } 
     
@@ -345,7 +317,7 @@ public class OrderController {
     		@Valid @RequestBody List<Integer> originTypeList) {
         
     	
-    	LOGGER.info("概览菜单-订单概览-分销机构、小于当前日期9天内的实付金额、订单数量...");    	
+    	LOGGER.info("概览菜单-订单概览-分销机构、小于当前日期9天内的实付金额、订单数量参数distributorId: {},originTypeList: {}",distributorId,originTypeList);    	
         return orderService.selectOrderByNineDate(distributorId,originTypeList);
     } 
     
@@ -361,7 +333,7 @@ public class OrderController {
     		@Valid @RequestBody List<Integer> originTypeList) {
         
     	
-    	LOGGER.info("概览菜单-订单概览-分销机构、小于当前日期9周内的实付金额、订单数量...");    	
+    	LOGGER.info("概览菜单-订单概览-分销机构、小于当前日期9周内的实付金额、订单数量参数 distributorId: {},originTypeList: {}",distributorId,originTypeList);    	
         return orderService.selectOrderByNineWeek(distributorId,originTypeList);
     } 
     
@@ -377,7 +349,7 @@ public class OrderController {
     		@Valid @RequestBody List<Integer> originTypeList) {
         
     	
-    	LOGGER.info("概览菜单-订单概览-分销机构、小于当前日期9个月内的实付金额、订单数量...");    	
+    	LOGGER.info("概览菜单-订单概览-分销机构、小于当前日期9个月内的实付金额、订单数量参数 distributorId: {},originTypeList: {}",distributorId,originTypeList);  	
         return orderService.selectOrderByNineMonth(distributorId,originTypeList);
     } 
     
@@ -392,7 +364,7 @@ public class OrderController {
     public HttpResponse updateorderClose(@Valid @RequestParam(name = "order_id", required = true) String orderId,@RequestParam(name = "update_by", required = true) String updateBy) {
         
     	
-    	LOGGER.info("接口-关闭订单...");    	
+    	LOGGER.info("接口-关闭订单参数orderId：{},updateBy:{}",orderId,updateBy);    	
         return orderService.closeorder(orderId,updateBy);
     } 
     
@@ -407,7 +379,7 @@ public class OrderController {
     public HttpResponse updateorderbusinessnote(@Valid @RequestParam(name = "order_id", required = true) String orderId,@RequestParam(name = "update_by", required = true) String updateBy,@RequestParam(name = "business_note", required = true) String businessNote) {
         
     	
-    	LOGGER.info("接口-更新商户备注...");    	
+    	LOGGER.info("接口-更新商户备注参数 orderId： {},updateBy：{},businessNote: {}",orderId,updateBy,businessNote);    	
         return orderService.updateorderbusinessnote(orderId,updateBy,businessNote);
     } 
     
@@ -427,7 +399,7 @@ public class OrderController {
     		) {
         
     	
-    	LOGGER.info("更改订单状态/支付状态/修改员...");    	
+    	LOGGER.info("更改订单状态/支付状态/修改员参数 orderId：{},orderStatus: {},payStatus: {},payType: {},updateBy: {}",orderId,orderStatus,payStatus,payType,updateBy);    	
         return orderService.updateOrderStatus(orderId,orderStatus,payStatus,updateBy);
     } 
     
@@ -445,27 +417,9 @@ public class OrderController {
     		) {
         
     	
-    	LOGGER.info("仅变更订单状态....");    	
+    	LOGGER.info("仅变更订单状态参数 orderId：{},orderStatus: {},updateBy: {}",orderId,orderStatus,updateBy);    	
         return orderService.onlyStatus(orderId,orderStatus,updateBy);
     } 
-    
-//    /**
-//     * 
-//     * 仅更改退货状态(订单主表+订单售后表) 业务逻辑不同 废弃
-//     * @param 
-//     * @return
-//     */
-//    @PutMapping("/return_status")
-//    @ApiOperation(value = "更改退货状态/修改员....")
-//    public HttpResponse returnStatus(@Valid @RequestParam(name = "order_id", required = true) String orderId,
-//    		@RequestParam(name = "return_status", required = true) Integer returnStatus,
-//    		@RequestParam(name = "update_by", required = true) String updateBy
-//    		) {
-//        
-//    	
-//    	LOGGER.info("更改退货状态/修改员...");    	
-//        return orderService.returnStatus(orderId,returnStatus,updateBy);
-//    }
     
     
     /**
@@ -482,7 +436,7 @@ public class OrderController {
     		) {
         
     	
-    	LOGGER.info("接口-收银员交班收银情况统计(param:cashier_id、begin_time、end_time、 return:list-OrderbyReceiptSumResponse)...");    	
+    	LOGGER.info("接口-收银员交班收银情况统计参数 cashierId:{},beginTime:{},endTime:{}",cashierId,beginTime,endTime);    	
         return orderService.cashier(cashierId,beginTime,endTime);
     }
     
@@ -497,7 +451,8 @@ public class OrderController {
     public HttpResponse last(@Valid @RequestParam(name = "member_id", required = true) String memberId
     		) {
 
-    	LOGGER.info("接口-通过会员查询最后一次的消费记录...");    	
+    	
+    	LOGGER.info("接口-通过会员查询最后一次的消费记录参数memberId:{} ",memberId);    	
         return orderService.last(memberId);
     }
     
@@ -513,9 +468,9 @@ public class OrderController {
     		@Valid @RequestBody List<String> detailList
     		) {
 
-    	LOGGER.info("接口-通过当前门店,等级会员list、 查询会员数、返回7天内的统计....");  
+    	
+    	LOGGER.info("接口-通过当前门店,等级会员list、 查询会员数、返回7天内的统计参数 distributorId：{},detailList: {}",distributorId,detailList);  
     	if(detailList !=null && detailList.size()>0) {
-    		
     	}else {
     		detailList =null;
     	}   	
@@ -536,6 +491,7 @@ public class OrderController {
     		) {
 
     	
+    	LOGGER.info("会员活跃情况-日周月参数 distributorId：{},dateType: {}",distributorId,dateType);
         return orderService.selectByMemberPayCount(distributorId,dateType);
     }
     
@@ -550,7 +506,8 @@ public class OrderController {
     @ApiOperation(value = "接口-生成提货码......")
     public HttpResponse rede(@Valid @RequestParam(name = "order_id", required = true) String orderId) {
 
-    	LOGGER.info("接口-生成提货码....");    	
+    	
+    	LOGGER.info("接口-生成提货码参数 orderId：{}",orderId);    	
         return orderService.rede(orderId);
     }
     
@@ -564,7 +521,8 @@ public class OrderController {
     @ApiOperation(value = "接口-注销提货码......")
     public HttpResponse reded(@Valid @RequestParam(name = "order_id", required = true) String orderId) {
 
-    	LOGGER.info("接口-注销提货码....");    	
+    	
+    	LOGGER.info("接口-注销提货码参数 orderId：{}",orderId);    	
         return orderService.reded(orderId);
     }
     
@@ -578,7 +536,8 @@ public class OrderController {
     @ApiOperation(value = "接口-可退货的订单查询......")
     public HttpResponse reorer(@Valid @RequestBody ReorerRequest reorerRequest) {
 
-    	LOGGER.info("接口-可退货的订单查询....");    	
+    	
+    	LOGGER.info("接口-可退货的订单查询参数：{}",reorerRequest);    	
         return orderService.reorer(reorerRequest);
     }   
     
@@ -593,9 +552,10 @@ public class OrderController {
     @ApiOperation(value = "微商城-销售总览....")
     public HttpResponse wssev(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId) {
 
-    	LOGGER.info("微商城-销售总览....");    	
+    	LOGGER.info("微商城-销售总览参数 distributorId: {}",distributorId);    	
         return orderService.wssev(distributorId);
     }
+    
     
     /**
      * 
@@ -607,9 +567,11 @@ public class OrderController {
     @ApiOperation(value = "微商城-事务总览....")
     public HttpResponse wsswv(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId) {
 
-    	LOGGER.info("微商城-事务总览....");    	
+    	
+    	LOGGER.info("微商城-事务总览参数 distributorId: {}",distributorId);    	
         return orderService.wsswv(distributorId);
     }
+    
     
     /**
      * 销售目标管理-分销机构-月销售额
@@ -621,8 +583,10 @@ public class OrderController {
     public HttpResponse sdm(@Valid @RequestBody DistributorMonthRequest DistributorMonthRequest) {
         
     	
+    	LOGGER.info("销售目标管理参数: {}",DistributorMonthRequest);
         return orderService.selectDistributorMonth(DistributorMonthRequest);
     } 
+    
     
     /**
      * 判断会员是否在当前门店时候有过消费记录
@@ -634,6 +598,7 @@ public class OrderController {
     public HttpResponse bmpy(@Valid @RequestBody MemberByDistributorRequest memberByDistributorRequest) {
         
     	
+    	LOGGER.info("判断会员是否在当前门店时候有过消费记录参数: {}",memberByDistributorRequest);
         return orderService.selectMemberByDistributor(memberByDistributorRequest);
     } 
 }

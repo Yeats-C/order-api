@@ -82,6 +82,7 @@ import com.aiqin.mgs.order.api.service.OrderLogService;
 import com.aiqin.mgs.order.api.service.OrderNoCodeService;
 import com.aiqin.mgs.order.api.service.OrderService;
 import com.aiqin.mgs.order.api.service.SettlementService;
+import com.aiqin.mgs.order.api.util.DateUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -113,8 +114,8 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 	public HttpResponse selectSumByStoreId(@Valid String distributorId) {
 		
 		//参数
-		String beginDate = "";
-		String endDate = "";
+		Date beginDate = new Date();
+		Date endDate = new Date();
 		
 		//返回值
 		SelectSumByStoreIdResonse info = new SelectSumByStoreIdResonse();
@@ -155,13 +156,13 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 		}
 		
 		//当月客流量
-		beginDate = OrderPublic.getMonth(0);
-		endDate = OrderPublic.NextDate(0);
+		beginDate = DateUtil.getDayBegin(DateUtil.getMonth(0));
+		endDate = DateUtil.getDayEnd(DateUtil.NextDate(0));
 		passengerFlow = orderNoCodeDao.getPassengerFlow(distributorId,beginDate,endDate);
 		
 		
-		beginDate = OrderPublic.NextDate(-1);
-		endDate = OrderPublic.NextDate(-1);
+		beginDate = DateUtil.getDayBegin(DateUtil.NextDate(-1));
+		endDate = DateUtil.getDayEnd(DateUtil.NextDate(-1));
 		
 		
 		//昨日订单金额
@@ -210,7 +211,23 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 	
 	//商品类别销售概况
 	@Override
-	public HttpResponse selectSaleView(@Valid String distributorId, @Valid String beginDate, @Valid String endDate) {
+	public HttpResponse selectSaleView(@Valid String distributorId, @Valid String begin, @Valid String end) {
+		
+		
+		//日期转换
+		Date beginDate = new Date(); 
+		Date endDate = new Date();
+		if(begin !=null && !begin.equals("")) {
+			beginDate = DateUtil.getDayBegin(begin);
+		}else {
+			beginDate = null;
+		}
+		if(end !=null && !end.equals("")) {
+			endDate = DateUtil.getDayEnd(endDate);
+		}else {
+			end = null;
+		}
+		
 		
 		//返回参数
 		List<SelectSaleViewResonse> list = new ArrayList();
@@ -341,7 +358,7 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 			//有码商品的销售金额
 			Integer codeOrderPrice = null;  
 			try {
-				codeOrderPrice = orderDao.selectDistributorMonth(distributorId,beginDate,endDate);
+				codeOrderPrice = orderDao.selectDistributorMonth(distributorId,DateUtil.formatDate(beginDate),DateUtil.formatDate(endDate));
 				
 				if(codeOrderPrice !=null && codeOrderPrice != 0) {
 					SelectSaleViewResonse info = new SelectSaleViewResonse();
@@ -352,71 +369,70 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 					info.setPassengerFlow(0);
 					list.add(info);
 				}
+				
+				return HttpResponse.success(list);
+				
 			} catch (Exception e) {
-				LOGGER.info("有码商品的销售金额查询异常");
+				LOGGER.error("有码商品的销售金额查询异常 {}",e);
 				return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 			}
-			
-			
-			
-		return HttpResponse.success(list);
 	}
 
 
 	//订单列表
-	@Override
-	public HttpResponse<List<OrderInfo>> selectNoCodeList(@Valid OrderNoCodeRequest orderNoCodeBuyRequest) {
-		
-		//购买.退货
-		try {
-			Integer orderFlow = null;
-            if(orderNoCodeBuyRequest !=null) {
-            	 if(orderNoCodeBuyRequest.getOrderFlow() !=null) {
-            		 orderFlow = orderNoCodeBuyRequest.getOrderFlow();
-            	 }else {
-            		 orderFlow = 0;
-            	 }
-            }
-			
-			//返回结果
-			List<OrderNoCodeInfo> list = new ArrayList();
-			
-			//分页
-			Integer totalCount = 0;
-			
-			if(orderFlow != Global.ORDER_FLOW_2) {
-				//购买订单列表
-				List<OrderNoCodeInfo> buyList = new ArrayList();
-				buyList = orderNoCodeDao.selectNoCodeOrderList(orderNoCodeBuyRequest);
-				if(buyList !=null && buyList.size()>0) {
-					for(OrderNoCodeInfo info : buyList) {
-						list.add(info);
-					}	
-				}
-				//订单列表总数据条数
-				totalCount += orderNoCodeDao.selectNoCodeOrderListCount(orderNoCodeBuyRequest);
-			}
-			if(orderFlow != Global.ORDER_FLOW_1) {
-			    //退货订单列表
-				List<OrderNoCodeInfo> returnList = new ArrayList();
-				returnList = orderNoCodeDao.selectNoCodeReturnList(orderNoCodeBuyRequest);	
-				if(returnList !=null && returnList.size()>0) {
-					for(OrderNoCodeInfo info : returnList) {
-						list.add(info);
-					}	
-				}
-				//退货订单列表总数据条数
-				totalCount += orderNoCodeDao.selectNoCodeReturnListCount(orderNoCodeBuyRequest);
-			}
-			
-			return HttpResponse.success(new PageResData(totalCount,list));
-	
-		} catch (Exception e) {
-			LOGGER.info("订单列表查询异常",e);
-			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
-		}
-		
-	}
+//	@Override
+//	public HttpResponse<List<OrderInfo>> selectNoCodeList(@Valid OrderNoCodeRequest orderNoCodeBuyRequest) {
+//		
+//		//购买.退货
+//		try {
+//			Integer orderFlow = null;
+//            if(orderNoCodeBuyRequest !=null) {
+//            	 if(orderNoCodeBuyRequest.getOrderFlow() !=null) {
+//            		 orderFlow = orderNoCodeBuyRequest.getOrderFlow();
+//            	 }else {
+//            		 orderFlow = 0;
+//            	 }
+//            }
+//			
+//			//返回结果
+//			List<OrderNoCodeInfo> list = new ArrayList();
+//			
+//			//分页
+//			Integer totalCount = 0;
+//			
+//			if(orderFlow != Global.ORDER_FLOW_2) {
+//				//购买订单列表
+//				List<OrderNoCodeInfo> buyList = new ArrayList();
+//				buyList = orderNoCodeDao.selectNoCodeOrderList(orderNoCodeBuyRequest);
+//				if(buyList !=null && buyList.size()>0) {
+//					for(OrderNoCodeInfo info : buyList) {
+//						list.add(info);
+//					}	
+//				}
+//				//订单列表总数据条数
+//				totalCount += orderNoCodeDao.selectNoCodeOrderListCount(orderNoCodeBuyRequest);
+//			}
+//			if(orderFlow != Global.ORDER_FLOW_1) {
+//			    //退货订单列表
+//				List<OrderNoCodeInfo> returnList = new ArrayList();
+//				returnList = orderNoCodeDao.selectNoCodeReturnList(orderNoCodeBuyRequest);	
+//				if(returnList !=null && returnList.size()>0) {
+//					for(OrderNoCodeInfo info : returnList) {
+//						list.add(info);
+//					}	
+//				}
+//				//退货订单列表总数据条数
+//				totalCount += orderNoCodeDao.selectNoCodeReturnListCount(orderNoCodeBuyRequest);
+//			}
+//			
+//			return HttpResponse.success(new PageResData(totalCount,list));
+//	
+//		} catch (Exception e) {
+//			LOGGER.info("订单列表查询异常",e);
+//			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+//		}
+//		
+//	}
 
 
 	//编号查询订单.
@@ -443,7 +459,7 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 			}
 			info.setOrderInfo(orderInfo);
 		} catch (Exception e) {
-			LOGGER.error("查询BYorderid-返回订单主数据",e);
+			LOGGER.error("查询BYorderid-返回订单主数据 {}",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 		
@@ -456,7 +472,7 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 	    	    info.setDetailList(detailList);
 	        }
 		} catch (Exception e) {
-			LOGGER.error("组装订单明细数据失败",e);
+			LOGGER.error("组装订单明细数据失败 {}",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}	
 		
@@ -470,7 +486,7 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 	        }
 	        
 		} catch (Exception e) {
-			LOGGER.error("组装订单结算数据失败",e);
+			LOGGER.error("组装订单结算数据失败 {}",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}	
 		
@@ -486,7 +502,7 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 	        return HttpResponse.success(info);
 	        
 		} catch (Exception e) {
-			LOGGER.error("组装订单支付数据失败",e);
+			LOGGER.error("组装订单支付数据失败 {}",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}	
 	}

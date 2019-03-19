@@ -23,6 +23,7 @@ import com.aiqin.mgs.order.api.dao.FrozenDao;
 import com.aiqin.mgs.order.api.domain.FrozenInfo;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.service.FrozenService;
+import com.aiqin.mgs.order.api.util.DateUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 
 @SuppressWarnings("all")
@@ -43,20 +44,20 @@ public class FrozenServiceImpl implements FrozenService{
 
 		try {
 			//生成挂单ID
-			String frozenId =OrderPublic.sysDate()+OrderPublic.randomNumberF();
+			String frozenId =DateUtil.sysDate()+OrderPublic.randomNumberF();
 			
 			if(frozenInfolist !=null && frozenInfolist.size()>0) {
 			for(FrozenInfo info : frozenInfolist ) {
-				LOGGER.info("挂单入库...", frozenInfolist);
+				LOGGER.info("挂单入库 {}", frozenInfolist);
 				
 				info.setFrozenId(frozenId);
 				frozenDao.insert(info);
 			}
 			}
 			return HttpResponse.success();
-		} catch (Exception e) {
 			
-			LOGGER.info("挂单入库失败", e);
+		} catch (Exception e) {
+			LOGGER.error("挂单入库失败 {}", e);
 			return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
 		}
 		
@@ -68,11 +69,10 @@ public class FrozenServiceImpl implements FrozenService{
 	public HttpResponse selectDetailByFrozenId(String frozenId) {
 		
 		try {
-			LOGGER.info("查询挂单明细...", frozenId);
+			LOGGER.info("查询挂单明细 {}", frozenId);
 			return HttpResponse.success(frozenDao.selectDetailByFrozenId(frozenId));
 		} catch (Exception e) {
-			
-			LOGGER.info("查询挂单明细失败", e);
+			LOGGER.error("查询挂单明细失败:{}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 		
@@ -85,12 +85,11 @@ public class FrozenServiceImpl implements FrozenService{
 	public HttpResponse deleteByFrozenId(String frozenId) {
 		
 		try {
-			LOGGER.info("解挂...", frozenId);
+			LOGGER.info("解挂 {}", frozenId);
 			frozenDao.deleteByFrozenId(frozenId);
 			return HttpResponse.success();
 		} catch (Exception e) {
-			
-			LOGGER.info("解挂失败", e);
+			LOGGER.error("解挂失败 {}", e);
 			return HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
 		}
 	}
@@ -101,12 +100,10 @@ public class FrozenServiceImpl implements FrozenService{
 	public HttpResponse selectSumByFrozenId(String createBy,String distributorId) {
 		
 		try {
-			LOGGER.info("查询挂单汇总...", distributorId+"."+createBy);
+			LOGGER.info("查询挂单汇总 distributorId: {},createBy: {}", distributorId,createBy);
 			return HttpResponse.success(frozenDao.selectSumByFrozenId(createBy,distributorId));
-			
 		} catch (Exception e) {
-			
-			LOGGER.info("查询挂单汇总",e);
+			LOGGER.error("查询挂单汇总 {}",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}
@@ -115,14 +112,11 @@ public class FrozenServiceImpl implements FrozenService{
 	@Override
 	public HttpResponse selectDetail(String createBy, String distributorId) {
 		 
-
 		try {
-			
-			LOGGER.info("查询挂单明细...", createBy);
+			LOGGER.info("查询挂单明细 {}", createBy);
 			return HttpResponse.success(frozenDao.selectDetail(createBy,distributorId));
 		} catch (Exception e) {
-			
-			LOGGER.info("查询挂单明细失败", e);
+			LOGGER.error("查询挂单明细失败 {}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}
@@ -131,6 +125,7 @@ public class FrozenServiceImpl implements FrozenService{
 	//查询挂单数量
 	@Override
 	public HttpResponse selectSumByParam(@Valid String createBy, String distributorId) {
+		
 		try {
 			Integer frozenSum = null;
 			frozenSum = frozenDao.selectSumByParam(createBy,distributorId);
@@ -139,8 +134,7 @@ public class FrozenServiceImpl implements FrozenService{
 			}
 			return HttpResponse.success(frozenSum);
 		} catch (Exception e) {
-			
-			LOGGER.info("查询挂单数量失败", e);
+			LOGGER.error("查询挂单数量失败 {}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}

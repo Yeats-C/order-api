@@ -218,6 +218,5 @@ public class PaymentInfo extends PagesRequest{
 	
 //	public static void main(String[] args) {
 //		PaymentInfo info = new PaymentInfo();
-//		System.out.println(info.getMchId());
 //	}
 }

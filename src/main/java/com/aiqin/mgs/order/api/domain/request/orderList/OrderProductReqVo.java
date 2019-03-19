@@ -19,6 +19,9 @@ public class OrderProductReqVo implements Serializable {
 
     private static final long serialVersionUID = -1223728764746461137L;
 
+    @ApiModelProperty(value = "商品行号", hidden = true)
+    private String orderProductId;
+
     @ApiModelProperty(value = "商品sku码")
     @JsonProperty("sku_code")
     private String skuCode;
@@ -106,6 +109,10 @@ public class OrderProductReqVo implements Serializable {
     @ApiModelProperty(value = "商品单位重量")
     @JsonProperty("weight")
     private Integer weight = 0;
+
+    @JsonProperty("product_type")
+    @ApiModelProperty("商品类型，1-正常品，0-效期品")
+    private Integer productType = 1;
 
     @ApiModelProperty(value = "优惠额度信息")
     @JsonProperty("discount_amount_info")

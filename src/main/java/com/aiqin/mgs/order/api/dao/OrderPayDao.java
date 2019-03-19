@@ -28,5 +28,8 @@ public interface OrderPayDao {
 
 	//已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)
 	void deleteOrderPayList(@Param("orderId")String orderId)throws Exception;
+	
+	//查询支付订单号
+	List<String> orderIDListPay(@Valid OrderPayInfo info) throws Exception;
 
 }

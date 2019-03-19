@@ -23,6 +23,8 @@ public interface ResultCode {
     MessageId SELECT_EXCEPTION = MessageId.create(Project.ORDER_API, 13, "查询异常");
     MessageId PARAMETER_EXCEPTION = MessageId.create(Project.ORDER_API, 14, "参数异常");
     
+    MessageId NET_EXCEPTION = MessageId.create(Project.ORDER_API, 15, "网络异常");
+    
     String CART = "购物车";
     String ORDER = "订单";
     

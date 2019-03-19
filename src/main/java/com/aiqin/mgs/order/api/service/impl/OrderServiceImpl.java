@@ -80,6 +80,7 @@ import com.aiqin.mgs.order.api.service.OrderDetailService;
 import com.aiqin.mgs.order.api.service.OrderLogService;
 import com.aiqin.mgs.order.api.service.OrderService;
 import com.aiqin.mgs.order.api.service.SettlementService;
+import com.aiqin.mgs.order.api.util.DateUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -122,8 +123,9 @@ public class OrderServiceImpl implements OrderService{
 	@Override
 	public HttpResponse selectOrder(OrderQuery orderQuery) {
 		
-			LOGGER.info("模糊查询订单列表", orderQuery);
-
+	   //根据支付类型查询订单
+	   payOrderIdList(OrderPublic.getOrderQuery(orderQuery));
+	   
 			try {
 				
 				List<OrderInfo> OrderInfolist = orderDao.selectOrder(OrderPublic.getOrderQuery(orderQuery));
@@ -149,30 +151,44 @@ public class OrderServiceImpl implements OrderService{
 						}else {
 							info.setTurnReturnView(1);
 						}
-						
-						
 						OrderInfolist.set(i,info);
-						
 					}
-					
-					
 				}
 				
 				//计算总数据量
 				Integer totalCount = 0;
 				Integer icount =null;
-//				orderQuery.setIcount(icount);
 				totalCount = orderDao.selectOrderCount(OrderPublic.getOrderQuery(orderQuery));
 				
-				
-//				return HttpResponse.success(OrderPublic.getData(OrderInfolist));
 				return HttpResponse.success(new PageResData(totalCount,OrderInfolist));
 				
 			} catch (Exception e) {
-				LOGGER.info("模糊查询订单列表報錯", e);
+				LOGGER.error("模糊查询订单列表异常 {}", e);
 				return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 			}
 			
+	}
+
+
+	private void payOrderIdList(OrderQuery orderQuery) {
+		
+		if(orderQuery !=null) {
+			  if(orderQuery.getPayType() !=null && !orderQuery.getPayType().equals("")){
+				  
+				  List<String> orderIdList = new ArrayList();
+				  try {
+					OrderPayInfo info = new OrderPayInfo();
+					info.setPayType(Integer.valueOf(orderQuery.getPayType()));
+					orderIdList = orderPayDao.orderIDListPay(info);
+					if(orderIdList !=null && orderIdList.size()>0) {
+						orderQuery.setOrderIdList(orderIdList);
+					}
+				} catch (Exception e) {
+					LOGGER.error("查询支付订单号异常 {}", e);
+				}
+			  } 
+		   }
+		
 	}
 
 
@@ -208,7 +224,7 @@ public class OrderServiceImpl implements OrderService{
 			companyCode = Global.COMPANY_01;
 		}
 		//yyMMddHHmmss+订单来源+销售渠道标识+公司标识+4位数的随机数
-		orderCode = OrderPublic.currentDate()+logo+String.valueOf(Global.ORDERID_CHANNEL_4)+companyCode+OrderPublic.randomNumberF();
+		orderCode = DateUtil.sysDate()+logo+String.valueOf(Global.ORDERID_CHANNEL_4)+companyCode+OrderPublic.randomNumberF();
 		orderInfo.setOrderCode(orderCode);
 		
 		//初始化提货码
@@ -237,7 +253,7 @@ public class OrderServiceImpl implements OrderService{
 			return HttpResponse.success();
 		
 		} catch (Exception e) {
-			LOGGER.info("添加订单日志報錯", e);
+			LOGGER.error("添加订单日志报错：{}", e);
 			return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
 		}
 	}
@@ -281,10 +297,10 @@ public class OrderServiceImpl implements OrderService{
 	public HttpResponse selectorderbymonth(@Valid String distributorId,List<Integer> originTypeList) {
 
 		//系统日期:年月
-		String yearMonth = OrderPublic.sysDateyyyyMM();
+		String yearMonth = DateUtil.sysDateyyyyMM();
 		
 		//取昨日日期
-		String yesterday = OrderPublic.NextDate(-1);
+		String yesterday = DateUtil.NextDate(-1);
 		
 		OrderOverviewMonthResponse info = new OrderOverviewMonthResponse();
 		
@@ -298,42 +314,38 @@ public class OrderServiceImpl implements OrderService{
 			originTypeList =null;
 		}
 		
-		//总销售额：包含退货、不包含取消、未付款的订单
-		Integer total_price = 0;
-		
-		//当月销售额：包含退货、不包含取消、未付款的订单
-		Integer monthtotal_price=0;
-		
-		//昨日销售额：包含退货、不包含取消、未付款的订单
-        Integer yesdaytotal_price=0;
-        
-        //当月支付订单数：包含退货、不包含取消、未付款的订单
-      	Integer monthorder_acount=0;
-      	
-        //昨日支付订单数：包含退货、不包含取消、未付款的订单
-        Integer yesdayorder_acount=0;
-		
-		//当月实收：不包含退货、未付款、取消的订单
-		Integer monthreal_amt=0;
-		
-		//昨日实收：不包含退货、未付款、取消的订单
+		//总销售额
+		Integer total_price;
+		//当月销售额
+		Integer monthtotal_price;
+		//昨日销售额
+        Integer yesdaytotal_price;
+        //当月支付订单数
+      	Integer monthorder_acount;
+        //昨日支付订单数
+        Integer yesdayorder_acount;
+		//当月实收
+		Integer monthreal_amt;
+		//昨日实收
         Integer yesdayreal_amt;
 
 		
 		try {
-			System.out.println("总销售额：包含退货、取消的订单==");
+			LOGGER.info("接口-分销机构+当月维度-当月销售额、当月实收、当月支付订单数 : {},originTypeList : {}", distributorId,originTypeList);
+			
+//			总销售额：包含退货、取消的订单==
 			total_price = orderDao.selectOrderAmt(distributorId,originTypeList);
-			System.out.println("当月销售额：包含退货、取消的订单==");
+//			当月销售额：包含退货、取消的订单==
 			monthtotal_price = orderDao.selectByMonthAllAmt(distributorId,originTypeList,yearMonth);
-			System.out.println("昨日销售额：包含退货、取消的订单==");
+//			昨日销售额：包含退货、取消的订单==
 			yesdaytotal_price = orderDao.selectByYesdayAllAmt(distributorId,originTypeList,yesterday);
-			System.out.println("当月支付订单数：包含退货、取消的订单==");
+//			当月支付订单数：包含退货、取消的订单==
 			monthorder_acount = orderDao.selectByMonthAcount(distributorId,originTypeList,yearMonth);
-			System.out.println("昨日支付订单数：包含退货、取消的订单==");
+//			昨日支付订单数：包含退货、取消的订单==
 			yesdayorder_acount = orderDao.selectByYesdayAcount(distributorId,originTypeList,yesterday);
-			System.out.println("当月实收：不包含退货、取消的订单==");
+//			当月实收：不包含退货、取消的订单==
 			monthreal_amt = orderDao.selectbByMonthRetailAmt(distributorId,originTypeList,yearMonth);
-			System.out.println("昨日实收：不包含退货、取消的订单==");
+//			昨日实收：不包含退货、取消的订单==
 			yesdayreal_amt = orderDao.selectbByYesdayRetailAmt(distributorId,originTypeList,yesterday);
 			
 			
@@ -373,7 +385,7 @@ public class OrderServiceImpl implements OrderService{
 			
 		} catch (Exception e) {
 			
-			LOGGER.info("接口-分销机构+当月维度-当月销售额、当月实收、当月支付订单数報錯", e);
+			LOGGER.error("接口-分销机构+当月维度-当月销售额、当月实收、当月支付订单数报错：{}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 		
@@ -387,8 +399,7 @@ public class OrderServiceImpl implements OrderService{
 	@Override
 	public HttpResponse selectOrderByNineDate(@Valid String distributorId,List<Integer> originTypeList) {
 		
-		String  beginDate= OrderPublic.NextDate(-8);
-		System.out.println("小于当前日期的第9天日期:"+beginDate);
+		String  beginDate= DateUtil.NextDate(-8);
 		try {
 			OrderQuery orderQuery = new OrderQuery();
 			orderQuery.setDistributorId(distributorId);
@@ -399,7 +410,7 @@ public class OrderServiceImpl implements OrderService{
 			return HttpResponse.success(list);
 		} catch (Exception e) {
 			
-			LOGGER.info("接口-订单概览-分销机构、小于当前日期9天内的实付金额、订单数量報錯", e);
+			LOGGER.error("接口-订单概览-分销机构、小于当前日期9天内的实付金额、订单数量报错：{}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 
@@ -429,7 +440,7 @@ public class OrderServiceImpl implements OrderService{
 			return HttpResponse.success(list);
 		} catch (Exception e) {
 			
-			LOGGER.info("接口-订单概览-分销机构、小于当前日期9周内的实付金额、订单数量報錯", e);
+			LOGGER.error("接口-订单概览-分销机构、小于当前日期9周内的实付金额、订单数量报错：{}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}
@@ -438,7 +449,7 @@ public class OrderServiceImpl implements OrderService{
 	@Override
 	public HttpResponse selectOrderByNineMonth(@Valid String distributorId,List<Integer> originTypeList) {
 
-        String  beginDate = OrderPublic.afterMonth(-8); //YYYY-MM
+        String  beginDate = DateUtil.afterMonth(-8); //YYYY-MM
         
         OrderQuery orderQuery = new OrderQuery();
 		orderQuery.setDistributorId(distributorId);
@@ -450,7 +461,7 @@ public class OrderServiceImpl implements OrderService{
 			return HttpResponse.success(list);
 		} catch (Exception e) {
 			
-			LOGGER.info("接口-订单概览-分销机构、小于当前日期9个月内的实付金额、订单数量報錯", e);
+			LOGGER.error("接口-订单概览-分销机构、小于当前日期9个月内的实付金额、订单数量报错：{}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}
@@ -541,7 +552,7 @@ public class OrderServiceImpl implements OrderService{
         		}
         		
         		//删除
-        		System.out.println("开始删除购物车======");
+        		LOGGER.info("开始删除购物车====== 会员：{},sku {},门店ID :{}",memberId,skuCodes,distributorId);
         		cartService.deleteCartInfoById(memberId, skuCodes, distributorId);
         	
         	}
@@ -551,8 +562,8 @@ public class OrderServiceImpl implements OrderService{
         String order_code = orderCode;
 		return HttpResponse.success(order_code);
 	 }catch (Exception e){
-		 LOGGER.info("添加新的订单主数据以及其他订单关联数据報錯", e);
-		 throw new RuntimeException("添加新的订单主数据以及其他订单关联数据報錯");
+		 LOGGER.error("添加新的订单主数据以及其他订单关联数据报错：{}", e);
+		 throw new RuntimeException("添加新的订单主数据以及其他订单关联数据报错");
 		}
 	}
 
@@ -573,7 +584,7 @@ public class OrderServiceImpl implements OrderService{
 			
 			return HttpResponse.success();
 		} catch (Exception e) {
-			LOGGER.info("接口-关闭订单報錯", e);
+			LOGGER.error("接口-关闭订单异常：{}", e);
 			return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
 		}
 	}
@@ -592,7 +603,7 @@ public class OrderServiceImpl implements OrderService{
 			orderDao.updateorderbusinessnote(orderInfo);
 			return HttpResponse.success();
 		} catch (Exception e) {
-			LOGGER.info("接口-更新商户备注報錯", e);
+			LOGGER.error("接口-更新商户备注异常： {}", e);
 			return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
 		}		
 		
@@ -630,7 +641,7 @@ public class OrderServiceImpl implements OrderService{
 			
 			return HttpResponse.success();
 		} catch (Exception e) {
-			LOGGER.info("更改订单状态/支付状态/支付方式/修改员報錯", e);
+			LOGGER.error("更改订单状态/支付状态/支付方式/修改员报错：{}", e);
 			return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
 		}		
 	}
@@ -680,7 +691,7 @@ public class OrderServiceImpl implements OrderService{
 			
 			return HttpResponse.success();
 		} catch (Exception e) {
-			LOGGER.info("仅变更订单状态-BY order_id,update_by modity order_status報錯", e);
+			LOGGER.error("仅变更订单状态-BY order_id,update_by modity order_status报错：{}", e);
 			return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
 		}
 	}
@@ -736,7 +747,7 @@ public class OrderServiceImpl implements OrderService{
 		
 		return HttpResponse.success(receiptSumInfo);
 		} catch (Exception e) {
-			LOGGER.info("接口-收银员交班收银情况统计報錯", e);
+			LOGGER.error("接口-收银员交班收银情况统计异常：{}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}
@@ -778,7 +789,7 @@ public class OrderServiceImpl implements OrderService{
 				return HttpResponse.success(null);
 			}
 		} catch (Exception e) {
-			LOGGER.info("接口-通过会员查询最后一次的消费记录報錯", e);
+			LOGGER.error("接口-通过会员查询最后一次的消费记录异常：{}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 		
@@ -806,7 +817,7 @@ public class OrderServiceImpl implements OrderService{
 			return HttpResponse.success(receiveCode);
 					
 		} catch (Exception e) {
-			LOGGER.info("接口-将提货码插入订单表中報錯", e);
+			LOGGER.error("接口-将提货码插入订单表中异常：{}", e);
 			return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
 		}
 	}
@@ -832,7 +843,7 @@ public class OrderServiceImpl implements OrderService{
 //			return HttpResponse.success(OrderPublic.getData(list));
 			return HttpResponse.success(new PageResData(totalCount,list));
 		} catch (Exception e) {
-			LOGGER.info("接口-可退货的订单查询報錯", e);
+			LOGGER.error("接口-可退货的订单查询异常：{}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 		
@@ -849,7 +860,7 @@ public class OrderServiceImpl implements OrderService{
 			orderDao.reded(orderQuery);
 			return HttpResponse.success();
 		} catch (Exception e) {
-			LOGGER.info("接口-注销提货码報錯", e);
+			LOGGER.error("接口-注销提货码异常：{}", e);
 			return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
 		}
 	}
@@ -864,7 +875,7 @@ public class OrderServiceImpl implements OrderService{
 			list= orderDao.nevder();
 		} catch (Exception e) {
 			
-			LOGGER.info("接口-注销提货码報錯", e);
+			LOGGER.error("未付款订单30分钟后自动取消异常：{}", e);
 		}
 		return list;
 	}
@@ -876,7 +887,7 @@ public class OrderServiceImpl implements OrderService{
 		try {
 			list= orderDao.nevred();
 		} catch (Exception e) {
-			LOGGER.info("提货码10分钟后失效.報錯", e);
+			LOGGER.error("提货码10分钟后失效.异常：{}", e);
 		}
 		return list;
 	}
@@ -905,7 +916,7 @@ public class OrderServiceImpl implements OrderService{
 		return HttpResponse.success(info);
 		
 		} catch (Exception e) {
-			LOGGER.info("接口-通过当前门店,等级会员list、 统计订单使用的会员数、返回7天内的统计.報錯", e);
+			LOGGER.error("接口-通过当前门店,等级会员list、 统计订单使用的会员数、返回7天内的统计.异常：{}", e);
 			return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
 		}
 	}
@@ -916,49 +927,49 @@ public class OrderServiceImpl implements OrderService{
 		MevBuyResponse info = new MevBuyResponse();
 		if(list !=null && list.size()>0) {
 			for(DevelRequest develRequest :list) {
-				if(develRequest.getTrante().equals(OrderPublic.NextDate(0))) {
+				if(develRequest.getTrante().equals(DateUtil.NextDate(0))) {
 					info.setSysDate(develRequest.getTrante());
 				    if(develRequest.getAcount() !=null) {
 				    	info.setSysNumber(develRequest.getAcount());
 				    }
 				}
-				if(develRequest.getTrante().equals(OrderPublic.NextDate(-1))) {
+				if(develRequest.getTrante().equals(DateUtil.NextDate(-1))) {
 					info.setOneDate(develRequest.getTrante());
 				    if(develRequest.getAcount() !=null) {
 				    	info.setOneNumber(develRequest.getAcount());
 				    }
 				}
-				if(develRequest.getTrante().equals(OrderPublic.NextDate(-2))) {
+				if(develRequest.getTrante().equals(DateUtil.NextDate(-2))) {
 					info.setTwoDate(develRequest.getTrante());
 				    if(develRequest.getAcount() !=null) {
 				    	info.setTwoNumber(develRequest.getAcount());
 				    }
 				}
-				if(develRequest.getTrante().equals(OrderPublic.NextDate(-3))) {
+				if(develRequest.getTrante().equals(DateUtil.NextDate(-3))) {
 					info.setThreeDate(develRequest.getTrante());
 				    if(develRequest.getAcount() !=null) {
 				    	info.setThreeNumber(develRequest.getAcount());
 				    }
 				}
-				if(develRequest.getTrante().equals(OrderPublic.NextDate(-4))) {
+				if(develRequest.getTrante().equals(DateUtil.NextDate(-4))) {
 					info.setFourDate(develRequest.getTrante());
 				    if(develRequest.getAcount() !=null) {
 				    	info.setFourNumber(develRequest.getAcount());
 				    }
 				}
-				if(develRequest.getTrante().equals(OrderPublic.NextDate(-5))) {
+				if(develRequest.getTrante().equals(DateUtil.NextDate(-5))) {
 					info.setFiveDate(develRequest.getTrante());
 				    if(develRequest.getAcount() !=null) {
 				    	info.setFiveNumber(develRequest.getAcount());
 				    }
 				}
-				if(develRequest.getTrante().equals(OrderPublic.NextDate(-6))) {
+				if(develRequest.getTrante().equals(DateUtil.NextDate(-6))) {
 					info.setSixDate(develRequest.getTrante());
 				    if(develRequest.getAcount() !=null) {
 				    	info.setSixNumber(develRequest.getAcount());
 				    }
 				}
-				if(develRequest.getTrante().equals(OrderPublic.NextDate(-7))) {
+				if(develRequest.getTrante().equals(DateUtil.NextDate(-7))) {
 					info.setSevenDate(develRequest.getTrante());
 				    if(develRequest.getAcount() !=null) {
 				    	info.setSevenNumber(develRequest.getAcount());
@@ -975,9 +986,10 @@ public class OrderServiceImpl implements OrderService{
 	@Override
 	public HttpResponse oradsku(@Valid OrderQuery orderQuery) {
 		
-		LOGGER.info("模糊查询订单列表+订单中商品sku数量", orderQuery);
-
 		try {
+			
+			//根据支付类型查询订单
+			payOrderIdList(orderQuery);
 			
 			//订单列表
 			List<OradskuResponse> OrderInfolist = orderDao.selectskuResponse(OrderPublic.getOrderQuery(orderQuery));
@@ -1021,7 +1033,7 @@ public class OrderServiceImpl implements OrderService{
 			return HttpResponse.success(new PageResData(totalCount,OrderInfolist));
 			
 		} catch (Exception e) {
-			LOGGER.info("模糊查询订单列表+订单中商品sku数量報錯", e);
+			LOGGER.error("模糊查询订单列表+订单中商品sku数量异常：{}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}
@@ -1039,6 +1051,10 @@ public class OrderServiceImpl implements OrderService{
 	public HttpResponse exorder(@Valid OrderQuery orderQuery) {
 
 		try {
+			
+			//根据支付类型查询订单
+			payOrderIdList(orderQuery);
+			   
 			Integer icount =null;
 			orderQuery.setIcount(icount);
 			List<OrderInfo> OrderInfolist = orderDao.selectOrder(OrderPublic.getOrderQuery(orderQuery));
@@ -1046,7 +1062,7 @@ public class OrderServiceImpl implements OrderService{
 			return HttpResponse.success(OrderInfolist);
 			
 		} catch (Exception e) {
-			LOGGER.info("导出订单列表報錯", e);
+			LOGGER.error("导出订单列表异常：{}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}
@@ -1107,7 +1123,7 @@ public class OrderServiceImpl implements OrderService{
         		}
         		
         		//删除
-        		System.out.println("开始删除购物车======");
+        		LOGGER.info("开始删除购物车====== memberId:{},skuCodes:{},distributorId:{}",memberId, skuCodes, distributorId);
         		cartService.deleteCartInfoById(memberId, skuCodes, distributorId);
         	
         	}	
@@ -1117,8 +1133,8 @@ public class OrderServiceImpl implements OrderService{
         String order_code = orderCode;
 		return HttpResponse.success(order_code);
 	 }catch (Exception e){
-		 LOGGER.info("添加新的订单主数据以及其他订单关联数据報錯", e);
-		 throw new RuntimeException("添加新的订单主数据以及其他订单关联数据報錯");
+		 LOGGER.error("添加新的订单主数据以及其他订单关联数据异常：{}", e);
+		 throw new RuntimeException("添加新的订单主数据以及其他订单关联数据异常");
 		}
 	}
 	
@@ -1151,7 +1167,7 @@ public class OrderServiceImpl implements OrderService{
 			}
 			
 			}catch (Exception e){
-				 LOGGER.info("orderDao.getOrderIdByCode(orderCode)", e);
+				 LOGGER.error("orderDao.getOrderIdByCode(orderCode)：{}", e);
 		    }
 			orderInfo.setOrderId(orderId);
 			if(orderId !=null && !orderId.equals("")) {
@@ -1190,14 +1206,14 @@ public class OrderServiceImpl implements OrderService{
 			try {
 			orderDao.deleteOrderInfo(orderInfo);
 			}catch (Exception e){
-				 LOGGER.info("orderDao.deleteOrderInfo(orderInfo)", e);
+				 LOGGER.error("orderDao.deleteOrderInfo(orderInfo)：{}", e);
 		    }
 			
 			//新增订单主数据
 			try {
 			orderDao.addOrderInfo(orderInfo);
 			}catch (Exception e){
-				 LOGGER.info("orderDao.addOrderInfo(orderInfo)", e);
+				 LOGGER.error("orderDao.addOrderInfo(orderInfo)：{}", e);
 		    }
 	        
 			//生成订单日志
@@ -1206,20 +1222,20 @@ public class OrderServiceImpl implements OrderService{
 			try {
 			orderLogService.addOrderLog(rderLog);
 			}catch (Exception e){
-				 LOGGER.info("orderLogService.addOrderLog(rderLog)1", e);
+				 LOGGER.error("生成订单日志异常：{}", e);
 		    }
 			//删除订单明细数据
 			try {
 			orderDetailDao.deleteOrderDetailInfo(orderInfo); 
 			}catch (Exception e){
-				 LOGGER.info("orderLogService.addOrderLog(rderLog)1", e);
+				 LOGGER.error("删除订单明细数据异常：{}", e);
 		    }
 		//新增订单明细数据
 		if(detailList !=null && detailList.size()>0) {
 			try {
 			detailList = orderDetailService.addDetailList(detailList,orderId);
 		    }catch (Exception e){
-			 LOGGER.info("orderLogService.addOrderLog(rderLog)1", e);
+			 LOGGER.error("新增订单明细数据异常：{}", e);
 	        }
 		}
 		//新增订单结算数据
@@ -1227,7 +1243,7 @@ public class OrderServiceImpl implements OrderService{
 			try {
             settlementService.addSettlement(settlementInfo,orderId);
 		    }catch (Exception e){
-			 LOGGER.info("orderLogService.addOrderLog(rderLog)1", e);
+			 LOGGER.error("新增订单结算数据异常：{}", e);
 	        }
 		}
 		//新增订单支付数据
@@ -1235,7 +1251,7 @@ public class OrderServiceImpl implements OrderService{
         	try {
         	settlementService.addOrderPayList(orderPayList,orderId);
             }catch (Exception e){
-			 LOGGER.info("orderLogService.addOrderLog(rderLog)1", e);
+			 LOGGER.error("新增订单支付数据异常：{}", e);
 	        }
 		}
         //新增订单与优惠券关系数据
@@ -1263,8 +1279,8 @@ public class OrderServiceImpl implements OrderService{
 		
 		return HttpResponse.success();
 	 }catch (Exception e){
-		 LOGGER.info("添加新的订单主数据以及其他订单关联数据報錯", e);
-		 throw new RuntimeException("添加新的订单主数据以及其他订单关联数据報錯");
+		 LOGGER.error("添加新的订单主数据以及其他订单关联数据异常：{}", e);
+		 throw new RuntimeException("添加新的订单主数据以及其他订单关联数据异常");
 		}
 	}
 
@@ -1285,7 +1301,7 @@ public class OrderServiceImpl implements OrderService{
 			
 			return HttpResponse.success();
 		} catch (Exception e) {
-			LOGGER.info("删除订单主数据+删除订单明细数据報錯", e);
+			LOGGER.error("删除订单主数据+删除订单明细数据异常：{}", e);
 			return HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
 		}
 	
@@ -1312,16 +1328,16 @@ public class OrderServiceImpl implements OrderService{
         OrderQuery orderQuery = new OrderQuery();
         orderQuery.setDistributorId(distributorId);
         
-        orderQuery.setBeginDate(OrderPublic.NextDate(0));
-        orderQuery.setEndDate(OrderPublic.NextDate(0));
+        orderQuery.setBeginDate(DateUtil.NextDate(0));
+        orderQuery.setEndDate(DateUtil.NextDate(0));
 		todayCount = orderDao.selectAcountByEcshop(orderQuery);
 		
-		orderQuery.setBeginDate(OrderPublic.NextDate(-1));
-        orderQuery.setEndDate(OrderPublic.NextDate(-1));
+		orderQuery.setBeginDate(DateUtil.NextDate(-1));
+        orderQuery.setEndDate(DateUtil.NextDate(-1));
         yesterdayCount = orderDao.selectAcountByEcshop(orderQuery);
         
-        orderQuery.setBeginDate(OrderPublic.NextDate(-7));
-        orderQuery.setEndDate(OrderPublic.NextDate(0));
+        orderQuery.setBeginDate(DateUtil.NextDate(-7));
+        orderQuery.setEndDate(DateUtil.NextDate(0));
         weekCount = orderDao.selectAcountByEcshop(orderQuery);
         
         //昨日订单金额
@@ -1331,28 +1347,28 @@ public class OrderServiceImpl implements OrderService{
         //近七日数据订单金额
         Integer weekAmount = null;
         
-        orderQuery.setBeginDate(OrderPublic.NextDate(0));
-        orderQuery.setEndDate(OrderPublic.NextDate(0));
+        orderQuery.setBeginDate(DateUtil.NextDate(0));
+        orderQuery.setEndDate(DateUtil.NextDate(0));
         todayAmount = orderDao.selectAmountByEcshop(orderQuery);
         
-        orderQuery.setBeginDate(OrderPublic.NextDate(-1));
-        orderQuery.setEndDate(OrderPublic.NextDate(-1));
+        orderQuery.setBeginDate(DateUtil.NextDate(-1));
+        orderQuery.setEndDate(DateUtil.NextDate(-1));
         yesterdayAmount = orderDao.selectAmountByEcshop(orderQuery);
         
-        orderQuery.setBeginDate(OrderPublic.NextDate(-7));
-        orderQuery.setEndDate(OrderPublic.NextDate(0));
+        orderQuery.setBeginDate(DateUtil.NextDate(-7));
+        orderQuery.setEndDate(DateUtil.NextDate(0));
         weekAmount = orderDao.selectAmountByEcshop(orderQuery);
 		
 		//今日成交客户
         Integer todayMembers = null;
-        orderQuery.setBeginDate(OrderPublic.NextDate(0));
-        orderQuery.setEndDate(OrderPublic.NextDate(0));
+        orderQuery.setBeginDate(DateUtil.NextDate(0));
+        orderQuery.setEndDate(DateUtil.NextDate(0));
         todayMembers = orderDao.selectMembersByEcshop(orderQuery);
         
 	    //昨日成交客户
         Integer yesterdayMembers = null;
-        orderQuery.setBeginDate(OrderPublic.NextDate(-1));
-        orderQuery.setEndDate(OrderPublic.NextDate(-1));
+        orderQuery.setBeginDate(DateUtil.NextDate(-1));
+        orderQuery.setEndDate(DateUtil.NextDate(-1));
         yesterdayMembers = orderDao.selectMembersByEcshop(orderQuery);
 		
         wscSaleResponse.setTodayAmount(todayAmount);
@@ -1367,7 +1383,7 @@ public class OrderServiceImpl implements OrderService{
         return HttpResponse.success(wscSaleResponse);
         
 		} catch (Exception e) {
-			LOGGER.info("微商城-销售总览報錯", e);
+			LOGGER.error("微商城-销售总览异常：{}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}
@@ -1413,7 +1429,7 @@ public class OrderServiceImpl implements OrderService{
 		return HttpResponse.success(wscWorkViewResponse);
 	        
 	  } catch (Exception e) {
-		LOGGER.info("微商城-事务总览報錯", e);
+		LOGGER.error("微商城-事务总览异常：{}", e);
 		return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 	  }
 	}
@@ -1442,7 +1458,7 @@ public class OrderServiceImpl implements OrderService{
         return HttpResponse.success();
         
 	    } catch (Exception e) {
-		  LOGGER.info("已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)報錯", e);
+		  LOGGER.error("已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)异常：{}", e);
 		  return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
 	    }
 	}
@@ -1490,7 +1506,7 @@ public class OrderServiceImpl implements OrderService{
 			}
 		return HttpResponse.success(list);
     } catch (Exception e) {
-	  LOGGER.info("销售目标管理-分销机构-月销售额報錯", e);
+	  LOGGER.error("销售目标管理-分销机构-月销售额异常：{}", e);
 	  return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
     }
 	}
@@ -1510,14 +1526,13 @@ public class OrderServiceImpl implements OrderService{
 				for(int i=-6;i<=0;i++) {
 					Integer countMember = null;
 					String countDate = "";
-					countDate = OrderPublic.NextDate(i);
-					System.out.println(countDate);
+					countDate = DateUtil.NextDate(i);
 					SelectByMemberPayCountResponse info = new SelectByMemberPayCountResponse();
 					info.setCountDate(countDate);
 					try {
 						countMember = orderDao.selectByMemberPayCountDay(info);
 					} catch (Exception e) {
-						LOGGER.info("会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、日报错", e);
+						LOGGER.error("会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、日异常：{}", e);
 						return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 					}
 					if(countMember == null) {
@@ -1541,7 +1556,7 @@ public class OrderServiceImpl implements OrderService{
 					try {
 						countMember = orderDao.selectByMemberPayCountWeek(i);
 					} catch (Exception e) {
-						LOGGER.info("会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、周报错", e);
+						LOGGER.error("会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、周报错：{}", e);
 						return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 					}
 					info.setCountDate(String.valueOf(i)); 
@@ -1563,14 +1578,13 @@ public class OrderServiceImpl implements OrderService{
 				for(int i=-6;i<=0;i++) {
 					Integer countMember = null;
 					String countDate = "";
-					countDate = OrderPublic.afterMonth(i);
-					System.out.println(countDate);
+					countDate = DateUtil.afterMonth(i);
 					SelectByMemberPayCountResponse info = new SelectByMemberPayCountResponse();
 					info.setCountDate(countDate);
 					try {
 						countMember = orderDao.selectByMemberPayCountMonth(info);
 					} catch (Exception e) {
-						LOGGER.info("会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、月报错", e);
+						LOGGER.error("会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、月报错：{}", e);
 						return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 					}
 					if(countMember == null) {
@@ -1585,7 +1599,7 @@ public class OrderServiceImpl implements OrderService{
 
 			}
 		}else {
-			 LOGGER.info("会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、日周月.参数确实报错");
+			 LOGGER.error("会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、日周月.参数确实报错： {}");
 			 return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}
@@ -1605,11 +1619,11 @@ public class OrderServiceImpl implements OrderService{
 				list = orderDao.selectMemberByDistributor(memberByDistributorRequest);
 				return HttpResponse.success(list);
 			} catch (Exception e) {
-				LOGGER.info("判断会员是否在当前门店时候有过消费记录  查询异常");
+				LOGGER.error("判断会员是否在当前门店时候有过消费记录  查询异常:{}",e);
 				return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 			}
         }else {
-        	LOGGER.info("判断会员是否在当前门店时候有过消费记录 参数异常");
+        	LOGGER.warn("判断会员是否在当前门店时候有过消费记录 参数异常: {}",memberByDistributorRequest);
 			return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
         }
 	}
@@ -1622,7 +1636,7 @@ public class OrderServiceImpl implements OrderService{
 		try {
 			return orderDao.selectsukReturn();
 		} catch (Exception e) {
-			LOGGER.info("查询未统计销量的已完成订单异常",e);
+			LOGGER.error("查询未统计销量的已完成订单异常: {}",e);
 			return null;
 		}
 	}
@@ -1635,7 +1649,7 @@ public class OrderServiceImpl implements OrderService{
 		try {
 			orderDao.updateSukReturn(orderId);
 		} catch (Exception e) {
-			LOGGER.info("修改统计销量状态异常",e);
+			LOGGER.error("修改统计销量状态异常 :{}",e);
 		}
 	}
 }

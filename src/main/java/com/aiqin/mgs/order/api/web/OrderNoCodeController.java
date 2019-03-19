@@ -73,7 +73,9 @@ public class OrderNoCodeController {
     @GetMapping("/ncass")
     @ApiOperation(value = "订单概览统计")
     public HttpResponse<SelectSumByStoreIdResonse> ncass(@Valid @RequestParam(name = "distributor_id", required = false) String distributorId){
-        LOGGER.info("订单概览统计.");
+        
+    	
+    	LOGGER.info("订单概览统计参数distributorId：{}",distributorId);
         return HttpResponse.success(orderNoCodeService.selectSumByStoreId(distributorId));
     }
     
@@ -87,21 +89,23 @@ public class OrderNoCodeController {
     public HttpResponse<SelectSaleViewResonse> ncbss(@Valid @RequestParam(name = "distributor_id", required = false) String distributorId,
     		@Valid @RequestParam(name = "begin_date", required = false) String beginDate,
     		@Valid @RequestParam(name = "end_date", required = false) String endDate){
-        LOGGER.info("商品类别销售概况.");
+        
+    	
+    	LOGGER.info("商品类别销售概况参数 distributorId：{},beginDate：{},endDate：{}",distributorId,beginDate,endDate);
         return HttpResponse.success(orderNoCodeService.selectSaleView(distributorId,beginDate,endDate));
     }
     
-    /**
-     * 订单列表
-     * @param 
-     * @return
-     */
-    @PostMapping("/nccss")
-    @ApiOperation(value = "订单列表")
-    public HttpResponse<List<OrderNoCodeInfo>> ncbss(@Valid @RequestBody OrderNoCodeRequest orderNoCodeBuyRequest){
-        LOGGER.info("订单列表.");
-        return HttpResponse.success(orderNoCodeService.selectNoCodeList(orderNoCodeBuyRequest));
-    }
+//    /**
+//     * 订单列表  --如打开使用请分析SQL
+//     * @param 
+//     * @return
+//     */
+//    @PostMapping("/nccss")
+//    @ApiOperation(value = "订单列表")
+//    public HttpResponse<List<OrderNoCodeInfo>> ncbss(@Valid @RequestBody OrderNoCodeRequest orderNoCodeBuyRequest){
+//        LOGGER.info("订单列表.");
+//        return HttpResponse.success(orderNoCodeService.selectNoCodeList(orderNoCodeBuyRequest));
+//    }
     
     
     /**
@@ -114,7 +118,7 @@ public class OrderNoCodeController {
     public HttpResponse<OrderInfo> selde(@Valid @RequestParam(name = "order_code", required = true) String orderCode) {
         
     	
-    	LOGGER.info("编号查询订单.");    	
+    	LOGGER.info("编号查询订单参数：{}",orderCode);    	
         return orderNoCodeService.selectorderByCode(orderCode);
     }
     
