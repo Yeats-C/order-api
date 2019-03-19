@@ -219,20 +219,20 @@ public class OrderListServiceImpl implements OrderListService {
         return new PageResData<>(count, inventories);
     }
 
-    @Override
-    public Boolean updateOrderActualDeliver(List<ActualDeliverVo> actualDeliverVos) {
-        for (ActualDeliverVo vo : actualDeliverVos) {
-            orderListProductDao.updateByOrderProductId(vo);
-        }
-        return true;
-    }
+//    @Override
+//    public Boolean updateOrderActualDeliver(List<ActualDeliverVo> actualDeliverVos) {
+//        for (ActualDeliverVo vo : actualDeliverVos) {
+//            orderListProductDao.updateByOrderProductId(vo);
+//        }
+//        return true;
+//    }
 
     @Override
     public Boolean updateOrderStatusDeliver(DeliverVo deliverVo) {
         Boolean br = orderListDao.updateStatusByCode(deliverVo.getOrderCode(), 11);
         List<ActualDeliverVo> actualDeliverVos = deliverVo.getActualDeliverVos();
         for (ActualDeliverVo vo : actualDeliverVos) {
-            orderListProductDao.updateByOrderProductId(vo);
+            orderListProductDao.updateByOrderProductId(vo,deliverVo.getOrderCode());
         }
         OrderListDetailsVo orderListDetailsVo = orderListDao.searchOrderByCode(deliverVo.getOrderCode());
         OrderListLogistics param = new OrderListLogistics();

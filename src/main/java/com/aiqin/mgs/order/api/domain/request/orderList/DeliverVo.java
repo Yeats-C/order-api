@@ -28,9 +28,9 @@ public class DeliverVo {
     @JsonProperty("implement_by")
     private String implementBy;
 
-    @ApiModelProperty(value = "订单商品ID")
-    @JsonProperty("order_product_id")
-    private String orderProductId;
+//    @ApiModelProperty(value = "订单商品ID")
+//    @JsonProperty("order_product_id")
+//    private String orderProductId;
 
     @ApiModelProperty(value = "添加商品实发数量list")
     @JsonProperty("actual_deliver_list")

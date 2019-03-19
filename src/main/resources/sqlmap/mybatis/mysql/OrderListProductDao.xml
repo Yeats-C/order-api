@@ -312,9 +312,9 @@ preferential_allocation activityApportionment,activity_code activityCode, pictur
   </update>
     <update id="updateByOrderProductId">
         update order_list_product
-    set actual_deliver_num = #{actualDeliverNum}
+    set actual_deliver_num = #{vo.actualDeliverNum}
 
-    where order_product_id = #{orderProductId}
+    where order_product_id = #{vo.orderProductId} and order_code=#{code}
 
     </update>
 </mapper>

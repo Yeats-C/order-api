@@ -235,15 +235,15 @@ public class OrderListController {
      */
 //    @PostMapping("update/order/actual/deliver")
 //    @ApiOperation("添加商品实发数量")
-    public HttpResponse<Boolean> updateOrderActualDeliver(@RequestBody List<ActualDeliverVo> actualDeliverVos) {
-
-        try {
-            return HttpResponse.success(this.orderListService.updateOrderActualDeliver(actualDeliverVos));
-        } catch (Exception e) {
-            log.error("Get purchasingTarget list failed", e);
-            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
-        }
-    }
+//    public HttpResponse<Boolean> updateOrderActualDeliver(@RequestBody List<ActualDeliverVo> actualDeliverVos) {
+//
+//        try {
+//            return HttpResponse.success(this.orderListService.updateOrderActualDeliver(actualDeliverVos));
+//        } catch (Exception e) {
+//            log.error("Get purchasingTarget list failed", e);
+//            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
+//        }
+//    }
 
 
     /**

@@ -53,7 +53,7 @@ public interface OrderListService {
 
     PageResData<OrderListFather> searchOrderReceptionListFatherProduct(OrderListVo2 param);
 
-    Boolean updateOrderActualDeliver(List<ActualDeliverVo> actualDeliverVos);
+//    Boolean updateOrderActualDeliver(List<ActualDeliverVo> actualDeliverVos);
 
     Boolean updateOrderStatusDeliver(DeliverVo vo);
 
