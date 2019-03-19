@@ -59,6 +59,7 @@ import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.OrderDetailService;
 import com.aiqin.mgs.order.api.service.OrderLogService;
 import com.aiqin.mgs.order.api.service.OrderService;
+import com.aiqin.mgs.order.api.util.DateUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -209,7 +210,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
       
        List<OrderDetailByMemberResponse> list = null;
 	   try {
-		   list = orderDetailDao.byMemberOrder(orderDetailQuery);
+		   list = orderDetailDao.byMemberOrder(OrderPublic.getOrderDetailQuery(orderDetailQuery));
 	   } catch (Exception e1) {
 		   LOGGER.error("查询接口--会员管理-会员消费记录异常: {}",e1);
 	   }
@@ -263,7 +264,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
                 			  }
                 			  Integer countenddate = cycle*amount;
                 			  
-                			  info.setCycleenddate(OrderPublic.afterThirdMonth(countenddate));           			  
+                			  info.setCycleenddate(DateUtil.afterThirdMonth(countenddate));           			  
                 			  list.set(i, info);
                 		  }
                 	  }
@@ -275,7 +276,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
   			Integer totalCount = 0;
   			Integer icount =null;
   			orderDetailQuery.setIcount(icount);
-  			List<OrderDetailByMemberResponse> icountList= orderDetailDao.byMemberOrder(orderDetailQuery);
+  			List<OrderDetailByMemberResponse> icountList= orderDetailDao.byMemberOrder(OrderPublic.getOrderDetailQuery(orderDetailQuery));
   			if(icountList !=null && icountList.size()>0) {
   				totalCount = icountList.size();
   			}
@@ -527,9 +528,9 @@ public class OrderDetailServiceImpl implements OrderDetailService{
             for(String skuCode : sukList) {
             	
             	for(int i=-14;i<1;i++) {
-            		amount = orderDetailDao.getSkuAmount(skuCode,OrderPublic.NextDate(i));
-            		price = orderDetailDao.getSkuPrice(skuCode,OrderPublic.NextDate(i));
-            		transDate = OrderPublic.NextDate(i);
+            		amount = orderDetailDao.getSkuAmount(skuCode,DateUtil.NextDate(i));
+            		price = orderDetailDao.getSkuPrice(skuCode,DateUtil.NextDate(i));
+            		transDate = DateUtil.NextDate(i);
                	    
             		SkuSumResponse skuSumResponse = new SkuSumResponse();
             		skuSumResponse.setAmount(amount==null?0:amount);

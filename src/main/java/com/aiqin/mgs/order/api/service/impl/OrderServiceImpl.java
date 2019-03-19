@@ -80,6 +80,7 @@ import com.aiqin.mgs.order.api.service.OrderDetailService;
 import com.aiqin.mgs.order.api.service.OrderLogService;
 import com.aiqin.mgs.order.api.service.OrderService;
 import com.aiqin.mgs.order.api.service.SettlementService;
+import com.aiqin.mgs.order.api.util.DateUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -123,7 +124,7 @@ public class OrderServiceImpl implements OrderService{
 	public HttpResponse selectOrder(OrderQuery orderQuery) {
 		
 	   //根据支付类型查询订单
-	   payOrderIdList(orderQuery);
+	   payOrderIdList(OrderPublic.getOrderQuery(orderQuery));
 	   
 			try {
 				
@@ -223,7 +224,7 @@ public class OrderServiceImpl implements OrderService{
 			companyCode = Global.COMPANY_01;
 		}
 		//yyMMddHHmmss+订单来源+销售渠道标识+公司标识+4位数的随机数
-		orderCode = OrderPublic.currentDate()+logo+String.valueOf(Global.ORDERID_CHANNEL_4)+companyCode+OrderPublic.randomNumberF();
+		orderCode = DateUtil.sysDate()+logo+String.valueOf(Global.ORDERID_CHANNEL_4)+companyCode+OrderPublic.randomNumberF();
 		orderInfo.setOrderCode(orderCode);
 		
 		//初始化提货码
@@ -296,10 +297,10 @@ public class OrderServiceImpl implements OrderService{
 	public HttpResponse selectorderbymonth(@Valid String distributorId,List<Integer> originTypeList) {
 
 		//系统日期:年月
-		String yearMonth = OrderPublic.sysDateyyyyMM();
+		String yearMonth = DateUtil.sysDateyyyyMM();
 		
 		//取昨日日期
-		String yesterday = OrderPublic.NextDate(-1);
+		String yesterday = DateUtil.NextDate(-1);
 		
 		OrderOverviewMonthResponse info = new OrderOverviewMonthResponse();
 		
@@ -398,7 +399,7 @@ public class OrderServiceImpl implements OrderService{
 	@Override
 	public HttpResponse selectOrderByNineDate(@Valid String distributorId,List<Integer> originTypeList) {
 		
-		String  beginDate= OrderPublic.NextDate(-8);
+		String  beginDate= DateUtil.NextDate(-8);
 		try {
 			OrderQuery orderQuery = new OrderQuery();
 			orderQuery.setDistributorId(distributorId);
@@ -448,7 +449,7 @@ public class OrderServiceImpl implements OrderService{
 	@Override
 	public HttpResponse selectOrderByNineMonth(@Valid String distributorId,List<Integer> originTypeList) {
 
-        String  beginDate = OrderPublic.afterMonth(-8); //YYYY-MM
+        String  beginDate = DateUtil.afterMonth(-8); //YYYY-MM
         
         OrderQuery orderQuery = new OrderQuery();
 		orderQuery.setDistributorId(distributorId);
@@ -926,49 +927,49 @@ public class OrderServiceImpl implements OrderService{
 		MevBuyResponse info = new MevBuyResponse();
 		if(list !=null && list.size()>0) {
 			for(DevelRequest develRequest :list) {
-				if(develRequest.getTrante().equals(OrderPublic.NextDate(0))) {
+				if(develRequest.getTrante().equals(DateUtil.NextDate(0))) {
 					info.setSysDate(develRequest.getTrante());
 				    if(develRequest.getAcount() !=null) {
 				    	info.setSysNumber(develRequest.getAcount());
 				    }
 				}
-				if(develRequest.getTrante().equals(OrderPublic.NextDate(-1))) {
+				if(develRequest.getTrante().equals(DateUtil.NextDate(-1))) {
 					info.setOneDate(develRequest.getTrante());
 				    if(develRequest.getAcount() !=null) {
 				    	info.setOneNumber(develRequest.getAcount());
 				    }
 				}
-				if(develRequest.getTrante().equals(OrderPublic.NextDate(-2))) {
+				if(develRequest.getTrante().equals(DateUtil.NextDate(-2))) {
 					info.setTwoDate(develRequest.getTrante());
 				    if(develRequest.getAcount() !=null) {
 				    	info.setTwoNumber(develRequest.getAcount());
 				    }
 				}
-				if(develRequest.getTrante().equals(OrderPublic.NextDate(-3))) {
+				if(develRequest.getTrante().equals(DateUtil.NextDate(-3))) {
 					info.setThreeDate(develRequest.getTrante());
 				    if(develRequest.getAcount() !=null) {
 				    	info.setThreeNumber(develRequest.getAcount());
 				    }
 				}
-				if(develRequest.getTrante().equals(OrderPublic.NextDate(-4))) {
+				if(develRequest.getTrante().equals(DateUtil.NextDate(-4))) {
 					info.setFourDate(develRequest.getTrante());
 				    if(develRequest.getAcount() !=null) {
 				    	info.setFourNumber(develRequest.getAcount());
 				    }
 				}
-				if(develRequest.getTrante().equals(OrderPublic.NextDate(-5))) {
+				if(develRequest.getTrante().equals(DateUtil.NextDate(-5))) {
 					info.setFiveDate(develRequest.getTrante());
 				    if(develRequest.getAcount() !=null) {
 				    	info.setFiveNumber(develRequest.getAcount());
 				    }
 				}
-				if(develRequest.getTrante().equals(OrderPublic.NextDate(-6))) {
+				if(develRequest.getTrante().equals(DateUtil.NextDate(-6))) {
 					info.setSixDate(develRequest.getTrante());
 				    if(develRequest.getAcount() !=null) {
 				    	info.setSixNumber(develRequest.getAcount());
 				    }
 				}
-				if(develRequest.getTrante().equals(OrderPublic.NextDate(-7))) {
+				if(develRequest.getTrante().equals(DateUtil.NextDate(-7))) {
 					info.setSevenDate(develRequest.getTrante());
 				    if(develRequest.getAcount() !=null) {
 				    	info.setSevenNumber(develRequest.getAcount());
@@ -1327,16 +1328,16 @@ public class OrderServiceImpl implements OrderService{
         OrderQuery orderQuery = new OrderQuery();
         orderQuery.setDistributorId(distributorId);
         
-        orderQuery.setBeginDate(OrderPublic.NextDate(0));
-        orderQuery.setEndDate(OrderPublic.NextDate(0));
+        orderQuery.setBeginDate(DateUtil.NextDate(0));
+        orderQuery.setEndDate(DateUtil.NextDate(0));
 		todayCount = orderDao.selectAcountByEcshop(orderQuery);
 		
-		orderQuery.setBeginDate(OrderPublic.NextDate(-1));
-        orderQuery.setEndDate(OrderPublic.NextDate(-1));
+		orderQuery.setBeginDate(DateUtil.NextDate(-1));
+        orderQuery.setEndDate(DateUtil.NextDate(-1));
         yesterdayCount = orderDao.selectAcountByEcshop(orderQuery);
         
-        orderQuery.setBeginDate(OrderPublic.NextDate(-7));
-        orderQuery.setEndDate(OrderPublic.NextDate(0));
+        orderQuery.setBeginDate(DateUtil.NextDate(-7));
+        orderQuery.setEndDate(DateUtil.NextDate(0));
         weekCount = orderDao.selectAcountByEcshop(orderQuery);
         
         //昨日订单金额
@@ -1346,28 +1347,28 @@ public class OrderServiceImpl implements OrderService{
         //近七日数据订单金额
         Integer weekAmount = null;
         
-        orderQuery.setBeginDate(OrderPublic.NextDate(0));
-        orderQuery.setEndDate(OrderPublic.NextDate(0));
+        orderQuery.setBeginDate(DateUtil.NextDate(0));
+        orderQuery.setEndDate(DateUtil.NextDate(0));
         todayAmount = orderDao.selectAmountByEcshop(orderQuery);
         
-        orderQuery.setBeginDate(OrderPublic.NextDate(-1));
-        orderQuery.setEndDate(OrderPublic.NextDate(-1));
+        orderQuery.setBeginDate(DateUtil.NextDate(-1));
+        orderQuery.setEndDate(DateUtil.NextDate(-1));
         yesterdayAmount = orderDao.selectAmountByEcshop(orderQuery);
         
-        orderQuery.setBeginDate(OrderPublic.NextDate(-7));
-        orderQuery.setEndDate(OrderPublic.NextDate(0));
+        orderQuery.setBeginDate(DateUtil.NextDate(-7));
+        orderQuery.setEndDate(DateUtil.NextDate(0));
         weekAmount = orderDao.selectAmountByEcshop(orderQuery);
 		
 		//今日成交客户
         Integer todayMembers = null;
-        orderQuery.setBeginDate(OrderPublic.NextDate(0));
-        orderQuery.setEndDate(OrderPublic.NextDate(0));
+        orderQuery.setBeginDate(DateUtil.NextDate(0));
+        orderQuery.setEndDate(DateUtil.NextDate(0));
         todayMembers = orderDao.selectMembersByEcshop(orderQuery);
         
 	    //昨日成交客户
         Integer yesterdayMembers = null;
-        orderQuery.setBeginDate(OrderPublic.NextDate(-1));
-        orderQuery.setEndDate(OrderPublic.NextDate(-1));
+        orderQuery.setBeginDate(DateUtil.NextDate(-1));
+        orderQuery.setEndDate(DateUtil.NextDate(-1));
         yesterdayMembers = orderDao.selectMembersByEcshop(orderQuery);
 		
         wscSaleResponse.setTodayAmount(todayAmount);
@@ -1525,7 +1526,7 @@ public class OrderServiceImpl implements OrderService{
 				for(int i=-6;i<=0;i++) {
 					Integer countMember = null;
 					String countDate = "";
-					countDate = OrderPublic.NextDate(i);
+					countDate = DateUtil.NextDate(i);
 					SelectByMemberPayCountResponse info = new SelectByMemberPayCountResponse();
 					info.setCountDate(countDate);
 					try {
@@ -1577,7 +1578,7 @@ public class OrderServiceImpl implements OrderService{
 				for(int i=-6;i<=0;i++) {
 					Integer countMember = null;
 					String countDate = "";
-					countDate = OrderPublic.afterMonth(i);
+					countDate = DateUtil.afterMonth(i);
 					SelectByMemberPayCountResponse info = new SelectByMemberPayCountResponse();
 					info.setCountDate(countDate);
 					try {

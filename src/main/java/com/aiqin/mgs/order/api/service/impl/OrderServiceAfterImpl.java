@@ -47,6 +47,7 @@ import com.aiqin.mgs.order.api.service.OrderAfterService;
 import com.aiqin.mgs.order.api.service.OrderDetailService;
 import com.aiqin.mgs.order.api.service.OrderLogService;
 import com.aiqin.mgs.order.api.service.OrderService;
+import com.aiqin.mgs.order.api.util.DateUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 
 @SuppressWarnings("all")
@@ -135,7 +136,7 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 			if(orderAfterSaleInfo.getOriginType() == Global.ORIGIN_TYPE_3) {
 				logo = Global.ORIGIN_COME_5;
 			}
-			afterSaleCode = OrderPublic.currentDate()+logo+String.valueOf(Global.ORDERID_CHANNEL_4)+OrderPublic.randomNumberF();
+			afterSaleCode = DateUtil.sysDate()+logo+String.valueOf(Global.ORDERID_CHANNEL_4)+OrderPublic.randomNumberF();
 			orderAfterSaleInfo.setAfterSaleCode(afterSaleCode);
 			
 			//保存订单售后
@@ -230,7 +231,7 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 			if(orderAfterSaleInfo.getOriginType() == Global.ORIGIN_TYPE_3) {
 				logo = Global.ORIGIN_COME_5;
 			}
-			afterSaleCode = OrderPublic.currentDate()+logo+String.valueOf(Global.ORDERID_CHANNEL_4)+OrderPublic.randomNumberF();
+			afterSaleCode = DateUtil.sysDate()+logo+String.valueOf(Global.ORDERID_CHANNEL_4)+OrderPublic.randomNumberF();
 			orderAfterSaleInfo.setAfterSaleCode(afterSaleCode);
 			
 			//保存订单售后

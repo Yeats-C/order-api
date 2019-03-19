@@ -149,8 +149,21 @@ public class OrderAfterSaleInfo extends PagesRequest {
 	@ApiModelProperty(value="售后明细数据")
 	@JsonProperty("detail_list")
 	private List<OrderAfterSaleDetailInfo> detailList;
+	
+	
+	@ApiModelProperty(value="退款方式")
+	@JsonProperty("return_money_type")
+	private Integer returnMoneyType;
 
 
+	public Integer getReturnMoneyType() {
+		return returnMoneyType;
+	}
+
+
+	public void setReturnMoneyType(Integer returnMoneyType) {
+		this.returnMoneyType = returnMoneyType;
+	}
 
 
 	public Integer getOrderType() {

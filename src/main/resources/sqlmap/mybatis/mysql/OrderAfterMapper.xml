@@ -28,6 +28,7 @@
 <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
 <result column="create_by_name" jdbcType="VARCHAR" property="createByName"/>
 <result column="update_by_name" jdbcType="VARCHAR" property="updateByName"/>
+<result column="return_money_type" jdbcType="TINYINT" property="returnMoneyType"/>
 </resultMap>
 
     
@@ -35,10 +36,18 @@
     <!-- 添加新的订单售后数据 --> 
     <insert id="addAfterOrder" >
         insert into order_after_sale
-        (after_sale_id,after_sale_code,order_id,order_code,member_id,member_name,member_phone,distributor_id,distributor_code,distributor_name,return_price,after_sale_status,after_sale_content,after_sale_type,process_type,receive_name,receive_phone,pay_type,origin_type,order_type,create_time,update_time,create_by,update_by,create_by_name,update_by_name)
+        (after_sale_id,after_sale_code,order_id,order_code,member_id,member_name,member_phone,distributor_id,distributor_code,distributor_name,return_price,after_sale_status,after_sale_content,after_sale_type,process_type,receive_name,receive_phone,pay_type,origin_type,order_type,create_time,update_time,create_by,update_by,create_by_name,update_by_name
+        <if test="returnMoneyType!=null">
+        ,return_money_type
+        </if>
+        )
         values
         (#{afterSaleId},#{afterSaleCode},#{orderId},#{orderCode},#{memberId},#{memberName},#{memberPhone},#{distributorId},#{distributorCode},#{distributorName},#{returnPrice},#{afterSaleStatus},#{afterSaleContent},#{afterSaleType},#{processType},#{receiveName},#{receivePhone},#{payType},#{originType},#{orderType},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},
-        #{createByName},#{updateByName})
+        #{createByName},#{updateByName}
+        <if test="returnMoneyType!=null">
+        ,#{returnMoneyType}
+        </if>
+        )
     </insert>
     
     
@@ -76,22 +85,14 @@
 		 <if test="memberPhone!=null and memberPhone!=''">
 		 and member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%') 
          </if>
-         
          <if test="codeAndPhone!=null and codeAndPhone!=''">
 		 and (member_phone like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%') or after_sale_code like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%'))
          </if>
-         
          <if test="beginTime!=null ">
-         and DATE_FORMAT(create_time,"%Y-%m-%d") &gt;= DATE_FORMAT(#{beginTime},"%Y-%m-%d") 
+         and create_time &gt;= #{beginTime}
          </if>
          <if test="endTime!=null ">
-         and DATE_FORMAT(create_time,"%Y-%m-%d") &lt;= DATE_FORMAT(#{endTime},"%Y-%m-%d")
-         </if>
-         <if test="beginDate!=null ">
-         and DATE_FORMAT(create_time,"%Y-%m-%d")  &gt;= #{beginDate}
-         </if>
-         <if test="endDate!=null ">
-         and DATE_FORMAT(create_time,"%Y-%m-%d") &lt;= #{endDate}
+         and create_time &lt;= #{endTime}
          </if>
          <if test="payType!=null ">
          and pay_type = #{payType}
