@@ -510,6 +510,11 @@ public class OrderListServiceImpl implements OrderListService {
     @Transactional
     @Override
     public Boolean saveOrder(OrderReqVo reqVo) {
+        //设置行号
+        for (int i = 0; i < reqVo.getProducts().size(); i++) {
+            OrderProductReqVo orderProductReqVo = reqVo.getProducts().get(i);
+            orderProductReqVo.setOrderProductId(String.valueOf(i + 1));
+        }
         Date now = new Date();
         OrderList order = new OrderList();
         String orderCode = reqVo.getOrderCode();
