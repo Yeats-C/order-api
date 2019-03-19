@@ -409,7 +409,6 @@ public class OrderListServiceImpl implements OrderListService {
                 OrderListProduct productDTO = new OrderListProduct();
                 BeanUtils.copyProperties(product, productDTO);
                 productDTO.setId(IdUtil.uuid());
-                productDTO.setOrderProductId(IdUtil.uuid());
                 //重新计算价格
                 productDTO.setProductNumber(stockLock.getLockNum());
                 productDTO.setAmount(stockLock.getLockNum() * product.getOriginalProductPrice());
