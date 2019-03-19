@@ -15,6 +15,10 @@ public class SupplyOrderProductItemReqVO {
     @ApiModelProperty("订单主表编码")
     private String orderCode;
 
+
+    @ApiModelProperty("订单商品ID")
+    private String orderProductId;
+
     @ApiModelProperty("sku编号")
     private String skuCode;
 

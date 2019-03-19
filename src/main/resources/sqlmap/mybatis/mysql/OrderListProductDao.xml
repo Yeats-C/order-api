@@ -101,7 +101,7 @@
     </select>
     <select id="searchOrderListProductByCodeOrOriginal"
             resultType="com.aiqin.mgs.order.api.domain.request.orderList.SupplyOrderProductItemReqVO">
-      select
+      select order_product_id orderProductId,
     order_code orderCode, sku_code skuCode, sku_name skuName,color_name colorName,color_code colorCode,unit  unitName,gift givePromotion,product_number num,amount ,product_price  price,
   preferential_allocation  preferentialAllocation,actual_deliver_num actualDeliverNum,specifications spec, return_num returnNum,supply_company_name supplyCompanyName,supply_company_code supplyCompanyCode,
 preferential_allocation activityApportionment,activity_code activityCode, picture_url pictureUrl
