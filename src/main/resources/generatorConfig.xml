@@ -12,31 +12,31 @@
             <property name="suppressDate" value="true"/>
         </commentGenerator>
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://127.0.0.1:3306/mgs_order"
-                        userId="develop"
-                        password="develop">
+                        connectionURL="jdbc:mysql://39.96.85.170:3306/mgs_order"
+                        userId="order_write"
+                        password="YktaGbqcQcRUHbL6PGHB">
         </jdbcConnection>
 
         <javaTypeResolver>
             <property name="forceBigDecimals" value="false"/>
         </javaTypeResolver>
 
-        <javaModelGenerator targetPackage="com.aiqin.bms.order.api.domain" targetProject="src/main/java">
+        <javaModelGenerator targetPackage="com.aiqin.bms.order.api" targetProject="src/main/java">
             <property name="enableSubPackages" value="true"/>
             <property name="trimStrings" value="false"/>
         </javaModelGenerator>
 
-        <sqlMapGenerator targetPackage="sqlmap.mybatis.mysql" targetProject="src/main/resources">
+        <sqlMapGenerator targetPackage="sqlmap.mybatis" targetProject="src/main/resources">
             <property name="trimStrings" value="true"/>
         </sqlMapGenerator>
 
-        <javaClientGenerator type="XMLMAPPER" targetPackage="com.aiqin.bms.order.api.dao" targetProject="src/main/java">
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.aiqin.bms.order.api" targetProject="src/main/java">
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
 
         <!--对应数据库表 mysql可以加入主键自增 字段命名 忽略某字段等-->
 
-        <table tableName="area_info_relation">
+        <table tableName="order_list">
         </table>
      </context>
 </generatorConfiguration>

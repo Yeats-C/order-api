@@ -233,7 +233,7 @@ preferential_allocation activityApportionment,activity_code activityCode, pictur
     <insert id="insertList">
         insert into order_list_product (id, order_product_id, order_code,
         sku_code, sku_name, product_number,
-        activity_code, activity_name, gift,
+        activity_code,activity_type, activity_name, gift,
         original_product_id, specifications, unit,
         color_code, color_name, model_number,
         actual_deliver_num, product_price, original_product_price,
@@ -247,7 +247,8 @@ preferential_allocation activityApportionment,activity_code activityCode, pictur
             #{product.orderCode,jdbcType=VARCHAR},
             #{product.skuCode,jdbcType=VARCHAR}, #{product.skuName,jdbcType=VARCHAR},
             #{product.productNumber,jdbcType=INTEGER},
-            #{product.activityCode,jdbcType=VARCHAR}, #{product.activityName,jdbcType=VARCHAR},
+            #{product.activityCode,jdbcType=VARCHAR},#{product.activityType,jdbcType=BIT},
+            #{product.activityName,jdbcType=VARCHAR},
             #{product.gift,jdbcType=BIT},
             #{product.originalProductId,jdbcType=VARCHAR}, #{product.specifications,jdbcType=VARCHAR},
             #{product.unit,jdbcType=VARCHAR},
