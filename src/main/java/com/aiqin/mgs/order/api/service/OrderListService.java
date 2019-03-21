@@ -58,4 +58,6 @@ public interface OrderListService {
     Boolean updateOrderStatusDeliver(DeliverVo vo);
 
     Boolean updateOrderStatusReceiving(String code, String name);
+
+    Boolean updateOrderStatusPayment(OrderStatusPayment vo);
 }

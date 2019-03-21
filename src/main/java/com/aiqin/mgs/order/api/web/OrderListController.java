@@ -214,6 +214,21 @@ public class OrderListController {
     /**
      * 修改订单状态
      */
+    @PostMapping("update/order/status/payment")
+    @ApiOperation("修改订单状态支付专用接口")
+    public HttpResponse<Boolean> updateOrderStatusPayment(@RequestBody OrderStatusPayment vo ) {
+        log.info("Search  purchasingTarget list:{}", vo);
+        try {
+            return HttpResponse.success(this.orderListService.updateOrderStatusPayment(vo));
+        } catch (Exception e) {
+            log.error("Get purchasingTarget list failed", e);
+            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
+        }
+    }
+
+    /**
+     * 修改订单状态
+     */
     @PostMapping("update/order/status/deliver")
     @ApiOperation("修改订单为发货状态")
     public HttpResponse<Boolean> updateOrderStatusDeliver(@RequestBody DeliverVo vo) {
