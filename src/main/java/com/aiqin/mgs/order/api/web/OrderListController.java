@@ -77,15 +77,15 @@ public class OrderListController {
      */
 //    @PostMapping("/list")
 //    @ApiOperation(value = "订单列表后台(过时)")
-    public HttpResponse<PageResData<OrderList>> list(@RequestBody OrderListVo param) {
-        log.info("Search  purchasingTarget list:{}", param);
-        try {
-            return HttpResponse.success(this.orderListService.searchOrderList(param));
-        } catch (Exception e) {
-            log.error("Get purchasingTarget list failed", e);
-            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
-        }
-    }
+//    public HttpResponse<PageResData<OrderList>> list(@RequestBody OrderListVo param) {
+//        log.info("Search  purchasingTarget list:{}", param);
+//        try {
+//            return HttpResponse.success(this.orderListService.searchOrderList(param));
+//        } catch (Exception e) {
+//            log.error("Get purchasingTarget list failed", e);
+//            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
+//        }
+//    }
 
 
     /**
@@ -96,15 +96,15 @@ public class OrderListController {
      */
 //    @PostMapping("/list/reception")
 //    @ApiOperation(value = "订单列表前台(过时)")
-    public HttpResponse<PageResData<OrderList>> listReception(@RequestBody OrderListVo2 param) {
-        log.info("Search  purchasingTarget list:{}", param);
-        try {
-            return HttpResponse.success(this.orderListService.searchOrderReceptionList(param));
-        } catch (Exception e) {
-            log.error("Get purchasingTarget list failed", e);
-            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
-        }
-    }
+//    public HttpResponse<PageResData<OrderList>> listReception(@RequestBody OrderListVo2 param) {
+//        log.info("Search  purchasingTarget list:{}", param);
+//        try {
+//            return HttpResponse.success(this.orderListService.searchOrderReceptionList(param));
+//        } catch (Exception e) {
+//            log.error("Get purchasingTarget list failed", e);
+//            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
+//        }
+//    }
 
     /**
      * 订单列表后台

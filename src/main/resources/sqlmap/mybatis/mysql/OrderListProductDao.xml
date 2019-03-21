@@ -89,7 +89,7 @@
     </select>
     <select id="searchOrderListProductByCode" resultType="com.aiqin.mgs.order.api.domain.OrderListProduct">
       select
-       id, order_product_id orderProductId, order_code orderCode, sku_code skuCode, sku_name skuName, product_number productNumber, activity_code activityCode,
+       id, order_product_id orderProductId, order_code orderCode, sku_code skuCode, sku_name skuName, product_number productNumber, activity_code activityCode,discount_amount_info discountAmountInfo,activity_type activityType,
     activity_name activityName, gift, original_product_id originalProductId, specifications, unit, color_code colorCode, color_name colorName,
     model_number modelNumber, actual_deliver_num actualDeliverNum, product_price productPrice, original_product_price originalProductPrice,
     discount_money discountMoney,  amount, picture_url pictureUrl,  preferential_allocation preferentialAllocation,
