@@ -258,6 +258,6 @@ public class OrderList extends PagesRequest {
 
     @ApiModelProperty(value = "订单参与活动类型 (6-条件类型满减，7-条件类型满赠，8-条件类型折扣，9-条件类型特价)")
     @JsonProperty("order_list_activity_type")
-    private String orderListActivityType;
+    private Integer orderListActivityType;
 
 }
