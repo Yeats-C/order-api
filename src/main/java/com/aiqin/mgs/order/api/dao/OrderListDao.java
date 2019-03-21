@@ -63,4 +63,8 @@ public interface OrderListDao {
     List<FirstOrderTimeRespVo> selectFirstOrderTime(List<String> storeIds);
 
     Integer deleteByOrderCode(String orderCode);
+
+    Boolean updateByCodePayment(OrderStatusPayment vo);
+
+    Boolean updateStatusByCodeReceiving(@Param("code") String code, @Param("status") Integer statu);
 }
