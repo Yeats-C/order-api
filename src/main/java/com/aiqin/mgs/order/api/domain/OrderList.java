@@ -246,4 +246,18 @@ public class OrderList extends PagesRequest {
     @ApiModelProperty(value = "商品List")
     @JsonProperty("order_list_product_list")
     private List<OrderListProduct> orderListProductList;
+
+
+    @ApiModelProperty(value = "订单参与活动编号")
+    @JsonProperty("order_list_activity_code")
+    private String orderListActivityCode;
+
+    @ApiModelProperty(value = "订单参与活动名称")
+    @JsonProperty("order_list_activity_name")
+    private String orderListActivityName;
+
+    @ApiModelProperty(value = "订单参与活动类型 (0-单品，1-排除单品，2-参与活动商品品类和品牌,3-参与活动门店类型，4-参与活动门店大区，5-参与活动省区，6-条件类型满减，7-条件类型满赠，8-条件类型折扣，9-条件类型特价)")
+    @JsonProperty("order_list_activity_type")
+    private String orderListActivityType;
+
 }
