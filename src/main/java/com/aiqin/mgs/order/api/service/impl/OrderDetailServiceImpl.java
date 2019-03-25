@@ -251,10 +251,12 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 
 	//接口--商品概览产品销量、销售额-前5名
 	@Override
-	public HttpResponse productOverviewByOrderTop(String distributor_id,String year, String month) {
+	public HttpResponse productOverviewByOrderTop(String distributoId,String year, String month) {
 		
 		try {
-			return HttpResponse.success(orderDetailDao.productOverviewByOrderTop(distributor_id,year,month));
+			String yearMonth = year+"-"+month+"-"+"01"; //"YYYY-MM"
+			
+			return HttpResponse.success(orderDetailDao.productOverviewByOrderTop(distributoId,DateUtil.getFristOfMonthDay(DateUtil.formatDate(yearMonth)),DateUtil.getLashOfMonthDay(DateUtil.formatDate(yearMonth))));
 		} catch (Exception e) {
 			LOGGER.error("接口--商品概览产品销量、销售额-前5名失败 {}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
@@ -264,10 +266,12 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 	
 	//接口--商品概览产品销量、销售额-后5名
 	@Override
-	public HttpResponse productOverviewByOrderLast(String distributor_id,String year, String month) {
+	public HttpResponse productOverviewByOrderLast(String distributoId,String year, String month) {
 		
 		try {
-			return HttpResponse.success(orderDetailDao.productOverviewByOrderLast(distributor_id,year,month));
+			String yearMonth = year+"-"+month+"-"+"01"; //"YYYY-MM"
+			
+			return HttpResponse.success(orderDetailDao.productOverviewByOrderLast(distributoId,DateUtil.getFristOfMonthDay(DateUtil.formatDate(yearMonth)),DateUtil.getLashOfMonthDay(DateUtil.formatDate(yearMonth))));
 		} catch (Exception e) {
 			LOGGER.error("接口--商品概览产品销量、销售额-后5名失败 {}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);

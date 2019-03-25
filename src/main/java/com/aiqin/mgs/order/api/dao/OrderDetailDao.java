@@ -7,6 +7,7 @@
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -32,14 +33,14 @@ public interface OrderDetailDao {
 	//查询订单明细部分汇总-（支持活动ID汇总、）
 	OrderDetailInfo selectorderdetailsum(@Valid OrderDetailQuery orderDetailQuery)throws Exception;
 
-	//接口--商品概览门店sku月销量、月销售额
-	OrderDetailInfo productOverviewByMonth(@Param("distributorId")String distributorId,@Param("year")String year,@Param("month")String month) throws Exception;
+//	//接口--商品概览门店sku月销量、月销售额
+//	OrderDetailInfo productOverviewByMonth(@Param("distributorId")String distributorId,@Param("dayBegin")Date dayBegin,@Param("dayEnd")Date dayEnd) throws Exception;
 
 	//接口--商品概览产品销量、销售额-前5名
-	List<OrderDetailInfo> productOverviewByOrderTop(@Param("distributor_id")String distributor_id,@Param("year")String year,@Param("month")String month) throws Exception;
+	List<OrderDetailInfo> productOverviewByOrderTop(@Param("distributorId")String distributorId,@Param("dayBegin")Date dayBegin,@Param("dayEnd")Date dayEnd) throws Exception;
 
     //接口--商品概览产品销量、销售额-后5名
-	List<OrderDetailInfo> productOverviewByOrderLast(@Param("distributor_id")String distributor_id,@Param("year")String year,@Param("month")String month) throws Exception;
+	List<OrderDetailInfo> productOverviewByOrderLast(@Param("distributorId")String distributorId,@Param("dayBegin")Date dayBegin,@Param("dayEnd")Date dayEnd) throws Exception;
 
 	//查询订单明细Byorderid
 	List<OrderDetailInfo> selectDetailById(@Valid OrderDetailQuery orderDetailQuery) throws Exception;

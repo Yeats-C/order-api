@@ -144,35 +144,35 @@ public class OrderDetailController {
     
 
     /**
-     * 接口--商品概览产品销量、销售额-前5名
+     * 接口--商品概览产品销量、销售额-前10名
      * @param distributor_id
      * @param year
      * @param month
      * @return
      */
     @GetMapping("/productoverviewbyskuordertop")
-    @ApiOperation(value = "商品概览菜单-产品销量、销售额-前5名")
+    @ApiOperation(value = "商品概览菜单-产品销量、销售额-前10名")
     public HttpResponse productOverviewByOrderTop(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,@Valid @RequestParam(name = "year", required = true) String year,@RequestParam(name = "month", required = true) String month) {
         
     	
-    	LOGGER.info("商品概览菜单-产品销量、销售额-前5名参数 distributor_id:{},year:{},month:{}",distributorId,year,month);    	
+    	LOGGER.info("商品概览菜单-产品销量、销售额-前10名参数 distributor_id:{},year:{},month:{}",distributorId,year,month);    	
         return orderDetailService.productOverviewByOrderTop(distributorId,year,month);//商品概览产品销量
     }
     
     
     /**
-     * 接口--商品概览产品销量、销售额-后5名
+     * 接口--商品概览产品销量、销售额-后10名
      * @param distributor_id
      * @param year
      * @param month
      * @return
      */
     @GetMapping("/productoverviewbyskuorderlast")
-    @ApiOperation(value = "商品概览菜单-产品销量、销售额-后5名")
+    @ApiOperation(value = "商品概览菜单-产品销量、销售额-后10名")
     public HttpResponse productOverviewByOrderLast(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,@Valid @RequestParam(name = "year", required = true) String year,@RequestParam(name = "month", required = true) String month) {
             
     	
-    	LOGGER.info("商品概览菜单-产品销量、销售额-后5名参数 distributorId：{},year：{},month：{}",distributorId,year,month);    	
+    	LOGGER.info("商品概览菜单-产品销量、销售额-后10名参数 distributorId：{},year：{},month：{}",distributorId,year,month);    	
         return orderDetailService.productOverviewByOrderLast(distributorId,year,month);//商品概览产品销量
     }
     

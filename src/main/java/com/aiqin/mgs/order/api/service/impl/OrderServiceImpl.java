@@ -1577,10 +1577,19 @@ public class OrderServiceImpl implements OrderService{
 		  }
           
           //修改订单支付方式信息
-          OrderQuery orderQuery = new OrderQuery();
-          orderQuery.setOrderId(orderId);
-          orderQuery.setPayType(payType);
-          orderDao.onlyPayType(orderQuery);
+          OrderInfo orderInfo = new OrderInfo();
+          orderInfo.setOrderId(orderId);
+          orderInfo.setPayType(payType);
+          //现金单支付-支持单支付 根据逻辑层做的调整.
+          if(orderPayList !=null && orderPayList.size()>0) {
+        	  OrderPayInfo info = new OrderPayInfo();
+        	  info = orderPayList.get(0);
+        	  if(info.getPayType().equals(Global.P_TYPE_3)) {
+        		  orderInfo.setPayStatus(info.getPayStatus()); 
+        	  }
+        	  
+          }
+          orderDao.onlyPayType(orderInfo);
           
         return HttpResponse.success();
         

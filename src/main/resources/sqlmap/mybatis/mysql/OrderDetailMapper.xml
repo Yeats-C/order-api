@@ -219,7 +219,7 @@
     
     
     <!--商品概览门店sku月销量、月销售额 不包含 未付款的和取消的-->
-    <select id="productOverviewByMonth"  resultMap="OrderInfoDetailMapping" >
+    <!-- <select id="productOverviewByMonth"  resultMap="OrderInfoDetailMapping" >
 	SELECT SUM(a.amount) AS amount,SUM(a.actual_price) AS actual_price FROM order_detail a
     LEFT JOIN order_info b ON a.order_id = b.order_id
     WHERE 1=1 and order_type = 1 
@@ -228,44 +228,49 @@
     and DATE_FORMAT(a.create_time,"%Y") =#{year}
     and DATE_FORMAT(a.create_time,"%m") =#{month}
     and b.distributor_id =#{distributorId}
-    </select>  
+    </select> -->  
     
     
-    <!--商品概览 sku产品销量、销售额-前5名 不包含取消、未付款的订单-->
+    <!--商品概览 sku产品销量、销售额-前10名 不包含取消、未付款的订单-->
     <select id="productOverviewByOrderTop"  resultMap="OrderInfoDetailMapping" resultType="java.util.List">
-    SELECT c.* FROM (
-    SELECT (@rowNO := @rowNo+1) AS rowno,a.* FROM(
-    SELECT any_value(product_id),any_value(product_name) as product_name,SUM(a.amount) AS amount,SUM(a.actual_price) AS actual_price FROM order_detail a
+    SELECT any_value(product_id),any_value(product_name) as product_name,SUM(IFNULL(a.amount,0)) AS amount,SUM(IFNULL(a.actual_price,0)) AS actual_price FROM order_detail a
     LEFT JOIN order_info b ON a.order_id = b.order_id
     WHERE 1=1 and order_type = 1
+    <if test="distributorId !=null and distributorId !='' ">
+    and b.distributor_id =#{distributorId}
+    </if>
     and b.order_status NOT IN ('0','4')
     and b.pay_status='1'
-    and DATE_FORMAT(a.create_time,"%Y") =#{year}
-    and DATE_FORMAT(a.create_time,"%m") =#{month}
-    and b.distributor_id =#{distributor_id}
+    <if test="dayBegin!=null ">
+    and a.create_time &gt;=#{dayBegin}
+    </if>
+    <if test="dayEnd!=null ">
+    and a.create_time &lt;=#{dayEnd}
+    </if>
     GROUP BY product_id,product_name
     ORDER BY SUM(a.amount) DESC 
-    ) a,(SELECT @rowNO :=0) b
-    )c WHERE rowno &lt;=10
-    
+    LIMIT 0,10
     </select> 
     
-    <!--商品概览sku产品销量、销售额-后5名 不包含取消、未付款的订单-->
+    <!--商品概览sku产品销量、销售额-后10名 不包含取消、未付款的订单-->
     <select id="productOverviewByOrderLast"  resultMap="OrderInfoDetailMapping" resultType="java.util.List">
-    SELECT c.* FROM (
-    SELECT (@rowNO := @rowNo+1) AS rowno,a.* FROM(
-    SELECT product_id,product_name,SUM(a.amount) AS amount,SUM(a.actual_price) AS actual_price FROM order_detail a
+    SELECT product_id,product_name,SUM(IFNULL(a.amount,0)) AS amount,SUM(IFNULL(a.actual_price,0)) AS actual_price FROM order_detail a
     LEFT JOIN order_info b ON a.order_id = b.order_id
     WHERE 1=1 and order_type = 1
+    <if test="distributorId !=null and distributorId !='' ">
+    and b.distributor_id =#{distributorId}
+    </if>
     and b.order_status NOT IN ('0','4')
     and b.pay_status='1'
-    and DATE_FORMAT(a.create_time,"%Y") =#{year}
-    and DATE_FORMAT(a.create_time,"%m") =#{month}
-    and b.distributor_id =#{distributor_id}
+    <if test="dayBegin!=null ">
+    and a.create_time &gt;=#{dayBegin}
+    </if>
+    <if test="dayEnd!=null ">
+    and a.create_time &lt;=#{dayEnd}
+    </if>
     GROUP BY product_id,product_name
     ORDER BY SUM(a.amount) 
-    ) a,(SELECT @rowNO :=0) b
-    )c WHERE rowno &lt;=10
+    LIMIT 0,10
     </select> 
     
     <!--接口-会员管理-会员消费记录-->

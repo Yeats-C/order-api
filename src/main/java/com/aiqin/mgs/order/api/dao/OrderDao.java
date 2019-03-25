@@ -141,7 +141,7 @@ public interface OrderDao {
 	Integer selectCountByStatus(OrderQuery orderQuery) throws Exception;
 
 	//修改订单支付方式信息
-	void onlyPayType(OrderQuery orderQuery)throws Exception;
+	void onlyPayType(OrderInfo orderInfo)throws Exception;
 
 	//TOC-通过订单编码查询订单ID
 	String getOrderIdByCode(@Valid @Param("orderCode") String orderCode)throws Exception;

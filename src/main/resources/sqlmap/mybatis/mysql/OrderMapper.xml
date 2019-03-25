@@ -664,7 +664,7 @@
 		</foreach>
 		)
       </if>
-      AND DATE_FORMAT(b.create_time,"%Y-%m-%d") &gt;= #{beginDate}
+      AND b.create_time &gt;= #{beginTime}
       GROUP BY DATE_FORMAT(b.create_time,"%Y-%m-%d")
       )a
       LEFT JOIN 
@@ -681,7 +681,7 @@
 		</foreach>
 		)
       </if>
-      AND DATE_FORMAT(b.create_time,"%Y-%m-%d") &gt;= #{beginDate}
+      AND b.create_time &gt;= #{beginTime}
       GROUP BY DATE_FORMAT(b.create_time,"%Y-%m-%d")
       )b 
       ON a.create_time = b.create_time
@@ -740,7 +740,7 @@
 		</foreach>
 		)
       </if>
-      AND DATE_FORMAT(b.create_time,"%Y-%m") &gt;= #{beginDate}
+      AND b.create_time &gt;= #{beginTime}
       GROUP BY DATE_FORMAT(b.create_time,"%Y-%m")
       )a
       LEFT JOIN 
@@ -789,9 +789,13 @@
 		update order_info set update_by=#{updateBy},update_time=CURRENT_TIMESTAMP,order_status=#{orderStatus} where order_id = #{orderId}
 	</update>
 	
-	<!-- 仅变更订单支付方式-->
+	<!-- 变更订单支付方式/支付状态-->
 	<update id="onlyPayType" >
-		update order_info set update_time=CURRENT_TIMESTAMP,pay_type=#{payType} where order_id = #{orderId}
+		update order_info set update_time=CURRENT_TIMESTAMP,pay_type=#{payType} 
+		<if test="payStatus!=null ">
+		,pay_status = #{payStatus}
+		</if>
+		where order_id = #{orderId}
 	</update>
 
     <!-- 接口-收银员交班收银情况统计  获取收银员、支付类型金额 -->

@@ -78,13 +78,13 @@ public interface Global {
     
     
     
-    /**
-     * 订单-支付方式
-     */
-    Integer PAY_TYPE_0 = 0;  //微信
-    Integer PAY_TYPE_1 = 1;  //支付宝
-    Integer PAY_TYPE_2 = 2;  //现金
-    Integer PAY_TYPE_3 = 3;  //银联
+//    /**
+//     * 订单-支付方式
+//     */
+//    Integer PAY_TYPE_0 = 0;  //微信
+//    Integer PAY_TYPE_1 = 1;  //支付宝
+//    Integer PAY_TYPE_2 = 2;  //现金
+//    Integer PAY_TYPE_3 = 3;  //银联
     
     
     /**
