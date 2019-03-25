@@ -150,7 +150,7 @@
     </select>
     <select id="searchOrderListCount" resultType="java.lang.Integer">
         select
-        count(*)
+        count(1)
         from order_list
         where 1=1
         <if test="storeCode !=null">
@@ -235,7 +235,7 @@
     </select>
     <select id="searchOrderReceptionListCount" resultType="java.lang.Integer">
         select
-        count(*)
+        count(1)
         from order_list
         where 1=1
         and store_id=#{storeId}
@@ -345,7 +345,7 @@ from order_list
     <select id="searchOrderReceptionListFatherCount" resultType="java.lang.Integer">
         SELECT IFNULL(
         (
-        SELECT count(*) FROM (
+        SELECT count(1) FROM (
         select
         original
         from order_list
@@ -410,7 +410,7 @@ from order_list
     </select>
     <select id="searchOrderListFatherCount" resultType="java.lang.Integer">
         SELECT IFNULL((
-        SELECT count(*) FROM (
+        SELECT count(1) FROM (
         select
         original
 

@@ -243,6 +243,27 @@ public class OrderPublic {
 				query.setOrderStatusList(null);
 			}
 			
+			//会员集合
+			if(query.getMemberidList() !=null && query.getMemberidList().size()>0) {
+				
+			}else {
+				query.setMemberidList(null);
+			}
+			
+			//订单集合
+			if(query.getOrderIdList() !=null && query.getOrderIdList().size()>0) {
+				
+			}else {
+				query.setOrderIdList(null);
+			}
+			
+			//排除订单集合
+			if(query.getNoExistOrderCodeList() !=null && query.getNoExistOrderCodeList().size()>0) {
+				
+			}else {
+				query.setNoExistOrderCodeList(null);
+			}
+			
 			//日期转换  YYYY-MM-DD 转换 2000-00-00 00:00:00 /2000-00-00 59:59:59
 			if(query.getBeginDate() !=null && !query.getBeginDate().equals("")) {
 				query.setBeginTime(DateUtil.getDayBegin(query.getBeginDate()));
@@ -301,6 +322,13 @@ public class OrderPublic {
 			
 		  }else {
 			 query.setSukList(null);
+		  }
+		  
+		  //订单集合
+		  if(query.getOrderIdList() !=null && query.getOrderIdList().size()>0) {
+				
+		  }else {
+			  query.setOrderIdList(null);
 		  }
 		  
 		  //日期转换  YYYY-MM-DD 转换 2000-00-00 00:00:00 /2000-00-00 59:59:59
@@ -437,6 +465,7 @@ public class OrderPublic {
 	}
 
 	public static void main(String[] args) {
+		System.out.println(DateUtil.getDayBegin(DateUtil.getCurrentDate()));
 	}
 	
 }

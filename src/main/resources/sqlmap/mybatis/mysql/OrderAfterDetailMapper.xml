@@ -32,6 +32,11 @@
 <result column="update_by_name" jdbcType="VARCHAR" property="updateByName"/>
 </resultMap>
 
+<resultMap id="IdAndAmountMapping" type="com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest">
+<result column="id" jdbcType="VARCHAR" property="id"/>
+<result column="amount" jdbcType="INTEGER" property="amount"/>
+</resultMap>
+
     
     <!-- 插入订单售后明细表 -->
     <insert id="addAfterOrderDetail" >
@@ -60,16 +65,25 @@
     
     
     <!-- 售后订单售后明细查询 (不带分页)-->
-    <select id="selectDetailbyId"  parameterType="com.aiqin.mgs.order.api.domain.OrderAfterSaleQuery" resultMap="OrderAfterDetailMapping" resultType="java.util.List">
-             
-         SELECT a.*,b.retail_price,b.actual_price,b.spec,b.unit,b.logo FROM order_after_sale_detail a
-         LEFT JOIN order_detail b ON a.order_detail_id = b.order_detail_id
+    <select id="selectReturnDetailbyId"  parameterType="com.aiqin.mgs.order.api.domain.OrderAfterSaleQuery" resultMap="OrderAfterDetailMapping" resultType="java.util.List">
+         SELECT a.* FROM order_after_sale_detail a
 		 WHERE 1=1
 		 <if test="afterSaleId!=null and afterSaleId!=''">
 		 and a.after_sale_id = #{afterSaleId}
 		 </if>
 		 ORDER BY a.create_time DESC
-    </select>    
+    </select>
+    
+    <!--查询订单退货数量-->
+    <select id="returnAmount" resultMap="IdAndAmountMapping" resultType="java.util.List">
+          SELECT id,amount FROM (
+          SELECT order_code AS id,SUM(a.return_amount) AS amount FROM  `order_after_sale_detail` a 
+          WHERE 1=1  
+          <if test="orderCode!=null and orderCode!='' ">
+		  and order_code =#{orderCode}
+		  </if>
+          GROUP BY order_code) a WHERE a.amount>0
+    </select>  
     
 </mapper>
 

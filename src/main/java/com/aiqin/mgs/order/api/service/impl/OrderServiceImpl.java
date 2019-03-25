@@ -38,6 +38,8 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.dao.CartDao;
+import com.aiqin.mgs.order.api.dao.OrderAfterDao;
+import com.aiqin.mgs.order.api.dao.OrderAfterDetailDao;
 import com.aiqin.mgs.order.api.dao.OrderCouponDao;
 import com.aiqin.mgs.order.api.dao.OrderDao;
 import com.aiqin.mgs.order.api.dao.OrderDetailDao;
@@ -63,6 +65,7 @@ import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
 import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderDetailRequest;
+import com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderResponse;
@@ -118,6 +121,12 @@ public class OrderServiceImpl implements OrderService{
 	@Resource
     private OrderDetailDao orderDetailDao;
 	
+	@Resource
+    private OrderAfterDao orderAfterDao;
+	
+	@Resource
+    private OrderAfterDetailDao orderAfterDetailDao;
+	
 
 	//模糊查询订单列表
 	@Override
@@ -140,16 +149,29 @@ public class OrderServiceImpl implements OrderService{
 					    List<OrderDetailInfo> detailList = orderDetailDao.selectDetailById(orderDetailQuery);
 					    info.setOrderdetailList(detailList);
 					    
-					    
 					    //特殊处理   (前端控制退货按钮使用字段:1:订单已全数退完)
-						ReorerRequest reorerRequest = new ReorerRequest();
-						reorerRequest.setOrderId(info.getOrderId());
-						List<OrderInfo> list = new ArrayList();
-						list = orderDao.reorer(reorerRequest);
-						if(list !=null && list.size()>0) {
-
-						}else {
-							info.setTurnReturnView(1);
+					    ReorerRequest reorerRequest = new ReorerRequest();
+						reorerRequest.setOrderCode(info.getOrderCode());
+						
+					    //查询购买数量
+						List<OrderIdAndAmountRequest> buyIdAndAmounts= new ArrayList();
+						buyIdAndAmounts = orderDetailDao.buyAmount(reorerRequest);
+						
+						//查询退货数量
+						List<OrderIdAndAmountRequest> returnIdAndAmounts= new ArrayList();
+						returnIdAndAmounts = orderAfterDetailDao.returnAmount(reorerRequest);
+						
+						//已完全退货完成订单
+						if(returnIdAndAmounts !=null) {
+							for(OrderIdAndAmountRequest returnInfo :returnIdAndAmounts) {
+								for(OrderIdAndAmountRequest buyInfo :buyIdAndAmounts) {
+									if(returnInfo.getId().equals(buyInfo.getId())) {
+										if(returnInfo.getAmount() >= buyInfo.getAmount()) {
+											info.setTurnReturnView(1);
+										}
+									}
+								}
+							}
 						}
 						OrderInfolist.set(i,info);
 					}
@@ -178,7 +200,9 @@ public class OrderServiceImpl implements OrderService{
 				  List<String> orderIdList = new ArrayList();
 				  try {
 					OrderPayInfo info = new OrderPayInfo();
-					info.setPayType(Integer.valueOf(orderQuery.getPayType()));
+					if(orderQuery.getPayType() !=null && !orderQuery.getPayType().equals("")) {
+						info.setPayType(Integer.valueOf(orderQuery.getPayType()));
+					}
 					orderIdList = orderPayDao.orderIDListPay(info);
 					if(orderIdList !=null && orderIdList.size()>0) {
 						orderQuery.setOrderIdList(orderIdList);
@@ -336,17 +360,17 @@ public class OrderServiceImpl implements OrderService{
 //			总销售额：包含退货、取消的订单==
 			total_price = orderDao.selectOrderAmt(distributorId,originTypeList);
 //			当月销售额：包含退货、取消的订单==
-			monthtotal_price = orderDao.selectByMonthAllAmt(distributorId,originTypeList,yearMonth);
+			monthtotal_price = orderDao.selectByMonthAllAmt(distributorId,originTypeList,DateUtil.getDayBegin(DateUtil.getFirstMonth(0)),DateUtil.getDayEnd(DateUtil.getLastMonth(1)));
 //			昨日销售额：包含退货、取消的订单==
-			yesdaytotal_price = orderDao.selectByYesdayAllAmt(distributorId,originTypeList,yesterday);
+			yesdaytotal_price = orderDao.selectByYesdayAllAmt(distributorId,originTypeList,DateUtil.getDayBegin(yesterday),DateUtil.getDayEnd(yesterday));
 //			当月支付订单数：包含退货、取消的订单==
-			monthorder_acount = orderDao.selectByMonthAcount(distributorId,originTypeList,yearMonth);
+			monthorder_acount = orderDao.selectByMonthAcount(distributorId,originTypeList,DateUtil.getDayBegin(DateUtil.getFirstMonth(0)),DateUtil.getDayEnd(DateUtil.getLastMonth(1)));
 //			昨日支付订单数：包含退货、取消的订单==
-			yesdayorder_acount = orderDao.selectByYesdayAcount(distributorId,originTypeList,yesterday);
+			yesdayorder_acount = orderDao.selectByYesdayAcount(distributorId,originTypeList,DateUtil.getDayBegin(yesterday),DateUtil.getDayEnd(yesterday));
 //			当月实收：不包含退货、取消的订单==
-			monthreal_amt = orderDao.selectbByMonthRetailAmt(distributorId,originTypeList,yearMonth);
+			monthreal_amt = orderDao.selectbByMonthRetailAmt(distributorId,originTypeList,DateUtil.getDayBegin(DateUtil.getFirstMonth(0)),DateUtil.getDayEnd(DateUtil.getLastMonth(1)));
 //			昨日实收：不包含退货、取消的订单==
-			yesdayreal_amt = orderDao.selectbByYesdayRetailAmt(distributorId,originTypeList,yesterday);
+			yesdayreal_amt = orderDao.selectbByYesdayRetailAmt(distributorId,originTypeList,DateUtil.getDayBegin(yesterday),DateUtil.getDayEnd(yesterday));
 			
 			
 			
@@ -498,7 +522,7 @@ public class OrderServiceImpl implements OrderService{
 		
 		//新增订单明细数据
 		if(detailList !=null && detailList.size()>0) {
-			detailList = orderDetailService.addDetailList(detailList,orderId);
+			detailList = orderDetailService.addDetailList(detailList,orderId,orderCode);
 		}
 		//新增订单结算数据
 		if(settlementInfo !=null) {
@@ -710,11 +734,12 @@ public class OrderServiceImpl implements OrderService{
 		orderQuery.setEndDate(endTime);
 		
 		//获取收银员、支付类型金额
-		List<OrderbyReceiptSumResponse> list= orderDao.cashier(orderQuery);
+		List<OrderbyReceiptSumResponse> list= orderDao.cashier(OrderPublic.getOrderQuery(orderQuery));
 		
 		
 		//获取退款金额、退款订单数、销售额、销售订单数
-		OrderbyReceiptSumResponse receiptSum= orderDao.byCashierSum(orderQuery);
+		OrderbyReceiptSumResponse receiptSum= new OrderbyReceiptSumResponse();
+		receiptSum= orderDao.byCashierSum(OrderPublic.getOrderQuery(orderQuery));
 		if(list !=null && list.size()>0) {
 			for(int i=0;i<list.size();i++) {
 				OrderbyReceiptSumResponse info = new OrderbyReceiptSumResponse();
@@ -828,20 +853,113 @@ public class OrderServiceImpl implements OrderService{
 	public HttpResponse reorer(@Valid ReorerRequest reorerRequest) {
 		
 		try {
+			
+			if(reorerRequest !=null) {
+				if(reorerRequest.getBeginTime() !=null && !reorerRequest.getBeginTime().equals("")) {
+					reorerRequest.setBeginTime(DateUtil.formatDateLong(DateUtil.getDayBegin(reorerRequest.getBeginTime())));
+					if(reorerRequest.getEndTime() ==null || reorerRequest.getEndTime().equals("")) {
+	                	reorerRequest.setEndTime(DateUtil.formatDateLong(DateUtil.getDayEnd(reorerRequest.getBeginTime())));
+					}
+				}
+                if(reorerRequest.getEndTime() !=null && !reorerRequest.getEndTime().equals("")) {
+                	reorerRequest.setEndTime(DateUtil.formatDateLong(DateUtil.getDayEnd(reorerRequest.getEndTime())));
+				}
+			}
+			//去掉关联查询
 			List<OrderInfo> list = new ArrayList();
 			list = orderDao.reorer(reorerRequest);
 			
-			//计算总数据量
-			Integer totalCount = 0;
-			Integer icount =null;
-			reorerRequest.setIcount(icount);
-			List<OrderInfo> Icount_list= orderDao.reorer(reorerRequest);
-			if(Icount_list !=null && Icount_list.size()>0) {
-				totalCount = Icount_list.size();
-			}
+//			//查询订单列表
+//			List<OrderInfo> orderInfoList = new ArrayList();
+//			
+//			//拼接参数
+//			OrderQuery orderQuery= new OrderQuery();
+//			if(reorerRequest !=null) {
+//				if(reorerRequest.getBeginIndex() !=null) {
+//					orderQuery.setBeginIndex(reorerRequest.getBeginIndex());
+//				}
+//				if(reorerRequest.getPageNo() !=null) {
+//					orderQuery.setPageNo(reorerRequest.getPageNo());
+//				}
+//				if(reorerRequest.getPageSize() !=null) {
+//					orderQuery.setPageSize(reorerRequest.getPageSize());
+//				}
+//				if(reorerRequest.getDistributorId() !=null && !reorerRequest.getDistributorId().equals("")) {
+//					orderQuery.setDistributorId(reorerRequest.getDistributorId());
+//				}
+//				if(reorerRequest.getOrderCode() !=null && !reorerRequest.getOrderCode().equals("")) {
+//					orderQuery.setOrderCode(reorerRequest.getOrderCode());
+//				}
+//				if(reorerRequest.getOrderId() !=null && !reorerRequest.getOrderId().equals("")) {
+//					orderQuery.setOrderId(reorerRequest.getOrderId());
+//				}
+//				
+//				if(reorerRequest.getStatusList() !=null && reorerRequest.getStatusList().size()>0) {
+//					orderQuery.setOrderStatusList(reorerRequest.getStatusList());
+//				}
+//				
+//				if(reorerRequest.getBeginTime() !=null && !reorerRequest.getBeginTime().equals("")) {
+//					orderQuery.setBeginTime(DateUtil.getDayBegin(reorerRequest.getBeginTime()));
+//					if(reorerRequest.getEndTime() ==null || reorerRequest.getEndTime().equals("")) {
+//						orderQuery.setEndTime(DateUtil.getDayEnd(reorerRequest.getBeginTime()));
+//					}
+//				}
+//				if(reorerRequest.getEndTime() !=null && !reorerRequest.getEndTime().equals("")) {
+//					orderQuery.setEndTime(DateUtil.getDayEnd(reorerRequest.getEndTime()));
+//					if(reorerRequest.getBeginTime() ==null || reorerRequest.getBeginTime().equals("")) {
+//						orderQuery.setBeginTime(DateUtil.getDayBegin(reorerRequest.getEndTime()));
+//					}
+//				}
+//			}
+//			
+//			//不分页
+//			Integer orderIcount =null;
+//			orderQuery.setIcount(orderIcount);
+//			orderInfoList = orderDao.selectOrder(orderQuery);
+//			
+//			List<String> orderCodes = new ArrayList();
+//			if(orderInfoList !=null && orderInfoList.size()>0) {
+//				for(int i=0;i<orderInfoList.size();i++) {
+//					OrderInfo info = new OrderInfo();
+//					info = orderInfoList.get(i);
+//					reorerRequest.setOrderCode(info.getOrderCode());
+//					//查询购买数量
+//					List<OrderIdAndAmountRequest> buyIdAndAmounts= new ArrayList();
+//					buyIdAndAmounts = orderDetailDao.buyAmount(reorerRequest);
+//					
+//					//查询退货数量
+//					List<OrderIdAndAmountRequest> returnIdAndAmounts= new ArrayList();
+//					returnIdAndAmounts = orderAfterDetailDao.returnAmount(reorerRequest);
+//					
+//					//已完全退货完成订单
+//					if(returnIdAndAmounts !=null) {
+//						for(OrderIdAndAmountRequest returnInfo :returnIdAndAmounts) {
+//							for(OrderIdAndAmountRequest buyInfo :buyIdAndAmounts) {
+//								if(returnInfo.getId().equals(buyInfo.getId())) {
+//									if(returnInfo.getAmount() >= buyInfo.getAmount()) {
+//										orderCodes.add(returnInfo.getId());
+//									}
+//								}
+//							}
+//						}
+//					}	
+//				}
+//			}
+//			
+//			//返回订单列表-分页
+//			List<OrderInfo> list = new ArrayList();
+//			orderQuery.setIcount(1);
+//            if(orderCodes !=null && orderCodes.size()>0) {
+//            	orderQuery.setNoExistOrderCodeList(orderCodes);
+//			}
+//            list = orderDao.selectOrder(orderQuery);
 			
-//			return HttpResponse.success(OrderPublic.getData(list));
+			//计算总数据量
+			Integer totalCount = null;
+			totalCount = orderDao.reorerCount(reorerRequest);
+			
 			return HttpResponse.success(new PageResData(totalCount,list));
+			
 		} catch (Exception e) {
 			LOGGER.error("接口-可退货的订单查询异常：{}", e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
@@ -1003,33 +1121,39 @@ public class OrderServiceImpl implements OrderService{
     				skuSum = orderDetailService.getSkuSum(oradskuResponse.getOrderId());
     				oradskuResponse.setSkuSum(skuSum);
     				
-
-    				//特殊处理   (前端控制退货按钮使用字段:1:订单已全数退完)
-					ReorerRequest reorerRequest = new ReorerRequest();
-					reorerRequest.setOrderId(oradskuResponse.getOrderId());
-					List<OrderInfo> list = new ArrayList();
-					list = orderDao.reorer(reorerRequest);
-					if(list !=null && list.size()>0) {
-					}else {
-						oradskuResponse.setTurnReturnView(1);
+					//特殊处理   (前端控制退货按钮使用字段:1:订单已全数退完)
+				    ReorerRequest reorerRequest = new ReorerRequest();
+					reorerRequest.setOrderCode(oradskuResponse.getOrderCode());
+					
+				    //查询购买数量
+					List<OrderIdAndAmountRequest> buyIdAndAmounts= new ArrayList();
+					buyIdAndAmounts = orderDetailDao.buyAmount(reorerRequest);
+					
+					//查询退货数量
+					List<OrderIdAndAmountRequest> returnIdAndAmounts= new ArrayList();
+					returnIdAndAmounts = orderAfterDetailDao.returnAmount(reorerRequest);
+					
+					//已完全退货完成订单
+					if(returnIdAndAmounts !=null) {
+						for(OrderIdAndAmountRequest returnInfo :returnIdAndAmounts) {
+							for(OrderIdAndAmountRequest buyInfo :buyIdAndAmounts) {
+								if(returnInfo.getId().equals(buyInfo.getId())) {
+									if(returnInfo.getAmount() >= buyInfo.getAmount()) {
+										oradskuResponse.setTurnReturnView(1);
+									}
+								}
+							}
+						}
 					}
 					
-					
 					OrderInfolist.set(i, oradskuResponse);
-					
     			}
 			}
 			
           //计算总数据量
-			Integer totalCount = 0;
-			Integer icount =null;
-			orderQuery.setIcount(icount);
-			List<OradskuResponse> Icount_list= orderDao.selectskuResponse(OrderPublic.getOrderQuery(orderQuery));
-			if(Icount_list !=null && Icount_list.size()>0) {
-				totalCount = Icount_list.size();
-			}
+			Integer totalCount = null;
+			totalCount= orderDao.skuResponseCount(OrderPublic.getOrderQuery(orderQuery));
             
-//			return HttpResponse.success(OrderPublic.getData(OrderInfolist));
 			return HttpResponse.success(new PageResData(totalCount,OrderInfolist));
 			
 		} catch (Exception e) {
@@ -1097,7 +1221,7 @@ public class OrderServiceImpl implements OrderService{
 			
 		//新增订单明细数据
 		if(detailList !=null && detailList.size()>0) {
-			detailList = orderDetailService.addDetailList(detailList,orderId);
+			detailList = orderDetailService.addDetailList(detailList,orderId,orderCode);
 		}
         
         //删除购物车数据
@@ -1233,7 +1357,7 @@ public class OrderServiceImpl implements OrderService{
 		//新增订单明细数据
 		if(detailList !=null && detailList.size()>0) {
 			try {
-			detailList = orderDetailService.addDetailList(detailList,orderId);
+			detailList = orderDetailService.addDetailList(detailList,orderId,orderCode);
 		    }catch (Exception e){
 			 LOGGER.error("新增订单明细数据异常：{}", e);
 	        }
@@ -1494,7 +1618,7 @@ public class OrderServiceImpl implements OrderService{
 			if(detailCouponRequest.getDistributorCodeList() !=null && detailCouponRequest.getDistributorCodeList().size()>0) {
 				for(String distributorCode : detailCouponRequest.getDistributorCodeList()) {
 					DistributorMonthResponse info = new DistributorMonthResponse();
-					monthtotalPrice = orderDao.selectDistributorMonth(distributorCode,detailCouponRequest.getBeginTime(),detailCouponRequest.getEndTime());
+					monthtotalPrice = orderDao.selectDistributorMonth(distributorCode,DateUtil.getDayBegin(detailCouponRequest.getBeginTime()),DateUtil.getDayEnd(detailCouponRequest.getEndTime()));
 					info.setDistributorCode(distributorCode);
 					if(monthtotalPrice ==null) {
 						info.setPrice(0);
@@ -1634,7 +1758,7 @@ public class OrderServiceImpl implements OrderService{
 	public List<String> selectsukReturn() {
 		
 		try {
-			return orderDao.selectsukReturn();
+			return orderDao.selectsukReturn(DateUtil.getDayBegin(DateUtil.getCurrentDate()),DateUtil.getDayEnd(DateUtil.getCurrentDate()));
 		} catch (Exception e) {
 			LOGGER.error("查询未统计销量的已完成订单异常: {}",e);
 			return null;

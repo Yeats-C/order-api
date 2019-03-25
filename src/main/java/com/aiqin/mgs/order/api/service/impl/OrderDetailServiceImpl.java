@@ -105,9 +105,80 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		
 		
 		try {
-		List<OrderDetailInfo> orderDetailList =null;
-		
+			
+			//返回参数
+		    List<OrderDetailInfo> orderDetailList =new ArrayList();
+		    
+		    //根据参数查询所有的订单信息。
+		    List<OrderInfo> orderInfoList =new ArrayList();
+		    if(orderDetailQuery !=null) {
+		    	OrderQuery orderQuery = new OrderQuery();
+		    	if(orderDetailQuery.getMemberidList() !=null && orderDetailQuery.getMemberidList().size()>0) {
+		    		orderQuery.setMemberidList(orderDetailQuery.getMemberidList());
+		    	}
+		    	if(orderDetailQuery.getMemberName() !=null && !orderDetailQuery.getMemberName().equals("")) {
+		    		orderQuery.setMemberName(orderDetailQuery.getMemberName());
+		    	}
+		    	if(orderDetailQuery.getMemberPhone() !=null && !orderDetailQuery.getMemberPhone().equals("")) {
+		    		orderQuery.setMemberPhone(orderDetailQuery.getMemberPhone());
+		    	}
+		    	if(orderDetailQuery.getOrderId() !=null && !orderDetailQuery.getOrderId().equals("")) {
+		    		orderQuery.setOrderId(orderDetailQuery.getOrderId());
+		    	}
+		    	if(orderDetailQuery.getOrderStatus() !=null) {
+		    		orderQuery.setOrderStatus(orderDetailQuery.getOrderStatus());
+		    	}
+		    	if(orderDetailQuery.getOriginTypeList() !=null && orderDetailQuery.getOriginTypeList().size()>0) {
+		    		orderQuery.setOriginTypeList(orderDetailQuery.getOriginTypeList());
+		    	}
+		    	if(orderDetailQuery.getDistributorId() !=null && !orderDetailQuery.getDistributorId().equals("")) {
+		    		orderQuery.setDistributorId(orderDetailQuery.getDistributorId());
+		    	}
+		    	if(orderDetailQuery.getOrderIdList() !=null && orderDetailQuery.getOrderIdList().size()>0) {
+		    		orderQuery.setOrderIdList(orderDetailQuery.getOrderIdList());
+		    	
+		    	}
+		    	
+		    	//取出所有的订单Id
+		    	orderInfoList = orderDao.selectOrder(orderQuery);
+		    	if(orderDetailQuery.getOrderIdList() !=null && orderDetailQuery.getOrderIdList().size()>0) {
+		    		if(orderInfoList !=null && orderInfoList.size()>0) {
+			    		List<String> orderIdList = new ArrayList();
+			    		for(int i=0;i<orderInfoList.size();i++) {
+			    			OrderInfo info = new OrderInfo();
+			    			info = orderInfoList.get(i);
+			    			orderIdList.add(info.getOrderId());
+			    		}
+			    		orderDetailQuery.setOrderIdList(orderIdList);	
+			    	}
+		    	}
+		    }
+		    
+		    //通过订单查询订单明细
 			orderDetailList = orderDetailDao.selectorderDetail(orderDetailQuery);
+			
+			//订单明细要带出订单的信息
+			if(orderInfoList !=null && orderInfoList.size()>0) {
+				if(orderDetailList !=null && orderDetailList.size()>0) {
+					for(int i=0;i<orderDetailList.size();i++) {
+						OrderDetailInfo detailInfo = new OrderDetailInfo(); 
+						detailInfo = orderDetailList.get(i);
+						for(OrderInfo orderInfo : orderInfoList) {
+							if(detailInfo.getOrderId().equals(orderInfo.getOrderId())) {
+								detailInfo.setMemberId(orderInfo.getMemberId());
+								detailInfo.setMemberName(orderInfo.getMemberName());
+								detailInfo.setMemberPhone(orderInfo.getMemberPhone());
+								if(orderInfo.getOriginType() !=null ) {
+									detailInfo.setOriginType(String.valueOf(orderInfo.getOriginType()));
+								}
+								if(orderInfo.getReceiveType() !=null ) {
+									detailInfo.setReceiveType(String.valueOf(orderInfo.getReceiveType()));
+								}
+							}
+						}
+					}
+				}
+			}
 			
 			//计算总数据量
 			Integer totalCount = 0;
@@ -148,15 +219,15 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		try {
 			
 			List<Integer> originTypeList = null;
-			String yearMonth = year+"-"+month; //"YYYY-MM"
+			String yearMonth = year+"-"+month+"-"+"01"; //"YYYY-MM"
 			
 			//月销售额
 			Integer actualPrice = null;
-			actualPrice = orderDao.selectByMonthAllAmt(distributorId,originTypeList,yearMonth);
+			actualPrice = orderDao.selectByMonthAllAmt(distributorId,originTypeList,DateUtil.getFristOfMonthDay(DateUtil.formatDate(yearMonth)),DateUtil.getLashOfMonthDay(DateUtil.formatDate(yearMonth)));
 			
 			//月销量
 			Integer amount = null;
-			amount = orderDao.selectByMonthAcount(distributorId,originTypeList,yearMonth);
+			amount = orderDao.selectByMonthAcount(distributorId,originTypeList,DateUtil.getFristOfMonthDay(DateUtil.formatDate(yearMonth)),DateUtil.getLashOfMonthDay(DateUtil.formatDate(yearMonth)));
 			
 			OrderDetailInfo info = new OrderDetailInfo();
 			info.setActualPrice(actualPrice !=null ? actualPrice :0);
@@ -349,7 +420,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 	@Override
 //	@Transactional(propagation = Propagation.REQUIRED, readOnly = false)
 	@Transactional
-	public List<OrderDetailInfo> addDetailList(@Valid List<OrderDetailInfo> detailList, @Valid String orderId) throws Exception {
+	public List<OrderDetailInfo> addDetailList(@Valid List<OrderDetailInfo> detailList, @Valid String orderId,@Valid String orderCode) throws Exception {
 		
 		List<OrderDetailInfo> list = new ArrayList();
 		if(detailList !=null && detailList.size()>0) {
@@ -357,6 +428,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 				
 				//订单ID、订单明细ID
 				info.setOrderId(orderId);
+				info.setOrderCode(orderCode);
 				info.setOrderDetailId(OrderPublic.getUUID());
 				//保存
 				orderDetailDao.addDetailList(info);
@@ -369,22 +441,22 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 	}
 
 
-	//查询会员下的所有订单ID下的商品集合...
-	@Override
-	public HttpResponse selectproductbyorders(@Valid List<String> orderidslList, @Valid String memberId) {
-				
-		        List<OrderProductsResponse> product_list=null;
-				try {
-					if(orderidslList !=null && orderidslList.size()>0) {
-					//保存
-				    product_list = orderDetailDao.selectproductbyorders(orderidslList,memberId);
-					}
-					return HttpResponse.success(product_list);
-				} catch (Exception e) {
-					LOGGER.error("查询会员下的所有订单ID下的商品集合失败",e);
-					return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
-				}
-	}
+//	//查询会员下的所有订单ID下的商品集合...
+//	@Override
+//	public HttpResponse selectproductbyorders(@Valid List<String> orderidslList, @Valid String memberId) {
+//				
+//		        List<OrderProductsResponse> product_list=null;
+//				try {
+//					if(orderidslList !=null && orderidslList.size()>0) {
+//					//保存
+//				    product_list = orderDetailDao.selectproductbyorders(orderidslList,memberId);
+//					}
+//					return HttpResponse.success(product_list);
+//				} catch (Exception e) {
+//					LOGGER.error("查询会员下的所有订单ID下的商品集合失败",e);
+//					return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+//				}
+//	}
 
 
 

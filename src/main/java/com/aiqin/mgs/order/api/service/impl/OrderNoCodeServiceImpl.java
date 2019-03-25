@@ -156,8 +156,8 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 		}
 		
 		//当月客流量
-		beginDate = DateUtil.getDayBegin(DateUtil.getMonth(0));
-		endDate = DateUtil.getDayEnd(DateUtil.NextDate(0));
+		beginDate = DateUtil.getDayBegin(DateUtil.getFirstMonth(0));
+		endDate = DateUtil.getDayEnd(DateUtil.getLastMonth(1));
 		passengerFlow = orderNoCodeDao.getPassengerFlow(distributorId,beginDate,endDate);
 		
 		
@@ -358,7 +358,7 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 			//有码商品的销售金额
 			Integer codeOrderPrice = null;  
 			try {
-				codeOrderPrice = orderDao.selectDistributorMonth(distributorId,DateUtil.formatDate(beginDate),DateUtil.formatDate(endDate));
+				codeOrderPrice = orderDao.selectDistributorMonth(distributorId,DateUtil.getDayBegin(beginDate),DateUtil.getDayEnd(endDate));
 				
 				if(codeOrderPrice !=null && codeOrderPrice != 0) {
 					SelectSaleViewResonse info = new SelectSaleViewResonse();

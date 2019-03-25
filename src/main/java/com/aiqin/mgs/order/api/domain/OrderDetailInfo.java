@@ -26,6 +26,10 @@ public class OrderDetailInfo extends PagesRequest {
 	@JsonProperty("order_id")
 	private String orderId ;
 	
+	@ApiModelProperty(value="订单编码")
+	@JsonProperty("order_code")
+	private String orderCode ;
+	
 	
 	@ApiModelProperty(value="订单明细id")
 	@JsonProperty("order_detail_id")
@@ -199,6 +203,16 @@ public class OrderDetailInfo extends PagesRequest {
     
     
     
+	public String getOrderCode() {
+		return orderCode;
+	}
+
+
+	public void setOrderCode(String orderCode) {
+		this.orderCode = orderCode;
+	}
+
+
 	public String getRowno() {
 		return rowno;
 	}

@@ -34,6 +34,10 @@ public class OrderDetailQuery extends PagesRequest {
 	@JsonProperty("order_id")
 	private String orderId ;
 	
+	@ApiModelProperty(value="查询条件:订单状态集合")
+	@JsonProperty("order_id_list")
+	private List<String> orderIdList;
+	
 	@ApiModelProperty(value="会员名称")
 	@JsonProperty("member_name")
 	private String memberName ;
@@ -100,6 +104,14 @@ public class OrderDetailQuery extends PagesRequest {
 
 	public Integer getOrderType() {
 		return orderType;
+	}
+
+	public List<String> getOrderIdList() {
+		return orderIdList;
+	}
+
+	public void setOrderIdList(List<String> orderIdList) {
+		this.orderIdList = orderIdList;
 	}
 
 	public void setOrderType(Integer orderType) {

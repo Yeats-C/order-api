@@ -15,6 +15,7 @@ import javax.validation.Valid;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.request.DevelRequest;
 import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
+import com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
@@ -35,6 +36,9 @@ public interface OrderDao {
     //唯一订单查询
     OrderInfo selecOrderById(OrderDetailQuery orderDetailQuery) throws Exception;
     
+//    //订单ID查询
+//    OrderInfo selecOrderId(OrderQuery OrderQuery) throws Exception;
+    
     //添加新的订单主数据
     public void addOrderInfo(@Valid OrderInfo orderInfo) throws Exception;
 
@@ -42,22 +46,22 @@ public interface OrderDao {
 	Integer selectOrderAmt(@Param("distributorId")String distributorId,@Param("originTypeList")List<Integer> originTypeList)throws Exception;
 
 	//接口-分销机构+当月维度-当月销售额
-	Integer selectByMonthAllAmt(@Param("distributorId")String distributorId, @Param("originTypeList")List<Integer> originTypeList,@Param("yearMonth")String yearMonth)throws Exception;
+	Integer selectByMonthAllAmt(@Param("distributorId")String distributorId, @Param("originTypeList")List<Integer> originTypeList,@Param("dayBegin")Date dayBegin,@Param("dayEnd")Date dayEnd)throws Exception;
 
     //接口-分销机构+当月维度-当月实收
-	Integer selectbByMonthRetailAmt(@Param("distributorId")String distributorId, @Param("originTypeList")List<Integer> originTypeList,@Param("yearMonth")String yearMonth)throws Exception;
+	Integer selectbByMonthRetailAmt(@Param("distributorId")String distributorId, @Param("originTypeList")List<Integer> originTypeList,@Param("dayBegin")Date dayBegin,@Param("dayEnd")Date dayEnd)throws Exception;
 
     //接口-分销机构+当月维度-当月支付订单数
-	Integer selectByMonthAcount(@Param("distributorId")String distributorId, @Param("originTypeList")List<Integer> originTypeList,@Param("yearMonth")String yearMonth)throws Exception;
+	Integer selectByMonthAcount(@Param("distributorId")String distributorId, @Param("originTypeList")List<Integer> originTypeList,@Param("dayBegin")Date dayBegin,@Param("dayEnd")Date dayEnd)throws Exception;
 
 	//接口-分销机构+日维度-日销售额
-	Integer selectByYesdayAllAmt(@Param("distributorId")String distributorId,@Param("originTypeList")List<Integer> originTypeList,@Param("yesterday")String yesterday)throws Exception;
+	Integer selectByYesdayAllAmt(@Param("distributorId")String distributorId,@Param("originTypeList")List<Integer> originTypeList,@Param("dayBegin")Date dayBegin,@Param("dayEnd")Date dayEnd)throws Exception;
 
     //接口-分销机构+日维度-日实收
-	Integer selectbByYesdayRetailAmt(@Param("distributorId")String distributorId, @Param("originTypeList")List<Integer> originTypeList,@Param("yesterday")String yesterday)throws Exception;
+	Integer selectbByYesdayRetailAmt(@Param("distributorId")String distributorId, @Param("originTypeList")List<Integer> originTypeList,@Param("dayBegin")Date dayBegin,@Param("dayEnd")Date dayEnd)throws Exception;
 
     //接口-分销机构+日维度-日支付订单数
-	Integer selectByYesdayAcount(@Param("distributorId")String distributorId, @Param("originTypeList")List<Integer> originTypeList,@Param("yesterday")String yesterday)throws Exception;
+	Integer selectByYesdayAcount(@Param("distributorId")String distributorId, @Param("originTypeList")List<Integer> originTypeList,@Param("dayBegin")Date dayBegin,@Param("dayEnd")Date dayEnd)throws Exception;
 
 	//接口-订单概览-分销机构、小于当前日期9天内的实付金额、订单数量
 	List<OrderResponse> selectOrderByNineDate(@Valid OrderQuery OrderQuery)throws Exception;
@@ -100,6 +104,8 @@ public interface OrderDao {
 
 	//接口-可退货的订单查询
 	List<OrderInfo> reorer(@Valid ReorerRequest reorerRequest)throws Exception;
+	
+	Integer reorerCount(@Valid ReorerRequest reorerRequest)throws Exception;
 
 	//接口-注销提货码
 	void reded(@Valid OrderQuery orderQuery)throws Exception;
@@ -143,7 +149,7 @@ public interface OrderDao {
 	Integer selectOrderCount(OrderQuery orderQuery)throws Exception;
 
 	//销售目标管理-分销机构-月销售额
-	Integer selectDistributorMonth(@Valid @Param("distributorCode")String distributorCode,@Valid @Param("beginTime")String beginTime,@Valid @Param("endTime")String endTime)throws Exception;
+	Integer selectDistributorMonth(@Valid @Param("distributorCode")String distributorCode,@Valid @Param("beginTime")Date beginTime,@Valid @Param("endTime")Date endTime)throws Exception;
 
 	//会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、日
 	Integer selectByMemberPayCountDay(SelectByMemberPayCountResponse info)throws Exception;
@@ -158,8 +164,10 @@ public interface OrderDao {
 	List<String> selectMemberByDistributor(@Valid MemberByDistributorRequest memberByDistributorRequest)throws Exception;
 
 	//查询未统计销量的已完成订单 
-	List<String> selectsukReturn()throws Exception;
+	List<String> selectsukReturn(@Valid @Param("beginTime")Date beginTime,@Valid @Param("endTime")Date endTime)throws Exception;
 
 	//修改统计销量状态
 	void updateSukReturn(@Param("orderId")String orderId)throws Exception;
+
+	Integer skuResponseCount(OrderQuery orderQuery)throws Exception;
 }

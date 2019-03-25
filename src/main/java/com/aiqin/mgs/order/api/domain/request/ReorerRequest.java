@@ -46,6 +46,30 @@ public class ReorerRequest extends PagesRequest{
 	@ApiModelProperty(value="开始时间String类型、格式:yyyy-MM-dd")
 	@JsonProperty("begin_time")
 	private String beginTime;
+	
+	@ApiModelProperty(value="结束时间String类型、格式:yyyy-MM-dd")
+	@JsonProperty("end_time")
+	private String endTime;
+
+
+	public String getEndTime() {
+		return endTime;
+	}
+
+
+	public void setEndTime(String endTime) {
+		this.endTime = endTime;
+	}
+
+
+	public String getBeginTime() {
+		return beginTime;
+	}
+
+
+	public void setBeginTime(String beginTime) {
+		this.beginTime = beginTime;
+	}
 
 
 	public String getOrderId() {

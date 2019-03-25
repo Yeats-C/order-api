@@ -319,64 +319,87 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 			OrderAfterSaleInfo orderAfterSaleInfo = new OrderAfterSaleInfo();
 			orderAfterSaleInfo = orderAfterDao.selectOrderAfterById(orderAfterSaleQuery);
 			
-			//组装退货明细数据
-			List<OrderAfterSaleDetailInfo> saleDetailInfoList = orderAfterDetailDao.selectDetailbyId(orderAfterSaleQuery);
-			if(saleDetailInfoList !=null && saleDetailInfoList.size()>0) {
-				orderAfterSaleInfo.setDetailList(saleDetailInfoList);
+			if(orderAfterSaleInfo !=null) {
+				//组装退货明细数据
+				List<OrderAfterSaleDetailInfo> saleDetailInfoList = new ArrayList();
+				saleDetailInfoList = orderAfterDetailDao.selectReturnDetailbyId(orderAfterSaleQuery);
+				
+				if(saleDetailInfoList !=null && saleDetailInfoList.size()>0) {
+					for(int j=0;j<saleDetailInfoList.size();j++) {
+						OrderAfterSaleDetailInfo info = new OrderAfterSaleDetailInfo();
+						info = saleDetailInfoList.get(j);
+						//将明细中的金额放入退货明细数据中
+						OrderDetailInfo orderDetailInfo = new OrderDetailInfo();
+						orderDetailInfo.setOrderDetailId(info.getOrderDetailId());
+						orderDetailInfo = orderDetailDao.setail(orderDetailInfo);
+						if(orderDetailInfo !=null ) {
+							info.setRetailPrice(orderDetailInfo.getRetailPrice());
+							info.setActualPrice(orderDetailInfo.getActualPrice());
+							info.setSpec(orderDetailInfo.getSpec());
+							info.setUnit(orderDetailInfo.getUnit());
+							info.setLogo(orderDetailInfo.getLogo());
+						}
+						saleDetailInfoList.set(j, info);
+					}
+					orderAfterSaleInfo.setDetailList(saleDetailInfoList);
+					
+				}
+				
+				orderJoinResponse.setOrderaftersaleinfo(orderAfterSaleInfo);	
 			}
-			orderJoinResponse.setOrderaftersaleinfo(orderAfterSaleInfo);
 			
-			//组装订单数据
-			String orderId ="";
-			if(orderAfterSaleInfo !=null && orderAfterSaleInfo.getOrderId() !=null && !orderAfterSaleInfo.getOrderId().equals("")) {
+			if(orderAfterSaleInfo !=null) {
+				
+				//组装订单数据
+				String orderId ="";
+				OrderInfo orderInfo = new OrderInfo();
 				orderId = orderAfterSaleInfo.getOrderId();
-			}
-			orderDetailQuery.setOrderId(orderId);
-			OrderInfo orderInfo = orderDao.selecOrderById(orderDetailQuery);
+				orderDetailQuery.setOrderId(orderId);
+				orderInfo = orderDao.selecOrderById(orderDetailQuery);
 			
-			//组装订单中的商品数量
-			Integer skuSum = 0;
-			if(orderInfo !=null ) {
-				if(orderInfo.getOrderId() !=null && !orderInfo.getOrderId().equals("")) {
-					skuSum = orderDetailService.getSkuSum(orderInfo.getOrderId());
+				//组装订单中的商品数量
+				Integer skuSum = 0;
+				if(orderInfo !=null ) {
+					if(orderInfo.getOrderId() !=null && !orderInfo.getOrderId().equals("")) {
+						skuSum = orderDetailService.getSkuSum(orderInfo.getOrderId());
+					}
+					if(skuSum !=null) {
+						orderInfo.setSkuSum(skuSum);
+					}
 				}
-				if(skuSum !=null) {
-					orderInfo.setSkuSum(skuSum);
-				}
-			}
-			
-			//组装订单明细数据
-			List<OrderDetailInfo> orderDetailInfoList = orderDetailDao.selectDetailById(orderDetailQuery);
-			
-			//组装订单明细与优惠券的关系
-			if(orderId !=null && !orderId.equals("")) {
-				OrderRelationCouponInfo orderRelationCouponInfo = new OrderRelationCouponInfo();
-				orderRelationCouponInfo.setOrderId(orderId);
-				List<OrderRelationCouponInfo> couponInfolist = orderCouponDao.soupon(orderRelationCouponInfo);
-				if(couponInfolist !=null && couponInfolist.size()>0) {
-					for(OrderRelationCouponInfo couponInfo :couponInfolist) {
-						if(couponInfo.getOrderDetailId() !=null && !couponInfo.getOrderDetailId().equals("")) {
-							if(orderDetailInfoList !=null && orderDetailInfoList.size()>0) {
-								for(int i=0;i<orderDetailInfoList.size();i++) {
-									OrderDetailInfo orderDetailInfo = new OrderDetailInfo();
-									orderDetailInfo = orderDetailInfoList.get(i); 
-									if(couponInfo.getOrderDetailId().equals(orderDetailInfo.getOrderDetailId())) {
-										orderDetailInfo.setCouponInfo(couponInfo);
-										orderDetailInfoList.set(i, orderDetailInfo);
+				
+				//组装订单明细数据
+				List<OrderDetailInfo> orderDetailInfoList = orderDetailDao.selectDetailById(orderDetailQuery);
+				
+				//组装订单明细与优惠券的关系
+				if(orderId !=null && !orderId.equals("")) {
+					OrderRelationCouponInfo orderRelationCouponInfo = new OrderRelationCouponInfo();
+					orderRelationCouponInfo.setOrderId(orderId);
+					List<OrderRelationCouponInfo> couponInfolist = orderCouponDao.soupon(orderRelationCouponInfo);
+					if(couponInfolist !=null && couponInfolist.size()>0) {
+						for(OrderRelationCouponInfo couponInfo :couponInfolist) {
+							if(couponInfo.getOrderDetailId() !=null && !couponInfo.getOrderDetailId().equals("")) {
+								if(orderDetailInfoList !=null && orderDetailInfoList.size()>0) {
+									for(int i=0;i<orderDetailInfoList.size();i++) {
+										OrderDetailInfo orderDetailInfo = new OrderDetailInfo();
+										orderDetailInfo = orderDetailInfoList.get(i); 
+										if(couponInfo.getOrderDetailId().equals(orderDetailInfo.getOrderDetailId())) {
+											orderDetailInfo.setCouponInfo(couponInfo);
+											orderDetailInfoList.set(i, orderDetailInfo);
+										}
 									}
 								}
 							}
-						}
-					}	
+						}	
+					}
+				}
+				if(orderDetailInfoList !=null && orderDetailInfoList.size()>0) {
+					orderInfo.setOrderdetailList(orderDetailInfoList);
+				}
+				if(orderInfo !=null) {
+					orderJoinResponse.setOrderInfo(orderInfo);
 				}
 			}
-			if(orderDetailInfoList !=null && orderDetailInfoList.size()>0) {
-				orderInfo.setOrderdetailList(orderDetailInfoList);
-			}
-			if(orderInfo !=null) {
-				orderJoinResponse.setOrderInfo(orderInfo);
-			}
-
 			return HttpResponse.success(orderJoinResponse);
 			
 		} catch (Exception e) {
@@ -506,7 +529,27 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 					orderAfterSaleQuery1.setAfterSaleId(orderAfterSaleInfo.getAfterSaleId());
 					
 					//组装退货明细数据
-					List<OrderAfterSaleDetailInfo> saleDetailInfoList = orderAfterDetailDao.selectDetailbyId(orderAfterSaleQuery1);
+					List<OrderAfterSaleDetailInfo> saleDetailInfoList = orderAfterDetailDao.selectReturnDetailbyId(orderAfterSaleQuery1);
+					
+					if(saleDetailInfoList !=null && saleDetailInfoList.size()>0) {
+						for(int j=0;j<saleDetailInfoList.size();j++) {
+							OrderAfterSaleDetailInfo info = new OrderAfterSaleDetailInfo();
+							info = saleDetailInfoList.get(j);
+							//将明细中的金额放入退货明细数据中
+							OrderDetailInfo orderDetailInfo = new OrderDetailInfo();
+							orderDetailInfo.setOrderDetailId(info.getOrderDetailId());
+							orderDetailInfo = orderDetailDao.setail(orderDetailInfo);
+							if(orderDetailInfo !=null ) {
+								info.setRetailPrice(orderDetailInfo.getRetailPrice());
+								info.setActualPrice(orderDetailInfo.getActualPrice());
+								info.setSpec(orderDetailInfo.getSpec());
+								info.setUnit(orderDetailInfo.getUnit());
+								info.setLogo(orderDetailInfo.getLogo());
+							}
+							saleDetailInfoList.set(j, info);
+						}
+							orderAfterSaleInfo.setDetailList(saleDetailInfoList);
+					}
 					
 //					//组装列表图放入退货明细
 //					if(saleDetailInfoList !=null && saleDetailInfoList.size()>0) {
@@ -522,9 +565,6 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 //							saleDetailInfoList.set(i, orderAfterSaleDetailInfo);
 //						}
 //					}
-					if(saleDetailInfoList !=null && saleDetailInfoList.size()>0) {
-						orderAfterSaleInfo.setDetailList(saleDetailInfoList);
-					}
 				}	
 			}
 			

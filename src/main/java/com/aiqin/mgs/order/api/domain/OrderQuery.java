@@ -34,6 +34,10 @@ public class OrderQuery extends PagesRequest {
     @JsonProperty("member_id")
     private String memberId="";
     
+    @ApiModelProperty(value="会员IDlist")
+	@JsonProperty("memberid_list")
+	private List<String>  memberidList;
+    
     @ApiModelProperty(value = "会员名称")
     @JsonProperty("member_name")
     private String memberName="";
@@ -144,6 +148,32 @@ public class OrderQuery extends PagesRequest {
 	@JsonProperty("order_id_list")
 	private List<String> orderIdList;
 	
+	@ApiModelProperty(value="控制SQL:订单状态集合排除")
+	@JsonProperty("no_exist_order_code_list")
+	private List<String> noExistOrderCodeList;
+	
+	
+
+
+	public List<String> getNoExistOrderCodeList() {
+		return noExistOrderCodeList;
+	}
+
+
+	public void setNoExistOrderCodeList(List<String> noExistOrderCodeList) {
+		this.noExistOrderCodeList = noExistOrderCodeList;
+	}
+
+
+	public List<String> getMemberidList() {
+		return memberidList;
+	}
+
+
+	public void setMemberidList(List<String> memberidList) {
+		this.memberidList = memberidList;
+	}
+
 
 	public List<String> getOrderIdList() {
 		return orderIdList;

@@ -9,7 +9,11 @@ package com.aiqin.mgs.order.api.dao;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import com.aiqin.mgs.order.api.domain.*;
+import com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest;
+import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 
 import io.lettuce.core.dynamic.annotation.Param;
 
@@ -19,8 +23,13 @@ public interface OrderAfterDetailDao {
     List<OrderAfterSaleDetailInfo> selectOrderAfterDetail(OrderAfterSaleQuery orderAfterSaleQuery) throws Exception;
     
     //通过ID查询退货明细数据-不带分页
-    List<OrderAfterSaleDetailInfo> selectDetailbyId(OrderAfterSaleQuery orderAfterSaleQuery) throws Exception;
+    List<OrderAfterSaleDetailInfo> selectReturnDetailbyId(OrderAfterSaleQuery orderAfterSaleQuery) throws Exception;
 
     void addAfterOrderDetail(OrderAfterSaleDetailInfo info) throws Exception;
+
+    //查询退货数量
+	List<OrderIdAndAmountRequest> returnAmount(@Valid ReorerRequest reorerRequest)throws Exception;
+    
+    
 
 }

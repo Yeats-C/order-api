@@ -14,6 +14,8 @@ import javax.validation.Valid;
 import org.apache.ibatis.annotations.Param;
 
 import com.aiqin.mgs.order.api.domain.*;
+import com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest;
+import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderDetailByMemberResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderProductsResponse;
 import com.aiqin.mgs.order.api.domain.response.ProdisorResponse;
@@ -45,8 +47,8 @@ public interface OrderDetailDao {
 	//插入订单明细表
 	void addDetailList(@Valid OrderDetailInfo orderDetailInfo) throws Exception;
 
-	//查询会员下的所有订单ID下的商品集合...
-	List<OrderProductsResponse> selectproductbyorders(@Valid List<String> orderidslList, @Param("memberId")String memberId)throws Exception;
+//	//查询会员下的所有订单ID下的商品集合...
+//	List<OrderProductsResponse> selectproductbyorders(@Valid List<String> orderidslList, @Param("memberId")String memberId)throws Exception;
 
 	//修改订单明细退货数据
 	void returnStatus(@Valid OrderDetailInfo info)throws Exception;
@@ -70,5 +72,8 @@ public interface OrderDetailDao {
 	Integer getSkuPrice(@Param("skuCode")String skuCode,@Param("nextDate")String nextDate) throws Exception;
 
 	List<SkuSaleResponse> selectSkuSale(@Valid List<String> orderList)throws Exception;
+
+	//查询购买数量
+	List<OrderIdAndAmountRequest> buyAmount(@Valid ReorerRequest reorerRequest)throws Exception;
 
 }
