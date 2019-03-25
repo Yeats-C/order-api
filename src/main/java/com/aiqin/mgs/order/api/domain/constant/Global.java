@@ -60,14 +60,14 @@ public interface Global {
     Integer ORDER_STATUS_6 = 6;  //已提货
     
     
-    /**
-     * 退货状态
-     */
-    Integer RETURN_STATUS_0 = 0;  //审批中
-    Integer RETURN_STATUS_1 = 1;  //处理中
-    Integer RETURN_STATUS_2 = 2;  //退款中
-    Integer RETURN_STATUS_3 = 3;  //已完成
-    Integer RETURN_STATUS_4 = 4;  //未操作
+//    /**
+//     * 退货状态
+//     */
+//    Integer RETURN_STATUS_0 = 0;  //审批中
+//    Integer RETURN_STATUS_1 = 1;  //处理中
+//    Integer RETURN_STATUS_2 = 2;  //退款中
+//    Integer RETURN_STATUS_3 = 3;  //已完成
+//    Integer RETURN_STATUS_4 = 4;  //未操作
     
     
     /**

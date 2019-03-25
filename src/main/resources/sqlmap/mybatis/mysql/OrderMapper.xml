@@ -818,13 +818,12 @@
     </select>
     
     <!-- 接口-收银员交班收银情况统计   获取退款金额、退款订单数、销售额、销售订单数-->
-    <select id="byCashierSum" resultMap="ReceiptSumMapping">
-         SELECT * FROM ( 
+    <select id="returnByCashierSum" resultMap="ReceiptSumMapping">
          SELECT 
                IFNULL(IFNULL(b.actual_price,0)*IFNULL(b.return_amount,0),0) AS return_price,COUNT(a.order_id) AS return_order_amount  
            FROM 
-               order_info a
-         LEFT JOIN order_detail b ON a.order_id = b.order_id
+               order_detail b
+         LEFT JOIN order_info a ON a.order_id = b.order_id
          LEFT JOIN order_pay c ON a.order_id = c.order_id
           WHERE 1=1 and order_type = 1
            AND a.cashier_id =#{cashierId}
@@ -836,12 +835,14 @@
            <if test="endTime!=null ">
            AND b.update_time &lt;= #{endTime}
            </if>
-           )a,
-         (SELECT 
+    </select>
+    
+    <!-- 接口-收银员交班收银情况统计 销售额、销售订单数-->
+    <select id="buyByCashierSum" resultMap="ReceiptSumMapping">
+         SELECT 
                SUM(IFNULL(a.actual_price,0)) AS sales_amount, COUNT(a.order_id) AS sales_order_amount
            FROM 
                order_info a
-         LEFT JOIN order_detail b ON a.order_id = b.order_id
          LEFT JOIN order_pay c ON a.order_id = c.order_id
           WHERE 1=1 and order_type = 1
            AND a.cashier_id =#{cashierId}
@@ -853,7 +854,6 @@
            <if test="endTime!=null ">
            and a.create_time &lt;= #{endTime}
            </if>
-           ) b
     </select>
     
     

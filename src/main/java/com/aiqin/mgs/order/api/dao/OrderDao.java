@@ -93,8 +93,11 @@ public interface OrderDao {
 	//接口-收银员交班收银情况统计   获取收银员、支付类型金额
 	List<OrderbyReceiptSumResponse> cashier(OrderQuery orderQuery)throws Exception;
 
-	//接口-收银员交班收银情况统计  获取退款金额、退款订单数、销售额、销售订单数
-	OrderbyReceiptSumResponse byCashierSum(OrderQuery orderQuery)throws Exception;
+	//接口-收银员交班收银情况统计  获取退款金额、退款订单数
+	OrderbyReceiptSumResponse returnByCashierSum(OrderQuery orderQuery)throws Exception;
+	
+	//接口-收银员交班收银情况统计  获取销售额、销售订单数
+	OrderbyReceiptSumResponse buyByCashierSum(OrderQuery orderQuery)throws Exception;
 
 	//接口-通过会员查询最后一次的消费记录.
 	List<LastBuyResponse> last(@Valid OrderInfo orderInfo)throws Exception;

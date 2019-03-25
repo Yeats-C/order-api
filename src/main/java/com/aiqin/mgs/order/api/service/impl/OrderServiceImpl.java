@@ -736,10 +736,6 @@ public class OrderServiceImpl implements OrderService{
 		//获取收银员、支付类型金额
 		List<OrderbyReceiptSumResponse> list= orderDao.cashier(OrderPublic.getOrderQuery(orderQuery));
 		
-		
-		//获取退款金额、退款订单数、销售额、销售订单数
-		OrderbyReceiptSumResponse receiptSum= new OrderbyReceiptSumResponse();
-		receiptSum= orderDao.byCashierSum(OrderPublic.getOrderQuery(orderQuery));
 		if(list !=null && list.size()>0) {
 			for(int i=0;i<list.size();i++) {
 				OrderbyReceiptSumResponse info = new OrderbyReceiptSumResponse();
@@ -764,11 +760,18 @@ public class OrderServiceImpl implements OrderService{
 			}
 		}
 		
+		//获取销售额、销售订单数
+		OrderbyReceiptSumResponse buyReceiptSum= new OrderbyReceiptSumResponse();
+		buyReceiptSum= orderDao.buyByCashierSum(OrderPublic.getOrderQuery(orderQuery));
+				
+		//获取退款金额、退款订单数、
+		OrderbyReceiptSumResponse returnReceiptSum= new OrderbyReceiptSumResponse();
+		returnReceiptSum= orderDao.returnByCashierSum(OrderPublic.getOrderQuery(orderQuery));
 		
-		receiptSumInfo.setReturnOrderAmount(receiptSum.getReturnOrderAmount());
-		receiptSumInfo.setReturnPrice(receiptSum.getReturnPrice());
-		receiptSumInfo.setSalesAmount(receiptSum.getSalesAmount());
-		receiptSumInfo.setSalesOrderAmount(receiptSum.getSalesOrderAmount());
+		receiptSumInfo.setSalesAmount(buyReceiptSum.getSalesAmount()!=null?buyReceiptSum.getSalesAmount():0);
+		receiptSumInfo.setSalesOrderAmount(buyReceiptSum.getSalesOrderAmount()!=null?buyReceiptSum.getSalesOrderAmount():0);
+		receiptSumInfo.setReturnOrderAmount(returnReceiptSum.getReturnOrderAmount()!=null?returnReceiptSum.getReturnOrderAmount():0);
+		receiptSumInfo.setReturnPrice(returnReceiptSum.getReturnPrice()!=null?returnReceiptSum.getReturnPrice():0);
 		
 		return HttpResponse.success(receiptSumInfo);
 		} catch (Exception e) {
