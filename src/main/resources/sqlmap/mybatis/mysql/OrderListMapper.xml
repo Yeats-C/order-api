@@ -150,7 +150,7 @@
     </select>
     <select id="searchOrderListCount" resultType="java.lang.Integer">
         select
-        count(1)
+        count(*)
         from order_list
         where 1=1
         <if test="storeCode !=null">
@@ -235,7 +235,7 @@
     </select>
     <select id="searchOrderReceptionListCount" resultType="java.lang.Integer">
         select
-        count(1)
+        count(*)
         from order_list
         where 1=1
         and store_id=#{storeId}
@@ -345,7 +345,7 @@ from order_list
     <select id="searchOrderReceptionListFatherCount" resultType="java.lang.Integer">
         SELECT IFNULL(
         (
-        SELECT count(1) FROM (
+        SELECT count(*) FROM (
         select
         original
         from order_list
@@ -410,7 +410,7 @@ from order_list
     </select>
     <select id="searchOrderListFatherCount" resultType="java.lang.Integer">
         SELECT IFNULL((
-        SELECT count(1) FROM (
+        SELECT count(*) FROM (
         select
         original
 
@@ -654,6 +654,15 @@ from order_list
             <if test="applyCoupons != null">
                 apply_coupons,
             </if>
+            <if test="orderListActivityCode != null">
+                order_list_activity_code,
+            </if>
+            <if test="orderListActivityName != null">
+                order_list_activity_name,
+            </if>
+            <if test="orderListActivityType != null">
+                order_list_activity_type,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -817,6 +826,15 @@ from order_list
             </if>
             <if test="applyCoupons != null">
                 #{applyCoupons,jdbcType=BIT},
+            </if>
+            <if test="orderListActivityCode != null">
+                #{orderListActivityCode,jdbcType=VARCHAR},
+            </if>
+            <if test="orderListActivityName != null">
+                #{orderListActivityName,jdbcType=VARCHAR},
+            </if>
+            <if test="orderListActivityType != null">
+                #{orderListActivityType,jdbcType=TINYINT},
             </if>
         </trim>
     </insert>
@@ -1285,6 +1303,22 @@ from order_list
      set   payment_status=#{paymentStatus}
     where order_code=#{code}
   </update>
+    <update id="updateByCodePayment">
+         update order_list
+        <set>
+            order_status=2 ,payment_status=1 ,payment_time=now(),
+            <if test="paymentType != null"> payment_type=#{paymentType},</if>
+            <if test="paymentTypeCode != null"> payment_type_code=#{paymentTypeCode},</if>
+            <if test="accountBalance != null"> account_balance=#{accountBalance},</if>
+            <if test="lineCredit != null"> line_credit=#{lineCredit},</if>
+        </set>
+    where order_code=#{orderCode} or original=#{orderCode}
+    </update>
+    <update id="updateStatusByCodeReceiving">
+          update order_list
+    set order_status=#{status},arrival_time= now()
+    where order_code=#{code} or original=#{code}
+    </update>
 
     <select id="selectFirstOrderTime" parameterType="list"
             resultType="com.aiqin.mgs.order.api.domain.response.orderlistre.FirstOrderTimeRespVo">

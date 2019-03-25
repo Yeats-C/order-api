@@ -125,32 +125,33 @@ public class OrderListServiceImpl implements OrderListService {
         }
         //将订单状态改完支付,将订单发送给供应链
         if (status == 2) {
-            br = orderListDao.updateByCode(code, 2, 1);
-            if (br == true) {
-                //获取订单信息
-                List<SupplyOrderInfoReqVO> vo = orderListDao.searchOrderByCodeOrOriginal(code);
-                List<SupplyOrderProductItemReqVO> list2 = orderListProductDao.searchOrderListProductByCodeOrOriginal(code);
-                for (SupplyOrderInfoReqVO reqVO : vo) {
-                    reqVO.setOrderStatus(4);
-                    List<SupplyOrderProductItemReqVO> supplylist = new ArrayList<>();
-                    for (SupplyOrderProductItemReqVO itemReqVO : list2) {
-                        if (reqVO.getOrderCode().equals(itemReqVO.getOrderCode())) {
-                            supplylist.add(itemReqVO);
-                        }
-                    }
-                    reqVO.setOrderItems(supplylist);
-                }
-                SupplyOrderMainReqVO svo = new SupplyOrderMainReqVO();
-                svo.setSubOrderInfo(vo);
-//                JsonUtil.toJson(vo);
-                HttpClient httpPost = HttpClient.post("http://" + purchase_ip + "/purchase/order/add").json(svo);
-                HttpResponse<List<OrderStockReVo>> result =
-                        httpPost.action().result(new TypeReference<HttpResponse<Boolean>>() {
-                        });
-                if (result == null || !(StringUtils.equals(result.getCode(), "0"))) {
-                    throw new GroundRuntimeException("推送订单失败");
-                }
-            }
+            throw new IllegalArgumentException("请使用支付专用接口");
+//            br = orderListDao.updateByCode(code, 2, 1);
+//            if (br == true) {
+//                //获取订单信息
+//                List<SupplyOrderInfoReqVO> vo = orderListDao.searchOrderByCodeOrOriginal(code);
+//                List<SupplyOrderProductItemReqVO> list2 = orderListProductDao.searchOrderListProductByCodeOrOriginal(code);
+//                for (SupplyOrderInfoReqVO reqVO : vo) {
+//                    reqVO.setOrderStatus(4);
+//                    List<SupplyOrderProductItemReqVO> supplylist = new ArrayList<>();
+//                    for (SupplyOrderProductItemReqVO itemReqVO : list2) {
+//                        if (reqVO.getOrderCode().equals(itemReqVO.getOrderCode())) {
+//                            supplylist.add(itemReqVO);
+//                        }
+//                    }
+//                    reqVO.setOrderItems(supplylist);
+//                }
+//                SupplyOrderMainReqVO svo = new SupplyOrderMainReqVO();
+//                svo.setSubOrderInfo(vo);
+////                JsonUtil.toJson(vo);
+//                HttpClient httpPost = HttpClient.post("http://" + purchase_ip + "/purchase/order/add").json(svo);
+//                HttpResponse<List<OrderStockReVo>> result =
+//                        httpPost.action().result(new TypeReference<HttpResponse<Boolean>>() {
+//                        });
+//                if (result == null || !(StringUtils.equals(result.getCode(), "0"))) {
+//                    throw new GroundRuntimeException("推送订单失败");
+//                }
+//            }
         }
 
         return br;
@@ -219,20 +220,20 @@ public class OrderListServiceImpl implements OrderListService {
         return new PageResData<>(count, inventories);
     }
 
-    @Override
-    public Boolean updateOrderActualDeliver(List<ActualDeliverVo> actualDeliverVos) {
-        for (ActualDeliverVo vo : actualDeliverVos) {
-            orderListProductDao.updateByOrderProductId(vo);
-        }
-        return true;
-    }
+//    @Override
+//    public Boolean updateOrderActualDeliver(List<ActualDeliverVo> actualDeliverVos) {
+//        for (ActualDeliverVo vo : actualDeliverVos) {
+//            orderListProductDao.updateByOrderProductId(vo);
+//        }
+//        return true;
+//    }
 
     @Override
     public Boolean updateOrderStatusDeliver(DeliverVo deliverVo) {
         Boolean br = orderListDao.updateStatusByCode(deliverVo.getOrderCode(), 11);
         List<ActualDeliverVo> actualDeliverVos = deliverVo.getActualDeliverVos();
         for (ActualDeliverVo vo : actualDeliverVos) {
-            orderListProductDao.updateByOrderProductId(vo);
+            orderListProductDao.updateByOrderProductId(vo, deliverVo.getOrderCode());
         }
         OrderListDetailsVo orderListDetailsVo = orderListDao.searchOrderByCode(deliverVo.getOrderCode());
         OrderListLogistics param = new OrderListLogistics();
@@ -249,7 +250,8 @@ public class OrderListServiceImpl implements OrderListService {
 
     @Override
     public Boolean updateOrderStatusReceiving(String code, String name) {
-        Boolean br = orderListDao.updateStatusByCode(code, 12);
+//        Boolean br = orderListDao.updateStatusByCode(code, 12);
+        Boolean br = orderListDao.updateStatusByCodeReceiving(code, 12);
         List<OrderListLogistics> listLogistics = orderListLogisticsDao.searchOrderListLogisticsByCode(code);
         if (listLogistics == null) {
             throw new IllegalArgumentException("数据异常");
@@ -265,6 +267,44 @@ public class OrderListServiceImpl implements OrderListService {
         param.setImplementContent("签收完成");
         Boolean re = orderListLogisticsDao.insertLogistics(param);
         return re;
+    }
+
+    @Override
+    public Boolean updateOrderStatusPayment(OrderStatusPayment vop) {
+        if (vop.getOrderCode() == null || vop.getOrderCode().length() == 0) {
+            throw new IllegalArgumentException("参数不能为空");
+        }
+        Boolean br = false;
+        //将订单状态改完支付,将订单发送给供应链
+        br = orderListDao.updateByCodePayment(vop);
+        if (br == true) {
+            //获取订单信息
+            List<SupplyOrderInfoReqVO> vo = orderListDao.searchOrderByCodeOrOriginal(vop.getOrderCode());
+            List<SupplyOrderProductItemReqVO> list2 = orderListProductDao.searchOrderListProductByCodeOrOriginal(vop.getOrderCode());
+            for (SupplyOrderInfoReqVO reqVO : vo) {
+                reqVO.setOrderStatus(4);
+                List<SupplyOrderProductItemReqVO> supplylist = new ArrayList<>();
+                for (SupplyOrderProductItemReqVO itemReqVO : list2) {
+                    if (reqVO.getOrderCode().equals(itemReqVO.getOrderCode())) {
+                        supplylist.add(itemReqVO);
+                    }
+                }
+                reqVO.setOrderItems(supplylist);
+            }
+            SupplyOrderMainReqVO svo = new SupplyOrderMainReqVO();
+            svo.setSubOrderInfo(vo);
+//                JsonUtil.toJson(vo);
+            HttpClient httpPost = HttpClient.post("http://" + purchase_ip + "/purchase/order/add").json(svo);
+            HttpResponse<List<OrderStockReVo>> result =
+                    httpPost.action().result(new TypeReference<HttpResponse<Boolean>>() {
+                    });
+            if (result == null || !(StringUtils.equals(result.getCode(), "0"))) {
+                throw new GroundRuntimeException("推送订单失败");
+            }
+
+        }
+
+        return br;
     }
 
     @Override
@@ -409,7 +449,6 @@ public class OrderListServiceImpl implements OrderListService {
                 OrderListProduct productDTO = new OrderListProduct();
                 BeanUtils.copyProperties(product, productDTO);
                 productDTO.setId(IdUtil.uuid());
-                productDTO.setOrderProductId(IdUtil.uuid());
                 //重新计算价格
                 productDTO.setProductNumber(stockLock.getLockNum());
                 productDTO.setAmount(stockLock.getLockNum() * product.getOriginalProductPrice());
@@ -510,6 +549,11 @@ public class OrderListServiceImpl implements OrderListService {
     @Transactional
     @Override
     public Boolean saveOrder(OrderReqVo reqVo) {
+        //设置行号
+        for (int i = 0; i < reqVo.getProducts().size(); i++) {
+            OrderProductReqVo orderProductReqVo = reqVo.getProducts().get(i);
+            orderProductReqVo.setOrderProductId(String.valueOf(i + 1));
+        }
         Date now = new Date();
         OrderList order = new OrderList();
         String orderCode = reqVo.getOrderCode();

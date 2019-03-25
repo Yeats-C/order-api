@@ -162,4 +162,16 @@ public class OrderReqVo {
 
     @ApiModelProperty(value = "订单是否需要支付")
     private Boolean needPaid = true;
+
+    @ApiModelProperty(value = "订单参与活动编号")
+    @JsonProperty("order_list_activity_code")
+    private String orderListActivityCode;
+
+    @ApiModelProperty(value = "订单参与活动名称")
+    @JsonProperty("order_list_activity_name")
+    private String orderListActivityName;
+
+    @ApiModelProperty(value = "订单参与活动类型 (6-条件类型满减，7-条件类型满赠，8-条件类型折扣，9-条件类型特价)")
+    @JsonProperty("order_list_activity_type")
+    private Integer orderListActivityType;
 }

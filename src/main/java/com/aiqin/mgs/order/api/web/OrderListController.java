@@ -77,15 +77,15 @@ public class OrderListController {
      */
 //    @PostMapping("/list")
 //    @ApiOperation(value = "订单列表后台(过时)")
-    public HttpResponse<PageResData<OrderList>> list(@RequestBody OrderListVo param) {
-        log.info("Search  purchasingTarget list:{}", param);
-        try {
-            return HttpResponse.success(this.orderListService.searchOrderList(param));
-        } catch (Exception e) {
-            log.error("Get purchasingTarget list failed", e);
-            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
-        }
-    }
+//    public HttpResponse<PageResData<OrderList>> list(@RequestBody OrderListVo param) {
+//        log.info("Search  purchasingTarget list:{}", param);
+//        try {
+//            return HttpResponse.success(this.orderListService.searchOrderList(param));
+//        } catch (Exception e) {
+//            log.error("Get purchasingTarget list failed", e);
+//            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
+//        }
+//    }
 
 
     /**
@@ -96,15 +96,15 @@ public class OrderListController {
      */
 //    @PostMapping("/list/reception")
 //    @ApiOperation(value = "订单列表前台(过时)")
-    public HttpResponse<PageResData<OrderList>> listReception(@RequestBody OrderListVo2 param) {
-        log.info("Search  purchasingTarget list:{}", param);
-        try {
-            return HttpResponse.success(this.orderListService.searchOrderReceptionList(param));
-        } catch (Exception e) {
-            log.error("Get purchasingTarget list failed", e);
-            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
-        }
-    }
+//    public HttpResponse<PageResData<OrderList>> listReception(@RequestBody OrderListVo2 param) {
+//        log.info("Search  purchasingTarget list:{}", param);
+//        try {
+//            return HttpResponse.success(this.orderListService.searchOrderReceptionList(param));
+//        } catch (Exception e) {
+//            log.error("Get purchasingTarget list failed", e);
+//            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
+//        }
+//    }
 
     /**
      * 订单列表后台
@@ -214,6 +214,21 @@ public class OrderListController {
     /**
      * 修改订单状态
      */
+    @PostMapping("update/order/status/payment")
+    @ApiOperation("修改订单状态支付专用接口")
+    public HttpResponse<Boolean> updateOrderStatusPayment(@RequestBody OrderStatusPayment vo ) {
+        log.info("Search  purchasingTarget list:{}", vo);
+        try {
+            return HttpResponse.success(this.orderListService.updateOrderStatusPayment(vo));
+        } catch (Exception e) {
+            log.error("Get purchasingTarget list failed", e);
+            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
+        }
+    }
+
+    /**
+     * 修改订单状态
+     */
     @PostMapping("update/order/status/deliver")
     @ApiOperation("修改订单为发货状态")
     public HttpResponse<Boolean> updateOrderStatusDeliver(@RequestBody DeliverVo vo) {
@@ -244,15 +259,15 @@ public class OrderListController {
      */
 //    @PostMapping("update/order/actual/deliver")
 //    @ApiOperation("添加商品实发数量")
-    public HttpResponse<Boolean> updateOrderActualDeliver(@RequestBody List<ActualDeliverVo> actualDeliverVos) {
-
-        try {
-            return HttpResponse.success(this.orderListService.updateOrderActualDeliver(actualDeliverVos));
-        } catch (Exception e) {
-            log.error("Get purchasingTarget list failed", e);
-            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
-        }
-    }
+//    public HttpResponse<Boolean> updateOrderActualDeliver(@RequestBody List<ActualDeliverVo> actualDeliverVos) {
+//
+//        try {
+//            return HttpResponse.success(this.orderListService.updateOrderActualDeliver(actualDeliverVos));
+//        } catch (Exception e) {
+//            log.error("Get purchasingTarget list failed", e);
+//            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
+//        }
+//    }
 
 
     /**

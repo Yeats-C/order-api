@@ -38,6 +38,10 @@ public class OrderProductReqVo implements Serializable {
     @JsonProperty("activity_code")
     private String activityCode;
 
+    @ApiModelProperty(value = "订单参与活动类型 (6-条件类型满减，7-条件类型满赠，8-条件类型折扣，9-条件类型特价)")
+    @JsonProperty("activity_type")
+    private Integer activityType;
+
     @ApiModelProperty(value = "参与活动名称")
     @JsonProperty("activity_name")
     private String activityName;
