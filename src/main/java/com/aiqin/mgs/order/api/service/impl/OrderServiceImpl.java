@@ -1288,43 +1288,30 @@ public class OrderServiceImpl implements OrderService{
 		if(orderInfo !=null ) {
 			orderCode = orderInfo.getOrderCode();
 //			orderId = orderInfo.getOrderId();
-			//通过订单编码查询订单ID
-			try {
+		 try {
+			
+			//获取数据库已存在的订单编号
+			 
+			//查询订单ID参数
+			OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
+			orderDetailQuery.setOrderCode(orderCode);
+			OrderInfo detailQueryInfo = new OrderInfo();
+				
 		    //判断订单类型
 			if(orderInfo.getOrderType().equals(Global.ORDER_TYPE_3)) {
-				orderId = orderDao.getNoCodeOrderIdByCode(orderCode);
-			}else {
-				orderId = orderDao.getOrderIdByCode(orderCode);
+				orderDetailQuery.setOrderType(Global.ORDER_TYPE_3);
 			}
 			
-			}catch (Exception e){
+			detailQueryInfo  = orderDao.selecOrderById(orderDetailQuery);
+			if(detailQueryInfo !=null) {
+				orderId = detailQueryInfo.getOrderId();
+			}
+			
+		   }catch (Exception e){
 				 LOGGER.error("orderDao.getOrderIdByCode(orderCode)：{}", e);
 		    }
 			orderInfo.setOrderId(orderId);
 			if(orderId !=null && !orderId.equals("")) {
-			
-//			//生成订单号
-//		    String logo = "";
-//			if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_0) {
-//				logo = Global.ORIGIN_COME_3;
-//			}
-//			if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_1) {
-//				logo = Global.ORIGIN_COME_4;
-//			}
-//			if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_3) {
-//				logo = Global.ORIGIN_COME_5;
-//			}
-//			//公司标识
-//			String companyCode = "";
-//			if(orderInfo.getCompanyCode() !=null && orderInfo.getCompanyCode().equals(Global.COMPANY_01)) {
-//				companyCode = Global.COMPANY_01;
-//			}else {
-//				companyCode = Global.COMPANY_01;
-//			}
-//			//yyMMddHHmmss+订单来源+销售渠道标识+公司标识+4位数的随机数
-//			String orderCode = "";
-//			orderCode = OrderPublic.currentDate()+logo+String.valueOf(Global.ORDERID_CHANNEL_4)+companyCode+OrderPublic.randomNumberF();
-//			orderInfo.setOrderCode(orderCode);
 			
 			//初始化提货码
 			if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_1) {

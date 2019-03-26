@@ -36,9 +36,6 @@ public interface OrderDao {
     //唯一订单查询
     OrderInfo selecOrderById(OrderDetailQuery orderDetailQuery) throws Exception;
     
-//    //订单ID查询
-//    OrderInfo selecOrderId(OrderQuery OrderQuery) throws Exception;
-    
     //添加新的订单主数据
     public void addOrderInfo(@Valid OrderInfo orderInfo) throws Exception;
 
@@ -124,15 +121,6 @@ public interface OrderDao {
 
 	//根据状态查询订单
 	Integer selectCountByStatus(OrderQuery orderQuery) throws Exception;
-
-//	//修改订单支付方式信息
-//	void onlyPayType(OrderInfo orderInfo)throws Exception;
-
-	//TOC-通过订单编码查询订单ID
-	String getOrderIdByCode(@Valid @Param("orderCode") String orderCode)throws Exception;
-	
-	//服务商品-通过订单编码查询订单ID
-	String getNoCodeOrderIdByCode(@Valid @Param("orderCode") String orderCode)throws Exception;
 
 	Integer selectOrderCount(OrderQuery orderQuery)throws Exception;
 
