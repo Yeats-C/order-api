@@ -50,7 +50,10 @@
     <!-- 查询挂单明细 -->
     <select id="selectDetailByFrozenId" resultMap="FrozenInfoMapping" resultType="java.util.List" >
     
-		select * from frozen where frozen_id = #{frozenId}
+		select * from frozen where 1=1 
+		<if test=" frozenId != null and frozenId!='' ">
+		and frozen_id = #{frozenId}
+		</if>
         ORDER BY create_time DESC 
     </select>
     
@@ -70,17 +73,16 @@
      <!-- 查询挂单汇总 -->
     <select id="selectSumByFrozenId" resultMap="FrozenInfoMapping" resultType="java.util.List">
     
-        SELECT a.*,b.member_name,b.create_time,b.create_by FROM (
-        SELECT frozen_id,ROUND(COUNT(frozen_id)) AS sum_sale, ROUND(SUM(amount)) AS sum_amount,ROUND(SUM(price)) AS sum_price FROM frozen WHERE 1=1
+        SELECT frozen_id,member_name,create_time,create_by,COUNT(frozen_id) AS sum_sale, SUM(IFNULL(amount,0)) AS sum_amount,SUM(IFNULL(price,0)) AS sum_price FROM frozen 
+        WHERE 1=1
         <if test=" createBy != null and createBy!='' ">
         and create_by = #{createBy}
         </if>
         <if test=" distributorId != null and distributorId!='' ">
         and distributor_id = #{distributorId}
         </if>
-        GROUP BY frozen_id)a ,frozen b 
-        WHERE a.frozen_id = b.frozen_id
-        ORDER BY b.create_time DESC
+        GROUP BY frozen_id,member_name,create_time,create_by
+        ORDER BY create_time DESC
     </select>
     
     <!-- 查询挂单数量 -->
@@ -93,7 +95,6 @@
         <if test=" distributorId != null and distributorId!='' ">
         and distributor_id = #{distributorId}
         </if>
-       
     </select>
     
 </mapper>
