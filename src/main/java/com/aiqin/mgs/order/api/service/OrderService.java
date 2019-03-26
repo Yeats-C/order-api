@@ -128,7 +128,7 @@ public interface OrderService {
 	HttpResponse wsswv(@Valid String distributorId);
 
 	//已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)
-	HttpResponse repast(@Valid String orderId, @Valid String payType, @Valid List<OrderPayInfo> orderPayList);
+	HttpResponse repast(@Valid String orderId, @Valid String payType, @Valid Integer orderStatus, @Valid List<OrderPayInfo> orderPayList);
 
 	//销售目标管理-分销机构-月销售额
 	HttpResponse selectDistributorMonth(@Valid DistributorMonthRequest detailCouponRequest);

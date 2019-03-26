@@ -129,12 +129,13 @@ public class OrderController {
     @ApiOperation(value = "门店新增TOC订单step3-已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)")
     public HttpResponse repast(@Valid @RequestParam(name = "order_id", required = true) String orderId,
     		@Valid @RequestParam(name = "pay_type", required = true) String payType,
+    		@Valid @RequestParam(name = "order_status", required = true) Integer orderStatus,
     		@Valid @RequestBody(required = true) List<OrderPayInfo> orderPayList
     		) {
     	
     	
         LOGGER.info("已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)参数orderId:{},payType:{},orderPayList:{}",orderId,payType,orderPayList);
-        return orderService.repast(orderId,payType,orderPayList);
+        return orderService.repast(orderId,payType,orderStatus,orderPayList);
     }
     
     
@@ -385,7 +386,7 @@ public class OrderController {
     
     
     /**
-     * 更改订单状态/支付状态/修改员
+     * 更改订单状态/支付状态/修改员 
      * @param 
      * @return
      */

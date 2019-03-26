@@ -795,6 +795,9 @@
 		<if test="payStatus!=null ">
 		,pay_status = #{payStatus}
 		</if>
+		<if test="orderStatus!=null ">
+		,order_status = #{orderStatus}
+		</if>
 		where order_id = #{orderId}
 	</update>
 

@@ -1565,7 +1565,7 @@ public class OrderServiceImpl implements OrderService{
 	//已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表)
 	@Override
 	@Transactional
-	public HttpResponse repast(@Valid String orderId, @Valid String payType, @Valid List<OrderPayInfo> orderPayList) {
+	public HttpResponse repast(@Valid String orderId, @Valid String payType,@Valid Integer orderStatus, @Valid List<OrderPayInfo> orderPayList) {
 		
 		try {
 			
@@ -1580,6 +1580,7 @@ public class OrderServiceImpl implements OrderService{
           OrderInfo orderInfo = new OrderInfo();
           orderInfo.setOrderId(orderId);
           orderInfo.setPayType(payType);
+          orderInfo.setOrderStatus(orderStatus);
           //现金单支付-支持单支付 根据逻辑层做的调整.
           if(orderPayList !=null && orderPayList.size()>0) {
         	  OrderPayInfo info = new OrderPayInfo();
