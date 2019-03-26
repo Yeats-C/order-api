@@ -153,6 +153,12 @@
     <select id="selectOrder"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="OrderInfoMapping" resultType="java.util.List">
          SELECT a.* FROM order_info a
 		 WHERE 1=1 and order_type = 1
+		 <if test="distributorId!=null and distributorId!='' ">
+         and a.distributor_id = #{distributorId}
+         </if>
+         <if test="distributorName!=null and distributorName!=''">
+		 and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
+         </if>
 		 <if test="orderId!=null and orderId!=''">
 		 and a.order_id = #{orderId}
 		 </if>
@@ -175,12 +181,6 @@
          <if test="codeAndPhone!=null and codeAndPhone!=''">
 		 and (a.member_phone like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%') or a.order_code like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%'))
          </if>
-         <if test="beginTime!=null ">
-         and a.create_time  &gt;= #{beginTime}
-         </if>
-         <if test="endTime!=null ">
-         and a.create_time &lt;= #{endTime}
-         </if>
          <if test="orderStatus!=null ">
          and a.order_status = #{orderStatus}
          </if>
@@ -190,6 +190,12 @@
 			 '${order_status}'
 		  </foreach>
 			)
+         </if>
+         <if test="beginTime!=null ">
+         and a.create_time  &gt;= #{beginTime}
+         </if>
+         <if test="endTime!=null ">
+         and a.create_time &lt;= #{endTime}
          </if>
          <if test="originTypeList != null" >
 		  and a.origin_type in (
@@ -217,12 +223,6 @@
          </if>
          <if test="receiveCode!=null and receiveCode!='' ">
          and a.receive_code =#{receiveCode}
-         </if>
-         <if test="distributorId!=null and distributorId!='' ">
-         and a.distributor_id = #{distributorId}
-         </if>
-         <if test="distributorName!=null and distributorName!=''">
-		 and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
          </if>
          ORDER BY a.create_time DESC
          <if test="icount!=null ">
@@ -234,83 +234,12 @@
     <select id="selectOrderCount"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultType="java.lang.Integer">
          SELECT count(1) FROM order_info a
 		 WHERE 1=1 and order_type = 1
-         <if test="orderId!=null and orderId!=''">
-		 and a.order_id = #{orderId}
-		 </if>
-		 <if test="orderCode!=null and orderCode!=''">
-		 and a.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%') 
-         </if>
-		 <if test="memberId!=null and memberId!=''">
-		 and a.member_id =#{memberId}
-         </if>
-         <if test="memberidList != null" >
-		     and a.member_id in (
-		  <foreach collection="memberidList" item="member_id" separator=",">
-			 '${member_id}'
-		  </foreach>
-			)
-          </if>
-		 <if test="memberPhone!=null and memberPhone!=''">
-		 and a.member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%') 
-         </if>
-         <if test="codeAndPhone!=null and codeAndPhone!=''">
-		 and (a.member_phone like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%') or a.order_code like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%'))
-         </if>
-         <if test="beginTime!=null ">
-         and a.create_time  &gt;= #{beginTime}
-         </if>
-         <if test="endTime!=null ">
-         and a.create_time &lt;= #{endTime}
-         </if>
-         <if test="orderStatus!=null ">
-         and a.order_status = #{orderStatus}
-         </if>
-         <if test="orderStatusList != null" >
-		  and a.order_status in (
-		  <foreach collection="orderStatusList" item="order_status" separator=",">
-			 '${order_status}'
-		  </foreach>
-			)
-         </if>
-         <if test="originTypeList != null" >
-		  and a.origin_type in (
-		  <foreach collection="originTypeList" item="origin_type" separator=",">
-			 '${origin_type}'
-		  </foreach>
-			)
-          </if>
-          <if test="orderIdList != null" >
-		  and a.order_id in (
-		  <foreach collection="orderIdList" item="order_id" separator=",">
-			 '${order_id}'
-		  </foreach>
-			)
-          </if>
-          <if test="noExistOrderCodeList != null" >
-		  and a.order_code not in (
-		  <foreach collection="noExistOrderCodeList" item="order_code" separator=",">
-			 '${order_code}'
-		  </foreach>
-			)
-          </if>
-         <if test="receiveType!=null ">
-         and a.receive_type =#{receiveType}
-         </if>
-         <if test="receiveCode!=null and receiveCode!='' ">
-         and a.receive_code =#{receiveCode}
-         </if>
          <if test="distributorId!=null and distributorId!='' ">
          and a.distributor_id = #{distributorId}
          </if>
          <if test="distributorName!=null and distributorName!=''">
 		 and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
          </if>
-    </select>
-    
-    <!-- 模糊查询订单列表+订单中商品sku数量分页 -->
-    <select id="selectskuResponse"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="OradskuMapping" resultType="java.util.List">
-         SELECT a.*,a.create_time AS pay_time FROM order_info a
-		 WHERE 1=1 and order_type = 1
 		 <if test="orderId!=null and orderId!=''">
 		 and a.order_id = #{orderId}
 		 </if>
@@ -333,12 +262,6 @@
          <if test="codeAndPhone!=null and codeAndPhone!=''">
 		 and (a.member_phone like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%') or a.order_code like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%'))
          </if>
-         <if test="beginTime!=null ">
-         and a.create_time  &gt;= #{beginTime}
-         </if>
-         <if test="endTime!=null ">
-         and a.create_time &lt;= #{endTime}
-         </if>
          <if test="orderStatus!=null ">
          and a.order_status = #{orderStatus}
          </if>
@@ -348,6 +271,12 @@
 			 '${order_status}'
 		  </foreach>
 			)
+         </if>
+         <if test="beginTime!=null ">
+         and a.create_time  &gt;= #{beginTime}
+         </if>
+         <if test="endTime!=null ">
+         and a.create_time &lt;= #{endTime}
          </if>
          <if test="originTypeList != null" >
 		  and a.origin_type in (
@@ -376,23 +305,19 @@
          <if test="receiveCode!=null and receiveCode!='' ">
          and a.receive_code =#{receiveCode}
          </if>
-         <if test="distributorId!=null and distributorId!='' ">
+    </select>
+    
+    <!-- 模糊查询订单列表+订单中商品sku数量分页 -->
+    <select id="selectskuResponse"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="OradskuMapping" resultType="java.util.List">
+         SELECT a.*,a.create_time AS pay_time FROM order_info a
+		 WHERE 1=1 and order_type = 1
+		 <if test="distributorId!=null and distributorId!='' ">
          and a.distributor_id = #{distributorId}
          </if>
          <if test="distributorName!=null and distributorName!=''">
 		 and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
          </if>
-         ORDER BY a.create_time DESC
-         <if test="icount!=null ">
-         limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
-         </if>
-    </select>
-    
-    <!-- 模糊查询订单列表+订单中商品sku数量 总数据量 -->
-    <select id="skuResponseCount"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery"  resultType="java.lang.Integer">
-         SELECT count(1) FROM order_info a
-		 WHERE 1=1 and order_type = 1
-         <if test="orderId!=null and orderId!=''">
+		 <if test="orderId!=null and orderId!=''">
 		 and a.order_id = #{orderId}
 		 </if>
 		 <if test="orderCode!=null and orderCode!=''">
@@ -414,12 +339,6 @@
          <if test="codeAndPhone!=null and codeAndPhone!=''">
 		 and (a.member_phone like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%') or a.order_code like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%'))
          </if>
-         <if test="beginTime!=null ">
-         and a.create_time  &gt;= #{beginTime}
-         </if>
-         <if test="endTime!=null ">
-         and a.create_time &lt;= #{endTime}
-         </if>
          <if test="orderStatus!=null ">
          and a.order_status = #{orderStatus}
          </if>
@@ -429,6 +348,12 @@
 			 '${order_status}'
 		  </foreach>
 			)
+         </if>
+         <if test="beginTime!=null ">
+         and a.create_time  &gt;= #{beginTime}
+         </if>
+         <if test="endTime!=null ">
+         and a.create_time &lt;= #{endTime}
          </if>
          <if test="originTypeList != null" >
 		  and a.origin_type in (
@@ -457,11 +382,86 @@
          <if test="receiveCode!=null and receiveCode!='' ">
          and a.receive_code =#{receiveCode}
          </if>
+         ORDER BY a.create_time DESC
+         <if test="icount!=null ">
+         limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+         </if>
+    </select>
+    
+    <!-- 模糊查询订单列表+订单中商品sku数量 总数据量 -->
+    <select id="skuResponseCount"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery"  resultType="java.lang.Integer">
+         SELECT count(1) FROM order_info a
+		 WHERE 1=1 and order_type = 1
          <if test="distributorId!=null and distributorId!='' ">
          and a.distributor_id = #{distributorId}
          </if>
          <if test="distributorName!=null and distributorName!=''">
 		 and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
+         </if>
+		 <if test="orderId!=null and orderId!=''">
+		 and a.order_id = #{orderId}
+		 </if>
+		 <if test="orderCode!=null and orderCode!=''">
+		 and a.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%') 
+         </if>
+		 <if test="memberId!=null and memberId!=''">
+		 and a.member_id =#{memberId}
+         </if>
+         <if test="memberidList != null" >
+		     and a.member_id in (
+		  <foreach collection="memberidList" item="member_id" separator=",">
+			 '${member_id}'
+		  </foreach>
+			)
+          </if>
+		 <if test="memberPhone!=null and memberPhone!=''">
+		 and a.member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%') 
+         </if>
+         <if test="codeAndPhone!=null and codeAndPhone!=''">
+		 and (a.member_phone like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%') or a.order_code like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%'))
+         </if>
+         <if test="orderStatus!=null ">
+         and a.order_status = #{orderStatus}
+         </if>
+         <if test="orderStatusList != null" >
+		  and a.order_status in (
+		  <foreach collection="orderStatusList" item="order_status" separator=",">
+			 '${order_status}'
+		  </foreach>
+			)
+         </if>
+         <if test="beginTime!=null ">
+         and a.create_time  &gt;= #{beginTime}
+         </if>
+         <if test="endTime!=null ">
+         and a.create_time &lt;= #{endTime}
+         </if>
+         <if test="originTypeList != null" >
+		  and a.origin_type in (
+		  <foreach collection="originTypeList" item="origin_type" separator=",">
+			 '${origin_type}'
+		  </foreach>
+			)
+          </if>
+          <if test="orderIdList != null" >
+		  and a.order_id in (
+		  <foreach collection="orderIdList" item="order_id" separator=",">
+			 '${order_id}'
+		  </foreach>
+			)
+          </if>
+          <if test="noExistOrderCodeList != null" >
+		  and a.order_code not in (
+		  <foreach collection="noExistOrderCodeList" item="order_code" separator=",">
+			 '${order_code}'
+		  </foreach>
+			)
+          </if>
+         <if test="receiveType!=null ">
+         and a.receive_type =#{receiveType}
+         </if>
+         <if test="receiveCode!=null and receiveCode!='' ">
+         and a.receive_code =#{receiveCode}
          </if>
     </select>
 
@@ -469,9 +469,9 @@
     <select id="selectOrderAmt"  resultType="java.lang.Integer">
          SELECT SUM(b.actual_price) AS total_price FROM order_info b
          WHERE  1=1 and order_type = 1
+         and b.distributor_id =#{arg0}
          AND b.order_status NOT IN ('0','4')
          AND b.pay_status='1'
-         and b.distributor_id =#{arg0}
          <if test="arg1!=null" >
 		  and b.origin_type in (
 		 <foreach collection="arg1" item="origin_type" separator=",">
@@ -485,9 +485,9 @@
     <select id="selectByMonthAllAmt" resultType="java.lang.Integer">
          SELECT SUM(b.actual_price) AS total_price FROM order_info b
          WHERE  1=1 and order_type = 1 
+         and b.distributor_id = #{arg0}
          AND b.order_status NOT IN ('0','4')
          AND b.pay_status='1'
-         and b.distributor_id = #{arg0}
          <if test="arg1!=null" >
 		  and b.origin_type in (
 		  <foreach collection="arg1" item="origin_type" separator=",">
@@ -503,11 +503,11 @@
     <select id="selectByYesdayAllAmt" resultType="java.lang.Integer">
          SELECT SUM(b.actual_price) AS total_price FROM order_info b
          WHERE  1=1 and order_type = 1 
-         AND b.order_status NOT IN ('0','4')
-         AND b.pay_status='1'
          <if test="arg0!=null and arg0 !='' ">
          and b.distributor_id = #{arg0}
          </if>
+         AND b.order_status NOT IN ('0','4')
+         AND b.pay_status='1'
          <if test="arg1!=null" >
 		  and b.origin_type in (
 		  <foreach collection="arg1" item="origin_type" separator=",">
@@ -524,9 +524,9 @@
          SELECT count(b.order_id) AS total_acount from order_info b
          WHERE  
          1=1 and order_type = 1
+         and b.distributor_id = #{arg0}
          AND b.order_status NOT IN ('0','4')
          AND b.pay_status='1'
-         and b.distributor_id = #{arg0}
          <if test="arg1!=null" >
 		  and b.origin_type in (
 		  <foreach collection="arg1" item="origin_type" separator=",">
@@ -543,9 +543,9 @@
          SELECT count(b.order_id) AS total_acount from order_info b
          WHERE  
          1=1 and order_type = 1
+         and b.distributor_id = #{arg0}
          AND b.order_status NOT IN ('0','4')
          AND b.pay_status='1'
-         and b.distributor_id = #{arg0}
          <if test="arg1!=null" >
 		  and b.origin_type in (
 		  <foreach collection="arg1" item="origin_type" separator=",">
@@ -562,9 +562,9 @@
       SELECT CASE WHEN b.return_price IS NULL  THEN a.real_amt ELSE a.real_amt-b.return_price END AS real_amt FROM (
       SELECT '1' AS create_time,SUM(actual_price) AS real_amt FROM order_info b
       WHERE 1=1 and order_type = 1
+      AND b.distributor_id = #{arg0}
       AND b.order_status NOT IN ('0','4')
       AND b.pay_status='1'
-      AND b.distributor_id = #{arg0}
       <if test="arg1!=null" >
 		  and b.origin_type in (
 		  <foreach collection="arg1" item="origin_type" separator=",">
@@ -579,9 +579,9 @@
       (
       SELECT '1' AS create_time,SUM(return_price)AS return_price FROM order_after_sale b
       WHERE 
-      1=1
-      AND b.after_sale_status='3'
+      1=1 AND order_type = 1
       AND b.distributor_id = #{arg0}
+      AND b.after_sale_status='3'
       <if test="arg1!=null" >
 		  and b.origin_type in (
 		  <foreach collection="arg1" item="origin_type" separator=",">
@@ -601,9 +601,9 @@
       SELECT CASE WHEN b.return_price IS NULL  THEN a.real_amt ELSE a.real_amt-b.return_price END  AS real_amt FROM (
       SELECT '1' AS create_time,COUNT(b.order_id) AS order_acount,SUM(actual_price) AS real_amt FROM order_info b
       WHERE 1=1 and order_type = 1
+      AND b.distributor_id = #{arg0}
       AND b.order_status NOT IN ('0','4')
       AND b.pay_status='1'
-      AND b.distributor_id = #{arg0}
       <if test="arg1!=null" >
 		  and b.origin_type in (
 		  <foreach collection="arg1" item="origin_type" separator=",">
@@ -618,9 +618,9 @@
       (
       SELECT '1' AS create_time,SUM(return_price)AS return_price FROM order_after_sale b
       WHERE 
-      1=1
-      AND b.after_sale_status='3'
+      1=1 and order_type = 1
       AND b.distributor_id = #{arg0}
+      AND b.after_sale_status='3'
       <if test="arg1!=null" >
 		  and b.origin_type in (
 		  <foreach collection="arg1" item="origin_type" separator=",">
@@ -639,9 +639,9 @@
       SELECT a.`create_time` as create_time ,a.order_acount as order_count,CASE WHEN b.return_price IS NULL  THEN a.real_amt ELSE a.real_amt-b.return_price END  AS actual_price FROM (
       SELECT DATE_FORMAT(b.create_time,"%Y-%m-%d") AS create_time,COUNT(b.order_id) AS order_acount,SUM(actual_price) AS real_amt FROM order_info b
       WHERE 1=1 and order_type = 1
+      AND b.distributor_id = #{distributorId}
       AND b.order_status NOT IN ('0','4')
       AND b.pay_status='1'
-      AND b.distributor_id = #{distributorId}
       <if test="originTypeList != null" >
 		AND b.origin_type in (
 		<foreach collection="originTypeList" item="origin_type" separator=",">
@@ -656,7 +656,7 @@
       (
       SELECT DATE_FORMAT(b.create_time,"%Y-%m-%d") AS create_time,SUM(return_price)AS return_price FROM order_after_sale b
       WHERE 
-      1=1
+      1=1 AND order_type = 1
       AND b.after_sale_status='3'
       AND b.distributor_id = #{distributorId}
       <if test="originTypeList != null" >
@@ -678,9 +678,9 @@
     SELECT #{any} AS create_time ,a.order_acount AS order_count,CASE WHEN b.return_price IS NULL  THEN a.real_amt ELSE a.real_amt-b.return_price END  AS actual_price FROM (
       SELECT YEARWEEK(DATE_FORMAT(b.create_time,'%Y-%m-%d')) AS create_time,COUNT(b.order_id) AS order_acount,SUM(actual_price) AS real_amt FROM order_info b
       WHERE 1=1 and order_type = 1
+      AND b.distributor_id = #{distributorId}
       AND b.order_status NOT IN ('0','4')
       AND b.pay_status='1'
-      AND b.distributor_id = #{distributorId}
       <if test="originTypeList != null" >
 		AND b.origin_type in (
 		<foreach collection="originTypeList" item="origin_type" separator=",">
@@ -694,7 +694,7 @@
       (
       SELECT YEARWEEK(DATE_FORMAT(b.create_time,'%Y-%m-%d')) AS create_time,SUM(return_price)AS return_price FROM order_after_sale b
       WHERE 
-      1=1
+      1=1 AND order_type = 1
       AND b.after_sale_status='3'
       AND b.distributor_id = #{distributorId}
       <if test="originTypeList != null" >
@@ -732,7 +732,7 @@
       (
       SELECT DATE_FORMAT(b.create_time,"%Y-%m") AS create_time,SUM(return_price)AS return_price FROM order_after_sale b
       WHERE 
-      1=1
+      1=1 AND order_type = 1
       AND b.after_sale_status='3'
       AND b.distributor_id = #{distributorId}
       <if test="originTypeList != null" >
@@ -845,6 +845,7 @@
          AND pay_status='1'
          ORDER BY create_time DESC LIMIT 1) b 
          WHERE a.order_id = b.order_id
+         LIMIT 2
     </select>
     
     <!-- 将提货码插入订单表中... -->
@@ -866,6 +867,9 @@
          LEFT JOIN (SELECT order_id,SUM(IFNULL(amount,0)) AS amount FROM order_detail GROUP BY order_id) b ON a.order_id = b.order_id
          LEFT JOIN (SELECT order_code,SUM(IFNULL(return_amount,0)) AS return_amount FROM `order_after_sale_detail` GROUP BY order_code) c ON a.order_code = c.order_code
 		 WHERE 1=1 and order_type = 1
+		 <if test="distributorId!=null and distributorId!='' ">
+         and a.distributor_id = #{distributorId}
+         </if>
 		 <if test="orderId!=null and orderId!=''">
 		 and a.order_id = #{orderId}
 		 </if>
@@ -877,9 +881,6 @@
          </if>
          <if test="endTime!=null and endTime!='' ">
          and a.create_time &lt;= #{endTime}
-         </if>
-         <if test="distributorId!=null and distributorId!='' ">
-         and a.distributor_id = #{distributorId}
          </if>
          <if test="statusList != null" >
 		     and a.order_status in (
@@ -900,6 +901,9 @@
          LEFT JOIN (SELECT order_id,SUM(IFNULL(amount,0)) AS amount FROM order_detail GROUP BY order_id) b ON a.order_id = b.order_id
          LEFT JOIN (SELECT order_code,SUM(IFNULL(return_amount,0)) AS return_amount FROM `order_after_sale_detail` GROUP BY order_code) c ON a.order_code = c.order_code
 		 WHERE 1=1 and order_type = 1
+		 <if test="distributorId!=null and distributorId!='' ">
+         and a.distributor_id = #{distributorId}
+         </if>
 		 <if test="orderId!=null and orderId!=''">
 		 and a.order_id = #{orderId}
 		 </if>
@@ -911,9 +915,6 @@
          </if>
          <if test="endTime!=null and endTime!='' ">
          and a.create_time &lt;= #{endTime}
-         </if>
-         <if test="distributorId!=null and distributorId!='' ">
-         and a.distributor_id = #{distributorId}
          </if>
          <if test="statusList != null" >
 		     and a.order_status in (
@@ -947,6 +948,7 @@
          SELECT DATE_FORMAT(create_time,'%Y-%m-%d') AS trante,COUNT(DISTINCT(member_id)) AS acount 
          FROM order_info 
          WHERE 1=1 and order_type = 1
+         AND distributor_id = #{distributorId}
          <if test="memberList != null" >
 		     and member_id in (
 		  <foreach collection="memberList" item="member_id" separator=",">
@@ -954,10 +956,8 @@
 		  </foreach>
 			)
           </if>
-         AND DATE_FORMAT(NOW(),'%Y-%m-%d') &gt;= DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 7 DAY),'%Y-%m-%d')
-
-         AND distributor_id = #{distributorId}
-         GROUP BY DATE_FORMAT(create_time,'%Y-%m-%d') ORDER BY DATE_FORMAT(create_time,'%Y-%m-%d') DESC
+         AND NOW() &gt;= DATE_FORMAT(DATE_SUB(NOW(),INTERVAL 7 DAY),'%Y-%m-%d 00:00:00')
+         GROUP BY DATE_FORMAT(create_time,'%Y-%m-%d') ORDER BY create_time DESC
     </select>
     
     <!-- 删除订单主数据 -->
@@ -970,44 +970,44 @@
     <select id="selectAcountByEcshop"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultType="java.lang.Integer">
          SELECT COUNT(1) FROM order_info  
 		 WHERE 1=1 and order_type = 1
-		 AND create_time &gt;= #{beginTime}  
-		 AND create_time &lt;= #{endTime}
-         <if test="distributorId!=null and distributorId!='' ">
+		 <if test="distributorId!=null and distributorId!='' ">
          and distributor_id = #{distributorId}
          </if>
+		 AND create_time &gt;= #{beginTime}  
+		 AND create_time &lt;= #{endTime}
     </select>
    
     <!-- 订单金额 -->
     <select id="selectAmountByEcshop"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultType="java.lang.Integer">
          SELECT COUNT(actual_price) FROM order_info  
 		 WHERE 1=1 and order_type = 1
-		 AND create_time &gt;= #{beginTime}  
-		 AND create_time &lt;= #{endTime}
-         <if test="distributorId!=null and distributorId!='' ">
+		 <if test="distributorId!=null and distributorId!='' ">
          and distributor_id = #{distributorId}
          </if>
+		 AND create_time &gt;= #{beginTime}  
+		 AND create_time &lt;= #{endTime}
     </select>
     
     <!-- 成交客户 -->
     <select id="selectMembersByEcshop"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultType="java.lang.Integer">
          SELECT COUNT(DISTINCT member_id) FROM order_info  
 		 WHERE 1=1 and order_type = 1
-		 AND create_time &gt;= #{beginTime}  
-		 AND create_time &lt;= #{endTime}
-         <if test="distributorId!=null and distributorId!='' ">
+		 <if test="distributorId!=null and distributorId!='' ">
          and distributor_id = #{distributorId}
          </if>
+		 AND create_time &gt;= #{beginTime}  
+		 AND create_time &lt;= #{endTime}
     </select>
     
     <!--根据状态查询订单 -->
     <select id="selectCountByStatus"  parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultType="java.lang.Integer">
          SELECT COUNT(order_id) FROM order_info  
 		 WHERE 1=1 and order_type = 1
+		 <if test="distributorId!=null and distributorId!='' ">
+         and distributor_id = #{distributorId}
+         </if>
          <if test="orderStatus!=null ">
          and order_status = #{orderStatus}
-         </if>
-         <if test="distributorId!=null and distributorId!='' ">
-         and distributor_id = #{distributorId}
          </if>
     </select>
     
