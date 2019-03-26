@@ -599,7 +599,11 @@ public class OrderServiceImpl implements OrderService{
 		try {
 			
 			//关闭订单
-			orderDao.closeOrder(orderId,updateBy);
+			OrderInfo info = new OrderInfo();
+			info.setOrderId(orderId);
+			info.setUpdateBy(updateBy);
+			info.setOrderStatus(Global.ORDER_STATUS_4);
+			orderDao.updateOrder(info);
 			
 			//生成订单日志
 			OrderLog rderLog = OrderPublic.addOrderLog(orderId,Global.STATUS_0,"OrderServiceImpl.closeorder()",
@@ -624,7 +628,7 @@ public class OrderServiceImpl implements OrderService{
 			orderInfo.setOrderId(orderId);
 			orderInfo.setUpdateBy(updateBy);
 			orderInfo.setBusinessNote(businessNote);
-			orderDao.updateorderbusinessnote(orderInfo);
+			orderDao.updateOrder(orderInfo);
 			return HttpResponse.success();
 		} catch (Exception e) {
 			LOGGER.error("接口-更新商户备注异常： {}", e);
@@ -648,7 +652,7 @@ public class OrderServiceImpl implements OrderService{
 			orderInfo.setUpdateBy(updateBy);
 			
 			//更新订单主数据
-			orderDao.updateOrderStatus(orderInfo);
+			orderDao.updateOrder(orderInfo);
 			
 			OrderPayInfo orderPayInfo = new OrderPayInfo();
 			orderPayInfo.setOrderId(orderId);
@@ -681,7 +685,7 @@ public class OrderServiceImpl implements OrderService{
 			orderInfo.setUpdateBy(updateBy);
 			
 			//更新订单
-			orderDao.retustus(orderInfo);			
+			orderDao.updateOrder(orderInfo);			
 			
 			//生成订单日志
 			OrderLog rderLog = OrderPublic.addOrderLog(orderId,Global.STATUS_2,"OrderServiceImpl.returnStatus()",
@@ -701,7 +705,7 @@ public class OrderServiceImpl implements OrderService{
 			orderInfo.setUpdateBy(updateBy);
 			
 			//更新订单
-			orderDao.onlyStatus(orderInfo);
+			orderDao.updateOrder(orderInfo);
 			
 			//判断是否变更为待提货、待提货订单需重新生成提货码.
 			if(orderStatus == Global.RECEIVE_TYPE_0) {
@@ -1590,7 +1594,7 @@ public class OrderServiceImpl implements OrderService{
         	  }
         	  
           }
-          orderDao.onlyPayType(orderInfo);
+          orderDao.updateOrder(orderInfo);
           
         return HttpResponse.success();
         

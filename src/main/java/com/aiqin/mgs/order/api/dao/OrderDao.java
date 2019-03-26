@@ -71,24 +71,9 @@ public interface OrderDao {
 	
 	//接口-订单概览-分销机构、小于当前日期9周内的实付金额、订单数量
 	OrderResponse selectOrderByNineWeek(@Valid OrderQuery orderQuery)throws Exception;
-	
-	//接口-关闭订单
-	void closeOrder(@Param("orderId")String orderId, @Param("updateBy")String updateBy)throws Exception;
-
-	//接口-更新商户备注
-	void updateorderbusinessnote(@Valid OrderInfo orderInfo)throws Exception;
-
-	//更改订单状态/支付状态/支付方式/修改员...
-	void updateOrderStatus(@Valid OrderInfo orderInfo)throws Exception;
-
-	//仅更改退货状态-订单主表
-	void retustus(@Valid OrderInfo orderInfo)throws Exception;
 
 	//修改订单主数据
-	void updateOrderInfo(@Valid OrderInfo orderInfo) throws Exception;
-
-	//仅变更订单状态
-	void onlyStatus(OrderInfo orderInfo);
+	void updateOrder(@Valid OrderInfo orderInfo)throws Exception;
 
 	//接口-收银员交班收银情况统计   获取收银员、支付类型金额
 	List<OrderbyReceiptSumResponse> cashier(OrderQuery orderQuery)throws Exception;
@@ -140,8 +125,8 @@ public interface OrderDao {
 	//根据状态查询订单
 	Integer selectCountByStatus(OrderQuery orderQuery) throws Exception;
 
-	//修改订单支付方式信息
-	void onlyPayType(OrderInfo orderInfo)throws Exception;
+//	//修改订单支付方式信息
+//	void onlyPayType(OrderInfo orderInfo)throws Exception;
 
 	//TOC-通过订单编码查询订单ID
 	String getOrderIdByCode(@Valid @Param("orderCode") String orderCode)throws Exception;

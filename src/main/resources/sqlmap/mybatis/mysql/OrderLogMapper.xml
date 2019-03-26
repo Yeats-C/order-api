@@ -4,7 +4,7 @@
 <resultMap id="OrderLogMapping" type="com.aiqin.mgs.order.api.domain.OrderLog">
 <result column="log_id" jdbcType="VARCHAR" property="logId"/>
 <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
-<result column="status_type" jdbcType="TINYINT" property="statusType"/>
+<result column="status_type" jdbcType="INTEGER" property="statusType"/>
 <result column="status" jdbcType="VARCHAR" property="status"/>
 <result column="status_code" jdbcType="VARCHAR" property="statusCode"/>
 <result column="status_content" jdbcType="VARCHAR" property="statusContent"/>
