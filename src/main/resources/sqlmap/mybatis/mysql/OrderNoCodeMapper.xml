@@ -40,14 +40,14 @@
          SELECT SUM(IFNULL(actual_price,0)) FROM order_info a 
           WHERE 1=1 AND order_type=3
             AND order_status NOT IN ('0','4')
-          <if test="arg0!=null and arg0!='' ">
-            AND distributor_id =#{arg0}
+          <if test="distributorId!=null and distributorId!='' ">
+            AND distributor_id =#{distributorId}
           </if>
-          <if test="arg1!=null ">
-            AND create_time &gt;= #{arg1}
+          <if test="beginDate!=null ">
+            AND create_time &gt;= #{beginDate}
           </if>
-          <if test="arg2!=null ">
-            AND create_time &lt;= #{arg2}
+          <if test="endDate!=null ">
+            AND create_time &lt;= #{endDate}
           </if>
     </select>
     
@@ -56,14 +56,14 @@
          SELECT SUM(IFNULL(return_price,0)) FROM order_after_sale
           WHERE 1=1 AND order_type=3
             AND after_sale_status='3'
-          <if test="arg0!=null and arg0!='' ">
-            AND distributor_id =#{arg0}
+          <if test="distributorId!=null and distributorId!='' ">
+            AND distributor_id =#{distributorId}
           </if>
-          <if test="arg1!=null ">
-            AND create_time &gt;= #{arg1}
+          <if test="beginDate!=null ">
+            AND create_time &gt;= #{beginDate}
           </if>
-          <if test="arg2!=null ">
-            AND create_time &lt;= #{arg2}
+          <if test="endDate!=null ">
+            AND create_time &lt;= #{endDate}
           </if>
     </select>
     
@@ -72,14 +72,14 @@
          SELECT COUNT(1) FROM order_info a 
           WHERE 1=1 AND order_type=3
             AND order_status NOT IN ('0','4')
-          <if test="arg0!=null and arg0!='' ">
-            AND distributor_id =#{arg0}
+          <if test="distributorId!=null and distributorId!='' ">
+            AND distributor_id =#{distributorId}
           </if>
-          <if test="arg1!=null ">
-            AND create_time &gt;= #{arg1}
+          <if test="beginDate!=null ">
+            AND create_time &gt;= #{beginDate}
           </if>
-          <if test="arg2!=null ">
-            AND create_time &lt;= #{arg2}
+          <if test="endDate!=null ">
+            AND create_time &lt;= #{endDate}
           </if>
     </select>
     
@@ -88,14 +88,14 @@
          SELECT COUNT(1) FROM order_after_sale
           WHERE 1=1 AND order_type=3
             AND after_sale_status='3'
-          <if test="arg0!=null and arg0!='' ">
-            AND distributor_id =#{arg0}
+          <if test="distributorId!=null and distributorId!='' ">
+            AND distributor_id =#{distributorId}
           </if>
-          <if test="arg1!=null ">
-            AND create_time &gt;= #{arg1}
+          <if test="beginDate!=null ">
+            AND create_time &gt;= #{beginDate}
           </if>
-          <if test="arg2!=null ">
-            AND create_time &lt;= #{arg2}
+          <if test="endDate!=null ">
+            AND create_time &lt;= #{endDate}
           </if>
     </select>
     
@@ -103,14 +103,14 @@
     <select id="getPassengerFlow" resultType="java.lang.Integer">
          SELECT COUNT(DISTINCT member_id) FROM order_info a 
           WHERE 1=1 AND order_type=3
-          <if test="arg0!=null and arg0!='' ">
-            AND distributor_id =#{arg0}
+          <if test="distributorId!=null and distributorId!='' ">
+            AND distributor_id =#{distributorId}
           </if>
-          <if test="arg1!=null ">
-            AND create_time &gt;= #{arg1}
+          <if test="beginDate!=null ">
+            AND create_time &gt;= #{beginDate}
           </if>
-          <if test="arg2!=null ">
-            AND create_time &lt;= #{arg2}
+          <if test="endDate!=null ">
+            AND create_time &lt;= #{endDate}
           </if>
     </select>
     
@@ -123,14 +123,14 @@
             SELECT order_id FROM order_info a 
              WHERE 1=1 AND order_type=3
                AND order_status NOT IN ('0','4')
-             <if test="arg0!=null and arg0!='' ">
-            AND distributor_id =#{arg0}
+             <if test="distributorId!=null and distributorId!='' ">
+            AND distributor_id =#{distributorId}
           </if>
-          <if test="arg1!=null ">
-            AND create_time &gt;= #{arg1}
+          <if test="beginDate!=null ">
+            AND create_time &gt;= #{beginDate}
           </if>
-          <if test="arg2!=null ">
-            AND create_time &lt;= #{arg2}
+          <if test="endDate!=null ">
+            AND create_time &lt;= #{endDate}
           </if>
           )
     </select>
@@ -144,14 +144,14 @@
             SELECT order_id FROM order_info a 
              WHERE 1=1 AND order_type=3
                AND order_status NOT IN ('0','4')
-             <if test="arg0!=null and arg0!='' ">
-            AND distributor_id =#{arg0}
+             <if test="distributorId!=null and distributorId!='' ">
+            AND distributor_id =#{distributorId}
           </if>
-          <if test="arg1!=null ">
-            AND create_time &gt;= #{arg1}
+          <if test="beginDate!=null ">
+            AND create_time &gt;= #{beginDate}
           </if>
-          <if test="arg2!=null ">
-            AND create_time &lt;= #{arg2}
+          <if test="endDate!=null ">
+            AND create_time &lt;= #{endDate}
           </if>
           )
     </select>
@@ -162,14 +162,14 @@
           WHERE 1=1 AND order_type=3
             AND a.order_id = b.order_id
             AND a.order_status NOT IN ('0','4')
-          <if test="arg0!=null and arg0!='' ">
-            AND a.distributor_id =#{arg0}
+          <if test="distributorId!=null and distributorId!='' ">
+            AND a.distributor_id =#{distributorId}
           </if>
-          <if test="arg1!=null ">
-            AND a.create_time &gt;= #{arg1}
+          <if test="beginDate!=null ">
+            AND a.create_time &gt;= #{beginDate}
           </if>
-          <if test="arg2!=null ">
-            AND a.create_time &lt;= #{arg2}
+          <if test="endDate!=null ">
+            AND a.create_time &lt;= #{endDate}
           </if>
     </select>
     
@@ -179,14 +179,14 @@
           WHERE 1=1 AND order_type=3
             AND a.order_id = b.order_id
             AND a.order_status NOT IN ('0','4')
-          <if test="arg0!=null and arg0!='' ">
-            AND a.distributor_id =#{arg0}
+          <if test="distributorId!=null and distributorId!='' ">
+            AND a.distributor_id =#{distributorId}
           </if>
-          <if test="arg1!=null ">
-            AND a.create_time &gt;= #{arg1}
+          <if test="beginDate!=null ">
+            AND a.create_time &gt;= #{beginDate}
           </if>
-          <if test="arg2!=null ">
-            AND a.create_time &lt;= #{arg2}
+          <if test="endDate!=null ">
+            AND a.create_time &lt;= #{endDate}
           </if>
           group by b.type_id,b.type_name
     </select>
@@ -201,14 +201,14 @@
             SELECT order_id FROM order_info a 
              WHERE 1=1 AND order_type=3
                AND order_status NOT IN ('0','4')
-             <if test="arg0!=null and arg0!='' ">
-            AND distributor_id =#{arg0}
+             <if test="distributorId!=null and distributorId!='' ">
+            AND distributor_id =#{distributorId}
           </if>
-          <if test="arg1!=null ">
-            AND a.create_time &gt;= #{arg1}
+          <if test="beginDate!=null ">
+            AND a.create_time &gt;= #{beginDate}
           </if>
-          <if test="arg2!=null ">
-            AND a.create_time &lt;= #{arg2}
+          <if test="endDate!=null ">
+            AND a.create_time &lt;= #{endDate}
           </if>
           )
           group by b.type_id,b.type_name
@@ -220,14 +220,14 @@
           WHERE 1=1 AND order_type=3
             AND a.order_id = b.order_id
             AND a.order_status NOT IN ('0','4')
-          <if test="arg0!=null and arg0!='' ">
-            AND a.distributor_id =#{arg0}
+          <if test="distributorId!=null and distributorId!='' ">
+            AND a.distributor_id =#{distributorId}
           </if>
-          <if test="arg1!=null ">
-            AND a.create_time &gt;= #{arg1}
+          <if test="beginDate!=null ">
+            AND a.create_time &gt;= #{beginDate}
           </if>
-          <if test="arg2!=null ">
-            AND a.create_time &lt;= #{arg2}
+          <if test="endDate!=null ">
+            AND a.create_time &lt;= #{endDate}
           </if>
           group by b.type_id,b.type_name
     </select>
@@ -242,14 +242,14 @@
             SELECT order_id FROM order_info a 
              WHERE 1=1 AND order_type=3
                AND order_status NOT IN ('0','4')
-             <if test="arg0!=null and arg0!='' ">
-            AND distributor_id =#{arg0}
+             <if test="distributorId!=null and distributorId!='' ">
+            AND distributor_id =#{distributorId}
           </if>
-          <if test="arg1!=null ">
-            AND a.create_time &gt;= #{arg1}
+          <if test="beginDate!=null ">
+            AND a.create_time &gt;= #{beginDate}
           </if>
-          <if test="arg2!=null ">
-            AND a.create_time &lt;= #{arg2}
+          <if test="endDate!=null ">
+            AND a.create_time &lt;= #{endDate}
           </if>
           )
           group by b.type_id,b.type_name
@@ -260,17 +260,17 @@
          SELECT COUNT(DISTINCT a.member_id) FROM order_info a, order_detail b
           WHERE 1=1 AND order_type=3
           and a.order_id = b.order_id
-          <if test="arg0!=null and arg0!='' ">
-            AND a.distributor_id =#{arg0}
+          <if test="distributorId!=null and distributorId!='' ">
+            AND a.distributor_id =#{distributorId}
           </if>
-          <if test="arg1!=null ">
-            AND a.create_time &gt;= #{arg1}
+          <if test="beginDate!=null ">
+            AND a.create_time &gt;= #{beginDate}
           </if>
-          <if test="arg2!=null ">
-            AND a.create_time &lt;= #{arg2}
+          <if test="endDate!=null ">
+            AND a.create_time &lt;= #{endDate}
           </if>
-          <if test="arg3!=null and arg3!='' ">
-            AND b.type_id =#{arg3}
+          <if test="typeId!=null and typeId!='' ">
+            AND b.type_id =#{typeId}
           </if>
     </select>
     

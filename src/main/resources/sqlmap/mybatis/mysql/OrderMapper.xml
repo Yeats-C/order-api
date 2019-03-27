@@ -469,12 +469,12 @@
     <select id="selectOrderAmt"  resultType="java.lang.Integer">
          SELECT SUM(b.actual_price) AS total_price FROM order_info b
          WHERE  1=1 and order_type = 1
-         and b.distributor_id =#{arg0}
+         and b.distributor_id =#{distributorId}
          AND b.order_status NOT IN ('0','4')
          AND b.pay_status='1'
-         <if test="arg1!=null" >
+         <if test="originTypeList!=null" >
 		  and b.origin_type in (
-		 <foreach collection="arg1" item="origin_type" separator=",">
+		 <foreach collection="originTypeList" item="origin_type" separator=",">
 			 '${origin_type}'
 		 </foreach>
 			)
@@ -485,38 +485,38 @@
     <select id="selectByMonthAllAmt" resultType="java.lang.Integer">
          SELECT SUM(b.actual_price) AS total_price FROM order_info b
          WHERE  1=1 and order_type = 1 
-         and b.distributor_id = #{arg0}
+         and b.distributor_id = #{distributorId}
          AND b.order_status NOT IN ('0','4')
          AND b.pay_status='1'
-         <if test="arg1!=null" >
+         <if test="originTypeList!=null" >
 		  and b.origin_type in (
-		  <foreach collection="arg1" item="origin_type" separator=",">
+		  <foreach collection="originTypeList" item="origin_type" separator=",">
 			 '${origin_type}'
 		  </foreach>
 			)
           </if>
-         AND b.create_time &gt;= #{arg2}
-         AND b.create_time &lt;= #{arg3}
+         AND b.create_time &gt;= #{dayBegin}
+         AND b.create_time &lt;= #{dayEnd}
     </select>
     
     <!-- 接口-分销机构+日维度- 昨日销售额：包含退货、不包含取消、未付款的订单  -->
     <select id="selectByYesdayAllAmt" resultType="java.lang.Integer">
          SELECT SUM(b.actual_price) AS total_price FROM order_info b
          WHERE  1=1 and order_type = 1 
-         <if test="arg0!=null and arg0 !='' ">
-         and b.distributor_id = #{arg0}
+         <if test="distributorId!=null and distributorId !='' ">
+         and b.distributor_id = #{distributorId}
          </if>
          AND b.order_status NOT IN ('0','4')
          AND b.pay_status='1'
-         <if test="arg1!=null" >
+         <if test="originTypeList!=null" >
 		  and b.origin_type in (
-		  <foreach collection="arg1" item="origin_type" separator=",">
+		  <foreach collection="originTypeList" item="origin_type" separator=",">
 			 '${origin_type}'
 		  </foreach>
 			)
           </if>
-         AND b.create_time &gt;= #{arg2}
-         AND b.create_time &lt;= #{arg3}
+         AND b.create_time &gt;= #{dayBegin}
+         AND b.create_time &lt;= #{dayEnd}
     </select>
     
     <!-- 接口-分销机构+当月维度-当月支付订单数   当月支付订单数：包含退货、不包含取消、未付款的订单-->
@@ -524,18 +524,18 @@
          SELECT count(b.order_id) AS total_acount from order_info b
          WHERE  
          1=1 and order_type = 1
-         and b.distributor_id = #{arg0}
+         and b.distributor_id = #{distributorId}
          AND b.order_status NOT IN ('0','4')
          AND b.pay_status='1'
-         <if test="arg1!=null" >
+         <if test="originTypeList!=null" >
 		  and b.origin_type in (
-		  <foreach collection="arg1" item="origin_type" separator=",">
+		  <foreach collection="originTypeList" item="origin_type" separator=",">
 			 '${origin_type}'
 		  </foreach>
 			)
           </if>
-         AND b.create_time &gt;= #{arg2}
-         AND b.create_time &lt;= #{arg3}
+         AND b.create_time &gt;= #{dayBegin}
+         AND b.create_time &lt;= #{dayEnd}
     </select>
     
     <!-- 接口-分销机构+日维度-昨日支付订单数  昨日支付订单数：包含退货、不包含取消、未付款的订单-->
@@ -543,18 +543,18 @@
          SELECT count(b.order_id) AS total_acount from order_info b
          WHERE  
          1=1 and order_type = 1
-         and b.distributor_id = #{arg0}
+         and b.distributor_id = #{distributorId}
          AND b.order_status NOT IN ('0','4')
          AND b.pay_status='1'
-         <if test="arg1!=null" >
+         <if test="originTypeList!=null" >
 		  and b.origin_type in (
-		  <foreach collection="arg1" item="origin_type" separator=",">
+		  <foreach collection="originTypeList" item="origin_type" separator=",">
 			 '${origin_type}'
 		  </foreach>
 			)
          </if>
-         AND b.create_time &gt;= #{arg2}
-         AND b.create_time &lt;= #{arg3}
+         AND b.create_time &gt;= #{dayBegin}
+         AND b.create_time &lt;= #{dayEnd}
     </select>
     
     <!-- 接口-分销机构+当月维度-当月实收    当月实收：不包含退货、未付款、取消的订单 -->
@@ -562,35 +562,35 @@
       SELECT CASE WHEN b.return_price IS NULL  THEN a.real_amt ELSE a.real_amt-b.return_price END AS real_amt FROM (
       SELECT '1' AS create_time,SUM(actual_price) AS real_amt FROM order_info b
       WHERE 1=1 and order_type = 1
-      AND b.distributor_id = #{arg0}
+      AND b.distributor_id = #{distributorId}
       AND b.order_status NOT IN ('0','4')
       AND b.pay_status='1'
-      <if test="arg1!=null" >
+      <if test="originTypeList!=null" >
 		  and b.origin_type in (
-		  <foreach collection="arg1" item="origin_type" separator=",">
+		  <foreach collection="originTypeList" item="origin_type" separator=",">
 			 '${origin_type}'
 		  </foreach>
 			)
        </if>
-      AND b.create_time &gt;= #{arg2}
-      AND b.create_time &lt;= #{arg3}
+      AND b.create_time &gt;= #{dayBegin}
+      AND b.create_time &lt;= #{dayEnd}
       )a
       LEFT JOIN 
       (
       SELECT '1' AS create_time,SUM(return_price)AS return_price FROM order_after_sale b
       WHERE 
       1=1 AND order_type = 1
-      AND b.distributor_id = #{arg0}
+      AND b.distributor_id = #{distributorId}
       AND b.after_sale_status='3'
-      <if test="arg1!=null" >
+      <if test="originTypeList!=null" >
 		  and b.origin_type in (
-		  <foreach collection="arg1" item="origin_type" separator=",">
+		  <foreach collection="originTypeList" item="origin_type" separator=",">
 			 '${origin_type}'
 		  </foreach>
 			)
        </if>
-      AND b.create_time &gt;= #{arg2}
-      AND b.create_time &lt;= #{arg3}
+      AND b.create_time &gt;= #{dayBegin}
+      AND b.create_time &lt;= #{dayEnd}
       )b 
       ON a.create_time = b.create_time
     </select>
@@ -601,35 +601,35 @@
       SELECT CASE WHEN b.return_price IS NULL  THEN a.real_amt ELSE a.real_amt-b.return_price END  AS real_amt FROM (
       SELECT '1' AS create_time,COUNT(b.order_id) AS order_acount,SUM(actual_price) AS real_amt FROM order_info b
       WHERE 1=1 and order_type = 1
-      AND b.distributor_id = #{arg0}
+      AND b.distributor_id = #{distributorId}
       AND b.order_status NOT IN ('0','4')
       AND b.pay_status='1'
-      <if test="arg1!=null" >
+      <if test="originTypeList!=null" >
 		  and b.origin_type in (
-		  <foreach collection="arg1" item="origin_type" separator=",">
+		  <foreach collection="originTypeList" item="origin_type" separator=",">
 			 '${origin_type}'
 		  </foreach>
 			)
        </if>
-      AND b.create_time &gt;= #{arg2}
-      AND b.create_time &lt;= #{arg3}
+      AND b.create_time &gt;= #{dayBegin}
+      AND b.create_time &lt;= #{dayEnd}
       )a
       LEFT JOIN 
       (
       SELECT '1' AS create_time,SUM(return_price)AS return_price FROM order_after_sale b
       WHERE 
       1=1 and order_type = 1
-      AND b.distributor_id = #{arg0}
+      AND b.distributor_id = #{distributorId}
       AND b.after_sale_status='3'
-      <if test="arg1!=null" >
+      <if test="originTypeList!=null" >
 		  and b.origin_type in (
-		  <foreach collection="arg1" item="origin_type" separator=",">
+		  <foreach collection="originTypeList" item="origin_type" separator=",">
 			 '${origin_type}'
 		  </foreach>
 			)
        </if>
-      AND b.create_time &gt;= #{arg2}
-      AND b.create_time &lt;= #{arg3}
+      AND b.create_time &gt;= #{dayBegin}
+      AND b.create_time &lt;= #{dayEnd}
       )b 
       ON a.create_time = b.create_time
     </select>
@@ -1017,14 +1017,14 @@
          WHERE  1=1 and order_type = 1 
          AND b.order_status NOT IN ('0','4')
          AND b.pay_status='1'
-         <if test="arg0!=null and arg0!=''">
-         and b.distributor_code = #{arg0}
+         <if test="distributorId!=null and distributorId!=''">
+         and b.distributor_code = #{distributorId}
          </if>
-         <if test="arg1!=null ">
-         and b.create_time &gt;= #{arg1}  
+         <if test="beginTime!=null ">
+         and b.create_time &gt;= #{beginTime}  
          </if>
-         <if test="arg2!=null ">
-         AND b.create_time &lt;= #{arg2}
+         <if test="endTime!=null ">
+         AND b.create_time &lt;= #{endTime}
          </if>
     </select>
     
@@ -1069,8 +1069,8 @@
           WHERE 1=1 AND order_type = 1
             AND order_status IN ('0','4')
             AND suk_return IS NULL
-            AND create_time &gt;= #{arg0}
-            AND create_time &lt;= #{arg1}
+            AND create_time &gt;= #{beginTime}
+            AND create_time &lt;= #{endTime}
     </select>
     
     <!-- 修改统计销量状态 -->

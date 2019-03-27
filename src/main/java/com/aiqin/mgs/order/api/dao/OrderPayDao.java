@@ -8,12 +8,11 @@
 package com.aiqin.mgs.order.api.dao;
 
 import java.util.List;
-
 import javax.validation.Valid;
 
-import com.aiqin.mgs.order.api.domain.OrderPayInfo;
+import org.apache.ibatis.annotations.Param;
 
-import io.lettuce.core.dynamic.annotation.Param;
+import com.aiqin.mgs.order.api.domain.OrderPayInfo;
 
 public interface OrderPayDao {
 

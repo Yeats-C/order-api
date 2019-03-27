@@ -11,9 +11,9 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import com.aiqin.mgs.order.api.domain.*;
+import org.apache.ibatis.annotations.Param;
 
-import io.lettuce.core.dynamic.annotation.Param;
+import com.aiqin.mgs.order.api.domain.*;
 
 public interface OrderLogDao {
 

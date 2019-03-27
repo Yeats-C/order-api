@@ -12,6 +12,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.request.DevelRequest;
 import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
@@ -24,8 +26,6 @@ import com.aiqin.mgs.order.api.domain.response.OrderNoCodeResponse.SelectSaleVie
 import com.aiqin.mgs.order.api.domain.response.LastBuyResponse;
 import com.aiqin.mgs.order.api.domain.response.MevBuyResponse;
 import com.aiqin.mgs.order.api.domain.response.OradskuResponse;
-
-import io.lettuce.core.dynamic.annotation.Param;
 
 public interface OrderNoCodeDao {
 

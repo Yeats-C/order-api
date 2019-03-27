@@ -15,7 +15,7 @@ import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 
-import io.lettuce.core.dynamic.annotation.Param;
+
 
 public interface OrderAfterDetailDao {
 
