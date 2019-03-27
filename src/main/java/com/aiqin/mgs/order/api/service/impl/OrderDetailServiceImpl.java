@@ -603,7 +603,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			
             for(String skuCode : sukList) {
             	
-            	for(int i=-14;i<1;i++) {
+            	for(int i=-13;i<1;i++) {
             		amount = orderDetailDao.getSkuAmount(skuCode,DateUtil.NextDate(i));
             		price = orderDetailDao.getSkuPrice(skuCode,DateUtil.NextDate(i));
             		transDate = DateUtil.NextDate(i);
