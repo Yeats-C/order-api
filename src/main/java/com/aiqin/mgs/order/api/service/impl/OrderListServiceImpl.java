@@ -313,6 +313,17 @@ public class OrderListServiceImpl implements OrderListService {
     }
 
     @Override
+    public List<String> selectOrderCancellation(int i, Date date) {
+        return  orderListDao.selectOrderCancellation(i,date);
+
+    }
+
+    @Override
+    public Boolean updateOrderCancellation(List<String> codeString,Integer stu) {
+        return orderListDao.updateOrderCancellation(codeString,stu);
+    }
+
+    @Override
     public PageResData<OrderListFather> searchOrderListFather(OrderListVo param) {
         List<OrderListFather> inventories = orderListDao.searchOrderListFather(param);
         for (OrderListFather inventory : inventories) {
