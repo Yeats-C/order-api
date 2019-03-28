@@ -31,7 +31,8 @@ public class BridgeStockServiceImpl implements BridgeStockService {
         HttpClient client = HttpClient.post(urlProperties.getProductApi() + "/stock/lock/merchant").json(reqVo);
         HttpResponse<List<StockLockRespVo>> response = client.action().result(new TypeReference<HttpResponse<List<StockLockRespVo>>>() {
         });
-        Assert.isTrue(Objects.nonNull(response) && Objects.equals("0", response.getCode()), "锁定库存失败");
+        Assert.notNull(response, "锁定库存失败");
+        Assert.isTrue(Objects.equals("0", response.getCode()), response.getMessage());
         return response.getData();
 //        List<StockLockRespVo> lockRespVos = Lists.newLinkedList();
 //        reqVo.getSkuList().forEach(skuReqVo -> {

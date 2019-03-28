@@ -435,7 +435,9 @@ public class OrderListServiceImpl implements OrderListService {
         stockLockReqVo.setCompanyCode(reqVo.getCompanyCode());
         stockLockReqVo.setProvinceId(reqVo.getProvinceCode());
         stockLockReqVo.setOrderCode(orderCode.get());
+        log.info("锁定库存请求入参：{}", JsonUtil.toJson(stockLockReqVo));
         List<StockLockRespVo> lockRespVos = bridgeStockService.lock(stockLockReqVo);
+        log.info("锁定库存返回数据：{}", JsonUtil.toJson(lockRespVos));
         Map<String, List<StockLockRespVo>> stockMap = lockRespVos.stream().collect(Collectors.toMap(StockLockRespVo::getLineNum, Lists::newArrayList, (l1, l2) -> {
             l1.addAll(l2);
             return l1;
