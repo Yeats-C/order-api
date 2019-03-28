@@ -269,6 +269,7 @@ public class OrderListServiceImpl implements OrderListService {
         return re;
     }
 
+    @Transactional
     @Override
     public Boolean updateOrderStatusPayment(OrderStatusPayment vop) {
         if (vop.getOrderCode() == null || vop.getOrderCode().length() == 0) {
