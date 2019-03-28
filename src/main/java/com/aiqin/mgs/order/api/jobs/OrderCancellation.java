@@ -27,8 +27,8 @@ public class OrderCancellation {
     @Value("${overtime}")
     private  Integer overtime;
     //订单创建超过30分钟未支付的订单改为99, "交易取消"
-//    @Scheduled(cron = "0 0/1 * * * ? ")
-    @Scheduled(cron = "0/1 * * * * ? ")
+    @Scheduled(cron = "0 0/1 * * * ? ")
+//    @Scheduled(cron = "0/1 * * * * ? ")
     public void cancellation() {
         //查询所有超过30分钟未支付的订单
         List<String> codeString = orderListService.selectOrderCancellation(overtime, new Date());
