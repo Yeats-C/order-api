@@ -3,7 +3,6 @@ package com.aiqin.mgs.order.api.service.impl;
 import com.aiqin.ground.util.exception.GroundRuntimeException;
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.id.IdUtil;
-import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.component.OrderStatusEnum;
@@ -294,7 +293,7 @@ public class OrderListServiceImpl implements OrderListService {
             }
             SupplyOrderMainReqVO svo = new SupplyOrderMainReqVO();
             svo.setSubOrderInfo(vo);
-            log.info(JsonUtil.toJson(vo));
+//            log.info(JsonUtil.toJson(vo));
             HttpClient httpPost = HttpClient.post("http://" + purchase_ip + "/purchase/order/add").json(svo);
             HttpResponse<List<OrderStockReVo>> result =
                     httpPost.action().result(new TypeReference<HttpResponse<Boolean>>() {
