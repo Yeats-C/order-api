@@ -135,6 +135,13 @@ public class OrderServiceImpl implements OrderService{
 	   //根据支付类型查询订单
 	   payOrderIdList(OrderPublic.getOrderQuery(orderQuery));
 	   
+	   if(orderQuery.getPayType()!=null && !orderQuery.getPayType().equals("") && orderQuery.getOrderCode()!=null && !orderQuery.getOrderCode().equals("")) {
+		  if(orderQuery.getOrderIdList() !=null && orderQuery.getOrderIdList().size()>0) {
+						
+		  }else {
+		     return HttpResponse.success(null);
+		  }
+		}
 			try {
 				
 				List<OrderInfo> OrderInfolist = orderDao.selectOrder(OrderPublic.getOrderQuery(orderQuery));
@@ -188,7 +195,7 @@ public class OrderServiceImpl implements OrderService{
 				LOGGER.error("模糊查询订单列表异常 {}", e);
 				return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 			}
-			
+
 	}
 
 
@@ -212,7 +219,6 @@ public class OrderServiceImpl implements OrderService{
 				}
 			  } 
 		   }
-		
 	}
 
 
@@ -530,7 +536,7 @@ public class OrderServiceImpl implements OrderService{
 		}
 		//新增订单支付数据
         if(orderPayList != null && orderPayList.size()>0) {
-        	settlementService.addOrderPayList(orderPayList,orderId);
+        	settlementService.addOrderPayList(orderPayList,orderId,orderCode);
 		}
         //新增订单与优惠券关系数据
         if(orderCouponList !=null && orderCouponList.size()>0) {
@@ -1116,6 +1122,14 @@ public class OrderServiceImpl implements OrderService{
 			//根据支付类型查询订单
 			payOrderIdList(orderQuery);
 			
+			if(orderQuery.getPayType()!=null && !orderQuery.getPayType().equals("") && orderQuery.getOrderCode()!=null && !orderQuery.getOrderCode().equals("")) {
+				if(orderQuery.getOrderIdList() !=null && orderQuery.getOrderIdList().size()>0) {
+								
+				}else {
+				   return HttpResponse.success(null);
+				}
+			}
+			
 			//订单列表
 			List<OradskuResponse> OrderInfolist = orderDao.selectskuResponse(OrderPublic.getOrderQuery(orderQuery));
 			OradskuResponse oradskuResponse = new OradskuResponse();
@@ -1185,6 +1199,14 @@ public class OrderServiceImpl implements OrderService{
 			
 			//根据支付类型查询订单
 			payOrderIdList(orderQuery);
+			
+			if(orderQuery.getPayType()!=null && !orderQuery.getPayType().equals("") && orderQuery.getOrderCode()!=null && !orderQuery.getOrderCode().equals("")) {
+			   if(orderQuery.getOrderIdList() !=null && orderQuery.getOrderIdList().size()>0) {
+								
+			   }else {
+				  return HttpResponse.success(null);
+			   }
+			}
 			   
 			Integer icount =null;
 			orderQuery.setIcount(icount);
@@ -1367,7 +1389,7 @@ public class OrderServiceImpl implements OrderService{
 		//新增订单支付数据
         if(orderPayList != null && orderPayList.size()>0) {
         	try {
-        	settlementService.addOrderPayList(orderPayList,orderId);
+        	settlementService.addOrderPayList(orderPayList,orderId,orderCode);
             }catch (Exception e){
 			 LOGGER.error("新增订单支付数据异常：{}", e);
 	        }
@@ -1562,9 +1584,19 @@ public class OrderServiceImpl implements OrderService{
 			
 		  //删除订单支付数据
 			settlementService.deleteOrderPayList(orderId);
+			
+		  //查询订单编码
+			OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
+			
+			OrderInfo order = new OrderInfo();
+			order = orderDao.selecOrderById(orderDetailQuery);
+			String orderCode = "";
+			if(order !=null) {
+				orderCode = order.getOrderCode();
+			}
 	      //新增订单支付数据
           if(orderPayList != null && orderPayList.size()>0) {
-        	settlementService.addOrderPayList(orderPayList,orderId);
+        	settlementService.addOrderPayList(orderPayList,orderId,orderCode);
 		  }
           
           //修改订单支付方式信息

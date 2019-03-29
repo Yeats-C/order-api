@@ -29,6 +29,10 @@ public class OrderPayInfo extends PagesRequest {
 	@NotBlank
 	private String orderId;
 	
+	@ApiModelProperty(value="订单编码")
+	@JsonProperty("order_code")
+	private String orderCode;
+	
 	@ApiModelProperty(value="支付类型")
 	@JsonProperty("pay_type")
 	private Integer payType;
@@ -48,6 +52,16 @@ public class OrderPayInfo extends PagesRequest {
 	
 	
 	
+	public String getOrderCode() {
+		return orderCode;
+	}
+
+
+	public void setOrderCode(String orderCode) {
+		this.orderCode = orderCode;
+	}
+
+
 	@ApiModelProperty(value="下单时间",example = "2001-01-01 01:01:01")
 	@JsonProperty("create_time")
 	private String createTime;
