@@ -210,6 +210,12 @@ public class OrderServiceImpl implements OrderService{
 					if(orderQuery.getPayType() !=null && !orderQuery.getPayType().equals("")) {
 						info.setPayType(Integer.valueOf(orderQuery.getPayType()));
 					}
+					if(orderQuery.getOrderId() !=null && !orderQuery.getOrderId().equals("")) {
+						info.setOrderId(orderQuery.getOrderId());
+					}
+					if(orderQuery.getOrderCode() !=null && !orderQuery.getOrderCode().equals("")) {
+						info.setOrderCode(orderQuery.getOrderCode());
+					}
 					orderIdList = orderPayDao.orderIDListPay(info);
 					if(orderIdList !=null && orderIdList.size()>0) {
 						orderQuery.setOrderIdList(orderIdList);
