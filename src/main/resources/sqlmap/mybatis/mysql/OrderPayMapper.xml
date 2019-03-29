@@ -53,6 +53,9 @@
          <if test="payType!=null ">
          and pay_type = #{payType}
          </if>
+         <if test="orderId!=null and orderId!='' ">
+         and order_id = #{orderId}
+         </if>
     </select>
 </mapper>
 

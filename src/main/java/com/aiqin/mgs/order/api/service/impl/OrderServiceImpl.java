@@ -135,9 +135,13 @@ public class OrderServiceImpl implements OrderService{
 	   //根据支付类型查询订单
 	   payOrderIdList(OrderPublic.getOrderQuery(orderQuery));
 	   
-	   if(orderQuery.getPayType()!=null && (orderQuery.getOrderIdList() ==null || orderQuery.getOrderIdList().size()<=0)) {
-		   return HttpResponse.success(null);
-	   }
+	   if(orderQuery.getPayType()!=null && !orderQuery.getPayType().equals("") && orderQuery.getOrderCode()!=null && !orderQuery.getOrderCode().equals("")) {
+		  if(orderQuery.getOrderIdList() !=null && orderQuery.getOrderIdList().size()>0) {
+						
+		  }else {
+		     return HttpResponse.success(null);
+		  }
+		}
 			try {
 				
 				List<OrderInfo> OrderInfolist = orderDao.selectOrder(OrderPublic.getOrderQuery(orderQuery));
@@ -215,7 +219,6 @@ public class OrderServiceImpl implements OrderService{
 				}
 			  } 
 		   }
-		
 	}
 
 
@@ -1119,6 +1122,14 @@ public class OrderServiceImpl implements OrderService{
 			//根据支付类型查询订单
 			payOrderIdList(orderQuery);
 			
+			if(orderQuery.getPayType()!=null && !orderQuery.getPayType().equals("") && orderQuery.getOrderCode()!=null && !orderQuery.getOrderCode().equals("")) {
+				if(orderQuery.getOrderIdList() !=null && orderQuery.getOrderIdList().size()>0) {
+								
+				}else {
+				   return HttpResponse.success(null);
+				}
+			}
+			
 			//订单列表
 			List<OradskuResponse> OrderInfolist = orderDao.selectskuResponse(OrderPublic.getOrderQuery(orderQuery));
 			OradskuResponse oradskuResponse = new OradskuResponse();
@@ -1188,6 +1199,14 @@ public class OrderServiceImpl implements OrderService{
 			
 			//根据支付类型查询订单
 			payOrderIdList(orderQuery);
+			
+			if(orderQuery.getPayType()!=null && !orderQuery.getPayType().equals("") && orderQuery.getOrderCode()!=null && !orderQuery.getOrderCode().equals("")) {
+			   if(orderQuery.getOrderIdList() !=null && orderQuery.getOrderIdList().size()>0) {
+								
+			   }else {
+				  return HttpResponse.success(null);
+			   }
+			}
 			   
 			Integer icount =null;
 			orderQuery.setIcount(icount);
