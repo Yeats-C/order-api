@@ -295,8 +295,9 @@ public class OrderListServiceImpl implements OrderListService {
             }
             SupplyOrderMainReqVO svo = new SupplyOrderMainReqVO();
             svo.setSubOrderInfo(vo);
-            log.info(JsonUtil.toJson(vo));
+            log.info("推送订单：{}", JsonUtil.toJson(svo));
             HttpClient httpPost = HttpClient.post("http://" + purchase_ip + "/purchase/order/add").json(svo);
+            httpPost.timeout(50000);
             HttpResponse<List<OrderStockReVo>> result =
                     httpPost.action().result(new TypeReference<HttpResponse<Boolean>>() {
                     });
@@ -314,13 +315,13 @@ public class OrderListServiceImpl implements OrderListService {
 
     @Override
     public List<String> selectOrderCancellation(int i, Date date) {
-        return  orderListDao.selectOrderCancellation(i,date);
+        return orderListDao.selectOrderCancellation(i, date);
 
     }
 
     @Override
-    public Boolean updateOrderCancellation(List<String> codeString,Integer stu) {
-        return orderListDao.updateOrderCancellation(codeString,stu);
+    public Boolean updateOrderCancellation(List<String> codeString, Integer stu) {
+        return orderListDao.updateOrderCancellation(codeString, stu);
     }
 
     @Override
