@@ -610,4 +610,10 @@ public class OrderListServiceImpl implements OrderListService {
     public List<FirstOrderTimeRespVo> selectFirstOrderTime(List<String> storeIds) {
         return orderListDao.selectFirstOrderTime(storeIds);
     }
+
+    @Override
+    public Boolean updateProductReturnNum(UpdateProductReturnNumReqVo reqVo) {
+        orderListProductDao.updateProductReturnNum(reqVo.getOrderCode(), reqVo.getItems());
+        return true;
+    }
 }

@@ -29,6 +29,7 @@ public interface OrderListService {
 
     /**
      * 保存订单（只保存，不支付也不锁库和拆单）
+     *
      * @param reqVo
      * @return
      */
@@ -64,5 +65,7 @@ public interface OrderListService {
 
     List<String> selectOrderCancellation(int i, Date date);
 
-    Boolean updateOrderCancellation(List<String> codeString,Integer stu);
+    Boolean updateOrderCancellation(List<String> codeString, Integer stu);
+
+    Boolean updateProductReturnNum(UpdateProductReturnNumReqVo reqVo);
 }
