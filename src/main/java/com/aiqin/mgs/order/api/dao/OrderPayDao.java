@@ -17,7 +17,7 @@ import com.aiqin.mgs.order.api.domain.OrderPayInfo;
 public interface OrderPayDao {
 
     //添加新的支付数据
-	void orderPayList(@Valid OrderPayInfo info)throws Exception;
+	void addOrderPay(@Valid OrderPayInfo info)throws Exception;
 	
 	//查询支付数据通过Order_id
 	List<OrderPayInfo> pay(@Valid OrderPayInfo info)throws Exception;

@@ -4,6 +4,7 @@
 <resultMap id="OrderPayInfoMapping" type="com.aiqin.mgs.order.api.domain.OrderPayInfo">
 <result column="pay_id" jdbcType="VARCHAR" property="payId"/>
 <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+<result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
 <result column="pay_type" jdbcType="TINYINT" property="payType"/>
 <result column="pay_name" jdbcType="VARCHAR" property="payName"/>
 <result column="pay_status" jdbcType="TINYINT" property="payStatus"/>
@@ -18,9 +19,9 @@
     <!-- 插入支付表 -->
     <insert id="orderPayList" >
         insert into order_pay
-        (pay_id,order_id,pay_type,pay_name,pay_status,pay_price,create_time,update_time,create_by,update_by,pay_way)
+        (pay_id,order_id,order_code,pay_type,pay_name,pay_status,pay_price,create_time,update_time,create_by,update_by,pay_way)
         values
-        (#{payId},#{orderId},#{payType},#{payName},#{payStatus},#{payPrice},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},#{payWay})
+        (#{payId},#{orderId},#{orderCode},#{payType},#{payName},#{payStatus},#{payPrice},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},#{payWay})
     </insert>
     
         <!-- 订单查询byorderid -->
@@ -55,6 +56,9 @@
          </if>
          <if test="orderId!=null and orderId!='' ">
          and order_id = #{orderId}
+         </if>
+         <if test="orderCode!=null and orderCode!=''">
+		 and order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%') 
          </if>
     </select>
 </mapper>

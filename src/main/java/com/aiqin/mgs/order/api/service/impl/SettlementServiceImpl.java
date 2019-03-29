@@ -107,16 +107,17 @@ public class SettlementServiceImpl implements SettlementService{
     //添加新的支付数据
 	@Override
 	@Transactional
-	public void addOrderPayList(@Valid List<OrderPayInfo> orderPayList, @Valid String orderId) throws Exception {
+	public void addOrderPayList(@Valid List<OrderPayInfo> orderPayList, @Valid String orderId,@Valid String orderCode) throws Exception {
 		
 		if(orderPayList !=null && orderPayList.size()>0) {
 			for(OrderPayInfo info :orderPayList) {
 				
 				//订单ID,支付ID
 				info.setOrderId(orderId);
+				info.setOrderCode(orderCode);
 				info.setPayId(OrderPublic.getUUID());
 				
-			    orderPayDao.orderPayList(info);
+			    orderPayDao.addOrderPay(info);
 			}
 		}else {
 			LOGGER.warn("未获取到支付数据orderPayList :{},orderId : {}",orderPayList,orderId);

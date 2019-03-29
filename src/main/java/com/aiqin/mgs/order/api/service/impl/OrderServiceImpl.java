@@ -536,7 +536,7 @@ public class OrderServiceImpl implements OrderService{
 		}
 		//新增订单支付数据
         if(orderPayList != null && orderPayList.size()>0) {
-        	settlementService.addOrderPayList(orderPayList,orderId);
+        	settlementService.addOrderPayList(orderPayList,orderId,orderCode);
 		}
         //新增订单与优惠券关系数据
         if(orderCouponList !=null && orderCouponList.size()>0) {
@@ -1389,7 +1389,7 @@ public class OrderServiceImpl implements OrderService{
 		//新增订单支付数据
         if(orderPayList != null && orderPayList.size()>0) {
         	try {
-        	settlementService.addOrderPayList(orderPayList,orderId);
+        	settlementService.addOrderPayList(orderPayList,orderId,orderCode);
             }catch (Exception e){
 			 LOGGER.error("新增订单支付数据异常：{}", e);
 	        }
@@ -1584,9 +1584,19 @@ public class OrderServiceImpl implements OrderService{
 			
 		  //删除订单支付数据
 			settlementService.deleteOrderPayList(orderId);
+			
+		  //查询订单编码
+			OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
+			
+			OrderInfo order = new OrderInfo();
+			order = orderDao.selecOrderById(orderDetailQuery);
+			String orderCode = "";
+			if(order !=null) {
+				orderCode = order.getOrderCode();
+			}
 	      //新增订单支付数据
           if(orderPayList != null && orderPayList.size()>0) {
-        	settlementService.addOrderPayList(orderPayList,orderId);
+        	settlementService.addOrderPayList(orderPayList,orderId,orderCode);
 		  }
           
           //修改订单支付方式信息
