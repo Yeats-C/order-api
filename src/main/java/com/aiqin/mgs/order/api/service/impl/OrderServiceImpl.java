@@ -135,6 +135,9 @@ public class OrderServiceImpl implements OrderService{
 	   //根据支付类型查询订单
 	   payOrderIdList(OrderPublic.getOrderQuery(orderQuery));
 	   
+	   if(orderQuery.getPayType()!=null && (orderQuery.getOrderIdList() ==null || orderQuery.getOrderIdList().size()<=0)) {
+		   return HttpResponse.success(null);
+	   }
 			try {
 				
 				List<OrderInfo> OrderInfolist = orderDao.selectOrder(OrderPublic.getOrderQuery(orderQuery));
@@ -188,7 +191,7 @@ public class OrderServiceImpl implements OrderService{
 				LOGGER.error("模糊查询订单列表异常 {}", e);
 				return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 			}
-			
+
 	}
 
 
