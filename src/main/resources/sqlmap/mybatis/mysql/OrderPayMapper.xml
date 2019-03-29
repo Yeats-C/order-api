@@ -17,7 +17,7 @@
 </resultMap>
     
     <!-- 插入支付表 -->
-    <insert id="orderPayList" >
+    <insert id="addOrderPay" >
         insert into order_pay
         (pay_id,order_id,order_code,pay_type,pay_name,pay_status,pay_price,create_time,update_time,create_by,update_by,pay_way)
         values
