@@ -337,7 +337,7 @@ preferential_allocation activityApportionment,activity_code activityCode, pictur
 
     <update id="updateProductReturnNum">
         <foreach collection="items" index="index" item="item" separator=";">
-            update order_list_product set return_num=return_num-#{item.num} where orderCode=#{orderCode} and
+            update order_list_product set return_num=ifnull(return_num,0)+#{item.num} where order_code=#{orderCode} and
             order_product_id=#{item.orderProductId}
         </foreach>
     </update>
