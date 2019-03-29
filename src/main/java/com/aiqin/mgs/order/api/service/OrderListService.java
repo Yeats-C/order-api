@@ -8,6 +8,7 @@ import com.aiqin.mgs.order.api.domain.response.orderlistre.FirstOrderTimeRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderSaveRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -60,4 +61,8 @@ public interface OrderListService {
     Boolean updateOrderStatusReceiving(String code, String name);
 
     Boolean updateOrderStatusPayment(OrderStatusPayment vo);
+
+    List<String> selectOrderCancellation(int i, Date date);
+
+    Boolean updateOrderCancellation(List<String> codeString,Integer stu);
 }

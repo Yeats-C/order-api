@@ -6,6 +6,7 @@ import com.aiqin.mgs.order.api.domain.response.orderlistre.FirstOrderTimeRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -67,4 +68,8 @@ public interface OrderListDao {
     Boolean updateByCodePayment(OrderStatusPayment vo);
 
     Boolean updateStatusByCodeReceiving(@Param("code") String code, @Param("status") Integer statu);
+
+    List<String> selectOrderCancellation(@Param("overtime") int i, @Param("date") Date date);
+
+    Boolean updateOrderCancellation(@Param("list") List<String> codeString,@Param("stu") Integer stu);
 }
