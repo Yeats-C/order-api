@@ -4,7 +4,6 @@ import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
-import com.aiqin.mgs.order.api.domain.OrderList;
 import com.aiqin.mgs.order.api.domain.OrderListLogistics;
 import com.aiqin.mgs.order.api.domain.request.orderList.*;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.FirstOrderTimeRespVo;
@@ -216,7 +215,7 @@ public class OrderListController {
      */
     @PostMapping("update/order/status/payment")
     @ApiOperation("修改订单状态支付专用接口")
-    public HttpResponse<Boolean> updateOrderStatusPayment(@RequestBody OrderStatusPayment vo ) {
+    public HttpResponse<Boolean> updateOrderStatusPayment(@RequestBody OrderStatusPayment vo) {
         log.info("Search  purchasingTarget list:{}", vo);
         try {
             return HttpResponse.success(this.orderListService.updateOrderStatusPayment(vo));
@@ -300,5 +299,15 @@ public class OrderListController {
     @ApiOperation("查询门店首单时间")
     public HttpResponse<List<FirstOrderTimeRespVo>> selectFirstOrderTime(@RequestParam("store_ids") List<String> storeIds) {
         return HttpResponse.success(orderListService.selectFirstOrderTime(storeIds));
+    }
+
+    @PostMapping("update/product/return/num")
+    @ApiOperation("修改订单商品退货数量")
+    public HttpResponse<Boolean> updateProductReturnNum(@RequestBody UpdateProductReturnNumReqVo reqVo) {
+        try {
+            return new HttpResponse<>(orderListService.updateProductReturnNum(reqVo));
+        } catch (Exception e) {
+            return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
+        }
     }
 }
