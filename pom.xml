@@ -15,7 +15,6 @@
     <name>order-api</name>
 
     <dependencies>
-
         <dependency>
             <groupId>com.aiqin.ground</groupId>
             <artifactId>ground-web</artifactId>
@@ -30,6 +29,16 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+        </dependency>
+		<dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.7</version>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>2.9.0</version>
         </dependency>
         
     </dependencies>
@@ -90,9 +99,6 @@
             <properties>
                 <profile.name>dev</profile.name>
             </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
         </profile>
         <profile>
             <id>release</id>
@@ -105,6 +111,9 @@
             <properties>
                 <profile.name>test</profile.name>
             </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
         </profile>
     </profiles>
 </project>

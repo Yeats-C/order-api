@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.OrderReceivingDao">
+<resultMap id="OrderReceivingMapping" type="com.aiqin.mgs.order.api.domain.OrderReceivingInfo">
+<result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+<result column="receive_name" jdbcType="VARCHAR" property="receiveName"/>
+<result column="receive_address" jdbcType="VARCHAR" property="receiveAddress"/>
+<result column="receive_phone" jdbcType="VARCHAR" property="receivePhone"/>
+<result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+<result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+<result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+<result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+</resultMap>
+    
+  
+    <!-- 查询订单收货信息表byOrderid -->
+    <select id="selecReceivingById"  resultMap="OrderReceivingMapping">
+    
+         SELECT * FROM order_receiving_info
+         where 1=1
+         <if test="orderId!=null and orderId!=''">
+		 and order_id = #{orderId}
+		 </if>
+         ORDER BY create_time DESC
+    </select>
+</mapper>
+

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.OrderPayDao">
+<resultMap id="OrderPayInfoMapping" type="com.aiqin.mgs.order.api.domain.OrderPayInfo">
+<result column="pay_id" jdbcType="VARCHAR" property="payId"/>
+<result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+<result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
+<result column="pay_type" jdbcType="TINYINT" property="payType"/>
+<result column="pay_name" jdbcType="VARCHAR" property="payName"/>
+<result column="pay_status" jdbcType="TINYINT" property="payStatus"/>
+<result column="pay_price" jdbcType="BIGINT" property="payPrice"/>
+<result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+<result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+<result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+<result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+<result column="pay_way" jdbcType="INTEGER" property="payWay"/>
+</resultMap>
+    
+    <!-- 插入支付表 -->
+    <insert id="addOrderPay" >
+        insert into order_pay
+        (pay_id,order_id,order_code,pay_type,pay_name,pay_status,pay_price,create_time,update_time,create_by,update_by,pay_way)
+        values
+        (#{payId},#{orderId},#{orderCode},#{payType},#{payName},#{payStatus},#{payPrice},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},#{payWay})
+    </insert>
+    
+        <!-- 订单查询byorderid -->
+    <select id="pay"  resultMap="OrderPayInfoMapping" resultType="java.util.List">
+    
+         SELECT * FROM order_pay
+         where 1=1
+         <if test="orderId!=null and orderId!='' ">
+		 and order_id = #{orderId}
+		 </if>
+		 ORDER BY create_time DESC
+    </select>
+    
+    <!-- 更改订单状态/支付状态/修改员... -->
+	<update id="usts">
+		UPDATE order_pay SET pay_status=#{payStatus},update_by=#{updateBy},update_time=CURRENT_TIMESTAMP 
+		where order_id = #{orderId}
+	</update>
+	
+	<!-- 已存在订单更新支付状态、重新生成支付数据(更改订单表、删除新增支付表) -->
+	<delete id="deleteOrderPayList" >
+		delete from order_pay WHERE order_id =#{orderId}
+     </delete>
+     
+     
+    <!--查询支付订单号 -->
+    <select id="orderIDListPay"  resultType="java.lang.String">
+         SELECT order_id FROM order_pay
+         where 1=1
+         <if test="payType!=null ">
+         and pay_type = #{payType}
+         </if>
+         <if test="orderId!=null and orderId!='' ">
+         and order_id = #{orderId}
+         </if>
+         <if test="orderCode!=null and orderCode!=''">
+		 and order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%') 
+         </if>
+    </select>
+</mapper>
+

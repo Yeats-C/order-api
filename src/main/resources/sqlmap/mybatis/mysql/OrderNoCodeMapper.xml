@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.OrderNoCodeDao">
+<resultMap id="OrderInfoMapping" type="com.aiqin.mgs.order.api.domain.OrderNoCodeInfo">
+<result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+<result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
+<result column="distributor_id" jdbcType="VARCHAR" property="distributorId"/>
+<result column="distributor_code" jdbcType="VARCHAR" property="distributorCode"/>
+<result column="distributor_name" jdbcType="VARCHAR" property="distributorName"/>
+<result column="member_id" jdbcType="VARCHAR" property="memberId"/>
+<result column="member_name" jdbcType="VARCHAR" property="memberName"/>
+<result column="member_phone" jdbcType="VARCHAR" property="memberPhone"/>
+<result column="member_type" jdbcType="INTEGER" property="memberType"/>
+<result column="actual_price" jdbcType="BIGINT" property="actualPrice"/>
+<result column="cashier_id" jdbcType="VARCHAR" property="cashierId"/>
+<result column="cashier_name" jdbcType="VARCHAR" property="cashierName"/>
+<result column="guide_id" jdbcType="VARCHAR" property="guideId"/>
+<result column="guide_name" jdbcType="VARCHAR" property="guideName"/>
+<result column="type_id" jdbcType="VARCHAR" property="typeId"/>
+<result column="type_name" jdbcType="VARCHAR" property="typeName"/>
+<result column="product_id" jdbcType="VARCHAR" property="productId"/>
+<result column="product_code" jdbcType="VARCHAR" property="productCode"/>
+<result column="product_name" jdbcType="VARCHAR" property="productName"/>
+<result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+</resultMap>
+
+<resultMap id="SaleViewMapping" type="com.aiqin.mgs.order.api.domain.response.OrderNoCodeResponse.SelectSaleViewResonse">
+<result column="type_id" jdbcType="VARCHAR" property="typeId"/>
+<result column="type_name" jdbcType="VARCHAR" property="typeName"/>
+<result column="product_code" jdbcType="VARCHAR" property="productCode"/>
+<result column="product_name" jdbcType="VARCHAR" property="productName"/>
+<result column="price" jdbcType="INTEGER" property="price"/>
+<result column="count" jdbcType="INTEGER" property="count"/>
+<result column="passenger_flow" jdbcType="INTEGER" property="passengerFlow"/>
+</resultMap>
+
+
+    <!-- 总销售金额 -->
+    <select id="getIncomePrice" resultType="java.lang.Integer">
+         SELECT SUM(IFNULL(actual_price,0)) FROM order_info a 
+          WHERE 1=1 AND order_type=3
+            AND order_status NOT IN ('0','4')
+          <if test="distributorId!=null and distributorId!='' ">
+            AND distributor_id =#{distributorId}
+          </if>
+          <if test="beginDate!=null ">
+            AND create_time &gt;= #{beginDate}
+          </if>
+          <if test="endDate!=null ">
+            AND create_time &lt;= #{endDate}
+          </if>
+    </select>
+    
+    <!-- 总退次金额 -->
+    <select id="getReturnPrice" resultType="java.lang.Integer">
+         SELECT SUM(IFNULL(return_price,0)) FROM order_after_sale
+          WHERE 1=1 AND order_type=3
+            AND after_sale_status='3'
+          <if test="distributorId!=null and distributorId!='' ">
+            AND distributor_id =#{distributorId}
+          </if>
+          <if test="beginDate!=null ">
+            AND create_time &gt;= #{beginDate}
+          </if>
+          <if test="endDate!=null ">
+            AND create_time &lt;= #{endDate}
+          </if>
+    </select>
+    
+    <!-- 总销量 -->
+    <select id="getIncomeCount" resultType="java.lang.Integer">
+         SELECT COUNT(1) FROM order_info a 
+          WHERE 1=1 AND order_type=3
+            AND order_status NOT IN ('0','4')
+          <if test="distributorId!=null and distributorId!='' ">
+            AND distributor_id =#{distributorId}
+          </if>
+          <if test="beginDate!=null ">
+            AND create_time &gt;= #{beginDate}
+          </if>
+          <if test="endDate!=null ">
+            AND create_time &lt;= #{endDate}
+          </if>
+    </select>
+    
+    <!-- 总退货量 -->
+    <select id="getReturnCount" resultType="java.lang.Integer">
+         SELECT COUNT(1) FROM order_after_sale
+          WHERE 1=1 AND order_type=3
+            AND after_sale_status='3'
+          <if test="distributorId!=null and distributorId!='' ">
+            AND distributor_id =#{distributorId}
+          </if>
+          <if test="beginDate!=null ">
+            AND create_time &gt;= #{beginDate}
+          </if>
+          <if test="endDate!=null ">
+            AND create_time &lt;= #{endDate}
+          </if>
+    </select>
+    
+    <!-- 当月客流量 -->
+    <select id="getPassengerFlow" resultType="java.lang.Integer">
+         SELECT COUNT(DISTINCT member_id) FROM order_info a 
+          WHERE 1=1 AND order_type=3
+          <if test="distributorId!=null and distributorId!='' ">
+            AND distributor_id =#{distributorId}
+          </if>
+          <if test="beginDate!=null ">
+            AND create_time &gt;= #{beginDate}
+          </if>
+          <if test="endDate!=null ">
+            AND create_time &lt;= #{endDate}
+          </if>
+    </select>
+    
+    <!-- 昨日订单的当天退货金额 -->
+    <select id="getYesterdayReturnPrice" resultType="java.lang.Integer">
+         SELECT SUM(IFNULL(return_price,0)) FROM order_after_sale
+          WHERE 1=1 AND order_type=3
+            AND after_sale_status='3'
+            AND order_id in (
+            SELECT order_id FROM order_info a 
+             WHERE 1=1 AND order_type=3
+               AND order_status NOT IN ('0','4')
+             <if test="distributorId!=null and distributorId!='' ">
+            AND distributor_id =#{distributorId}
+          </if>
+          <if test="beginDate!=null ">
+            AND create_time &gt;= #{beginDate}
+          </if>
+          <if test="endDate!=null ">
+            AND create_time &lt;= #{endDate}
+          </if>
+          )
+    </select>
+    
+    <!-- 昨日订单的当天退货量 -->
+    <select id="getYesterdayReturnCount" resultType="java.lang.Integer">
+         SELECT COUNT(1) FROM order_after_sale
+          WHERE 1=1 AND order_type=3
+            AND after_sale_status='3'
+            AND order_id in (
+            SELECT order_id FROM order_info a 
+             WHERE 1=1 AND order_type=3
+               AND order_status NOT IN ('0','4')
+             <if test="distributorId!=null and distributorId!='' ">
+            AND distributor_id =#{distributorId}
+          </if>
+          <if test="beginDate!=null ">
+            AND create_time &gt;= #{beginDate}
+          </if>
+          <if test="endDate!=null ">
+            AND create_time &lt;= #{endDate}
+          </if>
+          )
+    </select>
+    
+    <!-- 订单所涉及到的商品类别 -->
+    <select id="getTypeId" resultMap="SaleViewMapping" resultType="java.util.List">
+         SELECT distinct b.type_id,b.type_name FROM order_info a,order_detail b 
+          WHERE 1=1 AND order_type=3
+            AND a.order_id = b.order_id
+            AND a.order_status NOT IN ('0','4')
+          <if test="distributorId!=null and distributorId!='' ">
+            AND a.distributor_id =#{distributorId}
+          </if>
+          <if test="beginDate!=null ">
+            AND a.create_time &gt;= #{beginDate}
+          </if>
+          <if test="endDate!=null ">
+            AND a.create_time &lt;= #{endDate}
+          </if>
+    </select>
+    
+    <!-- 订单的销售额 -->
+    <select id="getIncomePriceGroupByTypeId" resultMap="SaleViewMapping" resultType="java.util.List" > 
+         SELECT SUM(IFNULL(a.actual_price,0)) as price,b.type_id,b.type_name FROM order_info a,order_detail b 
+          WHERE 1=1 AND order_type=3
+            AND a.order_id = b.order_id
+            AND a.order_status NOT IN ('0','4')
+          <if test="distributorId!=null and distributorId!='' ">
+            AND a.distributor_id =#{distributorId}
+          </if>
+          <if test="beginDate!=null ">
+            AND a.create_time &gt;= #{beginDate}
+          </if>
+          <if test="endDate!=null ">
+            AND a.create_time &lt;= #{endDate}
+          </if>
+          group by b.type_id,b.type_name
+    </select>
+    
+    <!-- 订单的退货金额 -->
+    <select id="getReturnPriceGroupByTypeId" resultMap="SaleViewMapping" resultType="java.util.List">
+         SELECT SUM(IFNULL(return_price,0)),b.type_id,b.type_name FROM order_after_sale a,order_detail b
+          WHERE 1=1 AND order_type=3
+            AND a.order_id = b.order_id
+            AND a.after_sale_status='3'
+            AND a.order_id in (
+            SELECT order_id FROM order_info a 
+             WHERE 1=1 AND order_type=3
+               AND order_status NOT IN ('0','4')
+             <if test="distributorId!=null and distributorId!='' ">
+            AND distributor_id =#{distributorId}
+          </if>
+          <if test="beginDate!=null ">
+            AND a.create_time &gt;= #{beginDate}
+          </if>
+          <if test="endDate!=null ">
+            AND a.create_time &lt;= #{endDate}
+          </if>
+          )
+          group by b.type_id,b.type_name
+    </select>
+    
+    <!-- 订单销量 -->
+    <select id="getIncomeCountGroupByTypeId" resultMap="SaleViewMapping" resultType="java.util.List">
+         SELECT COUNT(1),b.type_id,b.type_name FROM order_info a,order_detail b
+          WHERE 1=1 AND order_type=3
+            AND a.order_id = b.order_id
+            AND a.order_status NOT IN ('0','4')
+          <if test="distributorId!=null and distributorId!='' ">
+            AND a.distributor_id =#{distributorId}
+          </if>
+          <if test="beginDate!=null ">
+            AND a.create_time &gt;= #{beginDate}
+          </if>
+          <if test="endDate!=null ">
+            AND a.create_time &lt;= #{endDate}
+          </if>
+          group by b.type_id,b.type_name
+    </select>
+    
+    <!-- 订单的退货量 -->
+    <select id="getReturnCountGroupByTypeId" resultMap="SaleViewMapping" resultType="java.util.List">
+         SELECT COUNT(1),b.type_id,b.type_name FROM order_after_sale a,order_detail b
+          WHERE 1=1 AND order_type=3
+            AND a.order_id = b.order_id
+            AND a.after_sale_status='3'
+            AND a.order_id in (
+            SELECT order_id FROM order_info a 
+             WHERE 1=1 AND order_type=3
+               AND order_status NOT IN ('0','4')
+             <if test="distributorId!=null and distributorId!='' ">
+            AND distributor_id =#{distributorId}
+          </if>
+          <if test="beginDate!=null ">
+            AND a.create_time &gt;= #{beginDate}
+          </if>
+          <if test="endDate!=null ">
+            AND a.create_time &lt;= #{endDate}
+          </if>
+          )
+          group by b.type_id,b.type_name
+    </select>
+    
+    <!-- 客流量 -->
+    <select id="getPassengerFlowGroupByTypeId" resultType="java.lang.Integer">
+         SELECT COUNT(DISTINCT a.member_id) FROM order_info a, order_detail b
+          WHERE 1=1 AND order_type=3
+          and a.order_id = b.order_id
+          <if test="distributorId!=null and distributorId!='' ">
+            AND a.distributor_id =#{distributorId}
+          </if>
+          <if test="beginDate!=null ">
+            AND a.create_time &gt;= #{beginDate}
+          </if>
+          <if test="endDate!=null ">
+            AND a.create_time &lt;= #{endDate}
+          </if>
+          <if test="typeId!=null and typeId!='' ">
+            AND b.type_id =#{typeId}
+          </if>
+    </select>
+    
+    
+    <!-- 以上为概览查询 -->
+    <!-- 购买订单列表 -->
+    <!--<select id="selectNoCodeOrderList" resultMap="OrderInfoMapping" resultType="java.util.List">
+           SELECT a.order_id, a.order_code,a.distributor_id,a.distributor_code,a.distributor_name,
+                a.member_phone,a.create_time,b.type_id,b.product_id,
+                
+                a.member_id,a.member_name,CONVERT(CASE WHEN a.member_id IS NULL OR a.member_id=''  THEN 2 ELSE 1 END,SIGNED) AS member_type,
+                a.cashier_id,a.cashier_name,a.guide_id,a.guide_name,b.product_code,b.product_name,b.type_name,a.actual_price
+         FROM order_info a
+         left join order_detail b on a.order_id = b.order_id
+         
+          WHERE 1=1 AND order_type=3
+          <if test="orderId!=null and orderId!='' ">
+            AND a.order_id =#{orderId}
+          </if>
+          <if test="orderCode!=null and orderCode!='' ">
+            AND a.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%')
+          </if>
+          <if test="distributorGroup!=null and distributorGroup!='' ">
+            AND (a.distributor_code like concat('%',#{distributorGroup,jdbcType=VARCHAR},'%')  or a.distributor_name like concat('%',#{distributorGroup,jdbcType=VARCHAR},'%'))
+          </if>
+          <if test="distributorId!=null and distributorId!='' ">
+            AND a.distributor_id =#{distributorId}
+          </if>
+          <if test="distributorCode!=null and distributorCode!='' ">
+            AND a.distributor_code like concat('%',#{distributorCode,jdbcType=VARCHAR},'%')
+          </if>
+          <if test="distributorName!=null and distributorName!='' ">
+            AND a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
+          </if>
+          <if test="memberPhone!=null and memberPhone!='' ">
+            AND a.member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%')
+          </if>
+          <if test="beginDate!=null and beginDate!='' ">
+            AND DATE_FORMAT(a.create_time,"%Y-%m-%d") &gt;= #{beginDate}
+          </if>
+          <if test="endDate!=null and endDate!='' ">
+            AND DATE_FORMAT(a.create_time,"%Y-%m-%d") &lt;= #{endDate}
+          </if>
+          <if test="typeId!=null and typeId!='' ">
+            AND b.type_id =#{typeId}
+          </if>
+          <if test="productId!=null and productId!='' ">
+            AND b.product_id =#{productId}
+          </if>
+    </select>
+    -->
+    
+    <!-- 订单列表总数据条数-->
+    <!--<select id="selectNoCodeOrderListCount" resultType="java.lang.Integer">
+         SELECT count(1)
+         FROM order_info a
+         left join order_detail b on a.order_id = b.order_id
+          WHERE 1=1 AND order_type=3
+          <if test="orderId!=null and orderId!='' ">
+            AND a.order_id =#{orderId}
+          </if>
+          <if test="orderCode!=null and orderCode!='' ">
+            AND a.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%')
+          </if>
+          <if test="distributorGroup!=null and distributorGroup!='' ">
+            AND (a.distributor_code like concat('%',#{distributorGroup,jdbcType=VARCHAR},'%')  or a.distributor_name like concat('%',#{distributorGroup,jdbcType=VARCHAR},'%'))
+          </if>
+          <if test="distributorId!=null and distributorId!='' ">
+            AND a.distributor_id =#{distributorId}
+          </if>
+          <if test="distributorCode!=null and distributorCode!='' ">
+            AND a.distributor_code like concat('%',#{distributorCode,jdbcType=VARCHAR},'%')
+          </if>
+          <if test="distributorName!=null and distributorName!='' ">
+            AND a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
+          </if>
+          <if test="memberPhone!=null and memberPhone!='' ">
+            AND a.member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%')
+          </if>
+          <if test="beginDate!=null and beginDate!='' ">
+            AND DATE_FORMAT(a.create_time,"%Y-%m-%d") &gt;= #{beginDate}
+          </if>
+          <if test="endDate!=null and endDate!='' ">
+            AND DATE_FORMAT(a.create_time,"%Y-%m-%d") &lt;= #{endDate}
+          </if>
+          <if test="typeId!=null and typeId!='' ">
+            AND b.type_id =#{typeId}
+          </if>
+          <if test="productId!=null and productId!='' ">
+            AND b.product_id =#{productId}
+          </if>
+    </select>
+    -->
+    <!-- 退货订单列表 -->
+    <!--<select id="selectNoCodeReturnList" resultMap="OrderInfoMapping" resultType="java.util.List">
+         SELECT a.order_id, a.order_code,a.distributor_id,a.distributor_code,a.distributor_name,
+                a.member_phone,a.create_time,b.type_id,b.product_id,
+                
+                a.member_id,a.member_name,CONVERT(CASE WHEN a.member_id IS NULL OR a.member_id=''  THEN 2 ELSE 1 END,SIGNED) AS member_type,
+                a.cashier_id,a.cashier_name,a.guide_id,a.guide_name,b.product_code,b.product_name,b.type_name,a.actual_price
+         FROM order_after_sale c
+         left join order_detail b on c.order_id = b.order_id
+         left join order_info a on c.order_id = a.order_id
+          WHERE 1=1 AND c.order_type=3
+          <if test="orderId!=null and orderId!='' ">
+            AND a.order_id =#{orderId}
+          </if>
+          <if test="orderCode!=null and orderCode!='' ">
+            AND a.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%')
+          </if>
+          <if test="distributorGroup!=null and distributorGroup!='' ">
+            AND (a.distributor_code like concat('%',#{distributorGroup,jdbcType=VARCHAR},'%')  or a.distributor_name like concat('%',#{distributorGroup,jdbcType=VARCHAR},'%'))
+          </if>
+          <if test="distributorId!=null and distributorId!='' ">
+            AND a.distributor_id =#{distributorId}
+          </if>
+          <if test="distributorCode!=null and distributorCode!='' ">
+            AND a.distributor_code like concat('%',#{distributorCode,jdbcType=VARCHAR},'%')
+          </if>
+          <if test="distributorName!=null and distributorName!='' ">
+            AND a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
+          </if>
+          <if test="memberPhone!=null and memberPhone!='' ">
+            AND a.member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%')
+          </if>
+          <if test="beginDate!=null and beginDate!='' ">
+            AND DATE_FORMAT(a.create_time,"%Y-%m-%d") &gt;= #{beginDate}
+          </if>
+          <if test="endDate!=null and endDate!='' ">
+            AND DATE_FORMAT(a.create_time,"%Y-%m-%d") &lt;= #{endDate}
+          </if>
+          <if test="typeId!=null and typeId!='' ">
+            AND b.type_id =#{typeId}
+          </if>
+          <if test="productId!=null and productId!='' ">
+            AND b.product_id =#{productId}
+          </if>
+    </select>
+    -->
+    <!-- 退货订单列表总数据条数-->
+    <!--<select id="selectNoCodeReturnListCount" resultType="java.lang.Integer">
+         SELECT count(1)
+         FROM order_after_sale c
+         left join order_detail b on c.order_id = b.order_id
+         left join order_info a on c.order_id = a.order_id
+          WHERE 1=1 AND c.order_type=3
+          <if test="orderId!=null and orderId!='' ">
+            AND a.order_id =#{orderId}
+          </if>
+          <if test="orderCode!=null and orderCode!='' ">
+            AND a.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%')
+          </if>
+          <if test="distributorGroup!=null and distributorGroup!='' ">
+            AND (a.distributor_code like concat('%',#{distributorGroup,jdbcType=VARCHAR},'%')  or a.distributor_name like concat('%',#{distributorGroup,jdbcType=VARCHAR},'%'))
+          </if>
+          <if test="distributorId!=null and distributorId!='' ">
+            AND a.distributor_id =#{distributorId}
+          </if>
+          <if test="distributorCode!=null and distributorCode!='' ">
+            AND a.distributor_code like concat('%',#{distributorCode,jdbcType=VARCHAR},'%')
+          </if>
+          <if test="distributorName!=null and distributorName!='' ">
+            AND a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
+          </if>
+          <if test="memberPhone!=null and memberPhone!='' ">
+            AND a.member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%')
+          </if>
+          <if test="beginDate!=null and beginDate!='' ">
+            AND DATE_FORMAT(a.create_time,"%Y-%m-%d") &gt;= #{beginDate}
+          </if>
+          <if test="endDate!=null and endDate!='' ">
+            AND DATE_FORMAT(a.create_time,"%Y-%m-%d") &lt;= #{endDate}
+          </if>
+          <if test="typeId!=null and typeId!='' ">
+            AND b.type_id =#{typeId}
+          </if>
+          <if test="productId!=null and productId!='' ">
+            AND b.product_id =#{productId}
+          </if>
+    </select>
+    -->
+</mapper>
+

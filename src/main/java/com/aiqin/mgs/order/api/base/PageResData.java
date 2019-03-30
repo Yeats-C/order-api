@@ -1,21 +1,23 @@
-/**
- * 
- */
 package com.aiqin.mgs.order.api.base;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
-public class PageResData {
-    @JsonProperty("total_count")
+import java.util.List;
+
+
+@ApiModel("分页数据")
+public class PageResData<T> {
+    @ApiModelProperty("总条数")
     private Integer totalCount;
-    @JsonProperty("data_list")
-    private Object dataList;
+    @ApiModelProperty("返回数据")
+    private List<T> dataList;
 
     public PageResData() {
     }
 
-    public PageResData(Integer totalCount, Object dataList) {
+    public PageResData(Integer totalCount, List<T> dataList) {
         this.totalCount = totalCount;
         this.dataList = dataList;
     }
@@ -28,11 +30,11 @@ public class PageResData {
         this.totalCount = totalCount;
     }
 
-    public Object getDataList() {
+    public List<T> getDataList() {
         return dataList;
     }
 
-    public void setDataList(Object dataList) {
+    public void setDataList(List<T> dataList) {
         this.dataList = dataList;
     }
 

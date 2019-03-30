@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.OrderAfterDao">
+<resultMap id="OrderAfterMapping" type="com.aiqin.mgs.order.api.domain.OrderAfterSaleInfo">
+<result column="after_sale_id" jdbcType="VARCHAR" property="afterSaleId"/>
+<result column="after_sale_code" jdbcType="VARCHAR" property="afterSaleCode"/>
+<result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+<result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
+<result column="member_id" jdbcType="VARCHAR" property="memberId"/>
+<result column="member_name" jdbcType="VARCHAR" property="memberName"/>
+<result column="member_phone" jdbcType="VARCHAR" property="memberPhone"/>
+<result column="distributor_id" jdbcType="VARCHAR" property="distributorId"/>
+<result column="distributor_code" jdbcType="VARCHAR" property="distributorCode"/>
+<result column="distributor_name" jdbcType="VARCHAR" property="distributorName"/>
+<result column="return_price" jdbcType="BIGINT" property="returnPrice"/>
+<result column="after_sale_status" jdbcType="TINYINT" property="afterSaleStatus"/>
+<result column="after_sale_content" jdbcType="VARCHAR" property="afterSaleContent"/>
+<result column="after_sale_type" jdbcType="TINYINT" property="afterSaleType"/>
+<result column="process_type" jdbcType="TINYINT" property="processType"/>
+<result column="receive_name" jdbcType="VARCHAR" property="receiveName"/>
+<result column="receive_phone" jdbcType="VARCHAR" property="receivePhone"/>
+<result column="pay_type" jdbcType="TINYINT" property="payType"/>
+<result column="origin_type" jdbcType="TINYINT" property="originType"/>
+<result column="order_type" jdbcType="TINYINT" property="orderType"/>
+<result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+<result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+<result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+<result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+<result column="create_by_name" jdbcType="VARCHAR" property="createByName"/>
+<result column="update_by_name" jdbcType="VARCHAR" property="updateByName"/>
+<result column="return_money_type" jdbcType="TINYINT" property="returnMoneyType"/>
+</resultMap>
+
+    
+
+    <!-- 添加新的订单售后数据 --> 
+    <insert id="addAfterOrder" >
+        insert into order_after_sale
+        (after_sale_id,after_sale_code,order_id,order_code,member_id,member_name,member_phone,distributor_id,distributor_code,distributor_name,return_price,after_sale_status,after_sale_content,after_sale_type,process_type,receive_name,receive_phone,pay_type,origin_type,order_type,create_time,update_time,create_by,update_by,create_by_name,update_by_name
+        <if test="returnMoneyType!=null">
+        ,return_money_type
+        </if>
+        )
+        values
+        (#{afterSaleId},#{afterSaleCode},#{orderId},#{orderCode},#{memberId},#{memberName},#{memberPhone},#{distributorId},#{distributorCode},#{distributorName},#{returnPrice},#{afterSaleStatus},#{afterSaleContent},#{afterSaleType},#{processType},#{receiveName},#{receivePhone},#{payType},#{originType},#{orderType},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},
+        #{createByName},#{updateByName}
+        <if test="returnMoneyType!=null">
+        ,#{returnMoneyType}
+        </if>
+        )
+    </insert>
+    
+    
+    <!-- ID查询售后订单 -->
+    <select id="selectOrderAfterById"  resultMap="OrderAfterMapping" >
+         
+         SELECT * FROM order_after_sale
+		 WHERE 1=1 and order_type = 1
+		 <if test="afterSaleId!=null ">
+         and after_sale_id = #{afterSaleId}
+         </if>
+         ORDER BY create_time DESC
+    </select>
+    
+    
+    <!-- 售后订单查询 -->
+    <select id="selectOrderAfter"  resultMap="OrderAfterMapping" resultType="java.util.List">
+         SELECT * FROM order_after_sale
+		 WHERE 1=1 and order_type = 1
+		 <if test="distributorId!=null and distributorId!='' ">
+         and distributor_id = #{distributorId}
+         </if>
+         <if test="distributorName!=null and distributorName!='' ">
+		 and distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%') 
+		 </if>
+         <if test="afterSaleCode!=null and afterSaleCode!='' ">
+		 and after_sale_code like concat('%',#{afterSaleCode,jdbcType=VARCHAR},'%') 
+		 </if>
+		 <if test="afterSaleId!=null and afterSaleId!='' ">
+		 and after_sale_id like concat('%',#{afterSaleId,jdbcType=VARCHAR},'%') 
+		 </if>
+		 <if test="orderCode!=null and orderCode!=''">
+		 and order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%') 
+		 </if>
+		 <if test="memberPhone!=null and memberPhone!=''">
+		 and member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%') 
+         </if>
+         <if test="codeAndPhone!=null and codeAndPhone!=''">
+		 and (member_phone like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%') or after_sale_code like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%'))
+         </if>
+         <if test="beginTime!=null ">
+         and create_time &gt;= #{beginTime}
+         </if>
+         <if test="endTime!=null ">
+         and create_time &lt;= #{endTime}
+         </if>
+         <if test="payType!=null ">
+         and pay_type = #{payType}
+         </if>
+         <if test="afterSaleStatus!=null ">
+         and after_sale_status = #{afterSaleStatus}
+         </if>
+         <if test="originTypeList != null" >
+		     and origin_type in (
+		  <foreach collection="originTypeList" item="origin_type" separator=",">
+			 '${origin_type}'
+		  </foreach>
+			)
+          </if>
+         ORDER BY create_time DESC
+         <if test="icount!=null ">
+         limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+         </if>
+    </select>
+    
+    <!-- 个性化接口-通过ID更改售后表退货状态/修改员  -->
+	<update id="returnStatus" >
+		update order_after_sale set update_by=#{updateBy},update_by_name=#{updateByName},update_time=CURRENT_TIMESTAMP,after_sale_status=#{afterSaleStatus} where after_sale_id = #{afterSaleId}
+	</update>
+    
+</mapper>
+

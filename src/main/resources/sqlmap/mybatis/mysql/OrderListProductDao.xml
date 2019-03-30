@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.OrderListProductDao">
+    <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.OrderListProduct">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="order_list_id" jdbcType="VARCHAR" property="orderListId"/>
+        <result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
+        <result column="line_number" jdbcType="INTEGER" property="lineNumber"/>
+        <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
+        <result column="sku_name" jdbcType="VARCHAR" property="skuName"/>
+        <result column="product_price" jdbcType="INTEGER" property="productPrice"/>
+        <result column="product_number" jdbcType="INTEGER" property="productNumber"/>
+        <result column="activity_code" jdbcType="VARCHAR" property="activityCode"/>
+        <result column="activity_name" jdbcType="VARCHAR" property="activityName"/>
+        <result column="is_gift" jdbcType="BIT" property="isGift"/>
+        <result column="out_warehouse_code" jdbcType="VARCHAR" property="outWarehouseCode"/>
+        <result column="out_warehouse_name" jdbcType="VARCHAR" property="outWarehouseName"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+    id, order_list_id, order_code, line_number, sku_code, sku_name, product_price, product_number, 
+    activity_code, activity_name, is_gift, out_warehouse_code, out_warehouse_name
+  </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from order_list_product
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <select id="searchOrderListProductByCode" resultType="com.aiqin.mgs.order.api.domain.OrderListProduct">
+      select
+       id, order_product_id orderProductId, order_code orderCode, sku_code skuCode, sku_name skuName, product_number productNumber, activity_code activityCode,discount_amount_info discountAmountInfo,activity_type activityType,
+    activity_name activityName, gift, original_product_id originalProductId, specifications, unit, color_code colorCode, color_name colorName,
+    model_number modelNumber, actual_deliver_num actualDeliverNum, product_price productPrice, original_product_price originalProductPrice,
+    discount_money discountMoney,  amount, picture_url pictureUrl,  preferential_allocation preferentialAllocation,
+    return_num returnNum, supply_company_code supplyCompanyCode, supply_company_name supplyCompanyName, use_discount_amount useDiscountAmount,discount_amount_info discountAmountInfo,
+    product_type  productType
+      from order_list_product
+      where order_code = #{code}
+
+    </select>
+    <select id="searchOrderListProductByCodeOrOriginal"
+            resultType="com.aiqin.mgs.order.api.domain.request.orderList.SupplyOrderProductItemReqVO">
+      select order_product_id productLineNum,original_product_id promotionLineNum,
+    order_code orderCode, sku_code skuCode, sku_name skuName,color_name colorName,color_code colorCode,unit  unitName,gift givePromotion,product_number num,amount ,original_product_price  price,
+  preferential_allocation  preferentialAllocation,actual_deliver_num actualDeliverNum,specifications spec, return_num returnNum,supply_company_name supplyCompanyName,supply_company_code supplyCompanyCode,
+preferential_allocation activityApportionment,activity_code activityCode, picture_url pictureUrl
+      from order_list_product
+      where order_code in (select order_code from order_list where   order_code=#{code} or original=#{code})
+
+    </select>
+    <select id="searchOrderListProductByCodeList" resultType="com.aiqin.mgs.order.api.domain.OrderListProduct">
+        select
+        id, order_product_id orderProductId, order_code orderCode, sku_code skuCode, sku_name skuName, product_number
+        productNumber, activity_code activityCode,activity_type activityType,
+        activity_name activityName, gift, original_product_id originalProductId, specifications, unit, color_code
+        colorCode, color_name colorName,
+        model_number modelNumber, actual_deliver_num actualDeliverNum, product_price productPrice,
+        original_product_price originalProductPrice,
+        discount_money discountMoney, amount, picture_url pictureUrl, preferential_allocation preferentialAllocation,
+        return_num returnNum, supply_company_code supplyCompanyCode, supply_company_name supplyCompanyName,
+        use_discount_amount useDiscountAmount,discount_amount_info discountAmountInfo,
+        product_type productType
+        from order_list_product
+        where order_code in
+        <foreach close=")" collection="orderCode" item="code" open="(" separator=",">
+            #{code}
+        </foreach>
+
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from order_list_product
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
+    <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.OrderListProduct">
+    insert into order_list_product (id, order_list_id, order_code, 
+      line_number, sku_code, sku_name, 
+      product_price, product_number, activity_code, 
+      activity_name, is_gift, out_warehouse_code, 
+      out_warehouse_name)
+    values (#{id,jdbcType=BIGINT}, #{orderListId,jdbcType=VARCHAR}, #{orderCode,jdbcType=VARCHAR}, 
+      #{lineNumber,jdbcType=INTEGER}, #{skuCode,jdbcType=VARCHAR}, #{skuName,jdbcType=VARCHAR}, 
+      #{productPrice,jdbcType=INTEGER}, #{productNumber,jdbcType=INTEGER}, #{activityCode,jdbcType=VARCHAR}, 
+      #{activityName,jdbcType=VARCHAR}, #{isGift,jdbcType=BIT}, #{outWarehouseCode,jdbcType=VARCHAR}, 
+      #{outWarehouseName,jdbcType=VARCHAR})
+  </insert>
+    <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.OrderListProduct">
+        insert into order_list_product
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="orderListId != null">
+                order_list_id,
+            </if>
+            <if test="orderCode != null">
+                order_code,
+            </if>
+            <if test="lineNumber != null">
+                line_number,
+            </if>
+            <if test="skuCode != null">
+                sku_code,
+            </if>
+            <if test="skuName != null">
+                sku_name,
+            </if>
+            <if test="productPrice != null">
+                product_price,
+            </if>
+            <if test="productNumber != null">
+                product_number,
+            </if>
+            <if test="activityCode != null">
+                activity_code,
+            </if>
+            <if test="activityName != null">
+                activity_name,
+            </if>
+            <if test="isGift != null">
+                is_gift,
+            </if>
+            <if test="outWarehouseCode != null">
+                out_warehouse_code,
+            </if>
+            <if test="outWarehouseName != null">
+                out_warehouse_name,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="orderListId != null">
+                #{orderListId,jdbcType=VARCHAR},
+            </if>
+            <if test="orderCode != null">
+                #{orderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="lineNumber != null">
+                #{lineNumber,jdbcType=INTEGER},
+            </if>
+            <if test="skuCode != null">
+                #{skuCode,jdbcType=VARCHAR},
+            </if>
+            <if test="skuName != null">
+                #{skuName,jdbcType=VARCHAR},
+            </if>
+            <if test="productPrice != null">
+                #{productPrice,jdbcType=INTEGER},
+            </if>
+            <if test="productNumber != null">
+                #{productNumber,jdbcType=INTEGER},
+            </if>
+            <if test="activityCode != null">
+                #{activityCode,jdbcType=VARCHAR},
+            </if>
+            <if test="activityName != null">
+                #{activityName,jdbcType=VARCHAR},
+            </if>
+            <if test="isGift != null">
+                #{isGift,jdbcType=BIT},
+            </if>
+            <if test="outWarehouseCode != null">
+                #{outWarehouseCode,jdbcType=VARCHAR},
+            </if>
+            <if test="outWarehouseName != null">
+                #{outWarehouseName,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <insert id="insertList">
+        insert into order_list_product (id, order_product_id, order_code,
+        sku_code, sku_name, product_number,
+        activity_code,activity_type, activity_name, gift,
+        original_product_id, specifications, unit,
+        color_code, color_name, model_number,
+        actual_deliver_num, product_price, original_product_price,
+        discount_money,
+        amount, picture_url, preferential_allocation,
+        return_num, supply_company_code, supply_company_name,
+        use_discount_amount, discount_amount_info)
+        values
+        <foreach collection="list" item="product" index="index" separator=",">
+            (#{product.id,jdbcType=VARCHAR}, #{product.orderProductId,jdbcType=VARCHAR},
+            #{product.orderCode,jdbcType=VARCHAR},
+            #{product.skuCode,jdbcType=VARCHAR}, #{product.skuName,jdbcType=VARCHAR},
+            #{product.productNumber,jdbcType=INTEGER},
+            #{product.activityCode,jdbcType=VARCHAR},#{product.activityType,jdbcType=BIT},
+            #{product.activityName,jdbcType=VARCHAR},
+            #{product.gift,jdbcType=BIT},
+            #{product.originalProductId,jdbcType=VARCHAR}, #{product.specifications,jdbcType=VARCHAR},
+            #{product.unit,jdbcType=VARCHAR},
+            #{product.colorCode,jdbcType=VARCHAR}, #{product.colorName,jdbcType=VARCHAR},
+            #{product.modelNumber,jdbcType=VARCHAR},
+            #{product.actualDeliverNum,jdbcType=INTEGER}, #{product.productPrice,jdbcType=BIGINT},
+            #{product.originalProductPrice,jdbcType=BIGINT},
+            #{product.discountMoney,jdbcType=BIGINT},
+            #{product.amount,jdbcType=INTEGER}, #{product.pictureUrl,jdbcType=VARCHAR},
+            #{product.preferentialAllocation,jdbcType=INTEGER},
+            #{product.returnNum,jdbcType=INTEGER}, #{product.supplyCompanyCode,jdbcType=VARCHAR},
+            #{product.supplyCompanyName,jdbcType=VARCHAR},
+            #{product.useDiscountAmount},#{product.discountAmountInfo})
+        </foreach>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.OrderListProduct">
+        update order_list_product
+        <set>
+            <if test="orderListId != null">
+                order_list_id = #{orderListId,jdbcType=VARCHAR},
+            </if>
+            <if test="orderCode != null">
+                order_code = #{orderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="lineNumber != null">
+                line_number = #{lineNumber,jdbcType=INTEGER},
+            </if>
+            <if test="skuCode != null">
+                sku_code = #{skuCode,jdbcType=VARCHAR},
+            </if>
+            <if test="skuName != null">
+                sku_name = #{skuName,jdbcType=VARCHAR},
+            </if>
+            <if test="productPrice != null">
+                product_price = #{productPrice,jdbcType=INTEGER},
+            </if>
+            <if test="productNumber != null">
+                product_number = #{productNumber,jdbcType=INTEGER},
+            </if>
+            <if test="activityCode != null">
+                activity_code = #{activityCode,jdbcType=VARCHAR},
+            </if>
+            <if test="activityName != null">
+                activity_name = #{activityName,jdbcType=VARCHAR},
+            </if>
+            <if test="isGift != null">
+                is_gift = #{isGift,jdbcType=BIT},
+            </if>
+            <if test="outWarehouseCode != null">
+                out_warehouse_code = #{outWarehouseCode,jdbcType=VARCHAR},
+            </if>
+            <if test="outWarehouseName != null">
+                out_warehouse_name = #{outWarehouseName,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.aiqin.mgs.order.api.domain.OrderListProduct">
+    update order_list_product
+    set order_list_id = #{orderListId,jdbcType=VARCHAR},
+      order_code = #{orderCode,jdbcType=VARCHAR},
+      line_number = #{lineNumber,jdbcType=INTEGER},
+      sku_code = #{skuCode,jdbcType=VARCHAR},
+      sku_name = #{skuName,jdbcType=VARCHAR},
+      product_price = #{productPrice,jdbcType=INTEGER},
+      product_number = #{productNumber,jdbcType=INTEGER},
+      activity_code = #{activityCode,jdbcType=VARCHAR},
+      activity_name = #{activityName,jdbcType=VARCHAR},
+      is_gift = #{isGift,jdbcType=BIT},
+      out_warehouse_code = #{outWarehouseCode,jdbcType=VARCHAR},
+      out_warehouse_name = #{outWarehouseName,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+    <update id="updateByOrderProductId">
+        update order_list_product
+    set actual_deliver_num = #{vo.actualDeliverNum}
+
+    where order_product_id = #{vo.orderProductId} and order_code=#{code}
+
+    </update>
+
+    <delete id="deleteByOrderCode" parameterType="string">
+        delete from order_list_product where order_code=#{orderCode}
+    </delete>
+
+    <update id="updateProductReturnNum">
+        <foreach collection="items" index="index" item="item" separator=";">
+            update order_list_product set return_num=ifnull(return_num,0)+#{item.num} where order_code=#{orderCode} and
+            order_product_id=#{item.orderProductId}
+        </foreach>
+    </update>
+</mapper>

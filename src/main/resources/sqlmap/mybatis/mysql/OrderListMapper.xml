@@ -1,0 +1,1351 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.OrderListDao">
+    <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.OrderList">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
+        <result column="order_type" jdbcType="BIT" property="orderType"/>
+        <result column="order_status" jdbcType="VARCHAR" property="orderStatus"/>
+        <result column="payment_status" jdbcType="BIT" property="paymentStatus"/>
+        <result column="store_id" jdbcType="VARCHAR" property="storeId"/>
+        <result column="store_code" jdbcType="VARCHAR" property="storeCode"/>
+        <result column="store_name" jdbcType="VARCHAR" property="storeName"/>
+        <result column="store_type" jdbcType="VARCHAR" property="storeType"/>
+        <result column="total_orders" jdbcType="INTEGER" property="totalOrders"/>
+        <result column="actual_amount_paid" jdbcType="INTEGER" property="actualAmountPaid"/>
+        <result column="activity_amount" jdbcType="INTEGER" property="activityAmount"/>
+        <result column="preferential_quota" jdbcType="INTEGER" property="preferentialQuota"/>
+        <result column="logistics_remission_ratio" jdbcType="INTEGER" property="logisticsRemissionRatio"/>
+        <result column="place_order_time" jdbcType="TIMESTAMP" property="placeOrderTime"/>
+        <result column="account_balance" jdbcType="INTEGER" property="accountBalance"/>
+        <result column="line_credit" jdbcType="INTEGER" property="lineCredit"/>
+        <result column="receiving_address" jdbcType="VARCHAR" property="receivingAddress"/>
+        <result column="arrival_time" jdbcType="TIMESTAMP" property="arrivalTime"/>
+        <result column="consignee" jdbcType="VARCHAR" property="consignee"/>
+        <result column="consignee_phone" jdbcType="VARCHAR" property="consigneePhone"/>
+        <result column="company_code" jdbcType="VARCHAR" property="companyCode"/>
+        <result column="company_name" jdbcType="VARCHAR" property="companyName"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+    id, order_code, order_type, order_status, payment_status, store_id, store_code, store_name, 
+    store_type, total_orders, actual_amount_paid, activity_amount, preferential_quota, 
+    logistics_remission_ratio, place_order_time, account_balance, line_credit,
+    receiving_address, arrival_time, consignee, consignee_phone, company_code, company_name, 
+    create_by, create_time, update_by, update_time
+  </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from order_list
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <select id="searchOrderList" resultType="com.aiqin.mgs.order.api.domain.OrderList">
+        select
+        id, order_code orderCode, order_type orderType, order_status orderStatus, payment_status paymentStatus,
+        payment_time paymentTime, payment_type paymentType,
+        payment_type_code paymentTypeCode, store_id storeId, store_code storeCode, store_name storeName, store_type
+        storeType, total_orders totalOrders, actual_amount_paid actualAmountPaid,
+        activity_amount activityAmount, preferential_quota preferentialQuota, logistics_remission_ratio
+        logisticsRemissionRatio, logistics_remission_type logisticsRemissionType,
+        place_order_code placeOrderCode, place_order_time placeOrderTime, account_balance accountBalance, line_credit
+        lineCredit, receiving_address receivingAddress,
+        arrival_time arrivalTime, consignee, consignee_phone consigneePhone, company_code companyCode, company_name
+        companyName, original, province_code provinceCode,
+        province_name provinceName, city_code cityCode, city_name cityName, district_code districtCode, district_name
+        districtName, invoice_title invoiceTitle,
+        invoice_type invoiceType, order_original orderOriginal, product_num productNum, supplier_code supplierCode,
+        supplier_name supplierName,
+        transport_center_code transportCenterCode, transport_center_name transportCenterName, warehouse_code
+        warehouseCode, warehouse_name warehouseName, weight,
+        zip_code zipCode, remake, update_by updateBy, create_by createBy, update_time updateTime, create_time
+        createTime, application_gifts applicationGifts,
+        apply_coupons applyCoupons
+        from order_list
+        where 1=1
+        <if test="storeCode !=null">
+            and (store_code LIKE CONCAT('%',#{storeCode}, '%')
+            or store_name LIKE CONCAT('%',#{storeCode}, '%'))
+        </if>
+        <if test="startPlaceOrderTime !=null">
+            and place_order_time>#{startPlaceOrderTime}
+        </if>
+        <if test="endPlaceOrderTime !=null">
+            and #{endPlaceOrderTime}> place_order_time
+        </if>
+        <if test="paymentStatus !=null">
+            and payment_status=#{paymentStatus}
+        </if>
+        <if test="orderStatus !=null">
+            and order_status=#{orderStatus}
+        </if>
+        <if test="storeType !=null">
+            and store_type=#{storeType}
+        </if>
+        LIMIT #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </select>
+    <select id="searchOrderListCount" resultType="java.lang.Integer">
+        select
+        count(*)
+        from order_list
+        where 1=1
+        <if test="storeCode !=null">
+            and (store_code LIKE CONCAT('%',#{storeCode}, '%')
+            or store_name LIKE CONCAT('%',#{storeCode}, '%'))
+        </if>
+        <if test="startPlaceOrderTime !=null">
+            and place_order_time>#{startPlaceOrderTime}
+        </if>
+        <if test="endPlaceOrderTime !=null">
+            and #{endPlaceOrderTime}> place_order_time
+        </if>
+        <if test="paymentStatus !=null">
+            and payment_status=#{paymentStatus}
+        </if>
+        <if test="orderStatus !=null">
+            and order_status=#{orderStatus}
+        </if>
+        <if test="storeType !=null">
+            and store_type=#{storeType}
+        </if>
+    </select>
+    <select id="searchOrderByCode"
+            resultType="com.aiqin.mgs.order.api.domain.request.orderList.OrderListDetailsVo">
+        select
+       id, order_code orderCode, order_type orderType, order_status orderStatus, payment_status paymentStatus, payment_time paymentTime, payment_type paymentType,
+      payment_type_code paymentTypeCode, store_id storeId, store_code storeCode, store_name storeName, store_type storeType, total_orders totalOrders, actual_amount_paid actualAmountPaid,
+      activity_amount activityAmount, preferential_quota preferentialQuota, logistics_remission_ratio logisticsRemissionRatio, logistics_remission_type logisticsRemissionType,
+      place_order_code placeOrderCode, place_order_time placeOrderTime, account_balance accountBalance, line_credit lineCredit, receiving_address receivingAddress,
+      arrival_time arrivalTime, consignee, consignee_phone consigneePhone, company_code companyCode, company_name companyName, original, province_code provinceCode,
+      province_name provinceName, city_code cityCode, city_name cityName, district_code districtCode, district_name districtName, invoice_title invoiceTitle,
+      invoice_type invoiceType, order_original orderOriginal, product_num productNum,  supplier_code supplierCode, supplier_name supplierName,
+      transport_center_code transportCenterCode, transport_center_name transportCenterName, warehouse_code warehouseCode, warehouse_name warehouseName, weight,
+      zip_code zipCode, remake, update_by updateBy, create_by createBy, update_time updateTime, create_time createTime, application_gifts applicationGifts,
+      apply_coupons applyCoupons
+      from order_list
+      where  order_code=#{code}
+    </select>
+    <select id="searchOrderReceptionList" resultType="com.aiqin.mgs.order.api.domain.OrderList">
+
+        select
+        id, order_code orderCode, order_type orderType, order_status orderStatus, payment_status paymentStatus,
+        payment_time paymentTime, payment_type paymentType,
+        payment_type_code paymentTypeCode, store_id storeId, store_code storeCode, store_name storeName, store_type
+        storeType, total_orders totalOrders, actual_amount_paid actualAmountPaid,
+        activity_amount activityAmount, preferential_quota preferentialQuota, logistics_remission_ratio
+        logisticsRemissionRatio, logistics_remission_type logisticsRemissionType,
+        place_order_code placeOrderCode, place_order_time placeOrderTime, account_balance accountBalance, line_credit
+        lineCredit, receiving_address receivingAddress,
+        arrival_time arrivalTime, consignee, consignee_phone consigneePhone, company_code companyCode, company_name
+        companyName, original, province_code provinceCode,
+        province_name provinceName, city_code cityCode, city_name cityName, district_code districtCode, district_name
+        districtName, invoice_title invoiceTitle,
+        invoice_type invoiceType, order_original orderOriginal, product_num productNum, supplier_code supplierCode,
+        supplier_name supplierName,
+        transport_center_code transportCenterCode, transport_center_name transportCenterName, warehouse_code
+        warehouseCode, warehouse_name warehouseName, weight,
+        zip_code zipCode, remake, update_by updateBy, create_by createBy, update_time updateTime, create_time
+        createTime, application_gifts applicationGifts,
+        apply_coupons applyCoupons
+        from order_list
+        where 1=1
+
+        and store_id=#{storeId}
+
+        <if test="startPlaceOrderTime !=null">
+            and place_order_time>#{startPlaceOrderTime}
+        </if>
+        <if test="endPlaceOrderTime !=null">
+            and #{endPlaceOrderTime}> place_order_time
+        </if>
+        <if test="placeOrderBy">
+            and create_by=#{placeOrderBy}
+        </if>
+        <if test="orderStatus !=null">
+            and order_status=#{orderStatus}
+        </if>
+        <if test="orderCode!= null">
+            and order_code=#{orderCode}
+        </if>
+        LIMIT #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </select>
+    <select id="searchOrderReceptionListCount" resultType="java.lang.Integer">
+        select
+        count(*)
+        from order_list
+        where 1=1
+        and store_id=#{storeId}
+
+        <if test="startPlaceOrderTime !=null">
+            and place_order_time>#{startPlaceOrderTime}
+        </if>
+        <if test="endPlaceOrderTime !=null">
+            and #{endPlaceOrderTime}> place_order_time
+        </if>
+
+        <if test="orderStatus !=null">
+            and order_status=#{orderStatus}
+        </if>
+        <if test="orderCode!= null">
+            and order_code=#{orderCode}
+        </if>
+    </select>
+    <select id="getStockValue" resultType="com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo">
+        select store_code storeCode,sum(actual_amount_paid) stockValue from order_list
+        where 1=1
+        and place_order_time>#{vo.startPlaceOrderTime}
+        and #{vo.endPlaceOrderTime}> place_order_time
+        and store_code in
+        <foreach collection="vo.storeCode" index="index" item="code" open="(" separator="," close=")">
+            #{code}
+        </foreach>
+        group by store_code
+    </select>
+    <select id="searchFZ" resultType="com.aiqin.mgs.order.api.domain.OrderList">
+    select order_code orderCode,original
+     from order_list
+    where  order_code=#{code} or original=#{code}
+  </select>
+    <select id="searchOrderByCodeOrOriginal"
+            resultType="com.aiqin.mgs.order.api.domain.request.orderList.SupplyOrderInfoReqVO">
+     select
+
+
+    order_code orderCode,order_type orderType,store_name customerName,store_code customerCode,create_time createDate,
+order_status orderStatus,payment_status paymentStatus,transport_center_name transportCenterName,transport_center_code transportCenterCode,
+ warehouse_name warehouseName,warehouse_code warehouseCode,supplier_name supplierName,supplier_code supplierCode,logistics_remission_type  distributionMode,logistics_remission_ratio logisticsRemissionRatio,
+consignee, consignee_phone consigneePhone,province_code provinceCode,province_name provinceName, city_code cityCode,
+ city_name cityName,district_code districtCode,district_name districtName,receiving_address detailAddress,
+  zip_code zipCode,payment_type paymentType, payment_type_code paymentTypeCode,total_orders productTotalAmount,
+activity_amount+preferential_quota discountAmount ,actual_amount_paid orderAmount,product_num productNum, payment_time paymentTime,
+invoice_type invoiceType,invoice_title invoiceTitle,create_by operator,place_order_code  operatorCode,place_order_time  operatorTime,
+activity_amount activityDiscount,weight,original  fatherOrderCode, order_original orderOriginal,remake,company_code companyCode, company_name companyName
+from order_list
+      where   order_code=#{code} or original=#{code}
+  </select>
+
+
+    <resultMap type="com.aiqin.mgs.order.api.domain.request.orderList.OrderListFather" id="countryMapper2">
+        <id column="orderCodeFather" property="orderCodeFather"/>
+        <result column="actualAmountPaidFather" property="actualAmountPaidFather"/>
+        <result column="createTimeFather" property="createTimeFather"/>
+        <collection property="orderList"
+                    ofType="com.aiqin.mgs.order.api.domain.OrderList"
+                    select="selectOrderListByFather"
+                    column="orderCodeFather"/>
+    </resultMap>
+    <select id="selectOrderListByFather" resultType="com.aiqin.mgs.order.api.domain.OrderList">
+		  select
+      id, order_code orderCode, order_type orderType, order_status orderStatus, payment_status paymentStatus, payment_time paymentTime, payment_type paymentType,
+      payment_type_code paymentTypeCode, store_id storeId, store_code storeCode, store_name storeName, store_type storeType, total_orders totalOrders, actual_amount_paid actualAmountPaid,
+      activity_amount activityAmount, preferential_quota preferentialQuota, logistics_remission_ratio logisticsRemissionRatio, logistics_remission_type logisticsRemissionType,
+      place_order_code placeOrderCode, place_order_time placeOrderTime, account_balance accountBalance, line_credit lineCredit, receiving_address receivingAddress,
+      arrival_time arrivalTime, consignee, consignee_phone consigneePhone, company_code companyCode, company_name companyName, original, province_code provinceCode,
+      province_name provinceName, city_code cityCode, city_name cityName, district_code districtCode, district_name districtName, invoice_title invoiceTitle,
+      invoice_type invoiceType, order_original orderOriginal, product_num productNum,  supplier_code supplierCode, supplier_name supplierName,
+      transport_center_code transportCenterCode, transport_center_name transportCenterName, warehouse_code warehouseCode, warehouse_name warehouseName, weight,
+      zip_code zipCode, remake, update_by updateBy, create_by createBy, update_time updateTime, create_time createTime, application_gifts applicationGifts,
+      apply_coupons applyCoupons
+      from order_list
+      where original=#{orderCodeFather}
+	</select>
+
+    <select id="searchOrderReceptionListFather" resultMap="countryMapper2">
+        select original orderCodeFather,
+        sum(actual_amount_paid) actualAmountPaidFather,create_time createTimeFather
+        from order_list
+        where 1=1
+        <if test="startPlaceOrderTime !=null">
+            and place_order_time>#{startPlaceOrderTime}
+        </if>
+        <if test="endPlaceOrderTime !=null">
+            and #{endPlaceOrderTime}> place_order_time
+        </if>
+        <if test="placeOrderBy">
+            and create_by=#{placeOrderBy}
+        </if>
+        <if test="orderStatusList !=null and orderStatusList.size>0">
+            and order_status
+            in
+            <foreach collection="orderStatusList" index="index" item="status" open="(" separator="," close=")">
+                #{status}
+            </foreach>
+
+        </if>
+        <if test="orderCode!= null">
+            and order_code=#{orderCode}
+        </if>
+        group by original order by createTimeFather desc
+        LIMIT #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </select>
+    <select id="searchOrderReceptionListFatherCount" resultType="java.lang.Integer">
+        SELECT IFNULL(
+        (
+        SELECT count(*) FROM (
+        select
+        original
+        from order_list
+        where 1=1
+        <if test="startPlaceOrderTime !=null">
+            and place_order_time>#{startPlaceOrderTime}
+        </if>
+        <if test="endPlaceOrderTime !=null">
+            and #{endPlaceOrderTime}> place_order_time
+        </if>
+        <if test="placeOrderBy">
+            and create_by=#{placeOrderBy}
+        </if>
+        <if test="orderStatusList !=null and orderStatusList.size>0">
+            and order_status
+            in
+            <foreach collection="orderStatusList" index="index" item="status" open="(" separator="," close=")">
+                #{status}
+            </foreach>
+
+        </if>
+        <if test="orderCode!= null">
+            and order_code=#{orderCode}
+        </if>
+        group by original) t),0)
+
+    </select>
+    <select id="searchOrderListFather"
+            resultMap="countryMapper2">
+        select
+        original orderCodeFather,
+        sum(actual_amount_paid) actualAmountPaidFather,create_time createTimeFather
+        from order_list
+        where 1=1
+        <if test="storeCode !=null">
+            and (store_code LIKE CONCAT('%',#{storeCode}, '%')
+            or store_name LIKE CONCAT('%',#{storeCode}, '%'))
+        </if>
+        <if test="startPlaceOrderTime !=null">
+            and place_order_time>#{startPlaceOrderTime}
+        </if>
+        <if test="endPlaceOrderTime !=null">
+            and #{endPlaceOrderTime}> place_order_time
+        </if>
+        <if test="paymentStatus !=null">
+            and payment_status=#{paymentStatus}
+        </if>
+        <if test="orderStatusList !=null and orderStatusList.size>0">
+            and order_status
+            in
+            <foreach collection="orderStatusList" index="index" item="status" open="(" separator="," close=")">
+                #{status}
+            </foreach>
+
+        </if>
+        <if test="storeType !=null">
+            and store_type=#{storeType}
+        </if>
+        group by original order by createTimeFather desc
+        LIMIT #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+
+    </select>
+    <select id="searchOrderListFatherCount" resultType="java.lang.Integer">
+        SELECT IFNULL((
+        SELECT count(*) FROM (
+        select
+        original
+
+        from order_list
+        where 1=1
+        <if test="storeCode !=null">
+            and (store_code LIKE CONCAT('%',#{storeCode}, '%')
+            or store_name LIKE CONCAT('%',#{storeCode}, '%'))
+        </if>
+        <if test="startPlaceOrderTime !=null">
+            and place_order_time>#{startPlaceOrderTime}
+        </if>
+        <if test="endPlaceOrderTime !=null">
+            and #{endPlaceOrderTime}> place_order_time
+        </if>
+        <if test="paymentStatus !=null">
+            and payment_status=#{paymentStatus}
+        </if>
+        <if test="orderStatusList !=null and orderStatusList.size>0">
+            and order_status
+            in
+            <foreach collection="orderStatusList" index="index" item="status" open="(" separator="," close=")">
+                #{status}
+            </foreach>
+
+        </if>
+        <if test="storeType !=null">
+            and store_type=#{storeType}
+        </if>
+        group by original
+        ) t),0)
+    </select>
+    <select id="searchOrderByCodeFather"
+            resultType="com.aiqin.mgs.order.api.domain.request.orderList.OrderListDetailsVo">
+ select
+       id, order_code orderCode, order_type orderType, order_status orderStatus, payment_status paymentStatus, payment_time paymentTime, payment_type paymentType,
+      payment_type_code paymentTypeCode, store_id storeId, store_code storeCode, store_name storeName, store_type storeType, total_orders totalOrders, actual_amount_paid actualAmountPaid,
+      activity_amount activityAmount, preferential_quota preferentialQuota, logistics_remission_ratio logisticsRemissionRatio, logistics_remission_type logisticsRemissionType,
+      place_order_code placeOrderCode, place_order_time placeOrderTime, account_balance accountBalance, line_credit lineCredit, receiving_address receivingAddress,
+      arrival_time arrivalTime, consignee, consignee_phone consigneePhone, company_code companyCode, company_name companyName, original, province_code provinceCode,
+      province_name provinceName, city_code cityCode, city_name cityName, district_code districtCode, district_name districtName, invoice_title invoiceTitle,
+      invoice_type invoiceType, order_original orderOriginal, product_num productNum,  supplier_code supplierCode, supplier_name supplierName,
+      transport_center_code transportCenterCode, transport_center_name transportCenterName, warehouse_code warehouseCode, warehouse_name warehouseName, weight,
+      zip_code zipCode, remake, update_by updateBy, create_by createBy, update_time updateTime, create_time createTime, application_gifts applicationGifts,
+      apply_coupons applyCoupons
+      from order_list
+      where  original=#{code}
+
+  </select>
+
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from order_list
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
+    <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.OrderList">
+    insert into order_list (id, order_code, order_type, 
+      order_status, payment_status, store_id, 
+      store_code, store_name, store_type, 
+      total_orders, actual_amount_paid, activity_amount, 
+      preferential_quota, logistics_remission_ratio, 
+     place_order_time, account_balance,
+      line_credit, receiving_address, arrival_time, 
+      consignee, consignee_phone, company_code, 
+      company_name, create_by, create_time, 
+      update_by, update_time)
+    values (#{id,jdbcType=BIGINT}, #{orderCode,jdbcType=VARCHAR}, #{orderType,jdbcType=BIT}, 
+      #{orderStatus,jdbcType=VARCHAR}, #{paymentStatus,jdbcType=BIT}, #{storeId,jdbcType=VARCHAR}, 
+      #{storeCode,jdbcType=VARCHAR}, #{storeName,jdbcType=VARCHAR}, #{storeType,jdbcType=VARCHAR}, 
+      #{totalOrders,jdbcType=INTEGER}, #{actualAmountPaid,jdbcType=INTEGER}, #{activityAmount,jdbcType=INTEGER}, 
+      #{preferentialQuota,jdbcType=INTEGER}, #{logisticsRemissionRatio,jdbcType=INTEGER}, 
+      #{placeOrderBy,jdbcType=VARCHAR}, #{placeOrderTime,jdbcType=TIMESTAMP}, #{accountBalance,jdbcType=INTEGER}, 
+      #{lineCredit,jdbcType=INTEGER}, #{receivingAddress,jdbcType=VARCHAR}, #{arrivalTime,jdbcType=TIMESTAMP}, 
+      #{consignee,jdbcType=VARCHAR}, #{consigneePhone,jdbcType=VARCHAR}, #{companyCode,jdbcType=VARCHAR}, 
+      #{companyName,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+    <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.OrderList">
+        insert into order_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="orderCode != null">
+                order_code,
+            </if>
+            <if test="orderType != null">
+                order_type,
+            </if>
+            <if test="orderStatus != null">
+                order_status,
+            </if>
+            <if test="paymentStatus != null">
+                payment_status,
+            </if>
+            <if test="paymentTime != null">
+                payment_time,
+            </if>
+            <if test="paymentType != null">
+                payment_type,
+            </if>
+            <if test="paymentTypeCode != null">
+                payment_type_code,
+            </if>
+            <if test="storeId != null">
+                store_id,
+            </if>
+            <if test="storeCode != null">
+                store_code,
+            </if>
+            <if test="storeName != null">
+                store_name,
+            </if>
+            <if test="storeType != null">
+                store_type,
+            </if>
+            <if test="totalOrders != null">
+                total_orders,
+            </if>
+            <if test="actualAmountPaid != null">
+                actual_amount_paid,
+            </if>
+            <if test="activityAmount != null">
+                activity_amount,
+            </if>
+            <if test="preferentialQuota != null">
+                preferential_quota,
+            </if>
+            <if test="logisticsRemissionRatio != null">
+                logistics_remission_ratio,
+            </if>
+            <if test="logisticsRemissionType != null">
+                logistics_remission_type,
+            </if>
+            <if test="placeOrderCode != null">
+                place_order_code,
+            </if>
+            <if test="placeOrderTime != null">
+                place_order_time,
+            </if>
+            <if test="accountBalance != null">
+                account_balance,
+            </if>
+            <if test="lineCredit != null">
+                line_credit,
+            </if>
+            <if test="receivingAddress != null">
+                receiving_address,
+            </if>
+            <if test="arrivalTime != null">
+                arrival_time,
+            </if>
+            <if test="consignee != null">
+                consignee,
+            </if>
+            <if test="consigneePhone != null">
+                consignee_phone,
+            </if>
+            <if test="companyCode != null">
+                company_code,
+            </if>
+            <if test="companyName != null">
+                company_name,
+            </if>
+            <if test="original != null">
+                original,
+            </if>
+            <if test="provinceCode != null">
+                province_code,
+            </if>
+            <if test="provinceName != null">
+                province_name,
+            </if>
+            <if test="cityCode != null">
+                city_code,
+            </if>
+            <if test="cityName != null">
+                city_name,
+            </if>
+            <if test="districtCode != null">
+                district_code,
+            </if>
+            <if test="districtName != null">
+                district_name,
+            </if>
+            <if test="invoiceTitle != null">
+                invoice_title,
+            </if>
+            <if test="invoiceType != null">
+                invoice_type,
+            </if>
+            <if test="orderOriginal != null">
+                order_original,
+            </if>
+            <if test="productNum != null">
+                product_num,
+            </if>
+            <if test="supplierCode != null">
+                supplier_code,
+            </if>
+            <if test="supplierName != null">
+                supplier_name,
+            </if>
+            <if test="transportCenterCode != null">
+                transport_center_code,
+            </if>
+            <if test="transportCenterName != null">
+                transport_center_name,
+            </if>
+            <if test="warehouseCode != null">
+                warehouse_code,
+            </if>
+            <if test="warehouseName != null">
+                warehouse_name,
+            </if>
+            <if test="weight != null">
+                weight,
+            </if>
+            <if test="zipCode != null">
+                zip_code,
+            </if>
+            <if test="remake != null">
+                remake,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="applicationGifts != null">
+                application_gifts,
+            </if>
+            <if test="applyCoupons != null">
+                apply_coupons,
+            </if>
+            <if test="orderListActivityCode != null">
+                order_list_activity_code,
+            </if>
+            <if test="orderListActivityName != null">
+                order_list_activity_name,
+            </if>
+            <if test="orderListActivityType != null">
+                order_list_activity_type,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="orderCode != null">
+                #{orderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="orderType != null">
+                #{orderType,jdbcType=BIT},
+            </if>
+            <if test="orderStatus != null">
+                #{orderStatus,jdbcType=TINYINT},
+            </if>
+            <if test="paymentStatus != null">
+                #{paymentStatus,jdbcType=BIT},
+            </if>
+            <if test="paymentTime != null">
+                #{paymentTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="paymentType != null">
+                #{paymentType,jdbcType=VARCHAR},
+            </if>
+            <if test="paymentTypeCode != null">
+                #{paymentTypeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="storeId != null">
+                #{storeId,jdbcType=VARCHAR},
+            </if>
+            <if test="storeCode != null">
+                #{storeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="storeName != null">
+                #{storeName,jdbcType=VARCHAR},
+            </if>
+            <if test="storeType != null">
+                #{storeType,jdbcType=VARCHAR},
+            </if>
+            <if test="totalOrders != null">
+                #{totalOrders,jdbcType=BIGINT},
+            </if>
+            <if test="actualAmountPaid != null">
+                #{actualAmountPaid,jdbcType=BIGINT},
+            </if>
+            <if test="activityAmount != null">
+                #{activityAmount,jdbcType=BIGINT},
+            </if>
+            <if test="preferentialQuota != null">
+                #{preferentialQuota,jdbcType=BIGINT},
+            </if>
+            <if test="logisticsRemissionRatio != null">
+                #{logisticsRemissionRatio,jdbcType=INTEGER},
+            </if>
+            <if test="logisticsRemissionType != null">
+                #{logisticsRemissionType,jdbcType=BIT},
+            </if>
+            <if test="placeOrderCode != null">
+                #{placeOrderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="placeOrderTime != null">
+                #{placeOrderTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="accountBalance != null">
+                #{accountBalance,jdbcType=BIGINT},
+            </if>
+            <if test="lineCredit != null">
+                #{lineCredit,jdbcType=BIGINT},
+            </if>
+            <if test="receivingAddress != null">
+                #{receivingAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="arrivalTime != null">
+                #{arrivalTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="consignee != null">
+                #{consignee,jdbcType=VARCHAR},
+            </if>
+            <if test="consigneePhone != null">
+                #{consigneePhone,jdbcType=VARCHAR},
+            </if>
+            <if test="companyCode != null">
+                #{companyCode,jdbcType=VARCHAR},
+            </if>
+            <if test="companyName != null">
+                #{companyName,jdbcType=VARCHAR},
+            </if>
+            <if test="original != null">
+                #{original,jdbcType=VARCHAR},
+            </if>
+            <if test="provinceCode != null">
+                #{provinceCode,jdbcType=VARCHAR},
+            </if>
+            <if test="provinceName != null">
+                #{provinceName,jdbcType=VARCHAR},
+            </if>
+            <if test="cityCode != null">
+                #{cityCode,jdbcType=VARCHAR},
+            </if>
+            <if test="cityName != null">
+                #{cityName,jdbcType=VARCHAR},
+            </if>
+            <if test="districtCode != null">
+                #{districtCode,jdbcType=VARCHAR},
+            </if>
+            <if test="districtName != null">
+                #{districtName,jdbcType=VARCHAR},
+            </if>
+            <if test="invoiceTitle != null">
+                #{invoiceTitle,jdbcType=VARCHAR},
+            </if>
+            <if test="invoiceType != null">
+                #{invoiceType,jdbcType=BIT},
+            </if>
+            <if test="orderOriginal != null">
+                #{orderOriginal,jdbcType=VARCHAR},
+            </if>
+            <if test="productNum != null">
+                #{productNum,jdbcType=INTEGER},
+            </if>
+            <if test="supplierCode != null">
+                #{supplierCode,jdbcType=VARCHAR},
+            </if>
+            <if test="supplierName != null">
+                #{supplierName,jdbcType=VARCHAR},
+            </if>
+            <if test="transportCenterCode != null">
+                #{transportCenterCode,jdbcType=VARCHAR},
+            </if>
+            <if test="transportCenterName != null">
+                #{transportCenterName,jdbcType=VARCHAR},
+            </if>
+            <if test="warehouseCode != null">
+                #{warehouseCode,jdbcType=VARCHAR},
+            </if>
+            <if test="warehouseName != null">
+                #{warehouseName,jdbcType=VARCHAR},
+            </if>
+            <if test="weight != null">
+                #{weight,jdbcType=INTEGER},
+            </if>
+            <if test="zipCode != null">
+                #{zipCode,jdbcType=VARCHAR},
+            </if>
+            <if test="remake != null">
+                #{remake,jdbcType=VARCHAR},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=VARCHAR},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="applicationGifts != null">
+                #{applicationGifts,jdbcType=BIT},
+            </if>
+            <if test="applyCoupons != null">
+                #{applyCoupons,jdbcType=BIT},
+            </if>
+            <if test="orderListActivityCode != null">
+                #{orderListActivityCode,jdbcType=VARCHAR},
+            </if>
+            <if test="orderListActivityName != null">
+                #{orderListActivityName,jdbcType=VARCHAR},
+            </if>
+            <if test="orderListActivityType != null">
+                #{orderListActivityType,jdbcType=TINYINT},
+            </if>
+        </trim>
+    </insert>
+    <insert id="insertOrderListDetailsVo">
+        insert into order_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="orderCode != null">
+                order_code,
+            </if>
+            <if test="orderType != null">
+                order_type,
+            </if>
+            <if test="orderStatus != null">
+                order_status,
+            </if>
+            <if test="paymentStatus != null">
+                payment_status,
+            </if>
+            <if test="paymentTime != null">
+                payment_time,
+            </if>
+            <if test="paymentType != null">
+                payment_type,
+            </if>
+            <if test="paymentTypeCode != null">
+                payment_type_code,
+            </if>
+            <if test="storeId != null">
+                store_id,
+            </if>
+            <if test="storeCode != null">
+                store_code,
+            </if>
+            <if test="storeName != null">
+                store_name,
+            </if>
+            <if test="storeType != null">
+                store_type,
+            </if>
+            <if test="totalOrders != null">
+                total_orders,
+            </if>
+            <if test="actualAmountPaid != null">
+                actual_amount_paid,
+            </if>
+            <if test="activityAmount != null">
+                activity_amount,
+            </if>
+            <if test="preferentialQuota != null">
+                preferential_quota,
+            </if>
+            <if test="logisticsRemissionRatio != null">
+                logistics_remission_ratio,
+            </if>
+            <if test="logisticsRemissionType != null">
+                logistics_remission_type,
+            </if>
+            <if test="placeOrderCode != null">
+                place_order_code,
+            </if>
+            <if test="placeOrderTime != null">
+                place_order_time,
+            </if>
+            <if test="accountBalance != null">
+                account_balance,
+            </if>
+            <if test="lineCredit != null">
+                line_credit,
+            </if>
+            <if test="receivingAddress != null">
+                receiving_address,
+            </if>
+            <if test="arrivalTime != null">
+                arrival_time,
+            </if>
+            <if test="consignee != null">
+                consignee,
+            </if>
+            <if test="consigneePhone != null">
+                consignee_phone,
+            </if>
+            <if test="companyCode != null">
+                company_code,
+            </if>
+            <if test="companyName != null">
+                company_name,
+            </if>
+            <if test="original != null">
+                original,
+            </if>
+            <if test="provinceCode != null">
+                province_code,
+            </if>
+            <if test="provinceName != null">
+                province_name,
+            </if>
+            <if test="cityCode != null">
+                city_code,
+            </if>
+            <if test="cityName != null">
+                city_name,
+            </if>
+            <if test="districtCode != null">
+                district_code,
+            </if>
+            <if test="districtName != null">
+                district_name,
+            </if>
+            <if test="invoiceTitle != null">
+                invoice_title,
+            </if>
+            <if test="invoiceType != null">
+                invoice_type,
+            </if>
+            <if test="orderOriginal != null">
+                order_original,
+            </if>
+            <if test="productNum != null">
+                product_num,
+            </if>
+
+            <if test="supplierCode != null">
+                supplier_code,
+            </if>
+            <if test="supplierName != null">
+                supplier_name,
+            </if>
+            <if test="transportCenterCode != null">
+                transport_center_code,
+            </if>
+            <if test="transportCenterName != null">
+                transport_center_name,
+            </if>
+            <if test="warehouseCode != null">
+                warehouse_code,
+            </if>
+            <if test="warehouseName != null">
+                warehouse_name,
+            </if>
+            <if test="weight != null">
+                weight,
+            </if>
+            <if test="zipCode != null">
+                zip_code,
+            </if>
+            <if test="remake != null">
+                remake,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="applicationGifts != null">
+                application_gifts,
+            </if>
+            <if test="applyCoupons != null">
+                apply_coupons,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="orderCode != null">
+                #{orderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="orderType != null">
+                #{orderType,jdbcType=BIT},
+            </if>
+            <if test="orderStatus != null">
+                #{orderStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="paymentStatus != null">
+                #{paymentStatus,jdbcType=BIT},
+            </if>
+            <if test="paymentTime != null">
+                #{paymentTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="paymentType != null">
+                #{paymentType,jdbcType=VARCHAR},
+            </if>
+            <if test="paymentTypeCode != null">
+                #{paymentTypeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="storeId != null">
+                #{storeId,jdbcType=VARCHAR},
+            </if>
+            <if test="storeCode != null">
+                #{storeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="storeName != null">
+                #{storeName,jdbcType=VARCHAR},
+            </if>
+            <if test="storeType != null">
+                #{storeType,jdbcType=VARCHAR},
+            </if>
+            <if test="totalOrders != null">
+                #{totalOrders,jdbcType=BIGINT},
+            </if>
+            <if test="actualAmountPaid != null">
+                #{actualAmountPaid,jdbcType=BIGINT},
+            </if>
+            <if test="activityAmount != null">
+                #{activityAmount,jdbcType=BIGINT},
+            </if>
+            <if test="preferentialQuota != null">
+                #{preferentialQuota,jdbcType=BIGINT},
+            </if>
+            <if test="logisticsRemissionRatio != null">
+                #{logisticsRemissionRatio,jdbcType=INTEGER},
+            </if>
+            <if test="logisticsRemissionType != null">
+                #{logisticsRemissionType,jdbcType=BIT},
+            </if>
+            <if test="placeOrderCode != null">
+                #{placeOrderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="placeOrderTime != null">
+                #{placeOrderTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="accountBalance != null">
+                #{accountBalance,jdbcType=BIGINT},
+            </if>
+            <if test="lineCredit != null">
+                #{lineCredit,jdbcType=BIGINT},
+            </if>
+            <if test="receivingAddress != null">
+                #{receivingAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="arrivalTime != null">
+                #{arrivalTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="consignee != null">
+                #{consignee,jdbcType=VARCHAR},
+            </if>
+            <if test="consigneePhone != null">
+                #{consigneePhone,jdbcType=VARCHAR},
+            </if>
+            <if test="companyCode != null">
+                #{companyCode,jdbcType=VARCHAR},
+            </if>
+            <if test="companyName != null">
+                #{companyName,jdbcType=VARCHAR},
+            </if>
+            <if test="original != null">
+                #{original,jdbcType=VARCHAR},
+            </if>
+            <if test="provinceCode != null">
+                #{provinceCode,jdbcType=VARCHAR},
+            </if>
+            <if test="provinceName != null">
+                #{provinceName,jdbcType=VARCHAR},
+            </if>
+            <if test="cityCode != null">
+                #{cityCode,jdbcType=VARCHAR},
+            </if>
+            <if test="cityName != null">
+                #{cityName,jdbcType=VARCHAR},
+            </if>
+            <if test="districtCode != null">
+                #{districtCode,jdbcType=VARCHAR},
+            </if>
+            <if test="districtName != null">
+                #{districtName,jdbcType=VARCHAR},
+            </if>
+            <if test="invoiceTitle != null">
+                #{invoiceTitle,jdbcType=VARCHAR},
+            </if>
+            <if test="invoiceType != null">
+                #{invoiceType,jdbcType=BIT},
+            </if>
+            <if test="orderOriginal != null">
+                #{orderOriginal,jdbcType=VARCHAR},
+            </if>
+            <if test="productNum != null">
+                #{productNum,jdbcType=INTEGER},
+            </if>
+
+            <if test="supplierCode != null">
+                #{supplierCode,jdbcType=VARCHAR},
+            </if>
+            <if test="supplierName != null">
+                #{supplierName,jdbcType=VARCHAR},
+            </if>
+            <if test="transportCenterCode != null">
+                #{transportCenterCode,jdbcType=VARCHAR},
+            </if>
+            <if test="transportCenterName != null">
+                #{transportCenterName,jdbcType=VARCHAR},
+            </if>
+            <if test="warehouseCode != null">
+                #{warehouseCode,jdbcType=VARCHAR},
+            </if>
+            <if test="warehouseName != null">
+                #{warehouseName,jdbcType=VARCHAR},
+            </if>
+            <if test="weight != null">
+                #{weight,jdbcType=INTEGER},
+            </if>
+            <if test="zipCode != null">
+                #{zipCode,jdbcType=VARCHAR},
+            </if>
+            <if test="remake != null">
+                #{remake,jdbcType=VARCHAR},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=VARCHAR},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="applicationGifts != null">
+                #{applicationGifts,jdbcType=BIT},
+            </if>
+            <if test="applyCoupons != null">
+                #{applyCoupons,jdbcType=BIT},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.OrderList">
+        update order_list
+        <set>
+            <if test="orderCode != null">
+                order_code = #{orderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="orderType != null">
+                order_type = #{orderType,jdbcType=BIT},
+            </if>
+            <if test="orderStatus != null">
+                order_status = #{orderStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="paymentStatus != null">
+                payment_status = #{paymentStatus,jdbcType=BIT},
+            </if>
+            <if test="storeId != null">
+                store_id = #{storeId,jdbcType=VARCHAR},
+            </if>
+            <if test="storeCode != null">
+                store_code = #{storeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="storeName != null">
+                store_name = #{storeName,jdbcType=VARCHAR},
+            </if>
+            <if test="storeType != null">
+                store_type = #{storeType,jdbcType=VARCHAR},
+            </if>
+            <if test="totalOrders != null">
+                total_orders = #{totalOrders,jdbcType=INTEGER},
+            </if>
+            <if test="actualAmountPaid != null">
+                actual_amount_paid = #{actualAmountPaid,jdbcType=INTEGER},
+            </if>
+            <if test="activityAmount != null">
+                activity_amount = #{activityAmount,jdbcType=INTEGER},
+            </if>
+            <if test="preferentialQuota != null">
+                preferential_quota = #{preferentialQuota,jdbcType=INTEGER},
+            </if>
+            <if test="logisticsRemissionRatio != null">
+                logistics_remission_ratio = #{logisticsRemissionRatio,jdbcType=INTEGER},
+            </if>
+
+            <if test="placeOrderTime != null">
+                place_order_time = #{placeOrderTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="accountBalance != null">
+                account_balance = #{accountBalance,jdbcType=INTEGER},
+            </if>
+            <if test="lineCredit != null">
+                line_credit = #{lineCredit,jdbcType=INTEGER},
+            </if>
+            <if test="receivingAddress != null">
+                receiving_address = #{receivingAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="arrivalTime != null">
+                arrival_time = #{arrivalTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="consignee != null">
+                consignee = #{consignee,jdbcType=VARCHAR},
+            </if>
+            <if test="consigneePhone != null">
+                consignee_phone = #{consigneePhone,jdbcType=VARCHAR},
+            </if>
+            <if test="companyCode != null">
+                company_code = #{companyCode,jdbcType=VARCHAR},
+            </if>
+            <if test="companyName != null">
+                company_name = #{companyName,jdbcType=VARCHAR},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.aiqin.mgs.order.api.domain.OrderList">
+    update order_list
+    set order_code = #{orderCode,jdbcType=VARCHAR},
+      order_type = #{orderType,jdbcType=BIT},
+      order_status = #{orderStatus,jdbcType=VARCHAR},
+      payment_status = #{paymentStatus,jdbcType=BIT},
+      store_id = #{storeId,jdbcType=VARCHAR},
+      store_code = #{storeCode,jdbcType=VARCHAR},
+      store_name = #{storeName,jdbcType=VARCHAR},
+      store_type = #{storeType,jdbcType=VARCHAR},
+      total_orders = #{totalOrders,jdbcType=INTEGER},
+      actual_amount_paid = #{actualAmountPaid,jdbcType=INTEGER},
+      activity_amount = #{activityAmount,jdbcType=INTEGER},
+      preferential_quota = #{preferentialQuota,jdbcType=INTEGER},
+      logistics_remission_ratio = #{logisticsRemissionRatio,jdbcType=INTEGER},
+      place_order_time = #{placeOrderTime,jdbcType=TIMESTAMP},
+      account_balance = #{accountBalance,jdbcType=INTEGER},
+      line_credit = #{lineCredit,jdbcType=INTEGER},
+      receiving_address = #{receivingAddress,jdbcType=VARCHAR},
+      arrival_time = #{arrivalTime,jdbcType=TIMESTAMP},
+      consignee = #{consignee,jdbcType=VARCHAR},
+      consignee_phone = #{consigneePhone,jdbcType=VARCHAR},
+      company_code = #{companyCode,jdbcType=VARCHAR},
+      company_name = #{companyName,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+    <update id="updateByCode">
+    update order_list
+    set order_status=#{status} ,payment_status=#{paymentStatus}
+    where order_code=#{code} or original=#{code}
+
+  </update>
+    <update id="updateStatusByCode">
+     update order_list
+    set order_status=#{status}
+    where order_code=#{code} or original=#{code}
+  </update>
+    <update id="updateOrderPaymentStatus">
+    update order_list
+     set   payment_status=#{paymentStatus}
+    where order_code=#{code}
+  </update>
+    <update id="updateByCodePayment">
+         update order_list
+        <set>
+            order_status=2 ,payment_status=1 ,payment_time=now(),
+            <if test="paymentType != null"> payment_type=#{paymentType},</if>
+            <if test="paymentTypeCode != null"> payment_type_code=#{paymentTypeCode},</if>
+            <if test="accountBalance != null"> account_balance=#{accountBalance},</if>
+            <if test="lineCredit != null"> line_credit=#{lineCredit},</if>
+        </set>
+    where order_code=#{orderCode} or original=#{orderCode}
+    </update>
+    <update id="updateStatusByCodeReceiving">
+          update order_list
+    set order_status=#{status},arrival_time= now()
+    where order_code=#{code} or original=#{code}
+    </update>
+    <update id="updateOrderCancellation">
+        update order_list
+        set order_status=#{stu} where
+        order_code in
+        <foreach collection="list" index="index" item="code" open="(" separator="," close=")">
+            #{code}
+        </foreach>
+    </update>
+
+    <select id="selectFirstOrderTime" parameterType="list"
+            resultType="com.aiqin.mgs.order.api.domain.response.orderlistre.FirstOrderTimeRespVo">
+        select store_id as storeId,min(place_order_time) as firstOrderTime from order_list where order_type=3 and
+        store_id in
+        <foreach collection="list" index="index" item="storeId" open="(" separator="," close=")">
+            #{storeId}
+        </foreach>
+        group by store_id;
+    </select>
+    <select id="selectOrderCancellation" resultType="java.lang.String">
+          SELECT order_code FROM order_list
+    WHERE 1=1  and payment_status=0
+    AND order_status=1
+    AND DATE_ADD(create_time,INTERVAL #{overtime} MINUTE) &lt;= #{date}
+
+    </select>
+
+    <delete id="deleteByOrderCode" parameterType="string">
+        delete from order_list where order_code=#{orderCode}
+    </delete>
+</mapper>
