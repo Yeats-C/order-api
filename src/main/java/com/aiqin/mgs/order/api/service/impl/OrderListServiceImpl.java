@@ -273,6 +273,7 @@ public class OrderListServiceImpl implements OrderListService {
     @Transactional
     @Override
     public Boolean updateOrderStatusPayment(OrderStatusPayment vop) {
+        log.info("订单支付：{}", JsonUtil.toJson(vop));
         if (vop.getOrderCode() == null || vop.getOrderCode().length() == 0) {
             throw new IllegalArgumentException("参数不能为空");
         }
