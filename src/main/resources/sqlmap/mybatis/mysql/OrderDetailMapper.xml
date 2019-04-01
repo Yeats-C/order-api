@@ -208,7 +208,7 @@
 
     <!-- 查询订单明细部分汇总-（支持活动ID汇总、）-->
     <select id="selectorderdetailsum"  resultMap="OrderInfoDetailMapping" >
-    SELECT IFNULL(SUM(IFNULL(a.actual_price,0)),0) AS actual_price,COUNT(a.order_id) AS amount FROM order_detail a,order_info b 
+    SELECT IFNULL(SUM(IFNULL(a.actual_price,0)*IFNULL(a.amount,0)),0) AS actual_price,COUNT(a.order_id) AS amount FROM order_detail a,order_info b 
 	WHERE 1=1
 	AND a.order_id = b.order_id
 	AND b.order_status NOT IN ('0','4')
