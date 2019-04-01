@@ -215,7 +215,6 @@
 	<if test="activityId!=null and activityId!=''">
 	AND a.activity_id =#{activityId}
 	</if>
-	)
     </select>
     
     
