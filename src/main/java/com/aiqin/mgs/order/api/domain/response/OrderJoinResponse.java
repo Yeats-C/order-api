@@ -12,6 +12,7 @@ import java.util.List;
 import com.aiqin.mgs.order.api.domain.OrderAfterSaleDetailInfo;
 import com.aiqin.mgs.order.api.domain.OrderAfterSaleInfo;
 import com.aiqin.mgs.order.api.domain.OrderInfo;
+import com.aiqin.mgs.order.api.domain.SettlementInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
@@ -24,14 +25,21 @@ public class OrderJoinResponse {
 	@JsonProperty("order_info")
 	private OrderInfo orderInfo;
 
-//将明细列表放入订单售后中
-//	@ApiModelProperty(value = "订单售后明细列表")
-//    @JsonProperty("order_after_detail_list")
-//    private List<OrderAfterSaleDetailInfo> orderAfterDetailList;
+	@ApiModelProperty(value = "结算信息")
+    @JsonProperty("settlement_info")
+    private SettlementInfo settlementInfo;
 	
     @ApiModelProperty(value = "订单售后表")
     @JsonProperty("order_after_info")
     private OrderAfterSaleInfo orderaftersaleinfo;
+
+	public SettlementInfo getSettlementInfo() {
+		return settlementInfo;
+	}
+
+	public void setSettlementInfo(SettlementInfo settlementInfo) {
+		this.settlementInfo = settlementInfo;
+	}
 
 	public OrderInfo getOrderInfo() {
 		return orderInfo;
