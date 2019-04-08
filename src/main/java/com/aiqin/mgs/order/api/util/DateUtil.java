@@ -9,10 +9,7 @@ package com.aiqin.mgs.order.api.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import javax.annotation.Resource;
 
@@ -32,7 +29,8 @@ public class DateUtil {
 // static SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd"); 
 // static SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
 // static SimpleDateFormat sdf4 = new SimpleDateFormat("yyyy-MM"); 
-	
+
+    private final static SimpleDateFormat shortSdf = new SimpleDateFormat("yyyy-MM-dd");
 
 	/**
 	 * 获取当前系统日期 yyyyMMddHHmmss
@@ -316,12 +314,43 @@ public class DateUtil {
         return new DateTime(date).millisOfDay().withMaximumValue().toDate();
     }
 
- 
+
+    //获取昨天的开始时间
+    public static Date getBeginYesterday(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.DAY_OF_MONTH, -1);
+        return new DateTime(cal.getTime()).millisOfDay().withMinimumValue().toDate();
+    }
+    //获取昨天的结束时间
+    public static Date getEndYesterDay(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.DAY_OF_MONTH, -1);
+        return new DateTime(cal.getTime()).millisOfDay().withMaximumValue().toDate();
+    }
+
+    /**
+     * 当前年的开始时间
+     *
+     * @return
+     */
+    public static Date getCurrentYearBeginTime() {
+        Calendar c = Calendar.getInstance();
+        Date now = null;
+        try {
+            c.set(Calendar.MONTH, 0);
+            c.set(Calendar.DATE, 1);
+            now = shortSdf.parse(shortSdf.format(c.getTime()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return now;
+    }
 
 	public static void main(String[] args) {
 //		Date date=formatDate("2019-02-00");
 //		System.out.println(getFristOfMonthDay(formatDate("2019-02")));
-//		System.out.println(getLashOfMonthDay(formatDate("2019-02"))); 
 	}
 	
 }

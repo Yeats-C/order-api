@@ -12,6 +12,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.aiqin.mgs.order.api.domain.request.statistical.BusinessStatisticalRequest;
+import com.aiqin.mgs.order.api.domain.statistical.BusinessStatistical;
 import org.apache.ibatis.annotations.Param;
 
 import com.aiqin.mgs.order.api.domain.*;
@@ -147,4 +149,7 @@ public interface OrderDao {
 	void updateSukReturn(@Param("orderId")String orderId)throws Exception;
 
 	Integer skuResponseCount(OrderQuery orderQuery)throws Exception;
+
+	//营业数据统计
+	List<BusinessStatistical> statisticalBusiness(BusinessStatisticalRequest request);
 }
