@@ -18,7 +18,7 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping("/order/statistical")
-@Api("z.营业数据统计")
+@Api(tags = "z.营业数据统计")
 @Slf4j
 public class BusinessDataController {
 
