@@ -1174,6 +1174,27 @@
         limit 0,10
     </select>
 
+    <!--获取指定门店指定时间段内销量大于等于num的sku的集合-->
+    <select id="querySaleSkuGtNum" resultType="string">
+        select b.sku_code from
+        (select order_id from order_info
+        where 1=1
+        <if test="distributorId!=null">
+            and distributor_id = #{distributorId}
+        </if>
+        <if test="startDate!=null">
+            and create_time &gt;= #{startDate}
+        </if>
+        <if test="endDate!=null">
+            and create_time &lt;= #{endDate}
+        </if>
+        and order_status in(1,2,3,5,6)
+        ) a
+        left join order_detail b on a.order_id=b.order_id
+        group by b.sku_code
+        having count(b.sku_code) &gt;= #{num}
+    </select>
+
     <!--获取特定sku集合指定时间段内销量数据信息-->
     <select id="querySkuSale" parameterType="com.aiqin.mgs.order.api.domain.request.statistical.SkuSalesRequest"
             resultType="com.aiqin.mgs.order.api.domain.statistical.SkuSales">

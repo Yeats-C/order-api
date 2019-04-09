@@ -20,20 +20,21 @@ public interface OrderStatisticalService {
 
 
     /**
-     * 获取当前日期前30天有销售记录的门店集合
+     * 获取当前日期前day天有销售记录的门店集合
      *
+     * @param date
      * @param day
      * @return
      */
-    List<String> existsSalesDistributorIn30Days(Date day);
+    List<String> existsSalesDistributorInNumDays(Date date,int day);
 
     /**
      * 刷新指定门店的畅缺商品数据
      *
-     * @param day
+     * @param date
      * @param distributorId
      */
-    void refreshDistributorSoldOutOfStockProduct(Date day, String distributorId);
+    void refreshDistributorSoldOutOfStockProduct(Date date, String distributorId);
 
 
     /**
@@ -43,5 +44,22 @@ public interface OrderStatisticalService {
      * @return
      */
     List<SoldOutOfStockProduct> getSoldOutOfStockProduct(String distributorId);
+
+
+    /**
+     * 刷新指定门店不满足滞销商品sku集合
+     *
+     * @param date
+     * @param distributorId
+     */
+    void refreshDistributorDisUnsoldProduct(Date date, String distributorId);
+
+    /**
+     * 获取门店不满足滞销商品的sku集合
+     *
+     * @param distributorId
+     * @return
+     */
+    List<String> getDisUnsoldProduct(String distributorId);
 
 }

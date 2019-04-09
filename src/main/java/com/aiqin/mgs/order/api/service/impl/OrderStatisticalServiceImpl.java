@@ -120,17 +120,17 @@ public class OrderStatisticalServiceImpl implements OrderStatisticalService {
 
 
     @Override
-    public List<String> existsSalesDistributorIn30Days(Date day) {
-        Date start = DateUtil.getBeforeDate(DateUtil.getBeginYesterday(day), 29);
-        Date end = DateUtil.getEndYesterDay(day);
+    public List<String> existsSalesDistributorInNumDays(Date date, int day) {
+        Date start = DateUtil.getBeforeDate(DateUtil.getBeginYesterday(date), day);
+        Date end = DateUtil.getEndYesterDay(date);
         return orderDao.querySaleDistributor(start, end);
     }
 
     @Override
-    public void refreshDistributorSoldOutOfStockProduct(Date day, String distributorId) {
+    public void refreshDistributorSoldOutOfStockProduct(Date date, String distributorId) {
         StopWatch sw = new StopWatch();
-        Date start = DateUtil.getBeforeDate(DateUtil.getBeginYesterday(day), 29);
-        Date end = DateUtil.getEndYesterDay(day);
+        Date start = DateUtil.getBeforeDate(DateUtil.getBeginYesterday(date), 29);
+        Date end = DateUtil.getEndYesterDay(date);
         //获取销量前10的sku的集合
         sw.start("获取销量前10的sku的集合");
         List<String> top10SkuCodes = orderDao.queryTop10SaleSku(distributorId, start, end);
@@ -146,8 +146,8 @@ public class OrderStatisticalServiceImpl implements OrderStatisticalService {
         sw.stop();
 
         sw.start("获取畅缺商品14天销量");
-        Date start1 = DateUtil.getBeforeDate(DateUtil.getBeginYesterday(day), 13);
-        Date end1 = DateUtil.getEndYesterDay(day);
+        Date start1 = DateUtil.getBeforeDate(DateUtil.getBeginYesterday(date), 13);
+        Date end1 = DateUtil.getEndYesterDay(date);
         SkuSalesRequest skuSalesRequest = new SkuSalesRequest();
         skuSalesRequest.setDistributorId(distributorId);
         skuSalesRequest.setStartDate(start1);
@@ -200,6 +200,37 @@ public class OrderStatisticalServiceImpl implements OrderStatisticalService {
         return getSoldOutOfStockProductFromRedisByDistributorId(distributorId);
     }
 
+    @Override
+    public void refreshDistributorDisUnsoldProduct(Date date, String distributorId) {
+        StopWatch sw = new StopWatch();
+        Date start = DateUtil.getBeforeDate(DateUtil.getBeginYesterday(date), 89);
+        Date end = DateUtil.getEndYesterDay(date);
+        //获取销量大于等于5的sku集合
+        sw.start("获取销量大于等于5的sku集合");
+        List<String> soldSkuCodes = orderDao.querySaleSkuGtNum(distributorId, start, end, 5);
+        sw.stop();
+
+        sw.start("写入缓存");
+        if (CollectionUtils.isNotEmpty(soldSkuCodes)) {
+            setSoldInRedis(soldSkuCodes, distributorId);
+        }
+        sw.stop();
+
+        log.info("统计信息:[{}]", sw.prettyPrint());
+    }
+
+    @Override
+    public List<String> getDisUnsoldProduct(String distributorId) {
+        String key = "un:sale:prefix:" + distributorId;
+        List<String> list = Lists.newArrayList();
+
+        if (!redisTemplate.hasKey(key)) {
+            return list;
+        }
+        list = redisTemplate.opsForList().range(key, 0, -1);
+        return list;
+    }
+
     /**
      * 畅缺商品数据存入缓存
      *
@@ -211,7 +242,7 @@ public class OrderStatisticalServiceImpl implements OrderStatisticalService {
             return;
         }
         //当天截止时间 30秒随机数内过期
-        List<String> skuCodes = list.stream().map(a->a.getSkuCode()).collect(Collectors.toList());
+        List<String> skuCodes = list.stream().map(a -> a.getSkuCode()).collect(Collectors.toList());
         redisTemplate.opsForValue().set(key1, StringUtils.join(skuCodes, ","), DateUtil.getExpireEndRandomSeconds(30L), TimeUnit.SECONDS);
         for (SoldOutOfStockProduct item : list) {
             Map<String, Object> curMap = new HashMap();
@@ -279,5 +310,20 @@ public class OrderStatisticalServiceImpl implements OrderStatisticalService {
             re.add(curItem);
         }
         return re;
+    }
+
+    /**
+     * 写入缓存 非的滞销sku
+     *
+     * @param skuCodes
+     */
+    private void setSoldInRedis(List<String> skuCodes, String distributorId) {
+        String key = "un:sale:prefix:" + distributorId;
+        if (CollectionUtils.isEmpty(skuCodes)) {
+            return;
+        }
+        redisTemplate.delete(key);
+        redisTemplate.opsForList().leftPushAll(key, skuCodes);
+        redisTemplate.expire(key, DateUtil.getExpireEndRandomSeconds(30L), TimeUnit.SECONDS);
     }
 }

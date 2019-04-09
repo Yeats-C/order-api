@@ -28,10 +28,16 @@ public class OrderProductController {
     private OrderStatisticalService orderStatisticalService;
 
 
-    @GetMapping("/test")
-    @ApiOperation("测试数据初始化")
+    @GetMapping("/sold/init")
+    @ApiOperation("t.初始化指定门店的畅缺商品信息")
     public void initSoldOutOfStock(String distributorId) {
         orderStatisticalService.refreshDistributorSoldOutOfStockProduct(DateUtil.getCurrentDate(), distributorId);
+    }
+
+    @GetMapping("/unsold/init")
+    @ApiOperation("t.初始化指定门店的非滞销sku集合")
+    public void initUnsold(String distributorId) {
+        orderStatisticalService.refreshDistributorDisUnsoldProduct(DateUtil.getCurrentDate(), distributorId);
     }
 
     @GetMapping("/sold/stock/info")
@@ -39,5 +45,12 @@ public class OrderProductController {
     public HttpResponse<List<SoldOutOfStockProduct>> getSoldOutOfStock(@RequestParam("distributor_id") String distributorId) {
         log.info("/order/product/statistical/sold/stock/info [{}]", distributorId);
         return HttpResponse.success(orderStatisticalService.getSoldOutOfStockProduct(distributorId));
+    }
+
+    @GetMapping("/unsold")
+    @ApiOperation("2.不满足滞销商品的sku集合")
+    public HttpResponse<List<String>> getDisUnsold(@RequestParam("distributor_id") String distributorId) {
+        log.info("/order/product/statistical/unsold [{}]", distributorId);
+        return HttpResponse.success(orderStatisticalService.getDisUnsoldProduct(distributorId));
     }
 }

@@ -162,6 +162,12 @@ public interface OrderDao {
     //获取指定门店指定时间段内销量前10的sku的集合
     List<String> queryTop10SaleSku(@Param("distributorId") String distributorId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
+    //获取指定门店指定时间段内销量大于等于num的sku的集合
+    List<String> querySaleSkuGtNum(@Param("distributorId") String distributorId,
+                                   @Param("startDate") Date startDate,
+                                   @Param("endDate") Date endDate,
+                                   @Param("num") Integer num);
+
     //获取特定sku集合指定时间段内销量数据信息
     List<SkuSales> querySkuSale(SkuSalesRequest vo);
 }

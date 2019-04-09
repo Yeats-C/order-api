@@ -34,11 +34,11 @@ public class OrderProductSchedule {
      */
     @Scheduled(cron = "0 5 0 * * ?") // 每天0:05分执行
     public void refreshSoldOutOfStockProduct() {
-
+        log.info("畅缺商品定时任务启动");
         Date date = DateUtil.getCurrentDate();
 
         //获取有效销售的门店集合
-        List<String> distributorIds = orderStatisticalService.existsSalesDistributorIn30Days(date);
+        List<String> distributorIds = orderStatisticalService.existsSalesDistributorInNumDays(date, 29);
         log.info("定时任务门店集合【{}】", distributorIds);
 
         if (CollectionUtils.isEmpty(distributorIds)) {
@@ -47,6 +47,24 @@ public class OrderProductSchedule {
 
         for (String item : distributorIds) {
             orderStatisticalService.refreshDistributorSoldOutOfStockProduct(date, item);
+        }
+    }
+
+
+    @Scheduled(cron = "0 5 1 * * ?") // 每天1:05分执行
+    public void refreshUnsoldProduct() {
+        log.info("非滞销商品sku初始化任务启动");
+        Date date = DateUtil.getCurrentDate();
+        //获取有效销售的门店集合
+        List<String> distributorIds = orderStatisticalService.existsSalesDistributorInNumDays(date, 89);
+
+        log.info("非滞销商品定时任务门店集合【{}】", distributorIds);
+        if (CollectionUtils.isEmpty(distributorIds)) {
+            return;
+        }
+
+        for (String item : distributorIds) {
+            orderStatisticalService.refreshDistributorDisUnsoldProduct(date, item);
         }
     }
 }
