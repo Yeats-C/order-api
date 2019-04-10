@@ -22,9 +22,11 @@ import com.aiqin.mgs.order.api.domain.request.stock.StockLockSkuReqVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.FirstOrderTimeRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderSaveRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
+import com.aiqin.mgs.order.api.domain.response.statistical.StatisticalPurchaseAmount;
 import com.aiqin.mgs.order.api.domain.response.stock.StockLockRespVo;
 import com.aiqin.mgs.order.api.service.BridgeStockService;
 import com.aiqin.mgs.order.api.service.OrderListService;
+import com.aiqin.mgs.order.api.util.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
@@ -39,10 +41,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -616,5 +615,17 @@ public class OrderListServiceImpl implements OrderListService {
     public Boolean updateProductReturnNum(UpdateProductReturnNumReqVo reqVo) {
         orderListProductDao.updateProductReturnNum(reqVo.getOrderCode(), reqVo.getItems());
         return true;
+    }
+
+    @Override
+    public StatisticalPurchaseAmount getStatisticalPurchaseAmount(String storeId) {
+        StatisticalPurchaseAmount re = new StatisticalPurchaseAmount();
+        re.setPurchaseAmount(0L);
+        re.setYesterdayPurchaseAmount(0L);
+        Long amount = orderListDao.statisticalPurchaseAmount(storeId, DateUtil.getFristOfMonthDay(DateUtil.getCurrentDate()), DateUtil.getLashOfMonthDay(DateUtil.getCurrentDate()));
+        Long yesterday_amount = orderListDao.statisticalPurchaseAmount(storeId, DateUtil.getBeginYesterday(DateUtil.getCurrentDate()), DateUtil.getEndYesterDay(DateUtil.getCurrentDate()));
+        re.setPurchaseAmount(Optional.ofNullable(amount).orElse(0L).longValue());
+        re.setYesterdayPurchaseAmount(Optional.ofNullable(yesterday_amount).orElse(0L).longValue());
+        return re;
     }
 }
