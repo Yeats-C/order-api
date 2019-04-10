@@ -9,6 +9,7 @@ import com.aiqin.mgs.order.api.domain.request.orderList.*;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.FirstOrderTimeRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderSaveRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
+import com.aiqin.mgs.order.api.domain.response.statistical.StatisticalPurchaseAmount;
 import com.aiqin.mgs.order.api.service.OrderListService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -309,5 +310,12 @@ public class OrderListController {
         } catch (Exception e) {
             return HttpResponse.failure(MessageId.create(Project.OMS_API, 400, e.getMessage()));
         }
+    }
+
+    @GetMapping("/purchase/statistical")
+    @ApiOperation("进货额统计数据")
+    public HttpResponse<StatisticalPurchaseAmount> getStatisticalPurchaseAmount(@RequestParam("store_id") String storeId) {
+        log.info("/order/list/purchase/statistical [{}]", storeId);
+        return HttpResponse.success(orderListService.getStatisticalPurchaseAmount(storeId));
     }
 }

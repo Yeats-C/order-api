@@ -71,5 +71,16 @@ public interface OrderListDao {
 
     List<String> selectOrderCancellation(@Param("overtime") int i, @Param("date") Date date);
 
-    Boolean updateOrderCancellation(@Param("list") List<String> codeString,@Param("stu") Integer stu);
+    Boolean updateOrderCancellation(@Param("list") List<String> codeString, @Param("stu") Integer stu);
+
+    /**
+     * 统计指定门店指定时间段内已签收订单总金额
+     * @param storeId
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    Long statisticalPurchaseAmount(@Param("storeId") String storeId,
+                                   @Param("startDate") Date startDate,
+                                   @Param("endDate") Date endDate);
 }

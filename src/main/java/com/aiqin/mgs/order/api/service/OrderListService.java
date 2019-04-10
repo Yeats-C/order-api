@@ -7,6 +7,7 @@ import com.aiqin.mgs.order.api.domain.request.orderList.*;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.FirstOrderTimeRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderSaveRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
+import com.aiqin.mgs.order.api.domain.response.statistical.StatisticalPurchaseAmount;
 
 import java.util.Date;
 import java.util.List;
@@ -68,4 +69,12 @@ public interface OrderListService {
     Boolean updateOrderCancellation(List<String> codeString, Integer stu);
 
     Boolean updateProductReturnNum(UpdateProductReturnNumReqVo reqVo);
+
+    /**
+     * 获取指定门店的进货额统计数据
+     *
+     * @param storeId
+     * @return
+     */
+    StatisticalPurchaseAmount getStatisticalPurchaseAmount(String storeId);
 }
