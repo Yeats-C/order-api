@@ -15,6 +15,7 @@ import javax.websocket.server.PathParam;
 
 import com.aiqin.mgs.order.api.domain.request.statistical.BusinessStatisticalRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.SkuSalesRequest;
+import com.aiqin.mgs.order.api.domain.response.statistical.Last10DaysOrderStatistical;
 import com.aiqin.mgs.order.api.domain.statistical.BusinessStatistical;
 import com.aiqin.mgs.order.api.domain.statistical.SkuSales;
 import org.apache.ibatis.annotations.Param;
@@ -170,4 +171,14 @@ public interface OrderDao {
 
     //获取特定sku集合指定时间段内销量数据信息
     List<SkuSales> querySkuSale(SkuSalesRequest vo);
+
+    /**
+     * 门店近10天订单完成情况
+     *
+     * @param distributorId
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    List<Last10DaysOrderStatistical> queryLast10DaysOrderStatistical(@Param("distributorId") String distributorId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
 }
