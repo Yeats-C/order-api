@@ -1222,5 +1222,16 @@
             )
         </if>
     </select>
+
+    <select id="queryLast10DaysOrderStatistical" resultType="com.aiqin.mgs.order.api.domain.response.statistical.Last10DaysOrderStatistical">
+        select date_format(create_time,'%Y-%m-%d') as dateTag,count(*) as finishOrderNum
+        from order_info
+        where distributor_id = #{distributorId}
+        and create_time &gt;= #{startDate}
+        and create_time &lt;= #{endDate}
+        and order_status = 5
+        group by date_format(create_time,'%Y-%m-%d')
+        order by create_time desc
+    </select>
 </mapper>
 

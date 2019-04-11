@@ -6,6 +6,7 @@ import com.aiqin.mgs.order.api.domain.request.statistical.BusinessStatisticalReq
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.SkuSalesRequest;
 import com.aiqin.mgs.order.api.domain.response.statistical.BusinessStatisticalResponse;
+import com.aiqin.mgs.order.api.domain.response.statistical.Last10DaysOrderStatistical;
 import com.aiqin.mgs.order.api.domain.statistical.BusinessStatistical;
 import com.aiqin.mgs.order.api.domain.statistical.SkuSales;
 import com.aiqin.mgs.order.api.domain.statistical.SoldOutOfStockProduct;
@@ -229,6 +230,13 @@ public class OrderStatisticalServiceImpl implements OrderStatisticalService {
         }
         list = redisTemplate.opsForList().range(key, 0, -1);
         return list;
+    }
+
+    @Override
+    public List<Last10DaysOrderStatistical> getLast10DaysOrderStatisticals(String distributorId) {
+        Date start = DateUtil.getBeforeDate(DateUtil.getCurrentDate(), 9);
+        Date end = DateUtil.getDayEnd(DateUtil.getCurrentDate());
+        return orderDao.queryLast10DaysOrderStatistical(distributorId, start, end);
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.service;
 
 import com.aiqin.mgs.order.api.domain.response.statistical.BusinessStatisticalResponse;
+import com.aiqin.mgs.order.api.domain.response.statistical.Last10DaysOrderStatistical;
 import com.aiqin.mgs.order.api.domain.statistical.SoldOutOfStockProduct;
 
 import java.util.Date;
@@ -61,5 +62,13 @@ public interface OrderStatisticalService {
      * @return
      */
     List<String> getDisUnsoldProduct(String distributorId);
+
+    /**
+     * 门店近10天订单完成情况
+     *
+     * @param distributorId
+     * @return
+     */
+    List<Last10DaysOrderStatistical> getLast10DaysOrderStatisticals(String distributorId);
 
 }
