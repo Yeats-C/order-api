@@ -108,7 +108,7 @@ public class OrderAfterController {
   
   
   /**
-   * 查询BYorderid-返回订单订单主数据、退货数据、退货明细数据、订单明细数据、优惠券数据、
+   * 查询BYorderid-返回订单订单主数据、退货数据、退货明细数据、订单明细数据、优惠券数据、20190401新增结算信息
    * @param 
    * @return
    */

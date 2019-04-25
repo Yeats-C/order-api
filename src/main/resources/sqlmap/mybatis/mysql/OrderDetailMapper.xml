@@ -206,15 +206,15 @@
     
 
 
-    <!-- 查询订单明细部分汇总-（支持活动ID汇总、） 暂时注销待确认：GROUP BY order_id-->
+    <!-- 查询订单明细部分汇总-（支持活动ID汇总、）-->
     <select id="selectorderdetailsum"  resultMap="OrderInfoDetailMapping" >
-    SELECT SUM(actual_price) AS actual_price,count(order_id) AS amount FROM order_detail WHERE order_id IN (
-	SELECT DISTINCT order_id FROM order_detail 
+    SELECT IFNULL(SUM(IFNULL(a.actual_price,0)*IFNULL(a.amount,0)),0) AS actual_price,COUNT(a.order_id) AS amount FROM order_detail a,order_info b 
 	WHERE 1=1
+	AND a.order_id = b.order_id
+	AND b.order_status NOT IN ('0','4')
 	<if test="activityId!=null and activityId!=''">
-	AND activity_id =#{activityId}
+	AND a.activity_id =#{activityId}
 	</if>
-	)
     </select>
     
     

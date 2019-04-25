@@ -1348,4 +1348,12 @@ from order_list
     <delete id="deleteByOrderCode" parameterType="string">
         delete from order_list where order_code=#{orderCode}
     </delete>
+
+    <select id="statisticalPurchaseAmount" resultType="long">
+        select sum(actual_amount_paid) from order_list
+        where order_status=12
+        and store_id = #{storeId}
+        and create_time &gt;= #{startDate}
+        and create_time &lt;= #{endDate}
+    </select>
 </mapper>

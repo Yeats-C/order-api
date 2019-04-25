@@ -37,7 +37,9 @@ import com.aiqin.mgs.order.api.domain.OrderDetailInfo;
 import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
 import com.aiqin.mgs.order.api.domain.OrderInfo;
 import com.aiqin.mgs.order.api.domain.OrderLog;
+import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.OrderRelationCouponInfo;
+import com.aiqin.mgs.order.api.domain.SettlementInfo;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.response.OrderJoinResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderNoCodeResponse.AddReturnOrderResonse;
@@ -47,6 +49,7 @@ import com.aiqin.mgs.order.api.service.OrderAfterService;
 import com.aiqin.mgs.order.api.service.OrderDetailService;
 import com.aiqin.mgs.order.api.service.OrderLogService;
 import com.aiqin.mgs.order.api.service.OrderService;
+import com.aiqin.mgs.order.api.service.SettlementService;
 import com.aiqin.mgs.order.api.util.DateUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 
@@ -82,7 +85,13 @@ public class OrderServiceAfterImpl implements OrderAfterService{
     private OrderLogService orderLogService;
 	
 	@Resource
+    private SettlementService settlementService;
+	
+	@Resource
     private OrderCouponDao orderCouponDao;
+	
+	
+	
 	
 	
 	//支持-条件查询售后维权列表 /条件查询退货信息 分页
@@ -398,6 +407,16 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 				}
 				if(orderInfo !=null) {
 					orderJoinResponse.setOrderInfo(orderInfo);
+					
+					//20190401 返回结算信息
+					OrderQuery orderQuery = new OrderQuery();
+					orderQuery.setOrderId(orderId);
+					SettlementInfo settlementInfo = new SettlementInfo();
+					HttpResponse httpResponse = settlementService.jkselectsettlement(orderQuery);
+					settlementInfo = (SettlementInfo) httpResponse.getData();
+					if(settlementInfo !=null) {
+						orderJoinResponse.setSettlementInfo(settlementInfo);
+					}
 				}
 			}
 			return HttpResponse.success(orderJoinResponse);
