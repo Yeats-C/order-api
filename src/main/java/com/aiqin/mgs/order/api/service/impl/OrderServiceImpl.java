@@ -1800,7 +1800,7 @@ public class OrderServiceImpl implements OrderService{
 	public List<String> selectsukReturn() {
 		
 		try {
-			return orderDao.selectsukReturn(DateUtil.getDayBegin(DateUtil.getCurrentDate()),DateUtil.getDayEnd(DateUtil.getCurrentDate()));
+			return orderDao.selectsukReturn(DateUtil.getTimeBegin(DateUtil.sysDateYYYYMMDD()),DateUtil.getTimeEnd(DateUtil.sysDateYYYYMMDD()));
 		} catch (Exception e) {
 			LOGGER.error("查询未统计销量的已完成订单异常: {}",e);
 			return null;

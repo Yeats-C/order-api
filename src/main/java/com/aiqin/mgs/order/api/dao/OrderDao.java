@@ -147,7 +147,7 @@ public interface OrderDao {
     List<String> selectMemberByDistributor(@Valid MemberByDistributorRequest memberByDistributorRequest) throws Exception;
 
     //查询未统计销量的已完成订单
-    List<String> selectsukReturn(@Valid @Param("beginTime") Date beginTime, @Valid @Param("endTime") Date endTime) throws Exception;
+    List<String> selectsukReturn(@Valid @Param("beginTime") String beginTime, @Valid @Param("endTime") String endTime) throws Exception;
 
     //修改统计销量状态
     void updateSukReturn(@Param("orderId") String orderId) throws Exception;
