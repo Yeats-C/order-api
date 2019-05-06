@@ -238,5 +238,20 @@ public class OrderDetailController {
     	LOGGER.info("sku销量统计参数sukList {}",sukList);    	
         return orderDetailService.saveBatch(sukList);
     }
+    
+    /**
+     * 顾客可能还想购买
+     * sku销量统计 返回销量最高的sku
+     * @param 
+     * @return
+     */
+    @GetMapping("/want/buy")
+    @ApiOperation(value = "顾客可能还想购买")
+    public HttpResponse wantBuy(@Valid @RequestParam(required = true) List<String> sukList) {
+
+    	
+    	LOGGER.info("sku销量统计参数 sukList：{}",sukList);    	
+        return orderDetailService.wantBuy(sukList);
+    }
 
 }

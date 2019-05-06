@@ -77,4 +77,7 @@ public interface OrderDetailDao {
 	//查询购买数量
 	List<OrderIdAndAmountRequest> buyAmount(@Valid ReorerRequest reorerRequest)throws Exception;
 
+	//顾客可能还想购买
+	List<String> wantBuy(@Valid @Param("sukList")List<String> sukList)throws Exception;
+
 }
