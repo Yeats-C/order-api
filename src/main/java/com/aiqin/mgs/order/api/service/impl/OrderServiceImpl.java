@@ -818,7 +818,7 @@ public class OrderServiceImpl implements OrderService{
 //					}
 //				}
 				for(int i=0;i<list.size();i++) {
-					if(i<2) {
+					if(i<4) {
 						LastBuyResponse lastBuyInfo = new LastBuyResponse();
 						lastBuyInfo = list.get(i);
 					    if(lastBuyInfo !=null && lastBuyInfo.getProduct() !=null) {
