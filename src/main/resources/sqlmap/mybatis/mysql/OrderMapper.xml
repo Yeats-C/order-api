@@ -869,9 +869,9 @@
          and member_id=#{memberId} 
          AND order_status NOT IN ('0','4')
          AND pay_status='1'
-         ORDER BY create_time DESC LIMIT 1) b 
+         ORDER BY create_time DESC LIMIT 3) b 
          WHERE a.order_id = b.order_id
-         LIMIT 2
+         LIMIT 3
     </select>
 
     <!-- 将提货码插入订单表中... -->
