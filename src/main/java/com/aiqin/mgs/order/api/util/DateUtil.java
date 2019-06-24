@@ -187,6 +187,20 @@ public class DateUtil {
         String strDate = sdf4.format(date);
         return strDate;
     }
+    
+    /**
+     * 根据日期获取多少月后的日期  YYYY-MM-dd
+     */
+    public static String dateAfterMonth(String inputDate,int i) {
+        SimpleDateFormat sdf4 = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = formatDate(inputDate);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.MONTH, i);
+        date = cal.getTime();
+        String strDate = sdf4.format(date);
+        return strDate;
+    }
 
     /*****
      * 得到多少天之后的数 yyyy-MM-dd
@@ -357,6 +371,22 @@ public class DateUtil {
         cal.add(Calendar.DAY_OF_MONTH, -day);
         return new DateTime(cal.getTime()).millisOfDay().withMinimumValue().toDate();
     }
+    
+    /**
+     * 日期+天
+     *
+     * @param date
+     * @param day
+     * @return
+     */
+    public static String getBeforeDate(String inputDate, int day) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(formatDate(inputDate));
+        cal.add(Calendar.DAY_OF_MONTH, -day);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        inputDate = sdf.format(new DateTime(cal.getTime()).millisOfDay().withMinimumValue().toDate());
+        return inputDate;
+    }
 
     /**
      * 过期时间/秒
@@ -389,10 +419,7 @@ public class DateUtil {
     }
 
     public static void main(String[] args) {
-//		Date date=formatDate("2019-02-00");
-//		System.out.println(getFristOfMonthDay(formatDate("2019-02")));
-
-        System.out.println(getTimeBegin(sysDateYYYYMMDD()));
+		System.out.println(getBeforeDate(dateAfterMonth("2019-03-02",3),-1));
     }
 
 }

@@ -25,6 +25,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -126,6 +128,10 @@ public class OrderServiceImpl implements OrderService{
 	
 	@Resource
     private OrderAfterDetailDao orderAfterDetailDao;
+	
+	//商品项目地址
+    @Value("${slcs_ip}")
+    public String slcsIp;
 	
 
 	//模糊查询订单列表
@@ -1361,6 +1367,13 @@ public class OrderServiceImpl implements OrderService{
 			}catch (Exception e){
 				 LOGGER.error("orderDao.addOrderInfo(orderInfo)：{}", e);
 		    }
+			
+			//同步营业阶段
+			try {
+				updateOpenStatus(orderInfo.getDistributorId());
+			}catch (Exception e){
+				LOGGER.info("同步营业阶段报错(1364)：{}", e.getMessage());
+			}
 	        
 			//生成订单日志
 			OrderLog rderLog = OrderPublic.addOrderLog(orderId,Global.STATUS_0,"OrderServiceImpl.addOrderInfo()",
@@ -1817,6 +1830,55 @@ public class OrderServiceImpl implements OrderService{
 		} catch (Exception e) {
 			LOGGER.error("修改统计销量状态异常 :{}",e);
 		}
+	}
+
+
+	@Override
+	public void updateOpenStatus(@Valid String distributorId) {
+		
+		
+		String businessName = "";
+		//最早成单日
+		String createTime = orderDao.isExistOrder(distributorId);
+		
+		if(createTime.equals(DateUtil.sysDateYYYYMMDD())) {
+			businessName = "新店";
+		}else if(DateUtil.getBeforeDate(DateUtil.dateAfterMonth(createTime,3),-1).equals(DateUtil.sysDateYYYYMMDD())) {
+			businessName = "次新店1";
+		}else if(DateUtil.getBeforeDate(DateUtil.dateAfterMonth(createTime,6),-1).equals(DateUtil.sysDateYYYYMMDD())) {
+			businessName = "次新店2";
+		}else if(DateUtil.getBeforeDate(DateUtil.dateAfterMonth(createTime,12),-1).equals(DateUtil.sysDateYYYYMMDD())) {
+			businessName = "同店";
+		}else if(DateUtil.getBeforeDate(DateUtil.dateAfterMonth(createTime,24),-1).equals(DateUtil.sysDateYYYYMMDD())) {
+			businessName = "老店";
+		}else {
+			
+		}
+		
+		if(StringUtils.isNotBlank(businessName)) {
+			
+			//查询营业编码
+	    	StringBuilder codeUrl = new StringBuilder();
+	    	codeUrl.append(slcsIp).append("/basics/business/name");
+	    	
+	    	HttpClient httpGet = HttpClient.get("http://"+codeUrl.toString()+"?business_name="+businessName); 
+	    	httpGet.action().status();
+	  	    HttpResponse result = httpGet.action().result(new TypeReference<HttpResponse>(){});
+	  	    String openStatus = (String) result.getData();
+	  	    
+			LOGGER.info("门店编码ID:{},营业状态:{}",distributorId,openStatus);
+			
+			//访问地址
+	    	StringBuilder sb = new StringBuilder();
+	        sb.append(slcsIp).append("/store/open/Status");
+	        
+	        HttpClient httpPost = HttpClient.get("http://"+sb.toString()); 
+	        httpPost.addParameter("store_id", distributorId);
+	        httpPost.addParameter("business_stage_code", openStatus);
+	        httpPost.action().status();
+	  	    HttpResponse httpResponse = httpPost.action().result(new TypeReference<HttpResponse>(){});
+		}
+		
 	}
 }
 

@@ -1233,5 +1233,11 @@
         group by date_format(create_time,'%Y-%m-%d')
         order by create_time desc
     </select>
+    <select id="isExistOrder" resultType="java.lang.String">
+        SELECT DATE_FORMAT(create_time,'%Y-%m-%d') AS create_time
+        FROM order_info
+        WHERE distributor_id = #{distributorId}
+        ORDER BY create_time LIMIT 1
+    </select>
 </mapper>
 

@@ -144,4 +144,6 @@ public interface OrderService {
 
 	//修改统计销量状态
 	void updateSukReturn(@Valid String orderId);
+	
+	void updateOpenStatus(@Valid String distributorId);
 }

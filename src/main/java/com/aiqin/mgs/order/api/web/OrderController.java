@@ -602,4 +602,18 @@ public class OrderController {
     	LOGGER.info("判断会员是否在当前门店时候有过消费记录参数: {}",memberByDistributorRequest);
         return orderService.selectMemberByDistributor(memberByDistributorRequest);
     } 
+    
+    /**
+     * 修改门店营业状态
+     * @param 
+     * @return
+     */
+    @GetMapping("/bmpy")
+    @ApiOperation(value = "修改门店营业状态")
+    public void updateOpenStatus(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId) {
+        
+    	
+    	LOGGER.info("开始修改门店营业状态参数: {}",distributorId);
+        orderService.updateOpenStatus(distributorId);
+    } 
 }

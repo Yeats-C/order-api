@@ -181,4 +181,6 @@ public interface OrderDao {
      * @return
      */
     List<Last10DaysOrderStatistical> queryLast10DaysOrderStatistical(@Param("distributorId") String distributorId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
+	String isExistOrder(@Param("distributorId") String distributorId);
 }
