@@ -78,6 +78,7 @@ import com.aiqin.mgs.order.api.domain.response.WscSaleResponse;
 import com.aiqin.mgs.order.api.domain.response.WscWorkViewResponse;
 import com.aiqin.mgs.order.api.domain.response.DistributorMonthResponse;
 import com.aiqin.mgs.order.api.domain.response.LastBuyResponse;
+import com.aiqin.mgs.order.api.domain.response.LatelyResponse;
 import com.aiqin.mgs.order.api.domain.response.MevBuyResponse;
 import com.aiqin.mgs.order.api.domain.response.OradskuResponse;
 import com.aiqin.mgs.order.api.service.CartService;
@@ -1879,6 +1880,20 @@ public class OrderServiceImpl implements OrderService{
 	  	    HttpResponse httpResponse = httpPost.action().result(new TypeReference<HttpResponse>(){});
 		}
 		
+	}
+
+
+	@Override
+	public HttpResponse memberLately(@Valid String memberId, @Valid String distributorId) {
+		
+		List<LatelyResponse> list = new ArrayList();
+		try {
+			list = orderDao.memberLately(memberId,distributorId);
+			return HttpResponse.success(list);
+		} catch (Exception e) {
+			LOGGER.info("error 最近消费订单 (消费时间/消费金额)e:{}",e);
+			return HttpResponse.success(list);
+		}
 	}
 }
 

@@ -146,4 +146,6 @@ public interface OrderService {
 	void updateSukReturn(@Valid String orderId);
 	
 	void updateOpenStatus(@Valid String distributorId);
+
+	HttpResponse memberLately(@Valid String memberId, @Valid String distributorId);
 }

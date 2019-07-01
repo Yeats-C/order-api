@@ -103,7 +103,12 @@
         <result column="avg_paid_price" jdbcType="BIGINT" property="avgPaidPrice"/>
         <result column="date_tag" jdbcType="VARCHAR" property="dateTag"/>
     </resultMap>
-
+    
+    <resultMap id="LatelyResponse" type="com.aiqin.mgs.order.api.domain.response.LatelyResponse">
+        <result column="pay_time" property="pay_time"/>
+        <result column="price" property="price"/>
+    </resultMap>
+    
 
     <!-- 插入订单表 -->
     <insert id="addOrderInfo">
@@ -1238,6 +1243,20 @@
         FROM order_info
         WHERE distributor_id = #{distributorId}
         ORDER BY create_time LIMIT 1
+    </select>
+    
+    <select id="memberLately" resultMap="LatelyResponse"
+            resultType="java.util.List">
+        SELECT  create_time AS pay_time,actual_price as price FROM `order_info` 
+        WHERE 1=1
+        <if test="distributorId!=null">
+            and distributor_id = #{distributorId}
+        </if>
+        <if test="memberId!=null and memberId!=''">
+            and member_id =#{memberId}
+        </if>
+        GROUP BY create_time
+        ORDER BY create_time DESC LIMIT 3
     </select>
 </mapper>
 

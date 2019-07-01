@@ -30,6 +30,7 @@ import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
 import com.aiqin.mgs.order.api.domain.response.SelectByMemberPayCountResponse;
 import com.aiqin.mgs.order.api.domain.response.SkuSaleResponse;
 import com.aiqin.mgs.order.api.domain.response.LastBuyResponse;
+import com.aiqin.mgs.order.api.domain.response.LatelyResponse;
 import com.aiqin.mgs.order.api.domain.response.MevBuyResponse;
 import com.aiqin.mgs.order.api.domain.response.OradskuResponse;
 
@@ -183,4 +184,6 @@ public interface OrderDao {
     List<Last10DaysOrderStatistical> queryLast10DaysOrderStatistical(@Param("distributorId") String distributorId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
 	String isExistOrder(@Param("distributorId") String distributorId);
+
+	List<LatelyResponse> memberLately(@Param("memberId") String memberId, @Param("distributorId") String distributorId)throws Exception;
 }
