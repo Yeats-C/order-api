@@ -131,7 +131,7 @@ public class OrderServiceImpl implements OrderService{
     private OrderAfterDetailDao orderAfterDetailDao;
 	
 	//商品项目地址
-    @Value("${slcs_ip}")
+    @Value("${slcsIp}")
     public String slcsIp;
 	
 
