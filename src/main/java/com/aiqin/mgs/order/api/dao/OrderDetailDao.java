@@ -77,4 +77,6 @@ public interface OrderDetailDao {
 	//查询购买数量
 	List<OrderIdAndAmountRequest> buyAmount(@Valid ReorerRequest reorerRequest)throws Exception;
 
+	//更改详情中实际金额
+	void updateOrderDetail(OrderDetailInfo orderDetailInfo);
 }

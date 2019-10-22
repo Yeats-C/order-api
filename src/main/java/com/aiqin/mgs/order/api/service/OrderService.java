@@ -6,31 +6,18 @@
 
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.service;
-import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
 
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
+import com.aiqin.mgs.order.api.domain.request.*;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.domain.CartInfo;
-import com.aiqin.mgs.order.api.domain.OrderDetailInfo;
-import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
 import com.aiqin.mgs.order.api.domain.OrderInfo;
 import com.aiqin.mgs.order.api.domain.OrderLog;
 import com.aiqin.mgs.order.api.domain.OrderPayInfo;
 import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.OrderRelationCouponInfo;
-import com.aiqin.mgs.order.api.domain.SettlementInfo;
-import com.aiqin.mgs.order.api.domain.request.DetailCouponRequest;
-import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
-import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
-import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
-import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
-import com.aiqin.mgs.order.api.domain.response.SkuSaleResponse;
 
 @SuppressWarnings("all")
 public interface OrderService {
@@ -144,4 +131,6 @@ public interface OrderService {
 
 	//修改统计销量状态
 	void updateSukReturn(@Valid String orderId);
+
+	HttpResponse updateOrderInfo(StoreValueOrderPayRequest orderAndSoOnRequest);
 }
