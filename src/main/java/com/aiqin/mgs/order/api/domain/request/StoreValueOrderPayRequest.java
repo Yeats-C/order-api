@@ -44,4 +44,12 @@ public class StoreValueOrderPayRequest {
     @ApiModelProperty(value="订单id")
     @JsonProperty("order_no")
     private String orderNo;
+
+    @JsonProperty("store_name")
+    @ApiModelProperty("门店名称")
+    private String storeName;
+
+    @JsonProperty("store_code")
+    @ApiModelProperty("门店code")
+    private String storeCode;
 }

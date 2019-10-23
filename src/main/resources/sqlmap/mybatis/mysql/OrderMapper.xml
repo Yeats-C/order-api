@@ -794,6 +794,15 @@
         <if test="updateBy!=null and updateBy!='' ">
             ,update_by = #{updateBy}
         </if>
+        <if test="distributorName!=null and distributorName!='' ">
+            ,distributor_name = #{distributorName}
+        </if>
+        <if test="distributorCode!=null and distributorCode!='' ">
+            ,distributor_code = #{distributorCode}
+        </if>
+        <if test="actualPrice!=null and actualPrice!='' ">
+            ,actual_price = #{actualPrice}
+        </if>
         where order_id = #{orderId}
     </update>
 

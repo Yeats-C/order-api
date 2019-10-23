@@ -1806,15 +1806,20 @@ public class OrderServiceImpl implements OrderService{
 			Integer actualPrice = storeValueOrderPayRequest.getActualPrice();
 			String updateBy = storeValueOrderPayRequest.getUpdateBy();
 			orderInfo.setPayStatus(1);
+			//支付完成
+			orderInfo.setOrderStatus(5);
 			orderInfo.setPayType("储值卡");
 			orderInfo.setActualPrice(actualPrice);
 			orderInfo.setUpdateBy(updateBy);
+			orderInfo.setDistributorCode(storeValueOrderPayRequest.getStoreCode());
+			orderInfo.setDistributorName(storeValueOrderPayRequest.getStoreName());
 			orderDao.updateOrder(orderInfo);
             orderDetailQuery.setOrderId(orderInfo.getOrderId());
             List<OrderDetailInfo> orderDetailInfoList = orderDetailDao.selectDetailById(orderDetailQuery);
             Integer productCount = 0;
             for (OrderDetailInfo orderDetailInfo : orderDetailInfoList) {
                 productCount+=orderDetailInfo.getAmount();
+                orderDetailInfo.setUpdateBy(updateBy);
                 orderDetailDao.updateOrderDetail(orderDetailInfo);
             }
             //增加结算信息
