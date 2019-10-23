@@ -79,4 +79,7 @@ public interface OrderDetailDao {
 
 	//更改详情中实际金额
 	void updateOrderDetail(OrderDetailInfo orderDetailInfo);
+	//顾客可能还想购买
+	List<String> wantBuy(@Valid @Param("sukList")List<String> sukList)throws Exception;
+
 }

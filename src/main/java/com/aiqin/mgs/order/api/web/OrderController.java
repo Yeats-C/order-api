@@ -24,6 +24,7 @@ import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
 import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
+import com.aiqin.mgs.order.api.domain.response.LatelyResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
 import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.OrderDetailService;
@@ -601,5 +602,34 @@ public class OrderController {
     	
     	LOGGER.info("判断会员是否在当前门店时候有过消费记录参数: {}",memberByDistributorRequest);
         return orderService.selectMemberByDistributor(memberByDistributorRequest);
+    } 
+    
+    /**
+     * 修改门店营业状态
+     * @param 
+     * @return
+     */
+    @GetMapping("/bmpy")
+    @ApiOperation(value = "修改门店营业状态")
+    public void updateOpenStatus(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId) {
+        
+    	
+    	LOGGER.info("开始修改门店营业状态参数: {}",distributorId);
+        orderService.updateOpenStatus(distributorId);
+    } 
+    
+    /**
+     * 最近消费订单 (消费时间/消费金额)
+     * @param 
+     * @return
+     */
+    @GetMapping("/lately")
+    @ApiOperation(value = "最近消费订单 (消费时间/消费金额)")	
+    public HttpResponse<LatelyResponse> memberLately(@Valid @RequestParam(name = "member_id", required = false) String memberId,
+    		@Valid @RequestParam(name = "distributor_id", required = false) String distributorId) {
+        
+    	
+    	LOGGER.info("最近消费订单 (消费时间/消费金额)参数:memberId: {},distributorId:{}",memberId,distributorId);
+    	return orderService.memberLately(memberId,distributorId);
     } 
 }

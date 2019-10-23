@@ -76,5 +76,8 @@ public interface OrderDetailService {
 	//查询SKU+销量
 	List<SkuSaleResponse> selectSkuSale(@Valid List<String> orderList);
 
+	//顾客可能还想购买
+	HttpResponse wantBuy(@Valid List<String> sukList);
+
 
 }

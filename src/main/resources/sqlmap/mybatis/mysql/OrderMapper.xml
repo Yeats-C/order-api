@@ -103,7 +103,12 @@
         <result column="avg_paid_price" jdbcType="BIGINT" property="avgPaidPrice"/>
         <result column="date_tag" jdbcType="VARCHAR" property="dateTag"/>
     </resultMap>
-
+    
+    <resultMap id="LatelyResponse" type="com.aiqin.mgs.order.api.domain.response.LatelyResponse">
+        <result column="pay_time" property="pay_time"/>
+        <result column="price" property="price"/>
+    </resultMap>
+    
 
     <!-- 插入订单表 -->
     <insert id="addOrderInfo">
@@ -878,9 +883,9 @@
          and member_id=#{memberId} 
          AND order_status NOT IN ('0','4')
          AND pay_status='1'
-         ORDER BY create_time DESC LIMIT 1) b 
+         ORDER BY create_time DESC LIMIT 3) b 
          WHERE a.order_id = b.order_id
-         LIMIT 2
+         LIMIT 3
     </select>
 
     <!-- 将提货码插入订单表中... -->
@@ -1241,6 +1246,26 @@
         and order_status = 5
         group by date_format(create_time,'%Y-%m-%d')
         order by create_time desc
+    </select>
+    <select id="isExistOrder" resultType="java.lang.String">
+        SELECT DATE_FORMAT(create_time,'%Y-%m-%d') AS create_time
+        FROM order_info
+        WHERE distributor_id = #{distributorId}
+        ORDER BY create_time LIMIT 1
+    </select>
+    
+    <select id="memberLately" resultMap="LatelyResponse"
+            resultType="java.util.List">
+        SELECT  create_time AS pay_time,actual_price as price FROM `order_info` 
+        WHERE 1=1
+        <if test="distributorId!=null">
+            and distributor_id = #{distributorId}
+        </if>
+        <if test="memberId!=null and memberId!=''">
+            and member_id =#{memberId}
+        </if>
+        GROUP BY create_time
+        ORDER BY create_time DESC LIMIT 3
     </select>
 </mapper>
 
