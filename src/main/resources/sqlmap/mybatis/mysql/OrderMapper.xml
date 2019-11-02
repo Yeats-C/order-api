@@ -1267,5 +1267,68 @@
         GROUP BY create_time
         ORDER BY create_time DESC LIMIT 3
     </select>
+
+    <!-- 根据条件查询订单列表 -->
+    <select id="findOrderInfoList" parameterType="com.aiqin.mgs.order.api.domain.OrderInfo"
+            resultMap="OrderInfoMapping"
+            resultType="java.util.List">
+        SELECT a.*
+        FROM order_info a
+        WHERE 1 = 1
+        <if test="orderType != null and orderType != '' or orderType == 0">
+            and a.order_type = #{orderType,jdbcType=VARCHAR}
+        </if>
+        <if test="orderStatus != null and orderStatus != '' or orderStatus == 0">
+            and a.order_status = #{orderStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="payStatus != null and payStatus != '' or payStatus == 0">
+            and a.pay_status = #{payStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="orderCode != null and orderCode != ''">
+            and a.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="distributorName != null and distributorName != ''">
+            and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="createTimeBegin != null and createTimeBegin != ''">
+            and date_format(a.create_time,'%Y-%m-%d') &gt;= #{createTimeBegin,jdbcType=VARCHAR}
+        </if>
+        <if test="createTimeEnd != null and createTimeEnd != ''">
+            and date_format(a.create_time,'%Y-%m-%d') &lt;= #{createTimeEnd,jdbcType=VARCHAR}
+        </if>
+
+        ORDER BY a.create_time DESC
+            limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </select>
+    <!--统计条件查询订单列表总数-->
+    <select id="countOrderInfo" parameterType="com.aiqin.mgs.order.api.domain.OrderInfo"
+            resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM order_info a
+        WHERE 1 = 1
+        <if test="orderType != null and orderType != '' or orderType == 0">
+            and a.order_type = #{orderType,jdbcType=VARCHAR}
+        </if>
+        <if test="orderStatus != null and orderStatus != '' or orderStatus == 0">
+            and a.order_status = #{orderStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="payStatus != null and payStatus != '' or payStatus == 0">
+            and a.pay_status = #{payStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="orderCode != null and orderCode != ''">
+            and a.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="distributorName != null and distributorName != ''">
+            and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="createTimeBegin != null and createTimeBegin != ''">
+            and date_format(a.create_time,'%Y-%m-%d') &gt;= #{createTimeBegin,jdbcType=VARCHAR}
+        </if>
+        <if test="createTimeEnd != null and createTimeEnd != ''">
+            and date_format(a.create_time,'%Y-%m-%d') &lt;= #{createTimeEnd,jdbcType=VARCHAR}
+        </if>
+
+    </select>
+
 </mapper>
 

@@ -1895,6 +1895,18 @@ public class OrderServiceImpl implements OrderService {
             return HttpResponse.success(list);
         }
     }
+
+    @Override
+    public HttpResponse findOrderInfoList(@Valid OrderInfo orderInfo) {
+        try {
+            List<OrderInfo> orderInfoList = orderDao.findOrderInfoList(orderInfo);
+            Integer count = orderDao.countOrderInfo(orderInfo);
+            return HttpResponse.successGenerics(new PageResData(count, orderInfoList));
+        } catch (Exception e) {
+            LOGGER.error("查询订单列表异常 {}", e);
+            return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+    }
 }
 
 

@@ -24,14 +24,14 @@ public interface OrderService {
 
 	
 	HttpResponse selectOrder(@Valid OrderQuery OrderQuery);
-	
+
 	//导出订单列表
 	HttpResponse exorder(@Valid OrderQuery OrderQuery);
 
 	HttpResponse addOrderLog(@Valid OrderLog logInfo);
 
 	OrderInfo addOrderInfo(@Valid OrderInfo orderInfo) throws Exception;
-	
+
 	//添加新的订单优惠券关系表数据
 	void addOrderCoupon(@Valid List<OrderRelationCouponInfo> orderCouponList, @Valid String orderId)throws Exception;
 
@@ -49,13 +49,13 @@ public interface OrderService {
 
 	//接口-订单概览-分销机构、小于当前日期9个月内的实付金额、订单数量
 	HttpResponse selectOrderByNineMonth(@Valid String distributorId,@Valid List<Integer> originTypeList);
-	
+
 	//添加新的订单主数据以及其他订单关联数据
 	HttpResponse addOrderList(@Valid OrderAndSoOnRequest orderAndSoOnRequest);
-	
+
 	//添加订单主数据+添加订单明细数据+返回订单编号
 	HttpResponse addOrdta(@Valid OrderAndSoOnRequest orderAndSoOnRequest);
-	
+
 	//添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据
     HttpResponse addPamo(@Valid OrderAndSoOnRequest orderAndSoOnRequest);
 
@@ -83,7 +83,7 @@ public interface OrderService {
 
 	//接口-生成提货码
 	HttpResponse rede(@Valid String orderId);
-	
+
 	//接口-注销提货码
 	HttpResponse reded(@Valid String orderId);
 
@@ -126,7 +126,7 @@ public interface OrderService {
     //判断会员是否在当前门店时候有过消费记录
 	HttpResponse selectMemberByDistributor(@Valid MemberByDistributorRequest memberByDistributorRequest);
 
-	//查询未统计销量的已完成订单 
+	//查询未统计销量的已完成订单
 	List<String> selectsukReturn();
 
 	//修改统计销量状态
@@ -137,4 +137,15 @@ public interface OrderService {
 	void updateOpenStatus(@Valid String distributorId);
 
 	HttpResponse memberLately(@Valid String memberId, @Valid String distributorId);
+
+    /**
+     * 根据条件查询订单列表
+     *
+     * @param orderInfo
+     * @return com.aiqin.ground.util.protocol.http.HttpResponse
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/2 16:30
+     */
+    HttpResponse findOrderInfoList(@Valid OrderInfo orderInfo);
 }
