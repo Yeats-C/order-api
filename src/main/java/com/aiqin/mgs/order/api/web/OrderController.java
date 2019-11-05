@@ -649,4 +649,20 @@ public class OrderController {
         return orderService.findOrderInfoList(orderInfo);
     }
 
+    /**
+     * 根据订单编码查询订单详情
+     *
+     * @param orderCode 订单号
+     * @return com.aiqin.ground.util.protocol.http.HttpResponse
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/4 9:34
+     */
+    @GetMapping("/getOrderDetailsByOrderCode")
+    @ApiOperation(value = "根据订单编码查询订单详情")
+    public HttpResponse getOrderDetailsByOrderCode(@Valid @RequestParam(name = "order_code", required = false) String orderCode) {
+        LOGGER.info("查询订单明细，参数：orderCode：{}",orderCode);
+        return orderService.getOrderDetailsByOrderCode(orderCode);
+    }
+
 }

@@ -148,4 +148,15 @@ public interface OrderService {
      * @date 2019/11/2 16:30
      */
     HttpResponse findOrderInfoList(@Valid OrderInfo orderInfo);
+
+    /**
+     * 根据订单号查询订单详情
+     *
+     * @param orderCode
+     * @return com.aiqin.ground.util.protocol.http.HttpResponse
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/4 9:35
+     */
+    HttpResponse getOrderDetailsByOrderCode(@Valid String orderCode);
 }

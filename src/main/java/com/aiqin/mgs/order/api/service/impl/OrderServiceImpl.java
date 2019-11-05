@@ -70,6 +70,12 @@ public class OrderServiceImpl implements OrderService {
     private OrderAfterDao orderAfterDao;
     @Resource
     private OrderAfterDetailDao orderAfterDetailDao;
+    @Resource
+    private OrderReceivingDao orderReceivingDao;
+    @Resource
+    private SettlementDao settlementDao;
+    @Resource
+    private OrderListLogisticsDao orderListLogisticsDao;
 	
 
     //模糊查询订单列表
@@ -1904,6 +1910,58 @@ public class OrderServiceImpl implements OrderService {
             return HttpResponse.successGenerics(new PageResData(count, orderInfoList));
         } catch (Exception e) {
             LOGGER.error("查询订单列表异常 {}", e);
+            return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+    }
+
+    @Override
+    public HttpResponse getOrderDetailsByOrderCode(@Valid String orderCode) {
+        try {
+
+            if (orderCode == null || "".equals(orderCode)) {
+                throw new RuntimeException("订单编码为空");
+            }
+
+            OrderodrInfo info = new OrderodrInfo();
+
+            OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
+            orderDetailQuery.setOrderCode(orderCode);
+
+            //查询订单
+            OrderInfo orderInfo = orderDao.selecOrderById(orderDetailQuery);
+            if (orderInfo == null) {
+                throw new RuntimeException("订单编码无效");
+            }
+            info.setOrderInfo(orderInfo);
+
+            //订单明细数据
+            orderDetailQuery.setOrderId(orderInfo.getOrderId());
+            List<OrderDetailInfo> detailList = orderDetailDao.selectDetailById(orderDetailQuery);
+            info.setDetailList(detailList);
+
+            //收货信息
+            OrderReceivingInfo orderReceivingInfo = orderReceivingDao.selecReceivingById(orderDetailQuery);
+            info.setReceivingInfo(orderReceivingInfo);
+
+            //结算
+            OrderQuery orderQuery = new OrderQuery();
+            orderQuery.setOrderId(orderInfo.getOrderId());
+            SettlementInfo jkselectsettlement = settlementDao.jkselectsettlement(orderQuery);
+            info.setSettlementInfo(jkselectsettlement);
+
+            //订单支付信息
+            OrderPayInfo orderPayInfo = new OrderPayInfo();
+            orderPayInfo.setOrderId(orderInfo.getOrderId());
+            List<OrderPayInfo> payList = orderPayDao.pay(orderPayInfo);
+            info.setPayList(payList);
+
+            //订单物流信息
+            List<OrderListLogistics> orderListLogistics = orderListLogisticsDao.searchOrderListLogisticsByCode(orderInfo.getOrderCode());
+            info.setOrderListLogisticsList(orderListLogistics);
+
+            return HttpResponse.successGenerics(info);
+        } catch (Exception e) {
+            LOGGER.error("订单明细查询异常 {}", e);
             return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
         }
     }
