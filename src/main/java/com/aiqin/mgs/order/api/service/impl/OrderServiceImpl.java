@@ -26,7 +26,9 @@ import com.aiqin.mgs.order.api.domain.response.*;
 import com.aiqin.mgs.order.api.service.*;
 import com.aiqin.mgs.order.api.util.DateUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
+import com.aiqin.mgs.order.api.util.PageAutoHelperUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1905,9 +1907,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public HttpResponse findOrderInfoList(@Valid OrderInfo orderInfo) {
         try {
-            List<OrderInfo> orderInfoList = orderDao.findOrderInfoList(orderInfo);
-            Integer count = orderDao.countOrderInfo(orderInfo);
-            return HttpResponse.successGenerics(new PageResData(count, orderInfoList));
+            PageInfo<OrderInfo> pageInfo = PageAutoHelperUtil.generatePage(() -> orderDao.findOrderInfoList(orderInfo), orderInfo);
+            return HttpResponse.successGenerics(new PageResData((int)pageInfo.getTotal(), pageInfo.getList()));
         } catch (Exception e) {
             LOGGER.error("查询订单列表异常 {}", e);
             return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);

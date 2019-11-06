@@ -197,18 +197,6 @@ public interface OrderDao {
      * @version: v1.0.0
      * @date 2019/11/2 16:30
      */
-    List<OrderInfo> findOrderInfoList(OrderInfo orderInfo) throws Exception;
-
-    /**
-     * 统计条件查询订单列表总数
-     *
-     * @param orderInfo
-     * @return java.lang.Integer
-     * @throws Exception
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/11/2 16:48
-     */
-    Integer countOrderInfo(OrderInfo orderInfo) throws Exception;
+    List<OrderInfo> findOrderInfoList(OrderInfo orderInfo);
 
 }
