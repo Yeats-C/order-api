@@ -186,4 +186,17 @@ public interface OrderDao {
 	String isExistOrder(@Param("distributorId") String distributorId);
 
 	List<LatelyResponse> memberLately(@Param("memberId") String memberId, @Param("distributorId") String distributorId)throws Exception;
+
+	/**
+     * 根据条件查询订单列表
+     *
+     * @param orderInfo
+     * @return java.util.List<com.aiqin.mgs.order.api.domain.OrderInfo>
+     * @throws Exception
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/2 16:30
+     */
+    List<OrderInfo> findOrderInfoList(OrderInfo orderInfo);
+
 }

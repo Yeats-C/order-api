@@ -631,5 +631,38 @@ public class OrderController {
     	
     	LOGGER.info("最近消费订单 (消费时间/消费金额)参数:memberId: {},distributorId:{}",memberId,distributorId);
     	return orderService.memberLately(memberId,distributorId);
-    } 
+    }
+
+    /**
+     * 根据条件查询订单列表
+     *
+     * @param orderInfo
+     * @return com.aiqin.ground.util.protocol.http.HttpResponse
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/2 16:25
+     */
+    @GetMapping("/findOrderInfoList")
+    @ApiOperation(value = "根据条件查询订单列表")
+    public HttpResponse findOrderInfoList(@Valid @RequestBody OrderInfo orderInfo) {
+        LOGGER.info("查询订单列表参数：{}",orderInfo);
+        return orderService.findOrderInfoList(orderInfo);
+    }
+
+    /**
+     * 根据订单编码查询订单详情
+     *
+     * @param orderCode 订单号
+     * @return com.aiqin.ground.util.protocol.http.HttpResponse
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/4 9:34
+     */
+    @GetMapping("/getOrderDetailsByOrderCode")
+    @ApiOperation(value = "根据订单编码查询订单详情")
+    public HttpResponse getOrderDetailsByOrderCode(@Valid @RequestParam(name = "order_code", required = false) String orderCode) {
+        LOGGER.info("查询订单明细，参数：orderCode：{}",orderCode);
+        return orderService.getOrderDetailsByOrderCode(orderCode);
+    }
+
 }
