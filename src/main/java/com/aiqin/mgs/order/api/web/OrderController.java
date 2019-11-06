@@ -7,6 +7,8 @@
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.web;
 
+import com.aiqin.ground.util.protocol.MessageId;
+import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.*;
@@ -17,6 +19,7 @@ import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
+import com.aiqin.mgs.order.api.domain.response.PartnerPayGateRep;
 import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.OrderDetailService;
 import com.aiqin.mgs.order.api.service.OrderService;
@@ -649,4 +652,16 @@ public class OrderController {
         LOGGER.info("预存取货参数: {}",prestorageOutVo);
         return orderService.prestorageOut(prestorageOutVo);
     }
+
+    @PostMapping("/back")
+    @ApiOperation("支付回调修改订单状态和库存")
+    public HttpResponse callback(@RequestBody PartnerPayGateRep payReq) {
+        try {
+            return orderService.callback(payReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return HttpResponse.failure(MessageId.create(Project.ORDER_API, -1, e.getMessage()));
+        }
+    }
+
 }
