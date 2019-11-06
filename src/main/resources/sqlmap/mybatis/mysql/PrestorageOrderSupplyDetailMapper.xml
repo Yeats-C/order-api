@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.PrestorageOrderSupplyDetailDao">
+    <resultMap id="OrderSupplyMapping" type="com.aiqin.mgs.order.api.domain.PrestorageOrderSupplyDetail">
+        <result column="prestorage_order_supply_detail_id" jdbcType="VARCHAR" property="prestorageOrderSupplyDetailId"/>
+        <result column="prestorage_order_supply_id" jdbcType="VARCHAR" property="prestorageOrderSupplyId"/>
+        <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+        <result column="order_detail_id" jdbcType="VARCHAR" property="orderDetailId"/>
+        <result column="product_name" jdbcType="VARCHAR" property="productName"/>
+        <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
+        <result column="bar_code" jdbcType="VARCHAR" property="barCode"/>
+        <result column="amount" jdbcType="INTEGER" property="amount"/>
+
+        <result column="return_amount" jdbcType="INTEGER" property="returnAmount"/>
+        <result column="return_prestorage_amount" jdbcType="INTEGER" property="returnPrestorageAmount"/>
+        <result column="supply_amount" jdbcType="INTEGER" property="supplyAmount"/>
+
+        <result column="prestorage_order_supply_status" jdbcType="TINYINT" property="prestorageOrderSupplyStatus"/>
+
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+    </resultMap>
+
+
+    <select id="selectprestorageorderDetailsById" resultMap="OrderSupplyMapping">
+        select * from prestorage_order_supply_detail where prestorage_order_supply_detail_id=#{prestorageOrderSupplyDetailId}
+    </select>
+    <select id="selectprestorageorderDetailsListBySupplyId" resultMap="OrderSupplyMapping">
+         select * from prestorage_order_supply_detail where prestorage_order_supply_id=#{prestorageOrderSupplyId}
+    </select>
+
+
+
+    <update id="updateById" parameterType="com.aiqin.mgs.order.api.domain.PrestorageOrderSupplyDetail">
+        update prestorage_order_supply_detail set update_time=CURRENT_TIMESTAMP
+        <if test="returnAmount!=null and returnAmount!='' ">
+            ,return_amount=#{returnAmount}
+        </if>
+        <if test="returnPrestorageAmount!=null ">
+            ,return_prestorage_amount = #{returnPrestorageAmount}
+        </if>
+        <if test="supplyAmount!=null ">
+            ,supply_amount = #{supplyAmount}
+        </if>
+        <if test="prestorageOrderSupplyStatus!=null ">
+            ,prestorage_order_supply_status = #{prestorageOrderSupplyStatus}
+        </if>
+        <if test="updateBy!=null ">
+            ,update_by = #{updateBy}
+        </if>
+        where prestorage_order_supply_detail_id = #{prestorageOrderSupplyDetailId}
+
+
+    </update>
+</mapper>

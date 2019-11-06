@@ -10,14 +10,10 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.request.*;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.domain.OrderInfo;
-import com.aiqin.mgs.order.api.domain.OrderLog;
-import com.aiqin.mgs.order.api.domain.OrderPayInfo;
-import com.aiqin.mgs.order.api.domain.OrderQuery;
-import com.aiqin.mgs.order.api.domain.OrderRelationCouponInfo;
 
 @SuppressWarnings("all")
 public interface OrderService {
@@ -133,4 +129,25 @@ public interface OrderService {
 	void updateSukReturn(@Valid String orderId);
 
 	HttpResponse updateOrderInfo(StoreValueOrderPayRequest orderAndSoOnRequest);
+
+	/**
+	 * 查询预存订单
+	 * @param orderQuery
+	 * @return
+	 */
+	HttpResponse selectPrestorageOrder(OrderQuery orderQuery);
+
+	/**
+	 *查询预存订单详情
+	 * @param prestorageOrderSupplyDetailId
+	 * @return
+	 */
+	HttpResponse selectprestorageorderDetails(String prestorageOrderSupplyDetailId);
+
+	/**
+	 * 预存商品取货
+	 * @param prestorageOutVo
+	 * @return
+	 */
+	HttpResponse prestorageOut(PrestorageOutInfo prestorageOutVo);
 }

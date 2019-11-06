@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.PrestorageOrderSupplyDao">
+    <resultMap id="OrderSupplyMapping" type="com.aiqin.mgs.order.api.domain.PrestorageOrderSupply">
+        <result column="prestorage_order_supply_id" jdbcType="VARCHAR" property="prestorageOrderSupplyId"/>
+        <result column="prestorage_order_supply_code" jdbcType="VARCHAR" property="prestorageOrderSupplyCode"/>
+
+
+        <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+        <result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
+        <result column="member_id" jdbcType="VARCHAR" property="memberId"/>
+        <result column="member_name" jdbcType="VARCHAR" property="memberName"/>
+        <result column="member_phone" jdbcType="VARCHAR" property="memberPhone"/>
+        <result column="distributor_id" jdbcType="VARCHAR" property="distributorId"/>
+        <result column="distributor_code" jdbcType="VARCHAR" property="distributorCode"/>
+        <result column="distributor_name" jdbcType="VARCHAR" property="distributorName"/>
+        <result column="prestorage_order_supply_status" jdbcType="TINYINT" property="prestorageOrderSupplyStatus"/>
+
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+    </resultMap>
+
+    <update id="updateById" parameterType="com.aiqin.mgs.order.api.domain.PrestorageOrderSupply">
+        update prestorage_order_supply set update_time=CURRENT_TIMESTAMP
+
+        <if test="prestorageOrderSupplyStatus!=null ">
+            ,prestorage_order_supply_status = #{prestorageOrderSupplyStatus}
+        </if>
+        <if test="updateBy!=null ">
+            ,update_by = #{updateBy}
+        </if>
+        where prestorage_order_supply_detail_id = #{prestorageOrderSupplyDetailId}
+
+    </update>
+
+</mapper>

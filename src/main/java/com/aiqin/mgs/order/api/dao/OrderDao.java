@@ -11,10 +11,10 @@ import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
-import javax.websocket.server.PathParam;
 
 import com.aiqin.mgs.order.api.domain.request.statistical.BusinessStatisticalRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.SkuSalesRequest;
+import com.aiqin.mgs.order.api.domain.response.*;
 import com.aiqin.mgs.order.api.domain.response.statistical.Last10DaysOrderStatistical;
 import com.aiqin.mgs.order.api.domain.statistical.BusinessStatistical;
 import com.aiqin.mgs.order.api.domain.statistical.SkuSales;
@@ -23,15 +23,7 @@ import org.apache.ibatis.annotations.Param;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.request.DevelRequest;
 import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
-import com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
-import com.aiqin.mgs.order.api.domain.response.OrderResponse;
-import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
-import com.aiqin.mgs.order.api.domain.response.SelectByMemberPayCountResponse;
-import com.aiqin.mgs.order.api.domain.response.SkuSaleResponse;
-import com.aiqin.mgs.order.api.domain.response.LastBuyResponse;
-import com.aiqin.mgs.order.api.domain.response.MevBuyResponse;
-import com.aiqin.mgs.order.api.domain.response.OradskuResponse;
 
 
 public interface OrderDao {
@@ -181,4 +173,15 @@ public interface OrderDao {
      * @return
      */
     List<Last10DaysOrderStatistical> queryLast10DaysOrderStatistical(@Param("distributorId") String distributorId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
+    List<PrestorageResponse> selectPrestorageOrder(OrderQuery orderQuery);
+
+    Integer selectPrestorageOrderCount(OrderQuery orderQuery);
+
+    /**
+     * 预存商品详情
+     * @param prestorageOrderSupplyDetailId
+     * @return
+     */
+    PrestorageResponse selectprestorageorderDetails(String prestorageOrderSupplyDetailId);
 }

@@ -18,7 +18,10 @@ import javax.validation.Valid;
 
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.mgs.order.api.component.PayTypeEnum;
+import com.aiqin.mgs.order.api.dao.*;
+import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.request.*;
+import com.aiqin.mgs.order.api.domain.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -28,32 +31,7 @@ import com.aiqin.ground.util.exception.GroundRuntimeException;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
-import com.aiqin.mgs.order.api.dao.OrderAfterDao;
-import com.aiqin.mgs.order.api.dao.OrderAfterDetailDao;
-import com.aiqin.mgs.order.api.dao.OrderCouponDao;
-import com.aiqin.mgs.order.api.dao.OrderDao;
-import com.aiqin.mgs.order.api.dao.OrderDetailDao;
-import com.aiqin.mgs.order.api.dao.OrderLogDao;
-import com.aiqin.mgs.order.api.dao.OrderPayDao;
-import com.aiqin.mgs.order.api.domain.OrderDetailInfo;
-import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
-import com.aiqin.mgs.order.api.domain.OrderInfo;
-import com.aiqin.mgs.order.api.domain.OrderLog;
-import com.aiqin.mgs.order.api.domain.OrderPayInfo;
-import com.aiqin.mgs.order.api.domain.OrderQuery;
-import com.aiqin.mgs.order.api.domain.OrderRelationCouponInfo;
-import com.aiqin.mgs.order.api.domain.SettlementInfo;
 import com.aiqin.mgs.order.api.domain.constant.Global;
-import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
-import com.aiqin.mgs.order.api.domain.response.OrderResponse;
-import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
-import com.aiqin.mgs.order.api.domain.response.SelectByMemberPayCountResponse;
-import com.aiqin.mgs.order.api.domain.response.WscSaleResponse;
-import com.aiqin.mgs.order.api.domain.response.WscWorkViewResponse;
-import com.aiqin.mgs.order.api.domain.response.DistributorMonthResponse;
-import com.aiqin.mgs.order.api.domain.response.LastBuyResponse;
-import com.aiqin.mgs.order.api.domain.response.MevBuyResponse;
-import com.aiqin.mgs.order.api.domain.response.OradskuResponse;
 import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.OrderDetailService;
 import com.aiqin.mgs.order.api.service.OrderLogService;
@@ -101,8 +79,10 @@ public class OrderServiceImpl implements OrderService{
 
 	@Resource
     private OrderAfterDetailDao orderAfterDetailDao;
-
-
+    @Resource
+	private PrestorageOrderSupplyDetailDao prestorageOrderSupplyDetailDao;
+    @Resource
+    private PrestorageOrderSupplyDao prestorageOrderSupplyDao;
 	//模糊查询订单列表
 	@Override
 	public HttpResponse selectOrder(OrderQuery orderQuery) {
@@ -173,8 +153,58 @@ public class OrderServiceImpl implements OrderService{
 
 	}
 
+	@Override
+	public HttpResponse selectPrestorageOrder(OrderQuery orderQuery) {
+		List<PrestorageResponse> OrderInfolist = orderDao.selectPrestorageOrder(orderQuery);
+		Integer totalCount = 0;
+		Integer icount =null;
+		totalCount = orderDao.selectPrestorageOrderCount(OrderPublic.getOrderQuery(orderQuery));
+		return  HttpResponse.success(new PageResData(totalCount,OrderInfolist));
+	}
 
-	private void payOrderIdList(OrderQuery orderQuery) {
+	@Override
+	public HttpResponse selectprestorageorderDetails(String prestorageOrderSupplyDetailId) {
+		PrestorageResponse prestorageResponse = orderDao.selectprestorageorderDetails(prestorageOrderSupplyDetailId);
+		return  HttpResponse.success(prestorageResponse);
+	}
+
+	@Override
+	public HttpResponse prestorageOut(PrestorageOutInfo prestorageOutVo) {
+		//查询
+        PrestorageOrderSupplyDetail prestorageOrderSupplyDetail = prestorageOrderSupplyDetailDao.selectprestorageorderDetailsById(prestorageOutVo.getPrestorageOrderSupplyDetailId());
+		//判断可取数量
+		if (prestorageOrderSupplyDetail!=null&&prestorageOrderSupplyDetail.getAmount()-prestorageOrderSupplyDetail.getSupplyAmount() >=prestorageOutVo.getAmount()){
+			//修改
+            prestorageOrderSupplyDetail.setSupplyAmount(prestorageOrderSupplyDetail.getSupplyAmount()+prestorageOutVo.getAmount());
+            prestorageOrderSupplyDetailDao.updateById(prestorageOrderSupplyDetail);
+		}
+		if (prestorageOrderSupplyDetail!=null&&prestorageOrderSupplyDetail.getAmount()-prestorageOrderSupplyDetail.getSupplyAmount() ==prestorageOutVo.getAmount()){
+			//修改状态
+            prestorageOrderSupplyDetail.setPrestorageOrderSupplyStatus(1);
+            prestorageOrderSupplyDetailDao.updateById(prestorageOrderSupplyDetail);
+            updateprestorageOrderSupplyStatus(prestorageOrderSupplyDetail.getPrestorageOrderSupplyId());
+
+		}
+
+
+		return null;
+	}
+
+    private void updateprestorageOrderSupplyStatus(String prestorageOrderSupplyId) {
+        List<PrestorageOrderSupplyDetail> prestorageOrderSupplyDetails = prestorageOrderSupplyDetailDao.selectprestorageorderDetailsListBySupplyId(prestorageOrderSupplyId);
+        for (PrestorageOrderSupplyDetail prestorageOrderSupplyDetail:prestorageOrderSupplyDetails){
+            if (prestorageOrderSupplyDetail.getPrestorageOrderSupplyStatus()==0){
+                return;
+            }
+        }
+        //修改预存订单为以提取成功
+        PrestorageOrderSupply prestorageOrderSupply=new PrestorageOrderSupply();
+        prestorageOrderSupply.setPrestorageOrderSupplyId(prestorageOrderSupplyId);
+        prestorageOrderSupply.setPrestorageOrderSupplyStatus(1);
+        prestorageOrderSupplyDao.updateById(prestorageOrderSupply);
+    }
+
+    private void payOrderIdList(OrderQuery orderQuery) {
 
 		if(orderQuery !=null) {
 			  if(orderQuery.getPayType() !=null && !orderQuery.getPayType().equals("")){
@@ -218,13 +248,13 @@ public class OrderServiceImpl implements OrderService{
 
 		//生成订单号
 		String logo = "";
-		if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_0) {
+		if(orderInfo.getOriginType().intValue() == Global.ORIGIN_TYPE_0) {
 			logo = Global.ORIGIN_COME_3;
 		}
-		if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_1) {
+		if(orderInfo.getOriginType().intValue() == Global.ORIGIN_TYPE_1) {
 			logo = Global.ORIGIN_COME_4;
 		}
-		if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_3) {
+		if(orderInfo.getOriginType().intValue() == Global.ORIGIN_TYPE_3) {
 			logo = Global.ORIGIN_COME_5;
 		}
 		//公司标识
@@ -239,7 +269,7 @@ public class OrderServiceImpl implements OrderService{
 		orderInfo.setOrderCode(orderCode);
 
 		//初始化提货码
-		if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_1) {
+		if(orderInfo.getOriginType().intValue() == Global.ORIGIN_TYPE_1) {
 			if(orderInfo.getReceiveType().equals(Global.RECEIVE_TYPE_0)) {
 				receiveCode =OrderPublic.randomNumberE();
 				orderInfo.setReceiveCode(receiveCode);
@@ -695,7 +725,7 @@ public class OrderServiceImpl implements OrderService{
 			orderDao.updateOrder(orderInfo);
 
 			//判断是否变更为待提货、待提货订单需重新生成提货码.
-			if(orderStatus == Global.RECEIVE_TYPE_0) {
+			if(orderStatus.intValue()== Global.RECEIVE_TYPE_0) {
 				rede(orderId);
 			}
 
@@ -1317,7 +1347,7 @@ public class OrderServiceImpl implements OrderService{
 			if(orderId !=null && !orderId.equals("")) {
 
 			//初始化提货码
-			if(orderInfo.getOriginType() == Global.ORIGIN_TYPE_1) {
+			if(orderInfo.getOriginType().intValue() == Global.ORIGIN_TYPE_1) {
 				if(orderInfo.getReceiveType().equals(Global.RECEIVE_TYPE_0)) {
 					orderInfo.setReceiveCode(OrderPublic.randomNumberE());
 				}
@@ -1794,6 +1824,7 @@ public class OrderServiceImpl implements OrderService{
 		}
 	}
 
+	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public HttpResponse updateOrderInfo(StoreValueOrderPayRequest storeValueOrderPayRequest){
 		try {
@@ -1835,6 +1866,8 @@ public class OrderServiceImpl implements OrderService{
 			throw new GroundRuntimeException("");
 		}
 	}
+
+
 
 	private void addSettlementInfo(String orderId,Integer productCount,String updateBy,Integer actualPrice)throws Exception{
         SettlementInfo settlementInfo = new SettlementInfo();
