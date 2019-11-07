@@ -14,6 +14,7 @@ import java.util.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.Project;
@@ -30,6 +31,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,7 +67,7 @@ import com.aiqin.mgs.order.api.service.OrderService;
 import com.aiqin.mgs.order.api.service.SettlementService;
 import com.aiqin.mgs.order.api.util.DateUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
-
+import com.fasterxml.jackson.core.type.TypeReference;
 @SuppressWarnings("all")
 @Slf4j
 @Service
@@ -2068,6 +2070,11 @@ public class OrderServiceImpl implements OrderService {
 			return HttpResponse.success(list);
 		}
 	}
+
+    @Override
+    public HttpResponse updateOrderInfo(StoreValueOrderPayRequest orderAndSoOnRequest) {
+        return null;
+    }
 }
 
 
