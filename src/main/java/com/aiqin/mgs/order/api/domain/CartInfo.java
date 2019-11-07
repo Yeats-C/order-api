@@ -56,7 +56,7 @@ public class CartInfo extends PagesRequest {
     @ApiModelProperty(value = "商品名称")
     @JsonProperty("product_name")
     private String productName="";
-    
+
     @ApiModelProperty(value = "sku code")
     @JsonProperty("sku_code")
     private String skuCode="";
