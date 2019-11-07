@@ -7,27 +7,22 @@
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.service.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-import javax.validation.Valid;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.dao.CartDao;
 import com.aiqin.mgs.order.api.domain.CartInfo;
 import com.aiqin.mgs.order.api.domain.constant.Global;
+import com.aiqin.mgs.order.api.domain.request.AddProduct2CartRequest;
 import com.aiqin.mgs.order.api.service.CartService;
-import com.aiqin.mgs.order.api.util.OrderPublic;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.List;
+
 
 @SuppressWarnings("all")
 @Service
@@ -38,8 +33,8 @@ public class CartServiceImpl implements CartService{
 	
 	@Resource
     private CartDao cartDao;
-	
-	
+
+
 	//微商城-添加/修改购物车信息0:添加 1:修改....
 	@Override
 	@Transactional
@@ -88,7 +83,16 @@ public class CartServiceImpl implements CartService{
 		}
 	}
 
-	
+	@Override
+	public HttpResponse addProduct(AddProduct2CartRequest addProduct2CartRequest) {
+		//检查库存
+
+		//判断库存是否满足
+
+		return null;
+	}
+
+
 	//更新购物车清单
 	@Override
 	@Transactional

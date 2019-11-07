@@ -13,12 +13,16 @@ import javax.validation.Valid;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.CartInfo;
+import com.aiqin.mgs.order.api.domain.request.AddProduct2CartRequest;
 
 @SuppressWarnings("all")
 public interface CartService {
 	
 	//微商城-添加/修改购物车信息0:添加1:修改....
-	HttpResponse addCartInfo(CartInfo cartInfo);    
+	HttpResponse addCartInfo(CartInfo cartInfo);
+
+	//添加商品到购物车
+	HttpResponse addProduct(AddProduct2CartRequest addProduct2CartRequest);
     
 	//根据会员ID查询购物车
     HttpResponse selectCartByMemberId(String memberId,String distributorId,Integer pageNo,Integer pageSize);   

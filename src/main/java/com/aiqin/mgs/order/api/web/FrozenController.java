@@ -64,8 +64,7 @@ public class FrozenController {
     @DeleteMapping("/deletedetailbyfrozenId/{frozen_id}")
     @ApiOperation(value = "删除解卦信息")
     public HttpResponse deleteDetailByFrozenId(@Valid @PathVariable(name = "frozen_id",required = true) String frozenId) {
-        
-    	
+
     	LOGGER.info("删除挂单数据参数:{}",frozenId);
         return frozenService.deleteByFrozenId(frozenId);
     }
