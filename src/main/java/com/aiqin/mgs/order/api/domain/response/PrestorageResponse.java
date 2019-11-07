@@ -11,7 +11,7 @@ import lombok.Data;
  * Description:
  */
 @Data
-@ApiModel("封装-提货订单情况统计")
+@ApiModel("封装-预存订单提货明细")
 public class PrestorageResponse {
     @ApiModelProperty("预存订单提货明细id")
     @JsonProperty("prestorage_order_supply_detail_id")

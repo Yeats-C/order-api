@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.PrestorageOrderSupplyLogsDao">
+<insert id="addLogs" parameterType="com.aiqin.mgs.order.api.domain.PrestorageOrderSupplyLogs">
+    insert into prestorage_order_supply_logs
+      (prestorage_order_supply_detail_id,
+         prestorage_order_supply_id,
+
+    <if test="skuCode!=null">
+        sku_code,
+    </if>
+    <if test="spuCode!=null">
+        spu_code,
+    </if>
+    <if test="barCode!=null">
+        bar_code,
+    </if>
+    <if test="supplyAmount!=null">
+        supply_amount,
+    </if>
+    <if test="surplusAmount!=null">
+        surplus_amount,
+    </if>
+    create_time
+    values
+    (#{prestorageOrderSupplyDetailId},#{prestorageOrderSupplyId},
+    <if test="skuCode!=null">
+        #{skuCode},
+    </if>
+    <if test="spuCode!=null">
+        spuCode,
+    </if>
+    <if test="barCode!=null">
+        #{barCode},
+    </if>
+    <if test="supplyAmount!=null">
+        supplyAmount,
+    </if>
+    <if test="surplusAmount!=null">
+        surplusAmount,
+    </if>
+    CURRENT_TIMESTAMP
+</insert>
+</mapper>

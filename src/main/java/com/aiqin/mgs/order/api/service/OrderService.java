@@ -133,7 +133,7 @@ public interface OrderService {
 	HttpResponse updateOrderInfo(StoreValueOrderPayRequest orderAndSoOnRequest);
 
 	/**
-	 * 查询预存订单
+	 * 查询预存订单明细
 	 * @param orderQuery
 	 * @return
 	 */
@@ -159,4 +159,18 @@ public interface OrderService {
 	 * @return
 	 */
     HttpResponse callback(PartnerPayGateRep payReq) throws Exception;
+
+	/**
+	 * 查询预存订单列表
+	 * @param orderQuery
+	 * @return
+	 */
+	HttpResponse selectPrestorageOrderList(OrderQuery orderQuery);
+
+	/**
+	 * 查询预存订单日志列表
+	 * @param orderQuery
+	 * @return
+	 */
+	HttpResponse selectPrestorageOrderLogs(OrderQuery orderQuery);
 }

@@ -1,6 +1,8 @@
 package com.aiqin.mgs.order.api.dao;
 
+import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.PrestorageOrderSupplyDetail;
+import com.aiqin.mgs.order.api.domain.response.PrestorageOrderLogsInfo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -32,4 +34,13 @@ public interface PrestorageOrderSupplyDetailDao {
      * @param prestorageOrderSupplyDetail
      */
     void addPrestorageOrderDetail(PrestorageOrderSupplyDetail prestorageOrderSupplyDetail);
+
+    /**
+     *预存 提货日志
+     * @param orderQuery
+     * @return
+     */
+    List<PrestorageOrderLogsInfo> selectPrestorageOrderLogs(OrderQuery orderQuery);
+
+    int selectPrestorageOrderLogsCount(OrderQuery orderQuery);
 }

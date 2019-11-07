@@ -37,9 +37,13 @@ public class PrestorageOrderSupplyDetail {
     @JsonProperty("product_name")
     private String productName="";
 
-    @ApiModelProperty(value="条形码")
+    @ApiModelProperty(value="sku_code")
     @JsonProperty("sku_code")
     private String skuCode="";
+
+    @ApiModelProperty(value="skp_code")
+    @JsonProperty("skp_code")
+    private String skpCode="";
 
     @ApiModelProperty(value="条形码")
     @JsonProperty("bar_code")

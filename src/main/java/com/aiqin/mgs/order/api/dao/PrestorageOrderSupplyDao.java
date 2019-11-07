@@ -1,6 +1,9 @@
 package com.aiqin.mgs.order.api.dao;
 
+import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.PrestorageOrderSupply;
+
+import java.util.List;
 
 /**
  * @author jinghaibo
@@ -19,4 +22,13 @@ public interface PrestorageOrderSupplyDao {
      * @param prestorageOrderSupply
      */
     void addPrestorageOrder(PrestorageOrderSupply prestorageOrderSupply);
+
+    /**
+     * 查询预存订单列表
+     * @param trans
+     * @return
+     */
+    List<PrestorageOrderSupply> selectPrestorageOrderList(OrderQuery trans);
+
+    int selectPrestorageOrderListCount(OrderQuery trans);
 }

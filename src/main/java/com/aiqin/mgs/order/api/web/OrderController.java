@@ -664,4 +664,33 @@ public class OrderController {
         }
     }
 
+    /**
+     * 模糊查询预存订单列表
+     * @param
+     * @return
+     */
+    @PostMapping("/prestorageOrderList")
+    @ApiOperation(value = "查询预存订单列表....")
+    public HttpResponse selectPrestorageOrder(@Valid @RequestBody OrderQuery orderQuery) {
+
+
+        LOGGER.info("查询预存订单列表：{}",orderQuery);
+
+        return orderService.selectPrestorageOrderList(orderQuery);
+    }
+
+    /**
+     * 模糊查询预存订单取货日志列表
+     * @param
+     * @return
+     */
+    @PostMapping("/prestorageOrderLogs")
+    @ApiOperation(value = "模糊查询预存订单取货日志列表....")
+    public HttpResponse selectPrestorageOrderLogs(@Valid @RequestBody OrderQuery orderQuery) {
+
+
+        LOGGER.info("模糊查询预存订单取货日志列表：{}",orderQuery);
+
+        return orderService.selectPrestorageOrderLogs(orderQuery);
+    }
 }

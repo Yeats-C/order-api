@@ -90,7 +90,10 @@ public class OrderServiceImpl implements OrderService {
     @Resource
     private PrestorageOrderSupplyDao prestorageOrderSupplyDao;
     @Resource
-private BridgeProductService bridgeProductService;
+    private BridgeProductService bridgeProductService;
+    @Resource
+    private PrestorageOrderSupplyLogsDao prestorageOrderSupplyLogsDao;
+
     //模糊查询订单列表
     @Override
     public HttpResponse selectOrder(OrderQuery orderQuery) {
@@ -182,9 +185,21 @@ private BridgeProductService bridgeProductService;
         PrestorageOrderSupplyDetail prestorageOrderSupplyDetail = prestorageOrderSupplyDetailDao.selectprestorageorderDetailsById(prestorageOutVo.getPrestorageOrderSupplyDetailId());
         //判断可取数量
         if (prestorageOrderSupplyDetail != null && prestorageOrderSupplyDetail.getAmount() - prestorageOrderSupplyDetail.getSupplyAmount() >= prestorageOutVo.getAmount()) {
+
             //修改
             prestorageOrderSupplyDetail.setSupplyAmount(prestorageOrderSupplyDetail.getSupplyAmount() + prestorageOutVo.getAmount());
             prestorageOrderSupplyDetailDao.updateById(prestorageOrderSupplyDetail);
+            //添加日志
+            PrestorageOrderSupplyLogs prestorageOrderSupplyLogs=new PrestorageOrderSupplyLogs();
+            prestorageOrderSupplyLogs.setBarCode(prestorageOrderSupplyDetail.getBarCode());
+            prestorageOrderSupplyLogs.setPrestorageOrderSupplyDetailId(prestorageOrderSupplyDetail.getPrestorageOrderSupplyId());
+            prestorageOrderSupplyLogs.setPrestorageOrderSupplyId(prestorageOrderSupplyDetail.getPrestorageOrderSupplyId());
+            prestorageOrderSupplyLogs.setSkpCode(prestorageOrderSupplyDetail.getSkpCode());
+            prestorageOrderSupplyLogs.setSkuCode(prestorageOrderSupplyDetail.getSkuCode());
+            prestorageOrderSupplyLogs.setSupplyAmount(prestorageOutVo.getAmount());
+            prestorageOrderSupplyLogs.setSurplusAmount(prestorageOrderSupplyDetail.getAmount()-prestorageOrderSupplyDetail.getSupplyAmount());
+            prestorageOrderSupplyLogsDao.addLogs(prestorageOrderSupplyLogs);
+
         }
         if (prestorageOrderSupplyDetail != null && prestorageOrderSupplyDetail.getAmount() - prestorageOrderSupplyDetail.getSupplyAmount() == prestorageOutVo.getAmount()) {
             //修改状态
@@ -199,7 +214,7 @@ private BridgeProductService bridgeProductService;
     }
 
     @Override
-    public HttpResponse callback(PartnerPayGateRep vo)  {
+    public HttpResponse callback(PartnerPayGateRep vo) {
         if (Objects.nonNull(vo) && Constants.PAYSTATUS_1000.equals(vo.getDealCode()) && StringUtils.isNotEmpty(vo.getOrderNo())) {
             //支付成功
             log.info("回调修改订单状态，库存{}", "===========" + vo);
@@ -212,17 +227,17 @@ private BridgeProductService bridgeProductService;
             if (Objects.nonNull(orderInfo)) {
                 //修改状态
                 try {
-                    orderService.updateOrderStatuss(orderInfo.getOrderInfo().getOrderId(), OrderStatusEnum.OrderStatus_5.getStatus(), PayStatusEnum.HAS_PAY.getCode(),"系统设置");
-                    if (orderInfo.getOrderInfo().getIsPrestorage()==0){
+                    orderService.updateOrderStatuss(orderInfo.getOrderInfo().getOrderId(), OrderStatusEnum.OrderStatus_5.getStatus(), PayStatusEnum.HAS_PAY.getCode(), "系统设置");
+                    if (orderInfo.getOrderInfo().getIsPrestorage() == 0) {
                         //修改库存
                         changeProductStock(orderInfo);
-                    }else {
+                    } else {
                         //预存订单提出记录初始化
                         createPrestorageOrder(orderInfo);
                     }
 
                     return HttpResponse.success();
-                }catch (Exception e){
+                } catch (Exception e) {
                     log.info("修改订单状态失败{}", e.getMessage());
                     return HttpResponse.failure(ResultCode.CHANGE_STORE_ERROR);
                 }
@@ -235,13 +250,40 @@ private BridgeProductService bridgeProductService;
         }
     }
 
+    @Override
+    public HttpResponse selectPrestorageOrderList(OrderQuery orderQuery) {
+        List<PrestorageOrderSupply> prestorageOrderSupplies = prestorageOrderSupplyDao.selectPrestorageOrderList(trans(orderQuery));
+        int totalCount = prestorageOrderSupplyDao.selectPrestorageOrderListCount(trans(orderQuery));
+        return HttpResponse.success(new PageResData(totalCount, prestorageOrderSupplies));
+    }
+
+    @Override
+    public HttpResponse selectPrestorageOrderLogs(OrderQuery orderQuery) {
+        List<PrestorageOrderLogsInfo> prestorageOrderLogsInfos=prestorageOrderSupplyDetailDao.selectPrestorageOrderLogs(orderQuery);
+        int totalCount = prestorageOrderSupplyDetailDao.selectPrestorageOrderLogsCount(orderQuery);
+        return HttpResponse.success(new PageResData(totalCount, prestorageOrderLogsInfos));
+    }
+
+    private OrderQuery trans(OrderQuery orderQuery) {
+        if (orderQuery.getOrderStatus() != null) {
+            if (orderQuery.getOrderStatus() == 2) {
+                orderQuery.setOrderStatus(0);
+            }
+            if (orderQuery.getOrderStatus() == 6) {
+                orderQuery.setOrderStatus(1);
+            }
+        }
+        return OrderPublic.getOrderQuery(orderQuery);
+    }
+
     /**
      * 预存订单提出记录初始化
+     *
      * @param orderInfo
      */
-    private synchronized void  createPrestorageOrder(OrderodrInfo orderInfo) {
-        Date now=new Date();
-        PrestorageOrderSupply prestorageOrderSupply=new PrestorageOrderSupply();
+    private synchronized void createPrestorageOrder(OrderodrInfo orderInfo) {
+        Date now = new Date();
+        PrestorageOrderSupply prestorageOrderSupply = new PrestorageOrderSupply();
         prestorageOrderSupply.setPrestorageOrderSupplyId(OrderPublic.getUUID());
         prestorageOrderSupply.setPrestorageOrderSupplyStatus(PrestorageOrderEnum.UNEXTRACTED.getCode());
         prestorageOrderSupply.setCreateBy(orderInfo.getOrderInfo().getCreateBy());
@@ -256,8 +298,8 @@ private BridgeProductService bridgeProductService;
         prestorageOrderSupply.setOrderId(orderInfo.getOrderInfo().getOrderId());
         prestorageOrderSupplyDao.addPrestorageOrder(prestorageOrderSupply);
 
-        for (OrderDetailInfo detailInfo:orderInfo.getDetailList()){
-            PrestorageOrderSupplyDetail prestorageOrderSupplyDetail=new PrestorageOrderSupplyDetail();
+        for (OrderDetailInfo detailInfo : orderInfo.getDetailList()) {
+            PrestorageOrderSupplyDetail prestorageOrderSupplyDetail = new PrestorageOrderSupplyDetail();
             prestorageOrderSupplyDetail.setPrestorageOrderSupplyStatus(PrestorageOrderEnum.UNEXTRACTED.getCode());
             prestorageOrderSupplyDetail.setAmount(detailInfo.getAmount());
             prestorageOrderSupplyDetail.setBarCode(detailInfo.getBarCode());
@@ -274,7 +316,7 @@ private BridgeProductService bridgeProductService;
             prestorageOrderSupplyDetail.setSkuCode(detailInfo.getSkuCode());
             prestorageOrderSupplyDetail.setBarCode(detailInfo.getBarCode());
             prestorageOrderSupplyDetail.setSupplyAmount(0);
-            prestorageOrderSupplyDetailDao.addPrestorageOrderDetail(prestorageOrderSupplyDetail );
+            prestorageOrderSupplyDetailDao.addPrestorageOrderDetail(prestorageOrderSupplyDetail);
         }
 
     }
@@ -776,6 +818,7 @@ private BridgeProductService bridgeProductService;
             return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
         }
     }
+
     @Override
     @Transactional
     public void updateOrderStatuss(@Valid String orderId, Integer orderStatus, Integer payStatus,

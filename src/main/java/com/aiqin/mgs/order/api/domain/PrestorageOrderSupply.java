@@ -64,7 +64,9 @@ public class PrestorageOrderSupply {
     @JsonProperty("prestorage_order_supply_status")
     private Integer prestorageOrderSupplyStatus;
 
-
+    @ApiModelProperty(value="支付方式，1.现金、2微信  3.支付宝、4银联 5储值卡")
+    @JsonProperty("pay_type")
+    private Integer payType;
     @ApiModelProperty(value="下单时间",example = "2001-01-01 01:01:01")
     @JsonProperty("create_time")
     private Date createTime;

@@ -13,6 +13,7 @@
         <result column="distributor_code" jdbcType="VARCHAR" property="distributorCode"/>
         <result column="distributor_name" jdbcType="VARCHAR" property="distributorName"/>
         <result column="prestorage_order_supply_status" jdbcType="TINYINT" property="prestorageOrderSupplyStatus"/>
+        <result column="pay_type" jdbcType="VARCHAR" property="payType"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
@@ -64,9 +65,15 @@
         <if test="prestorageOrderSupplyStatus!=null">
             prestorage_order_supply_status,
         </if>
+        <if test="payType!=null">
+            pay_type,
+        </if>
         create_time,create_by
         values
         (#{prestorageOrderSupplyId},
+        <if test="prestorageOrderSupplyCode!=null">
+            #{prestorageOrderSupplyCode},
+        </if>
         <if test="orderId!=null">
             #{orderId},
         </if>
@@ -94,7 +101,98 @@
         <if test="prestorageOrderSupplyStatus!=null">
             #{prestorageOrderSupplyStatus},
         </if>
+        <if test="payType!=null">
+            #{payType},
+        </if>
 
        CURRENT_TIMESTAMP,#{createBy})
     </insert>
+
+    <select id="selectPrestorageOrderList" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="OrderSupplyMapping">
+        select  * from prestorage_order_supply a where 1=1
+        <if test="distributorId!=null and distributorId!='' ">
+            and a.distributor_id = #{distributorId}
+        </if>
+        <if test="distributorName!=null and distributorName!=''">
+            and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="orderId!=null and orderId!=''">
+            and a.order_id = #{orderId}
+        </if>
+        <if test="orderCode!=null and orderCode!=''">
+            and a.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="memberId!=null and memberId!=''">
+            and a.member_id =#{memberId}
+        </if>
+
+        <if test="memberPhone!=null and memberPhone!=''">
+            and a.member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%')
+        </if>
+
+        <if test="orderStatus!=null ">
+            and a.order_status = #{orderStatus}
+        </if>
+
+        <if test="beginTime!=null ">
+            and a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime!=null ">
+            and a.create_time &lt;= #{endTime}
+        </if>
+
+        <if test="receiveType!=null ">
+            and a.receive_type =#{receiveType}
+        </if>
+        <if test="receiveCode!=null and receiveCode!='' ">
+            and a.receive_code =#{receiveCode}
+        </if>
+        ORDER BY a.create_time DESC
+        <if test="icount!=null ">
+            limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+        </if>
+
+    </select>
+
+    <select id="selectPrestorageOrderListCount" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultType="integer">
+        select  count(1) from prestorage_order_supply a where 1=1
+        <if test="distributorId!=null and distributorId!='' ">
+            and a.distributor_id = #{distributorId}
+        </if>
+        <if test="distributorName!=null and distributorName!=''">
+            and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="orderId!=null and orderId!=''">
+            and a.order_id = #{orderId}
+        </if>
+        <if test="orderCode!=null and orderCode!=''">
+            and a.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="memberId!=null and memberId!=''">
+            and a.member_id =#{memberId}
+        </if>
+
+        <if test="memberPhone!=null and memberPhone!=''">
+            and a.member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%')
+        </if>
+
+        <if test="orderStatus!=null ">
+            and a.order_status = #{orderStatus}
+        </if>
+
+        <if test="beginTime!=null ">
+            and a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime!=null ">
+            and a.create_time &lt;= #{endTime}
+        </if>
+
+
+        <if test="receiveType!=null ">
+            and a.receive_type =#{receiveType}
+        </if>
+        <if test="receiveCode!=null and receiveCode!='' ">
+            and a.receive_code =#{receiveCode}
+        </if>
+    </select>
 </mapper>

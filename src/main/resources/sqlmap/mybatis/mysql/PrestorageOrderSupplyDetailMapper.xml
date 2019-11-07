@@ -19,11 +19,69 @@
         <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
         <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
     </resultMap>
+    <resultMap id="OrderLogs" type="com.aiqin.mgs.order.api.domain.response.PrestorageOrderLogsInfo">
+        <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+        <result column="member_name" jdbcType="VARCHAR" property="memberName"/>
+        <result column="member_phone" jdbcType="VARCHAR" property="memberPhone"/>
+        <result column="product_name" jdbcType="VARCHAR" property="productName"/>
+        <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
+        <result column="spu_code" jdbcType="VARCHAR" property="spuCode"/>
+        <result column="bar_code" jdbcType="VARCHAR" property="barCode"/>
+        <result column="supply_amount" jdbcType="INTEGER" property="supplyAmount"/>
+        <result column="surplus_amount" jdbcType="INTEGER" property="surplusAmount"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
     <select id="selectprestorageorderDetailsById" resultMap="OrderSupplyMapping">
         select * from prestorage_order_supply_detail where prestorage_order_supply_detail_id=#{prestorageOrderSupplyDetailId}
     </select>
     <select id="selectprestorageorderDetailsListBySupplyId" resultMap="OrderSupplyMapping">
          select * from prestorage_order_supply_detail where prestorage_order_supply_id=#{prestorageOrderSupplyId}
+    </select>
+    <select id="selectPrestorageOrderLogs" resultMap="OrderLogs"
+            parameterType="com.aiqin.mgs.order.api.domain.OrderQuery">
+        select
+        d.member_name,d.member_phone,l.product_name,l.bar_code,l.sku_code,l.supply_amount,l.surplus_amount,d.order_id,l.create_time
+        from prestorage_order_supply_logs l ,prestorage_order_supply d
+
+        where d.prestorage_order_supply_id=l.prestorage_order_supply_id
+
+        <if test="memberPhone!=null and memberPhone!=''">
+            and d.member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="distributorId!=null and distributorId!='' ">
+            and d.distributor_id = #{distributorId}
+        </if>
+        <if test="barCodeAndSku!=null and barCodeAndSku!=''">
+            and (l.bar_code= #{barCodeAndSku,jdbcType=VARCHAR} or l.sku_code = #{barCodeAndSku,jdbcType=VARCHAR})
+        </if>
+        <if test="beginTime!=null ">
+            and d.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime!=null ">
+            and d.create_time &lt;= #{endTime}
+        </if>
+    </select>
+    <select id="selectPrestorageOrderLogsCount" resultType="integer"
+            parameterType="com.aiqin.mgs.order.api.domain.OrderQuery">
+        select count(1) from prestorage_order_supply_logs l ,prestorage_order_supply d
+
+        where d.prestorage_order_supply_id=l.prestorage_order_supply_id
+
+        <if test="memberPhone!=null and memberPhone!=''">
+            and d.member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="distributorId!=null and distributorId!='' ">
+            and d.distributor_id = #{distributorId}
+        </if>
+        <if test="barCodeAndSku!=null and barCodeAndSku!=''">
+            and (l.bar_code= #{barCodeAndSku,jdbcType=VARCHAR} or l.sku_code = #{barCodeAndSku,jdbcType=VARCHAR})
+        </if>
+        <if test="beginTime!=null ">
+            and d.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime!=null ">
+            and d.create_time &lt;= #{endTime}
+        </if>
     </select>
     <update id="updateById" parameterType="com.aiqin.mgs.order.api.domain.PrestorageOrderSupplyDetail">
         update prestorage_order_supply_detail set update_time=CURRENT_TIMESTAMP
@@ -50,7 +108,7 @@
     <insert id="addPrestorageOrderDetail" parameterType="com.aiqin.mgs.order.api.domain.PrestorageOrderSupplyDetail">
         insert into prestorage_order_supply_detail
         (prestorage_order_supply_detail_id,
-         prestorage_order_supply_id,
+        prestorage_order_supply_id,
         <if test="orderId!=null">
             order_id,
         </if>
