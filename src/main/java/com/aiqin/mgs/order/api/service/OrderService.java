@@ -134,7 +134,6 @@ public interface OrderService {
 
 	HttpResponse memberLately(@Valid String memberId, @Valid String distributorId);
 
-	HttpResponse updateOrderInfo(StoreValueOrderPayRequest orderAndSoOnRequest);
 
 	/**
 	 * 查询预存订单明细

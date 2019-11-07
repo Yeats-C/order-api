@@ -2071,10 +2071,7 @@ public class OrderServiceImpl implements OrderService {
 		}
 	}
 
-    @Override
-    public HttpResponse updateOrderInfo(StoreValueOrderPayRequest orderAndSoOnRequest) {
-        return null;
-    }
+
 }
 
 
