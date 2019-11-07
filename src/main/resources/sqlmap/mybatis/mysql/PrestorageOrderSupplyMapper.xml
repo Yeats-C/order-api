@@ -4,8 +4,6 @@
     <resultMap id="OrderSupplyMapping" type="com.aiqin.mgs.order.api.domain.PrestorageOrderSupply">
         <result column="prestorage_order_supply_id" jdbcType="VARCHAR" property="prestorageOrderSupplyId"/>
         <result column="prestorage_order_supply_code" jdbcType="VARCHAR" property="prestorageOrderSupplyCode"/>
-
-
         <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
         <result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
         <result column="member_id" jdbcType="VARCHAR" property="memberId"/>
@@ -15,7 +13,6 @@
         <result column="distributor_code" jdbcType="VARCHAR" property="distributorCode"/>
         <result column="distributor_name" jdbcType="VARCHAR" property="distributorName"/>
         <result column="prestorage_order_supply_status" jdbcType="TINYINT" property="prestorageOrderSupplyStatus"/>
-
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
@@ -34,5 +31,70 @@
         where prestorage_order_supply_detail_id = #{prestorageOrderSupplyDetailId}
 
     </update>
+    <insert id="addPrestorageOrder" parameterType="com.aiqin.mgs.order.api.domain.PrestorageOrderSupply">
+        insert into prestorage_order_supply
+        (prestorage_order_supply_id,
+        <if test="prestorageOrderSupplyCode!=null">
+            prestorage_order_supply_code,
+        </if>
+        <if test="orderId!=null">
+            order_id,
+        </if>
+        <if test="orderCode!=null">
+            order_code,
+        </if>
+        <if test="memberId!=null">
+            member_id,
+        </if>
+        <if test="memberName!=null">
+            member_name,
+        </if>
+        <if test="memberPhone!=null">
+            member_phone,
+        </if>
+        <if test="distributorId!=null">
+            distributor_id,
+        </if>
+        <if test="distributorCode!=null">
+            distributor_code,
+        </if>
+        <if test="distributorName!=null">
+            distributor_name,
+        </if>
+        <if test="prestorageOrderSupplyStatus!=null">
+            prestorage_order_supply_status,
+        </if>
+        create_time,create_by
+        values
+        (#{prestorageOrderSupplyId},
+        <if test="orderId!=null">
+            #{orderId},
+        </if>
+        <if test="orderCode!=null">
+            #{orderCode},
+        </if>
+        <if test="memberId!=null">
+            #{memberId},
+        </if>
+        <if test="memberName!=null">
+            #{memberName},
+        </if>
+        <if test="memberPhone!=null">
+            #{memberPhone},
+        </if>
+        <if test="distributorId!=null">
+            #{distributorId},
+        </if>
+        <if test="distributorCode!=null">
+            #{distributorCode},
+        </if>
+        <if test="distributorName!=null">
+            #{distributorName},
+        </if>
+        <if test="prestorageOrderSupplyStatus!=null">
+            #{prestorageOrderSupplyStatus},
+        </if>
 
+       CURRENT_TIMESTAMP,#{createBy})
+    </insert>
 </mapper>

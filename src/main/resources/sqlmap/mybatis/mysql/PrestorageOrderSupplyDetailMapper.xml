@@ -10,29 +10,21 @@
         <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
         <result column="bar_code" jdbcType="VARCHAR" property="barCode"/>
         <result column="amount" jdbcType="INTEGER" property="amount"/>
-
         <result column="return_amount" jdbcType="INTEGER" property="returnAmount"/>
         <result column="return_prestorage_amount" jdbcType="INTEGER" property="returnPrestorageAmount"/>
         <result column="supply_amount" jdbcType="INTEGER" property="supplyAmount"/>
-
         <result column="prestorage_order_supply_status" jdbcType="TINYINT" property="prestorageOrderSupplyStatus"/>
-
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
         <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
     </resultMap>
-
-
     <select id="selectprestorageorderDetailsById" resultMap="OrderSupplyMapping">
         select * from prestorage_order_supply_detail where prestorage_order_supply_detail_id=#{prestorageOrderSupplyDetailId}
     </select>
     <select id="selectprestorageorderDetailsListBySupplyId" resultMap="OrderSupplyMapping">
          select * from prestorage_order_supply_detail where prestorage_order_supply_id=#{prestorageOrderSupplyId}
     </select>
-
-
-
     <update id="updateById" parameterType="com.aiqin.mgs.order.api.domain.PrestorageOrderSupplyDetail">
         update prestorage_order_supply_detail set update_time=CURRENT_TIMESTAMP
         <if test="returnAmount!=null and returnAmount!='' ">
@@ -54,4 +46,76 @@
 
 
     </update>
+
+    <insert id="addPrestorageOrderDetail" parameterType="com.aiqin.mgs.order.api.domain.PrestorageOrderSupplyDetail">
+        insert into prestorage_order_supply_detail
+        (prestorage_order_supply_detail_id,
+         prestorage_order_supply_id,
+        <if test="orderId!=null">
+            order_id,
+        </if>
+        <if test="orderDetailId!=null">
+            order_detail_id,
+        </if>
+        <if test="productName!=null">
+            product_name,
+        </if>
+        <if test="skuCode!=null">
+            sku_code,
+        </if>
+        <if test="barCode!=null">
+            bar_code,
+        </if>
+        <if test="amount!=null">
+            amount,
+        </if>
+        <if test="returnAmount!=null">
+            return_amount,
+        </if>
+        <if test="returnPrestorageAmount!=null">
+            return_prestorage_amount,
+        </if>
+        <if test="supplyAmount!=null">
+            supply_amount,
+        </if>
+
+
+        <if test="prestorageOrderSupplyStatus!=null">
+            prestorage_order_supply_status,
+        </if>
+        create_time,create_by
+        values
+        (#{prestorageOrderSupplyDetailId},#{prestorageOrderSupplyId},
+        <if test="orderId!=null">
+            #{orderId},
+        </if>
+        <if test="orderDetailId!=null">
+            #{orderDetailId},
+        </if>
+        <if test="productName!=null">
+            #{productName},
+        </if>
+        <if test="skuCode!=null">
+            #{skuCode},
+        </if>
+        <if test="barCode!=null">
+            #{barCode},
+        </if>
+        <if test="amount!=null">
+            #{amount},
+        </if>
+        <if test="returnAmount!=null">
+            #{returnAmount},
+        </if>
+        <if test="returnPrestorageAmount!=null">
+            #{returnPrestorageAmount},
+        </if>
+        <if test="supplyAmount!=null">
+            #{supplyAmount},
+        </if>
+        <if test="prestorageOrderSupplyStatus!=null">
+            #{prestorageOrderSupplyStatus},
+        </if>
+        CURRENT_TIMESTAMP,#{createBy})
+    </insert>
 </mapper>

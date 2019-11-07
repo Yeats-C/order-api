@@ -26,4 +26,10 @@ public interface PrestorageOrderSupplyDetailDao {
      * @return
      */
     List<PrestorageOrderSupplyDetail> selectprestorageorderDetailsListBySupplyId(@Param("prestorageOrderSupplyId") String prestorageOrderSupplyId);
+
+    /**
+     * 添加
+     * @param prestorageOrderSupplyDetail
+     */
+    void addPrestorageOrderDetail(PrestorageOrderSupplyDetail prestorageOrderSupplyDetail);
 }

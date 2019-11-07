@@ -213,8 +213,14 @@ private BridgeProductService bridgeProductService;
                 //修改状态
                 try {
                     orderService.updateOrderStatuss(orderInfo.getOrderInfo().getOrderId(), OrderStatusEnum.OrderStatus_5.getStatus(), PayStatusEnum.HAS_PAY.getCode(),"系统设置");
-                    //修改库存
-                    changeProductStock(orderInfo);
+                    if (orderInfo.getOrderInfo().getIsPrestorage()==0){
+                        //修改库存
+                        changeProductStock(orderInfo);
+                    }else {
+                        //预存订单提出记录初始化
+                        createPrestorageOrder(orderInfo);
+                    }
+
                     return HttpResponse.success();
                 }catch (Exception e){
                     log.info("修改订单状态失败{}", e.getMessage());
@@ -228,6 +234,51 @@ private BridgeProductService bridgeProductService;
             return HttpResponse.failure(MessageId.create(Project.ORDER_API, -1, vo.getDealMsg()));
         }
     }
+
+    /**
+     * 预存订单提出记录初始化
+     * @param orderInfo
+     */
+    private synchronized void  createPrestorageOrder(OrderodrInfo orderInfo) {
+        Date now=new Date();
+        PrestorageOrderSupply prestorageOrderSupply=new PrestorageOrderSupply();
+        prestorageOrderSupply.setPrestorageOrderSupplyId(OrderPublic.getUUID());
+        prestorageOrderSupply.setPrestorageOrderSupplyStatus(PrestorageOrderEnum.UNEXTRACTED.getCode());
+        prestorageOrderSupply.setCreateBy(orderInfo.getOrderInfo().getCreateBy());
+        prestorageOrderSupply.setCreateTime(now);
+        prestorageOrderSupply.setDistributorCode(orderInfo.getOrderInfo().getDistributorCode());
+        prestorageOrderSupply.setDistributorId(orderInfo.getOrderInfo().getDistributorId());
+        prestorageOrderSupply.setDistributorName(orderInfo.getOrderInfo().getDistributorName());
+        prestorageOrderSupply.setMemberId(orderInfo.getOrderInfo().getMemberId());
+        prestorageOrderSupply.setMemberName(orderInfo.getOrderInfo().getMemberName());
+        prestorageOrderSupply.setMemberPhone(orderInfo.getOrderInfo().getMemberPhone());
+        prestorageOrderSupply.setOrderCode(orderInfo.getOrderInfo().getOrderCode());
+        prestorageOrderSupply.setOrderId(orderInfo.getOrderInfo().getOrderId());
+        prestorageOrderSupplyDao.addPrestorageOrder(prestorageOrderSupply);
+
+        for (OrderDetailInfo detailInfo:orderInfo.getDetailList()){
+            PrestorageOrderSupplyDetail prestorageOrderSupplyDetail=new PrestorageOrderSupplyDetail();
+            prestorageOrderSupplyDetail.setPrestorageOrderSupplyStatus(PrestorageOrderEnum.UNEXTRACTED.getCode());
+            prestorageOrderSupplyDetail.setAmount(detailInfo.getAmount());
+            prestorageOrderSupplyDetail.setBarCode(detailInfo.getBarCode());
+            prestorageOrderSupplyDetail.setCreateBy(detailInfo.getCreateBy());
+            prestorageOrderSupplyDetail.setCreateTime(now);
+            prestorageOrderSupplyDetail.setOrderDetailId(detailInfo.getOrderDetailId());
+            prestorageOrderSupplyDetail.setOrderId(detailInfo.getOrderId());
+            prestorageOrderSupplyDetail.setPrestorageOrderSupplyDetailId((OrderPublic.getUUID()));
+            prestorageOrderSupplyDetail.setPrestorageOrderSupplyId(prestorageOrderSupply.getPrestorageOrderSupplyId());
+            prestorageOrderSupplyDetail.setProductName(detailInfo.getProductName());
+            prestorageOrderSupplyDetail.setReturnAmount(0);
+            prestorageOrderSupplyDetail.setReturnPrestorageAmount(0);
+            prestorageOrderSupplyDetail.setReturnPrestorageAmount(0);
+            prestorageOrderSupplyDetail.setSkuCode(detailInfo.getSkuCode());
+            prestorageOrderSupplyDetail.setBarCode(detailInfo.getBarCode());
+            prestorageOrderSupplyDetail.setSupplyAmount(0);
+            prestorageOrderSupplyDetailDao.addPrestorageOrderDetail(prestorageOrderSupplyDetail );
+        }
+
+    }
+
     private HttpResponse changeProductStock(OrderodrInfo orderInfo) {
         List<OperateStockVo> operateStockVos = Lists.newArrayList();
         orderInfo.getDetailList().stream().forEach(input -> {

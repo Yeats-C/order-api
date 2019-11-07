@@ -13,4 +13,10 @@ public interface PrestorageOrderSupplyDao {
      * @param prestorageOrderSupply
      */
     void updateById(PrestorageOrderSupply prestorageOrderSupply);
+
+    /**
+     * 插入
+     * @param prestorageOrderSupply
+     */
+    void addPrestorageOrder(PrestorageOrderSupply prestorageOrderSupply);
 }
