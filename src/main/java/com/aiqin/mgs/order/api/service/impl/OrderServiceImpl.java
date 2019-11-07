@@ -9,50 +9,51 @@
  * ****************************************************************************/
 package com.aiqin.mgs.order.api.service.impl;
 
-import java.util.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.id.IdUtil;
-import com.aiqin.ground.util.protocol.MessageId;
-import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.mgs.order.api.component.*;
 import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.domain.*;
+import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.ResultCode;
+import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.request.*;
 import com.aiqin.mgs.order.api.domain.response.*;
-import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 
-import org.apache.commons.lang.StringUtils;
+import com.aiqin.mgs.order.api.service.*;
+import com.aiqin.mgs.order.api.util.DateUtil;
+import com.aiqin.mgs.order.api.util.OrderPublic;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
 import com.aiqin.ground.util.exception.GroundRuntimeException;
-import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.base.PageResData;
-import com.aiqin.mgs.order.api.base.ResultCode;
-import com.aiqin.mgs.order.api.domain.constant.Global;
-import com.aiqin.mgs.order.api.domain.request.DetailCouponRequest;
 import com.aiqin.mgs.order.api.domain.request.DevelRequest;
 import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
 import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
-import com.aiqin.mgs.order.api.domain.request.OrderDetailRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
 import com.aiqin.mgs.order.api.domain.response.SelectByMemberPayCountResponse;
-import com.aiqin.mgs.order.api.domain.response.SkuSaleResponse;
 import com.aiqin.mgs.order.api.domain.response.WscSaleResponse;
 import com.aiqin.mgs.order.api.domain.response.WscWorkViewResponse;
 import com.aiqin.mgs.order.api.domain.response.DistributorMonthResponse;
@@ -65,17 +66,18 @@ import com.aiqin.mgs.order.api.service.OrderDetailService;
 import com.aiqin.mgs.order.api.service.OrderLogService;
 import com.aiqin.mgs.order.api.service.OrderService;
 import com.aiqin.mgs.order.api.service.SettlementService;
-import com.aiqin.mgs.order.api.util.DateUtil;
-import com.aiqin.mgs.order.api.util.OrderPublic;
-import com.fasterxml.jackson.core.type.TypeReference;
 @SuppressWarnings("all")
 @Slf4j
 @Service
 public class OrderServiceImpl implements OrderService {
 
+
+
+    @Resource
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
-
-
+    //商品项目地址
+    @Value("${slcsIp}")
+    public String slcsIp;
     @Resource
     private OrderDao orderDao;
 
@@ -311,12 +313,10 @@ public class OrderServiceImpl implements OrderService {
      * @param orderInfo
      */
     private synchronized void createPrestorageOrder(OrderodrInfo orderInfo) {
-        Date now = new Date();
         PrestorageOrderSupply prestorageOrderSupply = new PrestorageOrderSupply();
         prestorageOrderSupply.setPrestorageOrderSupplyId(OrderPublic.getUUID());
         prestorageOrderSupply.setPrestorageOrderSupplyStatus(PrestorageOrderEnum.UNEXTRACTED.getCode());
         prestorageOrderSupply.setCreateBy(orderInfo.getOrderInfo().getCreateBy());
-        prestorageOrderSupply.setCreateTime(now);
         prestorageOrderSupply.setDistributorCode(orderInfo.getOrderInfo().getDistributorCode());
         prestorageOrderSupply.setDistributorId(orderInfo.getOrderInfo().getDistributorId());
         prestorageOrderSupply.setDistributorName(orderInfo.getOrderInfo().getDistributorName());
@@ -333,7 +333,6 @@ public class OrderServiceImpl implements OrderService {
             prestorageOrderSupplyDetail.setAmount(detailInfo.getAmount());
             prestorageOrderSupplyDetail.setBarCode(detailInfo.getBarCode());
             prestorageOrderSupplyDetail.setCreateBy(detailInfo.getCreateBy());
-            prestorageOrderSupplyDetail.setCreateTime(now);
             prestorageOrderSupplyDetail.setOrderDetailId(detailInfo.getOrderDetailId());
             prestorageOrderSupplyDetail.setOrderId(detailInfo.getOrderId());
             prestorageOrderSupplyDetail.setPrestorageOrderSupplyDetailId((OrderPublic.getUUID()));
@@ -1006,7 +1005,7 @@ public class OrderServiceImpl implements OrderService {
 //					}
 //				}
                 for (int i = 0; i < list.size(); i++) {
-                    if (i < 2) {
+                    if (i < 4) {
                         LastBuyResponse lastBuyInfo = new LastBuyResponse();
                         lastBuyInfo = list.get(i);
                         if (lastBuyInfo != null && lastBuyInfo.getProduct() != null) {
@@ -1530,7 +1529,7 @@ public class OrderServiceImpl implements OrderService {
                 if (orderId != null && !orderId.equals("")) {
 
                     //初始化提货码
-                    if (orderInfo.getOriginType().intValue() == Global.ORIGIN_TYPE_1) {
+                    if (orderInfo.getOriginType() == Global.ORIGIN_TYPE_1) {
                         if (orderInfo.getReceiveType().equals(Global.RECEIVE_TYPE_0)) {
                             orderInfo.setReceiveCode(OrderPublic.randomNumberE());
                         }
@@ -1549,7 +1548,12 @@ public class OrderServiceImpl implements OrderService {
                     } catch (Exception e) {
                         LOGGER.error("orderDao.addOrderInfo(orderInfo)：{}", e);
                     }
-
+                    //同步营业阶段
+                    try {
+                        updateOpenStatus(orderInfo.getDistributorId());
+                    } catch (Exception e) {
+                        LOGGER.info("同步营业阶段报错(1364)：{}", e.getMessage());
+                    }
                     //生成订单日志
                     OrderLog rderLog = OrderPublic.addOrderLog(orderId, Global.STATUS_0, "OrderServiceImpl.addOrderInfo()",
                             OrderPublic.getStatus(Global.STATUS_0, orderInfo.getOrderStatus()), orderInfo.getCreateBy());
@@ -1983,95 +1987,162 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+    //查询未统计销量的已完成订单
+    @Override
+    public List<String> selectsukReturn() {
 
-	//查询未统计销量的已完成订单
-	@Override
-	public List<String> selectsukReturn() {
-
-		try {
-			return orderDao.selectsukReturn(DateUtil.getTimeBegin(DateUtil.sysDateYYYYMMDD()),DateUtil.getTimeEnd(DateUtil.sysDateYYYYMMDD()));
-		} catch (Exception e) {
-			LOGGER.error("查询未统计销量的已完成订单异常: {}",e);
-			return null;
-		}
-	}
-
-
-	//修改统计销量状态
-	@Override
-	public void updateSukReturn(@Valid String orderId) {
-		
-		try {
-			orderDao.updateSukReturn(orderId);
-		} catch (Exception e) {
-			LOGGER.error("修改统计销量状态异常 :{}",e);
-		}
-	}
+        try {
+            return orderDao.selectsukReturn(DateUtil.getTimeBegin(DateUtil.sysDateYYYYMMDD()), DateUtil.getTimeEnd(DateUtil.sysDateYYYYMMDD()));
+        } catch (Exception e) {
+            LOGGER.error("查询未统计销量的已完成订单异常: {}", e);
+            return null;
+        }
+    }
 
 
-	@Override
-	public void updateOpenStatus(@Valid String distributorId) {
+    //修改统计销量状态
+    @Override
+    public void updateSukReturn(@Valid String orderId) {
+
+        try {
+            orderDao.updateSukReturn(orderId);
+        } catch (Exception e) {
+            LOGGER.error("修改统计销量状态异常 :{}", e);
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public HttpResponse updateOrderInfo(StoreValueOrderPayRequest storeValueOrderPayRequest) {
+        try {
+            OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
+            orderDetailQuery.setOrderCode(storeValueOrderPayRequest.getOrderNo());
+            OrderInfo orderInfo = orderDao.selecOrderById(orderDetailQuery);
+            if (Objects.isNull(orderInfo)) {
+                throw new GroundRuntimeException("未查询到订单信息");
+            }
+            Integer actualPrice = storeValueOrderPayRequest.getActualPrice();
+            String updateBy = storeValueOrderPayRequest.getUpdateBy();
+            orderInfo.setPayStatus(1);
+            //支付完成
+            orderInfo.setOrderStatus(5);
+            orderInfo.setPayType("储值卡");
+            orderInfo.setActualPrice(actualPrice);
+            orderInfo.setUpdateBy(updateBy);
+            orderInfo.setDistributorCode(storeValueOrderPayRequest.getStoreCode());
+            orderInfo.setDistributorName(storeValueOrderPayRequest.getStoreName());
+            orderDao.updateOrder(orderInfo);
+            orderDetailQuery.setOrderId(orderInfo.getOrderId());
+            List<OrderDetailInfo> orderDetailInfoList = orderDetailDao.selectDetailById(orderDetailQuery);
+            Integer productCount = 0;
+            for (OrderDetailInfo orderDetailInfo : orderDetailInfoList) {
+                productCount += orderDetailInfo.getAmount();
+                orderDetailInfo.setUpdateBy(updateBy);
+                orderDetailDao.updateOrderDetail(orderDetailInfo);
+            }
+            //增加结算信息
+            addSettlementInfo(orderInfo.getOrderId(), productCount, updateBy, actualPrice);
+            //支付信息
+            addOrderPay(orderInfo, updateBy);
+            orderInfo.setOrderdetailList(orderDetailInfoList);
+            return HttpResponse.success(orderInfo);
+        } catch (GroundRuntimeException e) {
+            LOGGER.error("储值支付成功,更新订单异常:{}", e.getMessage());
+            throw new GroundRuntimeException(e.getMessage());
+        } catch (Exception e) {
+            throw new GroundRuntimeException("");
+        }
+    }
+
+    private void addSettlementInfo(String orderId, Integer productCount, String updateBy, Integer actualPrice) throws Exception {
+        SettlementInfo settlementInfo = new SettlementInfo();
+        settlementInfo.setProductSum(productCount);
+        settlementInfo.setOrderReceivable(actualPrice);
+        settlementInfo.setOrderSum(actualPrice);
+        settlementInfo.setOrderActual(actualPrice);
+        settlementInfo.setCreateBy(updateBy);
+        settlementInfo.setUpdateBy(updateBy);
+        settlementService.addSettlement(settlementInfo, orderId);
+    }
+
+    private void addOrderPay(OrderInfo orderInfo, String updateBy) throws Exception {
+        OrderPayInfo orderPayInfo = new OrderPayInfo();
+        orderPayInfo.setOrderId(orderInfo.getOrderId());
+        orderPayInfo.setOrderCode(orderInfo.getOrderCode());
+        orderPayInfo.setPayId(IdUtil.uuid());
+        orderPayInfo.setPayType(PayTypeEnum.BALANCE_PAY.getCode());
+        orderPayInfo.setPayName(PayTypeEnum.BALANCE_PAY.getDesc());
+        orderPayInfo.setPayWay(5);
+        //支付成功
+        orderPayInfo.setPayStatus(1);
+        orderPayInfo.setPayPrice(orderInfo.getActualPrice());
+        orderPayInfo.setCreateBy(updateBy);
+        orderPayInfo.setUpdateBy(updateBy);
+        orderPayDao.addOrderPay(orderPayInfo);
+    }
+
+    @Override
+    public void updateOpenStatus(@Valid String distributorId) {
 
 
-		String businessName = "";
-		//最早成单日
-		String createTime = orderDao.isExistOrder(distributorId);
+        String businessName = "";
+        //最早成单日
+        String createTime = orderDao.isExistOrder(distributorId);
 
-		if(createTime.equals(DateUtil.sysDateYYYYMMDD())) {
-			businessName = "新店";
-		}else if(DateUtil.getBeforeDate(DateUtil.dateAfterMonth(createTime,3),-1).equals(DateUtil.sysDateYYYYMMDD())) {
-			businessName = "次新店1";
-		}else if(DateUtil.getBeforeDate(DateUtil.dateAfterMonth(createTime,6),-1).equals(DateUtil.sysDateYYYYMMDD())) {
-			businessName = "次新店2";
-		}else if(DateUtil.getBeforeDate(DateUtil.dateAfterMonth(createTime,12),-1).equals(DateUtil.sysDateYYYYMMDD())) {
-			businessName = "同店";
-		}else if(DateUtil.getBeforeDate(DateUtil.dateAfterMonth(createTime,24),-1).equals(DateUtil.sysDateYYYYMMDD())) {
-			businessName = "老店";
-		}else {
+        if (createTime.equals(DateUtil.sysDateYYYYMMDD())) {
+            businessName = "新店";
+        } else if (DateUtil.getBeforeDate(DateUtil.dateAfterMonth(createTime, 3), -1).equals(DateUtil.sysDateYYYYMMDD())) {
+            businessName = "次新店1";
+        } else if (DateUtil.getBeforeDate(DateUtil.dateAfterMonth(createTime, 6), -1).equals(DateUtil.sysDateYYYYMMDD())) {
+            businessName = "次新店2";
+        } else if (DateUtil.getBeforeDate(DateUtil.dateAfterMonth(createTime, 12), -1).equals(DateUtil.sysDateYYYYMMDD())) {
+            businessName = "同店";
+        } else if (DateUtil.getBeforeDate(DateUtil.dateAfterMonth(createTime, 24), -1).equals(DateUtil.sysDateYYYYMMDD())) {
+            businessName = "老店";
+        } else {
 
-		}
+        }
 
-		if(StringUtils.isNotBlank(businessName)) {
+        if (StringUtils.isNotBlank(businessName)) {
 
-			//查询营业编码
-	    	StringBuilder codeUrl = new StringBuilder();
-	    	codeUrl.append(slcsIp).append("/basics/business/name");
+            //查询营业编码
+            StringBuilder codeUrl = new StringBuilder();
+            codeUrl.append(slcsIp).append("/basics/business/name");
 
-	    	HttpClient httpGet = HttpClient.get("http://"+codeUrl.toString()+"?business_name="+businessName);
-	    	httpGet.action().status();
-	  	    HttpResponse result = httpGet.action().result(new TypeReference<HttpResponse>(){});
-	  	    String openStatus = (String) result.getData();
+            HttpClient httpGet = HttpClient.get("http://" + codeUrl.toString() + "?business_name=" + businessName);
+            httpGet.action().status();
+            HttpResponse result = httpGet.action().result(new TypeReference<HttpResponse>() {
+            });
+            String openStatus = (String) result.getData();
 
-			LOGGER.info("门店编码ID:{},营业状态:{}",distributorId,openStatus);
+            LOGGER.info("门店编码ID:{},营业状态:{}", distributorId, openStatus);
 
-			//访问地址
-	    	StringBuilder sb = new StringBuilder();
-	        sb.append(slcsIp).append("/store/open/Status");
+            //访问地址
+            StringBuilder sb = new StringBuilder();
+            sb.append(slcsIp).append("/store/open/Status");
 
-	        HttpClient httpPost = HttpClient.get("http://"+sb.toString());
-	        httpPost.addParameter("store_id", distributorId);
-	        httpPost.addParameter("business_stage_code", openStatus);
-	        httpPost.action().status();
-	  	    HttpResponse httpResponse = httpPost.action().result(new TypeReference<HttpResponse>(){});
-		}
+            HttpClient httpPost = HttpClient.get("http://" + sb.toString());
+            httpPost.addParameter("store_id", distributorId);
+            httpPost.addParameter("business_stage_code", openStatus);
+            httpPost.action().status();
+            HttpResponse httpResponse = httpPost.action().result(new TypeReference<HttpResponse>() {
+            });
+        }
 
-	}
-
-
-	@Override
-	public HttpResponse memberLately(@Valid String memberId, @Valid String distributorId) {
-
-		List<LatelyResponse> list = new ArrayList();
-		try {
-			list = orderDao.memberLately(memberId,distributorId);
-			return HttpResponse.success(list);
-		} catch (Exception e) {
-			LOGGER.info("error 最近消费订单 (消费时间/消费金额)e:{}",e);
-			return HttpResponse.success(list);
-		}
-	}
+    }
 
 
+    @Override
+    public HttpResponse memberLately(@Valid String memberId, @Valid String distributorId) {
+
+        List<LatelyResponse> list = new ArrayList();
+        try {
+            list = orderDao.memberLately(memberId, distributorId);
+            return HttpResponse.success(list);
+        } catch (Exception e) {
+            LOGGER.info("error 最近消费订单 (消费时间/消费金额)e:{}", e);
+            return HttpResponse.success(list);
+        }
+    }
 }
 
 
