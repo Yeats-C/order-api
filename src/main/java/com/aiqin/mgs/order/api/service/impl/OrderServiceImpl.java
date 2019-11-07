@@ -26,6 +26,8 @@ import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,26 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.constant.Global;
+import com.aiqin.mgs.order.api.domain.request.DetailCouponRequest;
+import com.aiqin.mgs.order.api.domain.request.DevelRequest;
+import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
+import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
+import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
+import com.aiqin.mgs.order.api.domain.request.OrderDetailRequest;
+import com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest;
+import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
+import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
+import com.aiqin.mgs.order.api.domain.response.OrderResponse;
+import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
+import com.aiqin.mgs.order.api.domain.response.SelectByMemberPayCountResponse;
+import com.aiqin.mgs.order.api.domain.response.SkuSaleResponse;
+import com.aiqin.mgs.order.api.domain.response.WscSaleResponse;
+import com.aiqin.mgs.order.api.domain.response.WscWorkViewResponse;
+import com.aiqin.mgs.order.api.domain.response.DistributorMonthResponse;
+import com.aiqin.mgs.order.api.domain.response.LastBuyResponse;
+import com.aiqin.mgs.order.api.domain.response.LatelyResponse;
+import com.aiqin.mgs.order.api.domain.response.MevBuyResponse;
+import com.aiqin.mgs.order.api.domain.response.OradskuResponse;
 import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.OrderDetailService;
 import com.aiqin.mgs.order.api.service.OrderLogService;
@@ -93,6 +115,11 @@ public class OrderServiceImpl implements OrderService {
     private BridgeProductService bridgeProductService;
     @Resource
     private PrestorageOrderSupplyLogsDao prestorageOrderSupplyLogsDao;
+
+	//商品项目地址
+    @Value("${slcsIp}")
+    public String slcsIp;
+
 
     //模糊查询订单列表
     @Override
@@ -1954,100 +1981,93 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-    //查询未统计销量的已完成订单
-    @Override
-    public List<String> selectsukReturn() {
 
-        try {
-            return orderDao.selectsukReturn(DateUtil.getDayBegin(DateUtil.getCurrentDate()), DateUtil.getDayEnd(DateUtil.getCurrentDate()));
-        } catch (Exception e) {
-            LOGGER.error("查询未统计销量的已完成订单异常: {}", e);
-            return null;
-        }
-    }
+	//查询未统计销量的已完成订单
+	@Override
+	public List<String> selectsukReturn() {
 
-
-    //修改统计销量状态
-    @Override
-    public void updateSukReturn(@Valid String orderId) {
-
-        try {
-            orderDao.updateSukReturn(orderId);
-        } catch (Exception e) {
-            LOGGER.error("修改统计销量状态异常 :{}", e);
-        }
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public HttpResponse updateOrderInfo(StoreValueOrderPayRequest storeValueOrderPayRequest) {
-        try {
-            OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
-            orderDetailQuery.setOrderCode(storeValueOrderPayRequest.getOrderNo());
-            OrderInfo orderInfo = orderDao.selecOrderById(orderDetailQuery);
-            if (Objects.isNull(orderInfo)) {
-                throw new GroundRuntimeException("未查询到订单信息");
-            }
-            Integer actualPrice = storeValueOrderPayRequest.getActualPrice();
-            String updateBy = storeValueOrderPayRequest.getUpdateBy();
-            orderInfo.setPayStatus(1);
-            //支付完成
-            orderInfo.setOrderStatus(5);
-            orderInfo.setPayType("储值卡");
-            orderInfo.setActualPrice(actualPrice);
-            orderInfo.setUpdateBy(updateBy);
-            orderInfo.setDistributorCode(storeValueOrderPayRequest.getStoreCode());
-            orderInfo.setDistributorName(storeValueOrderPayRequest.getStoreName());
-            orderDao.updateOrder(orderInfo);
-            orderDetailQuery.setOrderId(orderInfo.getOrderId());
-            List<OrderDetailInfo> orderDetailInfoList = orderDetailDao.selectDetailById(orderDetailQuery);
-            Integer productCount = 0;
-            for (OrderDetailInfo orderDetailInfo : orderDetailInfoList) {
-                productCount += orderDetailInfo.getAmount();
-                orderDetailInfo.setUpdateBy(updateBy);
-                orderDetailDao.updateOrderDetail(orderDetailInfo);
-            }
-            //增加结算信息
-            addSettlementInfo(orderInfo.getOrderId(), productCount, updateBy, actualPrice);
-            //支付信息
-            addOrderPay(orderInfo, updateBy);
-            orderInfo.setOrderdetailList(orderDetailInfoList);
-            return HttpResponse.success(orderInfo);
-        } catch (GroundRuntimeException e) {
-            LOGGER.error("储值支付成功,更新订单异常:{}", e.getMessage());
-            throw new GroundRuntimeException(e.getMessage());
-        } catch (Exception e) {
-            throw new GroundRuntimeException("");
-        }
-    }
+		try {
+			return orderDao.selectsukReturn(DateUtil.getTimeBegin(DateUtil.sysDateYYYYMMDD()),DateUtil.getTimeEnd(DateUtil.sysDateYYYYMMDD()));
+		} catch (Exception e) {
+			LOGGER.error("查询未统计销量的已完成订单异常: {}",e);
+			return null;
+		}
+	}
 
 
-    private void addSettlementInfo(String orderId, Integer productCount, String updateBy, Integer actualPrice) throws Exception {
-        SettlementInfo settlementInfo = new SettlementInfo();
-        settlementInfo.setProductSum(productCount);
-        settlementInfo.setOrderReceivable(actualPrice);
-        settlementInfo.setOrderSum(actualPrice);
-        settlementInfo.setOrderActual(actualPrice);
-        settlementInfo.setCreateBy(updateBy);
-        settlementInfo.setUpdateBy(updateBy);
-        settlementService.addSettlement(settlementInfo, orderId);
-    }
+	//修改统计销量状态
+	@Override
+	public void updateSukReturn(@Valid String orderId) {
+		
+		try {
+			orderDao.updateSukReturn(orderId);
+		} catch (Exception e) {
+			LOGGER.error("修改统计销量状态异常 :{}",e);
+		}
+	}
 
-    private void addOrderPay(OrderInfo orderInfo, String updateBy) throws Exception {
-        OrderPayInfo orderPayInfo = new OrderPayInfo();
-        orderPayInfo.setOrderId(orderInfo.getOrderId());
-        orderPayInfo.setOrderCode(orderInfo.getOrderCode());
-        orderPayInfo.setPayId(IdUtil.uuid());
-        orderPayInfo.setPayType(PayTypeEnum.BALANCE_PAY.getCode());
-        orderPayInfo.setPayName(PayTypeEnum.BALANCE_PAY.getDesc());
-        orderPayInfo.setPayWay(5);
-        //支付成功
-        orderPayInfo.setPayStatus(1);
-        orderPayInfo.setPayPrice(orderInfo.getActualPrice());
-        orderPayInfo.setCreateBy(updateBy);
-        orderPayInfo.setUpdateBy(updateBy);
-        orderPayDao.addOrderPay(orderPayInfo);
-    }
+
+	@Override
+	public void updateOpenStatus(@Valid String distributorId) {
+
+
+		String businessName = "";
+		//最早成单日
+		String createTime = orderDao.isExistOrder(distributorId);
+
+		if(createTime.equals(DateUtil.sysDateYYYYMMDD())) {
+			businessName = "新店";
+		}else if(DateUtil.getBeforeDate(DateUtil.dateAfterMonth(createTime,3),-1).equals(DateUtil.sysDateYYYYMMDD())) {
+			businessName = "次新店1";
+		}else if(DateUtil.getBeforeDate(DateUtil.dateAfterMonth(createTime,6),-1).equals(DateUtil.sysDateYYYYMMDD())) {
+			businessName = "次新店2";
+		}else if(DateUtil.getBeforeDate(DateUtil.dateAfterMonth(createTime,12),-1).equals(DateUtil.sysDateYYYYMMDD())) {
+			businessName = "同店";
+		}else if(DateUtil.getBeforeDate(DateUtil.dateAfterMonth(createTime,24),-1).equals(DateUtil.sysDateYYYYMMDD())) {
+			businessName = "老店";
+		}else {
+
+		}
+
+		if(StringUtils.isNotBlank(businessName)) {
+
+			//查询营业编码
+	    	StringBuilder codeUrl = new StringBuilder();
+	    	codeUrl.append(slcsIp).append("/basics/business/name");
+
+	    	HttpClient httpGet = HttpClient.get("http://"+codeUrl.toString()+"?business_name="+businessName);
+	    	httpGet.action().status();
+	  	    HttpResponse result = httpGet.action().result(new TypeReference<HttpResponse>(){});
+	  	    String openStatus = (String) result.getData();
+
+			LOGGER.info("门店编码ID:{},营业状态:{}",distributorId,openStatus);
+
+			//访问地址
+	    	StringBuilder sb = new StringBuilder();
+	        sb.append(slcsIp).append("/store/open/Status");
+
+	        HttpClient httpPost = HttpClient.get("http://"+sb.toString());
+	        httpPost.addParameter("store_id", distributorId);
+	        httpPost.addParameter("business_stage_code", openStatus);
+	        httpPost.action().status();
+	  	    HttpResponse httpResponse = httpPost.action().result(new TypeReference<HttpResponse>(){});
+		}
+
+	}
+
+
+	@Override
+	public HttpResponse memberLately(@Valid String memberId, @Valid String distributorId) {
+
+		List<LatelyResponse> list = new ArrayList();
+		try {
+			list = orderDao.memberLately(memberId,distributorId);
+			return HttpResponse.success(list);
+		} catch (Exception e) {
+			LOGGER.info("error 最近消费订单 (消费时间/消费金额)e:{}",e);
+			return HttpResponse.success(list);
+		}
+	}
 }
 
 

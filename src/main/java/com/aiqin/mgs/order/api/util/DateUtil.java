@@ -11,24 +11,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import javax.annotation.Resource;
-
 import org.joda.time.DateTime;
 
-import com.aiqin.mgs.order.api.base.PageResData;
-import com.aiqin.mgs.order.api.domain.OrderAfterSaleQuery;
-import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
-import com.aiqin.mgs.order.api.domain.OrderLog;
-import com.aiqin.mgs.order.api.domain.OrderQuery;
-import com.aiqin.mgs.order.api.domain.constant.Global;
-import com.aiqin.mgs.order.api.service.OrderService;
-
 public class DateUtil {
-
-// static SimpleDateFormat sdf2 = new SimpleDateFormat("yyMMddHHmmss");
-// static SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd"); 
-// static SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
-// static SimpleDateFormat sdf4 = new SimpleDateFormat("yyyy-MM"); 
 
     private final static SimpleDateFormat shortSdf = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -41,6 +26,16 @@ public class DateUtil {
         String sysDate = sdf2.format(date);
         return sysDate;
     }
+    
+	/**
+	 * 获取当前系统日期 yyyy-MM-dd
+	 */
+	public static String sysDateYYYYMMDD() {
+    	SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
+		Date date = new Date();
+		String sysDate = sdf2.format(date);
+		return sysDate;
+	}
 
 
     /**
@@ -185,6 +180,20 @@ public class DateUtil {
     public static String afterMonth(int i) {
         SimpleDateFormat sdf4 = new SimpleDateFormat("yyyy-MM");
         Date date = getCurrentDate();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.MONTH, i);
+        date = cal.getTime();
+        String strDate = sdf4.format(date);
+        return strDate;
+    }
+    
+    /**
+     * 根据日期获取多少月后的日期  YYYY-MM-dd
+     */
+    public static String dateAfterMonth(String inputDate,int i) {
+        SimpleDateFormat sdf4 = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = formatDate(inputDate);
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.MONTH, i);
@@ -362,6 +371,22 @@ public class DateUtil {
         cal.add(Calendar.DAY_OF_MONTH, -day);
         return new DateTime(cal.getTime()).millisOfDay().withMinimumValue().toDate();
     }
+    
+    /**
+     * 日期+天
+     *
+     * @param date
+     * @param day
+     * @return
+     */
+    public static String getBeforeDate(String inputDate, int day) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(formatDate(inputDate));
+        cal.add(Calendar.DAY_OF_MONTH, -day);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        inputDate = sdf.format(new DateTime(cal.getTime()).millisOfDay().withMinimumValue().toDate());
+        return inputDate;
+    }
 
     /**
      * 过期时间/秒
@@ -373,12 +398,28 @@ public class DateUtil {
         Long diffSeconds = (getDayEnd(getCurrentDate()).getTime() - System.currentTimeMillis()) / 1000;
         return diffSeconds - (long)(Math.random()*randomSeconds);
     }
+    
+    /**
+     * 获取所在天的开始时间 参数:String<br>
+     */
+    public static String getTimeBegin(String date) {
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		date = sdf.format(new DateTime(date).millisOfDay().withMinimumValue().toDate());
+    	
+        return date;
+    }
+    
+    /**
+     * 获取所在天的结束时间  参数:String<br>
+     */
+    public static String getTimeEnd(String date) {
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	date = sdf.format(new DateTime(date).millisOfDay().withMaximumValue().toDate());
+        return date;
+    }
 
     public static void main(String[] args) {
-//		Date date=formatDate("2019-02-00");
-//		System.out.println(getFristOfMonthDay(formatDate("2019-02")));
-
-        System.out.println(getExpireEndRandomSeconds(30L));
+		System.out.println(getBeforeDate(dateAfterMonth("2019-03-02",3),-1));
     }
 
 }

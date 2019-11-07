@@ -401,5 +401,18 @@
          update_by = #{updateBy,jdbcType=VARCHAR}
          where order_code =#{orderCode}
      </update>
+
+    <!--顾客可能还想购买-->
+    <select id="wantBuy" resultType="java.lang.String">
+         SELECT sku_code FROM `order_detail` WHERE 1=1
+         <if test="sukList != null" >
+		     and sku_code in (
+		 <foreach collection="sukList" item="sku_code" separator=",">
+			 '${sku_code}'
+		 </foreach>
+			)
+         </if>
+         GROUP BY sku_code ORDER BY SUM(amount) DESC LIMIT 2
+    </select>
 </mapper>
 

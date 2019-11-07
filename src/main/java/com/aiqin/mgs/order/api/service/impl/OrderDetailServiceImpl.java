@@ -729,6 +729,18 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 	}
 
 
+	//顾客可能还想购买
+	@Override
+	public HttpResponse wantBuy(@Valid List<String> sukList) {
+		try {
+			return HttpResponse.success(orderDetailDao.wantBuy(sukList));
+		} catch (Exception e) {
+			LOGGER.error("查询顾客可能还想购买 异常 {}",e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}
+	}
+
+
 //	//查询BYorderid-返回订单明细数据、订单数据、收货信息、结算数据、退货数据
 //	@Override
 //	public HttpResponse selectorderjoin(@Valid String orderId) {
