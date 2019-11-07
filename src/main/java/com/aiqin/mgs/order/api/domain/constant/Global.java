@@ -222,7 +222,7 @@ public interface Global {
     Integer ORDER_TYPE_1 = 1;  //TOC订单
     Integer ORDER_TYPE_2 = 2;  //TOB订单
     Integer ORDER_TYPE_3 = 3;  //服务商品
-    
+    Integer ORDER_TYPE_4 = 4;  //预存订单
     //销售流向:1:购买 2:退次
     Integer ORDER_FLOW_1=1;
     Integer ORDER_FLOW_2=2;

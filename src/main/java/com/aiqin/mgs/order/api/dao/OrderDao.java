@@ -11,10 +11,10 @@ import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
-import javax.websocket.server.PathParam;
 
 import com.aiqin.mgs.order.api.domain.request.statistical.BusinessStatisticalRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.SkuSalesRequest;
+import com.aiqin.mgs.order.api.domain.response.*;
 import com.aiqin.mgs.order.api.domain.response.statistical.Last10DaysOrderStatistical;
 import com.aiqin.mgs.order.api.domain.statistical.BusinessStatistical;
 import com.aiqin.mgs.order.api.domain.statistical.SkuSales;
@@ -23,13 +23,13 @@ import org.apache.ibatis.annotations.Param;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.request.DevelRequest;
 import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
-import com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
 import com.aiqin.mgs.order.api.domain.response.SelectByMemberPayCountResponse;
 import com.aiqin.mgs.order.api.domain.response.SkuSaleResponse;
 import com.aiqin.mgs.order.api.domain.response.LastBuyResponse;
+import com.aiqin.mgs.order.api.domain.response.LatelyResponse;
 import com.aiqin.mgs.order.api.domain.response.MevBuyResponse;
 import com.aiqin.mgs.order.api.domain.response.OradskuResponse;
 
@@ -147,7 +147,7 @@ public interface OrderDao {
     List<String> selectMemberByDistributor(@Valid MemberByDistributorRequest memberByDistributorRequest) throws Exception;
 
     //查询未统计销量的已完成订单
-    List<String> selectsukReturn(@Valid @Param("beginTime") Date beginTime, @Valid @Param("endTime") Date endTime) throws Exception;
+    List<String> selectsukReturn(@Valid @Param("beginTime") String beginTime, @Valid @Param("endTime") String endTime) throws Exception;
 
     //修改统计销量状态
     void updateSukReturn(@Param("orderId") String orderId) throws Exception;
@@ -181,4 +181,20 @@ public interface OrderDao {
      * @return
      */
     List<Last10DaysOrderStatistical> queryLast10DaysOrderStatistical(@Param("distributorId") String distributorId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
+	String isExistOrder(@Param("distributorId") String distributorId);
+
+	List<LatelyResponse> memberLately(@Param("memberId") String memberId, @Param("distributorId") String distributorId)throws Exception;
+
+    List<PrestorageResponse> selectPrestorageOrder(OrderQuery orderQuery);
+
+    Integer selectPrestorageOrderCount(OrderQuery orderQuery);
+
+    /**
+     * 预存商品详情
+     * @param prestorageOrderSupplyDetailId
+     * @return
+     */
+    PrestorageResponse selectprestorageorderDetails(String prestorageOrderSupplyDetailId);
+
 }

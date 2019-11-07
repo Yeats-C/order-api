@@ -139,7 +139,11 @@ public class OrderQuery extends PagesRequest {
 	@ApiModelProperty(value="订单号/手机号")
 	@JsonProperty("code_and_phone")
 	private String codeAndPhone;
-	
+
+	@ApiModelProperty(value="条形码/sku码")
+	@JsonProperty("bar_code_and_sku")
+	private String barCodeAndSku;
+
 	@ApiModelProperty(value="查询条件:订单状态集合")
 	@JsonProperty("order_status_list")
 	private List<Integer> orderStatusList;

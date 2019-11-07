@@ -48,6 +48,19 @@
         <result column="return_order_amount" jdbcType="INTEGER" property="returnOrderAmount"/>
     </resultMap>
 
+    <resultMap id="LastPrestorageMapping" type="com.aiqin.mgs.order.api.domain.response.PrestorageResponse">
+        <result column="prestorage_order_supply_detail_id" jdbcType="VARCHAR" property="prestorageOrderSupplyDetailId"/>
+        <result column="product_name" jdbcType="VARCHAR" property="productName"/>
+        <result column="amount" jdbcType="INTEGER" property="amount"/>
+        <result column="return_amount" jdbcType="INTEGER" property="returnAmount"/>
+        <result column="return_prestorage_amount" jdbcType="INTEGER" property="returnPrestorageAmount"/>
+        <result column="supply_amount" jdbcType="INTEGER" property="supplyAmount"/>
+        <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
+        <result column="prestorage_order_supply_id" jdbcType="VARCHAR" property="prestorageOrderSupplyId"/>
+        <result column="distributor_code" jdbcType="VARCHAR" property="distributorCode"/>
+
+
+    </resultMap>
     <resultMap id="LastBuyMapping" type="com.aiqin.mgs.order.api.domain.response.LastBuyResponse">
         <result column="new_consume_time" jdbcType="TIMESTAMP" property="newConsumeTime"/>
         <result column="product" jdbcType="VARCHAR" property="product"/>
@@ -103,7 +116,12 @@
         <result column="avg_paid_price" jdbcType="BIGINT" property="avgPaidPrice"/>
         <result column="date_tag" jdbcType="VARCHAR" property="dateTag"/>
     </resultMap>
-
+    
+    <resultMap id="LatelyResponse" type="com.aiqin.mgs.order.api.domain.response.LatelyResponse">
+        <result column="pay_time" property="pay_time"/>
+        <result column="price" property="price"/>
+    </resultMap>
+    
 
     <!-- 插入订单表 -->
     <insert id="addOrderInfo">
@@ -119,7 +137,7 @@
         <if test="totalPrice!=null">
             total_price,
         </if>
-        custom_note,business_note,cashier_id,cashier_name,guide_id,guide_name,order_type,create_time,update_time,create_by,update_by,receive_code,receive_time)
+        custom_note,business_note,cashier_id,cashier_name,guide_id,guide_name,order_type,create_time,update_time,create_by,update_by,receive_code,receive_time,is_prestorage)
         values
         (#{orderId},#{orderCode},#{memberId},#{memberName},#{memberPhone},#{distributorId},#{distributorCode},#{distributorName},#{originType},#{receiveType},#{orderStatus},
         <if test="returnStatus!=null">
@@ -132,7 +150,7 @@
         <if test="totalPrice!=null">
             #{totalPrice},
         </if>
-        #{customNote},#{businessNote},#{cashierId},#{cashierName},#{guideId},#{guideName},#{orderType},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},#{receiveCode},CURRENT_TIMESTAMP)
+        #{customNote},#{businessNote},#{cashierId},#{cashierName},#{guideId},#{guideName},#{orderType},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},#{receiveCode},CURRENT_TIMESTAMP,#{isPrestorage})
     </insert>
 
     <!-- 订单查询byorderid -->
@@ -154,6 +172,38 @@
             and order_code = #{orderCode}
         </if>
         LIMIT 1
+    </select>
+
+    <!-- 预存订单查询 -->
+    <select id="selectPrestorageOrder" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="LastPrestorageMapping"
+            resultType="java.util.List">
+
+        select d.prestorage_order_supply_detail_id,d.product_name ,d.amount ,d.return_amount ,d.return_prestorage_amount,d.supply_amount  from prestorage_order_supply s,prestorage_order_supply_detail d
+        where  s.prestorage_order_supply_id=d.prestorage_order_supply_id and s.distributor_id = #{distributorId} and s.member_id =#{memberId}
+
+
+        ORDER BY s.create_time DESC
+
+    </select>
+    <!-- 总条数 -->
+    <select id="selectPrestorageOrderCount" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery"
+            resultType="java.lang.Integer">
+         SELECT count(1) FROM prestorage_order_supply s,prestorage_order_supply_detail d
+        WHERE  s.prestorage_order_supply_id=d.prestorage_order_supply_id and s.distributor_id = #{distributorId} and s.member_id =#{memberId}
+
+
+    </select>
+
+    <!-- 预存订单详情查询 -->
+    <select id="selectprestorageorderDetails" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="LastPrestorageMapping"
+            resultType="java.util.List">
+
+        select d.prestorage_order_supply_detail_id,d.product_name ,d.amount ,d.return_amount ,d.return_prestorage_amount,d.supply_amount,d.sku_code ,d.prestorage_order_supply_id,s.distributor_code from prestorage_order_supply s,prestorage_order_supply_detail d
+        where  d.prestorage_order_supply_detail_id = #{prestorageOrderSupplyDetailId} and s.prestorage_order_supply_id=d.prestorage_order_supply_id
+
+
+        ORDER BY s.create_time DESC
+
     </select>
 
 
@@ -878,9 +928,9 @@
          and member_id=#{memberId} 
          AND order_status NOT IN ('0','4')
          AND pay_status='1'
-         ORDER BY create_time DESC LIMIT 1) b 
+         ORDER BY create_time DESC LIMIT 3) b 
          WHERE a.order_id = b.order_id
-         LIMIT 2
+         LIMIT 3
     </select>
 
     <!-- 将提货码插入订单表中... -->
@@ -1241,6 +1291,26 @@
         and order_status = 5
         group by date_format(create_time,'%Y-%m-%d')
         order by create_time desc
+    </select>
+    <select id="isExistOrder" resultType="java.lang.String">
+        SELECT DATE_FORMAT(create_time,'%Y-%m-%d') AS create_time
+        FROM order_info
+        WHERE distributor_id = #{distributorId}
+        ORDER BY create_time LIMIT 1
+    </select>
+    
+    <select id="memberLately" resultMap="LatelyResponse"
+            resultType="java.util.List">
+        SELECT  create_time AS pay_time,actual_price as price FROM `order_info` 
+        WHERE 1=1
+        <if test="distributorId!=null">
+            and distributor_id = #{distributorId}
+        </if>
+        <if test="memberId!=null and memberId!=''">
+            and member_id =#{memberId}
+        </if>
+        GROUP BY create_time
+        ORDER BY create_time DESC LIMIT 3
     </select>
 </mapper>
 
