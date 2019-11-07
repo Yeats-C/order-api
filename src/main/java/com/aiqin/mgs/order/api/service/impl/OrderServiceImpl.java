@@ -15,6 +15,8 @@ import javax.validation.Valid;
 
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.id.IdUtil;
+import com.aiqin.ground.util.protocol.MessageId;
+import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.mgs.order.api.component.*;
 import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.domain.*;
@@ -24,6 +26,7 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.request.*;
 import com.aiqin.mgs.order.api.domain.response.*;
+import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -75,9 +78,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Resource
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
-    //商品项目地址
-    @Value("${slcsIp}")
-    public String slcsIp;
+
     @Resource
     private OrderDao orderDao;
 
@@ -1529,7 +1530,7 @@ public class OrderServiceImpl implements OrderService {
                 if (orderId != null && !orderId.equals("")) {
 
                     //初始化提货码
-                    if (orderInfo.getOriginType() == Global.ORIGIN_TYPE_1) {
+                    if (orderInfo.getOriginType().intValue() == Global.ORIGIN_TYPE_1) {
                         if (orderInfo.getReceiveType().equals(Global.RECEIVE_TYPE_0)) {
                             orderInfo.setReceiveCode(OrderPublic.randomNumberE());
                         }
@@ -2011,6 +2012,7 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public HttpResponse updateOrderInfo(StoreValueOrderPayRequest storeValueOrderPayRequest) {
         try {
