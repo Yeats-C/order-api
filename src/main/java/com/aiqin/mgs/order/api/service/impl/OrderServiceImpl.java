@@ -73,10 +73,6 @@ import com.aiqin.mgs.order.api.service.SettlementService;
 @Slf4j
 @Service
 public class OrderServiceImpl implements OrderService {
-
-
-
-    @Resource
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @Resource
