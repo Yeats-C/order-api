@@ -137,7 +137,7 @@
         <if test="totalPrice!=null">
             total_price,
         </if>
-        custom_note,business_note,cashier_id,cashier_name,guide_id,guide_name,order_type,create_time,update_time,create_by,update_by,receive_code,receive_time,is_prestorage)
+        custom_note,business_note,cashier_id,cashier_name,guide_id,guide_name,order_type,create_time,update_time,create_by,update_by,receive_code,receive_time)
         values
         (#{orderId},#{orderCode},#{memberId},#{memberName},#{memberPhone},#{distributorId},#{distributorCode},#{distributorName},#{originType},#{receiveType},#{orderStatus},
         <if test="returnStatus!=null">
@@ -150,7 +150,7 @@
         <if test="totalPrice!=null">
             #{totalPrice},
         </if>
-        #{customNote},#{businessNote},#{cashierId},#{cashierName},#{guideId},#{guideName},#{orderType},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},#{receiveCode},CURRENT_TIMESTAMP,#{isPrestorage})
+        #{customNote},#{businessNote},#{cashierId},#{cashierName},#{guideId},#{guideName},#{orderType},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},#{receiveCode},CURRENT_TIMESTAMP)
     </insert>
 
     <!-- 订单查询byorderid -->

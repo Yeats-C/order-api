@@ -103,9 +103,7 @@ public class OrderController {
         	OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
           if(orderInfo !=null) {
               //预存订单
-              if (orderInfo.getIsPrestorage()==1){
-                  orderInfo.setOrderType(Global.ORDER_TYPE_4);
-              }else {
+              if (orderInfo.getOrderType()!=4){
                   orderInfo.setOrderType(Global.ORDER_TYPE_1);
               }
         	  orderAndSoOnRequest.setOrderInfo(orderInfo);
@@ -188,7 +186,7 @@ public class OrderController {
         	OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
           if(orderInfo !=null) {
               //判断是不是预存订单
-              if (orderAndSoOnRequest.getOrderInfo().getIsPrestorage()==1){
+              if (orderAndSoOnRequest.getOrderInfo().getOrderType()==4){
                   orderInfo.setOrderType(Global.ORDER_TYPE_4);
               }else {
                   orderInfo.setOrderType(Global.ORDER_TYPE_3);

@@ -256,7 +256,7 @@ public class OrderServiceImpl implements OrderService {
                 //修改状态
                 try {
                     orderService.updateOrderStatuss(orderInfo.getOrderInfo().getOrderId(), OrderStatusEnum.OrderStatus_5.getStatus(), PayStatusEnum.HAS_PAY.getCode(), "系统设置");
-                    if (orderInfo.getOrderInfo().getIsPrestorage() == 0) {
+                    if (orderInfo.getOrderInfo().getOrderType() != 4) {
                         //修改库存
                         changeProductStock(orderInfo);
                     } else {
