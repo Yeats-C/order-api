@@ -660,9 +660,9 @@ public class OrderController {
      */
     @GetMapping("/getOrderDetailsByOrderCode")
     @ApiOperation(value = "根据订单编码查询订单详情")
-    public HttpResponse getOrderDetailsByOrderCode(@Valid @RequestParam(name = "order_code", required = false) String orderCode) {
-        LOGGER.info("查询订单明细，参数：orderCode：{}",orderCode);
-        return orderService.getOrderDetailsByOrderCode(orderCode);
+    public HttpResponse getOrderDetailsByOrderCode(@Valid @RequestBody OrderInfo orderInfo) {
+        LOGGER.info("查询订单明细，参数：orderCode：{}",orderInfo);
+        return orderService.getOrderDetailsByOrderCode(orderInfo.getOrderCode());
     }
 
 }
