@@ -1,10 +1,15 @@
-package com.aiqin.mgs.order.api.component;
+package com.aiqin.mgs.order.api.component.enums;
 
-import io.swagger.annotations.ApiModel;
 import lombok.Getter;
 
+/**
+ * 支付类型枚举
+ *
+ * @author: Tao.Chen
+ * @version: v1.0.0
+ * @date 2019/11/12 17:15
+ */
 @Getter
-@ApiModel("支付类型")
 public enum PayTypeEnum {
 
     /***在线支付-微信*/
