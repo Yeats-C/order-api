@@ -21,4 +21,6 @@ public class UrlProperties {
      */
     private String productApi;
 
+    private String payApi;
+
 }

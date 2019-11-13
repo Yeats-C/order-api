@@ -208,6 +208,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public HttpResponse prestorageOut(PrestorageOutInfo prestorageOutVo) {
         //查询
         PrestorageOrderSupplyDetail prestorageOrderSupplyDetail = prestorageOrderSupplyDetailDao.selectprestorageorderDetailsById(prestorageOutVo.getPrestorageOrderSupplyDetailId());
@@ -222,7 +223,7 @@ public class OrderServiceImpl implements OrderService {
             prestorageOrderSupplyLogs.setBarCode(prestorageOrderSupplyDetail.getBarCode());
             prestorageOrderSupplyLogs.setPrestorageOrderSupplyDetailId(prestorageOrderSupplyDetail.getPrestorageOrderSupplyId());
             prestorageOrderSupplyLogs.setPrestorageOrderSupplyId(prestorageOrderSupplyDetail.getPrestorageOrderSupplyId());
-            prestorageOrderSupplyLogs.setSkpCode(prestorageOrderSupplyDetail.getSkpCode());
+            prestorageOrderSupplyLogs.setSpuCode(prestorageOrderSupplyDetail.getSpuCode());
             prestorageOrderSupplyLogs.setSkuCode(prestorageOrderSupplyDetail.getSkuCode());
             prestorageOrderSupplyLogs.setSupplyAmount(prestorageOutVo.getAmount());
             prestorageOrderSupplyLogs.setSurplusAmount(prestorageOrderSupplyDetail.getAmount()-prestorageOrderSupplyDetail.getSupplyAmount());
