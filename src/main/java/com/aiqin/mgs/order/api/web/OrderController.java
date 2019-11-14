@@ -72,7 +72,12 @@ public class OrderController {
         if(orderAndSoOnRequest !=null) {
         	OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
           if(orderInfo !=null) {
-        	  orderInfo.setOrderType(Global.ORDER_TYPE_1);
+              if(orderInfo.getOrderType()==4){
+                  orderInfo.setOrderType(Global.ORDER_TYPE_4);
+              }else {
+                  orderInfo.setOrderType(Global.ORDER_TYPE_1);
+              }
+
         	  orderAndSoOnRequest.setOrderInfo(orderInfo);
         	  return orderService.addOrdta(orderAndSoOnRequest);
           }else {
