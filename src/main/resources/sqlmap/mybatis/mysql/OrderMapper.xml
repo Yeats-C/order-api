@@ -162,7 +162,7 @@
                 and order_type =#{orderType}
             </when>
             <otherwise>
-                and order_type = 1
+                and (order_type = 1 or order_type = 4)
             </otherwise>
         </choose>
         <if test="orderId!=null and orderId!=''">

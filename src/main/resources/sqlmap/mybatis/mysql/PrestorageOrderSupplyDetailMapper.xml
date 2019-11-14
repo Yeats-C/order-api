@@ -37,6 +37,11 @@
     <select id="selectprestorageorderDetailsListBySupplyId" resultMap="OrderSupplyMapping">
          select * from prestorage_order_supply_detail where prestorage_order_supply_id=#{prestorageOrderSupplyId}
     </select>
+
+    <select id="selectprestorageorderDetailsListByOrderId" resultMap="OrderSupplyMapping">
+         select * from prestorage_order_supply_detail where order_code=#{orderCode}
+    </select>
+
     <select id="selectPrestorageOrderLogs" resultMap="OrderLogs"
             parameterType="com.aiqin.mgs.order.api.domain.OrderQuery">
         select
@@ -83,6 +88,12 @@
             and d.create_time &lt;= #{endTime}
         </if>
     </select>
+
+    <!--订单中商品sku数量-->
+    <select id="getSkuSum"  parameterType="com.aiqin.mgs.order.api.domain.OrderDetailQuery" resultType="java.lang.Integer" >
+         SELECT COUNT(prestorage_order_supply_detail_id) AS acount FROM prestorage_order_supply_detail WHERE order_code=#{orderId}
+    </select>
+
     <update id="updateById" parameterType="com.aiqin.mgs.order.api.domain.PrestorageOrderSupplyDetail">
         update prestorage_order_supply_detail set update_time=CURRENT_TIMESTAMP
         <if test="returnAmount!=null and returnAmount!='' ">
@@ -141,7 +152,7 @@
         <if test="prestorageOrderSupplyStatus!=null">
             prestorage_order_supply_status,
         </if>
-        create_time,create_by
+        create_time,create_by)
         values
         (#{prestorageOrderSupplyDetailId},#{prestorageOrderSupplyId},
         <if test="orderId!=null">

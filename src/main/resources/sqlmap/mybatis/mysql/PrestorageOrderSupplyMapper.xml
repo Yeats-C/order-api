@@ -68,7 +68,7 @@
         <if test="payType!=null">
             pay_type,
         </if>
-        create_time,create_by
+        create_time,create_by)
         values
         (#{prestorageOrderSupplyId},
         <if test="prestorageOrderSupplyCode!=null">

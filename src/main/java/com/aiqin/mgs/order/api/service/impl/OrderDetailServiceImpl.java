@@ -21,8 +21,12 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+
+import com.aiqin.mgs.order.api.dao.*;
+import com.aiqin.mgs.order.api.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -32,21 +36,6 @@ import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
-import com.aiqin.mgs.order.api.dao.CartDao;
-import com.aiqin.mgs.order.api.dao.OrderDao;
-import com.aiqin.mgs.order.api.dao.OrderDetailDao;
-import com.aiqin.mgs.order.api.dao.OrderReceivingDao;
-import com.aiqin.mgs.order.api.dao.SettlementDao;
-import com.aiqin.mgs.order.api.domain.CartInfo;
-import com.aiqin.mgs.order.api.domain.OrderDetailInfo;
-import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
-import com.aiqin.mgs.order.api.domain.OrderInfo;
-import com.aiqin.mgs.order.api.domain.OrderListInfo;
-import com.aiqin.mgs.order.api.domain.OrderLog;
-import com.aiqin.mgs.order.api.domain.OrderQuery;
-import com.aiqin.mgs.order.api.domain.OrderReceivingInfo;
-import com.aiqin.mgs.order.api.domain.OrderodrInfo;
-import com.aiqin.mgs.order.api.domain.ProductCycle;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.request.OrderDetailRequest;
 import com.aiqin.mgs.order.api.domain.request.ProdisorRequest;
@@ -84,7 +73,8 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 	
 	@Resource
     private OrderLogService orderLogService;
-	
+	@Resource
+	private PrestorageOrderSupplyDetailDao prestorageOrderSupplyDetailDao;
     //商品项目地址
     @Value("${product_ip}")
     public String product_ip;
@@ -375,9 +365,44 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		
 		OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
 		orderDetailQuery.setOrderId(orderId);
+		OrderInfo orderInfo = new OrderInfo();
+		try {
+			//订单主数据
+
+			orderInfo = orderDao.selecOrderById(orderDetailQuery);
+			//获取SKU数量
+			Integer skuSum =0;
+			if (orderInfo!=null&&orderInfo.getOrderType()==4){
+				//预存订单
+				skuSum = getPrestorageSkuSum(orderId);
+			}else {
+				skuSum = getSkuSum(orderId);
+			}
+
+			orderInfo.setSkuSum(skuSum);
+			info.setOrderInfo(orderInfo);
+
+		} catch (Exception e) {
+			LOGGER.error("查询BYorderid-返回订单主数据",e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}
+
+
 		try {
 		//订单明细数据
-	    List<OrderDetailInfo> detailList = orderDetailDao.selectDetailById(orderDetailQuery);
+			List<OrderDetailInfo> detailList=new ArrayList<>();
+			if (orderInfo!=null&&orderInfo.getOrderType()==4){
+				//预存订单
+				List<PrestorageOrderSupplyDetail> prestorageOrderSupplyDetails=prestorageOrderSupplyDetailDao.selectprestorageorderDetailsListByOrderId(orderId);
+				for (PrestorageOrderSupplyDetail prestorageOrderSupplyDetail:prestorageOrderSupplyDetails){
+					OrderDetailInfo orderDetailInfo=new OrderDetailInfo();
+					BeanUtils.copyProperties(prestorageOrderSupplyDetail,orderDetailInfo);
+					detailList.add(orderDetailInfo);
+				}
+			}else {
+				detailList = orderDetailDao.selectDetailById(orderDetailQuery);
+			}
+
 		
 		info.setDetailList(detailList);
 
@@ -385,20 +410,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			LOGGER.error("查询BYorderid-返回订单明细数据",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
-		try {
-		//订单主数据
-		OrderInfo orderInfo = new OrderInfo();
-		orderInfo = orderDao.selecOrderById(orderDetailQuery);
-		//获取SKU数量
-		Integer skuSum =0;
-		skuSum = getSkuSum(orderId);
-		orderInfo.setSkuSum(skuSum);
-		info.setOrderInfo(orderInfo);
-		
-		} catch (Exception e) {
-			LOGGER.error("查询BYorderid-返回订单主数据",e);
-			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
-		}
+
 		try {
 		//收货信息
 		info.setReceivingInfo(orderReceivingDao.selecReceivingById(orderDetailQuery));
@@ -418,6 +430,19 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 				LOGGER.error("查询BYorderid-返回订单结算信息",e);
 				return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 			}				
+	}
+
+	private Integer getPrestorageSkuSum(String orderId) {
+		Integer acount = null;
+		OrderDetailQuery query = new OrderDetailQuery();
+		query.setOrderId(orderId);
+		try {
+			acount = prestorageOrderSupplyDetailDao.getSkuSum(query);
+
+		} catch (Exception e) {
+			LOGGER.error("订单中商品sku数量失败 {}",e);
+		}
+		return acount!=null?acount:0;
 	}
 
 

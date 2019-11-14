@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.dao;
 
+import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
 import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.PrestorageOrderSupplyDetail;
 import com.aiqin.mgs.order.api.domain.response.PrestorageOrderLogsInfo;
@@ -43,4 +44,18 @@ public interface PrestorageOrderSupplyDetailDao {
     List<PrestorageOrderLogsInfo> selectPrestorageOrderLogs(OrderQuery orderQuery);
 
     int selectPrestorageOrderLogsCount(OrderQuery orderQuery);
+
+    /**
+     * 订单中sku数量
+     * @param query
+     * @return
+     */
+    Integer getSkuSum(OrderDetailQuery query);
+
+    /**
+     *
+     * @param orderCode
+     * @return
+     */
+    List<PrestorageOrderSupplyDetail> selectprestorageorderDetailsListByOrderId(@Param("orderCode") String orderCode);
 }
