@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.OrderStoreOrderOperationLogDao">
+
+    <select id="selectOperationLogListByOrderId" parameterType="java.lang.String"
+            resultType="com.aiqin.mgs.order.api.domain.OrderStoreOrderOperationLog">
+        select id                as id,
+               log_id            as logId,
+               order_id          as orderId,
+               operation_content as operationContent,
+               create_time       as createTime,
+               create_by_id      as createById,
+               create_by_name    as createByName
+        from order_store_order_operation_log
+        where 1 = 1
+          and order_id = #{orderId}
+        order by create_time desc
+    </select>
+
+</mapper>
+

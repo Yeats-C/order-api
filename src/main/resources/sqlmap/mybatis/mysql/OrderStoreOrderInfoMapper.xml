@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.OrderStoreOrderInfoDao">
+
+    <select id="findOrderList" parameterType="com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo"
+            resultType="com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo">
+        select a1.id             as id,
+               a1.order_id       as orderId,
+               a1.order_code     as orderCode,
+               a1.order_status   as orderStatus,
+               a1.return_status  as returnStatus,
+               a1.pay_status     as payStatus,
+               a1.order_type     as orderType,
+               a1.store_id       as storeId,
+               a1.store_name     as storeName,
+               a1.total_price    as totalPrice,
+               a1.actual_price   as actualPrice,
+               a1.create_time    as createTime,
+               a1.create_by_id   as createById,
+               a1.create_by_name as createByName,
+               a1.update_time    as updateTime,
+               a1.update_by_id   as updateById,
+               a1.update_by_name as updateByName
+        from order_store_order_info a1
+        where 1 = 1
+    </select>
+
+    <select id="select" parameterType="com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo"
+            resultType="com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo">
+        select id             as id,
+               order_id       as orderId,
+               order_code     as orderCode,
+               order_status   as orderStatus,
+               return_status  as returnStatus,
+               pay_status     as payStatus,
+               order_type     as orderType,
+               store_id       as storeId,
+               store_name     as storeName,
+               total_price    as totalPrice,
+               actual_price   as actualPrice,
+               create_time    as createTime,
+               create_by_id   as createById,
+               create_by_name as createByName,
+               update_time    as updateTime,
+               update_by_id   as updateById,
+               update_by_name as updateByName
+        from order_store_order_info
+        where 1 = 1
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="orderId != null and orderId != ''">
+            and order_id = #{orderId}
+        </if>
+        <if test="orderCode != null and orderCode != ''">
+            and order_code = #{orderCode}
+        </if>
+        <if test="orderStatus != null and orderStatus != ''">
+            and order_status = #{orderStatus}
+        </if>
+        <if test="payStatus != null and payStatus != ''">
+            and pay_status = #{payStatus}
+        </if>
+        <if test="orderType != null and orderType != ''">
+            and order_type = #{orderType}
+        </if>
+        <if test="storeId != null and storeId != ''">
+            and store_id = #{storeId}
+        </if>
+        order by create_time desc
+    </select>
+
+</mapper>
+
