@@ -18,16 +18,14 @@ import java.util.List;
 
 @ApiModel("购物车")
 public class CartInfo extends PagesRequest {
-    
+
 	@ApiModelProperty(value="不传参不返回 0:全部")
 	@JsonProperty("icount")
 	private Integer icount = 0;
-	
 
 	public Integer getIcount() {
 		return icount;
 	}
-
 
 	public void setIcount(Integer icount) {
 		this.icount = icount;
@@ -71,8 +69,8 @@ public class CartInfo extends PagesRequest {
     private String logo="";
     
     @ApiModelProperty(value = "创建时间",example = "2001-01-01 01:01:01")
-    @JsonProperty("create_time")
-    private Date createTime;
+	@JsonProperty("create_time")
+	private Date createTime;
     
     @ApiModelProperty(value = "更新时间",example = "2001-01-01 01:01:01")
     @JsonProperty("update_time")

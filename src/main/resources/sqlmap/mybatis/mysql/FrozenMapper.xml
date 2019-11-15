@@ -8,8 +8,8 @@
     <result column="distributor_name" jdbcType="VARCHAR" property="distributorName"/>
     <result column="member_id" jdbcType="VARCHAR" property="memberId"/>
     <result column="member_name" jdbcType="VARCHAR" property="memberName"/>
-    <result column="sale_byid" jdbcType="VARCHAR" property="saleByid"/>
-    <result column="sale_byname" jdbcType="VARCHAR" property="saleByname"/>
+    <result column="sale_byid" jdbcType="VARCHAR" property="saleById"/>
+    <result column="sale_byname" jdbcType="VARCHAR" property="saleByName"/>
     <result column="product_id" jdbcType="VARCHAR" property="productId"/>
     <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
     <result column="product_name" jdbcType="VARCHAR" property="productName"/>

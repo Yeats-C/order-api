@@ -13,7 +13,7 @@
         <result column="origin_type" jdbcType="TINYINT" property="originType"/>
         <result column="receive_type" jdbcType="TINYINT" property="receiveType"/>
         <result column="receive_code" jdbcType="VARCHAR" property="receiveCode"/>
-        <result column="receiveTime" jdbcType="TIMESTAMP" property="receive_time"/>
+        <result column="receive_time" jdbcType="TIMESTAMP" property="receiveTime"/>
         <result column="order_status" jdbcType="TINYINT" property="orderStatus"/>
         <result column="return_status" jdbcType="TINYINT" property="returnStatus"/>
         <result column="pay_status" jdbcType="TINYINT" property="payStatus"/>
@@ -83,7 +83,7 @@
         <result column="origin_type" jdbcType="TINYINT" property="originType"/>
         <result column="receive_type" jdbcType="TINYINT" property="receiveType"/>
         <result column="receive_code" jdbcType="VARCHAR" property="receiveCode"/>
-        <result column="receiveTime" jdbcType="TIMESTAMP" property="receive_time"/>
+        <result column="receive_time" jdbcType="TIMESTAMP" property="receiveTime"/>
         <result column="order_status" jdbcType="TINYINT" property="orderStatus"/>
         <result column="return_status" jdbcType="TINYINT" property="returnStatus"/>
         <result column="pay_status" jdbcType="TINYINT" property="payStatus"/>

@@ -76,7 +76,7 @@ public class OrderServiceImpl implements OrderService {
 
 
 
-    @Resource
+//    @Resource
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @Resource

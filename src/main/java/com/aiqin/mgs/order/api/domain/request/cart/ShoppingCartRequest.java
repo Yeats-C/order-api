@@ -1,19 +1,15 @@
-package com.aiqin.mgs.order.api.domain;
+package com.aiqin.mgs.order.api.domain.request.cart;
 
-import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
-@ApiModel("购物车商品项")
-public class CartOrderInfo extends PagesRequest {
+public class ShoppingCartRequest {
 
     @ApiModelProperty(value = "商品id")
     @JsonProperty("product_id")
-    private String productId="";
+    private String productId;
 
     @ApiModelProperty(value = "商品名称")
     @JsonProperty("product_name")
@@ -39,22 +35,6 @@ public class CartOrderInfo extends PagesRequest {
     @JsonProperty("product_size")
     private String productSize="";
 
-    @ApiModelProperty(value = "活动id")
-    @JsonProperty("activity_id")
-    private String activityId="";
-
-    @ApiModelProperty(value = "活动名称")
-    @JsonProperty("activity_name")
-    private String activityName="";
-
-    @ApiModelProperty(value = "购物车id")
-    @JsonProperty("cart_order_id")
-    private String cartOrderId;
-
-    @ApiModelProperty(value = "加盟商id")
-    @JsonProperty("franchisee_id")
-    private String franchiseeId;
-
     @ApiModelProperty(value = "门店id")
     @JsonProperty("distributor_id")
     private String distributorId;
@@ -71,61 +51,8 @@ public class CartOrderInfo extends PagesRequest {
     @JsonProperty("distribution_type")
     private Integer distributionType;
 
-
-
-
-    public Integer getDistributionType() {
-        return distributionType;
-    }
-
-
-    public void setDistributionType(Integer distributionType) {
-        this.distributionType = distributionType;
-    }
-
-
-    public void setAmount(int amount) {
-        this.amount = amount;
-    }
-
-    public String getCartOrderId() {
-        return cartOrderId;
-    }
-
-    public void setCartOrderId(String cartOrderId) {
-        this.cartOrderId = cartOrderId;
-    }
-
-    public String getFranchiseeId() {
-        return franchiseeId;
-    }
-
-    public void setFranchiseeId(String franchiseeId) {
-        this.franchiseeId = franchiseeId;
-    }
-
-    public String getDistributorId() {
-        return distributorId;
-    }
-
-    public void setDistributorId(String distributorId) {
-        this.distributorId = distributorId;
-    }
-
-    public String getSkuId() {
-        return skuId;
-    }
-
-    public void setSkuId(String skuId) {
-        this.skuId = skuId;
-    }
-
-    public String getSpuId() {
-        return spuId;
-    }
-
-    public void setSpuId(String spuId) {
-        this.spuId = spuId;
+    public ShoppingCartRequest() {
+        productId = "";
     }
 
     public String getProductId() {
@@ -144,11 +71,11 @@ public class CartOrderInfo extends PagesRequest {
         this.productName = productName;
     }
 
-    public Integer getAmount() {
+    public int getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(int amount) {
         this.amount = amount;
     }
 
@@ -184,19 +111,35 @@ public class CartOrderInfo extends PagesRequest {
         this.productSize = productSize;
     }
 
-    public String getActivityId() {
-        return activityId;
+    public String getDistributorId() {
+        return distributorId;
     }
 
-    public void setActivityId(String activityId) {
-        this.activityId = activityId;
+    public void setDistributorId(String distributorId) {
+        this.distributorId = distributorId;
     }
 
-    public String getActivityName() {
-        return activityName;
+    public String getSkuId() {
+        return skuId;
     }
 
-    public void setActivityName(String activityName) {
-        this.activityName = activityName;
+    public void setSkuId(String skuId) {
+        this.skuId = skuId;
+    }
+
+    public String getSpuId() {
+        return spuId;
+    }
+
+    public void setSpuId(String spuId) {
+        this.spuId = spuId;
+    }
+
+    public Integer getDistributionType() {
+        return distributionType;
+    }
+
+    public void setDistributionType(Integer distributionType) {
+        this.distributionType = distributionType;
     }
 }
