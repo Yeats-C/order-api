@@ -468,7 +468,8 @@ public class OrderServiceImpl implements OrderService {
             companyCode = Global.COMPANY_01;
         }
         //yyMMddHHmmss+订单来源+销售渠道标识+公司标识+4位数的随机数
-        orderCode = DateUtil.sysDate() + logo + String.valueOf(Global.ORDERID_CHANNEL_4) + companyCode + OrderPublic.randomNumberF();
+        //orderCode = DateUtil.sysDate() + logo + String.valueOf(Global.ORDERID_CHANNEL_4) + companyCode + OrderPublic.randomNumberF();
+        orderCode = DateUtil.sysDate() + logo + String.valueOf(Global.ORDERID_CHANNEL_4) +  OrderPublic.randomNumberF();
         orderInfo.setOrderCode(orderCode);
 
         //初始化提货码
