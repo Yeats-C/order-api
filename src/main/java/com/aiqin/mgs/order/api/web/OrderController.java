@@ -13,11 +13,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
-import com.aiqin.mgs.order.api.domain.request.DetailCouponRequest;
-import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
-import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
-import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
-import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
+import com.aiqin.mgs.order.api.domain.request.*;
 import com.aiqin.mgs.order.api.domain.response.LatelyResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
 import com.aiqin.mgs.order.api.domain.response.PartnerPayGateRep;
@@ -683,7 +679,15 @@ public class OrderController {
 
         return orderService.selectPrestorageOrderList(orderQuery);
     }
+    @GetMapping("/prestorageOrderDetail")
+    @ApiOperation(value = "查询预存订单详情列表....")
+    public HttpResponse selectPrestorageOrderDetail(@Valid @RequestParam(name = "order_id", required = true) String orderId) {
 
+
+        LOGGER.info("查询预存订单详情列表：{}",orderId);
+
+        return orderService.selectPrestorageOrderDetail(orderId);
+    }
     /**
      * 模糊查询预存订单取货日志列表
      * @param
@@ -728,4 +732,16 @@ public class OrderController {
     	LOGGER.info("最近消费订单 (消费时间/消费金额)参数:memberId: {},distributorId:{}",memberId,distributorId);
     	return orderService.memberLately(memberId,distributorId);
     }
+
+    @PostMapping("/updateRejectPrestoragProduct")
+    @ApiOperation(value = "修改预存商品退货数量....")
+    public HttpResponse updateRejectPrestoragProduct(@Valid @RequestBody PrestorageOrderSupplyDetailVo vo) {
+
+
+        LOGGER.info("修改预存商品退货数量：{}",vo);
+
+        return orderService.updateRejectPrestoragProduct(vo);
+    }
+
+
 }

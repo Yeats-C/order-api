@@ -179,4 +179,13 @@ public interface OrderService {
 	 * @return
 	 */
 	HttpResponse selectPrestorageOrderLogs(OrderQuery orderQuery);
+
+	HttpResponse selectPrestorageOrderDetail(String orderId);
+
+	/**
+	 * 修改预存商品退货数量
+	 * @param vo
+	 * @return
+	 */
+	HttpResponse updateRejectPrestoragProduct(PrestorageOrderSupplyDetailVo vo);
 }

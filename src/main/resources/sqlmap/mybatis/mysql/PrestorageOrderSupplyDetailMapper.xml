@@ -39,9 +39,11 @@
     </select>
 
     <select id="selectprestorageorderDetailsListByOrderId" resultMap="OrderSupplyMapping">
-         select * from prestorage_order_supply_detail where order_code=#{orderCode}
+         select * from prestorage_order_supply_detail where order_id=#{orderId}
     </select>
-
+    <select id="selectPrestorageOrderDetailByOrderId" resultMap="OrderSupplyMapping">
+         select d.* from prestorage_order_supply_detail d ,prestorage_order_supply s where s.prestorage_order_supply_id=d.prestorage_order_supply_id and  s.order_id=#{orderId}
+    </select>
     <select id="selectPrestorageOrderLogs" resultMap="OrderLogs"
             parameterType="com.aiqin.mgs.order.api.domain.OrderQuery">
         select
@@ -115,7 +117,30 @@
 
 
     </update>
+<update id="updateRejectPrestoragProduct" parameterType="com.aiqin.mgs.order.api.domain.request.PrestorageOrderSupplyDetailVo">
+    update prestorage_order_supply_detail set update_time=CURRENT_TIMESTAMP
 
+    <if test="returnPrestorageAmount!=null ">
+        ,return_prestorage_amount = #{returnPrestorageAmount}
+    </if>
+    <if test="returnAmount!=null ">
+        ,return_amount = #{returnAmount}
+    </if>
+
+    <if test="updateBy!=null ">
+        ,update_by = #{updateBy}
+    </if>
+    where prestorage_order_supply_detail_id = #{prestorageOrderSupplyDetailId}
+    <if test="oldReturnAmount!=null ">
+       and return_amount = #{oldReturnAmount}
+    </if>
+    <if test="oldReturnPrestorageAmount!=null ">
+        and return_prestorage_amount = #{oldReturnPrestorageAmount}
+    </if>
+
+
+
+</update>
     <insert id="addPrestorageOrderDetail" parameterType="com.aiqin.mgs.order.api.domain.PrestorageOrderSupplyDetail">
         insert into prestorage_order_supply_detail
         (prestorage_order_supply_detail_id,

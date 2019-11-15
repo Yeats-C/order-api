@@ -765,6 +765,11 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		}
 	}
 
+	@Override
+	public HttpResponse findOrderDetailById(String orderDetailId) {
+		return HttpResponse.success(orderDetailDao.findOrderDetailById(orderDetailId));
+	}
+
 
 //	//查询BYorderid-返回订单明细数据、订单数据、收货信息、结算数据、退货数据
 //	@Override

@@ -305,6 +305,17 @@ public class OrderServiceImpl implements OrderService {
         return HttpResponse.success(new PageResData(totalCount, prestorageOrderLogsInfos));
     }
 
+    @Override
+    public HttpResponse selectPrestorageOrderDetail(String orderId) {
+        return HttpResponse.success(prestorageOrderSupplyDetailDao.selectPrestorageOrderDetailByOrderId(orderId));
+    }
+
+    @Override
+    public HttpResponse updateRejectPrestoragProduct(PrestorageOrderSupplyDetailVo vo) {
+        int updateLine =prestorageOrderSupplyDetailDao.updateRejectPrestoragProduct(vo);
+        return HttpResponse.success();
+    }
+
     private OrderQuery trans(OrderQuery orderQuery) {
         if (orderQuery.getOrderStatus() != null) {
             if (orderQuery.getOrderStatus() == 2) {

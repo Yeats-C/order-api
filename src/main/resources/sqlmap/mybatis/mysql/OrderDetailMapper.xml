@@ -414,5 +414,9 @@
          </if>
          GROUP BY sku_code ORDER BY SUM(amount) DESC LIMIT 2
     </select>
+
+    <select id="findOrderDetailById" resultMap="OrderInfoDetailMapping">
+        select * from order_detail where  order_detail_id=#{orderDetailId}
+    </select>
 </mapper>
 
