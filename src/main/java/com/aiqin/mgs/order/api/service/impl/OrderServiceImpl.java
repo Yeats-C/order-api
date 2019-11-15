@@ -293,7 +293,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public HttpResponse selectPrestorageOrderList(OrderQuery orderQuery) {
-        List<PrestorageOrderSupply> prestorageOrderSupplies = prestorageOrderSupplyDao.selectPrestorageOrderList(trans(orderQuery));
+        List<PrestorageOrderInfo> prestorageOrderSupplies = prestorageOrderSupplyDao.selectPrestorageOrderList(trans(orderQuery));
         int totalCount = prestorageOrderSupplyDao.selectPrestorageOrderListCount(trans(orderQuery));
         return HttpResponse.success(new PageResData(totalCount, prestorageOrderSupplies));
     }

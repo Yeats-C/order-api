@@ -19,6 +19,26 @@
         <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
         <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
     </resultMap>
+    <resultMap id="OrderSupplyInfoMapping" type="com.aiqin.mgs.order.api.domain.response.PrestorageOrderInfo">
+        <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+        <result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
+        <result column="pay_type" jdbcType="TINYINT" property="payType"/>
+        <result column="member_name" jdbcType="VARCHAR" property="memberName"/>
+        <result column="member_phone" jdbcType="VARCHAR" property="memberPhone"/>
+        <result column="origin_type" jdbcType="VARCHAR" property="originType"/>
+        <result column="actual_price" jdbcType="INTEGER" property="actualPrice"/>
+        <result column="total_price" jdbcType="INTEGER" property="totalPrice"/>
+        <result column="cashier_id" jdbcType="VARCHAR" property="cashierId"/>
+        <result column="cashier_name" jdbcType="VARCHAR" property="cashierName"/>
+        <result column="guide_id" jdbcType="VARCHAR" property="guideId"/>
+        <result column="guide_name" jdbcType="VARCHAR" property="guideName"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="payTime"/>
+        <result column="order_status" jdbcType="TINYINT" property="orderStatus"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+    </resultMap>
 
     <update id="updateById" parameterType="com.aiqin.mgs.order.api.domain.PrestorageOrderSupply">
         update prestorage_order_supply set update_time=CURRENT_TIMESTAMP
@@ -108,8 +128,8 @@
        CURRENT_TIMESTAMP,#{createBy})
     </insert>
 
-    <select id="selectPrestorageOrderList" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="OrderSupplyMapping">
-        select  * from prestorage_order_supply a where 1=1
+    <select id="selectPrestorageOrderList" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="OrderSupplyInfoMapping">
+        select  o.* from prestorage_order_supply a ,order_info o where a.order_id=o.order_id
         <if test="distributorId!=null and distributorId!='' ">
             and a.distributor_id = #{distributorId}
         </if>
