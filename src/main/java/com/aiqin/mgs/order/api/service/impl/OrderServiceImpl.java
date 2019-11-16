@@ -17,7 +17,7 @@ import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
-import com.aiqin.mgs.order.api.component.PayTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.PayTypeEnum;
 import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;

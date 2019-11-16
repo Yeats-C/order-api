@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.OrderStoreOrderSendingDao">
+
+    <select id="getOrderSendingByOrderId" parameterType="java.lang.String"
+            resultType="com.aiqin.mgs.order.api.domain.OrderStoreOrderSending">
+        select id                   as id,
+               order_id             as orderId,
+               sending_id           as sendingId,
+               logistic_centre_name as logisticCentreName,
+               logistic_id          as logisticId,
+               logistic_fee         as logisticFee,
+               logistic_status      as logisticStatus,
+               send_store           as sendStore,
+               pay_status           as payStatus,
+               create_time          as createTime,
+               create_by_id         as createById,
+               create_by_name       as createByName,
+               update_time          as updateTime,
+               update_by_id         as updateById,
+               update_by_name       as updateByName
+        from order_store_sending
+        where 1 = 1
+          and order_id = #{orderId}
+    </select>
+
+</mapper>
