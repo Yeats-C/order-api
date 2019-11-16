@@ -11,10 +11,10 @@ import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
-import javax.websocket.server.PathParam;
 
 import com.aiqin.mgs.order.api.domain.request.statistical.BusinessStatisticalRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.SkuSalesRequest;
+import com.aiqin.mgs.order.api.domain.response.*;
 import com.aiqin.mgs.order.api.domain.response.statistical.Last10DaysOrderStatistical;
 import com.aiqin.mgs.order.api.domain.statistical.BusinessStatistical;
 import com.aiqin.mgs.order.api.domain.statistical.SkuSales;
@@ -23,7 +23,6 @@ import org.apache.ibatis.annotations.Param;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.request.DevelRequest;
 import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
-import com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
@@ -187,16 +186,15 @@ public interface OrderDao {
 
 	List<LatelyResponse> memberLately(@Param("memberId") String memberId, @Param("distributorId") String distributorId)throws Exception;
 
-	/**
-     * 根据条件查询订单列表
-     *
-     * @param orderInfo
-     * @return java.util.List<com.aiqin.mgs.order.api.domain.OrderInfo>
-     * @throws Exception
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/11/2 16:30
+    List<PrestorageResponse> selectPrestorageOrder(OrderQuery orderQuery);
+
+    Integer selectPrestorageOrderCount(OrderQuery orderQuery);
+
+    /**
+     * 预存商品详情
+     * @param prestorageOrderSupplyDetailId
+     * @return
      */
-    List<OrderInfo> findOrderInfoList(OrderInfo orderInfo);
+    PrestorageResponse selectprestorageorderDetails(String prestorageOrderSupplyDetailId);
 
 }

@@ -9,25 +9,17 @@ package com.aiqin.mgs.order.api.web;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.CartInfo;
-import com.aiqin.mgs.order.api.domain.FrozenInfo;
-import com.aiqin.mgs.order.api.domain.OrderInfo;
 import com.aiqin.mgs.order.api.service.CartService;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.sql.Date;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/cart")
@@ -35,7 +27,6 @@ import java.util.List;
 @SuppressWarnings("all")
 public class CartController {
 
-    
 	private static final Logger LOGGER = LoggerFactory.getLogger(CartController.class);
     @Resource
     private CartService cartService;
@@ -49,14 +40,11 @@ public class CartController {
     @PostMapping("")
     @ApiOperation(value = "微商城-添加/修改购物车信息0:添加1:修改....")
     public HttpResponse addNewCart(@Valid @RequestBody CartInfo cartInfo) {
- 	
- 	
         LOGGER.info("微商城-添加/修改购物车信息0:添加1:修改 参数：{}",cartInfo);
         return cartService.addCartInfo(cartInfo);
- 
-    }    
-    
-    
+    }
+
+
     /**
      * 微商城-清空购物车
      * @param memberId
@@ -65,8 +53,6 @@ public class CartController {
     @DeleteMapping("/deletecartinfo/{member_id}")
     @ApiOperation(value = "清空购物车")
     public HttpResponse deleteCartInfo(@Valid @PathVariable(name = "member_id") String memberId) {
-        
-    	
         LOGGER.info("清空购物车参数：{}",memberId);
         return cartService.deleteCartInfo(memberId);
     }

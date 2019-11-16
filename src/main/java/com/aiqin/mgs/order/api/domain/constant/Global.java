@@ -1,6 +1,8 @@
 package com.aiqin.mgs.order.api.domain.constant;
 
 
+import io.swagger.models.auth.In;
+
 public interface Global {
 
     /**
@@ -222,7 +224,7 @@ public interface Global {
     Integer ORDER_TYPE_1 = 1;  //TOC订单
     Integer ORDER_TYPE_2 = 2;  //TOB订单
     Integer ORDER_TYPE_3 = 3;  //服务商品
-    
+    Integer ORDER_TYPE_4 = 4;  //预存订单
     //销售流向:1:购买 2:退次
     Integer ORDER_FLOW_1=1;
     Integer ORDER_FLOW_2=2;
@@ -230,4 +232,8 @@ public interface Global {
     //会员类型:1:会员 2:非会员
     Integer MEMBER_TYPE_1=1;
     Integer MEMBER_TYPE_2=2;
+
+    //配送方式：1:配送 2:直送
+    Integer DISTRIBUTION_TYPE_1 = 1;
+    Integer DISTRIBUTION_TYPE_2 = 2;
 }
