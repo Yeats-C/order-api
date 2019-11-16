@@ -1,9 +1,6 @@
 package com.aiqin.mgs.order.api.domain;
 
 import com.aiqin.mgs.order.api.base.PagesRequest;
-import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
-import com.aiqin.mgs.order.api.component.enums.OrderTypeEnum;
-import com.aiqin.mgs.order.api.component.enums.PayStatusEnum;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -25,22 +22,14 @@ public class OrderStoreOrderInfo extends PagesRequest {
     private String orderId;
     /***订单编号*/
     private String orderCode;
-    /***订单状态*/
+    /***订单状态 枚举 ErpOrderStatusEnum*/
     private Integer orderStatus;
-    /***订单状态描述*/
-    private String orderStatusDesc;
-    /***是否发生退货 0:普通订单 1:退货单*/
+    /***是否发生退货 0否 1是*/
     private Integer returnStatus;
-    /***是否发生退货 描述*/
-    private String returnStatusDesc;
     /***支付状态 */
     private Integer payStatus;
-    /***支付状态描述 */
-    private String payStatusDesc;
-    /***订单类型*/
+    /***订单类型 枚举 OrderTypeEnum*/
     private Integer orderType;
-    /***订单类型描述*/
-    private String orderTypeDesc;
     /***门店id*/
     private String storeId;
     /***门店名称*/
@@ -49,6 +38,10 @@ public class OrderStoreOrderInfo extends PagesRequest {
     private BigDecimal totalPrice;
     /***实付金额*/
     private BigDecimal actualPrice;
+    /***订单级别 枚举 OrderLevelEnum*/
+    private Integer orderLevel;
+    /***关联主订单编码*/
+    private String primaryCode;
 
     /***创建时间*/
     private Date createTime;
@@ -62,20 +55,4 @@ public class OrderStoreOrderInfo extends PagesRequest {
     private String updateById;
     /***修改人姓名*/
     private String updateByName;
-
-    public String getOrderStatusDesc() {
-        return ErpOrderStatusEnum.getEnumDesc(orderStatus);
-    }
-
-    public String getReturnStatusDesc() {
-        return returnStatusDesc;
-    }
-
-    public String getPayStatusDesc() {
-        return PayStatusEnum.getEnumDesc(payStatus);
-    }
-
-    public String getOrderTypeDesc() {
-        return OrderTypeEnum.getEnumDesc(orderType);
-    }
 }

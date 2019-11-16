@@ -12,12 +12,22 @@ import lombok.Getter;
 @Getter
 public enum OrderTypeEnum {
 
-    //TODO 状态待定
-
-    /***状态1*/
-    ORDER_STATUS_1(1, "1", "状态1"),
-    /***状态2*/
-    ORDER_STATUS_2(2, "2", "状态2");
+    /***首单配送*/
+    ORDER_TYPE_1(1, "1", "首单配送"),
+    /***首单赠送*/
+    ORDER_TYPE_2(2, "2", "首单赠送"),
+    /***首单货架*/
+    ORDER_TYPE_3(3, "3", "首单货架"),
+    /***货架补货*/
+    ORDER_TYPE_4(4, "4", "货架补货"),
+    /***配送补货*/
+    ORDER_TYPE_5(5, "5", "配送补货"),
+    /***游乐设备*/
+    ORDER_TYPE_6(6, "6", "游乐设备"),
+    /***首单直送*/
+    ORDER_TYPE_7(7, "7", "首单直送"),
+    /***直送补货*/
+    ORDER_TYPE_8(8, "8", "直送补货");
 
     private Integer code;
     private String value;

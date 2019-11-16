@@ -24,7 +24,7 @@
                update_time            as updateTime,
                update_by_id           as updateById,
                update_by_name         as updateByName
-        from order_store_order_product_item
+        from order_store_product_item
         where 1 = 1
           and order_id = #{orderId}
         order by create_time desc

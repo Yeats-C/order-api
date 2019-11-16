@@ -15,13 +15,15 @@
                a1.store_name     as storeName,
                a1.total_price    as totalPrice,
                a1.actual_price   as actualPrice,
+               a1.order_level    as orderLevel,
+               a1.primary_code   as primaryCode,
                a1.create_time    as createTime,
                a1.create_by_id   as createById,
                a1.create_by_name as createByName,
                a1.update_time    as updateTime,
                a1.update_by_id   as updateById,
                a1.update_by_name as updateByName
-        from order_store_order_info a1
+        from order_store_info a1
         where 1 = 1
     </select>
 
@@ -38,13 +40,15 @@
                store_name     as storeName,
                total_price    as totalPrice,
                actual_price   as actualPrice,
+               order_level    as orderLevel,
+               primary_code   as primaryCode,
                create_time    as createTime,
                create_by_id   as createById,
                create_by_name as createByName,
                update_time    as updateTime,
                update_by_id   as updateById,
                update_by_name as updateByName
-        from order_store_order_info
+        from order_store_info
         where 1 = 1
         <if test="id != null and id != ''">
             and id = #{id}

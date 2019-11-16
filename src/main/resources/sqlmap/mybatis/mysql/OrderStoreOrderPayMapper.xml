@@ -19,7 +19,7 @@
                update_time           as updateTime,
                update_by_id          as updateById,
                update_by_name        as updateByName
-        from order_store_order_pay
+        from order_store_pay
         where 1 = 1
           and order_id = #{orderId}
     </select>

@@ -13,7 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +30,7 @@ public class ErpOrderController {
     @Resource
     private ErpOrderService erpOrderService;
 
-    @GetMapping("/findOrderList")
+    @PostMapping("/findOrderList")
     @ApiOperation(value = "查询销售单订单列表")
     public HttpResponse findOrderList(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
         HttpResponse response = HttpResponse.success();
@@ -44,7 +44,7 @@ public class ErpOrderController {
         return response;
     }
 
-    @GetMapping("/getOrderDetail")
+    @PostMapping("/getOrderDetail")
     @ApiOperation(value = "查询erp订单详情")
     public HttpResponse getOrderDetail(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
         HttpResponse response = HttpResponse.success();
@@ -60,7 +60,7 @@ public class ErpOrderController {
         return response;
     }
 
-    @GetMapping("/saveOrder")
+    @PostMapping("/saveOrder")
     @ApiOperation(value = "保存erp订单")
     public HttpResponse saveOrder(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
         HttpResponse response = HttpResponse.success();
@@ -75,7 +75,7 @@ public class ErpOrderController {
         return response;
     }
 
-    @GetMapping("/changeOrderStatus")
+    @PostMapping("/changeOrderStatus")
     @ApiOperation(value = "修改订单状态")
     public HttpResponse changeOrderStatus(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
         HttpResponse response = HttpResponse.success();

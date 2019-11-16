@@ -11,7 +11,7 @@
                create_time       as createTime,
                create_by_id      as createById,
                create_by_name    as createByName
-        from order_store_order_operation_log
+        from order_store_operation_log
         where 1 = 1
           and order_id = #{orderId}
         order by create_time desc

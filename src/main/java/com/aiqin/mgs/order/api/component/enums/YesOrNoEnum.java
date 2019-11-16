@@ -3,32 +3,35 @@ package com.aiqin.mgs.order.api.component.enums;
 import lombok.Getter;
 
 /**
- * 支付状态枚举类
+ * 逻辑状态枚举类
  *
  * @author: Tao.Chen
  * @version: v1.0.0
- * @date 2019/11/12 16:58
+ * @date 2019/11/14 17:39
  */
 @Getter
-public enum PayStatusEnum {
+public enum YesOrNoEnum {
 
-    /***未支付*/
-    PAY_STATUS_NO(0, "0", "未支付"),
-    /***已支付*/
-    PAY_STATUS_YES(1, "1", "已支付");
+    /***逻辑-是*/
+    YES(1, "1", "是"),
+    /***逻辑-否*/
+    NO(0, "0", "否");
 
+    /***数字类型状态*/
     private Integer code;
+    /***字符串类型状态*/
     private String value;
+    /***状态描述*/
     private String desc;
 
-    PayStatusEnum(Integer code, String value, String desc) {
+    YesOrNoEnum(Integer code, String value, String desc) {
         this.code = code;
         this.value = value;
         this.desc = desc;
     }
 
-    public static PayStatusEnum getEnum(Integer code) {
-        for (PayStatusEnum type : PayStatusEnum.values()) {
+    public static YesOrNoEnum getEnum(Integer code) {
+        for (YesOrNoEnum type : YesOrNoEnum.values()) {
             if (type.getCode().equals(code)) {
                 return type;
             }
@@ -36,8 +39,8 @@ public enum PayStatusEnum {
         return null;
     }
 
-    public static PayStatusEnum getEnum(String value) {
-        for (PayStatusEnum type : PayStatusEnum.values()) {
+    public static YesOrNoEnum getEnum(String value) {
+        for (YesOrNoEnum type : YesOrNoEnum.values()) {
             if (type.getValue().equals(value)) {
                 return type;
             }
@@ -47,7 +50,7 @@ public enum PayStatusEnum {
 
 
     public static String getEnumDesc(Integer code) {
-        for (PayStatusEnum type : PayStatusEnum.values()) {
+        for (YesOrNoEnum type : YesOrNoEnum.values()) {
             if (type.getCode().equals(code)) {
                 return type.getDesc();
             }
@@ -56,7 +59,7 @@ public enum PayStatusEnum {
     }
 
     public static String getEnumDesc(String value) {
-        for (PayStatusEnum type : PayStatusEnum.values()) {
+        for (YesOrNoEnum type : YesOrNoEnum.values()) {
             if (type.getValue().equals(value)) {
                 return type.getDesc();
             }
