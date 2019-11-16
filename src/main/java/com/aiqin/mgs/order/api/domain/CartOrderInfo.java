@@ -48,16 +48,16 @@ public class CartOrderInfo extends PagesRequest {
     private String activityName="";
 
     @ApiModelProperty(value = "购物车id")
-    @JsonProperty("cart_order_id")
-    private String cartOrderId;
+    @JsonProperty("cart_id")
+    private String cartId;
 
     @ApiModelProperty(value = "加盟商id")
     @JsonProperty("franchisee_id")
     private String franchiseeId;
 
     @ApiModelProperty(value = "门店id")
-    @JsonProperty("distributor_id")
-    private String distributorId;
+    @JsonProperty("store_id")
+    private String storeId;
 
     @ApiModelProperty(value = "sku码")
     @JsonProperty("sku_id")
@@ -67,33 +67,29 @@ public class CartOrderInfo extends PagesRequest {
     @JsonProperty("spu_id")
     private String spuId;
 
-    @ApiModelProperty(value = "配送方式 1:配送 2:直送")
-    @JsonProperty("distribution_type")
-    private Integer distributionType;
+    @ApiModelProperty(value = "配送方式 1:配送 2:直送 3:货架 ")
+    @JsonProperty("product_type")
+    private Integer productType;
 
 
-
-
-    public Integer getDistributionType() {
-        return distributionType;
+    public Integer getProductType() {
+        return productType;
     }
 
-
-    public void setDistributionType(Integer distributionType) {
-        this.distributionType = distributionType;
+    public void setProductType(Integer productType) {
+        this.productType = productType;
     }
-
 
     public void setAmount(int amount) {
         this.amount = amount;
     }
 
-    public String getCartOrderId() {
-        return cartOrderId;
+    public String getCartId() {
+        return cartId;
     }
 
-    public void setCartOrderId(String cartOrderId) {
-        this.cartOrderId = cartOrderId;
+    public void setCartId(String cartId) {
+        this.cartId = cartId;
     }
 
     public String getFranchiseeId() {
@@ -104,12 +100,12 @@ public class CartOrderInfo extends PagesRequest {
         this.franchiseeId = franchiseeId;
     }
 
-    public String getDistributorId() {
-        return distributorId;
+    public String getStoreId() {
+        return storeId;
     }
 
-    public void setDistributorId(String distributorId) {
-        this.distributorId = distributorId;
+    public void setStoreId(String storeId) {
+        this.storeId = storeId;
     }
 
     public String getSkuId() {

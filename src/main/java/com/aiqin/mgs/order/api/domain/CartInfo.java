@@ -84,11 +84,11 @@ public class CartInfo extends PagesRequest {
     @JsonProperty("update_by")
     private String updateBy="";
     
-    @ApiModelProperty(value = "折扣类型  1:限时折扣 2:优惠券")
-    @JsonProperty("agio_type")
-    private Integer agioType;
-    
-    @ApiModelProperty(value = "原价")
+   	@ApiModelProperty(value = "折扣类型  1:限时折扣 2:优惠券")
+	@JsonProperty("agio_type")
+	private Integer agioType;
+
+	@ApiModelProperty(value = "原价")
     @JsonProperty("price")
     private Integer price;
     

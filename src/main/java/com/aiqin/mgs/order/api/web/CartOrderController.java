@@ -11,10 +11,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -37,14 +35,27 @@ public class CartOrderController {
         cartOrderInfo.setPrice(shoppingCartRequest.getPrice());
         cartOrderInfo.setLogo(shoppingCartRequest.getLogo());
         cartOrderInfo.setProductId(shoppingCartRequest.getProductId());
-        cartOrderInfo.setDistributionType(shoppingCartRequest.getDistributionType());
+        cartOrderInfo.setProductType(shoppingCartRequest.getProductType());
         cartOrderInfo.setSkuId(shoppingCartRequest.getSkuId());
         cartOrderInfo.setSpuId(shoppingCartRequest.getSpuId());
         cartOrderInfo.setProductName(shoppingCartRequest.getProductName());
         cartOrderInfo.setProductSize(shoppingCartRequest.getProductSize());
-        cartOrderInfo.setDistributorId(shoppingCartRequest.getDistributorId());
+        cartOrderInfo.setStoreId(shoppingCartRequest.getStoreId());
         LOGGER.info("将商品添加到购物车参数：{}",cartOrderInfo);
         return cartOrderService.addCartInfo(cartOrderInfo);
+    }
+
+    /**
+     * 购物车展示列表
+     * @param
+     * @return
+     */
+    @GetMapping("/cartDisplay")
+    @ApiOperation(value = "购物车展示列表")
+    public HttpResponse selectCartByMemberId(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,Integer distributionType
+    ) {
+        LOGGER.info("购物车展示列表参数：{},{}",distributorId);
+        return cartOrderService.selectCartByDistributorId(distributorId,distributionType);
     }
 
 }

@@ -420,9 +420,9 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderInfo addOrderInfo(@Valid OrderInfo orderInfo) throws Exception {
 
-        String orderId = "";
-        String orderCode = "";
-        String receiveCode = "";
+        String orderId = ""; //订单Id
+        String orderCode = ""; //订单编号
+        String receiveCode = ""; //订单提取码
 
         //生成订单ID
         orderId = OrderPublic.getUUID();
@@ -1421,7 +1421,9 @@ public class OrderServiceImpl implements OrderService {
     public HttpResponse addOrdta(@Valid OrderAndSoOnRequest orderAndSoOnRequest) {
 
         try {
+            //获取订单信息
             OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
+            //获取订单详情列表
             List<OrderDetailInfo> detailList = orderAndSoOnRequest.getDetailList();
 
             //新增订单主数据

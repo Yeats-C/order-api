@@ -3,9 +3,9 @@
 <mapper namespace="com.aiqin.mgs.order.api.dao.CartOrderDao">
     <resultMap id="CartOrderInfoMapping" type="com.aiqin.mgs.order.api.domain.CartOrderInfo">
         <result column="product_id" jdbcType="VARCHAR" property="productId"/>
-        <result column="cart_order_id" jdbcType="VARCHAR" property="cartOrderId"/>
+        <result column="cart_id" jdbcType="VARCHAR" property="cartId"/>
         <result column="franchisee_id" jdbcType="VARCHAR" property="franchiseeId"/>
-        <result column="distributor_id" jdbcType="VARCHAR" property="distributorId"/>
+        <result column="store_id" jdbcType="VARCHAR" property="storeId"/>
         <result column="sku_id" jdbcType="VARCHAR" property="skuId"/>
         <result column="spu_id" jdbcType="VARCHAR" property="spuId"/>
         <result column="product_name" jdbcType="VARCHAR" property="productName"/>
@@ -16,7 +16,7 @@
         <result column="product_size" jdbcType="VARCHAR" property="productSize"/>
         <result column="activity_id" jdbcType="VARCHAR" property="activityId"/>
         <result column="activity_name" jdbcType="VARCHAR" property="activityName"/>
-        <result column="distribution_type" jdbcType="INTEGER" property="distributionType"/>
+        <result column="product_type" jdbcType="INTEGER" property="productType"/>
     </resultMap>
 
     <sql id="Base">
@@ -27,28 +27,41 @@
     <!-- 将商品添加添加购物车 -->
     <insert id="insertCart" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo">
         insert into order_store_cart
-			(product_id,cart_order_id,product_name,amount,logo,create_time,update_time,price,color,product_size,activity_id,activity_name,distribution_type,sku_id,spu_id,distributor_id)
+			(product_id,cart_id,product_name,amount,logo,create_time,update_time,price,color,product_size,activity_id,activity_name,product_type,sku_id,spu_id,store_id)
 		values
-		    (#{productId},#{cartOrderId},#{productName},#{amount},#{logo},CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,#{price},#{color},#{productSize},#{activityId},#{activityName},#{distributionType},#{skuId},#{spuId},#{distributorId})
+		    (#{productId},#{cartId},#{productName},#{amount},#{logo},now(),now(),#{price},#{color},#{productSize},#{activityId},#{activityName},#{productType},#{skuId},#{spuId},#{storeId})
     </insert>
 
     <!-- 判断SKU商品是否已存在购物车中 -->
-    <select id="isYesCart"  resultType="java.lang.String" parameterType="com.aiqin.mgs.order.api.domain.CartInfo">
+    <select id="isYesCart"  resultType="java.lang.String" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo">
          select SUM(amount) as amount from order_store_cart where 1=1
-         and distributor_id =#{distributorId}
+         and store_id =#{storeId}
          and product_id = #{productId}
          and sku_id = #{skuId}
-         GROUP BY distributor_id,product_id,sku_id
+         GROUP BY store_id,product_id,sku_id
     </select>
 
     <!-- 更新购物车 -->
-    <update id="updateCartById" parameterType="com.aiqin.mgs.order.api.domain.CartInfo">
+    <update id="updateCartById" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo">
         update order_store_cart set amount=#{amount} where 1=1
-        and distributor_id = #{distributorId}
+        and store_id = #{storeId}
         and product_id = #{productId}
         and sku_id = #{skuId}
     </update>
 
 
+    <!-- 查询门店Id的购物车 -->
+    <select id="selectCartByDistributorId" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo" resultMap="CartOrderInfoMapping" resultType="java.util.List">
+        SELECT * FROM
+        order_store_cart
+        <where>
+            <if test=" distributorId != '' ">
+                and store_id = #{storeId}
+            </if>
+            <if test=" distribution_type != '' ">
+                and distribution_type = #{distributionType}
+            </if>
+        </where>
+    </select>
 
 </mapper>

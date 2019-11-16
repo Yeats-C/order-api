@@ -36,8 +36,8 @@ public class ShoppingCartRequest {
     private String productSize="";
 
     @ApiModelProperty(value = "门店id")
-    @JsonProperty("distributor_id")
-    private String distributorId;
+    @JsonProperty("store_id")
+    private String storeId;
 
     @ApiModelProperty(value = "sku码")
     @JsonProperty("sku_id")
@@ -48,8 +48,8 @@ public class ShoppingCartRequest {
     private String spuId;
 
     @ApiModelProperty(value = "配送方式 1:配送 2:直送")
-    @JsonProperty("distribution_type")
-    private Integer distributionType;
+    @JsonProperty("product_type")
+    private Integer productType;
 
     public ShoppingCartRequest() {
         productId = "";
@@ -111,12 +111,12 @@ public class ShoppingCartRequest {
         this.productSize = productSize;
     }
 
-    public String getDistributorId() {
-        return distributorId;
+    public String getStoreId() {
+        return storeId;
     }
 
-    public void setDistributorId(String distributorId) {
-        this.distributorId = distributorId;
+    public void setStoreId(String storeId) {
+        this.storeId = storeId;
     }
 
     public String getSkuId() {
@@ -135,11 +135,11 @@ public class ShoppingCartRequest {
         this.spuId = spuId;
     }
 
-    public Integer getDistributionType() {
-        return distributionType;
+    public Integer getProductType() {
+        return productType;
     }
 
-    public void setDistributionType(Integer distributionType) {
-        this.distributionType = distributionType;
+    public void setProductType(Integer productType) {
+        this.productType = productType;
     }
 }

@@ -12,8 +12,8 @@ public interface CartOrderDao {
     //添加商品到购物车
     void insertCart(@Valid CartOrderInfo cartOrderInfo) throws Exception;
 
-//    //根据门店id查询购物车
-//    List<CartInfo> selectCartByMemberId(@Valid CartOrderInfo cartOrderInfo) throws Exception;
+    //根据门店id查询购物车
+    List<CartOrderInfo> selectCartByDistributorId(@Valid CartOrderInfo cartOrderInfo) throws Exception;
 //
 //    //清空购物车
 //    void deleteCartInfo(@Param("memberId")String memberId) throws Exception;

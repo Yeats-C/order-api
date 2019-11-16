@@ -70,8 +70,10 @@ public class OrderController {
         
     	//添加TOC订单标识
         if(orderAndSoOnRequest !=null) {
+            //返回订单信息
         	OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
           if(orderInfo !=null) {
+              //TOC订单信息
         	  orderInfo.setOrderType(Global.ORDER_TYPE_1);
         	  orderAndSoOnRequest.setOrderInfo(orderInfo);
         	  return orderService.addOrdta(orderAndSoOnRequest);

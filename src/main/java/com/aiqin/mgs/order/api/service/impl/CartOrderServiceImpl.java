@@ -43,14 +43,13 @@ public class CartOrderServiceImpl implements CartOrderService {
                 } else {
                     //生成购物车id
                     String cartId = IdUtil.uuid();
-                    cartOrderInfo.setCartOrderId(cartId);
-
+                    cartOrderInfo.setCartId(cartId);
                     //添加购物车
                     LOGGER.info("添加购物车:{}", cartOrderInfo);
                     cartOrderDao.insertCart(cartOrderInfo);
                 }
                 return HttpResponse.success();
-            }else {
+            } else {
                 LOGGER.warn("购物车信息为空!");
                 return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
             }
@@ -60,11 +59,25 @@ public class CartOrderServiceImpl implements CartOrderService {
         }
     }
 
-
+    //根据门店ID显示购物侧列表
     @Override
-    public HttpResponse selectCartByMemberId(String distributorId, Integer pageNo, Integer pageSize) {
-        return null;
+    public HttpResponse selectCartByDistributorId(String storeId, Integer productType) {
+        try {
+            CartOrderInfo cartOrderInfo = new CartOrderInfo();
+            cartOrderInfo.setStoreId(storeId);
+            cartOrderInfo.setProductType(productType);
+
+            //购物车数据
+            List<CartOrderInfo> cartInfoList = cartOrderDao.selectCartByDistributorId(cartOrderInfo);
+
+            return HttpResponse.success();
+
+        } catch (Exception e) {
+            LOGGER.error("根据门店ID查询购物车数据异常：{}", e);
+            return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
     }
+
 
     @Override
     public HttpResponse deleteCartInfo(String distributorId) {

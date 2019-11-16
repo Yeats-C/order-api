@@ -12,8 +12,8 @@ public interface CartOrderService {
     //添加商品到购物车
     HttpResponse addCartInfo(CartOrderInfo cartOrderInfo);
 
-    //根据加盟商ID查询购物车
-    HttpResponse selectCartByMemberId(String distributorId,Integer pageNo,Integer pageSize);
+    //根据门店id查询购物车
+    HttpResponse selectCartByDistributorId(String distributorId,Integer distributionType);
 
     //全部清空购物车
     HttpResponse deleteCartInfo(String distributorId);
