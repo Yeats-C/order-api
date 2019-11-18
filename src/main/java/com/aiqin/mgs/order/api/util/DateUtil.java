@@ -1,17 +1,18 @@
 /*****************************************************************
-
  * 模块名称：时间类
  * 开发人员: 黄祉壹
  * 开发时间: 2018-11-15
-
  * ****************************************************************************/
 package com.aiqin.mgs.order.api.util;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 import org.joda.time.DateTime;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 public class DateUtil {
 
@@ -26,16 +27,16 @@ public class DateUtil {
         String sysDate = sdf2.format(date);
         return sysDate;
     }
-    
-	/**
-	 * 获取当前系统日期 yyyy-MM-dd
-	 */
-	public static String sysDateYYYYMMDD() {
-    	SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
-		Date date = new Date();
-		String sysDate = sdf2.format(date);
-		return sysDate;
-	}
+
+    /**
+     * 获取当前系统日期 yyyy-MM-dd
+     */
+    public static String sysDateYYYYMMDD() {
+        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = new Date();
+        String sysDate = sdf2.format(date);
+        return sysDate;
+    }
 
 
     /**
@@ -87,6 +88,35 @@ public class DateUtil {
         return date;
     }
 
+    /**
+     * 获取现在时间
+     *
+     * @return 返回时间类型 yyyy-MM-dd HH:mm:ss
+     */
+    public static Date getNowDate(){
+        Date currentTime = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateString = formatter.format(currentTime);
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+        try {
+            Date date = format.parse(dateString);
+            return date;
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static Date StrToDate(String str) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = null;
+        try {
+            date = format.parse(str);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
 
     /**
      * 获取当前系统日期
@@ -187,11 +217,11 @@ public class DateUtil {
         String strDate = sdf4.format(date);
         return strDate;
     }
-    
+
     /**
      * 根据日期获取多少月后的日期  YYYY-MM-dd
      */
-    public static String dateAfterMonth(String inputDate,int i) {
+    public static String dateAfterMonth(String inputDate, int i) {
         SimpleDateFormat sdf4 = new SimpleDateFormat("yyyy-MM-dd");
         Date date = formatDate(inputDate);
         Calendar cal = Calendar.getInstance();
@@ -371,11 +401,11 @@ public class DateUtil {
         cal.add(Calendar.DAY_OF_MONTH, -day);
         return new DateTime(cal.getTime()).millisOfDay().withMinimumValue().toDate();
     }
-    
+
     /**
      * 日期+天
      *
-     * @param date
+     * @param
      * @param day
      * @return
      */
@@ -396,30 +426,32 @@ public class DateUtil {
      */
     public static Long getExpireEndRandomSeconds(Long randomSeconds) {
         Long diffSeconds = (getDayEnd(getCurrentDate()).getTime() - System.currentTimeMillis()) / 1000;
-        return diffSeconds - (long)(Math.random()*randomSeconds);
+        return diffSeconds - (long) (Math.random() * randomSeconds);
     }
-    
+
     /**
      * 获取所在天的开始时间 参数:String<br>
      */
     public static String getTimeBegin(String date) {
-    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		date = sdf.format(new DateTime(date).millisOfDay().withMinimumValue().toDate());
-    	
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        date = sdf.format(new DateTime(date).millisOfDay().withMinimumValue().toDate());
+
         return date;
     }
-    
+
     /**
      * 获取所在天的结束时间  参数:String<br>
      */
     public static String getTimeEnd(String date) {
-    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    	date = sdf.format(new DateTime(date).millisOfDay().withMaximumValue().toDate());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        date = sdf.format(new DateTime(date).millisOfDay().withMaximumValue().toDate());
         return date;
     }
 
     public static void main(String[] args) {
-		System.out.println(getBeforeDate(dateAfterMonth("2019-03-02",3),-1));
+
+        System.out.println(getBeforeDate(dateAfterMonth("2019-03-02",3),-1));
+        System.out.println(DateUtil.getNowDate());
     }
 
 }

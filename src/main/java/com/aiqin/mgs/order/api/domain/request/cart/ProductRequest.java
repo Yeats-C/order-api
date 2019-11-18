@@ -5,18 +5,11 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class ShoppingCartRequest {
+public class ProductRequest {
 
-    /***商品id*/
     private String productId;
 
-    /***商品数量*/
-    private Integer amount;
-
-    /***门店id*/
     private String storeId;
 
-    /***sku码集合*/
     private List<String> skuIds;
-
 }

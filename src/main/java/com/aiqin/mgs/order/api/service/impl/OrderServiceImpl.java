@@ -18,6 +18,7 @@ import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.mgs.order.api.component.*;
+import com.aiqin.mgs.order.api.component.enums.PayTypeEnum;
 import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.ground.util.protocol.http.HttpResponse;

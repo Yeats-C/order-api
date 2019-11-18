@@ -65,14 +65,14 @@
      </delete>
      
     
+
     <!-- 清空购物车购物清单 -->
-	<delete id="deleteCartInfo" >
-		
+    <delete id="deleteCartInfo" >
+
 		delete from cart where 1=1
           and member_id = #{memberId}
-        
+
      </delete>
-    
     <!-- 判断SKU商品是否已存在购物车中 -->
     <select id="isYesCart"  resultType="java.lang.String" parameterType="com.aiqin.mgs.order.api.domain.CartInfo">
          select SUM(amount) as amount from cart where 1=1

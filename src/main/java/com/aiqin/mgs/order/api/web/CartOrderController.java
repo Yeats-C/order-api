@@ -2,16 +2,13 @@ package com.aiqin.mgs.order.api.web;
 
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.domain.CartInfo;
-import com.aiqin.mgs.order.api.domain.CartOrderInfo;
+import com.aiqin.mgs.order.api.domain.request.cart.DeleteCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.CartOrderService;
-import com.aiqin.mgs.order.api.service.CartService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -26,24 +23,32 @@ public class CartOrderController {
     @Resource
     private CartOrderService cartOrderService;
 
+
+
+    /**
+     * 添加商品到购物车
+     *
+     * @param shoppingCartRequest
+     * @return
+     */
     @PostMapping("/add")
     @ApiOperation(value = "将商品添加到购物车")
-    public HttpResponse addNewCart(@Valid @RequestBody ShoppingCartRequest shoppingCartRequest) {
-        CartOrderInfo cartOrderInfo = new CartOrderInfo();
-        cartOrderInfo.setAmount(shoppingCartRequest.getAmount());
-        cartOrderInfo.setColor(shoppingCartRequest.getColor());
-        cartOrderInfo.setPrice(shoppingCartRequest.getPrice());
-        cartOrderInfo.setLogo(shoppingCartRequest.getLogo());
-        cartOrderInfo.setProductId(shoppingCartRequest.getProductId());
-        cartOrderInfo.setProductType(shoppingCartRequest.getProductType());
-        cartOrderInfo.setSkuId(shoppingCartRequest.getSkuId());
-        cartOrderInfo.setSpuId(shoppingCartRequest.getSpuId());
-        cartOrderInfo.setProductName(shoppingCartRequest.getProductName());
-        cartOrderInfo.setProductSize(shoppingCartRequest.getProductSize());
-        cartOrderInfo.setStoreId(shoppingCartRequest.getStoreId());
-        LOGGER.info("将商品添加到购物车参数：{}",cartOrderInfo);
-        return cartOrderService.addCartInfo(cartOrderInfo);
+    public HttpResponse addCart(@Valid @RequestBody ShoppingCartRequest shoppingCartRequest) {
+        //将商品添加到购物车
+        return cartOrderService.addCart(shoppingCartRequest);
     }
+
+    /**
+     * 返回购物车中的商品的总数量
+     * @param shoppingCartRequest
+     * @return
+     */
+    @PostMapping("/getTotal")
+    @ApiOperation(value = "返回购物车中的商品总数量")
+    public HttpResponse getTotal(@Valid @RequestBody ShoppingCartRequest shoppingCartRequest) {
+        return cartOrderService.getTotal(shoppingCartRequest.getStoreId());
+    }
+
 
     /**
      * 购物车展示列表
@@ -52,10 +57,21 @@ public class CartOrderController {
      */
     @GetMapping("/cartDisplay")
     @ApiOperation(value = "购物车展示列表")
-    public HttpResponse selectCartByMemberId(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,Integer distributionType
-    ) {
-        LOGGER.info("购物车展示列表参数：{},{}",distributorId);
-        return cartOrderService.selectCartByDistributorId(distributorId,distributionType);
+    public HttpResponse selectCartByStoreId(@Valid @RequestParam(name = "storeId", required = true) String storeId, Integer productType) {
+        LOGGER.info("购物车展示列表参数：{},{}", storeId,productType);
+        return cartOrderService.selectCartByStoreId(storeId,productType);
     }
+
+    /**
+     * 清空购物车、删除单个商品、删除勾选商品
+     * @param deleteCartProductRequest
+     * @return
+     */
+    @PostMapping("/deleteCart")
+    @ApiOperation(value = "清空购物车、删除单个商品、删除勾选商品")
+    public HttpResponse deleteCart(@Valid @RequestBody DeleteCartProductRequest deleteCartProductRequest){
+        return cartOrderService.deleteCartInfo(deleteCartProductRequest.getStoreId(),deleteCartProductRequest.getSkuId(),deleteCartProductRequest.getLineCheckStatus());
+    }
+
 
 }
