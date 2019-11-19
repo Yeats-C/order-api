@@ -114,4 +114,8 @@ public class PayReq implements Serializable {
      * 环境  test  测试  release  正式
      */
     private String environment;
+
+    @ApiModelProperty("订单类型 2 toc ")
+    @JsonProperty("pay_order_type")
+    private Integer payOrderType=2;
 }

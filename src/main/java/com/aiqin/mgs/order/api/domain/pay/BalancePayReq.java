@@ -58,7 +58,7 @@ public class BalancePayReq implements Serializable{
     @JsonProperty("create_by")
     private  String createBy;
 
-    @ApiModelProperty(value = "支付回调地址",hidden = true)
+    @ApiModelProperty(value = "支付地址",hidden = true)
     @JsonProperty("back_url")
     private  String backUrl;
 
