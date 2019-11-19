@@ -211,7 +211,7 @@
     <select id="selectOrder" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="OrderInfoMapping"
             resultType="java.util.List">
         SELECT a.* FROM order_info a
-        WHERE 1=1 and (order_type = 1 or order_type = 4)
+        WHERE 1=1 and order_type = 1
         <if test="distributorId!=null and distributorId!='' ">
             and a.distributor_id = #{distributorId}
         </if>

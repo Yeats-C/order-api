@@ -14,7 +14,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
+@Data
 @ApiModel("结算")
 public class SettlementInfo extends PagesRequest {
     
@@ -28,9 +30,7 @@ public class SettlementInfo extends PagesRequest {
     @NotBlank
     private String orderId;
     
-//    @ApiModelProperty(value = "结算id")
-//    @JsonProperty("settlementId")
-//    private String settlement_id;
+
     
     @ApiModelProperty(value = "商品合计")
     @JsonProperty("product_sum")
@@ -109,177 +109,7 @@ public class SettlementInfo extends PagesRequest {
     @JsonProperty("update_by")
     private String updateBy;
     
-    public String getSettlementId() {
-		return settlementId;
-	}
 
-	public void setSettlementId(String settlementId) {
-		this.settlementId = settlementId;
-	}
-    
-//    @ApiModelProperty(value = "支付方式")
-//    @JsonProperty("pay_type")
-//    private Integer payType;
-//    
-//    @ApiModelProperty(value = "输入现金金额")
-//    @JsonProperty("input_amt")
-//    private Integer inputAmt;
-//    
-//    @ApiModelProperty(value = "输入积分")
-//    @JsonProperty("input_points")
-//    private Integer inputPoints;
-//    
-//    
-//    @ApiModelProperty(value = "是否舍零")
-//    @JsonProperty("is_abandon")
-//    private Integer isAbandon;
-    
-    
-
-
-//	public String getSettlement_id() {
-//		return settlement_id;
-//	}
-//
-//	public void setSettlement_id(String settlement_id) {
-//		this.settlement_id = settlement_id;
-//	}
-
-	public String getUpdateTime() {
-		return updateTime;
-	}
-
-	public void setUpdateTime(String updateTime) {
-		this.updateTime = updateTime;
-	}
-
-	public String getUpdateBy() {
-		return updateBy;
-	}
-
-	public void setUpdateBy(String updateBy) {
-		this.updateBy = updateBy;
-	}
-
-	public String getOrderId() {
-		return orderId;
-	}
-
-	public Integer getOrderAbandon() {
-		return orderAbandon;
-	}
-
-	public void setOrderAbandon(Integer orderAbandon) {
-		this.orderAbandon = orderAbandon;
-	}
-
-	public void setOrderId(String orderId) {
-		this.orderId = orderId;
-	}
-
-	public Integer getProductSum() {
-		return productSum;
-	}
-
-	public void setProductSum(Integer productSum) {
-		this.productSum = productSum;
-	}
-
-	public Integer getFreight() {
-		return freight;
-	}
-
-	public void setFreight(Integer freight) {
-		this.freight = freight;
-	}
-
-	public Integer getTotalCouponsDiscount() {
-		return totalCouponsDiscount;
-	}
-
-	public void setTotalCouponsDiscount(Integer totalCouponsDiscount) {
-		this.totalCouponsDiscount = totalCouponsDiscount;
-	}
-
-	public Integer getPointPercentage() {
-		return pointPercentage;
-	}
-
-	public void setPointPercentage(Integer pointPercentage) {
-		this.pointPercentage = pointPercentage;
-	}
-
-	public Integer getActivityDiscount() {
-		return activityDiscount;
-	}
-
-	public void setActivityDiscount(Integer activityDiscount) {
-		this.activityDiscount = activityDiscount;
-	}
-
-	public Integer getOrderSum() {
-		return orderSum;
-	}
-
-	public void setOrderSum(Integer orderSum) {
-		this.orderSum = orderSum;
-	}
-
-	public Integer getOrderReceivable() {
-		return orderReceivable;
-	}
-
-	public void setOrderReceivable(Integer orderReceivable) {
-		this.orderReceivable = orderReceivable;
-	}
-
-	public Integer getOrderActual() {
-		return orderActual;
-	}
-
-	public void setOrderActual(Integer orderActual) {
-		this.orderActual = orderActual;
-	}
-
-	public Integer getOrderChange() {
-		return orderChange;
-	}
-
-	public void setOrderChange(Integer orderChange) {
-		this.orderChange = orderChange;
-	}
-
-	public Integer getPoints() {
-		return points;
-	}
-
-	public void setPoints(Integer points) {
-		this.points = points;
-	}
-
-	public Integer getPointDiscount() {
-		return pointDiscount;
-	}
-
-	public void setPointDiscount(Integer pointDiscount) {
-		this.pointDiscount = pointDiscount;
-	}
-
-	public String getCreateTime() {
-		return createTime;
-	}
-
-	public void setCreateTime(String createTime) {
-		this.createTime = createTime;
-	}
-
-	public String getCreateBy() {
-		return createBy;
-	}
-
-	public void setCreateBy(String createBy) {
-		this.createBy = createBy;
-	}    
 }
 
 
