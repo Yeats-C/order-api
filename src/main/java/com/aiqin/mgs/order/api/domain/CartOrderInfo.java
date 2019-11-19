@@ -1,9 +1,6 @@
 package com.aiqin.mgs.order.api.domain;
 
-import com.aiqin.mgs.order.api.base.PagesRequest;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -12,7 +9,7 @@ import java.util.List;
 
 @ApiModel("购物车商品项")
 @Data
-public class CartOrderInfo extends PagesRequest {
+public class CartOrderInfo {
 
     /**商品ID*/
     private String productId="";
@@ -94,6 +91,5 @@ public class CartOrderInfo extends PagesRequest {
 
     /***行是否选中 1:true 0:false*/
     private Integer lineCheckStatus;
-
 
 }

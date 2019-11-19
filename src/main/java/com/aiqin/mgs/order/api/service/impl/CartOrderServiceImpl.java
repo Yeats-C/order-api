@@ -11,9 +11,11 @@ import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.CartResponse;
 import com.aiqin.mgs.order.api.service.CartOrderService;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
+import com.sun.org.apache.regexp.internal.RE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -39,6 +41,7 @@ public class CartOrderServiceImpl implements CartOrderService {
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public HttpResponse addCart(ShoppingCartRequest shoppingCartRequest) {
         //入参校验
         checkParam(shoppingCartRequest);
@@ -131,7 +134,7 @@ public class CartOrderServiceImpl implements CartOrderService {
      * @return
      */
     @Override
-    public HttpResponse selectCartByStoreId(String storeId, Integer productType,String skuId,Integer lineCheckStatus) {
+    public HttpResponse selectCartByStoreId(String storeId, Integer productType, String skuId, Integer lineCheckStatus) {
         HttpResponse<Object> response = new HttpResponse<>();
         try {
             CartOrderInfo cartOrderInfo = new CartOrderInfo();
@@ -140,12 +143,13 @@ public class CartOrderServiceImpl implements CartOrderService {
             //默认标志为0
             lineCheckStatus = lineCheckStatus == null ? 0 : lineCheckStatus;
             //检查商品是否被勾选，勾选后，更新数据库标识
-            if(null != skuId && lineCheckStatus == Global.LINECHECKSTATUS_1){
+            LOGGER.info("商品勾选后，更新勾选状态：{}", lineCheckStatus);
+            if (null != skuId && lineCheckStatus == Global.LINECHECKSTATUS_1) {
                 cartOrderInfo.setSkuId(skuId);
                 cartOrderInfo.setLineCheckStatus(lineCheckStatus);
                 cartOrderDao.updateProductList(cartOrderInfo);
                 return HttpResponse.success();
-            }else {
+            } else {
                 //购物车数据
                 List<CartOrderInfo> cartInfoList = cartOrderDao.selectCartByStoreId(cartOrderInfo);
                 //计算商品总价格
@@ -163,6 +167,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                 cartResponse.setCartInfoList(cartInfoList);
                 cartResponse.setAcountActualprice(acountActualprice);
                 cartResponse.setTotalNumber(totalNumber);
+                LOGGER.info("返回购物车中的数据给前端：{}", cartResponse);
                 response.setData(cartResponse);
                 return response;
             }
@@ -185,6 +190,7 @@ public class CartOrderServiceImpl implements CartOrderService {
         try {
             if (storeId != null) {
                 Integer total = cartOrderDao.getTotal(storeId);
+                LOGGER.info("返回总数量给购物车：{}", total);
                 return response.setData(total);
             }
         } catch (Exception e) {
@@ -208,14 +214,17 @@ public class CartOrderServiceImpl implements CartOrderService {
         try {
             //清空购物车
             if (storeId != null) {
+                LOGGER.info("通过门店id清空购物车：{}", storeId);
                 cartOrderDao.deleteCart(storeId, null, null);
             }
             //删除单条商品
             if (skuId != null) {
+                LOGGER.info("通过skuId删除商品：{}", skuId);
                 cartOrderDao.deleteCart(null, skuId, null);
             }
             //删除选中的商品
             if (lineCheckStatus != null) {
+                LOGGER.info("清空全部勾选商品：{}", lineCheckStatus);
                 cartOrderDao.deleteCart(null, null, lineCheckStatus);
             }
             return HttpResponse.success();
@@ -224,5 +233,28 @@ public class CartOrderServiceImpl implements CartOrderService {
             LOGGER.error("清空购物车失败", e);
             return HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
         }
+    }
+
+    /**
+     * 显示购物车中的勾选商品
+     * @param cartOrderInfo
+     * @return
+     */
+    @Override
+    public HttpResponse<List<CartOrderInfo>> displayCartLineCheckProduct(CartOrderInfo cartOrderInfo) {
+        //TODO 调用门店接口，返回门店的基本信息
+
+        HttpResponse response = new HttpResponse();
+        try {
+            if (cartOrderInfo != null) {
+                List<CartOrderInfo> cartOrderInfos = cartOrderDao.selectCartByLineCheckStatus(cartOrderInfo);
+                //TODO  计算订货金额合计
+                response.setData(cartOrderInfos);
+            }
+        } catch (Exception e) {
+            LOGGER.error("显示勾选商品失败", e);
+            return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
     }
 }

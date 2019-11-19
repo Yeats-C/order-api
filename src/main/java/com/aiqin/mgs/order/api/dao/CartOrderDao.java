@@ -29,6 +29,7 @@ public interface CartOrderDao {
     // 删除购物车中商品
     void deleteCart(@Param("storeId") String storeId,@Param("skuId") String skuId,@Param("lineCheckStatus") Integer lineCheckStatus) throws Exception;
 
-
+    //显示购物车中勾选的商品
+    List<CartOrderInfo> selectCartByLineCheckStatus(@Valid CartOrderInfo cartOrderInfo) throws Exception;
 
 }

@@ -1,7 +1,10 @@
 package com.aiqin.mgs.order.api.service;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
+
+import java.util.List;
 
 
 public interface CartOrderService {
@@ -17,5 +20,8 @@ public interface CartOrderService {
 
     //清空购物车或者删除购物车中的单条商品
     HttpResponse deleteCartInfo(String storeId,String skuId,Integer lineCheckStatus);
+
+    //显示购物车中的勾选商品
+    HttpResponse<List<CartOrderInfo>> displayCartLineCheckProduct(CartOrderInfo cartOrderInfo);
 
 }

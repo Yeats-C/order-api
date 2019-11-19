@@ -208,4 +208,14 @@ public class OrderServiceTest {
         cartOrderInfo.setLineCheckStatus(1);
         cartOrderDao.updateProductList(cartOrderInfo);
     }
+
+    @Test
+    public void testSelectCartByLineCheckStatus() throws Exception {
+       CartOrderInfo cartOrderInfo = new CartOrderInfo();
+       cartOrderInfo.setLineCheckStatus(1);
+        List<CartOrderInfo> cartOrderInfos = cartOrderDao.selectCartByLineCheckStatus(cartOrderInfo);
+        for (CartOrderInfo cartOrderInfo1:cartOrderInfos){
+            System.out.println(cartOrderInfo1.toString());
+        }
+    }
 }

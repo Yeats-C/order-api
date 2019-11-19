@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.web;
 
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.cart.DeleteCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.CartOrderService;
@@ -13,10 +14,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/cartOrder")
-@Api("购物车相关操作接口")
+@Api(tags = "购物车相关接口")
 public class CartOrderController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CartController.class);
@@ -74,6 +76,17 @@ public class CartOrderController {
     @ApiOperation(value = "清空购物车、删除单个商品、删除勾选商品")
     public HttpResponse deleteCart(@Valid @RequestBody DeleteCartProductRequest deleteCartProductRequest){
         return cartOrderService.deleteCartInfo(deleteCartProductRequest.getStoreId(),deleteCartProductRequest.getSkuId(),deleteCartProductRequest.getLineCheckStatus());
+    }
+
+    /**
+     * 显示勾选商品列表
+     * @param cartOrderInfo
+     * @return
+     */
+    @PostMapping("/displayCartLineCheckProduct")
+    @ApiOperation(value = "显示勾选商品列表")
+    public HttpResponse<List<CartOrderInfo>> displayCartLineCheckProduct(CartOrderInfo cartOrderInfo){
+        return cartOrderService.displayCartLineCheckProduct(cartOrderInfo);
     }
 
 
