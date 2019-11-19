@@ -14,6 +14,8 @@ public interface CartOrderDao {
     //根据门店id查询购物车
     List<CartOrderInfo> selectCartByStoreId(@Valid CartOrderInfo cartOrderInfo) throws Exception;
 
+    // 更新勾选商品标识
+    void updateProductList(@Valid CartOrderInfo cartOrderInfo) throws Exception;
 
     //调用购物车修改逻辑
     void updateCartById(@Valid CartOrderInfo cartOrderInfo) throws Exception;

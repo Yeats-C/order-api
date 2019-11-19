@@ -57,9 +57,12 @@ public class CartOrderController {
      */
     @GetMapping("/cartDisplay")
     @ApiOperation(value = "购物车展示列表")
-    public HttpResponse selectCartByStoreId(@Valid @RequestParam(name = "storeId", required = true) String storeId, Integer productType) {
-        LOGGER.info("购物车展示列表参数：{},{}", storeId,productType);
-        return cartOrderService.selectCartByStoreId(storeId,productType);
+    public HttpResponse selectCartByStoreId(@Valid @RequestParam(name = "storeId", required = true) String storeId,
+                                            @Valid @RequestParam(name = "productType", required = true)Integer productType,
+                                            @Valid @RequestParam(name = "skuId", required = false)String skuId,
+                                            @Valid @RequestParam(name = "lineCheckStatus", required = false)Integer lineCheckStatus) {
+        LOGGER.info("购物车展示列表参数：{},{},{},{}", storeId,productType,skuId,lineCheckStatus);
+        return cartOrderService.selectCartByStoreId(storeId,productType,skuId,lineCheckStatus);
     }
 
     /**

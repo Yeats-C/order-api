@@ -233,7 +233,13 @@ public interface Global {
     Integer MEMBER_TYPE_1=1;
     Integer MEMBER_TYPE_2=2;
 
-    //配送方式：1:配送 2:直送
+    //配送方式：1:配送 2:直送 3:货架
     Integer DISTRIBUTION_TYPE_1 = 1;
     Integer DISTRIBUTION_TYPE_2 = 2;
+    Integer DISTRIBUTION_TYPE_3 = 3;
+
+    //1:勾选 0:未勾选
+    Integer LINECHECKSTATUS_0 = 0;
+    Integer LINECHECKSTATUS_1 = 1;
+
 }

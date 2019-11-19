@@ -6,7 +6,9 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.dao.CartOrderDao;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
+import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
+import com.aiqin.mgs.order.api.domain.response.cart.CartResponse;
 import com.aiqin.mgs.order.api.service.CartOrderService;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import org.slf4j.Logger;
@@ -14,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +34,7 @@ public class CartOrderServiceImpl implements CartOrderService {
 
     /**
      * 将商品加入购物车
+     *
      * @param shoppingCartRequest
      * @return
      */
@@ -76,9 +80,9 @@ public class CartOrderServiceImpl implements CartOrderService {
                     //更新购物车
                     cartOrderDao.updateCartById(cartOrderInfo);
                 } else {
-                    if (cartOrderInfo.getCartId() != null){
+                    if (cartOrderInfo.getCartId() != null) {
                         cartOrderDao.insertCart(cartOrderInfo);
-                    }else {
+                    } else {
                         //生成购物车id
                         String cartId = IdUtil.uuid();
                         cartOrderInfo.setCartId(cartId);
@@ -121,21 +125,47 @@ public class CartOrderServiceImpl implements CartOrderService {
 
     /**
      * 根据门店ID显示购物车中商品信息
+     *
      * @param storeId
      * @param productType
      * @return
      */
     @Override
-    public HttpResponse selectCartByStoreId(String storeId, Integer productType) {
+    public HttpResponse selectCartByStoreId(String storeId, Integer productType,String skuId,Integer lineCheckStatus) {
+        HttpResponse<Object> response = new HttpResponse<>();
         try {
             CartOrderInfo cartOrderInfo = new CartOrderInfo();
             cartOrderInfo.setStoreId(storeId);
             cartOrderInfo.setProductType(productType);
-
-            //购物车数据
-            List<CartOrderInfo> cartInfoList = cartOrderDao.selectCartByStoreId(cartOrderInfo);
-
-            return HttpResponse.success().setData(cartInfoList);
+            //默认标志为0
+            lineCheckStatus = lineCheckStatus == null ? 0 : lineCheckStatus;
+            //检查商品是否被勾选，勾选后，更新数据库标识
+            if(null != skuId && lineCheckStatus == Global.LINECHECKSTATUS_1){
+                cartOrderInfo.setSkuId(skuId);
+                cartOrderInfo.setLineCheckStatus(lineCheckStatus);
+                cartOrderDao.updateProductList(cartOrderInfo);
+                return HttpResponse.success();
+            }else {
+                //购物车数据
+                List<CartOrderInfo> cartInfoList = cartOrderDao.selectCartByStoreId(cartOrderInfo);
+                //计算商品总价格
+                BigDecimal acountActualprice = new BigDecimal(0);
+                for (CartOrderInfo cartOrderInfo1 : cartInfoList) {
+                    BigDecimal total = cartOrderInfo1.getPrice().multiply(new BigDecimal(cartOrderInfo1.getAmount()));
+                    acountActualprice = acountActualprice.add(total);
+                }
+                //计算商品总数量
+                int totalNumber = 0;
+                for (CartOrderInfo cartOrderInfo2 : cartInfoList) {
+                    totalNumber += cartOrderInfo2.getAmount();
+                }
+                CartResponse cartResponse = new CartResponse();
+                cartResponse.setCartInfoList(cartInfoList);
+                cartResponse.setAcountActualprice(acountActualprice);
+                cartResponse.setTotalNumber(totalNumber);
+                response.setData(cartResponse);
+                return response;
+            }
 
         } catch (Exception e) {
             LOGGER.error("根据门店ID查询购物车数据异常：{}", e);
@@ -145,6 +175,7 @@ public class CartOrderServiceImpl implements CartOrderService {
 
     /**
      * 根据门店id返回商品的总数量
+     *
      * @param storeId
      * @return
      */
@@ -166,29 +197,30 @@ public class CartOrderServiceImpl implements CartOrderService {
 
     /**
      * 删除单条商品，清空整个购物车，删除勾选商品
+     *
      * @param storeId
      * @param skuId
      * @param lineCheckStatus
      * @return
      */
     @Override
-    public HttpResponse deleteCartInfo(String storeId,String skuId,Integer lineCheckStatus) {
-        try{
+    public HttpResponse deleteCartInfo(String storeId, String skuId, Integer lineCheckStatus) {
+        try {
             //清空购物车
-            if (storeId !=null){
-                cartOrderDao.deleteCart(storeId,null,null);
+            if (storeId != null) {
+                cartOrderDao.deleteCart(storeId, null, null);
             }
             //删除单条商品
-            if (skuId != null){
-                cartOrderDao.deleteCart(null,skuId,null);
+            if (skuId != null) {
+                cartOrderDao.deleteCart(null, skuId, null);
             }
             //删除选中的商品
-            if (lineCheckStatus !=null){
-                cartOrderDao.deleteCart(null,null,lineCheckStatus);
+            if (lineCheckStatus != null) {
+                cartOrderDao.deleteCart(null, null, lineCheckStatus);
             }
             return HttpResponse.success();
 
-        }catch (Exception e){
+        } catch (Exception e) {
             LOGGER.error("清空购物车失败", e);
             return HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
         }

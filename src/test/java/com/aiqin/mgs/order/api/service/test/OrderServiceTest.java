@@ -200,4 +200,12 @@ public class OrderServiceTest {
     public void testDeleteCart() throws Exception {
         cartOrderDao.deleteCart(null,"12345678",null);
     }
+
+    @Test
+    public void testUpdateProductList() throws Exception {
+        CartOrderInfo cartOrderInfo = new CartOrderInfo();
+        cartOrderInfo.setSkuId("5678");
+        cartOrderInfo.setLineCheckStatus(1);
+        cartOrderDao.updateProductList(cartOrderInfo);
+    }
 }

@@ -96,7 +96,4 @@ public class CartOrderInfo extends PagesRequest {
     private Integer lineCheckStatus;
 
 
-
-
-
 }

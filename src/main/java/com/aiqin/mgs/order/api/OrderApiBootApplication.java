@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * </pre>
  * <p>
  */
-@EnableScheduling //定时任务
+//@EnableScheduling //定时任务
 @SuppressWarnings("ALL")
 @Configuration
 @ComponentScan
