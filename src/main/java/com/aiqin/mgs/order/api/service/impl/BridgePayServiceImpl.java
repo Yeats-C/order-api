@@ -27,9 +27,9 @@ public class BridgePayServiceImpl implements BridgePayService {
      */
     @Override
     public HttpResponse<PartnerGetCodeUrlRep> mainSwept(PayReq vo) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(urlProperties.getPayApi()).append("/payment/pay/getCodeUrl");
-        HttpClient client = HttpClient.post(urlProperties.getPayApi() + "/payment/pay/getCodeUrl").json(vo);
+        //StringBuilder sb = new StringBuilder();
+        //sb.append(urlProperties.getPayApi()).append("/payment/pay/payTocAll");
+        HttpClient client = HttpClient.post(urlProperties.getPayApi() + "/payment/pay/payTocAll").json(vo);
         HttpResponse<PartnerGetCodeUrlRep> response = client.action().result(new TypeReference<HttpResponse<PartnerGetCodeUrlRep>>() {  });
 
         return response;

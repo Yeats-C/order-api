@@ -24,6 +24,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.constant.Global;
+import com.aiqin.mgs.order.api.domain.pay.PayReq;
 import com.aiqin.mgs.order.api.domain.request.*;
 import com.aiqin.mgs.order.api.domain.response.*;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
@@ -117,7 +118,8 @@ public class OrderServiceImpl implements OrderService {
     private BridgeProductService bridgeProductService;
     @Resource
     private PrestorageOrderSupplyLogsDao prestorageOrderSupplyLogsDao;
-
+    @Resource
+    private PayService payService;
     //商品项目地址
     @Value("${slcsIp}")
     public String slcsIp;
@@ -1669,8 +1671,19 @@ public class OrderServiceImpl implements OrderService {
                         addOrderCoupon(orderCouponList, orderId);
                     }
                 }
+                //如果订单状态是已支付此处应该写调用支付中心现金支付
+                if (orderInfo.getOrderStatus().equals(Global.ORDER_STATUS_2)||orderInfo.getOrderStatus().equals(Global.ORDER_STATUS_5)){
+                    PayReq payReq=new PayReq();
+                    payReq.setOrderAmount(Long.valueOf(orderInfo.getActualPrice()));
+                    payReq.setAiqinMerchantId(orderInfo.getDistributorId());
+                    payReq.setOrderNo(orderInfo.getOrderCode());
+                    payReq.setOrderTime(orderInfo.getCreateTime());
+                    payReq.setPayType(Integer.valueOf(orderInfo.getPayType()));
+                    payReq.setOrderSource(orderInfo.getOrderType());
+                    payService.doPay(payReq);
+                }
             }
-//如果订单状态是已支付此处应该写调用支付中心现金支付
+
             return HttpResponse.success();
         } catch (Exception e) {
             LOGGER.error("添加新的订单主数据以及其他订单关联数据异常：{}", e);
