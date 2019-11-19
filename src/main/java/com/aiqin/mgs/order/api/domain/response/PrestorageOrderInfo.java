@@ -34,6 +34,11 @@ public class PrestorageOrderInfo {
     @JsonProperty("order_status")
     @ApiModelProperty("订单状态，0.未提货、1.已提货")
     private Integer orderStatus;
+
+
+    @ApiModelProperty(value = "前端控制退货按钮使用字段:1:订单已全数退完,0 未退完")
+    @JsonProperty("turn_return_view")
+    private Integer turnReturnView=0;
     /**
      * 会员名称
      */

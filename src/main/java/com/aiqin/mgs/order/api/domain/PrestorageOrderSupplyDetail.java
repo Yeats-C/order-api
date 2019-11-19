@@ -65,7 +65,7 @@ public class PrestorageOrderSupplyDetail {
     @JsonProperty("supply_amount")
     private Integer supplyAmount=0;
 
-    @ApiModelProperty(value="提货状态，0待提货，1已完成")
+    @ApiModelProperty(value="提货状态")
     @JsonProperty("prestorage_order_supply_status")
     private Integer prestorageOrderSupplyStatus=0;
 
