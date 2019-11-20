@@ -1,24 +1,12 @@
-package com.aiqin.mgs.order.api.domain;
+package com.aiqin.mgs.order.api.domain.request;
 
-import com.aiqin.mgs.order.api.base.PagesRequest;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
 
-/**
- * 订单主表数据
- *
- * @author: Tao.Chen
- * @version: v1.0.0
- * @date 2019/11/12 15:45
- */
 @Data
-public class OrderStoreOrderInfo extends PagesRequest {
+public class OrderStoreOrderInfoRequest {
 
-    /***主键*/
-    private Long id;
     /***订单id*/
     private String orderId;
     /***订单编号*/
@@ -31,8 +19,6 @@ public class OrderStoreOrderInfo extends PagesRequest {
     private Integer payStatus;
     /***订单类型 枚举 OrderTypeEnum*/
     private Integer orderType;
-    /***加盟商id*/
-    private String franchiseeId;
     /***门店id*/
     private String storeId;
     /***门店名称*/
@@ -46,20 +32,6 @@ public class OrderStoreOrderInfo extends PagesRequest {
     /***关联主订单编码*/
     private String primaryCode;
 
-    /***创建时间*/
-    private Date createTime;
-    /***创建人id*/
-    private String createById;
-    /***创建人姓名*/
-    private String createByName;
-    /***更新时间*/
-    private Date updateTime;
-    /***修改人id*/
-    private String updateById;
-    /***修改人姓名*/
-    private String updateByName;
-
-    /***关联子订单*/
-    private List<OrderStoreOrderInfo> secondaryOrderList;
-
+    private Integer pageSize;
+    private Integer pageNo;
 }

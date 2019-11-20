@@ -13,6 +13,7 @@
                activity_coupon_money as activityCouponMoney,
                cloth_coupon_money    as clothOouponMoney,
                actual_money          as actualMoney,
+               polling_times         as pollingTimes,
                create_time           as createTime,
                create_by_id          as createById,
                create_by_name        as createByName,
@@ -23,5 +24,29 @@
         where 1 = 1
           and order_id = #{orderId}
     </select>
+
+    <insert id="insert">
+        insert into order_store_pay (pay_id, order_id, pay_status, activity_money, activity_coupon_money,
+                                     cloth_coupon_money, actual_money, polling_times, create_time, create_by_id,
+                                     create_by_name, update_time, update_by_id, update_by_name)
+        values (#{payId}, #{orderId}, #{payStatus}, #{activityMoney}, #{activityCouponMoney},
+                #{clothCouponMoney}, #{actualMoney}, #{pollingTimes}, sysdate(), #{createById},
+                #{createByName}, sysdate(), #{updateById}, #{updateByName})
+    </insert>
+
+    <update id="updateByPrimaryKey">
+        update order_store_pay
+        set
+        <if test="payStatus != null and payStatus != '' or payStatus == 0">
+            pay_status = #{payStatus},
+        </if>
+        <if test="pollingTimes != null and pollingTimes != '' or pollingTimes == 0">
+            pay_status = #{pollingTimes},
+        </if>
+        update_by_id = #{updateById},
+        update_by_name = #{updateByName},
+        update_time = sysdate()
+        where id = #{id}
+    </update>
 
 </mapper>

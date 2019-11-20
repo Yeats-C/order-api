@@ -22,4 +22,26 @@ public interface OrderStoreOrderPayDao {
      * @date 2019/11/14 15:53
      */
     OrderStoreOrderPay getOrderPayByOrderId(@Param("orderId") String orderId);
+
+    /**
+     * 插入订单支付信息数据
+     *
+     * @param orderStoreOrderPay
+     * @return java.lang.Integer
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/20 11:09
+     */
+    Integer insert(OrderStoreOrderPay orderStoreOrderPay);
+
+    /**
+     * 根据主键更新非空字段
+     *
+     * @param orderStoreOrderPay
+     * @return java.lang.Integer
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/20 11:09
+     */
+    Integer updateByPrimaryKeySelective(OrderStoreOrderPay orderStoreOrderPay);
 }

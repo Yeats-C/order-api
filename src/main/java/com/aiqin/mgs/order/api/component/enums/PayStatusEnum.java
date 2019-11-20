@@ -12,10 +12,14 @@ import lombok.Getter;
 @Getter
 public enum PayStatusEnum {
 
-    /***未支付*/
-    PAY_STATUS_NO(0, "0", "未支付"),
-    /***已支付*/
-    PAY_STATUS_YES(1, "1", "已支付");
+    /***待支付*/
+    UNPAID(0, "0", "待支付"),
+    /***已发起支付*/
+    PAYING(1, "1", "已发起支付"),
+    /***支付成功*/
+    SUCCESS(2, "2", "支付成功"),
+    /***支付失败*/
+    FAIL(3, "3", "支付失败");
 
     private Integer code;
     private String value;

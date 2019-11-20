@@ -17,30 +17,24 @@ public class OrderStoreOrderPay {
 
     /***主键*/
     private Long id;
-
     /***订单id*/
     private String orderId;
-
     /***支付id*/
     private String payId;
-
     /***支付状态*/
     private Integer payStatus;
-
     /***订货含税总金额*/
     private BigDecimal orderTotal;
-
     /***活动金额*/
     private BigDecimal activityMoney;
-
     /***A品券抵减金额*/
     private BigDecimal activityCouponMoney;
-
     /***服纺券抵减金额*/
     private BigDecimal clothCouponMoney;
-
     /***实付金额*/
     private BigDecimal actualMoney;
+    /***轮询次数*/
+    private Integer pollingTimes;
 
     /***创建时间*/
     private Date createTime;
