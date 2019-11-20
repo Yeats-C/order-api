@@ -139,14 +139,14 @@ public class CartOrderServiceImpl implements CartOrderService {
     }
 
     /**
-     * 根据门店ID显示购物车中商品信息
+     * 根据门店ID显示购物车中商品信息,如果勾选商品，就更新标记和数量
      *
      * @param storeId
      * @param productType
      * @return
      */
     @Override
-    public HttpResponse selectCartByStoreId(String storeId, Integer productType, String skuId, Integer lineCheckStatus) {
+    public HttpResponse selectCartByStoreId(String storeId, Integer productType, String skuId, Integer lineCheckStatus,Integer number) {
         HttpResponse<Object> response = new HttpResponse<>();
         try {
             CartOrderInfo cartOrderInfo = new CartOrderInfo();
@@ -159,6 +159,7 @@ public class CartOrderServiceImpl implements CartOrderService {
             if (null != skuId && lineCheckStatus == Global.LINECHECKSTATUS_1) {
                 cartOrderInfo.setSkuId(skuId);
                 cartOrderInfo.setLineCheckStatus(lineCheckStatus);
+                cartOrderInfo.setAmount(number);
                 cartOrderDao.updateProductList(cartOrderInfo);
                 return HttpResponse.success();
             } else {

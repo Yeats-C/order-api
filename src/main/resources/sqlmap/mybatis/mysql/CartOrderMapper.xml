@@ -61,7 +61,7 @@
 
     <!-- 更新购物车里的商品标识 -->
     <update id="updateProductList" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo">
-        update order_store_cart set line_check_status=#{lineCheckStatus}
+        update order_store_cart set line_check_status=#{lineCheckStatus},amount=#{amount}
         <where>
             and sku_id = #{skuId}
         </where>

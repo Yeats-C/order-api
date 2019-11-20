@@ -54,18 +54,19 @@ public class CartOrderController {
 
 
     /**
-     * 购物车展示列表
+     * 购物车展示列表,如果勾选了商品，就要连数量一起更新
      * @param
      * @return
      */
     @GetMapping("/cartDisplay")
-    @ApiOperation(value = "购物车展示列表")
+    @ApiOperation(value = "购物车展示列表,附带勾选功能")
     public HttpResponse selectCartByStoreId(@Valid @RequestParam(name = "storeId", required = true) String storeId,
                                             @Valid @RequestParam(name = "productType", required = true)Integer productType,
                                             @Valid @RequestParam(name = "skuId", required = false)String skuId,
-                                            @Valid @RequestParam(name = "lineCheckStatus", required = false)Integer lineCheckStatus) {
-        LOGGER.info("购物车展示列表参数：{},{},{},{}", storeId,productType,skuId,lineCheckStatus);
-        return cartOrderService.selectCartByStoreId(storeId,productType,skuId,lineCheckStatus);
+                                            @Valid @RequestParam(name = "lineCheckStatus", required = false)Integer lineCheckStatus,
+                                            @Valid @RequestParam(name = "number", required = false)Integer number) {
+        LOGGER.info("购物车展示列表参数：{},{},{},{},{}", storeId,productType,skuId,lineCheckStatus,number);
+        return cartOrderService.selectCartByStoreId(storeId,productType,skuId,lineCheckStatus,number);
     }
 
     /**

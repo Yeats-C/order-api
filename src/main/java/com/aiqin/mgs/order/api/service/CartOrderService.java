@@ -13,7 +13,7 @@ public interface CartOrderService {
     HttpResponse addCart(ShoppingCartRequest shoppingCartRequest);
 
     //根据门店id查询购物车
-    HttpResponse selectCartByStoreId(String storeId,Integer productType,String skuId,Integer lineCheckStatus);
+    HttpResponse selectCartByStoreId(String storeId,Integer productType,String skuId,Integer lineCheckStatus,Integer number);
 
     //返回购物车中的所有商品数量
     HttpResponse<Integer> getTotal(String storeId);
