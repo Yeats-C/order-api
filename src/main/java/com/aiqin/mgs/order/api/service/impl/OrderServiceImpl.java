@@ -274,7 +274,14 @@ public class OrderServiceImpl implements OrderService {
     private HttpResponse tocOrderCallback(OrderodrInfo orderInfo) {
         //修改状态
         try {
-            int i = orderService.updateOrderStatuss(orderInfo.getOrderInfo().getOrderId(), Global.ORDER_STATUS_2, PayStatusEnum.HAS_PAY.getCode(), "系统设置");
+            int i=0;
+            if (orderInfo.getOrderInfo().getOrderType()==4){
+                 i = orderService.updateOrderStatuss(orderInfo.getOrderInfo().getOrderId(), Global.ORDER_STATUS_2, PayStatusEnum.HAS_PAY.getCode(), "系统设置");
+
+            }else {
+                 i = orderService.updateOrderStatuss(orderInfo.getOrderInfo().getOrderId(), Global.ORDER_STATUS_5, PayStatusEnum.HAS_PAY.getCode(), "系统设置");
+
+            }
             if (i == 0) {
                 return HttpResponse.success();
             }
