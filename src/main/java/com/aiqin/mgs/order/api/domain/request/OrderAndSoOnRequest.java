@@ -24,6 +24,7 @@ public class OrderAndSoOnRequest {
 	private List<OrderRelationCouponInfo> orderCouponList;
 	
 	private OrderLog logInfo;
+
 	public OrderInfo getOrderInfo() {
 		return orderInfo;
 	}

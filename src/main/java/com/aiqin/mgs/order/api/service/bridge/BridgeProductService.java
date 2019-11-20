@@ -3,7 +3,10 @@ package com.aiqin.mgs.order.api.service.bridge;
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
+import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.dto.ProductDistributorOrderDTO;
+import com.aiqin.mgs.order.api.domain.request.OperateStockVo;
+import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
@@ -40,4 +43,55 @@ public class BridgeProductService {
         }
         return Lists.newArrayList();
     }
+
+    public HttpResponse changeStock(List<OperateStockVo> stockReqVos) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(urlProperties.getProductApi()).append("/inventory/update/record");
+        HttpClient orderClient =HttpClient.post(sb.toString()).json(stockReqVos);
+        return orderClient.action().result(HttpResponse.class);
+    }
+
+    /**
+     * 获取商品信息
+     * @param shoppingCartRequest
+     * @return
+     */
+    public HttpResponse<CartOrderInfo> getProduct(ShoppingCartRequest shoppingCartRequest){
+        String path = "/product/productInfo";
+        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartRequest);
+        HttpResponse<CartOrderInfo> response = httpClient.action().result(new TypeReference<HttpResponse<CartOrderInfo>>() {
+        });
+        //测试接口
+//        HttpResponse<CartOrderInfo> cartOrderInfoHttpResponse = new HttpResponse<>();
+//        CartOrderInfo data = new CartOrderInfo();
+//        data.setProductId("123");
+//        data.setStoreId("123");
+//        data.setSkuId("123");
+//        data.setAmount(20);
+//        data.setPrice(new BigDecimal(20.10));
+//        data.setProductType(1);
+//        cartOrderInfoHttpResponse.setData(data);
+        return response;
+    }
+
+
+    /**
+     * 获取门店的信息
+     * @param shoppingCartRequest
+     * @return
+     */
+    public HttpResponse<CartOrderInfo> getStoreInfo(ShoppingCartRequest shoppingCartRequest){
+        String path = "/store/getStoreInfo";
+        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartRequest);
+        HttpResponse<CartOrderInfo> response = httpClient.action().result(new TypeReference<HttpResponse<CartOrderInfo>>() {
+        });
+//        HttpResponse<CartOrderInfo> cartOrderInfoHttpResponse = new HttpResponse<>();
+//        CartOrderInfo data = new CartOrderInfo();
+//        data.setStoreAddress("北京市海淀区海淀南路35号");
+//        data.setStoreContacts("胡金英");
+//        data.setStoreContactsPhone("18513854421");
+//        cartOrderInfoHttpResponse.setData(data);
+        return response;
+    }
+
 }

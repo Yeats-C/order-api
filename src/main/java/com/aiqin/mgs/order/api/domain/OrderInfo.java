@@ -148,14 +148,7 @@ public class OrderInfo extends PagesRequest {
 	@ApiModelProperty(value="下单时间",example = "2001-01-01 01:01:01")
 	@JsonProperty("create_time")
 	private Date createTime;
-
-    @ApiModelProperty(value="下单时间区间筛选开始日期 yyyy-MM-dd",example = "2001-01-01")
-    @JsonProperty("create_time_begin")
-    private String createTimeBegin;
-
-    @ApiModelProperty(value="下单时间区间筛选结束日期 yyyy-MM-dd",example = "2001-01-01")
-    @JsonProperty("create_time_end")
-    private String createTimeEnd;
+	
 	
 	@ApiModelProperty(value="更改时间",example = "2001-01-01 01:01:01")
 	@JsonProperty("update_time")
@@ -189,8 +182,18 @@ public class OrderInfo extends PagesRequest {
 	@JsonProperty("turn_return_view")
 	private Integer turnReturnView;
 
-	
+	@JsonProperty("is_prestorage")
+	@ApiModelProperty(value = "是否是预存订单，0为否，1为是")
+	private Integer isPrestorage=0;
 
+
+	public Integer getIsPrestorage() {
+		return isPrestorage;
+	}
+
+	public void setIsPrestorage(Integer isPrestorage) {
+		this.isPrestorage = isPrestorage;
+	}
 
 	public Integer getTurnReturnView() {
 		return turnReturnView;
@@ -499,23 +502,8 @@ public class OrderInfo extends PagesRequest {
 		this.createTime = createTime;
 	}
 
-    public String getCreateTimeBegin() {
-        return createTimeBegin;
-    }
 
-    public void setCreateTimeBegin(String createTimeBegin) {
-        this.createTimeBegin = createTimeBegin;
-    }
-
-    public String getCreateTimeEnd() {
-        return createTimeEnd;
-    }
-
-    public void setCreateTimeEnd(String createTimeEnd) {
-        this.createTimeEnd = createTimeEnd;
-    }
-
-    public Date getUpdateTime() {
+	public Date getUpdateTime() {
 		return updateTime;
 	}
 

@@ -7,17 +7,11 @@
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.web;
 
+import com.aiqin.ground.util.protocol.MessageId;
+import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
-import com.aiqin.mgs.order.api.domain.CartInfo;
-import com.aiqin.mgs.order.api.domain.OrderDetailInfo;
-import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
-import com.aiqin.mgs.order.api.domain.OrderInfo;
-import com.aiqin.mgs.order.api.domain.OrderLog;
-import com.aiqin.mgs.order.api.domain.OrderPayInfo;
-import com.aiqin.mgs.order.api.domain.OrderQuery;
-import com.aiqin.mgs.order.api.domain.OrderRelationCouponInfo;
-import com.aiqin.mgs.order.api.domain.SettlementInfo;
+import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.request.DetailCouponRequest;
 import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
@@ -26,6 +20,7 @@ import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.LatelyResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
+import com.aiqin.mgs.order.api.domain.response.PartnerPayGateRep;
 import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.OrderDetailService;
 import com.aiqin.mgs.order.api.service.OrderService;
@@ -75,8 +70,10 @@ public class OrderController {
         
     	//添加TOC订单标识
         if(orderAndSoOnRequest !=null) {
+            //返回订单信息
         	OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
           if(orderInfo !=null) {
+              //TOC订单信息
         	  orderInfo.setOrderType(Global.ORDER_TYPE_1);
         	  orderAndSoOnRequest.setOrderInfo(orderInfo);
         	  return orderService.addOrdta(orderAndSoOnRequest);
@@ -107,7 +104,12 @@ public class OrderController {
         if(orderAndSoOnRequest !=null) {
         	OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
           if(orderInfo !=null) {
-        	  orderInfo.setOrderType(Global.ORDER_TYPE_1);
+              //预存订单
+              if (orderInfo.getIsPrestorage()==1){
+                  orderInfo.setOrderType(Global.ORDER_TYPE_4);
+              }else {
+                  orderInfo.setOrderType(Global.ORDER_TYPE_1);
+              }
         	  orderAndSoOnRequest.setOrderInfo(orderInfo);
         	  return orderService.addPamo(orderAndSoOnRequest);
           }else {
@@ -181,12 +183,18 @@ public class OrderController {
         
     	
     	LOGGER.info("门店新增服务订单step2-添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据参数：{}",orderAndSoOnRequest);
-		
+
+
         //添加TOC订单标识
         if(orderAndSoOnRequest !=null) {
         	OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
           if(orderInfo !=null) {
-        	  orderInfo.setOrderType(Global.ORDER_TYPE_3);
+              //判断是不是预存订单
+              if (orderAndSoOnRequest.getOrderInfo().getIsPrestorage()==1){
+                  orderInfo.setOrderType(Global.ORDER_TYPE_4);
+              }else {
+                  orderInfo.setOrderType(Global.ORDER_TYPE_3);
+              }
         	  orderAndSoOnRequest.setOrderInfo(orderInfo);
         	  return orderService.addPamo(orderAndSoOnRequest);
           }else {
@@ -602,67 +610,120 @@ public class OrderController {
     	
     	LOGGER.info("判断会员是否在当前门店时候有过消费记录参数: {}",memberByDistributorRequest);
         return orderService.selectMemberByDistributor(memberByDistributorRequest);
-    } 
-    
+    }
+
+
+    /**
+     * 查询预存订单
+     * @param
+     * @return
+     */
+    @PostMapping("/selectPrestorageOrder")
+    @ApiOperation(value = "查询预存订单")
+    public HttpResponse selectprestorageorder(@Valid @RequestBody OrderQuery orderQuery) {
+
+
+        LOGGER.info("查询预存订单参数: {}",orderQuery);
+        return orderService.selectPrestorageOrder(orderQuery);
+    }
+
+    /**
+     * 查询预存订单详情
+     * @param
+     * @return
+     */
+    @GetMapping("/selectPrestorageOrderDetails")
+    @ApiOperation(value = "查询预存订单详情")
+    public HttpResponse selectprestorageorderDetails(@Valid @RequestParam(name = "prestorage_order_supply_detail_id", required = true) String prestorageOrderSupplyDetailId) {
+
+
+        LOGGER.info("查询预存订单详情: {}",prestorageOrderSupplyDetailId);
+        return orderService.selectprestorageorderDetails(prestorageOrderSupplyDetailId);
+    }
+
+
+    /**
+     * 预存取货
+     * @param
+     * @return
+     */
+    @PostMapping("/prestorageOut")
+    @ApiOperation(value = "预存取货")
+    public HttpResponse prestorageOut(@Valid @RequestBody PrestorageOutInfo prestorageOutVo) {
+
+
+        LOGGER.info("预存取货参数: {}",prestorageOutVo);
+        return orderService.prestorageOut(prestorageOutVo);
+    }
+
+    @PostMapping("/back")
+    @ApiOperation("支付回调修改订单状态和库存")
+    public HttpResponse callback(@RequestBody PartnerPayGateRep payReq) {
+        try {
+            return orderService.callback(payReq);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return HttpResponse.failure(MessageId.create(Project.ORDER_API, -1, e.getMessage()));
+        }
+    }
+
+    /**
+     * 模糊查询预存订单列表
+     * @param
+     * @return
+     */
+    @PostMapping("/prestorageOrderList")
+    @ApiOperation(value = "查询预存订单列表....")
+    public HttpResponse selectPrestorageOrder(@Valid @RequestBody OrderQuery orderQuery) {
+
+
+        LOGGER.info("查询预存订单列表：{}",orderQuery);
+
+        return orderService.selectPrestorageOrderList(orderQuery);
+    }
+
+    /**
+     * 模糊查询预存订单取货日志列表
+     * @param
+     * @return
+     */
+    @PostMapping("/prestorageOrderLogs")
+    @ApiOperation(value = "模糊查询预存订单取货日志列表....")
+    public HttpResponse selectPrestorageOrderLogs(@Valid @RequestBody OrderQuery orderQuery) {
+
+
+        LOGGER.info("模糊查询预存订单取货日志列表：{}",orderQuery);
+
+        return orderService.selectPrestorageOrderLogs(orderQuery);
+    }
+
+
     /**
      * 修改门店营业状态
-     * @param 
+     * @param
      * @return
      */
     @GetMapping("/bmpy")
     @ApiOperation(value = "修改门店营业状态")
     public void updateOpenStatus(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId) {
-        
-    	
+
+
     	LOGGER.info("开始修改门店营业状态参数: {}",distributorId);
         orderService.updateOpenStatus(distributorId);
-    } 
-    
+    }
+
     /**
      * 最近消费订单 (消费时间/消费金额)
-     * @param 
+     * @param
      * @return
      */
     @GetMapping("/lately")
-    @ApiOperation(value = "最近消费订单 (消费时间/消费金额)")	
+    @ApiOperation(value = "最近消费订单 (消费时间/消费金额)")
     public HttpResponse<LatelyResponse> memberLately(@Valid @RequestParam(name = "member_id", required = false) String memberId,
     		@Valid @RequestParam(name = "distributor_id", required = false) String distributorId) {
-        
-    	
+
+
     	LOGGER.info("最近消费订单 (消费时间/消费金额)参数:memberId: {},distributorId:{}",memberId,distributorId);
     	return orderService.memberLately(memberId,distributorId);
     }
-
-    /**
-     * 根据条件查询订单列表
-     *
-     * @param orderInfo
-     * @return com.aiqin.ground.util.protocol.http.HttpResponse
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/11/2 16:25
-     */
-    @GetMapping("/findOrderInfoList")
-    @ApiOperation(value = "根据条件查询订单列表")
-    public HttpResponse findOrderInfoList(@Valid @RequestBody OrderInfo orderInfo) {
-        LOGGER.info("查询订单列表参数：{}",orderInfo);
-        return orderService.findOrderInfoList(orderInfo);
-    }
-
-    /**
-     * 根据订单编码查询订单详情
-     *
-     * @param orderCode 订单号
-     * @return com.aiqin.ground.util.protocol.http.HttpResponse
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/11/4 9:34
-     */
-    @GetMapping("/getOrderDetailsByOrderCode")
-    @ApiOperation(value = "根据订单编码查询订单详情")
-    public HttpResponse getOrderDetailsByOrderCode(@Valid @RequestBody OrderInfo orderInfo) {
-        LOGGER.info("查询订单明细，参数：orderCode：{}",orderInfo);
-        return orderService.getOrderDetailsByOrderCode(orderInfo.getOrderCode());
-    }
-
 }

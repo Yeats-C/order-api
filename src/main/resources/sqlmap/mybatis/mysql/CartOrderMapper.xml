@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.CartOrderDao">
+    <resultMap id="CartOrderInfoMapping" type="com.aiqin.mgs.order.api.domain.CartOrderInfo">
+        <result column="product_id" jdbcType="VARCHAR" property="productId"/>
+        <result column="cart_id" jdbcType="VARCHAR" property="cartId"/>
+        <result column="franchisee_id" jdbcType="VARCHAR" property="franchiseeId"/>
+        <result column="store_id" jdbcType="VARCHAR" property="storeId"/>
+        <result column="sku_id" jdbcType="VARCHAR" property="skuId"/>
+        <result column="spu_id" jdbcType="VARCHAR" property="spuId"/>
+        <result column="product_name" jdbcType="VARCHAR" property="productName"/>
+        <result column="amount" jdbcType="INTEGER" property="amount"/>
+        <result column="logo" jdbcType="VARCHAR" property="logo"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+        <result column="color" jdbcType="VARCHAR" property="color"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="product_size" jdbcType="VARCHAR" property="productSize"/>
+        <result column="activity_id" jdbcType="VARCHAR" property="activityId"/>
+        <result column="activity_name" jdbcType="VARCHAR" property="activityName"/>
+        <result column="product_type" jdbcType="INTEGER" property="productType"/>
+        <result column="create_source" jdbcType="INTEGER" property="createSource"/>
+        <result column="product_gift" jdbcType="INTEGER" property="productGift"/>
+        <result column="gift_parent_cart_id" jdbcType="VARCHAR" property="giftParentCartId"/>
+        <result column="line_check_status" jdbcType="INTEGER" property="lineCheckStatus"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        product_id,cart_id,franchisee_id,store_id,sku_id,spu_id,product_name,amount,logo,price,color,create_time,update_time,product_size,activity_id,
+        activity_name,product_type,create_source,product_gift,gift_parent_cart_id,line_check_status
+    </sql>
+
+    <!-- 将商品添加添加购物车 -->
+    <insert id="insertCart" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo">
+        insert into order_store_cart
+			(product_id,cart_id,product_name,amount,logo,create_time,update_time,price,color,product_size,activity_id,activity_name,product_type,sku_id,spu_id,store_id,create_source)
+		values
+		    (#{productId},#{cartId},#{productName},#{amount},#{logo},#{createTime},#{updateTime},#{price},#{color},#{productSize},#{activityId},#{activityName},#{productType},#{skuId},#{spuId},#{storeId},#{createSource})
+    </insert>
+
+    <!-- 判断SKU商品是否已存在购物车中 -->
+    <select id="isYesCart" resultType="java.lang.String" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo">
+        select SUM(amount) as amount from order_store_cart
+        <where>
+            store_id =#{storeId}
+            and product_id = #{productId}
+            and sku_id = #{skuId}
+        </where>
+        GROUP BY store_id,product_id,sku_id
+    </select>
+
+    <!-- 更新购物车 -->
+    <update id="updateCartById" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo">
+        update order_store_cart set amount=#{amount}
+        <where>
+            and store_id = #{storeId}
+            and product_id = #{productId}
+            and sku_id = #{skuId}
+        </where>
+    </update>
+
+    <!-- 更新购物车里的商品标识 -->
+    <update id="updateProductList" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo">
+        update order_store_cart set line_check_status=#{lineCheckStatus}
+        <where>
+            and sku_id = #{skuId}
+        </where>
+    </update>
+
+
+
+    <!-- 查询门店Id的购物车 -->
+    <select id="selectCartByStoreId" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo"
+            resultMap="CartOrderInfoMapping" resultType="java.util.List">
+        SELECT <include refid="Base_Column_List"/>
+        FROM order_store_cart
+        <where>
+            <if test=" storeId != '' ">
+                and store_id = #{storeId}
+            </if>
+                and product_type = #{productType}
+        </where>
+        order by create_time
+    </select>
+
+    <!--获取购物车中的商品总数量-->
+    <select id="getTotal" resultType="java.lang.Integer" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo">
+        select SUM(amount) as amount from order_store_cart
+        <where>
+            store_id =#{storeId}
+        </where>
+    </select>
+
+    <!-- 清空购物车购物清单 -->
+    <delete id="deleteCart" >
+		delete from order_store_cart
+		<where>
+		    <if test="storeId != null " >
+                and store_id =#{storeId}
+            </if>
+            <if test="skuId != null">
+              and sku_id = #{skuId}
+            </if>
+            <if test="lineCheckStatus != null">
+                and line_check_status = #{lineCheckStatus}
+            </if>
+        </where>
+     </delete>
+
+    <select id="selectCartByLineCheckStatus" resultType="java.util.List" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo"
+            resultMap="CartOrderInfoMapping">
+        select <include refid="Base_Column_List"/> from order_store_cart
+        <where>
+            line_check_status =#{lineCheckStatus}
+        </where>
+    </select>
+
+
+
+
+</mapper>
