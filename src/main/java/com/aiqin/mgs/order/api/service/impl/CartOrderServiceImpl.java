@@ -9,6 +9,7 @@ import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.CartResponse;
+import com.aiqin.mgs.order.api.domain.response.cart.OrderConfirmResponse;
 import com.aiqin.mgs.order.api.service.CartOrderService;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.sun.org.apache.regexp.internal.RE;
@@ -241,18 +242,35 @@ public class CartOrderServiceImpl implements CartOrderService {
      * @return
      */
     @Override
-    public HttpResponse<List<CartOrderInfo>> displayCartLineCheckProduct(CartOrderInfo cartOrderInfo) {
-        //TODO 调用门店接口，返回门店的基本信息
+    public HttpResponse displayCartLineCheckProduct(CartOrderInfo cartOrderInfo) {
 
         HttpResponse response = new HttpResponse();
+        //调用门店接口，返回门店的基本信息
+        ShoppingCartRequest shoppingCartRequest = new ShoppingCartRequest();
+        shoppingCartRequest.setStoreId(cartOrderInfo.getStoreId());
+        HttpResponse<CartOrderInfo> storeInfo = bridgeProductService.getStoreInfo(shoppingCartRequest);
+        OrderConfirmResponse orderConfirmResponse = new OrderConfirmResponse();
+        //封装门店信息
+        orderConfirmResponse.setStoreAddress(storeInfo.getData().getStoreAddress());
+        orderConfirmResponse.setStoreContacts(storeInfo.getData().getStoreContacts());
+        orderConfirmResponse.setStoreContactsPhone(storeInfo.getData().getStoreContactsPhone());
         try {
             if (cartOrderInfo != null) {
                 List<CartOrderInfo> cartOrderInfos = cartOrderDao.selectCartByLineCheckStatus(cartOrderInfo);
-                //TODO  计算订货金额合计
-                response.setData(cartOrderInfos);
+                //封装返回的勾选的商品信息
+                orderConfirmResponse.setCartOrderInfos(cartOrderInfos);
+                //计算订货金额合计
+                BigDecimal orderTotalPrice = new BigDecimal(0);
+                for (CartOrderInfo cartOrderInfo1:cartOrderInfos){
+                    BigDecimal total = cartOrderInfo1.getPrice().multiply(new BigDecimal(cartOrderInfo1.getAmount()));
+                    orderTotalPrice = orderTotalPrice.add(total);
+                }
+                //封装订货金额合计
+                orderConfirmResponse.setAcountActualprice(orderTotalPrice);
+                response.setData(orderConfirmResponse);
             }
         } catch (Exception e) {
-            LOGGER.error("显示勾选商品失败", e);
+            LOGGER.error("返回订单确认数据失败", e);
             return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
         }
         return response;

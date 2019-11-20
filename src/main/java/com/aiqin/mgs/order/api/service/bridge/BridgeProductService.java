@@ -10,12 +10,10 @@ import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
@@ -87,6 +85,12 @@ public class BridgeProductService {
         HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartRequest);
         HttpResponse<CartOrderInfo> response = httpClient.action().result(new TypeReference<HttpResponse<CartOrderInfo>>() {
         });
+//        HttpResponse<CartOrderInfo> cartOrderInfoHttpResponse = new HttpResponse<>();
+//        CartOrderInfo data = new CartOrderInfo();
+//        data.setStoreAddress("北京市海淀区海淀南路35号");
+//        data.setStoreContacts("胡金英");
+//        data.setStoreContactsPhone("18513854421");
+//        cartOrderInfoHttpResponse.setData(data);
         return response;
     }
 

@@ -102,7 +102,6 @@
         </if>
         where prestorage_order_supply_detail_id = #{prestorageOrderSupplyDetailId}
 
-
     </update>
 
     <insert id="addPrestorageOrderDetail" parameterType="com.aiqin.mgs.order.api.domain.PrestorageOrderSupplyDetail">
