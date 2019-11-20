@@ -408,7 +408,7 @@ public class OrderController {
         
     	
     	LOGGER.info("更改订单状态/支付状态/修改员参数 orderId：{},orderStatus: {},payStatus: {},payType: {},updateBy: {}",orderId,orderStatus,payStatus,payType,updateBy);    	
-        return orderService.updateOrderStatus(orderId,orderStatus,payStatus,updateBy);
+        return orderService.updateOrderStatus(orderId,orderStatus,payStatus,updateBy,payType);
     } 
     
     
@@ -658,6 +658,7 @@ public class OrderController {
     @ApiOperation("支付回调修改订单状态和库存")
     public HttpResponse callback(@RequestBody PartnerPayGateRep payReq) {
         try {
+            LOGGER.info("支付回调修改订单状态和库存: {}",payReq);
             return orderService.callback(payReq);
         } catch (Exception e) {
             e.printStackTrace();

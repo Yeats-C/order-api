@@ -259,6 +259,7 @@ public class OrderServiceImpl implements OrderService {
             if (Objects.nonNull(orderInfo)) {
                 //Toc 订单
                 if (orderInfo.getOrderInfo().getOrderType() == 1||orderInfo.getOrderInfo().getOrderType() == 4) {
+                    orderInfo.getOrderInfo().setPayType(String.valueOf(vo.getPayType()));
                     return tocOrderCallback(orderInfo);
                 }
 
@@ -276,10 +277,10 @@ public class OrderServiceImpl implements OrderService {
         try {
             int i=0;
             if (orderInfo.getOrderInfo().getOrderType()==4){
-                 i = orderService.updateOrderStatuss(orderInfo.getOrderInfo().getOrderId(), Global.ORDER_STATUS_2, PayStatusEnum.HAS_PAY.getCode(), "系统设置");
+                 i = orderService.updateOrderStatuss(orderInfo.getOrderInfo().getOrderId(), Global.ORDER_STATUS_2, PayStatusEnum.HAS_PAY.getCode(), "系统设置",orderInfo.getOrderInfo().getPayType());
 
             }else {
-                 i = orderService.updateOrderStatuss(orderInfo.getOrderInfo().getOrderId(), Global.ORDER_STATUS_5, PayStatusEnum.HAS_PAY.getCode(), "系统设置");
+                 i = orderService.updateOrderStatuss(orderInfo.getOrderInfo().getOrderId(), Global.ORDER_STATUS_5, PayStatusEnum.HAS_PAY.getCode(), "系统设置",orderInfo.getOrderInfo().getPayType());
 
             }
             if (i == 0) {
@@ -563,18 +564,18 @@ public class OrderServiceImpl implements OrderService {
 //	//接口-分销机构维度-总销售额 返回INT
 //	@Override
 //	public HttpResponse selectOrderAmt(String distributorId, String originType) {
-//		
+//
 //		try {
 //			Integer  total_price = orderDao.selectOrderAmt(distributorId,originType);
-//			
+//
 //			return HttpResponse.success(total_price);
 //		} catch (Exception e) {
 //
 //			LOGGER.info("接口-分销机构维度-总销售额 返回INT報錯", e);
 //			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 //		}
-//		
-//		
+//
+//
 //	}
 
 
@@ -900,9 +901,9 @@ public class OrderServiceImpl implements OrderService {
     //更改订单状态/支付状态/修改员...
     @Override
     public HttpResponse updateOrderStatus(@Valid String orderId, Integer orderStatus, Integer payStatus,
-                                          String updateBy) {
+                                          String updateBy, String payType) {
         try {
-            updateOrderStatuss(orderId, orderStatus, payStatus, updateBy);
+            updateOrderStatuss(orderId, orderStatus, payStatus, updateBy,payType);
 
             return HttpResponse.success();
         } catch (Exception e) {
@@ -914,13 +915,13 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public int updateOrderStatuss(@Valid String orderId, Integer orderStatus, Integer payStatus,
-                                  String updateBy) throws Exception {
+                                  String updateBy, String payType) throws Exception {
         OrderInfo orderInfo = new OrderInfo();
         orderInfo.setOrderId(orderId);
         orderInfo.setOrderStatus(orderStatus);
         orderInfo.setPayStatus(payStatus);
         orderInfo.setUpdateBy(updateBy);
-
+        orderInfo.setPayType(payType);
         //更新订单主数据
         int i = orderDao.updateOrder(orderInfo);
 
@@ -928,7 +929,6 @@ public class OrderServiceImpl implements OrderService {
         orderPayInfo.setOrderId(orderId);
         orderPayInfo.setPayStatus(payStatus);
         orderPayInfo.setUpdateBy(updateBy);
-
         //更新支付数据
         orderPayDao.usts(orderPayInfo);
 
