@@ -242,4 +242,8 @@ public interface Global {
     Integer LINECHECKSTATUS_0 = 0;
     Integer LINECHECKSTATUS_1 = 1;
 
+    //1:门店 2:erp
+    Integer CREATESOURCE_1 = 1;
+    Integer CREATESOURCE_2 = 2;
+
 }

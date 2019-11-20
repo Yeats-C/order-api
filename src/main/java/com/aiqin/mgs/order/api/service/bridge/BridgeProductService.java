@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -56,22 +58,24 @@ public class BridgeProductService {
      * @param shoppingCartRequest
      * @return
      */
-    public HttpResponse<CartOrderInfo> getProduct(ShoppingCartRequest shoppingCartRequest){
-        String path = "/product/productInfo";
-        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartRequest);
-        HttpResponse<CartOrderInfo> response = httpClient.action().result(new TypeReference<HttpResponse<CartOrderInfo>>() {
-        });
+    public HttpResponse<List<CartOrderInfo>> getProduct(ShoppingCartRequest shoppingCartRequest){
+//        String path = "/product/productInfo";
+//        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartRequest);
+//        HttpResponse<List<CartOrderInfo>> response = httpClient.action().result(new TypeReference<HttpResponse<CartOrderInfo>>() {
+//        });
         //测试接口
-//        HttpResponse<CartOrderInfo> cartOrderInfoHttpResponse = new HttpResponse<>();
-//        CartOrderInfo data = new CartOrderInfo();
-//        data.setProductId("123");
-//        data.setStoreId("123");
-//        data.setSkuId("123");
-//        data.setAmount(20);
-//        data.setPrice(new BigDecimal(20.10));
-//        data.setProductType(1);
-//        cartOrderInfoHttpResponse.setData(data);
-        return response;
+        HttpResponse<List<CartOrderInfo>> cartOrderInfoHttpResponse = new HttpResponse<>();
+        CartOrderInfo data = new CartOrderInfo();
+        data.setProductId("12345");
+        data.setStoreId("12345");
+        data.setSkuId("12345");
+        data.setAmount(20);
+        data.setPrice(new BigDecimal(29.10));
+        data.setProductType(1);
+        ArrayList<CartOrderInfo> list = new ArrayList<>();
+        list.add(data);
+        cartOrderInfoHttpResponse.setData(list);
+        return cartOrderInfoHttpResponse;
     }
 
 

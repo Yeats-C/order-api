@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.web;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
+import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.request.cart.DeleteCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.CartOrderService;

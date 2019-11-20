@@ -10,13 +10,14 @@ public class ShoppingCartRequest {
     /***商品id*/
     private String productId;
 
-    /***商品数量*/
-    private Integer amount;
+    /**商品集合*/
+    private List<Product> products;
 
     /***门店id*/
     private String storeId;
 
-    /***sku码集合*/
-    private List<String> skuIds;
+    /***创建来源*/
+    private String createSource;
+
 
 }

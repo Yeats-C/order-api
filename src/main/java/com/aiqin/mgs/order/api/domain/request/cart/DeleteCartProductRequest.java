@@ -13,4 +13,5 @@ public class DeleteCartProductRequest {
 
     /**删除勾选商品*/
     private Integer lineCheckStatus;
+
 }
