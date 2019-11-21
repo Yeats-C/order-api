@@ -19,7 +19,7 @@
         <result column="activity_id" jdbcType="VARCHAR" property="activityId"/>
         <result column="activity_name" jdbcType="VARCHAR" property="activityName"/>
         <result column="product_type" jdbcType="INTEGER" property="productType"/>
-        <result column="create_source" jdbcType="INTEGER" property="createSource"/>
+        <result column="create_source" jdbcType="VARCHAR" property="createSource"/>
         <result column="product_gift" jdbcType="INTEGER" property="productGift"/>
         <result column="gift_parent_cart_id" jdbcType="VARCHAR" property="giftParentCartId"/>
         <result column="line_check_status" jdbcType="INTEGER" property="lineCheckStatus"/>
@@ -61,7 +61,7 @@
 
     <!-- 更新购物车里的商品标识 -->
     <update id="updateProductList" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo">
-        update order_store_cart set line_check_status=#{lineCheckStatus}
+        update order_store_cart set line_check_status=#{lineCheckStatus},amount=#{amount}
         <where>
             and sku_id = #{skuId}
         </where>

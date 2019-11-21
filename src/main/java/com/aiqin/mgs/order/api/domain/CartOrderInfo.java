@@ -81,7 +81,7 @@ public class CartOrderInfo {
     private String storeContactsPhone;
 
     /***商品添加来源 1:门店 2:erp*/
-    private Integer createSource;
+    private String createSource;
 
     /***本品或者赠品 1:本品 2:赠品*/
     private Integer productGift;
