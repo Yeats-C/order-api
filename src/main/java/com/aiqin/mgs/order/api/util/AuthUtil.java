@@ -59,4 +59,19 @@ public class AuthUtil {
         return authToken;
     }
 
+    /**
+     * 获取定时任务操作人
+     *
+     * @param
+     * @return com.aiqin.mgs.order.api.domain.AuthToken
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/21 10:35
+     */
+    public static AuthToken getTaskSystemAuth() {
+        AuthToken auth = new AuthToken();
+        auth.setPersonId("定时任务");
+        auth.setPersonName("定时任务");
+        return auth;
+    }
 }

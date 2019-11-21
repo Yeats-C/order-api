@@ -4,10 +4,8 @@ import com.aiqin.mgs.order.api.dao.OrderStoreOrderOperationLogDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderOperationLog;
 import com.aiqin.mgs.order.api.service.ErpOrderOperationLogService;
-import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -24,9 +22,7 @@ public class ErpOrderOperationLogServiceImpl implements ErpOrderOperationLogServ
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void saveOrderOperationLog(String orderId, String operationContent) {
-        AuthToken auth = AuthUtil.getCurrentAuth();
+    public void saveOrderOperationLog(String orderId, String operationContent, AuthToken auth) {
         OrderStoreOrderOperationLog operationLog = new OrderStoreOrderOperationLog();
         operationLog.setOrderId(orderId);
         operationLog.setOperationContent(operationContent);

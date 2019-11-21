@@ -3,12 +3,13 @@ package com.aiqin.mgs.order.api.service.impl;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
-import com.aiqin.mgs.order.api.dao.*;
+import com.aiqin.mgs.order.api.dao.OrderStoreOrderInfoDao;
+import com.aiqin.mgs.order.api.dao.OrderStoreOrderProductItemDao;
+import com.aiqin.mgs.order.api.dao.OrderStoreOrderReceivingDao;
+import com.aiqin.mgs.order.api.dao.OrderStoreOrderSendingDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.response.ErpOrderDetailResponse;
-import com.aiqin.mgs.order.api.service.ErpOrderOperationLogService;
-import com.aiqin.mgs.order.api.service.ErpOrderPayService;
-import com.aiqin.mgs.order.api.service.ErpOrderService;
+import com.aiqin.mgs.order.api.service.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.DateUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
@@ -29,6 +30,12 @@ public class ErpOrderServiceImpl implements ErpOrderService {
 
     @Resource
     private OrderStoreOrderInfoDao orderStoreOrderInfoDao;
+
+    @Resource
+    private ErpOrderQueryService erpOrderQueryService;
+
+    @Resource
+    private ErpOrderOperationService erpOrderOperationService;
 
     @Resource
     private OrderStoreOrderProductItemDao orderStoreOrderProductItemDao;
@@ -96,7 +103,7 @@ public class ErpOrderServiceImpl implements ErpOrderService {
         }
 
         //查询订单
-        List<OrderStoreOrderInfo> orderList = orderStoreOrderInfoDao.select(orderStoreOrderInfo);
+        List<OrderStoreOrderInfo> orderList = erpOrderQueryService.selectOrderBySelective(orderStoreOrderInfo);
         if (orderList == null || orderList.size() <= 0) {
             throw new BusinessException("订单不存在");
         }
@@ -131,7 +138,7 @@ public class ErpOrderServiceImpl implements ErpOrderService {
     public void saveOrder(OrderStoreOrderInfo orderStoreOrderInfo) {
 
         AuthToken auth = AuthUtil.getCurrentAuth();
-        if (auth.getPersonId()==null || "".equals(auth.getPersonId())) {
+        if (auth.getPersonId() == null || "".equals(auth.getPersonId())) {
             throw new BusinessException("请先登录");
         }
 
@@ -142,10 +149,6 @@ public class ErpOrderServiceImpl implements ErpOrderService {
         OrderStoreOrderInfo orderInfo = new OrderStoreOrderInfo();
         orderInfo.setOrderCode(orderCode);
         orderInfo.setOrderId(orderId);
-        orderInfo.setCreateById(auth.getPersonId());
-        orderInfo.setCreateByName(auth.getPersonName());
-        orderInfo.setUpdateById(auth.getPersonId());
-        orderInfo.setUpdateByName(auth.getPersonName());
         orderInfo.setPayStatus(PayStatusEnum.UNPAID.getCode());
         orderInfo.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
         orderInfo.setOrderLevel(OrderLevelEnum.PRIMARY.getCode());
@@ -156,7 +159,7 @@ public class ErpOrderServiceImpl implements ErpOrderService {
         orderInfo.setFranchiseeId("12345");
         orderInfo.setStoreId("123456");
         orderInfo.setStoreName("门店1");
-        orderStoreOrderInfoDao.insert(orderInfo);
+        erpOrderOperationService.saveOrder(orderInfo, auth);
 
         //保存订单支付信息
         OrderStoreOrderPay orderPay = new OrderStoreOrderPay();
@@ -223,9 +226,6 @@ public class ErpOrderServiceImpl implements ErpOrderService {
                 orderProductItemList) {
             orderStoreOrderProductItemDao.insert(item);
         }
-
-        //保存订单日志
-        erpOrderOperationLogService.saveOrderOperationLog(orderId,"创建订单");
     }
 
     /**

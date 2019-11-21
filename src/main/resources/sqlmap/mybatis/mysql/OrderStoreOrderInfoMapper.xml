@@ -2,6 +2,77 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aiqin.mgs.order.api.dao.OrderStoreOrderInfoDao">
 
+    <select id="select" parameterType="com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo"
+            resultType="com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo">
+        select id as id,
+        order_id as orderId,
+        order_code as orderCode,
+        order_status as orderStatus,
+        return_status as returnStatus,
+        pay_status as payStatus,
+        order_type as orderType,
+        franchisee_id as franchiseeId,
+        store_id as storeId,
+        store_name as storeName,
+        total_price as totalPrice,
+        actual_price as actualPrice,
+        order_level as orderLevel,
+        primary_code as primaryCode,
+        create_time as createTime,
+        create_by_id as createById,
+        create_by_name as createByName,
+        update_time as updateTime,
+        update_by_id as updateById,
+        update_by_name as updateByName
+        from order_store_info
+        where 1 = 1
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="orderId != null and orderId != ''">
+            and order_id = #{orderId}
+        </if>
+        <if test="orderCode != null and orderCode != ''">
+            and order_code = #{orderCode}
+        </if>
+        <if test="orderStatus != null and orderStatus != '' or orderStatus == 0">
+            and order_status = #{orderStatus}
+        </if>
+        <if test="payStatus != null and payStatus != '' or payStatus == 0">
+            and pay_status = #{payStatus}
+        </if>
+        <if test="orderType != null and orderType != '' or orderType == 0">
+            and order_type = #{orderType}
+        </if>
+        <if test="storeId != null and storeId != ''">
+            and store_id = #{storeId}
+        </if>
+        order by create_time desc
+    </select>
+
+    <update id="updateByPrimaryKeySelective">
+        update order_store_info
+        set
+        <if test="orderStatus != null and orderStatus != '' or orderStatus == 0">
+            order_status = #{orderStatus},
+        </if>
+        update_by_id = #{updateById},
+        update_by_name = #{updateByName},
+        update_time = sysdate()
+        where id = #{id}
+    </update>
+
+    <insert id="insert">
+        insert into order_store_info (order_id, order_code, order_status, order_level, primary_code, return_status,
+                                      order_type, pay_status, franchisee_id, store_id, store_name, total_price,
+                                      actual_price,
+                                      create_time, create_by_id, create_by_name, update_time, update_by_id,
+                                      update_by_name)
+        values (#{orderId}, #{orderCode}, #{orderStatus}, #{orderLevel}, #{primaryCode}, #{returnStatus},
+                #{orderType}, #{payStatus}, #{franchiseeId}, #{storeId}, #{storeName}, #{totalPrice}, #{actualPrice},
+                sysdate(), #{createById}, #{createByName}, sysdate(), #{updateById}, #{updateByName})
+    </insert>
+
     <select id="findOrderList" parameterType="com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo"
             resultType="com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo">
         select a1.id as id,
@@ -64,130 +135,6 @@
         )
         order by create_time desc
     </select>
-
-    <select id="select" parameterType="com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo"
-            resultType="com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo">
-        select id as id,
-        order_id as orderId,
-        order_code as orderCode,
-        order_status as orderStatus,
-        return_status as returnStatus,
-        pay_status as payStatus,
-        order_type as orderType,
-        franchisee_id as franchiseeId,
-        store_id as storeId,
-        store_name as storeName,
-        total_price as totalPrice,
-        actual_price as actualPrice,
-        order_level as orderLevel,
-        primary_code as primaryCode,
-        create_time as createTime,
-        create_by_id as createById,
-        create_by_name as createByName,
-        update_time as updateTime,
-        update_by_id as updateById,
-        update_by_name as updateByName
-        from order_store_info
-        where 1 = 1
-        <if test="id != null and id != ''">
-            and id = #{id}
-        </if>
-        <if test="orderId != null and orderId != ''">
-            and order_id = #{orderId}
-        </if>
-        <if test="orderCode != null and orderCode != ''">
-            and order_code = #{orderCode}
-        </if>
-        <if test="orderStatus != null and orderStatus != '' or orderStatus == 0">
-            and order_status = #{orderStatus}
-        </if>
-        <if test="payStatus != null and payStatus != '' or payStatus == 0">
-            and pay_status = #{payStatus}
-        </if>
-        <if test="orderType != null and orderType != '' or orderType == 0">
-            and order_type = #{orderType}
-        </if>
-        <if test="storeId != null and storeId != ''">
-            and store_id = #{storeId}
-        </if>
-        order by create_time desc
-    </select>
-
-    <select id="selectByOrderId" parameterType="java.lang.String"
-            resultType="com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo">
-        select id             as id,
-               order_id       as orderId,
-               order_code     as orderCode,
-               order_status   as orderStatus,
-               return_status  as returnStatus,
-               pay_status     as payStatus,
-               order_type     as orderType,
-               franchisee_id  as franchiseeId,
-               store_id       as storeId,
-               store_name     as storeName,
-               total_price    as totalPrice,
-               actual_price   as actualPrice,
-               order_level    as orderLevel,
-               primary_code   as primaryCode,
-               create_time    as createTime,
-               create_by_id   as createById,
-               create_by_name as createByName,
-               update_time    as updateTime,
-               update_by_id   as updateById,
-               update_by_name as updateByName
-        from order_store_info
-        where order_id = #{orderId} limit 1
-    </select>
-
-    <select id="selectByOrderCode" parameterType="java.lang.String"
-            resultType="com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo">
-        select id             as id,
-               order_id       as orderId,
-               order_code     as orderCode,
-               order_status   as orderStatus,
-               return_status  as returnStatus,
-               pay_status     as payStatus,
-               order_type     as orderType,
-               franchisee_id  as franchiseeId,
-               store_id       as storeId,
-               store_name     as storeName,
-               total_price    as totalPrice,
-               actual_price   as actualPrice,
-               order_level    as orderLevel,
-               primary_code   as primaryCode,
-               create_time    as createTime,
-               create_by_id   as createById,
-               create_by_name as createByName,
-               update_time    as updateTime,
-               update_by_id   as updateById,
-               update_by_name as updateByName
-        from order_store_info
-        where order_code = #{orderCode} limit 1
-    </select>
-
-    <select id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo"
-            resultType="com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo">
-        update order_store_info
-        set
-        <if test="orderStatus != null and orderStatus != '' or orderStatus == 0">
-            order_status = #{orderStatus},
-        </if>
-        update_by_id = #{updateById},
-        update_by_name = #{updateByName},
-        update_time = sysdate()
-        where id = #{id}
-    </select>
-
-    <insert id="insert">
-        insert into order_store_info (order_id, order_code, order_status, order_level, primary_code, return_status,
-                                      order_type, pay_status, franchisee_id, store_id, store_name, total_price,
-                                      actual_price,
-                                      create_time, create_by_id, create_by_name, update_time, update_by_id,
-                                      update_by_name)
-        values (#{orderId}, #{orderCode}, #{orderStatus}, #{orderLevel}, #{primaryCode}, #{returnStatus},
-                #{orderType}, #{payStatus}, #{franchiseeId}, #{storeId}, #{storeName}, #{totalPrice}, #{actualPrice},
-                sysdate(), #{createById}, #{createByName}, sysdate(), #{updateById}, #{updateByName})
-    </insert>
 
 </mapper>
 
