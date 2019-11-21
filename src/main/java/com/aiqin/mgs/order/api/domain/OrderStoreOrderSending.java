@@ -17,28 +17,20 @@ public class OrderStoreOrderSending {
 
     /***主键*/
     private Long id;
-
     /***订单编号*/
     private String orderId;
-
     /***发货id*/
     private String sendingId;
-
     /***物流公司名称*/
     private String logisticCentreName;
-
     /***物流单号*/
     private String logisticId;
-
     /***物流费用*/
     private BigDecimal logisticFee;
-
     /***物流状态*/
     private Integer logisticStatus;
-
     /***发货仓库*/
     private String sendStore;
-
     /***支付状态*/
     private Integer payStatus;
 

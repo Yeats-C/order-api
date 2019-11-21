@@ -17,5 +17,11 @@
         order by create_time desc
     </select>
 
+    <insert id="insert">
+        insert into order_store_operation_log (log_id, order_id, operation_content, create_time, create_by_id,
+                                               create_by_name)
+        values (#{logId}, #{orderId}, #{operationContent}, sysdate(), #{createById}, #{createByName})
+    </insert>
+
 </mapper>
 

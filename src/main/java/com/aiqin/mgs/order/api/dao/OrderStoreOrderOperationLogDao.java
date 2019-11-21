@@ -25,4 +25,14 @@ public interface OrderStoreOrderOperationLogDao {
      */
     List<OrderStoreOrderOperationLog> selectOperationLogListByOrderId(@Param("orderId") String orderId);
 
+    /**
+     * 插入订单日志数据
+     *
+     * @param orderStoreOrderOperationLog
+     * @return java.lang.Integer
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/20 11:08
+     */
+    Integer insert(OrderStoreOrderOperationLog orderStoreOrderOperationLog);
 }

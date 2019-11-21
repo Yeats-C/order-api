@@ -24,4 +24,15 @@ public interface OrderStoreOrderProductItemDao {
      * @date 2019/11/14 15:58
      */
     List<OrderStoreOrderProductItem> selectOrderProductListByOrderId(@Param("orderId") String orderId);
+
+    /**
+     * 插入订单商品行数据
+     *
+     * @param orderStoreOrderProductItem
+     * @return java.lang.Integer
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/20 11:08
+     */
+    Integer insert(OrderStoreOrderProductItem orderStoreOrderProductItem);
 }
