@@ -211,6 +211,12 @@ public class OrderDetailInfo extends PagesRequest {
 	@ApiModelProperty(value="剩余提货数量")
 	@JsonProperty("able_supply_amount")
 	private Integer ableSupplyAmount=0;
+
+
+
+    @ApiModelProperty(value="未提货的退货数量")
+    @JsonProperty("return_prestorage_amount")
+    private Integer returnPrestorageAmount=0;
 }
 
 

@@ -2102,9 +2102,9 @@ public class OrderServiceImpl implements OrderService {
             Integer actualPrice = storeValueOrderPayRequest.getActualPrice();
             String updateBy = storeValueOrderPayRequest.getUpdateBy();
             orderInfo.setPayStatus(1);
-            //支付完成
-            orderInfo.setOrderStatus(5);
-            orderInfo.setPayType("储值卡");
+            //支付完成由回调修改
+            //orderInfo.setOrderStatus(5);
+            orderInfo.setPayType("7");
             orderInfo.setActualPrice(actualPrice);
             orderInfo.setUpdateBy(updateBy);
             orderInfo.setDistributorCode(storeValueOrderPayRequest.getStoreCode());
@@ -2123,6 +2123,7 @@ public class OrderServiceImpl implements OrderService {
             //支付信息
             addOrderPay(orderInfo, updateBy);
             orderInfo.setOrderdetailList(orderDetailInfoList);
+
             return HttpResponse.success(orderInfo);
         } catch (GroundRuntimeException e) {
             LOGGER.error("储值支付成功,更新订单异常:{}", e.getMessage());

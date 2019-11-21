@@ -400,6 +400,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 						if (orderDetailInfo.getOrderDetailId().equals(prestorageOrderSupplyDetail.getOrderDetailId())){
 							orderDetailInfo.setReturnAmount(prestorageOrderSupplyDetail.getReturnAmount());
 							orderDetailInfo.setSupplyAmount(prestorageOrderSupplyDetail.getSupplyAmount());
+							orderDetailInfo.setReturnPrestorageAmount(prestorageOrderSupplyDetail.getReturnPrestorageAmount());
 							//可提货数量
 							orderDetailInfo.setAbleSupplyAmount(prestorageOrderSupplyDetail.getAmount()-prestorageOrderSupplyDetail.getSupplyAmount()-prestorageOrderSupplyDetail.getReturnPrestorageAmount());
 						}
