@@ -202,9 +202,15 @@ public class OrderDetailInfo extends PagesRequest {
     @ApiModelProperty(value="优惠券实体类")
     @JsonProperty("coupon_info")
     private OrderRelationCouponInfo couponInfo;
-    
-    
 
+
+	@ApiModelProperty(value="提货数量")
+	@JsonProperty("supply_amount")
+	private Integer supplyAmount=0;
+
+	@ApiModelProperty(value="剩余提货数量")
+	@JsonProperty("able_supply_amount")
+	private Integer ableSupplyAmount=0;
 }
 
 

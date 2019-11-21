@@ -391,12 +391,25 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		try {
 		//订单明细数据
 			List<OrderDetailInfo> detailList=new ArrayList<>();
+			detailList = orderDetailDao.selectDetailById(orderDetailQuery);
 			if (orderInfo!=null&&orderInfo.getOrderType()==4){
 				//预存订单
 				List<PrestorageOrderSupplyDetail> prestorageOrderSupplyDetails=prestorageOrderSupplyDetailDao.selectprestorageorderDetailsListByOrderId(orderId);
 				for (PrestorageOrderSupplyDetail prestorageOrderSupplyDetail:prestorageOrderSupplyDetails){
+					for (OrderDetailInfo orderDetailInfo:detailList){
+						if (orderDetailInfo.getOrderDetailId().equals(prestorageOrderSupplyDetail.getOrderDetailId())){
+							orderDetailInfo.setReturnAmount(prestorageOrderSupplyDetail.getReturnAmount());
+							orderDetailInfo.setSupplyAmount(prestorageOrderSupplyDetail.getSupplyAmount());
+							//可提货数量
+							orderDetailInfo.setAbleSupplyAmount(prestorageOrderSupplyDetail.getAmount()-prestorageOrderSupplyDetail.getSupplyAmount()-prestorageOrderSupplyDetail.getReturnPrestorageAmount());
+						}
+					}
+
+
+
 					OrderDetailInfo orderDetailInfo=new OrderDetailInfo();
 					BeanUtils.copyProperties(prestorageOrderSupplyDetail,orderDetailInfo);
+					orderDetailInfo.setOrderCode(prestorageOrderSupplyDetail.getOrderId());
 					detailList.add(orderDetailInfo);
 				}
 			}else {
