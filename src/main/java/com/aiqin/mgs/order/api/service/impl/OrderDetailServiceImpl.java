@@ -371,14 +371,14 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 
 			orderInfo = orderDao.selecOrderById(orderDetailQuery);
 			//获取SKU数量
-			Integer skuSum =0;
+			/*Integer skuSum =0;
 			if (orderInfo!=null&&orderInfo.getOrderType()==4){
 				//预存订单
 				skuSum = getPrestorageSkuSum(orderId);
 			}else {
 				skuSum = getSkuSum(orderId);
-			}
-
+			}*/
+			Integer skuSum = getSkuSum(orderId);
 			orderInfo.setSkuSum(skuSum);
 			info.setOrderInfo(orderInfo);
 
