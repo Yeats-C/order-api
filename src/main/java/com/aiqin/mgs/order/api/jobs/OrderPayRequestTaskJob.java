@@ -32,7 +32,7 @@ public class OrderPayRequestTaskJob {
     @Resource
     private ErpOrderPayService erpOrderPayService;
 
-    @Scheduled(cron = "0 0/5 * * * ? ")
+//    @Scheduled(cron = "0 0/5 * * * ? ")
     public void getTask() {
         //计时器
         StopWatch watch = new StopWatch();
