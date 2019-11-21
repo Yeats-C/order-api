@@ -405,12 +405,6 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 						}
 					}
 
-
-
-					OrderDetailInfo orderDetailInfo=new OrderDetailInfo();
-					BeanUtils.copyProperties(prestorageOrderSupplyDetail,orderDetailInfo);
-					orderDetailInfo.setOrderCode(prestorageOrderSupplyDetail.getOrderId());
-					detailList.add(orderDetailInfo);
 				}
 			}else {
 				detailList = orderDetailDao.selectDetailById(orderDetailQuery);

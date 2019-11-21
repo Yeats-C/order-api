@@ -35,15 +35,7 @@ public class PayServiceImpl implements PayService {
     private BridgePayService bridgePayService;
     @Override
     public HttpResponse doPay(PayReq vo) {
-        //vo.setBackUrl(UrlConfig.getMerchanatApiUrl() + "/pay/back");
-
-        if (!Objects.equals("release", vo.getEnvironment())) {
-            //TODO 测试金额
-            vo.setOrderAmount(1L);
-        }else{
-            //支付金额
-            checkPayMoney(vo);
-        }
+        checkPayMoney(vo);
         return bridgePayService.mainSwept(vo);
     }
 

@@ -260,6 +260,7 @@ public class OrderServiceImpl implements OrderService {
                 //Toc 订单
                 if (orderInfo.getOrderInfo().getOrderType() == 1||orderInfo.getOrderInfo().getOrderType() == 4) {
                     orderInfo.getOrderInfo().setPayType(String.valueOf(vo.getPayType()));
+                    orderInfo.getOrderInfo().setActualPrice(vo.getOrderAmount());
                     return tocOrderCallback(orderInfo);
                 }
 
@@ -273,14 +274,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private HttpResponse tocOrderCallback(OrderodrInfo orderInfo) {
-        //修改状态
+        //修改状态 支付类型
         try {
             int i=0;
             if (orderInfo.getOrderInfo().getOrderType()==4){
-                 i = orderService.updateOrderStatuss(orderInfo.getOrderInfo().getOrderId(), Global.ORDER_STATUS_2, PayStatusEnum.HAS_PAY.getCode(), "系统设置",orderInfo.getOrderInfo().getPayType());
+                 i = orderService.updateOrderStatuss(orderInfo.getOrderInfo().getOrderId(), Global.ORDER_STATUS_2, PayStatusEnum.HAS_PAY.getCode(), "系统设置",orderInfo.getOrderInfo().getPayType(),orderInfo.getOrderInfo().getActualPrice());
 
             }else {
-                 i = orderService.updateOrderStatuss(orderInfo.getOrderInfo().getOrderId(), Global.ORDER_STATUS_5, PayStatusEnum.HAS_PAY.getCode(), "系统设置",orderInfo.getOrderInfo().getPayType());
+                 i = orderService.updateOrderStatuss(orderInfo.getOrderInfo().getOrderId(), Global.ORDER_STATUS_5, PayStatusEnum.HAS_PAY.getCode(), "系统设置",orderInfo.getOrderInfo().getPayType(), orderInfo.getOrderInfo().getActualPrice());
 
             }
             if (i == 0) {
@@ -903,7 +904,7 @@ public class OrderServiceImpl implements OrderService {
     public HttpResponse updateOrderStatus(@Valid String orderId, Integer orderStatus, Integer payStatus,
                                           String updateBy, String payType) {
         try {
-            updateOrderStatuss(orderId, orderStatus, payStatus, updateBy,payType);
+            updateOrderStatuss(orderId, orderStatus, payStatus, updateBy,payType, null);
 
             return HttpResponse.success();
         } catch (Exception e) {
@@ -915,13 +916,14 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public int updateOrderStatuss(@Valid String orderId, Integer orderStatus, Integer payStatus,
-                                  String updateBy, String payType) throws Exception {
+                                  String updateBy, String payType, Integer actualPrice) throws Exception {
         OrderInfo orderInfo = new OrderInfo();
         orderInfo.setOrderId(orderId);
         orderInfo.setOrderStatus(orderStatus);
         orderInfo.setPayStatus(payStatus);
         orderInfo.setUpdateBy(updateBy);
         orderInfo.setPayType(payType);
+        orderInfo.setActualPrice(actualPrice);
         //更新订单主数据
         int i = orderDao.updateOrder(orderInfo);
 

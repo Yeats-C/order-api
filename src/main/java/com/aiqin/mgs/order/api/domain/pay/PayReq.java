@@ -46,7 +46,7 @@ public class PayReq implements Serializable {
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonProperty("order_time")
     private Date orderTime;
-    @ApiModelProperty(value = "(支付类型1.微信，2支付宝，3网联，4 转账,5现金，6储值卡)")
+    @ApiModelProperty(value = "(支付类型1)")
     @JsonProperty("pay_type")
     private Integer payType;
     @ApiModelProperty(value = "微信公众号标识--不传", hidden = true)

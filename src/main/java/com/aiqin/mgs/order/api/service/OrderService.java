@@ -66,7 +66,7 @@ public interface OrderService {
 	HttpResponse updateOrderStatus(@Valid String orderId, Integer orderStatus, Integer payStatus,
                                    String updateBy, String payType);
 	public int updateOrderStatuss(@Valid String orderId, Integer orderStatus, Integer payStatus,
-								   String updateBy, String payType) throws Exception;
+								  String updateBy, String payType, Integer actualPrice) throws Exception;
 	//仅更改退货状态-订单主表
 	void retustus(@Valid String orderId, Integer returnStatus, String updateBy)throws Exception;
 
