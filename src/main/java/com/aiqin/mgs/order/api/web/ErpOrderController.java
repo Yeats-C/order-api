@@ -7,6 +7,7 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo;
+import com.aiqin.mgs.order.api.domain.request.ErpOrderSaveRequest;
 import com.aiqin.mgs.order.api.domain.response.ErpOrderDetailResponse;
 import com.aiqin.mgs.order.api.service.ErpOrderService;
 import io.swagger.annotations.Api;
@@ -62,10 +63,10 @@ public class ErpOrderController {
 
     @PostMapping("/saveOrder")
     @ApiOperation(value = "保存erp订单")
-    public HttpResponse saveOrder(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
+    public HttpResponse saveOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-            erpOrderService.saveOrder(orderStoreOrderInfo);
+            erpOrderService.saveOrder(erpOrderSaveRequest);
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {

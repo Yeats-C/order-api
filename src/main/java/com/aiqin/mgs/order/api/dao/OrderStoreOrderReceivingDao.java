@@ -1,7 +1,8 @@
 package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderReceiving;
-import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 订单收货信息
@@ -13,13 +14,24 @@ import org.apache.ibatis.annotations.Param;
 public interface OrderStoreOrderReceivingDao {
 
     /**
-     * 根据订单id查询收货信息
+     * 非空字段精确筛选
      *
-     * @param orderId
-     * @return com.aiqin.mgs.order.api.domain.OrderStoreOrderReceiving
+     * @param orderStoreOrderReceiving
+     * @return java.util.List<com.aiqin.mgs.order.api.domain.OrderStoreOrderReceiving>
      * @author: Tao.Chen
      * @version: v1.0.0
-     * @date 2019/11/14 15:50
+     * @date 2019/11/21 17:09
      */
-    OrderStoreOrderReceiving getOrderReceivingByOrderId(@Param("orderId") String orderId);
+    List<OrderStoreOrderReceiving> select(OrderStoreOrderReceiving orderStoreOrderReceiving);
+
+    /**
+     * 保存数据
+     *
+     * @param orderStoreOrderReceiving
+     * @return java.lang.Integer
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/21 17:09
+     */
+    Integer insert(OrderStoreOrderReceiving orderStoreOrderReceiving);
 }

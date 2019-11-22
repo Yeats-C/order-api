@@ -2,24 +2,46 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aiqin.mgs.order.api.dao.OrderStoreOrderReceivingDao">
 
-    <select id="getOrderReceivingByOrderId" parameterType="java.lang.String"
+    <select id="select" parameterType="com.aiqin.mgs.order.api.domain.OrderStoreOrderReceiving"
             resultType="com.aiqin.mgs.order.api.domain.OrderStoreOrderReceiving">
-        select id              as id,
-               order_id        as orderId,
-               receive_id      as receiveId,
-               receive_name    as receiveName,
-               receive_address as receiveAddress,
-               receive_phone   as receivePhone,
-               bill_status     as billStatus,
-               create_time     as createTime,
-               create_by_id    as createById,
-               create_by_name  as createByName,
-               update_time     as updateTime,
-               update_by_id    as updateById,
-               update_by_name  as updateByName
+        select id as id,
+        order_id as orderId,
+        receive_id as receiveId,
+        receive_name as receiveName,
+        receive_address as receiveAddress,
+        receive_phone as receivePhone,
+        bill_status as billStatus,
+        create_time as createTime,
+        create_by_id as createById,
+        create_by_name as createByName,
+        update_time as updateTime,
+        update_by_id as updateById,
+        update_by_name as updateByName
         from order_store_receiving
-        where 1 = 1
-          and order_id = #{orderId}
+        <where>
+            1 = 1
+            <if test=" id != null and id != '' ">
+                and id = #{id}
+            </if>
+            <if test=" orderId != null and orderId != '' ">
+                and order_id = #{orderId}
+            </if>
+            <if test=" receiveId != null and receiveId != '' ">
+                and receive_id = #{receiveId}
+            </if>
+            <if test=" billStatus != null and billStatus != '' or billStatus == 0 ">
+                and bill_status = #{billStatus}
+            </if>
+        </where>
+        order by create_time desc
     </select>
+
+    <insert id="insert">
+        insert into order_store_receiving (order_id, receive_id, receive_name, receive_address, receive_phone,
+                                           bill_status, create_time, create_by_id, create_by_name,
+                                           update_time, update_by_id, update_by_name)
+        values (#{orderId}, #{receiveId}, #{receiveName}, #{receiveAddress}, #{receivePhone}, #{billStatus}, sysdate(),
+                #{createById}, #{createByName}, sysdate(), #{updateById}, #{updateByName})
+    </insert>
 
 </mapper>

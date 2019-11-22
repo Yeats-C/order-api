@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 
 @Service
-@Transactional(rollbackFor = Exception.class)
 public class ErpOrderOperationServiceImpl implements ErpOrderOperationService {
 
     @Resource
@@ -21,6 +20,7 @@ public class ErpOrderOperationServiceImpl implements ErpOrderOperationService {
     private ErpOrderOperationLogService erpOrderOperationLogService;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void saveOrder(OrderStoreOrderInfo orderInfo, AuthToken auth) {
         //TODO 数据校验
 
@@ -36,6 +36,7 @@ public class ErpOrderOperationServiceImpl implements ErpOrderOperationService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateOrderByPrimaryKeySelective(OrderStoreOrderInfo orderInfo, String operationContent, AuthToken auth) {
         //TODO 数据校验
 
