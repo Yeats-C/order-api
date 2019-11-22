@@ -1,6 +1,6 @@
 package com.aiqin.mgs.order.api.domain;
 
-import com.aiqin.mgs.order.api.base.PagesRequest;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -15,27 +15,32 @@ import java.util.List;
  * @date 2019/11/12 15:45
  */
 @Data
-public class OrderStoreOrderInfo extends PagesRequest {
+public class OrderStoreOrderInfo {
 
     /***主键*/
     private Long id;
     /***订单id*/
     private String orderId;
     /***订单编号*/
+    @ApiModelProperty(value = "订单号")
     private String orderCode;
     /***订单状态 枚举 ErpOrderStatusEnum*/
+    @ApiModelProperty(value = "订单状态")
     private Integer orderStatus;
     /***是否发生退货 0否 1是*/
     private Integer returnStatus;
     /***支付状态 */
+    @ApiModelProperty(value = "支付状态")
     private Integer payStatus;
     /***订单类型 枚举 OrderTypeEnum*/
+    @ApiModelProperty(value = "订单类型")
     private Integer orderType;
     /***加盟商id*/
     private String franchiseeId;
     /***门店id*/
     private String storeId;
     /***门店名称*/
+    @ApiModelProperty(value = "门店名称")
     private String storeName;
     /***订单总额*/
     private BigDecimal totalPrice;
@@ -48,6 +53,12 @@ public class OrderStoreOrderInfo extends PagesRequest {
 
     /***创建时间*/
     private Date createTime;
+    /***创建时间开始 yyyy-MM-dd*/
+    @ApiModelProperty(value = "订单日期 开始")
+    private String createTimeBegin;
+    /***创建时间结束 yyyy-MM-dd*/
+    @ApiModelProperty(value = "订单日期 结束")
+    private String createTimeEnd;
     /***创建人id*/
     private String createById;
     /***创建人姓名*/
@@ -58,6 +69,11 @@ public class OrderStoreOrderInfo extends PagesRequest {
     private String updateById;
     /***修改人姓名*/
     private String updateByName;
+
+    @ApiModelProperty(value = "每页条数")
+    private Integer pageSize;
+    @ApiModelProperty(value = "当前页")
+    private Integer pageNo;
 
     /***关联子订单*/
     private List<OrderStoreOrderInfo> secondaryOrderList;
