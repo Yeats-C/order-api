@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.service;
 
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo;
+import com.aiqin.mgs.order.api.domain.request.ErpOrderSaveRequest;
 import com.aiqin.mgs.order.api.domain.response.ErpOrderDetailResponse;
 
 /**
@@ -38,11 +39,11 @@ public interface ErpOrderService {
     /**
      * 保存订单
      *
-     * @param orderStoreOrderInfo
+     * @param erpOrderSaveRequest
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/11/13 10:15
      */
-    void saveOrder(OrderStoreOrderInfo orderStoreOrderInfo);
+    void saveOrder(ErpOrderSaveRequest erpOrderSaveRequest);
 }

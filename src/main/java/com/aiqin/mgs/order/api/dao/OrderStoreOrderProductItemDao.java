@@ -1,7 +1,6 @@
 package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderProductItem;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -15,17 +14,6 @@ import java.util.List;
 public interface OrderStoreOrderProductItemDao {
 
     /**
-     * 根据订单id查询订单商品明细列表
-     *
-     * @param orderId
-     * @return java.util.List<com.aiqin.mgs.order.api.domain.OrderStoreOrderProductItem>
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/11/14 15:58
-     */
-    List<OrderStoreOrderProductItem> selectOrderProductListByOrderId(@Param("orderId") String orderId);
-
-    /**
      * 插入订单商品行数据
      *
      * @param orderStoreOrderProductItem
@@ -35,4 +23,15 @@ public interface OrderStoreOrderProductItemDao {
      * @date 2019/11/20 11:08
      */
     Integer insert(OrderStoreOrderProductItem orderStoreOrderProductItem);
+
+    /**
+     * 根据非空字段精确查询
+     *
+     * @param orderStoreOrderProductItem
+     * @return java.util.List<com.aiqin.mgs.order.api.domain.OrderStoreOrderProductItem>
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/22 9:32
+     */
+    List<OrderStoreOrderProductItem> select(OrderStoreOrderProductItem orderStoreOrderProductItem);
 }

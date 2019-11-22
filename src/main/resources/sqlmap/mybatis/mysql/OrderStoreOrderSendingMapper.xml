@@ -2,26 +2,59 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aiqin.mgs.order.api.dao.OrderStoreOrderSendingDao">
 
-    <select id="getOrderSendingByOrderId" parameterType="java.lang.String"
-            resultType="com.aiqin.mgs.order.api.domain.OrderStoreOrderSending">
-        select id                   as id,
-               order_id             as orderId,
-               sending_id           as sendingId,
-               logistic_centre_name as logisticCentreName,
-               logistic_id          as logisticId,
-               logistic_fee         as logisticFee,
-               logistic_status      as logisticStatus,
-               send_store           as sendStore,
-               pay_status           as payStatus,
-               create_time          as createTime,
-               create_by_id         as createById,
-               create_by_name       as createByName,
-               update_time          as updateTime,
-               update_by_id         as updateById,
-               update_by_name       as updateByName
+    <select id="select" resultType="com.aiqin.mgs.order.api.domain.OrderStoreOrderSending"
+            parameterType="com.aiqin.mgs.order.api.domain.OrderStoreOrderSending">
+        select id as id,
+        order_id as orderId,
+        sending_id as sendingId,
+        logistic_centre_name as logisticCentreName,
+        logistic_id as logisticId,
+        logistic_fee as logisticFee,
+        logistic_status as logisticStatus,
+        send_store as sendStore,
+        pay_status as payStatus,
+        create_time as createTime,
+        create_by_id as createById,
+        create_by_name as createByName,
+        update_time as updateTime,
+        update_by_id as updateById,
+        update_by_name as updateByName
         from order_store_sending
-        where 1 = 1
-          and order_id = #{orderId}
+        <where>
+            1 = 1
+            <if test=" id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test=" orderId != null and orderId != ''">
+                and order_id = #{orderId}
+            </if>
+            <if test=" sendingId != null and sendingId != ''">
+                and sending_id = #{sendingId}
+            </if>
+            <if test=" logisticId != null and logisticId != ''">
+                and logistic_id = #{logisticId}
+            </if>
+            <if test=" payStatus != null and payStatus != '' or payStatus == 0">
+                and pay_status = #{payStatus}
+            </if>
+            <if test=" logisticStatus != null and logisticStatus != '' or logisticStatus == 0">
+                and logistic_status = #{logisticStatus}
+            </if>
+            <if test=" sendStore != null and sendStore != ''">
+                and send_store = #{sendStore}
+            </if>
+        </where>
+        order by create_time desc
     </select>
+
+    <insert id="insert">
+        insert into order_store_sending (order_id, sending_id, logistic_centre_name, logistic_id,
+                                         logistic_fee, logistic_status, send_store, pay_status, create_time,
+                                         create_by_id, create_by_name, update_time, update_by_id,
+                                         update_by_name)
+        values (#{orderId}, #{sendingId}, #{logisticCentreName}, #{logisticId}, #{logisticFee}, #{logisticStatus},
+                #{sendStore}, #{payStatus}, sysdate(), #{createById}, #{createByName}, sysdate(), #{updateById},
+                #{updateByName})
+    </insert>
 
 </mapper>

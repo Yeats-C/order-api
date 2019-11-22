@@ -2,33 +2,45 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aiqin.mgs.order.api.dao.OrderStoreOrderProductItemDao">
 
-    <select id="selectOrderProductListByOrderId"
-            parameterType="com.aiqin.mgs.order.api.domain.OrderStoreOrderProductItem"
+    <select id="select" parameterType="com.aiqin.mgs.order.api.domain.OrderStoreOrderProductItem"
             resultType="com.aiqin.mgs.order.api.domain.OrderStoreOrderProductItem">
-        select id                     as id,
-               order_id               as orderId,
-               order_code             as orderCode,
-               order_product_id       as orderProductId,
-               sku_code               as skuCode,
-               sku_name               as skuName,
-               product_number         as productNumber,
-               product_order_price    as productOrderPrice,
-               tax_purchase_price     as taxPurchasePrice,
-               order_money            as orderMoney,
-               unit                   as unit,
-               actual_deliver_num     as actualDeliverNum,
-               actual_store_num       as actualStoreNum,
-               original_product_price as originalProductPrice,
-               share_after_price      as shareAfterPrice,
-               create_time            as createTime,
-               create_by_id           as createById,
-               create_by_name         as createByName,
-               update_time            as updateTime,
-               update_by_id           as updateById,
-               update_by_name         as updateByName
+        select id as id,
+        order_id as orderId,
+        order_code as orderCode,
+        order_product_id as orderProductId,
+        sku_code as skuCode,
+        sku_name as skuName,
+        product_number as productNumber,
+        product_order_price as productOrderPrice,
+        tax_purchase_price as taxPurchasePrice,
+        order_money as orderMoney,
+        unit as unit,
+        actual_deliver_num as actualDeliverNum,
+        actual_store_num as actualStoreNum,
+        original_product_price as originalProductPrice,
+        share_after_price as shareAfterPrice,
+        create_time as createTime,
+        create_by_id as createById,
+        create_by_name as createByName,
+        update_time as updateTime,
+        update_by_id as updateById,
+        update_by_name as updateByName
         from order_store_product_item
-        where 1 = 1
-          and order_id = #{orderId}
+        <where>
+            1 = 1
+            <if test=" id != null and id != '' ">
+                and id = #{id}
+            </if>
+            <if test=" orderId != null and orderId != '' ">
+                and order_id = #{orderId}
+            </if>
+            <if test=" orderCode != null and orderCode != '' ">
+                and order_code = #{orderCode}
+            </if>
+            <if test=" orderProductId != null and orderProductId != '' ">
+                and order_product_id = #{orderProductId}
+            </if>
+        </where>
         order by create_time desc
     </select>
 
