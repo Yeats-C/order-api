@@ -36,6 +36,7 @@ public class PayServiceImpl implements PayService {
     @Override
     public HttpResponse doPay(PayReq vo) {
         checkPayMoney(vo);
+        vo.setStoreId(vo.getAiqinMerchantId());
         return bridgePayService.mainSwept(vo);
     }
 

@@ -31,6 +31,10 @@ public class PayReq implements Serializable {
     @JsonProperty("aiqin_merchant_id")
     private String aiqinMerchantId;
 
+    @ApiModelProperty(value = "门店id",hidden = true)
+    @JsonProperty("store_id")
+    private String storeId;
+
     @ApiModelProperty("订单号")
     @JsonProperty("order_no")
     private String orderNo;
@@ -70,6 +74,11 @@ public class PayReq implements Serializable {
     @ApiModelProperty(value = "创建人编号 ", hidden = true)
     @JsonProperty("create_by")
     private String createBy;
+
+    @ApiModelProperty(value = "创建人 ", hidden = true)
+    @JsonProperty("create_name")
+    private String createName;
+
     @ApiModelProperty(value = "回调地址", hidden = true)
     @JsonProperty("back_url")
     private String backUrl;
@@ -90,6 +99,13 @@ public class PayReq implements Serializable {
     @JsonProperty("company_code")
     private  String companyCode;
 
+    @ApiModelProperty(value = "公司",hidden = true)
+    @JsonProperty("company_name")
+    private  String companyName;
+
+    @ApiModelProperty(value="操作门店名称")
+    @JsonProperty("operation_store_name")
+    private String operationStoreName;
     /*******************新增*******************/
     @ApiModelProperty(value = "加盟商id",hidden = true)
     @JsonProperty("franchisee_id")
