@@ -43,12 +43,12 @@ public class SettlementInfo extends PagesRequest {
     
     @ApiModelProperty(value = "优惠券总优惠金额")
     @JsonProperty("total_coupons_discount")
-    private Integer totalCouponsDiscount;
+    private Integer totalCouponsDiscount=0;
     
     
     @ApiModelProperty(value = "积分折扣")
     @JsonProperty("point_percentage")
-    private Integer pointPercentage;
+    private Integer pointPercentage=0;
     
     
     @ApiModelProperty(value = "活动优惠")
@@ -88,7 +88,7 @@ public class SettlementInfo extends PagesRequest {
     
     @ApiModelProperty(value = "积分抵扣金额")
     @JsonProperty("point_discount")
-    private Integer pointDiscount;
+    private Integer pointDiscount=0;
     
     
     @ApiModelProperty(value = "订单创建时间")

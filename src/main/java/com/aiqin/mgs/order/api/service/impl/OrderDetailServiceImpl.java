@@ -432,7 +432,9 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			OrderQuery orderQuery = new OrderQuery();
 			orderQuery.setOrderId(orderId);
 			info.setSettlementInfo(settlementDao.jkselectsettlement(orderQuery));
-			
+			if (orderInfo!=null&&orderInfo.getOrderType()==4){
+				//预存订单 储值卡金额
+			}
 			return HttpResponse.success(info);
 			} catch (Exception e) {
 				LOGGER.error("查询BYorderid-返回订单结算信息",e);
