@@ -49,7 +49,7 @@ public class CartOrderServiceImpl implements CartOrderService {
 
         //商品数量不能大于999
         List<Product> products = shoppingCartRequest.getProducts();
-        for (Product product:products){
+        for (Product product : products) {
             if (product.getAmount() > 999) {
                 return HttpResponse.failure(ResultCode.OVER_LIMIT);
             }
@@ -57,17 +57,17 @@ public class CartOrderServiceImpl implements CartOrderService {
         //通过商品id、门店Id、skuid调用商品模块，返回商品信息
         HttpResponse<List<CartOrderInfo>> productInfo = bridgeProductService.getProduct(shoppingCartRequest);
         List<CartOrderInfo> cartOrderInfoList = productInfo.getData();
-        for (CartOrderInfo cartOrderInfo1:cartOrderInfoList){
+        for (CartOrderInfo cartOrderInfo1 : cartOrderInfoList) {
             //获取库房的商品数量和sku码
             int stockProductAmount = cartOrderInfo1.getAmount();
             String skuId = cartOrderInfo1.getSkuId();
-            LOGGER.info("库存的skuId编码和数量：{},{}",skuId,stockProductAmount);
+            LOGGER.info("库存的skuId编码和数量：{},{}", skuId, stockProductAmount);
             //获取前端的商品数量，与库房数量进行比对
-            for (Product product:products){
-                if (skuId == product.getSkuId()&& stockProductAmount < product.getAmount()){
+            for (Product product : products) {
+                if (skuId == product.getSkuId() && stockProductAmount < product.getAmount()) {
                     return HttpResponse.failure(ResultCode.STORE_SHORT);
                 }
-                if (stockProductAmount< 10) {
+                if (stockProductAmount < 10) {
                     return HttpResponse.failure(ResultCode.STOCK_SHORT1);
                 }
                 CartOrderInfo cartOrderInfo = new CartOrderInfo();
@@ -121,7 +121,7 @@ public class CartOrderServiceImpl implements CartOrderService {
 
         }
         return HttpResponse.success();
-}
+    }
 
     private void checkParam(ShoppingCartRequest shoppingCartRequest) {
         if (shoppingCartRequest == null) {
@@ -146,7 +146,7 @@ public class CartOrderServiceImpl implements CartOrderService {
      * @return
      */
     @Override
-    public HttpResponse selectCartByStoreId(String storeId, Integer productType, String skuId, Integer lineCheckStatus,Integer number) {
+    public HttpResponse selectCartByStoreId(String storeId, Integer productType, String skuId, Integer lineCheckStatus, Integer number) {
         HttpResponse<Object> response = new HttpResponse<>();
         try {
             CartOrderInfo cartOrderInfo = new CartOrderInfo();
@@ -227,36 +227,32 @@ public class CartOrderServiceImpl implements CartOrderService {
         try {
             //清空购物车
             if (storeId != null) {
-                LOGGER.info("通过门店id清空购物车：{}", storeId);
-                cartOrderDao.deleteCart(storeId, null, null);
-            }
-            //删除单条商品
-            if (skuId != null) {
-                LOGGER.info("通过skuId删除商品：{}", skuId);
-                cartOrderDao.deleteCart(null, skuId, null);
-            }
-            //删除选中的商品
-            if (lineCheckStatus != null) {
-                LOGGER.info("清空全部勾选商品：{}", lineCheckStatus);
-                cartOrderDao.deleteCart(null, null, lineCheckStatus);
+                LOGGER.info("删除购物车中的商品：{}", storeId);
+                //可以清空，可以删除单条，删除勾选数据。
+                cartOrderDao.deleteCart(storeId, skuId, lineCheckStatus);
+            } else {
+                LOGGER.error("删除购物车中的商品失败：{}", storeId);
+                return HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
             }
             return HttpResponse.success();
 
         } catch (Exception e) {
             LOGGER.error("清空购物车失败", e);
+
             return HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
         }
     }
 
     /**
      * 显示购物车中的勾选商品
+     *
      * @param cartOrderInfo
      * @return
      */
     @Override
     public HttpResponse displayCartLineCheckProduct(CartOrderInfo cartOrderInfo) {
 
-        HttpResponse response = new HttpResponse();
+        HttpResponse response = HttpResponse.success();
         //调用门店接口，返回门店的基本信息
         ShoppingCartRequest shoppingCartRequest = new ShoppingCartRequest();
         shoppingCartRequest.setStoreId(cartOrderInfo.getStoreId());
@@ -273,7 +269,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                 orderConfirmResponse.setCartOrderInfos(cartOrderInfos);
                 //计算订货金额合计
                 BigDecimal orderTotalPrice = new BigDecimal(0);
-                for (CartOrderInfo cartOrderInfo1:cartOrderInfos){
+                for (CartOrderInfo cartOrderInfo1 : cartOrderInfos) {
                     BigDecimal total = cartOrderInfo1.getPrice().multiply(new BigDecimal(cartOrderInfo1.getAmount()));
                     orderTotalPrice = orderTotalPrice.add(total);
                 }
