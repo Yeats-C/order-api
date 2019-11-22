@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.service.impl;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.dao.OrderStoreOrderInfoDao;
@@ -55,38 +56,44 @@ public class ErpOrderServiceImpl implements ErpOrderService {
     @Override
     public PageResData<OrderStoreOrderInfo> findOrderList(OrderStoreOrderInfo orderStoreOrderInfo) {
         orderStoreOrderInfo.setOrderLevel(OrderLevelEnum.PRIMARY.getCode());
-        PageResData<OrderStoreOrderInfo> pageResData = PageAutoHelperUtil.generatePageRes(() -> orderStoreOrderInfoDao.findOrderList(orderStoreOrderInfo), orderStoreOrderInfo);
+        PagesRequest page = new PagesRequest();
+        page.setPageNo(orderStoreOrderInfo.getPageNo() == null ? 1 : orderStoreOrderInfo.getPageNo());
+        page.setPageSize(orderStoreOrderInfo.getPageSize() == null ? 10 : orderStoreOrderInfo.getPageSize());
+        PageResData<OrderStoreOrderInfo> pageResData = PageAutoHelperUtil.generatePageRes(() -> orderStoreOrderInfoDao.findOrderList(orderStoreOrderInfo), page);
         List<OrderStoreOrderInfo> dataList = pageResData.getDataList();
-        List<String> primaryOrderCodeList = new ArrayList<>();
-        for (OrderStoreOrderInfo item :
-                dataList) {
-            primaryOrderCodeList.add(item.getOrderCode());
-        }
+        if (dataList != null && dataList.size() > 0) {
 
-        //查询子订单列表
-        Map<String, List<OrderStoreOrderInfo>> secondaryOrderMap = new HashMap<>(16);
-        List<OrderStoreOrderInfo> secondaryOrderList = orderStoreOrderInfoDao.findSecondaryOrderList(primaryOrderCodeList);
-        if (secondaryOrderList != null && secondaryOrderList.size() > 0) {
+            //获取主订单编码
+            List<String> primaryOrderCodeList = new ArrayList<>();
             for (OrderStoreOrderInfo item :
-                    secondaryOrderList) {
-                String primaryCode = item.getPrimaryCode();
-                if (secondaryOrderMap.containsKey(primaryCode)) {
-                    secondaryOrderMap.get(primaryCode).add(item);
-                } else {
-                    List<OrderStoreOrderInfo> newSecondaryOrderList = new ArrayList<>();
-                    newSecondaryOrderList.add(item);
-                    secondaryOrderMap.put(primaryCode, newSecondaryOrderList);
+                    dataList) {
+                primaryOrderCodeList.add(item.getOrderCode());
+            }
+
+            //查询子订单列表
+            Map<String, List<OrderStoreOrderInfo>> secondaryOrderMap = new HashMap<>(16);
+            List<OrderStoreOrderInfo> secondaryOrderList = orderStoreOrderInfoDao.findSecondaryOrderList(primaryOrderCodeList);
+            if (secondaryOrderList != null && secondaryOrderList.size() > 0) {
+                for (OrderStoreOrderInfo item :
+                        secondaryOrderList) {
+                    String primaryCode = item.getPrimaryCode();
+                    if (secondaryOrderMap.containsKey(primaryCode)) {
+                        secondaryOrderMap.get(primaryCode).add(item);
+                    } else {
+                        List<OrderStoreOrderInfo> newSecondaryOrderList = new ArrayList<>();
+                        newSecondaryOrderList.add(item);
+                        secondaryOrderMap.put(primaryCode, newSecondaryOrderList);
+                    }
+                }
+            }
+
+            for (OrderStoreOrderInfo item :
+                    dataList) {
+                if (secondaryOrderMap.containsKey(item.getOrderCode())) {
+                    item.setSecondaryOrderList(secondaryOrderMap.get(item.getOrderCode()));
                 }
             }
         }
-
-        for (OrderStoreOrderInfo item :
-                dataList) {
-            if (secondaryOrderMap.containsKey(item.getOrderCode())) {
-                item.setSecondaryOrderList(secondaryOrderMap.get(item.getOrderCode()));
-            }
-        }
-
 
         return pageResData;
     }
@@ -138,12 +145,12 @@ public class ErpOrderServiceImpl implements ErpOrderService {
     public void saveOrder(ErpOrderSaveRequest erpOrderSaveRequest) {
 
         AuthToken auth = AuthUtil.getCurrentAuth();
-        if (auth.getPersonId() == null || "".equals(auth.getPersonId())) {
+        if (auth.getPersonId() == null) {
             throw new BusinessException("请先登录");
         }
-        if (erpOrderSaveRequest == null || StringUtils.isEmpty(erpOrderSaveRequest.getStoreId())) {
-            throw new BusinessException("请选择门店");
-        }
+        //校验参数
+        validateSaveOrderRequest(erpOrderSaveRequest);
+
         if ("test".equals(erpOrderSaveRequest.getStoreId())) {
             test(auth);
             return;
@@ -163,6 +170,39 @@ public class ErpOrderServiceImpl implements ErpOrderService {
         //删除购物车商品
         deleteOrderProductFromCart(storeCartProduct);
 
+    }
+
+    private void validateSaveOrderRequest(ErpOrderSaveRequest erpOrderSaveRequest) {
+        if (erpOrderSaveRequest == null) {
+            throw new BusinessException("空参数");
+        }
+        if (StringUtils.isEmpty(erpOrderSaveRequest.getStoreId())) {
+            throw new BusinessException("请传入门店id");
+        }
+        if (erpOrderSaveRequest.getOrderType() == null) {
+            throw new BusinessException("请传入订单类型");
+        } else {
+            if (!OrderTypeEnum.exist(erpOrderSaveRequest.getOrderType())) {
+                throw new BusinessException("无效的订单类型");
+            }
+        }
+        if (erpOrderSaveRequest.getOrderOriginType() == null) {
+            throw new BusinessException("请选择订单来源");
+        } else {
+            if (!OrderOriginTypeEnum.exist(erpOrderSaveRequest.getOrderOriginType())) {
+                throw new BusinessException("无效的订单来源");
+            }
+        }
+        if (erpOrderSaveRequest.getOrderChannel() == null) {
+            throw new BusinessException("请选择销售渠道");
+        } else {
+            if (!OrderChannelEnum.exist(erpOrderSaveRequest.getOrderChannel())) {
+                throw new BusinessException("无效的销售渠道");
+            }
+        }
+        if (erpOrderSaveRequest.getBillStatus() == null) {
+            throw new BusinessException("请确认是否需要发票");
+        }
     }
 
     /**
@@ -234,16 +274,17 @@ public class ErpOrderServiceImpl implements ErpOrderService {
 //            orderProductItem.setActualDeliverNum(10);
             //门店实际接收数量
 //            orderProductItem.setActualStoreNum(10);
-            orderProductItem.setOrderMoney(item.getAcountTotalprice());
+//            orderProductItem.setOrderMoney(item.getAcountTotalprice());
+            orderProductItem.setOrderMoney(BigDecimal.TEN);
             orderProductItem.setOriginalProductPrice(item.getPrice());
             orderProductItem.setProductNumber(item.getAmount());
             //订货价
-//            orderProductItem.setProductOrderPrice(BigDecimal.TEN);
+            orderProductItem.setProductOrderPrice(item.getPrice());
             //分摊后单价？
 //            orderProductItem.setShareAfterPrice(BigDecimal.TEN);
             orderProductItem.setSkuCode(item.getSkuId());
             //skuName从哪里来
-//            orderProductItem.setSkuName("");
+            orderProductItem.setSkuName(item.getSkuId());
             //单位
 //            orderProductItem.setUnit("");
 

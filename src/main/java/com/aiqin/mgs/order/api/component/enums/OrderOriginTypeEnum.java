@@ -38,4 +38,13 @@ public enum OrderOriginTypeEnum {
         return false;
     }
 
+    public static boolean exist(String value) {
+        for (OrderOriginTypeEnum type : OrderOriginTypeEnum.values()) {
+            if (type.getValue().equals(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

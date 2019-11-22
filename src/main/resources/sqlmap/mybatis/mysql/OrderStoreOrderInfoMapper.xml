@@ -97,8 +97,26 @@
         a1.update_by_name as updateByName
         from order_store_info a1
         where 1 = 1
-        <if test="orderLevel != null and orderLevel != ''">
-            and a1.order_level = #{orderLevel}
+        <if test="orderCode != null and orderCode != ''">
+            and a1.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="storeName != null and storeName != ''">
+            and a1.store_name like concat('%',#{storeName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="orderStatus != null and orderStatus != '' or orderStatus == 0 ">
+            and a1.order_status = #{orderStatus}
+        </if>
+        <if test="payStatus != null and payStatus != '' or payStatus == 0 ">
+            and a1.pay_status = #{payStatus}
+        </if>
+        <if test="orderType != null and orderType != '' or orderType == 0 ">
+            and a1.order_type = #{orderType}
+        </if>
+        <if test="createTimeBegin != null and createTimeBegin != ''">
+            and date_format(a1.create_time,'%Y-%m-%d') &gt;= #{createTimeBegin,jdbcType=VARCHAR}
+        </if>
+        <if test="createTimeEnd != null and createTimeEnd != ''">
+            and date_format(a1.create_time,'%Y-%m-%d') &lt;= #{createTimeEnd,jdbcType=VARCHAR}
         </if>
         order by a1.create_time desc
     </select>

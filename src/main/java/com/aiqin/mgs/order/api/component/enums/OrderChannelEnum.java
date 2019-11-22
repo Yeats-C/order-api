@@ -36,4 +36,13 @@ public enum OrderChannelEnum {
         return false;
     }
 
+    public static boolean exist(String value) {
+        for (OrderChannelEnum type : OrderChannelEnum.values()) {
+            if (type.getValue().equals(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

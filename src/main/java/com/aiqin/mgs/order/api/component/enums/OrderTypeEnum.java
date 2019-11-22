@@ -75,5 +75,23 @@ public enum OrderTypeEnum {
         }
         return "";
     }
+
+    public static boolean exist(Integer code) {
+        for (OrderTypeEnum type : OrderTypeEnum.values()) {
+            if (type.getCode().equals(code)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean exist(String value) {
+        for (OrderTypeEnum type : OrderTypeEnum.values()) {
+            if (type.getValue().equals(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 

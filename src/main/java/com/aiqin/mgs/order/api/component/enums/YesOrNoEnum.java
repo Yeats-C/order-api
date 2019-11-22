@@ -66,4 +66,22 @@ public enum YesOrNoEnum {
         }
         return "";
     }
+
+    public static boolean exist(Integer code) {
+        for (YesOrNoEnum type : YesOrNoEnum.values()) {
+            if (type.getCode().equals(code)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean exist(String value) {
+        for (YesOrNoEnum type : YesOrNoEnum.values()) {
+            if (type.getValue().equals(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
