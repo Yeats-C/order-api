@@ -91,5 +91,4 @@ public class CartOrderController {
         return cartOrderService.displayCartLineCheckProduct(cartOrderInfo);
     }
 
-
 }

@@ -11,6 +11,7 @@ import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrde
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -85,17 +86,22 @@ public class BridgeProductService {
      * @return
      */
     public HttpResponse<CartOrderInfo> getStoreInfo(ShoppingCartRequest shoppingCartRequest){
+
         String path = "/store/getStoreInfo";
-        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartRequest);
-        HttpResponse<CartOrderInfo> response = httpClient.action().result(new TypeReference<HttpResponse<CartOrderInfo>>() {
+        StringBuilder codeUrl = new StringBuilder();
+        codeUrl.append(urlProperties.getSlcsApi()).append(path);
+        HttpClient httpGet = HttpClient.get(codeUrl.toString() + "?store_id=" + shoppingCartRequest.getStoreId());
+        httpGet.action().status();
+        HttpResponse result = httpGet.action().result(new TypeReference<HttpResponse<CartOrderInfo>>() {
         });
+
 //        HttpResponse<CartOrderInfo> cartOrderInfoHttpResponse = new HttpResponse<>();
 //        CartOrderInfo data = new CartOrderInfo();
 //        data.setStoreAddress("北京市海淀区海淀南路35号");
 //        data.setStoreContacts("胡金英");
 //        data.setStoreContactsPhone("18513854421");
 //        cartOrderInfoHttpResponse.setData(data);
-        return response;
+        return result;
     }
 
 }

@@ -259,9 +259,9 @@ public class CartOrderServiceImpl implements CartOrderService {
         HttpResponse<CartOrderInfo> storeInfo = bridgeProductService.getStoreInfo(shoppingCartRequest);
         OrderConfirmResponse orderConfirmResponse = new OrderConfirmResponse();
         //封装门店信息
-        orderConfirmResponse.setStoreAddress(storeInfo.getData().getStoreAddress());
-        orderConfirmResponse.setStoreContacts(storeInfo.getData().getStoreContacts());
-        orderConfirmResponse.setStoreContactsPhone(storeInfo.getData().getStoreContactsPhone());
+        orderConfirmResponse.setStoreAddress(storeInfo.getData().getAddress());
+        orderConfirmResponse.setStoreContacts(storeInfo.getData().getContacts());
+        orderConfirmResponse.setStoreContactsPhone(storeInfo.getData().getContactsPhone());
         try {
             if (cartOrderInfo != null) {
                 List<CartOrderInfo> cartOrderInfos = cartOrderDao.selectCartByLineCheckStatus(cartOrderInfo);
