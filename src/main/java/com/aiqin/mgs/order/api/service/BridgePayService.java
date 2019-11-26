@@ -14,4 +14,10 @@ public interface BridgePayService {
      * 主扫
      */
     HttpResponse<PartnerGetCodeUrlRep> mainSwept(PayReq vo);
+
+    /**
+     * 退款
+     * @param payReq
+     */
+    void toRefund(PayReq payReq);
 }

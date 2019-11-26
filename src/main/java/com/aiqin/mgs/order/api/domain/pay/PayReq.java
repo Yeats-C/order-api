@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -134,4 +135,8 @@ public class PayReq implements Serializable {
     @ApiModelProperty("订单类型 2 toc ")
     @JsonProperty("pay_order_type")
     private Integer payOrderType=2;
+    @ApiModelProperty("申请退款金额")
+    @NotNull(message = "退款金额不能为空")
+    @JsonProperty("refund_amount")
+    private Long refundAmount;
 }

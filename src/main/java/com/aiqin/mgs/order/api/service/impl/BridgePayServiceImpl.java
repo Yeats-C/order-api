@@ -34,4 +34,12 @@ public class BridgePayServiceImpl implements BridgePayService {
 
         return response;
     }
+
+    @Override
+    public void toRefund(PayReq payReq) {
+        HttpClient client = HttpClient.post(urlProperties.getPayApi() + "/payment/pay/payTocAll").json(payReq);
+        HttpResponse<PartnerGetCodeUrlRep> response = client.action().result(new TypeReference<HttpResponse<PartnerGetCodeUrlRep>>() {  });
+
+
+    }
 }
