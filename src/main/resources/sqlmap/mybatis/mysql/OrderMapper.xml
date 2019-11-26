@@ -405,7 +405,7 @@
 
     </select>
 
-    <select id="getUnPayMemberIdList" parameterType="com.aiqin.mgs.order.api.domain.request.UnPayVo">
+    <select id="getUnPayMemberIdList" parameterType="com.aiqin.mgs.order.api.domain.request.UnPayVo" resultType="java.lang.String">
         SELECT distinct a.member_id FROM order_info a
         WHERE 1=1
         <if test="distributorId!=null and distributorId!='' ">
@@ -429,9 +429,7 @@
             and a.create_time &lt;= #{endTime}
         </if>
         ORDER BY a.distributor_id DESC
-        <if test="icount!=null ">
-            limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
-        </if>
+        limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
     </select>
     <!-- 模糊查询订单列表+订单中商品sku数量分页 -->
     <select id="selectskuResponse" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="OradskuMapping"

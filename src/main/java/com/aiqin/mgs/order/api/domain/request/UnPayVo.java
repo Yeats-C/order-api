@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author jinghaibo
@@ -31,4 +32,6 @@ public class UnPayVo extends PagesRequest {
     @ApiModelProperty(value="订单状态")
     @JsonProperty("order_status")
     private Integer orderStatus;
+    @JsonProperty("order_status_list")
+    private List orderStatusList;
 }
