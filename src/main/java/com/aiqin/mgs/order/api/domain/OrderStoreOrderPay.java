@@ -21,6 +21,8 @@ public class OrderStoreOrderPay {
     private String orderId;
     /***支付id*/
     private String payId;
+    /***支付中心支付单编号*/
+    private String payCode;
     /***支付状态*/
     private Integer payStatus;
     /***订货含税总金额*/
@@ -35,6 +37,10 @@ public class OrderStoreOrderPay {
     private BigDecimal actualMoney;
     /***轮询次数*/
     private Integer pollingTimes;
+    /***开始支付时间*/
+    private Date payStartTime;
+    /***结束支付时间*/
+    private Date payEndTime;
 
     /***创建时间*/
     private Date createTime;

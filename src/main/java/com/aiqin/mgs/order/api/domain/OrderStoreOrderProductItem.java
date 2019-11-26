@@ -21,30 +21,58 @@ public class OrderStoreOrderProductItem {
     private String orderId;
     /***订单编号*/
     private String orderCode;
-    /***订单商品ID*/
-    private String orderProductId;
+    /***订单明细行编号*/
+    private String orderItemCode;
+
+    /***商品ID*/
+    private String productId;
+    /***商品编码*/
+    private String productCode;
+    /***商品名称*/
+    private String productName;
     /***商品sku码*/
     private String skuCode;
     /***商品名称*/
     private String skuName;
-    /***订货数量*/
-    private Integer productNumber;
-    /***订货价*/
-    private BigDecimal productOrderPrice;
-    /***含税采购价*/
-    private BigDecimal taxPurchasePrice;
-    /***订货金额*/
-    private BigDecimal orderMoney;
     /***单位*/
     private String unit;
+
+    /***本品赠品标记 ProductGiftEnum */
+    private Integer productGift;
+    /***赠品行关联本品行编码*/
+    private String parentOrderItemCode;
+
+    /***活动id*/
+    private String activityId;
+    /***服纺券id*/
+    private String spinCouponId;
+    /***A品券id*/
+    private String topCouponId;
+
+    /***订货数量*/
+    private Integer quantity;
     /***仓库实发数量*/
-    private Integer actualDeliverNum;
+    private Integer actualDeliverQuantity;
     /***门店实收数量*/
-    private Integer actualStoreNum;
-    /***商品单价*/
-    private BigDecimal originalProductPrice;
+    private Integer actualStoreQuantity;
+
+    /***订货价*/
+    private BigDecimal price;
+    /***含税采购价*/
+    private BigDecimal taxPurchasePrice;
     /***分摊后单价*/
-    private BigDecimal shareAfterPrice;
+    private BigDecimal sharePrice;
+
+    /***订货金额*/
+    private BigDecimal money;
+    /***实际支付金额*/
+    private BigDecimal realMoney;
+    /***活动优惠金额*/
+    private BigDecimal activityMoney;
+    /***服纺券优惠金额*/
+    private BigDecimal spinCouponMoney;
+    /***A品券优惠金额*/
+    private BigDecimal topCouponMoney;
 
     /***创建时间*/
     private Date createTime;

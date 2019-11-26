@@ -20,7 +20,17 @@ public class StoreInfo {
     private String storeName;
     /***加盟商id*/
     private String franchiseeId;
+    /***加盟商编码*/
+    private String franchiseeCode;
     /***加盟商名称*/
     private String franchiseeName;
+    /***门店联系人*/
+    private String contacts;
+    /***门店联系人电话*/
+    private String contactsPhone;
+    /***地址*/
+    private String address;
+
+    //TODO 字段待补充
 
 }

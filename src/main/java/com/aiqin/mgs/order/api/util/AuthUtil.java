@@ -68,10 +68,26 @@ public class AuthUtil {
      * @version: v1.0.0
      * @date 2019/11/21 10:35
      */
-    public static AuthToken getTaskSystemAuth() {
+    public static AuthToken getTaskAuth() {
         AuthToken auth = new AuthToken();
         auth.setPersonId("定时任务");
         auth.setPersonName("定时任务");
+        return auth;
+    }
+
+    /**
+     * 获取系统操作人
+     *
+     * @param
+     * @return com.aiqin.mgs.order.api.domain.AuthToken
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/26 10:12
+     */
+    public static AuthToken getSystemAuth() {
+        AuthToken auth = new AuthToken();
+        auth.setPersonId("系统初始化");
+        auth.setPersonName("系统初始化");
         return auth;
     }
 }

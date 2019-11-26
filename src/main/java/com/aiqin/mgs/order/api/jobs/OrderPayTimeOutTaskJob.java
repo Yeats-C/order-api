@@ -10,7 +10,6 @@ import com.aiqin.mgs.order.api.service.ErpOrderQueryService;
 import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -27,7 +26,7 @@ import java.util.List;
 @Component
 public class OrderPayTimeOutTaskJob {
 
-    private static final Logger logger = LoggerFactory.getLogger(OrderPayRequestTaskJob.class);
+    private static final Logger logger = LoggerFactory.getLogger(OrderPayTimeOutTaskJob.class);
 
     @Resource
     private ErpOrderQueryService erpOrderQueryService;

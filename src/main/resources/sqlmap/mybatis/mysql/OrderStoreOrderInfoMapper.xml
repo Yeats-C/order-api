@@ -18,6 +18,7 @@
         actual_price as actualPrice,
         order_level as orderLevel,
         primary_code as primaryCode,
+        goods_coupon as goodsCoupon,
         create_time as createTime,
         create_by_id as createById,
         create_by_name as createByName,
@@ -56,6 +57,9 @@
         <if test="orderStatus != null and orderStatus != '' or orderStatus == 0">
             order_status = #{orderStatus},
         </if>
+        <if test="payStatus != null and payStatus != '' or payStatus == 0">
+            pay_status = #{payStatus},
+        </if>
         update_by_id = #{updateById},
         update_by_name = #{updateByName},
         update_time = sysdate()
@@ -65,11 +69,11 @@
     <insert id="insert">
         insert into order_store_info (order_id, order_code, order_status, order_level, primary_code, return_status,
                                       order_type, pay_status, franchisee_id, store_id, store_name, total_price,
-                                      actual_price,
+                                      actual_price,goods_coupon,
                                       create_time, create_by_id, create_by_name, update_time, update_by_id,
                                       update_by_name)
         values (#{orderId}, #{orderCode}, #{orderStatus}, #{orderLevel}, #{primaryCode}, #{returnStatus},
-                #{orderType}, #{payStatus}, #{franchiseeId}, #{storeId}, #{storeName}, #{totalPrice}, #{actualPrice},
+                #{orderType}, #{payStatus}, #{franchiseeId}, #{storeId}, #{storeName}, #{totalPrice}, #{actualPrice},#{goodsCoupon},
                 sysdate(), #{createById}, #{createByName}, sysdate(), #{updateById}, #{updateByName})
     </insert>
 
@@ -89,6 +93,7 @@
         a1.actual_price as actualPrice,
         a1.order_level as orderLevel,
         a1.primary_code as primaryCode,
+        a1.goods_coupon as goodsCoupon,
         a1.create_time as createTime,
         a1.create_by_id as createById,
         a1.create_by_name as createByName,
@@ -137,6 +142,7 @@
         a1.actual_price as actualPrice,
         a1.order_level as orderLevel,
         a1.primary_code as primaryCode,
+        a1.goods_coupon as goodsCoupon,
         a1.create_time as createTime,
         a1.create_by_id as createById,
         a1.create_by_name as createByName,

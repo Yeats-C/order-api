@@ -12,9 +12,9 @@ import lombok.Getter;
 @Getter
 public enum ProductGiftEnum {
 
-    /***逻辑-是*/
+    /***本品*/
     PRODUCT(1, "1", "本品"),
-    /***逻辑-否*/
+    /***赠品*/
     GIFT(2, "2", "赠品");
 
     private Integer code;

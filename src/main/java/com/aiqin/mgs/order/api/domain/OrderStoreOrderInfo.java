@@ -50,6 +50,8 @@ public class OrderStoreOrderInfo {
     private Integer orderLevel;
     /***关联主订单编码*/
     private String primaryCode;
+    /***物流券*/
+    private BigDecimal goodsCoupon;
 
     /***创建时间*/
     private Date createTime;
@@ -74,6 +76,9 @@ public class OrderStoreOrderInfo {
     private Integer pageSize;
     @ApiModelProperty(value = "当前页")
     private Integer pageNo;
+    /***是否支持校验支付 对应列表上的确认收款按钮 1有按钮 0没有按钮*/
+    @ApiModelProperty(value = "是否支持校验支付")
+    private Integer repayOperation;
 
     /***关联子订单*/
     private List<OrderStoreOrderInfo> secondaryOrderList;

@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.service.impl;
 
 import com.aiqin.mgs.order.api.dao.OrderStoreOrderProductItemDao;
+import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderProductItem;
 import com.aiqin.mgs.order.api.service.ErpOrderProductItemService;
 import org.apache.commons.lang.StringUtils;
@@ -32,16 +33,24 @@ public class ErpOrderProductItemServiceImpl implements ErpOrderProductItemServic
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveOrderProductItem(OrderStoreOrderProductItem orderStoreOrderProductItem) {
+    public void saveOrderProductItem(OrderStoreOrderProductItem orderStoreOrderProductItem, AuthToken auth) {
+        orderStoreOrderProductItem.setCreateById(auth.getPersonId());
+        orderStoreOrderProductItem.setCreateByName(auth.getPersonName());
+        orderStoreOrderProductItem.setUpdateById(auth.getPersonId());
+        orderStoreOrderProductItem.setUpdateByName(auth.getPersonName());
         Integer insert = orderStoreOrderProductItemDao.insert(orderStoreOrderProductItem);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveOrderProductItemList(List<OrderStoreOrderProductItem> list) {
+    public void saveOrderProductItemList(List<OrderStoreOrderProductItem> list, AuthToken auth) {
         if (list != null && list.size() > 0) {
             for (OrderStoreOrderProductItem item :
                     list) {
+                item.setCreateById(auth.getPersonId());
+                item.setCreateByName(auth.getPersonName());
+                item.setUpdateById(auth.getPersonId());
+                item.setUpdateByName(auth.getPersonName());
                 Integer insert = orderStoreOrderProductItemDao.insert(item);
             }
         }

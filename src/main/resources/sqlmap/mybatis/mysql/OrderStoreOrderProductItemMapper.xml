@@ -7,18 +7,29 @@
         select id as id,
         order_id as orderId,
         order_code as orderCode,
-        order_product_id as orderProductId,
+        order_item_code as orderItemCode,
+        product_id as productId,
+        product_code as productCode,
+        product_name as productName,
         sku_code as skuCode,
         sku_name as skuName,
-        product_number as productNumber,
-        product_order_price as productOrderPrice,
-        tax_purchase_price as taxPurchasePrice,
-        order_money as orderMoney,
         unit as unit,
-        actual_deliver_num as actualDeliverNum,
-        actual_store_num as actualStoreNum,
-        original_product_price as originalProductPrice,
-        share_after_price as shareAfterPrice,
+        product_gift as productGift,
+        parent_order_item_code as parentOrderItemCode,
+        activity_id as activityId,
+        spin_coupon_id as spinCouponId,
+        top_coupon_id as topCouponId,
+        quantity as quantity,
+        actual_deliver_quantity as actualDeliverQuantity,
+        actual_store_quantity as actualStoreQuantity,
+        price as price,
+        share_price as sharePrice,
+        tax_purchase_price as taxPurchasePrice,
+        money as money,
+        real_money as realMoney,
+        activity_money as activityMoney,
+        spin_coupon_money as spinCouponMoney,
+        top_coupon_money as topCouponMoney,
         create_time as createTime,
         create_by_id as createById,
         create_by_name as createByName,
@@ -37,25 +48,27 @@
             <if test=" orderCode != null and orderCode != '' ">
                 and order_code = #{orderCode}
             </if>
-            <if test=" orderProductId != null and orderProductId != '' ">
-                and order_product_id = #{orderProductId}
+            <if test=" orderItemCode != null and orderItemCode != '' ">
+                and order_item_code = #{orderItemCode}
             </if>
         </where>
         order by create_time desc
     </select>
 
     <insert id="insert">
-        insert into order_store_product_item (order_id, order_code, order_product_id, sku_code, sku_name,
-                                              product_number, product_order_price, tax_purchase_price, order_money,
-                                              unit,
-                                              actual_deliver_num, actual_store_num, original_product_price,
-                                              share_after_price, create_time, create_by_id, create_by_name,
-                                              update_time, update_by_id, update_by_name)
-        values (#{orderId}, #{orderCode}, #{orderProductId}, #{skuCode}, #{skuName}, #{productNumber},
-                #{productOrderPrice}, #{taxPurchasePrice}, #{orderMoney}, #{unit}, #{actualDeliverNum},
-                #{actualStoreNum},
-                #{originalProductPrice}, #{shareAfterPrice}, sysdate(), #{createById}, #{createByName},
-                sysdate(), #{updateById}, #{updateByName})
+        insert into order_store_product_item
+        (order_id, order_code, order_item_code, product_id, product_code,
+         product_name, sku_code, sku_name, unit, product_gift,
+         parent_order_item_code, activity_id, spin_coupon_id, top_coupon_id,
+         quantity, actual_deliver_quantity, actual_store_quantity, price,
+         share_price, tax_purchase_price, money, real_money, activity_money,
+         spin_coupon_money, top_coupon_money, create_time, create_by_id,
+         create_by_name, update_time, update_by_id, update_by_name)
+        values (#{orderId}, #{orderCode}, #{orderItemCode}, #{productId}, #{productCode}, #{productName}, #{skuCode},
+                #{skuName}, #{unit}, #{productGift}, #{parentOrderItemCode}, #{activityId}, #{spinCouponId},
+                #{topCouponId}, #{quantity}, #{actualDeliverQuantity}, #{actualStoreQuantity}, #{price}, #{sharePrice},
+                #{taxPurchasePrice}, #{money}, #{realMoney}, #{activityMoney}, #{spinCouponMoney}, #{topCouponMoney},
+                sysdate(), #{createById}, #{createByName}, sysdate(), #{updateById}, #{updateByName})
     </insert>
 
 </mapper>

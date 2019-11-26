@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.service.impl;
 
 import com.aiqin.mgs.order.api.dao.OrderStoreOrderReceivingDao;
+import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderReceiving;
 import com.aiqin.mgs.order.api.service.ErpOrderReceivingService;
 import org.apache.commons.lang.StringUtils;
@@ -32,7 +33,11 @@ public class ErpOrderReceivingServiceImpl implements ErpOrderReceivingService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveOrderReceiving(OrderStoreOrderReceiving orderReceiving) {
+    public void saveOrderReceiving(OrderStoreOrderReceiving orderReceiving, AuthToken auth) {
+        orderReceiving.setCreateById(auth.getPersonId());
+        orderReceiving.setCreateByName(auth.getPersonName());
+        orderReceiving.setUpdateById(auth.getPersonId());
+        orderReceiving.setUpdateByName(auth.getPersonName());
         Integer insert = orderStoreOrderReceivingDao.insert(orderReceiving);
     }
 

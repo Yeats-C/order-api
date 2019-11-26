@@ -1,7 +1,8 @@
 package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderPay;
-import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 订单支付信息
@@ -13,15 +14,15 @@ import org.apache.ibatis.annotations.Param;
 public interface OrderStoreOrderPayDao {
 
     /**
-     * 根据订单id查询订单支付信息
+     * 根据非空条件精确筛选
      *
-     * @param orderId
-     * @return com.aiqin.mgs.order.api.domain.OrderStoreOrderPay
+     * @param orderStoreOrderPay
+     * @return java.util.List<com.aiqin.mgs.order.api.domain.OrderStoreOrderPay>
      * @author: Tao.Chen
      * @version: v1.0.0
-     * @date 2019/11/14 15:53
+     * @date 2019/11/26 15:54
      */
-    OrderStoreOrderPay getOrderPayByOrderId(@Param("orderId") String orderId);
+    List<OrderStoreOrderPay> select(OrderStoreOrderPay orderStoreOrderPay);
 
     /**
      * 插入订单支付信息数据

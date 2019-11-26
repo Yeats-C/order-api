@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.service;
 
+import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderProductItem;
 
 import java.util.List;
@@ -28,22 +29,24 @@ public interface ErpOrderProductItemService {
      * 保存订单商品行
      *
      * @param orderStoreOrderProductItem
+     * @param auth
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/11/22 9:38
      */
-    void saveOrderProductItem(OrderStoreOrderProductItem orderStoreOrderProductItem);
+    void saveOrderProductItem(OrderStoreOrderProductItem orderStoreOrderProductItem, AuthToken auth);
 
     /**
      * 批量保存订单商品行
      *
      * @param list
+     * @param auth
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/11/22 9:39
      */
-    void saveOrderProductItemList(List<OrderStoreOrderProductItem> list);
+    void saveOrderProductItemList(List<OrderStoreOrderProductItem> list,AuthToken auth);
 
 }
