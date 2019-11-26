@@ -26,4 +26,9 @@ public class UrlProperties {
      */
     private String paymentApi;
 
+    /**
+     * 门店生命周期
+     */
+    private String slcsApi;
+
 }

@@ -72,13 +72,13 @@ public class CartOrderInfo {
     private List<String> skuIds;
 
     /***门店地址*/
-    private String storeAddress;
+    private String address;
 
     /***门店联系人*/
-    private String storeContacts;
+    private String contacts;
 
     /***门店联系人电话*/
-    private String storeContactsPhone;
+    private String contactsPhone;
 
     /***商品添加来源 1:门店 2:erp*/
     private String createSource;
