@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -742,6 +743,36 @@ public class OrderController {
         LOGGER.info("修改预存商品退货数量：{}",vo);
 
         return orderService.updateRejectPrestoragProduct(vo);
+    }
+
+    @PostMapping("/updateRejectPrestoragState")
+    @ApiOperation(value = "修改预存商品状态和订单状态")
+    public HttpResponse updateRejectPrestoragState(@Valid @RequestBody RejectPrestoragStateVo vo) {
+
+
+        LOGGER.info("修改预存商品状态和订单状态：{}",vo);
+
+        return orderService.updateRejectPrestoragState(vo);
+    }
+
+
+    @PostMapping("/getUnPayNum")
+    @ApiOperation(value = "近期未购买的会员数")
+    public HttpResponse getUnPayNum(@Valid  @RequestBody UnPayVo unPayVo) {
+
+
+        LOGGER.info("近期未购买的会员数：{}",unPayVo);
+
+        return orderService.getUnPayNum(unPayVo);
+    }
+    @PostMapping("/getUnPayMemberIdList")
+    @ApiOperation(value = "近期未购买的会员")
+    public HttpResponse getUnPayMemberIdList(@Valid @RequestBody UnPayVo unPayVo) {
+
+
+        LOGGER.info("修改预存商品状态和订单状态：{}",unPayVo);
+
+        return orderService.getUnPayMemberIdList(unPayVo);
     }
 
 

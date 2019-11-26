@@ -49,7 +49,7 @@
         <if test="updateBy!=null ">
             ,update_by = #{updateBy}
         </if>
-        where prestorage_order_supply_detail_id = #{prestorageOrderSupplyDetailId}
+        where prestorage_order_supply_id = #{prestorageOrderSupplyId}
 
     </update>
     <insert id="addPrestorageOrder" parameterType="com.aiqin.mgs.order.api.domain.PrestorageOrderSupply">

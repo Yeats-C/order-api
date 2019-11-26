@@ -351,6 +351,38 @@ public class OrderServiceImpl implements OrderService {
         return HttpResponse.success();
     }
 
+    @Override
+    public HttpResponse updateRejectPrestoragState(RejectPrestoragStateVo vo) {
+        PrestorageOrderSupply prestorageOrderSupply=new PrestorageOrderSupply();
+        prestorageOrderSupply.setPrestorageOrderSupplyId(vo.getPrestorageOrderSupplyId());
+        prestorageOrderSupply.setPrestorageOrderSupplyStatus(vo.getProductStatus());
+        prestorageOrderSupplyDao.updateById(prestorageOrderSupply);
+
+        OrderInfo orderInfo = new OrderInfo();
+        orderInfo.setOrderId(vo.getOrderId());
+        orderInfo.setOrderStatus(vo.getProductStatus());
+
+        //更新订单主数据
+        try {
+            int i = orderDao.updateOrder(orderInfo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return HttpResponse.success();
+    }
+
+    @Override
+    public HttpResponse getUnPayNum(UnPayVo unPayVo) {
+        int num=orderDao.getUnPayNum(unPayVo);
+        return HttpResponse.success(num);
+    }
+
+    @Override
+    public HttpResponse getUnPayMemberIdList(UnPayVo unPayVo) {
+        List<String> MemberIds=orderDao.getUnPayMemberIdList(unPayVo);
+        return HttpResponse.success(MemberIds);
+    }
+
     private OrderQuery trans(OrderQuery orderQuery) {
         if (orderQuery.getOrderStatus() != null) {
             if (orderQuery.getOrderStatus() == 2) {

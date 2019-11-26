@@ -188,4 +188,15 @@ public interface OrderService {
 	 * @return
 	 */
 	HttpResponse updateRejectPrestoragProduct(PrestorageOrderSupplyDetailVo vo);
+
+	/**
+	 * 修改预存商品订单状态和订单状态
+	 * @param vo
+	 * @return
+	 */
+	HttpResponse updateRejectPrestoragState(RejectPrestoragStateVo vo);
+
+	HttpResponse getUnPayNum(UnPayVo unPayVo);
+
+	HttpResponse getUnPayMemberIdList(UnPayVo unPayVo);
 }

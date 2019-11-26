@@ -377,6 +377,62 @@
         </if>
     </select>
 
+
+
+    <select id="getUnPayNum" parameterType="com.aiqin.mgs.order.api.domain.request.UnPayVo" resultType="java.lang.Integer">
+        SELECT count(distinct a.member_id) FROM order_info a
+        WHERE 1=1
+        <if test="distributorId!=null and distributorId!='' ">
+            and a.distributor_id = #{distributorId}
+        </if>
+
+        <if test="orderStatus!=null ">
+            and a.order_status = #{orderStatus}
+        </if>
+        <if test="orderStatusList != null">
+            and a.order_status in (
+            <foreach collection="orderStatusList" item="order_status" separator=",">
+                '${order_status}'
+            </foreach>
+            )
+        </if>
+        <if test="beginTime!=null ">
+            and a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime!=null ">
+            and a.create_time &lt;= #{endTime}
+        </if>
+
+    </select>
+
+    <select id="getUnPayMemberIdList" parameterType="com.aiqin.mgs.order.api.domain.request.UnPayVo">
+        SELECT distinct a.member_id FROM order_info a
+        WHERE 1=1
+        <if test="distributorId!=null and distributorId!='' ">
+            and a.distributor_id = #{distributorId}
+        </if>
+
+        <if test="orderStatus!=null ">
+            and a.order_status = #{orderStatus}
+        </if>
+        <if test="orderStatusList != null">
+            and a.order_status in (
+            <foreach collection="orderStatusList" item="order_status" separator=",">
+                '${order_status}'
+            </foreach>
+            )
+        </if>
+        <if test="beginTime!=null ">
+            and a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime!=null ">
+            and a.create_time &lt;= #{endTime}
+        </if>
+        ORDER BY a.distributor_id DESC
+        <if test="icount!=null ">
+            limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+        </if>
+    </select>
     <!-- 模糊查询订单列表+订单中商品sku数量分页 -->
     <select id="selectskuResponse" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="OradskuMapping"
             resultType="java.util.List">

@@ -128,6 +128,9 @@
         ,return_amount = #{returnAmount}
     </if>
 
+    <if test="prestorageOrderSupplyStatus!=null ">
+        ,prestorage_order_supply_status = #{prestorageOrderSupplyStatus}
+    </if>
     <if test="updateBy!=null ">
         ,update_by = #{updateBy}
     </if>

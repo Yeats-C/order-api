@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.aiqin.mgs.order.api.domain.request.UnPayVo;
 import com.aiqin.mgs.order.api.domain.request.statistical.BusinessStatisticalRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.SkuSalesRequest;
 import com.aiqin.mgs.order.api.domain.response.*;
@@ -197,4 +198,12 @@ public interface OrderDao {
      */
     PrestorageResponse selectprestorageorderDetails(String prestorageOrderSupplyDetailId);
 
+    /**
+     * 获取门店未付款会员数
+     * @param unPayVo
+     * @return
+     */
+    int getUnPayNum(UnPayVo unPayVo);
+
+    List<String> getUnPayMemberIdList(UnPayVo unPayVo);
 }

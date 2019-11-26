@@ -34,4 +34,7 @@ public class PrestorageOrderSupplyDetailVo {
 
     private String updateBy;
 
+    @ApiModelProperty(value="提货状态，0待提货，1已完成")
+    @JsonProperty("prestorage_order_supply_status")
+    private Integer prestorageOrderSupplyStatus=0;
 }
