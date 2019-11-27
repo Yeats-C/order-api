@@ -1,6 +1,12 @@
 package com.aiqin.mgs.order.api.component.enums;
 
+import com.aiqin.mgs.order.api.domain.EnumItemInfo;
 import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 订单支付轮询返回状态
@@ -43,40 +49,43 @@ public enum OrderPayPollingBackStatus {
         this.desc = desc;
     }
 
-    public static OrderPayPollingBackStatus getEnum(Integer code) {
-        for (OrderPayPollingBackStatus type : OrderPayPollingBackStatus.values()) {
-            if (type.getCode().equals(code)) {
-                return type;
-            }
+    /***选项类型*/
+    public static List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
+    /***code-enum map*/
+    public static Map<Integer, OrderPayPollingBackStatus> CODE_ENUM_MAP = new LinkedHashMap<>(16);
+    /***value-enum map*/
+    public static Map<String, OrderPayPollingBackStatus> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+
+    static {
+        for (OrderPayPollingBackStatus item :
+                OrderPayPollingBackStatus.values()) {
+            SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
+            CODE_ENUM_MAP.put(item.getCode(), item);
+            VALUE_ENUM_MAP.put(item.getValue(), item);
+        }
+    }
+
+    public static OrderPayPollingBackStatus getEnum(Object object) {
+        if (object != null) {
+            return VALUE_ENUM_MAP.get(object.toString());
         }
         return null;
     }
 
-    public static OrderPayPollingBackStatus getEnum(String value) {
-        for (OrderPayPollingBackStatus type : OrderPayPollingBackStatus.values()) {
-            if (type.getValue().equals(value)) {
-                return type;
-            }
-        }
-        return null;
-    }
-
-
-    public static String getEnumDesc(Integer code) {
-        for (OrderPayPollingBackStatus type : OrderPayPollingBackStatus.values()) {
-            if (type.getCode().equals(code)) {
-                return type.getDesc();
+    public static String getEnumDesc(Object object) {
+        if (object != null) {
+            OrderPayPollingBackStatus anEnum = VALUE_ENUM_MAP.get(object.toString());
+            if (anEnum != null) {
+                return anEnum.getDesc();
             }
         }
         return "";
     }
 
-    public static String getEnumDesc(String value) {
-        for (OrderPayPollingBackStatus type : OrderPayPollingBackStatus.values()) {
-            if (type.getValue().equals(value)) {
-                return type.getDesc();
-            }
+    public static boolean exist(Object object) {
+        if (object != null) {
+            return VALUE_ENUM_MAP.containsKey(object.toString());
         }
-        return "";
+        return false;
     }
 }

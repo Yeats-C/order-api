@@ -1,6 +1,12 @@
 package com.aiqin.mgs.order.api.component.enums;
 
+import com.aiqin.mgs.order.api.domain.EnumItemInfo;
 import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 支付类型枚举
@@ -39,41 +45,44 @@ public enum PayTypeEnum {
         this.desc = desc;
     }
 
-    public static PayTypeEnum getEnum(Integer code) {
-        for (PayTypeEnum type : PayTypeEnum.values()) {
-            if (type.getCode().equals(code)) {
-                return type;
-            }
+    /***选项类型*/
+    public static List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
+    /***code-enum map*/
+    public static Map<Integer, PayTypeEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
+    /***value-enum map*/
+    public static Map<String, PayTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+
+    static {
+        for (PayTypeEnum item :
+                PayTypeEnum.values()) {
+            SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
+            CODE_ENUM_MAP.put(item.getCode(), item);
+            VALUE_ENUM_MAP.put(item.getValue(), item);
+        }
+    }
+
+    public static PayTypeEnum getEnum(Object object) {
+        if (object != null) {
+            return VALUE_ENUM_MAP.get(object.toString());
         }
         return null;
     }
 
-    public static PayTypeEnum getEnum(String value) {
-        for (PayTypeEnum type : PayTypeEnum.values()) {
-            if (type.getValue().equals(value)) {
-                return type;
-            }
-        }
-        return null;
-    }
-
-
-    public static String getEnumDesc(Integer code) {
-        for (PayTypeEnum type : PayTypeEnum.values()) {
-            if (type.getCode().equals(code)) {
-                return type.getDesc();
+    public static String getEnumDesc(Object object) {
+        if (object != null) {
+            PayTypeEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            if (anEnum != null) {
+                return anEnum.getDesc();
             }
         }
         return "";
     }
 
-    public static String getEnumDesc(String value) {
-        for (PayTypeEnum type : PayTypeEnum.values()) {
-            if (type.getValue().equals(value)) {
-                return type.getDesc();
-            }
+    public static boolean exist(Object object) {
+        if (object != null) {
+            return VALUE_ENUM_MAP.containsKey(object.toString());
         }
-        return "";
+        return false;
     }
 
 }

@@ -1,6 +1,12 @@
 package com.aiqin.mgs.order.api.component.enums;
 
+import com.aiqin.mgs.order.api.domain.EnumItemInfo;
 import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 订单来源
@@ -29,20 +35,42 @@ public enum OrderOriginTypeEnum {
         this.desc = desc;
     }
 
-    public static boolean exist(Integer code) {
-        for (OrderOriginTypeEnum type : OrderOriginTypeEnum.values()) {
-            if (type.getCode().equals(code)) {
-                return true;
-            }
+    /***选项类型*/
+    public static List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
+    /***code-enum map*/
+    public static Map<Integer, OrderOriginTypeEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
+    /***value-enum map*/
+    public static Map<String, OrderOriginTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+
+    static {
+        for (OrderOriginTypeEnum item :
+                OrderOriginTypeEnum.values()) {
+            SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
+            CODE_ENUM_MAP.put(item.getCode(), item);
+            VALUE_ENUM_MAP.put(item.getValue(), item);
         }
-        return false;
     }
 
-    public static boolean exist(String value) {
-        for (OrderOriginTypeEnum type : OrderOriginTypeEnum.values()) {
-            if (type.getValue().equals(value)) {
-                return true;
+    public static OrderOriginTypeEnum getEnum(Object object) {
+        if (object != null) {
+            return VALUE_ENUM_MAP.get(object.toString());
+        }
+        return null;
+    }
+
+    public static String getEnumDesc(Object object) {
+        if (object != null) {
+            OrderOriginTypeEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            if (anEnum != null) {
+                return anEnum.getDesc();
             }
+        }
+        return "";
+    }
+
+    public static boolean exist(Object object) {
+        if (object != null) {
+            return VALUE_ENUM_MAP.containsKey(object.toString());
         }
         return false;
     }
