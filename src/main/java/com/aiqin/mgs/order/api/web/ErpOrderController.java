@@ -6,6 +6,9 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.OrderTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.PayStatusEnum;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.ErpOrderSaveRequest;
 import com.aiqin.mgs.order.api.domain.response.ErpOrderDetailResponse;
@@ -14,7 +17,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 
@@ -59,11 +65,12 @@ public class ErpOrderController {
     }
 
     @PostMapping("/saveOrder")
-    @ApiOperation(value = "保存erp订单")
+    @ApiOperation(value = "创建订单")
     public HttpResponse saveOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-            erpOrderService.saveOrder(erpOrderSaveRequest);
+            ErpOrderDetailResponse erpOrderDetailResponse = erpOrderService.saveOrder(erpOrderSaveRequest);
+            response.setData(erpOrderDetailResponse);
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {
@@ -73,12 +80,55 @@ public class ErpOrderController {
         return response;
     }
 
-    @PostMapping("/changeOrderStatus")
-    @ApiOperation(value = "修改订单状态")
-    public HttpResponse changeOrderStatus(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
+    @PostMapping("/saveRackOrder")
+    @ApiOperation(value = "创建货架订单")
+    public HttpResponse saveRackOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
         HttpResponse response = HttpResponse.success();
         try {
+            ErpOrderDetailResponse erpOrderDetailResponse = erpOrderService.saveRackOrder(erpOrderSaveRequest);
+            response.setData(erpOrderDetailResponse);
+        } catch (BusinessException e) {
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
+    }
 
+    @PostMapping("/findOrderTypeList")
+    @ApiOperation(value = "获取订单类型选项列表")
+    public HttpResponse findOrderTypeList() {
+        HttpResponse response = HttpResponse.success();
+        try {
+            response.setData(OrderTypeEnum.SELECT_LIST);
+        } catch (BusinessException e) {
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
+    }
+
+    @PostMapping("/findOrderStatusList")
+    @ApiOperation(value = "获取订单状态选项列表")
+    public HttpResponse findOrderStatusList() {
+        HttpResponse response = HttpResponse.success();
+        try {
+            response.setData(ErpOrderStatusEnum.SELECT_LIST);
+        } catch (BusinessException e) {
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
+    }
+
+    @PostMapping("/findOrderPayStatusList")
+    @ApiOperation(value = "获取订单支付状态选项列表")
+    public HttpResponse findOrderPayStatusList() {
+        HttpResponse response = HttpResponse.success();
+        try {
+            response.setData(PayStatusEnum.SELECT_LIST);
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {

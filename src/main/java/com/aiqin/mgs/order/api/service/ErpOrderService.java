@@ -37,7 +37,7 @@ public interface ErpOrderService {
     ErpOrderDetailResponse getOrderDetail(OrderStoreOrderInfo orderStoreOrderInfo);
 
     /**
-     * 保存订单
+     * 创建订单
      *
      * @param erpOrderSaveRequest
      * @return void
@@ -45,5 +45,16 @@ public interface ErpOrderService {
      * @version: v1.0.0
      * @date 2019/11/13 10:15
      */
-    void saveOrder(ErpOrderSaveRequest erpOrderSaveRequest);
+    ErpOrderDetailResponse saveOrder(ErpOrderSaveRequest erpOrderSaveRequest);
+
+    /**
+     * 创建货架订单
+     *
+     * @param erpOrderSaveRequest
+     * @return com.aiqin.mgs.order.api.domain.response.ErpOrderDetailResponse
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/27 14:06
+     */
+    ErpOrderDetailResponse saveRackOrder(ErpOrderSaveRequest erpOrderSaveRequest);
 }

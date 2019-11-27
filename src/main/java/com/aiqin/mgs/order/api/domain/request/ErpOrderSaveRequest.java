@@ -1,7 +1,10 @@
 package com.aiqin.mgs.order.api.domain.request;
 
+import com.aiqin.mgs.order.api.domain.OrderStoreOrderProductItem;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * 保存订单请求参数类
@@ -32,4 +35,8 @@ public class ErpOrderSaveRequest {
     /***是否需要发票*/
     @ApiModelProperty(value = "是否需要发票")
     private Integer billStatus;
+
+    /***货架商品列表*/
+    @ApiModelProperty(value = "货架商品列表")
+    private List<OrderStoreOrderProductItem> productList;
 }

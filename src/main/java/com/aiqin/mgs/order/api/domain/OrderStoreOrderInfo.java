@@ -1,5 +1,8 @@
 package com.aiqin.mgs.order.api.domain;
 
+import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.OrderTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.PayStatusEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -27,14 +30,20 @@ public class OrderStoreOrderInfo {
     /***订单状态 枚举 ErpOrderStatusEnum*/
     @ApiModelProperty(value = "订单状态")
     private Integer orderStatus;
+    @ApiModelProperty(value = "订单状态描述")
+    private String orderStatusDesc;
     /***是否发生退货 0否 1是*/
     private Integer returnStatus;
     /***支付状态 */
     @ApiModelProperty(value = "支付状态")
     private Integer payStatus;
+    @ApiModelProperty(value = "支付状态描述")
+    private String payStatusDesc;
     /***订单类型 枚举 OrderTypeEnum*/
     @ApiModelProperty(value = "订单类型")
     private Integer orderType;
+    @ApiModelProperty(value = "订单类型描述")
+    private String orderTypeDesc;
     /***加盟商id*/
     private String franchiseeId;
     /***门店id*/
@@ -82,5 +91,17 @@ public class OrderStoreOrderInfo {
 
     /***关联子订单*/
     private List<OrderStoreOrderInfo> secondaryOrderList;
+
+    public String getOrderStatusDesc() {
+        return ErpOrderStatusEnum.getEnumDesc(orderStatus);
+    }
+
+    public String getPayStatusDesc() {
+        return PayStatusEnum.getEnumDesc(payStatus);
+    }
+
+    public String getOrderTypeDesc() {
+        return OrderTypeEnum.getEnumDesc(orderType);
+    }
 
 }
