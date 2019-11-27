@@ -1,6 +1,12 @@
 package com.aiqin.mgs.order.api.component.enums;
 
+import com.aiqin.mgs.order.api.domain.EnumItemInfo;
 import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 购物车商品添加来源
@@ -27,39 +33,43 @@ public enum CartProductCreateSourceEnum {
         this.desc = desc;
     }
 
-    public static CartProductCreateSourceEnum getEnum(Integer code) {
-        for (CartProductCreateSourceEnum type : CartProductCreateSourceEnum.values()) {
-            if (type.getCode().equals(code)) {
-                return type;
-            }
+    /***选项类型*/
+    public static List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
+    /***code-enum map*/
+    public static Map<Integer, CartProductCreateSourceEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
+    /***value-enum map*/
+    public static Map<String, CartProductCreateSourceEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+
+    static {
+        for (CartProductCreateSourceEnum item :
+                CartProductCreateSourceEnum.values()) {
+            SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
+            CODE_ENUM_MAP.put(item.getCode(), item);
+            VALUE_ENUM_MAP.put(item.getValue(), item);
+        }
+    }
+
+    public static CartProductCreateSourceEnum getEnum(Object object) {
+        if (object != null) {
+            return VALUE_ENUM_MAP.get(object.toString());
         }
         return null;
     }
 
-    public static CartProductCreateSourceEnum getEnum(String value) {
-        for (CartProductCreateSourceEnum type : CartProductCreateSourceEnum.values()) {
-            if (type.getValue().equals(value)) {
-                return type;
-            }
-        }
-        return null;
-    }
-
-    public static String getEnumDesc(Integer code) {
-        for (CartProductCreateSourceEnum type : CartProductCreateSourceEnum.values()) {
-            if (type.getCode().equals(code)) {
-                return type.getDesc();
+    public static String getEnumDesc(Object object) {
+        if (object != null) {
+            CartProductCreateSourceEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            if (anEnum != null) {
+                return anEnum.getDesc();
             }
         }
         return "";
     }
 
-    public static String getEnumDesc(String value) {
-        for (CartProductCreateSourceEnum type : CartProductCreateSourceEnum.values()) {
-            if (type.getValue().equals(value)) {
-                return type.getDesc();
-            }
+    public static boolean exist(Object object) {
+        if (object != null) {
+            return VALUE_ENUM_MAP.containsKey(object.toString());
         }
-        return "";
+        return false;
     }
 }

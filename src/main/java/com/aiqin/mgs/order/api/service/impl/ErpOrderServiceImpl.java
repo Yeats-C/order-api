@@ -13,7 +13,10 @@ import com.aiqin.mgs.order.api.domain.request.ErpOrderSaveRequest;
 import com.aiqin.mgs.order.api.domain.response.ErpOrderDetailResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.OrderConfirmResponse;
 import com.aiqin.mgs.order.api.service.*;
-import com.aiqin.mgs.order.api.util.*;
+import com.aiqin.mgs.order.api.util.AuthUtil;
+import com.aiqin.mgs.order.api.util.OrderPublic;
+import com.aiqin.mgs.order.api.util.PageAutoHelperUtil;
+import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -176,38 +179,57 @@ public class ErpOrderServiceImpl implements ErpOrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveOrder(ErpOrderSaveRequest erpOrderSaveRequest) {
+    public ErpOrderDetailResponse saveOrder(ErpOrderSaveRequest erpOrderSaveRequest) {
 
+        //操作人信息
         AuthToken auth = AuthUtil.getCurrentAuth();
-        if (auth.getPersonId() == null) {
-            throw new BusinessException("请先登录");
-        }
         //校验参数
         validateSaveOrderRequest(erpOrderSaveRequest);
-
-        //临时生成假数据使用
-        if ("test".equals(erpOrderSaveRequest.getStoreId())) {
-            test(auth);
-            return;
-        }
-
-        //获取购物车商品
-        OrderConfirmResponse storeCartProduct = getStoreCartProduct(erpOrderSaveRequest.getStoreId());
-
-        //TODO 购物车数据校验
-
-        //根据购物车的商品信息从供应链获取商品详情
-        Map<String, ProductInfo> productDetailMap = getProductDetail(storeCartProduct.getCartOrderInfos());
 
         //获取门店信息
         StoreInfo storeInfo = getStoreInfoByStoreId(erpOrderSaveRequest.getStoreId());
 
-        //生成订单
-        generateOrder(storeCartProduct, storeInfo, erpOrderSaveRequest, productDetailMap);
+        //获取购物车商品
+        OrderConfirmResponse storeCartProduct = getStoreCartProduct(erpOrderSaveRequest.getStoreId());
+
+        //构建订单商品明细行
+        List<OrderStoreOrderProductItem> orderProductItemList = generateOrderProductList(storeCartProduct.getCartOrderInfos(), storeInfo);
+
+        //购物车数据校验
+        productCheck(erpOrderSaveRequest.getOrderType(), storeInfo, orderProductItemList);
+
+        //生成订单，返回订单号
+        String orderCode = generateOrder(orderProductItemList, storeInfo, erpOrderSaveRequest, auth);
 
         //删除购物车商品
         deleteOrderProductFromCart(erpOrderSaveRequest.getStoreId(), storeCartProduct);
 
+        //返回订单明细
+        OrderStoreOrderInfo createOrderQuery = new OrderStoreOrderInfo();
+        createOrderQuery.setOrderCode(orderCode);
+        return getOrderDetail(createOrderQuery);
+    }
+
+    @Override
+    public ErpOrderDetailResponse saveRackOrder(ErpOrderSaveRequest erpOrderSaveRequest) {
+        //操作人信息
+        AuthToken auth = AuthUtil.getCurrentAuth();
+        //校验参数
+        validateSaveOrderRequest(erpOrderSaveRequest);
+        //获取门店信息
+        StoreInfo storeInfo = getStoreInfoByStoreId(erpOrderSaveRequest.getStoreId());
+        //商品参数信息
+        List<OrderStoreOrderProductItem> productList = erpOrderSaveRequest.getProductList();
+
+        //构建货架订单商品信息行
+        List<OrderStoreOrderProductItem> orderProductItemList = generateRackOrderProductList(productList, storeInfo);
+        //构建和保存货架订单，返回订单编号
+        String orderCode = generateRackOrder(erpOrderSaveRequest, orderProductItemList, storeInfo, auth);
+
+        //返回订单明细
+        OrderStoreOrderInfo createOrderQuery = new OrderStoreOrderInfo();
+        createOrderQuery.setOrderCode(orderCode);
+        return getOrderDetail(createOrderQuery);
     }
 
     /**
@@ -220,6 +242,10 @@ public class ErpOrderServiceImpl implements ErpOrderService {
      * @date 2019/11/25 9:40
      */
     private void validateSaveOrderRequest(ErpOrderSaveRequest erpOrderSaveRequest) {
+        AuthToken auth = AuthUtil.getCurrentAuth();
+        if (auth.getPersonId() == null) {
+            throw new BusinessException("请先登录");
+        }
         if (erpOrderSaveRequest == null) {
             throw new BusinessException("空参数");
         }
@@ -247,37 +273,10 @@ public class ErpOrderServiceImpl implements ErpOrderService {
                 throw new BusinessException("无效的销售渠道");
             }
         }
-        if (erpOrderSaveRequest.getBillStatus() == null) {
-            throw new BusinessException("请确认是否需要发票");
-        }
     }
 
     /**
-     * 根据门店id获取门店信息
-     *
-     * @param storeId
-     * @return com.aiqin.mgs.order.api.domain.StoreInfo
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/11/21 16:07
-     */
-    private StoreInfo getStoreInfoByStoreId(String storeId) {
-        //TODO 根据门店id跨项目查询门店信息
-        StoreInfo storeInfo = new StoreInfo();
-        storeInfo.setStoreId(storeId);
-        storeInfo.setStoreCode("123456");
-        storeInfo.setStoreName("门店1");
-        storeInfo.setFranchiseeId("123456");
-        storeInfo.setFranchiseeCode("123456");
-        storeInfo.setFranchiseeName("加盟商1");
-        storeInfo.setContacts("张三");
-        storeInfo.setContactsPhone("12345678910");
-        storeInfo.setAddress("北京市朝阳区");
-        return storeInfo;
-    }
-
-    /**
-     * 从购物车获取选择的商品
+     * 从购物车获取选择的门店的勾选的商品
      *
      * @param storeId 门店id
      * @return com.aiqin.mgs.order.api.domain.response.cart.OrderConfirmResponse
@@ -301,84 +300,39 @@ public class ErpOrderServiceImpl implements ErpOrderService {
     }
 
     /**
-     * 根据购物车商品从供应链获取商品详情
+     * 构建订单商品明细行数据
      *
-     * @param list
-     * @return java.util.Map
+     * @param cartProductList 购物车商品行
+     * @param storeInfo       门店信息
+     * @return java.util.List<com.aiqin.mgs.order.api.domain.OrderStoreOrderProductItem>
      * @author: Tao.Chen
      * @version: v1.0.0
-     * @date 2019/11/25 9:42
+     * @date 2019/11/27 19:02
      */
-    private Map<String, ProductInfo> getProductDetail(List<CartOrderInfo> list) {
+    private List<OrderStoreOrderProductItem> generateOrderProductList(List<CartOrderInfo> cartProductList, StoreInfo storeInfo) {
 
-        //保存商品详情  key：sku  value：商品详情
+        //商品详情Map
         Map<String, ProductInfo> productMap = new HashMap<>(16);
 
-        //TODO 从供应链获取商品详情
+        //遍历参数商品列表，获取商品详情，校验数据
         for (CartOrderInfo item :
-                list) {
-            ProductInfo product = new ProductInfo();
-            product.setProductId(item.getProductId());
-            product.setProductCode("1"+System.currentTimeMillis());
-            product.setProductName(item.getProductName());
-            product.setSkuCode(item.getSkuId());
-            product.setSkuName(item.getSkuId() + System.currentTimeMillis());
-            product.setUnit("个");
-            product.setPrice(BigDecimal.TEN);
-            product.setTaxPurchasePrice(BigDecimal.TEN.add(BigDecimal.ONE));
-
+                cartProductList) {
+            //获取商品详情
+            ProductInfo product = getProductDetail(storeInfo.getStoreId(), item.getProductId(), item.getSkuId());
+            if (product == null) {
+                throw new BusinessException("未获取到商品" + item.getProductName() + "的信息");
+            }
             productMap.put(item.getSkuId(), product);
         }
-        return productMap;
-    }
 
-    /**
-     * 构建订单数据
-     *
-     * @param orderConfirmResponse 购物车数据
-     * @param storeInfo            门店信息
-     * @return void
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/11/21 16:01
-     */
-    private void generateOrder(OrderConfirmResponse orderConfirmResponse, StoreInfo storeInfo, ErpOrderSaveRequest erpOrderSaveRequest, Map<String, ProductInfo> productMap) {
-
-        //生成订单id
-        String orderId = OrderPublic.getUUID();
-        //生成订单code
-        String orderCode = OrderPublic.generateOrderCode(erpOrderSaveRequest.getOrderOriginType(), erpOrderSaveRequest.getOrderChannel());
-
-        //获取登录用户信息
-        AuthToken auth = AuthUtil.getCurrentAuth();
-
-        //购物车商品
-        List<CartOrderInfo> cartOrderInfoList = orderConfirmResponse.getCartOrderInfos();
-
-        //第一次遍历 构建订单明细行商品 TODO 没有计算活动优惠、A品券优惠、服纺券优惠，没有计算分摊后单价
+        //订单商品明细行
         List<OrderStoreOrderProductItem> orderProductItemList = new ArrayList<>();
-        //订货金额汇总
-        BigDecimal moneyTotal = BigDecimal.ZERO;
-        //实际支付金额汇总
-        BigDecimal realMoneyTotal = BigDecimal.ZERO;
-        //活动优惠金额汇总
-        BigDecimal activityMoneyTotal = BigDecimal.ZERO;
-        //服纺券优惠金额汇总
-        BigDecimal spinCouponMoneyTotal = BigDecimal.ZERO;
-        //A品券优惠金额汇总
-        BigDecimal topCouponMoneyTotal = BigDecimal.ZERO;
-        int orderItemNum = 1;
+        //遍历参数商品列表，构建订单商品明细行
         for (CartOrderInfo item :
-                cartOrderInfoList) {
+                cartProductList) {
             ProductInfo productInfo = productMap.get(item.getSkuId());
-            OrderStoreOrderProductItem orderProductItem = new OrderStoreOrderProductItem();
 
-            //订单id
-            orderProductItem.setOrderId(orderId);
-            //订单编号
-            orderProductItem.setOrderCode(orderCode);
-            //订单明细行编号
-            orderProductItem.setOrderItemCode(orderCode + String.format("%03d", orderItemNum++));
+            OrderStoreOrderProductItem orderProductItem = new OrderStoreOrderProductItem();
 
             //商品ID
             orderProductItem.setProductId(productInfo.getProductId());
@@ -412,11 +366,11 @@ public class ErpOrderServiceImpl implements ErpOrderService {
             orderProductItem.setActualStoreQuantity(null);
 
             //订货价
-            orderProductItem.setPrice(productInfo.getPrice());
+            orderProductItem.setPrice(item.getPrice());
             //含税采购价
-            orderProductItem.setTaxPurchasePrice(productInfo.getTaxPurchasePrice());
-            //分摊后单价 TODO 计算分摊后单价
-            orderProductItem.setSharePrice(productInfo.getPrice());
+//            orderProductItem.setTaxPurchasePrice();
+            //分摊后单价 需要单独计算
+            orderProductItem.setSharePrice(item.getPrice());
 
             //订货金额
             orderProductItem.setMoney(productInfo.getPrice().multiply(new BigDecimal(item.getAmount())).setScale(4, RoundingMode.UP));
@@ -430,18 +384,96 @@ public class ErpOrderServiceImpl implements ErpOrderService {
             orderProductItem.setRealMoney(orderProductItem.getMoney().subtract(orderProductItem.getActivityMoney()).subtract(orderProductItem.getSpinCouponMoney()).subtract(orderProductItem.getTopCouponMoney()));
 
             orderProductItemList.add(orderProductItem);
+        }
+
+        return orderProductItemList;
+    }
+
+    /**
+     * 商品校验
+     *
+     * @param orderType            订单类型
+     * @param storeInfo            门店信息
+     * @param orderProductItemList 订单商品明细行
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/27 19:03
+     */
+    private void productCheck(Integer orderType, StoreInfo storeInfo, List<OrderStoreOrderProductItem> orderProductItemList) {
+
+        //订单类型
+        OrderTypeEnum orderTypeEnum = OrderTypeEnum.getEnum(orderType);
+        if (orderTypeEnum == null) {
+            throw new BusinessException("无效的订单类型");
+        }
+
+        if (orderTypeEnum.isActivityCheck()) {
+            //TODO 活动校验
+        }
+        if (orderTypeEnum.isAreaCheck()) {
+            //TODO 商品销售区域配置校验
+        }
+        if (orderTypeEnum.isPriceCheck()) {
+            //TODO 商品销售价格校验
+        }
+        if (orderTypeEnum.isRepertoryCheck()) {
+            //TODO 商品库存校验
+        }
+
+    }
+
+    /**
+     * 构建订单信息
+     *
+     * @param orderProductItemList 订单商品明细行
+     * @param storeInfo            门店信息
+     * @param erpOrderSaveRequest  保存订单参数
+     * @param auth                 操作人信息
+     * @return java.lang.String
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/27 19:04
+     */
+    private String generateOrder(List<OrderStoreOrderProductItem> orderProductItemList, StoreInfo storeInfo, ErpOrderSaveRequest erpOrderSaveRequest, AuthToken auth) {
+
+        //生成订单id
+        String orderId = OrderPublic.getUUID();
+        //生成订单code
+        String orderCode = OrderPublic.generateOrderCode(erpOrderSaveRequest.getOrderOriginType(), erpOrderSaveRequest.getOrderChannel());
+
+        //订货金额汇总
+        BigDecimal moneyTotal = BigDecimal.ZERO;
+        //实际支付金额汇总
+        BigDecimal realMoneyTotal = BigDecimal.ZERO;
+        //活动优惠金额汇总
+        BigDecimal activityMoneyTotal = BigDecimal.ZERO;
+        //服纺券优惠金额汇总
+        BigDecimal spinCouponMoneyTotal = BigDecimal.ZERO;
+        //A品券优惠金额汇总
+        BigDecimal topCouponMoneyTotal = BigDecimal.ZERO;
+        int orderItemNum = 1;
+        for (OrderStoreOrderProductItem item :
+                orderProductItemList) {
+
+            //订单id
+            item.setOrderId(orderId);
+            //订单编号
+            item.setOrderCode(orderCode);
+            //订单明细行编号
+            item.setOrderItemCode(orderCode + String.format("%03d", orderItemNum++));
+
 
             //订货金额汇总
-            moneyTotal = moneyTotal.add(orderProductItem.getMoney()==null?BigDecimal.ZERO:orderProductItem.getMoney());
+            moneyTotal = moneyTotal.add(item.getMoney() == null ? BigDecimal.ZERO : item.getMoney());
             //实际支付金额汇总
-            realMoneyTotal = realMoneyTotal.add(orderProductItem.getRealMoney()==null?BigDecimal.ZERO:orderProductItem.getRealMoney());
+            realMoneyTotal = realMoneyTotal.add(item.getRealMoney() == null ? BigDecimal.ZERO : item.getRealMoney());
             //活动优惠金额汇总
-            activityMoneyTotal = activityMoneyTotal.add(orderProductItem.getActivityMoney()==null?BigDecimal.ZERO:orderProductItem.getActivityMoney());
+            activityMoneyTotal = activityMoneyTotal.add(item.getActivityMoney() == null ? BigDecimal.ZERO : item.getActivityMoney());
             //服纺券优惠金额汇总
-            spinCouponMoneyTotal = spinCouponMoneyTotal.add(orderProductItem.getSpinCouponMoney()==null?BigDecimal.ZERO:orderProductItem.getSpinCouponMoney());
+            spinCouponMoneyTotal = spinCouponMoneyTotal.add(item.getSpinCouponMoney() == null ? BigDecimal.ZERO : item.getSpinCouponMoney());
             //A品券优惠金额汇总
-            topCouponMoneyTotal = topCouponMoneyTotal.add(orderProductItem.getTopCouponMoney()==null?BigDecimal.ZERO:orderProductItem.getTopCouponMoney());
-
+            topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponMoney() == null ? BigDecimal.ZERO : item.getTopCouponMoney());
         }
         erpOrderProductItemService.saveOrderProductItemList(orderProductItemList, auth);
 
@@ -483,6 +515,7 @@ public class ErpOrderServiceImpl implements ErpOrderService {
         orderReceiving.setBillStatus(erpOrderSaveRequest.getBillStatus());
         erpOrderReceivingService.saveOrderReceiving(orderReceiving, auth);
 
+        return orderCode;
     }
 
     /**
@@ -495,15 +528,182 @@ public class ErpOrderServiceImpl implements ErpOrderService {
      * @date 2019/11/21 16:02
      */
     private void deleteOrderProductFromCart(String storeId, OrderConfirmResponse orderConfirmResponse) {
-        for (CartOrderInfo item:
-             orderConfirmResponse.getCartOrderInfos()) {
+        for (CartOrderInfo item :
+                orderConfirmResponse.getCartOrderInfos()) {
             cartOrderService.deleteCartInfo(storeId, item.getSkuId(), YesOrNoEnum.YES.getCode());
         }
     }
 
-    private void test(AuthToken auth) {
+    /**
+     * 构建货架订单商品信息行数据
+     *
+     * @param productList 货架商品参数
+     * @param storeInfo   门店信息
+     * @return java.util.List<com.aiqin.mgs.order.api.domain.OrderStoreOrderProductItem>
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/27 17:43
+     */
+    private List<OrderStoreOrderProductItem> generateRackOrderProductList(List<OrderStoreOrderProductItem> productList, StoreInfo storeInfo) {
+
+        if (productList == null || productList.size() == 0) {
+            throw new BusinessException("缺少商品数据");
+        }
+
+        //商品详情Map
+        Map<String, ProductInfo> productMap = new HashMap<>(16);
+
+        //参数商品行标识
+        int lineIndex = 0;
+
+        //遍历参数商品列表，获取商品详情，校验数据
+        for (OrderStoreOrderProductItem item :
+                productList) {
+            lineIndex++;
+            if (StringUtils.isEmpty(item.getProductId())) {
+                throw new BusinessException("第" + lineIndex + "行商品id为空");
+            }
+            if (StringUtils.isEmpty(item.getSkuCode())) {
+                throw new BusinessException("第" + lineIndex + "行商品sku为空");
+            }
+            if (item.getTaxPurchasePrice() == null) {
+                throw new BusinessException("第" + lineIndex + "行商品含税采购价为空");
+            }
+            if (item.getPrice() == null) {
+                throw new BusinessException("第" + lineIndex + "行商品销售价为空");
+            }
+            if (item.getQuantity() == null) {
+                throw new BusinessException("第" + lineIndex + "行商品数量为空");
+            }
+
+            //获取商品详情
+            ProductInfo product = getProductDetail(storeInfo.getStoreId(), item.getProductId(), item.getSkuCode());
+            if (product == null) {
+                throw new BusinessException("第" + lineIndex + "行商品不存在");
+            }
+
+            productMap.put(item.getSkuCode(), product);
+        }
+
+        //订单商品明细行
+        List<OrderStoreOrderProductItem> orderProductItemList = new ArrayList<>();
+        //遍历参数商品列表，构建订单商品明细行
+        for (OrderStoreOrderProductItem item :
+                productList) {
+            ProductInfo productInfo = productMap.get(item.getSkuCode());
+
+            OrderStoreOrderProductItem orderProductItem = new OrderStoreOrderProductItem();
+
+            //商品ID
+            orderProductItem.setProductId(productInfo.getProductId());
+            //商品编码
+            orderProductItem.setProductCode(productInfo.getProductCode());
+            //商品名称
+            orderProductItem.setProductName(productInfo.getProductName());
+            //商品sku码
+            orderProductItem.setSkuCode(productInfo.getSkuCode());
+            //商品名称
+            orderProductItem.setSkuName(productInfo.getSkuName());
+            //单位
+            orderProductItem.setUnit(productInfo.getUnit());
+            //本品赠品标记 ProductGiftEnum
+            orderProductItem.setProductGift(ProductGiftEnum.PRODUCT.getCode());
+            //赠品行关联本品行编码
+            orderProductItem.setParentOrderItemCode("");
+
+            //活动id
+            orderProductItem.setActivityId(null);
+            //服纺券id
+            orderProductItem.setSpinCouponId(null);
+            //A品券id
+            orderProductItem.setTopCouponId(null);
+
+            //订货数量
+            orderProductItem.setQuantity(item.getQuantity());
+            //仓库实发数量
+            orderProductItem.setActualDeliverQuantity(null);
+            //门店实收数量
+            orderProductItem.setActualStoreQuantity(null);
+
+            //订货价
+            orderProductItem.setPrice(item.getPrice());
+            //含税采购价
+            orderProductItem.setTaxPurchasePrice(item.getTaxPurchasePrice());
+            //分摊后单价 货架订单没有活动、优惠，分摊价等于原价
+            orderProductItem.setSharePrice(item.getPrice());
+
+            //订货金额
+            orderProductItem.setMoney(item.getPrice().multiply(new BigDecimal(item.getQuantity())).setScale(4, RoundingMode.UP));
+            //活动优惠金额
+            orderProductItem.setActivityMoney(BigDecimal.ZERO);
+            //服纺券优惠金额
+            orderProductItem.setSpinCouponMoney(BigDecimal.ZERO);
+            //A品券优惠金额
+            orderProductItem.setTopCouponMoney(BigDecimal.ZERO);
+            //实际支付金额
+            orderProductItem.setRealMoney(orderProductItem.getMoney().subtract(orderProductItem.getActivityMoney()).subtract(orderProductItem.getSpinCouponMoney()).subtract(orderProductItem.getTopCouponMoney()));
+
+            orderProductItemList.add(orderProductItem);
+        }
+
+        return orderProductItemList;
+    }
+
+    /**
+     * 构建和保存货架订单数据
+     *
+     * @param erpOrderSaveRequest  入口参数
+     * @param orderProductItemList 订单商品明细行
+     * @param storeInfo            门店信息
+     * @param auth                 操作人信息
+     * @return java.lang.String
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/27 17:50
+     */
+    private String generateRackOrder(ErpOrderSaveRequest erpOrderSaveRequest, List<OrderStoreOrderProductItem> orderProductItemList, StoreInfo storeInfo, AuthToken auth) {
+        //生成订单id
         String orderId = OrderPublic.getUUID();
-        String orderCode = OrderPublic.generateOrderCode(OrderOriginTypeEnum.ORIGIN_COME_5.getCode(), OrderChannelEnum.CHANNEL_3.getCode());
+        //生成订单code
+        String orderCode = OrderPublic.generateOrderCode(erpOrderSaveRequest.getOrderOriginType(), erpOrderSaveRequest.getOrderChannel());
+
+        //订货金额汇总
+        BigDecimal moneyTotal = BigDecimal.ZERO;
+        //实际支付金额汇总
+        BigDecimal realMoneyTotal = BigDecimal.ZERO;
+        //活动优惠金额汇总
+        BigDecimal activityMoneyTotal = BigDecimal.ZERO;
+        //服纺券优惠金额汇总
+        BigDecimal spinCouponMoneyTotal = BigDecimal.ZERO;
+        //A品券优惠金额汇总
+        BigDecimal topCouponMoneyTotal = BigDecimal.ZERO;
+
+        int orderItemNum = 1;
+
+        //遍历商品订单行，汇总价格
+        for (OrderStoreOrderProductItem item :
+                orderProductItemList) {
+
+            //订单id
+            item.setOrderId(orderId);
+            //订单编号
+            item.setOrderCode(orderCode);
+            //订单明细行编号
+            item.setOrderItemCode(orderCode + String.format("%03d", orderItemNum++));
+
+            //订货金额汇总
+            moneyTotal = moneyTotal.add(item.getMoney() == null ? BigDecimal.ZERO : item.getMoney());
+            //实际支付金额汇总
+            realMoneyTotal = realMoneyTotal.add(item.getRealMoney() == null ? BigDecimal.ZERO : item.getRealMoney());
+            //活动优惠金额汇总
+            activityMoneyTotal = activityMoneyTotal.add(item.getActivityMoney() == null ? BigDecimal.ZERO : item.getActivityMoney());
+            //服纺券优惠金额汇总
+            spinCouponMoneyTotal = spinCouponMoneyTotal.add(item.getSpinCouponMoney() == null ? BigDecimal.ZERO : item.getSpinCouponMoney());
+            //A品券优惠金额汇总
+            topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponMoney() == null ? BigDecimal.ZERO : item.getTopCouponMoney());
+        }
+
+        erpOrderProductItemService.saveOrderProductItemList(orderProductItemList, auth);
 
         //保存订单信息
         OrderStoreOrderInfo orderInfo = new OrderStoreOrderInfo();
@@ -512,165 +712,99 @@ public class ErpOrderServiceImpl implements ErpOrderService {
         orderInfo.setPayStatus(PayStatusEnum.UNPAID.getCode());
         orderInfo.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
         orderInfo.setOrderLevel(OrderLevelEnum.PRIMARY.getCode());
-        orderInfo.setActualPrice(new BigDecimal(120.0000));
-        orderInfo.setTotalPrice(new BigDecimal(120.0000));
-        orderInfo.setOrderType(OrderTypeEnum.ORDER_TYPE_1.getCode());
+        orderInfo.setActualPrice(realMoneyTotal);
+        orderInfo.setTotalPrice(moneyTotal);
+        orderInfo.setOrderType(erpOrderSaveRequest.getOrderType());
         orderInfo.setReturnStatus(YesOrNoEnum.NO.getCode());
-        orderInfo.setFranchiseeId("12345");
-        orderInfo.setStoreId("123456");
-        orderInfo.setStoreName("门店1");
+        orderInfo.setFranchiseeId(storeInfo.getFranchiseeId());
+        orderInfo.setStoreId(storeInfo.getStoreId());
+        orderInfo.setStoreName(storeInfo.getStoreName());
         erpOrderOperationService.saveOrder(orderInfo, auth);
 
         //保存订单支付信息
         OrderStoreOrderPay orderPay = new OrderStoreOrderPay();
         orderPay.setOrderId(orderId);
-        orderPay.setOrderTotal(orderInfo.getTotalPrice());
+        orderPay.setOrderTotal(moneyTotal);
         orderPay.setPayStatus(orderInfo.getPayStatus());
         orderPay.setPayId(OrderPublic.getUUID());
-        orderPay.setActivityCouponMoney(BigDecimal.ZERO);
-        orderPay.setActivityMoney(BigDecimal.ZERO);
-        orderPay.setClothCouponMoney(BigDecimal.ZERO);
-        orderPay.setActualMoney(new BigDecimal(120));
+        orderPay.setActivityCouponMoney(topCouponMoneyTotal);
+        orderPay.setActivityMoney(activityMoneyTotal);
+        orderPay.setClothCouponMoney(spinCouponMoneyTotal);
+        orderPay.setActualMoney(realMoneyTotal);
         erpOrderPayService.saveOrderPay(orderPay, auth);
 
         //保存订单收货信息
         OrderStoreOrderReceiving orderReceiving = new OrderStoreOrderReceiving();
         orderReceiving.setOrderId(orderId);
         orderReceiving.setReceiveId(OrderPublic.getUUID());
-        orderReceiving.setReceiveName("张三");
-        orderReceiving.setReceiveAddress("北京市朝阳区");
-        orderReceiving.setReceivePhone("12345678910");
-        orderReceiving.setBillStatus(YesOrNoEnum.YES.getCode());
+        orderReceiving.setReceiveName(storeInfo.getContacts());
+        orderReceiving.setReceiveAddress(storeInfo.getAddress());
+        orderReceiving.setReceivePhone(storeInfo.getContactsPhone());
+        orderReceiving.setBillStatus(erpOrderSaveRequest.getBillStatus());
         erpOrderReceivingService.saveOrderReceiving(orderReceiving, auth);
 
-        //保存订单商品明细
-        List<OrderStoreOrderProductItem> orderProductItemList = new ArrayList<>();
-        OrderStoreOrderProductItem orderProductItem1 = new OrderStoreOrderProductItem();
-        //订单id
-        orderProductItem1.setOrderId(orderId);
-        //订单编号
-        orderProductItem1.setOrderCode(orderCode);
-        //订单明细行编号
-        orderProductItem1.setOrderItemCode(orderCode + String.format("%03d", 1));
+        return orderCode;
+    }
 
-        //商品ID
-        orderProductItem1.setProductId("12321232123");
-        //商品编码
-        orderProductItem1.setProductCode("12343211");
-        //商品名称
-        orderProductItem1.setProductName("衣服");
-        //商品sku码
-        orderProductItem1.setSkuCode("12321");
-        //商品名称
-        orderProductItem1.setSkuName("XXL");
-        //单位
-        orderProductItem1.setUnit("件");
-        //本品赠品标记 ProductGiftEnum
-        orderProductItem1.setProductGift(ProductGiftEnum.PRODUCT.getCode());
-        //赠品行关联本品行编码
-        orderProductItem1.setParentOrderItemCode("");
+    /**
+     * 获取商品详情信息
+     *
+     * @param storeId   门店id
+     * @param productId 商品id
+     * @param skuCode   商品sku
+     * @return com.aiqin.mgs.order.api.domain.ProductInfo
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/27 16:21
+     */
+    private ProductInfo getProductDetail(String storeId, String productId, String skuCode) {
+        ProductInfo product = new ProductInfo();
+        try {
+            product.setProductId(productId);
+            product.setProductCode(productId + System.currentTimeMillis());
+            product.setProductName("商品名称" + System.currentTimeMillis());
+            product.setSkuCode(skuCode);
+            product.setSkuName(skuCode + System.currentTimeMillis());
+            product.setUnit("个");
+            product.setPrice(BigDecimal.TEN);
+            product.setTaxPurchasePrice(BigDecimal.TEN.add(BigDecimal.ONE));
 
-        //活动id
-        orderProductItem1.setActivityId(null);
-        //服纺券id
-        orderProductItem1.setSpinCouponId(null);
-        //A品券id
-        orderProductItem1.setTopCouponId(null);
+            //TODO 从供应链获取商品详情
+//            Map<String, Object> paramMap = new HashMap<>();
+//            paramMap.put("storeId", storeId);
+//            paramMap.put("productId", productId);
+//            paramMap.put("skuCode", skuCode);
+//            HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/test").json(paramMap);
+//            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
+//            });
+        } catch (Exception e) {
+            logger.error("获取商品信息失败：{}", e);
+            throw new BusinessException("获取商品详情信息失败");
+        }
+        return product;
+    }
 
-        //订货数量
-        orderProductItem1.setQuantity(10);
-        //仓库实发数量
-        orderProductItem1.setActualDeliverQuantity(null);
-        //门店实收数量
-        orderProductItem1.setActualStoreQuantity(null);
-
-        //订货价
-        orderProductItem1.setPrice(BigDecimal.TEN);
-        //含税采购价
-        orderProductItem1.setTaxPurchasePrice(BigDecimal.TEN.add(BigDecimal.ONE));
-        //分摊后单价 TODO 计算分摊后单价
-        orderProductItem1.setSharePrice(BigDecimal.TEN);
-
-        //订货金额
-        orderProductItem1.setMoney(BigDecimal.TEN.multiply(new BigDecimal(10)).setScale(4, RoundingMode.UP));
-        //活动优惠金额
-        orderProductItem1.setActivityMoney(BigDecimal.ZERO);
-        //服纺券优惠金额
-        orderProductItem1.setSpinCouponMoney(BigDecimal.ZERO);
-        //A品券优惠金额
-        orderProductItem1.setTopCouponMoney(BigDecimal.ZERO);
-        //实际支付金额
-        orderProductItem1.setRealMoney(orderProductItem1.getMoney().subtract(orderProductItem1.getActivityMoney()).subtract(orderProductItem1.getSpinCouponMoney()).subtract(orderProductItem1.getTopCouponMoney()));
-
-        //创建人id
-        orderProductItem1.setCreateById(auth.getPersonId());
-        //创建人姓名
-        orderProductItem1.setCreateByName(auth.getPersonName());
-        //修改人id
-        orderProductItem1.setUpdateById(auth.getPersonId());
-        //修改人姓名
-        orderProductItem1.setUpdateByName(auth.getPersonName());
-        orderProductItemList.add(orderProductItem1);
-
-        OrderStoreOrderProductItem orderProductItem2 = new OrderStoreOrderProductItem();
-        //订单id
-        orderProductItem2.setOrderId(orderId);
-        //订单编号
-        orderProductItem2.setOrderCode(orderCode);
-        //订单明细行编号
-        orderProductItem2.setOrderItemCode(orderCode + String.format("%03d", 2));
-
-        //商品ID
-        orderProductItem2.setProductId("12321232123");
-        //商品编码
-        orderProductItem2.setProductCode("12343211");
-        //商品名称
-        orderProductItem2.setProductName("衣服");
-        //商品sku码
-        orderProductItem2.setSkuCode("12321");
-        //商品名称
-        orderProductItem2.setSkuName("XXL");
-        //单位
-        orderProductItem2.setUnit("件");
-        //本品赠品标记 ProductGiftEnum
-        orderProductItem2.setProductGift(ProductGiftEnum.PRODUCT.getCode());
-        //赠品行关联本品行编码
-        orderProductItem2.setParentOrderItemCode("");
-
-        //活动id
-        orderProductItem2.setActivityId(null);
-        //服纺券id
-        orderProductItem2.setSpinCouponId(null);
-        //A品券id
-        orderProductItem2.setTopCouponId(null);
-
-        //订货数量
-        orderProductItem2.setQuantity(10);
-        //仓库实发数量
-        orderProductItem2.setActualDeliverQuantity(null);
-        //门店实收数量
-        orderProductItem2.setActualStoreQuantity(null);
-
-        //订货价
-        orderProductItem2.setPrice(BigDecimal.TEN);
-        //含税采购价
-        orderProductItem2.setTaxPurchasePrice(BigDecimal.TEN.add(BigDecimal.ONE));
-        //分摊后单价 TODO 计算分摊后单价
-        orderProductItem2.setSharePrice(BigDecimal.TEN);
-
-        //订货金额
-        orderProductItem2.setMoney(BigDecimal.TEN.multiply(new BigDecimal(10)).setScale(4, RoundingMode.UP));
-        //活动优惠金额
-        orderProductItem2.setActivityMoney(BigDecimal.ZERO);
-        //服纺券优惠金额
-        orderProductItem2.setSpinCouponMoney(BigDecimal.ZERO);
-        //A品券优惠金额
-        orderProductItem2.setTopCouponMoney(BigDecimal.ZERO);
-        //实际支付金额
-        orderProductItem2.setRealMoney(orderProductItem2.getMoney().subtract(orderProductItem2.getActivityMoney()).subtract(orderProductItem2.getSpinCouponMoney()).subtract(orderProductItem2.getTopCouponMoney()));
-        orderProductItemList.add(orderProductItem2);
-
-        erpOrderProductItemService.saveOrderProductItemList(orderProductItemList, auth);
-
+    /**
+     * 根据门店id获取门店信息
+     *
+     * @param storeId
+     * @return com.aiqin.mgs.order.api.domain.StoreInfo
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/21 16:07
+     */
+    private StoreInfo getStoreInfoByStoreId(String storeId) {
+        //TODO 根据门店id跨项目查询门店信息
+        StoreInfo storeInfo = new StoreInfo();
+        storeInfo.setStoreId(storeId);
+        storeInfo.setStoreCode("123456");
+        storeInfo.setStoreName("门店1");
+        storeInfo.setFranchiseeId("123456");
+        storeInfo.setFranchiseeCode("123456");
+        storeInfo.setFranchiseeName("加盟商1");
+        storeInfo.setContacts("张三");
+        storeInfo.setContactsPhone("12345678910");
+        storeInfo.setAddress("北京市朝阳区");
+        return storeInfo;
     }
 }
