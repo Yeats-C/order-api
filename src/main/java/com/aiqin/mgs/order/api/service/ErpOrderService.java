@@ -57,4 +57,48 @@ public interface ErpOrderService {
      * @date 2019/11/27 14:06
      */
     ErpOrderDetailResponse saveRackOrder(ErpOrderSaveRequest erpOrderSaveRequest);
+
+    /**
+     * 订单拆分
+     *
+     * @param orderStoreOrderInfo
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/28 10:01
+     */
+    void orderSplit(OrderStoreOrderInfo orderStoreOrderInfo);
+
+    /**
+     * 订单发货
+     *
+     * @param orderStoreOrderInfo
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/28 14:28
+     */
+    void deliveryOrder(OrderStoreOrderInfo orderStoreOrderInfo);
+
+    /**
+     * 订单签收
+     *
+     * @param orderStoreOrderInfo
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/28 14:31
+     */
+    void signOrder(OrderStoreOrderInfo orderStoreOrderInfo);
+
+    /**
+     * 取消订单
+     *
+     * @param orderStoreOrderInfo
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/28 14:38
+     */
+    void cancelOrder(OrderStoreOrderInfo orderStoreOrderInfo);
 }

@@ -232,6 +232,40 @@ public class ErpOrderServiceImpl implements ErpOrderService {
         return getOrderDetail(createOrderQuery);
     }
 
+    @Override
+    public void orderSplit(OrderStoreOrderInfo orderStoreOrderInfo) {
+
+//        orderStoreOrderInfo.
+
+    }
+
+    @Override
+    public void deliveryOrder(OrderStoreOrderInfo orderStoreOrderInfo) {
+
+    }
+
+    @Override
+    public void signOrder(OrderStoreOrderInfo orderStoreOrderInfo) {
+
+    }
+
+    @Override
+    public void cancelOrder(OrderStoreOrderInfo orderStoreOrderInfo) {
+
+        if (orderStoreOrderInfo == null || StringUtils.isEmpty(orderStoreOrderInfo.getOrderCode())) {
+            throw new BusinessException("请传入订单号");
+        }
+
+        OrderStoreOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderStoreOrderInfo.getOrderCode());
+        if (order == null) {
+            throw new BusinessException("无效的订单号");
+        }
+        ErpOrderStatusEnum orderStatusEnum = ErpOrderStatusEnum.getEnum(order.getOrderStatus());
+//        if () {
+//        }
+
+    }
+
     /**
      * 校验保存订单参数
      *

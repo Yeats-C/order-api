@@ -9,27 +9,23 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 购物车商品类型
+ * 支付方式枚举
  *
  * @author: Tao.Chen
  * @version: v1.0.0
- * @date 2019/11/15 11:09
+ * @date 2019/11/12 17:15
  */
 @Getter
-public enum CartProductTypeEnum {
+public enum PayWayEnum {
 
-    /***直送*/
-    DIRECT_SEND(1, "1", "直送"),
-    /***配送*/
-    DISTRIBUTION(2, "2", "配送"),
-    /***货架*/
-    STORAGE_RACK(3, "3", "货架");
+    /***余额*/
+    PAY_1(1, "1", "余额支付");
 
     private Integer code;
     private String value;
     private String desc;
 
-    CartProductTypeEnum(Integer code, String value, String desc) {
+    PayWayEnum(Integer code, String value, String desc) {
         this.code = code;
         this.value = value;
         this.desc = desc;
@@ -38,20 +34,20 @@ public enum CartProductTypeEnum {
     /***选项类型*/
     public static List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
     /***code-enum map*/
-    public static Map<Integer, CartProductTypeEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static Map<Integer, PayWayEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
     /***value-enum map*/
-    public static Map<String, CartProductTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static Map<String, PayWayEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
     static {
-        for (CartProductTypeEnum item :
-                CartProductTypeEnum.values()) {
+        for (PayWayEnum item :
+                PayWayEnum.values()) {
             SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
             CODE_ENUM_MAP.put(item.getCode(), item);
             VALUE_ENUM_MAP.put(item.getValue(), item);
         }
     }
 
-    public static CartProductTypeEnum getEnum(Object object) {
+    public static PayWayEnum getEnum(Object object) {
         if (object != null) {
             return VALUE_ENUM_MAP.get(object.toString());
         }
@@ -60,7 +56,7 @@ public enum CartProductTypeEnum {
 
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            CartProductTypeEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            PayWayEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
             }
@@ -74,4 +70,5 @@ public enum CartProductTypeEnum {
         }
         return false;
     }
+
 }

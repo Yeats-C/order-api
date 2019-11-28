@@ -52,57 +52,57 @@ public interface ErpOrderPayService {
     /**
      * 发起支付
      *
-     * @param orderStoreOrderInfo
+     * @param orderStoreOrderPay
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/11/20 15:26
      */
-    void orderPay(OrderStoreOrderInfo orderStoreOrderInfo);
+    void orderPay(OrderStoreOrderPay orderStoreOrderPay);
 
     /**
      * 查询订单支付结果
      *
-     * @param orderStoreOrderInfo
+     * @param orderStoreOrderPay
      * @return com.aiqin.mgs.order.api.domain.response.OrderPayResultResponse
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/11/25 14:55
      */
-    OrderPayResultResponse orderPayResult(OrderStoreOrderInfo orderStoreOrderInfo);
+    OrderPayResultResponse orderPayResult(OrderStoreOrderPay orderStoreOrderPay);
 
     /**
      * 轮询订单支付状态
      *
-     * @param orderStoreOrderInfo
+     * @param orderStoreOrderPay
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/11/20 16:38
      */
-    void orderPayPolling(OrderStoreOrderInfo orderStoreOrderInfo);
+    void orderPayPolling(OrderStoreOrderPay orderStoreOrderPay);
 
     /**
      * 订单支付回调方法
      *
-     * @param orderStoreOrderInfo
+     * @param orderStoreOrderPay
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/11/20 15:26
      */
-    void orderPayCallback(OrderStoreOrderInfo orderStoreOrderInfo);
+    void orderPayCallback(OrderStoreOrderPay orderStoreOrderPay);
 
     /**
      * 校验并更正订单支付信息
      *
-     * @param orderStoreOrderInfo
+     * @param orderStoreOrderPay
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/11/25 17:59
      */
-    void orderPayRepay(OrderStoreOrderInfo orderStoreOrderInfo);
+    void orderPayRepay(OrderStoreOrderPay orderStoreOrderPay);
 
     /**
      * 订单超时未支付取消订单
