@@ -158,7 +158,7 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 			orderId = orderAfterSaleInfo.getOrderId();
 			returnStatus = Global.IS_RETURN_1;
 			updateBy = orderAfterSaleInfo.getCreateBy();
-			
+			//仅更改退货状态-订单主表
 			orderService.retustus(orderId,returnStatus,updateBy);
 			
 			
@@ -208,7 +208,7 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 
 
 			//调用支付中心退款
-			//toRefund(orderAfterSaleInfo);
+			toRefund(orderAfterSaleInfo);
 
 
 
@@ -240,6 +240,7 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 		payReq.setMemberPhone(orderAfterSaleInfo.getMemberPhone());
 		payReq.setFranchiseeId(orderAfterSaleInfo.getFranchiseeId());
 		payReq.setPayOrderType(orderAfterSaleInfo.getOrderType());
+		payReq.setRefundType(orderAfterSaleInfo.getReturnMoneyType());
 		bridgePayService.toRefund(payReq);
 	}
 

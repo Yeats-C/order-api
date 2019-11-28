@@ -139,4 +139,9 @@ public class PayReq implements Serializable {
     @NotNull(message = "退款金额不能为空")
     @JsonProperty("refund_amount")
     private Long refundAmount;
+
+    @ApiModelProperty("退款支付方式(0.现金 1.储值卡)")
+    @JsonProperty("refund_type")
+    @NotNull(message = "退款支付方式不能为空")
+    private Integer refundType;
 }
