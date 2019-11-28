@@ -9,6 +9,7 @@
         order_id as orderId,
         pay_code as payCode,
         pay_status as payStatus,
+        pay_way as payWay,
         order_total as orderTotal,
         activity_money as activityMoney,
         activity_coupon_money as activityCouponMoney,
@@ -35,11 +36,11 @@
     </select>
 
     <insert id="insert">
-        insert into order_store_pay (pay_id, pay_code, order_id, pay_status, activity_money, activity_coupon_money,
+        insert into order_store_pay (pay_id, pay_code, order_id, pay_status, pay_way, activity_money, activity_coupon_money,
                                      cloth_coupon_money, actual_money, polling_times, pay_start_time, pay_end_time,
                                      create_time, create_by_id,
                                      create_by_name, update_time, update_by_id, update_by_name)
-        values (#{payId}, #{payCode}, #{orderId}, #{payStatus}, #{activityMoney}, #{activityCouponMoney},
+        values (#{payId}, #{payCode}, #{orderId}, #{payStatus}, #{payWay}, #{activityMoney}, #{activityCouponMoney},
                 #{clothCouponMoney}, #{actualMoney}, #{pollingTimes}, #{payStartTime}, #{payEndTime}, sysdate(),
                 #{createById},
                 #{createByName}, sysdate(), #{updateById}, #{updateByName})
@@ -56,6 +57,9 @@
         </if>
         <if test="payStatus != null and payStatus != '' or payStatus == 0">
             pay_status = #{payStatus},
+        </if>
+        <if test="payWay != null and payWay != '' or payWay == 0">
+            pay_way = #{payWay},
         </if>
         <if test="payCode != null and payCode != ''">
             pay_code = #{payCode},

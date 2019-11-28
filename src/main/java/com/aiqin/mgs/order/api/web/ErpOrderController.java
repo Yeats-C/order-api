@@ -9,6 +9,7 @@ import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.OrderTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.PayStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.PayWayEnum;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.ErpOrderSaveRequest;
 import com.aiqin.mgs.order.api.domain.response.ErpOrderDetailResponse;
@@ -95,6 +96,48 @@ public class ErpOrderController {
         return response;
     }
 
+    @PostMapping("/deliveryOrder")
+    @ApiOperation(value = "订单发货")
+    public HttpResponse deliveryOrder(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
+        HttpResponse response = HttpResponse.success();
+        try {
+            erpOrderService.deliveryOrder(orderStoreOrderInfo);
+        } catch (BusinessException e) {
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
+    }
+
+    @PostMapping("/signOrder")
+    @ApiOperation(value = "订单签收")
+    public HttpResponse signOrder(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
+        HttpResponse response = HttpResponse.success();
+        try {
+            erpOrderService.signOrder(orderStoreOrderInfo);
+        } catch (BusinessException e) {
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
+    }
+
+    @PostMapping("/cancelOrder")
+    @ApiOperation(value = "取消订单")
+    public HttpResponse cancelOrder(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
+        HttpResponse response = HttpResponse.success();
+        try {
+            erpOrderService.cancelOrder(orderStoreOrderInfo);
+        } catch (BusinessException e) {
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
+    }
+
     @PostMapping("/findOrderTypeList")
     @ApiOperation(value = "获取订单类型选项列表")
     public HttpResponse findOrderTypeList() {
@@ -129,6 +172,20 @@ public class ErpOrderController {
         HttpResponse response = HttpResponse.success();
         try {
             response.setData(PayStatusEnum.SELECT_LIST);
+        } catch (BusinessException e) {
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
+    }
+
+    @PostMapping("/findOrderPayWayList")
+    @ApiOperation(value = "获取订单支付方式选项列表")
+    public HttpResponse findOrderPayWayList() {
+        HttpResponse response = HttpResponse.success();
+        try {
+            response.setData(PayWayEnum.SELECT_LIST);
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {

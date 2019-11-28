@@ -6,6 +6,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo;
+import com.aiqin.mgs.order.api.domain.OrderStoreOrderPay;
 import com.aiqin.mgs.order.api.domain.response.OrderPayResultResponse;
 import com.aiqin.mgs.order.api.service.ErpOrderPayService;
 import io.swagger.annotations.Api;
@@ -31,13 +32,13 @@ public class ErpOrderPayController {
 
     @PostMapping("/orderPay")
     @ApiOperation(value = "订单发起支付")
-    public HttpResponse orderPay(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
+    public HttpResponse orderPay(@RequestBody OrderStoreOrderPay orderStoreOrderPay) {
         HttpResponse response = HttpResponse.success();
         try {
             //发起支付
-            erpOrderPayService.orderPay(orderStoreOrderInfo);
+            erpOrderPayService.orderPay(orderStoreOrderPay);
             //开始轮询
-            erpOrderPayService.orderPayPolling(orderStoreOrderInfo);
+            erpOrderPayService.orderPayPolling(orderStoreOrderPay);
         } catch (BusinessException e) {
             logger.error("异常信息：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
@@ -50,10 +51,10 @@ public class ErpOrderPayController {
 
     @PostMapping("/orderPayResult")
     @ApiOperation(value = "订单支付结果查询")
-    public HttpResponse orderPayResult(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
+    public HttpResponse orderPayResult(@RequestBody OrderStoreOrderPay orderStoreOrderPay) {
         HttpResponse response = HttpResponse.success();
         try {
-            OrderPayResultResponse orderPayResultResponse = erpOrderPayService.orderPayResult(orderStoreOrderInfo);
+            OrderPayResultResponse orderPayResultResponse = erpOrderPayService.orderPayResult(orderStoreOrderPay);
             response.setData(orderPayResultResponse);
         } catch (BusinessException e) {
             logger.error("异常信息：{}", e);
@@ -67,10 +68,10 @@ public class ErpOrderPayController {
 
     @PostMapping("/orderPayCallback")
     @ApiOperation(value = "订单支付回调接口")
-    public HttpResponse orderPayCallback(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
+    public HttpResponse orderPayCallback(@RequestBody OrderStoreOrderPay orderStoreOrderPay) {
         HttpResponse response = HttpResponse.success();
         try {
-            erpOrderPayService.orderPayCallback(orderStoreOrderInfo);
+            erpOrderPayService.orderPayCallback(orderStoreOrderPay);
         } catch (BusinessException e) {
             logger.error("异常信息：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
@@ -83,10 +84,10 @@ public class ErpOrderPayController {
 
     @PostMapping("/orderPayRepay")
     @ApiOperation(value = "校验并同步订单支付状态")
-    public HttpResponse orderPayRepay(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
+    public HttpResponse orderPayRepay(@RequestBody OrderStoreOrderPay orderStoreOrderPay) {
         HttpResponse response = HttpResponse.success();
         try {
-            erpOrderPayService.orderPayRepay(orderStoreOrderInfo);
+            erpOrderPayService.orderPayRepay(orderStoreOrderPay);
         } catch (BusinessException e) {
             logger.error("异常信息：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));

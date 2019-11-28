@@ -45,7 +45,7 @@ public class OrderStoreCart {
     private String skuId;
     /***spu码*/
     private String spuId;
-    /***商品类型 枚举 CartProductTypeEnum*/
+    /***商品类型 枚举 ProductTypeEnum*/
     private Integer productType;
     /***创建时间*/
     private Date createTime;

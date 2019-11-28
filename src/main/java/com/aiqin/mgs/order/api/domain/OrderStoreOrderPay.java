@@ -19,10 +19,14 @@ public class OrderStoreOrderPay {
     private Long id;
     /***订单id*/
     private String orderId;
+    /***订单号*/
+    private String orderCode;
     /***支付id*/
     private String payId;
     /***支付中心支付单编号*/
     private String payCode;
+    /***支付方式*/
+    private Integer payWay;
     /***支付状态*/
     private Integer payStatus;
     /***订货含税总金额*/
