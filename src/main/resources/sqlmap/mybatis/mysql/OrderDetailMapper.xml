@@ -98,7 +98,7 @@
     
     <!-- 插入订单明细表 -->
     <insert id="addDetailList" >
-        insert into order_detail
+        insert into order_consumer_detail
         (order_id,order_code,order_detail_id,product_id,product_code,product_name,list_name,sku_code,spu_code,bar_code,spec,unit,retail_price,actual_price,amount,product_status,logo,type_id,type_name,
         <if test="giftStatus!=null">
         gift_status,
@@ -134,7 +134,7 @@
     
     <!-- 修改订单明细退货数据-->
     <update id="returnStatus" >
-		update order_detail set return_status=#{returnStatus},return_amount=#{returnAmount},
+		update order_consumer_detail set return_status=#{returnStatus},return_amount=#{returnAmount},
 		update_by=#{updateBy},update_time=CURRENT_TIMESTAMP
 		where order_detail_id = #{orderDetailId}
 	</update>
@@ -143,7 +143,7 @@
     <!-- 订单明细查询byOrderId 未用到分页-->
     <select id="selectDetailById"  resultMap="OrderInfoDetailMapping" resultType="java.util.List">
    
-         SELECT a.* FROM order_detail a where 1=1
+         SELECT a.* FROM order_consumer_detail a where 1=1
 
          <if test="orderId!=null">
 		 and a.order_id =#{orderId}
@@ -154,8 +154,8 @@
     <!-- 查询会员下的所有订单ID下的商品集合... -->
     <!--<select id="selectproductbyorders"  resultMap="ProductsMapping" resultType="java.util.List">
     
-         SELECT a.* FROM order_detail a
-         L-E-F-T JOIN order_info b ON a.order_id = b.order_id
+         SELECT a.* FROM order_consumer_detail a
+         L-E-F-T JOIN order_consumer_info b ON a.order_id = b.order_id
          where 1=1 and order_type = 1
          <if test="memberId!= null and memberId!='' " >
 		     and b.member_id =#{memberId}
@@ -173,7 +173,7 @@
 
     <!-- 模糊查询订单明细 -->
     <select id="selectorderDetail"  resultMap="OrderInfoDetailMapping" resultType="java.util.List">
-         SELECT a.* FROM order_detail a where 1=1
+         SELECT a.* FROM order_consumer_detail a where 1=1
           <if test="orderIdList != null" >
 		  and a.order_id in (
 		  <foreach collection="orderIdList" item="order_id" separator=",">
@@ -208,7 +208,7 @@
 
     <!-- 查询订单明细部分汇总-（支持活动ID汇总、）-->
     <select id="selectorderdetailsum"  resultMap="OrderInfoDetailMapping" >
-    SELECT IFNULL(SUM(IFNULL(a.actual_price,0)*IFNULL(a.amount,0)),0) AS actual_price,COUNT(a.order_id) AS amount FROM order_detail a,order_info b 
+    SELECT IFNULL(SUM(IFNULL(a.actual_price,0)*IFNULL(a.amount,0)),0) AS actual_price,COUNT(a.order_id) AS amount FROM order_consumer_detail a,order_consumer_info b
 	WHERE 1=1
 	AND a.order_id = b.order_id
 	AND b.order_status NOT IN ('0','4')
@@ -220,8 +220,8 @@
     
     <!--商品概览门店sku月销量、月销售额 不包含 未付款的和取消的-->
     <!-- <select id="productOverviewByMonth"  resultMap="OrderInfoDetailMapping" >
-	SELECT SUM(a.amount) AS amount,SUM(a.actual_price) AS actual_price FROM order_detail a
-    LEFT JOIN order_info b ON a.order_id = b.order_id
+	SELECT SUM(a.amount) AS amount,SUM(a.actual_price) AS actual_price FROM order_consumer_detail a
+    LEFT JOIN order_consumer_info b ON a.order_id = b.order_id
     WHERE 1=1 and order_type = 1 
     and b.order_status NOT IN ('0','4')
     and b.pay_status='1'
@@ -233,8 +233,8 @@
     
     <!--商品概览 sku产品销量、销售额-前10名 不包含取消、未付款的订单-->
     <select id="productOverviewByOrderTop"  resultMap="OrderInfoDetailMapping" resultType="java.util.List">
-    SELECT any_value(product_id),any_value(product_name) as product_name,SUM(IFNULL(a.amount,0)) AS amount,SUM(IFNULL(a.actual_price,0)) AS actual_price FROM order_detail a
-    LEFT JOIN order_info b ON a.order_id = b.order_id
+    SELECT any_value(product_id),any_value(product_name) as product_name,SUM(IFNULL(a.amount,0)) AS amount,SUM(IFNULL(a.actual_price,0)) AS actual_price FROM order_consumer_detail a
+    LEFT JOIN order_consumer_info b ON a.order_id = b.order_id
     WHERE 1=1 and order_type = 1
     <if test="distributorId !=null and distributorId !='' ">
     and b.distributor_id =#{distributorId}
@@ -254,8 +254,8 @@
     
     <!--商品概览sku产品销量、销售额-后10名 不包含取消、未付款的订单-->
     <select id="productOverviewByOrderLast"  resultMap="OrderInfoDetailMapping" resultType="java.util.List">
-    SELECT product_id,product_name,SUM(IFNULL(a.amount,0)) AS amount,SUM(IFNULL(a.actual_price,0)) AS actual_price FROM order_detail a
-    LEFT JOIN order_info b ON a.order_id = b.order_id
+    SELECT product_id,product_name,SUM(IFNULL(a.amount,0)) AS amount,SUM(IFNULL(a.actual_price,0)) AS actual_price FROM order_consumer_detail a
+    LEFT JOIN order_consumer_info b ON a.order_id = b.order_id
     WHERE 1=1 and order_type = 1
     <if test="distributorId !=null and distributorId !='' ">
     and b.distributor_id =#{distributorId}
@@ -280,8 +280,8 @@
 		      a.spec,b.origin_type,b.distributor_id,b.distributor_code,b.distributor_name,
 		      b.receive_type,b.create_time,a.amount,ROUND(a.actual_price*a.amount) AS price 
 		  FROM  
-		      order_detail a
-        LEFT JOIN order_info b ON a.order_id=b.order_id
+		      order_consumer_detail a
+        LEFT JOIN order_consumer_info b ON a.order_id=b.order_id
         where 1=1 and order_type = 1
         <if test="memberidList != null" >
 		     and b.member_id in (
@@ -313,8 +313,8 @@
     
     <!--接口-统计商品在各个渠道的订单数.-->
     <select id="prodisor"  resultMap="ProdisorMapping" resultType="java.util.List">
-		SELECT a.sku_code AS CODE,SUM(amount) AS amount FROM order_detail a
-        LEFT JOIN order_info b ON a.order_id = b.order_id 
+		SELECT a.sku_code AS CODE,SUM(amount) AS amount FROM order_consumer_detail a
+        LEFT JOIN order_consumer_info b ON a.order_id = b.order_id
          WHERE 1=1 and order_type = 1
          <if test="sukList != null" >
 		     and a.sku_code in (
@@ -337,7 +337,7 @@
     
     <!--根据明细编码查询明细-->
     <select id="setail"  resultMap="OrderInfoDetailMapping" >
-         SELECT * FROM order_detail where 1=1
+         SELECT * FROM order_consumer_detail where 1=1
          <if test="orderDetailId!=null and orderDetailId!='' ">
 		 and order_detail_id =#{orderDetailId}
 		 </if>
@@ -346,19 +346,19 @@
     
     <!--订单中商品sku数量-->
     <select id="getSkuSum"  parameterType="com.aiqin.mgs.order.api.domain.OrderDetailQuery" resultType="java.lang.Integer" >
-         SELECT COUNT(order_detail_id) AS acount FROM order_detail WHERE order_id=#{orderId}
+         SELECT COUNT(order_detail_id) AS acount FROM order_consumer_detail WHERE order_id=#{orderId}
     </select> 
     
     <!-- 删除订单明细数据 -->
 	<delete id="deleteOrderDetailInfo" >
-		delete from order_detail WHERE order_id =#{orderId}
+		delete from order_consumer_detail WHERE order_id =#{orderId}
     </delete>
     
     
     <!--sku销量统计：包含退货、不包含取消、未付款的订单-->
     <select id="getSkuAmount" resultType="java.lang.Integer">
-         SELECT SUM(a.amount) FROM order_detail a 
-         LEFT JOIN  order_info b ON a.order_id = b.order_id
+         SELECT SUM(a.amount) FROM order_consumer_detail a
+         LEFT JOIN  order_consumer_info b ON a.order_id = b.order_id
          WHERE 1=1 and order_type = 1
            AND a.sku_code =#{skuCode} 
            AND b.order_status NOT IN ('0','4')
@@ -368,8 +368,8 @@
     
     <!--sku金额统计：包含退货、不包含取消、未付款的订单-->
     <select id="getSkuPrice" resultType="java.lang.Integer">
-         SELECT SUM(a.actual_price*a.amount) FROM order_detail a 
-         LEFT JOIN  order_info b ON a.order_id = b.order_id
+         SELECT SUM(a.actual_price*a.amount) FROM order_consumer_detail a
+         LEFT JOIN  order_consumer_info b ON a.order_id = b.order_id
          WHERE 1=1 and order_type = 1
            AND a.sku_code =#{skuCode} 
            AND b.order_status NOT IN ('0','4')
@@ -380,13 +380,13 @@
     
     <!--sku销量统计：订单-->
     <select id="selectSkuSale" resultMap="SkuSaleMapping" resultType="java.util.List">
-         SELECT SUM(a.amount) as sale_volume,sku_code FROM order_detail a 
+         SELECT SUM(a.amount) as sale_volume,sku_code FROM order_consumer_detail a
           WHERE 1=1 GROUP BY sku_code
     </select>
     
     <!--查询订单购买数量-->
     <select id="buyAmount" resultMap="IdAndAmountMapping" resultType="java.util.List">
-         SELECT order_code as id,SUM(a.amount) as amount FROM order_detail a 
+         SELECT order_code as id,SUM(a.amount) as amount FROM order_consumer_detail a
           WHERE 1=1 
           <if test="orderCode!=null and orderCode!='' ">
 		  and order_code =#{orderCode}
@@ -394,9 +394,9 @@
           GROUP BY order_code
     </select>
      <update id="updateOrderDetail">
-         update order_detail
+         update order_consumer_detail
          set
-         actual_price = retail_price,
+         actual_price = #{actualPrice},
          update_time = now(),
          update_by = #{updateBy,jdbcType=VARCHAR}
          where order_code =#{orderCode}
@@ -404,7 +404,7 @@
 
     <!--顾客可能还想购买-->
     <select id="wantBuy" resultType="java.lang.String">
-         SELECT sku_code FROM `order_detail` WHERE 1=1
+         SELECT sku_code FROM `order_consumer_detail` WHERE 1=1
          <if test="sukList != null" >
 		     and sku_code in (
 		 <foreach collection="sukList" item="sku_code" separator=",">
@@ -416,7 +416,7 @@
     </select>
 
     <select id="findOrderDetailById" resultMap="OrderInfoDetailMapping">
-        select * from order_detail where  order_detail_id=#{orderDetailId}
+        select * from order_consumer_detail where  order_detail_id=#{orderDetailId}
     </select>
 </mapper>
 

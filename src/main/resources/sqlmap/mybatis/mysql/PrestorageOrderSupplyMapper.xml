@@ -129,7 +129,7 @@
     </insert>
 
     <select id="selectPrestorageOrderList" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="OrderSupplyInfoMapping">
-        select  o.* from prestorage_order_supply a ,order_info o where a.order_id=o.order_id
+        select  o.* from prestorage_order_supply a ,order_consumer_info o where a.order_id=o.order_id
         <if test="distributorId!=null and distributorId!='' ">
             and a.distributor_id = #{distributorId}
         </if>

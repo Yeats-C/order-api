@@ -1719,7 +1719,7 @@ public class OrderServiceImpl implements OrderService {
                     payReq.setAiqinMerchantId(orderInfo.getDistributorId());
                     payReq.setOrderNo(orderInfo.getOrderCode());
                     payReq.setOrderTime(orderInfo.getCreateTime());
-                    payReq.setPayType(Integer.valueOf(orderInfo.getPayType()));
+                    payReq.setPayType(orderAndSoOnRequest.getOrderPayList().get(0).getPayType());
                     payReq.setOrderSource(orderInfo.getOrderType());
                     payService.doPay(payReq);
                 }
@@ -2144,10 +2144,16 @@ public class OrderServiceImpl implements OrderService {
             orderDao.updateOrder(orderInfo);
             orderDetailQuery.setOrderId(orderInfo.getOrderId());
             List<OrderDetailInfo> orderDetailInfoList = orderDetailDao.selectDetailById(orderDetailQuery);
+
             Integer productCount = 0;
             for (OrderDetailInfo orderDetailInfo : orderDetailInfoList) {
                 productCount += orderDetailInfo.getAmount();
                 orderDetailInfo.setUpdateBy(updateBy);
+
+                orderDetailInfo.setActualPrice(orderDetailInfo.getActualPrice()*orderInfo.getActualPrice()/storeValueOrderPayRequest.getActualPrice());
+
+
+
                 orderDetailDao.updateOrderDetail(orderDetailInfo);
             }
             //增加结算信息
