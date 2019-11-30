@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.service;
 
+import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderOperationLog;
 
@@ -29,12 +30,12 @@ public interface ErpOrderOperationLogService {
      * 插入订单操作日志，无请求用户
      *
      * @param orderId          订单id
-     * @param operationContent 操作动作
+     * @param orderStatusEnum  订单状态
      * @param auth             手动传入操作人
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/11/21 10:33
      */
-    void saveOrderOperationLog(String orderId, String operationContent, AuthToken auth);
+    void saveOrderOperationLog(String orderId, ErpOrderStatusEnum orderStatusEnum, AuthToken auth);
 }

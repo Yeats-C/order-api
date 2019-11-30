@@ -56,4 +56,23 @@ public class ErpOrderProductItemServiceImpl implements ErpOrderProductItemServic
         }
     }
 
+    @Override
+    public void updateOrderProductItem(OrderStoreOrderProductItem orderStoreOrderProductItem, AuthToken auth) {
+        orderStoreOrderProductItem.setUpdateById(auth.getPersonId());
+        orderStoreOrderProductItem.setUpdateByName(auth.getPersonName());
+        orderStoreOrderProductItemDao.updateByPrimaryKeySelective(orderStoreOrderProductItem);
+    }
+
+    @Override
+    public void updateOrderProductItemList(List<OrderStoreOrderProductItem> list, AuthToken auth) {
+        if (list != null && list.size() > 0) {
+            for (OrderStoreOrderProductItem item :
+                    list) {
+                item.setUpdateById(auth.getPersonId());
+                item.setUpdateByName(auth.getPersonName());
+                Integer insert = orderStoreOrderProductItemDao.updateByPrimaryKeySelective(item);
+            }
+        }
+    }
+
 }

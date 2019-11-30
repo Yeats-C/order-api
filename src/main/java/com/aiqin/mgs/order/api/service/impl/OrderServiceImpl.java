@@ -500,10 +500,10 @@ public class OrderServiceImpl implements OrderService {
 
 //	//接口-分销机构维度-总销售额 返回INT
 //	@Override
-//	public HttpResponse selectOrderAmt(String distributorId, String originType) {
+//	public HttpResponse selectOrderAmt(String distributorId, String orderOriginType) {
 //		
 //		try {
-//			Integer  total_price = orderDao.selectOrderAmt(distributorId,originType);
+//			Integer  total_price = orderDao.selectOrderAmt(distributorId,orderOriginType);
 //			
 //			return HttpResponse.success(total_price);
 //		} catch (Exception e) {
