@@ -21,6 +21,9 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+
+import com.aiqin.mgs.order.api.domain.request.ProductStoreRequest;
+import com.aiqin.mgs.order.api.domain.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,11 +53,6 @@ import com.aiqin.mgs.order.api.domain.ProductCycle;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.request.OrderDetailRequest;
 import com.aiqin.mgs.order.api.domain.request.ProdisorRequest;
-import com.aiqin.mgs.order.api.domain.response.OrderDetailByMemberResponse;
-import com.aiqin.mgs.order.api.domain.response.OrderProductsResponse;
-import com.aiqin.mgs.order.api.domain.response.ProdisorResponse;
-import com.aiqin.mgs.order.api.domain.response.SkuSaleResponse;
-import com.aiqin.mgs.order.api.domain.response.SkuSumResponse;
 import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.OrderDetailService;
 import com.aiqin.mgs.order.api.service.OrderLogService;
@@ -736,6 +734,32 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			return HttpResponse.success(orderDetailDao.wantBuy(sukList));
 		} catch (Exception e) {
 			LOGGER.error("查询顾客可能还想购买 异常 {}",e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}
+	}
+
+	@Override
+	public HttpResponse productStore(@Valid ProductStoreRequest productStoreRequest) {
+		try {
+			List<String> sukList = new ArrayList();
+			List<Integer> originTypeList = new ArrayList();
+			if(productStoreRequest !=null) {
+				sukList = productStoreRequest.getSkuList();
+				originTypeList = productStoreRequest.getOriginTypeList();
+			}
+			//返回
+			List<ProductStoreResponse> list = new ArrayList();
+
+			if(sukList !=null && sukList.size()>0) {
+				//查询条件
+				list = orderDetailDao.productStore(productStoreRequest);
+			}else {
+				return HttpResponse.success(null);
+			}
+
+			return HttpResponse.success(list);
+		} catch (Exception e) {
+			LOGGER.error("接口-统计商品在各个渠道的订单数失败 {}",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}

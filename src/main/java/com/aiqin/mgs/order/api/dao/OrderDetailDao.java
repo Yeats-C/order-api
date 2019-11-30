@@ -12,15 +12,14 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.aiqin.mgs.order.api.domain.request.ProdisorRequest;
+import com.aiqin.mgs.order.api.domain.request.ProductStoreRequest;
+import com.aiqin.mgs.order.api.domain.response.*;
 import org.apache.ibatis.annotations.Param;
 
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
-import com.aiqin.mgs.order.api.domain.response.OrderDetailByMemberResponse;
-import com.aiqin.mgs.order.api.domain.response.OrderProductsResponse;
-import com.aiqin.mgs.order.api.domain.response.ProdisorResponse;
-import com.aiqin.mgs.order.api.domain.response.SkuSaleResponse;
 
 public interface OrderDetailDao {
 
@@ -80,4 +79,6 @@ public interface OrderDetailDao {
 	//顾客可能还想购买
 	List<String> wantBuy(@Valid @Param("sukList")List<String> sukList)throws Exception;
 
+	// 查询门店商品订单数
+	List<ProductStoreResponse> productStore(@Valid ProductStoreRequest productStoreRequest);
 }

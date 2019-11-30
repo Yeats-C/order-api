@@ -16,6 +16,7 @@ import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
 import com.aiqin.mgs.order.api.domain.OrderInfo;
 import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.request.ProdisorRequest;
+import com.aiqin.mgs.order.api.domain.request.ProductStoreRequest;
 import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.OrderDetailService;
 
@@ -206,8 +207,20 @@ public class OrderDetailController {
     	LOGGER.info("商品总库菜单-统计商品在各个渠道的订单数参数 {}",info);    	
         return orderDetailService.prodisor(info);
     }
-    
-    
+
+    /**
+     *  商品总库-统计商品在不同渠道的订单数
+     */
+    @PostMapping("/product/store")
+    @ApiOperation(value = "商品总库菜单-统计商品在各个渠道的订单数....")
+    public HttpResponse productStore(@Valid @RequestBody ProductStoreRequest info) {
+
+
+        LOGGER.info("商品总库菜单-统计商品在各个渠道的订单数参数 {}",info);
+        return orderDetailService.productStore(info);
+    }
+
+
     /**
      * 
      * sku销量统计
