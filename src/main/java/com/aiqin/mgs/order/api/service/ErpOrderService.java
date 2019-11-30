@@ -37,26 +37,26 @@ public interface ErpOrderService {
     ErpOrderDetailResponse getOrderDetail(OrderStoreOrderInfo orderStoreOrderInfo);
 
     /**
-     * 创建订单
+     * 创建配送订单
      *
      * @param erpOrderSaveRequest
-     * @return void
+     * @return com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/11/13 10:15
      */
-    ErpOrderDetailResponse saveOrder(ErpOrderSaveRequest erpOrderSaveRequest);
+    OrderStoreOrderInfo saveDistributionOrder(ErpOrderSaveRequest erpOrderSaveRequest);
 
     /**
      * 创建货架订单
      *
      * @param erpOrderSaveRequest
-     * @return com.aiqin.mgs.order.api.domain.response.ErpOrderDetailResponse
+     * @return com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/11/27 14:06
      */
-    ErpOrderDetailResponse saveRackOrder(ErpOrderSaveRequest erpOrderSaveRequest);
+    OrderStoreOrderInfo saveRackOrder(ErpOrderSaveRequest erpOrderSaveRequest);
 
     /**
      * 订单拆分
@@ -68,37 +68,4 @@ public interface ErpOrderService {
      * @date 2019/11/28 10:01
      */
     void orderSplit(OrderStoreOrderInfo orderStoreOrderInfo);
-
-    /**
-     * 订单发货
-     *
-     * @param orderStoreOrderInfo
-     * @return void
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/11/28 14:28
-     */
-    void deliveryOrder(OrderStoreOrderInfo orderStoreOrderInfo);
-
-    /**
-     * 订单签收
-     *
-     * @param orderStoreOrderInfo
-     * @return void
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/11/28 14:31
-     */
-    void signOrder(OrderStoreOrderInfo orderStoreOrderInfo);
-
-    /**
-     * 取消订单
-     *
-     * @param orderStoreOrderInfo
-     * @return void
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/11/28 14:38
-     */
-    void cancelOrder(OrderStoreOrderInfo orderStoreOrderInfo);
 }

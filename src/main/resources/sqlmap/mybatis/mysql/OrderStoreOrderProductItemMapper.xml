@@ -21,7 +21,9 @@
         top_coupon_id as topCouponId,
         quantity as quantity,
         actual_deliver_quantity as actualDeliverQuantity,
+        deliver_difference_reason as deliverDifferenceReason,
         actual_store_quantity as actualStoreQuantity,
+        sign_difference_reason as signDifferenceReason,
         price as price,
         share_price as sharePrice,
         tax_purchase_price as taxPurchasePrice,
@@ -60,15 +62,38 @@
         (order_id, order_code, order_item_code, product_id, product_code,
          product_name, sku_code, sku_name, unit, product_gift,
          parent_order_item_code, activity_id, spin_coupon_id, top_coupon_id,
-         quantity, actual_deliver_quantity, actual_store_quantity, price,
+         quantity, actual_deliver_quantity, deliver_difference_reason, actual_store_quantity, sign_difference_reason,
+         price,
          share_price, tax_purchase_price, money, real_money, activity_money,
          spin_coupon_money, top_coupon_money, create_time, create_by_id,
          create_by_name, update_time, update_by_id, update_by_name)
         values (#{orderId}, #{orderCode}, #{orderItemCode}, #{productId}, #{productCode}, #{productName}, #{skuCode},
                 #{skuName}, #{unit}, #{productGift}, #{parentOrderItemCode}, #{activityId}, #{spinCouponId},
-                #{topCouponId}, #{quantity}, #{actualDeliverQuantity}, #{actualStoreQuantity}, #{price}, #{sharePrice},
+                #{topCouponId}, #{quantity}, #{actualDeliverQuantity}, #{deliverDifferenceReason},
+                #{actualStoreQuantity}, #{signDifferenceReason}, #{price}, #{sharePrice},
                 #{taxPurchasePrice}, #{money}, #{realMoney}, #{activityMoney}, #{spinCouponMoney}, #{topCouponMoney},
                 sysdate(), #{createById}, #{createByName}, sysdate(), #{updateById}, #{updateByName})
     </insert>
+
+    <update id="updateByPrimaryKeySelective">
+        update order_store_product_item
+        set
+        <if test="actualDeliverQuantity != null and actualDeliverQuantity != '' or actualDeliverQuantity == 0 ">
+            actual_deliver_quantity = #{actualDeliverQuantity},
+        </if>
+        <if test="deliverDifferenceReason != null and deliverDifferenceReason != '' ">
+            deliver_difference_reason = #{deliverDifferenceReason},
+        </if>
+        <if test="actualStoreQuantity != null and actualStoreQuantity != '' or actualStoreQuantity == 0 ">
+            actual_store_quantity = #{actualStoreQuantity},
+        </if>
+        <if test="signDifferenceReason != null and signDifferenceReason != '' ">
+            sign_difference_reason = #{signDifferenceReason},
+        </if>
+        update_by_id = #{updateById},
+        update_by_name = #{updateByName},
+        update_time = sysdate()
+        where id = #{id}
+    </update>
 
 </mapper>

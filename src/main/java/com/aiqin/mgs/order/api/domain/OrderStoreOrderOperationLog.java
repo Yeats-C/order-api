@@ -20,6 +20,8 @@ public class OrderStoreOrderOperationLog {
     private String logId;
     /***订单id*/
     private String orderId;
+    /***订单状态*/
+    private Integer orderStatus;
     /***操作内容*/
     private String operationContent;
     /***创建时间*/

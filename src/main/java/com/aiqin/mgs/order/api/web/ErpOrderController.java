@@ -65,13 +65,13 @@ public class ErpOrderController {
         return response;
     }
 
-    @PostMapping("/saveOrder")
-    @ApiOperation(value = "创建订单")
-    public HttpResponse saveOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
+    @PostMapping("/saveDistributionOrder")
+    @ApiOperation(value = "创建配送订单")
+    public HttpResponse saveDistributionOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-            ErpOrderDetailResponse erpOrderDetailResponse = erpOrderService.saveOrder(erpOrderSaveRequest);
-            response.setData(erpOrderDetailResponse);
+            OrderStoreOrderInfo orderInfo = erpOrderService.saveDistributionOrder(erpOrderSaveRequest);
+            response.setData(orderInfo);
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {
@@ -86,50 +86,8 @@ public class ErpOrderController {
     public HttpResponse saveRackOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-            ErpOrderDetailResponse erpOrderDetailResponse = erpOrderService.saveRackOrder(erpOrderSaveRequest);
-            response.setData(erpOrderDetailResponse);
-        } catch (BusinessException e) {
-            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
-        } catch (Exception e) {
-            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
-        }
-        return response;
-    }
-
-    @PostMapping("/deliveryOrder")
-    @ApiOperation(value = "订单发货")
-    public HttpResponse deliveryOrder(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
-        HttpResponse response = HttpResponse.success();
-        try {
-            erpOrderService.deliveryOrder(orderStoreOrderInfo);
-        } catch (BusinessException e) {
-            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
-        } catch (Exception e) {
-            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
-        }
-        return response;
-    }
-
-    @PostMapping("/signOrder")
-    @ApiOperation(value = "订单签收")
-    public HttpResponse signOrder(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
-        HttpResponse response = HttpResponse.success();
-        try {
-            erpOrderService.signOrder(orderStoreOrderInfo);
-        } catch (BusinessException e) {
-            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
-        } catch (Exception e) {
-            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
-        }
-        return response;
-    }
-
-    @PostMapping("/cancelOrder")
-    @ApiOperation(value = "取消订单")
-    public HttpResponse cancelOrder(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
-        HttpResponse response = HttpResponse.success();
-        try {
-            erpOrderService.cancelOrder(orderStoreOrderInfo);
+            OrderStoreOrderInfo orderInfo = erpOrderService.saveRackOrder(erpOrderSaveRequest);
+            response.setData(orderInfo);
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {
