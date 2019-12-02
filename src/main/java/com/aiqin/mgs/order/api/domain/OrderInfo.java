@@ -181,9 +181,19 @@ public class OrderInfo extends PagesRequest {
 	@ApiModelProperty(value="前端控制退货按钮使用字段:1:订单已全数退完")
 	@JsonProperty("turn_return_view")
 	private Integer turnReturnView;
-	
-	
 
+	@JsonProperty("is_prestorage")
+	@ApiModelProperty(value = "是否是预存订单，0为否，1为是")
+	private Integer isPrestorage=0;
+
+
+	public Integer getIsPrestorage() {
+		return isPrestorage;
+	}
+
+	public void setIsPrestorage(Integer isPrestorage) {
+		this.isPrestorage = isPrestorage;
+	}
 
 	public Integer getTurnReturnView() {
 		return turnReturnView;

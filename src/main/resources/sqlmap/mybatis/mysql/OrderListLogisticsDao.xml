@@ -3,19 +3,19 @@
 <mapper namespace="com.aiqin.mgs.order.api.dao.OrderListLogisticsDao">
   <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.OrderListLogistics">
     <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="order_list_id" jdbcType="BIGINT" property="orderListId" />
+<!--    <result column="order_list_id" jdbcType="BIGINT" property="orderListId" />-->
     <result column="order_code" jdbcType="VARCHAR" property="orderCode" />
     <result column="Invoice_code" jdbcType="VARCHAR" property="invoiceCode" />
     <result column="logistics_centre_code" jdbcType="VARCHAR" property="logisticsCentreCode" />
     <result column="logistics_centre_name" jdbcType="VARCHAR" property="logisticsCentreName" />
-    <result column="delivery_time" jdbcType="TIMESTAMP" property="deliveryTime" />
+<!--    <result column="delivery_time" jdbcType="TIMESTAMP" property="deliveryTime" />-->
     <result column="implement_by" jdbcType="VARCHAR" property="implementBy" />
     <result column="implement_time" jdbcType="TIMESTAMP" property="implementTime" />
     <result column="implement_content" jdbcType="VARCHAR" property="implementContent" />
     <result column="create_by" jdbcType="VARCHAR" property="createBy" />
     <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
-    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+<!--    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />-->
+<!--    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />-->
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>

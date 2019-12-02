@@ -14,7 +14,9 @@ public interface ResultCode {
     MessageId NOT_LOGIN_INFO = MessageId.create(Project.STORE_API, 7, "登录人账号或密码错误");
     MessageId SOSO_CONNECT_ERROR = MessageId.create(Project.STORE_API, 8, "调用腾讯地图异常");
     MessageId NO_HAVE_STORE_ERROR = MessageId.create(Project.STORE_API, 9, "未查询到对应门店信息");
-    
+    MessageId CHANGE_STORE_ERROR=MessageId.create(Project.ORDER_API, -1, "修改库存失败");
+    MessageId STATUS_CHANGE_ERROR=MessageId.create(Project.ORDER_API, -1, "订单状态修改失败");
+
     /** 黄祉壹   2018-11-05 开始     */
     
     MessageId ADD_EXCEPTION = MessageId.create(Project.ORDER_API, 10, "新增异常");
@@ -24,6 +26,12 @@ public interface ResultCode {
     MessageId PARAMETER_EXCEPTION = MessageId.create(Project.ORDER_API, 14, "参数异常");
     
     MessageId NET_EXCEPTION = MessageId.create(Project.ORDER_API, 15, "网络异常");
+
+    MessageId OVER_LIMIT = MessageId.create(Project.PRODUCT_API,20,"订购商品不能超过999");
+    MessageId STORE_SHORT = MessageId.create(Project.PRODUCT_API,21,"库存不足");
+    MessageId STOCK_SHORT1 = MessageId.create(Project.PRODUCT_API,22,"库存紧张");
+    MessageId GETTOTAL = MessageId.create(Project.PRODUCT_API,23,"查询总数量异常");
+
     
     String CART = "购物车";
     String ORDER = "订单";
