@@ -752,7 +752,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 
 			if(sukList !=null && sukList.size()>0) {
 				//查询条件
-				list = orderDetailDao.productStore(productStoreRequest);
+//				list = orderDetailDao.productStore(productStoreRequest);
 			}else {
 				return HttpResponse.success(null);
 			}
