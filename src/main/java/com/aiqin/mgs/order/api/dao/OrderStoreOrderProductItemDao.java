@@ -25,6 +25,17 @@ public interface OrderStoreOrderProductItemDao {
     Integer insert(OrderStoreOrderProductItem orderStoreOrderProductItem);
 
     /**
+     * 根据id更新订单行数据非空字段
+     *
+     * @param orderStoreOrderProductItem
+     * @return java.lang.Integer
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/30 14:39
+     */
+    Integer updateByPrimaryKeySelective(OrderStoreOrderProductItem orderStoreOrderProductItem);
+
+    /**
      * 根据非空字段精确查询
      *
      * @param orderStoreOrderProductItem

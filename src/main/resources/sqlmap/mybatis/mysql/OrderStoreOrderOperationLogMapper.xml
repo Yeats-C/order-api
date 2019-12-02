@@ -7,6 +7,7 @@
         select id                as id,
                log_id            as logId,
                order_id          as orderId,
+               order_status      as orderStatus,
                operation_content as operationContent,
                create_time       as createTime,
                create_by_id      as createById,
@@ -18,9 +19,10 @@
     </select>
 
     <insert id="insert">
-        insert into order_store_operation_log (log_id, order_id, operation_content, create_time, create_by_id,
+        insert into order_store_operation_log (log_id, order_id, order_status, operation_content, create_time,
+                                               create_by_id,
                                                create_by_name)
-        values (#{logId}, #{orderId}, #{operationContent}, sysdate(), #{createById}, #{createByName})
+        values (#{logId}, #{orderId}, #{orderStatus}, #{operationContent}, sysdate(), #{createById}, #{createByName})
     </insert>
 
 </mapper>

@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain;
 
+import com.aiqin.mgs.order.api.component.enums.ProductGiftEnum;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -39,6 +40,8 @@ public class OrderStoreOrderProductItem {
 
     /***本品赠品标记 ProductGiftEnum */
     private Integer productGift;
+    /***本品赠品描述 ProductGiftEnum */
+    private String productGiftDesc;
     /***赠品行关联本品行编码*/
     private String parentOrderItemCode;
 
@@ -53,8 +56,12 @@ public class OrderStoreOrderProductItem {
     private Integer quantity;
     /***仓库实发数量*/
     private Integer actualDeliverQuantity;
+    /***仓库发货数量差异原因*/
+    private String deliverDifferenceReason;
     /***门店实收数量*/
     private Integer actualStoreQuantity;
+    /***签收数量差异原因*/
+    private String signDifferenceReason;
 
     /***订货价*/
     private BigDecimal price;
@@ -86,4 +93,8 @@ public class OrderStoreOrderProductItem {
     private String updateById;
     /***修改人姓名*/
     private String updateByName;
+
+    public String getProductGiftDesc() {
+        return ProductGiftEnum.getEnumDesc(productGift);
+    }
 }

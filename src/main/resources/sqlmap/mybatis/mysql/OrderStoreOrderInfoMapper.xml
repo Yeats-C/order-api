@@ -8,6 +8,12 @@
         order_id as orderId,
         order_code as orderCode,
         order_status as orderStatus,
+        order_origin_type as orderOriginType,
+        order_channel as orderChannel,
+        supplier_code as supplierCode,
+        supplier_name as supplierName,
+        repertory_code as repertoryCode,
+        repertory_name as repertoryName,
         return_status as returnStatus,
         pay_status as payStatus,
         order_type as orderType,
@@ -60,6 +66,21 @@
         <if test="payStatus != null and payStatus != '' or payStatus == 0">
             pay_status = #{payStatus},
         </if>
+        <if test="returnStatus != null and returnStatus != '' or returnStatus == 0">
+            return_status = #{returnStatus},
+        </if>
+        <if test="supplierCode != null and supplierCode != ''">
+            supplier_code = #{supplierCode},
+        </if>
+        <if test="supplierName != null and supplierName != ''">
+            supplier_name = #{supplierName},
+        </if>
+        <if test="repertoryCode != null and repertoryCode != ''">
+            repertory_code = #{repertoryCode},
+        </if>
+        <if test="repertoryName != null and repertoryName != ''">
+            repertory_name = #{repertoryName},
+        </if>
         update_by_id = #{updateById},
         update_by_name = #{updateByName},
         update_time = sysdate()
@@ -67,13 +88,20 @@
     </update>
 
     <insert id="insert">
-        insert into order_store_info (order_id, order_code, order_status, order_level, primary_code, return_status,
+        insert into order_store_info (order_id, order_code, order_status,
+                                      order_origin_type, order_channel, supplier_code, supplier_name, repertory_code,
+                                      repertory_name,
+                                      order_level, primary_code, return_status,
                                       order_type, pay_status, franchisee_id, store_id, store_name, total_price,
-                                      actual_price,goods_coupon,
+                                      actual_price, goods_coupon,
                                       create_time, create_by_id, create_by_name, update_time, update_by_id,
                                       update_by_name)
-        values (#{orderId}, #{orderCode}, #{orderStatus}, #{orderLevel}, #{primaryCode}, #{returnStatus},
-                #{orderType}, #{payStatus}, #{franchiseeId}, #{storeId}, #{storeName}, #{totalPrice}, #{actualPrice},#{goodsCoupon},
+        values (#{orderId}, #{orderCode}, #{orderStatus},
+                #{orderOriginType}, #{orderChannel}, #{supplierCode}, #{supplierName}, #{repertoryCode},
+                #{repertoryName},
+                #{orderLevel}, #{primaryCode}, #{returnStatus},
+                #{orderType}, #{payStatus}, #{franchiseeId}, #{storeId}, #{storeName}, #{totalPrice}, #{actualPrice},
+                #{goodsCoupon},
                 sysdate(), #{createById}, #{createByName}, sysdate(), #{updateById}, #{updateByName})
     </insert>
 
@@ -83,6 +111,12 @@
         a1.order_id as orderId,
         a1.order_code as orderCode,
         a1.order_status as orderStatus,
+        a1.order_origin_type as orderOriginType,
+        a1.order_channel as orderChannel,
+        a1.supplier_code as supplierCode,
+        a1.supplier_name as supplierName,
+        a1.repertory_code as repertoryCode,
+        a1.repertory_name as repertoryName,
         a1.return_status as returnStatus,
         a1.pay_status as payStatus,
         a1.order_type as orderType,
@@ -132,6 +166,12 @@
         a1.order_id as orderId,
         a1.order_code as orderCode,
         a1.order_status as orderStatus,
+        a1.order_origin_type as orderOriginType,
+        a1.order_channel as orderChannel,
+        a1.supplier_code as supplierCode,
+        a1.supplier_name as supplierName,
+        a1.repertory_code as repertoryCode,
+        a1.repertory_name as repertoryName,
         a1.return_status as returnStatus,
         a1.pay_status as payStatus,
         a1.order_type as orderType,

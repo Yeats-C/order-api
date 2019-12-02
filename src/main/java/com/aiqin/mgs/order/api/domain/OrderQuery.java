@@ -63,7 +63,7 @@ public class OrderQuery extends PagesRequest {
 	
 //	@ApiModelProperty(value="来源类型0-pos，1-微商城, 2-全部 ,3:web")
 //	@JsonProperty("origin_type")
-//	private Integer originType;
+//	private Integer orderOriginType;
 	
 	@ApiModelProperty(value="来源类型:2||null-全部;0&&3-门店;1-微商城;0-pos;3:web")
 	@JsonProperty("origin_type_list")
@@ -399,13 +399,13 @@ public class OrderQuery extends PagesRequest {
 	}
 
 
-//	public Integer getOriginType() {
-//		return originType;
+//	public Integer getOrderOriginType() {
+//		return orderOriginType;
 //	}
 //
 //
-//	public void setOriginType(Integer originType) {
-//		this.originType = originType;
+//	public void setOrderOriginType(Integer orderOriginType) {
+//		this.orderOriginType = orderOriginType;
 //	}
 
 

@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.service.impl;
 
+import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.dao.OrderStoreOrderOperationLogDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderOperationLog;
@@ -24,13 +25,16 @@ public class ErpOrderOperationLogServiceImpl implements ErpOrderOperationLogServ
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveOrderOperationLog(String orderId, String operationContent, AuthToken auth) {
-        OrderStoreOrderOperationLog operationLog = new OrderStoreOrderOperationLog();
-        operationLog.setOrderId(orderId);
-        operationLog.setOperationContent(operationContent);
-        operationLog.setLogId(OrderPublic.getUUID());
-        operationLog.setCreateById(auth.getPersonId());
-        operationLog.setCreateByName(auth.getPersonName());
-        Integer insert = orderStoreOrderOperationLogDao.insert(operationLog);
+    public void saveOrderOperationLog(String orderId, ErpOrderStatusEnum orderStatusEnum, AuthToken auth) {
+        if (orderStatusEnum != null) {
+            OrderStoreOrderOperationLog operationLog = new OrderStoreOrderOperationLog();
+            operationLog.setOrderId(orderId);
+            operationLog.setOrderStatus(orderStatusEnum.getCode());
+            operationLog.setOperationContent(orderStatusEnum.getDesc());
+            operationLog.setLogId(OrderPublic.getUUID());
+            operationLog.setCreateById(auth.getPersonId());
+            operationLog.setCreateByName(auth.getPersonName());
+            Integer insert = orderStoreOrderOperationLogDao.insert(operationLog);
+        }
     }
 }

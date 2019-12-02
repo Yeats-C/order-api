@@ -44,6 +44,20 @@ public class OrderStoreOrderInfo {
     private Integer orderType;
     @ApiModelProperty(value = "订单类型描述")
     private String orderTypeDesc;
+    /***订单来源 OrderOriginTypeEnum*/
+    @ApiModelProperty(value = "订单来源")
+    private Integer orderOriginType;
+    /***订单销售渠道标识 OrderChannelEnum*/
+    @ApiModelProperty(value = "销售渠道")
+    private Integer orderChannel;
+    /***供应商编码*/
+    private String supplierCode;
+    /***供应商名称*/
+    private String supplierName;
+    /***仓库编码*/
+    private String repertoryCode;
+    /***仓库名称*/
+    private String repertoryName;
     /***加盟商id*/
     private String franchiseeId;
     /***门店id*/
@@ -91,6 +105,16 @@ public class OrderStoreOrderInfo {
 
     /***关联子订单*/
     private List<OrderStoreOrderInfo> secondaryOrderList;
+    /***订单支付信息*/
+    private OrderStoreOrderPay orderPay;
+    /***订单收货信息*/
+    private OrderStoreOrderReceiving orderReceiving;
+    /***订单发货信息*/
+    private OrderStoreOrderSending orderSending;
+    /***订单操作日志列表*/
+    private List<OrderStoreOrderOperationLog> orderOperationLogList;
+    /***关联订单商品明细行*/
+    private List<OrderStoreOrderProductItem> productItemList;
 
     public String getOrderStatusDesc() {
         return ErpOrderStatusEnum.getEnumDesc(orderStatus);

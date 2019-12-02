@@ -47,6 +47,30 @@ public interface ErpOrderProductItemService {
      * @version: v1.0.0
      * @date 2019/11/22 9:39
      */
-    void saveOrderProductItemList(List<OrderStoreOrderProductItem> list,AuthToken auth);
+    void saveOrderProductItemList(List<OrderStoreOrderProductItem> list, AuthToken auth);
+
+    /**
+     * 更新订单商品行
+     *
+     * @param orderStoreOrderProductItem
+     * @param auth
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/22 9:38
+     */
+    void updateOrderProductItem(OrderStoreOrderProductItem orderStoreOrderProductItem, AuthToken auth);
+
+    /**
+     * 批量更新订单商品行
+     *
+     * @param list
+     * @param auth
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/22 9:39
+     */
+    void updateOrderProductItemList(List<OrderStoreOrderProductItem> list, AuthToken auth);
 
 }
