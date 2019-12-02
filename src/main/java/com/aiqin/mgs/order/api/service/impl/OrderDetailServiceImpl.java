@@ -24,6 +24,9 @@ import javax.validation.Valid;
 
 import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.domain.*;
+
+import com.aiqin.mgs.order.api.domain.request.ProductStoreRequest;
+import com.aiqin.mgs.order.api.domain.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -413,7 +416,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 				detailList = orderDetailDao.selectDetailById(orderDetailQuery);
 			}
 
-		
+
 		info.setDetailList(detailList);
 
 		} catch (Exception e) {
@@ -773,6 +776,32 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			return HttpResponse.success(orderDetailDao.wantBuy(sukList));
 		} catch (Exception e) {
 			LOGGER.error("查询顾客可能还想购买 异常 {}",e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}
+	}
+
+	@Override
+	public HttpResponse productStore(@Valid ProductStoreRequest productStoreRequest) {
+		try {
+			List<String> sukList = new ArrayList();
+			List<Integer> originTypeList = new ArrayList();
+			if(productStoreRequest !=null) {
+				sukList = productStoreRequest.getSkuList();
+				originTypeList = productStoreRequest.getOriginTypeList();
+			}
+			//返回
+			List<ProductStoreResponse> list = new ArrayList();
+
+			if(sukList !=null && sukList.size()>0) {
+				//查询条件
+//				list = orderDetailDao.productStore(productStoreRequest);
+			}else {
+				return HttpResponse.success(null);
+			}
+
+			return HttpResponse.success(list);
+		} catch (Exception e) {
+			LOGGER.error("接口-统计商品在各个渠道的订单数失败 {}",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
 	}

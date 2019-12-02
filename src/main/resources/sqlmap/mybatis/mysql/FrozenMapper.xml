@@ -2,26 +2,29 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aiqin.mgs.order.api.dao.FrozenDao">
     <resultMap id="FrozenInfoMapping" type="com.aiqin.mgs.order.api.domain.FrozenInfo">
-        <result column="frozen_id" jdbcType="VARCHAR" property="frozenId"/>
-        <result column="distributor_id" jdbcType="VARCHAR" property="distributorId"/>
-        <result column="distributor_code" jdbcType="VARCHAR" property="distributorCode"/>
-        <result column="distributor_name" jdbcType="VARCHAR" property="distributorName"/>
-        <result column="member_id" jdbcType="VARCHAR" property="memberId"/>
-        <result column="member_name" jdbcType="VARCHAR" property="memberName"/>
-        <result column="product_id" jdbcType="VARCHAR" property="productId"/>
-        <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
-        <result column="product_name" jdbcType="VARCHAR" property="productName"/>
-        <result column="orig_price" jdbcType="BIGINT" property="origPrice"/>
-        <result column="curr_price" jdbcType="BIGINT" property="currPrice"/>
-        <result column="amount" jdbcType="INTEGER" property="amount"/>
-        <result column="price" jdbcType="BIGINT" property="price"/>
-        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
-        <result column="create_time" jdbcType="VARCHAR" property="createTime"/>
-        <result column="memo" jdbcType="VARCHAR" property="memo"/>
-        <result column="sum_amount" jdbcType="INTEGER" property="sumAmount"/>
-        <result column="sum_sale" jdbcType="INTEGER" property="sumSale"/>
-        <result column="sum_price" jdbcType="INTEGER" property="sumPrice"/>
+<result column="frozen_id" jdbcType="VARCHAR" property="frozenId"/>
+<result column="distributor_id" jdbcType="VARCHAR" property="distributorId"/>
+<result column="distributor_code" jdbcType="VARCHAR" property="distributorCode"/>
+<result column="distributor_name" jdbcType="VARCHAR" property="distributorName"/>
+<result column="member_id" jdbcType="VARCHAR" property="memberId"/>
+<result column="member_name" jdbcType="VARCHAR" property="memberName"/>
+<result column="sale_byid" jdbcType="VARCHAR" property="saleById"/>
+<result column="sale_byname" jdbcType="VARCHAR" property="saleByName"/>
+<result column="product_id" jdbcType="VARCHAR" property="productId"/>
+<result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
+<result column="product_name" jdbcType="VARCHAR" property="productName"/>
+<result column="orig_price" jdbcType="BIGINT" property="origPrice"/>
+<result column="curr_price" jdbcType="BIGINT" property="currPrice"/>
+<result column="amount" jdbcType="INTEGER" property="amount"/>
+<result column="price" jdbcType="BIGINT" property="price"/>
+<result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+<result column="create_time" jdbcType="VARCHAR" property="createTime"/>
+<result column="memo" jdbcType="VARCHAR" property="memo"/>
+    <result column="sum_amount" jdbcType="INTEGER" property="sumAmount"/>
+    <result column="sum_sale" jdbcType="INTEGER" property="sumSale"/>
+    <result column="sum_price" jdbcType="INTEGER" property="sumPrice"/>
         <result column="is_prestorage" jdbcType="INTEGER" property="isPrestorage"/>
+
     </resultMap>
 
 

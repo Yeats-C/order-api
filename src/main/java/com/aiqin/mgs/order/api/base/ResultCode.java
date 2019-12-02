@@ -26,6 +26,12 @@ public interface ResultCode {
     MessageId PARAMETER_EXCEPTION = MessageId.create(Project.ORDER_API, 14, "参数异常");
     
     MessageId NET_EXCEPTION = MessageId.create(Project.ORDER_API, 15, "网络异常");
+
+    MessageId OVER_LIMIT = MessageId.create(Project.PRODUCT_API,20,"订购商品不能超过999");
+    MessageId STORE_SHORT = MessageId.create(Project.PRODUCT_API,21,"库存不足");
+    MessageId STOCK_SHORT1 = MessageId.create(Project.PRODUCT_API,22,"库存紧张");
+    MessageId GETTOTAL = MessageId.create(Project.PRODUCT_API,23,"查询总数量异常");
+
     
     String CART = "购物车";
     String ORDER = "订单";

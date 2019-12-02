@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.OrderStoreOrderProductItemDao">
+
+    <select id="select" parameterType="com.aiqin.mgs.order.api.domain.OrderStoreOrderProductItem"
+            resultType="com.aiqin.mgs.order.api.domain.OrderStoreOrderProductItem">
+        select id as id,
+        order_id as orderId,
+        order_code as orderCode,
+        order_item_code as orderItemCode,
+        product_id as productId,
+        product_code as productCode,
+        product_name as productName,
+        sku_code as skuCode,
+        sku_name as skuName,
+        unit as unit,
+        product_gift as productGift,
+        parent_order_item_code as parentOrderItemCode,
+        activity_id as activityId,
+        spin_coupon_id as spinCouponId,
+        top_coupon_id as topCouponId,
+        quantity as quantity,
+        actual_deliver_quantity as actualDeliverQuantity,
+        deliver_difference_reason as deliverDifferenceReason,
+        actual_store_quantity as actualStoreQuantity,
+        sign_difference_reason as signDifferenceReason,
+        price as price,
+        share_price as sharePrice,
+        tax_purchase_price as taxPurchasePrice,
+        money as money,
+        real_money as realMoney,
+        activity_money as activityMoney,
+        spin_coupon_money as spinCouponMoney,
+        top_coupon_money as topCouponMoney,
+        create_time as createTime,
+        create_by_id as createById,
+        create_by_name as createByName,
+        update_time as updateTime,
+        update_by_id as updateById,
+        update_by_name as updateByName
+        from order_store_product_item
+        <where>
+            1 = 1
+            <if test=" id != null and id != '' ">
+                and id = #{id}
+            </if>
+            <if test=" orderId != null and orderId != '' ">
+                and order_id = #{orderId}
+            </if>
+            <if test=" orderCode != null and orderCode != '' ">
+                and order_code = #{orderCode}
+            </if>
+            <if test=" orderItemCode != null and orderItemCode != '' ">
+                and order_item_code = #{orderItemCode}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <insert id="insert">
+        insert into order_store_product_item
+        (order_id, order_code, order_item_code, product_id, product_code,
+         product_name, sku_code, sku_name, unit, product_gift,
+         parent_order_item_code, activity_id, spin_coupon_id, top_coupon_id,
+         quantity, actual_deliver_quantity, deliver_difference_reason, actual_store_quantity, sign_difference_reason,
+         price,
+         share_price, tax_purchase_price, money, real_money, activity_money,
+         spin_coupon_money, top_coupon_money, create_time, create_by_id,
+         create_by_name, update_time, update_by_id, update_by_name)
+        values (#{orderId}, #{orderCode}, #{orderItemCode}, #{productId}, #{productCode}, #{productName}, #{skuCode},
+                #{skuName}, #{unit}, #{productGift}, #{parentOrderItemCode}, #{activityId}, #{spinCouponId},
+                #{topCouponId}, #{quantity}, #{actualDeliverQuantity}, #{deliverDifferenceReason},
+                #{actualStoreQuantity}, #{signDifferenceReason}, #{price}, #{sharePrice},
+                #{taxPurchasePrice}, #{money}, #{realMoney}, #{activityMoney}, #{spinCouponMoney}, #{topCouponMoney},
+                sysdate(), #{createById}, #{createByName}, sysdate(), #{updateById}, #{updateByName})
+    </insert>
+
+    <update id="updateByPrimaryKeySelective">
+        update order_store_product_item
+        set
+        <if test="actualDeliverQuantity != null and actualDeliverQuantity != '' or actualDeliverQuantity == 0 ">
+            actual_deliver_quantity = #{actualDeliverQuantity},
+        </if>
+        <if test="deliverDifferenceReason != null and deliverDifferenceReason != '' ">
+            deliver_difference_reason = #{deliverDifferenceReason},
+        </if>
+        <if test="actualStoreQuantity != null and actualStoreQuantity != '' or actualStoreQuantity == 0 ">
+            actual_store_quantity = #{actualStoreQuantity},
+        </if>
+        <if test="signDifferenceReason != null and signDifferenceReason != '' ">
+            sign_difference_reason = #{signDifferenceReason},
+        </if>
+        update_by_id = #{updateById},
+        update_by_name = #{updateByName},
+        update_time = sysdate()
+        where id = #{id}
+    </update>
+
+</mapper>

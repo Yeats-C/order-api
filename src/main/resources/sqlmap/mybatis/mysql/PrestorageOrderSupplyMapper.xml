@@ -207,7 +207,6 @@
             and a.create_time &lt;= #{endTime}
         </if>
 
-
         <if test="receiveType!=null ">
             and a.receive_type =#{receiveType}
         </if>

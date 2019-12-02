@@ -428,5 +428,35 @@
     <select id="findOrderDetailById" resultMap="OrderInfoDetailMapping">
         select * from order_consumer_detail where  order_detail_id=#{orderDetailId}
     </select>
+
+    <select id="productStore" parameterType="com.aiqin.mgs.order.api.domain.request.ProductStoreRequest"
+            resultType="com.aiqin.mgs.order.api.domain.response.ProductStoreResponse">
+        SELECT a.sku_code AS CODE,SUM(amount) AS amount,SUM(amount)/30 productSalability
+        FROM order_detail a
+        LEFT JOIN order_info b ON a.order_id = b.order_id
+        WHERE 1=1 and order_type = 1
+        <if test="skuList != null" >
+            and a.sku_code in
+            <foreach collection="skuList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="originTypeList != null" >
+            and b.origin_type in
+            <foreach collection="originTypeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        AND b.order_status NOT IN (0,4)
+        GROUP BY a.sku_code
+        order by productSalability
+        <if test="ascOrDesc != null and ascOrDesc == 'desc'">
+            desc
+        </if>
+        <if test="ascOrDesc != null and ascOrDesc == 'asc'">
+            asc
+        </if>
+        limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </select>
 </mapper>
 

@@ -116,7 +116,6 @@
         </if>
         where prestorage_order_supply_detail_id = #{prestorageOrderSupplyDetailId}
 
-
     </update>
 <update id="updateRejectPrestoragProduct" parameterType="com.aiqin.mgs.order.api.domain.request.PrestorageOrderSupplyDetailVo">
     update prestorage_order_supply_detail set update_time=CURRENT_TIMESTAMP

@@ -58,12 +58,12 @@ public class FrozenInfo extends PagesRequest {
     
     @ApiModelProperty(value = "销售员id")
     @JsonProperty("sale_byid")
-    private String SaleById="";
+    private String saleById="";
     
     @ApiModelProperty(value = "销售员名称")
     @JsonProperty("sale_byname")
     @NotBlank
-    private String SaleByName="";
+    private String saleByName="";
     
     @ApiModelProperty(value = "商品id")
     @JsonProperty("product_id")
@@ -277,19 +277,19 @@ public class FrozenInfo extends PagesRequest {
 
 
 	public String getSaleById() {
-		return SaleById;
+		return saleById;
 	}
 
 	public void setSaleById(String saleById) {
-		SaleById = saleById;
+		saleById = saleById;
 	}
 
 	public String getSaleByName() {
-		return SaleByName;
+		return saleByName;
 	}
 
 	public void setSaleByName(String saleByName) {
-		SaleByName = saleByName;
+		this.saleByName = saleByName;
 	}
 
 	public Integer getSumSale() {

@@ -67,6 +67,7 @@ public class OrderController {
         
     	//添加TOC订单标识
         if(orderAndSoOnRequest !=null) {
+
         	OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
           if(orderInfo !=null) {
               if(orderInfo.getOrderType()==4){
@@ -91,7 +92,7 @@ public class OrderController {
     /**
      * 门店新增TOC订单step2-添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据
      * 现金结算，创建订单信息
-     * @param 
+     * @param
      * @return
      */
     @PostMapping("/addpamo")

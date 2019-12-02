@@ -18,16 +18,14 @@ import java.util.List;
 
 @ApiModel("购物车")
 public class CartInfo extends PagesRequest {
-    
+
 	@ApiModelProperty(value="不传参不返回 0:全部")
 	@JsonProperty("icount")
 	private Integer icount = 0;
-	
 
 	public Integer getIcount() {
 		return icount;
 	}
-
 
 	public void setIcount(Integer icount) {
 		this.icount = icount;
@@ -56,7 +54,7 @@ public class CartInfo extends PagesRequest {
     @ApiModelProperty(value = "商品名称")
     @JsonProperty("product_name")
     private String productName="";
-    
+
     @ApiModelProperty(value = "sku code")
     @JsonProperty("sku_code")
     private String skuCode="";
@@ -71,8 +69,8 @@ public class CartInfo extends PagesRequest {
     private String logo="";
     
     @ApiModelProperty(value = "创建时间",example = "2001-01-01 01:01:01")
-    @JsonProperty("create_time")
-    private Date createTime;
+	@JsonProperty("create_time")
+	private Date createTime;
     
     @ApiModelProperty(value = "更新时间",example = "2001-01-01 01:01:01")
     @JsonProperty("update_time")
@@ -86,11 +84,11 @@ public class CartInfo extends PagesRequest {
     @JsonProperty("update_by")
     private String updateBy="";
     
-    @ApiModelProperty(value = "折扣类型  1:限时折扣 2:优惠券")
-    @JsonProperty("agio_type")
-    private Integer agioType;
-    
-    @ApiModelProperty(value = "原价")
+   	@ApiModelProperty(value = "折扣类型  1:限时折扣 2:优惠券")
+	@JsonProperty("agio_type")
+	private Integer agioType;
+
+	@ApiModelProperty(value = "原价")
     @JsonProperty("price")
     private Integer price;
     

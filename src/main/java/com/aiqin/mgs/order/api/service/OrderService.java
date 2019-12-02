@@ -33,7 +33,7 @@ public interface OrderService {
 	void addOrderCoupon(@Valid List<OrderRelationCouponInfo> orderCouponList, @Valid String orderId)throws Exception;
 
 	//接口-分销机构维度-总销售额  废弃
-//	HttpResponse selectOrderAmt(String distributorId, String originType);
+//	HttpResponse selectOrderAmt(String distributorId, String orderOriginType);
 
 	//接口-分销机构+当月维度-当月销售额、当月实收、当月支付订单数
 	HttpResponse selectorderbymonth(@Valid String distributorId,@Valid List<Integer> originTypeList);

@@ -18,6 +18,7 @@ import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.mgs.order.api.component.*;
+import com.aiqin.mgs.order.api.component.enums.PayTypeEnum;
 import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
@@ -516,9 +517,9 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderInfo addOrderInfo(@Valid OrderInfo orderInfo) throws Exception {
 
-        String orderId = "";
-        String orderCode = "";
-        String receiveCode = "";
+        String orderId = ""; //订单Id
+        String orderCode = ""; //订单编号
+        String receiveCode = ""; //订单提取码
 
         //生成订单ID
         orderId = OrderPublic.getUUID();
@@ -597,18 +598,18 @@ public class OrderServiceImpl implements OrderService {
 //	//接口-分销机构维度-总销售额 返回INT
 //	@Override
 //	public HttpResponse selectOrderAmt(String distributorId, String originType) {
-//
+//		
 //		try {
 //			Integer  total_price = orderDao.selectOrderAmt(distributorId,originType);
-//
+//			
 //			return HttpResponse.success(total_price);
 //		} catch (Exception e) {
 //
 //			LOGGER.info("接口-分销机构维度-总销售额 返回INT報錯", e);
 //			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 //		}
-//
-//
+//		
+//		
 //	}
 
 
@@ -1518,7 +1519,9 @@ public class OrderServiceImpl implements OrderService {
     public HttpResponse addOrdta(@Valid OrderAndSoOnRequest orderAndSoOnRequest) {
 
         try {
+            //获取订单信息
             OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
+            //获取订单详情列表
             List<OrderDetailInfo> detailList = orderAndSoOnRequest.getDetailList();
 
             //新增订单主数据

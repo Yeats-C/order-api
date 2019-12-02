@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.aiqin.mgs.order.api.domain.request.ProductStoreRequest;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,4 +82,6 @@ public interface OrderDetailService {
 
 
 	HttpResponse findOrderDetailById(String orderDetailId);
+	// 查询门店商品订单数
+	HttpResponse productStore(@Valid ProductStoreRequest info);
 }
