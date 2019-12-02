@@ -11,10 +11,11 @@ import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
-import javax.websocket.server.PathParam;
 
+import com.aiqin.mgs.order.api.domain.request.UnPayVo;
 import com.aiqin.mgs.order.api.domain.request.statistical.BusinessStatisticalRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.SkuSalesRequest;
+import com.aiqin.mgs.order.api.domain.response.*;
 import com.aiqin.mgs.order.api.domain.response.statistical.Last10DaysOrderStatistical;
 import com.aiqin.mgs.order.api.domain.statistical.BusinessStatistical;
 import com.aiqin.mgs.order.api.domain.statistical.SkuSales;
@@ -23,7 +24,6 @@ import org.apache.ibatis.annotations.Param;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.request.DevelRequest;
 import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
-import com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
@@ -78,7 +78,7 @@ public interface OrderDao {
     OrderResponse selectOrderByNineWeek(@Valid OrderQuery orderQuery) throws Exception;
 
     //修改订单主数据
-    void updateOrder(@Valid OrderInfo orderInfo) throws Exception;
+    int updateOrder(@Valid OrderInfo orderInfo) throws Exception;
 
     //接口-收银员交班收银情况统计   获取收银员、支付类型金额
     List<OrderbyReceiptSumResponse> cashier(OrderQuery orderQuery) throws Exception;
@@ -186,4 +186,24 @@ public interface OrderDao {
 	String isExistOrder(@Param("distributorId") String distributorId);
 
 	List<LatelyResponse> memberLately(@Param("memberId") String memberId, @Param("distributorId") String distributorId)throws Exception;
+
+    List<PrestorageResponse> selectPrestorageOrder(OrderQuery orderQuery);
+
+    Integer selectPrestorageOrderCount(OrderQuery orderQuery);
+
+    /**
+     * 预存商品详情
+     * @param prestorageOrderSupplyDetailId
+     * @return
+     */
+    PrestorageResponse selectprestorageorderDetails(String prestorageOrderSupplyDetailId);
+
+    /**
+     * 获取门店未付款会员数
+     * @param unPayVo
+     * @return
+     */
+    int getUnPayNum(UnPayVo unPayVo);
+
+    List<String> getUnPayMemberIdList(UnPayVo unPayVo);
 }

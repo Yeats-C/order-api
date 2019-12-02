@@ -133,11 +133,19 @@ public class FrozenInfo extends PagesRequest {
     @ApiModelProperty(value = "备注")
     @JsonProperty("memo")
     private String memo;
-    
-    
 
-    
 
+	@ApiModelProperty("是否预存订单，1：是 ，2 否")
+	@JsonProperty("is_prestorage")
+	private Integer isPrestorage=2;
+
+	public Integer getIsPrestorage() {
+		return isPrestorage;
+	}
+
+	public void setIsPrestorage(Integer isPrestorage) {
+		this.isPrestorage = isPrestorage;
+	}
 
 	public String getMemo() {
 		return memo;

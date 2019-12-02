@@ -14,7 +14,9 @@ public interface ResultCode {
     MessageId NOT_LOGIN_INFO = MessageId.create(Project.STORE_API, 7, "登录人账号或密码错误");
     MessageId SOSO_CONNECT_ERROR = MessageId.create(Project.STORE_API, 8, "调用腾讯地图异常");
     MessageId NO_HAVE_STORE_ERROR = MessageId.create(Project.STORE_API, 9, "未查询到对应门店信息");
-    
+    MessageId CHANGE_STORE_ERROR=MessageId.create(Project.ORDER_API, -1, "修改库存失败");
+    MessageId STATUS_CHANGE_ERROR=MessageId.create(Project.ORDER_API, -1, "订单状态修改失败");
+
     /** 黄祉壹   2018-11-05 开始     */
     
     MessageId ADD_EXCEPTION = MessageId.create(Project.ORDER_API, 10, "新增异常");

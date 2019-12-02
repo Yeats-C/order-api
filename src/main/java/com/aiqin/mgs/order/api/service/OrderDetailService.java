@@ -80,4 +80,5 @@ public interface OrderDetailService {
 	HttpResponse wantBuy(@Valid List<String> sukList);
 
 
+	HttpResponse findOrderDetailById(String orderDetailId);
 }

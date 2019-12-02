@@ -22,7 +22,7 @@ import io.swagger.annotations.ApiModelProperty;
 public class OrderJoinResponse {
     
 	@ApiModelProperty(value = "订单主数据")
-	@JsonProperty("order_info")
+	@JsonProperty("order_consumer_info")
 	private OrderInfo orderInfo;
 
 	@ApiModelProperty(value = "结算信息")

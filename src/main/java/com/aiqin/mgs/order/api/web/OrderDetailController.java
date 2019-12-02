@@ -254,4 +254,17 @@ public class OrderDetailController {
         return orderDetailService.wantBuy(sukList);
     }
 
+    /**
+     *
+     * @param sukList
+     * @return
+     */
+    @GetMapping("/findOrderDetailById")
+    @ApiOperation(value = "通过ID查询订单详情")
+    public HttpResponse findOrderDetailById(@Valid @RequestParam("order_detail_id") String orderDetailId) {
+
+
+        LOGGER.info("sku销量统计参数 sukList：{}",orderDetailId);
+        return orderDetailService.findOrderDetailById(orderDetailId);
+    }
 }

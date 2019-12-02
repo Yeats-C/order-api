@@ -6,31 +6,15 @@
 
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.service;
-import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
 
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
+import com.aiqin.mgs.order.api.domain.*;
+import com.aiqin.mgs.order.api.domain.request.*;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.domain.CartInfo;
-import com.aiqin.mgs.order.api.domain.OrderDetailInfo;
-import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
-import com.aiqin.mgs.order.api.domain.OrderInfo;
-import com.aiqin.mgs.order.api.domain.OrderLog;
-import com.aiqin.mgs.order.api.domain.OrderPayInfo;
-import com.aiqin.mgs.order.api.domain.OrderQuery;
-import com.aiqin.mgs.order.api.domain.OrderRelationCouponInfo;
-import com.aiqin.mgs.order.api.domain.SettlementInfo;
-import com.aiqin.mgs.order.api.domain.request.DetailCouponRequest;
-import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
-import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
-import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
-import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
-import com.aiqin.mgs.order.api.domain.response.SkuSaleResponse;
+import com.aiqin.mgs.order.api.domain.response.PartnerPayGateRep;
 
 @SuppressWarnings("all")
 public interface OrderService {
@@ -80,8 +64,9 @@ public interface OrderService {
 
 	//更改订单状态/支付状态/修改员...
 	HttpResponse updateOrderStatus(@Valid String orderId, Integer orderStatus, Integer payStatus,
-			String updateBy);
-
+                                   String updateBy, String payType);
+	public int updateOrderStatuss(@Valid String orderId, Integer orderStatus, Integer payStatus,
+								  String updateBy, String payType, Integer actualPrice) throws Exception;
 	//仅更改退货状态-订单主表
 	void retustus(@Valid String orderId, Integer returnStatus, String updateBy)throws Exception;
 
@@ -144,8 +129,74 @@ public interface OrderService {
 
 	//修改统计销量状态
 	void updateSukReturn(@Valid String orderId);
-	
+
+
+
 	void updateOpenStatus(@Valid String distributorId);
 
 	HttpResponse memberLately(@Valid String memberId, @Valid String distributorId);
+
+	HttpResponse updateOrderInfo(StoreValueOrderPayRequest orderAndSoOnRequest);
+
+	/**
+	 * 查询预存订单明细
+	 * @param orderQuery
+	 * @return
+	 */
+	HttpResponse selectPrestorageOrder(OrderQuery orderQuery);
+
+	/**
+	 *查询预存订单详情
+	 * @param prestorageOrderSupplyDetailId
+	 * @return
+	 */
+	HttpResponse selectprestorageorderDetails(String prestorageOrderSupplyDetailId);
+
+	/**
+	 * 预存商品取货
+	 * @param prestorageOutVo
+	 * @return
+	 */
+	HttpResponse prestorageOut(PrestorageOutInfo prestorageOutVo);
+
+	/**
+	 * 支付回调
+	 * @param payReq
+	 * @return
+	 */
+    HttpResponse callback(PartnerPayGateRep payReq) throws Exception;
+
+	/**
+	 * 查询预存订单列表
+	 * @param orderQuery
+	 * @return
+	 */
+	HttpResponse selectPrestorageOrderList(OrderQuery orderQuery);
+
+	/**
+	 * 查询预存订单日志列表
+	 * @param orderQuery
+	 * @return
+	 */
+	HttpResponse selectPrestorageOrderLogs(OrderQuery orderQuery);
+
+	HttpResponse selectPrestorageOrderDetail(String orderId);
+
+	/**
+	 * 修改预存商品退货数量
+	 * @param vo
+	 * @return
+	 */
+	HttpResponse updateRejectPrestoragProduct(PrestorageOrderSupplyDetailVo vo);
+
+	/**
+	 * 修改预存商品订单状态和订单状态
+	 * @param vo
+	 * @return
+	 */
+	HttpResponse updateRejectPrestoragState(RejectPrestoragStateVo vo);
+
+	HttpResponse getUnPayNum(UnPayVo unPayVo);
+
+	HttpResponse getUnPayMemberIdList(UnPayVo unPayVo);
 }

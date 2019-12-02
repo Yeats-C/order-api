@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.PrestorageOrderSupplyDao">
+    <resultMap id="OrderSupplyMapping" type="com.aiqin.mgs.order.api.domain.PrestorageOrderSupply">
+        <result column="prestorage_order_supply_id" jdbcType="VARCHAR" property="prestorageOrderSupplyId"/>
+        <result column="prestorage_order_supply_code" jdbcType="VARCHAR" property="prestorageOrderSupplyCode"/>
+        <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+        <result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
+        <result column="member_id" jdbcType="VARCHAR" property="memberId"/>
+        <result column="member_name" jdbcType="VARCHAR" property="memberName"/>
+        <result column="member_phone" jdbcType="VARCHAR" property="memberPhone"/>
+        <result column="distributor_id" jdbcType="VARCHAR" property="distributorId"/>
+        <result column="distributor_code" jdbcType="VARCHAR" property="distributorCode"/>
+        <result column="distributor_name" jdbcType="VARCHAR" property="distributorName"/>
+        <result column="prestorage_order_supply_status" jdbcType="TINYINT" property="prestorageOrderSupplyStatus"/>
+        <result column="pay_type" jdbcType="VARCHAR" property="payType"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+    </resultMap>
+    <resultMap id="OrderSupplyInfoMapping" type="com.aiqin.mgs.order.api.domain.response.PrestorageOrderInfo">
+        <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+        <result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
+        <result column="pay_type" jdbcType="TINYINT" property="payType"/>
+        <result column="member_name" jdbcType="VARCHAR" property="memberName"/>
+        <result column="member_phone" jdbcType="VARCHAR" property="memberPhone"/>
+        <result column="origin_type" jdbcType="VARCHAR" property="originType"/>
+        <result column="actual_price" jdbcType="INTEGER" property="actualPrice"/>
+        <result column="total_price" jdbcType="INTEGER" property="totalPrice"/>
+        <result column="cashier_id" jdbcType="VARCHAR" property="cashierId"/>
+        <result column="cashier_name" jdbcType="VARCHAR" property="cashierName"/>
+        <result column="guide_id" jdbcType="VARCHAR" property="guideId"/>
+        <result column="guide_name" jdbcType="VARCHAR" property="guideName"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="payTime"/>
+        <result column="order_status" jdbcType="TINYINT" property="orderStatus"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+    </resultMap>
+
+    <update id="updateById" parameterType="com.aiqin.mgs.order.api.domain.PrestorageOrderSupply">
+        update prestorage_order_supply set update_time=CURRENT_TIMESTAMP
+
+        <if test="prestorageOrderSupplyStatus!=null ">
+            ,prestorage_order_supply_status = #{prestorageOrderSupplyStatus}
+        </if>
+        <if test="updateBy!=null ">
+            ,update_by = #{updateBy}
+        </if>
+        where prestorage_order_supply_id = #{prestorageOrderSupplyId}
+
+    </update>
+    <insert id="addPrestorageOrder" parameterType="com.aiqin.mgs.order.api.domain.PrestorageOrderSupply">
+        insert into prestorage_order_supply
+        (prestorage_order_supply_id,
+        <if test="prestorageOrderSupplyCode!=null">
+            prestorage_order_supply_code,
+        </if>
+        <if test="orderId!=null">
+            order_id,
+        </if>
+        <if test="orderCode!=null">
+            order_code,
+        </if>
+        <if test="memberId!=null">
+            member_id,
+        </if>
+        <if test="memberName!=null">
+            member_name,
+        </if>
+        <if test="memberPhone!=null">
+            member_phone,
+        </if>
+        <if test="distributorId!=null">
+            distributor_id,
+        </if>
+        <if test="distributorCode!=null">
+            distributor_code,
+        </if>
+        <if test="distributorName!=null">
+            distributor_name,
+        </if>
+        <if test="prestorageOrderSupplyStatus!=null">
+            prestorage_order_supply_status,
+        </if>
+        <if test="payType!=null">
+            pay_type,
+        </if>
+        create_time,create_by)
+        values
+        (#{prestorageOrderSupplyId},
+        <if test="prestorageOrderSupplyCode!=null">
+            #{prestorageOrderSupplyCode},
+        </if>
+        <if test="orderId!=null">
+            #{orderId},
+        </if>
+        <if test="orderCode!=null">
+            #{orderCode},
+        </if>
+        <if test="memberId!=null">
+            #{memberId},
+        </if>
+        <if test="memberName!=null">
+            #{memberName},
+        </if>
+        <if test="memberPhone!=null">
+            #{memberPhone},
+        </if>
+        <if test="distributorId!=null">
+            #{distributorId},
+        </if>
+        <if test="distributorCode!=null">
+            #{distributorCode},
+        </if>
+        <if test="distributorName!=null">
+            #{distributorName},
+        </if>
+        <if test="prestorageOrderSupplyStatus!=null">
+            #{prestorageOrderSupplyStatus},
+        </if>
+        <if test="payType!=null">
+            #{payType},
+        </if>
+
+       CURRENT_TIMESTAMP,#{createBy})
+    </insert>
+
+    <select id="selectPrestorageOrderList" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="OrderSupplyInfoMapping">
+        select  o.* from prestorage_order_supply a ,order_consumer_info o where a.order_id=o.order_id
+        <if test="distributorId!=null and distributorId!='' ">
+            and a.distributor_id = #{distributorId}
+        </if>
+        <if test="distributorName!=null and distributorName!=''">
+            and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="orderId!=null and orderId!=''">
+            and a.order_id = #{orderId}
+        </if>
+        <if test="orderCode!=null and orderCode!=''">
+            and a.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="memberId!=null and memberId!=''">
+            and a.member_id =#{memberId}
+        </if>
+
+        <if test="memberPhone!=null and memberPhone!=''">
+            and a.member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%')
+        </if>
+
+        <if test="orderStatus!=null ">
+            and a.order_status = #{orderStatus}
+        </if>
+
+        <if test="beginTime!=null ">
+            and a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime!=null ">
+            and a.create_time &lt;= #{endTime}
+        </if>
+
+        <if test="receiveType!=null ">
+            and a.receive_type =#{receiveType}
+        </if>
+        <if test="receiveCode!=null and receiveCode!='' ">
+            and a.receive_code =#{receiveCode}
+        </if>
+        ORDER BY a.create_time DESC
+        <if test="icount!=null ">
+            limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+        </if>
+
+    </select>
+
+    <select id="selectPrestorageOrderListCount" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultType="integer">
+        select  count(1) from prestorage_order_supply a where 1=1
+        <if test="distributorId!=null and distributorId!='' ">
+            and a.distributor_id = #{distributorId}
+        </if>
+        <if test="distributorName!=null and distributorName!=''">
+            and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="orderId!=null and orderId!=''">
+            and a.order_id = #{orderId}
+        </if>
+        <if test="orderCode!=null and orderCode!=''">
+            and a.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="memberId!=null and memberId!=''">
+            and a.member_id =#{memberId}
+        </if>
+
+        <if test="memberPhone!=null and memberPhone!=''">
+            and a.member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%')
+        </if>
+
+        <if test="orderStatus!=null ">
+            and a.order_status = #{orderStatus}
+        </if>
+
+        <if test="beginTime!=null ">
+            and a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime!=null ">
+            and a.create_time &lt;= #{endTime}
+        </if>
+
+
+        <if test="receiveType!=null ">
+            and a.receive_type =#{receiveType}
+        </if>
+        <if test="receiveCode!=null and receiveCode!='' ">
+            and a.receive_code =#{receiveCode}
+        </if>
+    </select>
+</mapper>

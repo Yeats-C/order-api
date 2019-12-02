@@ -4,6 +4,7 @@ import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.dto.ProductDistributorOrderDTO;
+import com.aiqin.mgs.order.api.domain.request.OperateStockVo;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
@@ -39,5 +40,12 @@ public class BridgeProductService {
             return response.getData();
         }
         return Lists.newArrayList();
+    }
+
+    public HttpResponse changeStock(List<OperateStockVo> stockReqVos) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(urlProperties.getProductApi()).append("/inventory/update/record");
+        HttpClient orderClient =HttpClient.post(sb.toString()).json(stockReqVos);
+        return orderClient.action().result(HttpResponse.class);
     }
 }

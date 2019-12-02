@@ -97,7 +97,8 @@ public interface Global {
     Integer P_TYPE_4 = 4;  //到店支付-微信
     Integer P_TYPE_5 = 5;  //到店支付-支付宝
     Integer P_TYPE_6 = 6;  //到店支付-银联
-    
+    Integer P_TYPE_7 = 7;  //到店支付-储值卡支付
+
     
     /**
      * 发货方状态
@@ -222,7 +223,7 @@ public interface Global {
     Integer ORDER_TYPE_1 = 1;  //TOC订单
     Integer ORDER_TYPE_2 = 2;  //TOB订单
     Integer ORDER_TYPE_3 = 3;  //服务商品
-    
+    Integer ORDER_TYPE_4 = 4;  //预存订单
     //销售流向:1:购买 2:退次
     Integer ORDER_FLOW_1=1;
     Integer ORDER_FLOW_2=2;
