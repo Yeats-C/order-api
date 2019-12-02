@@ -91,8 +91,11 @@ public class OrderDetailInfo extends PagesRequest {
 	@ApiModelProperty(value="实际价格")
 	@JsonProperty("actual_price")
 	private Integer actualPrice ;
-	
-	
+
+	@ApiModelProperty(value="成本价格")
+	@JsonProperty("cost_price")
+	private Integer costPrice ;
+
 	@ApiModelProperty(value="购买数量")
 	@JsonProperty("amount")
 	private Integer amount;
