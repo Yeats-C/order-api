@@ -33,7 +33,17 @@ public class ErpOrderOperationServiceImpl implements ErpOrderOperationService {
         Integer insert = orderStoreOrderInfoDao.insert(orderInfo);
 
         //保存订单操作日志
-        erpOrderOperationLogService.saveOrderOperationLog(orderInfo.getOrderId(), OrderLevelEnum.PRIMARY.getCode().equals(orderInfo.getOrderLevel()) ? ErpOrderStatusEnum.ORDER_STATUS_1 : ErpOrderStatusEnum.ORDER_STATUS_3, auth);
+        erpOrderOperationLogService.saveOrderOperationLog(orderInfo.getOrderId(), ErpOrderStatusEnum.ORDER_STATUS_1, auth);
+    }
+
+    @Override
+    public void saveOrderNoLog(OrderStoreOrderInfo orderInfo, AuthToken auth) {
+        //保存订单
+        orderInfo.setCreateById(auth.getPersonId());
+        orderInfo.setCreateByName(auth.getPersonName());
+        orderInfo.setUpdateById(auth.getPersonId());
+        orderInfo.setUpdateByName(auth.getPersonName());
+        Integer insert = orderStoreOrderInfoDao.insert(orderInfo);
     }
 
     @Override

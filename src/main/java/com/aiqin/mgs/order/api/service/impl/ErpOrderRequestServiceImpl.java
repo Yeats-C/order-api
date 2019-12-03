@@ -35,27 +35,27 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     @Override
     public StoreInfo getStoreInfoByStoreId(String storeId) {
         StoreInfo storeInfo = new StoreInfo();
-        try {
-            HttpClient httpClient = HttpClient.get(urlProperties.getSlcsApi() + "/store/getStoreInfo?store_id=" + storeId);
-            HttpResponse<StoreBackInfoResponse> response = httpClient.action().result(new TypeReference<HttpResponse<StoreBackInfoResponse>>() {
-            });
-            if (RequestReturnUtil.validateHttpResponse(response)) {
-                throw new BusinessException("获取门店信息失败");
-            }
-            StoreBackInfoResponse data = response.getData();
-            storeInfo.setStoreId(data.getStoreId());
-            storeInfo.setStoreCode(data.getStoreCode());
-            storeInfo.setStoreName(data.getStoreName());
-            storeInfo.setAddress(data.getAddress());
-            storeInfo.setContacts(data.getContacts());
-            storeInfo.setContactsPhone(data.getContactsPhone());
-            storeInfo.setFranchiseeId("franchiseeId");
-            storeInfo.setFranchiseeCode("franchiseeCode");
-            storeInfo.setFranchiseeName("加盟商名称");
-        } catch (Exception e) {
-            logger.info("获取门店信息失败：{}", e);
-            throw new BusinessException("获取门店信息失败");
-        }
+//        try {
+//            HttpClient httpClient = HttpClient.get(urlProperties.getSlcsApi() + "/store/getStoreInfo?store_id=" + storeId);
+//            HttpResponse<StoreBackInfoResponse> response = httpClient.action().result(new TypeReference<HttpResponse<StoreBackInfoResponse>>() {
+//            });
+//            if (RequestReturnUtil.validateHttpResponse(response)) {
+//                throw new BusinessException("获取门店信息失败");
+//            }
+//            StoreBackInfoResponse data = response.getData();
+//            storeInfo.setStoreId(data.getStoreId());
+//            storeInfo.setStoreCode(data.getStoreCode());
+//            storeInfo.setStoreName(data.getStoreName());
+//            storeInfo.setAddress(data.getAddress());
+//            storeInfo.setContacts(data.getContacts());
+//            storeInfo.setContactsPhone(data.getContactsPhone());
+//            storeInfo.setFranchiseeId("franchiseeId");
+//            storeInfo.setFranchiseeCode("franchiseeCode");
+//            storeInfo.setFranchiseeName("加盟商名称");
+//        } catch (Exception e) {
+//            logger.info("获取门店信息失败：{}", e);
+//            throw new BusinessException("获取门店信息失败");
+//        }
 
         if (StringUtils.isEmpty(storeInfo.getStoreId())) {
             //生成临时假数据
@@ -172,7 +172,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     }
 
     @Override
-    public boolean sendOrderPaySuccess(OrderStoreOrderInfo order) {
+    public boolean sendOrderPaySuccessToSupplyChain(OrderStoreOrderInfo order) {
         boolean flag = false;
         try {
             //TODO 订单支付成功通知供应链
@@ -185,6 +185,11 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             logger.error("订单支付成功通知供应链失败：{}", e);
         }
         return flag;
+    }
+
+    @Override
+    public boolean sendSplitOrderToSupplyChain(OrderStoreOrderInfo order, List<OrderStoreOrderInfo> splitOrderList) {
+        return false;
     }
 
     @Override

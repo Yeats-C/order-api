@@ -98,6 +98,20 @@ public class ErpOrderController {
         return response;
     }
 
+    @PostMapping("/orderProductItemSplitGroup")
+    @ApiOperation(value = "接收供应链返回订单商品行分组信息")
+    public HttpResponse orderProductItemSplitGroup(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
+        HttpResponse response = HttpResponse.success();
+        try {
+            erpOrderService.orderSplit(orderStoreOrderInfo);
+        } catch (BusinessException e) {
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
+    }
+
     @PostMapping("/findOrderTypeList")
     @ApiOperation(value = "获取订单类型选项列表")
     public HttpResponse findOrderTypeList() {

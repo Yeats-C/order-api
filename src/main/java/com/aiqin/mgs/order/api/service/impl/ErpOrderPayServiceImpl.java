@@ -344,7 +344,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
 
             if (PayStatusEnum.SUCCESS == payStatusEnum) {
                 //如果支付成功，发送信息到供应链
-                erpOrderRequestService.sendOrderPaySuccess(order);
+                erpOrderRequestService.sendOrderPaySuccessToSupplyChain(order);
             }
         }
     }

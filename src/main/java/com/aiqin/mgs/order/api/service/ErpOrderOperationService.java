@@ -25,6 +25,18 @@ public interface ErpOrderOperationService {
     void saveOrder(OrderStoreOrderInfo orderInfo, AuthToken auth);
 
     /**
+     * 保存订单，不保存日志
+     *
+     * @param orderInfo
+     * @param auth
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/3 19:07
+     */
+    void saveOrderNoLog(OrderStoreOrderInfo orderInfo, AuthToken auth);
+
+    /**
      * 修改订单数据
      *
      * @param orderInfo        根据主键修改非空字段
