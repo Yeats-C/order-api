@@ -1,0 +1,14 @@
+variables:
+  SONAR_TOKEN: "339245dc1931fb79884ced5d730f04188f3643bf"
+  SONAR_HOST_URL: "http://sonar.aiqin.com"
+
+stages:
+  - check
+
+sonarqube-scan:
+  stage: check
+  script:
+    - mvn verify sonar:sonar -U -DskipTests=true
+  only:
+    - merge_requests
+    - branches
