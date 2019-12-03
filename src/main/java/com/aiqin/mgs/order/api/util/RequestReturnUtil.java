@@ -28,7 +28,7 @@ public class RequestReturnUtil {
         if (httpResponse == null) {
             flag = false;
         } else {
-            if (httpResponse.getCode() != null && !HTTP_RESPONSE_CODE_SUCCESS.equals(httpResponse.getCode())) {
+            if (!HTTP_RESPONSE_CODE_SUCCESS.equals(httpResponse.getCode())) {
                 flag = false;
             }
         }

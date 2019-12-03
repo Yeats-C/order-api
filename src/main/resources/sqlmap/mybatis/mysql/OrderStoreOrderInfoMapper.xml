@@ -81,6 +81,9 @@
         <if test="repertoryName != null and repertoryName != ''">
             repertory_name = #{repertoryName},
         </if>
+        <if test="goodsCoupon != null">
+            goods_coupon = #{goodsCoupon},
+        </if>
         update_by_id = #{updateById},
         update_by_name = #{updateByName},
         update_time = sysdate()
