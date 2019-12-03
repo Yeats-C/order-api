@@ -2,11 +2,15 @@ package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.flyway.FlywayDataSource;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
 
 public interface CartOrderDao {
+
 
     //添加商品到购物车
     void insertCart(@Valid CartOrderInfo cartOrderInfo) throws Exception;
@@ -33,3 +37,11 @@ public interface CartOrderDao {
     List<CartOrderInfo> selectCartByLineCheckStatus(@Valid CartOrderInfo cartOrderInfo) throws Exception;
 
 }
+
+
+
+
+
+
+
+
