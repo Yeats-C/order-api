@@ -7,10 +7,8 @@ import com.aiqin.mgs.order.api.component.enums.ProductTypeEnum;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderProductItem;
-import com.aiqin.mgs.order.api.service.ErpOrderOperationService;
-import com.aiqin.mgs.order.api.service.ErpOrderProductItemService;
-import com.aiqin.mgs.order.api.service.ErpOrderQueryService;
-import com.aiqin.mgs.order.api.service.ErpOrderSignService;
+import com.aiqin.mgs.order.api.domain.OrderStoreOrderSending;
+import com.aiqin.mgs.order.api.service.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -30,6 +28,8 @@ public class ErpOrderSignServiceImpl implements ErpOrderSignService {
     private ErpOrderOperationService erpOrderOperationService;
     @Resource
     private ErpOrderProductItemService erpOrderProductItemService;
+    @Resource
+    private ErpOrderSendingService erpOrderSendingService;
 
     @Override
     public OrderStoreOrderInfo getOrderSignDetail(OrderStoreOrderInfo orderStoreOrderInfo) {
@@ -42,6 +42,9 @@ public class ErpOrderSignServiceImpl implements ErpOrderSignService {
         }
         List<OrderStoreOrderProductItem> orderProductItemList = erpOrderProductItemService.selectOrderProductListByOrderId(order.getOrderId());
         order.setProductItemList(orderProductItemList);
+
+        OrderStoreOrderSending orderSending = erpOrderSendingService.getOrderSendingByOrderId(order.getOrderId());
+        order.setOrderSending(orderSending);
         return order;
     }
 
@@ -122,6 +125,6 @@ public class ErpOrderSignServiceImpl implements ErpOrderSignService {
         OrderStoreOrderInfo updateOrder = new OrderStoreOrderInfo();
         updateOrder.setId(order.getId());
         updateOrder.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_13.getCode());
-        erpOrderOperationService.updateOrderByPrimaryKeySelective(updateOrder, ErpOrderStatusEnum.ORDER_STATUS_13.getDesc(), auth);
+        erpOrderOperationService.updateOrderByPrimaryKeySelective(updateOrder, auth);
     }
 }

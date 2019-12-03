@@ -4,16 +4,17 @@ import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.PayStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.PayWayEnum;
-import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.dao.OrderStoreOrderPayDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderPay;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
+import com.aiqin.mgs.order.api.domain.response.ErpOrderPayStatusResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderPayResultResponse;
 import com.aiqin.mgs.order.api.service.ErpOrderOperationService;
 import com.aiqin.mgs.order.api.service.ErpOrderPayService;
 import com.aiqin.mgs.order.api.service.ErpOrderQueryService;
+import com.aiqin.mgs.order.api.service.ErpOrderRequestService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import org.apache.commons.lang.StringUtils;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
@@ -44,7 +46,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
     private OrderStoreOrderPayDao orderStoreOrderPayDao;
 
     @Resource
-    private UrlProperties urlProperties;
+    private ErpOrderRequestService erpOrderRequestService;
 
     @Override
     public OrderStoreOrderPay getOrderPayByOrderId(String orderId) {
@@ -115,14 +117,9 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
             throw new BusinessException("非" + PayStatusEnum.UNPAID.getDesc() + "的订单不能发起支付");
         }
 
-        //TODO 调用支付中心接口
-//        Map<String, Object> paramMap = new HashMap<>();
-//        HttpClient httpClient = HttpClient.post(urlProperties.getPaymentApi() + "/test").json(paramMap);
-//        HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
-//        });
+        //调用支付中心接口
+        boolean flag = erpOrderRequestService.sendPayRequest(order, orderPay);
 
-        //返回状态
-        boolean flag = true;
         if (!flag) {
             throw new BusinessException("发起支付失败");
         }
@@ -135,7 +132,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
 
         //更新订单状态
         order.setPayStatus(orderPay.getPayStatus());
-        erpOrderOperationService.updateOrderByPrimaryKeySelective(order, "发起支付", auth);
+        erpOrderOperationService.updateOrderByPrimaryKeySelective(order, auth);
     }
 
     @Override
@@ -186,32 +183,19 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
                 }
                 OrderStoreOrderPay orderPayByOrderId = getOrderPayByOrderId(orderId);
                 if (PayStatusEnum.PAYING.getCode().equals(orderPayByOrderId.getPayStatus())) {
-                    PayStatusEnum payStatusEnum = PayStatusEnum.PAYING;
-                    String payCode = null;
-                    try {
-                        //TODO 调用支付中心接口 查询支付状态是否成功
-                        if (pollingTimes == 4) {
-                            payStatusEnum = PayStatusEnum.SUCCESS;
-                            payCode = OrderPublic.getUUID();
 
-                        }
-//                        Map<String, Object> paramMap = new HashMap<>();
-//                        HttpClient httpClient = HttpClient.post(urlProperties.getPaymentApi() + "/test").json(paramMap);
-//                        HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
-//                        });
-                    } catch (Exception e) {
-                        payStatusEnum = PayStatusEnum.PAYING;
-                    }
-
-                    if (PayStatusEnum.SUCCESS == payStatusEnum || PayStatusEnum.FAIL == payStatusEnum) {
-                        orderPayEnd(orderId, payStatusEnum, PayStatusEnum.SUCCESS == payStatusEnum ? ErpOrderStatusEnum.ORDER_STATUS_2 : ErpOrderStatusEnum.ORDER_STATUS_99, payCode, auth);
-                    } else {
+                    //调用支付中心接口 查询支付状态是否成功
+                    ErpOrderPayStatusResponse orderPayStatusResponse = erpOrderRequestService.getOrderPayStatus(orderCode);
+                    if (orderPayStatusResponse.isRequestSuccess() || orderPayStatusResponse.getPayStatusEnum() == PayStatusEnum.PAYING) {
                         //更新轮询次数
                         OrderStoreOrderPay updateOrderPay = new OrderStoreOrderPay();
                         updateOrderPay.setId(orderPayByOrderId.getId());
                         updateOrderPay.setPollingTimes(orderPayByOrderId.getPollingTimes() == null ? 1 : orderPayByOrderId.getPollingTimes() + 1);
                         updateOrderPaySelective(updateOrderPay, auth);
+                    } else {
+                        orderPayEnd(orderId, orderPayStatusResponse.getPayStatusEnum(), PayStatusEnum.SUCCESS == orderPayStatusResponse.getPayStatusEnum() ? ErpOrderStatusEnum.ORDER_STATUS_2 : ErpOrderStatusEnum.ORDER_STATUS_99, orderPayStatusResponse.getPayCode(), auth);
                     }
+
                 } else {
                     service.shutdown();
                 }
@@ -274,25 +258,17 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
             throw new BusinessException("只有" + ErpOrderStatusEnum.ORDER_STATUS_1.getDesc() + "和" + ErpOrderStatusEnum.ORDER_STATUS_99.getDesc() + "的订单才支持该操作");
         }
 
-        PayStatusEnum payStatusEnum;
-        String payCode = null;
-        //TODO 调用支付中心接口 查询支付状态是否成功
-        try {
-//            Map<String, Object> paramMap = new HashMap<>();
-//            HttpClient httpClient = HttpClient.post(urlProperties.getPaymentApi() + "/test").json(paramMap);
-//            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
-//            });
-            payStatusEnum = PayStatusEnum.SUCCESS;
-            payCode = OrderPublic.getUUID();
-        } catch (Exception e) {
-            throw new BusinessException("查询远程支付状态失败");
-        }
-
-        if (payStatusEnum == PayStatusEnum.SUCCESS) {
-            //更新订单状态和支付状态
-            orderPayEnd(order.getOrderId(), payStatusEnum, ErpOrderStatusEnum.ORDER_STATUS_1.getCode().equals(order.getOrderStatus()) ? ErpOrderStatusEnum.ORDER_STATUS_92 : ErpOrderStatusEnum.ORDER_STATUS_93, payCode, auth);
+        //调用支付中心接口 查询支付状态是否成功
+        ErpOrderPayStatusResponse orderPayStatusResponse = erpOrderRequestService.getOrderPayStatus(order.getOrderCode());
+        if (orderPayStatusResponse.isRequestSuccess()) {
+            if (orderPayStatusResponse.getPayStatusEnum() == PayStatusEnum.SUCCESS) {
+                //更新订单状态和支付状态
+                orderPayEnd(order.getOrderId(), orderPayStatusResponse.getPayStatusEnum(), ErpOrderStatusEnum.ORDER_STATUS_1.getCode().equals(order.getOrderStatus()) ? ErpOrderStatusEnum.ORDER_STATUS_92 : ErpOrderStatusEnum.ORDER_STATUS_93, orderPayStatusResponse.getPayCode(), auth);
+            } else {
+                throw new BusinessException("订单未支付成功");
+            }
         } else {
-            throw new BusinessException("订单未支付成功");
+            throw new BusinessException("查询支付中心订单支付状态失败");
         }
 
     }
@@ -314,7 +290,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
                 orderStoreOrderInfo.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_99.getCode());
                 orderStoreOrderInfo.setUpdateById(auth.getPersonId());
                 orderStoreOrderInfo.setUpdateByName(auth.getPersonName());
-                erpOrderOperationService.updateOrderByPrimaryKeySelective(orderStoreOrderInfo, "超时未支付取消订单", auth);
+                erpOrderOperationService.updateOrderByPrimaryKeySelective(orderStoreOrderInfo, auth);
             }
         }
     }
@@ -359,7 +335,17 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
             updateOrder.setOrderId(order.getOrderId());
             updateOrder.setOrderStatus(erpOrderStatusEnum.getCode());
             updateOrder.setPayStatus(payStatusEnum.getCode());
-            erpOrderOperationService.updateOrderByPrimaryKeySelective(updateOrder, erpOrderStatusEnum.getDesc(), auth);
+            if (PayStatusEnum.SUCCESS == payStatusEnum) {
+                //如果支付成功，获取物流券
+                BigDecimal goodsCoupon = erpOrderRequestService.getGoodsCoupon(order);
+                updateOrder.setGoodsCoupon(goodsCoupon);
+            }
+            erpOrderOperationService.updateOrderByPrimaryKeySelective(updateOrder, auth);
+
+            if (PayStatusEnum.SUCCESS == payStatusEnum) {
+                //如果支付成功，发送信息到供应链
+                erpOrderRequestService.sendOrderPaySuccess(order);
+            }
         }
     }
 

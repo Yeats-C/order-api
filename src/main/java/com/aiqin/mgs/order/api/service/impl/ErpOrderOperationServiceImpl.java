@@ -38,7 +38,7 @@ public class ErpOrderOperationServiceImpl implements ErpOrderOperationService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateOrderByPrimaryKeySelective(OrderStoreOrderInfo orderInfo, String operationContent, AuthToken auth) {
+    public void updateOrderByPrimaryKeySelective(OrderStoreOrderInfo orderInfo, AuthToken auth) {
 
         //更新订单数据
         orderInfo.setUpdateById(auth.getPersonId());

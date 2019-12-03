@@ -36,6 +36,8 @@ public interface ErpOrderService {
      */
     ErpOrderDetailResponse getOrderDetail(OrderStoreOrderInfo orderStoreOrderInfo);
 
+    OrderStoreOrderInfo getOrderDetail2(OrderStoreOrderInfo orderStoreOrderInfo);
+
     /**
      * 创建配送订单
      *

@@ -28,12 +28,11 @@ public interface ErpOrderOperationService {
      * 修改订单数据
      *
      * @param orderInfo        根据主键修改非空字段
-     * @param operationContent 操作动作
      * @param auth             操作人
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/11/21 11:02
      */
-    void updateOrderByPrimaryKeySelective(OrderStoreOrderInfo orderInfo, String operationContent, AuthToken auth);
+    void updateOrderByPrimaryKeySelective(OrderStoreOrderInfo orderInfo, AuthToken auth);
 }
