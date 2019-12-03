@@ -54,8 +54,10 @@ public class ErpOrderController {
     public HttpResponse getOrderDetail(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
         HttpResponse response = HttpResponse.success();
         try {
-            ErpOrderDetailResponse orderDetail = erpOrderService.getOrderDetail(orderStoreOrderInfo);
-            response.setData(orderDetail);
+//            ErpOrderDetailResponse orderDetail = erpOrderService.getOrderDetail(orderStoreOrderInfo);
+//            response.setData(orderDetail);
+            OrderStoreOrderInfo orderDetail2 = erpOrderService.getOrderDetail2(orderStoreOrderInfo);
+            response.setData(orderDetail2);
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {
