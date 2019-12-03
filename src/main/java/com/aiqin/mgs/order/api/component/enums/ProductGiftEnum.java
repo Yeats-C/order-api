@@ -49,6 +49,11 @@ public enum ProductGiftEnum {
         }
     }
 
+    /**
+     * 返回枚举对象
+     * @param object
+     * @return
+     */
     public static ProductGiftEnum getEnum(Object object) {
         if (object != null) {
             return VALUE_ENUM_MAP.get(object.toString());
@@ -56,6 +61,11 @@ public enum ProductGiftEnum {
         return null;
     }
 
+    /**
+     * 返回枚举对象的描述信息
+     * @param object
+     * @return
+     */
     public static String getEnumDesc(Object object) {
         if (object != null) {
             ProductGiftEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
@@ -66,6 +76,41 @@ public enum ProductGiftEnum {
         return "";
     }
 
+    /**
+     * 返回枚举对象的值
+     * @param object
+     * @return
+     */
+    public static String getEnumValue(Object object) {
+        if (object != null) {
+            ProductGiftEnum productGiftEnum = VALUE_ENUM_MAP.get(object.toString());
+            if (productGiftEnum != null){
+                return productGiftEnum.getValue();
+            }
+        }
+        return "";
+    }
+
+    /**
+     * 返回枚举对象的编码
+     * @param object
+     * @return
+     */
+    public static Integer getEnumCode(Object object){
+        if (object != null){
+            ProductGiftEnum productGiftEnum = CODE_ENUM_MAP.get(object.toString());
+            if (productGiftEnum != null){
+                return productGiftEnum.getCode();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 判断枚举类型是否存在
+     * @param object
+     * @return
+     */
     public static boolean exist(Object object) {
         if (object != null) {
             return VALUE_ENUM_MAP.containsKey(object.toString());
