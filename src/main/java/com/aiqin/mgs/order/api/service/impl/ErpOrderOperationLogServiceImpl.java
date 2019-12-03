@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -32,9 +33,19 @@ public class ErpOrderOperationLogServiceImpl implements ErpOrderOperationLogServ
             operationLog.setOrderStatus(orderStatusEnum.getCode());
             operationLog.setOperationContent(orderStatusEnum.getDesc());
             operationLog.setLogId(OrderPublic.getUUID());
+            operationLog.setCreateTime(new Date());
             operationLog.setCreateById(auth.getPersonId());
             operationLog.setCreateByName(auth.getPersonName());
             Integer insert = orderStoreOrderOperationLogDao.insert(operationLog);
+        }
+    }
+
+    @Override
+    public void copySplitOrderLog(String orderId, List<OrderStoreOrderOperationLog> list) {
+        for (OrderStoreOrderOperationLog item :
+                list) {
+            item.setOrderId(orderId);
+            orderStoreOrderOperationLogDao.insert(item);
         }
     }
 }

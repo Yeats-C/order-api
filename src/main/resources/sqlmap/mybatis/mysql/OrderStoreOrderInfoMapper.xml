@@ -23,6 +23,7 @@
         total_price as totalPrice,
         actual_price as actualPrice,
         order_level as orderLevel,
+        split_status as splitStatus,
         primary_code as primaryCode,
         goods_coupon as goodsCoupon,
         create_time as createTime,
@@ -51,6 +52,9 @@
         <if test="orderType != null and orderType != '' or orderType == 0">
             and order_type = #{orderType}
         </if>
+        <if test="splitStatus != null and splitStatus != '' or splitStatus == 0">
+            and split_status = #{splitStatus}
+        </if>
         <if test="storeId != null and storeId != ''">
             and store_id = #{storeId}
         </if>
@@ -69,17 +73,14 @@
         <if test="returnStatus != null and returnStatus != '' or returnStatus == 0">
             return_status = #{returnStatus},
         </if>
+        <if test="splitStatus != null and splitStatus != '' or splitStatus == 0">
+            split_status = #{splitStatus},
+        </if>
         <if test="supplierCode != null and supplierCode != ''">
             supplier_code = #{supplierCode},
         </if>
-        <if test="supplierName != null and supplierName != ''">
-            supplier_name = #{supplierName},
-        </if>
         <if test="repertoryCode != null and repertoryCode != ''">
             repertory_code = #{repertoryCode},
-        </if>
-        <if test="repertoryName != null and repertoryName != ''">
-            repertory_name = #{repertoryName},
         </if>
         <if test="goodsCoupon != null">
             goods_coupon = #{goodsCoupon},
@@ -94,7 +95,7 @@
         insert into order_store_info (order_id, order_code, order_status,
                                       order_origin_type, order_channel, supplier_code, supplier_name, repertory_code,
                                       repertory_name,
-                                      order_level, primary_code, return_status,
+                                      order_level,split_status, primary_code, return_status,
                                       order_type, pay_status, franchisee_id, store_id, store_name, total_price,
                                       actual_price, goods_coupon,
                                       create_time, create_by_id, create_by_name, update_time, update_by_id,
@@ -102,7 +103,7 @@
         values (#{orderId}, #{orderCode}, #{orderStatus},
                 #{orderOriginType}, #{orderChannel}, #{supplierCode}, #{supplierName}, #{repertoryCode},
                 #{repertoryName},
-                #{orderLevel}, #{primaryCode}, #{returnStatus},
+                #{orderLevel}, #{splitStatus}, #{primaryCode}, #{returnStatus},
                 #{orderType}, #{payStatus}, #{franchiseeId}, #{storeId}, #{storeName}, #{totalPrice}, #{actualPrice},
                 #{goodsCoupon},
                 sysdate(), #{createById}, #{createByName}, sysdate(), #{updateById}, #{updateByName})
@@ -129,6 +130,7 @@
         a1.total_price as totalPrice,
         a1.actual_price as actualPrice,
         a1.order_level as orderLevel,
+        a1.split_status as splitStatus,
         a1.primary_code as primaryCode,
         a1.goods_coupon as goodsCoupon,
         a1.create_time as createTime,
@@ -184,6 +186,7 @@
         a1.total_price as totalPrice,
         a1.actual_price as actualPrice,
         a1.order_level as orderLevel,
+        a1.split_status as splitStatus,
         a1.primary_code as primaryCode,
         a1.goods_coupon as goodsCoupon,
         a1.create_time as createTime,

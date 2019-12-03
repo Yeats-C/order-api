@@ -94,6 +94,11 @@ public class OrderStoreOrderProductItem {
     /***修改人姓名*/
     private String updateByName;
 
+    /***仓库编码 接收供应链参数使用*/
+    private String repertoryCode;
+    /***库存名称 接收供应链参数使用*/
+    private String repertoryName;
+
     public String getProductGiftDesc() {
         return ProductGiftEnum.getEnumDesc(productGift);
     }

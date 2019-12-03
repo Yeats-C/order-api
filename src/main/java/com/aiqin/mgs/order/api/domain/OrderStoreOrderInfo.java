@@ -71,6 +71,8 @@ public class OrderStoreOrderInfo {
     private BigDecimal actualPrice;
     /***订单级别 枚举 OrderLevelEnum*/
     private Integer orderLevel;
+    /***是否被拆分 YesOrNoEnum */
+    private Integer splitStatus;
     /***关联主订单编码*/
     private String primaryCode;
     /***物流券*/

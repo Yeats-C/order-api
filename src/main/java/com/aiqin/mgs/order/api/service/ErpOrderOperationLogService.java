@@ -38,4 +38,16 @@ public interface ErpOrderOperationLogService {
      * @date 2019/11/21 10:33
      */
     void saveOrderOperationLog(String orderId, ErpOrderStatusEnum orderStatusEnum, AuthToken auth);
+
+    /**
+     * 复制日志集合到另一个订单
+     *
+     * @param orderId
+     * @param list
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/3 19:08
+     */
+    void copySplitOrderLog(String orderId, List<OrderStoreOrderOperationLog> list);
 }

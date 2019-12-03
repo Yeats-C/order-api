@@ -82,7 +82,19 @@ public interface ErpOrderRequestService {
      * @version: v1.0.0
      * @date 2019/12/2 15:48
      */
-    boolean sendOrderPaySuccess(OrderStoreOrderInfo order);
+    boolean sendOrderPaySuccessToSupplyChain(OrderStoreOrderInfo order);
+
+    /**
+     * 推送拆分后的订单到供应链
+     *
+     * @param order
+     * @param splitOrderList
+     * @return boolean
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/3 17:26
+     */
+    boolean sendSplitOrderToSupplyChain(OrderStoreOrderInfo order, List<OrderStoreOrderInfo> splitOrderList);
 
     /**
      * 商品销售区域配置校验
