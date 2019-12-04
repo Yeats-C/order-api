@@ -54,6 +54,7 @@ public class OrderController {
     
     
     /**
+     * 普通订单
      * 门店新增TOC订单step1-添加订单主数据+添加订单明细数据+返回订单编号
      * @param 
      * @return
