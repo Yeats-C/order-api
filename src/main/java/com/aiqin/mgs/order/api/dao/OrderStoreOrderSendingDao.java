@@ -35,4 +35,15 @@ public interface OrderStoreOrderSendingDao {
      */
     Integer insert(OrderStoreOrderSending orderStoreOrderSending);
 
+    /**
+     * 根据id更新非空字段
+     *
+     * @param orderStoreOrderSending
+     * @return java.lang.Integer
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/4 10:18
+     */
+    Integer updateByPrimaryKeySelective(OrderStoreOrderSending orderStoreOrderSending);
+
 }

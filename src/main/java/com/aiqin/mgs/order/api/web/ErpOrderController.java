@@ -112,6 +112,20 @@ public class ErpOrderController {
         return response;
     }
 
+    @PostMapping("/orderSend")
+    @ApiOperation(value = "订单发货")
+    public HttpResponse orderSend(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
+        HttpResponse response = HttpResponse.success();
+        try {
+            erpOrderService.orderSend(orderStoreOrderInfo);
+        } catch (BusinessException e) {
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
+    }
+
     @PostMapping("/findOrderTypeList")
     @ApiOperation(value = "获取订单类型选项列表")
     public HttpResponse findOrderTypeList() {
