@@ -273,7 +273,7 @@ public class FrozenInfo extends PagesRequest {
 	}
 
 	public void setSaleById(String saleById) {
-		saleById = saleById;
+		this.saleById = saleById;
 	}
 
 	public String getSaleByName() {

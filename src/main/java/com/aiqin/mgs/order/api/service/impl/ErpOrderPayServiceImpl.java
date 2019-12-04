@@ -201,7 +201,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
                 }
             }
             //轮询时间控制
-        }, 1000 * 2, 1000 * 5, TimeUnit.MILLISECONDS);
+        }, (long)1000 * 2, (long)1000 * 5, TimeUnit.MILLISECONDS);
     }
 
     @Override
