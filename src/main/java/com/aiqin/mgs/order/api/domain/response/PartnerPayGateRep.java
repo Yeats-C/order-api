@@ -25,11 +25,11 @@ public class PartnerPayGateRep {
     private Date payTime;
     @ApiModelProperty("申请支付金额")
     @JsonProperty("order_amount")
-    private BigDecimal orderAmount;
+    private Integer orderAmount;
     @ApiModelProperty("实际订单金额")
     @JsonProperty("actual_order_amount")
     private BigDecimal actualOrderAmount;
-    @ApiModelProperty(value = "支付类型(1.微信，2支付宝，3网联，4 转账)")
+    @ApiModelProperty(value = "支付类型")
     @JsonProperty("pay_type")
     private Integer payType;
     @ApiModelProperty("处理结果代码 ，为1000支付成功,1001 支付中，1005 支付失败")

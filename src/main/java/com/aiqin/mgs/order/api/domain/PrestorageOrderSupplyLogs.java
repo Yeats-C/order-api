@@ -24,12 +24,12 @@ public class PrestorageOrderSupplyLogs {
     @ApiModelProperty(value="预存订单提货id")
     @JsonProperty("prestorage_order_supply_id")
     private String prestorageOrderSupplyId="";
-    @ApiModelProperty(value="条形码")
+    @ApiModelProperty(value="sku_code")
     @JsonProperty("sku_code")
     private String skuCode="";
-    @ApiModelProperty(value="skp_code")
-    @JsonProperty("skp_code")
-    private String skpCode="";
+    @ApiModelProperty(value="spu_code")
+    @JsonProperty("spu_code")
+    private String spuCode="";
     @ApiModelProperty(value="条形码")
     @JsonProperty("bar_code")
     private String barCode="";

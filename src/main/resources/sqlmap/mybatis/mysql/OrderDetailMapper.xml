@@ -1,161 +1,168 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aiqin.mgs.order.api.dao.OrderDetailDao">
-<resultMap id="OrderInfoDetailMapping" type="com.aiqin.mgs.order.api.domain.OrderDetailInfo">
-<result column="order_id" jdbcType="VARCHAR" property="orderId"/>
-<result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
-<result column="member_id" jdbcType="VARCHAR" property="memberId"/>
-<result column="member_name" jdbcType="VARCHAR" property="memberName"/>
-<result column="member_phone" jdbcType="VARCHAR" property="memberPhone"/>
-<result column="order_detail_id" jdbcType="VARCHAR" property="orderDetailId"/>
-<result column="product_id" jdbcType="VARCHAR" property="productId"/>
-<result column="product_code" jdbcType="VARCHAR" property="productCode"/>
-<result column="product_name" jdbcType="VARCHAR" property="productName"/>
-<result column="list_name" jdbcType="VARCHAR" property="listName"/>
-<result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
-<result column="spu_code" jdbcType="VARCHAR" property="spuCode"/>
-<result column="bar_code" jdbcType="VARCHAR" property="barCode"/>
-<result column="spec" jdbcType="VARCHAR" property="spec"/>
-<result column="unit" jdbcType="VARCHAR" property="unit"/>
-<result column="retail_price" jdbcType="BIGINT" property="retailPrice"/>
-<result column="actual_price" jdbcType="BIGINT" property="actualPrice"/>
-<result column="amount" jdbcType="INTEGER" property="amount"/>
-<result column="product_status" jdbcType="TINYINT" property="productStatus"/>
-<result column="logo" jdbcType="VARCHAR" property="logo"/>
-<result column="type_id" jdbcType="VARCHAR" property="typeId"/>
-<result column="type_name" jdbcType="VARCHAR" property="typeName"/>
-<result column="gift_status" jdbcType="TINYINT" property="giftStatus"/>
-<result column="return_status" jdbcType="TINYINT" property="returnStatus"/>
-<result column="return_amount" jdbcType="INTEGER" property="returnAmount"/>
-<result column="activity_id" jdbcType="VARCHAR" property="activityId"/>
-<result column="activity_name" jdbcType="VARCHAR" property="activityName"/>
-<result column="coupon_discount" jdbcType="BIGINT" property="couponDiscount"/>
-<result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
-<result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
-<result column="create_by" jdbcType="VARCHAR" property="createBy"/>
-<result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
-<result column="receive_type" jdbcType="VARCHAR" property="receiveType"/>
-</resultMap>
+    <resultMap id="OrderInfoDetailMapping" type="com.aiqin.mgs.order.api.domain.OrderDetailInfo">
+        <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+        <result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
+        <result column="member_id" jdbcType="VARCHAR" property="memberId"/>
+        <result column="member_name" jdbcType="VARCHAR" property="memberName"/>
+        <result column="member_phone" jdbcType="VARCHAR" property="memberPhone"/>
+        <result column="order_detail_id" jdbcType="VARCHAR" property="orderDetailId"/>
+        <result column="product_id" jdbcType="VARCHAR" property="productId"/>
+        <result column="product_code" jdbcType="VARCHAR" property="productCode"/>
+        <result column="product_name" jdbcType="VARCHAR" property="productName"/>
+        <result column="list_name" jdbcType="VARCHAR" property="listName"/>
+        <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
+        <result column="spu_code" jdbcType="VARCHAR" property="spuCode"/>
+        <result column="bar_code" jdbcType="VARCHAR" property="barCode"/>
+        <result column="spec" jdbcType="VARCHAR" property="spec"/>
+        <result column="unit" jdbcType="VARCHAR" property="unit"/>
+        <result column="retail_price" jdbcType="BIGINT" property="retailPrice"/>
+        <result column="actual_price" jdbcType="BIGINT" property="actualPrice"/>
+        <result column="cost_price" jdbcType="BIGINT" property="costPrice"/>
+        <result column="amount" jdbcType="INTEGER" property="amount"/>
+        <result column="product_status" jdbcType="TINYINT" property="productStatus"/>
+        <result column="logo" jdbcType="VARCHAR" property="logo"/>
+        <result column="type_id" jdbcType="VARCHAR" property="typeId"/>
+        <result column="type_name" jdbcType="VARCHAR" property="typeName"/>
+        <result column="gift_status" jdbcType="TINYINT" property="giftStatus"/>
+        <result column="return_status" jdbcType="TINYINT" property="returnStatus"/>
+        <result column="return_amount" jdbcType="INTEGER" property="returnAmount"/>
+        <result column="activity_id" jdbcType="VARCHAR" property="activityId"/>
+        <result column="activity_name" jdbcType="VARCHAR" property="activityName"/>
+        <result column="coupon_discount" jdbcType="BIGINT" property="couponDiscount"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="receive_type" jdbcType="VARCHAR" property="receiveType"/>
+    </resultMap>
 
-<resultMap id="ProductsMapping" type="com.aiqin.mgs.order.api.domain.response.OrderProductsResponse">
-<result column="order_id" jdbcType="VARCHAR" property="orderId"/>
-<result column="order_detail_id" jdbcType="VARCHAR" property="orderDetailId"/>
-<result column="product_id" jdbcType="VARCHAR" property="productId"/>
-<result column="product_code" jdbcType="VARCHAR" property="productCode"/>
-<result column="product_name" jdbcType="VARCHAR" property="productName"/>
-<result column="list_name" jdbcType="VARCHAR" property="listName"/>
-<result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
-<result column="spu_code" jdbcType="VARCHAR" property="spuCode"/>
-<result column="bar_code" jdbcType="VARCHAR" property="barCode"/>
-<result column="spec" jdbcType="VARCHAR" property="spec"/>
-<result column="unit" jdbcType="VARCHAR" property="unit"/>
-<result column="retail_price" jdbcType="BIGINT" property="retailPrice"/>
-<result column="actual_price" jdbcType="BIGINT" property="actualPrice"/>
-<result column="amount" jdbcType="INTEGER" property="amount"/>
-<result column="product_status" jdbcType="TINYINT" property="productStatus"/>
-<result column="logo" jdbcType="VARCHAR" property="logo"/>
-<result column="type_id" jdbcType="VARCHAR" property="typeId"/>
-<result column="type_name" jdbcType="VARCHAR" property="typeName"/>
-<result column="gift_status" jdbcType="TINYINT" property="giftStatus"/>
-<result column="activity_id" jdbcType="VARCHAR" property="activityId"/>
-<result column="activity_name" jdbcType="VARCHAR" property="activityName"/>
-<result column="coupon_discount" jdbcType="BIGINT" property="couponDiscount"/>
-</resultMap>
+    <resultMap id="ProductsMapping" type="com.aiqin.mgs.order.api.domain.response.OrderProductsResponse">
+        <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+        <result column="order_detail_id" jdbcType="VARCHAR" property="orderDetailId"/>
+        <result column="product_id" jdbcType="VARCHAR" property="productId"/>
+        <result column="product_code" jdbcType="VARCHAR" property="productCode"/>
+        <result column="product_name" jdbcType="VARCHAR" property="productName"/>
+        <result column="list_name" jdbcType="VARCHAR" property="listName"/>
+        <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
+        <result column="spu_code" jdbcType="VARCHAR" property="spuCode"/>
+        <result column="bar_code" jdbcType="VARCHAR" property="barCode"/>
+        <result column="spec" jdbcType="VARCHAR" property="spec"/>
+        <result column="unit" jdbcType="VARCHAR" property="unit"/>
+        <result column="retail_price" jdbcType="BIGINT" property="retailPrice"/>
+        <result column="actual_price" jdbcType="BIGINT" property="actualPrice"/>
+        <result column="amount" jdbcType="INTEGER" property="amount"/>
+        <result column="product_status" jdbcType="TINYINT" property="productStatus"/>
+        <result column="logo" jdbcType="VARCHAR" property="logo"/>
+        <result column="type_id" jdbcType="VARCHAR" property="typeId"/>
+        <result column="type_name" jdbcType="VARCHAR" property="typeName"/>
+        <result column="gift_status" jdbcType="TINYINT" property="giftStatus"/>
+        <result column="activity_id" jdbcType="VARCHAR" property="activityId"/>
+        <result column="activity_name" jdbcType="VARCHAR" property="activityName"/>
+        <result column="coupon_discount" jdbcType="BIGINT" property="couponDiscount"/>
+    </resultMap>
 
-<resultMap id="DetailByMemberResponseMapping" type="com.aiqin.mgs.order.api.domain.response.OrderDetailByMemberResponse">
-<result column="member_id" jdbcType="VARCHAR" property="memberId"/>
-<result column="member_name" jdbcType="VARCHAR" property="memberName"/>
-<result column="member_phone" jdbcType="VARCHAR" property="memberPhone"/>
-<result column="product_id" jdbcType="VARCHAR" property="productId"/>
-<result column="product_code" jdbcType="VARCHAR" property="productCode"/>
-<result column="product_name" jdbcType="VARCHAR" property="productName"/>
-<result column="spec" jdbcType="VARCHAR" property="spec"/>
-<result column="origin_type" jdbcType="TINYINT" property="originType"/>
-<result column="distributor_id" jdbcType="VARCHAR" property="distributorId"/>
-<result column="distributor_code" jdbcType="VARCHAR" property="distributorCode"/>
-<result column="distributor_name" jdbcType="VARCHAR" property="distributorName"/>
-<result column="receive_type" jdbcType="TINYINT" property="receiveType"/>
-<result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
-<result column="amount" jdbcType="INTEGER" property="amount"/>
-</resultMap>
+    <resultMap id="DetailByMemberResponseMapping"
+               type="com.aiqin.mgs.order.api.domain.response.OrderDetailByMemberResponse">
+        <result column="member_id" jdbcType="VARCHAR" property="memberId"/>
+        <result column="member_name" jdbcType="VARCHAR" property="memberName"/>
+        <result column="member_phone" jdbcType="VARCHAR" property="memberPhone"/>
+        <result column="product_id" jdbcType="VARCHAR" property="productId"/>
+        <result column="product_code" jdbcType="VARCHAR" property="productCode"/>
+        <result column="product_name" jdbcType="VARCHAR" property="productName"/>
+        <result column="spec" jdbcType="VARCHAR" property="spec"/>
+        <result column="origin_type" jdbcType="TINYINT" property="originType"/>
+        <result column="distributor_id" jdbcType="VARCHAR" property="distributorId"/>
+        <result column="distributor_code" jdbcType="VARCHAR" property="distributorCode"/>
+        <result column="distributor_name" jdbcType="VARCHAR" property="distributorName"/>
+        <result column="receive_type" jdbcType="TINYINT" property="receiveType"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="amount" jdbcType="INTEGER" property="amount"/>
+    </resultMap>
 
-<resultMap id="ProdisorMapping" type="com.aiqin.mgs.order.api.domain.response.ProdisorResponse">
-<result column="code" jdbcType="VARCHAR" property="code"/>
-<result column="amount" jdbcType="INTEGER" property="amount"/>
-</resultMap>
+    <resultMap id="ProdisorMapping" type="com.aiqin.mgs.order.api.domain.response.ProdisorResponse">
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="amount" jdbcType="INTEGER" property="amount"/>
+    </resultMap>
 
-<resultMap id="SkuSaleMapping" type="com.aiqin.mgs.order.api.domain.response.SkuSaleResponse">
-<result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
-<result column="sale_volume" jdbcType="INTEGER" property="saleVolume"/>
-</resultMap>
+    <resultMap id="SkuSaleMapping" type="com.aiqin.mgs.order.api.domain.response.SkuSaleResponse">
+        <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
+        <result column="sale_volume" jdbcType="INTEGER" property="saleVolume"/>
+    </resultMap>
 
-<resultMap id="IdAndAmountMapping" type="com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest">
-<result column="id" jdbcType="VARCHAR" property="id"/>
-<result column="amount" jdbcType="INTEGER" property="amount"/>
-</resultMap>
+    <resultMap id="IdAndAmountMapping" type="com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest">
+        <result column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="amount" jdbcType="INTEGER" property="amount"/>
+    </resultMap>
 
 
-    
     <!-- 插入订单明细表 -->
-    <insert id="addDetailList" >
-        insert into order_detail
+    <insert id="addDetailList">
+        insert into order_consumer_detail
         (order_id,order_code,order_detail_id,product_id,product_code,product_name,list_name,sku_code,spu_code,bar_code,spec,unit,retail_price,actual_price,amount,product_status,logo,type_id,type_name,
         <if test="giftStatus!=null">
-        gift_status,
+            gift_status,
         </if>
         <if test="returnStatus!=null">
-        return_status,
+            return_status,
         </if>
         <if test="returnAmount!=null">
-        return_amount,
+            return_amount,
         </if>
         activity_id,activity_name,
         <if test="couponDiscount!=null">
-        coupon_discount,
+            coupon_discount,
+        </if>
+        <if test="costPrice!=null">
+            cost_price,
         </if>
         create_time,update_time,create_by,update_by)
         values
         (#{orderId},#{orderCode},#{orderDetailId},#{productId},#{productCode},#{productName},#{listName},#{skuCode},#{spuCode},#{barCode},#{spec},#{unit},#{retailPrice},#{actualPrice},#{amount},#{productStatus},#{logo},#{typeId},#{typeName},
         <if test="giftStatus!=null">
-        #{giftStatus},
+            #{giftStatus},
         </if>
         <if test="returnStatus!=null">
-        #{returnStatus},
+            #{returnStatus},
         </if>
         <if test="returnAmount!=null">
-        #{returnAmount},
+            #{returnAmount},
         </if>
         #{activityId},#{activityName},
         <if test="couponDiscount!=null">
-        #{couponDiscount},
+            #{couponDiscount},
+        </if>
+        <if test="costPrice!=null">
+            #{costPrice},
         </if>
         CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy})
     </insert>
-    
+
     <!-- 修改订单明细退货数据-->
-    <update id="returnStatus" >
-		update order_detail set return_status=#{returnStatus},return_amount=#{returnAmount},
+    <update id="returnStatus">
+		update order_consumer_detail set return_status=#{returnStatus},return_amount=#{returnAmount},
 		update_by=#{updateBy},update_time=CURRENT_TIMESTAMP
 		where order_detail_id = #{orderDetailId}
 	</update>
-    
-    
-    <!-- 订单明细查询byOrderId 未用到分页-->
-    <select id="selectDetailById"  resultMap="OrderInfoDetailMapping" resultType="java.util.List">
-   
-         SELECT a.* FROM order_detail a where 1=1
 
-         <if test="orderId!=null">
-		 and a.order_id =#{orderId}
-		 </if>
-		 ORDER BY a.create_time DESC
+
+    <!-- 订单明细查询byOrderId 未用到分页-->
+    <select id="selectDetailById" resultMap="OrderInfoDetailMapping" resultType="java.util.List">
+
+        SELECT a.* FROM order_consumer_detail a where 1=1
+
+        <if test="orderId!=null">
+            and a.order_id =#{orderId}
+        </if>
+        ORDER BY a.create_time DESC
     </select>
-    
+
     <!-- 查询会员下的所有订单ID下的商品集合... -->
     <!--<select id="selectproductbyorders"  resultMap="ProductsMapping" resultType="java.util.List">
     
-         SELECT a.* FROM order_detail a
-         L-E-F-T JOIN order_info b ON a.order_id = b.order_id
+         SELECT a.* FROM order_consumer_detail a
+         L-E-F-T JOIN order_consumer_info b ON a.order_id = b.order_id
          where 1=1 and order_type = 1
          <if test="memberId!= null and memberId!='' " >
 		     and b.member_id =#{memberId}
@@ -172,231 +179,234 @@
      -->
 
     <!-- 模糊查询订单明细 -->
-    <select id="selectorderDetail"  resultMap="OrderInfoDetailMapping" resultType="java.util.List">
-         SELECT a.* FROM order_detail a where 1=1
-          <if test="orderIdList != null" >
-		  and a.order_id in (
-		  <foreach collection="orderIdList" item="order_id" separator=",">
-			 '${order_id}'
-		  </foreach>
-			)
-          </if>
-          <if test="sukList != null" >
-		     and a.sku_code in (
-		  <foreach collection="sukList" item="sku_code" separator=",">
-			 '${sku_code}'
-		  </foreach>
-			)
-          </if>
-		 <if test="activityId!=null and activityId!='' ">
-		 and a.activity_id =#{activityId}
-		 </if>
-		 <if test="activityIdList != null" >
-		     and a.activity_id in (
-		  <foreach collection="activityIdList" item="activity_id" separator=",">
-			 '${activity_id}'
-		  </foreach>
-			)
-          </if>
-          ORDER BY a.create_time DESC
-		 <if test="icount!=null ">
-         limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
-         </if>
+    <select id="selectorderDetail" resultMap="OrderInfoDetailMapping" resultType="java.util.List">
+        SELECT a.* FROM order_consumer_detail a where 1=1
+        <if test="orderIdList != null">
+            and a.order_id in (
+            <foreach collection="orderIdList" item="order_id" separator=",">
+                '${order_id}'
+            </foreach>
+            )
+        </if>
+        <if test="sukList != null">
+            and a.sku_code in (
+            <foreach collection="sukList" item="sku_code" separator=",">
+                '${sku_code}'
+            </foreach>
+            )
+        </if>
+        <if test="activityId!=null and activityId!='' ">
+            and a.activity_id =#{activityId}
+        </if>
+        <if test="activityIdList != null">
+            and a.activity_id in (
+            <foreach collection="activityIdList" item="activity_id" separator=",">
+                '${activity_id}'
+            </foreach>
+            )
+        </if>
+        ORDER BY a.create_time DESC
+        <if test="icount!=null ">
+            limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+        </if>
     </select>
-    
 
 
     <!-- 查询订单明细部分汇总-（支持活动ID汇总、）-->
-    <select id="selectorderdetailsum"  resultMap="OrderInfoDetailMapping" >
-    SELECT IFNULL(SUM(IFNULL(a.actual_price,0)*IFNULL(a.amount,0)),0) AS actual_price,COUNT(a.order_id) AS amount FROM order_detail a,order_info b 
-	WHERE 1=1
-	AND a.order_id = b.order_id
-	AND b.order_status NOT IN ('0','4')
-	<if test="activityId!=null and activityId!=''">
-	AND a.activity_id =#{activityId}
-	</if>
+    <select id="selectorderdetailsum" resultMap="OrderInfoDetailMapping">
+        SELECT IFNULL(SUM(IFNULL(a.actual_price,0)*IFNULL(a.amount,0)),0) AS actual_price,COUNT(a.order_id) AS amount
+        FROM order_consumer_detail a,order_consumer_info b
+        WHERE 1=1
+        AND a.order_id = b.order_id
+        AND b.order_status NOT IN ('0','4')
+        <if test="activityId!=null and activityId!=''">
+            AND a.activity_id =#{activityId}
+        </if>
     </select>
-    
-    
+
+
     <!--商品概览门店sku月销量、月销售额 不包含 未付款的和取消的-->
     <!-- <select id="productOverviewByMonth"  resultMap="OrderInfoDetailMapping" >
-	SELECT SUM(a.amount) AS amount,SUM(a.actual_price) AS actual_price FROM order_detail a
-    LEFT JOIN order_info b ON a.order_id = b.order_id
+	SELECT SUM(a.amount) AS amount,SUM(a.actual_price) AS actual_price FROM order_consumer_detail a
+    LEFT JOIN order_consumer_info b ON a.order_id = b.order_id
     WHERE 1=1 and order_type = 1 
     and b.order_status NOT IN ('0','4')
     and b.pay_status='1'
     and DATE_FORMAT(a.create_time,"%Y") =#{year}
     and DATE_FORMAT(a.create_time,"%m") =#{month}
     and b.distributor_id =#{distributorId}
-    </select> -->  
-    
-    
+    </select> -->
+
+
     <!--商品概览 sku产品销量、销售额-前10名 不包含取消、未付款的订单-->
-    <select id="productOverviewByOrderTop"  resultMap="OrderInfoDetailMapping" resultType="java.util.List">
-    SELECT any_value(product_id),any_value(product_name) as product_name,SUM(IFNULL(a.amount,0)) AS amount,SUM(IFNULL(a.actual_price,0)) AS actual_price FROM order_detail a
-    LEFT JOIN order_info b ON a.order_id = b.order_id
-    WHERE 1=1 and order_type = 1
-    <if test="distributorId !=null and distributorId !='' ">
-    and b.distributor_id =#{distributorId}
-    </if>
-    and b.order_status NOT IN ('0','4')
-    and b.pay_status='1'
-    <if test="dayBegin!=null ">
-    and a.create_time &gt;=#{dayBegin}
-    </if>
-    <if test="dayEnd!=null ">
-    and a.create_time &lt;=#{dayEnd}
-    </if>
-    GROUP BY product_id,product_name
-    ORDER BY SUM(a.amount) DESC 
-    LIMIT 0,10
-    </select> 
-    
+    <select id="productOverviewByOrderTop" resultMap="OrderInfoDetailMapping" resultType="java.util.List">
+        SELECT any_value(product_id),any_value(product_name) as product_name,SUM(IFNULL(a.amount,0)) AS
+        amount,SUM(IFNULL(a.actual_price,0)) AS actual_price FROM order_consumer_detail a
+        LEFT JOIN order_consumer_info b ON a.order_id = b.order_id
+        WHERE 1=1 and order_type = 1
+        <if test="distributorId !=null and distributorId !='' ">
+            and b.distributor_id =#{distributorId}
+        </if>
+        and b.order_status NOT IN ('0','4')
+        and b.pay_status='1'
+        <if test="dayBegin!=null ">
+            and a.create_time &gt;=#{dayBegin}
+        </if>
+        <if test="dayEnd!=null ">
+            and a.create_time &lt;=#{dayEnd}
+        </if>
+        GROUP BY product_id,product_name
+        ORDER BY SUM(a.amount) DESC
+        LIMIT 0,10
+    </select>
+
     <!--商品概览sku产品销量、销售额-后10名 不包含取消、未付款的订单-->
-    <select id="productOverviewByOrderLast"  resultMap="OrderInfoDetailMapping" resultType="java.util.List">
-    SELECT product_id,product_name,SUM(IFNULL(a.amount,0)) AS amount,SUM(IFNULL(a.actual_price,0)) AS actual_price FROM order_detail a
-    LEFT JOIN order_info b ON a.order_id = b.order_id
-    WHERE 1=1 and order_type = 1
-    <if test="distributorId !=null and distributorId !='' ">
-    and b.distributor_id =#{distributorId}
-    </if>
-    and b.order_status NOT IN ('0','4')
-    and b.pay_status='1'
-    <if test="dayBegin!=null ">
-    and a.create_time &gt;=#{dayBegin}
-    </if>
-    <if test="dayEnd!=null ">
-    and a.create_time &lt;=#{dayEnd}
-    </if>
-    GROUP BY product_id,product_name
-    ORDER BY SUM(a.amount) 
-    LIMIT 0,10
-    </select> 
-    
+    <select id="productOverviewByOrderLast" resultMap="OrderInfoDetailMapping" resultType="java.util.List">
+        SELECT product_id,product_name,SUM(IFNULL(a.amount,0)) AS amount,SUM(IFNULL(a.actual_price,0)) AS actual_price
+        FROM order_consumer_detail a
+        LEFT JOIN order_consumer_info b ON a.order_id = b.order_id
+        WHERE 1=1 and order_type = 1
+        <if test="distributorId !=null and distributorId !='' ">
+            and b.distributor_id =#{distributorId}
+        </if>
+        and b.order_status NOT IN ('0','4')
+        and b.pay_status='1'
+        <if test="dayBegin!=null ">
+            and a.create_time &gt;=#{dayBegin}
+        </if>
+        <if test="dayEnd!=null ">
+            and a.create_time &lt;=#{dayEnd}
+        </if>
+        GROUP BY product_id,product_name
+        ORDER BY SUM(a.amount)
+        LIMIT 0,10
+    </select>
+
     <!--接口-会员管理-会员消费记录-->
-    <select id="byMemberOrder"  resultMap="DetailByMemberResponseMapping" resultType="java.util.List">
-		SELECT 
-		      b.member_id,b.member_name,b.member_phone,a.product_id,a.product_code,a.product_name,
-		      a.spec,b.origin_type,b.distributor_id,b.distributor_code,b.distributor_name,
-		      b.receive_type,b.create_time,a.amount,ROUND(a.actual_price*a.amount) AS price 
-		  FROM  
-		      order_detail a
-        LEFT JOIN order_info b ON a.order_id=b.order_id
+    <select id="byMemberOrder" resultMap="DetailByMemberResponseMapping" resultType="java.util.List">
+        SELECT
+        b.member_id,b.member_name,b.member_phone,a.product_id,a.product_code,a.product_name,
+        a.spec,b.origin_type,b.distributor_id,b.distributor_code,b.distributor_name,
+        b.receive_type,b.create_time,a.amount,ROUND(a.actual_price*a.amount) AS price
+        FROM
+        order_consumer_detail a
+        LEFT JOIN order_consumer_info b ON a.order_id=b.order_id
         where 1=1 and order_type = 1
-        <if test="memberidList != null" >
-		     and b.member_id in (
-		<foreach collection="memberidList" item="member_id" separator=",">
-			 '${member_id}'
-		</foreach>
-			)
+        <if test="memberidList != null">
+            and b.member_id in (
+            <foreach collection="memberidList" item="member_id" separator=",">
+                '${member_id}'
+            </foreach>
+            )
         </if>
         <if test="memberName!=null and memberName!='' ">
-		 AND b.member_name like CONCAT(CONCAT('%',#{memberName}),'%')    
-		 </if>
-		 <if test="memberPhone!=null and memberPhone!='' ">
-		 and b.member_phone like CONCAT(CONCAT('%',#{memberPhone}),'%')
-		 </if>
-		 <if test="distributorId!=null and distributorId!=''">
-		 and b.distributor_id = #{distributorId}
-		 </if>
-         <if test="beginDate!=null ">
-         and create_time &gt;= #{beginDate}
-         </if>
-         <if test="endDate!=null ">
-         and create_time &lt;= #{endDate}
-         </if>
-         ORDER BY a.create_time DESC
+            AND b.member_name like CONCAT(CONCAT('%',#{memberName}),'%')
+        </if>
+        <if test="memberPhone!=null and memberPhone!='' ">
+            and b.member_phone like CONCAT(CONCAT('%',#{memberPhone}),'%')
+        </if>
+        <if test="distributorId!=null and distributorId!=''">
+            and b.distributor_id = #{distributorId}
+        </if>
+        <if test="beginDate!=null ">
+            and create_time &gt;= #{beginDate}
+        </if>
+        <if test="endDate!=null ">
+            and create_time &lt;= #{endDate}
+        </if>
+        ORDER BY a.create_time DESC
         <if test="icount!=null ">
-         limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
-         </if>
-    </select>     
-    
+            limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+        </if>
+    </select>
+
     <!--接口-统计商品在各个渠道的订单数.-->
-    <select id="prodisor"  resultMap="ProdisorMapping" resultType="java.util.List">
-		SELECT a.sku_code AS CODE,SUM(amount) AS amount FROM order_detail a
-        LEFT JOIN order_info b ON a.order_id = b.order_id 
-         WHERE 1=1 and order_type = 1
-         <if test="sukList != null" >
-		     and a.sku_code in (
-		 <foreach collection="sukList" item="sku_code" separator=",">
-			 '${sku_code}'
-		 </foreach>
-			)
-         </if>
-         <if test="originTypeList != null" >
-		     and b.origin_type in (
-		  <foreach collection="originTypeList" item="origin_type" separator=",">
-			 '${origin_type}'
-		  </foreach>
-			)
-          </if>
-           AND b.order_status NOT IN (0,4)
-      GROUP BY a.sku_code
-    </select> 
-    
-    
+    <select id="prodisor" resultMap="ProdisorMapping" resultType="java.util.List">
+        SELECT a.sku_code AS CODE,SUM(amount) AS amount FROM order_consumer_detail a
+        LEFT JOIN order_consumer_info b ON a.order_id = b.order_id
+        WHERE 1=1 and order_type = 1
+        <if test="sukList != null">
+            and a.sku_code in (
+            <foreach collection="sukList" item="sku_code" separator=",">
+                '${sku_code}'
+            </foreach>
+            )
+        </if>
+        <if test="originTypeList != null">
+            and b.origin_type in (
+            <foreach collection="originTypeList" item="origin_type" separator=",">
+                '${origin_type}'
+            </foreach>
+            )
+        </if>
+        AND b.order_status NOT IN (0,4)
+        GROUP BY a.sku_code
+    </select>
+
+
     <!--根据明细编码查询明细-->
-    <select id="setail"  resultMap="OrderInfoDetailMapping" >
-         SELECT * FROM order_detail where 1=1
-         <if test="orderDetailId!=null and orderDetailId!='' ">
-		 and order_detail_id =#{orderDetailId}
-		 </if>
-		 ORDER BY create_time DESC
-    </select> 
-    
+    <select id="setail" resultMap="OrderInfoDetailMapping">
+        SELECT * FROM order_consumer_detail where 1=1
+        <if test="orderDetailId!=null and orderDetailId!='' ">
+            and order_detail_id =#{orderDetailId}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
     <!--订单中商品sku数量-->
-    <select id="getSkuSum"  parameterType="com.aiqin.mgs.order.api.domain.OrderDetailQuery" resultType="java.lang.Integer" >
-         SELECT COUNT(order_detail_id) AS acount FROM order_detail WHERE order_id=#{orderId}
-    </select> 
-    
+    <select id="getSkuSum" parameterType="com.aiqin.mgs.order.api.domain.OrderDetailQuery"
+            resultType="java.lang.Integer">
+         SELECT COUNT(order_detail_id) AS acount FROM order_consumer_detail WHERE order_id=#{orderId}
+    </select>
+
     <!-- 删除订单明细数据 -->
-	<delete id="deleteOrderDetailInfo" >
-		delete from order_detail WHERE order_id =#{orderId}
+    <delete id="deleteOrderDetailInfo">
+		delete from order_consumer_detail WHERE order_id =#{orderId}
     </delete>
-    
-    
+
+
     <!--sku销量统计：包含退货、不包含取消、未付款的订单-->
     <select id="getSkuAmount" resultType="java.lang.Integer">
-         SELECT SUM(a.amount) FROM order_detail a 
-         LEFT JOIN  order_info b ON a.order_id = b.order_id
+         SELECT SUM(a.amount) FROM order_consumer_detail a
+         LEFT JOIN  order_consumer_info b ON a.order_id = b.order_id
          WHERE 1=1 and order_type = 1
            AND a.sku_code =#{skuCode} 
            AND b.order_status NOT IN ('0','4')
            AND b.pay_status='1' 
            AND DATE_FORMAT(a.create_time,'%Y-%m-%d')  = #{nextDate}
     </select>
-    
+
     <!--sku金额统计：包含退货、不包含取消、未付款的订单-->
     <select id="getSkuPrice" resultType="java.lang.Integer">
-         SELECT SUM(a.actual_price*a.amount) FROM order_detail a 
-         LEFT JOIN  order_info b ON a.order_id = b.order_id
+         SELECT SUM(a.actual_price*a.amount) FROM order_consumer_detail a
+         LEFT JOIN  order_consumer_info b ON a.order_id = b.order_id
          WHERE 1=1 and order_type = 1
            AND a.sku_code =#{skuCode} 
            AND b.order_status NOT IN ('0','4')
            AND b.pay_status='1' 
            AND DATE_FORMAT(a.create_time,'%Y-%m-%d')  = #{nextDate}
     </select>
-    
-    
+
+
     <!--sku销量统计：订单-->
     <select id="selectSkuSale" resultMap="SkuSaleMapping" resultType="java.util.List">
-         SELECT SUM(a.amount) as sale_volume,sku_code FROM order_detail a 
+         SELECT SUM(a.amount) as sale_volume,sku_code FROM order_consumer_detail a
           WHERE 1=1 GROUP BY sku_code
     </select>
-    
+
     <!--查询订单购买数量-->
     <select id="buyAmount" resultMap="IdAndAmountMapping" resultType="java.util.List">
-         SELECT order_code as id,SUM(a.amount) as amount FROM order_detail a 
-          WHERE 1=1 
-          <if test="orderCode!=null and orderCode!='' ">
-		  and order_code =#{orderCode}
-		  </if>
-          GROUP BY order_code
+        SELECT order_code as id,SUM(a.amount) as amount FROM order_consumer_detail a
+        WHERE 1=1
+        <if test="orderCode!=null and orderCode!='' ">
+            and order_code =#{orderCode}
+        </if>
+        GROUP BY order_code
     </select>
-     <update id="updateOrderDetail">
-         update order_detail
+    <update id="updateOrderDetail">
+         update order_consumer_detail
          set
-         actual_price = retail_price,
+         actual_price = #{actualPrice},
          update_time = now(),
          update_by = #{updateBy,jdbcType=VARCHAR}
          where order_code =#{orderCode}
@@ -404,15 +414,49 @@
 
     <!--顾客可能还想购买-->
     <select id="wantBuy" resultType="java.lang.String">
-         SELECT sku_code FROM `order_detail` WHERE 1=1
-         <if test="sukList != null" >
-		     and sku_code in (
-		 <foreach collection="sukList" item="sku_code" separator=",">
-			 '${sku_code}'
-		 </foreach>
-			)
-         </if>
-         GROUP BY sku_code ORDER BY SUM(amount) DESC LIMIT 2
+        SELECT sku_code FROM `order_consumer_detail` WHERE 1=1
+        <if test="sukList != null">
+            and sku_code in (
+            <foreach collection="sukList" item="sku_code" separator=",">
+                '${sku_code}'
+            </foreach>
+            )
+        </if>
+        GROUP BY sku_code ORDER BY SUM(amount) DESC LIMIT 2
+    </select>
+
+    <select id="findOrderDetailById" resultMap="OrderInfoDetailMapping">
+        select * from order_consumer_detail where  order_detail_id=#{orderDetailId}
+    </select>
+
+    <select id="productStore" parameterType="com.aiqin.mgs.order.api.domain.request.ProductStoreRequest"
+            resultType="com.aiqin.mgs.order.api.domain.response.ProductStoreResponse">
+        SELECT a.sku_code AS CODE,SUM(amount) AS amount,SUM(amount)/30 productSalability
+        FROM order_detail a
+        LEFT JOIN order_info b ON a.order_id = b.order_id
+        WHERE 1=1 and order_type = 1
+        <if test="skuList != null" >
+            and a.sku_code in
+            <foreach collection="skuList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="originTypeList != null" >
+            and b.origin_type in
+            <foreach collection="originTypeList" separator="," open="(" close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        AND b.order_status NOT IN (0,4)
+        GROUP BY a.sku_code
+        order by productSalability
+        <if test="ascOrDesc != null and ascOrDesc == 'desc'">
+            desc
+        </if>
+        <if test="ascOrDesc != null and ascOrDesc == 'asc'">
+            asc
+        </if>
+        limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
     </select>
 </mapper>
 

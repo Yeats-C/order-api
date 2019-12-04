@@ -21,24 +21,24 @@
     <if test="surplusAmount!=null">
         surplus_amount,
     </if>
-    create_time
+    create_time)
     values
     (#{prestorageOrderSupplyDetailId},#{prestorageOrderSupplyId},
     <if test="skuCode!=null">
         #{skuCode},
     </if>
     <if test="spuCode!=null">
-        spuCode,
+        #{spuCode},
     </if>
     <if test="barCode!=null">
         #{barCode},
     </if>
     <if test="supplyAmount!=null">
-        supplyAmount,
+        #{supplyAmount},
     </if>
     <if test="surplusAmount!=null">
-        surplusAmount,
+        #{surplusAmount},
     </if>
-    CURRENT_TIMESTAMP
+    CURRENT_TIMESTAMP)
 </insert>
 </mapper>

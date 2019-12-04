@@ -13,11 +13,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
-import com.aiqin.mgs.order.api.domain.request.DetailCouponRequest;
-import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
-import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
-import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
-import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
+import com.aiqin.mgs.order.api.domain.request.*;
 import com.aiqin.mgs.order.api.domain.response.LatelyResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
 import com.aiqin.mgs.order.api.domain.response.PartnerPayGateRep;
@@ -28,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -70,11 +67,15 @@ public class OrderController {
         
     	//添加TOC订单标识
         if(orderAndSoOnRequest !=null) {
-            //返回订单信息
+
         	OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
           if(orderInfo !=null) {
-              //TOC订单信息
-        	  orderInfo.setOrderType(Global.ORDER_TYPE_1);
+              if(orderInfo.getOrderType()==4){
+                  orderInfo.setOrderType(Global.ORDER_TYPE_4);
+              }else {
+                  orderInfo.setOrderType(Global.ORDER_TYPE_1);
+              }
+
         	  orderAndSoOnRequest.setOrderInfo(orderInfo);
         	  return orderService.addOrdta(orderAndSoOnRequest);
           }else {
@@ -90,7 +91,8 @@ public class OrderController {
     
     /**
      * 门店新增TOC订单step2-添加结算数据+添加支付数据+添加优惠关系数据+修改订单主数据+修改订单明细数据
-     * @param 
+     * 现金结算，创建订单信息
+     * @param
      * @return
      */
     @PostMapping("/addpamo")
@@ -105,9 +107,7 @@ public class OrderController {
         	OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
           if(orderInfo !=null) {
               //预存订单
-              if (orderInfo.getIsPrestorage()==1){
-                  orderInfo.setOrderType(Global.ORDER_TYPE_4);
-              }else {
+              if (orderInfo.getOrderType()!=4){
                   orderInfo.setOrderType(Global.ORDER_TYPE_1);
               }
         	  orderAndSoOnRequest.setOrderInfo(orderInfo);
@@ -190,7 +190,7 @@ public class OrderController {
         	OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
           if(orderInfo !=null) {
               //判断是不是预存订单
-              if (orderAndSoOnRequest.getOrderInfo().getIsPrestorage()==1){
+              if (orderAndSoOnRequest.getOrderInfo().getOrderType()==4){
                   orderInfo.setOrderType(Global.ORDER_TYPE_4);
               }else {
                   orderInfo.setOrderType(Global.ORDER_TYPE_3);
@@ -410,7 +410,7 @@ public class OrderController {
         
     	
     	LOGGER.info("更改订单状态/支付状态/修改员参数 orderId：{},orderStatus: {},payStatus: {},payType: {},updateBy: {}",orderId,orderStatus,payStatus,payType,updateBy);    	
-        return orderService.updateOrderStatus(orderId,orderStatus,payStatus,updateBy);
+        return orderService.updateOrderStatus(orderId,orderStatus,payStatus,updateBy,payType);
     } 
     
     
@@ -660,6 +660,7 @@ public class OrderController {
     @ApiOperation("支付回调修改订单状态和库存")
     public HttpResponse callback(@RequestBody PartnerPayGateRep payReq) {
         try {
+            LOGGER.info("支付回调修改订单状态和库存: {}",payReq);
             return orderService.callback(payReq);
         } catch (Exception e) {
             e.printStackTrace();
@@ -681,7 +682,15 @@ public class OrderController {
 
         return orderService.selectPrestorageOrderList(orderQuery);
     }
+    @GetMapping("/prestorageOrderDetail")
+    @ApiOperation(value = "查询预存订单详情列表....")
+    public HttpResponse selectPrestorageOrderDetail(@Valid @RequestParam(name = "order_id", required = true) String orderId) {
 
+
+        LOGGER.info("查询预存订单详情列表：{}",orderId);
+
+        return orderService.selectPrestorageOrderDetail(orderId);
+    }
     /**
      * 模糊查询预存订单取货日志列表
      * @param
@@ -726,4 +735,46 @@ public class OrderController {
     	LOGGER.info("最近消费订单 (消费时间/消费金额)参数:memberId: {},distributorId:{}",memberId,distributorId);
     	return orderService.memberLately(memberId,distributorId);
     }
+
+    @PostMapping("/updateRejectPrestoragProduct")
+    @ApiOperation(value = "修改预存商品退货数量....")
+    public HttpResponse updateRejectPrestoragProduct(@Valid @RequestBody PrestorageOrderSupplyDetailVo vo) {
+
+
+        LOGGER.info("修改预存商品退货数量：{}",vo);
+
+        return orderService.updateRejectPrestoragProduct(vo);
+    }
+
+    @PostMapping("/updateRejectPrestoragState")
+    @ApiOperation(value = "修改预存商品状态和订单状态")
+    public HttpResponse updateRejectPrestoragState(@Valid @RequestBody RejectPrestoragStateVo vo) {
+
+
+        LOGGER.info("修改预存商品状态和订单状态：{}",vo);
+
+        return orderService.updateRejectPrestoragState(vo);
+    }
+
+
+    @PostMapping("/getUnPayNum")
+    @ApiOperation(value = "近期未购买的会员数")
+    public HttpResponse getUnPayNum(@Valid  @RequestBody UnPayVo unPayVo) {
+
+
+        LOGGER.info("近期未购买的会员数：{}",unPayVo);
+
+        return orderService.getUnPayNum(unPayVo);
+    }
+    @PostMapping("/getUnPayMemberIdList")
+    @ApiOperation(value = "近期未购买的会员")
+    public HttpResponse getUnPayMemberIdList(@Valid @RequestBody UnPayVo unPayVo) {
+
+
+        LOGGER.info("修改预存商品状态和订单状态：{}",unPayVo);
+
+        return orderService.getUnPayMemberIdList(unPayVo);
+    }
+
+
 }
