@@ -70,4 +70,15 @@ public interface ErpOrderService {
      * @date 2019/11/28 10:01
      */
     void orderSplit(OrderStoreOrderInfo orderStoreOrderInfo);
+
+    /**
+     * 订单发货
+     *
+     * @param orderStoreOrderInfo
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/3 19:35
+     */
+    void orderSend(OrderStoreOrderInfo orderStoreOrderInfo);
 }

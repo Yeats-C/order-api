@@ -1,6 +1,8 @@
 package com.aiqin.mgs.order.api.util;
 
+import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.AuthToken;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -89,5 +91,24 @@ public class AuthUtil {
         auth.setPersonId("系统初始化");
         auth.setPersonName("系统初始化");
         return auth;
+    }
+
+    /**
+     * 登录检查
+     *
+     * @param
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/3 20:02
+     */
+    public static void loginCheck() {
+        AuthToken auth = getCurrentAuth();
+        if (StringUtils.isEmpty(auth.getPersonId())) {
+            throw new BusinessException("请先登录");
+        }
+        if (StringUtils.isEmpty(auth.getPersonName())) {
+            throw new BusinessException("缺失公共参数person_name");
+        }
     }
 }
