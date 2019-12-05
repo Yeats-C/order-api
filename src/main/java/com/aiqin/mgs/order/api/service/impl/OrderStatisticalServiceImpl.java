@@ -91,8 +91,9 @@ public class OrderStatisticalServiceImpl implements OrderStatisticalService {
 
             //当前数据统计
             BusinessStatisticalRequest year = new BusinessStatisticalRequest();
+            DateUtil dateUtil = new DateUtil();
             year.setDistributorId(distributorId);
-            year.setStartDate(DateUtil.getCurrentYearBeginTime());
+            year.setStartDate(dateUtil.getCurrentYearBeginTime());
             year.setEndDate(DateUtil.getCurrentDate());
             year.setGroupByFlag(true);
             CompletableFuture<List<BusinessStatistical>> yearStatistical = CompletableFuture.supplyAsync(() -> {

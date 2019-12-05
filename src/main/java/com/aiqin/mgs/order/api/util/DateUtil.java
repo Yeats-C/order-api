@@ -16,7 +16,7 @@ import java.util.Date;
 
 public class DateUtil {
 
-    private final static SimpleDateFormat shortSdf = new SimpleDateFormat("yyyy-MM-dd");
+    private SimpleDateFormat shortSdf = new SimpleDateFormat("yyyy-MM-dd");
 
     /**
      * 获取当前系统日期 yyyyMMddHHmmss
@@ -375,7 +375,7 @@ public class DateUtil {
      *
      * @return
      */
-    public static Date getCurrentYearBeginTime() {
+    public Date getCurrentYearBeginTime() {
         Calendar c = Calendar.getInstance();
         Date now = null;
         try {
