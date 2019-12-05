@@ -12,6 +12,7 @@ import com.aiqin.mgs.order.api.component.enums.PayStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.PayWayEnum;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSendRequest;
 import com.aiqin.mgs.order.api.service.ErpOrderService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import io.swagger.annotations.Api;
@@ -114,11 +115,11 @@ public class ErpOrderController {
 
     @PostMapping("/orderSend")
     @ApiOperation(value = "订单发货")
-    public HttpResponse orderSend(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
+    public HttpResponse orderSend(@RequestBody ErpOrderSendRequest erpOrderSendRequest) {
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
-            erpOrderService.orderSend(orderStoreOrderInfo);
+            erpOrderService.orderSend(erpOrderSendRequest);
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {

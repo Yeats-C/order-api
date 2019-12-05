@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.service;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSendRequest;
 
 /**
  * erp订单相关
@@ -71,13 +72,13 @@ public interface ErpOrderService {
     /**
      * 订单发货
      *
-     * @param orderStoreOrderInfo
+     * @param erpOrderSendRequest
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/3 19:35
      */
-    void orderSend(OrderStoreOrderInfo orderStoreOrderInfo);
+    void orderSend(ErpOrderSendRequest erpOrderSendRequest);
 
     /**
      * 查询订单物流信息
