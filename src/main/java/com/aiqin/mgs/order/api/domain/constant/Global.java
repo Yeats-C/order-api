@@ -99,7 +99,8 @@ public interface Global {
     Integer P_TYPE_4 = 4;  //到店支付-微信
     Integer P_TYPE_5 = 5;  //到店支付-支付宝
     Integer P_TYPE_6 = 6;  //到店支付-银联
-    
+    Integer P_TYPE_7 = 7;  //到店支付-储值卡支付
+
     
     /**
      * 发货方状态

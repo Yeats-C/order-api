@@ -82,4 +82,5 @@ public interface OrderDetailDao {
     //顾客可能还想购买
     List<String> wantBuy(@Valid @Param("sukList") List<String> sukList) throws Exception;
 
+    OrderDetailInfo findOrderDetailById(@Param("orderDetailId") String orderDetailId);
 }

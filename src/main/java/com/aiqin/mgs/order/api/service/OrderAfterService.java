@@ -25,7 +25,7 @@ public interface OrderAfterService {
 	HttpResponse selectOrderAfter(@Valid OrderAfterSaleQuery orderAfterSaleQuery);
 
 	//TOC-添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表....
-	HttpResponse addAfterOrder(@Valid OrderAfterSaleInfo orderAfterSaleInfo);
+	HttpResponse addAfterOrder(@Valid OrderAfterSaleInfo orderAfterSaleInfo) throws Exception;
 	
 	//服务商品-添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表....
 	HttpResponse addAfterNoCodeOrder(@Valid OrderAfterSaleInfo orderAfterSaleInfo);
