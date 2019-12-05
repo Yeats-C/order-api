@@ -21,7 +21,7 @@ public interface ErpOrderSendingService {
      * @version: v1.0.0
      * @date 2019/11/21 17:48
      */
-    OrderStoreOrderSending getOrderSendingByOrderId(String orderId);
+    OrderStoreOrderSending getOrderSendingBySendingId(String orderId);
 
     /**
      * 保存订单发货信息
