@@ -19,11 +19,11 @@ public class ErpOrderSendingServiceImpl implements ErpOrderSendingService {
 
 
     @Override
-    public OrderStoreOrderSending getOrderSendingByOrderId(String orderId) {
+    public OrderStoreOrderSending getOrderSendingBySendingId(String sendingId) {
         OrderStoreOrderSending orderSending = null;
-        if (StringUtils.isNotEmpty(orderId)) {
+        if (StringUtils.isNotEmpty(sendingId)) {
             OrderStoreOrderSending orderSendingQuery = new OrderStoreOrderSending();
-            orderSendingQuery.setOrderId(orderId);
+            orderSendingQuery.setSendingId(sendingId);
             List<OrderStoreOrderSending> select = orderStoreOrderSendingDao.select(orderSendingQuery);
             if (select != null && select.size() > 0) {
                 orderSending = select.get(0);

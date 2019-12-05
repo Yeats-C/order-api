@@ -12,8 +12,8 @@ import com.aiqin.mgs.order.api.component.enums.PayStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.PayWayEnum;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.ErpOrderSaveRequest;
-import com.aiqin.mgs.order.api.domain.response.ErpOrderDetailResponse;
 import com.aiqin.mgs.order.api.service.ErpOrderService;
+import com.aiqin.mgs.order.api.util.AuthUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -54,10 +54,8 @@ public class ErpOrderController {
     public HttpResponse getOrderDetail(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
         HttpResponse response = HttpResponse.success();
         try {
-//            ErpOrderDetailResponse orderDetail = erpOrderService.getOrderDetail(orderStoreOrderInfo);
-//            response.setData(orderDetail);
-            OrderStoreOrderInfo orderDetail2 = erpOrderService.getOrderDetail2(orderStoreOrderInfo);
-            response.setData(orderDetail2);
+            OrderStoreOrderInfo orderDetail = erpOrderService.getOrderDetail(orderStoreOrderInfo);
+            response.setData(orderDetail);
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {
@@ -72,6 +70,7 @@ public class ErpOrderController {
     public HttpResponse saveDistributionOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
         HttpResponse response = HttpResponse.success();
         try {
+            AuthUtil.loginCheck();
             OrderStoreOrderInfo orderInfo = erpOrderService.saveDistributionOrder(erpOrderSaveRequest);
             response.setData(orderInfo);
         } catch (BusinessException e) {
@@ -88,6 +87,7 @@ public class ErpOrderController {
     public HttpResponse saveRackOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
         HttpResponse response = HttpResponse.success();
         try {
+            AuthUtil.loginCheck();
             OrderStoreOrderInfo orderInfo = erpOrderService.saveRackOrder(erpOrderSaveRequest);
             response.setData(orderInfo);
         } catch (BusinessException e) {
@@ -117,6 +117,7 @@ public class ErpOrderController {
     public HttpResponse orderSend(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
         HttpResponse response = HttpResponse.success();
         try {
+            AuthUtil.loginCheck();
             erpOrderService.orderSend(orderStoreOrderInfo);
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));

@@ -77,6 +77,10 @@ public class OrderStoreOrderInfo {
     private String primaryCode;
     /***物流券*/
     private BigDecimal goodsCoupon;
+    /***订单取消之前的订单状态*/
+    private Integer beforeCancelStatus;
+    /***关联物流单id*/
+    private String sendingId;
 
     /***创建时间*/
     private Date createTime;
