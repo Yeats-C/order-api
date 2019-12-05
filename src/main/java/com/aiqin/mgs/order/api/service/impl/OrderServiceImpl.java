@@ -121,6 +121,8 @@ public class OrderServiceImpl implements OrderService {
     private PrestorageOrderSupplyLogsDao prestorageOrderSupplyLogsDao;
     @Resource
     private PayService payService;
+    @Resource
+    private OrderAfterService orderAfterService;
     //商品项目地址
     @Value("${slcsIp}")
     public String slcsIp;
@@ -382,6 +384,16 @@ public class OrderServiceImpl implements OrderService {
     public HttpResponse getUnPayMemberIdList(UnPayVo unPayVo) {
         List<String> MemberIds=orderDao.getUnPayMemberIdList(unPayVo);
         return HttpResponse.success(MemberIds);
+    }
+
+    @Transactional
+    @Override
+    public HttpResponse batchUpdateRejectPrestoragProduct(PrestoragProductAfter vos) throws Exception {
+        for (PrestorageOrderSupplyDetailVo rejectPrestoragStateVo:vos.getPrestorageOrderSupplyDetailVos()){
+            updateRejectPrestoragProduct(rejectPrestoragStateVo);
+        }
+        vos.getAfterSaleSaveVo().setOrderType(Global.ORDER_TYPE_1);
+        return orderAfterService.addAfterOrder( vos.getAfterSaleSaveVo());
     }
 
     private OrderQuery trans(OrderQuery orderQuery) {

@@ -19,6 +19,8 @@ import com.aiqin.mgs.order.api.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
@@ -119,12 +121,12 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 	
 	//TOC订单-添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表
 	@Override
-	@Transactional
-	public HttpResponse addAfterOrder(@Valid OrderAfterSaleInfo orderAfterSaleInfo) {
+	@Transactional(isolation = Isolation.REPEATABLE_READ, propagation = Propagation.REQUIRED, readOnly = false, rollbackFor = Exception.class)
+	public HttpResponse addAfterOrder(@Valid OrderAfterSaleInfo orderAfterSaleInfo) throws Exception {
 		
 		String afterSaleId = "";
 		String afterSaleCode = "";
-		try {
+
 			//生成订单售后ID
 			afterSaleId = OrderPublic.getUUID();
 			orderAfterSaleInfo.setAfterSaleId(afterSaleId);
@@ -200,29 +202,12 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 			//返回售后编号
 			String after_sale_code = afterSaleId;
 
-
-
-
-
-
-
-
 			//调用支付中心退款
 			toRefund(orderAfterSaleInfo);
 
-
-
-
-
-
-
-
 			return HttpResponse.success(after_sale_code);
 		
-		} catch (Exception e) {
-			LOGGER.error("添加新的订单售后数据报错 {}", e);
-			return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
-		}
+
 	}
 
 	private void toRefund(OrderAfterSaleInfo orderAfterSaleInfo) {

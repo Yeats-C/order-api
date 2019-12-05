@@ -199,4 +199,10 @@ public interface OrderService {
 	HttpResponse getUnPayNum(UnPayVo unPayVo);
 
 	HttpResponse getUnPayMemberIdList(UnPayVo unPayVo);
+	/**
+	 * 批量修改预存商品订单
+	 * @param vo
+	 * @return
+	 */
+    HttpResponse batchUpdateRejectPrestoragProduct(PrestoragProductAfter vos) throws Exception;
 }

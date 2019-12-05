@@ -757,6 +757,15 @@ public class OrderController {
         return orderService.updateRejectPrestoragState(vo);
     }
 
+    @PostMapping("/batchUpdateRejectPrestoragProduct")
+    @ApiOperation(value = "批量修改预存商品")
+    public HttpResponse batchUpdateRejectPrestoragProduct(@Valid @RequestBody PrestoragProductAfter vos) throws Exception {
+
+
+        LOGGER.info("修改预存商品状态和订单状态：{}",vos);
+
+        return orderService.batchUpdateRejectPrestoragProduct(vos);
+    }
 
     @PostMapping("/getUnPayNum")
     @ApiOperation(value = "近期未购买的会员数")
