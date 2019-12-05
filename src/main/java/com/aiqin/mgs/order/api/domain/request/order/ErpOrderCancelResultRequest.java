@@ -1,4 +1,4 @@
-package com.aiqin.mgs.order.api.domain.request;
+package com.aiqin.mgs.order.api.domain.request.order;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

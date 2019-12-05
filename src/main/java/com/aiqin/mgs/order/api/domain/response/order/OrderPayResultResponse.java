@@ -1,4 +1,4 @@
-package com.aiqin.mgs.order.api.domain.response;
+package com.aiqin.mgs.order.api.domain.response.order;
 
 import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.PayStatusEnum;

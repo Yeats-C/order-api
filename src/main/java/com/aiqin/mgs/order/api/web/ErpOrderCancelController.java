@@ -6,7 +6,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo;
-import com.aiqin.mgs.order.api.domain.request.ErpOrderCancelResultRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCancelResultRequest;
 import com.aiqin.mgs.order.api.service.ErpOrderCancelService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import io.swagger.annotations.Api;

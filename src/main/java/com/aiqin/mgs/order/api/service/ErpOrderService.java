@@ -2,7 +2,7 @@ package com.aiqin.mgs.order.api.service;
 
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo;
-import com.aiqin.mgs.order.api.domain.request.ErpOrderSaveRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
 
 /**
  * erp订单相关
