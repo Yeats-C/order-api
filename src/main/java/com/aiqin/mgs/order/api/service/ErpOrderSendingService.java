@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.service;
 
+import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderSending;
 
 /**
@@ -20,16 +21,29 @@ public interface ErpOrderSendingService {
      * @version: v1.0.0
      * @date 2019/11/21 17:48
      */
-    OrderStoreOrderSending getOrderSendingByOrderId(String orderId);
+    OrderStoreOrderSending getOrderSendingBySendingId(String orderId);
 
     /**
      * 保存订单发货信息
      *
-     * @param orderStoreOrderSending
+     * @param orderSending
+     * @param auth
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/11/21 17:49
      */
-    void saveOrderSending(OrderStoreOrderSending orderStoreOrderSending);
+    void saveOrderSending(OrderStoreOrderSending orderSending, AuthToken auth);
+
+    /**
+     * 根据id更新非空字段
+     *
+     * @param orderSending
+     * @param auth
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/4 10:19
+     */
+    void updateOrderSendingSelective(OrderStoreOrderSending orderSending, AuthToken auth);
 }
