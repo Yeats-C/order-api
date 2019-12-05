@@ -132,12 +132,13 @@ public enum OrderStatusEnum {
 
     /**
      * 传对应状态获取状态枚举
+     *
      * @param num
      * @return
      */
-    public static OrderStatusEnum getOrderStatusEnum(Integer num){
+    public static OrderStatusEnum getOrderStatusEnum(Integer num) {
         for (OrderStatusEnum value : OrderStatusEnum.values()) {
-            if (num.equals(value.getStatus())){
+            if (num.equals(value.getStatus())) {
                 return value;
             }
         }
@@ -148,78 +149,39 @@ public enum OrderStatusEnum {
         return serial;
     }
 
-    public void setSerial(Integer serial) {
-        this.serial = serial;
-    }
-
     public Integer getStatus() {
         return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
     }
 
     public String getReceptionDisplay() {
         return receptionDisplay;
     }
 
-    public void setReceptionDisplay(String receptionDisplay) {
-        this.receptionDisplay = receptionDisplay;
-    }
-
     public String getReceptionStatus() {
         return receptionStatus;
-    }
-
-    public void setReceptionStatus(String receptionStatus) {
-        this.receptionStatus = receptionStatus;
     }
 
     public String getBackstageStatus() {
         return backstageStatus;
     }
 
-    public void setBackstageStatus(String backstageStatus) {
-        this.backstageStatus = backstageStatus;
-    }
-
     public String getExplain() {
         return explain;
-    }
-
-    public void setExplain(String explain) {
-        this.explain = explain;
     }
 
     public String getStandardDescription() {
         return standardDescription;
     }
 
-    public void setStandardDescription(String standardDescription) {
-        this.standardDescription = standardDescription;
-    }
-
     public String getDisplayedIs() {
         return displayedIs;
-    }
-
-    public void setDisplayedIs(String displayedIs) {
-        this.displayedIs = displayedIs;
     }
 
     public String getFollowStatus() {
         return followStatus;
     }
 
-    public void setFollowStatus(String followStatus) {
-        this.followStatus = followStatus;
-    }
-
     public Integer getTerminationStatus() {
         return terminationStatus;
     }
-
-    public void setTerminationStatus(Integer terminationStatus) {
-        this.terminationStatus = terminationStatus;
-    }}
+}
