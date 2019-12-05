@@ -271,6 +271,35 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		}
 	}
 
+	//接口--商品概览产品销量、销售额-前5名
+	@Override
+	public HttpResponse productFrontTop10(String distributorId,String beginTime, String endTime, String categoryId) {
+
+		try {
+			//String yearMonth = year+"-"+month+"-"+"01"; //"YYYY-MM"
+
+			return HttpResponse.success(orderDetailDao.productFrontTop10(distributorId,DateUtil.getFristOfMonthDay(DateUtil.formatDate(beginTime)),DateUtil.getLashOfMonthDay(DateUtil.formatDate(endTime)),categoryId));
+		} catch (Exception e) {
+			LOGGER.error("接口--商品概览产品销量、销售额-前5名失败 {}", e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}
+	}
+
+
+	//接口--商品概览产品销量、销售额-后5名
+	@Override
+	public HttpResponse productAfterTop10(String distributorId,String beginTime, String endTime, String categoryId) {
+
+		try {
+		//	String yearMonth = year+"-"+month+"-"+"01"; //"YYYY-MM"
+
+			return HttpResponse.success(orderDetailDao.productAfterTop10(distributorId,DateUtil.getFristOfMonthDay(DateUtil.formatDate(beginTime)),DateUtil.getLashOfMonthDay(DateUtil.formatDate(endTime)),categoryId));
+		} catch (Exception e) {
+			LOGGER.error("接口--商品概览产品销量、销售额-后5名失败 {}", e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}
+	}
+
 
     //接口--会员管理-会员消费记录
     @Override
