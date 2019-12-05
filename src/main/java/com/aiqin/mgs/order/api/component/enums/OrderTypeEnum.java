@@ -21,7 +21,7 @@ public enum OrderTypeEnum {
     /***首单配送*/
     ORDER_TYPE_1(1, "1", "首单配送", ProductTypeEnum.DISTRIBUTION, true, true, true, false),
     /***首单赠送*/
-    ORDER_TYPE_2(2, "2", "首单赠送", ProductTypeEnum.DIRECT_SEND, true, true, false, false),
+    ORDER_TYPE_2(2, "2", "首单赠送", ProductTypeEnum.DISTRIBUTION, true, true, false, false),
     /***首单货架*/
     ORDER_TYPE_3(3, "3", "首单货架", ProductTypeEnum.STORAGE_RACK, true, false, false, false),
     /***货架补货*/

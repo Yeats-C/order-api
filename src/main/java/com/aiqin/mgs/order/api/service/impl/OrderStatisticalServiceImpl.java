@@ -296,7 +296,8 @@ public class OrderStatisticalServiceImpl implements OrderStatisticalService {
         for (String item : list) {
             String curKey = key + ":" + item;
             Map<String, Object> cur = redisTemplate.opsForHash().entries(curKey);
-            if (Objects.isNull(cur)) {
+            boolean isNull = Objects.isNull(cur);
+            if (isNull) {
                 continue;
             }
             SoldOutOfStockProduct curItem = new SoldOutOfStockProduct();

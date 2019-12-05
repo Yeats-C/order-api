@@ -7,11 +7,13 @@
         select id as id,
         order_id as orderId,
         sending_id as sendingId,
+        logistic_centre_code as logisticCentreCode,
         logistic_centre_name as logisticCentreName,
-        logistic_id as logisticId,
+        logistic_code as logisticCode,
         logistic_fee as logisticFee,
         logistic_status as logisticStatus,
-        send_store as sendStore,
+        send_repertory_code as sendRepertoryCode,
+        send_repertory_name as sendRepertoryName,
         pay_status as payStatus,
         create_time as createTime,
         create_by_id as createById,
@@ -31,8 +33,8 @@
             <if test=" sendingId != null and sendingId != ''">
                 and sending_id = #{sendingId}
             </if>
-            <if test=" logisticId != null and logisticId != ''">
-                and logistic_id = #{logisticId}
+            <if test=" logisticCode != null and logisticCode != ''">
+                and logistic_code = #{logisticCode}
             </if>
             <if test=" payStatus != null and payStatus != '' or payStatus == 0">
                 and pay_status = #{payStatus}
@@ -40,21 +42,39 @@
             <if test=" logisticStatus != null and logisticStatus != '' or logisticStatus == 0">
                 and logistic_status = #{logisticStatus}
             </if>
-            <if test=" sendStore != null and sendStore != ''">
-                and send_store = #{sendStore}
+            <if test=" sendRepertoryCode != null and sendRepertoryCode != ''">
+                and send_repertory_code = #{sendRepertoryCode}
+            </if>
+            <if test=" logisticCentreCode != null and logisticCentreCode != ''">
+                and logistic_centre_code = #{logisticCentreCode}
             </if>
         </where>
         order by create_time desc
     </select>
 
     <insert id="insert">
-        insert into order_store_sending (order_id, sending_id, logistic_centre_name, logistic_id,
-                                         logistic_fee, logistic_status, send_store, pay_status, create_time,
+        insert into order_store_sending (order_id, sending_id, logistic_centre_code, logistic_centre_name, logistic_code,
+                                         logistic_fee, logistic_status, send_repertory_code,send_repertory_name, pay_status, create_time,
                                          create_by_id, create_by_name, update_time, update_by_id,
                                          update_by_name)
-        values (#{orderId}, #{sendingId}, #{logisticCentreName}, #{logisticId}, #{logisticFee}, #{logisticStatus},
-                #{sendStore}, #{payStatus}, sysdate(), #{createById}, #{createByName}, sysdate(), #{updateById},
+        values (#{orderId}, #{sendingId}, #{logisticCentreCode}, #{logisticCentreName}, #{logisticCode}, #{logisticFee}, #{logisticStatus},
+                #{sendRepertoryCode},#{sendRepertoryName}, #{payStatus}, sysdate(), #{createById}, #{createByName}, sysdate(), #{updateById},
                 #{updateByName})
     </insert>
+
+    <update id="updateByPrimaryKeySelective">
+        update order_store_sending
+        set
+        <if test="logisticStatus != null and logisticStatus != '' or logisticStatus == 0">
+            logistic_status = #{logisticStatus},
+        </if>
+        <if test="payStatus != null and payStatus != '' or payStatus == 0">
+            pay_status = #{payStatus},
+        </if>
+        update_by_id = #{updateById},
+        update_by_name = #{updateByName},
+        update_time = sysdate()
+        where id = #{id}
+    </update>
 
 </mapper>

@@ -54,8 +54,10 @@ public class ErpOrderController {
     public HttpResponse getOrderDetail(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
         HttpResponse response = HttpResponse.success();
         try {
-            ErpOrderDetailResponse orderDetail = erpOrderService.getOrderDetail(orderStoreOrderInfo);
-            response.setData(orderDetail);
+//            ErpOrderDetailResponse orderDetail = erpOrderService.getOrderDetail(orderStoreOrderInfo);
+//            response.setData(orderDetail);
+            OrderStoreOrderInfo orderDetail2 = erpOrderService.getOrderDetail2(orderStoreOrderInfo);
+            response.setData(orderDetail2);
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {
@@ -88,6 +90,34 @@ public class ErpOrderController {
         try {
             OrderStoreOrderInfo orderInfo = erpOrderService.saveRackOrder(erpOrderSaveRequest);
             response.setData(orderInfo);
+        } catch (BusinessException e) {
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
+    }
+
+    @PostMapping("/orderProductItemSplitGroup")
+    @ApiOperation(value = "接收供应链返回订单商品行分组信息")
+    public HttpResponse orderProductItemSplitGroup(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
+        HttpResponse response = HttpResponse.success();
+        try {
+            erpOrderService.orderSplit(orderStoreOrderInfo);
+        } catch (BusinessException e) {
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
+    }
+
+    @PostMapping("/orderSend")
+    @ApiOperation(value = "订单发货")
+    public HttpResponse orderSend(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
+        HttpResponse response = HttpResponse.success();
+        try {
+            erpOrderService.orderSend(orderStoreOrderInfo);
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {

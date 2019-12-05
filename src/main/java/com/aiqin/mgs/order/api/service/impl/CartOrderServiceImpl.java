@@ -64,7 +64,7 @@ public class CartOrderServiceImpl implements CartOrderService {
             LOGGER.info("库存的skuId编码和数量：{},{}", skuId, stockProductAmount);
             //获取前端的商品数量，与库房数量进行比对
             for (Product product : products) {
-                if (skuId == product.getSkuId() && stockProductAmount < product.getAmount()) {
+                if (skuId != null && skuId.equals(product.getSkuId()) && stockProductAmount < product.getAmount()) {
                     return HttpResponse.failure(ResultCode.STORE_SHORT);
                 }
                 if (stockProductAmount < 10) {
@@ -156,7 +156,7 @@ public class CartOrderServiceImpl implements CartOrderService {
             lineCheckStatus = lineCheckStatus == null ? 0 : lineCheckStatus;
             //检查商品是否被勾选，勾选后，更新数据库标识
             LOGGER.info("商品勾选后，更新勾选状态：{}", lineCheckStatus);
-            if (null != skuId && lineCheckStatus == Global.LINECHECKSTATUS_1) {
+            if (null != skuId && lineCheckStatus.equals(Global.LINECHECKSTATUS_1)) {
                 cartOrderInfo.setSkuId(skuId);
                 cartOrderInfo.setLineCheckStatus(lineCheckStatus);
                 cartOrderInfo.setAmount(number);
