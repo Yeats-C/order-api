@@ -317,7 +317,11 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 			
 			addReturnOrderResonse.setAfterSaleId(afterSaleId);
 			addReturnOrderResonse.setAfterSaleCode(afterSaleCode);
-			
+
+			//调用支付中心退款
+
+            //调用支付中心退款
+            toRefund(orderAfterSaleInfo);
 			return HttpResponse.success(addReturnOrderResonse);
 		
 		} catch (Exception e) {
