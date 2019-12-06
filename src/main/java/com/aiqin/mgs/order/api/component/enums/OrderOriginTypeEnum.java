@@ -36,11 +36,11 @@ public enum OrderOriginTypeEnum {
     }
 
     /***选项类型*/
-    public static List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
+    public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
     /***code-enum map*/
-    public static Map<Integer, OrderOriginTypeEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<Integer, OrderOriginTypeEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
     /***value-enum map*/
-    public static Map<String, OrderOriginTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<String, OrderOriginTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
     static {
         for (OrderOriginTypeEnum item :

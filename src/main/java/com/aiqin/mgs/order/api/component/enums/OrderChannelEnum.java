@@ -34,11 +34,11 @@ public enum OrderChannelEnum {
     }
 
     /***选项类型*/
-    public static List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
+    public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
     /***code-enum map*/
-    public static Map<Integer, OrderChannelEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<Integer, OrderChannelEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
     /***value-enum map*/
-    public static Map<String, OrderChannelEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<String, OrderChannelEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
     static {
         for (OrderChannelEnum item :

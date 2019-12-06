@@ -46,31 +46,15 @@ public enum SequenceType {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getPrefix() {
         return prefix;
-    }
-
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
     }
 
     public String getSuffix() {
         return suffix;
     }
 
-    public void setSuffix(String suffix) {
-        this.suffix = suffix;
-    }
-
     public String getDescription() {
         return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 }

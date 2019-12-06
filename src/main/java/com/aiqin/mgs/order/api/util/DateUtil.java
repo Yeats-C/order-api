@@ -5,7 +5,10 @@
  * ****************************************************************************/
 package com.aiqin.mgs.order.api.util;
 
+import com.aiqin.mgs.order.api.service.impl.OrderStatisticalServiceImpl;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -16,7 +19,9 @@ import java.util.Date;
 
 public class DateUtil {
 
-    private final static SimpleDateFormat shortSdf = new SimpleDateFormat("yyyy-MM-dd");
+    private SimpleDateFormat shortSdf = new SimpleDateFormat("yyyy-MM-dd");
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DateUtil.class);
 
     /**
      * 获取当前系统日期 yyyyMMddHHmmss
@@ -83,7 +88,7 @@ public class DateUtil {
         try {
             date = sdf1.parse(strDate);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info("context",e);
         }
         return date;
     }
@@ -102,7 +107,7 @@ public class DateUtil {
             Date date = format.parse(dateString);
             return date;
         } catch (ParseException e) {
-            e.printStackTrace();
+            LOGGER.info("context",e);
             return null;
         }
     }
@@ -113,7 +118,7 @@ public class DateUtil {
         try {
             date = format.parse(str);
         } catch (ParseException e) {
-            e.printStackTrace();
+            LOGGER.info("context",e);
         }
         return date;
     }
@@ -172,7 +177,7 @@ public class DateUtil {
         try {
             firstDayNew = sdf.parse(sdf.format(firstDay));
         } catch (ParseException e) {
-            e.printStackTrace();
+            LOGGER.info("context",e);
         }
         return firstDayNew;
     }
@@ -199,7 +204,7 @@ public class DateUtil {
             cal.setTimeInMillis(cal.getTimeInMillis() + 24 * 60 * 60 * 1000 - 1);
             lastDayNew = cal.getTime();
         } catch (ParseException e) {
-            e.printStackTrace();
+            LOGGER.info("context",e);
         }
         return lastDayNew;
     }
@@ -375,7 +380,7 @@ public class DateUtil {
      *
      * @return
      */
-    public static Date getCurrentYearBeginTime() {
+    public Date getCurrentYearBeginTime() {
         Calendar c = Calendar.getInstance();
         Date now = null;
         try {
@@ -383,7 +388,7 @@ public class DateUtil {
             c.set(Calendar.DATE, 1);
             now = shortSdf.parse(shortSdf.format(c.getTime()));
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info("context",e);
         }
         return now;
     }

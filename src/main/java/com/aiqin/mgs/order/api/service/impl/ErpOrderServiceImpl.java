@@ -430,11 +430,11 @@ public class ErpOrderServiceImpl implements ErpOrderService {
                     try {
                         PropertyUtils.copyProperties(splitItem, item);
                     } catch (IllegalAccessException e) {
-                        e.printStackTrace();
+                        logger.info("context",e);
                     } catch (InvocationTargetException e) {
-                        e.printStackTrace();
+                        logger.info("context",e);
                     } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
+                        logger.info("context",e);
                     }
                     splitItem.setId(null);
                     splitItem.setQuantity(entry.getValue());
