@@ -38,11 +38,11 @@ public enum PayStatusEnum {
     }
 
     /***选项类型*/
-    public static List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
+    public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
     /***code-enum map*/
-    public static Map<Integer, PayStatusEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<Integer, PayStatusEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
     /***value-enum map*/
-    public static Map<String, PayStatusEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<String, PayStatusEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
     static {
         for (PayStatusEnum item :

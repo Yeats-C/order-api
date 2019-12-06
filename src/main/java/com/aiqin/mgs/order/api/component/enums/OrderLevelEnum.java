@@ -36,11 +36,11 @@ public enum OrderLevelEnum {
         this.desc = desc;
     }
     /***选项类型*/
-    public static List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
+    public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
     /***code-enum map*/
-    public static Map<Integer, OrderLevelEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<Integer, OrderLevelEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
     /***value-enum map*/
-    public static Map<String, OrderLevelEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<String, OrderLevelEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
     static {
         for (OrderLevelEnum item :
