@@ -64,9 +64,9 @@ public interface OrderService {
 
 	//更改订单状态/支付状态/修改员...
 	HttpResponse updateOrderStatus(@Valid String orderId, Integer orderStatus, Integer payStatus,
-			String updateBy);
-	public void updateOrderStatuss(@Valid String orderId, Integer orderStatus, Integer payStatus,
-								   String updateBy) throws Exception;
+                                   String updateBy, String payType);
+	public int updateOrderStatuss(@Valid String orderId, Integer orderStatus, Integer payStatus,
+								  String updateBy, String payType, Integer actualPrice) throws Exception;
 	//仅更改退货状态-订单主表
 	void retustus(@Valid String orderId, Integer returnStatus, String updateBy)throws Exception;
 
@@ -179,4 +179,30 @@ public interface OrderService {
 	 * @return
 	 */
 	HttpResponse selectPrestorageOrderLogs(OrderQuery orderQuery);
+
+	HttpResponse selectPrestorageOrderDetail(String orderId);
+
+	/**
+	 * 修改预存商品退货数量
+	 * @param vo
+	 * @return
+	 */
+	HttpResponse updateRejectPrestoragProduct(PrestorageOrderSupplyDetailVo vo);
+
+	/**
+	 * 修改预存商品订单状态和订单状态
+	 * @param vo
+	 * @return
+	 */
+	HttpResponse updateRejectPrestoragState(RejectPrestoragStateVo vo);
+
+	HttpResponse getUnPayNum(UnPayVo unPayVo);
+
+	HttpResponse getUnPayMemberIdList(UnPayVo unPayVo);
+	/**
+	 * 批量修改预存商品订单
+	 * @param vo
+	 * @return
+	 */
+    HttpResponse batchUpdateRejectPrestoragProduct(PrestoragProductAfter vos) throws Exception;
 }

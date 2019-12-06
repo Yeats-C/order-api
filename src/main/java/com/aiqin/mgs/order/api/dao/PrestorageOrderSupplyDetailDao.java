@@ -1,7 +1,10 @@
 package com.aiqin.mgs.order.api.dao;
 
+import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
 import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.PrestorageOrderSupplyDetail;
+import com.aiqin.mgs.order.api.domain.request.PrestorageOrderSupplyDetailVo;
 import com.aiqin.mgs.order.api.domain.response.PrestorageOrderLogsInfo;
 import org.apache.ibatis.annotations.Param;
 
@@ -43,4 +46,27 @@ public interface PrestorageOrderSupplyDetailDao {
     List<PrestorageOrderLogsInfo> selectPrestorageOrderLogs(OrderQuery orderQuery);
 
     int selectPrestorageOrderLogsCount(OrderQuery orderQuery);
+
+    /**
+     * 订单中sku数量
+     * @param query
+     * @return
+     */
+    Integer getSkuSum(OrderDetailQuery query);
+
+    /**
+     *
+     * @param orderId
+     * @return
+     */
+    List<PrestorageOrderSupplyDetail> selectprestorageorderDetailsListByOrderId(@Param("orderId") String orderId);
+
+    /**
+     * 通过订单orderId 查询预存详情单
+     * @param orderId 订单ID
+     * @return
+     */
+    List<PrestorageOrderSupplyDetail> selectPrestorageOrderDetailByOrderId(@Param("orderId") String orderId);
+
+    int updateRejectPrestoragProduct(PrestorageOrderSupplyDetailVo vo);
 }

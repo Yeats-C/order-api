@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.aiqin.mgs.order.api.domain.request.UnPayVo;
 import com.aiqin.mgs.order.api.domain.request.statistical.BusinessStatisticalRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.SkuSalesRequest;
 import com.aiqin.mgs.order.api.domain.response.*;
@@ -77,7 +78,7 @@ public interface OrderDao {
     OrderResponse selectOrderByNineWeek(@Valid OrderQuery orderQuery) throws Exception;
 
     //修改订单主数据
-    void updateOrder(@Valid OrderInfo orderInfo) throws Exception;
+    int updateOrder(@Valid OrderInfo orderInfo) throws Exception;
 
     //接口-收银员交班收银情况统计   获取收银员、支付类型金额
     List<OrderbyReceiptSumResponse> cashier(OrderQuery orderQuery) throws Exception;
@@ -197,4 +198,12 @@ public interface OrderDao {
      */
     PrestorageResponse selectprestorageorderDetails(String prestorageOrderSupplyDetailId);
 
+    /**
+     * 获取门店未付款会员数
+     * @param unPayVo
+     * @return
+     */
+    int getUnPayNum(UnPayVo unPayVo);
+
+    List<String> getUnPayMemberIdList(UnPayVo unPayVo);
 }

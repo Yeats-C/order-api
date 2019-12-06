@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.ServiceProjectReduceDetailDao">
+    <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.request.service.ServiceProjectReduceDetail">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="asset_id" jdbcType="VARCHAR" property="assetId"/>
+        <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+        <result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
+        <result column="order_type" jdbcType="BIT" property="orderType"/>
+        <result column="reduce_id" jdbcType="VARCHAR" property="reduceId"/>
+        <result column="customer_id" jdbcType="VARCHAR" property="customerId"/>
+        <result column="customer_name" jdbcType="VARCHAR" property="customerName"/>
+        <result column="customer_phone" jdbcType="VARCHAR" property="customerPhone"/>
+        <result column="customer_type" jdbcType="BIT" property="customerType"/>
+        <result column="store_id" jdbcType="VARCHAR" property="storeId"/>
+        <result column="store_code" jdbcType="VARCHAR" property="storeCode"/>
+        <result column="store_name" jdbcType="VARCHAR" property="storeName"/>
+        <result column="project_id" jdbcType="VARCHAR" property="projectId"/>
+        <result column="project_code" jdbcType="VARCHAR" property="projectCode"/>
+        <result column="project_name" jdbcType="VARCHAR" property="projectName"/>
+        <result column="type_id" jdbcType="VARCHAR" property="typeId"/>
+        <result column="reduce_count" jdbcType="INTEGER" property="reduceCount"/>
+        <result column="return_amount" jdbcType="BIGINT" property="returnAmount"/>
+        <result column="remain_count" jdbcType="INTEGER" property="remainCount"/>
+        <result column="cashier_id" jdbcType="VARCHAR" property="cashierId"/>
+        <result column="cashier_name" jdbcType="VARCHAR" property="cashierName"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <resultMap id="customerPhoneMap" type="java.lang.String">
+        <result column="customer_phone" jdbcType="VARCHAR" />
+    </resultMap>
+    <resultMap id="customerCountMap" type="com.aiqin.mgs.order.api.domain.response.service.ServiceProjectTransformResponse">
+        <result column="project_id" jdbcType="VARCHAR" property="projectId"/>
+        <result column="project_name" jdbcType="VARCHAR" property="projectName"/>
+        <result column="type_id" jdbcType="VARCHAR" property="typeId"/>
+        <result column="type_name" jdbcType="VARCHAR" property="typeName"/>
+        <result column="total_amount" jdbcType="BIGINT" property="totalAmount"/>
+        <result column="total_return_amount" jdbcType="BIGINT" property="totalReturnAmount"/>
+        <result column="yesterday_amount" jdbcType="BIGINT" property="yesterdayAmount"/>
+        <result column="total_count" jdbcType="INTEGER" property="totalCount"/>
+        <result column="total_return_count" jdbcType="INTEGER" property="totalReturnCount"/>
+        <result column="yesterday_count" jdbcType="INTEGER" property="yesterdayCount"/>
+        <result column="total_customer_count" jdbcType="INTEGER" property="totalCustomerCount"/>
+        <result column="yesterday_customer_count" jdbcType="INTEGER" property="yesterdayCustomerCount"/>
+        <result column="use_project_count" jdbcType="INTEGER" property="useProjectCount"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+     id,asset_id,order_id,order_code,order_type,customer_id,customer_name,customer_phone,customer_type,store_id,store_code,store_name
+     ,project_id,project_code,project_name,type_id,reduce_count,return_amount,remain_count,cashier_id,cashier_name,create_time,update_time
+  </sql>
+    <insert id="insertReduceDetail" parameterType="com.aiqin.mgs.order.api.domain.request.service.ServiceProjectReduceDetail">
+        insert into service_project_reduce_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="assetId != null">
+                asset_id,
+            </if>
+            <if test="orderId != null">
+                order_id,
+            </if>
+            <if test="orderCode != null">
+                order_code,
+            </if>
+            <if test="orderType != null">
+                order_type,
+            </if>
+            <if test="customerId != null">
+                customer_id,
+            </if>
+            <if test="customerName != null">
+                customer_name,
+            </if>
+            <if test="customerPhone != null">
+                customer_phone,
+            </if>
+            <if test="customerType != null">
+                customer_type,
+            </if>
+            <if test="storeId != null">
+                store_id,
+            </if>
+            <if test="storeCode != null">
+                store_code,
+            </if>
+            <if test="storeName != null">
+                store_name,
+            </if>
+            <if test="projectId != null">
+                project_id,
+            </if>
+            <if test="projectCode != null">
+                project_code,
+            </if>
+            <if test="projectName != null">
+                project_name,
+            </if>
+            <if test="typeId != null">
+                type_id,
+            </if>
+            <if test="reduceCount != null">
+                reduce_count,
+            </if>
+            <if test="returnAmount != null">
+                return_amount,
+            </if>
+            <if test="remainCount != null">
+                remain_count,
+            </if>
+            <if test="cashierId != null">
+                cashier_id,
+            </if>
+            <if test="cashierName != null">
+                cashier_name,
+            </if>
+            create_time, update_time,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="assetId != null">
+                #{assetId,jdbcType=VARCHAR},
+            </if>
+            <if test="orderId != null">
+                #{orderId,jdbcType=VARCHAR},
+            </if>
+            <if test="orderCode != null">
+                #{orderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="orderType != null">
+                #{orderType,jdbcType=BIT},
+            </if>
+            <if test="customerId != null">
+                #{customerId,jdbcType=VARCHAR},
+            </if>
+            <if test="customerName != null">
+                #{customerName,jdbcType=VARCHAR},
+            </if>
+            <if test="customerPhone != null">
+                #{customerPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="customerType != null">
+                #{customerType,jdbcType=BIT},
+            </if>
+            <if test="storeId != null">
+                #{storeId,jdbcType=VARCHAR},
+            </if>
+            <if test="storeCode != null">
+                #{storeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="storeName != null">
+                #{storeName,jdbcType=VARCHAR},
+            </if>
+            <if test="projectId != null">
+                #{projectId,jdbcType=VARCHAR},
+            </if>
+            <if test="projectCode != null">
+                #{projectCode,jdbcType=VARCHAR},
+            </if>
+            <if test="projectName != null">
+                #{projectName,jdbcType=VARCHAR},
+            </if>
+            <if test="typeId != null">
+                #{typeId,jdbcType=VARCHAR},
+            </if>
+            <if test="reduceCount != null">
+                #{reduceCount,jdbcType=INTEGER},
+            </if>
+            <if test="returnAmount != null">
+                #{returnAmount,jdbcType=BIGINT},
+            </if>
+            <if test="remainCount != null">
+                #{remainCount,jdbcType=INTEGER},
+            </if>
+            <if test="cashierId != null">
+                #{cashierId,jdbcType=VARCHAR},
+            </if>
+            <if test="cashierName != null">
+                #{cashierName,jdbcType=VARCHAR},
+            </if>
+            now(),now(),
+        </trim>
+    </insert>
+    <insert id="insertReduceDetailList" parameterType="java.util.List">
+        insert into service_project_reduce_detail (asset_id,order_id,order_code,order_type,customer_id,customer_name,customer_phone,customer_type,store_id,store_code,
+        store_name,project_id,project_code,project_name,type_id,reduce_count,return_amount,remain_count,cashier_id,cashier_name,create_time,update_time)
+        values
+        <foreach collection="list" item="serviceProjectReduceDetail" separator="," index="index">
+            (#{serviceProjectReduceDetail.assetId,jdbcType=VARCHAR},
+            #{serviceProjectReduceDetail.orderId,jdbcType=VARCHAR},
+            #{serviceProjectReduceDetail.orderCode,jdbcType=VARCHAR},
+            #{serviceProjectReduceDetail.orderType,jdbcType=BIT},
+            #{serviceProjectReduceDetail.customerId,jdbcType=VARCHAR},
+            #{serviceProjectReduceDetail.customerName,jdbcType=VARCHAR},
+            #{serviceProjectReduceDetail.customerPhone,jdbcType=VARCHAR},
+            #{serviceProjectReduceDetail.customerType,jdbcType=BIT},
+            #{serviceProjectReduceDetail.storeId,jdbcType=VARCHAR},
+            #{serviceProjectReduceDetail.storeCode,jdbcType=VARCHAR},
+            #{serviceProjectReduceDetail.storeName,jdbcType=VARCHAR},
+            #{serviceProjectReduceDetail.projectId,jdbcType=VARCHAR},
+            #{serviceProjectReduceDetail.projectCode,jdbcType=VARCHAR},
+            #{serviceProjectReduceDetail.projectName,jdbcType=VARCHAR},
+            #{serviceProjectReduceDetail.typeId,jdbcType=VARCHAR},
+            #{serviceProjectReduceDetail.reduceCount,jdbcType=INTEGER},
+            #{serviceProjectReduceDetail.returnAmount,jdbcType=BIGINT},
+            #{serviceProjectReduceDetail.remainCount,jdbcType=INTEGER},
+            #{serviceProjectReduceDetail.cashierId,jdbcType=VARCHAR},
+            #{serviceProjectReduceDetail.cashierName,jdbcType=VARCHAR},
+            now(),now())
+        </foreach>
+    </insert>
+    <select id="selectReduceDetailByCondition" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest" resultMap="BaseResultMap" resultType="java.util.List">
+        select
+        <include refid="Base_Column_List"/>
+        from service_project_reduce_detail
+        <where>
+            <if test="storeInfo!=null">
+                and (store_code  LIKE concat(#{storeInfo,jdbcType=VARCHAR},'%') or store_name  LIKE concat(#{storeInfo,jdbcType=VARCHAR},'%') )
+            </if>
+            <if test="customerPhone!=null">
+                and customer_phone  LIKE concat(#{customerPhone,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="storeId!=null">
+                and store_id  = #{storeId,jdbcType=VARCHAR}
+            </if>
+            <if test="typeId!=null">
+                and type_id  = #{typeId,jdbcType=VARCHAR}
+            </if>
+            <if test="projectId!=null">
+                and project_id  = #{projectId,jdbcType=VARCHAR}
+            </if>
+            <if test="orderId!=null">
+                and order_id = #{orderId,jdbcType=VARCHAR}
+            </if>
+            <if test="orderCode!=null">
+                and order_code = #{orderCode,jdbcType=VARCHAR}
+            </if>
+            <if test="beginTime!=null">
+                and TO_DAYS(#{beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(create_time)
+            </if>
+            <if test="finishTime!=null">
+                and TO_DAYS(#{finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(create_time)
+            </if>
+            <if test="queryTime!=null">
+                and TO_DAYS(#{queryTime,jdbcType=TIMESTAMP}) = TO_DAYS(create_time)
+            </if>
+        </where>
+        limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </select>
+    <select id="countReduceDetailByCondition" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest" resultType="java.lang.Integer">
+        select
+        count(1)
+        from service_project_reduce_detail
+        <where>
+            <if test="storeInfo!=null">
+                and store_code  LIKE concat(#{storeInfo,jdbcType=VARCHAR},'%') or store_name  LIKE concat(#{storeInfo,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="customerPhone!=null">
+                and customer_phone  LIKE concat(#{customerPhone,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="storeId!=null">
+                and store_id  = #{storeId,jdbcType=VARCHAR}
+            </if>
+            <if test="typeId!=null">
+                and type_id  = #{typeId,jdbcType=VARCHAR}
+            </if>
+            <if test="projectId!=null">
+                and project_id  = #{projectId,jdbcType=VARCHAR}
+            </if>
+            <if test="orderId!=null">
+                and order_id = #{orderId,jdbcType=VARCHAR}
+            </if>
+            <if test="orderCode!=null">
+                and order_code = #{orderCode,jdbcType=VARCHAR}
+            </if>
+            <if test="beginTime!=null">
+                and TO_DAYS(#{beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(create_time)
+            </if>
+            <if test="finishTime!=null">
+                and TO_DAYS(#{finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(create_time)
+            </if>
+            <if test="queryTime!=null">
+                and TO_DAYS(#{queryTime,jdbcType=TIMESTAMP}) = TO_DAYS(create_time)
+            </if>
+        </where>
+    </select>
+    <select id="selectReduceDetailByReduceId" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from service_project_reduce_detail
+        <where>
+            <if test="storeId!=null">
+                and store_id  = #{storeId,jdbcType=VARCHAR}
+            </if>
+            <if test="orderId!=null">
+                and order_id = #{orderId,jdbcType=VARCHAR}
+            </if>
+            <if test="orderType!=null">
+                and order_type = #{orderType,jdbcType=BIT}
+            </if>
+        </where>
+    </select>
+    <select id="selectReduceDetailByAssetId" parameterType="java.lang.String" resultMap="BaseResultMap" resultType="java.util.List">
+        select
+        <include refid="Base_Column_List"/>
+        from service_project_reduce_detail
+        where asset_id = #{assetId,jdbcType=VARCHAR}
+    </select>
+    <select id="TotalConsumer" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest" resultType="java.util.List"  resultMap="customerPhoneMap">
+        select customer_phone from service_project_reduce_detail
+        <where>
+            date_format(create_time,'%Y-%m')=date_format(now(),'%Y-%m')
+            <if test="storeId!=null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+    <select id="yesTodayTotalConsumer" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest" resultType="java.util.List"  resultMap="customerPhoneMap">
+        select customer_phone from service_project_reduce_detail
+        <where>
+            TO_DAYS(create_time) = TO_DAYS(now())-1
+            <if test="storeId!=null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+    <select id="selectReduceDetailByConditions" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest" resultMap="BaseResultMap" resultType="java.util.List">
+        select
+        <include refid="Base_Column_List"/>
+        from service_project_reduce_detail
+        <where>
+            <if test="storeInfo!=null">
+                and (store_code  LIKE concat(#{storeInfo,jdbcType=VARCHAR},'%') or store_name  LIKE concat(#{storeInfo,jdbcType=VARCHAR},'%') )
+            </if>
+            <if test="customerPhone!=null">
+                and customer_phone  LIKE concat(#{customerPhone,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="storeId!=null">
+                and store_id  = #{storeId,jdbcType=VARCHAR}
+            </if>
+            <if test="typeId!=null">
+                and type_id  = #{typeId,jdbcType=VARCHAR}
+            </if>
+            <if test="projectId!=null">
+                and project_id  = #{projectId,jdbcType=VARCHAR}
+            </if>
+            <if test="orderId!=null">
+                and order_id = #{orderId,jdbcType=VARCHAR}
+            </if>
+            <if test="orderCode!=null">
+                and order_code = #{orderCode,jdbcType=VARCHAR}
+            </if>
+            <if test="beginTime!=null">
+                and TO_DAYS(#{beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(create_time)
+            </if>
+            <if test="finishTime!=null">
+                and TO_DAYS(#{finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(create_time)
+            </if>
+            <if test="queryTime!=null">
+                and TO_DAYS(#{queryTime,jdbcType=TIMESTAMP}) = TO_DAYS(create_time)
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+    <select id="TotalReturnAmount" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest"
+            resultType="java.lang.Long">
+        select COALESCE(SUM(return_amount),0) from service_project_reduce_detail
+        <where>
+            order_type = 1
+            <if test="storeId!=null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+    <select id="yesTodayTotalReturnAmount" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest"
+            resultType="java.lang.Long">
+        select COALESCE(SUM(return_amount),0) from service_project_reduce_detail
+        <where>
+            TO_DAYS(create_time) = TO_DAYS(now())-1 and order_type = 1
+            <if test="storeId!=null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+    <select id="TotalReturnCount" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest"
+            resultType="java.lang.Integer">
+        select count(1) from service_project_reduce_detail
+        <where>
+            order_type = 1 and reduce_count is null
+            <if test="storeId!=null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+    <select id="yesTodayTotalReturnCount" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest"
+            resultType="java.lang.Integer">
+        select count(1) from service_project_reduce_detail
+        <where>
+            TO_DAYS(create_time) = TO_DAYS(now())-1 and order_type = 1 and reduce_count is null
+            <if test="storeId!=null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+    <select id="consumerCount" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest" resultType="java.util.List"
+            resultMap="customerPhoneMap">
+        select distinct customer_phone
+        from service_project_reduce_detail
+        <where>
+            <if test="storeId != null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+            <if test="projectId != null">
+                and project_id = #{projectId,jdbcType=VARCHAR}
+            </if>
+            <if test="typeId != null">
+                and type_id = #{typeId,jdbcType=VARCHAR}
+            </if>
+            <if test="beginTime!=null">
+                and TO_DAYS(#{beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(create_time)
+            </if>
+            <if test="finishTime!=null">
+                and TO_DAYS(#{finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(create_time)
+            </if>
+        </where>
+    </select>
+    <select id="totalReturnCountAndAmountByType" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest" resultType="java.util.List" resultMap="customerCountMap">
+        select type_id ,COALESCE(SUM(return_amount),0) as total_return_amount ,count(1) as total_return_count
+        from service_project_reduce_detail
+        <where>
+            order_type = 1 and reduce_count is null
+            <if test="storeId != null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+            <if test="beginTime!=null">
+                and TO_DAYS(#{beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(create_time)
+            </if>
+            <if test="finishTime!=null">
+                and TO_DAYS(#{finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(create_time)
+            </if>
+        </where>
+        group by type_id
+    </select>
+    <select id="totalReturnCountAndAmountByProject" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest" resultType="java.util.List" resultMap="customerCountMap">
+        select project_id ,project_name,COALESCE(SUM(return_amount),0) as total_return_amount,count(1) as total_return_count
+        from service_project_reduce_detail
+        <where>
+            order_type = 1 and reduce_count is null
+            <if test="storeId != null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+            <if test="beginTime!=null">
+                and TO_DAYS(#{beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(create_time)
+            </if>
+            <if test="finishTime!=null">
+                and TO_DAYS(#{finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(create_time)
+            </if>
+        </where>
+        group by project_id
+    </select>
+</mapper>

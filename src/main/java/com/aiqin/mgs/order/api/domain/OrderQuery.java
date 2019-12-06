@@ -17,8 +17,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
-
+@Data
 @ApiModel("订单查询条件")
 public class OrderQuery extends PagesRequest {
     
@@ -60,11 +61,12 @@ public class OrderQuery extends PagesRequest {
 	@JsonProperty("distributor_name")
 	private String distributorName="";
 	
-	
+
+
 //	@ApiModelProperty(value="来源类型0-pos，1-微商城, 2-全部 ,3:web")
 //	@JsonProperty("origin_type")
 //	private Integer orderOriginType;
-	
+
 	@ApiModelProperty(value="来源类型:2||null-全部;0&&3-门店;1-微商城;0-pos;3:web")
 	@JsonProperty("origin_type_list")
 	private List<Integer> originTypeList;
@@ -155,314 +157,13 @@ public class OrderQuery extends PagesRequest {
 	@ApiModelProperty(value="控制SQL:订单状态集合排除")
 	@JsonProperty("no_exist_order_code_list")
 	private List<String> noExistOrderCodeList;
-	
-	
 
+	@ApiModelProperty(value="订单类型 1：TOC订单 2: TOB订单 3：服务商品，4 预存订单")
+	@JsonProperty("order_type")
+	private String orderType;
 
-	public List<String> getNoExistOrderCodeList() {
-		return noExistOrderCodeList;
-	}
 
 
-	public void setNoExistOrderCodeList(List<String> noExistOrderCodeList) {
-		this.noExistOrderCodeList = noExistOrderCodeList;
-	}
-
-
-	public List<String> getMemberidList() {
-		return memberidList;
-	}
-
-
-	public void setMemberidList(List<String> memberidList) {
-		this.memberidList = memberidList;
-	}
-
-
-	public List<String> getOrderIdList() {
-		return orderIdList;
-	}
-
-
-	public void setOrderIdList(List<String> orderIdList) {
-		this.orderIdList = orderIdList;
-	}
-
-
-	public List<Integer> getOrderStatusList() {
-		return orderStatusList;
-	}
-
-
-	public void setOrderStatusList(List<Integer> orderStatusList) {
-		this.orderStatusList = orderStatusList;
-	}
-
-
-	public List<Integer> getOriginTypeList() {
-		return originTypeList;
-	}
-
-
-	public void setOriginTypeList(List<Integer> originTypeList) {
-		this.originTypeList = originTypeList;
-	}
-
-
-	public String getOrderCode() {
-		return orderCode;
-	}
-
-
-	public void setOrderCode(String orderCode) {
-		this.orderCode = orderCode;
-	}
-
-
-	public Integer getIcount() {
-		return icount;
-	}
-
-
-	public void setIcount(Integer icount) {
-		this.icount = icount;
-	}
-
-
-	public Integer getAny() {
-		return any;
-	}
-
-
-	public void setAny(Integer any) {
-		this.any = any;
-	}
-
-
-	public String getReceiveCode() {
-		return receiveCode;
-	}
-
-
-	public void setReceiveCode(String receiveCode) {
-		this.receiveCode = receiveCode;
-	}
-
-
-	public String getBeginDate() {
-		return beginDate;
-	}
-
-
-	public void setBeginDate(String beginDate) {
-		this.beginDate = beginDate;
-	}
-
-
-	public String getEndDate() {
-		return endDate;
-	}
-
-
-	public void setEndDate(String endDate) {
-		this.endDate = endDate;
-	}
-
-
-	public String getPayType() {
-		return payType;
-	}
-
-
-	public void setPayType(String payType) {
-		this.payType = payType;
-	}
-
-
-	public Integer getReceiveType() {
-		return receiveType;
-	}
-
-
-	public void setReceiveType(Integer receiveType) {
-		this.receiveType = receiveType;
-	}
-
-
-	public String getOrderId() {
-		return orderId;
-	}
-
-
-	public void setOrderId(String orderId) {
-		this.orderId = orderId;
-	}
-
-
-	public Date getCreate_time() {
-		return create_time;
-	}
-
-
-	public void setCreate_time(Date create_time) {
-		this.create_time = create_time;
-	}
-
-
-	public Date getBeginTime() {
-		return beginTime;
-	}
-
-
-	public void setBeginTime(Date beginTime) {
-		this.beginTime = beginTime;
-	}
-
-
-	public Date getEndTime() {
-		return endTime;
-	}
-
-
-	public void setEndTime(Date endTime) {
-		this.endTime = endTime;
-	}
-
-
-	public Integer getOrderStatus() {
-		return orderStatus;
-	}
-
-
-	public void setOrderStatus(Integer orderStatus) {
-		this.orderStatus = orderStatus;
-	}
-
-
-	public String getMemberId() {
-		return memberId;
-	}
-
-
-	public void setMemberId(String memberId) {
-		this.memberId = memberId;
-	}
-
-
-	public String getMemberName() {
-		return memberName;
-	}
-
-
-	public void setMemberName(String memberName) {
-		this.memberName = memberName;
-	}
-
-
-	public String getMemberPhone() {
-		return memberPhone;
-	}
-
-
-	public void setMemberPhone(String memberPhone) {
-		this.memberPhone = memberPhone;
-	}
-
-
-	public String getDistributorId() {
-		return distributorId;
-	}
-
-
-	public void setDistributorId(String distributorId) {
-		this.distributorId = distributorId;
-	}
-
-
-	public String getDistributorCode() {
-		return distributorCode;
-	}
-
-
-	public void setDistributorCode(String distributorCode) {
-		this.distributorCode = distributorCode;
-	}
-
-
-	public String getDistributorName() {
-		return distributorName;
-	}
-
-
-	public void setDistributorName(String distributorName) {
-		this.distributorName = distributorName;
-	}
-
-
-//	public Integer getOrderOriginType() {
-//		return orderOriginType;
-//	}
-//
-//
-//	public void setOrderOriginType(Integer orderOriginType) {
-//		this.orderOriginType = orderOriginType;
-//	}
-
-
-	public String getCashierId() {
-		return cashierId;
-	}
-
-
-	public void setCashierId(String cashierId) {
-		this.cashierId = cashierId;
-	}
-
-
-	public String getCashierName() {
-		return cashierName;
-	}
-
-
-	public void setCashierName(String cashierName) {
-		this.cashierName = cashierName;
-	}
-
-
-	public String getGuideId() {
-		return guideId;
-	}
-
-
-	public void setGuideId(String guideId) {
-		this.guideId = guideId;
-	}
-
-
-	public String getGuideName() {
-		return guideName;
-	}
-
-
-	public void setGuideName(String guideName) {
-		this.guideName = guideName;
-	}
-
-
-	public String getCodeAndPhone() {
-		return codeAndPhone;
-	}
-
-
-	public void setCodeAndPhone(String codeAndPhone) {
-		this.codeAndPhone = codeAndPhone;
-	}
-
-
-	
-
-	
-    
 }
 
 

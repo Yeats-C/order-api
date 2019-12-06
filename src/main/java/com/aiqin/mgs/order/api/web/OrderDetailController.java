@@ -16,6 +16,7 @@ import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
 import com.aiqin.mgs.order.api.domain.OrderInfo;
 import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.request.ProdisorRequest;
+import com.aiqin.mgs.order.api.domain.request.ProductStoreRequest;
 import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.OrderDetailService;
 
@@ -175,6 +176,36 @@ public class OrderDetailController {
     	LOGGER.info("商品概览菜单-产品销量、销售额-后10名参数 distributorId：{},year：{},month：{}",distributorId,year,month);    	
         return orderDetailService.productOverviewByOrderLast(distributorId,year,month);//商品概览产品销量
     }
+
+    /**
+     * 接口--商品概览产品销量、销售额-前10名
+     */
+    @GetMapping("/product/fronttop10")
+    @ApiOperation(value = "商品概览菜单-产品销量、销售额-前10名")
+    public HttpResponse productFrontTop10(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,
+                                          @Valid @RequestParam(name = "begin_time", required = true) String beginTime,
+                                          @RequestParam(name = "end_time", required = true) String endTime,
+                                          @RequestParam(name = "category_id", required = true) String categoryId) {
+
+
+        LOGGER.info("商品概览菜单-产品销量、销售额-前10名参数 distributorId：{},beginTime：{},endTime：{},categoryId：{}",distributorId,beginTime,endTime,categoryId);
+        return orderDetailService.productFrontTop10(distributorId,beginTime,endTime,categoryId);//商品概览产品销量
+    }
+
+    /**
+     * 接口--商品概览产品销量、销售额-后10名
+     */
+    @GetMapping("/product/aftertop10")
+    @ApiOperation(value = "商品概览菜单-产品销量、销售额-后10名")
+    public HttpResponse productAfterTop10(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,
+                                          @Valid @RequestParam(name = "begin_time", required = true) String beginTime,
+                                          @RequestParam(name = "end_time", required = true) String endTime,
+                                          @RequestParam(name = "category_id", required = true) String categoryId) {
+
+
+    	LOGGER.info("商品概览菜单-产品销量、销售额-后10名参数 distributorId：{},beginTime：{},endTime：{},categoryId：{}",distributorId,beginTime,endTime,categoryId);
+        return orderDetailService.productAfterTop10(distributorId,beginTime,endTime,categoryId);//商品概览产品销量
+    }
     
     
     /**
@@ -206,8 +237,20 @@ public class OrderDetailController {
     	LOGGER.info("商品总库菜单-统计商品在各个渠道的订单数参数 {}",info);    	
         return orderDetailService.prodisor(info);
     }
-    
-    
+
+    /**
+     *  商品总库-统计商品在不同渠道的订单数
+     */
+    @PostMapping("/product/store")
+    @ApiOperation(value = "商品总库菜单-统计商品在各个渠道的订单数....")
+    public HttpResponse productStore(@Valid @RequestBody ProductStoreRequest info) {
+
+
+        LOGGER.info("商品总库菜单-统计商品在各个渠道的订单数参数 {}",info);
+        return orderDetailService.productStore(info);
+    }
+
+
     /**
      * 
      * sku销量统计
@@ -254,4 +297,17 @@ public class OrderDetailController {
         return orderDetailService.wantBuy(sukList);
     }
 
+    /**
+     *
+     * @param sukList
+     * @return
+     */
+    @GetMapping("/findOrderDetailById")
+    @ApiOperation(value = "通过ID查询订单详情")
+    public HttpResponse findOrderDetailById(@Valid @RequestParam("order_detail_id") String orderDetailId) {
+
+
+        LOGGER.info("sku销量统计参数 sukList：{}",orderDetailId);
+        return orderDetailService.findOrderDetailById(orderDetailId);
+    }
 }
