@@ -246,5 +246,46 @@ public interface Global {
     //1:门店 2:erp
     Integer CREATESOURCE_1 = 1;
     Integer CREATESOURCE_2 = 2;
+    /**
+     * 判断插入和更新操作是否成功
+     */
+    Integer CHERC_INSERT_DELETE_UPDATE_SUCCESS = 0;
 
+
+    /**
+     * 服务项目的订单类型,扣减
+     */
+    Integer ORDER_TYPE_REDUCE = 0;
+    /**
+     * 服务项目的订单类型,购买
+     */
+    Integer ORDER_TYPE_BUY = 1;
+    /**
+     * 服务项目的订单类型,退次
+     */
+    Integer ORDER_TYPE_RETURN = 2;
+    /**
+     * 服务项目的订单类型,增次
+     */
+    Integer ORDER_TYPE_CONTINUE = 3;
+
+    /**
+     * 服务项目的订单类型,延期
+     */
+    Integer ORDER_TYPE_DELAY = 4;
+
+
+    /**
+     * 是否直接消费，0为是
+     */
+    Integer IS_DIRECT_CUSTOM = 0;
+    /**
+     * 是否限次，0为限次
+     */
+    Integer CONSUMPTION_PATTERN_LIMIT = 0;
+
+    /**
+     * 接口返回码
+     */
+    String RESULT_CODE = "code";
 }

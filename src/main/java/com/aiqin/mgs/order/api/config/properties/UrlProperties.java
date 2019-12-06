@@ -32,5 +32,9 @@ public class UrlProperties {
     private String slcsApi;
 
     private String payApi;
+    /**
+     * 营运中心api
+     */
+    private String omsApi;
 
 }
