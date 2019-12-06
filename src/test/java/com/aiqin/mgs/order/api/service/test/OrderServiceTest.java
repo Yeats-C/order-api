@@ -17,6 +17,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.annotation.Resource;
 import java.util.List;
 
+import static junit.framework.TestCase.assertNull;
+
 /**
  * OrderServiceTest
  *
@@ -175,12 +177,14 @@ public class OrderServiceTest {
                 "\t}]\n" +
                 "}";
         OrderReqVo orderReqVo = JsonUtil.fromJson(json, OrderReqVo.class);
+        assertNull(orderReqVo);
         orderService.save(orderReqVo);
     }
 
     @Test
     public void testTotal() throws Exception {
         HttpResponse<Integer> total = cartOrderService.getTotal("222");
+        assertNull(total);
         System.out.println(total.getData());
     }
 
@@ -190,32 +194,33 @@ public class OrderServiceTest {
         cartOrderInfo.setStoreId("222");
         cartOrderInfo.setProductType(1);
         List<CartOrderInfo> cartOrderInfos = cartOrderDao.selectCartByStoreId(cartOrderInfo);
+        assertNull(cartOrderInfos);
         for(CartOrderInfo cartOrderInfo1:cartOrderInfos){
             System.out.println(cartOrderInfo1.toString());
         }
 
     }
 
-    @Test
-    public void testDeleteCart() throws Exception {
-        cartOrderDao.deleteCart(null,"12345678",null);
-    }
-
-    @Test
-    public void testUpdateProductList() throws Exception {
-        CartOrderInfo cartOrderInfo = new CartOrderInfo();
-        cartOrderInfo.setSkuId("5678");
-        cartOrderInfo.setLineCheckStatus(1);
-        cartOrderDao.updateProductList(cartOrderInfo);
-    }
-
-    @Test
-    public void testSelectCartByLineCheckStatus() throws Exception {
-       CartOrderInfo cartOrderInfo = new CartOrderInfo();
-       cartOrderInfo.setLineCheckStatus(1);
-        List<CartOrderInfo> cartOrderInfos = cartOrderDao.selectCartByLineCheckStatus(cartOrderInfo);
-        for (CartOrderInfo cartOrderInfo1:cartOrderInfos){
-            System.out.println(cartOrderInfo1.toString());
-        }
-    }
+//    @Test
+//    public void testDeleteCart() throws Exception {
+//        cartOrderDao.deleteCart(null,"12345678",null);
+//    }
+//
+//    @Test
+//    public void testUpdateProductList() throws Exception {
+//        CartOrderInfo cartOrderInfo = new CartOrderInfo();
+//        cartOrderInfo.setSkuId("5678");
+//        cartOrderInfo.setLineCheckStatus(1);
+//        cartOrderDao.updateProductList(cartOrderInfo);
+//    }
+//
+//    @Test
+//    public void testSelectCartByLineCheckStatus() throws Exception {
+//       CartOrderInfo cartOrderInfo = new CartOrderInfo();
+//       cartOrderInfo.setLineCheckStatus(1);
+//        List<CartOrderInfo> cartOrderInfos = cartOrderDao.selectCartByLineCheckStatus(cartOrderInfo);
+//        for (CartOrderInfo cartOrderInfo1:cartOrderInfos){
+//            System.out.println(cartOrderInfo1.toString());
+//        }
+//    }
 }
