@@ -118,7 +118,6 @@ public class OrderStatisticalServiceImpl implements OrderStatisticalService {
             response = BusinessStatisticalBuilder.create(yesterdayStatistical.get(), todayStatistical.get(), yearStatistical.get()).builder();
             return response;
         } catch (Exception ex) {
-            ex.printStackTrace();
             log.error("error [{}]", ex);
         }
         return null;
