@@ -5,16 +5,18 @@
     <select id="select" resultType="com.aiqin.mgs.order.api.domain.OrderStoreOrderSending"
             parameterType="com.aiqin.mgs.order.api.domain.OrderStoreOrderSending">
         select id as id,
-        order_id as orderId,
         sending_id as sendingId,
         logistic_centre_code as logisticCentreCode,
         logistic_centre_name as logisticCentreName,
         logistic_code as logisticCode,
         logistic_fee as logisticFee,
-        logistic_status as logisticStatus,
         send_repertory_code as sendRepertoryCode,
         send_repertory_name as sendRepertoryName,
         pay_status as payStatus,
+        pay_start_time as payStartTime,
+        pay_end_time as payEndTime,
+        coupon_pay_fee as couponPayFee,
+        balance_pay_fee as balancePayFee,
         create_time as createTime,
         create_by_id as createById,
         create_by_name as createByName,
@@ -53,22 +55,33 @@
     </select>
 
     <insert id="insert">
-        insert into order_store_sending (order_id, sending_id, logistic_centre_code, logistic_centre_name, logistic_code,
-                                         logistic_fee, logistic_status, send_repertory_code,send_repertory_name, pay_status, create_time,
-                                         create_by_id, create_by_name, update_time, update_by_id,
+        insert into order_store_sending (sending_id, logistic_centre_code, logistic_centre_name, logistic_code,
+                                         logistic_fee, send_repertory_code, send_repertory_name, pay_status,
+                                         pay_start_time, pay_end_time, coupon_pay_fee, balance_pay_fee,
+                                         create_time, create_by_id, create_by_name, update_time, update_by_id,
                                          update_by_name)
-        values (#{orderId}, #{sendingId}, #{logisticCentreCode}, #{logisticCentreName}, #{logisticCode}, #{logisticFee}, #{logisticStatus},
-                #{sendRepertoryCode},#{sendRepertoryName}, #{payStatus}, sysdate(), #{createById}, #{createByName}, sysdate(), #{updateById},
-                #{updateByName})
+        values (#{sendingId}, #{logisticCentreCode}, #{logisticCentreName}, #{logisticCode},
+                #{logisticFee}, #{sendRepertoryCode}, #{sendRepertoryName}, #{payStatus}, #{payStartTime},
+                #{payEndTime}, #{couponPayFee}, #{balancePayFee},
+                sysdate(), #{createById}, #{createByName}, sysdate(), #{updateById}, #{updateByName})
     </insert>
 
     <update id="updateByPrimaryKeySelective">
         update order_store_sending
         set
-        <if test="logisticStatus != null and logisticStatus != '' or logisticStatus == 0">
-            logistic_status = #{logisticStatus},
+        <if test="payStartTime != null ">
+            pay_start_time = #{payStartTime},
         </if>
-        <if test="payStatus != null and payStatus != '' or payStatus == 0">
+        <if test="payEndTime != null ">
+            pay_end_time = #{payEndTime},
+        </if>
+        <if test="couponPayFee != null ">
+            coupon_pay_fee = #{couponPayFee},
+        </if>
+        <if test="balancePayFee != null ">
+            balance_pay_fee = #{balancePayFee},
+        </if>
+        <if test="payStatus != null and payStatus != '' or payStatus == 0 ">
             pay_status = #{payStatus},
         </if>
         update_by_id = #{updateById},

@@ -43,6 +43,11 @@ public interface OrderDetailDao {
 
     //查询订单明细Byorderid
     List<OrderDetailInfo> selectDetailById(@Valid OrderDetailQuery orderDetailQuery) throws Exception;
+	//接口--商品概览产品销量、销售额-前5名
+	List<OrderDetailInfo> productFrontTop10(@Param("distributorId")String distributorId,@Param("dayBegin")Date dayBegin,@Param("dayEnd")Date dayEnd,@Param("categoryId") String categoryId) throws Exception;
+
+    //接口--商品概览产品销量、销售额-后5名
+	List<OrderDetailInfo> productAfterTop10(@Param("distributorId")String distributorId,@Param("dayBegin")Date dayBegin,@Param("dayEnd")Date dayEnd,@Param("categoryId") String categoryId) throws Exception;
 
     //插入订单明细表
     void addDetailList(@Valid OrderDetailInfo orderDetailInfo) throws Exception;

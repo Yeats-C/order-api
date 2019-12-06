@@ -176,6 +176,36 @@ public class OrderDetailController {
     	LOGGER.info("商品概览菜单-产品销量、销售额-后10名参数 distributorId：{},year：{},month：{}",distributorId,year,month);    	
         return orderDetailService.productOverviewByOrderLast(distributorId,year,month);//商品概览产品销量
     }
+
+    /**
+     * 接口--商品概览产品销量、销售额-前10名
+     */
+    @GetMapping("/product/fronttop10")
+    @ApiOperation(value = "商品概览菜单-产品销量、销售额-前10名")
+    public HttpResponse productFrontTop10(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,
+                                          @Valid @RequestParam(name = "begin_time", required = true) String beginTime,
+                                          @RequestParam(name = "end_time", required = true) String endTime,
+                                          @RequestParam(name = "category_id", required = true) String categoryId) {
+
+
+        LOGGER.info("商品概览菜单-产品销量、销售额-前10名参数 distributorId：{},beginTime：{},endTime：{},categoryId：{}",distributorId,beginTime,endTime,categoryId);
+        return orderDetailService.productFrontTop10(distributorId,beginTime,endTime,categoryId);//商品概览产品销量
+    }
+
+    /**
+     * 接口--商品概览产品销量、销售额-后10名
+     */
+    @GetMapping("/product/aftertop10")
+    @ApiOperation(value = "商品概览菜单-产品销量、销售额-后10名")
+    public HttpResponse productAfterTop10(@Valid @RequestParam(name = "distributor_id", required = true) String distributorId,
+                                          @Valid @RequestParam(name = "begin_time", required = true) String beginTime,
+                                          @RequestParam(name = "end_time", required = true) String endTime,
+                                          @RequestParam(name = "category_id", required = true) String categoryId) {
+
+
+    	LOGGER.info("商品概览菜单-产品销量、销售额-后10名参数 distributorId：{},beginTime：{},endTime：{},categoryId：{}",distributorId,beginTime,endTime,categoryId);
+        return orderDetailService.productAfterTop10(distributorId,beginTime,endTime,categoryId);//商品概览产品销量
+    }
     
     
     /**

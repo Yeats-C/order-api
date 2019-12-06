@@ -41,6 +41,12 @@ public interface OrderDetailService {
     //接口--商品概览产品销量、销售额-后5名
 	HttpResponse productOverviewByOrderLast(@Valid String distributor_id,String year, String month);
 
+	//接口--商品概览产品销量、销售额-前5名
+	HttpResponse productFrontTop10(@Valid String distributor_id,String beginTime, String endTime, String categoryId);
+
+    //接口--商品概览产品销量、销售额-后5名
+	HttpResponse productAfterTop10(@Valid String distributor_id,String beginTime, String endTime, String categoryId);
+
 	//接口--会员管理-会员消费记录
 	HttpResponse byMemberOrder(OrderDetailQuery orderDetailQuery); 
 

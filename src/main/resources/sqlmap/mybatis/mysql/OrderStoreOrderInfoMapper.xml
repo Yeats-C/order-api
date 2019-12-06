@@ -8,6 +8,7 @@
         order_id as orderId,
         order_code as orderCode,
         order_status as orderStatus,
+        before_cancel_status as beforeCancelStatus,
         order_origin_type as orderOriginType,
         order_channel as orderChannel,
         supplier_code as supplierCode,
@@ -26,6 +27,7 @@
         split_status as splitStatus,
         primary_code as primaryCode,
         goods_coupon as goodsCoupon,
+        sending_id as sendingId,
         create_time as createTime,
         create_by_id as createById,
         create_by_name as createByName,
@@ -43,6 +45,9 @@
         <if test="orderCode != null and orderCode != ''">
             and order_code = #{orderCode}
         </if>
+        <if test="sendingId != null and sendingId != ''">
+            and sending_id = #{sendingId}
+        </if>
         <if test="orderStatus != null and orderStatus != '' or orderStatus == 0">
             and order_status = #{orderStatus}
         </if>
@@ -54,6 +59,9 @@
         </if>
         <if test="splitStatus != null and splitStatus != '' or splitStatus == 0">
             and split_status = #{splitStatus}
+        </if>
+        <if test="beforeCancelStatus != null and beforeCancelStatus != '' or beforeCancelStatus == 0">
+            and before_cancel_status = #{beforeCancelStatus}
         </if>
         <if test="storeId != null and storeId != ''">
             and store_id = #{storeId}
@@ -76,11 +84,17 @@
         <if test="splitStatus != null and splitStatus != '' or splitStatus == 0">
             split_status = #{splitStatus},
         </if>
+        <if test="beforeCancelStatus != null and beforeCancelStatus != '' or beforeCancelStatus == 0">
+            before_cancel_status = #{beforeCancelStatus},
+        </if>
         <if test="supplierCode != null and supplierCode != ''">
             supplier_code = #{supplierCode},
         </if>
         <if test="repertoryCode != null and repertoryCode != ''">
             repertory_code = #{repertoryCode},
+        </if>
+        <if test="sendingId != null and sendingId != ''">
+            sending_id = #{sendingId},
         </if>
         <if test="goodsCoupon != null">
             goods_coupon = #{goodsCoupon},
@@ -92,15 +106,15 @@
     </update>
 
     <insert id="insert">
-        insert into order_store_info (order_id, order_code, order_status,
+        insert into order_store_info (order_id, order_code, order_status, before_cancel_status, sending_id,
                                       order_origin_type, order_channel, supplier_code, supplier_name, repertory_code,
                                       repertory_name,
-                                      order_level,split_status, primary_code, return_status,
+                                      order_level, split_status, primary_code, return_status,
                                       order_type, pay_status, franchisee_id, store_id, store_name, total_price,
                                       actual_price, goods_coupon,
                                       create_time, create_by_id, create_by_name, update_time, update_by_id,
                                       update_by_name)
-        values (#{orderId}, #{orderCode}, #{orderStatus},
+        values (#{orderId}, #{orderCode}, #{orderStatus}, #{beforeCancelStatus}, #{sendingId},
                 #{orderOriginType}, #{orderChannel}, #{supplierCode}, #{supplierName}, #{repertoryCode},
                 #{repertoryName},
                 #{orderLevel}, #{splitStatus}, #{primaryCode}, #{returnStatus},
@@ -115,6 +129,7 @@
         a1.order_id as orderId,
         a1.order_code as orderCode,
         a1.order_status as orderStatus,
+        a1.before_cancel_status as beforeCancelStatus,
         a1.order_origin_type as orderOriginType,
         a1.order_channel as orderChannel,
         a1.supplier_code as supplierCode,
@@ -133,6 +148,7 @@
         a1.split_status as splitStatus,
         a1.primary_code as primaryCode,
         a1.goods_coupon as goodsCoupon,
+        a1.sending_id as sendingId,
         a1.create_time as createTime,
         a1.create_by_id as createById,
         a1.create_by_name as createByName,
@@ -171,6 +187,7 @@
         a1.order_id as orderId,
         a1.order_code as orderCode,
         a1.order_status as orderStatus,
+        a1.before_cancel_status as beforeCancelStatus,
         a1.order_origin_type as orderOriginType,
         a1.order_channel as orderChannel,
         a1.supplier_code as supplierCode,
@@ -189,6 +206,7 @@
         a1.split_status as splitStatus,
         a1.primary_code as primaryCode,
         a1.goods_coupon as goodsCoupon,
+        a1.sending_id as sendingId,
         a1.create_time as createTime,
         a1.create_by_id as createById,
         a1.create_by_name as createByName,

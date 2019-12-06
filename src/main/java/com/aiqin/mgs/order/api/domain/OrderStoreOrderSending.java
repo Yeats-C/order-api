@@ -17,8 +17,6 @@ public class OrderStoreOrderSending {
 
     /***主键*/
     private Long id;
-    /***订单id*/
-    private String orderId;
     /***发货id*/
     private String sendingId;
     /***物流公司编码*/
@@ -29,14 +27,20 @@ public class OrderStoreOrderSending {
     private String logisticCode;
     /***物流费用*/
     private BigDecimal logisticFee;
-    /***物流状态*/
-    private Integer logisticStatus;
     /***发货仓库编码*/
     private String sendRepertoryCode;
     /***发货仓库名称*/
     private String sendRepertoryName;
     /***支付状态*/
     private Integer payStatus;
+    /***开始支付物流费用时间*/
+    private Date payStartTime;
+    /***结束支付物流费用时间*/
+    private Date payEndTime;
+    /***物流券支付金额*/
+    private BigDecimal couponPayFee;
+    /***余额支付金额*/
+    private BigDecimal balancePayFee;
 
     /***创建时间*/
     private Date createTime;
