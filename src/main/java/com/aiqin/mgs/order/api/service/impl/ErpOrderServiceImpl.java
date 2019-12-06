@@ -692,11 +692,11 @@ public class ErpOrderServiceImpl implements ErpOrderService {
                 try {
                     PropertyUtils.copyProperties(reductionProductItem, item);
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    logger.info("context",e);
                 } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+                    logger.info("context",e);
                 } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
+                    logger.info("context",e);
                 }
                 reductionProductItem.setQuantity(item.getQuantity() - paramProductItem.getActualDeliverQuantity());
                 reductionProductItem.setMoney(item.getSharePrice().multiply(new BigDecimal(reductionProductItem.getQuantity())).setScale(4, RoundingMode.HALF_UP));
