@@ -29,9 +29,6 @@
             <if test=" id != null and id != ''">
                 and id = #{id}
             </if>
-            <if test=" orderId != null and orderId != ''">
-                and order_id = #{orderId}
-            </if>
             <if test=" sendingId != null and sendingId != ''">
                 and sending_id = #{sendingId}
             </if>
@@ -40,9 +37,6 @@
             </if>
             <if test=" payStatus != null and payStatus != '' or payStatus == 0">
                 and pay_status = #{payStatus}
-            </if>
-            <if test=" logisticStatus != null and logisticStatus != '' or logisticStatus == 0">
-                and logistic_status = #{logisticStatus}
             </if>
             <if test=" sendRepertoryCode != null and sendRepertoryCode != ''">
                 and send_repertory_code = #{sendRepertoryCode}

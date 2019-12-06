@@ -33,6 +33,20 @@ public class ErpOrderSendingServiceImpl implements ErpOrderSendingService {
     }
 
     @Override
+    public OrderStoreOrderSending getOrderSendingByLogisticCode(String logisticCode) {
+        OrderStoreOrderSending orderSending = null;
+        if (StringUtils.isNotEmpty(logisticCode)) {
+            OrderStoreOrderSending orderSendingQuery = new OrderStoreOrderSending();
+            orderSendingQuery.setLogisticCode(logisticCode);
+            List<OrderStoreOrderSending> select = orderStoreOrderSendingDao.select(orderSendingQuery);
+            if (select != null && select.size() > 0) {
+                orderSending = select.get(0);
+            }
+        }
+        return orderSending;
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveOrderSending(OrderStoreOrderSending orderSending, AuthToken auth) {
         orderSending.setCreateById(auth.getPersonId());

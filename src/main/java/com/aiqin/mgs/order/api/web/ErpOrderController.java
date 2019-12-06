@@ -11,7 +11,8 @@ import com.aiqin.mgs.order.api.component.enums.OrderTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.PayStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.PayWayEnum;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo;
-import com.aiqin.mgs.order.api.domain.request.ErpOrderSaveRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSendRequest;
 import com.aiqin.mgs.order.api.service.ErpOrderService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import io.swagger.annotations.Api;
@@ -50,7 +51,7 @@ public class ErpOrderController {
     }
 
     @PostMapping("/getOrderDetail")
-    @ApiOperation(value = "查询erp订单详情")
+    @ApiOperation(value = "查询订单详情")
     public HttpResponse getOrderDetail(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
         HttpResponse response = HttpResponse.success();
         try {
@@ -65,13 +66,13 @@ public class ErpOrderController {
         return response;
     }
 
-    @PostMapping("/saveDistributionOrder")
+    @PostMapping("/saveOrder")
     @ApiOperation(value = "创建配送订单")
-    public HttpResponse saveDistributionOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
+    public HttpResponse saveOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
-            OrderStoreOrderInfo orderInfo = erpOrderService.saveDistributionOrder(erpOrderSaveRequest);
+            OrderStoreOrderInfo orderInfo = erpOrderService.saveOrder(erpOrderSaveRequest);
             response.setData(orderInfo);
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
@@ -114,11 +115,11 @@ public class ErpOrderController {
 
     @PostMapping("/orderSend")
     @ApiOperation(value = "订单发货")
-    public HttpResponse orderSend(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
+    public HttpResponse orderSend(@RequestBody ErpOrderSendRequest erpOrderSendRequest) {
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
-            erpOrderService.orderSend(orderStoreOrderInfo);
+            erpOrderService.orderSend(erpOrderSendRequest);
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {

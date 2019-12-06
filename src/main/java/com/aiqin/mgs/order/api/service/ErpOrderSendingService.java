@@ -22,6 +22,17 @@ public interface ErpOrderSendingService {
      * @date 2019/11/21 17:48
      */
     OrderStoreOrderSending getOrderSendingBySendingId(String orderId);
+    
+    /**
+     * 根据物流单号查询订单物流信息
+     *
+     * @param logisticCode
+     * @return com.aiqin.mgs.order.api.domain.OrderStoreOrderSending
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/5 18:52
+     */
+    OrderStoreOrderSending getOrderSendingByLogisticCode(String logisticCode);
 
     /**
      * 保存订单发货信息

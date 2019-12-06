@@ -1,7 +1,7 @@
 package com.aiqin.mgs.order.api.service;
 
 import com.aiqin.mgs.order.api.domain.*;
-import com.aiqin.mgs.order.api.domain.response.ErpOrderPayStatusResponse;
+import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
 
 import java.math.BigDecimal;
 import java.util.List;

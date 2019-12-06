@@ -9,8 +9,9 @@ import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderPay;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
-import com.aiqin.mgs.order.api.domain.response.ErpOrderPayStatusResponse;
-import com.aiqin.mgs.order.api.domain.response.OrderPayResultResponse;
+import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
+import com.aiqin.mgs.order.api.domain.response.order.OrderPayResultResponse;
+import com.aiqin.mgs.order.api.domain.response.order.OrderSendingPayResultResponse;
 import com.aiqin.mgs.order.api.service.ErpOrderOperationService;
 import com.aiqin.mgs.order.api.service.ErpOrderPayService;
 import com.aiqin.mgs.order.api.service.ErpOrderQueryService;
@@ -293,6 +294,11 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
                 erpOrderOperationService.updateOrderByPrimaryKeySelective(orderStoreOrderInfo, auth);
             }
         }
+    }
+
+    @Override
+    public OrderSendingPayResultResponse orderSendingPayResult(OrderStoreOrderInfo orderStoreOrderInfo) {
+        return null;
     }
 
     /**

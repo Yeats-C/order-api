@@ -8,7 +8,8 @@ import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderPay;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderSending;
-import com.aiqin.mgs.order.api.domain.response.OrderPayResultResponse;
+import com.aiqin.mgs.order.api.domain.response.order.OrderPayResultResponse;
+import com.aiqin.mgs.order.api.domain.response.order.OrderSendingPayResultResponse;
 import com.aiqin.mgs.order.api.service.ErpOrderPayService;
 import com.aiqin.mgs.order.api.service.ErpOrderService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
@@ -153,7 +154,8 @@ public class ErpOrderPayController {
     public HttpResponse orderSendingPayResult(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
         HttpResponse response = HttpResponse.success();
         try {
-
+            OrderSendingPayResultResponse orderSendingPayResultResponse = erpOrderPayService.orderSendingPayResult(orderStoreOrderInfo);
+            response.setData(orderSendingPayResultResponse);
         } catch (BusinessException e) {
             logger.error("异常信息：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
