@@ -60,7 +60,7 @@ public class ErpOrderController {
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {
-            e.printStackTrace();
+           LOGGER.info("context",e);
             response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
         }
         return response;
@@ -77,7 +77,7 @@ public class ErpOrderController {
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {
-            e.printStackTrace();
+             LOGGER.info("context",e);
             response = HttpResponse.failure(ResultCode.ADD_EXCEPTION);
         }
         return response;
