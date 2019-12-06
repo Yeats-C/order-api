@@ -45,7 +45,7 @@ public interface ErpOrderService {
      * @version: v1.0.0
      * @date 2019/11/13 10:15
      */
-    OrderStoreOrderInfo saveDistributionOrder(ErpOrderSaveRequest erpOrderSaveRequest);
+    OrderStoreOrderInfo saveOrder(ErpOrderSaveRequest erpOrderSaveRequest);
 
     /**
      * 创建货架订单

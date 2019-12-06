@@ -94,6 +94,23 @@ public class AuthUtil {
     }
 
     /**
+     * 请求接口调用，不能返回空操作人
+     *
+     * @param
+     * @return com.aiqin.mgs.order.api.domain.AuthToken
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/6 10:54
+     */
+    public static AuthToken getSendAuth() {
+        AuthToken auth = getCurrentAuth();
+        if (StringUtils.isEmpty(auth.getPersonId())) {
+            auth = getSystemAuth();
+        }
+        return auth;
+    }
+
+    /**
      * 登录检查
      *
      * @param

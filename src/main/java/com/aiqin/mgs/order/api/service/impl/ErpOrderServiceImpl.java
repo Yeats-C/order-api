@@ -168,7 +168,7 @@ public class ErpOrderServiceImpl implements ErpOrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public OrderStoreOrderInfo saveDistributionOrder(ErpOrderSaveRequest erpOrderSaveRequest) {
+    public OrderStoreOrderInfo saveOrder(ErpOrderSaveRequest erpOrderSaveRequest) {
 
         //操作人信息
         AuthToken auth = AuthUtil.getCurrentAuth();
@@ -182,13 +182,13 @@ public class ErpOrderServiceImpl implements ErpOrderService {
         OrderConfirmResponse storeCartProduct = getStoreCartProduct(erpOrderSaveRequest.getStoreId());
 
         //构建订单商品明细行
-        List<OrderStoreOrderProductItem> orderProductItemList = generateDistributionOrderProductList(storeCartProduct.getCartOrderInfos(), storeInfo);
+        List<OrderStoreOrderProductItem> orderProductItemList = generateOrderProductList(storeCartProduct.getCartOrderInfos(), storeInfo);
 
         //购物车数据校验
         productCheck(erpOrderSaveRequest.getOrderType(), storeInfo, orderProductItemList);
 
         //生成订单，返回订单号
-        String orderCode = generateDistributionOrder(orderProductItemList, storeInfo, erpOrderSaveRequest, auth);
+        String orderCode = generateOrder(orderProductItemList, storeInfo, erpOrderSaveRequest, auth);
 
         //删除购物车商品
         deleteOrderProductFromCart(erpOrderSaveRequest.getStoreId(), storeCartProduct);
@@ -938,7 +938,7 @@ public class ErpOrderServiceImpl implements ErpOrderService {
     }
 
     /**
-     * 构建配送订单商品明细行数据
+     * 构建订单商品明细行数据
      *
      * @param cartProductList 购物车商品行
      * @param storeInfo       门店信息
@@ -947,7 +947,7 @@ public class ErpOrderServiceImpl implements ErpOrderService {
      * @version: v1.0.0
      * @date 2019/11/27 19:02
      */
-    private List<OrderStoreOrderProductItem> generateDistributionOrderProductList(List<CartOrderInfo> cartProductList, StoreInfo storeInfo) {
+    private List<OrderStoreOrderProductItem> generateOrderProductList(List<CartOrderInfo> cartProductList, StoreInfo storeInfo) {
 
         //商品详情Map
         Map<String, ProductInfo> productMap = new HashMap<>(16);
@@ -1078,7 +1078,7 @@ public class ErpOrderServiceImpl implements ErpOrderService {
     }
 
     /**
-     * 构建配送订单信息
+     * 构建订单信息
      *
      * @param orderProductItemList 订单商品明细行
      * @param storeInfo            门店信息
@@ -1089,7 +1089,7 @@ public class ErpOrderServiceImpl implements ErpOrderService {
      * @version: v1.0.0
      * @date 2019/11/27 19:04
      */
-    private String generateDistributionOrder(List<OrderStoreOrderProductItem> orderProductItemList, StoreInfo storeInfo, ErpOrderSaveRequest erpOrderSaveRequest, AuthToken auth) {
+    private String generateOrder(List<OrderStoreOrderProductItem> orderProductItemList, StoreInfo storeInfo, ErpOrderSaveRequest erpOrderSaveRequest, AuthToken auth) {
 
         //生成订单id
         String orderId = OrderPublic.getUUID();

@@ -51,7 +51,7 @@ public class ErpOrderController {
     }
 
     @PostMapping("/getOrderDetail")
-    @ApiOperation(value = "查询erp订单详情")
+    @ApiOperation(value = "查询订单详情")
     public HttpResponse getOrderDetail(@RequestBody OrderStoreOrderInfo orderStoreOrderInfo) {
         HttpResponse response = HttpResponse.success();
         try {
@@ -66,13 +66,13 @@ public class ErpOrderController {
         return response;
     }
 
-    @PostMapping("/saveDistributionOrder")
+    @PostMapping("/saveOrder")
     @ApiOperation(value = "创建配送订单")
-    public HttpResponse saveDistributionOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
+    public HttpResponse saveOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
-            OrderStoreOrderInfo orderInfo = erpOrderService.saveDistributionOrder(erpOrderSaveRequest);
+            OrderStoreOrderInfo orderInfo = erpOrderService.saveOrder(erpOrderSaveRequest);
             response.setData(orderInfo);
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));

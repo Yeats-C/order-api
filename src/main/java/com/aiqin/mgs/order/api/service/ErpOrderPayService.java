@@ -4,6 +4,7 @@ import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo;
 import com.aiqin.mgs.order.api.domain.OrderStoreOrderPay;
 import com.aiqin.mgs.order.api.domain.response.order.OrderPayResultResponse;
+import com.aiqin.mgs.order.api.domain.response.order.OrderSendingPayResultResponse;
 
 /**
  * 订单支付service
@@ -114,4 +115,6 @@ public interface ErpOrderPayService {
      * @date 2019/11/21 9:57
      */
     void orderTimeoutUnpaid(OrderStoreOrderInfo orderStoreOrderInfo);
+
+    OrderSendingPayResultResponse orderSendingPayResult(OrderStoreOrderInfo orderStoreOrderInfo);
 }
