@@ -122,14 +122,23 @@ public class OrderStoreOrderInfo {
     /***关联订单商品明细行*/
     private List<OrderStoreOrderProductItem> productItemList;
 
+    /***获取订单状态*/
     public String getOrderStatusDesc() {
         return ErpOrderStatusEnum.getEnumDesc(orderStatus);
     }
 
+    /**
+     * 获取支付状态
+     * @return
+     */
     public String getPayStatusDesc() {
         return PayStatusEnum.getEnumDesc(payStatus);
     }
 
+    /**
+     * 获取订单类型
+     * @return
+     */
     public String getOrderTypeDesc() {
         return OrderTypeEnum.getEnumDesc(orderType);
     }

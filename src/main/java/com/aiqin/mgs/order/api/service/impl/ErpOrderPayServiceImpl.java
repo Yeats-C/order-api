@@ -49,12 +49,23 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
     @Resource
     private ErpOrderRequestService erpOrderRequestService;
 
+    /**
+     * 根据订单id查询订单支付信息
+     *
+     * @param orderId
+     * @return com.aiqin.mgs.order.api.domain.OrderStoreOrderPay
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/11/20 15:25
+     */
     @Override
     public OrderStoreOrderPay getOrderPayByOrderId(String orderId) {
+        //订单支付信息
         OrderStoreOrderPay orderPay = null;
         if (StringUtils.isNotEmpty(orderId)) {
             OrderStoreOrderPay orderPayQuery = new OrderStoreOrderPay();
             orderPayQuery.setOrderId(orderId);
+            //通过订单id查询支付信息
             List<OrderStoreOrderPay> select = orderStoreOrderPayDao.select(orderPayQuery);
             if (select != null && select.size() > 0) {
                 orderPay = select.get(0);
@@ -221,18 +232,22 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
             auth = AuthUtil.getSystemAuth();
         }
 
+        //通过订单号获取定单信息
         OrderStoreOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
         if (order == null) {
             throw new BusinessException("无效的订单编号");
         }
+        //如果订单状态不是待支付状态
         if (!ErpOrderStatusEnum.ORDER_STATUS_1.getCode().equals(order.getOrderStatus())) {
             throw new BusinessException("该订单不是" + ErpOrderStatusEnum.ORDER_STATUS_1.getDesc() + "状态的订单");
         }
 
+        //通过订单id获取支付信息
         OrderStoreOrderPay orderPay = this.getOrderPayByOrderId(order.getOrderId());
         if (orderPay == null) {
             throw new BusinessException("订单支付信息异常");
         }
+        //如果订单的支付状态不是已发起支付状态
         if (!PayStatusEnum.PAYING.getCode().equals(orderPay.getPayStatus())) {
             throw new BusinessException("订单支付信息异常");
         }
