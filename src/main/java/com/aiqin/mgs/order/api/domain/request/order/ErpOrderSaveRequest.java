@@ -1,6 +1,6 @@
 package com.aiqin.mgs.order.api.domain.request.order;
 
-import com.aiqin.mgs.order.api.domain.OrderStoreOrderProductItem;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -38,5 +38,5 @@ public class ErpOrderSaveRequest {
 
     /***货架商品列表*/
     @ApiModelProperty(value = "货架商品列表")
-    private List<OrderStoreOrderProductItem> productList;
+    private List<ErpOrderItem> itemList;
 }
