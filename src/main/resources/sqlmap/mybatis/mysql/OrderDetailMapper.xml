@@ -260,7 +260,7 @@
         LIMIT 0,10
     </select>
 
-    <select id="productOverviewByOrderTop"  resultMap="OrderInfoDetailMapping" resultType="java.util.List">
+    <!--<select id="productOverviewByOrderTop"  resultMap="OrderInfoDetailMapping" resultType="java.util.List">
     SELECT any_value(product_id),any_value(product_name) as product_name,SUM(IFNULL(a.amount,0)) AS amount,SUM(IFNULL(a.actual_price,0)) AS actual_price FROM order_detail a
     LEFT JOIN order_info b ON a.order_id = b.order_id
     WHERE 1=1 and order_type = 1
@@ -278,7 +278,7 @@
     GROUP BY product_id,product_name
     ORDER BY SUM(a.amount) DESC
     LIMIT 0,10
-    </select>
+    </select>-->
 
     <!--商品概览 sku产品销量、销售额-前10名 不包含取消、未付款的订单-->
     <select id="productFrontTop10"  resultMap="OrderInfoDetailMapping" resultType="java.util.List">
@@ -326,7 +326,7 @@
         LIMIT 0,10
     </select>
 
-    <select id="productOverviewByOrderLast"  resultMap="OrderInfoDetailMapping" resultType="java.util.List">
+   <!-- <select id="productOverviewByOrderLast"  resultMap="OrderInfoDetailMapping" resultType="java.util.List">
     SELECT product_id,product_name,SUM(IFNULL(a.amount,0)) AS amount,SUM(IFNULL(a.actual_price,0)) AS actual_price FROM order_detail a
     LEFT JOIN order_info b ON a.order_id = b.order_id
     WHERE 1=1 and order_type = 1
@@ -344,7 +344,7 @@
     GROUP BY product_id,product_name
     ORDER BY SUM(a.amount)
     LIMIT 0,10
-    </select>
+    </select>-->
 
     <!--商品概览sku产品销量、销售额-后10名 不包含取消、未付款的订单-->
     <select id="productAfterTop10"  resultMap="OrderInfoDetailMapping" resultType="java.util.List">
