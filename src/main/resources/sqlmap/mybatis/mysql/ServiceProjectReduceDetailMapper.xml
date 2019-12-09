@@ -7,7 +7,6 @@
         <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
         <result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
         <result column="order_type" jdbcType="BIT" property="orderType"/>
-        <result column="reduce_id" jdbcType="VARCHAR" property="reduceId"/>
         <result column="customer_id" jdbcType="VARCHAR" property="customerId"/>
         <result column="customer_name" jdbcType="VARCHAR" property="customerName"/>
         <result column="customer_phone" jdbcType="VARCHAR" property="customerPhone"/>

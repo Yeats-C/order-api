@@ -127,8 +127,5 @@ public class ServiceProjectReduceDetail {
     @JsonProperty("project_list")
     private List<ServiceProjectAsset> serviceProjectAssetList;
 
-    @Override
-    public int hashCode() {
-        return (int)createTime.getTime();
-    }
+
 }
