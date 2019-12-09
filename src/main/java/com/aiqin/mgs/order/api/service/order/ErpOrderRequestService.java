@@ -1,7 +1,9 @@
 package com.aiqin.mgs.order.api.service.order;
 
 import com.aiqin.mgs.order.api.domain.*;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
 
 import java.math.BigDecimal;
@@ -61,7 +63,7 @@ public interface ErpOrderRequestService {
      * @version: v1.0.0
      * @date 2019/12/2 15:37
      */
-    boolean sendPayRequest(OrderStoreOrderInfo order, OrderStoreOrderPay orderPay);
+    boolean sendPayRequest(ErpOrderInfo order, ErpOrderPay orderPay);
 
     /**
      * 获取物流券
@@ -72,7 +74,7 @@ public interface ErpOrderRequestService {
      * @version: v1.0.0
      * @date 2019/12/2 15:45
      */
-    BigDecimal getGoodsCoupon(OrderStoreOrderInfo order);
+    BigDecimal getGoodsCoupon(ErpOrderInfo order);
 
     /**
      * 订单支付成功推送供应链
@@ -83,7 +85,7 @@ public interface ErpOrderRequestService {
      * @version: v1.0.0
      * @date 2019/12/2 15:48
      */
-    boolean sendOrderPaySuccessToSupplyChain(OrderStoreOrderInfo order);
+    boolean sendOrderPaySuccessToSupplyChain(ErpOrderInfo order);
 
     /**
      * 推送拆分后的订单到供应链
@@ -95,7 +97,7 @@ public interface ErpOrderRequestService {
      * @version: v1.0.0
      * @date 2019/12/3 17:26
      */
-    boolean sendSplitOrderToSupplyChain(OrderStoreOrderInfo order, List<OrderStoreOrderInfo> splitOrderList);
+    boolean sendSplitOrderToSupplyChain(ErpOrderInfo order, List<ErpOrderInfo> splitOrderList);
 
     /**
      * 商品销售区域配置校验

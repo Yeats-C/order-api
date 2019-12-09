@@ -1,10 +1,10 @@
 package com.aiqin.mgs.order.api.service.impl.order;
 
-import com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo;
-import com.aiqin.mgs.order.api.domain.OrderStoreOrderPay;
 import com.aiqin.mgs.order.api.domain.ProductInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
 import org.springframework.stereotype.Service;
@@ -70,7 +70,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
      * @date 2019/12/2 15:37
      */
     @Override
-    public boolean sendPayRequest(OrderStoreOrderInfo order, OrderStoreOrderPay orderPay) {
+    public boolean sendPayRequest(ErpOrderInfo order, ErpOrderPay orderPay) {
         return false;
     }
 
@@ -84,7 +84,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
      * @date 2019/12/2 15:45
      */
     @Override
-    public BigDecimal getGoodsCoupon(OrderStoreOrderInfo order) {
+    public BigDecimal getGoodsCoupon(ErpOrderInfo order) {
         return null;
     }
 
@@ -98,7 +98,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
      * @date 2019/12/2 15:48
      */
     @Override
-    public boolean sendOrderPaySuccessToSupplyChain(OrderStoreOrderInfo order) {
+    public boolean sendOrderPaySuccessToSupplyChain(ErpOrderInfo order) {
         return false;
     }
 
@@ -113,7 +113,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
      * @date 2019/12/3 17:26
      */
     @Override
-    public boolean sendSplitOrderToSupplyChain(OrderStoreOrderInfo order, List<OrderStoreOrderInfo> splitOrderList) {
+    public boolean sendSplitOrderToSupplyChain(ErpOrderInfo order, List<ErpOrderInfo> splitOrderList) {
         return false;
     }
 
