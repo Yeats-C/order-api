@@ -20,15 +20,15 @@ public class ErpOrderSaveRequest {
     @ApiModelProperty(value = "门店id")
     private String storeId;
 
-    /***订单类型 OrderTypeEnum*/
+    /***订单类型 ErpOrderTypeEnum*/
     @ApiModelProperty(value = "订单类型")
     private Integer orderType;
 
-    /***订单来源 OrderOriginTypeEnum*/
+    /***订单来源 ErpOrderOriginTypeEnum*/
     @ApiModelProperty(value = "订单来源")
     private Integer orderOriginType;
 
-    /***订单销售渠道标识 OrderChannelEnum*/
+    /***订单销售渠道标识 ErpOrderChannelTypeEnum*/
     @ApiModelProperty(value = "销售渠道")
     private Integer orderChannel;
 

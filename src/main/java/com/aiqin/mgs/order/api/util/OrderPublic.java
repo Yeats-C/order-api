@@ -7,24 +7,18 @@
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.util;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import javax.annotation.Resource;
-
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
-import com.aiqin.mgs.order.api.component.enums.OrderChannelEnum;
-import com.aiqin.mgs.order.api.component.enums.OrderOriginTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderChannelTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderOriginTypeEnum;
 import com.aiqin.mgs.order.api.domain.OrderAfterSaleQuery;
 import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
 import com.aiqin.mgs.order.api.domain.OrderLog;
 import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.constant.Global;
-import com.aiqin.mgs.order.api.service.OrderService;
 
 public class OrderPublic {
 	
@@ -182,10 +176,10 @@ public class OrderPublic {
     public static String generateOrderCode(Integer originType, Integer orderChannel) {
 
         //判断订单来源和销售渠道是否合法
-        if (!OrderOriginTypeEnum.exist(originType)) {
+        if (!ErpOrderOriginTypeEnum.exist(originType)) {
             throw new BusinessException("无效的订单来源");
         }
-        if (!OrderChannelEnum.exist(orderChannel)) {
+        if (!ErpOrderChannelTypeEnum.exist(orderChannel)) {
             throw new BusinessException("无效的销售渠道类型");
         }
 

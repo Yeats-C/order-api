@@ -16,7 +16,7 @@ import java.util.Map;
  * @date 2019/11/12 17:15
  */
 @Getter
-public enum PayWayEnum {
+public enum ErpPayWayEnum {
 
     /***余额*/
     PAY_1(1, "1", "余额支付");
@@ -25,7 +25,7 @@ public enum PayWayEnum {
     private String value;
     private String desc;
 
-    PayWayEnum(Integer code, String value, String desc) {
+    ErpPayWayEnum(Integer code, String value, String desc) {
         this.code = code;
         this.value = value;
         this.desc = desc;
@@ -34,20 +34,20 @@ public enum PayWayEnum {
     /***选项类型*/
     public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
     /***code-enum map*/
-    public static final Map<Integer, PayWayEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<Integer, ErpPayWayEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
     /***value-enum map*/
-    public static final Map<String, PayWayEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<String, ErpPayWayEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
     static {
-        for (PayWayEnum item :
-                PayWayEnum.values()) {
+        for (ErpPayWayEnum item :
+                ErpPayWayEnum.values()) {
             SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
             CODE_ENUM_MAP.put(item.getCode(), item);
             VALUE_ENUM_MAP.put(item.getValue(), item);
         }
     }
 
-    public static PayWayEnum getEnum(Object object) {
+    public static ErpPayWayEnum getEnum(Object object) {
         if (object != null) {
             return VALUE_ENUM_MAP.get(object.toString());
         }
@@ -56,7 +56,7 @@ public enum PayWayEnum {
 
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            PayWayEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            ErpPayWayEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
             }

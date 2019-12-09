@@ -16,7 +16,7 @@ import java.util.Map;
  * @date 2019/11/21 10:12
  */
 @Getter
-public enum OrderPayPollingBackStatus {
+public enum ErpOrderPayPollingBackStatus {
 
     /***订单支付处理中*/
     ORDER_TYPE_0(0, "0", "订单支付处理中"),
@@ -43,7 +43,7 @@ public enum OrderPayPollingBackStatus {
     private String value;
     private String desc;
 
-    OrderPayPollingBackStatus(Integer code, String value, String desc) {
+    ErpOrderPayPollingBackStatus(Integer code, String value, String desc) {
         this.code = code;
         this.value = value;
         this.desc = desc;
@@ -52,20 +52,20 @@ public enum OrderPayPollingBackStatus {
     /***选项类型*/
     public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
     /***code-enum map*/
-    public static final Map<Integer, OrderPayPollingBackStatus> CODE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<Integer, ErpOrderPayPollingBackStatus> CODE_ENUM_MAP = new LinkedHashMap<>(16);
     /***value-enum map*/
-    public static final Map<String, OrderPayPollingBackStatus> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<String, ErpOrderPayPollingBackStatus> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
     static {
-        for (OrderPayPollingBackStatus item :
-                OrderPayPollingBackStatus.values()) {
+        for (ErpOrderPayPollingBackStatus item :
+                ErpOrderPayPollingBackStatus.values()) {
             SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
             CODE_ENUM_MAP.put(item.getCode(), item);
             VALUE_ENUM_MAP.put(item.getValue(), item);
         }
     }
 
-    public static OrderPayPollingBackStatus getEnum(Object object) {
+    public static ErpOrderPayPollingBackStatus getEnum(Object object) {
         if (object != null) {
             return VALUE_ENUM_MAP.get(object.toString());
         }
@@ -74,7 +74,7 @@ public enum OrderPayPollingBackStatus {
 
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            OrderPayPollingBackStatus anEnum = VALUE_ENUM_MAP.get(object.toString());
+            ErpOrderPayPollingBackStatus anEnum = VALUE_ENUM_MAP.get(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
             }

@@ -18,7 +18,7 @@ import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.mgs.order.api.component.*;
-import com.aiqin.mgs.order.api.component.enums.PayTypeEnum;
+import com.aiqin.mgs.order.api.component.PayTypeEnum;
 import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
@@ -32,7 +32,6 @@ import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 
-import com.aiqin.mgs.order.api.service.*;
 import com.aiqin.mgs.order.api.util.DateUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.fasterxml.jackson.core.type.TypeReference;

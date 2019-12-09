@@ -1,7 +1,7 @@
 package com.aiqin.mgs.order.api.domain.response.order;
 
 import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
-import com.aiqin.mgs.order.api.component.enums.PayStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -36,6 +36,6 @@ public class OrderPayResultResponse {
     }
 
     public String getPayStatusDesc() {
-        return PayStatusEnum.getEnumDesc(payStatus);
+        return ErpPayStatusEnum.getEnumDesc(payStatus);
     }
 }

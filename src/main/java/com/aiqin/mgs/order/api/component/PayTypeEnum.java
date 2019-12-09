@@ -1,4 +1,4 @@
-package com.aiqin.mgs.order.api.component.enums;
+package com.aiqin.mgs.order.api.component;
 
 import com.aiqin.mgs.order.api.domain.EnumItemInfo;
 import lombok.Getter;
@@ -9,49 +9,59 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 订单附属级别
+ * 支付类型枚举
  *
  * @author: Tao.Chen
  * @version: v1.0.0
- * @date 2019/11/15 15:42
+ * @date 2019/11/12 17:15
  */
 @Getter
-public enum OrderLevelEnum {
+public enum PayTypeEnum {
 
-    /***主订单*/
-    PRIMARY(1, "1", "主订单"),
-    /***子订单*/
-    SECONDARY(2, "2", "子订单");
+    /***在线支付-微信*/
+    ONLINE_WE_CHAT(0, "0", "在线支付-微信"),
+    /***在线支付-支付宝*/
+    ONLINE_ALI_PAY(1, "1", "在线支付-支付宝"),
+    /***在线支付-银行卡*/
+    ONLINE_BANK_CARD(2, "2", "在线支付-银行卡"),
+    /***到店支付-现金*/
+    CASH(3, "3", "到店支付-现金"),
+    /***到店支付-微信*/
+    DOOR_WE_CHAT(4, "4", "到店支付-微信"),
+    /***到店支付-支付宝*/
+    DOOR_ALI_PAY(5, "5", "到店支付-支付宝"),
+    /***到店支付-银行卡*/
+    DOOR_BANK_CARD(6, "6", "到店支付-银行卡"),
+    /***储值卡支付*/
+    BALANCE_PAY(7, "7", "储值卡支付");
 
-    /***数字类型状态*/
     private Integer code;
-    /***字符串类型状态*/
     private String value;
-    /***状态描述*/
     private String desc;
 
-    OrderLevelEnum(Integer code, String value, String desc) {
+    PayTypeEnum(Integer code, String value, String desc) {
         this.code = code;
         this.value = value;
         this.desc = desc;
     }
+
     /***选项类型*/
     public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
     /***code-enum map*/
-    public static final Map<Integer, OrderLevelEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<Integer, PayTypeEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
     /***value-enum map*/
-    public static final Map<String, OrderLevelEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<String, PayTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
     static {
-        for (OrderLevelEnum item :
-                OrderLevelEnum.values()) {
+        for (PayTypeEnum item :
+                PayTypeEnum.values()) {
             SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
             CODE_ENUM_MAP.put(item.getCode(), item);
             VALUE_ENUM_MAP.put(item.getValue(), item);
         }
     }
 
-    public static OrderLevelEnum getEnum(Object object) {
+    public static PayTypeEnum getEnum(Object object) {
         if (object != null) {
             return VALUE_ENUM_MAP.get(object.toString());
         }
@@ -60,7 +70,7 @@ public enum OrderLevelEnum {
 
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            OrderLevelEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            PayTypeEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
             }
@@ -74,4 +84,5 @@ public enum OrderLevelEnum {
         }
         return false;
     }
+
 }

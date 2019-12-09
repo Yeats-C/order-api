@@ -16,7 +16,7 @@ import java.util.Map;
  * @date 2019/11/15 17:33
  */
 @Getter
-public enum ProductGiftEnum {
+public enum ErpProductGiftEnum {
 
     /***本品*/
     PRODUCT(1, "1", "本品"),
@@ -27,7 +27,7 @@ public enum ProductGiftEnum {
     private String value;
     private String desc;
 
-    ProductGiftEnum(Integer code, String value, String desc) {
+    ErpProductGiftEnum(Integer code, String value, String desc) {
         this.code = code;
         this.value = value;
         this.desc = desc;
@@ -36,13 +36,13 @@ public enum ProductGiftEnum {
     /***选项类型*/
     public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
     /***code-enum map*/
-    public static final Map<Integer, ProductGiftEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<Integer, ErpProductGiftEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
     /***value-enum map*/
-    public static final Map<String, ProductGiftEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<String, ErpProductGiftEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
     static {
-        for (ProductGiftEnum item :
-                ProductGiftEnum.values()) {
+        for (ErpProductGiftEnum item :
+                ErpProductGiftEnum.values()) {
             SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
             CODE_ENUM_MAP.put(item.getCode(), item);
             VALUE_ENUM_MAP.put(item.getValue(), item);
@@ -54,7 +54,7 @@ public enum ProductGiftEnum {
      * @param object
      * @return
      */
-    public static ProductGiftEnum getEnum(Object object) {
+    public static ErpProductGiftEnum getEnum(Object object) {
         if (object != null) {
             return VALUE_ENUM_MAP.get(object.toString());
         }
@@ -68,7 +68,7 @@ public enum ProductGiftEnum {
      */
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            ProductGiftEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            ErpProductGiftEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
             }
@@ -83,9 +83,9 @@ public enum ProductGiftEnum {
      */
     public static String getEnumValue(Object object) {
         if (object != null) {
-            ProductGiftEnum productGiftEnum = VALUE_ENUM_MAP.get(object.toString());
-            if (productGiftEnum != null){
-                return productGiftEnum.getValue();
+            ErpProductGiftEnum erpProductGiftEnum = VALUE_ENUM_MAP.get(object.toString());
+            if (erpProductGiftEnum != null){
+                return erpProductGiftEnum.getValue();
             }
         }
         return "";
@@ -98,9 +98,9 @@ public enum ProductGiftEnum {
      */
     public static Integer getEnumCode(Object object){
         if (object != null){
-            ProductGiftEnum productGiftEnum = CODE_ENUM_MAP.get(object.toString());
-            if (productGiftEnum != null){
-                return productGiftEnum.getCode();
+            ErpProductGiftEnum erpProductGiftEnum = CODE_ENUM_MAP.get(object.toString());
+            if (erpProductGiftEnum != null){
+                return erpProductGiftEnum.getCode();
             }
         }
         return null;

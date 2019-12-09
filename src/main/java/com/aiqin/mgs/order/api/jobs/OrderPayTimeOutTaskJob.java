@@ -1,18 +1,8 @@
 package com.aiqin.mgs.order.api.jobs;
 
-import com.aiqin.mgs.order.api.base.exception.BusinessException;
-import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
-import com.aiqin.mgs.order.api.component.enums.PayStatusEnum;
-import com.aiqin.mgs.order.api.domain.OrderStoreOrderInfo;
-import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
-import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
 
 /**
  * 取消超时未支付订单定时任务
@@ -41,7 +31,7 @@ public class OrderPayTimeOutTaskJob {
 //        logger.info("取消超时未支付订单定时任务=====>开始");
 //        OrderStoreOrderInfo orderInfo = new OrderStoreOrderInfo();
 //        orderInfo.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
-//        orderInfo.setPayStatus(PayStatusEnum.UNPAID.getCode());
+//        orderInfo.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
 //        List<OrderStoreOrderInfo> list = erpOrderQueryService.selectOrderBySelective(orderInfo);
 //        Date now = new Date();
 //        if (list != null && list.size() > 0) {

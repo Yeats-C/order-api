@@ -16,7 +16,7 @@ import java.util.Map;
  * @date 2019/11/12 16:58
  */
 @Getter
-public enum PayStatusEnum {
+public enum ErpPayStatusEnum {
 
     /***待支付*/
     UNPAID(0, "0", "待支付"),
@@ -31,7 +31,7 @@ public enum PayStatusEnum {
     private String value;
     private String desc;
 
-    PayStatusEnum(Integer code, String value, String desc) {
+    ErpPayStatusEnum(Integer code, String value, String desc) {
         this.code = code;
         this.value = value;
         this.desc = desc;
@@ -40,20 +40,20 @@ public enum PayStatusEnum {
     /***选项类型*/
     public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
     /***code-enum map*/
-    public static final Map<Integer, PayStatusEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<Integer, ErpPayStatusEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
     /***value-enum map*/
-    public static final Map<String, PayStatusEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<String, ErpPayStatusEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
     static {
-        for (PayStatusEnum item :
-                PayStatusEnum.values()) {
+        for (ErpPayStatusEnum item :
+                ErpPayStatusEnum.values()) {
             SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
             CODE_ENUM_MAP.put(item.getCode(), item);
             VALUE_ENUM_MAP.put(item.getValue(), item);
         }
     }
 
-    public static PayStatusEnum getEnum(Object object) {
+    public static ErpPayStatusEnum getEnum(Object object) {
         if (object != null) {
             return VALUE_ENUM_MAP.get(object.toString());
         }
@@ -62,7 +62,7 @@ public enum PayStatusEnum {
 
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            PayStatusEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            ErpPayStatusEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
             }

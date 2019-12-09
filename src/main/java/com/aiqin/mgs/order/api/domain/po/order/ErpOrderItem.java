@@ -36,7 +36,7 @@ public class ErpOrderItem extends ErpOrderBase {
 
     /***活动id*/
     private String activityId;
-    /***本品赠品标记 ProductGiftEnum */
+    /***本品赠品标记 ErpProductGiftEnum */
     private Integer productGift;
 
     /***订货数量*/

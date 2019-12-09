@@ -9,25 +9,27 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 购物车商品添加来源
+ * 购物车商品类型
  *
  * @author: Tao.Chen
  * @version: v1.0.0
- * @date 2019/11/15 17:30
+ * @date 2019/11/15 11:09
  */
 @Getter
-public enum CartProductCreateSourceEnum {
+public enum ErpProductTypeEnum {
 
-    /***运维中心ERP*/
-    ERP(1, "1", "运维中心ERP"),
-    /***爱掌柜*/
-    STORE(2, "2", "爱掌柜");
+    /***直送*/
+    DIRECT_SEND(1, "1", "直送"),
+    /***配送*/
+    DISTRIBUTION(2, "2", "配送"),
+    /***货架*/
+    STORAGE_RACK(3, "3", "货架");
 
     private Integer code;
     private String value;
     private String desc;
 
-    CartProductCreateSourceEnum(Integer code, String value, String desc) {
+    ErpProductTypeEnum(Integer code, String value, String desc) {
         this.code = code;
         this.value = value;
         this.desc = desc;
@@ -36,20 +38,20 @@ public enum CartProductCreateSourceEnum {
     /***选项类型*/
     public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
     /***code-enum map*/
-    public static final Map<Integer, CartProductCreateSourceEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<Integer, ErpProductTypeEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
     /***value-enum map*/
-    public static final Map<String, CartProductCreateSourceEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<String, ErpProductTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
     static {
-        for (CartProductCreateSourceEnum item :
-                CartProductCreateSourceEnum.values()) {
+        for (ErpProductTypeEnum item :
+                ErpProductTypeEnum.values()) {
             SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
             CODE_ENUM_MAP.put(item.getCode(), item);
             VALUE_ENUM_MAP.put(item.getValue(), item);
         }
     }
 
-    public static CartProductCreateSourceEnum getEnum(Object object) {
+    public static ErpProductTypeEnum getEnum(Object object) {
         if (object != null) {
             return VALUE_ENUM_MAP.get(object.toString());
         }
@@ -58,7 +60,7 @@ public enum CartProductCreateSourceEnum {
 
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            CartProductCreateSourceEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            ErpProductTypeEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
             }

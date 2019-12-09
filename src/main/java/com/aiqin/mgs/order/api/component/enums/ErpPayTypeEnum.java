@@ -9,25 +9,37 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 订单销售渠道标识
+ * 支付类型枚举
  *
  * @author: Tao.Chen
  * @version: v1.0.0
- * @date 2019/11/19 10:02
+ * @date 2019/11/12 17:15
  */
 @Getter
-public enum OrderChannelEnum {
+public enum ErpPayTypeEnum {
 
-    /***总部向门店销售*/
-    CHANNEL_3(3, "3", "总部向门店销售"),
-    /***门店向会员销售*/
-    CHANNEL_4(4, "4", "门店向会员销售");
+    /***在线支付-微信*/
+    ONLINE_WE_CHAT(0, "0", "在线支付-微信"),
+    /***在线支付-支付宝*/
+    ONLINE_ALI_PAY(1, "1", "在线支付-支付宝"),
+    /***在线支付-银行卡*/
+    ONLINE_BANK_CARD(2, "2", "在线支付-银行卡"),
+    /***到店支付-现金*/
+    CASH(3, "3", "到店支付-现金"),
+    /***到店支付-微信*/
+    DOOR_WE_CHAT(4, "4", "到店支付-微信"),
+    /***到店支付-支付宝*/
+    DOOR_ALI_PAY(5, "5", "到店支付-支付宝"),
+    /***到店支付-银行卡*/
+    DOOR_BANK_CARD(6, "6", "到店支付-银行卡"),
+    /***储值卡支付*/
+    BALANCE_PAY(7, "7", "储值卡支付");
 
     private Integer code;
     private String value;
     private String desc;
 
-    OrderChannelEnum(Integer code, String value, String desc) {
+    ErpPayTypeEnum(Integer code, String value, String desc) {
         this.code = code;
         this.value = value;
         this.desc = desc;
@@ -36,20 +48,20 @@ public enum OrderChannelEnum {
     /***选项类型*/
     public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
     /***code-enum map*/
-    public static final Map<Integer, OrderChannelEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<Integer, ErpPayTypeEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
     /***value-enum map*/
-    public static final Map<String, OrderChannelEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<String, ErpPayTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
     static {
-        for (OrderChannelEnum item :
-                OrderChannelEnum.values()) {
+        for (ErpPayTypeEnum item :
+                ErpPayTypeEnum.values()) {
             SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
             CODE_ENUM_MAP.put(item.getCode(), item);
             VALUE_ENUM_MAP.put(item.getValue(), item);
         }
     }
 
-    public static OrderChannelEnum getEnum(Object object) {
+    public static ErpPayTypeEnum getEnum(Object object) {
         if (object != null) {
             return VALUE_ENUM_MAP.get(object.toString());
         }
@@ -58,7 +70,7 @@ public enum OrderChannelEnum {
 
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            OrderChannelEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            ErpPayTypeEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
             }

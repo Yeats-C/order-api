@@ -21,13 +21,13 @@ public class ErpOrderInfo extends ErpOrderBase {
     private String orderCode;
     /***订单状态 枚举 ErpOrderStatusEnum*/
     private Integer orderStatus;
-    /***订单类型 枚举 OrderTypeEnum*/
+    /***订单类型 枚举 ErpOrderTypeEnum*/
     private Integer orderType;
-    /***订单来源 OrderOriginTypeEnum*/
+    /***订单来源 ErpOrderOriginTypeEnum*/
     private Integer orderOriginType;
-    /***订单销售渠道标识 OrderChannelEnum*/
+    /***订单销售渠道标识 ErpOrderChannelTypeEnum*/
     private Integer orderChannelType;
-    /***订单级别 枚举 OrderLevelEnum*/
+    /***订单级别 枚举 ErpOrderLevelEnum*/
     private Integer orderLevel;
     /***关联主订单编码*/
     private String primaryCode;

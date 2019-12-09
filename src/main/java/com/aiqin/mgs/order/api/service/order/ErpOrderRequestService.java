@@ -46,7 +46,7 @@ public interface ErpOrderRequestService {
      * 根据订单编码获取订单支付状态
      *
      * @param orderCode 订单编码
-     * @return com.aiqin.mgs.order.api.component.enums.PayStatusEnum
+     * @return com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/2 15:37

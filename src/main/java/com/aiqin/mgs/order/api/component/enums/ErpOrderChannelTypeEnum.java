@@ -9,27 +9,25 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 购物车商品类型
+ * 订单销售渠道标识
  *
  * @author: Tao.Chen
  * @version: v1.0.0
- * @date 2019/11/15 11:09
+ * @date 2019/11/19 10:02
  */
 @Getter
-public enum ProductTypeEnum {
+public enum ErpOrderChannelTypeEnum {
 
-    /***直送*/
-    DIRECT_SEND(1, "1", "直送"),
-    /***配送*/
-    DISTRIBUTION(2, "2", "配送"),
-    /***货架*/
-    STORAGE_RACK(3, "3", "货架");
+    /***总部向门店销售*/
+    CHANNEL_3(3, "3", "总部向门店销售"),
+    /***门店向会员销售*/
+    CHANNEL_4(4, "4", "门店向会员销售");
 
     private Integer code;
     private String value;
     private String desc;
 
-    ProductTypeEnum(Integer code, String value, String desc) {
+    ErpOrderChannelTypeEnum(Integer code, String value, String desc) {
         this.code = code;
         this.value = value;
         this.desc = desc;
@@ -38,20 +36,20 @@ public enum ProductTypeEnum {
     /***选项类型*/
     public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
     /***code-enum map*/
-    public static final Map<Integer, ProductTypeEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<Integer, ErpOrderChannelTypeEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
     /***value-enum map*/
-    public static final Map<String, ProductTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<String, ErpOrderChannelTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
     static {
-        for (ProductTypeEnum item :
-                ProductTypeEnum.values()) {
+        for (ErpOrderChannelTypeEnum item :
+                ErpOrderChannelTypeEnum.values()) {
             SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
             CODE_ENUM_MAP.put(item.getCode(), item);
             VALUE_ENUM_MAP.put(item.getValue(), item);
         }
     }
 
-    public static ProductTypeEnum getEnum(Object object) {
+    public static ErpOrderChannelTypeEnum getEnum(Object object) {
         if (object != null) {
             return VALUE_ENUM_MAP.get(object.toString());
         }
@@ -60,7 +58,7 @@ public enum ProductTypeEnum {
 
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            ProductTypeEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            ErpOrderChannelTypeEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
             }
@@ -74,4 +72,5 @@ public enum ProductTypeEnum {
         }
         return false;
     }
+
 }

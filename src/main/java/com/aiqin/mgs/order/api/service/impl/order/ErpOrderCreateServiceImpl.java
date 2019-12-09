@@ -122,21 +122,21 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         if (erpOrderSaveRequest.getOrderType() == null) {
             throw new BusinessException("请传入订单类型");
         } else {
-            if (!OrderTypeEnum.exist(erpOrderSaveRequest.getOrderType())) {
+            if (!ErpOrderTypeEnum.exist(erpOrderSaveRequest.getOrderType())) {
                 throw new BusinessException("无效的订单类型");
             }
         }
         if (erpOrderSaveRequest.getOrderOriginType() == null) {
             throw new BusinessException("请选择订单来源");
         } else {
-            if (!OrderOriginTypeEnum.exist(erpOrderSaveRequest.getOrderOriginType())) {
+            if (!ErpOrderOriginTypeEnum.exist(erpOrderSaveRequest.getOrderOriginType())) {
                 throw new BusinessException("无效的订单来源");
             }
         }
         if (erpOrderSaveRequest.getOrderChannel() == null) {
             throw new BusinessException("请选择销售渠道");
         } else {
-            if (!OrderChannelEnum.exist(erpOrderSaveRequest.getOrderChannel())) {
+            if (!ErpOrderChannelTypeEnum.exist(erpOrderSaveRequest.getOrderChannel())) {
                 throw new BusinessException("无效的销售渠道");
             }
         }
@@ -213,8 +213,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             orderItem.setSkuName(productInfo.getSkuName());
             //单位
             orderItem.setUnit(productInfo.getUnit());
-            //本品赠品标记 ProductGiftEnum
-            orderItem.setProductGift(ProductGiftEnum.PRODUCT.getCode());
+            //本品赠品标记 ErpProductGiftEnum
+            orderItem.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
 
             //活动id
             orderItem.setActivityId(null);
@@ -250,33 +250,33 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private void productCheck(Integer orderType, StoreInfo storeInfo, List<ErpOrderItem> orderProductItemList) {
 
         //订单类型
-        OrderTypeEnum orderTypeEnum = OrderTypeEnum.getEnum(orderType);
-        if (orderTypeEnum == null) {
+        ErpOrderTypeEnum erpOrderTypeEnum = ErpOrderTypeEnum.getEnum(orderType);
+        if (erpOrderTypeEnum == null) {
             throw new BusinessException("无效的订单类型");
         }
 
-        if (orderTypeEnum.isActivityCheck()) {
+        if (erpOrderTypeEnum.isActivityCheck()) {
             //活动校验
             boolean flag = erpOrderRequestService.activityCheck(storeInfo, orderProductItemList);
             if (!flag) {
                 throw new BusinessException("活动校验失败");
             }
         }
-        if (orderTypeEnum.isAreaCheck()) {
+        if (erpOrderTypeEnum.isAreaCheck()) {
             //商品销售区域配置校验
             boolean flag = erpOrderRequestService.areaCheck(storeInfo, orderProductItemList);
             if (!flag) {
                 throw new BusinessException("商品销售区域配置校验失败");
             }
         }
-        if (orderTypeEnum.isPriceCheck()) {
+        if (erpOrderTypeEnum.isPriceCheck()) {
             //商品销售价格校验
             boolean flag = erpOrderRequestService.priceCheck(storeInfo, orderProductItemList);
             if (!flag) {
                 throw new BusinessException("商品销售价格校验失败");
             }
         }
-        if (orderTypeEnum.isRepertoryCheck()) {
+        if (erpOrderTypeEnum.isRepertoryCheck()) {
             //商品库存校验
             boolean flag = erpOrderRequestService.repertoryCheck(storeInfo, orderProductItemList);
             if (!flag) {
@@ -322,14 +322,14 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         ErpOrderInfo orderInfo = new ErpOrderInfo();
         //订单状态 枚举 ErpOrderStatusEnum
         orderInfo.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
-        //订单类型 枚举 OrderTypeEnum
+        //订单类型 枚举 ErpOrderTypeEnum
         orderInfo.setOrderType(erpOrderSaveRequest.getOrderType());
-        //订单来源 OrderOriginTypeEnum
+        //订单来源 ErpOrderOriginTypeEnum
         orderInfo.setOrderOriginType(erpOrderSaveRequest.getOrderOriginType());
-        //订单销售渠道标识 OrderChannelEnum
+        //订单销售渠道标识 ErpOrderChannelTypeEnum
         orderInfo.setOrderChannelType(erpOrderSaveRequest.getOrderChannel());
-        //订单级别 枚举 OrderLevelEnum
-        orderInfo.setOrderLevel(OrderLevelEnum.PRIMARY.getCode());
+        //订单级别 枚举 ErpOrderLevelEnum
+        orderInfo.setOrderLevel(ErpOrderLevelEnum.PRIMARY.getCode());
         //是否被拆分 YesOrNoEnum
         orderInfo.setSplitStatus(YesOrNoEnum.NO.getCode());
         //是否发生退货 YesOrNoEnum
@@ -417,7 +417,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         orderPay.setPayId(OrderPublic.getUUID());
         orderPay.setBusinessId(orderCode);
         orderPay.setFee(orderInfo.getActualMoney());
-        orderPay.setPayStatus(PayStatusEnum.UNPAID.getCode());
+        orderPay.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
         orderPay.setPayWay(null);
         orderPay.setFeeType(ErpOrderPayFeeTypeEnum.ORDER_FEE.getCode());
         erpOrderPayService.saveOrderPay(orderPay, auth);
@@ -523,8 +523,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             orderItem.setSkuName(productInfo.getSkuName());
             //单位
             orderItem.setUnit(productInfo.getUnit());
-            //本品赠品标记 ProductGiftEnum
-            orderItem.setProductGift(ProductGiftEnum.PRODUCT.getCode());
+            //本品赠品标记 ErpProductGiftEnum
+            orderItem.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
 
             //订货数量
             orderItem.setQuantity(item.getQuantity());
@@ -602,14 +602,14 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         orderInfo.setOrderCode(orderCode);
         //订单状态 枚举 ErpOrderStatusEnum
         orderInfo.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
-        //订单类型 枚举 OrderTypeEnum
+        //订单类型 枚举 ErpOrderTypeEnum
         orderInfo.setOrderType(erpOrderSaveRequest.getOrderType());
-        //订单来源 OrderOriginTypeEnum
+        //订单来源 ErpOrderOriginTypeEnum
         orderInfo.setOrderOriginType(erpOrderSaveRequest.getOrderOriginType());
-        //订单销售渠道标识 OrderChannelEnum
+        //订单销售渠道标识 ErpOrderChannelTypeEnum
         orderInfo.setOrderChannelType(erpOrderSaveRequest.getOrderChannel());
-        //订单级别 枚举 OrderLevelEnum
-        orderInfo.setOrderLevel(OrderLevelEnum.PRIMARY.getCode());
+        //订单级别 枚举 ErpOrderLevelEnum
+        orderInfo.setOrderLevel(ErpOrderLevelEnum.PRIMARY.getCode());
         //是否被拆分 YesOrNoEnum
         orderInfo.setSplitStatus(YesOrNoEnum.NO.getCode());
         //是否发生退货 YesOrNoEnum
@@ -645,7 +645,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         orderPay.setPayId(OrderPublic.getUUID());
         orderPay.setBusinessId(orderCode);
         orderPay.setFee(orderInfo.getActualMoney());
-        orderPay.setPayStatus(PayStatusEnum.UNPAID.getCode());
+        orderPay.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
         orderPay.setPayWay(null);
         orderPay.setFeeType(ErpOrderPayFeeTypeEnum.ORDER_FEE.getCode());
         erpOrderPayService.saveOrderPay(orderPay, auth);

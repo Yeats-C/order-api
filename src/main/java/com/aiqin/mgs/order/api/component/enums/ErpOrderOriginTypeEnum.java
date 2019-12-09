@@ -16,7 +16,7 @@ import java.util.Map;
  * @date 2019/11/19 10:44
  */
 @Getter
-public enum OrderOriginTypeEnum {
+public enum ErpOrderOriginTypeEnum {
 
     /***POS*/
     ORIGIN_COME_3(3, "3", "POS"),
@@ -29,7 +29,7 @@ public enum OrderOriginTypeEnum {
     private String value;
     private String desc;
 
-    OrderOriginTypeEnum(Integer code, String value, String desc) {
+    ErpOrderOriginTypeEnum(Integer code, String value, String desc) {
         this.code = code;
         this.value = value;
         this.desc = desc;
@@ -38,20 +38,20 @@ public enum OrderOriginTypeEnum {
     /***选项类型*/
     public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
     /***code-enum map*/
-    public static final Map<Integer, OrderOriginTypeEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<Integer, ErpOrderOriginTypeEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
     /***value-enum map*/
-    public static final Map<String, OrderOriginTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<String, ErpOrderOriginTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
     static {
-        for (OrderOriginTypeEnum item :
-                OrderOriginTypeEnum.values()) {
+        for (ErpOrderOriginTypeEnum item :
+                ErpOrderOriginTypeEnum.values()) {
             SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
             CODE_ENUM_MAP.put(item.getCode(), item);
             VALUE_ENUM_MAP.put(item.getValue(), item);
         }
     }
 
-    public static OrderOriginTypeEnum getEnum(Object object) {
+    public static ErpOrderOriginTypeEnum getEnum(Object object) {
         if (object != null) {
             return VALUE_ENUM_MAP.get(object.toString());
         }
@@ -60,7 +60,7 @@ public enum OrderOriginTypeEnum {
 
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            OrderOriginTypeEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            ErpOrderOriginTypeEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
             }
