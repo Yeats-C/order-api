@@ -19,6 +19,7 @@ import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -36,6 +37,7 @@ import java.util.Map;
  * @version: v1.0.0
  * @date 2019/12/9 13:57
  */
+@Service
 public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
     @Resource
