@@ -59,7 +59,7 @@ public interface ErpOrderPayService {
      * @version: v1.0.0
      * @date 2019/12/10 9:47
      */
-    void orderPay(ErpOrderPayRequest erpOrderPayRequest);
+    String orderPay(ErpOrderPayRequest erpOrderPayRequest);
 
     /**
      * 查询订单支付结果
@@ -75,13 +75,13 @@ public interface ErpOrderPayService {
     /**
      * 轮询查询支付结果
      *
-     * @param erpOrderPayRequest
+     * @param payId 支付id
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/10 9:48
      */
-    void orderPayPolling(ErpOrderPayRequest erpOrderPayRequest);
+    void payPolling(String payId);
 
     /**
      * 支付回调方法

@@ -17,7 +17,7 @@ public class ErpOrderItem extends ErpOrderBase {
     /***订单id*/
     private String orderId;
     /***订单明细id*/
-    private String OrderItemId;
+    private String orderItemId;
     /***订单明细行编号*/
     private String orderItemCode;
 
@@ -63,4 +63,9 @@ public class ErpOrderItem extends ErpOrderBase {
     private BigDecimal realMoney;
     /***分摊后金额*/
     private BigDecimal shareMoney;
+
+    /***仓库编码 接收供应链参数使用*/
+    private String repertoryCode;
+    /***库存名称 接收供应链参数使用*/
+    private String repertoryName;
 }

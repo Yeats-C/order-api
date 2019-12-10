@@ -12,9 +12,16 @@ import lombok.Data;
  */
 @Data
 public class ErpOrderPayStatusResponse {
+
+    /***请求是否成功*/
     private boolean requestSuccess = true;
+    /***订单号*/
     private String orderCode;
-    private ErpPayStatusEnum erpPayStatusEnum;
+    /***支付结果*/
+    private ErpPayStatusEnum payStatusEnum;
+    /***支付流水号*/
     private String payCode;
+    /***支付id*/
+    private String payId;
 
 }

@@ -6,6 +6,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.service.order.ErpOrderLogisticsService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -17,6 +18,7 @@ public class ErpOrderLogisticsServiceImpl implements ErpOrderLogisticsService {
     private ErpOrderLogisticsDao erpOrderLogisticsDao;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void saveOrderLogistics(ErpOrderLogistics po, AuthToken auth) {
         po.setCreateById(auth.getPersonId());
         po.setCreateByName(auth.getPersonName());
@@ -68,6 +70,7 @@ public class ErpOrderLogisticsServiceImpl implements ErpOrderLogisticsService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateOrderLogisticsSelective(ErpOrderLogistics po, AuthToken auth) {
         po.setUpdateById(auth.getPersonId());
         po.setUpdateByName(auth.getPersonName());

@@ -7,6 +7,7 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayCallbackRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
+import com.aiqin.mgs.order.api.domain.response.order.OrderPayResultResponse;
 import com.aiqin.mgs.order.api.service.order.ErpOrderPayService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import io.swagger.annotations.Api;
@@ -43,11 +44,10 @@ public class ErpOrderPayController {
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
-
 //            //发起支付
-            erpOrderPayService.orderPay(erpOrderPayRequest);
+            String payId = erpOrderPayService.orderPay(erpOrderPayRequest);
 //            //开始轮询
-//            erpOrderPayService.orderPayPolling(orderStoreOrderPay);
+            erpOrderPayService.payPolling(payId);
         } catch (BusinessException e) {
             logger.error("订单支付异常：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
@@ -63,8 +63,8 @@ public class ErpOrderPayController {
     public HttpResponse orderPayResult(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-//            OrderPayResultResponse orderPayResultResponse = erpOrderPayService.orderPayResult(orderStoreOrderPay);
-//            response.setData(orderPayResultResponse);
+            OrderPayResultResponse orderPayResultResponse = erpOrderPayService.orderPayResult(erpOrderPayRequest);
+            response.setData(orderPayResultResponse);
         } catch (BusinessException e) {
             logger.error("订单支付结果查询异常：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
@@ -80,8 +80,10 @@ public class ErpOrderPayController {
     public HttpResponse orderPayCallback(@RequestBody ErpOrderPayCallbackRequest erpOrderPayCallbackRequest) {
         HttpResponse response = HttpResponse.success();
         try {
+            //修改支付单状态
             String payId = erpOrderPayService.orderPayCallback(erpOrderPayCallbackRequest);
-
+            //支付之后后续逻辑
+//            erpOrderPayService.endPay(payId);
         } catch (BusinessException e) {
             logger.error("订单支付回调异常：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));

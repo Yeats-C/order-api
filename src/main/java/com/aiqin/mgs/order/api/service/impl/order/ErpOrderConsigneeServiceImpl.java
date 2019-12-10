@@ -6,6 +6,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderConsignee;
 import com.aiqin.mgs.order.api.service.order.ErpOrderConsigneeService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -17,6 +18,7 @@ public class ErpOrderConsigneeServiceImpl implements ErpOrderConsigneeService {
     private ErpOrderConsigneeDao erpOrderConsigneeDao;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void saveOrderConsignee(ErpOrderConsignee po, AuthToken auth) {
         po.setCreateById(auth.getPersonId());
         po.setCreateByName(auth.getPersonName());

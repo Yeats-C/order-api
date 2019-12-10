@@ -50,6 +50,17 @@ public interface ErpOrderInfoService {
     void updateOrderByPrimaryKeySelective(ErpOrderInfo po, AuthToken auth);
 
     /**
+     * 订单拆单逻辑
+     *
+     * @param orderInfo
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/10 13:50
+     */
+    void orderSplit(ErpOrderInfo orderInfo);
+
+    /**
      * 订单发货
      *
      * @param erpOrderDeliverRequest

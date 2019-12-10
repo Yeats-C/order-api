@@ -4,24 +4,34 @@ import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderPayDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
+import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayCallbackRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
+import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
 import com.aiqin.mgs.order.api.domain.response.order.OrderPayResultResponse;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class ErpOrderPayServiceImpl implements ErpOrderPayService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ErpOrderPayServiceImpl.class);
 
     @Resource
     private ErpOrderPayDao erpOrderPayDao;
@@ -29,6 +39,8 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
     private ErpOrderQueryService erpOrderQueryService;
     @Resource
     private ErpOrderInfoService erpOrderInfoService;
+    @Resource
+    private ErpOrderItemService erpOrderItemService;
     @Resource
     private ErpOrderRequestService erpOrderRequestService;
     @Resource
@@ -49,6 +61,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void saveOrderPay(ErpOrderPay po, AuthToken auth) {
         po.setCreateById(auth.getPersonId());
         po.setCreateByName(auth.getPersonName());
@@ -58,6 +71,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateOrderPaySelective(ErpOrderPay po, AuthToken auth) {
         po.setUpdateById(auth.getPersonId());
         po.setUpdateByName(auth.getPersonName());
@@ -65,7 +79,8 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
     }
 
     @Override
-    public void orderPay(ErpOrderPayRequest erpOrderPayRequest) {
+    @Transactional(rollbackFor = Exception.class)
+    public String orderPay(ErpOrderPayRequest erpOrderPayRequest) {
 
         AuthToken auth = AuthUtil.getCurrentAuth();
 
@@ -111,6 +126,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
         orderPay.setPayWay(erpOrderPayRequest.getPayWay());
         this.updateOrderPaySelective(orderPay, auth);
 
+        return orderPay.getPayId();
     }
 
     @Override
@@ -134,11 +150,55 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
     }
 
     @Override
-    public void orderPayPolling(ErpOrderPayRequest erpOrderPayRequest) {
+    @Transactional(rollbackFor = Exception.class)
+    public void payPolling(String payId) {
 
+        //登录信息
+        AuthToken auth = AuthUtil.getCurrentAuth();
+
+        //轮询请求查询支付信息
+        ScheduledExecutorService service = new ScheduledThreadPoolExecutor(1);
+        service.scheduleAtFixedRate(new Runnable() {
+
+            int pollingTimes = 0;
+
+            @Override
+            public void run() {
+                ErpOrderPay orderPay = getOrderPayByPayId(payId);
+                if (orderPay == null) {
+                    throw new BusinessException("无效的支付id");
+                }
+                if (!ErpPayStatusEnum.PAYING.getCode().equals(orderPay.getPayStatus())) {
+                    service.shutdown();
+                }
+                pollingTimes++;
+                logger.info("第{}次轮询", pollingTimes);
+                if (pollingTimes > OrderConstant.MAX_PAY_POLLING_TIMES) {
+                    //支付超时
+                    orderPay.setPayStatus(ErpPayStatusEnum.FAIL.getCode());
+                    orderPay.setPayEndTime(new Date());
+                    updateOrderPaySelective(orderPay, auth);
+                    endPay(payId);
+                    service.shutdown();
+                }
+                ErpOrderPayStatusResponse payStatusResponse = erpOrderRequestService.getOrderPayStatus(payId);
+                if (payStatusResponse.isRequestSuccess()) {
+                    if (ErpPayStatusEnum.FAIL == payStatusResponse.getPayStatusEnum() || ErpPayStatusEnum.SUCCESS == payStatusResponse.getPayStatusEnum()) {
+
+                        orderPay.setPayStatus(payStatusResponse.getPayStatusEnum().getCode());
+                        orderPay.setPayEndTime(new Date());
+                        updateOrderPaySelective(orderPay, auth);
+                        endPay(payId);
+                        service.shutdown();
+                    }
+                }
+            }
+            //轮询时间控制
+        }, OrderConstant.MAX_PAY_POLLING_INITIALDELAY, OrderConstant.MAX_PAY_POLLING_PERIOD, TimeUnit.MILLISECONDS);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String orderPayCallback(ErpOrderPayCallbackRequest erpOrderPayCallbackRequest) {
 
         //TODO CT 校验参数
@@ -174,11 +234,13 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
         orderPay.setPayEndTime(new Date());
         this.updateOrderPaySelective(orderPay, auth);
 
-
+        //支付单支付成功后续逻辑
+        endPay(payId);
         return payId;
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String endPay(String payId) {
 
         AuthToken auth = AuthUtil.getSystemAuth();
@@ -197,21 +259,48 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
                 if (order == null) {
                     throw new BusinessException("数据异常");
                 }
+                order.setOrderItemList(erpOrderItemService.selectOrderItemListByOrderId(order.getOrderId()));
                 if (payStatusEnum == ErpPayStatusEnum.SUCCESS) {
                     order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_2.getCode());
                     order.setPaid(YesOrNoEnum.YES.getCode());
-                    //TODO CT 获取物流券
-                    BigDecimal goodsCoupon = BigDecimal.TEN;
+                    //获取物流券
+                    BigDecimal goodsCoupon = erpOrderRequestService.getGoodsCoupon(order);
                     order.setGoodsCoupon(goodsCoupon);
                     erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
 
-                    //TODO CT 后续操作
+                    //请求供应链，获取库存分组，进行拆单
+                    ScheduledExecutorService splitService = new ScheduledThreadPoolExecutor(1);
+                    splitService.scheduleAtFixedRate(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            //请求供应链解锁库存
+                            erpOrderInfoService.orderSplit(order);
+
+                            splitService.shutdown();
+                        }
+                        //轮询时间控制
+                    },0, 1000L, TimeUnit.MILLISECONDS);
+
                 } else if (payStatusEnum == ErpPayStatusEnum.FAIL) {
                     order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_99.getCode());
                     order.setPaid(YesOrNoEnum.NO.getCode());
                     erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
 
-                    //TODO CT 解锁库存
+                    //解锁库存
+                    ScheduledExecutorService unlockStockService = new ScheduledThreadPoolExecutor(1);
+                    unlockStockService.scheduleAtFixedRate(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            //请求供应链解锁库存
+                            erpOrderRequestService.unlockStockInSupplyChain(order);
+
+                            unlockStockService.shutdown();
+                        }
+                        //轮询时间控制
+                    },0, 1000L, TimeUnit.MILLISECONDS);
+
                 } else {
 
                 }
@@ -250,11 +339,13 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void orderPayRepay(ErpOrderPayRequest erpOrderPayRequest) {
 
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void orderTimeoutUnpaid(ErpOrderPayRequest erpOrderPayRequest) {
 
     }

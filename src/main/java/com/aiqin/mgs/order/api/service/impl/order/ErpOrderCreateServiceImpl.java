@@ -19,6 +19,7 @@ import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -53,6 +54,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private ErpOrderConsigneeService erpOrderConsigneeService;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ErpOrderInfo saveOrder(ErpOrderSaveRequest erpOrderSaveRequest) {
 
         //操作人信息
@@ -75,11 +77,14 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         String orderId = insertOrder(erpOrderInfo, storeInfo, auth, erpOrderSaveRequest);
         //删除购物车商品
         deleteOrderProductFromCart(erpOrderSaveRequest.getStoreId(), storeCartProduct);
+        //锁库存
+        erpOrderRequestService.lockStockInSupplyChain(erpOrderInfo);
         //返回订单信息
         return erpOrderQueryService.getOrderByOrderId(orderId);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ErpOrderInfo saveRackOrder(ErpOrderSaveRequest erpOrderSaveRequest) {
         //操作人信息
         AuthToken auth = AuthUtil.getCurrentAuth();

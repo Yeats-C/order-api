@@ -5,6 +5,7 @@ import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -16,6 +17,7 @@ public class ErpOrderItemServiceImpl implements ErpOrderItemService {
     private ErpOrderItemDao erpOrderItemDao;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void saveOrderItem(ErpOrderItem po, AuthToken auth) {
         po.setCreateById(auth.getPersonId());
         po.setCreateByName(auth.getPersonName());
@@ -25,6 +27,7 @@ public class ErpOrderItemServiceImpl implements ErpOrderItemService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void saveOrderItemList(List<ErpOrderItem> list, AuthToken auth) {
         if (list != null && list.size() > 0) {
             for (ErpOrderItem item :
@@ -35,6 +38,7 @@ public class ErpOrderItemServiceImpl implements ErpOrderItemService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateOrderItem(ErpOrderItem po, AuthToken auth) {
         po.setUpdateById(auth.getPersonId());
         po.setUpdateByName(auth.getPersonName());
@@ -42,6 +46,7 @@ public class ErpOrderItemServiceImpl implements ErpOrderItemService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateOrderItemList(List<ErpOrderItem> list, AuthToken auth) {
         if (list != null && list.size() > 0) {
             for (ErpOrderItem item :

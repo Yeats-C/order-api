@@ -43,15 +43,37 @@ public interface ErpOrderRequestService {
     ProductInfo getProductDetail(String storeId, String productId, String skuCode);
 
     /**
-     * 根据订单编码获取订单支付状态
+     * 锁库存
      *
-     * @param orderCode 订单编码
+     * @param order
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/10 13:38
+     */
+    void lockStockInSupplyChain(ErpOrderInfo order);
+
+    /**
+     * 解锁库存
+     *
+     * @param order
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/10 13:38
+     */
+    void unlockStockInSupplyChain(ErpOrderInfo order);
+
+    /**
+     * 根据支付id获取订单支付状态
+     *
+     * @param payId 订单编码
      * @return com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/2 15:37
      */
-    ErpOrderPayStatusResponse getOrderPayStatus(String orderCode);
+    ErpOrderPayStatusResponse getOrderPayStatus(String payId);
 
     /**
      * 发起支付请求
@@ -77,7 +99,7 @@ public interface ErpOrderRequestService {
     BigDecimal getGoodsCoupon(ErpOrderInfo order);
 
     /**
-     * 订单支付成功推送供应链
+     * 订单支付成功推送供应链,返回商品库存分组数据
      *
      * @param order
      * @return boolean
@@ -85,7 +107,7 @@ public interface ErpOrderRequestService {
      * @version: v1.0.0
      * @date 2019/12/2 15:48
      */
-    boolean sendOrderPaySuccessToSupplyChain(ErpOrderInfo order);
+    ErpOrderInfo sendOrderToSupplyChainAndGetSplitGroup(ErpOrderInfo order);
 
     /**
      * 推送拆分后的订单到供应链

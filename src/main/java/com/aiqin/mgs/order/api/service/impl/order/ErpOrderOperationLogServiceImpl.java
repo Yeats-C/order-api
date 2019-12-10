@@ -7,6 +7,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
 import com.aiqin.mgs.order.api.service.order.ErpOrderOperationLogService;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -24,6 +25,7 @@ public class ErpOrderOperationLogServiceImpl implements ErpOrderOperationLogServ
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void saveOrderOperationLog(String orderId, ErpOrderStatusEnum orderStatusEnum, AuthToken auth) {
         if (orderStatusEnum != null) {
             ErpOrderOperationLog operationLog = new ErpOrderOperationLog();
@@ -39,6 +41,7 @@ public class ErpOrderOperationLogServiceImpl implements ErpOrderOperationLogServ
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void copySplitOrderLog(String orderId, List<ErpOrderOperationLog> list) {
         for (ErpOrderOperationLog item :
                 list) {
