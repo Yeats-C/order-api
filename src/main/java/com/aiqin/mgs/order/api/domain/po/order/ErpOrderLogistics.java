@@ -21,17 +21,17 @@ public class ErpOrderLogistics extends ErpOrderBase {
     /***物流费用是否支付成功 YesOrNoEnum*/
     private Integer paid;
     /***物流公司编码*/
-    private String logisticCentreCode;
+    private String logisticsCentreCode;
     /***物流公司名称*/
-    private String logisticCentreName;
+    private String logisticsCentreName;
     /***物流单号*/
-    private String logisticCode;
+    private String logisticsCode;
     /***发货仓库编码*/
     private String sendRepertoryCode;
     /***发货仓库名称*/
     private String sendRepertoryName;
     /***物流费用*/
-    private BigDecimal logisticFee;
+    private BigDecimal logisticsFee;
     /***物流券支付金额*/
     private BigDecimal couponPayFee;
     /***余额支付金额*/

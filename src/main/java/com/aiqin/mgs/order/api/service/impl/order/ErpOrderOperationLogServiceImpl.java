@@ -5,11 +5,12 @@ import com.aiqin.mgs.order.api.dao.order.ErpOrderOperationLogDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
 import com.aiqin.mgs.order.api.service.order.ErpOrderOperationLogService;
-import com.aiqin.mgs.order.api.util.OrderPublic;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -21,7 +22,13 @@ public class ErpOrderOperationLogServiceImpl implements ErpOrderOperationLogServ
 
     @Override
     public List<ErpOrderOperationLog> selectOrderOperationLogListByOrderId(String orderId) {
-        return erpOrderOperationLogDao.selectOperationLogListByOrderId(orderId);
+        List<ErpOrderOperationLog> list = new ArrayList<>();
+        if (StringUtils.isNotEmpty(orderId)) {
+            ErpOrderOperationLog query = new ErpOrderOperationLog();
+            query.setOrderId(orderId);
+            list = erpOrderOperationLogDao.select(query);
+        }
+        return list;
     }
 
     @Override
@@ -32,7 +39,6 @@ public class ErpOrderOperationLogServiceImpl implements ErpOrderOperationLogServ
             operationLog.setOrderId(orderId);
             operationLog.setOrderStatus(orderStatusEnum.getCode());
             operationLog.setOperationContent(orderStatusEnum.getDesc());
-            operationLog.setLogId(OrderPublic.getUUID());
             operationLog.setCreateTime(new Date());
             operationLog.setCreateById(auth.getPersonId());
             operationLog.setCreateByName(auth.getPersonName());

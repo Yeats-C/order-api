@@ -12,9 +12,9 @@ import org.springframework.stereotype.Component;
  * @date 2019/11/20 16:54
  */
 @Component
-public class OrderPayTimeOutTaskJob {
+public class ErpOrderPayTimeOutTaskJob {
 
-    private static final Logger logger = LoggerFactory.getLogger(OrderPayTimeOutTaskJob.class);
+    private static final Logger logger = LoggerFactory.getLogger(ErpOrderPayTimeOutTaskJob.class);
 //
 //    @Resource
 //    private ErpOrderQueryService erpOrderQueryService;
@@ -31,7 +31,7 @@ public class OrderPayTimeOutTaskJob {
 //        logger.info("取消超时未支付订单定时任务=====>开始");
 //        OrderStoreOrderInfo orderInfo = new OrderStoreOrderInfo();
 //        orderInfo.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
-//        orderInfo.setPaid(ErpPayStatusEnum.UNPAID.getCode());
+//        orderInfo.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
 //        List<OrderStoreOrderInfo> list = erpOrderQueryService.selectOrderBySelective(orderInfo);
 //        Date now = new Date();
 //        if (list != null && list.size() > 0) {

@@ -235,7 +235,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             //活动优惠金额
             orderItem.setActivityMoney(BigDecimal.ZERO);
             //实际支付金额
-            orderItem.setRealMoney(orderItem.getMoney().subtract(orderItem.getActivityMoney()));
+            orderItem.setActualMoney(orderItem.getMoney().subtract(orderItem.getActivityMoney()));
 
             orderItemList.add(orderItem);
         }
@@ -320,7 +320,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             //订货金额汇总
             moneyTotal = moneyTotal.add(item.getMoney() == null ? BigDecimal.ZERO : item.getMoney());
             //实际支付金额汇总
-            realMoneyTotal = realMoneyTotal.add(item.getRealMoney() == null ? BigDecimal.ZERO : item.getRealMoney());
+            realMoneyTotal = realMoneyTotal.add(item.getActualMoney() == null ? BigDecimal.ZERO : item.getActualMoney());
             //活动优惠金额汇总
             activityMoneyTotal = activityMoneyTotal.add(item.getActivityMoney() == null ? BigDecimal.ZERO : item.getActivityMoney());
         }
@@ -428,7 +428,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         ErpOrderPay orderPay = new ErpOrderPay();
         orderPay.setPayId(payId);
         orderPay.setBusinessKey(orderCode);
-        orderPay.setFee(orderInfo.getActualMoney());
+        orderPay.setPayFee(orderInfo.getActualMoney());
         orderPay.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
         orderPay.setPayWay(null);
         orderPay.setFeeType(ErpPayFeeTypeEnum.ORDER_FEE.getCode());
@@ -550,7 +550,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             //活动优惠金额
             orderItem.setActivityMoney(BigDecimal.ZERO);
             //实际支付金额
-            orderItem.setRealMoney(orderItem.getMoney().subtract(orderItem.getActivityMoney()));
+            orderItem.setActualMoney(orderItem.getMoney().subtract(orderItem.getActivityMoney()));
             //货架订单分摊金额等于实际金额
             orderItem.setShareMoney(orderItem.getActivityMoney());
 
@@ -604,7 +604,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             //订货金额汇总
             moneyTotal = moneyTotal.add(item.getMoney() == null ? BigDecimal.ZERO : item.getMoney());
             //实际支付金额汇总
-            realMoneyTotal = realMoneyTotal.add(item.getRealMoney() == null ? BigDecimal.ZERO : item.getRealMoney());
+            realMoneyTotal = realMoneyTotal.add(item.getActualMoney() == null ? BigDecimal.ZERO : item.getActualMoney());
             //活动优惠金额汇总
             activityMoneyTotal = activityMoneyTotal.add(item.getActivityMoney() == null ? BigDecimal.ZERO : item.getActivityMoney());
         }
@@ -662,7 +662,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         ErpOrderPay orderPay = new ErpOrderPay();
         orderPay.setPayId(payId);
         orderPay.setBusinessKey(orderCode);
-        orderPay.setFee(orderInfo.getActualMoney());
+        orderPay.setPayFee(orderInfo.getActualMoney());
         orderPay.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
         orderPay.setPayWay(null);
         orderPay.setFeeType(ErpPayFeeTypeEnum.ORDER_FEE.getCode());

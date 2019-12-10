@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -185,7 +184,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 //                        //订货金额汇总
 //                        moneyTotal = moneyTotal.add(item.getMoney() == null ? BigDecimal.ZERO : item.getMoney());
 //                        //实际支付金额汇总
-//                        realMoneyTotal = realMoneyTotal.add(item.getRealMoney() == null ? BigDecimal.ZERO : item.getRealMoney());
+//                        realMoneyTotal = realMoneyTotal.add(item.getActualMoney() == null ? BigDecimal.ZERO : item.getActualMoney());
 ////                        //活动优惠金额汇总
 ////                        activityMoneyTotal = activityMoneyTotal.add(item.getActivityMoney() == null ? BigDecimal.ZERO : item.getActivityMoney());
 ////                        //服纺券优惠金额汇总
@@ -301,7 +300,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     splitItem.setMoney(splitItem.getPrice().multiply(new BigDecimal(splitItem.getQuantity())));
 
                     //TODO 尾差处理 如果有活动或者优惠券的情况下可能会除不尽
-                    splitItem.setRealMoney(item.getRealMoney().multiply(new BigDecimal(entry.getValue())).divide(BigDecimal.TEN, 4, RoundingMode.HALF_UP));
+                    splitItem.setActualMoney(item.getActualMoney().multiply(new BigDecimal(entry.getValue())).divide(BigDecimal.TEN, 4, RoundingMode.HALF_UP));
                     splitItem.setActivityMoney(item.getActivityMoney().multiply(new BigDecimal(entry.getValue())).divide(BigDecimal.TEN, 4, RoundingMode.HALF_UP));
 
                     splitItemList.add(splitItem);
@@ -360,7 +359,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                         //订货金额汇总
                         moneyTotal = moneyTotal.add(item.getMoney() == null ? BigDecimal.ZERO : item.getMoney());
                         //实际支付金额汇总
-                        realMoneyTotal = realMoneyTotal.add(item.getRealMoney() == null ? BigDecimal.ZERO : item.getRealMoney());
+                        realMoneyTotal = realMoneyTotal.add(item.getActualMoney() == null ? BigDecimal.ZERO : item.getActualMoney());
                         //活动优惠金额汇总
                         activityMoneyTotal = activityMoneyTotal.add(item.getActivityMoney() == null ? BigDecimal.ZERO : item.getActivityMoney());
 //                    //服纺券优惠金额汇总
@@ -376,7 +375,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     newOrder.setOrderId(newOrderId);
                     newOrder.setOrderChannelType(order.getOrderChannelType());
                     newOrder.setOrderOriginType(order.getOrderOriginType());
-                    newOrder.setPaid(order.getPaid());
+                    newOrder.setPayStatus(order.getPayStatus());
                     newOrder.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_3.getCode());
                     //TODO CT 金额需要重新计算
                     newOrder.setActualMoney(realMoneyTotal);
@@ -462,19 +461,19 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         if (paramOrderLogistics == null) {
             throw new BusinessException("缺失物流信息为空");
         } else {
-            if (StringUtils.isEmpty(paramOrderLogistics.getLogisticCode())) {
+            if (StringUtils.isEmpty(paramOrderLogistics.getLogisticsCode())) {
                 throw new BusinessException("缺失物流单号");
             }
-            if (StringUtils.isEmpty(paramOrderLogistics.getLogisticCentreCode())) {
+            if (StringUtils.isEmpty(paramOrderLogistics.getLogisticsCentreCode())) {
                 throw new BusinessException("缺失物流公司编码");
             }
-            if (StringUtils.isEmpty(paramOrderLogistics.getLogisticCentreName())) {
+            if (StringUtils.isEmpty(paramOrderLogistics.getLogisticsCentreName())) {
                 throw new BusinessException("缺失物流公司名称");
             }
-            if (paramOrderLogistics.getLogisticFee() == null) {
+            if (paramOrderLogistics.getLogisticsFee() == null) {
                 throw new BusinessException("缺失物流费用");
             } else {
-                if (paramOrderLogistics.getLogisticFee().compareTo(BigDecimal.ZERO) < 0) {
+                if (paramOrderLogistics.getLogisticsFee().compareTo(BigDecimal.ZERO) < 0) {
                     throw new BusinessException("物流费用不能小于0");
                 }
             }
@@ -486,19 +485,19 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             }
         }
 
-        ErpOrderLogistics orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsCode(paramOrderLogistics.getLogisticCode());
+        ErpOrderLogistics orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsCode(paramOrderLogistics.getLogisticsCode());
         if (orderLogistics == null) {
             paramOrderLogistics.setLogisticsId(OrderPublic.getUUID());
             paramOrderLogistics.setPaid(YesOrNoEnum.NO.getCode());
             erpOrderLogisticsService.saveOrderLogistics(paramOrderLogistics, auth);
         } else {
-            if (orderLogistics.getLogisticFee().compareTo(paramOrderLogistics.getLogisticFee()) != 0) {
+            if (orderLogistics.getLogisticsFee().compareTo(paramOrderLogistics.getLogisticsFee()) != 0) {
                 throw new BusinessException("物流单费用与已有物流单费用不相等");
             }
-            if (!orderLogistics.getLogisticCentreCode().equals(paramOrderLogistics.getLogisticCentreCode())) {
+            if (!orderLogistics.getLogisticsCentreCode().equals(paramOrderLogistics.getLogisticsCentreCode())) {
                 throw new BusinessException("物流公司编码与已有物流单物流公司编码不相同");
             }
-            if (!orderLogistics.getLogisticCentreName().equals(paramOrderLogistics.getLogisticCentreName())) {
+            if (!orderLogistics.getLogisticsCentreName().equals(paramOrderLogistics.getLogisticsCentreName())) {
                 throw new BusinessException("物流公司名称与已有物流单物流公司名称不相同");
             }
             if (!orderLogistics.getSendRepertoryCode().equals(paramOrderLogistics.getSendRepertoryCode())) {

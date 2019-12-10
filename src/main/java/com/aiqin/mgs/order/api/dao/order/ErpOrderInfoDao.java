@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.dao.order;
 
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -45,5 +46,27 @@ public interface ErpOrderInfoDao {
      * @date 2019/12/9 14:04
      */
     Integer insert(ErpOrderInfo po);
+
+    /**
+     * 查询订单列表
+     *
+     * @param erpOrderInfo
+     * @return java.util.List<com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo>
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/10 20:05
+     */
+    List<ErpOrderInfo> findOrderList(ErpOrderInfo erpOrderInfo);
+
+    /**
+     * 查询子订单列表
+     *
+     * @param primaryOrderCodeList
+     * @return java.util.List<com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo>
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/10 20:05
+     */
+    List<ErpOrderInfo> findSecondaryOrderList(@Param("primaryOrderCodeList") List<String> primaryOrderCodeList);
 
 }

@@ -269,7 +269,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
                     } else {
                         order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_2.getCode());
                     }
-                    order.setPaid(YesOrNoEnum.YES.getCode());
+                    order.setPayStatus(payStatusEnum.getCode());
                     //获取物流券
                     BigDecimal goodsCoupon = erpOrderRequestService.getGoodsCoupon(order);
                     order.setGoodsCoupon(goodsCoupon);
@@ -296,7 +296,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
 
                 } else if (payStatusEnum == ErpPayStatusEnum.FAIL) {
                     order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_99.getCode());
-                    order.setPaid(YesOrNoEnum.NO.getCode());
+                    order.setPayStatus(payStatusEnum.getCode());
                     erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
 
                     //解锁库存
@@ -422,6 +422,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String orderLogisticsPay(ErpOrderPayRequest erpOrderPayRequest) {
         AuthToken auth = AuthUtil.getCurrentAuth();
         if (erpOrderPayRequest == null || StringUtils.isEmpty(erpOrderPayRequest.getOrderCode())) {
@@ -446,16 +447,16 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
         //TODO CT 获取物流券信息
         //TODO CT 计算物流费用
         BigDecimal couponPayFee = BigDecimal.ZERO;
-        BigDecimal balancePayFee = orderLogistics.getLogisticFee().subtract(couponPayFee);
+        BigDecimal balancePayFee = orderLogistics.getLogisticsFee().subtract(couponPayFee);
 
         String payId = OrderPublic.getUUID();
         ErpOrderPay logisticsPay = new ErpOrderPay();
         logisticsPay.setPayStatus(ErpPayStatusEnum.PAYING.getCode());
         logisticsPay.setPayId(payId);
-        logisticsPay.setBusinessKey(orderLogistics.getLogisticCode());
+        logisticsPay.setBusinessKey(orderLogistics.getLogisticsCode());
         logisticsPay.setFeeType(ErpPayFeeTypeEnum.LOGISTICS_FEE.getCode());
         logisticsPay.setPayStartTime(new Date());
-        logisticsPay.setFee(balancePayFee);
+        logisticsPay.setPayFee(balancePayFee);
         this.saveOrderPay(logisticsPay, auth);
 
         //调用支付中心接口
@@ -489,7 +490,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
         }
         ErpOrderLogisticsPayResultResponse response = new ErpOrderLogisticsPayResultResponse();
         response.setOrderCode(order.getOrderCode());
-        response.setLogisticsCode(orderLogistics.getLogisticCode());
+        response.setLogisticsCode(orderLogistics.getLogisticsCode());
         response.setLogisticsId(orderLogistics.getLogisticsId());
         response.setPayCode(orderPay.getPayCode());
         response.setPayStatus(orderPay.getPayStatus());
@@ -521,10 +522,10 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
         ErpOrderLogisticsPrintQueryResponse response = new ErpOrderLogisticsPrintQueryResponse();
         response.setStoreName(order.getStoreName());
         response.setOrderCode(order.getOrderCode());
-        response.setLogisticCentreCode(orderLogistics.getLogisticCentreCode());
-        response.setLogisticCentreName(orderLogistics.getLogisticCentreName());
-        response.setLogisticCode(orderLogistics.getLogisticCode());
-        response.setLogisticFee(orderLogistics.getLogisticFee());
+        response.setLogisticCentreCode(orderLogistics.getLogisticsCentreCode());
+        response.setLogisticCentreName(orderLogistics.getLogisticsCentreName());
+        response.setLogisticCode(orderLogistics.getLogisticsCode());
+        response.setLogisticFee(orderLogistics.getLogisticsFee());
         response.setCouponPayFee(orderLogistics.getCouponPayFee());
         response.setBalancePayFee(orderLogistics.getBalancePayFee());
         response.setPayCode(orderPay.getPayCode());

@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.service.order;
 
+import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 
 import java.util.List;
@@ -67,5 +68,16 @@ public interface ErpOrderQueryService {
      * @date 2019/12/10 9:53
      */
     List<ErpOrderInfo> getOrderByLogisticsId(String logisticsId);
+
+    /**
+     * 查询订单列表
+     *
+     * @param erpOrderInfo
+     * @return com.aiqin.mgs.order.api.base.PageResData<com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo>
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/10 21:44
+     */
+    PageResData<ErpOrderInfo> findOrderList(ErpOrderInfo erpOrderInfo);
 
 }

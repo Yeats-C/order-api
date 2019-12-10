@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.po.order;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -21,8 +22,8 @@ public class ErpOrderInfo extends ErpOrderBase {
     private String orderCode;
     /***订单状态 枚举 ErpOrderStatusEnum*/
     private Integer orderStatus;
-    /***订单是否支付成功 YesOrNoEnum*/
-    private Integer paid;
+    /***订单支付状态 ErpPayStatusEnum*/
+    private Integer payStatus;
     /***订单类型 枚举 ErpOrderTypeEnum*/
     private Integer orderType;
     /***订单来源 ErpOrderOriginTypeEnum*/
@@ -78,6 +79,21 @@ public class ErpOrderInfo extends ErpOrderBase {
     private String storeCode;
     /***门店名称*/
     private String storeName;
+
+    /***查询开始时间 yyyy-MM-dd*/
+    private String createTimeStart;
+    /***查询结束时间 yyyy-MM-dd*/
+    private String createTimeEnd;
+    @ApiModelProperty(value = "每页条数")
+    private Integer pageSize;
+    @ApiModelProperty(value = "当前页")
+    private Integer pageNo;
+    /***是否支持校验支付 对应列表上的确认收款按钮 1有按钮 0没有按钮*/
+    @ApiModelProperty(value = "是否支持校验支付")
+    private Integer repayOperation;
+
+    /***关联子订单*/
+    private List<ErpOrderInfo> secondaryOrderList;
 
     /***订单明细*/
     private List<ErpOrderItem> orderItemList;
