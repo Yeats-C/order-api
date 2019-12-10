@@ -11,6 +11,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayCallbackRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPayResultResponse;
+import com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPrintQueryResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayResultResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
 import com.aiqin.mgs.order.api.service.order.*;
@@ -494,6 +495,41 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
         response.setPayStatus(orderPay.getPayStatus());
         response.setPayStartTime(orderPay.getPayStartTime());
         response.setPayEndTime(orderPay.getPayEndTime());
+        return response;
+    }
+
+    @Override
+    public ErpOrderLogisticsPrintQueryResponse orderLogisticsPrintQuery(ErpOrderPayRequest erpOrderPayRequest) {
+        if (erpOrderPayRequest == null || StringUtils.isEmpty(erpOrderPayRequest.getOrderCode())) {
+            throw new BusinessException("缺失订单号");
+        }
+        ErpOrderInfo order = erpOrderQueryService.getOrderDetailByOrderCode(erpOrderPayRequest.getOrderCode());
+        if (order == null) {
+            throw new BusinessException("无效的订单编号");
+        }
+        ErpOrderLogistics orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsId(order.getLogisticsId());
+        if (orderLogistics == null) {
+            throw new BusinessException("未找到物流单");
+        }
+        ErpOrderPay orderPay = getOrderPayByPayId(orderLogistics.getPayId());
+        if (orderPay == null) {
+            throw new BusinessException("未找到物流单支付信息");
+        }
+        if (!ErpPayStatusEnum.SUCCESS.getCode().equals(orderPay.getPayStatus())) {
+            throw new BusinessException("物流费用未支付成功");
+        }
+        ErpOrderLogisticsPrintQueryResponse response = new ErpOrderLogisticsPrintQueryResponse();
+        response.setStoreName(order.getStoreName());
+        response.setOrderCode(order.getOrderCode());
+        response.setLogisticCentreCode(orderLogistics.getLogisticCentreCode());
+        response.setLogisticCentreName(orderLogistics.getLogisticCentreName());
+        response.setLogisticCode(orderLogistics.getLogisticCode());
+        response.setLogisticFee(orderLogistics.getLogisticFee());
+        response.setCouponPayFee(orderLogistics.getCouponPayFee());
+        response.setBalancePayFee(orderLogistics.getBalancePayFee());
+        response.setPayCode(orderPay.getPayCode());
+        response.setPayEndTime(orderPay.getPayEndTime());
+        response.setPayUser(orderPay.getCreateByName());
         return response;
     }
 

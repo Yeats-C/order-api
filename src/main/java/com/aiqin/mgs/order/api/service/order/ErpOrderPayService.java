@@ -6,6 +6,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayCallbackRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPayResultResponse;
+import com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPrintQueryResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayResultResponse;
 
 /**
@@ -162,4 +163,15 @@ public interface ErpOrderPayService {
      * @date 2019/12/10 15:31
      */
     ErpOrderLogisticsPayResultResponse orderLogisticsPayResult(ErpOrderPayRequest erpOrderPayRequest);
+
+    /**
+     * 物流费用支付凭证打印数据查询
+     *
+     * @param erpOrderPayRequest
+     * @return com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPrintQueryResponse
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/10 16:41
+     */
+    ErpOrderLogisticsPrintQueryResponse orderLogisticsPrintQuery(ErpOrderPayRequest erpOrderPayRequest);
 }

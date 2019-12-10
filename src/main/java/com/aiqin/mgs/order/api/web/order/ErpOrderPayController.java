@@ -9,6 +9,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayCallbackRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPayResultResponse;
+import com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPrintQueryResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayResultResponse;
 import com.aiqin.mgs.order.api.service.order.ErpOrderPayService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
@@ -148,12 +149,29 @@ public class ErpOrderPayController {
     }
 
     @PostMapping("/orderSendingPayResult")
-    @ApiOperation(value = "订单物流费用支付结果查询")
+    @ApiOperation(value = "订单物流费用支付结果轮询")
     public HttpResponse orderLogisticsPayResult(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
         HttpResponse response = HttpResponse.success();
         try {
             ErpOrderLogisticsPayResultResponse resultResponse = erpOrderPayService.orderLogisticsPayResult(erpOrderPayRequest);
             response.setData(resultResponse);
+        } catch (BusinessException e) {
+            logger.error("订单物流费用支付结果查询异常：{}", e);
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            logger.error("订单物流费用支付结果查询异常：{}", e);
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
+    }
+
+    @PostMapping("/orderLogisticsPrintQuery")
+    @ApiOperation(value = "订单物流费用支付凭证")
+    public HttpResponse orderLogisticsPrintQuery(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
+        HttpResponse response = HttpResponse.success();
+        try {
+            ErpOrderLogisticsPrintQueryResponse queryResponse = erpOrderPayService.orderLogisticsPrintQuery(erpOrderPayRequest);
+            response.setData(queryResponse);
         } catch (BusinessException e) {
             logger.error("订单物流费用支付结果查询异常：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
