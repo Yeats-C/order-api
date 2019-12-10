@@ -33,6 +33,7 @@ import com.aiqin.mgs.order.api.domain.response.LastBuyResponse;
 import com.aiqin.mgs.order.api.domain.response.LatelyResponse;
 import com.aiqin.mgs.order.api.domain.response.MevBuyResponse;
 import com.aiqin.mgs.order.api.domain.response.OradskuResponse;
+import org.apache.ibatis.annotations.Select;
 
 
 public interface OrderDao {
@@ -206,4 +207,8 @@ public interface OrderDao {
     int getUnPayNum(UnPayVo unPayVo);
 
     List<String> getUnPayMemberIdList(UnPayVo unPayVo);
+
+    //  获取收银员上次退出时间
+    @Select("select create_time from order_consumer_info where cashier_id = #{cashierId} order by create_time desc limit 1")
+    Date selectTimeByCashierId(@Valid @Param("cashierId") String cashierId);
 }

@@ -37,16 +37,15 @@ import com.aiqin.mgs.order.api.service.*;
 import com.aiqin.mgs.order.api.util.DateUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.http.client.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import com.aiqin.ground.util.exception.GroundRuntimeException;
 import com.aiqin.mgs.order.api.domain.request.DevelRequest;
@@ -1043,6 +1042,10 @@ public class OrderServiceImpl implements OrderService {
     public HttpResponse cashier(@Valid String cashierId, String beginTime, String endTime) {
         try {
 
+            // 获取改收银员最后一次交接时间
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date date = orderDao.selectTimeByCashierId(cashierId);
+            beginTime = formatter.format(date);
             OrderbyReceiptSumResponse receiptSumInfo = new OrderbyReceiptSumResponse();
 
             OrderQuery orderQuery = new OrderQuery();
