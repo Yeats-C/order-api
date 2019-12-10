@@ -21,8 +21,8 @@ public class ErpOrderInfo extends ErpOrderBase {
     private String orderCode;
     /***订单状态 枚举 ErpOrderStatusEnum*/
     private Integer orderStatus;
-    /***订单是否支付成功 YesOrNoEnum*/
-    private Integer paid;
+    /***订单支付状态 ErpPayStatusEnum*/
+    private Integer payStatus;
     /***订单类型 枚举 ErpOrderTypeEnum*/
     private Integer orderType;
     /***订单来源 ErpOrderOriginTypeEnum*/
@@ -78,6 +78,11 @@ public class ErpOrderInfo extends ErpOrderBase {
     private String storeCode;
     /***门店名称*/
     private String storeName;
+
+    /***查询开始时间 yyyy-MM-dd*/
+    private String createTimeStart;
+    /***查询结束时间 yyyy-MM-dd*/
+    private String createTimeEnd;
 
     /***订单明细*/
     private List<ErpOrderItem> orderItemList;

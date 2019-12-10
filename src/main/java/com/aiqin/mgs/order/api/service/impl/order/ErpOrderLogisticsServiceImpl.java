@@ -60,7 +60,7 @@ public class ErpOrderLogisticsServiceImpl implements ErpOrderLogisticsService {
         ErpOrderLogistics orderLogistics = null;
         if (StringUtils.isNotEmpty(logisticsCode)) {
             ErpOrderLogistics query = new ErpOrderLogistics();
-            query.setLogisticCode(logisticsCode);
+            query.setLogisticsCode(logisticsCode);
             List<ErpOrderLogistics> select = erpOrderLogisticsDao.select(query);
             if (select != null && select.size() > 0) {
                 orderLogistics = select.get(0);

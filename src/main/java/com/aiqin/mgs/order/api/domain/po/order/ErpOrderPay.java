@@ -28,7 +28,7 @@ public class ErpOrderPay extends ErpOrderBase {
     /***支付方式*/
     private Integer payWay;
     /***费用*/
-    private BigDecimal fee;
+    private BigDecimal payFee;
     /***开始支付时间*/
     private Date payStartTime;
     /***结束支付时间*/

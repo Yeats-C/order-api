@@ -12,8 +12,6 @@ import lombok.Data;
 @Data
 public class ErpOrderOperationLog extends ErpOrderBase {
 
-    /***日志id*/
-    private String logId;
     /***订单id*/
     private String orderId;
     /***订单状态*/

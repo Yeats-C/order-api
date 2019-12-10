@@ -60,7 +60,7 @@ public class ErpOrderItem extends ErpOrderBase {
     /***活动优惠金额*/
     private BigDecimal activityMoney;
     /***实际支付金额*/
-    private BigDecimal realMoney;
+    private BigDecimal actualMoney;
     /***分摊后金额*/
     private BigDecimal shareMoney;
 
