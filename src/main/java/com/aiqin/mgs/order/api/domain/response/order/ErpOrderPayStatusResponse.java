@@ -1,6 +1,6 @@
 package com.aiqin.mgs.order.api.domain.response.order;
 
-import com.aiqin.mgs.order.api.component.enums.PayStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum;
 import lombok.Data;
 
 /**
@@ -12,9 +12,16 @@ import lombok.Data;
  */
 @Data
 public class ErpOrderPayStatusResponse {
+
+    /***请求是否成功*/
     private boolean requestSuccess = true;
+    /***订单号*/
     private String orderCode;
-    private PayStatusEnum payStatusEnum;
+    /***支付结果*/
+    private ErpPayStatusEnum payStatusEnum;
+    /***支付流水号*/
     private String payCode;
+    /***支付id*/
+    private String payId;
 
 }

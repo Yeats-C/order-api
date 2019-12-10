@@ -1,0 +1,185 @@
+package com.aiqin.mgs.order.api.service.order;
+
+import com.aiqin.mgs.order.api.domain.*;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
+import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+/**
+ * 订单调用其他系统service
+ *
+ * @author: Tao.Chen
+ * @version: v1.0.0
+ * @date 2019/12/2 15:01
+ */
+public interface ErpOrderRequestService {
+
+    /**
+     * 根据门店id查询门店信息
+     *
+     * @param storeId 门店id
+     * @return com.aiqin.mgs.order.api.domain.StoreInfo
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/2 15:36
+     */
+    StoreInfo getStoreInfoByStoreId(String storeId);
+
+    /**
+     * 查询商品明细
+     *
+     * @param storeId   门店id
+     * @param productId 商品id
+     * @param skuCode   商品sku编码
+     * @return com.aiqin.mgs.order.api.domain.ProductInfo
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/2 15:37
+     */
+    ProductInfo getProductDetail(String storeId, String productId, String skuCode);
+
+    /**
+     * 锁库存
+     *
+     * @param order
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/10 13:38
+     */
+    void lockStockInSupplyChain(ErpOrderInfo order);
+
+    /**
+     * 解锁库存
+     *
+     * @param order
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/10 13:38
+     */
+    void unlockStockInSupplyChain(ErpOrderInfo order);
+
+    /**
+     * 根据支付id获取订单支付状态
+     *
+     * @param payId 订单编码
+     * @return com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/2 15:37
+     */
+    ErpOrderPayStatusResponse getOrderPayStatus(String payId);
+
+    /**
+     * 发起支付请求
+     *
+     * @param order    订单信息
+     * @param orderPay 订单支付信息
+     * @return boolean
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/2 15:37
+     */
+    boolean sendPayRequest(ErpOrderInfo order, ErpOrderPay orderPay);
+
+    /**
+     * 发起支付物流费用申请
+     *
+     * @param orderLogistics
+     * @param orderPay
+     * @return boolean
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/10 15:45
+     */
+    boolean sendLogisticsPayRequest(ErpOrderLogistics orderLogistics, ErpOrderPay orderPay);
+
+    /**
+     * 获取物流券
+     *
+     * @param order 订单信息
+     * @return java.math.BigDecimal
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/2 15:45
+     */
+    BigDecimal getGoodsCoupon(ErpOrderInfo order);
+
+    /**
+     * 订单支付成功推送供应链,返回商品库存分组数据
+     *
+     * @param order
+     * @return boolean
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/2 15:48
+     */
+    ErpOrderInfo sendOrderToSupplyChainAndGetSplitGroup(ErpOrderInfo order);
+
+    /**
+     * 推送拆分后的订单到供应链
+     *
+     * @param order
+     * @param splitOrderList
+     * @return boolean
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/3 17:26
+     */
+    boolean sendSplitOrderToSupplyChain(ErpOrderInfo order, List<ErpOrderInfo> splitOrderList);
+
+    /**
+     * 商品销售区域配置校验
+     *
+     * @param storeInfo
+     * @param orderProductItemList
+     * @return boolean
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/2 16:11
+     */
+    boolean areaCheck(StoreInfo storeInfo, List<ErpOrderItem> orderProductItemList);
+
+    /**
+     * 商品库存校验
+     *
+     * @param storeInfo
+     * @param orderProductItemList
+     * @return boolean
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/2 16:11
+     */
+    boolean repertoryCheck(StoreInfo storeInfo, List<ErpOrderItem> orderProductItemList);
+
+    /**
+     * 商品销售价格校验
+     *
+     * @param storeInfo
+     * @param orderProductItemList
+     * @return boolean
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/2 16:11
+     */
+    boolean priceCheck(StoreInfo storeInfo, List<ErpOrderItem> orderProductItemList);
+
+    /**
+     * 促销活动校验
+     *
+     * @param storeInfo
+     * @param orderProductItemList
+     * @return boolean
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/2 16:11
+     */
+    boolean activityCheck(StoreInfo storeInfo, List<ErpOrderItem> orderProductItemList);
+
+}

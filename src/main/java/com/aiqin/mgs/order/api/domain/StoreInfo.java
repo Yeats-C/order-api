@@ -30,6 +30,22 @@ public class StoreInfo {
     private String contactsPhone;
     /***地址*/
     private String address;
+    /***大区id*/
+    private String areaId;
+    /***大区名称*/
+    private String areaName;
+    /***省id*/
+    private String provinceId;
+    /***省名称*/
+    private String provinceName;
+    /***市id*/
+    private String cityId;
+    /***市名称*/
+    private String cityName;
+    /***县id*/
+    private String districtId;
+    /***县名称*/
+    private String districtName;
 
     //TODO 字段待补充
 
