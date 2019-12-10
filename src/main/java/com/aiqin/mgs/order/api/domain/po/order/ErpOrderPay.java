@@ -18,7 +18,7 @@ public class ErpOrderPay extends ErpOrderBase {
     /***支付id*/
     private String payId;
     /***业务外键*/
-    private String businessId;
+    private String businessKey;
     /***支付流水号*/
     private String payCode;
     /***费用类型*/

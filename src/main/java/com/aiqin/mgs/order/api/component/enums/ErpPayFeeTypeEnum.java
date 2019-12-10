@@ -16,7 +16,7 @@ import java.util.Map;
  * @date 2019/12/9 15:07
  */
 @Getter
-public enum ErpOrderPayFeeTypeEnum {
+public enum ErpPayFeeTypeEnum {
 
     /***订单费用*/
     ORDER_FEE(1, "1", "订单费用"),
@@ -30,7 +30,7 @@ public enum ErpOrderPayFeeTypeEnum {
     /***状态描述*/
     private String desc;
 
-    ErpOrderPayFeeTypeEnum(Integer code, String value, String desc) {
+    ErpPayFeeTypeEnum(Integer code, String value, String desc) {
         this.code = code;
         this.value = value;
         this.desc = desc;
@@ -38,20 +38,20 @@ public enum ErpOrderPayFeeTypeEnum {
     /***选项类型*/
     public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
     /***code-enum map*/
-    public static final Map<Integer, ErpOrderPayFeeTypeEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<Integer, ErpPayFeeTypeEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
     /***value-enum map*/
-    public static final Map<String, ErpOrderPayFeeTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<String, ErpPayFeeTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
     static {
-        for (ErpOrderPayFeeTypeEnum item :
-                ErpOrderPayFeeTypeEnum.values()) {
+        for (ErpPayFeeTypeEnum item :
+                ErpPayFeeTypeEnum.values()) {
             SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
             CODE_ENUM_MAP.put(item.getCode(), item);
             VALUE_ENUM_MAP.put(item.getValue(), item);
         }
     }
 
-    public static ErpOrderPayFeeTypeEnum getEnum(Object object) {
+    public static ErpPayFeeTypeEnum getEnum(Object object) {
         if (object != null) {
             return VALUE_ENUM_MAP.get(object.toString());
         }
@@ -60,7 +60,7 @@ public enum ErpOrderPayFeeTypeEnum {
 
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            ErpOrderPayFeeTypeEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            ErpPayFeeTypeEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
             }

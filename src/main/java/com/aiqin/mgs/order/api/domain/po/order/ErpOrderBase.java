@@ -1,6 +1,8 @@
 package com.aiqin.mgs.order.api.domain.po.order;
 
 
+import lombok.Data;
+
 import java.util.Date;
 
 /**
@@ -10,6 +12,7 @@ import java.util.Date;
  * @version: v1.0.0
  * @date 2019/12/9 10:13
  */
+@Data
 public class ErpOrderBase {
 
     /***主键*/

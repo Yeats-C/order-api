@@ -359,7 +359,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //门店名称
         orderInfo.setStoreName(storeInfo.getStoreName());
 
-        orderInfo.setItemList(orderItemList);
+        orderInfo.setOrderItemList(orderItemList);
         return orderInfo;
     }
 
@@ -392,34 +392,39 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //生成订单id
         String orderId = OrderPublic.getUUID();
+        //生成支付id
+        String payId = OrderPublic.getUUID();
         //生成订单code
         String orderCode = OrderPublic.generateOrderCode(erpOrderSaveRequest.getOrderOriginType(), erpOrderSaveRequest.getOrderChannel());
 
         int orderItemNum = 1;
         for (ErpOrderItem item :
-                orderInfo.getItemList()) {
+                orderInfo.getOrderItemList()) {
             //订单id
             item.setOrderId(orderId);
+            //订单明细id
+            item.setOrderItemId(OrderPublic.getUUID());
             //订单明细行编号
             item.setOrderItemCode(orderCode + String.format("%03d", orderItemNum++));
         }
         //保存订单
         orderInfo.setOrderId(orderId);
         orderInfo.setOrderCode(orderCode);
+        orderInfo.setPayId(payId);
         erpOrderInfoService.saveOrder(orderInfo, auth);
 
         //保存订单明细行
-        erpOrderItemService.saveOrderItemList(orderInfo.getItemList(), auth);
+        erpOrderItemService.saveOrderItemList(orderInfo.getOrderItemList(), auth);
 
 
         //保存订单支付信息
         ErpOrderPay orderPay = new ErpOrderPay();
-        orderPay.setPayId(OrderPublic.getUUID());
-        orderPay.setBusinessId(orderCode);
+        orderPay.setPayId(payId);
+        orderPay.setBusinessKey(orderCode);
         orderPay.setFee(orderInfo.getActualMoney());
         orderPay.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
         orderPay.setPayWay(null);
-        orderPay.setFeeType(ErpOrderPayFeeTypeEnum.ORDER_FEE.getCode());
+        orderPay.setFeeType(ErpPayFeeTypeEnum.ORDER_FEE.getCode());
         erpOrderPayService.saveOrderPay(orderPay, auth);
 
         //保存订单收货信息
@@ -564,6 +569,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //生成订单id
         String orderId = OrderPublic.getUUID();
+        //生成支付id
+        String payId = OrderPublic.getUUID();
         //生成订单code
         String orderCode = OrderPublic.generateOrderCode(erpOrderSaveRequest.getOrderOriginType(), erpOrderSaveRequest.getOrderChannel());
 
@@ -582,6 +589,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
             //订单id
             item.setOrderId(orderId);
+            //订单明细id
+            item.setOrderItemId(OrderPublic.getUUID());
             //订单明细行编号
             item.setOrderItemCode(orderCode + String.format("%03d", orderItemNum++));
 
@@ -638,16 +647,18 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         orderInfo.setStoreCode(storeInfo.getStoreCode());
         //门店名称
         orderInfo.setStoreName(storeInfo.getStoreName());
+        //支付id
+        orderInfo.setPayId(payId);
         erpOrderInfoService.saveOrder(orderInfo, auth);
 
         //保存订单支付信息
         ErpOrderPay orderPay = new ErpOrderPay();
-        orderPay.setPayId(OrderPublic.getUUID());
-        orderPay.setBusinessId(orderCode);
+        orderPay.setPayId(payId);
+        orderPay.setBusinessKey(orderCode);
         orderPay.setFee(orderInfo.getActualMoney());
         orderPay.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
         orderPay.setPayWay(null);
-        orderPay.setFeeType(ErpOrderPayFeeTypeEnum.ORDER_FEE.getCode());
+        orderPay.setFeeType(ErpPayFeeTypeEnum.ORDER_FEE.getCode());
         erpOrderPayService.saveOrderPay(orderPay, auth);
 
         //保存订单收货信息

@@ -25,6 +25,17 @@ public interface ErpOrderOperationLogDao {
     List<ErpOrderOperationLog> select(ErpOrderOperationLog po);
 
     /**
+     * 根据订单id查询订单操作日志
+     *
+     * @param orderId 订单id
+     * @return java.util.List<com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog>
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/9 21:28
+     */
+    List<ErpOrderOperationLog> selectOperationLogListByOrderId(String orderId);
+
+    /**
      * 根据主键更新非空字段（部分字段除外）
      *
      * @param po

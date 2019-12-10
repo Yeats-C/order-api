@@ -31,7 +31,7 @@ public class OrderPayTimeOutTaskJob {
 //        logger.info("取消超时未支付订单定时任务=====>开始");
 //        OrderStoreOrderInfo orderInfo = new OrderStoreOrderInfo();
 //        orderInfo.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
-//        orderInfo.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
+//        orderInfo.setPaid(ErpPayStatusEnum.UNPAID.getCode());
 //        List<OrderStoreOrderInfo> list = erpOrderQueryService.selectOrderBySelective(orderInfo);
 //        Date now = new Date();
 //        if (list != null && list.size() > 0) {

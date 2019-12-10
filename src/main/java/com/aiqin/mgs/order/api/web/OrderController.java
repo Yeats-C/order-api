@@ -409,7 +409,7 @@ public class OrderController {
     		) {
         
     	
-    	LOGGER.info("更改订单状态/支付状态/修改员参数 orderId：{},orderStatus: {},payStatus: {},payType: {},updateBy: {}",orderId,orderStatus,payStatus,payType,updateBy);    	
+    	LOGGER.info("更改订单状态/支付状态/修改员参数 orderId：{},orderStatus: {},paid: {},payType: {},updateBy: {}",orderId,orderStatus,payStatus,payType,updateBy);
         return orderService.updateOrderStatus(orderId,orderStatus,payStatus,updateBy);
     } 
     

@@ -5,6 +5,7 @@ import com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 订单支付结果查询返回值
@@ -30,6 +31,12 @@ public class OrderPayResultResponse {
     private String payStatusDesc;
     /***物流券*/
     private BigDecimal goodsCoupon;
+    /***支付流水号*/
+    private String payCode;
+    /***支付开始时间*/
+    private Date payStartTime;
+    /***支付完成时间*/
+    private Date payEndTime;
 
     public String getOrderStatusDesc() {
         return ErpOrderStatusEnum.getEnumDesc(orderStatus);

@@ -1,5 +1,7 @@
 package com.aiqin.mgs.order.api.domain.po.order;
 
+import lombok.Data;
+
 /**
  * 订单操作日志实体
  *
@@ -7,6 +9,7 @@ package com.aiqin.mgs.order.api.domain.po.order;
  * @version: v1.0.0
  * @date 2019/12/9 9:58
  */
+@Data
 public class ErpOrderOperationLog extends ErpOrderBase {
 
     /***日志id*/
