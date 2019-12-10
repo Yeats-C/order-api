@@ -422,6 +422,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String orderLogisticsPay(ErpOrderPayRequest erpOrderPayRequest) {
         AuthToken auth = AuthUtil.getCurrentAuth();
         if (erpOrderPayRequest == null || StringUtils.isEmpty(erpOrderPayRequest.getOrderCode())) {
