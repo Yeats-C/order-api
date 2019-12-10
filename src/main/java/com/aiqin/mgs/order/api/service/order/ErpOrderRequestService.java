@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.service.order;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
 
@@ -86,6 +87,18 @@ public interface ErpOrderRequestService {
      * @date 2019/12/2 15:37
      */
     boolean sendPayRequest(ErpOrderInfo order, ErpOrderPay orderPay);
+
+    /**
+     * 发起支付物流费用申请
+     *
+     * @param orderLogistics
+     * @param orderPay
+     * @return boolean
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/10 15:45
+     */
+    boolean sendLogisticsPayRequest(ErpOrderLogistics orderLogistics, ErpOrderPay orderPay);
 
     /**
      * 获取物流券

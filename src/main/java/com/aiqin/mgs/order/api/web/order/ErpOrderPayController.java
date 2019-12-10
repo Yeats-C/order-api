@@ -5,9 +5,11 @@ import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayCallbackRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
-import com.aiqin.mgs.order.api.domain.response.order.OrderPayResultResponse;
+import com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPayResultResponse;
+import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayResultResponse;
 import com.aiqin.mgs.order.api.service.order.ErpOrderPayService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import io.swagger.annotations.Api;
@@ -44,9 +46,9 @@ public class ErpOrderPayController {
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
-//            //发起支付
+            //发起支付
             String payId = erpOrderPayService.orderPay(erpOrderPayRequest);
-//            //开始轮询
+            //开始轮询
             erpOrderPayService.payPolling(payId);
         } catch (BusinessException e) {
             logger.error("订单支付异常：{}", e);
@@ -63,8 +65,8 @@ public class ErpOrderPayController {
     public HttpResponse orderPayResult(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-            OrderPayResultResponse orderPayResultResponse = erpOrderPayService.orderPayResult(erpOrderPayRequest);
-            response.setData(orderPayResultResponse);
+            ErpOrderPayResultResponse erpOrderPayResultResponse = erpOrderPayService.orderPayResult(erpOrderPayRequest);
+            response.setData(erpOrderPayResultResponse);
         } catch (BusinessException e) {
             logger.error("订单支付结果查询异常：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
@@ -80,10 +82,7 @@ public class ErpOrderPayController {
     public HttpResponse orderPayCallback(@RequestBody ErpOrderPayCallbackRequest erpOrderPayCallbackRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-            //修改支付单状态
-            String payId = erpOrderPayService.orderPayCallback(erpOrderPayCallbackRequest);
-            //支付之后后续逻辑
-//            erpOrderPayService.endPay(payId);
+            erpOrderPayService.orderPayCallback(erpOrderPayCallbackRequest);
         } catch (BusinessException e) {
             logger.error("订单支付回调异常：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
@@ -100,7 +99,7 @@ public class ErpOrderPayController {
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
-//            erpOrderPayService.orderPayRepay(orderStoreOrderPay);
+            erpOrderPayService.orderPayRepay(erpOrderPayRequest);
         } catch (BusinessException e) {
             logger.error("校验并同步订单支付状态异常：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
@@ -111,13 +110,13 @@ public class ErpOrderPayController {
         return response;
     }
 
-    @PostMapping("/getOrderSendingFee")
+    @PostMapping("/getOrderLogisticsFee")
     @ApiOperation(value = "获取订单物流费用信息")
-    public HttpResponse getOrderSendingFee(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
+    public HttpResponse getOrderLogisticsFee(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-//            OrderStoreOrderInfo order = erpOrderService.getOrderSendingFee(orderStoreOrderInfo);
-//            response.setData(order);
+            ErpOrderLogistics orderLogisticsFee = erpOrderPayService.getOrderLogisticsFee(erpOrderPayRequest);
+            response.setData(orderLogisticsFee);
         } catch (BusinessException e) {
             logger.error("获取订单物流费用信息异常：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
@@ -128,13 +127,16 @@ public class ErpOrderPayController {
         return response;
     }
 
-    @PostMapping("/orderSendingPay")
+    @PostMapping("/orderLogisticsPay")
     @ApiOperation(value = "支付物流费用")
-    public HttpResponse orderSendingPay(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
+    public HttpResponse orderLogisticsPay(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
-
+            //发起支付
+            String payId = erpOrderPayService.orderLogisticsPay(erpOrderPayRequest);
+            //开启轮询
+            erpOrderPayService.payPolling(payId);
         } catch (BusinessException e) {
             logger.error("支付物流费用异常：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
@@ -147,11 +149,11 @@ public class ErpOrderPayController {
 
     @PostMapping("/orderSendingPayResult")
     @ApiOperation(value = "订单物流费用支付结果查询")
-    public HttpResponse orderSendingPayResult(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
+    public HttpResponse orderLogisticsPayResult(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-//            OrderSendingPayResultResponse orderSendingPayResultResponse = erpOrderPayService.orderSendingPayResult(orderStoreOrderInfo);
-//            response.setData(orderSendingPayResultResponse);
+            ErpOrderLogisticsPayResultResponse resultResponse = erpOrderPayService.orderLogisticsPayResult(erpOrderPayRequest);
+            response.setData(resultResponse);
         } catch (BusinessException e) {
             logger.error("订单物流费用支付结果查询异常：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));

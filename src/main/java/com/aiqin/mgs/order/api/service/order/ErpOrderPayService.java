@@ -1,10 +1,12 @@
 package com.aiqin.mgs.order.api.service.order;
 
 import com.aiqin.mgs.order.api.domain.AuthToken;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayCallbackRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
-import com.aiqin.mgs.order.api.domain.response.order.OrderPayResultResponse;
+import com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPayResultResponse;
+import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayResultResponse;
 
 /**
  * 订单支付service
@@ -48,7 +50,7 @@ public interface ErpOrderPayService {
      * @version: v1.0.0
      * @date 2019/12/10 9:47
      */
-    void updateOrderPaySelective(ErpOrderPay po,AuthToken auth);
+    void updateOrderPaySelective(ErpOrderPay po, AuthToken auth);
 
     /**
      * 订单支付
@@ -65,12 +67,12 @@ public interface ErpOrderPayService {
      * 查询订单支付结果
      *
      * @param erpOrderPayRequest
-     * @return com.aiqin.mgs.order.api.domain.response.order.OrderPayResultResponse
+     * @return com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayResultResponse
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/10 9:47
      */
-    OrderPayResultResponse orderPayResult(ErpOrderPayRequest erpOrderPayRequest);
+    ErpOrderPayResultResponse orderPayResult(ErpOrderPayRequest erpOrderPayRequest);
 
     /**
      * 轮询查询支付结果
@@ -92,18 +94,19 @@ public interface ErpOrderPayService {
      * @version: v1.0.0
      * @date 2019/12/10 9:48
      */
-    String orderPayCallback(ErpOrderPayCallbackRequest erpOrderPayCallbackRequest);
+    void orderPayCallback(ErpOrderPayCallbackRequest erpOrderPayCallbackRequest);
 
     /**
      * 支付完成后续处理
      *
-     * @param payId 支付id
+     * @param payId  支付id
+     * @param manual 是否人工操作
      * @return java.lang.String
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/10 9:48
      */
-    String endPay(String payId);
+    String endPay(String payId, boolean manual);
 
     /**
      * 校验并更正订单支付信息
@@ -126,4 +129,37 @@ public interface ErpOrderPayService {
      * @date 2019/12/10 9:49
      */
     void orderTimeoutUnpaid(ErpOrderPayRequest erpOrderPayRequest);
+
+    /**
+     * 获取需要支付的物流费用信息
+     *
+     * @param erpOrderPayRequest
+     * @return com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/10 15:13
+     */
+    ErpOrderLogistics getOrderLogisticsFee(ErpOrderPayRequest erpOrderPayRequest);
+
+    /**
+     * 发起支付物流费用
+     *
+     * @param erpOrderPayRequest
+     * @return java.lang.String
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/10 15:41
+     */
+    String orderLogisticsPay(ErpOrderPayRequest erpOrderPayRequest);
+
+    /**
+     * 查询订单物流费用支付结果
+     *
+     * @param erpOrderPayRequest
+     * @return com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPayResultResponse
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/10 15:31
+     */
+    ErpOrderLogisticsPayResultResponse orderLogisticsPayResult(ErpOrderPayRequest erpOrderPayRequest);
 }

@@ -20,4 +20,8 @@ public class ErpOrderPayRequest {
     /***支付方式*/
     @ApiModelProperty(value = "支付方式")
     private Integer payWay;
+
+    /***物流券id，多个用逗号间隔*/
+    @ApiModelProperty(value = "物流券id")
+    private String couponIds;
 }

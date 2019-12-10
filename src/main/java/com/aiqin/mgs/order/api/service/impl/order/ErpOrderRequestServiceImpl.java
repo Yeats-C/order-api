@@ -10,6 +10,7 @@ import com.aiqin.mgs.order.api.domain.ProductRepertoryQuantity;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
 import com.aiqin.mgs.order.api.domain.response.StoreBackInfoResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
@@ -177,6 +178,11 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             logger.error("发起支付失败：{}", e);
         }
         return flag;
+    }
+
+    @Override
+    public boolean sendLogisticsPayRequest(ErpOrderLogistics orderLogistics, ErpOrderPay orderPay) {
+        return false;
     }
 
     @Override
