@@ -1,0 +1,701 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.ServiceProjectAssetDao">
+    <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.request.service.ServiceProjectAsset">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="asset_id" jdbcType="VARCHAR" property="assetId"/>
+        <result column="customer_id" jdbcType="VARCHAR" property="customerId"/>
+        <result column="customer_name" jdbcType="VARCHAR" property="customerName"/>
+        <result column="customer_phone" jdbcType="VARCHAR" property="customerPhone"/>
+        <result column="customer_type" jdbcType="BIT" property="customerType"/>
+        <result column="store_id" jdbcType="VARCHAR" property="storeId"/>
+        <result column="store_code" jdbcType="VARCHAR" property="storeCode"/>
+        <result column="store_name" jdbcType="VARCHAR" property="storeName"/>
+        <result column="project_id" jdbcType="VARCHAR" property="projectId"/>
+        <result column="project_code" jdbcType="VARCHAR" property="projectCode"/>
+        <result column="project_name" jdbcType="VARCHAR" property="projectName"/>
+        <result column="type_id" jdbcType="VARCHAR" property="typeId"/>
+        <result column="begin_time" jdbcType="TIMESTAMP" property="beginTime"/>
+        <result column="finish_time" jdbcType="TIMESTAMP" property="finishTime"/>
+        <result column="consumption_pattern" jdbcType="BIT" property="consumptionPattern"/>
+        <result column="limit_count" jdbcType="INTEGER" property="limitCount"/>
+        <result column="remain_count" jdbcType="INTEGER" property="remainCount"/>
+        <result column="actual_amount" jdbcType="BIGINT" property="actualAmount"/>
+        <result column="cashier_id" jdbcType="VARCHAR" property="cashierId"/>
+        <result column="cashier_name" jdbcType="VARCHAR" property="cashierName"/>
+        <result column="guide_id" jdbcType="VARCHAR" property="guideId"/>
+        <result column="guide_name" jdbcType="VARCHAR" property="guideName"/>
+        <result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
+        <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+        <result column="order_detail_id" jdbcType="VARCHAR" property="orderDetailId"/>
+        <result column="is_direct_custom" jdbcType="BIT" property="isDirectCustom"/>
+        <result column="pay_status" jdbcType="BIT" property="payStatus"/>
+        <result column="use_status" jdbcType="BIT" property="useStatus"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <resultMap id="customerPhoneMap" type="java.lang.String">
+        <result column="customer_phone" jdbcType="VARCHAR" property="customerPhone"/>
+    </resultMap>
+    <resultMap id="customerCountMap" type="com.aiqin.mgs.order.api.domain.response.service.ServiceProjectTransformResponse">
+        <result column="project_id" jdbcType="VARCHAR" property="projectId"/>
+        <result column="project_name" jdbcType="VARCHAR" property="projectName"/>
+        <result column="type_id" jdbcType="VARCHAR" property="typeId"/>
+        <result column="type_name" jdbcType="VARCHAR" property="typeName"/>
+        <result column="total_amount" jdbcType="BIGINT" property="totalAmount"/>
+        <result column="total_return_amount" jdbcType="BIGINT" property="totalReturnAmount"/>
+        <result column="yesterday_amount" jdbcType="BIGINT" property="yesterdayAmount"/>
+        <result column="total_count" jdbcType="INTEGER" property="totalCount"/>
+        <result column="total_return_count" jdbcType="INTEGER" property="totalReturnCount"/>
+        <result column="yesterday_count" jdbcType="INTEGER" property="yesterdayCount"/>
+        <result column="total_customer_count" jdbcType="INTEGER" property="totalCustomerCount"/>
+        <result column="yesterday_customer_count" jdbcType="INTEGER" property="yesterdayCustomerCount"/>
+        <result column="use_project_count" jdbcType="INTEGER" property="useProjectCount"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+     id,asset_id,customer_id,customer_name,customer_phone,customer_type,store_id,store_code,store_name,project_id,project_code,project_name,
+     type_id,begin_time,finish_time,consumption_pattern,limit_count,remain_count,actual_amount,cashier_id,cashier_name,guide_id,guide_name,order_code,order_id,order_detail_id,is_direct_custom,pay_status,use_status,create_time,update_time
+  </sql>
+    <insert id="insertServiceProjectAsset" parameterType="com.aiqin.mgs.order.api.domain.request.service.ServiceProjectAsset">
+        insert into service_project_asset
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="assetId != null">
+                asset_id,
+            </if>
+            <if test="customerId != null">
+                customer_id,
+            </if>
+            <if test="customerName != null">
+                customer_name,
+            </if>
+            <if test="customerPhone != null">
+                customer_phone,
+            </if>
+            <if test="customerType != null">
+                customer_type,
+            </if>
+            <if test="storeId != null">
+                store_id,
+            </if>
+            <if test="storeCode != null">
+                store_code,
+            </if>
+            <if test="storeName != null">
+                store_name,
+            </if>
+            <if test="projectId != null">
+                project_id,
+            </if>
+            <if test="projectCode != null">
+                project_code,
+            </if>
+            <if test="projectName != null">
+                project_name,
+            </if>
+            <if test="typeId != null">
+                type_id,
+            </if>
+            <if test="beginTime != null">
+                begin_time,
+            </if>
+            <if test="finishTime != null">
+                finish_time,
+            </if>
+            <if test="consumptionPattern != null">
+                consumption_pattern,
+            </if>
+            <if test="limitCount != null">
+                limit_count,
+            </if>
+            <if test="remainCount != null">
+                remain_count,
+            </if>
+            <if test="actualAmount != null">
+                actual_amount,
+            </if>
+            <if test="cashierId != null">
+                cashier_id,
+            </if>
+            <if test="cashierName != null">
+                cashier_name,
+            </if>
+            <if test="guideId != null">
+                guide_id,
+            </if>
+            <if test="guideName != null">
+                guide_name,
+            </if>
+            <if test="orderCode != null">
+                order_code,
+            </if>
+            <if test="orderId != null">
+                order_id,
+            </if>
+            <if test="orderDetailId != null">
+                order_detail_id,
+            </if>
+            <if test="isDirectCustom != null">
+                is_direct_custom,
+            </if>
+            <if test="payStatus != null">
+                pay_status,
+            </if>
+            <if test="useStatus != null">
+                use_status,
+            </if>
+            create_time, update_time,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="assetId != null">
+                #{assetId,jdbcType=VARCHAR},
+            </if>
+            <if test="customerId != null">
+                #{customerId,jdbcType=VARCHAR},
+            </if>
+            <if test="customerName != null">
+                #{customerName,jdbcType=VARCHAR},
+            </if>
+            <if test="customerPhone != null">
+                #{customerPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="customerType != null">
+                #{customerType,jdbcType=BIT},
+            </if>
+            <if test="storeId != null">
+                #{storeId,jdbcType=VARCHAR},
+            </if>
+            <if test="storeCode != null">
+                #{storeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="storeName != null">
+                #{storeName,jdbcType=VARCHAR},
+            </if>
+            <if test="projectId != null">
+                #{projectId,jdbcType=VARCHAR},
+            </if>
+            <if test="projectCode != null">
+                #{projectCode,jdbcType=VARCHAR},
+            </if>
+            <if test="projectName != null">
+                #{projectName,jdbcType=VARCHAR},
+            </if>
+            <if test="typeId != null">
+                #{typeId,jdbcType=VARCHAR},
+            </if>
+            <if test="beginTime != null">
+                #{beginTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="finishTime != null">
+                #{finishTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="consumptionPattern != null">
+                #{consumptionPattern,jdbcType=BIT},
+            </if>
+            <if test="limitCount != null">
+                #{limitCount,jdbcType=INTEGER},
+            </if>
+            <if test="remainCount != null">
+                #{remainCount,jdbcType=INTEGER},
+            </if>
+            <if test="actualAmount != null">
+                #{actualAmount,jdbcType=BIGINT},
+            </if>
+            <if test="cashierId != null">
+                #{cashierId,jdbcType=VARCHAR},
+            </if>
+            <if test="cashierName != null">
+                #{cashierName,jdbcType=VARCHAR},
+            </if>
+            <if test="guideId != null">
+                #{guideId,jdbcType=VARCHAR},
+            </if>
+            <if test="guideName != null">
+                #{guideName,jdbcType=VARCHAR},
+            </if>
+            <if test="orderCode != null">
+                #{orderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="orderId != null">
+                #{orderId,jdbcType=VARCHAR},
+            </if>
+            <if test="orderDetailId != null">
+                #{orderDetailId,jdbcType=VARCHAR},
+            </if>
+            <if test="isDirectCustom != null">
+                #{isDirectCustom,jdbcType=BIT},
+            </if>
+            <if test="payStatus != null">
+                #{payStatus,jdbcType=BIT},
+            </if>
+            <if test="useStatus != null">
+                #{useStatus,jdbcType=BIT},
+            </if>
+            now(),now(),
+        </trim>
+    </insert>
+    <insert id="insertList" parameterType="java.util.List">
+        insert into
+        service_project_asset(asset_id,customer_id,customer_name,customer_phone,customer_type,store_id,store_code,store_name,project_id,project_code,project_name,
+        type_id,begin_time,finish_time,consumption_pattern,limit_count,remain_count,actual_amount,cashier_id,cashier_name,guide_id,guide_name,order_code,order_id,order_detail_id,is_direct_custom,pay_status,use_status,create_time,update_time)
+        values
+        <foreach collection="list" item="serviceProjectAsset" separator=",">
+            ( #{serviceProjectAsset.assetId,jdbcType=VARCHAR},
+            #{serviceProjectAsset.customerId,jdbcType=VARCHAR},
+            #{serviceProjectAsset.customerName,jdbcType=VARCHAR},
+            #{serviceProjectAsset.customerPhone,jdbcType=VARCHAR},
+            #{serviceProjectAsset.customerType,jdbcType=BIT},
+            #{serviceProjectAsset.storeId,jdbcType=VARCHAR},
+            #{serviceProjectAsset.storeCode,jdbcType=VARCHAR},
+            #{serviceProjectAsset.storeName,jdbcType=VARCHAR},
+            #{serviceProjectAsset.projectId,jdbcType=VARCHAR},
+            #{serviceProjectAsset.projectCode,jdbcType=VARCHAR},
+            #{serviceProjectAsset.projectName,jdbcType=VARCHAR},
+            #{serviceProjectAsset.typeId,jdbcType=VARCHAR},
+            #{serviceProjectAsset.beginTime,jdbcType=TIMESTAMP},
+            #{serviceProjectAsset.finishTime,jdbcType=TIMESTAMP},
+            #{serviceProjectAsset.consumptionPattern,jdbcType=BIT},
+            #{serviceProjectAsset.limitCount,jdbcType=INTEGER},
+            #{serviceProjectAsset.remainCount,jdbcType=INTEGER},
+            #{serviceProjectAsset.actualAmount,jdbcType=BIGINT},
+            #{serviceProjectAsset.cashierId,jdbcType=VARCHAR},
+            #{serviceProjectAsset.cashierName,jdbcType=VARCHAR},
+            #{serviceProjectAsset.guideId,jdbcType=VARCHAR},
+            #{serviceProjectAsset.guideName,jdbcType=VARCHAR},
+            #{serviceProjectAsset.orderCode,jdbcType=VARCHAR},
+            #{serviceProjectAsset.orderId,jdbcType=VARCHAR},
+            #{serviceProjectAsset.orderDetailId,jdbcType=VARCHAR},
+            #{serviceProjectAsset.isDirectCustom,jdbcType=BIT},
+            #{serviceProjectAsset.payStatus,jdbcType=BIT},
+            #{serviceProjectAsset.useStatus,jdbcType=BIT},
+            now(),now())
+        </foreach>
+    </insert>
+    <update id="updateSource" parameterType="com.aiqin.mgs.order.api.domain.request.service.ServiceProjectAsset">
+        update service_project_asset
+        <set>
+            <if test="customerId != null">
+                customer_id = #{customerId,jdbcType=VARCHAR},
+            </if>
+            <if test="customerName != null">
+                customer_name = #{customerName,jdbcType=VARCHAR},
+            </if>
+            <if test="customerPhone != null">
+                customer_phone = #{customerPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="customerType != null">
+                customer_type = #{customerType,jdbcType=BIT},
+            </if>
+            <if test="storeId != null">
+                store_id = #{storeId,jdbcType=VARCHAR},
+            </if>
+            <if test="storeCode != null">
+                store_code = #{storeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="storeName != null">
+                store_name = #{storeName,jdbcType=VARCHAR},
+            </if>
+            <if test="projectId != null">
+                project_id = #{projectId,jdbcType=VARCHAR},
+            </if>
+            <if test="projectCode != null">
+                project_code = #{projectCode,jdbcType=VARCHAR},
+            </if>
+            <if test="projectName != null">
+                project_name = #{projectName,jdbcType=VARCHAR},
+            </if>
+            <if test="typeId != null">
+                type_id = #{typeId,jdbcType=VARCHAR},
+            </if>
+            <if test="beginTime != null">
+                begin_time = #{beginTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="finishTime != null">
+                finish_time = #{finishTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="consumptionPattern != null">
+                consumption_pattern = #{consumptionPattern,jdbcType=BIT},
+            </if>
+            <if test="limitCount != null">
+                limit_count = #{limitCount,jdbcType=INTEGER},
+            </if>
+            <if test="remainCount != null">
+                remain_count = #{remainCount,jdbcType=INTEGER},
+            </if>
+            <if test="actualAmount != null">
+                actual_amount = #{actualAmount,jdbcType=BIGINT},
+            </if>
+            <if test="cashierId != null">
+                cashier_id = #{cashierId,jdbcType=VARCHAR},
+            </if>
+            <if test="cashierName != null">
+                cashier_name = #{cashierName,jdbcType=VARCHAR},
+            </if>
+            <if test="guideId != null">
+                guide_id = #{guideId,jdbcType=VARCHAR},
+            </if>
+            <if test="guideName != null">
+                guide_name = #{guideName,jdbcType=VARCHAR},
+            </if>
+            <if test="orderCode != null">
+                order_code = #{orderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="orderId != null">
+                order_id = #{orderId,jdbcType=VARCHAR},
+            </if>
+            <if test="orderDetailId != null">
+                order_detail_id = #{orderDetailId,jdbcType=VARCHAR},
+            </if>
+            <if test="isDirectCustom != null">
+                is_direct_custom = #{isDirectCustom,jdbcType=BIT},
+            </if>
+            <if test="payStatus != null">
+                pay_status = #{payStatus,jdbcType=BIT},
+            </if>
+            <if test="useStatus != null">
+                use_status = #{useStatus,jdbcType=BIT},
+            </if>
+            update_time = now()
+        </set>
+        where asset_id = #{assetId,jdbcType=VARCHAR}
+    </update>
+    <select id="selectServiceProjectAssetByPhone" resultMap="BaseResultMap" resultType="java.util.List">
+        select
+        <include refid="Base_Column_List"/>
+        from service_project_asset
+        <where>
+            <if test="store_id!=null">
+                and store_id = #{store_id,jdbcType=VARCHAR} and pay_status = 1
+            </if>
+            <if test="customer_phone!=null">
+                and customer_phone like concat(#{customer_phone,jdbcType=VARCHAR},'%') and pay_status = 1
+            </if>
+            <if test="order_code!=null">
+                and order_code = #{order_code,jdbcType=VARCHAR} and pay_status = 0 and use_status = 0
+            </if>
+            <if test="order_id!=null">
+                and order_id = #{order_id,jdbcType=VARCHAR} and pay_status = 1
+            </if>
+        </where>
+        order by id desc
+    </select>
+    <select id="selectServiceProjectAssetBySourceId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from service_project_asset
+        where asset_id = #{assetId,jdbcType=VARCHAR} and pay_status = 1
+    </select>
+    <select id="selectAllUseSource" resultMap="BaseResultMap" resultType="java.util.List">
+        select
+        <include refid="Base_Column_List"/>
+        from service_project_asset
+        where store_id = #{store_id,jdbcType=VARCHAR} and project_id = #{project_id,jdbcType=VARCHAR} and
+        TO_DAYS(finish_time) &gt;= now() and (consumption_pattern = 1 or remain_count>0) and pay_status = 1 and
+        use_status = 0
+    </select>
+    <delete id="deleteList" parameterType="java.util.List">
+        delete from service_project_asset
+        where asset_id in (
+        <foreach collection="list" item="serviceProjectAsset" separator=",">
+            #{serviceProjectAsset.assetId,jdbcType=VARCHAR}
+        </foreach>
+        )
+    </delete>
+    <select id="assetOutTime" resultType="java.util.List" resultMap="BaseResultMap">
+        select asset_id ,use_status from  service_project_asset
+        where finish_time &lt; now() and use_status = 0
+    </select>
+    <update id="updateAssetUseStatus" parameterType="java.util.List">
+        update service_project_asset
+        set use_status = 1
+        where asset_id in (
+        <foreach collection="list" separator="," item="serviceProjectAsset">
+            #{serviceProjectAsset.assetId,jdbcType=VARCHAR}
+        </foreach>
+        )
+    </update>
+    <select id="TotalAmount" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest"
+            resultType="java.lang.Long">
+        select sum(actual_amount) from service_project_asset
+        <where>
+            <if test="storeId!=null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+    <select id="yesTodayTotalAmount" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest"
+            resultType="java.lang.Long">
+        select sum(actual_amount) from service_project_asset
+        <where>
+            TO_DAYS(create_time) = TO_DAYS(now())-1
+            <if test="storeId!=null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+    <select id="TotalCount" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest"
+            resultType="java.lang.Integer">
+        select count(1) from service_project_asset
+        <where>
+            <if test="storeId!=null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+    <select id="yesTodayTotalCount" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest"
+            resultType="java.lang.Integer">
+        select count(1) from service_project_asset
+        <where>
+            TO_DAYS(create_time) = TO_DAYS(now())-1
+            <if test="storeId!=null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+    <select id="TotalConsumer" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest"
+            resultType="java.util.List" resultMap="customerPhoneMap">
+        select customer_phone from service_project_asset
+        <where>
+            date_format(create_time,'%Y-%m')=date_format(now(),'%Y-%m')
+            <if test="storeId!=null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+    <select id="yesTodayTotalConsumer" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest"
+            resultType="java.util.List" resultMap="customerPhoneMap">
+        select customer_phone from service_project_asset
+        <where>
+            TO_DAYS(create_time) = TO_DAYS(now())-1
+            <if test="storeId!=null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+    <select id="selectAssetByCondition" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest"
+            resultMap="BaseResultMap" resultType="java.util.List">
+        select
+        <include refid="Base_Column_List"/>
+        from service_project_asset
+        <where>
+            <if test="storeInfo!=null">
+                and (store_code LIKE concat(#{storeInfo,jdbcType=VARCHAR},'%') or store_name LIKE
+                concat(#{storeInfo,jdbcType=VARCHAR},'%') )
+            </if>
+            <if test="customerPhone!=null">
+                and customer_phone LIKE concat(#{customerPhone,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="storeId!=null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+            <if test="typeId!=null">
+                and type_id = #{typeId,jdbcType=VARCHAR}
+            </if>
+            <if test="orderId!=null">
+                and order_id = #{orderId,jdbcType=VARCHAR}
+            </if>
+            <if test="orderCode!=null">
+                and order_code = #{orderCode,jdbcType=VARCHAR}
+            </if>
+            <if test="beginTime!=null">
+                and TO_DAYS(#{beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(create_time)
+            </if>
+            <if test="finishTime!=null">
+                and TO_DAYS(#{finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(create_time)
+            </if>
+            <if test="queryTime!=null">
+                and TO_DAYS(#{queryTime,jdbcType=TIMESTAMP}) = TO_DAYS(create_time)
+            </if>
+        </where>
+        group by order_id
+        order by create_time desc
+        limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </select>
+    <select id="countAssetByCondition" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest"
+            resultType="java.lang.Integer">
+        select count(distinct order_code)
+        from service_project_asset
+        <where>
+            <if test="storeInfo!=null">
+                and store_code LIKE concat(#{storeInfo,jdbcType=VARCHAR},'%') or store_name LIKE
+                concat(#{storeInfo,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="customerPhone!=null">
+                and customer_phone LIKE concat(#{customerPhone,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="storeId!=null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+            <if test="typeId!=null">
+                and type_id = #{typeId,jdbcType=VARCHAR}
+            </if>
+            <if test="orderId!=null">
+                and order_id = #{orderId,jdbcType=VARCHAR}
+            </if>
+            <if test="orderCode!=null">
+                and order_code = #{orderCode,jdbcType=VARCHAR}
+            </if>
+            <if test="beginTime!=null">
+                and TO_DAYS(#{beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(create_time)
+            </if>
+            <if test="finishTime!=null">
+                and TO_DAYS(#{finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(create_time)
+            </if>
+            <if test="queryTime!=null">
+                and TO_DAYS(#{queryTime,jdbcType=TIMESTAMP}) = TO_DAYS(create_time)
+            </if>
+        </where>
+    </select>
+    <select id="selectAssetByConditions"
+            parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest" resultMap="BaseResultMap"
+            resultType="java.util.List">
+        select asset_id,customer_id,customer_name,customer_phone,customer_type,store_id,store_code,store_name,
+        type_id,consumption_pattern,guide_id,guide_name,order_code,order_id,order_detail_id,create_time
+        from service_project_asset
+        <where>
+            pay_status = 1
+            <if test="storeInfo!=null">
+                and (store_code LIKE concat(#{storeInfo,jdbcType=VARCHAR},'%') or store_name LIKE
+                concat(#{storeInfo,jdbcType=VARCHAR},'%') )
+            </if>
+            <if test="customerPhone!=null">
+                and customer_phone LIKE concat(#{customerPhone,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="storeId!=null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+            <if test="typeId!=null">
+                and type_id = #{typeId,jdbcType=VARCHAR}
+            </if>
+            <if test="orderId!=null">
+                and order_id = #{orderId,jdbcType=VARCHAR}
+            </if>
+            <if test="orderCode!=null">
+                and order_code = #{orderCode,jdbcType=VARCHAR}
+            </if>
+            <if test="beginTime!=null">
+                and TO_DAYS(#{beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(create_time)
+            </if>
+            <if test="finishTime!=null">
+                and TO_DAYS(#{finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(create_time)
+            </if>
+            <if test="queryTime!=null">
+                and TO_DAYS(#{queryTime,jdbcType=TIMESTAMP}) = TO_DAYS(create_time)
+            </if>
+        </where>
+        group by order_id
+        order by create_time desc
+    </select>
+    <select id="countAssetByConditions" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest"
+            resultType="java.lang.Integer">
+        select count(distinct order_id)
+        from service_project_asset
+        <where>
+            pay_status = 1
+            <if test="storeInfo!=null">
+                and store_code LIKE concat(#{storeInfo,jdbcType=VARCHAR},'%') or store_name LIKE
+                concat(#{storeInfo,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="customerPhone!=null">
+                and customer_phone LIKE concat(#{customerPhone,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="storeId!=null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+            <if test="typeId!=null">
+                and type_id = #{typeId,jdbcType=VARCHAR}
+            </if>
+            <if test="orderId!=null">
+                and order_id = #{orderId,jdbcType=VARCHAR}
+            </if>
+            <if test="orderCode!=null">
+                and order_code = #{orderCode,jdbcType=VARCHAR}
+            </if>
+            <if test="beginTime!=null">
+                and TO_DAYS(#{beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(create_time)
+            </if>
+            <if test="finishTime!=null">
+                and TO_DAYS(#{finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(create_time)
+            </if>
+            <if test="queryTime!=null">
+                and TO_DAYS(#{queryTime,jdbcType=TIMESTAMP}) = TO_DAYS(create_time)
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+    <select id="selectServiceProjectCount"
+            parameterType="java.lang.String"
+            resultType="java.lang.Integer">
+        select
+        count(1)
+        from service_project_asset
+        <where>
+            <if test="store_id != null">
+                and store_id = #{store_id,jdbcType=VARCHAR}
+            </if>
+            <if test="project_id != null">
+                and project_id = #{project_id,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+    <select id="countAmount" parameterType="java.lang.String" resultType="java.lang.Long">
+        select COALESCE(SUM(actual_amount),0) from service_project_asset where order_id = #{orderId,jdbcType=VARCHAR}
+    </select>
+
+
+    <select id="buyCount" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest" resultType="java.util.List"
+            resultMap="customerPhoneMap">
+        select distinct customer_phone
+        from service_project_asset
+        <where>
+            <if test="storeId != null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+            <if test="projectId != null">
+                and project_id = #{projectId,jdbcType=VARCHAR}
+            </if>
+            <if test="typeId != null">
+                and type_id = #{typeId,jdbcType=VARCHAR}
+            </if>
+            <if test="beginTime!=null">
+                and TO_DAYS(#{beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(create_time)
+            </if>
+            <if test="finishTime!=null">
+                and TO_DAYS(#{finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(create_time)
+            </if>
+        </where>
+    </select>
+    <select id="totalCountAndAmountByType" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest" resultType="java.util.List" resultMap="customerCountMap">
+        select type_id ,COALESCE(SUM(actual_amount),0) as total_amount ,count(1) as total_count
+        from service_project_asset
+        <where>
+            <if test="storeId != null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+            <if test="beginTime!=null">
+                and TO_DAYS(#{beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(create_time)
+            </if>
+            <if test="finishTime!=null">
+                and TO_DAYS(#{finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(create_time)
+            </if>
+        </where>
+        group by type_id
+        order by total_amount desc
+    </select>
+    <select id="totalCountAndAmountByProject" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest" resultType="java.util.List" resultMap="customerCountMap">
+        select project_id ,project_name,COALESCE(SUM(actual_amount),0) as total_amount,count(1) as total_count
+        from service_project_asset
+        <where>
+            <if test="storeId != null">
+                and store_id = #{storeId,jdbcType=VARCHAR}
+            </if>
+            <if test="beginTime!=null">
+                and TO_DAYS(#{beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(create_time)
+            </if>
+            <if test="finishTime!=null">
+                and TO_DAYS(#{finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(create_time)
+            </if>
+        </where>
+        group by project_id
+        order by total_amount desc
+    </select>
+</mapper>

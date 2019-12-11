@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.aiqin.mgs.order.api.base.PagesRequest;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
@@ -155,6 +156,30 @@ public class OrderAfterSaleInfo extends PagesRequest {
 	@JsonProperty("return_money_type")
 	private Integer returnMoneyType;
 
+	@ApiModelProperty("下单时间")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonProperty("order_time")
+	private Date orderTime;
+
+	@ApiModelProperty("加盟商id")
+	@JsonProperty("franchisee_id")
+	private String franchiseeId;
+
+	public Date getOrderTime() {
+		return orderTime;
+	}
+
+	public void setOrderTime(Date orderTime) {
+		this.orderTime = orderTime;
+	}
+
+	public String getFranchiseeId() {
+		return franchiseeId;
+	}
+
+	public void setFranchiseeId(String franchiseeId) {
+		this.franchiseeId = franchiseeId;
+	}
 
 	public Integer getReturnMoneyType() {
 		return returnMoneyType;

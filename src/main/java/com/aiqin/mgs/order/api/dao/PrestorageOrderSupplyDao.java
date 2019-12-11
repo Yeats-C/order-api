@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.PrestorageOrderSupply;
+import com.aiqin.mgs.order.api.domain.response.PrestorageOrderInfo;
 
 import java.util.List;
 
@@ -28,7 +29,7 @@ public interface PrestorageOrderSupplyDao {
      * @param trans
      * @return
      */
-    List<PrestorageOrderSupply> selectPrestorageOrderList(OrderQuery trans);
+    List<PrestorageOrderInfo> selectPrestorageOrderList(OrderQuery trans);
 
     int selectPrestorageOrderListCount(OrderQuery trans);
 }

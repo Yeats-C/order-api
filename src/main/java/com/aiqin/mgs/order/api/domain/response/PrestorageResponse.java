@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * @author jinghaibo
  * Date: 2019/11/4 10:51
@@ -55,4 +57,9 @@ public class PrestorageResponse {
     @ApiModelProperty("分销机构编码")
     @JsonProperty("distributor_code")
     private String distributorCode;
+
+
+    @ApiModelProperty(value="下单时间",example = "2001-01-01 01:01:01")
+    @JsonProperty("create_time")
+    private Date createTime;
 }

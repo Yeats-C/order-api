@@ -68,7 +68,7 @@ public class OrderAfterController {
    */
   @PostMapping("")
   @ApiOperation(value = "TOC订单-添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表...")
-  public HttpResponse addAfterOrder(@Valid @RequestBody OrderAfterSaleInfo orderAfterSaleInfo) {
+  public HttpResponse addAfterOrder(@Valid @RequestBody OrderAfterSaleInfo orderAfterSaleInfo) throws Exception {
       
 	  
 	  LOGGER.info("添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表参数：{}",orderAfterSaleInfo);

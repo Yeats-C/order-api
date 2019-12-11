@@ -15,8 +15,8 @@ import lombok.Data;
 import java.util.Date;
 import java.util.List;
 
-@ApiModel("订单售后查询条件")
 @Data
+@ApiModel("订单售后查询条件")
 public class OrderAfterSaleQuery extends PagesRequest {
     
 	@ApiModelProperty(value="不传参不返回 0:全部")
@@ -60,10 +60,7 @@ public class OrderAfterSaleQuery extends PagesRequest {
 	@ApiModelProperty(value="售后id")
 	@JsonProperty("after_sale_id")
 	private String afterSaleId ;
-	
-//	@ApiModelProperty(value="订单来源类型")
-//	@JsonProperty("origin_type")
-//	private Integer orderOriginType;
+
 	
 	@ApiModelProperty(value="来源类型:2||null-全部;0&&3-门店;1-微商城;0-pos;3:web")
 	@JsonProperty("origin_type_list")
@@ -102,8 +99,11 @@ public class OrderAfterSaleQuery extends PagesRequest {
 	@ApiModelProperty(value="订单号/手机号")
 	@JsonProperty("code_and_phone")
 	private String codeAndPhone;
-	
-	
+
+	@ApiModelProperty(value="退款方式(0.现金 1.储值卡)")
+	@JsonProperty("return_money_type")
+	private Integer returnMoneyType;
+
 	
 }
 
