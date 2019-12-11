@@ -1,6 +1,5 @@
 package com.aiqin.mgs.order.api.service.impl.order;
 
-import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.domain.AuthToken;
@@ -17,7 +16,6 @@ import com.aiqin.mgs.order.api.service.CartOrderService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
-import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -159,17 +157,45 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @date 2019/11/21 16:00
      */
     private OrderConfirmResponse getStoreCartProduct(String storeId) {
-        CartOrderInfo cartOrderInfoQuery = new CartOrderInfo();
-        cartOrderInfoQuery.setStoreId(storeId);
-        cartOrderInfoQuery.setLineCheckStatus(YesOrNoEnum.YES.getCode());
-        HttpResponse listHttpResponse = cartOrderService.displayCartLineCheckProduct(cartOrderInfoQuery);
-        if (!RequestReturnUtil.validateHttpResponse(listHttpResponse)) {
-            throw new BusinessException("获取购物车商品失败");
-        }
-        OrderConfirmResponse data = (OrderConfirmResponse) listHttpResponse.getData();
-        if (data == null || data.getCartOrderInfos() == null || data.getCartOrderInfos().size() == 0) {
-            throw new BusinessException("购物车没有勾选的商品");
-        }
+//        CartOrderInfo cartOrderInfoQuery = new CartOrderInfo();
+//        cartOrderInfoQuery.setStoreId(storeId);
+//        cartOrderInfoQuery.setLineCheckStatus(YesOrNoEnum.YES.getCode());
+//        HttpResponse listHttpResponse = cartOrderService.displayCartLineCheckProduct(cartOrderInfoQuery);
+//        if (!RequestReturnUtil.validateHttpResponse(listHttpResponse)) {
+//            throw new BusinessException("获取购物车商品失败");
+//        }
+//        OrderConfirmResponse data = (OrderConfirmResponse) listHttpResponse.getData();
+//        if (data == null || data.getCartOrderInfos() == null || data.getCartOrderInfos().size() == 0) {
+//            throw new BusinessException("购物车没有勾选的商品");
+//        }
+
+        OrderConfirmResponse data = new OrderConfirmResponse();
+        List<CartOrderInfo> list = new ArrayList<>();
+        CartOrderInfo info1 = new CartOrderInfo();
+        info1.setProductId("1000001");
+        info1.setProductName("奶粉");
+        info1.setSkuId("9001");
+        info1.setPrice(new BigDecimal(5));
+        info1.setAmount(11);
+        list.add(info1);
+
+        CartOrderInfo info2 = new CartOrderInfo();
+        info2.setProductId("1000002");
+        info2.setProductName("玩具");
+        info2.setSkuId("9002");
+        info2.setPrice(new BigDecimal(10));
+        info2.setAmount(22);
+        list.add(info2);
+
+        CartOrderInfo info3 = new CartOrderInfo();
+        info3.setProductId("1000003");
+        info3.setProductName("衣服");
+        info3.setSkuId("9003");
+        info3.setPrice(new BigDecimal(15));
+        info3.setAmount(8);
+        list.add(info3);
+        data.setCartOrderInfos(list);
+
         return data;
     }
 
@@ -329,6 +355,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         ErpOrderInfo orderInfo = new ErpOrderInfo();
         //订单状态 枚举 ErpOrderStatusEnum
         orderInfo.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
+        //订单支付状态 枚举 ErpPayStatusEnum
+        orderInfo.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
         //订单类型 枚举 ErpOrderTypeEnum
         orderInfo.setOrderType(erpOrderSaveRequest.getOrderType());
         //订单来源 ErpOrderOriginTypeEnum
@@ -351,7 +379,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //A品券优惠金额
         orderInfo.setTopCouponMoney(BigDecimal.ZERO);
         //实付金额
-        orderInfo.setActualMoney(orderInfo.getTotalMoney().subtract(orderInfo.getActivityMoney()).subtract(orderInfo.getSuitCouponMoney()).subtract(orderInfo.getTopCouponMoney()));
+        orderInfo.setPayMoney(orderInfo.getTotalMoney().subtract(orderInfo.getActivityMoney()).subtract(orderInfo.getSuitCouponMoney()).subtract(orderInfo.getTopCouponMoney()));
 
         //加盟商id
         orderInfo.setFranchiseeId(storeInfo.getFranchiseeId());
@@ -373,14 +401,18 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     /**
      * 计算均摊金额
      *
-     * @param erpOrderInfoPO
+     * @param erpOrderInfo
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/9 15:35
      */
-    private void sharePrice(ErpOrderInfo erpOrderInfoPO) {
+    private void sharePrice(ErpOrderInfo erpOrderInfo) {
         //TODO CT 计算均摊金额
+        for (ErpOrderItem item :
+                erpOrderInfo.getOrderItemList()) {
+            item.setShareMoney(item.getActualMoney());
+        }
     }
 
     /**
@@ -428,7 +460,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         ErpOrderPay orderPay = new ErpOrderPay();
         orderPay.setPayId(payId);
         orderPay.setBusinessKey(orderCode);
-        orderPay.setPayFee(orderInfo.getActualMoney());
+        orderPay.setPayFee(orderInfo.getPayMoney());
         orderPay.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
         orderPay.setPayWay(null);
         orderPay.setFeeType(ErpPayFeeTypeEnum.ORDER_FEE.getCode());
@@ -459,7 +491,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private void deleteOrderProductFromCart(String storeId, OrderConfirmResponse orderConfirmResponse) {
         for (CartOrderInfo item :
                 orderConfirmResponse.getCartOrderInfos()) {
-            cartOrderService.deleteCartInfo(storeId, item.getSkuId(), YesOrNoEnum.YES.getCode());
+//            cartOrderService.deleteCartInfo(storeId, item.getSkuId(), YesOrNoEnum.YES.getCode());
         }
     }
 
@@ -642,7 +674,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //A品券优惠金额
         orderInfo.setTopCouponMoney(BigDecimal.ZERO);
         //实付金额
-        orderInfo.setActualMoney(orderInfo.getTotalMoney().subtract(orderInfo.getActivityMoney()).subtract(orderInfo.getSuitCouponMoney()).subtract(orderInfo.getTopCouponMoney()));
+        orderInfo.setPayMoney(orderInfo.getTotalMoney().subtract(orderInfo.getActivityMoney()).subtract(orderInfo.getSuitCouponMoney()).subtract(orderInfo.getTopCouponMoney()));
 
         //加盟商id
         orderInfo.setFranchiseeId(storeInfo.getFranchiseeId());
@@ -664,7 +696,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         ErpOrderPay orderPay = new ErpOrderPay();
         orderPay.setPayId(payId);
         orderPay.setBusinessKey(orderCode);
-        orderPay.setPayFee(orderInfo.getActualMoney());
+        orderPay.setPayFee(orderInfo.getPayMoney());
         orderPay.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
         orderPay.setPayWay(null);
         orderPay.setFeeType(ErpPayFeeTypeEnum.ORDER_FEE.getCode());

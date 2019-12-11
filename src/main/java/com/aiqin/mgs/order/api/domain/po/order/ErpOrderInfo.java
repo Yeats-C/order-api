@@ -48,7 +48,7 @@ public class ErpOrderInfo extends ErpOrderBase {
     /***A品券优惠金额*/
     private BigDecimal topCouponMoney;
     /***实付金额*/
-    private BigDecimal actualMoney;
+    private BigDecimal payMoney;
 
     /***物流券*/
     private BigDecimal goodsCoupon;

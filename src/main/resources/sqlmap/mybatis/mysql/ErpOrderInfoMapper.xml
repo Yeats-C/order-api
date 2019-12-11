@@ -21,7 +21,7 @@
         activity_money as activityMoney,
         suit_coupon_money as suitCouponMoney,
         top_coupon_money as topCouponMoney,
-        actual_money as actualMoney,
+        pay_money as payMoney,
         goods_coupon as goodsCoupon,
         before_cancel_status as beforeCancelStatus,
         logistics_id as logisticsId,
@@ -158,8 +158,8 @@
         <if test="activityMoney != null">
             activity_money = #{activityMoney},
         </if>
-        <if test="actualMoney != null">
-            actual_money = #{actualMoney},
+        <if test="payMoney != null">
+            pay_money = #{payMoney},
         </if>
         <if test="topCouponMoney != null">
             top_coupon_money = #{topCouponMoney},
@@ -177,7 +177,7 @@
         insert into order_store_info (order_id, order_code, order_status, pay_status, order_type, order_origin_type,
                                       order_channel_type, order_level, primary_code, split_status,
                                       return_status, total_money, activity_money, suit_coupon_money,
-                                      top_coupon_money, actual_money, goods_coupon, before_cancel_status,
+                                      top_coupon_money, pay_money, goods_coupon, before_cancel_status,
                                       logistics_id, pay_id, supplier_code, supplier_name, repertory_code,
                                       repertory_name, franchisee_id, franchisee_code, franchisee_name,
                                       store_id, store_code, store_name, create_time, create_by_id,
@@ -185,7 +185,7 @@
         values (#{orderId}, #{orderCode}, #{orderStatus}, #{payStatus}, #{orderType}, #{orderOriginType},
                 #{orderChannelType}, #{orderLevel}, #{primaryCode}, #{splitStatus},
                 #{returnStatus}, #{totalMoney}, #{activityMoney}, #{suitCouponMoney},
-                #{topCouponMoney}, #{actualMoney}, #{goodsCoupon}, #{beforeCancelStatus},
+                #{topCouponMoney}, #{payMoney}, #{goodsCoupon}, #{beforeCancelStatus},
                 #{logisticsId}, #{payId}, #{supplierCode}, #{supplierName}, #{repertoryCode},
                 #{repertoryName}, #{franchiseeId}, #{franchiseeCode}, #{franchiseeName},
                 #{storeId}, #{storeCode}, #{storeName}, sysdate(), #{createById},
@@ -211,7 +211,7 @@
         a1.activity_money as activityMoney,
         a1.suit_coupon_money as suitCouponMoney,
         a1.top_coupon_money as topCouponMoney,
-        a1.actual_money as actualMoney,
+        a1.pay_money as payMoney,
         a1.goods_coupon as goodsCoupon,
         a1.before_cancel_status as beforeCancelStatus,
         a1.logistics_id as logisticsId,
@@ -278,7 +278,7 @@
         a1.activity_money as activityMoney,
         a1.suit_coupon_money as suitCouponMoney,
         a1.top_coupon_money as topCouponMoney,
-        a1.actual_money as actualMoney,
+        a1.pay_money as payMoney,
         a1.goods_coupon as goodsCoupon,
         a1.before_cancel_status as beforeCancelStatus,
         a1.logistics_id as logisticsId,
