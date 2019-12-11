@@ -232,7 +232,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 //                        //订货金额汇总
 //                        moneyTotal = moneyTotal.add(item.getMoney() == null ? BigDecimal.ZERO : item.getMoney());
 //                        //实际支付金额汇总
-//                        realMoneyTotal = realMoneyTotal.add(item.getActualMoney() == null ? BigDecimal.ZERO : item.getActualMoney());
+//                        realMoneyTotal = realMoneyTotal.add(item.getPayMoney() == null ? BigDecimal.ZERO : item.getPayMoney());
 ////                        //活动优惠金额汇总
 ////                        activityMoneyTotal = activityMoneyTotal.add(item.getActivityMoney() == null ? BigDecimal.ZERO : item.getActivityMoney());
 ////                        //服纺券优惠金额汇总
@@ -426,7 +426,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     newOrder.setPayStatus(order.getPayStatus());
                     newOrder.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_3.getCode());
                     //TODO CT 金额需要重新计算
-                    newOrder.setActualMoney(realMoneyTotal);
+                    newOrder.setPayMoney(realMoneyTotal);
                     newOrder.setTotalMoney(moneyTotal);
                     newOrder.setOrderType(order.getOrderType());
                     newOrder.setFranchiseeId(order.getFranchiseeId());
