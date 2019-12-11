@@ -18,8 +18,8 @@ public class ErpOrderLogistics extends ErpOrderBase {
     private String logisticsId;
     /***支付单id*/
     private String payId;
-    /***物流费用是否支付成功 YesOrNoEnum*/
-    private Integer paid;
+    /***支付状态 ErpPayStatusEnum*/
+    private Integer payStatus;
     /***物流公司编码*/
     private String logisticsCentreCode;
     /***物流公司名称*/

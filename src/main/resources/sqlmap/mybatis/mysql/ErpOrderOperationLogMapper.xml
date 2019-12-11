@@ -30,7 +30,7 @@
         insert into order_store_operation_log (order_id, order_status, operation_content, create_time,
                                                create_by_id, create_by_name, update_time, update_by_id,
                                                update_by_name)
-        values (#{orderId}, #{orderStatus}, #{operationContent}, #{createtime},
+        values (#{orderId}, #{orderStatus}, #{operationContent}, #{createTime},
                 #{createById}, #{createByName}, #{updateTime}, #{updateById},
                 #{updateByName})
     </insert>

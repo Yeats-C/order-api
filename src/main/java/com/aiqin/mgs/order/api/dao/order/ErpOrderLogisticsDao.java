@@ -36,6 +36,17 @@ public interface ErpOrderLogisticsDao {
     Integer updateByPrimaryKeySelective(ErpOrderLogistics po);
 
     /**
+     * 根据主键更新全部字段
+     *
+     * @param po
+     * @return java.lang.Integer
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/11 10:43
+     */
+    Integer updateByPrimaryKey(ErpOrderLogistics po);
+
+    /**
      * 插入数据
      *
      * @param po

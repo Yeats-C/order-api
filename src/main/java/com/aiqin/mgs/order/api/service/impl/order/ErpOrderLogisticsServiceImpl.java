@@ -77,4 +77,12 @@ public class ErpOrderLogisticsServiceImpl implements ErpOrderLogisticsService {
         Integer integer = erpOrderLogisticsDao.updateByPrimaryKeySelective(po);
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateOrderLogistics(ErpOrderLogistics po, AuthToken auth) {
+        po.setUpdateById(auth.getPersonId());
+        po.setUpdateByName(auth.getPersonName());
+        Integer integer = erpOrderLogisticsDao.updateByPrimaryKeySelective(po);
+    }
+
 }

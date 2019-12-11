@@ -7,7 +7,7 @@
         select id as id,
         logistics_id as logisticsId,
         pay_id as payId,
-        paid as paid,
+        pay_status as payStatus,
         logistics_centre_code as logisticsCentreCode,
         logistics_centre_name as logisticsCentreName,
         logistics_code as logisticsCode,
@@ -38,8 +38,8 @@
         <if test="logisticsCode != null and logisticsCode != ''">
             and logistics_code = #{logisticsCode}
         </if>
-        <if test="paid != null and paid != '' or paid == 0 ">
-            and paid = #{paid}
+        <if test="payStatus != null and payStatus != '' or payStatus == 0 ">
+            and pay_status = #{payStatus}
         </if>
         order by create_time desc
     </select>
@@ -50,8 +50,8 @@
         <if test="payId != null and payId != ''">
             pay_id = #{payId},
         </if>
-        <if test="paid != null and paid != '' or paid == 0 ">
-            paid = #{paid},
+        <if test="payStatus != null and payStatus != '' or payStatus == 0 ">
+            pay_status = #{payStatus},
         </if>
         <if test="coupon_ids != null and coupon_ids != '' ">
             coupon_ids = #{coupon_ids},
@@ -68,13 +68,37 @@
         where id = #{id}
     </update>
 
+    <update id="updateByPrimaryKey">
+        update order_store_logistics
+        set logistics_id          = #{logisticsId},
+            pay_id                = #{payId},
+            pay_status            = #{payStatus},
+            logistics_centre_code = #{logisticsCentreCode},
+            logistics_centre_name = #{logisticsCentreName},
+            logistics_code        = #{logisticsCode},
+            send_repertory_code   = #{sendRepertoryCode},
+            send_repertory_name   = #{sendRepertoryName},
+            logistics_fee         = #{logisticsFee},
+            coupon_pay_fee        = #{couponPayFee},
+            balance_pay_fee       = #{balancePayFee},
+            coupon_ids            = #{couponIds},
+            create_time           = #{createTime},
+            create_by_id          = #{createById},
+            create_by_name        = #{createByName},
+            update_time           = sysdate(),
+            update_by_id          = #{updateById},
+            update_by_name        = #{updateByName},
+            status                = #{status}
+        where id = #{id}
+    </update>
+
     <insert id="insert">
-        insert into order_store_logistics (logistics_id, pay_id, paid, logistics_centre_code,
+        insert into order_store_logistics (logistics_id, pay_id, pay_status, logistics_centre_code,
                                            logistics_centre_name, logistics_code, send_repertory_code,
                                            send_repertory_name, logistics_fee, coupon_pay_fee, balance_pay_fee,
                                            coupon_ids, create_time, create_by_id, create_by_name, update_time,
                                            update_by_id, update_by_name)
-        values (#{logisticsId}, #{payId}, #{paid}, #{logisticsCentreCode},
+        values (#{logisticsId}, #{payId}, #{payStatus}, #{logisticsCentreCode},
                 #{logisticsCentreName}, #{logisticsCode}, #{sendRepertoryCode},
                 #{sendRepertoryName}, #{logisticsFee}, #{couponPayFee}, #{balancePayFee},
                 #{couponIds}, sysdate(), #{createById}, #{createByName}, sysdate(),

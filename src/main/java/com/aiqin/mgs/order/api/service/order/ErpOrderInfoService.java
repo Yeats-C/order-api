@@ -50,6 +50,18 @@ public interface ErpOrderInfoService {
     void updateOrderByPrimaryKeySelective(ErpOrderInfo po, AuthToken auth);
 
     /**
+     * 根据主键更新订单数据（不保存日志）
+     *
+     * @param po
+     * @param auth
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/11 10:19
+     */
+    void updateOrderByPrimaryKeySelectiveNoLog(ErpOrderInfo po, AuthToken auth);
+
+    /**
      * 订单拆单逻辑
      *
      * @param orderInfo

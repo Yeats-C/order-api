@@ -51,6 +51,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         po.setCreateByName(auth.getPersonName());
         po.setUpdateById(auth.getPersonId());
         po.setUpdateByName(auth.getPersonName());
+        po.setStatus(YesOrNoEnum.YES.getCode());
         Integer insert = erpOrderInfoDao.insert(po);
 
         //保存日志
@@ -78,6 +79,14 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
         //保存订单操作日志
         erpOrderOperationLogService.saveOrderOperationLog(po.getOrderId(), ErpOrderStatusEnum.getEnum(po.getOrderStatus()), auth);
+    }
+
+    @Override
+    public void updateOrderByPrimaryKeySelectiveNoLog(ErpOrderInfo po, AuthToken auth) {
+        //更新订单数据
+        po.setUpdateById(auth.getPersonId());
+        po.setUpdateByName(auth.getPersonName());
+        Integer integer = erpOrderInfoDao.updateByPrimaryKeySelective(po);
     }
 
     @Override
@@ -488,7 +497,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         ErpOrderLogistics orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsCode(paramOrderLogistics.getLogisticsCode());
         if (orderLogistics == null) {
             paramOrderLogistics.setLogisticsId(OrderPublic.getUUID());
-            paramOrderLogistics.setPaid(YesOrNoEnum.NO.getCode());
+            paramOrderLogistics.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
             erpOrderLogisticsService.saveOrderLogistics(paramOrderLogistics, auth);
         } else {
             if (orderLogistics.getLogisticsFee().compareTo(paramOrderLogistics.getLogisticsFee()) != 0) {
@@ -507,7 +516,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 throw new BusinessException("发货仓库名称与已有物流单发货仓库名称不相同");
             }
             paramOrderLogistics.setLogisticsId(orderLogistics.getLogisticsId());
-            paramOrderLogistics.setPaid(orderLogistics.getPaid());
+            paramOrderLogistics.setPayStatus(orderLogistics.getPayStatus());
         }
 
         int paramOrderIndex = 0;
@@ -612,7 +621,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             }
             this.updateOrderByPrimaryKeySelective(order, auth);
 
-            if (YesOrNoEnum.YES.getCode().equals(paramOrderLogistics.getPaid())) {
+            if (ErpPayStatusEnum.SUCCESS.getCode().equals(paramOrderLogistics.getPayStatus())) {
                 //如果物流单已经支付成功，订单修改为已支付物流费用
                 order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_12.getCode());
                 this.updateOrderByPrimaryKeySelective(order, auth);

@@ -129,6 +129,10 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
         orderPay.setPayWay(erpOrderPayRequest.getPayWay());
         this.updateOrderPaySelective(orderPay, auth);
 
+        //更新订单支付状态
+        order.setPayStatus(ErpPayStatusEnum.PAYING.getCode());
+        erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
+
         return orderPay.getPayId();
     }
 
@@ -273,6 +277,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
                     //获取物流券
                     BigDecimal goodsCoupon = erpOrderRequestService.getGoodsCoupon(order);
                     order.setGoodsCoupon(goodsCoupon);
+                    order.setPayStatus(payStatusEnum.getCode());
                     erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
 
                     //请求供应链，获取库存分组，进行拆单
@@ -326,13 +331,14 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
                     throw new BusinessException("数据异常");
                 }
                 if (payStatusEnum == ErpPayStatusEnum.SUCCESS) {
-                    orderLogistics.setPaid(YesOrNoEnum.YES.getCode());
+                    orderLogistics.setPayStatus(payStatusEnum.getCode());
                     erpOrderLogisticsService.updateOrderLogisticsSelective(orderLogistics, auth);
                     //TODO CT 调用结算中心接口
                     //TODO CT 优惠券消券
+
+                    //订单修改为已支付物流费用
                     List<ErpOrderInfo> orderList = erpOrderQueryService.getOrderByLogisticsId(orderLogistics.getLogisticsId());
                     if (orderList != null && orderList.size() > 0) {
-                        //订单修改为已支付物流费用
                         for (ErpOrderInfo item :
                                 orderList) {
                             if (ErpOrderStatusEnum.ORDER_STATUS_11.getCode().equals(item.getOrderStatus())) {
@@ -342,11 +348,11 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
                         }
                     }
                 } else if (payStatusEnum == ErpPayStatusEnum.FAIL) {
-
-//                    orderLogistics.setCouponPayFee(null);
-//                    orderLogistics.setBalancePayFee(null);
-//                    orderLogistics.setCouponIds(null);
-//                    erpOrderLogisticsService.updateOrderLogisticsSelective(orderLogistics, auth);
+                    orderLogistics.setPayStatus(payStatusEnum.getCode());
+                    orderLogistics.setCouponPayFee(null);
+                    orderLogistics.setBalancePayFee(null);
+                    orderLogistics.setCouponIds(null);
+                    erpOrderLogisticsService.updateOrderLogistics(orderLogistics, auth);
                 } else {
 
                 }
@@ -462,6 +468,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
         //调用支付中心接口
         boolean flag = erpOrderRequestService.sendPayRequest(order, logisticsPay);
 
+        orderLogistics.setPayStatus(ErpPayStatusEnum.PAYING.getCode());
         orderLogistics.setCouponPayFee(couponPayFee);
         orderLogistics.setBalancePayFee(balancePayFee);
         orderLogistics.setCouponIds(couponIds);
