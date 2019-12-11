@@ -7,16 +7,11 @@
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.service;
 
-import java.util.List;
-
-import javax.validation.Valid;
-
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.domain.CartInfo;
-import com.aiqin.mgs.order.api.domain.OrderAfteIListInfo;
 import com.aiqin.mgs.order.api.domain.OrderAfterSaleInfo;
 import com.aiqin.mgs.order.api.domain.OrderAfterSaleQuery;
-import com.aiqin.mgs.order.api.domain.OrderInfo;
+
+import javax.validation.Valid;
 
 @SuppressWarnings("all")
 public interface OrderAfterService {

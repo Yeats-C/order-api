@@ -5,14 +5,12 @@
  * ****************************************************************************/
 package com.aiqin.mgs.order.api.util;
 
-import com.aiqin.mgs.order.api.service.impl.OrderStatisticalServiceImpl;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;

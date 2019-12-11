@@ -6,15 +6,14 @@
 
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.domain;
-import java.util.Date;
-import java.util.List;
-
 import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.Date;
+import java.util.List;
 
 @Data
 @ApiModel("订单售后查询条件")

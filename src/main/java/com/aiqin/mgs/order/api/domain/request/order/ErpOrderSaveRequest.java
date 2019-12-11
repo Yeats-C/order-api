@@ -1,6 +1,6 @@
 package com.aiqin.mgs.order.api.domain.request.order;
 
-import com.aiqin.mgs.order.api.domain.OrderStoreOrderProductItem;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -20,15 +20,15 @@ public class ErpOrderSaveRequest {
     @ApiModelProperty(value = "门店id")
     private String storeId;
 
-    /***订单类型 OrderTypeEnum*/
+    /***订单类型 ErpOrderTypeEnum*/
     @ApiModelProperty(value = "订单类型")
     private Integer orderType;
 
-    /***订单来源 OrderOriginTypeEnum*/
+    /***订单来源 ErpOrderOriginTypeEnum*/
     @ApiModelProperty(value = "订单来源")
     private Integer orderOriginType;
 
-    /***订单销售渠道标识 OrderChannelEnum*/
+    /***订单销售渠道标识 ErpOrderChannelTypeEnum*/
     @ApiModelProperty(value = "销售渠道")
     private Integer orderChannel;
 
@@ -38,5 +38,5 @@ public class ErpOrderSaveRequest {
 
     /***货架商品列表*/
     @ApiModelProperty(value = "货架商品列表")
-    private List<OrderStoreOrderProductItem> productList;
+    private List<ErpOrderItem> itemList;
 }

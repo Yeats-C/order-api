@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao">
+
+    <select id="select" parameterType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem"
+            resultType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem">
+        select id as id,
+        order_id as orderId,
+        order_item_id as orderItemId,
+        order_item_code as orderItemCode,
+        product_id as productId,
+        product_code as productCode,
+        product_name as productName,
+        sku_code as skuCode,
+        sku_name as skuName,
+        unit as unit,
+        activity_id as activityId,
+        product_gift as productGift,
+        quantity as quantity,
+        deliver_quantity as deliverQuantity,
+        deliver_difference_reason as deliverDifferenceReason,
+        sign_quantity as signQuantity,
+        sign_difference_reason as signDifferenceReason,
+        price as price,
+        tax_purchase_price as taxPurchasePrice,
+        money as money,
+        activity_money as activityMoney,
+        actual_money as actualMoney,
+        share_money as shareMoney,
+        create_time as createTime,
+        create_by_id as createById,
+        create_by_name as createByName,
+        update_time as updateTime,
+        update_by_id as updateById,
+        update_by_name as updateByName,
+        status as status
+        from order_store_product_item
+        where 1 = 1
+        <if test=" id != null and id != '' ">
+            and id = #{id}
+        </if>
+        <if test=" orderId != null and orderId != '' ">
+            and order_id = #{orderId}
+        </if>
+        <if test=" orderItemId != null and orderItemId != '' ">
+            and order_item_id = #{orderItemId}
+        </if>
+        <if test=" orderItemCode != null and orderItemCode != '' ">
+            and order_item_code = #{orderItemCode}
+        </if>
+        order by create_time desc
+    </select>
+
+    <update id="updateByPrimaryKeySelective">
+        update order_store_product_item
+        set
+        <if test="quantity != null and quantity != '' or quantity == 0 ">
+            quantity = #{quantity},
+        </if>
+        <if test="deliverQuantity != null and deliverQuantity != '' or deliverQuantity == 0 ">
+            deliver_quantity = #{deliverQuantity},
+        </if>
+        <if test="signQuantity != null and signQuantity != '' or signQuantity == 0 ">
+            sign_quantity = #{signQuantity},
+        </if>
+        <if test="money != null and money != '' or money == 0 ">
+            money = #{money},
+        </if>
+        <if test="activityMoney != null and activityMoney != '' or activityMoney == 0 ">
+            activity_money = #{activityMoney},
+        </if>
+        <if test="shareMoney != null and shareMoney != '' or shareMoney == 0 ">
+            share_money = #{shareMoney},
+        </if>
+        <if test="activityMoney != null and activityMoney != '' or activityMoney == 0 ">
+            activity_money = #{activityMoney},
+        </if>
+        <if test="deliverDifferenceReason != null and deliverDifferenceReason != '' ">
+            deliver_difference_reason = #{deliverDifferenceReason},
+        </if>
+        <if test="signDifferenceReason != null and signDifferenceReason != '' ">
+            sign_difference_reason = #{signDifferenceReason},
+        </if>
+        update_by_id = #{updateById},
+        update_by_name = #{updateByName},
+        update_time = sysdate()
+        where id = #{id}
+    </update>
+
+    <insert id="insert">
+        insert into order_store_product_item (order_id, order_item_id, order_item_code, product_id,
+                                              product_code, product_name, sku_code, sku_name, unit,
+                                              activity_id, product_gift, quantity, deliver_quantity,
+                                              deliver_difference_reason, sign_quantity, sign_difference_reason,
+                                              price, tax_purchase_price, money, activity_money, actual_money,
+                                              share_money, create_time, create_by_id, create_by_name,
+                                              update_time, update_by_id, update_by_name)
+        values (#{orderId}, #{orderItemId}, #{orderItemCode}, #{productId},
+                #{productCode}, #{productName}, #{skuCode}, #{skuName}, #{unit},
+                #{activityId}, #{productGift}, #{quantity}, #{deliverQuantity},
+                #{deliverDifferenceReason}, #{signQuantity}, #{signDifferenceReason},
+                #{price}, #{taxPurchasePrice}, #{money}, #{activityMoney}, #{actualMoney},
+                #{shareMoney}, sysdate(), #{createById}, #{createByName},
+                sysdate(), #{updateById}, #{updateByName})
+    </insert>
+
+</mapper>
+
