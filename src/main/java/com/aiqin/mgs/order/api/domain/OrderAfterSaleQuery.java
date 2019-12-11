@@ -14,7 +14,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
+@Data
 @ApiModel("订单售后查询条件")
 public class OrderAfterSaleQuery extends PagesRequest {
     
@@ -59,10 +61,7 @@ public class OrderAfterSaleQuery extends PagesRequest {
 	@ApiModelProperty(value="售后id")
 	@JsonProperty("after_sale_id")
 	private String afterSaleId ;
-	
-//	@ApiModelProperty(value="订单来源类型")
-//	@JsonProperty("origin_type")
-//	private Integer orderOriginType;
+
 	
 	@ApiModelProperty(value="来源类型:2||null-全部;0&&3-门店;1-微商城;0-pos;3:web")
 	@JsonProperty("origin_type_list")
@@ -101,151 +100,11 @@ public class OrderAfterSaleQuery extends PagesRequest {
 	@ApiModelProperty(value="订单号/手机号")
 	@JsonProperty("code_and_phone")
 	private String codeAndPhone;
-	
-	
-	public String getDistributorName() {
-		return distributorName;
-	}
 
+	@ApiModelProperty(value="退款方式(0.现金 1.储值卡)")
+	@JsonProperty("return_money_type")
+	private Integer returnMoneyType;
 
-	public void setDistributorName(String distributorName) {
-		this.distributorName = distributorName;
-	}
-
-
-	public List<Integer> getOriginTypeList() {
-		return originTypeList;
-	}
-
-
-	public void setOriginTypeList(List<Integer> originTypeList) {
-		this.originTypeList = originTypeList;
-	}
-
-
-	public String getCodeAndPhone() {
-		return codeAndPhone;
-	}
-
-
-	public void setCodeAndPhone(String codeAndPhone) {
-		this.codeAndPhone = codeAndPhone;
-	}
-
-
-	public String getBeginDate() {
-		return beginDate;
-	}
-
-	public void setBeginDate(String beginDate) {
-		this.beginDate = beginDate;
-	}
-
-	public String getEndDate() {
-		return endDate;
-	}
-
-	public void setEndDate(String endDate) {
-		this.endDate = endDate;
-	}
-
-	public Integer getPayType() {
-		return payType;
-	}
-
-	public void setPayType(Integer payType) {
-		this.payType = payType;
-	}
-
-	public String getMemberPhone() {
-		return memberPhone;
-	}
-
-	public void setMemberPhone(String memberPhone) {
-		this.memberPhone = memberPhone;
-	}
-
-	public Integer getAfterSaleStatus() {
-		return afterSaleStatus;
-	}
-
-	public void setAfterSaleStatus(Integer afterSaleStatus) {
-		this.afterSaleStatus = afterSaleStatus;
-	}
-
-//	public Integer getOrderOriginType() {
-//		return orderOriginType;
-//	}
-//
-//	public void setOrderOriginType(Integer orderOriginType) {
-//		this.orderOriginType = orderOriginType;
-//	}
-
-	public String getOrderCode() {
-		return orderCode;
-	}
-
-	public void setOrderCode(String orderCode) {
-		this.orderCode = orderCode;
-	}
-
-	public String getAfterSaleCode() {
-		return afterSaleCode;
-	}
-
-	public void setAfterSaleCode(String afterSaleCode) {
-		this.afterSaleCode = afterSaleCode;
-	}
-
-	public String getOrderId() {
-		return orderId;
-	}
-
-	public void setOrderId(String orderId) {
-		this.orderId = orderId;
-	}
-
-	public String getDistributorId() {
-		return distributorId;
-	}
-
-	public void setDistributorId(String distributorId) {
-		this.distributorId = distributorId;
-	}
-
-	public String getAfterSaleId() {
-		return afterSaleId;
-	}
-
-	public void setAfterSaleId(String afterSaleId) {
-		this.afterSaleId = afterSaleId;
-	}
-
-	public Date getBeginTime() {
-		return beginTime;
-	}
-
-	public void setBeginTime(Date beginTime) {
-		this.beginTime = beginTime;
-	}
-
-	public Date getEndTime() {
-		return endTime;
-	}
-
-	public void setEndTime(Date endTime) {
-		this.endTime = endTime;
-	}
-
-	public Date getCreateTime() {
-		return createTime;
-	}
-
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
-	
-	
 	
 }
 

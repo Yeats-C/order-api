@@ -266,7 +266,7 @@ public class ServiceProjectServiceImpl  implements ServiceProjectService {
             LOGGER.info("通过门店编号、名称、用户手机号和时间查询订单的信息，请求参数为{}", reduceDetailRequest);
             PageResData<ServiceProjectReduceDetail> pageResData = new PageResData<>();
             reduceDetailRequest.setBeginIndex((reduceDetailRequest.getPageNo()-1)*reduceDetailRequest.getPageSize());
-            if (Global.ORDER_TYPE_REDUCE.equals(reduceDetailRequest.getOrderType()) || Global.ORDER_TYPE_RETURN.equals(reduceDetailRequest.getOrderType())) {
+            if (reduceDetailRequest.getOrderType()!=null && !Global.ORDER_TYPE_BUY.equals(reduceDetailRequest.getOrderType())) {
                 // 扣减单和退次单查询
                 List<ServiceProjectReduceDetail> serviceProjectReduceDetailList = serviceProjectReduceDetailDao.selectReduceDetailByCondition(reduceDetailRequest);
                 serviceProjectReduceDetailList.forEach(serviceProjectReduceDetail -> serviceProjectReduceDetail.setOrderType(reduceDetailRequest.getOrderType()));
@@ -370,7 +370,7 @@ public class ServiceProjectServiceImpl  implements ServiceProjectService {
             LOGGER.info("根据订单id和订单类型查询订单信息，请求参数orderId为{},orderType为{}", orderId, orderType);
             ServiceProjectReduceDetail serviceProjectReduceDetail = new ServiceProjectReduceDetail();
             if (Global.ORDER_TYPE_BUY.equals(orderType)) {
-                //购买订单查询，因在用户资产中保存有购买订单的信息，因此去用户资产表查询
+                //购买订单查询
                 List<ServiceProjectAsset> serviceProjectAssetList = serviceProjectAssetDao.selectServiceProjectAssetByPhone(null, storeId, null, orderId);
                 if (CollectionUtils.isEmpty(serviceProjectAssetList)) {
                     LOGGER.info("未查询到对应的订单信息");
@@ -379,7 +379,7 @@ public class ServiceProjectServiceImpl  implements ServiceProjectService {
                 ServiceProjectAsset serviceProjectAsset = serviceProjectAssetList.get(0);
                 serviceProjectReduceDetail.setOrderCode(serviceProjectAsset.getOrderCode());
                 serviceProjectReduceDetail.setOrderId(serviceProjectAsset.getOrderId());
-                serviceProjectReduceDetail.setOrderType(2);
+                serviceProjectReduceDetail.setOrderType(Global.ORDER_TYPE_BUY);
                 serviceProjectReduceDetail.setCashierId(serviceProjectAsset.getCashierId());
                 serviceProjectReduceDetail.setCashierName(serviceProjectAsset.getCashierName());
                 serviceProjectReduceDetail.setCustomerId(serviceProjectAsset.getCustomerId());
