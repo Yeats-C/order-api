@@ -1,7 +1,10 @@
 package com.aiqin.mgs.order.api.domain.request.order;
 
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * 订单编辑请求参数
@@ -16,4 +19,8 @@ public class ErpOrderEditRequest {
     /***订单编号*/
     @ApiModelProperty(value = "订单编号")
     private String orderCode;
+
+    /***赠品行*/
+    @ApiModelProperty(value = "赠品行")
+    private List<ErpOrderItem> productGiftList;
 }

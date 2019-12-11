@@ -6,6 +6,7 @@ import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.order.*;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderDeliverRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderEditRequest;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
@@ -51,6 +52,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         po.setCreateByName(auth.getPersonName());
         po.setUpdateById(auth.getPersonId());
         po.setUpdateByName(auth.getPersonName());
+        po.setStatus(YesOrNoEnum.YES.getCode());
         Integer insert = erpOrderInfoDao.insert(po);
 
         //保存日志
@@ -78,6 +80,52 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
         //保存订单操作日志
         erpOrderOperationLogService.saveOrderOperationLog(po.getOrderId(), ErpOrderStatusEnum.getEnum(po.getOrderStatus()), auth);
+    }
+
+    @Override
+    public void updateOrderByPrimaryKeySelectiveNoLog(ErpOrderInfo po, AuthToken auth) {
+        //更新订单数据
+        po.setUpdateById(auth.getPersonId());
+        po.setUpdateByName(auth.getPersonName());
+        Integer integer = erpOrderInfoDao.updateByPrimaryKeySelective(po);
+    }
+
+    @Override
+    public void addProductGift(ErpOrderEditRequest erpOrderEditRequest) {
+        if (erpOrderEditRequest == null || StringUtils.isEmpty(erpOrderEditRequest.getOrderCode())) {
+            throw new BusinessException("缺失订单编号");
+        }
+        if (erpOrderEditRequest.getProductGiftList() == null || erpOrderEditRequest.getProductGiftList().size() == 0) {
+            throw new BusinessException("缺失赠品行");
+        }
+        ErpOrderInfo order = erpOrderQueryService.getOrderDetailByOrderCode(erpOrderEditRequest.getOrderCode());
+        if (order == null) {
+            throw new BusinessException("无效的订单编号");
+        }
+        if (!ErpOrderStatusEnum.ORDER_STATUS_1.getCode().equals(order.getOrderStatus())) {
+            throw new BusinessException("只有" + ErpOrderStatusEnum.ORDER_STATUS_1.getDesc() + "的订单才能增加赠品行");
+        }
+        if (!ErpPayStatusEnum.UNPAID.getCode().equals(order.getPayStatus())) {
+            throw new BusinessException("订单已经发起支付，不能编辑");
+        }
+
+        int lineIndex = 0;
+        for (ErpOrderItem item :
+                erpOrderEditRequest.getProductGiftList()) {
+            lineIndex++;
+            if (StringUtils.isEmpty(item.getProductId())) {
+                throw new BusinessException("赠品行第" + lineIndex + "行缺失商品id");
+            }
+            if (StringUtils.isEmpty(item.getSkuCode())) {
+                throw new BusinessException("赠品行第" + lineIndex + "行缺失sku");
+            }
+            if (item.getQuantity() == null) {
+                throw new BusinessException("赠品行第" + lineIndex + "行缺少数量");
+            }
+        }
+
+
+
     }
 
     @Override
@@ -488,7 +536,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         ErpOrderLogistics orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsCode(paramOrderLogistics.getLogisticsCode());
         if (orderLogistics == null) {
             paramOrderLogistics.setLogisticsId(OrderPublic.getUUID());
-            paramOrderLogistics.setPaid(YesOrNoEnum.NO.getCode());
+            paramOrderLogistics.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
             erpOrderLogisticsService.saveOrderLogistics(paramOrderLogistics, auth);
         } else {
             if (orderLogistics.getLogisticsFee().compareTo(paramOrderLogistics.getLogisticsFee()) != 0) {
@@ -507,7 +555,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 throw new BusinessException("发货仓库名称与已有物流单发货仓库名称不相同");
             }
             paramOrderLogistics.setLogisticsId(orderLogistics.getLogisticsId());
-            paramOrderLogistics.setPaid(orderLogistics.getPaid());
+            paramOrderLogistics.setPayStatus(orderLogistics.getPayStatus());
         }
 
         int paramOrderIndex = 0;
@@ -612,7 +660,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             }
             this.updateOrderByPrimaryKeySelective(order, auth);
 
-            if (YesOrNoEnum.YES.getCode().equals(paramOrderLogistics.getPaid())) {
+            if (ErpPayStatusEnum.SUCCESS.getCode().equals(paramOrderLogistics.getPayStatus())) {
                 //如果物流单已经支付成功，订单修改为已支付物流费用
                 order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_12.getCode());
                 this.updateOrderByPrimaryKeySelective(order, auth);

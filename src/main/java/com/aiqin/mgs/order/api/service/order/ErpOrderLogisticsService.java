@@ -58,7 +58,7 @@ public interface ErpOrderLogisticsService {
     ErpOrderLogistics getOrderLogisticsByLogisticsCode(String logisticsCode);
 
     /**
-     * 根据主键更新物流信息
+     * 根据主键更新物流信息（非空字段）
      *
      * @param po
      * @param auth
@@ -68,4 +68,16 @@ public interface ErpOrderLogisticsService {
      * @date 2019/12/10 9:43
      */
     void updateOrderLogisticsSelective(ErpOrderLogistics po, AuthToken auth);
+
+    /**
+     * 根据主键更新物流信息（全字段）
+     *
+     * @param po
+     * @param auth
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/11 10:43
+     */
+    void updateOrderLogistics(ErpOrderLogistics po, AuthToken auth);
 }

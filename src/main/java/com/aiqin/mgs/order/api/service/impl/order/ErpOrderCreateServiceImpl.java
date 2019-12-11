@@ -618,6 +618,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         orderInfo.setOrderCode(orderCode);
         //订单状态 枚举 ErpOrderStatusEnum
         orderInfo.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
+        //订单支付状态 枚举 ErpPayStatusEnum
+        orderInfo.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
         //订单类型 枚举 ErpOrderTypeEnum
         orderInfo.setOrderType(erpOrderSaveRequest.getOrderType());
         //订单来源 ErpOrderOriginTypeEnum

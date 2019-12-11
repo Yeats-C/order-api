@@ -41,7 +41,7 @@
                                            bill_status, create_time, create_by_id, create_by_name,
                                            update_time, update_by_id, update_by_name)
         values (#{receiveId}, #{orderId}, #{receiveName}, #{receiveAddress}, #{receivePhone},
-                #{billStatus}, sysdate(), #{createByBd}, #{createByName},
+                #{billStatus}, sysdate(), #{createById}, #{createByName},
                 sysdate(), #{updateById}, #{updateByName})
     </insert>
 
