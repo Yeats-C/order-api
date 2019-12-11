@@ -70,6 +70,12 @@ public class PrestorageOrderLogsInfo {
     @JsonProperty("order_id")
     @ApiModelProperty("订单id")
     private String orderId;
+    /**
+     * 订单orderCode
+     */
+    @JsonProperty("order_code")
+    @ApiModelProperty("订单orderCode")
+    private String orderCode;
 
     @JsonProperty("create_time")
     @ApiModelProperty(value = "提货时间")

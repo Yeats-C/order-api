@@ -41,9 +41,9 @@ public class PrestorageOrderSupplyDetail {
     @JsonProperty("sku_code")
     private String skuCode="";
 
-    @ApiModelProperty(value="skp_code")
-    @JsonProperty("skp_code")
-    private String skpCode="";
+    @ApiModelProperty(value="spu_code")
+    @JsonProperty("spu_code")
+    private String spuCode="";
 
     @ApiModelProperty(value="条形码")
     @JsonProperty("bar_code")
@@ -65,7 +65,7 @@ public class PrestorageOrderSupplyDetail {
     @JsonProperty("supply_amount")
     private Integer supplyAmount=0;
 
-    @ApiModelProperty(value="提货状态，0待提货，1已完成")
+    @ApiModelProperty(value="提货状态")
     @JsonProperty("prestorage_order_supply_status")
     private Integer prestorageOrderSupplyStatus=0;
 
