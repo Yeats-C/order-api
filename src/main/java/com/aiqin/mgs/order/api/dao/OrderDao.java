@@ -208,7 +208,5 @@ public interface OrderDao {
 
     List<String> getUnPayMemberIdList(UnPayVo unPayVo);
 
-    //  获取收银员上次退出时间
-    @Select("select create_time from order_consumer_info where cashier_id = #{cashierId} order by create_time desc limit 1")
-    Date selectTimeByCashierId(@Valid @Param("cashierId") String cashierId);
+
 }

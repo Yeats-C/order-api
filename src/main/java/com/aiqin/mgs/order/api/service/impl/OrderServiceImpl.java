@@ -30,6 +30,7 @@ import com.aiqin.mgs.order.api.domain.request.*;
 import com.aiqin.mgs.order.api.domain.response.*;
 import com.aiqin.mgs.order.api.service.*;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
+import com.aiqin.mgs.order.api.util.DayUtil;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -117,6 +118,8 @@ public class OrderServiceImpl implements OrderService {
     private PayService payService;
     @Resource
     private OrderAfterService orderAfterService;
+    @Resource
+    private CashierShiftScheduleDao cashierShiftScheduleDao;
     //商品项目地址
     @Value("${slcsIp}")
     public String slcsIp;
@@ -388,6 +391,17 @@ public class OrderServiceImpl implements OrderService {
         }
         vos.getAfterSaleSaveVo().setOrderType(Global.ORDER_TYPE_1);
         return orderAfterService.addAfterOrder( vos.getAfterSaleSaveVo());
+    }
+
+    @Override
+    public HttpResponse cashierQuery(CashierReqVo cashierReqVo) {
+        // 新增 交接班时间
+        Integer type = cashierShiftScheduleDao.cashierQuery(cashierReqVo);
+        if(type == 1){
+            return HttpResponse.success(true);
+        }else {
+            return HttpResponse.failure(ResultCode.CASHIER_SHIFT_SCHEDULE);
+        }
     }
 
     private OrderQuery trans(OrderQuery orderQuery) {
@@ -1034,22 +1048,24 @@ public class OrderServiceImpl implements OrderService {
 
     //接口-收银员交班收银情况统计
     @Override
-    public HttpResponse cashier(@Valid String cashierId, String beginTime, String endTime) {
+    public HttpResponse cashier(@Valid String cashierId, String endTime) {
         try {
 
             // 获取改收银员最后一次交接时间
+            String beginTime = cashierShiftScheduleDao.selectTimeByCashierId(cashierId);
+            if(StringUtils.isEmpty(beginTime)){
+               beginTime = DayUtil.getYearStr();
+            }
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date date = orderDao.selectTimeByCashierId(cashierId);
-            beginTime = formatter.format(date);
             OrderbyReceiptSumResponse receiptSumInfo = new OrderbyReceiptSumResponse();
 
             OrderQuery orderQuery = new OrderQuery();
             orderQuery.setCashierId(cashierId);
-            orderQuery.setBeginDate(beginTime);
-            orderQuery.setEndDate(endTime);
+            orderQuery.setBeginTime(formatter.parse(beginTime));
+            orderQuery.setEndTime(formatter.parse(endTime));
 
             //获取收银员、支付类型金额
-            List<OrderbyReceiptSumResponse> list = orderDao.cashier(OrderPublic.getOrderQuery(orderQuery));
+            List<OrderbyReceiptSumResponse> list = orderDao.cashier(orderQuery);
 
             if (list != null && list.size() > 0) {
                 for (int i = 0; i < list.size(); i++) {

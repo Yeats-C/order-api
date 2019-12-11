@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.CashierShiftScheduleDao">
+
+    <insert id="cashierQuery">
+        insert into cashier_shift_schedule
+        (store_id,cashier_id,end_time)
+        values
+        (#{distributorId},#{personId},#{endTime})
+    </insert>
+
+    
+</mapper>
+

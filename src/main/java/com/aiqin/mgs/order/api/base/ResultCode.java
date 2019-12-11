@@ -66,6 +66,8 @@ public interface ResultCode {
     MessageId SERVICE_PROJECT_PROJECT_TRANSFORM_STATISTICS_EXCEPTION = MessageId.create(Project.OMS_API, 60, "统计各服务项目的转化情况异常");
     MessageId SERVICE_PROJECT_TOP_TRANSFORM_STATISTICS_EXCEPTION = MessageId.create(Project.OMS_API, 61, "统计各服务项目销量top10异常");
 
+    MessageId CASHIER_SHIFT_SCHEDULE = MessageId.create(Project.OMS_API, 61, "交接班退出异常");
+
     String CART = "购物车";
     String ORDER = "订单";
     
