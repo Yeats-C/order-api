@@ -7,6 +7,7 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderEditRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
+import com.aiqin.mgs.order.api.service.order.ErpOrderInfoService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  * 订单编辑controller
@@ -31,13 +34,16 @@ public class ErpOrderEditController {
 
     private static final Logger logger = LoggerFactory.getLogger(ErpOrderEditController.class);
 
+    @Resource
+    private ErpOrderInfoService erpOrderInfoService;
+
     @PostMapping("/addProductGift")
     @ApiOperation(value = "订单添加赠品")
     public HttpResponse addProductGift(@RequestBody ErpOrderEditRequest erpOrderEditRequest) {
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
-
+            erpOrderInfoService.addProductGift(erpOrderEditRequest);
         } catch (BusinessException e) {
             logger.error("订单添加赠品失败：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
