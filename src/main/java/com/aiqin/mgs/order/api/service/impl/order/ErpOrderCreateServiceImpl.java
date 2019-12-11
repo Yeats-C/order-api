@@ -6,10 +6,7 @@ import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.ProductInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderConsignee;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
+import com.aiqin.mgs.order.api.domain.po.order.*;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.OrderConfirmResponse;
 import com.aiqin.mgs.order.api.service.CartOrderService;
@@ -52,6 +49,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private ErpOrderPayService erpOrderPayService;
     @Resource
     private ErpOrderConsigneeService erpOrderConsigneeService;
+    @Resource
+    private ErpOrderFeeService erpOrderFeeService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -339,7 +338,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         BigDecimal realMoneyTotal = BigDecimal.ZERO;
         //活动优惠金额汇总
         BigDecimal activityMoneyTotal = BigDecimal.ZERO;
-        int orderItemNum = 1;
+
         for (ErpOrderItem item :
                 orderItemList) {
 
@@ -351,8 +350,27 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             activityMoneyTotal = activityMoneyTotal.add(item.getActivityMoney() == null ? BigDecimal.ZERO : item.getActivityMoney());
         }
 
+        //保存订单费用信息
+        ErpOrderFee orderFee = new ErpOrderFee();
+        //费用id
+        orderFee.setFeeId(OrderPublic.getUUID());
+        //订单支付状态 枚举 ErpPayStatusEnum
+        orderFee.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
+        //订单总额
+        orderFee.setTotalMoney(moneyTotal);
+        //活动优惠金额
+        orderFee.setActivityMoney(activityMoneyTotal);
+        //服纺券优惠金额
+        orderFee.setSuitCouponMoney(BigDecimal.ZERO);
+        //A品券优惠金额
+        orderFee.setTopCouponMoney(BigDecimal.ZERO);
+        //实付金额
+        orderFee.setPayMoney(orderFee.getTotalMoney().subtract(orderFee.getActivityMoney()).subtract(orderFee.getSuitCouponMoney()).subtract(orderFee.getTopCouponMoney()));
+
         //保存订单信息
         ErpOrderInfo orderInfo = new ErpOrderInfo();
+        //订单费用信息
+        orderInfo.setOrderFee(orderFee);
         //订单状态 枚举 ErpOrderStatusEnum
         orderInfo.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
         //订单支付状态 枚举 ErpPayStatusEnum
@@ -369,18 +387,6 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         orderInfo.setSplitStatus(YesOrNoEnum.NO.getCode());
         //是否发生退货 YesOrNoEnum
         orderInfo.setReturnStatus(YesOrNoEnum.NO.getCode());
-
-        //订单总额
-        orderInfo.setTotalMoney(moneyTotal);
-        //活动优惠金额
-        orderInfo.setActivityMoney(activityMoneyTotal);
-        //服纺券优惠金额
-        orderInfo.setSuitCouponMoney(BigDecimal.ZERO);
-        //A品券优惠金额
-        orderInfo.setTopCouponMoney(BigDecimal.ZERO);
-        //实付金额
-        orderInfo.setPayMoney(orderInfo.getTotalMoney().subtract(orderInfo.getActivityMoney()).subtract(orderInfo.getSuitCouponMoney()).subtract(orderInfo.getTopCouponMoney()));
-
         //加盟商id
         orderInfo.setFranchiseeId(storeInfo.getFranchiseeId());
         //加盟商编码
@@ -435,7 +441,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         String payId = OrderPublic.getUUID();
         //生成订单code
         String orderCode = OrderPublic.generateOrderCode(erpOrderSaveRequest.getOrderOriginType(), erpOrderSaveRequest.getOrderChannel());
-
+        //初始支付状态
+        ErpPayStatusEnum payStatusEnum = ErpPayStatusEnum.UNPAID;
         int orderItemNum = 1;
         for (ErpOrderItem item :
                 orderInfo.getOrderItemList()) {
@@ -450,18 +457,24 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         orderInfo.setOrderId(orderId);
         orderInfo.setOrderCode(orderCode);
         orderInfo.setPayId(payId);
+        orderInfo.setPayStatus(payStatusEnum.getCode());
         erpOrderInfoService.saveOrder(orderInfo, auth);
 
         //保存订单明细行
         erpOrderItemService.saveOrderItemList(orderInfo.getOrderItemList(), auth);
 
+        ErpOrderFee orderFee = orderInfo.getOrderFee();
+        orderFee.setOrderId(orderId);
+        orderFee.setPayId(payId);
+        orderFee.setPayStatus(payStatusEnum.getCode());
+        erpOrderFeeService.saveOrderFee(orderFee, auth);
 
         //保存订单支付信息
         ErpOrderPay orderPay = new ErpOrderPay();
         orderPay.setPayId(payId);
         orderPay.setBusinessKey(orderCode);
-        orderPay.setPayFee(orderInfo.getPayMoney());
-        orderPay.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
+        orderPay.setPayFee(orderFee.getPayMoney());
+        orderPay.setPayStatus(payStatusEnum.getCode());
         orderPay.setPayWay(null);
         orderPay.setFeeType(ErpPayFeeTypeEnum.ORDER_FEE.getCode());
         erpOrderPayService.saveOrderPay(orderPay, auth);
@@ -584,7 +597,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             //实际支付金额
             orderItem.setActualMoney(orderItem.getMoney().subtract(orderItem.getActivityMoney()));
             //货架订单分摊金额等于实际金额
-            orderItem.setShareMoney(orderItem.getActivityMoney());
+            orderItem.setShareMoney(orderItem.getActualMoney());
 
             orderItemList.add(orderItem);
         }
@@ -612,13 +625,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         String payId = OrderPublic.getUUID();
         //生成订单code
         String orderCode = OrderPublic.generateOrderCode(erpOrderSaveRequest.getOrderOriginType(), erpOrderSaveRequest.getOrderChannel());
+        //初始支付状态
+        ErpPayStatusEnum payStatusEnum = ErpPayStatusEnum.UNPAID;
 
         //订货金额汇总
         BigDecimal moneyTotal = BigDecimal.ZERO;
-        //实际支付金额汇总
-        BigDecimal realMoneyTotal = BigDecimal.ZERO;
-        //活动优惠金额汇总
-        BigDecimal activityMoneyTotal = BigDecimal.ZERO;
 
         int orderItemNum = 1;
 
@@ -635,10 +646,6 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
             //订货金额汇总
             moneyTotal = moneyTotal.add(item.getMoney() == null ? BigDecimal.ZERO : item.getMoney());
-            //实际支付金额汇总
-            realMoneyTotal = realMoneyTotal.add(item.getActualMoney() == null ? BigDecimal.ZERO : item.getActualMoney());
-            //活动优惠金额汇总
-            activityMoneyTotal = activityMoneyTotal.add(item.getActivityMoney() == null ? BigDecimal.ZERO : item.getActivityMoney());
         }
 
         erpOrderItemService.saveOrderItemList(orderItemList, auth);
@@ -651,7 +658,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //订单状态 枚举 ErpOrderStatusEnum
         orderInfo.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
         //订单支付状态 枚举 ErpPayStatusEnum
-        orderInfo.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
+        orderInfo.setPayStatus(payStatusEnum.getCode());
         //订单类型 枚举 ErpOrderTypeEnum
         orderInfo.setOrderType(erpOrderSaveRequest.getOrderType());
         //订单来源 ErpOrderOriginTypeEnum
@@ -664,17 +671,6 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         orderInfo.setSplitStatus(YesOrNoEnum.NO.getCode());
         //是否发生退货 YesOrNoEnum
         orderInfo.setReturnStatus(YesOrNoEnum.NO.getCode());
-
-        //订单总额
-        orderInfo.setTotalMoney(moneyTotal);
-        //活动优惠金额
-        orderInfo.setActivityMoney(activityMoneyTotal);
-        //服纺券优惠金额
-        orderInfo.setSuitCouponMoney(BigDecimal.ZERO);
-        //A品券优惠金额
-        orderInfo.setTopCouponMoney(BigDecimal.ZERO);
-        //实付金额
-        orderInfo.setPayMoney(orderInfo.getTotalMoney().subtract(orderInfo.getActivityMoney()).subtract(orderInfo.getSuitCouponMoney()).subtract(orderInfo.getTopCouponMoney()));
 
         //加盟商id
         orderInfo.setFranchiseeId(storeInfo.getFranchiseeId());
@@ -692,17 +688,39 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         orderInfo.setPayId(payId);
         erpOrderInfoService.saveOrder(orderInfo, auth);
 
+        //保存订单费用信息
+        ErpOrderFee orderFee = new ErpOrderFee();
+        //费用id
+        orderFee.setFeeId(OrderPublic.getUUID());
+        //订单id
+        orderFee.setOrderId(orderId);
+        //支付单id
+        orderFee.setPayId(payId);
+        //支付状态
+        orderFee.setPayStatus(payStatusEnum.getCode());
+        //订单总额
+        orderFee.setTotalMoney(moneyTotal);
+        //活动优惠金额
+        orderFee.setActivityMoney(BigDecimal.ZERO);
+        //服纺券优惠金额
+        orderFee.setSuitCouponMoney(BigDecimal.ZERO);
+        //A品券优惠金额
+        orderFee.setTopCouponMoney(BigDecimal.ZERO);
+        //实付金额
+        orderFee.setPayMoney(orderFee.getTotalMoney().subtract(orderFee.getActivityMoney()).subtract(orderFee.getSuitCouponMoney()).subtract(orderFee.getTopCouponMoney()));
+        erpOrderFeeService.saveOrderFee(orderFee, auth);
+
         //保存订单支付信息
         ErpOrderPay orderPay = new ErpOrderPay();
         orderPay.setPayId(payId);
         orderPay.setBusinessKey(orderCode);
-        orderPay.setPayFee(orderInfo.getPayMoney());
-        orderPay.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
+        orderPay.setPayFee(orderFee.getPayMoney());
+        orderPay.setPayStatus(payStatusEnum.getCode());
         orderPay.setPayWay(null);
         orderPay.setFeeType(ErpPayFeeTypeEnum.ORDER_FEE.getCode());
         erpOrderPayService.saveOrderPay(orderPay, auth);
 
-        //保存订单收货信息
+        //保存订单收货人信息
         ErpOrderConsignee orderConsignee = new ErpOrderConsignee();
         orderConsignee.setOrderId(orderId);
         orderConsignee.setReceiveId(OrderPublic.getUUID());

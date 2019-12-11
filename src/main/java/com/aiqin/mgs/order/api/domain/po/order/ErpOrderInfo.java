@@ -49,9 +49,9 @@ public class ErpOrderInfo extends ErpOrderBase {
     private BigDecimal topCouponMoney;
     /***实付金额*/
     private BigDecimal payMoney;
-
     /***物流券*/
     private BigDecimal goodsCoupon;
+
     /***订单取消之前的订单状态*/
     private Integer beforeCancelStatus;
     /***关联物流单id*/
@@ -95,8 +95,10 @@ public class ErpOrderInfo extends ErpOrderBase {
     /***关联子订单*/
     private List<ErpOrderInfo> secondaryOrderList;
 
-    /***订单明细*/
+    /***订单商品明细行*/
     private List<ErpOrderItem> orderItemList;
+    /***订单费用*/
+    private ErpOrderFee orderFee;
     /***订单支付*/
     private ErpOrderPay orderPay;
     /***订单物流信息*/
