@@ -85,7 +85,7 @@ public class ServiceProjectReduceDetail {
 
     @ApiModelProperty(value = "扣减次数或者退次次数")
     @JsonProperty("reduce_count")
-    private Integer reduceCount;
+    private Integer reduceCount=0;
 
     @ApiModelProperty(value = "退还金额")
     @JsonProperty("return_amount")

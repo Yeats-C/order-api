@@ -555,7 +555,7 @@ public class ServiceProjectServiceImpl  implements ServiceProjectService {
                 }
             }
             LOGGER.info("添加服务项目扣减信息和更新资产信息成功，请求参数reduceDetailAsset为{}", reduceDetailAsset);
-            return new  HttpResponse();
+            return HttpResponse.success();
         } catch (Exception e) {
             LOGGER.error("添加服务项目扣减信息和更新资产信息异常，请求参数reduceDetailAsset为{}", reduceDetailAsset, e);
             throw new RuntimeException(ResultCode.INSERT_REDUCE_DETAIL_UPDATE_ASSET_EXCEPTION.getMessage());
