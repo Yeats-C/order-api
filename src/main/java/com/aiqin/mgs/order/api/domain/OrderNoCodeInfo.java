@@ -97,7 +97,7 @@ public class OrderNoCodeInfo extends PagesRequest {
 //	
 //	@ApiModelProperty(value="支付状态")
 //	@JsonProperty("pay_status")
-//	private Integer payStatus;
+//	private Integer paid;
 //	
 //	
 //	@ApiModelProperty(value="支付方式")

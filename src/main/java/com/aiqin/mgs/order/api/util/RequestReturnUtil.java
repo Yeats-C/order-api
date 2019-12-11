@@ -12,7 +12,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 public class RequestReturnUtil {
 
     /***HttpResponse中的code 表示成功*/
-    private static String HTTP_RESPONSE_CODE_SUCCESS = "0";
+    private static final String HTTP_RESPONSE_CODE_SUCCESS = "0";
 
     /**
      * 判断请求是否成功
