@@ -35,4 +35,6 @@ public class ErpOrderFee extends ErpOrderBase {
     /***返还物流券金额*/
     private BigDecimal goodsCoupon;
 
+    /***订单支付*/
+    private ErpOrderPay orderPay;
 }
