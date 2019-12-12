@@ -49,15 +49,15 @@ public class ErpOrderInfo extends ErpOrderBase {
     private BigDecimal topCouponMoney;
     /***实付金额*/
     private BigDecimal payMoney;
-
     /***物流券*/
     private BigDecimal goodsCoupon;
+
     /***订单取消之前的订单状态*/
     private Integer beforeCancelStatus;
     /***关联物流单id*/
     private String logisticsId;
-    /***关联支付单id*/
-    private String payId;
+    /***费用id*/
+    private String feeId;
 
     /***供应商编码*/
     private String supplierCode;
@@ -92,13 +92,15 @@ public class ErpOrderInfo extends ErpOrderBase {
     @ApiModelProperty(value = "是否支持校验支付")
     private Integer repayOperation;
 
+    /***上级订单*/
+    private ErpOrderInfo primaryOrder;
     /***关联子订单*/
     private List<ErpOrderInfo> secondaryOrderList;
 
-    /***订单明细*/
+    /***订单商品明细行*/
     private List<ErpOrderItem> orderItemList;
-    /***订单支付*/
-    private ErpOrderPay orderPay;
+    /***订单费用*/
+    private ErpOrderFee orderFee;
     /***订单物流信息*/
     private ErpOrderLogistics orderLogistics;
     /***订单收货人信息*/

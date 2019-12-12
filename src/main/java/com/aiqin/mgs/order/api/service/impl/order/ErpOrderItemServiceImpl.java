@@ -4,10 +4,12 @@ import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -58,7 +60,13 @@ public class ErpOrderItemServiceImpl implements ErpOrderItemService {
 
     @Override
     public List<ErpOrderItem> selectOrderItemListByOrderId(String orderId) {
-        return null;
+        List<ErpOrderItem> list = new ArrayList<>();
+        if (StringUtils.isNotEmpty(orderId)) {
+            ErpOrderItem query = new ErpOrderItem();
+            query.setOrderId(orderId);
+            list = erpOrderItemDao.select(query);
+        }
+        return list;
     }
 
 }
