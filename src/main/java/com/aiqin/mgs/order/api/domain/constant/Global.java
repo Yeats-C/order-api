@@ -290,9 +290,10 @@ public interface Global {
     String RESULT_CODE = "code";
 
     /**
-     *  客流状态编码
+     *  爱掌柜首页概览状态编码
      */
-    Integer CUSTOMER_FLOW_0 = 0;
-    Integer CUSTOMER_FLOW_1 = 1;
-    Integer CUSTOMER_FLOW_2 = 2;
+    Integer STORE_STATUS_0 = 0;
+    Integer STORE_STATUS_1 = 1;
+    Integer STORE_STATUS_2 = 2;
+    Integer STORE_STATUS_3 = 3;
 }

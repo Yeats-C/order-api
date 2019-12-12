@@ -31,6 +31,38 @@ public class StoreOverviewController {
     @Resource
     private StoreOverviewService storeOverviewService;
 
+    @GetMapping("/sales/achieved")
+    @ApiOperation(value = "门店总销售额")
+    @ApiImplicitParams({@ApiImplicitParam(name = "store_id", value = "门店id", dataType = "String"),
+            @ApiImplicitParam(name = "text", value = "状态(0当月,1当年,2选择年月3,昨日)", dataType = "Integer"),
+            @ApiImplicitParam(name = "year", value = "年", dataType = "String"),
+            @ApiImplicitParam(name = "month", value = "月", dataType = "String"),
+            @ApiImplicitParam(name = "day", value = "日", dataType = "String"),
+    })
+    public HttpResponse storeSalesAchieved(@RequestParam(value = "store_id") String storeId,
+                                                 @RequestParam(value = "text") Integer text,
+                                                 @RequestParam(value = "year", required = false) String year,
+                                                 @RequestParam(value = "month", required = false) String month,
+                                                 @RequestParam(value = "day", required = false) String day) {
+        LOGGER.info("获取门店总销售额......",storeId,text,year,month,day);
+        return storeOverviewService.storeSalesAchieved(storeId,text,year,month,day);
+    }
+
+    @GetMapping("/sales/achieved/eighteen")
+    @ApiOperation(value = "门店18A销售额")
+    @ApiImplicitParams({@ApiImplicitParam(name = "store_id", value = "门店id", dataType = "String"),
+            @ApiImplicitParam(name = "text", value = "状态(0当月,1当年,2选择年月)", dataType = "Integer"),
+            @ApiImplicitParam(name = "year", value = "年", dataType = "String"),
+            @ApiImplicitParam(name = "month", value = "月", dataType = "String"),
+    })
+    public HttpResponse storeEighteenSalesAchieved(@RequestParam(value = "store_id") String storeId,
+                                                 @RequestParam(value = "text") Integer text,
+                                                 @RequestParam(value = "year", required = false) String year,
+                                                 @RequestParam(value = "month", required = false) String month) {
+        LOGGER.info("获取门店18A总销售额......",storeId,text,year,month);
+        return storeOverviewService.storeEighteenSalesAchieved(storeId,text,year,month);
+    }
+
     @GetMapping("/customer/flow")
     @ApiOperation(value = "客流情况")
     @ApiImplicitParams({@ApiImplicitParam(name = "store_id", value = "门店id", dataType = "String"),
