@@ -13,6 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/erpOrderCancelController")
-@Api("订单支付")
+@Api(tags = "订单取消")
 public class ErpOrderCancelController {
 }

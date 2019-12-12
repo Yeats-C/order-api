@@ -9,7 +9,6 @@
         order_id as orderId,
         order_code as orderCode,
         order_status as orderStatus,
-        pay_status as payStatus,
         order_type as orderType,
         order_origin_type as orderOriginType,
         order_channel_type as orderChannelType,
@@ -17,15 +16,9 @@
         primary_code as primaryCode,
         split_status as splitStatus,
         return_status as returnStatus,
-        total_money as totalMoney,
-        activity_money as activityMoney,
-        suit_coupon_money as suitCouponMoney,
-        top_coupon_money as topCouponMoney,
-        pay_money as payMoney,
-        goods_coupon as goodsCoupon,
         before_cancel_status as beforeCancelStatus,
+        fee_id as feeId,
         logistics_id as logisticsId,
-        pay_id as payId,
         supplier_code as supplierCode,
         supplier_name as supplierName,
         repertory_code as repertoryCode,
@@ -58,9 +51,6 @@
         <if test="orderStatus != null and orderStatus != '' or orderStatus == 0">
             and order_status = #{orderStatus}
         </if>
-        <if test="payStatus != null and payStatus != '' or payStatus == 0">
-            and pay_status = #{payStatus}
-        </if>
         <if test="orderLevel != null and orderLevel != '' or orderLevel == 0">
             and order_level = #{orderLevel}
         </if>
@@ -88,8 +78,8 @@
         <if test="logisticsId != null and logisticsId != ''">
             and logistics_id = #{logisticsId}
         </if>
-        <if test="payId != null and payId != ''">
-            and pay_id = #{payId}
+        <if test="feeId != null and feeId != ''">
+            and fee_id = #{feeId}
         </if>
         <if test="supplierCode != null and supplierCode != ''">
             and supplier_code = #{supplierCode}
@@ -119,9 +109,6 @@
         <if test="orderStatus != null and orderStatus != '' or orderStatus == 0">
             order_status = #{orderStatus},
         </if>
-        <if test="payStatus != null and payStatus != '' or payStatus == 0">
-            pay_status = #{payStatus},
-        </if>
         <if test="returnStatus != null and returnStatus != '' or returnStatus == 0">
             return_status = #{returnStatus},
         </if>
@@ -149,24 +136,6 @@
         <if test="logisticsId != null and logisticsId != ''">
             logistics_id = #{logisticsId},
         </if>
-        <if test="goodsCoupon != null">
-            goods_coupon = #{goodsCoupon},
-        </if>
-        <if test="totalMoney != null">
-            total_money = #{totalMoney},
-        </if>
-        <if test="activityMoney != null">
-            activity_money = #{activityMoney},
-        </if>
-        <if test="payMoney != null">
-            pay_money = #{payMoney},
-        </if>
-        <if test="topCouponMoney != null">
-            top_coupon_money = #{topCouponMoney},
-        </if>
-        <if test="suitCouponMoney != null">
-            suit_coupon_money = #{suitCouponMoney},
-        </if>
         update_by_id = #{updateById},
         update_by_name = #{updateByName},
         update_time = sysdate()
@@ -174,19 +143,17 @@
     </update>
 
     <insert id="insert">
-        insert into order_store_info (order_id, order_code, order_status, pay_status, order_type, order_origin_type,
+        insert into order_store_info (order_id, order_code, order_status, order_type, order_origin_type,
                                       order_channel_type, order_level, primary_code, split_status,
-                                      return_status, total_money, activity_money, suit_coupon_money,
-                                      top_coupon_money, pay_money, goods_coupon, before_cancel_status,
-                                      logistics_id, pay_id, supplier_code, supplier_name, repertory_code,
+                                      return_status, before_cancel_status,
+                                      logistics_id, fee_id, supplier_code, supplier_name, repertory_code,
                                       repertory_name, franchisee_id, franchisee_code, franchisee_name,
                                       store_id, store_code, store_name, create_time, create_by_id,
                                       create_by_name, update_time, update_by_id, update_by_name, status)
-        values (#{orderId}, #{orderCode}, #{orderStatus}, #{payStatus}, #{orderType}, #{orderOriginType},
+        values (#{orderId}, #{orderCode}, #{orderStatus}, #{orderType}, #{orderOriginType},
                 #{orderChannelType}, #{orderLevel}, #{primaryCode}, #{splitStatus},
-                #{returnStatus}, #{totalMoney}, #{activityMoney}, #{suitCouponMoney},
-                #{topCouponMoney}, #{payMoney}, #{goodsCoupon}, #{beforeCancelStatus},
-                #{logisticsId}, #{payId}, #{supplierCode}, #{supplierName}, #{repertoryCode},
+                #{returnStatus}, #{beforeCancelStatus},
+                #{logisticsId}, #{feeId}, #{supplierCode}, #{supplierName}, #{repertoryCode},
                 #{repertoryName}, #{franchiseeId}, #{franchiseeCode}, #{franchiseeName},
                 #{storeId}, #{storeCode}, #{storeName}, sysdate(), #{createById},
                 #{createByName}, sysdate(), #{updateById}, #{updateByName}, #{status})
@@ -199,7 +166,7 @@
         a1.order_id as orderId,
         a1.order_code as orderCode,
         a1.order_status as orderStatus,
-        a1.pay_status as payStatus,
+        a2.pay_status as payStatus,
         a1.order_type as orderType,
         a1.order_origin_type as orderOriginType,
         a1.order_channel_type as orderChannelType,
@@ -207,15 +174,15 @@
         a1.primary_code as primaryCode,
         a1.split_status as splitStatus,
         a1.return_status as returnStatus,
-        a1.total_money as totalMoney,
-        a1.activity_money as activityMoney,
-        a1.suit_coupon_money as suitCouponMoney,
-        a1.top_coupon_money as topCouponMoney,
-        a1.pay_money as payMoney,
-        a1.goods_coupon as goodsCoupon,
+        a2.total_money as totalMoney,
+        a2.activity_money as activityMoney,
+        a2.suit_coupon_money as suitCouponMoney,
+        a2.top_coupon_money as topCouponMoney,
+        a2.pay_money as payMoney,
+        a2.goods_coupon as goodsCoupon,
         a1.before_cancel_status as beforeCancelStatus,
         a1.logistics_id as logisticsId,
-        a1.pay_id as payId,
+        a1.fee_id as feeId,
         a1.supplier_code as supplierCode,
         a1.supplier_name as supplierName,
         a1.repertory_code as repertoryCode,
@@ -234,6 +201,7 @@
         a1.update_by_name as updateByName,
         a1.status as status
         from order_store_info a1
+        left join order_store_fee a2 on a1.fee_id = a2.fee_id
         where 1 = 1
         <if test="orderCode != null and orderCode != ''">
             and a1.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%')
@@ -245,7 +213,7 @@
             and a1.order_status = #{orderStatus}
         </if>
         <if test="payStatus != null and payStatus != '' or payStatus == 0 ">
-            and a1.pay_status = #{payStatus}
+            and a2.pay_status = #{payStatus}
         </if>
         <if test="orderType != null and orderType != '' or orderType == 0 ">
             and a1.order_type = #{orderType}
@@ -266,7 +234,7 @@
         a1.order_id as orderId,
         a1.order_code as orderCode,
         a1.order_status as orderStatus,
-        a1.pay_status as payStatus,
+        a2.pay_status as payStatus,
         a1.order_type as orderType,
         a1.order_origin_type as orderOriginType,
         a1.order_channel_type as orderChannelType,
@@ -274,15 +242,15 @@
         a1.primary_code as primaryCode,
         a1.split_status as splitStatus,
         a1.return_status as returnStatus,
-        a1.total_money as totalMoney,
-        a1.activity_money as activityMoney,
-        a1.suit_coupon_money as suitCouponMoney,
-        a1.top_coupon_money as topCouponMoney,
-        a1.pay_money as payMoney,
-        a1.goods_coupon as goodsCoupon,
+        a2.total_money as totalMoney,
+        a2.activity_money as activityMoney,
+        a2.suit_coupon_money as suitCouponMoney,
+        a2.top_coupon_money as topCouponMoney,
+        a2.pay_money as payMoney,
+        a2.goods_coupon as goodsCoupon,
         a1.before_cancel_status as beforeCancelStatus,
         a1.logistics_id as logisticsId,
-        a1.pay_id as payId,
+        a2.pay_id as payId,
         a1.supplier_code as supplierCode,
         a1.supplier_name as supplierName,
         a1.repertory_code as repertoryCode,
@@ -301,6 +269,7 @@
         a1.update_by_name as updateByName,
         a1.status as status
         from order_store_info a1
+        left join order_store_fee a2 on a1.fee_id = a2.fee_id
         where 1 = 1
         and order_level = 2
         and primary_code in (
@@ -308,7 +277,7 @@
             '${primaryCode}'
         </foreach>
         )
-        order by create_time desc
+        order by a1.create_time desc
     </select>
 
 </mapper>
