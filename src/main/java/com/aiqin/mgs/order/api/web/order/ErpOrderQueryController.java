@@ -16,10 +16,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -33,7 +30,7 @@ public class ErpOrderQueryController {
     @Resource
     private ErpOrderQueryService erpOrderQueryService;
 
-    @PostMapping("/findOrderList")
+    @GetMapping("/findOrderList")
     @ApiOperation(value = "查询销售单订单列表")
     public HttpResponse findOrderList(@RequestBody ErpOrderInfo erpOrderInfo) {
         HttpResponse response = HttpResponse.success();
@@ -50,7 +47,7 @@ public class ErpOrderQueryController {
         return response;
     }
 
-    @PostMapping("/getOrderDetail")
+    @GetMapping("/getOrderDetail")
     @ApiOperation(value = "查询订单详情")
     public HttpResponse getOrderDetail(@RequestBody ErpOrderInfo erpOrderInfo) {
         HttpResponse response = HttpResponse.success();
@@ -67,7 +64,7 @@ public class ErpOrderQueryController {
         return response;
     }
 
-    @PostMapping("/findOrderTypeList")
+    @GetMapping("/findOrderTypeList")
     @ApiOperation(value = "获取订单类型选项列表")
     public HttpResponse findOrderTypeList() {
         HttpResponse response = HttpResponse.success();
@@ -81,7 +78,7 @@ public class ErpOrderQueryController {
         return response;
     }
 
-    @PostMapping("/findOrderStatusList")
+    @GetMapping("/findOrderStatusList")
     @ApiOperation(value = "获取订单状态选项列表")
     public HttpResponse findOrderStatusList() {
         HttpResponse response = HttpResponse.success();
@@ -95,7 +92,7 @@ public class ErpOrderQueryController {
         return response;
     }
 
-    @PostMapping("/findOrderPayStatusList")
+    @GetMapping("/findOrderPayStatusList")
     @ApiOperation(value = "获取订单支付状态选项列表")
     public HttpResponse findOrderPayStatusList() {
         HttpResponse response = HttpResponse.success();
@@ -109,7 +106,7 @@ public class ErpOrderQueryController {
         return response;
     }
 
-    @PostMapping("/findOrderPayWayList")
+    @GetMapping("/findOrderPayWayList")
     @ApiOperation(value = "获取订单支付方式选项列表")
     public HttpResponse findOrderPayWayList() {
         HttpResponse response = HttpResponse.success();
