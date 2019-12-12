@@ -74,7 +74,7 @@ public interface OrderService {
 	HttpResponse onlyStatus(@Valid String orderId, Integer orderStatus, String updateBy);
 
 	//接口-收银员交班收银情况统计
-	HttpResponse cashier(@Valid String cashierId, String beginTime, String endTime);
+	HttpResponse cashier(@Valid String cashierId, String endTime);
 
 	//接口-通过会员查询最后一次的消费记录.
 	HttpResponse last(@Valid String memberId);
@@ -205,4 +205,11 @@ public interface OrderService {
 	 * @return
 	 */
     HttpResponse batchUpdateRejectPrestoragProduct(PrestoragProductAfter vos) throws Exception;
+
+	/**
+	 * 收银员交班结束时间参数
+	 * @param cashierReqVo
+	 * @return
+	 */
+	HttpResponse cashierQuery(CashierReqVo cashierReqVo);
 }

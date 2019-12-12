@@ -448,13 +448,27 @@ public class OrderController {
     @GetMapping("/cashier")
     @ApiOperation(value = "接口-收银员交班收银情况统计(param:cashier_id、begin_time、end_time、 return:list-OrderbyReceiptSumResponse)....")
     public HttpResponse cashier(@Valid @RequestParam(name = "cashier_id", required = true) String cashierId,
-    		@RequestParam(name = "begin_time", required = true) String beginTime,
     		@RequestParam(name = "end_time", required = true) String endTime
     		) {
         
     	
-    	LOGGER.info("接口-收银员交班收银情况统计参数 cashierId:{},beginTime:{},endTime:{}",cashierId,beginTime,endTime);    	
-        return orderService.cashier(cashierId,beginTime,endTime);
+    	LOGGER.info("接口-收银员交班收银情况统计参数 cashierId:{},endTime:{}",cashierId,endTime);
+        return orderService.cashier(cashierId,endTime);
+    }
+
+    /**
+     *
+     * 接口-收银员交班结束时间
+     * @param
+     * @return
+     */
+    @PostMapping("/cashier/query")
+    @ApiOperation(value = "接口-收银员交班结束时间")
+    public HttpResponse cashierQuery(@RequestBody CashierReqVo cashierReqVo) {
+
+
+        LOGGER.info("接口-收银员交班结束时间参数 ",cashierReqVo);
+        return orderService.cashierQuery(cashierReqVo);
     }
     
     /**
