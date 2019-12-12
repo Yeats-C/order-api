@@ -161,9 +161,7 @@
             <when test="orderType != null ">
                 and order_type =#{orderType}
             </when>
-            <otherwise>
-                and (order_type = 1 or order_type = 4)
-            </otherwise>
+
         </choose>
         <if test="orderId!=null and orderId!=''">
             and order_id = #{orderId}
