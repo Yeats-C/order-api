@@ -36,6 +36,8 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
     @Resource
     private ErpOrderLogisticsService erpOrderLogisticsService;
     @Resource
+    private ErpOrderFeeService erpOrderFeeService;
+    @Resource
     private ErpOrderRequestService erpOrderRequestService;
 
     @Override
@@ -89,8 +91,12 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderId());
             order.setOrderItemList(orderItemList);
 
+            //订单费用
+            ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(order.getOrderId());
+            order.setOrderFee(orderFee);
+
             //订单关联支付单
-            ErpOrderPay orderPay = erpOrderPayService.getOrderPayByPayId(order.getPayId());
+            ErpOrderPay orderPay = erpOrderPayService.getOrderPayByPayId(orderFee.getPayId());
             order.setOrderPay(orderPay);
 
             //订单收货人信息

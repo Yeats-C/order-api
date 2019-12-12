@@ -5,6 +5,7 @@ import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderPayDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
@@ -48,6 +49,8 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
     private ErpOrderRequestService erpOrderRequestService;
     @Resource
     private ErpOrderLogisticsService erpOrderLogisticsService;
+    @Resource
+    private ErpOrderFeeService erpOrderFeeService;
 
     @Override
     public ErpOrderPay getOrderPayByPayId(String payId) {
@@ -144,11 +147,12 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
         if (order == null) {
             throw new BusinessException("无效的订单编码");
         }
-        ErpOrderPay orderPay = this.getOrderPayByPayId(order.getPayId());
+        ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(order.getOrderId());
+        ErpOrderPay orderPay = this.getOrderPayByPayId(orderFee.getPayId());
         result.setOrderCode(order.getOrderCode());
         result.setOrderId(order.getOrderId());
         result.setOrderStatus(order.getOrderStatus());
-        result.setGoodsCoupon(order.getGoodsCoupon());
+        result.setGoodsCoupon(orderFee.getGoodsCoupon());
         result.setPayStatus(orderPay.getPayStatus());
         result.setPayCode(orderPay.getPayCode());
         result.setPayStartTime(orderPay.getPayStartTime());
@@ -266,6 +270,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
                 if (order == null) {
                     throw new BusinessException("数据异常");
                 }
+                ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(order.getOrderId());
                 order.setOrderItemList(erpOrderItemService.selectOrderItemListByOrderId(order.getOrderId()));
                 if (payStatusEnum == ErpPayStatusEnum.SUCCESS) {
                     if (manual) {
@@ -276,9 +281,11 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
                     order.setPayStatus(payStatusEnum.getCode());
                     //获取物流券
                     BigDecimal goodsCoupon = erpOrderRequestService.getGoodsCoupon(order);
-                    order.setGoodsCoupon(goodsCoupon);
+                    //TODO CT 01 物流券
+//                    order.setGoodsCoupon(goodsCoupon);
                     order.setPayStatus(payStatusEnum.getCode());
                     erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
+
 
                     //请求供应链，获取库存分组，进行拆单
                     ScheduledExecutorService splitService = new ScheduledThreadPoolExecutor(1);
