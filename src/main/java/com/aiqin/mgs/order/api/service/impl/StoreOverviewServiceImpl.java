@@ -4,11 +4,15 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.dao.StoreOverviewDao;
 import com.aiqin.mgs.order.api.domain.constant.Global;
+import com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateDaily;
+import com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateResp;
+import com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateYearMonth;
 import com.aiqin.mgs.order.api.domain.response.customer.CustomreFlowDaily;
 import com.aiqin.mgs.order.api.domain.response.customer.CustomreFlowResp;
 import com.aiqin.mgs.order.api.domain.response.customer.CustomreFlowYearMonth;
 import com.aiqin.mgs.order.api.service.StoreOverviewService;
 import com.aiqin.mgs.order.api.util.DayUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +20,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class StoreOverviewServiceImpl implements StoreOverviewService{
 
@@ -52,5 +57,37 @@ public class StoreOverviewServiceImpl implements StoreOverviewService{
             return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER,"text="+text);
         }
         return HttpResponse.success(customreFlowResps);
+    }
+
+    /**
+     *  首页客流转化率
+     *
+     * @param storeId
+     * @param text
+     *@param year
+     * @param month  @return
+     */
+    @Override
+    public HttpResponse storeTransforRate(String storeId, Integer text, String year, String month) {
+        if(StringUtils.isEmpty(storeId)){
+            return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER,"storeId="+storeId);
+        }
+
+        StoreTransforRateResp storeTransforRateResp = new StoreTransforRateResp();
+        // 根据状态获取不同门店转化率数据--状态(0当月,1当年,2选择年月)
+        if(Global.CUSTOMER_FLOW_0 == text){
+            month = DayUtil.getYearMonthStr();
+            List<StoreTransforRateYearMonth> storeTransforRateYearMonths = storeOverviewDao.storeTransforRateMonthly(storeId, month);
+            storeTransforRateResp.setStoreTransforRateYearMonths(storeTransforRateYearMonths);
+        }else if(Global.CUSTOMER_FLOW_1 == text){
+            List<StoreTransforRateYearMonth> storeTransforRateYearMonths = storeOverviewDao.storeTransforRateYear(storeId, year);
+            storeTransforRateResp.setStoreTransforRateYearMonths(storeTransforRateYearMonths);
+        }else if(Global.CUSTOMER_FLOW_2 == text){
+            List<StoreTransforRateDaily> storeTransforRateDailies = storeOverviewDao.storeTransforRateYearMonthly(storeId, year, month);
+            storeTransforRateResp.setStoreTransforRateDailies(storeTransforRateDailies);
+        }else {
+            return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER,"text="+text);
+        }
+        return HttpResponse.success(storeTransforRateResp);
     }
 }

@@ -25,5 +25,32 @@
         from bi_customer_flow_daily
         where store_id = #{storeId} and stat_year = #{year} and stat_month = #{month}
     </select>
+
+    <select id="storeTransforRateMonthly" resultType="com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateYearMonth">
+        select
+        id,stat_year_month as statYearMonth,stat_year as statYear,stat_month as statMonth,
+        store_id as storeId,store_name as storeName,total_customer_flow as totalCustomerFlow,
+        order_num as orderNum,goal_rate as goalRate,actual_transfor_rate as actualTransforRate
+        from bi_store_transfor_rate_monthly
+        where store_id = #{storeId} and stat_year_month = #{month}
+    </select>
+
+    <select id="storeTransforRateYear" resultType="com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateYearMonth">
+        select
+        id,stat_year_month as statYearMonth,stat_year as statYear,stat_month as statMonth,
+        store_id as storeId,store_name as storeName,total_customer_flow as totalCustomerFlow,
+        order_num as orderNum,goal_rate as goalRate,actual_transfor_rate as actualTransforRate
+        from bi_store_transfor_rate_monthly
+        where store_id = #{storeId} and stat_year = #{year}
+    </select>
+
+    <select id="storeTransforRateYearMonthly" resultType="com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateDaily">
+        select
+        id,stat_year_month_day as statYearMonthDay,stat_year as statYear,stat_month as statMonth,stat_day as statDay,
+        store_id as storeId,store_name as storeName,total_customer_flow as totalCustomerFlow,
+        order_num as orderNum,goal_rate as goalRate,actual_transfor_rate as actualTransforRate
+        from bi_store_transfor_rate_daily
+        where store_id = #{storeId} and stat_year = #{year} and stat_month = #{month}
+    </select>
 </mapper>
 
