@@ -33,7 +33,7 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping("/erpOrderPayController")
-@Api("订单创建")
+@Api(tags = "ERP订单支付")
 public class ErpOrderPayController {
 
     private static final Logger logger = LoggerFactory.getLogger(ErpOrderCreateController.class);
