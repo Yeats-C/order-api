@@ -277,7 +277,7 @@
             '${primaryCode}'
         </foreach>
         )
-        order by create_time desc
+        order by a1.create_time desc
     </select>
 
 </mapper>
