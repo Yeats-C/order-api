@@ -36,6 +36,8 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
     @Resource
     private ErpOrderLogisticsService erpOrderLogisticsService;
     @Resource
+    private ErpOrderFeeService erpOrderFeeService;
+    @Resource
     private ErpOrderRequestService erpOrderRequestService;
 
     @Override
@@ -67,17 +69,15 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
     }
 
     @Override
-    public ErpOrderInfo getOrderByPayId(String payId) {
-        ErpOrderInfo order = null;
-        if (StringUtils.isNotEmpty(payId)) {
-            ErpOrderInfo orderInfoQuery = new ErpOrderInfo();
-            orderInfoQuery.setPayId(payId);
-            List<ErpOrderInfo> select = erpOrderInfoDao.select(orderInfoQuery);
-            if (select != null && select.size() > 0) {
-                order = select.get(0);
-            }
+    public List<ErpOrderInfo> getSecondOrderListByPrimaryCode(String orderCode) {
+        List<ErpOrderInfo> list = new ArrayList<>();
+        if (StringUtils.isNotEmpty(orderCode)) {
+            ErpOrderInfo query = new ErpOrderInfo();
+            query.setOrderLevel(ErpOrderLevelEnum.SECONDARY.getCode());
+            query.setPrimaryCode(orderCode);
+            list = erpOrderInfoDao.select(query);
         }
-        return order;
+        return list;
     }
 
     @Override
@@ -85,13 +85,35 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         ErpOrderInfo order = this.getOrderByOrderCode(orderCode);
         if (order != null) {
 
+            if (ErpOrderLevelEnum.PRIMARY.getCode().equals(order.getOrderLevel())) {
+                //主订单
+
+                //获取拆分订单
+                if (YesOrNoEnum.YES.getCode().equals(order.getSplitStatus())) {
+                    List<ErpOrderInfo> secondOrderList = getSecondOrderListByPrimaryCode(order.getOrderCode());
+                    order.setSecondaryOrderList(secondOrderList);
+                }
+
+            } else {
+                //子订单
+
+                //获取上级订单
+                ErpOrderInfo primaryOrder = getOrderByOrderCode(order.getPrimaryCode());
+                order.setPrimaryOrder(primaryOrder);
+            }
+
             //订单明细行
             List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderId());
             order.setOrderItemList(orderItemList);
 
-            //订单关联支付单
-            ErpOrderPay orderPay = erpOrderPayService.getOrderPayByPayId(order.getPayId());
-            order.setOrderPay(orderPay);
+            //订单费用
+            ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByFeeId(order.getFeeId());
+            if (orderFee != null) {
+                order.setPayStatus(orderFee.getPayStatus());
+                ErpOrderPay orderPay = erpOrderPayService.getOrderPayByPayId(orderFee.getPayId());
+                orderFee.setOrderPay(orderPay);
+            }
+            order.setOrderFee(orderFee);
 
             //订单收货人信息
             ErpOrderConsignee orderConsignee = erpOrderConsigneeService.getOrderConsigneeByOrderId(order.getOrderId());
@@ -102,7 +124,11 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             order.setOrderOperationLogList(orderOperationLogList);
 
             //订单物流信息
-            ErpOrderLogistics orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsId(order.getOrderId());
+            ErpOrderLogistics orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsId(order.getLogisticsId());
+            if (orderLogistics != null) {
+                ErpOrderPay logisticsPay = erpOrderPayService.getOrderPayByPayId(orderLogistics.getPayId());
+                orderLogistics.setLogisticsPay(logisticsPay);
+            }
             order.setOrderLogistics(orderLogistics);
         }
         return order;

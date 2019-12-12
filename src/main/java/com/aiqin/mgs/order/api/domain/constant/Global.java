@@ -288,4 +288,11 @@ public interface Global {
      * 接口返回码
      */
     String RESULT_CODE = "code";
+
+    /**
+     *  客流状态编码
+     */
+    Integer CUSTOMER_FLOW_0 = 0;
+    Integer CUSTOMER_FLOW_1 = 1;
+    Integer CUSTOMER_FLOW_2 = 2;
 }

@@ -426,8 +426,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     newOrder.setPayStatus(order.getPayStatus());
                     newOrder.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_3.getCode());
                     //TODO CT 金额需要重新计算
-                    newOrder.setPayMoney(realMoneyTotal);
-                    newOrder.setTotalMoney(moneyTotal);
+//                    newOrder.setPayMoney(realMoneyTotal);
+//                    newOrder.setTotalMoney(moneyTotal);
                     newOrder.setOrderType(order.getOrderType());
                     newOrder.setFranchiseeId(order.getFranchiseeId());
                     newOrder.setFranchiseeCode(order.getFranchiseeCode());
