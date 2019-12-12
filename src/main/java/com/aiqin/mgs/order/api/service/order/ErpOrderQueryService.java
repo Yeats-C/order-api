@@ -37,15 +37,15 @@ public interface ErpOrderQueryService {
     ErpOrderInfo getOrderByOrderCode(String orderCode);
 
     /**
-     * 根据支付id查询订单
+     * 根据以及订单编码获取拆分列表
      *
-     * @param payId 支付id
+     * @param orderCode
      * @return com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo
      * @author: Tao.Chen
      * @version: v1.0.0
-     * @date 2019/12/10 9:52
+     * @date 2019/12/12 10:30
      */
-    ErpOrderInfo getOrderByPayId(String payId);
+    List<ErpOrderInfo> getSecondOrderListByPrimaryCode(String orderCode);
 
     /**
      * 根据订单编号查询订单详情信息

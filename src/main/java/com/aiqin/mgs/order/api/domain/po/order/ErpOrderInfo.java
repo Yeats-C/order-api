@@ -56,8 +56,8 @@ public class ErpOrderInfo extends ErpOrderBase {
     private Integer beforeCancelStatus;
     /***关联物流单id*/
     private String logisticsId;
-    /***关联支付单id*/
-    private String payId;
+    /***费用id*/
+    private String feeId;
 
     /***供应商编码*/
     private String supplierCode;
@@ -92,6 +92,8 @@ public class ErpOrderInfo extends ErpOrderBase {
     @ApiModelProperty(value = "是否支持校验支付")
     private Integer repayOperation;
 
+    /***上级订单*/
+    private ErpOrderInfo primaryOrder;
     /***关联子订单*/
     private List<ErpOrderInfo> secondaryOrderList;
 
@@ -99,8 +101,6 @@ public class ErpOrderInfo extends ErpOrderBase {
     private List<ErpOrderItem> orderItemList;
     /***订单费用*/
     private ErpOrderFee orderFee;
-    /***订单支付*/
-    private ErpOrderPay orderPay;
     /***订单物流信息*/
     private ErpOrderLogistics orderLogistics;
     /***订单收货人信息*/
