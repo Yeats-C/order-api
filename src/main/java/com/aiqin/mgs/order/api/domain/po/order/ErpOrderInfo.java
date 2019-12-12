@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.po.order;
 
+import com.aiqin.mgs.order.api.component.enums.*;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -22,16 +23,28 @@ public class ErpOrderInfo extends ErpOrderBase {
     private String orderCode;
     /***订单状态 枚举 ErpOrderStatusEnum*/
     private Integer orderStatus;
+    /***订单状态描述 枚举 ErpOrderStatusEnum*/
+    private String orderStatusDesc;
     /***订单支付状态 ErpPayStatusEnum*/
     private Integer payStatus;
+    /***订单支付状态描述 ErpPayStatusEnum*/
+    private String payStatusDesc;
     /***订单类型 枚举 ErpOrderTypeEnum*/
     private Integer orderType;
+    /***订单类型描述 枚举 ErpOrderTypeEnum*/
+    private String orderTypeDesc;
     /***订单来源 ErpOrderOriginTypeEnum*/
     private Integer orderOriginType;
+    /***订单来源描述 ErpOrderOriginTypeEnum*/
+    private String orderOriginTypeDesc;
     /***订单销售渠道标识 ErpOrderChannelTypeEnum*/
     private Integer orderChannelType;
+    /***订单销售渠道标识描述 ErpOrderChannelTypeEnum*/
+    private String orderChannelTypeDesc;
     /***订单级别 枚举 ErpOrderLevelEnum*/
     private Integer orderLevel;
+    /***订单级别描述 枚举 ErpOrderLevelEnum*/
+    private String orderLevelDesc;
     /***关联主订单编码*/
     private String primaryCode;
     /***是否被拆分 YesOrNoEnum */
@@ -107,4 +120,28 @@ public class ErpOrderInfo extends ErpOrderBase {
     private ErpOrderConsignee orderConsignee;
     /***订单操作日志*/
     private List<ErpOrderOperationLog> orderOperationLogList;
+
+    public String getOrderStatusDesc() {
+        return ErpOrderStatusEnum.getEnumDesc(orderStatus);
+    }
+
+    public String getPayStatusDesc() {
+        return ErpPayStatusEnum.getEnumDesc(payStatus);
+    }
+
+    public String getOrderTypeDesc() {
+        return ErpOrderTypeEnum.getEnumDesc(orderType);
+    }
+
+    public String getOrderOriginTypeDesc() {
+        return ErpOrderOriginTypeEnum.getEnumDesc(orderOriginType);
+    }
+
+    public String getOrderChannelTypeDesc() {
+        return ErpOrderChannelTypeEnum.getEnumDesc(orderChannelType);
+    }
+
+    public String getOrderLevelDesc() {
+        return ErpOrderLevelEnum.getEnumDesc(orderLevel);
+    }
 }
