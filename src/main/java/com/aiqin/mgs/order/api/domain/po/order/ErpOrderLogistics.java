@@ -39,4 +39,6 @@ public class ErpOrderLogistics extends ErpOrderBase {
     /***物流券ids，多个用逗号间隔*/
     private String couponIds;
 
+    /***物流费用支付*/
+    private ErpOrderPay logisticsPay;
 }

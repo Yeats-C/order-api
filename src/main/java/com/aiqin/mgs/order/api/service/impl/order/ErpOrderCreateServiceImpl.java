@@ -352,10 +352,6 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //保存订单费用信息
         ErpOrderFee orderFee = new ErpOrderFee();
-        //费用id
-        orderFee.setFeeId(OrderPublic.getUUID());
-        //订单支付状态 枚举 ErpPayStatusEnum
-        orderFee.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
         //订单总额
         orderFee.setTotalMoney(moneyTotal);
         //活动优惠金额
@@ -373,8 +369,6 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         orderInfo.setOrderFee(orderFee);
         //订单状态 枚举 ErpOrderStatusEnum
         orderInfo.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
-        //订单支付状态 枚举 ErpPayStatusEnum
-        orderInfo.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
         //订单类型 枚举 ErpOrderTypeEnum
         orderInfo.setOrderType(erpOrderSaveRequest.getOrderType());
         //订单来源 ErpOrderOriginTypeEnum
@@ -437,6 +431,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //生成订单id
         String orderId = OrderPublic.getUUID();
+        //生成费用id
+        String feeId = OrderPublic.getUUID();
         //生成支付id
         String payId = OrderPublic.getUUID();
         //生成订单code
@@ -456,8 +452,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //保存订单
         orderInfo.setOrderId(orderId);
         orderInfo.setOrderCode(orderCode);
-        orderInfo.setPayId(payId);
-        orderInfo.setPayStatus(payStatusEnum.getCode());
+        orderInfo.setFeeId(feeId);
         erpOrderInfoService.saveOrder(orderInfo, auth);
 
         //保存订单明细行
@@ -466,6 +461,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         ErpOrderFee orderFee = orderInfo.getOrderFee();
         orderFee.setOrderId(orderId);
         orderFee.setPayId(payId);
+        orderFee.setFeeId(feeId);
         orderFee.setPayStatus(payStatusEnum.getCode());
         erpOrderFeeService.saveOrderFee(orderFee, auth);
 
@@ -621,6 +617,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //生成订单id
         String orderId = OrderPublic.getUUID();
+        //生成费用id
+        String feeId = OrderPublic.getUUID();
         //生成支付id
         String payId = OrderPublic.getUUID();
         //生成订单code
@@ -657,8 +655,6 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         orderInfo.setOrderCode(orderCode);
         //订单状态 枚举 ErpOrderStatusEnum
         orderInfo.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
-        //订单支付状态 枚举 ErpPayStatusEnum
-        orderInfo.setPayStatus(payStatusEnum.getCode());
         //订单类型 枚举 ErpOrderTypeEnum
         orderInfo.setOrderType(erpOrderSaveRequest.getOrderType());
         //订单来源 ErpOrderOriginTypeEnum
@@ -685,13 +681,13 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //门店名称
         orderInfo.setStoreName(storeInfo.getStoreName());
         //支付id
-        orderInfo.setPayId(payId);
+        orderInfo.setFeeId(feeId);
         erpOrderInfoService.saveOrder(orderInfo, auth);
 
         //保存订单费用信息
         ErpOrderFee orderFee = new ErpOrderFee();
         //费用id
-        orderFee.setFeeId(OrderPublic.getUUID());
+        orderFee.setFeeId(feeId);
         //订单id
         orderFee.setOrderId(orderId);
         //支付单id
