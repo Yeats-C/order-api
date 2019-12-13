@@ -1555,6 +1555,7 @@ public class OrderServiceImpl implements OrderService {
             String orderCode = "";
             if (orderInfo != null) {
                 orderInfo = addOrderInfo(orderInfo);
+                //存入订单主数据
                 orderId = orderInfo.getOrderId();
                 orderCode = orderInfo.getOrderCode();
                 if (orderId.equals("")) {
