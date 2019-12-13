@@ -106,6 +106,9 @@ public class ErpOrderInfo extends ErpOrderBase {
     /***是否支持校验支付 对应列表上的确认收款按钮 1有按钮 0没有按钮*/
     @ApiModelProperty(value = "是否支持校验支付")
     private Integer repayOperation;
+    /***能否新增赠品行  1可以 0不能 */
+    @ApiModelProperty(value = "是否支持校验支付")
+    private Integer addProductGiftOperation;
 
     /***上级订单*/
     private ErpOrderInfo primaryOrder;

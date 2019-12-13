@@ -11,6 +11,7 @@ import com.aiqin.mgs.order.api.component.enums.ErpOrderTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpPayWayEnum;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest;
 import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,10 +33,27 @@ public class ErpOrderQueryController {
 
     @PostMapping("/findOrderList")
     @ApiOperation(value = "查询销售单订单列表")
-    public HttpResponse findOrderList(@RequestBody ErpOrderInfo erpOrderInfo) {
+    public HttpResponse findOrderList(@RequestBody ErpOrderQueryRequest erpOrderQueryRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-            PageResData<ErpOrderInfo> orderList = erpOrderQueryService.findOrderList(erpOrderInfo);
+            PageResData<ErpOrderInfo> orderList = erpOrderQueryService.findOrderList(erpOrderQueryRequest);
+            response.setData(orderList);
+        } catch (BusinessException e) {
+            logger.error("查询销售单订单列表异常：{}", e);
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            logger.error("查询销售单订单列表异常：{}", e);
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
+    }
+
+    @PostMapping("/findRackOrderList")
+    @ApiOperation(value = "查询货架订单列表")
+    public HttpResponse findRackOrderList(@RequestBody ErpOrderQueryRequest erpOrderQueryRequest) {
+        HttpResponse response = HttpResponse.success();
+        try {
+            PageResData<ErpOrderInfo> orderList = erpOrderQueryService.findRackOrderList(erpOrderQueryRequest);
             response.setData(orderList);
         } catch (BusinessException e) {
             logger.error("查询销售单订单列表异常：{}", e);
@@ -49,10 +67,10 @@ public class ErpOrderQueryController {
 
     @PostMapping("/getOrderDetail")
     @ApiOperation(value = "查询订单详情")
-    public HttpResponse getOrderDetail(@RequestBody ErpOrderInfo erpOrderInfo) {
+    public HttpResponse getOrderDetail(@RequestBody ErpOrderQueryRequest erpOrderQueryRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-            ErpOrderInfo orderDetailByOrderCode = erpOrderQueryService.getOrderDetailByOrderCode(erpOrderInfo.getOrderCode());
+            ErpOrderInfo orderDetailByOrderCode = erpOrderQueryService.getOrderDetailByOrderCode(erpOrderQueryRequest.getOrderCode());
             response.setData(orderDetailByOrderCode);
         } catch (BusinessException e) {
             logger.error("查询订单详情异常：{}", e);
@@ -70,6 +88,20 @@ public class ErpOrderQueryController {
         HttpResponse response = HttpResponse.success();
         try {
             response.setData(ErpOrderTypeEnum.SELECT_LIST);
+        } catch (BusinessException e) {
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
+    }
+
+    @GetMapping("/findRackOrderTypeList")
+    @ApiOperation(value = "获取货架订单类型选项列表")
+    public HttpResponse findRackOrderTypeList() {
+        HttpResponse response = HttpResponse.success();
+        try {
+            response.setData(ErpOrderTypeEnum.STORAGE_RACK_SELECT_LIST);
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {

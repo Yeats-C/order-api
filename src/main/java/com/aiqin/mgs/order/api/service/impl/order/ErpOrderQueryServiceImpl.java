@@ -2,12 +2,11 @@ package com.aiqin.mgs.order.api.service.impl.order;
 
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.PagesRequest;
-import com.aiqin.mgs.order.api.component.enums.ErpOrderLevelEnum;
-import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
-import com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum;
-import com.aiqin.mgs.order.api.component.enums.YesOrNoEnum;
+import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
+import com.aiqin.mgs.order.api.domain.EnumItemInfo;
 import com.aiqin.mgs.order.api.domain.po.order.*;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.PageAutoHelperUtil;
@@ -130,6 +129,16 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                 orderLogistics.setLogisticsPay(logisticsPay);
             }
             order.setOrderLogistics(orderLogistics);
+
+            //能不能编辑新增赠品行
+            order.setAddProductGiftOperation(YesOrNoEnum.NO.getCode());
+            ErpOrderTypeEnum erpOrderTypeEnum = ErpOrderTypeEnum.getEnum(order.getOrderType());
+            if (ErpOrderStatusEnum.ORDER_STATUS_1.getCode().equals(order.getOrderStatus())) {
+                if (erpOrderTypeEnum != null && erpOrderTypeEnum.isAddProductGift()) {
+                    order.setAddProductGiftOperation(YesOrNoEnum.YES.getCode());
+                }
+            }
+
         }
         return order;
     }
@@ -146,13 +155,13 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
     }
 
     @Override
-    public PageResData<ErpOrderInfo> findOrderList(ErpOrderInfo erpOrderInfo) {
+    public PageResData<ErpOrderInfo> findOrderList(ErpOrderQueryRequest erpOrderQueryRequest) {
         //查询主订单列表
-        erpOrderInfo.setOrderLevel(ErpOrderLevelEnum.PRIMARY.getCode());
+        erpOrderQueryRequest.setOrderLevel(ErpOrderLevelEnum.PRIMARY.getCode());
         PagesRequest page = new PagesRequest();
-        page.setPageNo(erpOrderInfo.getPageNo() == null ? 1 : erpOrderInfo.getPageNo());
-        page.setPageSize(erpOrderInfo.getPageSize() == null ? 10 : erpOrderInfo.getPageSize());
-        PageResData<ErpOrderInfo> pageResData = PageAutoHelperUtil.generatePageRes(() -> erpOrderInfoDao.findOrderList(erpOrderInfo), page);
+        page.setPageNo(erpOrderQueryRequest.getPageNo() == null ? 1 : erpOrderQueryRequest.getPageNo());
+        page.setPageSize(erpOrderQueryRequest.getPageSize() == null ? 10 : erpOrderQueryRequest.getPageSize());
+        PageResData<ErpOrderInfo> pageResData = PageAutoHelperUtil.generatePageRes(() -> erpOrderInfoDao.findOrderList(erpOrderQueryRequest), page);
 
         //查询子订单列表
         List<ErpOrderInfo> dataList = pageResData.getDataList();
@@ -204,4 +213,14 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         return pageResData;
     }
 
+    @Override
+    public PageResData<ErpOrderInfo> findRackOrderList(ErpOrderQueryRequest erpOrderQueryRequest) {
+        List<Integer> orderTypeQueryList = new ArrayList<>();
+        for (EnumItemInfo item :
+                ErpOrderTypeEnum.STORAGE_RACK_SELECT_LIST) {
+            orderTypeQueryList.add(item.getCode());
+        }
+        erpOrderQueryRequest.setOrderTypeQueryList(orderTypeQueryList);
+        return this.findOrderList(erpOrderQueryRequest);
+    }
 }
