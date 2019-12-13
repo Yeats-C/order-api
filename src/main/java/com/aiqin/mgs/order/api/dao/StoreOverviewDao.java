@@ -4,10 +4,7 @@ import com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateD
 import com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateYearMonth;
 import com.aiqin.mgs.order.api.domain.response.customer.CustomreFlowDaily;
 import com.aiqin.mgs.order.api.domain.response.customer.CustomreFlowYearMonth;
-import com.aiqin.mgs.order.api.domain.response.sales.StoreSaleMarginResp;
-import com.aiqin.mgs.order.api.domain.response.sales.StoreSalesAchievedDaily;
-import com.aiqin.mgs.order.api.domain.response.sales.StoreSalesAchievedYearMonth;
-import com.aiqin.mgs.order.api.domain.response.sales.StoreSalesEighteenAchievedBrand;
+import com.aiqin.mgs.order.api.domain.response.sales.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -141,4 +138,11 @@ public interface StoreOverviewDao {
      * @param year
      */
     List<StoreSaleMarginResp> storeEighteenSaleMarginYear(@Param("storeId") String storeId,@Param("year") String year);
+
+    /**
+     *  查询门店订单概览
+     * @param storeId
+     * @return
+     */
+    List<StoreSaleOverViewResp> storeOrderOverView(@Param("storeId") String storeId);
 }

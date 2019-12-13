@@ -54,4 +54,11 @@ public interface StoreOverviewService {
      * @return
      */
     HttpResponse storeSaleMargin(String storeId, Integer text, String year);
+
+    /**
+     *  爱掌柜首页概览订单概览
+     * @param storeId
+     * @return
+     */
+    HttpResponse storeOrderOverView(String storeId);
 }

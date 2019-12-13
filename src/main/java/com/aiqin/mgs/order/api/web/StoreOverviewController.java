@@ -107,4 +107,12 @@ public class StoreOverviewController {
         return storeOverviewService.storeSaleMargin(storeId,text,year);
     }
 
+    @GetMapping("/store/order")
+    @ApiOperation(value = "订单概览")
+    @ApiImplicitParam(name = "store_id", value = "门店id", dataType = "String")
+    public HttpResponse storeOrderOverView(@RequestParam(value = "store_id") String storeId){
+        LOGGER.info("获取门店订单概览......",storeId);
+        return storeOverviewService.storeOrderOverView(storeId);
+    }
+
 }
