@@ -197,4 +197,20 @@ public class StoreOverviewServiceImpl implements StoreOverviewService{
             return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER,"text="+text);
         }
     }
+
+    /**
+     *  首页订单概览
+     * @param storeId
+     * @return
+     */
+    @Override
+    public HttpResponse storeOrderOverView(String storeId) {
+        if(StringUtils.isEmpty(storeId)){
+            return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER,"storeId="+storeId);
+        }
+        // 获取当年门店订单概览
+        List<StoreSaleOverViewResp> storeSaleOverViewResps = storeOverviewDao.storeOrderOverView(storeId);
+
+        return HttpResponse.success(storeSaleOverViewResps);
+    }
 }

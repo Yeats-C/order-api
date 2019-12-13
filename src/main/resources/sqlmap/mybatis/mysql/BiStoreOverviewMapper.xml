@@ -159,5 +159,14 @@
         where store_id = #{storeId} and stat_year = #{year}
     </select>
 
+    <select id="storeOrderOverView" resultType="com.aiqin.mgs.order.api.domain.response.sales.StoreSaleOverViewResp">
+        select
+        id,stat_year_month as statYearMonth,stat_year as statYear,stat_month as statMonth,store_id as storeId,store_name as storeName,
+        order_num as orderNum,sale_amt as saleAmt,last_month_sale_amt as lastMonthSaleAmt,last_year_sale_amt as lastYearSaleAmt,
+        chain_growth as chaingrowth,year_on_year_growth as yearOnYearGrowth
+        from bi_order_overview
+        where store_id = #{storeId}
+    </select>
+
 </mapper>
 
