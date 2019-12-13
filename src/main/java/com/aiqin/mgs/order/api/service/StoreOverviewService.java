@@ -46,5 +46,12 @@ public interface StoreOverviewService {
      */
     HttpResponse storeTransforRate(String storeId, Integer text, String year, String month);
 
-
+    /**
+     *  爱掌柜首页概览门店销售毛利
+     * @param storeId
+     * @param text
+     * @param year
+     * @return
+     */
+    HttpResponse storeSaleMargin(String storeId, Integer text, String year);
 }
