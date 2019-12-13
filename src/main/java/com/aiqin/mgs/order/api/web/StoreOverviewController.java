@@ -94,4 +94,25 @@ public class StoreOverviewController {
         return storeOverviewService.storeTransforRate(storeId,text,year,month);
     }
 
+    @GetMapping("/store/margin")
+    @ApiOperation(value = "销售毛利")
+    @ApiImplicitParams({@ApiImplicitParam(name = "store_id", value = "门店id", dataType = "String"),
+            @ApiImplicitParam(name = "text", value = "状态(0当月,1总毛利额,2,18A毛利额)", dataType = "Integer"),
+            @ApiImplicitParam(name = "year", value = "年", dataType = "String"),
+    })
+    public HttpResponse storeSaleMargin(@RequestParam(value = "store_id") String storeId,
+                                          @RequestParam(value = "text") Integer text,
+                                          @RequestParam(value = "year", required = false) String year){
+        LOGGER.info("获取门店转化率数据......",storeId,text,year);
+        return storeOverviewService.storeSaleMargin(storeId,text,year);
+    }
+
+    @GetMapping("/store/order")
+    @ApiOperation(value = "订单概览")
+    @ApiImplicitParam(name = "store_id", value = "门店id", dataType = "String")
+    public HttpResponse storeOrderOverView(@RequestParam(value = "store_id") String storeId){
+        LOGGER.info("获取门店订单概览......",storeId);
+        return storeOverviewService.storeOrderOverView(storeId);
+    }
+
 }

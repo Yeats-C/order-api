@@ -18,6 +18,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class StoreOverviewServiceImpl implements StoreOverviewService{
         }
 
         StoreSalesAchievedResp storeSalesAchievedResp = new StoreSalesAchievedResp();
-        // 根据状态获取不同客流数据--状态(0当月,1当年,2选择年月)
+        // 根据状态获取不同数据的销售额--状态(0当月,1当年,2选择年月3,昨日)
         if(Global.STORE_STATUS_0 == text){
             month = DayUtil.getYearMonthStr();
             List<StoreSalesAchievedYearMonth> storeSalesAchievedYearMonths = storeOverviewDao.storeSalesAchievedMonthly(storeId, month);
@@ -79,7 +80,7 @@ public class StoreOverviewServiceImpl implements StoreOverviewService{
         }
 
         StoreSalesEighteenAchievedResp storeSalesEighteenAchievedResp = new StoreSalesEighteenAchievedResp();
-        // 根据状态获取不同客流数据--状态(0当月,1当年,2选择年月)
+        // 根据状态获取不同数据的18A销售额--状态(0当月,1当年,2选择年月)
         if(Global.STORE_STATUS_0 == text){
             month = DayUtil.getYearMonthStr();
             List<StoreSalesAchievedYearMonth> storeSalesAchievedYearMonths = storeOverviewDao.storeEighteenSalesAchievedMonthly(storeId, month);
@@ -158,5 +159,58 @@ public class StoreOverviewServiceImpl implements StoreOverviewService{
             return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER,"text="+text);
         }
         return HttpResponse.success(storeTransforRateResp);
+    }
+
+    /**
+     *  首页销售毛利
+     *
+     * @param storeId
+     * @param text
+     * @param year
+     * @return
+     */
+    @Override
+    public HttpResponse storeSaleMargin(String storeId, Integer text, String year) {
+        if(StringUtils.isEmpty(storeId)){
+            return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER,"storeId="+storeId);
+        }
+
+        StoreSaleMarginResp storeSaleMarginResp = new StoreSaleMarginResp();
+        // 根据状态获取不同销售毛利--状态(0当月,1总毛利额,2,18A毛利额)
+        if(Global.STORE_STATUS_0 == text){
+            // 获取当月的销售毛利和18a销售毛利
+            String month = DayUtil.getYearMonthStr();
+            BigDecimal saleMargin = storeOverviewDao.storeSaleMargin(storeId, month);
+            BigDecimal eighteenSaleMargin = storeOverviewDao.storeEighteenSaleMargin(storeId, month);
+            storeSaleMarginResp.setSaleMargin(saleMargin);
+            storeSaleMarginResp.setEighteenSaleMargin(eighteenSaleMargin);
+            return HttpResponse.success(storeSaleMarginResp);
+        }else if(Global.STORE_STATUS_1 == text){
+            // 获取当年销售毛利
+            List<StoreSaleMarginResp> storeSaleMarginResps = storeOverviewDao.storeSaleMarginYear(storeId, year);
+            return HttpResponse.success(storeSaleMarginResps);
+        }else if(Global.STORE_STATUS_2 == text){
+            // 获取当年18A销售毛利
+            List<StoreSaleMarginResp> storeSaleMarginResps = storeOverviewDao.storeEighteenSaleMarginYear(storeId, year);
+            return HttpResponse.success(storeSaleMarginResps);
+        }else {
+            return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER,"text="+text);
+        }
+    }
+
+    /**
+     *  首页订单概览
+     * @param storeId
+     * @return
+     */
+    @Override
+    public HttpResponse storeOrderOverView(String storeId) {
+        if(StringUtils.isEmpty(storeId)){
+            return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER,"storeId="+storeId);
+        }
+        // 获取当年门店订单概览
+        List<StoreSaleOverViewResp> storeSaleOverViewResps = storeOverviewDao.storeOrderOverView(storeId);
+
+        return HttpResponse.success(storeSaleOverViewResps);
     }
 }

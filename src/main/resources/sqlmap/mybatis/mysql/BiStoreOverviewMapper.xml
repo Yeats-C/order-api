@@ -126,5 +126,47 @@
         from bi_store_transfor_rate_daily
         where store_id = #{storeId} and stat_year = #{year} and stat_month = #{month}
     </select>
+
+    <select id="storeSaleMargin" resultType="java.math.BigDecimal">
+        select
+        sale_margin as saleMargin
+        from bi_month_sale_margin
+        where store_id = #{storeId} and stat_year_month = #{month}
+    </select>
+
+    <select id="storeEighteenSaleMargin" resultType="java.math.BigDecimal">
+        select
+        sale_margin as saleMargin
+        from bi_month_18a_sale_margin
+        where store_id = #{storeId} and stat_year_month = #{month}
+    </select>
+
+    <select id="storeSaleMarginYear" resultType="com.aiqin.mgs.order.api.domain.response.sales.StoreSaleMarginResp">
+        select
+        id,stat_year_month as statYearMonth,stat_year as statYear,stat_month as statMonth,store_id as storeId,store_name as storeName,
+        sale_margin as saleMargin,last_month_margin as lastMonthMargin,last_year_margin as lastYearMargin,
+        chain_growth as chainGrowth,year_on_year_growth as yearOnYearGrowth
+        from bi_month_sale_margin
+        where store_id = #{storeId} and stat_year = #{year}
+    </select>
+
+    <select id="storeEighteenSaleMarginYear" resultType="com.aiqin.mgs.order.api.domain.response.sales.StoreSaleMarginResp">
+        select
+         id,stat_year_month as statYearMonth,stat_year as statYear,stat_month as statMonth,store_id as storeId,store_name as storeName,
+        sale_margin as saleMargin,last_month_margin as lastMonthMargin,last_year_margin as lastYearMargin,
+        chain_growth as chainGrowth,year_on_year_growth as yearOnYearGrowth
+        from bi_month_18a_sale_margin
+        where store_id = #{storeId} and stat_year = #{year}
+    </select>
+
+    <select id="storeOrderOverView" resultType="com.aiqin.mgs.order.api.domain.response.sales.StoreSaleOverViewResp">
+        select
+        id,stat_year_month as statYearMonth,stat_year as statYear,stat_month as statMonth,store_id as storeId,store_name as storeName,
+        order_num as orderNum,sale_amt as saleAmt,last_month_sale_amt as lastMonthSaleAmt,last_year_sale_amt as lastYearSaleAmt,
+        chain_growth as chaingrowth,year_on_year_growth as yearOnYearGrowth
+        from bi_order_overview
+        where store_id = #{storeId}
+    </select>
+
 </mapper>
 

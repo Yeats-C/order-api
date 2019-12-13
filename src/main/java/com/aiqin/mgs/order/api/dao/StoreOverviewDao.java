@@ -4,11 +4,10 @@ import com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateD
 import com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateYearMonth;
 import com.aiqin.mgs.order.api.domain.response.customer.CustomreFlowDaily;
 import com.aiqin.mgs.order.api.domain.response.customer.CustomreFlowYearMonth;
-import com.aiqin.mgs.order.api.domain.response.sales.StoreSalesAchievedDaily;
-import com.aiqin.mgs.order.api.domain.response.sales.StoreSalesAchievedYearMonth;
-import com.aiqin.mgs.order.api.domain.response.sales.StoreSalesEighteenAchievedBrand;
+import com.aiqin.mgs.order.api.domain.response.sales.*;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface StoreOverviewDao {
@@ -110,6 +109,40 @@ public interface StoreOverviewDao {
      */
     List<StoreTransforRateDaily> storeTransforRateYearMonthly(@Param("storeId") String storeId,@Param("year") String year,@Param("month") String month);
 
+    /**
+     *  查询门店当月销售毛利
+     * @param storeId
+     * @param month
+     * @return
+     */
+    BigDecimal storeSaleMargin(@Param("storeId") String storeId,@Param("month") String month);
 
+    /**
+     *  查询门店当月18销售毛利
+     * @param storeId
+     * @param month
+     * @return
+     */
+    BigDecimal storeEighteenSaleMargin(@Param("storeId") String storeId,@Param("month") String month);
 
+    /**
+     *  查询门店当年销售毛利
+     * @param storeId
+     * @param year
+     */
+    List<StoreSaleMarginResp> storeSaleMarginYear(@Param("storeId") String storeId,@Param("year") String year);
+
+    /**
+     *  查询门店当年18销售毛利
+     * @param storeId
+     * @param year
+     */
+    List<StoreSaleMarginResp> storeEighteenSaleMarginYear(@Param("storeId") String storeId,@Param("year") String year);
+
+    /**
+     *  查询门店订单概览
+     * @param storeId
+     * @return
+     */
+    List<StoreSaleOverViewResp> storeOrderOverView(@Param("storeId") String storeId);
 }
