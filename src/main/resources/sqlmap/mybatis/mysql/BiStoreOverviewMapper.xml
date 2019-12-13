@@ -2,6 +2,80 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aiqin.mgs.order.api.dao.StoreOverviewDao">
 
+    <select id="storeSalesAchievedMonthly" resultType="com.aiqin.mgs.order.api.domain.response.sales.StoreSalesAchievedYearMonth">
+        select
+        id,stat_year_month as statYearMonth,stat_year as statYear,stat_month as statMonth,
+        store_id as storeId,store_code as storeCode, store_name as storeName,
+        goal_sale_amt as goalSaleAmt,sale_amt as saleAmt,sale_cost as saleCost,
+        sale_num as saleNum,sale_margin as saleMargin,different_amt as differentAmt,
+        is_satisfy_code as isSatisfyCode,is_satisfy as isSatisfy
+        from bi_total_sales_achieved_month
+        where store_id = #{storeId} and stat_year_month = #{month}
+    </select>
+
+    <select id="storeSalesAchievedYear" resultType="com.aiqin.mgs.order.api.domain.response.sales.StoreSalesAchievedYearMonth">
+        select
+        id,stat_year_month as statYearMonth,stat_year as statYear,stat_month as statMonth,
+        store_id as storeId,store_code as storeCode, store_name as storeName,
+        goal_sale_amt as goalSaleAmt,sale_amt as saleAmt,sale_cost as saleCost,
+        sale_num as saleNum,sale_margin as saleMargin,different_amt as differentAmt,
+        is_satisfy_code as isSatisfyCode,is_satisfy as isSatisfy
+        from bi_total_sales_achieved_month
+        where store_id = #{storeId} and stat_year = #{year}
+    </select>
+
+    <select id="storeSalesAchievedYearMonthly" resultType="com.aiqin.mgs.order.api.domain.response.sales.StoreSalesAchievedDaily">
+        select
+        id,stat_year_month_day as statYearMonthDay,stat_year as statYear,stat_month as statMonth,stat_day as statDay,
+        store_id as storeId,store_code as storeCode,store_name as storeName,
+        goal_sale_amt as goalSaleAmt,sale_amt as saleAmt,different_amt as differentAmt
+        from bi_total_sales_achieved_day
+        where store_id = #{storeId} and stat_year = #{year} and stat_month = #{month}
+    </select>
+
+    <select id="storeSalesAchievedYesterday" resultType="com.aiqin.mgs.order.api.domain.response.sales.StoreSalesAchievedDaily">
+        select
+        id,stat_year_month_day as statYearMonthDay,stat_year as statYear,stat_month as statMonth,stat_day as statDay,
+        store_id as storeId,store_code as storeCode,store_name as storeName,
+        goal_sale_amt as goalSaleAmt,sale_amt as saleAmt,different_amt as differentAmt
+        from bi_total_sales_achieved_day
+        where store_id = #{storeId} and stat_year = #{year} and stat_month = #{month} and stat_day = #{day}
+    </select>
+
+
+    <select id="storeEighteenSalesAchievedMonthly" resultType="com.aiqin.mgs.order.api.domain.response.sales.StoreSalesAchievedYearMonth">
+        select
+        id,stat_year_month as statYearMonth,stat_year as statYear,stat_month as statMonth,
+        store_id as storeId,store_code as storeCode, store_name as storeName,
+        goal_sale_amt as goalSaleAmt,sale_amt as saleAmt,sale_cost as saleCost,
+        sale_num as saleNum,sale_margin as saleMargin,different_amt as differentAmt,
+        is_satisfy_code as isSatisfyCode,is_satisfy as isSatisfy
+        from bi_month_18a_total_sale_month
+        where store_id = #{storeId} and stat_year_month = #{month}
+    </select>
+
+    <select id="storeEighteenSalesAchievedYear" resultType="com.aiqin.mgs.order.api.domain.response.sales.StoreSalesAchievedYearMonth">
+        select
+        id,stat_year_month as statYearMonth,stat_year as statYear,stat_month as statMonth,
+        store_id as storeId,store_code as storeCode, store_name as storeName,
+        goal_sale_amt as goalSaleAmt,sale_amt as saleAmt,sale_cost as saleCost,
+        sale_num as saleNum,sale_margin as saleMargin,different_amt as differentAmt,
+        is_satisfy_code as isSatisfyCode,is_satisfy as isSatisfy
+        from bi_month_18a_total_sale_month
+        where store_id = #{storeId} and stat_year = #{year}
+    </select>
+
+    <select id="storeEighteenSalesAchievedBrand" resultType="com.aiqin.mgs.order.api.domain.response.sales.StoreSalesEighteenAchievedBrand">
+        select
+        id,stat_year_month as statYearMonth,stat_year as statYear,stat_month as statMonth,
+        store_id as storeId,store_code as storeCode, store_name as storeName,brand_code as brandCode,
+        brand_name as brandName,goal_sale_amt as goalSaleAmt,sale_amt as saleAmt,sale_cost as saleCost,
+        sale_amt as saleAmt,sale_cost as saleCost,sale_num as saleNum,sale_margin as saleMargin,
+        goal_sale_amt as goalSaleAmt,different_amt as differentAmt
+        from bi_month_18a_brand_sale_month
+        where store_id = #{storeId} and stat_year = #{year} and stat_month = #{month}
+    </select>
+
     <select id="storeCustomerFlowMonthly" resultType="com.aiqin.mgs.order.api.domain.response.customer.CustomreFlowYearMonth">
         select
         id,stat_year_month as statYearMonth,stat_year as statYear,stat_month as statMonth,
@@ -23,6 +97,33 @@
         id,stat_year_month_day as statYearMonthDay,stat_year as statYear,stat_month as statMonth,stat_day as statDay,
         store_id as storeId,store_name as storeName,total_customer_flow as totalCustomerFlow,goal_num as goalNum,different_num as differentNum
         from bi_customer_flow_daily
+        where store_id = #{storeId} and stat_year = #{year} and stat_month = #{month}
+    </select>
+
+    <select id="storeTransforRateMonthly" resultType="com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateYearMonth">
+        select
+        id,stat_year_month as statYearMonth,stat_year as statYear,stat_month as statMonth,
+        store_id as storeId,store_name as storeName,total_customer_flow as totalCustomerFlow,
+        order_num as orderNum,goal_rate as goalRate,actual_transfor_rate as actualTransforRate
+        from bi_store_transfor_rate_monthly
+        where store_id = #{storeId} and stat_year_month = #{month}
+    </select>
+
+    <select id="storeTransforRateYear" resultType="com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateYearMonth">
+        select
+        id,stat_year_month as statYearMonth,stat_year as statYear,stat_month as statMonth,
+        store_id as storeId,store_name as storeName,total_customer_flow as totalCustomerFlow,
+        order_num as orderNum,goal_rate as goalRate,actual_transfor_rate as actualTransforRate
+        from bi_store_transfor_rate_monthly
+        where store_id = #{storeId} and stat_year = #{year}
+    </select>
+
+    <select id="storeTransforRateYearMonthly" resultType="com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateDaily">
+        select
+        id,stat_year_month_day as statYearMonthDay,stat_year as statYear,stat_month as statMonth,stat_day as statDay,
+        store_id as storeId,store_name as storeName,total_customer_flow as totalCustomerFlow,
+        order_num as orderNum,goal_rate as goalRate,actual_transfor_rate as actualTransforRate
+        from bi_store_transfor_rate_daily
         where store_id = #{storeId} and stat_year = #{year} and stat_month = #{month}
     </select>
 </mapper>

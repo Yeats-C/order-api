@@ -61,7 +61,10 @@ public class OrderbyReceiptSumResponse{
     @ApiModelProperty("退款订单数")
     @JsonProperty("return_order_amount")
     private Integer returnOrderAmount;
-    
+
+	@ApiModelProperty("上次交接时间")
+	@JsonProperty("loading_start")
+	private String loadingStart;
     
 
 	public Long getPayPrice() {
@@ -160,8 +163,13 @@ public class OrderbyReceiptSumResponse{
 		this.payType = payType;
 	}
 
-	
-	
+	public String getLoadingStart() {
+		return loadingStart;
+	}
+
+	public void setLoadingStart(String loadingStart) {
+		this.loadingStart = loadingStart;
+	}
 }
 
 
