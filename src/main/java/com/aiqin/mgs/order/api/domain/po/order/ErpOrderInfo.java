@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.domain.po.order;
 
 import com.aiqin.mgs.order.api.component.enums.*;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -15,6 +16,7 @@ import java.util.List;
  * @date 2019/12/9 9:49
  */
 @Data
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class ErpOrderInfo extends ErpOrderBase {
 
     /***订单id*/

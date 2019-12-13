@@ -29,7 +29,7 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping("/erpOrderCreateController")
-@Api("订单创建")
+@Api(tags = "ERP订单创建")
 public class ErpOrderCreateController {
 
     private static final Logger logger = LoggerFactory.getLogger(ErpOrderCreateController.class);
