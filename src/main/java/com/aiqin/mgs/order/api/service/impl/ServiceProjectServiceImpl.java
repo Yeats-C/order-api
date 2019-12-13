@@ -266,13 +266,13 @@ public class ServiceProjectServiceImpl  implements ServiceProjectService {
             LOGGER.info("通过门店编号、名称、用户手机号和时间查询订单的信息，请求参数为{}", reduceDetailRequest);
             PageResData<ServiceProjectReduceDetail> pageResData = new PageResData<>();
             reduceDetailRequest.setBeginIndex((reduceDetailRequest.getPageNo()-1)*reduceDetailRequest.getPageSize());
-
             List<ServiceProjectReduceDetail> serviceProjectReduceDetailList = serviceProjectReduceDetailDao.selectReduceDetailByCondition(reduceDetailRequest);
             serviceProjectReduceDetailList.forEach(serviceProjectReduceDetail -> serviceProjectReduceDetail.setOrderType(reduceDetailRequest.getOrderType()));
             Integer totalCount = serviceProjectReduceDetailDao.countReduceDetailByCondition(reduceDetailRequest);
             pageResData.setDataList(serviceProjectReduceDetailList);
             pageResData.setTotalCount(totalCount);
-            /*
+
+/*
             if (reduceDetailRequest.getOrderType()!=null && !Global.ORDER_TYPE_BUY.equals(reduceDetailRequest.getOrderType())) {
                 // 扣减单和退次单查询
                 List<ServiceProjectReduceDetail> serviceProjectReduceDetailList = serviceProjectReduceDetailDao.selectReduceDetailByCondition(reduceDetailRequest);
