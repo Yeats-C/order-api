@@ -16,7 +16,7 @@ public class ErpOrderCancelResultRequest {
     @ApiModelProperty(value = "订单编号")
     private String orderCode;
     @ApiModelProperty(value = "结果 1可以取消 0不可取消")
-    private String status;
+    private Integer status;
     @ApiModelProperty(value = "不可取消原因（选填）")
     private String reason;
 }
