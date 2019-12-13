@@ -48,7 +48,7 @@
         <if test=" orderItemCode != null and orderItemCode != '' ">
             and order_item_code = #{orderItemCode}
         </if>
-        order by create_time desc
+        order by create_time asc, order_item_code asc
     </select>
 
     <update id="updateByPrimaryKeySelective">
