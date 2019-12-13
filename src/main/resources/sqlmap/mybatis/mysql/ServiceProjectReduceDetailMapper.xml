@@ -244,6 +244,7 @@
                 and TO_DAYS(#{queryTime,jdbcType=TIMESTAMP}) = TO_DAYS(create_time)
             </if>
         </where>
+        order by id desc
         limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
     </select>
     <select id="countReduceDetailByCondition" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest" resultType="java.lang.Integer">
