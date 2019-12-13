@@ -6,6 +6,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayCallbackRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPayResultResponse;
@@ -89,6 +90,23 @@ public class ErpOrderPayController {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {
             logger.error("订单支付回调异常：{}", e);
+            response = HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
+        }
+        return response;
+    }
+
+    @PostMapping("/getOrderPayRepayInfo")
+    @ApiOperation(value = "查询确认收款信息")
+    public HttpResponse getOrderPayRepayInfo(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
+        HttpResponse response = HttpResponse.success();
+        try {
+            ErpOrderPay payRepayInfo = erpOrderPayService.getOrderPayRepayInfo(erpOrderPayRequest);
+            response.setData(payRepayInfo);
+        } catch (BusinessException e) {
+            logger.error("校验并同步订单支付状态异常：{}", e);
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            logger.error("校验并同步订单支付状态异常：{}", e);
             response = HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
         }
         return response;

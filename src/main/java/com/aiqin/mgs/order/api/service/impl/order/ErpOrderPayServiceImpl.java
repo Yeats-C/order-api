@@ -386,6 +386,39 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
     }
 
     @Override
+    public ErpOrderPay getOrderPayRepayInfo(ErpOrderPayRequest erpOrderPayRequest) {
+        AuthToken auth = AuthUtil.getCurrentAuth();
+
+        if (erpOrderPayRequest == null || StringUtils.isEmpty(erpOrderPayRequest.getOrderCode())) {
+            throw new BusinessException("空订单编码");
+        }
+        //订单
+        ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(erpOrderPayRequest.getOrderCode());
+        if (order == null) {
+            throw new BusinessException("无效的订单编码");
+        }
+        ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByFeeId(order.getFeeId());
+        if (orderFee == null) {
+            throw new BusinessException("订单费用信息异常");
+        }
+        ErpOrderPay orderPay = this.getOrderPayByPayId(orderFee.getPayId());
+        if (orderPay == null) {
+            throw new BusinessException("订单费用支付信息异常");
+        }
+
+        ErpOrderPayStatusResponse orderPayStatus = erpOrderRequestService.getOrderPayStatus(orderPay.getPayId());
+        if (!orderPayStatus.isRequestSuccess()) {
+            throw new BusinessException("查询支付状态异常");
+        }
+        ErpOrderPay result = new ErpOrderPay();
+        result.setPayFee(orderPay.getPayFee());
+        result.setPayStatus(orderPayStatus.getPayStatusEnum().getCode());
+        result.setPayStartTime(orderPay.getPayStartTime());
+        result.setPayCode(orderPay.getPayCode());
+        return result;
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void orderPayRepay(ErpOrderPayRequest erpOrderPayRequest) {
         AuthToken auth = AuthUtil.getCurrentAuth();
