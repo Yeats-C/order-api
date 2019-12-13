@@ -93,6 +93,9 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
     @Override
     public void addProductGift(ErpOrderEditRequest erpOrderEditRequest) {
+
+        AuthToken auth = AuthUtil.getCurrentAuth();
+
         if (erpOrderEditRequest == null || StringUtils.isEmpty(erpOrderEditRequest.getOrderCode())) {
             throw new BusinessException("缺失订单编号");
         }
@@ -103,6 +106,13 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         if (order == null) {
             throw new BusinessException("无效的订单编号");
         }
+
+        //订单类型
+        ErpOrderTypeEnum orderTypeEnum = ErpOrderTypeEnum.getEnum(order.getOrderType());
+        if (!orderTypeEnum.isAddProductGift()) {
+            throw new BusinessException(orderTypeEnum.getDesc() + "的订单不能增加赠品行");
+        }
+
         if (!ErpOrderStatusEnum.ORDER_STATUS_1.getCode().equals(order.getOrderStatus())) {
             throw new BusinessException("只有" + ErpOrderStatusEnum.ORDER_STATUS_1.getDesc() + "的订单才能增加赠品行");
         }
@@ -110,11 +120,24 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             throw new BusinessException("订单已经发起支付，不能编辑");
         }
 
+        //订单原商品明细行
+        List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderId());
+        //记录原订单明细行最大行号最后三位数的值
+        int maxLineIndex = 0;
+        for (ErpOrderItem item :
+                orderItemList) {
+            String orderItemCode = item.getOrderItemCode();
+            Integer integer = Integer.valueOf(orderItemCode.substring(orderItemCode.length() - 3));
+            maxLineIndex = maxLineIndex > integer ? maxLineIndex : integer;
+        }
+
+        List<ErpOrderItem> addGiftList = new ArrayList<>();
         Map<String, ProductInfo> skuProductMap = new HashMap<>(16);
         int lineIndex = 0;
         for (ErpOrderItem item :
                 erpOrderEditRequest.getProductGiftList()) {
             lineIndex++;
+            maxLineIndex++;
             if (StringUtils.isEmpty(item.getProductId())) {
                 throw new BusinessException("赠品行第" + lineIndex + "行缺失商品id");
             }
@@ -125,21 +148,50 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 throw new BusinessException("赠品行第" + lineIndex + "行缺少数量");
             }
             ProductInfo product = erpOrderRequestService.getProductDetail(order.getStoreId(), item.getProductId(), item.getSkuCode());
-            if (product != null) {
-                skuProductMap.put(item.getSkuCode(), product);
+            if (product == null) {
+                throw new BusinessException("赠品行第" + lineIndex + "行商品未找到");
             }
+            skuProductMap.put(item.getSkuCode(), product);
+
+            ErpOrderItem orderItem = new ErpOrderItem();
+            //订单ID
+            orderItem.setOrderId(order.getOrderId());
+            //订单商品明细ID
+            orderItem.setOrderItemId(OrderPublic.getUUID());
+            //订单商品明细编码
+            orderItem.setOrderItemCode(order.getOrderCode() + String.format("%03d", maxLineIndex));
+            //商品ID
+            orderItem.setProductId(product.getProductId());
+            //商品编码
+            orderItem.setProductCode(product.getProductCode());
+            //商品名称
+            orderItem.setProductName(product.getProductName());
+            //商品sku码
+            orderItem.setSkuCode(product.getSkuCode());
+            //商品名称
+            orderItem.setSkuName(product.getSkuName());
+            //单位
+            orderItem.setUnit(product.getUnit());
+            //本品赠品标记 ErpProductGiftEnum
+            orderItem.setProductGift(ErpProductGiftEnum.GIFT.getCode());
+            //活动id
+            orderItem.setActivityId(null);
+            //订货数量
+            orderItem.setQuantity(item.getQuantity());
+            //订货价
+            orderItem.setPrice(BigDecimal.ZERO);
+            //订货金额
+            orderItem.setMoney(BigDecimal.ZERO);
+            //活动优惠金额
+            orderItem.setActivityMoney(BigDecimal.ZERO);
+            //实际支付金额
+            orderItem.setActualMoney(BigDecimal.ZERO);
+            //行均摊金额
+            orderItem.setShareMoney(BigDecimal.ZERO);
+            addGiftList.add(orderItem);
         }
 
-        //订单原商品明细行
-        List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderId());
-        int maxLineIndex = 0;
-        for (ErpOrderItem item :
-                orderItemList) {
-            String orderItemCode = item.getOrderItemCode();
-            Integer integer = Integer.valueOf(orderItemCode.substring(orderItemCode.length() - 3));
-            maxLineIndex = maxLineIndex > integer ? maxLineIndex : integer;
-        }
-
+        erpOrderItemService.saveOrderItemList(addGiftList, auth);
 
     }
 

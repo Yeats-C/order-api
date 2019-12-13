@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.dao.order;
 
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -50,13 +51,13 @@ public interface ErpOrderInfoDao {
     /**
      * 查询订单列表
      *
-     * @param erpOrderInfo
+     * @param erpOrderQueryRequest
      * @return java.util.List<com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo>
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/10 20:05
      */
-    List<ErpOrderInfo> findOrderList(ErpOrderInfo erpOrderInfo);
+    List<ErpOrderInfo> findOrderList(ErpOrderQueryRequest erpOrderQueryRequest);
 
     /**
      * 查询子订单列表
