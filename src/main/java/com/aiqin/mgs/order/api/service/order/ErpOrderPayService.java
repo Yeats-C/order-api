@@ -110,6 +110,17 @@ public interface ErpOrderPayService {
     String endPay(String payId, boolean manual);
 
     /**
+     * 查询确认收款信息
+     *
+     * @param erpOrderPayRequest
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/10 9:48
+     */
+    ErpOrderPay getOrderPayRepayInfo(ErpOrderPayRequest erpOrderPayRequest);
+
+    /**
      * 校验并更正订单支付信息
      *
      * @param erpOrderPayRequest

@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.po.order;
 
+import com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -22,6 +23,8 @@ public class ErpOrderFee extends ErpOrderBase {
     private String payId;
     /***支付状态*/
     private Integer payStatus;
+    /***支付状态描述*/
+    private String payStatusDesc;
     /***订单总额*/
     private BigDecimal totalMoney;
     /***活动优惠金额*/
@@ -37,4 +40,8 @@ public class ErpOrderFee extends ErpOrderBase {
 
     /***订单支付*/
     private ErpOrderPay orderPay;
+
+    public String getPayStatusDesc() {
+        return ErpPayStatusEnum.getEnumDesc(payStatus);
+    }
 }

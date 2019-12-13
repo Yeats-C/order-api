@@ -22,7 +22,7 @@ import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/erpOrderQueryController")
-@Api("订单查询")
+@Api(tags = "ERP订单查询")
 public class ErpOrderQueryController {
 
     private static final Logger logger = LoggerFactory.getLogger(ErpOrderQueryController.class);
@@ -30,7 +30,7 @@ public class ErpOrderQueryController {
     @Resource
     private ErpOrderQueryService erpOrderQueryService;
 
-    @GetMapping("/findOrderList")
+    @PostMapping("/findOrderList")
     @ApiOperation(value = "查询销售单订单列表")
     public HttpResponse findOrderList(@RequestBody ErpOrderInfo erpOrderInfo) {
         HttpResponse response = HttpResponse.success();
@@ -47,7 +47,7 @@ public class ErpOrderQueryController {
         return response;
     }
 
-    @GetMapping("/getOrderDetail")
+    @PostMapping("/getOrderDetail")
     @ApiOperation(value = "查询订单详情")
     public HttpResponse getOrderDetail(@RequestBody ErpOrderInfo erpOrderInfo) {
         HttpResponse response = HttpResponse.success();

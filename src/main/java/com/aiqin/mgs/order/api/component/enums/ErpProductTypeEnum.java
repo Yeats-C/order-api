@@ -18,10 +18,10 @@ import java.util.Map;
 @Getter
 public enum ErpProductTypeEnum {
 
-    /***直送*/
-    DIRECT_SEND(1, "1", "直送"),
     /***配送*/
-    DISTRIBUTION(2, "2", "配送"),
+    DISTRIBUTION(1, "1", "配送"),
+    /***直送*/
+    DIRECT_SEND(2, "2", "直送"),
     /***货架*/
     STORAGE_RACK(3, "3", "货架");
 
