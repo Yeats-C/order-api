@@ -1090,17 +1090,17 @@ public class OrderServiceImpl implements OrderService {
 
             //获取销售额、销售订单数
             OrderbyReceiptSumResponse buyReceiptSum = new OrderbyReceiptSumResponse();
-            buyReceiptSum = orderDao.buyByCashierSum(OrderPublic.getOrderQuery(orderQuery));
+            buyReceiptSum = orderDao.buyByCashierSum(orderQuery);
 
             //获取退款金额、退款订单数、
             OrderbyReceiptSumResponse returnReceiptSum = new OrderbyReceiptSumResponse();
-            returnReceiptSum = orderDao.returnByCashierSum(OrderPublic.getOrderQuery(orderQuery));
+            returnReceiptSum = orderDao.returnByCashierSum(orderQuery);
 
             receiptSumInfo.setSalesAmount(buyReceiptSum.getSalesAmount() != null ? buyReceiptSum.getSalesAmount() : 0);
             receiptSumInfo.setSalesOrderAmount(buyReceiptSum.getSalesOrderAmount() != null ? buyReceiptSum.getSalesOrderAmount() : 0);
             receiptSumInfo.setReturnOrderAmount(returnReceiptSum.getReturnOrderAmount() != null ? returnReceiptSum.getReturnOrderAmount() : 0);
             receiptSumInfo.setReturnPrice(returnReceiptSum.getReturnPrice() != null ? returnReceiptSum.getReturnPrice() : 0);
-
+            receiptSumInfo.setLoadingStart(beginTime);
             return HttpResponse.success(receiptSumInfo);
         } catch (Exception e) {
             LOGGER.error("接口-收银员交班收银情况统计异常：{}", e);
@@ -1555,6 +1555,7 @@ public class OrderServiceImpl implements OrderService {
             String orderCode = "";
             if (orderInfo != null) {
                 orderInfo = addOrderInfo(orderInfo);
+                //存入订单主数据
                 orderId = orderInfo.getOrderId();
                 orderCode = orderInfo.getOrderCode();
                 if (orderId.equals("")) {

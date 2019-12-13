@@ -108,6 +108,9 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
             throw new BusinessException("无效的订单编码");
         }
         ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(order.getOrderId());
+        if (orderFee == null) {
+            throw new BusinessException("订单费用信息异常");
+        }
         if (!ErpOrderStatusEnum.ORDER_STATUS_1.getCode().equals(order.getOrderStatus())) {
             throw new BusinessException("不是" + ErpOrderStatusEnum.ORDER_STATUS_1.getDesc() + "的订单不能发起支付");
         }
@@ -127,15 +130,16 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
             throw new BusinessException("发起支付失败");
         }
 
+        ErpPayStatusEnum paying = ErpPayStatusEnum.PAYING;
         //更新支付信息
         orderPay.setPayStartTime(new Date());
-        orderPay.setPayStatus(ErpPayStatusEnum.PAYING.getCode());
+        orderPay.setPayStatus(paying.getCode());
         orderPay.setPayWay(erpOrderPayRequest.getPayWay());
         this.updateOrderPaySelective(orderPay, auth);
 
-        //更新订单支付状态
-        order.setPayStatus(ErpPayStatusEnum.PAYING.getCode());
-        erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
+        //更新费用信息表
+        orderFee.setPayStatus(paying.getCode());
+        erpOrderFeeService.updateOrderFeeByPrimaryKeySelective(orderFee, auth);
 
         return orderPay.getPayId();
     }
@@ -198,6 +202,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
                     if (ErpPayStatusEnum.FAIL == payStatusResponse.getPayStatusEnum() || ErpPayStatusEnum.SUCCESS == payStatusResponse.getPayStatusEnum()) {
 
                         orderPay.setPayStatus(payStatusResponse.getPayStatusEnum().getCode());
+                        orderPay.setPayCode(payStatusResponse.getPayCode());
                         orderPay.setPayEndTime(new Date());
                         updateOrderPaySelective(orderPay, auth);
                         endPay(payId, false);
@@ -267,28 +272,29 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
         switch (payFeeTypeEnum) {
             //订单费用
             case ORDER_FEE:
-//                ErpOrderInfo order = erpOrderQueryService.getOrderByPayId(payId);
-                //TODO CT 01
-                ErpOrderInfo order = new ErpOrderInfo();
-                if (order == null) {
-                    throw new BusinessException("数据异常");
+                ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByPayId(payId);
+                if (orderFee == null) {
+                    throw new BusinessException("订单费用数据异常");
                 }
-                ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(order.getOrderId());
+                ErpOrderInfo order = erpOrderQueryService.getOrderByOrderId(orderFee.getOrderId());
+                if (order == null) {
+                    throw new BusinessException("订单数据异常");
+                }
                 order.setOrderItemList(erpOrderItemService.selectOrderItemListByOrderId(order.getOrderId()));
                 if (payStatusEnum == ErpPayStatusEnum.SUCCESS) {
+
+                    //获取物流券
+                    BigDecimal goodsCoupon = erpOrderRequestService.getGoodsCoupon(order);
+                    orderFee.setGoodsCoupon(goodsCoupon);
+                    orderFee.setPayStatus(payStatusEnum.getCode());
+                    erpOrderFeeService.updateOrderFeeByPrimaryKeySelective(orderFee, auth);
+
                     if (manual) {
                         order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode().equals(order.getOrderStatus()) ? ErpOrderStatusEnum.ORDER_STATUS_92.getCode() : ErpOrderStatusEnum.ORDER_STATUS_93.getCode());
                     } else {
                         order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_2.getCode());
                     }
-                    order.setPayStatus(payStatusEnum.getCode());
-                    //获取物流券
-                    BigDecimal goodsCoupon = erpOrderRequestService.getGoodsCoupon(order);
-                    //TODO CT 01 物流券
-//                    order.setGoodsCoupon(goodsCoupon);
-                    order.setPayStatus(payStatusEnum.getCode());
                     erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
-
 
                     //请求供应链，获取库存分组，进行拆单
                     ScheduledExecutorService splitService = new ScheduledThreadPoolExecutor(1);
@@ -310,8 +316,11 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
                     }, 0, 1000L, TimeUnit.MILLISECONDS);
 
                 } else if (payStatusEnum == ErpPayStatusEnum.FAIL) {
+
+                    orderFee.setPayStatus(payStatusEnum.getCode());
+                    erpOrderFeeService.updateOrderFeeByPrimaryKeySelective(orderFee, auth);
+
                     order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_99.getCode());
-                    order.setPayStatus(payStatusEnum.getCode());
                     erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
 
                     //解锁库存
@@ -377,6 +386,39 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
     }
 
     @Override
+    public ErpOrderPay getOrderPayRepayInfo(ErpOrderPayRequest erpOrderPayRequest) {
+        AuthToken auth = AuthUtil.getCurrentAuth();
+
+        if (erpOrderPayRequest == null || StringUtils.isEmpty(erpOrderPayRequest.getOrderCode())) {
+            throw new BusinessException("空订单编码");
+        }
+        //订单
+        ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(erpOrderPayRequest.getOrderCode());
+        if (order == null) {
+            throw new BusinessException("无效的订单编码");
+        }
+        ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByFeeId(order.getFeeId());
+        if (orderFee == null) {
+            throw new BusinessException("订单费用信息异常");
+        }
+        ErpOrderPay orderPay = this.getOrderPayByPayId(orderFee.getPayId());
+        if (orderPay == null) {
+            throw new BusinessException("订单费用支付信息异常");
+        }
+
+        ErpOrderPayStatusResponse orderPayStatus = erpOrderRequestService.getOrderPayStatus(orderPay.getPayId());
+        if (!orderPayStatus.isRequestSuccess()) {
+            throw new BusinessException("查询支付状态异常");
+        }
+        ErpOrderPay result = new ErpOrderPay();
+        result.setPayFee(orderPay.getPayFee());
+        result.setPayStatus(orderPayStatus.getPayStatusEnum().getCode());
+        result.setPayStartTime(orderPay.getPayStartTime());
+        result.setPayCode(orderPay.getPayCode());
+        return result;
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void orderPayRepay(ErpOrderPayRequest erpOrderPayRequest) {
         AuthToken auth = AuthUtil.getCurrentAuth();
@@ -384,6 +426,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
         if (erpOrderPayRequest == null || StringUtils.isEmpty(erpOrderPayRequest.getOrderCode())) {
             throw new BusinessException("空订单编码");
         }
+        //订单
         ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(erpOrderPayRequest.getOrderCode());
         if (order == null) {
             throw new BusinessException("无效的订单编码");
@@ -391,27 +434,35 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
         if (!ErpOrderStatusEnum.ORDER_STATUS_1.getCode().equals(order.getOrderStatus()) && !ErpOrderStatusEnum.ORDER_STATUS_99.getCode().equals(order.getOrderStatus())) {
             throw new BusinessException("只有" + ErpOrderStatusEnum.ORDER_STATUS_1.getDesc() + "和" + ErpOrderStatusEnum.ORDER_STATUS_99.getDesc() + "的订单才支持该操作");
         }
+        //订单费用
+        ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(order.getOrderId());
+        if (orderFee == null) {
+            throw new BusinessException("订单费用信息异常");
+        }
+        //订单费用支付单
+        ErpOrderPay orderPay = this.getOrderPayByPayId(orderFee.getPayId());
+        if (orderPay == null) {
+            throw new BusinessException("订单费用支付信息异常");
+        }
 
         //调用支付中心接口 查询支付状态是否成功
-        //TODO CT 01
-//        ErpOrderPayStatusResponse orderPayStatusResponse = erpOrderRequestService.getOrderPayStatus(order.getPayId());
-//        if (orderPayStatusResponse.isRequestSuccess()) {
-//            if (orderPayStatusResponse.getPayStatusEnum() == ErpPayStatusEnum.SUCCESS) {
-//
-//                ErpOrderPay orderPay = this.getOrderPayByPayId(order.getPayId());
-//                orderPay.setPayStatus(ErpPayStatusEnum.SUCCESS.getCode());
-//                orderPay.setPayEndTime(new Date());
-//                this.updateOrderPaySelective(orderPay, auth);
-//
-//                //更新订单状态和支付状态
-//                endPay(order.getPayId(), true);
-//
-//            } else {
-//                throw new BusinessException("订单未支付成功");
-//            }
-//        } else {
-//            throw new BusinessException("查询支付中心订单支付状态失败");
-//        }
+        ErpOrderPayStatusResponse orderPayStatusResponse = erpOrderRequestService.getOrderPayStatus(orderPay.getPayId());
+        if (orderPayStatusResponse.isRequestSuccess()) {
+            if (orderPayStatusResponse.getPayStatusEnum() == ErpPayStatusEnum.SUCCESS) {
+
+                orderPay.setPayStatus(ErpPayStatusEnum.SUCCESS.getCode());
+                orderPay.setPayEndTime(new Date());
+                this.updateOrderPaySelective(orderPay, auth);
+
+                //更新订单状态和支付状态
+                endPay(orderPay.getPayId(), true);
+
+            } else {
+                throw new BusinessException("订单未支付成功");
+            }
+        } else {
+            throw new BusinessException("查询支付中心订单支付状态失败");
+        }
     }
 
     @Override

@@ -233,6 +233,11 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     }
 
     @Override
+    public void applyToCancelOrderRequest(ErpOrderInfo order) {
+
+    }
+
+    @Override
     public boolean areaCheck(StoreInfo storeInfo, List<ErpOrderItem> orderProductItemList) {
         boolean flag = false;
         try {

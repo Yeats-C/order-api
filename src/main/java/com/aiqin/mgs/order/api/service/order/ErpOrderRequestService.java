@@ -133,6 +133,17 @@ public interface ErpOrderRequestService {
      * @date 2019/12/3 17:26
      */
     boolean sendSplitOrderToSupplyChain(ErpOrderInfo order, List<ErpOrderInfo> splitOrderList);
+    
+    /**
+     * 请求供应链取消订单
+     *
+     * @param order
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/12 19:04
+     */
+    void applyToCancelOrderRequest(ErpOrderInfo order);
 
     /**
      * 商品销售区域配置校验

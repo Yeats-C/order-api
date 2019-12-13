@@ -22,18 +22,20 @@ public enum ErpOrderTypeEnum {
     ORDER_TYPE_1(1, "1", "首单配送", ErpProductTypeEnum.DISTRIBUTION, true, true, true, false),
     /***首单赠送*/
     ORDER_TYPE_2(2, "2", "首单赠送", ErpProductTypeEnum.DISTRIBUTION, true, true, false, false),
-    /***首单货架*/
-    ORDER_TYPE_3(3, "3", "首单货架", ErpProductTypeEnum.STORAGE_RACK, true, false, false, false),
-    /***货架补货*/
-    ORDER_TYPE_4(4, "4", "货架补货", ErpProductTypeEnum.STORAGE_RACK, true, false, false, false),
     /***配送补货*/
-    ORDER_TYPE_5(5, "5", "配送补货", ErpProductTypeEnum.DISTRIBUTION, true, true, true, true),
-    /***游乐设备*/
-    ORDER_TYPE_6(6, "6", "游乐设备", ErpProductTypeEnum.STORAGE_RACK, true, false, false, false),
+    ORDER_TYPE_3(3, "3", "配送补货", ErpProductTypeEnum.DISTRIBUTION, true, true, true, true),
+
     /***首单直送*/
-    ORDER_TYPE_7(7, "7", "首单直送", ErpProductTypeEnum.DIRECT_SEND, true, false, true, false),
+    ORDER_TYPE_4(4, "4", "首单直送", ErpProductTypeEnum.DIRECT_SEND, true, false, true, false),
     /***直送补货*/
-    ORDER_TYPE_8(8, "8", "直送补货", ErpProductTypeEnum.DIRECT_SEND, true, false, true, false);
+    ORDER_TYPE_5(5, "5", "直送补货", ErpProductTypeEnum.DIRECT_SEND, true, false, true, false),
+
+    /***首单货架*/
+    ORDER_TYPE_6(6, "6", "首单货架", ErpProductTypeEnum.STORAGE_RACK, true, false, false, false),
+    /***货架补货*/
+    ORDER_TYPE_7(7, "7", "货架补货", ErpProductTypeEnum.STORAGE_RACK, true, false, false, false),
+    /***游乐设备*/
+    ORDER_TYPE_8(8, "8", "游乐设备", ErpProductTypeEnum.STORAGE_RACK, true, false, false, false);
 
     /***数字编码*/
     private Integer code;

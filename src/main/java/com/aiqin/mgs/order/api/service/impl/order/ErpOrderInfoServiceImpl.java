@@ -4,6 +4,7 @@ import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
+import com.aiqin.mgs.order.api.domain.ProductInfo;
 import com.aiqin.mgs.order.api.domain.po.order.*;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderDeliverRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderEditRequest;
@@ -109,6 +110,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             throw new BusinessException("订单已经发起支付，不能编辑");
         }
 
+        Map<String, ProductInfo> skuProductMap = new HashMap<>(16);
         int lineIndex = 0;
         for (ErpOrderItem item :
                 erpOrderEditRequest.getProductGiftList()) {
@@ -122,8 +124,21 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             if (item.getQuantity() == null) {
                 throw new BusinessException("赠品行第" + lineIndex + "行缺少数量");
             }
+            ProductInfo product = erpOrderRequestService.getProductDetail(order.getStoreId(), item.getProductId(), item.getSkuCode());
+            if (product != null) {
+                skuProductMap.put(item.getSkuCode(), product);
+            }
         }
 
+        //订单原商品明细行
+        List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderId());
+        int maxLineIndex = 0;
+        for (ErpOrderItem item :
+                orderItemList) {
+            String orderItemCode = item.getOrderItemCode();
+            Integer integer = Integer.valueOf(orderItemCode.substring(orderItemCode.length() - 3));
+            maxLineIndex = maxLineIndex > integer ? maxLineIndex : integer;
+        }
 
 
     }
