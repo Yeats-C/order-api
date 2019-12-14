@@ -20,6 +20,7 @@
         <result column="type_id" jdbcType="VARCHAR" property="typeId"/>
         <result column="reduce_count" jdbcType="INTEGER" property="reduceCount"/>
         <result column="return_amount" jdbcType="BIGINT" property="returnAmount"/>
+        <result column="guide_name" jdbcType="BIGINT" property="guideName"/>
         <result column="remain_count" jdbcType="INTEGER" property="remainCount"/>
         <result column="cashier_id" jdbcType="VARCHAR" property="cashierId"/>
         <result column="cashier_name" jdbcType="VARCHAR" property="cashierName"/>
@@ -207,82 +208,86 @@
     </insert>
     <select id="selectReduceDetailByCondition" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest" resultMap="BaseResultMap" resultType="java.util.List">
         select
-        <include refid="Base_Column_List"/>
-        from service_project_reduce_detail
+        d.id,d.asset_id,d.order_id,d.order_code,d.order_type,d.customer_id,d.customer_name,d.customer_phone,d.customer_type,d.store_id,d.store_code,d.store_name
+        ,d.project_id,d.project_code,d.project_name,d.type_id,d.reduce_count,d.return_amount,d.remain_count,d.cashier_id,d.cashier_name,d.create_time,d.update_time,a.guide_name
+        from service_project_reduce_detail d ,service_project_asset a
         <where>
+            d.asset_id=a.asset_id and a.pay_status=1
             <if test="storeInfo!=null">
-                and (store_code  LIKE concat(#{storeInfo,jdbcType=VARCHAR},'%') or store_name  LIKE concat(#{storeInfo,jdbcType=VARCHAR},'%') )
+                and (d.store_code  LIKE concat(#{storeInfo,jdbcType=VARCHAR},'%') or store_name  LIKE concat(#{storeInfo,jdbcType=VARCHAR},'%') )
             </if>
             <if test="customerPhone!=null">
-                and customer_phone  LIKE concat(#{customerPhone,jdbcType=VARCHAR},'%')
+                and d.customer_phone  LIKE concat(#{customerPhone,jdbcType=VARCHAR},'%')
             </if>
             <if test="storeId!=null">
-                and store_id  = #{storeId,jdbcType=VARCHAR}
+                and d.store_id  = #{storeId,jdbcType=VARCHAR}
             </if>
             <if test="typeId!=null">
-                and type_id  = #{typeId,jdbcType=VARCHAR}
+                and d.type_id  = #{typeId,jdbcType=VARCHAR}
             </if>
             <if test="projectId!=null">
-                and project_id  = #{projectId,jdbcType=VARCHAR}
+                and d.project_id  = #{projectId,jdbcType=VARCHAR}
             </if>
             <if test="orderId!=null">
-                and order_id = #{orderId,jdbcType=VARCHAR}
+                and d.order_id = #{orderId,jdbcType=VARCHAR}
             </if>
             <if test="orderCode!=null">
-                and order_code = #{orderCode,jdbcType=VARCHAR}
+                and d.order_code = #{orderCode,jdbcType=VARCHAR}
             </if>
             <if test="orderType!=null">
-                and order_type = #{orderType,jdbcType=VARCHAR}
+                and d.order_type = #{orderType,jdbcType=VARCHAR}
             </if>
             <if test="beginTime!=null">
-                and TO_DAYS(#{beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(create_time)
+                and TO_DAYS(#{d.beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(create_time)
             </if>
             <if test="finishTime!=null">
-                and TO_DAYS(#{finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(create_time)
+                and TO_DAYS(#{d.finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(create_time)
             </if>
             <if test="queryTime!=null">
-                and TO_DAYS(#{queryTime,jdbcType=TIMESTAMP}) = TO_DAYS(create_time)
+                and TO_DAYS(#{d.queryTime,jdbcType=TIMESTAMP}) = TO_DAYS(create_time)
             </if>
         </where>
+        order by d.id desc
         limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
     </select>
     <select id="countReduceDetailByCondition" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest" resultType="java.lang.Integer">
         select
         count(1)
-        from service_project_reduce_detail
+        from service_project_reduce_detail d ,service_project_asset a
         <where>
+            d.asset_id=a.asset_id and a.pay_status=1
             <if test="storeInfo!=null">
-                and store_code  LIKE concat(#{storeInfo,jdbcType=VARCHAR},'%') or store_name  LIKE concat(#{storeInfo,jdbcType=VARCHAR},'%')
+                and (d.store_code  LIKE concat(#{storeInfo,jdbcType=VARCHAR},'%') or store_name  LIKE concat(#{storeInfo,jdbcType=VARCHAR},'%') )
             </if>
             <if test="customerPhone!=null">
-                and customer_phone  LIKE concat(#{customerPhone,jdbcType=VARCHAR},'%')
+                and d.customer_phone  LIKE concat(#{customerPhone,jdbcType=VARCHAR},'%')
             </if>
             <if test="storeId!=null">
-                and store_id  = #{storeId,jdbcType=VARCHAR}
+                and d.store_id  = #{storeId,jdbcType=VARCHAR}
             </if>
             <if test="typeId!=null">
-                and type_id  = #{typeId,jdbcType=VARCHAR}
+                and d.type_id  = #{typeId,jdbcType=VARCHAR}
             </if>
             <if test="projectId!=null">
-                and project_id  = #{projectId,jdbcType=VARCHAR}
+                and d.project_id  = #{projectId,jdbcType=VARCHAR}
             </if>
             <if test="orderId!=null">
-                and order_id = #{orderId,jdbcType=VARCHAR}
-            </if>
-            <if test="orderType!=null">
-                and order_type = #{orderType,jdbcType=VARCHAR}
+                and d.order_id = #{orderId,jdbcType=VARCHAR}
             </if>
             <if test="orderCode!=null">
-                and order_code = #{orderCode,jdbcType=VARCHAR}
+                and d.order_code = #{orderCode,jdbcType=VARCHAR}
+            </if>
+            <if test="orderType!=null">
+                and d.order_type = #{orderType,jdbcType=VARCHAR}
             </if>
             <if test="beginTime!=null">
-                and TO_DAYS(#{beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(create_time)
+                and TO_DAYS(#{d.beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(create_time)
             </if>
             <if test="finishTime!=null">
-                and TO_DAYS(#{finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(create_time)
+                and TO_DAYS(#{d.finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(create_time)
             </if>
             <if test="queryTime!=null">
-                and TO_DAYS(#{queryTime,jdbcType=TIMESTAMP}) = TO_DAYS(create_time)
+                and TO_DAYS(#{d.queryTime,jdbcType=TIMESTAMP}) = TO_DAYS(create_time)
             </if>
         </where>
     </select>
