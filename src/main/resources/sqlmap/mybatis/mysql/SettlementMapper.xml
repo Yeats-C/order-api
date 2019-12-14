@@ -34,7 +34,7 @@
     <!-- 接口-结算数据查询 -->
     <select id="jkselectsettlement" resultMap="SettlementMapping" >
     
-         SELECT * FROM settlement_info where 1=1
+         SELECT * FROM settlement_info  where 1=1
          
          <if test="orderId!=null and orderId!=''">
 		 and order_id =#{orderId}

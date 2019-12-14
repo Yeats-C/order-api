@@ -267,7 +267,7 @@ public class ServiceProjectServiceImpl  implements ServiceProjectService {
             PageResData<ServiceProjectReduceDetail> pageResData = new PageResData<>();
             reduceDetailRequest.setBeginIndex((reduceDetailRequest.getPageNo()-1)*reduceDetailRequest.getPageSize());
             List<ServiceProjectReduceDetail> serviceProjectReduceDetailList = serviceProjectReduceDetailDao.selectReduceDetailByCondition(reduceDetailRequest);
-            serviceProjectReduceDetailList.forEach(serviceProjectReduceDetail -> serviceProjectReduceDetail.setOrderType(reduceDetailRequest.getOrderType()));
+           // serviceProjectReduceDetailList.forEach(serviceProjectReduceDetail -> serviceProjectReduceDetail.setOrderType(reduceDetailRequest.getOrderType()));
             Integer totalCount = serviceProjectReduceDetailDao.countReduceDetailByCondition(reduceDetailRequest);
             pageResData.setDataList(serviceProjectReduceDetailList);
             pageResData.setTotalCount(totalCount);
@@ -398,6 +398,7 @@ public class ServiceProjectServiceImpl  implements ServiceProjectService {
                 serviceProjectReduceDetail.setStoreName(serviceProjectAsset.getStoreName());
                 serviceProjectReduceDetail.setGuideId(serviceProjectAsset.getGuideId());
                 serviceProjectReduceDetail.setGuideName(serviceProjectAsset.getGuideName());
+                serviceProjectReduceDetail.setCreateTime(serviceProjectAsset.getCreateTime());
                 for (ServiceProjectAsset serviceProjectAsset1 : serviceProjectAssetList) {
                     if (serviceProjectAsset.getConsumptionPattern().equals(0) && serviceProjectAsset.getIsDirectCustom().equals(0)) {
                         serviceProjectAsset1.setRemainCount(serviceProjectAsset1.getLimitCount() - 1);
