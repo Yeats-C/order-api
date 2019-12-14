@@ -267,7 +267,7 @@ public class ServiceProjectServiceImpl  implements ServiceProjectService {
             PageResData<ServiceProjectReduceDetail> pageResData = new PageResData<>();
             reduceDetailRequest.setBeginIndex((reduceDetailRequest.getPageNo()-1)*reduceDetailRequest.getPageSize());
             List<ServiceProjectReduceDetail> serviceProjectReduceDetailList = serviceProjectReduceDetailDao.selectReduceDetailByCondition(reduceDetailRequest);
-            serviceProjectReduceDetailList.forEach(serviceProjectReduceDetail -> serviceProjectReduceDetail.setOrderType(reduceDetailRequest.getOrderType()));
+           // serviceProjectReduceDetailList.forEach(serviceProjectReduceDetail -> serviceProjectReduceDetail.setOrderType(reduceDetailRequest.getOrderType()));
             Integer totalCount = serviceProjectReduceDetailDao.countReduceDetailByCondition(reduceDetailRequest);
             pageResData.setDataList(serviceProjectReduceDetailList);
             pageResData.setTotalCount(totalCount);
