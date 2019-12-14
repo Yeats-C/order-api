@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.service.impl.order;
 
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.PagesRequest;
+import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.EnumItemInfo;
@@ -14,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -223,4 +225,71 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         erpOrderQueryRequest.setOrderTypeQueryList(orderTypeQueryList);
         return this.findOrderList(erpOrderQueryRequest);
     }
+
+    @Override
+    public ErpOrderInfo getNeedSignOrderDetailByOrderCode(String orderCode) {
+        ErpOrderInfo order = this.getOrderByOrderCode(orderCode);
+        if (order != null) {
+
+            //订单明细行
+            List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderId());
+            order.setOrderItemList(orderItemList);
+
+            BigDecimal shareMoneyTotal = BigDecimal.ZERO;
+            BigDecimal moneyTotal = BigDecimal.ZERO;
+            for (ErpOrderItem item :
+                    orderItemList) {
+                shareMoneyTotal = shareMoneyTotal.add(item.getShareMoney());
+                moneyTotal = moneyTotal.add(item.getMoney());
+            }
+            order.setTotalMoney(moneyTotal);
+            order.setPayMoney(shareMoneyTotal);
+
+            //订单收货人信息
+            ErpOrderConsignee orderConsignee = erpOrderConsigneeService.getOrderConsigneeByOrderId(order.getOrderId());
+            order.setOrderConsignee(orderConsignee);
+
+            //订单物流信息
+            ErpOrderLogistics orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsId(order.getLogisticsId());
+            order.setOrderLogistics(orderLogistics);
+
+        }
+        return order;
+    }
+
+    @Override
+    public int getNeedSignOrderQuantity(String storeCode) {
+        int quantity = 0;
+        if (StringUtils.isEmpty(storeCode)) {
+            throw new BusinessException("缺失门店编码");
+        }
+        ErpOrderInfo query = new ErpOrderInfo();
+        query.setStoreCode(storeCode);
+        query.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_11.getCode());
+        List<ErpOrderInfo> select = erpOrderInfoDao.select(query);
+        if (select != null && select.size() > 0) {
+            for (ErpOrderInfo item :
+                    select) {
+                ErpOrderTypeEnum orderTypeEnum = ErpOrderTypeEnum.getEnum(item.getOrderType());
+                if (orderTypeEnum != null) {
+                    if (!orderTypeEnum.isHasLogisticsFee()) {
+                        quantity++;
+                    }
+                }
+            }
+        }
+
+        ErpOrderInfo logisticsQuery = new ErpOrderInfo();
+        logisticsQuery.setStoreCode(storeCode);
+        logisticsQuery.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_12.getCode());
+        List<ErpOrderInfo> logisticsSelect = erpOrderInfoDao.select(logisticsQuery);
+        if (logisticsSelect != null && logisticsSelect.size() > 0) {
+            for (ErpOrderInfo item :
+                    select) {
+                quantity++;
+            }
+        }
+        return quantity;
+    }
+
 }

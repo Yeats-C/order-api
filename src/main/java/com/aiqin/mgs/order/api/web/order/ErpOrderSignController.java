@@ -6,6 +6,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSignRequest;
 import com.aiqin.mgs.order.api.service.order.ErpOrderInfoService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
@@ -39,12 +40,29 @@ public class ErpOrderSignController {
     @Resource
     private ErpOrderQueryService erpOrderQueryService;
 
-    @PostMapping("/getOrderSignDetail")
-    @ApiOperation(value = "查询待签收订单详情")
-    public HttpResponse getOrderSignDetail(@RequestBody ErpOrderInfo erpOrderInfo) {
+    @PostMapping("/getNeedSignOrderQuantity")
+    @ApiOperation(value = "查询门店未签收订单数量")
+    public HttpResponse getNeedSignOrderQuantity(@RequestBody ErpOrderSignRequest erpOrderSignRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-            ErpOrderInfo order = erpOrderQueryService.getOrderDetailByOrderCode(erpOrderInfo.getOrderCode());
+            int needSignOrderQuantity = erpOrderQueryService.getNeedSignOrderQuantity(erpOrderSignRequest.getStoreCode());
+            response.setData(needSignOrderQuantity);
+        } catch (BusinessException e) {
+            logger.error("查询待签收订单详情：{}", e);
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            logger.error("查询待签收订单详情：{}", e);
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
+    }
+
+    @PostMapping("/getOrderSignDetail")
+    @ApiOperation(value = "查询待签收订单详情")
+    public HttpResponse getOrderSignDetail(@RequestBody ErpOrderSignRequest erpOrderSignRequest) {
+        HttpResponse response = HttpResponse.success();
+        try {
+            ErpOrderInfo order = erpOrderQueryService.getNeedSignOrderDetailByOrderCode(erpOrderSignRequest.getOrderCode());
             response.setData(order);
         } catch (BusinessException e) {
             logger.error("查询待签收订单详情：{}", e);

@@ -95,14 +95,6 @@ public class ErpOrderInfo extends ErpOrderBase {
     /***门店名称*/
     private String storeName;
 
-    /***查询开始时间 yyyy-MM-dd*/
-    private String createTimeStart;
-    /***查询结束时间 yyyy-MM-dd*/
-    private String createTimeEnd;
-    @ApiModelProperty(value = "每页条数")
-    private Integer pageSize;
-    @ApiModelProperty(value = "当前页")
-    private Integer pageNo;
     /***是否支持校验支付 对应列表上的确认收款按钮 1有按钮 0没有按钮*/
     @ApiModelProperty(value = "是否支持校验支付")
     private Integer repayOperation;
