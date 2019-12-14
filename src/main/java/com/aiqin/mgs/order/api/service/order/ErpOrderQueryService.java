@@ -92,4 +92,25 @@ public interface ErpOrderQueryService {
      */
     PageResData<ErpOrderInfo> findRackOrderList(ErpOrderQueryRequest erpOrderQueryRequest);
 
+    /**
+     * 根据订单编号查询待签收订单和商品行详情
+     *
+     * @param orderCode
+     * @return com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/14 14:50
+     */
+    ErpOrderInfo getNeedSignOrderDetailByOrderCode(String orderCode);
+
+    /**
+     * 查询门店未签收订单数量
+     *
+     * @param storeCode 门店编码
+     * @return int
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/14 14:20
+     */
+    int getNeedSignOrderQuantity(String storeCode);
 }
