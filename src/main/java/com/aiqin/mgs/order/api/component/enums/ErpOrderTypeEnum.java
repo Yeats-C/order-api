@@ -19,23 +19,23 @@ import java.util.Map;
 public enum ErpOrderTypeEnum {
 
     /***首单配送*/
-    ORDER_TYPE_1(1, "1", "首单配送", ErpProductTypeEnum.DISTRIBUTION, true, true, true, false, false, true),
+    ORDER_TYPE_1(1, "1", "首单配送", ErpProductTypeEnum.DISTRIBUTION, true, true, true, false, false, true,true,true,true,true,false),
     /***首单赠送*/
-    ORDER_TYPE_2(2, "2", "首单赠送", ErpProductTypeEnum.DISTRIBUTION, true, true, false, false, false, true),
+    ORDER_TYPE_2(2, "2", "首单赠送", ErpProductTypeEnum.DISTRIBUTION, true, true, false, false, false, true,true,true,true,true,false),
     /***配送补货*/
-    ORDER_TYPE_3(3, "3", "配送补货", ErpProductTypeEnum.DISTRIBUTION, true, true, true, true, true, true),
+    ORDER_TYPE_3(3, "3", "配送补货", ErpProductTypeEnum.DISTRIBUTION, true, true, true, true, true, true,true,true,false,true,true),
 
     /***首单直送*/
-    ORDER_TYPE_4(4, "4", "首单直送", ErpProductTypeEnum.DIRECT_SEND, true, false, true, false, false, false),
+    ORDER_TYPE_4(4, "4", "首单直送", ErpProductTypeEnum.DIRECT_SEND, true, false, true, false, false, false,false,false,true,false,false),
     /***直送补货*/
-    ORDER_TYPE_5(5, "5", "直送补货", ErpProductTypeEnum.DIRECT_SEND, true, false, true, false, false, false),
+    ORDER_TYPE_5(5, "5", "直送补货", ErpProductTypeEnum.DIRECT_SEND, true, false, true, false, false, false,false,false,false,false,false),
 
     /***首单货架*/
-    ORDER_TYPE_6(6, "6", "首单货架", ErpProductTypeEnum.STORAGE_RACK, true, false, false, false, false, false),
+    ORDER_TYPE_6(6, "6", "首单货架", ErpProductTypeEnum.STORAGE_RACK, true, false, false, false, false, false,false,false,true,false,false),
     /***货架补货*/
-    ORDER_TYPE_7(7, "7", "货架补货", ErpProductTypeEnum.STORAGE_RACK, true, false, false, false, false, false),
+    ORDER_TYPE_7(7, "7", "货架补货", ErpProductTypeEnum.STORAGE_RACK, true, false, false, false, false, false,false,false,true,false,false),
     /***游乐设备*/
-    ORDER_TYPE_8(8, "8", "游乐设备", ErpProductTypeEnum.STORAGE_RACK, true, false, false, false, false, false);
+    ORDER_TYPE_8(8, "8", "游乐设备", ErpProductTypeEnum.STORAGE_RACK, true, false, false, false, false, false,false,false,true,false,false);
 
     /***数字编码*/
     private Integer code;
@@ -57,8 +57,18 @@ public enum ErpOrderTypeEnum {
     private boolean addProductGift;
     /***需要支付物流费用*/
     private boolean hasLogisticsFee;
+    /***可选活动活动*/
+    private boolean hasActivity;
+    /***可选优惠券*/
+    private boolean hasCoupon;
+    /***自动发起支付*/
+    private boolean autoPay;
+    /***需要锁库存/解锁库存*/
+    private boolean lockStock;
+    /***支付成功返回物流券*/
+    private boolean hasGoodsCoupon;
 
-    ErpOrderTypeEnum(Integer code, String value, String desc, ErpProductTypeEnum erpProductTypeEnum, boolean areaCheck, boolean repertoryCheck, boolean priceCheck, boolean activityCheck, boolean addProductGift, boolean hasLogisticsFee) {
+    ErpOrderTypeEnum(Integer code, String value, String desc, ErpProductTypeEnum erpProductTypeEnum, boolean areaCheck, boolean repertoryCheck, boolean priceCheck, boolean activityCheck, boolean addProductGift, boolean hasLogisticsFee, boolean hasActivity, boolean hasCoupon, boolean autoPay, boolean lockStock, boolean hasGoodsCoupon) {
         this.code = code;
         this.value = value;
         this.desc = desc;
@@ -69,6 +79,11 @@ public enum ErpOrderTypeEnum {
         this.activityCheck = activityCheck;
         this.addProductGift = addProductGift;
         this.hasLogisticsFee = hasLogisticsFee;
+        this.hasActivity = hasActivity;
+        this.hasCoupon = hasCoupon;
+        this.autoPay = autoPay;
+        this.lockStock = lockStock;
+        this.hasGoodsCoupon = hasGoodsCoupon;
     }
 
     /***选项类型*/

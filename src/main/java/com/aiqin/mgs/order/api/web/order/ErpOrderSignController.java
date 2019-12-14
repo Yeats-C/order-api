@@ -45,7 +45,7 @@ public class ErpOrderSignController {
     public HttpResponse getNeedSignOrderQuantity(@RequestBody ErpOrderSignRequest erpOrderSignRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-            int needSignOrderQuantity = erpOrderQueryService.getNeedSignOrderQuantity(erpOrderSignRequest.getStoreCode());
+            int needSignOrderQuantity = erpOrderQueryService.getNeedSignOrderQuantity(erpOrderSignRequest.getStoreId());
             response.setData(needSignOrderQuantity);
         } catch (BusinessException e) {
             logger.error("查询待签收订单详情：{}", e);
