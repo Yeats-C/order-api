@@ -147,7 +147,7 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 			
 			//保存订单售后
 			orderAfterDao.addAfterOrder(orderAfterSaleInfo);
-			
+
 			//保存订单售后明细
 			List<OrderAfterSaleDetailInfo> orderAfterDetailList = orderAfterSaleInfo.getDetailList();
 			orderAfterDetailService.addAfterOrderDetail(orderAfterDetailList,afterSaleId);   
@@ -204,7 +204,9 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 
 			//调用支付中心退款
 			toRefund(orderAfterSaleInfo);
-
+            //退款成功修改退款状态
+            orderAfterSaleInfo.setRefundStatus(1);
+            orderAfterDao.updateRefundStatus(orderAfterSaleInfo);
 			return HttpResponse.success(after_sale_code);
 		
 

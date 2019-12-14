@@ -29,6 +29,7 @@
 <result column="create_by_name" jdbcType="VARCHAR" property="createByName"/>
 <result column="update_by_name" jdbcType="VARCHAR" property="updateByName"/>
 <result column="return_money_type" jdbcType="TINYINT" property="returnMoneyType"/>
+    <result column="refund_status" jdbcType="TINYINT" property="refundStatus"/>
 </resultMap>
 
     
@@ -36,14 +37,14 @@
     <!-- 添加新的订单售后数据 --> 
     <insert id="addAfterOrder" >
         insert into order_after_sale
-        (after_sale_id,after_sale_code,order_id,order_code,member_id,member_name,member_phone,distributor_id,distributor_code,distributor_name,return_price,after_sale_status,after_sale_content,after_sale_type,process_type,receive_name,receive_phone,pay_type,origin_type,order_type,create_time,update_time,create_by,update_by,create_by_name,update_by_name
+        (after_sale_id,after_sale_code,order_id,order_code,member_id,member_name,member_phone,distributor_id,distributor_code,distributor_name,return_price,after_sale_status,after_sale_content,after_sale_type,process_type,receive_name,receive_phone,pay_type,origin_type,order_type,create_time,update_time,create_by,update_by,create_by_name,update_by_name,refund_status
         <if test="returnMoneyType!=null">
         ,return_money_type
         </if>
         )
         values
         (#{afterSaleId},#{afterSaleCode},#{orderId},#{orderCode},#{memberId},#{memberName},#{memberPhone},#{distributorId},#{distributorCode},#{distributorName},#{returnPrice},#{afterSaleStatus},#{afterSaleContent},#{afterSaleType},#{processType},#{receiveName},#{receivePhone},#{payType},#{originType},#{orderType},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},
-        #{createByName},#{updateByName}
+        #{createByName},#{updateByName},#{refundStatus}
         <if test="returnMoneyType!=null">
         ,#{returnMoneyType}
         </if>
@@ -120,6 +121,8 @@
 	<update id="returnStatus" >
 		update order_after_sale set update_by=#{updateBy},update_by_name=#{updateByName},update_time=CURRENT_TIMESTAMP,after_sale_status=#{afterSaleStatus} where after_sale_id = #{afterSaleId}
 	</update>
-    
+    <update id="updateRefundStatus" >
+		update order_after_sale set update_by=#{updateBy},update_by_name=#{updateByName},update_time=CURRENT_TIMESTAMP,refund_status=#{refundStatus} where after_sale_id = #{afterSaleId}
+	</update>
 </mapper>
 
