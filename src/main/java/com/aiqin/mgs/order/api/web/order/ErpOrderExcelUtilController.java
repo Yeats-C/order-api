@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,7 +45,7 @@ public class ErpOrderExcelUtilController {
         return httpResponse;
     }
 
-    @GetMapping("/transformRackOrderProductExcel")
+    @PostMapping("/transformRackOrderProductExcel")
     @ApiOperation(value = "解析货架订单商品模板数据")
     public HttpResponse transformRackOrderProductExcel(MultipartFile file) {
         HttpResponse httpResponse = HttpResponse.success();
