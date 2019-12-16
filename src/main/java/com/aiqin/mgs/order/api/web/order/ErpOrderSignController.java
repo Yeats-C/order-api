@@ -7,6 +7,7 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSignRequest;
+import com.aiqin.mgs.order.api.domain.response.order.ErpOrderSignResponse;
 import com.aiqin.mgs.order.api.service.order.ErpOrderInfoService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
@@ -46,7 +47,9 @@ public class ErpOrderSignController {
         HttpResponse response = HttpResponse.success();
         try {
             int needSignOrderQuantity = erpOrderQueryService.getNeedSignOrderQuantity(erpOrderSignRequest.getStoreId());
-            response.setData(needSignOrderQuantity);
+            ErpOrderSignResponse signResponse = new ErpOrderSignResponse();
+            signResponse.setNeedSignOrderQuantity(needSignOrderQuantity);
+            response.setData(signResponse);
         } catch (BusinessException e) {
             logger.error("查询待签收订单详情：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));

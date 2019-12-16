@@ -260,6 +260,10 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
     @Override
     public int getNeedSignOrderQuantity(String storeId) {
         int quantity = 0;
+        if (1==1) {
+            //TODO CT 测试接口使用
+            return 1;
+        }
         if (StringUtils.isEmpty(storeId)) {
             throw new BusinessException("缺失门店id");
         }
