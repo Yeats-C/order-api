@@ -75,10 +75,12 @@
         SELECT <include refid="Base_Column_List"/>
         FROM order_store_cart
         <where>
-            <if test=" storeId != '' ">
+            <if test="storeId != '' || storeId != null">
                 and store_id = #{storeId}
             </if>
+            <if test="productType != '' || productType != null">
                 and product_type = #{productType}
+            </if>
         </where>
         order by create_time
     </select>
