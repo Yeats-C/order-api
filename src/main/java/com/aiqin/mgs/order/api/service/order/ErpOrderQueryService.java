@@ -106,11 +106,11 @@ public interface ErpOrderQueryService {
     /**
      * 查询门店未签收订单数量
      *
-     * @param storeCode 门店编码
+     * @param storeId 门店id
      * @return int
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/14 14:20
      */
-    int getNeedSignOrderQuantity(String storeCode);
+    int getNeedSignOrderQuantity(String storeId);
 }

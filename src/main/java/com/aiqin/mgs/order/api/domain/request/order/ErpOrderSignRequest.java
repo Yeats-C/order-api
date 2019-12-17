@@ -14,6 +14,8 @@ public class ErpOrderSignRequest {
 
     /***订单编号*/
     private String orderCode;
+    /***门店id*/
+    private String storeId;
     /***门店编号*/
     private String storeCode;
 

@@ -258,13 +258,17 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
     }
 
     @Override
-    public int getNeedSignOrderQuantity(String storeCode) {
+    public int getNeedSignOrderQuantity(String storeId) {
         int quantity = 0;
-        if (StringUtils.isEmpty(storeCode)) {
-            throw new BusinessException("缺失门店编码");
+        if (1==1) {
+            //TODO CT 测试接口使用
+            return 1;
+        }
+        if (StringUtils.isEmpty(storeId)) {
+            throw new BusinessException("缺失门店id");
         }
         ErpOrderInfo query = new ErpOrderInfo();
-        query.setStoreCode(storeCode);
+        query.setStoreId(storeId);
         query.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_11.getCode());
         List<ErpOrderInfo> select = erpOrderInfoDao.select(query);
         if (select != null && select.size() > 0) {
@@ -280,7 +284,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         }
 
         ErpOrderInfo logisticsQuery = new ErpOrderInfo();
-        logisticsQuery.setStoreCode(storeCode);
+        logisticsQuery.setStoreId(storeId);
         logisticsQuery.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_12.getCode());
         List<ErpOrderInfo> logisticsSelect = erpOrderInfoDao.select(logisticsQuery);
         if (logisticsSelect != null && logisticsSelect.size() > 0) {
