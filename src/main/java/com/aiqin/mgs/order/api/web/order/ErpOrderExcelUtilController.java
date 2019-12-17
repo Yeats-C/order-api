@@ -59,7 +59,9 @@ public class ErpOrderExcelUtilController {
                 map.put("spuName", item[1]);
                 map.put("skuCode", item[2]);
                 map.put("skuName", item[3]);
-                map.put("quantity", item[4]);
+                map.put("taxPrice", item[4]);
+                map.put("price", item[5]);
+                map.put("quantity", item[6]);
                 resultList.add(map);
             }
             httpResponse.setData(JSON.toJSON(resultList));
@@ -111,7 +113,7 @@ public class ErpOrderExcelUtilController {
             sheet.setColumnWidth(0, (15 * 256));
 
             cell = row.createCell(1);
-            cell.setCellValue("spu名称(非必填)");
+            cell.setCellValue("spu名称");
             cell.setCellStyle(style);
             sheet.setColumnWidth(1, (30 * 256));
 
@@ -121,14 +123,24 @@ public class ErpOrderExcelUtilController {
             sheet.setColumnWidth(2, (15 * 256));
 
             cell = row.createCell(3);
-            cell.setCellValue("sku名称(非必填)");
+            cell.setCellValue("sku名称");
             cell.setCellStyle(style);
             sheet.setColumnWidth(3, (30 * 256));
 
             cell = row.createCell(4);
-            cell.setCellValue("数量");
+            cell.setCellValue("采购单价");
             cell.setCellStyle(style);
             sheet.setColumnWidth(4, (15 * 256));
+
+            cell = row.createCell(5);
+            cell.setCellValue("销售单价");
+            cell.setCellStyle(style);
+            sheet.setColumnWidth(5, (15 * 256));
+
+            cell = row.createCell(6);
+            cell.setCellValue("数量");
+            cell.setCellStyle(style);
+            sheet.setColumnWidth(6, (15 * 256));
 
 
             // 第五步，写入实体数据
