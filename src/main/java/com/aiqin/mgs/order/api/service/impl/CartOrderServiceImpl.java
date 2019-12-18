@@ -60,7 +60,7 @@ public class CartOrderServiceImpl implements CartOrderService {
         for (CartOrderInfo cartOrderInfo1 : cartOrderInfoList) {
             //获取库房的商品数量和sku码
             int stockProductAmount = cartOrderInfo1.getAmount();
-            String skuId = cartOrderInfo1.getSkuId();
+            String skuId = cartOrderInfo1.getSkuCode();
             LOGGER.info("库存的skuId编码和数量：{},{}", skuId, stockProductAmount);
             //获取前端的商品数量，与库房数量进行比对
             for (Product product : products) {
@@ -71,7 +71,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                     return HttpResponse.failure(ResultCode.STOCK_SHORT1);
                 }
                 CartOrderInfo cartOrderInfo = new CartOrderInfo();
-                cartOrderInfo.setSkuId(cartOrderInfo1.getSkuId());//skuId
+                cartOrderInfo.setSkuCode(cartOrderInfo1.getSkuCode());//skuId
                 cartOrderInfo.setProductId(cartOrderInfo1.getProductId());//商品id
                 cartOrderInfo.setStoreId(cartOrderInfo1.getStoreId());//门店id
                 cartOrderInfo.setPrice(cartOrderInfo1.getPrice());//商品价格
@@ -85,7 +85,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                 try {
                     if (cartOrderInfo != null) {
                         //判断sku是否在购物车里面存在
-                        LOGGER.info("判断SKU商品是否已存在购物车中:{}", cartOrderInfo.getSkuId());
+                        LOGGER.info("判断SKU商品是否已存在购物车中:{}", cartOrderInfo.getSkuCode());
                         String oldAount = cartOrderDao.isYesCart(cartOrderInfo);
                         if (oldAount != null && !oldAount.equals("")) {
                             //已存在购物车的、新添加+已存在购物车的数量=真实数量
@@ -146,8 +146,8 @@ public class CartOrderServiceImpl implements CartOrderService {
      * @return
      */
     @Override
-    public HttpResponse selectCartByStoreId(String storeId, Integer productType, String skuId, Integer lineCheckStatus, Integer number) {
-        HttpResponse<Object> response = new HttpResponse<>();
+    public HttpResponse<CartResponse> selectCartByStoreId(String storeId, Integer productType, String skuId, Integer lineCheckStatus, Integer number) {
+        HttpResponse<CartResponse> response = new HttpResponse<>();
         try {
             CartOrderInfo cartOrderInfo = new CartOrderInfo();
             cartOrderInfo.setStoreId(storeId);
@@ -157,7 +157,7 @@ public class CartOrderServiceImpl implements CartOrderService {
             //检查商品是否被勾选，勾选后，更新数据库标识
             LOGGER.info("商品勾选后，更新勾选状态：{}", lineCheckStatus);
             if (null != skuId && lineCheckStatus.equals(Global.LINECHECKSTATUS_1)) {
-                cartOrderInfo.setSkuId(skuId);
+                cartOrderInfo.setSkuCode(skuId);
                 cartOrderInfo.setLineCheckStatus(lineCheckStatus);
                 cartOrderInfo.setAmount(number);
                 cartOrderDao.updateProductList(cartOrderInfo);
@@ -178,7 +178,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                 }
                 CartResponse cartResponse = new CartResponse();
                 cartResponse.setCartInfoList(cartInfoList);
-                cartResponse.setAcountActualprice(acountActualprice);
+                cartResponse.setAccountActualPrice(acountActualprice);
                 cartResponse.setTotalNumber(totalNumber);
                 LOGGER.info("返回购物车中的数据给前端：{}", cartResponse);
                 response.setData(cartResponse);

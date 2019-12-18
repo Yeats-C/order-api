@@ -85,8 +85,8 @@ public class CartOrderInfo {
 
     /***sku码*/
     @ApiModelProperty(value = "sku码")
-    @JsonProperty("sku_id")
-    private String skuId;
+    @JsonProperty("sku_code")
+    private String skuCode;
 
     /***spu码*/
     @ApiModelProperty(value = "spu码")

@@ -6,7 +6,7 @@
         <result column="cart_id" jdbcType="VARCHAR" property="cartId"/>
         <result column="franchisee_id" jdbcType="VARCHAR" property="franchiseeId"/>
         <result column="store_id" jdbcType="VARCHAR" property="storeId"/>
-        <result column="sku_id" jdbcType="VARCHAR" property="skuId"/>
+        <result column="sku_id" jdbcType="VARCHAR" property="skuCode"/>
         <result column="spu_id" jdbcType="VARCHAR" property="spuId"/>
         <result column="product_name" jdbcType="VARCHAR" property="productName"/>
         <result column="amount" jdbcType="INTEGER" property="amount"/>
@@ -75,10 +75,10 @@
         SELECT <include refid="Base_Column_List"/>
         FROM order_store_cart
         <where>
-            <if test="storeId != '' || storeId != null">
+            <if test="storeId != ''||storeId != null">
                 and store_id = #{storeId}
             </if>
-            <if test="productType != '' || productType != null">
+            <if test="productType != ''||productType != null">
                 and product_type = #{productType}
             </if>
         </where>

@@ -1,7 +1,9 @@
 package com.aiqin.mgs.order.api.domain.response.cart;
 
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -13,7 +15,11 @@ public class CartResponse {
 
     private List<CartOrderInfo> cartInfoList;
 
-    private BigDecimal acountActualprice;
+    @ApiModelProperty(value = "实付总价")
+    @JsonProperty("account_actual_price")
+    private BigDecimal accountActualPrice;
 
+    @ApiModelProperty(value = "商品总数量")
+    @JsonProperty("account_actual_price")
     private int totalNumber;
 }
