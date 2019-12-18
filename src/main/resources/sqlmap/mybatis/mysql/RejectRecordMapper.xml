@@ -1,0 +1,562 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.RejectRecordDao">
+  <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.RejectRecord">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="reject_record_id" jdbcType="VARCHAR" property="rejectRecordId" />
+    <result column="reject_record_code" jdbcType="VARCHAR" property="rejectRecordCode" />
+    <result column="company_code" jdbcType="VARCHAR" property="companyCode" />
+    <result column="company_name" jdbcType="VARCHAR" property="companyName" />
+    <result column="supplier_code" jdbcType="VARCHAR" property="supplierCode" />
+    <result column="supplier_name" jdbcType="VARCHAR" property="supplierName" />
+    <result column="transport_center_code" jdbcType="VARCHAR" property="transportCenterCode" />
+    <result column="transport_center_name" jdbcType="VARCHAR" property="transportCenterName" />
+    <result column="warehouse_code" jdbcType="VARCHAR" property="warehouseCode" />
+    <result column="warehouse_name" jdbcType="VARCHAR" property="warehouseName" />
+    <result column="purchase_group_code" jdbcType="VARCHAR" property="purchaseGroupCode" />
+    <result column="purchase_group_name" jdbcType="VARCHAR" property="purchaseGroupName" />
+    <result column="settlement_method_code" jdbcType="VARCHAR" property="settlementMethodCode" />
+    <result column="settlement_method_name" jdbcType="VARCHAR" property="settlementMethodName" />
+    <result column="reject_record_status" jdbcType="BIT" property="rejectRecordStatus" />
+    <result column="total_count" jdbcType="BIGINT" property="totalCount" />
+    <result column="total_tax_amount" jdbcType="DECIMAL" property="totalTaxAmount" />
+    <result column="actual_total_count" jdbcType="BIGINT" property="actualTotalCount" />
+    <result column="actual_total_tax_amount" jdbcType="VARCHAR" property="actualTotalTaxAmount" />
+    <result column="charge_person" jdbcType="VARCHAR" property="chargePerson" />
+    <result column="contact_person" jdbcType="VARCHAR" property="contactPerson" />
+    <result column="contact_mobile" jdbcType="VARCHAR" property="contactMobile" />
+    <result column="province_id" jdbcType="VARCHAR" property="provinceId" />
+    <result column="province_name" jdbcType="VARCHAR" property="provinceName" />
+    <result column="city_id" jdbcType="VARCHAR" property="cityId" />
+    <result column="city_name" jdbcType="VARCHAR" property="cityName" />
+    <result column="district_id" jdbcType="VARCHAR" property="districtId" />
+    <result column="district_name" jdbcType="VARCHAR" property="districtName" />
+    <result column="receive_address" jdbcType="VARCHAR" property="receiveAddress" />
+    <result column="pre_expect_time" jdbcType="TIMESTAMP" property="preExpectTime" />
+    <result column="valid_time" jdbcType="TIMESTAMP" property="validTime" />
+    <result column="out_stock_time" jdbcType="TIMESTAMP" property="outStockTime" />
+    <result column="delivery_time" jdbcType="TIMESTAMP" property="deliveryTime" />
+    <result column="finish_time" jdbcType="TIMESTAMP" property="finishTime" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="use_status" jdbcType="BIT" property="useStatus" />
+    <result column="source_code" jdbcType="VARCHAR" property="sourceCode" />
+    <result column="source_type" jdbcType="BIT" property="sourceType" />
+    <result column="create_by_id" jdbcType="VARCHAR" property="createById" />
+    <result column="create_by_name" jdbcType="VARCHAR" property="createByName" />
+    <result column="update_by_id" jdbcType="VARCHAR" property="updateById" />
+    <result column="update_by_name" jdbcType="VARCHAR" property="updateByName" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, reject_record_id, reject_record_code, company_code, company_name, supplier_code, 
+    supplier_name, transport_center_code, transport_center_name, warehouse_code, warehouse_name, 
+    purchase_group_code, purchase_group_name, settlement_method_code, settlement_method_name, 
+    reject_record_status, total_count, total_tax_amount, actual_total_count, actual_total_tax_amount, 
+    charge_person, contact_person, contact_mobile, province_id, province_name, city_id, 
+    city_name, district_id, district_name, receive_address, pre_expect_time, valid_time, 
+    out_stock_time, delivery_time, finish_time, remark, use_status, source_code, source_type, 
+    create_by_id, create_by_name, update_by_id, update_by_name, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from reject_record
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from reject_record
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.RejectRecord">
+    insert into reject_record (reject_record_id, reject_record_code,
+      company_code, company_name, supplier_code, 
+      supplier_name, transport_center_code, transport_center_name, 
+      warehouse_code, warehouse_name, purchase_group_code, 
+      purchase_group_name, settlement_method_code, 
+      settlement_method_name, reject_record_status, total_count, 
+      total_tax_amount, actual_total_count, actual_total_tax_amount, 
+      charge_person, contact_person, contact_mobile, 
+      province_id, province_name, city_id, 
+      city_name, district_id, district_name, 
+      receive_address, pre_expect_time, valid_time, 
+      out_stock_time, delivery_time, finish_time, 
+      remark, use_status, source_code, 
+      source_type, create_by_id, create_by_name, 
+      update_by_id, update_by_name, create_time, 
+      update_time)
+    values (#{rejectRecordId,jdbcType=VARCHAR}, #{rejectRecordCode,jdbcType=VARCHAR},
+      #{companyCode,jdbcType=VARCHAR}, #{companyName,jdbcType=VARCHAR}, #{supplierCode,jdbcType=VARCHAR}, 
+      #{supplierName,jdbcType=VARCHAR}, #{transportCenterCode,jdbcType=VARCHAR}, #{transportCenterName,jdbcType=VARCHAR}, 
+      #{warehouseCode,jdbcType=VARCHAR}, #{warehouseName,jdbcType=VARCHAR}, #{purchaseGroupCode,jdbcType=VARCHAR}, 
+      #{purchaseGroupName,jdbcType=VARCHAR}, #{settlementMethodCode,jdbcType=VARCHAR}, 
+      #{settlementMethodName,jdbcType=VARCHAR}, #{rejectRecordStatus,jdbcType=BIT}, #{totalCount,jdbcType=BIGINT}, 
+      #{totalTaxAmount,jdbcType=DECIMAL}, #{actualTotalCount,jdbcType=BIGINT}, #{actualTotalTaxAmount,jdbcType=VARCHAR}, 
+      #{chargePerson,jdbcType=VARCHAR}, #{contactPerson,jdbcType=VARCHAR}, #{contactMobile,jdbcType=VARCHAR}, 
+      #{provinceId,jdbcType=VARCHAR}, #{provinceName,jdbcType=VARCHAR}, #{cityId,jdbcType=VARCHAR}, 
+      #{cityName,jdbcType=VARCHAR}, #{districtId,jdbcType=VARCHAR}, #{districtName,jdbcType=VARCHAR}, 
+      #{receiveAddress,jdbcType=VARCHAR}, #{preExpectTime,jdbcType=TIMESTAMP}, #{validTime,jdbcType=TIMESTAMP}, 
+      #{outStockTime,jdbcType=TIMESTAMP}, #{deliveryTime,jdbcType=TIMESTAMP}, #{finishTime,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR}, #{useStatus,jdbcType=BIT}, #{sourceCode,jdbcType=VARCHAR}, 
+      #{sourceType,jdbcType=BIT}, #{createById,jdbcType=VARCHAR}, #{createByName,jdbcType=VARCHAR}, 
+      #{updateById,jdbcType=VARCHAR}, #{updateByName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.RejectRecord">
+    insert into reject_record
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="rejectRecordId != null">
+        reject_record_id,
+      </if>
+      <if test="rejectRecordCode != null">
+        reject_record_code,
+      </if>
+      <if test="companyCode != null">
+        company_code,
+      </if>
+      <if test="companyName != null">
+        company_name,
+      </if>
+      <if test="supplierCode != null">
+        supplier_code,
+      </if>
+      <if test="supplierName != null">
+        supplier_name,
+      </if>
+      <if test="transportCenterCode != null">
+        transport_center_code,
+      </if>
+      <if test="transportCenterName != null">
+        transport_center_name,
+      </if>
+      <if test="warehouseCode != null">
+        warehouse_code,
+      </if>
+      <if test="warehouseName != null">
+        warehouse_name,
+      </if>
+      <if test="purchaseGroupCode != null">
+        purchase_group_code,
+      </if>
+      <if test="purchaseGroupName != null">
+        purchase_group_name,
+      </if>
+      <if test="settlementMethodCode != null">
+        settlement_method_code,
+      </if>
+      <if test="settlementMethodName != null">
+        settlement_method_name,
+      </if>
+      <if test="rejectRecordStatus != null">
+        reject_record_status,
+      </if>
+      <if test="totalCount != null">
+        total_count,
+      </if>
+      <if test="totalTaxAmount != null">
+        total_tax_amount,
+      </if>
+      <if test="actualTotalCount != null">
+        actual_total_count,
+      </if>
+      <if test="actualTotalTaxAmount != null">
+        actual_total_tax_amount,
+      </if>
+      <if test="chargePerson != null">
+        charge_person,
+      </if>
+      <if test="contactPerson != null">
+        contact_person,
+      </if>
+      <if test="contactMobile != null">
+        contact_mobile,
+      </if>
+      <if test="provinceId != null">
+        province_id,
+      </if>
+      <if test="provinceName != null">
+        province_name,
+      </if>
+      <if test="cityId != null">
+        city_id,
+      </if>
+      <if test="cityName != null">
+        city_name,
+      </if>
+      <if test="districtId != null">
+        district_id,
+      </if>
+      <if test="districtName != null">
+        district_name,
+      </if>
+      <if test="receiveAddress != null">
+        receive_address,
+      </if>
+      <if test="preExpectTime != null">
+        pre_expect_time,
+      </if>
+      <if test="validTime != null">
+        valid_time,
+      </if>
+      <if test="outStockTime != null">
+        out_stock_time,
+      </if>
+      <if test="deliveryTime != null">
+        delivery_time,
+      </if>
+      <if test="finishTime != null">
+        finish_time,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="useStatus != null">
+        use_status,
+      </if>
+      <if test="sourceCode != null">
+        source_code,
+      </if>
+      <if test="sourceType != null">
+        source_type,
+      </if>
+      <if test="createById != null">
+        create_by_id,
+      </if>
+      <if test="createByName != null">
+        create_by_name,
+      </if>
+      <if test="updateById != null">
+        update_by_id,
+      </if>
+      <if test="updateByName != null">
+        update_by_name,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="rejectRecordId != null">
+        #{rejectRecordId,jdbcType=VARCHAR},
+      </if>
+      <if test="rejectRecordCode != null">
+        #{rejectRecordCode,jdbcType=VARCHAR},
+      </if>
+      <if test="companyCode != null">
+        #{companyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="companyName != null">
+        #{companyName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierCode != null">
+        #{supplierCode,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierName != null">
+        #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="transportCenterCode != null">
+        #{transportCenterCode,jdbcType=VARCHAR},
+      </if>
+      <if test="transportCenterName != null">
+        #{transportCenterName,jdbcType=VARCHAR},
+      </if>
+      <if test="warehouseCode != null">
+        #{warehouseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="warehouseName != null">
+        #{warehouseName,jdbcType=VARCHAR},
+      </if>
+      <if test="purchaseGroupCode != null">
+        #{purchaseGroupCode,jdbcType=VARCHAR},
+      </if>
+      <if test="purchaseGroupName != null">
+        #{purchaseGroupName,jdbcType=VARCHAR},
+      </if>
+      <if test="settlementMethodCode != null">
+        #{settlementMethodCode,jdbcType=VARCHAR},
+      </if>
+      <if test="settlementMethodName != null">
+        #{settlementMethodName,jdbcType=VARCHAR},
+      </if>
+      <if test="rejectRecordStatus != null">
+        #{rejectRecordStatus,jdbcType=BIT},
+      </if>
+      <if test="totalCount != null">
+        #{totalCount,jdbcType=BIGINT},
+      </if>
+      <if test="totalTaxAmount != null">
+        #{totalTaxAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="actualTotalCount != null">
+        #{actualTotalCount,jdbcType=BIGINT},
+      </if>
+      <if test="actualTotalTaxAmount != null">
+        #{actualTotalTaxAmount,jdbcType=VARCHAR},
+      </if>
+      <if test="chargePerson != null">
+        #{chargePerson,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPerson != null">
+        #{contactPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="contactMobile != null">
+        #{contactMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="provinceId != null">
+        #{provinceId,jdbcType=VARCHAR},
+      </if>
+      <if test="provinceName != null">
+        #{provinceName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null">
+        #{cityId,jdbcType=VARCHAR},
+      </if>
+      <if test="cityName != null">
+        #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="districtId != null">
+        #{districtId,jdbcType=VARCHAR},
+      </if>
+      <if test="districtName != null">
+        #{districtName,jdbcType=VARCHAR},
+      </if>
+      <if test="receiveAddress != null">
+        #{receiveAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="preExpectTime != null">
+        #{preExpectTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="validTime != null">
+        #{validTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="outStockTime != null">
+        #{outStockTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deliveryTime != null">
+        #{deliveryTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="finishTime != null">
+        #{finishTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="useStatus != null">
+        #{useStatus,jdbcType=BIT},
+      </if>
+      <if test="sourceCode != null">
+        #{sourceCode,jdbcType=VARCHAR},
+      </if>
+      <if test="sourceType != null">
+        #{sourceType,jdbcType=BIT},
+      </if>
+      <if test="createById != null">
+        #{createById,jdbcType=VARCHAR},
+      </if>
+      <if test="createByName != null">
+        #{createByName,jdbcType=VARCHAR},
+      </if>
+      <if test="updateById != null">
+        #{updateById,jdbcType=VARCHAR},
+      </if>
+      <if test="updateByName != null">
+        #{updateByName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.RejectRecord">
+    update reject_record
+    <set>
+      <if test="rejectRecordId != null">
+        reject_record_id = #{rejectRecordId,jdbcType=VARCHAR},
+      </if>
+      <if test="rejectRecordCode != null">
+        reject_record_code = #{rejectRecordCode,jdbcType=VARCHAR},
+      </if>
+      <if test="companyCode != null">
+        company_code = #{companyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="companyName != null">
+        company_name = #{companyName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierCode != null">
+        supplier_code = #{supplierCode,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierName != null">
+        supplier_name = #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="transportCenterCode != null">
+        transport_center_code = #{transportCenterCode,jdbcType=VARCHAR},
+      </if>
+      <if test="transportCenterName != null">
+        transport_center_name = #{transportCenterName,jdbcType=VARCHAR},
+      </if>
+      <if test="warehouseCode != null">
+        warehouse_code = #{warehouseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="warehouseName != null">
+        warehouse_name = #{warehouseName,jdbcType=VARCHAR},
+      </if>
+      <if test="purchaseGroupCode != null">
+        purchase_group_code = #{purchaseGroupCode,jdbcType=VARCHAR},
+      </if>
+      <if test="purchaseGroupName != null">
+        purchase_group_name = #{purchaseGroupName,jdbcType=VARCHAR},
+      </if>
+      <if test="settlementMethodCode != null">
+        settlement_method_code = #{settlementMethodCode,jdbcType=VARCHAR},
+      </if>
+      <if test="settlementMethodName != null">
+        settlement_method_name = #{settlementMethodName,jdbcType=VARCHAR},
+      </if>
+      <if test="rejectRecordStatus != null">
+        reject_record_status = #{rejectRecordStatus,jdbcType=BIT},
+      </if>
+      <if test="totalCount != null">
+        total_count = #{totalCount,jdbcType=BIGINT},
+      </if>
+      <if test="totalTaxAmount != null">
+        total_tax_amount = #{totalTaxAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="actualTotalCount != null">
+        actual_total_count = #{actualTotalCount,jdbcType=BIGINT},
+      </if>
+      <if test="actualTotalTaxAmount != null">
+        actual_total_tax_amount = #{actualTotalTaxAmount,jdbcType=VARCHAR},
+      </if>
+      <if test="chargePerson != null">
+        charge_person = #{chargePerson,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPerson != null">
+        contact_person = #{contactPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="contactMobile != null">
+        contact_mobile = #{contactMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="provinceId != null">
+        province_id = #{provinceId,jdbcType=VARCHAR},
+      </if>
+      <if test="provinceName != null">
+        province_name = #{provinceName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null">
+        city_id = #{cityId,jdbcType=VARCHAR},
+      </if>
+      <if test="cityName != null">
+        city_name = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="districtId != null">
+        district_id = #{districtId,jdbcType=VARCHAR},
+      </if>
+      <if test="districtName != null">
+        district_name = #{districtName,jdbcType=VARCHAR},
+      </if>
+      <if test="receiveAddress != null">
+        receive_address = #{receiveAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="preExpectTime != null">
+        pre_expect_time = #{preExpectTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="validTime != null">
+        valid_time = #{validTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="outStockTime != null">
+        out_stock_time = #{outStockTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deliveryTime != null">
+        delivery_time = #{deliveryTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="finishTime != null">
+        finish_time = #{finishTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="useStatus != null">
+        use_status = #{useStatus,jdbcType=BIT},
+      </if>
+      <if test="sourceCode != null">
+        source_code = #{sourceCode,jdbcType=VARCHAR},
+      </if>
+      <if test="sourceType != null">
+        source_type = #{sourceType,jdbcType=BIT},
+      </if>
+      <if test="createById != null">
+        create_by_id = #{createById,jdbcType=VARCHAR},
+      </if>
+      <if test="createByName != null">
+        create_by_name = #{createByName,jdbcType=VARCHAR},
+      </if>
+      <if test="updateById != null">
+        update_by_id = #{updateById,jdbcType=VARCHAR},
+      </if>
+      <if test="updateByName != null">
+        update_by_name = #{updateByName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.aiqin.mgs.order.api.domain.RejectRecord">
+    update reject_record
+    set reject_record_id = #{rejectRecordId,jdbcType=VARCHAR},
+      reject_record_code = #{rejectRecordCode,jdbcType=VARCHAR},
+      company_code = #{companyCode,jdbcType=VARCHAR},
+      company_name = #{companyName,jdbcType=VARCHAR},
+      supplier_code = #{supplierCode,jdbcType=VARCHAR},
+      supplier_name = #{supplierName,jdbcType=VARCHAR},
+      transport_center_code = #{transportCenterCode,jdbcType=VARCHAR},
+      transport_center_name = #{transportCenterName,jdbcType=VARCHAR},
+      warehouse_code = #{warehouseCode,jdbcType=VARCHAR},
+      warehouse_name = #{warehouseName,jdbcType=VARCHAR},
+      purchase_group_code = #{purchaseGroupCode,jdbcType=VARCHAR},
+      purchase_group_name = #{purchaseGroupName,jdbcType=VARCHAR},
+      settlement_method_code = #{settlementMethodCode,jdbcType=VARCHAR},
+      settlement_method_name = #{settlementMethodName,jdbcType=VARCHAR},
+      reject_record_status = #{rejectRecordStatus,jdbcType=BIT},
+      total_count = #{totalCount,jdbcType=BIGINT},
+      total_tax_amount = #{totalTaxAmount,jdbcType=DECIMAL},
+      actual_total_count = #{actualTotalCount,jdbcType=BIGINT},
+      actual_total_tax_amount = #{actualTotalTaxAmount,jdbcType=VARCHAR},
+      charge_person = #{chargePerson,jdbcType=VARCHAR},
+      contact_person = #{contactPerson,jdbcType=VARCHAR},
+      contact_mobile = #{contactMobile,jdbcType=VARCHAR},
+      province_id = #{provinceId,jdbcType=VARCHAR},
+      province_name = #{provinceName,jdbcType=VARCHAR},
+      city_id = #{cityId,jdbcType=VARCHAR},
+      city_name = #{cityName,jdbcType=VARCHAR},
+      district_id = #{districtId,jdbcType=VARCHAR},
+      district_name = #{districtName,jdbcType=VARCHAR},
+      receive_address = #{receiveAddress,jdbcType=VARCHAR},
+      pre_expect_time = #{preExpectTime,jdbcType=TIMESTAMP},
+      valid_time = #{validTime,jdbcType=TIMESTAMP},
+      out_stock_time = #{outStockTime,jdbcType=TIMESTAMP},
+      delivery_time = #{deliveryTime,jdbcType=TIMESTAMP},
+      finish_time = #{finishTime,jdbcType=TIMESTAMP},
+      remark = #{remark,jdbcType=VARCHAR},
+      use_status = #{useStatus,jdbcType=BIT},
+      source_code = #{sourceCode,jdbcType=VARCHAR},
+      source_type = #{sourceType,jdbcType=BIT},
+      create_by_id = #{createById,jdbcType=VARCHAR},
+      create_by_name = #{createByName,jdbcType=VARCHAR},
+      update_by_id = #{updateById,jdbcType=VARCHAR},
+      update_by_name = #{updateByName,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>
