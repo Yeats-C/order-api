@@ -11,7 +11,6 @@ import com.aiqin.mgs.order.api.domain.PurchaseOrderDetail;
 import com.aiqin.mgs.order.api.domain.request.bill.PurchaseOrderReq;
 import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
-import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
