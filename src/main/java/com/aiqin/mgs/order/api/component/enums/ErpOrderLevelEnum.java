@@ -19,9 +19,9 @@ import java.util.Map;
 public enum ErpOrderLevelEnum {
 
     /***主订单*/
-    PRIMARY(1, "1", "主订单"),
+    PRIMARY(0, "0", "主订单"),
     /***子订单*/
-    SECONDARY(2, "2", "子订单");
+    SECONDARY(1, "1", "子订单");
 
     /***数字类型状态*/
     private Integer code;
@@ -37,8 +37,6 @@ public enum ErpOrderLevelEnum {
     }
     /***选项类型*/
     public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
-    /***code-enum map*/
-    public static final Map<Integer, ErpOrderLevelEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
     /***value-enum map*/
     public static final Map<String, ErpOrderLevelEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
@@ -46,7 +44,6 @@ public enum ErpOrderLevelEnum {
         for (ErpOrderLevelEnum item :
                 ErpOrderLevelEnum.values()) {
             SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
-            CODE_ENUM_MAP.put(item.getCode(), item);
             VALUE_ENUM_MAP.put(item.getValue(), item);
         }
     }

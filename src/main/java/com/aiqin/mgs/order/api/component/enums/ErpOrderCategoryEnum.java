@@ -9,25 +9,36 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 商品本品赠品枚举
+ * 订单类别枚举
  *
  * @author: Tao.Chen
  * @version: v1.0.0
- * @date 2019/11/15 17:33
+ * @date 2019/11/12 17:00
  */
 @Getter
-public enum ErpProductGiftEnum {
+public enum ErpOrderCategoryEnum {
 
-    /***商品*/
-    PRODUCT(0, "0", "商品"),
-    /***赠品*/
-    GIFT(1, "1", "赠品");
+    /***首单配送*/
+    ORDER_TYPE_1(1, "1", "正常补货"),
+    /***首单赠送*/
+    ORDER_TYPE_2(2, "2", "普通首单"),
+    /***配送补货*/
+    ORDER_TYPE_4(4, "4", "首单赠送"),
+    /***首单直送*/
+    ORDER_TYPE_16(16, "16", "新店货架"),
+    /***直送补货*/
+    ORDER_TYPE_17(17, "17", "货架补货"),
+    /***首单货架*/
+    ORDER_TYPE_172(172, "172", "游泳游乐");
 
+    /***数字编码*/
     private Integer code;
+    /***字符串编码*/
     private String value;
+    /***描述*/
     private String desc;
 
-    ErpProductGiftEnum(Integer code, String value, String desc) {
+    ErpOrderCategoryEnum(Integer code, String value, String desc) {
         this.code = code;
         this.value = value;
         this.desc = desc;
@@ -36,38 +47,26 @@ public enum ErpProductGiftEnum {
     /***选项类型*/
     public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
     /***value-enum map*/
-    public static final Map<String, ErpProductGiftEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<String, ErpOrderCategoryEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
     static {
-        for (ErpProductGiftEnum item :
-                ErpProductGiftEnum.values()) {
+        for (ErpOrderCategoryEnum item :
+                ErpOrderCategoryEnum.values()) {
             SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
             VALUE_ENUM_MAP.put(item.getValue(), item);
         }
     }
 
-    /**
-     * 返回枚举对象
-     *
-     * @param object
-     * @return
-     */
-    public static ErpProductGiftEnum getEnum(Object object) {
+    public static ErpOrderCategoryEnum getEnum(Object object) {
         if (object != null) {
             return VALUE_ENUM_MAP.get(object.toString());
         }
         return null;
     }
 
-    /**
-     * 返回枚举对象的描述信息
-     *
-     * @param object
-     * @return
-     */
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            ErpProductGiftEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            ErpOrderCategoryEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
             }
@@ -75,12 +74,6 @@ public enum ErpProductGiftEnum {
         return "";
     }
 
-    /**
-     * 判断枚举类型是否存在
-     *
-     * @param object
-     * @return
-     */
     public static boolean exist(Object object) {
         if (object != null) {
             return VALUE_ENUM_MAP.containsKey(object.toString());
@@ -89,3 +82,4 @@ public enum ErpProductGiftEnum {
     }
 
 }
+

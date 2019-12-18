@@ -9,65 +9,57 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 商品本品赠品枚举
+ * 发票类型枚举类
  *
  * @author: Tao.Chen
  * @version: v1.0.0
- * @date 2019/11/15 17:33
+ * @date 2019/12/18 20:24
  */
 @Getter
-public enum ErpProductGiftEnum {
+public enum ErpInvoiceTypeEnum {
 
-    /***商品*/
-    PRODUCT(0, "0", "商品"),
-    /***赠品*/
-    GIFT(1, "1", "赠品");
+    /***不开发票*/
+    NO_INVOICE(1, "1", "不开发票"),
+    /***普通增值税发票*/
+    ORDINARY_VAT(2, "2", "普通增值税发票"),
+    /***专用增值税发票*/
+    SPECIAL_VAT(3, "3", "专用增值税发票");
 
+    /***数字类型状态*/
     private Integer code;
+    /***字符串类型状态*/
     private String value;
+    /***状态描述*/
     private String desc;
 
-    ErpProductGiftEnum(Integer code, String value, String desc) {
+    ErpInvoiceTypeEnum(Integer code, String value, String desc) {
         this.code = code;
         this.value = value;
         this.desc = desc;
     }
-
     /***选项类型*/
     public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
     /***value-enum map*/
-    public static final Map<String, ErpProductGiftEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<String, ErpInvoiceTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
     static {
-        for (ErpProductGiftEnum item :
-                ErpProductGiftEnum.values()) {
+        for (ErpInvoiceTypeEnum item :
+                ErpInvoiceTypeEnum.values()) {
             SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
             VALUE_ENUM_MAP.put(item.getValue(), item);
         }
     }
 
-    /**
-     * 返回枚举对象
-     *
-     * @param object
-     * @return
-     */
-    public static ErpProductGiftEnum getEnum(Object object) {
+    public static ErpInvoiceTypeEnum getEnum(Object object) {
         if (object != null) {
             return VALUE_ENUM_MAP.get(object.toString());
         }
         return null;
     }
 
-    /**
-     * 返回枚举对象的描述信息
-     *
-     * @param object
-     * @return
-     */
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            ErpProductGiftEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            ErpInvoiceTypeEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
             }
@@ -75,17 +67,10 @@ public enum ErpProductGiftEnum {
         return "";
     }
 
-    /**
-     * 判断枚举类型是否存在
-     *
-     * @param object
-     * @return
-     */
     public static boolean exist(Object object) {
         if (object != null) {
             return VALUE_ENUM_MAP.containsKey(object.toString());
         }
         return false;
     }
-
 }
