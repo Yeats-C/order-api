@@ -115,4 +115,13 @@ public class StoreOverviewController {
         return storeOverviewService.storeOrderOverView(storeId);
     }
 
+    @GetMapping("/store/product")
+    @ApiOperation(value = "商品概览（畅销度）")
+    @ApiImplicitParams({@ApiImplicitParam(name = "store_id", value = "门店id", dataType = "String"),
+    })
+    public HttpResponse storeProductOverView(@RequestParam(value = "store_id") String storeId){
+        LOGGER.info("获取门店商品概览（畅销度）......",storeId);
+        return storeOverviewService.storeProductOverView(storeId);
+    }
+
 }
