@@ -12,7 +12,6 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
-import com.aiqin.mgs.order.api.domain.response.StoreBackInfoResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
 import com.aiqin.mgs.order.api.domain.response.order.StoreFranchiseeInfoResponse;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
@@ -41,13 +40,13 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public StoreInfo getStoreInfoByStoreId(String storeId) {
-        storeId = "ABB508212C0F1340B0ADC1CDA1CC72E2F1";
+        storeId = "3604f41aba22481da201e0c3d7a7451a";
         StoreInfo storeInfo = new StoreInfo();
         try {
             HttpClient httpClient = HttpClient.get(urlProperties.getSlcsApi() + "/store/info?store_id=" + storeId);
-            HttpResponse<StoreFranchiseeInfoResponse> response = httpClient.action().result(new TypeReference<HttpResponse<StoreBackInfoResponse>>() {
+            HttpResponse<StoreFranchiseeInfoResponse> response = httpClient.action().result(new TypeReference<HttpResponse<StoreFranchiseeInfoResponse>>() {
             });
-            if (RequestReturnUtil.validateHttpResponse(response)) {
+            if (!RequestReturnUtil.validateHttpResponse(response)) {
                 throw new BusinessException("获取门店信息失败");
             }
             StoreFranchiseeInfoResponse data = response.getData();

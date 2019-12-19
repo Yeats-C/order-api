@@ -84,6 +84,9 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         ErpOrderInfo order = this.getOrderByOrderCode(orderCode);
         if (order != null) {
 
+            List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
+            order.setItemList(orderItemList);
+
 //            if (ErpOrderLevelEnum.PRIMARY.getCode().equals(order.getOrderLevel())) {
 //                //主订单
 //
@@ -168,28 +171,28 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         if (dataList != null && dataList.size() > 0) {
 
             //获取主订单编码，检查待支付和已取消订单支付状态
-            List<String> primaryOrderCodeList = new ArrayList<>();
-            for (ErpOrderInfo item :
-                    dataList) {
-                primaryOrderCodeList.add(item.getOrderStoreCode());
-            }
+//            List<String> primaryOrderCodeList = new ArrayList<>();
+//            for (ErpOrderInfo item :
+//                    dataList) {
+//                primaryOrderCodeList.add(item.getOrderStoreCode());
+//            }
 
             //查询子订单列表
-            Map<String, List<ErpOrderInfo>> secondaryOrderMap = new HashMap<>(16);
-            List<ErpOrderInfo> secondaryOrderList = erpOrderInfoDao.findSecondaryOrderList(primaryOrderCodeList);
-            if (secondaryOrderList != null && secondaryOrderList.size() > 0) {
-                for (ErpOrderInfo item :
-                        secondaryOrderList) {
-                    String primaryCode = item.getMainOrderCode();
-                    if (secondaryOrderMap.containsKey(primaryCode)) {
-                        secondaryOrderMap.get(primaryCode).add(item);
-                    } else {
-                        List<ErpOrderInfo> newSecondaryOrderList = new ArrayList<>();
-                        newSecondaryOrderList.add(item);
-                        secondaryOrderMap.put(primaryCode, newSecondaryOrderList);
-                    }
-                }
-            }
+//            Map<String, List<ErpOrderInfo>> secondaryOrderMap = new HashMap<>(16);
+//            List<ErpOrderInfo> secondaryOrderList = erpOrderInfoDao.findSecondaryOrderList(primaryOrderCodeList);
+//            if (secondaryOrderList != null && secondaryOrderList.size() > 0) {
+//                for (ErpOrderInfo item :
+//                        secondaryOrderList) {
+//                    String primaryCode = item.getMainOrderCode();
+//                    if (secondaryOrderMap.containsKey(primaryCode)) {
+//                        secondaryOrderMap.get(primaryCode).add(item);
+//                    } else {
+//                        List<ErpOrderInfo> newSecondaryOrderList = new ArrayList<>();
+//                        newSecondaryOrderList.add(item);
+//                        secondaryOrderMap.put(primaryCode, newSecondaryOrderList);
+//                    }
+//                }
+//            }
 
 //            for (ErpOrderInfo item :
 //                    dataList) {

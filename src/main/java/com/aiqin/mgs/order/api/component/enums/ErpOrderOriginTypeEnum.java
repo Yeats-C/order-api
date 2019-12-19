@@ -19,11 +19,11 @@ import java.util.Map;
 public enum ErpOrderOriginTypeEnum {
 
     /***POS*/
-    ORIGIN_COME_0(0, "0", "POS"),
+    ORIGIN_COME_0(101, "101", "POS"),
     /***微商城*/
-    ORIGIN_COME_1(1, "1", "微商城"),
+    ORIGIN_COME_1(102, "102", "微商城"),
     /***WEB*/
-    ORIGIN_COME_2(2, "2", "WEB");
+    ORIGIN_COME_2(103, "103", "WEB");
 
     private Integer code;
     private String value;

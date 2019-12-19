@@ -60,7 +60,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         Integer insert = erpOrderInfoDao.insert(po);
 
         //保存日志
-        erpOrderOperationLogService.saveOrderOperationLog(po.getOrderStoreId(), ErpOrderStatusEnum.ORDER_STATUS_1, auth);
+//        erpOrderOperationLogService.saveOrderOperationLog(po.getOrderStoreId(), ErpOrderStatusEnum.ORDER_STATUS_1, auth);
     }
 
     @Override

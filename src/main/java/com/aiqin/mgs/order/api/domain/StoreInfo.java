@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -12,6 +13,7 @@ import lombok.Data;
  * @date 2019/11/21 15:57
  */
 @Data
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class StoreInfo {
 
     @JsonProperty("store_id")
@@ -25,14 +27,6 @@ public class StoreInfo {
     @JsonProperty("store_name")
     private String storeName;
 
-    @ApiModelProperty(value="店铺类别")
-    @JsonProperty("category_code")
-    private String categoryCode;
-
-    @ApiModelProperty(value="店铺类别名称")
-    @JsonProperty("category_name")
-    private String categoryName;
-
     @ApiModelProperty(value="门店联系人")
     @JsonProperty("contacts")
     private String contacts;
@@ -40,10 +34,6 @@ public class StoreInfo {
     @ApiModelProperty(value="门店联系电话")
     @JsonProperty("contacts_phone")
     private String contactsPhone;
-
-    @ApiModelProperty(value="店铺二维码")
-    @JsonProperty("bar_code")
-    private String barCode;
 
     @ApiModelProperty(value="门店类型")
     @JsonProperty("nature_code")
@@ -61,22 +51,6 @@ public class StoreInfo {
     @JsonProperty("company_name")
     private String companyName;
 
-    @ApiModelProperty(value="门店管理级别")
-    @JsonProperty("manage_level")
-    private String manageLevel;
-
-    @ApiModelProperty(value="门店管理级别名称")
-    @JsonProperty("manage_level_name")
-    private String manageLevelName;
-
-    @ApiModelProperty(value="门店级别")
-    @JsonProperty("store_grade")
-    private String storeGrade;
-
-    @ApiModelProperty(value="门店级别名称")
-    @JsonProperty("store_grade_name")
-    private String storeGradeName;
-
     @ApiModelProperty(value="加盟商id")
     @JsonProperty("franchisee_id")
     private String franchiseeId;
@@ -89,7 +63,6 @@ public class StoreInfo {
     @JsonProperty("franchisee_name")
     private String franchiseeName;
 
-    //地址信息
     @ApiModelProperty(value="大区")
     @JsonProperty("area_id")
     private String areaId;
@@ -125,9 +98,5 @@ public class StoreInfo {
     @ApiModelProperty(value="地址")
     @JsonProperty("address")
     private String address;
-
-    @ApiModelProperty(value="行政区域（XX省XX市XX县）")
-    @JsonProperty("administrative_area")
-    private String administrativeArea;
 
 }

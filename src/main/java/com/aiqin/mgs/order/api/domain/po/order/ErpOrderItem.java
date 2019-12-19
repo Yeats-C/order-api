@@ -47,25 +47,25 @@ public class ErpOrderItem {
     private String unitName;
     /***折零系数*/
     private Long zeroDisassemblyCoefficient;
-    /***商品类型  0商品 1赠品 2实物返回*/
+    /***商品类型  0商品 1赠品*/
     private Integer productType;
     /***商品数量*/
     private Long productCount;
     /***商品单价*/
     private BigDecimal productAmount;
     /***含税采购价*/
-    private BigDecimal taxPurchaseAmount;
+    private BigDecimal purchaseAmount;
     /***商品总价*/
     private BigDecimal totalProductAmount;
-    /***实际商品总价*/
+    /***实际商品总价（发货商品总价）*/
     private BigDecimal actualTotalProductAmount;
-    /***优惠分摊总金额*/
+    /***优惠分摊总金额（分摊后金额）*/
     private BigDecimal totalPreferentialAmount;
     /***活动优惠总金额*/
     private BigDecimal totalAcivityAmount;
     /***实收数量（门店）*/
     private Long actualInboundCount;
-    /***实际商品数量*/
+    /***实发商品数量*/
     private Long actualProductCount;
     /***退货数量*/
     private Long returnProductCount;

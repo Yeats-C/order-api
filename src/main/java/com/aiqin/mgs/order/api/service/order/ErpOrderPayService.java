@@ -65,6 +65,17 @@ public interface ErpOrderPayService {
     String orderPay(ErpOrderPayRequest erpOrderPayRequest);
 
     /**
+     * 自动发起支付
+     *
+     * @param orderId
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/19 17:02
+     */
+    void autoPay(String orderId);
+
+    /**
      * 查询订单支付结果
      *
      * @param erpOrderPayRequest

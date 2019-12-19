@@ -145,6 +145,35 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void autoPay(String orderId) {
+
+        AuthToken auth = AuthUtil.getCurrentAuth();
+        //订单
+        ErpOrderInfo order = erpOrderQueryService.getOrderByOrderId(orderId);
+        //订单费用
+        ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByFeeId(order.getFeeId());
+
+        String payId = OrderPublic.getUUID();
+        //TODO 调用支付接口
+        ErpOrderPay orderPay = new ErpOrderPay();
+        orderPay.setPayId(payId);
+        orderPay.setPayStartTime(new Date());
+        orderPay.setPayStatus(ErpPayPollingBackStatusEnum.STATUS_6.getCode());
+        orderPay.setPayWay(ErpPayWayEnum.PAY_1.getCode());
+        orderPay.setPayFee(orderFee.getPayMoney());
+        orderPay.setFeeType(ErpPayFeeTypeEnum.ORDER_FEE.getCode());
+        orderPay.setBusinessKey(order.getOrderStoreCode());
+        orderPay.setPayCode(null);
+        this.saveOrderPay(orderPay, auth);
+
+        //更新订单费用单支付状态
+        orderFee.setPayStatus(ErpPayStatusEnum.PAYING.getCode());
+        erpOrderFeeService.updateOrderFeeByPrimaryKeySelective(orderFee, auth);
+
+    }
+
+    @Override
     public ErpOrderPayResultResponse orderPayResult(ErpOrderPayRequest erpOrderPayRequest) {
         ErpOrderPayResultResponse result = new ErpOrderPayResultResponse();
         String orderCode = erpOrderPayRequest.getOrderCode();

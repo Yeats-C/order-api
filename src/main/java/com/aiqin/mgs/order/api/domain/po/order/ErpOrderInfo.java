@@ -62,6 +62,8 @@ public class ErpOrderInfo {
     private String lockReason;
     /***是否是异常订单(0是1否)*/
     private Integer orderException;
+    /***异常原因*/
+    private String exceptionReason;
     /***是否删除(0是1否)*/
     private Integer orderDelete;
     /***支付状态0已支付  1未支付*/
@@ -82,17 +84,17 @@ public class ErpOrderInfo {
 
     /***收货地址*/
     private String receiveAddress;
-    /***配送方式编码 TODO 有哪些？*/
+    /***配送方式编码*/
     private String distributionModeCode;
     /***配送方式名称*/
     private String distributionModeName;
     /***收货人*/
     private String receivePerson;
     /***收货人电话*/
-    private String receivePersonMobile;
+    private String receiveMobile;
     /***邮编*/
     private String zipCode;
-    /***支付方式编码 TODO 有哪些？*/
+    /***支付方式编码*/
     private String paymentCode;
     /***支付方式名称*/
     private String paymentName;
@@ -100,13 +102,13 @@ public class ErpOrderInfo {
     private BigDecimal deliverAmount;
     /***商品总价*/
     private BigDecimal totalProductAmount;
-    /***实际商品总价*/
+    /***实际商品总价 （发货商品的总价格） */
     private BigDecimal actualTotalProductAmount;
     /***实际发货数量*/
     private Long actualProductCount;
     /***优惠额度*/
     private BigDecimal discountAmount;
-    /*** TODO ？ */
+    /***实际支付金额 */
     private BigDecimal orderAmount;
     /***付款日期*/
     private Date paymentTime;
@@ -122,22 +124,24 @@ public class ErpOrderInfo {
     private Integer invoiceType;
     /***发票抬头*/
     private String invoiceTitle;
-    /***TODO 什么体积？*/
-    private Long volume;
+    /***体积*/
+    private Long totalVolume;
     /***实际体积*/
-    private Long actualVolume;
+    private Long actualTotalVolume;
     /***重量*/
-    private Long weight;
+    private Long totalWeight;
     /***实际重量*/
-    private Long actualWeight;
+    private Long actualTotalWeight;
     /***主订单号  如果非子订单 此处存order_code*/
     private String mainOrderCode;
     /***订单级别(0主1子订单)*/
     private Integer orderLevel;
+    /***是否被拆分 (0是 1否)*/
+    private Integer splitStatus;
+    /***申请取消时的状态*/
+    private Integer beforeCancelStatus;
     /***备注*/
     private String remake;
-    /***减免比例*/
-    private Long reductionRatio;
     /***门店类型*/
     private Integer storeType;
     /***门店id*/
@@ -168,7 +172,7 @@ public class ErpOrderInfo {
     private String sourceCode;
     /***来源名称*/
     private String sourceName;
-    /***来源类型 TODO 有哪些？*/
+    /***来源类型*/
     private Integer sourceType;
 
     /***0. 启用   1.禁用*/
@@ -190,4 +194,5 @@ public class ErpOrderInfo {
     private ErpOrderFee orderFee;
     /***订单商品明细*/
     private List<ErpOrderItem> itemList;
+
 }

@@ -23,7 +23,7 @@ public enum ErpOrderTypeEnum {
     /***配送*/
     DISTRIBUTION(1, "1", "配送"),
     /***辅采直送*/
-    ASSIST_PURCHASING(2, "3", "辅采直送");
+    ASSIST_PURCHASING(2, "2", "辅采直送");
 
     private Integer code;
     private String value;
