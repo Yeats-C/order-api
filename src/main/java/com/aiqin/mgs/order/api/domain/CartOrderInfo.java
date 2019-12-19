@@ -30,11 +30,11 @@ public class CartOrderInfo {
 
     /***商品最大订货数量*/
     @ApiModelProperty(value = "商品最大订货数量")
-    @JsonProperty("max_Number")
+    @JsonProperty("max_number")
     private Integer maxNumber;
 
-    /***订货倍数*/
-    @ApiModelProperty(value = "订货倍数")
+    /***最小订货倍数*/
+    @ApiModelProperty(value = "最小订货倍数")
     @JsonProperty("order_multiple")
     private Integer order_multiple;
 
@@ -48,25 +48,45 @@ public class CartOrderInfo {
     @JsonProperty("production_date")
     private int productionDate;
 
-    /***商品标签*/
-    @ApiModelProperty(value = "商品标签")
-    @JsonProperty("label")
-    private int label;
+    /***商品标签名称*/
+    @ApiModelProperty(value = "商品标签名称")
+    @JsonProperty("label_name")
+    private int labelName;
 
-    /***商品属性*/
-    @ApiModelProperty(value = "商品属性")
-    @JsonProperty("product_property")
-    private int productProperty;
+    /***商品标签名称*/
+    @ApiModelProperty(value = "商品标签编码")
+    @JsonProperty("label_code")
+    private int labelCode;
 
-    /***商品品牌*/
-    @ApiModelProperty(value = "商品品牌")
-    @JsonProperty("product_brand")
-    private int productBrand;
+    /***商品属性名称*/
+    @ApiModelProperty(value = "商品属性名称")
+    @JsonProperty("product_property_name")
+    private int productPropertyName;
 
-    /***商品品类*/
-    @ApiModelProperty(value = "商品品类")
-    @JsonProperty("`product_category")
-    private int productCategory;
+    /***商品属性编码*/
+    @ApiModelProperty(value = "商品属性编码")
+    @JsonProperty("product_property_code")
+    private int productPropertyCode;
+
+    /***商品品牌名称*/
+    @ApiModelProperty(value = "商品品牌名称")
+    @JsonProperty("product_brand_name")
+    private int productBrandName;
+
+    /***商品品牌编码*/
+    @ApiModelProperty(value = "商品品牌编码")
+    @JsonProperty("product_brand_code")
+    private int productBrandCode;
+
+    /***商品品类名称*/
+    @ApiModelProperty(value = "商品品类名称")
+    @JsonProperty("`product_category_name")
+    private int productCategoryName;
+
+    /***商品品类编码*/
+    @ApiModelProperty(value = "商品品类编码")
+    @JsonProperty("`product_category_code")
+    private int productCategoryCode;
 
 
     /***商品logo图片*/

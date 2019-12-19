@@ -147,7 +147,7 @@ public class CartOrderServiceImpl implements CartOrderService {
      */
     @Override
     public HttpResponse<CartResponse> selectCartByStoreId(String storeId, Integer productType, String skuId, Integer lineCheckStatus, Integer number) {
-        HttpResponse<CartResponse> response = new HttpResponse<>();
+        HttpResponse<CartResponse> response = HttpResponse.success();
         try {
             CartOrderInfo cartOrderInfo = new CartOrderInfo();
             cartOrderInfo.setStoreId(storeId);
@@ -199,7 +199,7 @@ public class CartOrderServiceImpl implements CartOrderService {
      */
     @Override
     public HttpResponse getTotal(String storeId) {
-        HttpResponse<Integer> response = new HttpResponse<>();
+        HttpResponse<Integer> response = HttpResponse.success();
         try {
             if (storeId != null) {
                 Integer total = cartOrderDao.getTotal(storeId);
@@ -238,7 +238,6 @@ public class CartOrderServiceImpl implements CartOrderService {
 
         } catch (Exception e) {
             LOGGER.error("清空购物车失败", e);
-
             return HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
         }
     }
