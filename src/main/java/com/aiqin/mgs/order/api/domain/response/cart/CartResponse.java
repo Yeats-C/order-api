@@ -13,6 +13,8 @@ import java.util.List;
 @ApiModel(value = "购物车响应参数，计算金额，数量")
 public class CartResponse {
 
+    @ApiModelProperty(value = "商品列表")
+    @JsonProperty("cartInfoList")
     private List<CartOrderInfo> cartInfoList;
 
     @ApiModelProperty(value = "实付总价")
@@ -20,6 +22,6 @@ public class CartResponse {
     private BigDecimal accountActualPrice;
 
     @ApiModelProperty(value = "商品总数量")
-    @JsonProperty("account_actual_price")
+    @JsonProperty("total_number")
     private int totalNumber;
 }

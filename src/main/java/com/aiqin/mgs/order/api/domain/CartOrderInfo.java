@@ -28,6 +28,42 @@ public class CartOrderInfo {
     @JsonProperty("amount")
     private int amount;
 
+    /***订货倍数*/
+    @ApiModelProperty(value = "订货倍数")
+    @JsonProperty("order_multiple")
+    private Integer order_multiple;
+
+    /***库存数量*/
+    @ApiModelProperty(value = "库存数量")
+    @JsonProperty("stock_number")
+    private int stockNumber;
+
+    /***生产日期*/
+    @ApiModelProperty(value = "生产日期")
+    @JsonProperty("production_date")
+    private int productionDate;
+
+    /***商品标签*/
+    @ApiModelProperty(value = "商品标签")
+    @JsonProperty("label")
+    private int label;
+
+    /***商品属性*/
+    @ApiModelProperty(value = "商品属性")
+    @JsonProperty("product_property")
+    private int productProperty;
+
+    /***商品品牌*/
+    @ApiModelProperty(value = "商品品牌")
+    @JsonProperty("product_brand")
+    private int productBrand;
+
+    /***商品品类*/
+    @ApiModelProperty(value = "商品品类")
+    @JsonProperty("`product_category")
+    private int productCategory;
+
+
     /***商品logo图片*/
     @ApiModelProperty(value = "商品logo图片")
     @JsonProperty("logo")
@@ -37,6 +73,11 @@ public class CartOrderInfo {
     @ApiModelProperty(value = "商品原价")
     @JsonProperty("price")
     private BigDecimal price;
+
+    /***商品特价*/
+    @ApiModelProperty(value = "商品特价")
+    @JsonProperty("special_price")
+    private BigDecimal specialPrice;
 
     /**实付金额总和*/
     @ApiModelProperty(value = "实付金额总和")
@@ -110,8 +151,8 @@ public class CartOrderInfo {
 
     /***skuId集合*/
     @ApiModelProperty(value = "skuId集合")
-    @JsonProperty("sku_ids")
-    private List<String> skuIds;
+    @JsonProperty("sku_codes")
+    private List<String> skuCodes;
 
     /***门店地址*/
     @ApiModelProperty(value = "门店地址")
@@ -129,12 +170,12 @@ public class CartOrderInfo {
     private String contactsPhone;
 
     /***商品添加来源 1:门店 2:erp*/
-    @ApiModelProperty(value = "商品添加来源")
+    @ApiModelProperty(value = "商品添加来源 1:门店 2:erp")
     @JsonProperty("create_source")
     private String createSource;
 
-    /***本品或者赠品 1:本品 2:赠品*/
-    @ApiModelProperty(value = "本品或者赠品")
+    /***本品或者赠品 0:本品 1:赠品*/
+    @ApiModelProperty(value = "本品或者赠品 0:本品 1:赠品")
     @JsonProperty("product_gift")
     private Integer productGift;
 
@@ -144,7 +185,7 @@ public class CartOrderInfo {
     private String giftParentCartId;
 
     /***行是否选中 1:true 0:false*/
-    @ApiModelProperty(value = "行是否选中")
+    @ApiModelProperty(value = "行是否选中 1:是 0:否")
     @JsonProperty("line_check_status")
     private Integer lineCheckStatus;
 
