@@ -63,10 +63,11 @@ public class CartOrderController {
     @GetMapping("/cartDisplay")
     @ApiOperation(value = "购物车展示列表,附带勾选功能")
     @ApiImplicitParams({@ApiImplicitParam(name = "store_id", value = "门店id", dataType = "String", paramType = "query", required = true),
-            @ApiImplicitParam(name = "product_type", value = "商品类型 1:直送 2:配送 3:货架", dataType = "Integer", paramType = "query", required = true),
+            @ApiImplicitParam(name = "product_type", value = "商品类型 1:直送 2:配送 3:货架", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(name = "sku_code", value = "sku编码", dataType = "String", paramType = "query", required = false),
             @ApiImplicitParam(name = "line_check_status", value = "勾选标记,0:否,1:是", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(name = "order_multiple", value = "商品订货最小倍数", dataType = "Integer", paramType = "query", required = false),
+            @ApiImplicitParam(name = "MaxNumber", value = "商品最大订货数量", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(name = "number", value = "商品数量", dataType = "Integer", paramType = "query", required = false)})
     public HttpResponse<CartResponse> selectCartByStoreId(String store_id, Integer product_type, String sku_code, Integer line_check_status, Integer number) {
         LOGGER.info("购物车展示列表参数：{},{},{},{},{}", store_id,product_type,sku_code,line_check_status,number);

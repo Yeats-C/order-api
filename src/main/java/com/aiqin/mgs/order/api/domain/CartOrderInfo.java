@@ -28,6 +28,11 @@ public class CartOrderInfo {
     @JsonProperty("amount")
     private int amount;
 
+    /***商品最大订货数量*/
+    @ApiModelProperty(value = "商品最大订货数量")
+    @JsonProperty("max_Number")
+    private Integer maxNumber;
+
     /***订货倍数*/
     @ApiModelProperty(value = "订货倍数")
     @JsonProperty("order_multiple")
@@ -150,7 +155,7 @@ public class CartOrderInfo {
     private Integer productType;
 
     /***skuId集合*/
-    @ApiModelProperty(value = "skuId集合")
+    @ApiModelProperty(value = "skuCodes集合")
     @JsonProperty("sku_codes")
     private List<String> skuCodes;
 
