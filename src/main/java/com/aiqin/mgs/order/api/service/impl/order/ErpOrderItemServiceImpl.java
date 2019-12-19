@@ -63,7 +63,7 @@ public class ErpOrderItemServiceImpl implements ErpOrderItemService {
         List<ErpOrderItem> list = new ArrayList<>();
         if (StringUtils.isNotEmpty(orderId)) {
             ErpOrderItem query = new ErpOrderItem();
-            query.setOrderId(orderId);
+            query.setOrderStoreId(orderId);
             list = erpOrderItemDao.select(query);
         }
         return list;

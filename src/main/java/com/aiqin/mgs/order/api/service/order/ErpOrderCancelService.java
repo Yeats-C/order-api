@@ -1,7 +1,6 @@
 package com.aiqin.mgs.order.api.service.order;
 
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
-import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCancelResultRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCancelRequest;
 
 /**
  * 订单取消
@@ -15,44 +14,44 @@ public interface ErpOrderCancelService {
     /**
      * 缺货终止交易
      *
-     * @param erpOrderInfo
+     * @param erpOrderCancelRequest
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/12 17:45
      */
-    void cancelOrderWithoutStock(ErpOrderInfo erpOrderInfo);
+    void cancelOrderWithoutStock(ErpOrderCancelRequest erpOrderCancelRequest);
 
     /**
      * 拒收终止交易
      *
-     * @param erpOrderInfo
+     * @param erpOrderCancelRequest
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/12 17:46
      */
-    void cancelOrderRejectSign(ErpOrderInfo erpOrderInfo);
+    void cancelOrderRejectSign(ErpOrderCancelRequest erpOrderCancelRequest);
 
     /**
      * 申请取消订单
      *
-     * @param erpOrderInfo
+     * @param erpOrderCancelRequest
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/12 17:46
      */
-    void applyCancelOrder(ErpOrderInfo erpOrderInfo);
+    void applyCancelOrder(ErpOrderCancelRequest erpOrderCancelRequest);
 
     /**
      * 供应链返回订单是否可以取消
      *
-     * @param erpOrderCancelResultRequest
+     * @param erpOrderCancelRequest
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/12 19:23
      */
-    void orderCancelResultCallback(ErpOrderCancelResultRequest erpOrderCancelResultRequest);
+    void orderCancelResultCallback(ErpOrderCancelRequest erpOrderCancelRequest);
 }

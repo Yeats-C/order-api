@@ -15,12 +15,10 @@ import java.util.List;
 @Data
 public class ProductInfo {
 
-    /***商品id*/
-    private String productId;
     /***商品编码*/
-    private String productCode;
+    private String spuCode;
     /***商品名称*/
-    private String productName;
+    private String spuName;
     /***skuCode*/
     private String skuCode;
     /***skuName*/
@@ -29,16 +27,25 @@ public class ProductInfo {
     private String supplierCode;
     /***供应商名称*/
     private String supplierName;
-    /***单位*/
-    private String unit;
+    /***图片地址*/
+    private String pictureUrl;
+    /***规格*/
+    private String productSpec;
+    /***颜色编码*/
+    private String colorCode;
+    /***颜色名称*/
+    private String colorName;
+    /***型号*/
+    private String modelCode;
+    /***单位编码*/
+    private String unitCode;
+    /***单位名称*/
+    private String unitName;
     /***单价*/
     private BigDecimal price;
-    /***含税采购价*/
-    private BigDecimal taxPurchasePrice;
-
-    /***商品在各个仓库的数量*/
-    private List<ProductRepertoryQuantity> repertoryQuantityList;
-
-    //TODO 字段待补充
+    /***条形码*/
+    private String barCode;
+    /***税率*/
+    private BigDecimal taxRate;
 
 }
