@@ -1952,7 +1952,17 @@ public class OrderServiceImpl implements OrderService {
 
             }
             orderDao.updateOrder(orderInfo);
-//如果订单状态是已支付此处增加支付中心现金支付
+            //如果订单状态是已支付此处增加支付中心现金支付
+            if (orderInfo.getOrderStatus().equals(Global.ORDER_STATUS_2)||orderInfo.getOrderStatus().equals(Global.ORDER_STATUS_5)){
+                PayReq payReq=new PayReq();
+                payReq.setOrderAmount(Long.valueOf(orderInfo.getActualPrice()));
+                payReq.setAiqinMerchantId(orderInfo.getDistributorId());
+                payReq.setOrderNo(orderInfo.getOrderCode());
+                payReq.setOrderTime(orderInfo.getCreateTime());
+                payReq.setPayType(orderPayList.get(0).getPayType());
+                payReq.setOrderSource(orderInfo.getOrderType());
+                payService.doPay(payReq);
+            }
             return HttpResponse.success();
 
         } catch (Exception e) {
