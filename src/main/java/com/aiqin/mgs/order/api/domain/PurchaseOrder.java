@@ -79,15 +79,15 @@ public class PurchaseOrder implements Serializable {
     private String contactPerson;
     @ApiModelProperty(value = "联系人电话")
     private String contactMobile;
-    @ApiModelProperty(value = "预计到货时间")
+    @ApiModelProperty(value = "预计到货时间",example = "2001-01-01 01:01:01")
     private Date preArrivalTime;
-    @ApiModelProperty(value = "有效期")
+    @ApiModelProperty(value = "有效期",example = "2001-01-01 01:01:01")
     private Date validTime;
     @ApiModelProperty(value = "发货地址")
     private String deliveryAddress;
-    @ApiModelProperty(value = "发货时间")
+    @ApiModelProperty(value = "发货时间",example = "2001-01-01 01:01:01")
     private Date deliveryTime;
-    @ApiModelProperty(value = "入库时间")
+    @ApiModelProperty(value = "入库时间",example = "2001-01-01 01:01:01")
     private Date inStockTime;
     @ApiModelProperty(value = "入库地址")
     private String inStockAddress;
@@ -107,4 +107,16 @@ public class PurchaseOrder implements Serializable {
     private String sourceCode;
     @ApiModelProperty(value = "来源类型")
     private Boolean sourceType;
+    @ApiModelProperty(value = "创建人编码")
+    private String createById;
+    @ApiModelProperty(value = "创建人名称")
+    private String createByName;
+    @ApiModelProperty(value = "修改人编码")
+    private String updateById;
+    @ApiModelProperty(value = "修改人名称")
+    private String updateByName;
+    @ApiModelProperty(value = "创建时间",example = "2001-01-01 01:01:01")
+    private Date createTime;
+    @ApiModelProperty(value = "修改时间",example = "2001-01-01 01:01:01")
+    private Date updateTime;
 }

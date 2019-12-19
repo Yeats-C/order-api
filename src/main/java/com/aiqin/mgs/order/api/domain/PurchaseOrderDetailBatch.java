@@ -24,7 +24,7 @@ public class PurchaseOrderDetailBatch implements Serializable {
     private String skuName;
     @ApiModelProperty(value = "批次号")
     private String batchCode;
-    @ApiModelProperty(value = "生产日期")
+    @ApiModelProperty(value = "生产日期",example = "2001-01-01 01:01:01")
     private Date productDate;
     @ApiModelProperty(value = "批次备注")
     private String batchRemark;
@@ -54,8 +54,8 @@ public class PurchaseOrderDetailBatch implements Serializable {
     private String updateById;
     @ApiModelProperty(value = "修改人名称")
     private String updateByName;
-    @ApiModelProperty(value = "创建时间")
-    private String createTime;
-    @ApiModelProperty(value = "修改时间")
-    private String updateTime;
+    @ApiModelProperty(value = "创建时间",example = "2001-01-01 01:01:01")
+    private Date createTime;
+    @ApiModelProperty(value = "修改时间",example = "2001-01-01 01:01:01")
+    private Date updateTime;
 }

@@ -36,6 +36,465 @@
     <result column="create_by_name" jdbcType="VARCHAR" property="createByName" />
     <result column="update_by_id" jdbcType="VARCHAR" property="updateById" />
     <result column="update_by_name" jdbcType="VARCHAR" property="updateByName" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, purchase_order_detail_id, purchase_order_code, spu_code, spu_name, sku_code, 
+    sku_name, brand_code, brand_name, category_code, category_name, product_spec, color_code, 
+    color_name, model_code, unit_code, unit_name, product_type, purchase_whole, purchase_single, 
+    base_product_spec, box_gauge, tax_rate, line_code, factory_sku_code, tax_amount, 
+    total_tax_amount, total_count, actual_total_tax_amount, use_status, create_by_id, 
+    create_by_name, update_by_id, update_by_name, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from purchase_order_detail
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from purchase_order_detail
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insertList" parameterType="java.util.List">
+    insert into purchase_order_detail (purchase_order_detail_id, purchase_order_code,
+      spu_code, spu_name, sku_code, 
+      sku_name, brand_code, brand_name, 
+      category_code, category_name, product_spec, 
+      color_code, color_name, model_code, 
+      unit_code, unit_name, product_type, 
+      purchase_whole, purchase_single, base_product_spec, 
+      box_gauge, tax_rate, line_code, 
+      factory_sku_code, tax_amount, total_tax_amount, 
+      total_count, actual_total_tax_amount, use_status, 
+      create_by_id, create_by_name, update_by_id, 
+      update_by_name, create_time, update_time
+      )
+    <foreach collection="list" item="PurchaseOrderDetail" separator=",">
+    values (#{purchaseOrderDetailId,jdbcType=VARCHAR}, #{purchaseOrderCode,jdbcType=VARCHAR},
+      #{spuCode,jdbcType=VARCHAR}, #{spuName,jdbcType=VARCHAR}, #{skuCode,jdbcType=VARCHAR}, 
+      #{skuName,jdbcType=VARCHAR}, #{brandCode,jdbcType=VARCHAR}, #{brandName,jdbcType=VARCHAR}, 
+      #{categoryCode,jdbcType=VARCHAR}, #{categoryName,jdbcType=VARCHAR}, #{productSpec,jdbcType=VARCHAR}, 
+      #{colorCode,jdbcType=VARCHAR}, #{colorName,jdbcType=VARCHAR}, #{modelCode,jdbcType=VARCHAR}, 
+      #{unitCode,jdbcType=VARCHAR}, #{unitName,jdbcType=VARCHAR}, #{productType,jdbcType=BIT}, 
+      #{purchaseWhole,jdbcType=BIGINT}, #{purchaseSingle,jdbcType=BIGINT}, #{baseProductSpec,jdbcType=BIGINT}, 
+      #{boxGauge,jdbcType=VARCHAR}, #{taxRate,jdbcType=DECIMAL}, #{lineCode,jdbcType=BIGINT}, 
+      #{factorySkuCode,jdbcType=VARCHAR}, #{taxAmount,jdbcType=DECIMAL}, #{totalTaxAmount,jdbcType=DECIMAL}, 
+      #{totalCount,jdbcType=BIGINT}, #{actualTotalTaxAmount,jdbcType=DECIMAL}, #{useStatus,jdbcType=BIT}, 
+      #{createById,jdbcType=VARCHAR}, #{createByName,jdbcType=VARCHAR}, #{updateById,jdbcType=VARCHAR}, 
+      #{updateByName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+    </foreach>
+  </insert>
+  <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.PurchaseOrderDetail">
+    insert into purchase_order_detail
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="purchaseOrderDetailId != null">
+        purchase_order_detail_id,
+      </if>
+      <if test="purchaseOrderCode != null">
+        purchase_order_code,
+      </if>
+      <if test="spuCode != null">
+        spu_code,
+      </if>
+      <if test="spuName != null">
+        spu_name,
+      </if>
+      <if test="skuCode != null">
+        sku_code,
+      </if>
+      <if test="skuName != null">
+        sku_name,
+      </if>
+      <if test="brandCode != null">
+        brand_code,
+      </if>
+      <if test="brandName != null">
+        brand_name,
+      </if>
+      <if test="categoryCode != null">
+        category_code,
+      </if>
+      <if test="categoryName != null">
+        category_name,
+      </if>
+      <if test="productSpec != null">
+        product_spec,
+      </if>
+      <if test="colorCode != null">
+        color_code,
+      </if>
+      <if test="colorName != null">
+        color_name,
+      </if>
+      <if test="modelCode != null">
+        model_code,
+      </if>
+      <if test="unitCode != null">
+        unit_code,
+      </if>
+      <if test="unitName != null">
+        unit_name,
+      </if>
+      <if test="productType != null">
+        product_type,
+      </if>
+      <if test="purchaseWhole != null">
+        purchase_whole,
+      </if>
+      <if test="purchaseSingle != null">
+        purchase_single,
+      </if>
+      <if test="baseProductSpec != null">
+        base_product_spec,
+      </if>
+      <if test="boxGauge != null">
+        box_gauge,
+      </if>
+      <if test="taxRate != null">
+        tax_rate,
+      </if>
+      <if test="lineCode != null">
+        line_code,
+      </if>
+      <if test="factorySkuCode != null">
+        factory_sku_code,
+      </if>
+      <if test="taxAmount != null">
+        tax_amount,
+      </if>
+      <if test="totalTaxAmount != null">
+        total_tax_amount,
+      </if>
+      <if test="totalCount != null">
+        total_count,
+      </if>
+      <if test="actualTotalTaxAmount != null">
+        actual_total_tax_amount,
+      </if>
+      <if test="useStatus != null">
+        use_status,
+      </if>
+      <if test="createById != null">
+        create_by_id,
+      </if>
+      <if test="createByName != null">
+        create_by_name,
+      </if>
+      <if test="updateById != null">
+        update_by_id,
+      </if>
+      <if test="updateByName != null">
+        update_by_name,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="purchaseOrderDetailId != null">
+        #{purchaseOrderDetailId,jdbcType=VARCHAR},
+      </if>
+      <if test="purchaseOrderCode != null">
+        #{purchaseOrderCode,jdbcType=VARCHAR},
+      </if>
+      <if test="spuCode != null">
+        #{spuCode,jdbcType=VARCHAR},
+      </if>
+      <if test="spuName != null">
+        #{spuName,jdbcType=VARCHAR},
+      </if>
+      <if test="skuCode != null">
+        #{skuCode,jdbcType=VARCHAR},
+      </if>
+      <if test="skuName != null">
+        #{skuName,jdbcType=VARCHAR},
+      </if>
+      <if test="brandCode != null">
+        #{brandCode,jdbcType=VARCHAR},
+      </if>
+      <if test="brandName != null">
+        #{brandName,jdbcType=VARCHAR},
+      </if>
+      <if test="categoryCode != null">
+        #{categoryCode,jdbcType=VARCHAR},
+      </if>
+      <if test="categoryName != null">
+        #{categoryName,jdbcType=VARCHAR},
+      </if>
+      <if test="productSpec != null">
+        #{productSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="colorCode != null">
+        #{colorCode,jdbcType=VARCHAR},
+      </if>
+      <if test="colorName != null">
+        #{colorName,jdbcType=VARCHAR},
+      </if>
+      <if test="modelCode != null">
+        #{modelCode,jdbcType=VARCHAR},
+      </if>
+      <if test="unitCode != null">
+        #{unitCode,jdbcType=VARCHAR},
+      </if>
+      <if test="unitName != null">
+        #{unitName,jdbcType=VARCHAR},
+      </if>
+      <if test="productType != null">
+        #{productType,jdbcType=BIT},
+      </if>
+      <if test="purchaseWhole != null">
+        #{purchaseWhole,jdbcType=BIGINT},
+      </if>
+      <if test="purchaseSingle != null">
+        #{purchaseSingle,jdbcType=BIGINT},
+      </if>
+      <if test="baseProductSpec != null">
+        #{baseProductSpec,jdbcType=BIGINT},
+      </if>
+      <if test="boxGauge != null">
+        #{boxGauge,jdbcType=VARCHAR},
+      </if>
+      <if test="taxRate != null">
+        #{taxRate,jdbcType=DECIMAL},
+      </if>
+      <if test="lineCode != null">
+        #{lineCode,jdbcType=BIGINT},
+      </if>
+      <if test="factorySkuCode != null">
+        #{factorySkuCode,jdbcType=VARCHAR},
+      </if>
+      <if test="taxAmount != null">
+        #{taxAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="totalTaxAmount != null">
+        #{totalTaxAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="totalCount != null">
+        #{totalCount,jdbcType=BIGINT},
+      </if>
+      <if test="actualTotalTaxAmount != null">
+        #{actualTotalTaxAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="useStatus != null">
+        #{useStatus,jdbcType=BIT},
+      </if>
+      <if test="createById != null">
+        #{createById,jdbcType=VARCHAR},
+      </if>
+      <if test="createByName != null">
+        #{createByName,jdbcType=VARCHAR},
+      </if>
+      <if test="updateById != null">
+        #{updateById,jdbcType=VARCHAR},
+      </if>
+      <if test="updateByName != null">
+        #{updateByName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.PurchaseOrderDetail">
+    update purchase_order_detail
+    <set>
+      <if test="purchaseOrderDetailId != null">
+        purchase_order_detail_id = #{purchaseOrderDetailId,jdbcType=VARCHAR},
+      </if>
+      <if test="purchaseOrderCode != null">
+        purchase_order_code = #{purchaseOrderCode,jdbcType=VARCHAR},
+      </if>
+      <if test="spuCode != null">
+        spu_code = #{spuCode,jdbcType=VARCHAR},
+      </if>
+      <if test="spuName != null">
+        spu_name = #{spuName,jdbcType=VARCHAR},
+      </if>
+      <if test="skuCode != null">
+        sku_code = #{skuCode,jdbcType=VARCHAR},
+      </if>
+      <if test="skuName != null">
+        sku_name = #{skuName,jdbcType=VARCHAR},
+      </if>
+      <if test="brandCode != null">
+        brand_code = #{brandCode,jdbcType=VARCHAR},
+      </if>
+      <if test="brandName != null">
+        brand_name = #{brandName,jdbcType=VARCHAR},
+      </if>
+      <if test="categoryCode != null">
+        category_code = #{categoryCode,jdbcType=VARCHAR},
+      </if>
+      <if test="categoryName != null">
+        category_name = #{categoryName,jdbcType=VARCHAR},
+      </if>
+      <if test="productSpec != null">
+        product_spec = #{productSpec,jdbcType=VARCHAR},
+      </if>
+      <if test="colorCode != null">
+        color_code = #{colorCode,jdbcType=VARCHAR},
+      </if>
+      <if test="colorName != null">
+        color_name = #{colorName,jdbcType=VARCHAR},
+      </if>
+      <if test="modelCode != null">
+        model_code = #{modelCode,jdbcType=VARCHAR},
+      </if>
+      <if test="unitCode != null">
+        unit_code = #{unitCode,jdbcType=VARCHAR},
+      </if>
+      <if test="unitName != null">
+        unit_name = #{unitName,jdbcType=VARCHAR},
+      </if>
+      <if test="productType != null">
+        product_type = #{productType,jdbcType=BIT},
+      </if>
+      <if test="purchaseWhole != null">
+        purchase_whole = #{purchaseWhole,jdbcType=BIGINT},
+      </if>
+      <if test="purchaseSingle != null">
+        purchase_single = #{purchaseSingle,jdbcType=BIGINT},
+      </if>
+      <if test="baseProductSpec != null">
+        base_product_spec = #{baseProductSpec,jdbcType=BIGINT},
+      </if>
+      <if test="boxGauge != null">
+        box_gauge = #{boxGauge,jdbcType=VARCHAR},
+      </if>
+      <if test="taxRate != null">
+        tax_rate = #{taxRate,jdbcType=DECIMAL},
+      </if>
+      <if test="lineCode != null">
+        line_code = #{lineCode,jdbcType=BIGINT},
+      </if>
+      <if test="factorySkuCode != null">
+        factory_sku_code = #{factorySkuCode,jdbcType=VARCHAR},
+      </if>
+      <if test="taxAmount != null">
+        tax_amount = #{taxAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="totalTaxAmount != null">
+        total_tax_amount = #{totalTaxAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="totalCount != null">
+        total_count = #{totalCount,jdbcType=BIGINT},
+      </if>
+      <if test="actualTotalTaxAmount != null">
+        actual_total_tax_amount = #{actualTotalTaxAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="useStatus != null">
+        use_status = #{useStatus,jdbcType=BIT},
+      </if>
+      <if test="createById != null">
+        create_by_id = #{createById,jdbcType=VARCHAR},
+      </if>
+      <if test="createByName != null">
+        create_by_name = #{createByName,jdbcType=VARCHAR},
+      </if>
+      <if test="updateById != null">
+        update_by_id = #{updateById,jdbcType=VARCHAR},
+      </if>
+      <if test="updateByName != null">
+        update_by_name = #{updateByName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.aiqin.mgs.order.api.domain.PurchaseOrderDetail">
+    update purchase_order_detail
+    set purchase_order_detail_id = #{purchaseOrderDetailId,jdbcType=VARCHAR},
+      purchase_order_code = #{purchaseOrderCode,jdbcType=VARCHAR},
+      spu_code = #{spuCode,jdbcType=VARCHAR},
+      spu_name = #{spuName,jdbcType=VARCHAR},
+      sku_code = #{skuCode,jdbcType=VARCHAR},
+      sku_name = #{skuName,jdbcType=VARCHAR},
+      brand_code = #{brandCode,jdbcType=VARCHAR},
+      brand_name = #{brandName,jdbcType=VARCHAR},
+      category_code = #{categoryCode,jdbcType=VARCHAR},
+      category_name = #{categoryName,jdbcType=VARCHAR},
+      product_spec = #{productSpec,jdbcType=VARCHAR},
+      color_code = #{colorCode,jdbcType=VARCHAR},
+      color_name = #{colorName,jdbcType=VARCHAR},
+      model_code = #{modelCode,jdbcType=VARCHAR},
+      unit_code = #{unitCode,jdbcType=VARCHAR},
+      unit_name = #{unitName,jdbcType=VARCHAR},
+      product_type = #{productType,jdbcType=BIT},
+      purchase_whole = #{purchaseWhole,jdbcType=BIGINT},
+      purchase_single = #{purchaseSingle,jdbcType=BIGINT},
+      base_product_spec = #{baseProductSpec,jdbcType=BIGINT},
+      box_gauge = #{boxGauge,jdbcType=VARCHAR},
+      tax_rate = #{taxRate,jdbcType=DECIMAL},
+      line_code = #{lineCode,jdbcType=BIGINT},
+      factory_sku_code = #{factorySkuCode,jdbcType=VARCHAR},
+      tax_amount = #{taxAmount,jdbcType=DECIMAL},
+      total_tax_amount = #{totalTaxAmount,jdbcType=DECIMAL},
+      total_count = #{totalCount,jdbcType=BIGINT},
+      actual_total_tax_amount = #{actualTotalTaxAmount,jdbcType=DECIMAL},
+      use_status = #{useStatus,jdbcType=BIT},
+      create_by_id = #{createById,jdbcType=VARCHAR},
+      create_by_name = #{createByName,jdbcType=VARCHAR},
+      update_by_id = #{updateById,jdbcType=VARCHAR},
+      update_by_name = #{updateByName,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.PurchaseOrderDetail">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="purchase_order_detail_id" jdbcType="VARCHAR" property="purchaseOrderDetailId" />
+    <result column="purchase_order_code" jdbcType="VARCHAR" property="purchaseOrderCode" />
+    <result column="spu_code" jdbcType="VARCHAR" property="spuCode" />
+    <result column="spu_name" jdbcType="VARCHAR" property="spuName" />
+    <result column="sku_code" jdbcType="VARCHAR" property="skuCode" />
+    <result column="sku_name" jdbcType="VARCHAR" property="skuName" />
+    <result column="brand_code" jdbcType="VARCHAR" property="brandCode" />
+    <result column="brand_name" jdbcType="VARCHAR" property="brandName" />
+    <result column="category_code" jdbcType="VARCHAR" property="categoryCode" />
+    <result column="category_name" jdbcType="VARCHAR" property="categoryName" />
+    <result column="product_spec" jdbcType="VARCHAR" property="productSpec" />
+    <result column="color_code" jdbcType="VARCHAR" property="colorCode" />
+    <result column="color_name" jdbcType="VARCHAR" property="colorName" />
+    <result column="model_code" jdbcType="VARCHAR" property="modelCode" />
+    <result column="unit_code" jdbcType="VARCHAR" property="unitCode" />
+    <result column="unit_name" jdbcType="VARCHAR" property="unitName" />
+    <result column="product_type" jdbcType="BIT" property="productType" />
+    <result column="purchase_whole" jdbcType="BIGINT" property="purchaseWhole" />
+    <result column="purchase_single" jdbcType="BIGINT" property="purchaseSingle" />
+    <result column="base_product_spec" jdbcType="BIGINT" property="baseProductSpec" />
+    <result column="box_gauge" jdbcType="VARCHAR" property="boxGauge" />
+    <result column="tax_rate" jdbcType="DECIMAL" property="taxRate" />
+    <result column="line_code" jdbcType="BIGINT" property="lineCode" />
+    <result column="factory_sku_code" jdbcType="VARCHAR" property="factorySkuCode" />
+    <result column="tax_amount" jdbcType="DECIMAL" property="taxAmount" />
+    <result column="total_tax_amount" jdbcType="DECIMAL" property="totalTaxAmount" />
+    <result column="total_count" jdbcType="BIGINT" property="totalCount" />
+    <result column="actual_total_tax_amount" jdbcType="DECIMAL" property="actualTotalTaxAmount" />
+    <result column="use_status" jdbcType="BIT" property="useStatus" />
+    <result column="create_by_id" jdbcType="VARCHAR" property="createById" />
+    <result column="create_by_name" jdbcType="VARCHAR" property="createByName" />
+    <result column="update_by_id" jdbcType="VARCHAR" property="updateById" />
+    <result column="update_by_name" jdbcType="VARCHAR" property="updateByName" />
     <result column="create_time" jdbcType="VARCHAR" property="createTime" />
     <result column="update_time" jdbcType="VARCHAR" property="updateTime" />
   </resultMap>
