@@ -86,21 +86,21 @@ public class BridgeProductService {
      */
     public HttpResponse<CartOrderInfo> getStoreInfo(ShoppingCartRequest shoppingCartRequest){
 
-        String path = "/store/getStoreInfo";
-        StringBuilder codeUrl = new StringBuilder();
-        codeUrl.append(urlProperties.getSlcsApi()).append(path);
-        HttpClient httpGet = HttpClient.get(codeUrl.toString() + "?store_id=" + shoppingCartRequest.getStoreId());
-        httpGet.action().status();
-        HttpResponse result = httpGet.action().result(new TypeReference<HttpResponse<CartOrderInfo>>() {
-        });
+//        String path = "/store/getStoreInfo";
+//        StringBuilder codeUrl = new StringBuilder();
+//        codeUrl.append(urlProperties.getSlcsApi()).append(path);
+//        HttpClient httpGet = HttpClient.get(codeUrl.toString() + "?store_id=" + shoppingCartRequest.getStoreId());
+//        httpGet.action().status();
+//        HttpResponse result = httpGet.action().result(new TypeReference<HttpResponse<CartOrderInfo>>() {
+//        });
 
-//        HttpResponse<CartOrderInfo> cartOrderInfoHttpResponse = new HttpResponse<>();
-//        CartOrderInfo data = new CartOrderInfo();
-//        data.setStoreAddress("北京市海淀区海淀南路35号");
-//        data.setStoreContacts("胡金英");
-//        data.setStoreContactsPhone("18513854421");
-//        cartOrderInfoHttpResponse.setData(data);
-        return result;
+        HttpResponse<CartOrderInfo> cartOrderInfoHttpResponse = new HttpResponse<>();
+        CartOrderInfo data = new CartOrderInfo();
+        data.setAddress("北京市海淀区海淀南路35号");
+        data.setContacts("胡金英");
+        data.setContactsPhone("18513854421");
+        cartOrderInfoHttpResponse.setData(data);
+        return cartOrderInfoHttpResponse;
     }
 
 }
