@@ -107,11 +107,9 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                 //审核通过，修改本地主表状态
                 couponApprovalInfo.setStatus(StatusEnum.AUDIT_PASS.getValue());
                 couponApprovalInfo.setStatuStr(StatusEnum.AUDIT_PASS.getDesc());
-                //计算A品券数量，同步到虚拟资产
-                List<FranchiseeAsset> list=new ArrayList();
                 Double totalMoney=couponApprovalDetail.getTotalMoney();
-                //同步到虚拟资产
-                List<FranchiseeAsset> franchiseeAssets=new ArrayList<>();
+                //计算A品券数量，同步到虚拟资产
+                List<FranchiseeAssetVo> franchiseeAssets=new ArrayList<>();
                 if(couponApprovalDetail!=null&&totalMoney!=null){
                     //计算面值为100的A品券数量
                     int num=(int)(totalMoney/100);
@@ -130,7 +128,7 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                         couponInfo.setCouponCode(couponCode());
                         couponInfo.setNominalValue(ConstantData.nominalValue);
                         couponInfoList.add(couponInfo);
-                        FranchiseeAsset franchiseeAsset=new FranchiseeAsset();
+                        FranchiseeAssetVo franchiseeAsset=new FranchiseeAssetVo();
                         BeanUtils.copyProperties(couponInfo,franchiseeAsset);
                         franchiseeAssets.add(franchiseeAsset);
                     }
@@ -138,7 +136,7 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                         couponInfo.setCouponCode(couponCode());
                         couponInfo.setNominalValue(BigDecimal.valueOf(balance));
                         couponInfoList.add(couponInfo);
-                        FranchiseeAsset franchiseeAsset=new FranchiseeAsset();
+                        FranchiseeAssetVo franchiseeAsset=new FranchiseeAssetVo();
                         BeanUtils.copyProperties(couponInfo,franchiseeAsset);
                         franchiseeAssets.add(franchiseeAsset);
                     }
@@ -153,8 +151,6 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                     String request= URLConnectionUtil.doPost(url,null,json);
                     log.info("同步到虚拟资产:"+request);
                 }
-
-
 
             } else if (TpmBpmUtils.isPass(formCallBackVo.getUpdateFormStatus(), formCallBackVo.getOptBtn())) {
                 couponApprovalInfo.setStatus(StatusEnum.AUDIT.getValue());
