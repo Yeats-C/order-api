@@ -74,8 +74,8 @@ public class RejectRecordDetail {
     private String updateById;
     @ApiModelProperty(value = "修改人名称")
     private String updateByName;
-    @ApiModelProperty(value = "创建时间")
-    private String createTime;
-    @ApiModelProperty(value = "修改时间")
-    private String updateTime;
+    @ApiModelProperty(value = "创建时间",example = "2001-01-01 01:01:01")
+    private Date createTime;
+    @ApiModelProperty(value = "修改时间",example = "2001-01-01 01:01:01")
+    private Date updateTime;
 }

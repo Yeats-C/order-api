@@ -43,7 +43,7 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.PurchaseOrderDetailBatch">
-    insert into purchase_order_detail_batch (purchase_order_detail_batch_id, purchase_order_code,
+    insert into purchase_order_detail_batch (id, purchase_order_detail_batch_id, purchase_order_code, 
       sku_code, sku_name, batch_code, 
       product_date, batch_remark, unit_code, 
       unit_name, purchase_whole, purchase_single, 
@@ -51,7 +51,7 @@
       line_code, use_status, create_by_id, 
       create_by_name, update_by_id, update_by_name, 
       create_time, update_time)
-    values (#{#{purchaseOrderDetailBatchId,jdbcType=VARCHAR}, #{purchaseOrderCode,jdbcType=VARCHAR},
+    values (#{id,jdbcType=BIGINT}, #{purchaseOrderDetailBatchId,jdbcType=VARCHAR}, #{purchaseOrderCode,jdbcType=VARCHAR}, 
       #{skuCode,jdbcType=VARCHAR}, #{skuName,jdbcType=VARCHAR}, #{batchCode,jdbcType=VARCHAR}, 
       #{productDate,jdbcType=TIMESTAMP}, #{batchRemark,jdbcType=VARCHAR}, #{unitCode,jdbcType=VARCHAR}, 
       #{unitName,jdbcType=VARCHAR}, #{purchaseWhole,jdbcType=BIGINT}, #{purchaseSingle,jdbcType=BIGINT}, 
@@ -63,6 +63,9 @@
   <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.PurchaseOrderDetailBatch">
     insert into purchase_order_detail_batch
     <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
       <if test="purchaseOrderDetailBatchId != null">
         purchase_order_detail_batch_id,
       </if>
@@ -131,6 +134,9 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
       <if test="purchaseOrderDetailBatchId != null">
         #{purchaseOrderDetailBatchId,jdbcType=VARCHAR},
       </if>
