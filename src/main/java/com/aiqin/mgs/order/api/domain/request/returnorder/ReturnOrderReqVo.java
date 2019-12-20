@@ -120,6 +120,9 @@ public class ReturnOrderReqVo implements Serializable {
     @ApiModelProperty(value = "退货原因描述")
     private String returnReasonContent;
 
+    @ApiModelProperty(value = "来源类型")
+    private Integer sourceType;
+
     @ApiModelProperty(value = "明细")
     private List<ReturnOrderDetail> details;
 
