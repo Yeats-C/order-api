@@ -7,6 +7,8 @@ import lombok.ToString;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
+
 /**
  * 采购商品信息
  * TableName: purchase_order_detail
@@ -73,4 +75,16 @@ public class PurchaseOrderDetail implements Serializable {
     private BigDecimal actualTotalTaxAmount;
     @ApiModelProperty(value = "0. 启用   1.禁用")
     private Boolean useStatus;
+    @ApiModelProperty(value = "创建人编码")
+    private String createById;
+    @ApiModelProperty(value = "创建人名称")
+    private String createByName;
+    @ApiModelProperty(value = "修改人编码")
+    private String updateById;
+    @ApiModelProperty(value = "修改人名称")
+    private String updateByName;
+    @ApiModelProperty(value = "创建时间",example = "2001-01-01 01:01:01")
+    private Date createTime;
+    @ApiModelProperty(value = "修改时间",example = "2001-01-01 01:01:01")
+    private Date updateTime;
 }

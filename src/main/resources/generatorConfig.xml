@@ -40,10 +40,18 @@
         <!--对应数据库表 mysql可以加入主键自增 字段命名 忽略某字段等-->
         <!--operation_log-->
 
+        <!--
+        purchase_order
+        purchase_order_detail
+        purchase_order_detail_batch
+        -->
+
+
+
         <!--reject_record
         reject_record_detail
         reject_record_detail_batch-->
-        <table schema="general" tableName="reject_record_detail_batch" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
+        <table schema="general" tableName="purchase_order_detail_batch" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
                enableSelectByExample="false" selectByExampleQueryId="true" >
             <property name="useActualColumnNames" value="false"/>
     </table>

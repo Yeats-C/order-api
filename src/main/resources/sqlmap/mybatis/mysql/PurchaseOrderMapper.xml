@@ -52,11 +52,11 @@
     <result column="create_by_name" jdbcType="VARCHAR" property="createByName" />
     <result column="update_by_id" jdbcType="VARCHAR" property="updateById" />
     <result column="update_by_name" jdbcType="VARCHAR" property="updateByName" />
-    <result column="create_time" jdbcType="VARCHAR" property="createTime" />
-    <result column="update_time" jdbcType="VARCHAR" property="updateTime" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, purchase_order_id, purchase_order_code, company_code, company_name, supplier_code,
+    id, purchase_order_id, purchase_order_code, company_code, company_name, supplier_code, 
     supplier_name, transport_center_code, transport_center_name, warehouse_code, warehouse_name, 
     purchase_group_code, purchase_group_name, settlement_method_code, settlement_method_name, 
     purchase_order_status, purchase_mode, purchase_type, total_count, total_tax_amount, 
@@ -78,7 +78,7 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.PurchaseOrder">
-    insert into purchase_order (purchase_order_id, purchase_order_code,
+    insert into purchase_order (id, purchase_order_id, purchase_order_code, 
       company_code, company_name, supplier_code, 
       supplier_name, transport_center_code, transport_center_name, 
       warehouse_code, warehouse_name, purchase_group_code, 
@@ -97,7 +97,7 @@
       create_by_id, create_by_name, update_by_id, 
       update_by_name, create_time, update_time
       )
-    values (#{#{purchaseOrderId,jdbcType=VARCHAR}, #{purchaseOrderCode,jdbcType=VARCHAR},
+    values (#{id,jdbcType=BIGINT}, #{purchaseOrderId,jdbcType=VARCHAR}, #{purchaseOrderCode,jdbcType=VARCHAR}, 
       #{companyCode,jdbcType=VARCHAR}, #{companyName,jdbcType=VARCHAR}, #{supplierCode,jdbcType=VARCHAR}, 
       #{supplierName,jdbcType=VARCHAR}, #{transportCenterCode,jdbcType=VARCHAR}, #{transportCenterName,jdbcType=VARCHAR}, 
       #{warehouseCode,jdbcType=VARCHAR}, #{warehouseName,jdbcType=VARCHAR}, #{purchaseGroupCode,jdbcType=VARCHAR}, 
@@ -114,12 +114,15 @@
       #{paymentName,jdbcType=VARCHAR}, #{paymentTime,jdbcType=BIGINT}, #{preAmount,jdbcType=DECIMAL}, 
       #{remark,jdbcType=VARCHAR}, #{sourceCode,jdbcType=VARCHAR}, #{sourceType,jdbcType=BIT}, 
       #{createById,jdbcType=VARCHAR}, #{createByName,jdbcType=VARCHAR}, #{updateById,jdbcType=VARCHAR}, 
-      #{updateByName,jdbcType=VARCHAR}, #{createTime,jdbcType=VARCHAR}, #{updateTime,jdbcType=VARCHAR}
+      #{updateByName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.PurchaseOrder">
     insert into purchase_order
     <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
       <if test="purchaseOrderId != null">
         purchase_order_id,
       </if>
@@ -275,6 +278,9 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
       <if test="purchaseOrderId != null">
         #{purchaseOrderId,jdbcType=VARCHAR},
       </if>
@@ -423,10 +429,10 @@
         #{updateByName,jdbcType=VARCHAR},
       </if>
       <if test="createTime != null">
-        #{createTime,jdbcType=VARCHAR},
+        #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        #{updateTime,jdbcType=VARCHAR},
+        #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -581,10 +587,10 @@
         update_by_name = #{updateByName,jdbcType=VARCHAR},
       </if>
       <if test="createTime != null">
-        create_time = #{createTime,jdbcType=VARCHAR},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=VARCHAR},
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
@@ -640,8 +646,8 @@
       create_by_name = #{createByName,jdbcType=VARCHAR},
       update_by_id = #{updateById,jdbcType=VARCHAR},
       update_by_name = #{updateByName,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=VARCHAR},
-      update_time = #{updateTime,jdbcType=VARCHAR}
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>
