@@ -1,8 +1,6 @@
 package com.aiqin.mgs.order.api.domain.constant;
 
 
-import io.swagger.models.auth.In;
-
 public interface Global {
 
     /**
@@ -239,9 +237,10 @@ public interface Global {
     Integer DISTRIBUTION_TYPE_2 = 2;
     Integer DISTRIBUTION_TYPE_3 = 3;
 
-    //1:勾选 0:未勾选
+    //1:勾选 0:未勾选 2:全选
     Integer LINECHECKSTATUS_0 = 0;
     Integer LINECHECKSTATUS_1 = 1;
+    Integer LINECHECKSTATUS_2 = 2;
 
     //1:门店 2:erp
     Integer CREATESOURCE_1 = 1;

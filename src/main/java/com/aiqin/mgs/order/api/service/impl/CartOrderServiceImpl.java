@@ -26,6 +26,7 @@ import java.util.List;
 @Service
 public class CartOrderServiceImpl implements CartOrderService {
 
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CartServiceImpl.class);
 
     @Resource
@@ -147,7 +148,7 @@ public class CartOrderServiceImpl implements CartOrderService {
      */
     @Override
     public HttpResponse<CartResponse> selectCartByStoreId(String storeId, Integer productType, String skuId, Integer lineCheckStatus, Integer number) {
-        HttpResponse<CartResponse> response = new HttpResponse<>();
+        HttpResponse<CartResponse> response = HttpResponse.success();
         try {
             CartOrderInfo cartOrderInfo = new CartOrderInfo();
             cartOrderInfo.setStoreId(storeId);
@@ -156,30 +157,28 @@ public class CartOrderServiceImpl implements CartOrderService {
             lineCheckStatus = lineCheckStatus == null ? 0 : lineCheckStatus;
             //检查商品是否被勾选，勾选后，更新数据库标识
             LOGGER.info("商品勾选后，更新勾选状态：{}", lineCheckStatus);
-            if (null != skuId && lineCheckStatus.equals(Global.LINECHECKSTATUS_1)) {
+            if (null != skuId && lineCheckStatus.equals(Global.LINECHECKSTATUS_1) && null != number) {
                 cartOrderInfo.setSkuCode(skuId);
                 cartOrderInfo.setLineCheckStatus(lineCheckStatus);
                 cartOrderInfo.setAmount(number);
                 cartOrderDao.updateProductList(cartOrderInfo);
-                return HttpResponse.success();
+                CartResponse cartResponse = getProductList(cartOrderInfo);
+                LOGGER.info("返回购物车中的数据给前端：{}", cartResponse);
+                response.setData(cartResponse);
+                return response;
+                //如果是全选，通过门店id更新所有标记
+            }else if(null != storeId && lineCheckStatus.equals(Global.LINECHECKSTATUS_2)) {
+                cartOrderInfo.setStoreId(storeId);
+                cartOrderInfo.setLineCheckStatus(Global.LINECHECKSTATUS_1);
+                cartOrderDao.updateProductList(cartOrderInfo);
+                //返回商品列表并结算价格
+                CartResponse cartResponse = getProductList(cartOrderInfo);
+                LOGGER.info("返回购物车中的数据给前端：{}", cartResponse);
+                response.setData(cartResponse);
+                return response;
             } else {
-                //购物车数据
-                List<CartOrderInfo> cartInfoList = cartOrderDao.selectCartByStoreId(cartOrderInfo);
-                //计算商品总价格
-                BigDecimal acountActualprice = new BigDecimal(0);
-                for (CartOrderInfo cartOrderInfo1 : cartInfoList) {
-                    BigDecimal total = cartOrderInfo1.getPrice().multiply(new BigDecimal(cartOrderInfo1.getAmount()));
-                    acountActualprice = acountActualprice.add(total);
-                }
-                //计算商品总数量
-                int totalNumber = 0;
-                for (CartOrderInfo cartOrderInfo2 : cartInfoList) {
-                    totalNumber += cartOrderInfo2.getAmount();
-                }
-                CartResponse cartResponse = new CartResponse();
-                cartResponse.setCartInfoList(cartInfoList);
-                cartResponse.setAccountActualPrice(acountActualprice);
-                cartResponse.setTotalNumber(totalNumber);
+                //返回商品列表并结算价格
+                CartResponse cartResponse = getProductList(cartOrderInfo);
                 LOGGER.info("返回购物车中的数据给前端：{}", cartResponse);
                 response.setData(cartResponse);
                 return response;
@@ -192,6 +191,34 @@ public class CartOrderServiceImpl implements CartOrderService {
     }
 
     /**
+     * 返回购物车中的商品列表，并计算出商品总价和总数量
+     * @param cartOrderInfo
+     * @return
+     * @throws Exception
+     */
+    private CartResponse getProductList(CartOrderInfo cartOrderInfo) throws Exception {
+        //购物车数据
+        List<CartOrderInfo> cartInfoList = cartOrderDao.selectCartByStoreId(cartOrderInfo);
+        //计算商品总价格
+        BigDecimal acountActualprice = new BigDecimal(0);
+        for (CartOrderInfo cartOrderInfo1 : cartInfoList) {
+            BigDecimal total = cartOrderInfo1.getPrice().multiply(new BigDecimal(cartOrderInfo1.getAmount()));
+            acountActualprice = acountActualprice.add(total);
+        }
+        //计算商品总数量
+        int totalNumber = 0;
+        for (CartOrderInfo cartOrderInfo2 : cartInfoList) {
+            totalNumber += cartOrderInfo2.getAmount();
+        }
+        CartResponse cartResponse = new CartResponse();
+        cartResponse.setCartInfoList(cartInfoList);
+        cartResponse.setAccountActualPrice(acountActualprice);
+        cartResponse.setTotalNumber(totalNumber);
+        return cartResponse;
+    }
+
+
+    /**
      * 根据门店id返回商品的总数量
      *
      * @param storeId
@@ -199,7 +226,7 @@ public class CartOrderServiceImpl implements CartOrderService {
      */
     @Override
     public HttpResponse getTotal(String storeId) {
-        HttpResponse<Integer> response = new HttpResponse<>();
+        HttpResponse<Integer> response = HttpResponse.success();
         try {
             if (storeId != null) {
                 Integer total = cartOrderDao.getTotal(storeId);
@@ -238,7 +265,6 @@ public class CartOrderServiceImpl implements CartOrderService {
 
         } catch (Exception e) {
             LOGGER.error("清空购物车失败", e);
-
             return HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
         }
     }

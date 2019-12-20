@@ -6,7 +6,7 @@
         <result column="cart_id" jdbcType="VARCHAR" property="cartId"/>
         <result column="franchisee_id" jdbcType="VARCHAR" property="franchiseeId"/>
         <result column="store_id" jdbcType="VARCHAR" property="storeId"/>
-        <result column="sku_id" jdbcType="VARCHAR" property="skuCode"/>
+        <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
         <result column="spu_id" jdbcType="VARCHAR" property="spuId"/>
         <result column="product_name" jdbcType="VARCHAR" property="productName"/>
         <result column="amount" jdbcType="INTEGER" property="amount"/>
@@ -26,16 +26,16 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        product_id,cart_id,franchisee_id,store_id,sku_id,spu_id,product_name,amount,logo,price,color,create_time,update_time,product_size,activity_id,
+        product_id,cart_id,franchisee_id,store_id,sku_code,spu_id,product_name,amount,logo,price,color,create_time,update_time,product_size,activity_id,
         activity_name,product_type,create_source,product_gift,gift_parent_cart_id,line_check_status
     </sql>
 
     <!-- 将商品添加添加购物车 -->
     <insert id="insertCart" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo">
         insert into order_store_cart
-			(product_id,cart_id,product_name,amount,logo,create_time,update_time,price,color,product_size,activity_id,activity_name,product_type,sku_id,spu_id,store_id,create_source)
+			(product_id,cart_id,product_name,amount,logo,create_time,update_time,price,color,product_size,activity_id,activity_name,product_type,sku_code,spu_id,store_id,create_source)
 		values
-		    (#{productId},#{cartId},#{productName},#{amount},#{logo},#{createTime},#{updateTime},#{price},#{color},#{productSize},#{activityId},#{activityName},#{productType},#{skuId},#{spuId},#{storeId},#{createSource})
+		    (#{productId},#{cartId},#{productName},#{amount},#{logo},#{createTime},#{updateTime},#{price},#{color},#{productSize},#{activityId},#{activityName},#{productType},#{skuCode},#{spuId},#{storeId},#{createSource})
     </insert>
 
     <!-- 判断SKU商品是否已存在购物车中 -->
@@ -44,9 +44,9 @@
         <where>
             store_id =#{storeId}
             and product_id = #{productId}
-            and sku_id = #{skuId}
+            and sku_code = #{skuCode}
         </where>
-        GROUP BY store_id,product_id,sku_id
+        GROUP BY store_id,product_id,sku_code
     </select>
 
     <!-- 更新购物车 -->
@@ -55,15 +55,23 @@
         <where>
             and store_id = #{storeId}
             and product_id = #{productId}
-            and sku_id = #{skuId}
+            and sku_code = #{skuCode}
         </where>
     </update>
 
     <!-- 更新购物车里的商品标识 -->
     <update id="updateProductList" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo">
-        update order_store_cart set line_check_status=#{lineCheckStatus},amount=#{amount}
+        update order_store_cart set line_check_status=#{lineCheckStatus}
         <where>
-            and sku_id = #{skuId}
+            <if test="amount != null and amount != ''">
+                and amount = #{amount}
+            </if>
+            <if test="skuCode != null and skuCode != ''">
+                and sku_code = #{skuCode}
+            </if>
+            <if test="storeId != null and storeId != ''">
+                and store_id = #{storeId}
+            </if>
         </where>
     </update>
 
@@ -75,10 +83,10 @@
         SELECT <include refid="Base_Column_List"/>
         FROM order_store_cart
         <where>
-            <if test="storeId != ''||storeId != null">
+            <if test="storeId != '' and storeId != null">
                 and store_id = #{storeId}
             </if>
-            <if test="productType != ''||productType != null">
+            <if test="productType != ''and productType != null">
                 and product_type = #{productType}
             </if>
         </where>
@@ -97,13 +105,13 @@
     <delete id="deleteCart" >
 		delete from order_store_cart
 		<where>
-		    <if test="storeId != null " >
+		    <if test="storeId != null and storeId != '' " >
                 and store_id =#{storeId}
             </if>
-            <if test="skuId != null">
-              and sku_id = #{skuId}
+            <if test="skuCode != null and skuCode != ''">
+              and sku_code = #{skuCode}
             </if>
-            <if test="lineCheckStatus != null">
+            <if test="lineCheckStatus != null and lineCheckStatus != ''">
                 and line_check_status = #{lineCheckStatus}
             </if>
         </where>

@@ -11,7 +11,6 @@ import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrde
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -60,23 +59,23 @@ public class BridgeProductService {
      * @return
      */
     public HttpResponse<List<CartOrderInfo>> getProduct(ShoppingCartRequest shoppingCartRequest){
-        String path = "/product/productInfo";
-        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartRequest);
-        HttpResponse<List<CartOrderInfo>> response = httpClient.action().result(new TypeReference<HttpResponse<CartOrderInfo>>() {
-        });
+//        String path = "/product/productInfo";
+//        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartRequest);
+//        HttpResponse<List<CartOrderInfo>> response = httpClient.action().result(new TypeReference<HttpResponse<CartOrderInfo>>() {
+//        });
         //测试接口
-//        HttpResponse<List<CartOrderInfo>> cartOrderInfoHttpResponse = new HttpResponse<>();
-//        CartOrderInfo data = new CartOrderInfo();
-//        data.setProductId("12345");
-//        data.setStoreId("12345");
-//        data.setSkuId("12345");
-//        data.setAmount(20);
-//        data.setPrice(new BigDecimal(29.10));
-//        data.setProductType(1);
-//        ArrayList<CartOrderInfo> list = new ArrayList<>();
-//        list.add(data);
-//        cartOrderInfoHttpResponse.setData(list);
-        return response;
+        HttpResponse<List<CartOrderInfo>> cartOrderInfoHttpResponse = new HttpResponse<>();
+        CartOrderInfo data = new CartOrderInfo();
+        data.setProductId("12345");
+        data.setStoreId("12345");
+        data.setSkuCode("12345");
+        data.setAmount(20);
+        data.setPrice(new BigDecimal(29.10));
+        data.setProductType(1);
+        ArrayList<CartOrderInfo> list = new ArrayList<>();
+        list.add(data);
+        cartOrderInfoHttpResponse.setData(list);
+        return cartOrderInfoHttpResponse;
     }
 
 
@@ -87,21 +86,21 @@ public class BridgeProductService {
      */
     public HttpResponse<CartOrderInfo> getStoreInfo(ShoppingCartRequest shoppingCartRequest){
 
-        String path = "/store/getStoreInfo";
-        StringBuilder codeUrl = new StringBuilder();
-        codeUrl.append(urlProperties.getSlcsApi()).append(path);
-        HttpClient httpGet = HttpClient.get(codeUrl.toString() + "?store_id=" + shoppingCartRequest.getStoreId());
-        httpGet.action().status();
-        HttpResponse result = httpGet.action().result(new TypeReference<HttpResponse<CartOrderInfo>>() {
-        });
+//        String path = "/store/getStoreInfo";
+//        StringBuilder codeUrl = new StringBuilder();
+//        codeUrl.append(urlProperties.getSlcsApi()).append(path);
+//        HttpClient httpGet = HttpClient.get(codeUrl.toString() + "?store_id=" + shoppingCartRequest.getStoreId());
+//        httpGet.action().status();
+//        HttpResponse result = httpGet.action().result(new TypeReference<HttpResponse<CartOrderInfo>>() {
+//        });
 
-//        HttpResponse<CartOrderInfo> cartOrderInfoHttpResponse = new HttpResponse<>();
-//        CartOrderInfo data = new CartOrderInfo();
-//        data.setStoreAddress("北京市海淀区海淀南路35号");
-//        data.setStoreContacts("胡金英");
-//        data.setStoreContactsPhone("18513854421");
-//        cartOrderInfoHttpResponse.setData(data);
-        return result;
+        HttpResponse<CartOrderInfo> cartOrderInfoHttpResponse = new HttpResponse<>();
+        CartOrderInfo data = new CartOrderInfo();
+        data.setAddress("北京市海淀区海淀南路35号");
+        data.setContacts("胡金英");
+        data.setContactsPhone("18513854421");
+        cartOrderInfoHttpResponse.setData(data);
+        return cartOrderInfoHttpResponse;
     }
 
 }

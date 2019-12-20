@@ -28,6 +28,67 @@ public class CartOrderInfo {
     @JsonProperty("amount")
     private int amount;
 
+    /***商品最大订货数量*/
+    @ApiModelProperty(value = "商品最大订货数量")
+    @JsonProperty("max_number")
+    private Integer maxNumber;
+
+    /***最小订货倍数*/
+    @ApiModelProperty(value = "最小订货倍数")
+    @JsonProperty("order_multiple")
+    private Integer order_multiple;
+
+    /***库存数量*/
+    @ApiModelProperty(value = "库存数量")
+    @JsonProperty("stock_number")
+    private int stockNumber;
+
+    /***生产日期*/
+    @ApiModelProperty(value = "生产日期")
+    @JsonProperty("production_date")
+    private int productionDate;
+
+    /***商品标签名称*/
+    @ApiModelProperty(value = "商品标签名称")
+    @JsonProperty("label_name")
+    private int labelName;
+
+    /***商品标签名称*/
+    @ApiModelProperty(value = "商品标签编码")
+    @JsonProperty("label_code")
+    private int labelCode;
+
+    /***商品属性名称*/
+    @ApiModelProperty(value = "商品属性名称")
+    @JsonProperty("product_property_name")
+    private int productPropertyName;
+
+    /***商品属性编码*/
+    @ApiModelProperty(value = "商品属性编码")
+    @JsonProperty("product_property_code")
+    private int productPropertyCode;
+
+    /***商品品牌名称*/
+    @ApiModelProperty(value = "商品品牌名称")
+    @JsonProperty("product_brand_name")
+    private int productBrandName;
+
+    /***商品品牌编码*/
+    @ApiModelProperty(value = "商品品牌编码")
+    @JsonProperty("product_brand_code")
+    private int productBrandCode;
+
+    /***商品品类名称*/
+    @ApiModelProperty(value = "商品品类名称")
+    @JsonProperty("`product_category_name")
+    private int productCategoryName;
+
+    /***商品品类编码*/
+    @ApiModelProperty(value = "商品品类编码")
+    @JsonProperty("`product_category_code")
+    private int productCategoryCode;
+
+
     /***商品logo图片*/
     @ApiModelProperty(value = "商品logo图片")
     @JsonProperty("logo")
@@ -37,6 +98,11 @@ public class CartOrderInfo {
     @ApiModelProperty(value = "商品原价")
     @JsonProperty("price")
     private BigDecimal price;
+
+    /***商品特价*/
+    @ApiModelProperty(value = "商品特价")
+    @JsonProperty("special_price")
+    private BigDecimal specialPrice;
 
     /**实付金额总和*/
     @ApiModelProperty(value = "实付金额总和")
@@ -109,9 +175,9 @@ public class CartOrderInfo {
     private Integer productType;
 
     /***skuId集合*/
-    @ApiModelProperty(value = "skuId集合")
-    @JsonProperty("sku_ids")
-    private List<String> skuIds;
+    @ApiModelProperty(value = "skuCodes集合")
+    @JsonProperty("sku_codes")
+    private List<String> skuCodes;
 
     /***门店地址*/
     @ApiModelProperty(value = "门店地址")
@@ -129,12 +195,12 @@ public class CartOrderInfo {
     private String contactsPhone;
 
     /***商品添加来源 1:门店 2:erp*/
-    @ApiModelProperty(value = "商品添加来源")
+    @ApiModelProperty(value = "商品添加来源 1:门店 2:erp")
     @JsonProperty("create_source")
     private String createSource;
 
-    /***本品或者赠品 1:本品 2:赠品*/
-    @ApiModelProperty(value = "本品或者赠品")
+    /***本品或者赠品 0:本品 1:赠品*/
+    @ApiModelProperty(value = "本品或者赠品 0:本品 1:赠品")
     @JsonProperty("product_gift")
     private Integer productGift;
 
@@ -144,7 +210,7 @@ public class CartOrderInfo {
     private String giftParentCartId;
 
     /***行是否选中 1:true 0:false*/
-    @ApiModelProperty(value = "行是否选中")
+    @ApiModelProperty(value = "行是否选中 1:是 0:否")
     @JsonProperty("line_check_status")
     private Integer lineCheckStatus;
 

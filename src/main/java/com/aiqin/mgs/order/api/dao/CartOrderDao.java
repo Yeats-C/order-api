@@ -2,10 +2,7 @@ package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.flyway.FlywayDataSource;
 
-import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -31,7 +28,7 @@ public interface CartOrderDao {
     Integer getTotal(@Param("storeId") String storeId) throws Exception;
 
     // 删除购物车中商品
-    void deleteCart(@Param("storeId") String storeId,@Param("skuId") String skuId,@Param("lineCheckStatus") Integer lineCheckStatus) throws Exception;
+    void deleteCart(@Param("storeId") String storeId,@Param("skuCode") String skuId,@Param("lineCheckStatus") Integer lineCheckStatus) throws Exception;
 
     //显示购物车中勾选的商品
     List<CartOrderInfo> selectCartByLineCheckStatus(@Valid CartOrderInfo cartOrderInfo) throws Exception;
