@@ -1,7 +1,9 @@
 package com.aiqin.mgs.order.api.service;
 
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailVO;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReqVo;
+import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
 import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderListVo;
 
 /**
@@ -26,5 +28,19 @@ public interface ReturnOrderInfoService {
      * @return
      */
 //    PageResData<ReturnOrderListVo> list(OrderAfterSaleSearchVo searchVo);
+
+    /**
+     * 审核操作
+     * @param reqVo
+     * @return
+     */
+    Boolean updateReturnStatus(ReturnOrderReviewReqVo reqVo);
+
+    /**
+     * 修改退货单详情
+     * @param records
+     * @return
+     */
+    Boolean updateOrderAfterSaleDetail(ReturnOrderDetailVO records);
 
 }

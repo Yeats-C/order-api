@@ -881,4 +881,21 @@
     where order_store_code = #{orderStoreCode,jdbcType=VARCHAR} and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
   </select>
 
+
+    <update id="updateReturnStatus" parameterType="com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo" >
+        update return_order_info
+        <set >
+            <if test="operateStatus!=null">
+                after_sale_status=#{operateStatus,jdbcType=INTEGER},
+            </if>
+            <if test="operator!=null">
+                review_operator=#{operator,jdbcType=VARCHAR},
+            </if>
+            <if test="reviewNote!=null">
+                review_remark=#{reviewNote,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where return_order_id=#{returnOrderId,jdbcType=VARCHAR}
+    </update>
+
 </mapper>

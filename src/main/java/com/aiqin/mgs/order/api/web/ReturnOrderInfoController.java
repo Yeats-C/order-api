@@ -1,7 +1,9 @@
 package com.aiqin.mgs.order.api.web;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailVO;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReqVo;
+import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
 import com.aiqin.mgs.order.api.service.ReturnOrderInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -42,7 +44,24 @@ public class ReturnOrderInfoController {
 //        return new HttpResponse<>(orderAfterSaleService.list(searchVo));
 //    }
 
+    @ApiOperation("操作审核退货单")
+    @PostMapping("/updateStatus")
+    public HttpResponse<Boolean> updateStatus(@RequestBody ReturnOrderReviewReqVo reqVo) {
+        Boolean review = returnOrderInfoService.updateReturnStatus(reqVo);
+        return new HttpResponse<>(review);
+    }
 
+    /**
+     * 修改退货单详情--这里逻辑是根据需求，先根据退货单id删除所有详情记录，然后重新添加
+     * @param reqVo
+     * @return
+     */
+    @ApiOperation("修改退货单详情")
+    @PostMapping("/updateDetail")
+    public HttpResponse<Boolean> updateDetail(@RequestBody ReturnOrderDetailVO reqVo) {
+        Boolean review = returnOrderInfoService.updateOrderAfterSaleDetail(reqVo);
+        return new HttpResponse<>(review);
+    }
 
 
 }
