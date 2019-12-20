@@ -146,11 +146,13 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                         BeanUtils.copyProperties(couponInfo,franchiseeAsset);
                         franchiseeAssets.add(franchiseeAsset);
                     }
+                    log.info("A品券明细本地同步开始,couponInfoList={}",couponInfoList);
                     couponInfoDao.insertBatch(couponInfoList);
-                    log.info("A品券明细本地同步完成,couponInfoList={}",couponInfoList);
+                    log.info("A品券明细本地同步完成");
                 }
                 //产生的A品券不为空，同步到虚拟资产
                 if(CollectionUtils.isNotEmpty(franchiseeAssets)){
+                    log.info("A品券同步到虚拟资产开始，franchiseeAssets={}",franchiseeAssets);
                     String url=slcsHost+"/franchiseeVirtual/VirtualA";
                     JSONObject json=new JSONObject();
                     json.put("list",franchiseeAssets);
