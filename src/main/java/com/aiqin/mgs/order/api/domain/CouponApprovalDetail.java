@@ -16,7 +16,7 @@ public class CouponApprovalDetail {
     @ApiModelProperty("审批编号")
     private String formNo;
 
-    @ApiModelProperty("优惠券种类：1-A品券 2-服纺券")
+    @ApiModelProperty("优惠券种类： 1-服纺券 2-A品券")
     private Integer couponType;
 
     @ApiModelProperty("优惠券金额总额度")
@@ -45,5 +45,8 @@ public class CouponApprovalDetail {
 
     @ApiModelProperty("加盟商id")
     private String franchiseeId;
+
+    @ApiModelProperty(value = "业务单号（例如：退货单号）")
+    private String orderId;
 
 }

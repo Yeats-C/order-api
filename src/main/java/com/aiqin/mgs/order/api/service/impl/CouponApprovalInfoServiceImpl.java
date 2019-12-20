@@ -1,13 +1,17 @@
 package com.aiqin.mgs.order.api.service.impl;
 
 import com.aiqin.ground.util.id.IdUtil;
+import com.aiqin.mgs.order.api.base.ConstantData;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
+import com.aiqin.mgs.order.api.dao.CouponInfoDao;
 import com.aiqin.mgs.order.api.domain.CouponApprovalDetail;
 import com.aiqin.mgs.order.api.domain.CouponApprovalInfo;
+import com.aiqin.mgs.order.api.domain.CouponInfo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.FranchiseeAsset;
+import com.aiqin.mgs.order.api.domain.request.returnorder.FranchiseeAssetVo;
 import com.aiqin.mgs.order.api.service.CouponApprovalInfoService;
 import com.aiqin.mgs.order.api.util.URLConnectionUtil;
 import com.aiqin.platform.flows.client.constant.Indicator;
@@ -19,13 +23,19 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 /**
  * description: ApprovalInfoServiceImpl
@@ -44,6 +54,8 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
     private CouponApprovalInfoDao couponApprovalInfoDao;
     @Autowired
     private CouponApprovalDetailDao couponApprovalDetailDao;
+    @Autowired
+    private CouponInfoDao couponInfoDao;
 
 
     @Override
@@ -98,20 +110,50 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                 //计算A品券数量，同步到虚拟资产
                 List<FranchiseeAsset> list=new ArrayList();
                 Double totalMoney=couponApprovalDetail.getTotalMoney();
+                //同步到虚拟资产
+                List<FranchiseeAsset> franchiseeAssets=new ArrayList<>();
                 if(couponApprovalDetail!=null&&totalMoney!=null){
+                    //计算面值为100的A品券数量
                     int num=(int)(totalMoney/100);
+                    //计算剩余钱数
                     double balance=totalMoney%100;
-
+                    //存储A品卷信息
+                    List<CouponInfo> couponInfoList=new ArrayList<>();
+                    CouponInfo couponInfo=new CouponInfo();
+                    couponInfo.setCouponName(ConstantData.aCouponName);
+                    couponInfo.setCouponType(ConstantData.couponType);
+                    couponInfo.setFranchiseeId(couponApprovalDetail.getFranchiseeId());
+                    couponInfo.setOrderId(couponApprovalDetail.getOrderId());
+                    couponInfo.setValidityStartTime(couponApprovalDetail.getStartTime());
+                    couponInfo.setValidityEndTime(couponApprovalDetail.getEndTime());
                     for(int i=0;i<num;i++){
-
+                        couponInfo.setCouponCode(couponCode());
+                        couponInfo.setNominalValue(ConstantData.nominalValue);
+                        couponInfoList.add(couponInfo);
+                        FranchiseeAsset franchiseeAsset=new FranchiseeAsset();
+                        BeanUtils.copyProperties(couponInfo,franchiseeAsset);
+                        franchiseeAssets.add(franchiseeAsset);
                     }
-
+                    if(balance>0){
+                        couponInfo.setCouponCode(couponCode());
+                        couponInfo.setNominalValue(BigDecimal.valueOf(balance));
+                        couponInfoList.add(couponInfo);
+                        FranchiseeAsset franchiseeAsset=new FranchiseeAsset();
+                        BeanUtils.copyProperties(couponInfo,franchiseeAsset);
+                        franchiseeAssets.add(franchiseeAsset);
+                    }
+                    couponInfoDao.insertBatch(couponInfoList);
+                    log.info("A品券明细本地同步完成,couponInfoList={}",couponInfoList);
                 }
-                String url=slcsHost+"/franchiseeVirtual/VirtualA";
-                JSONObject json=new JSONObject();
-                json.put("list",null);
-                String request= URLConnectionUtil.doPost(url,null,json);
-//                logger.info("the getByBrandName request is:"+request);
+                //产生的A品券不为空，同步到虚拟资产
+                if(CollectionUtils.isNotEmpty(franchiseeAssets)){
+                    String url=slcsHost+"/franchiseeVirtual/VirtualA";
+                    JSONObject json=new JSONObject();
+                    json.put("list",franchiseeAssets);
+                    String request= URLConnectionUtil.doPost(url,null,json);
+                    log.info("同步到虚拟资产:"+request);
+                }
+
 
 
             } else if (TpmBpmUtils.isPass(formCallBackVo.getUpdateFormStatus(), formCallBackVo.getOptBtn())) {
@@ -148,8 +190,46 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
         return result;
     }
 
+    /**
+     * 生成A品券编码
+     * @return
+     */
+    public static String couponCode(){
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMddHHmmss");
+        String str=sdf.format(new Date());
+        str="AC"+str+String.format("%04d",new Random().nextInt(9999));
+        return str;
+    }
+
     public static void main(String[] args) {
-        System.out.println(IdUtil.activityId());
+//        System.out.println(IdUtil.activityId());
+//        for (int i=0;i<1000;i++){
+//            System.out.println(couponCode());
+//        }
+
+//        String url="http://slcs.api.aiqin.com/franchiseeVirtual/VirtualA";
+//        String url="http://192.168.200.127:9011/franchiseeVirtual/VirtualA";
+        String url="http://127.0.0.1:9011/franchiseeVirtual/VirtualA";
+        List<FranchiseeAssetVo> franchiseeAssets=new ArrayList<>();
+        CouponInfo couponInfo=new CouponInfo();
+        couponInfo.setCouponName(ConstantData.aCouponName);
+        couponInfo.setCouponType(ConstantData.couponType);
+        couponInfo.setFranchiseeId("1001");
+        couponInfo.setOrderId("1002");
+        couponInfo.setValidityStartTime(new Date());
+        couponInfo.setValidityEndTime(new Date());
+        couponInfo.setCouponCode(couponCode());
+        couponInfo.setNominalValue(ConstantData.nominalValue);
+        couponInfo.setCreateTime(new Date());
+        FranchiseeAssetVo franchiseeAsset=new FranchiseeAssetVo();
+        BeanUtils.copyProperties(couponInfo,franchiseeAsset);
+        franchiseeAssets.add(franchiseeAsset);
+        JSONObject json=new JSONObject();
+        json.put("list",franchiseeAssets);
+        String request= URLConnectionUtil.doPost(url,null,json);
+        log.info("同步到虚拟资产:"+request);
+
+
     }
 
 }

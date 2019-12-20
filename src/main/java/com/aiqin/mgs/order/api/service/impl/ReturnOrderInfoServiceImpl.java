@@ -159,6 +159,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             approvalDetail.setCreator(reqVo.getUserName());
             approvalDetail.setRemark(reqVo.getReviewNote());
             approvalDetail.setFranchiseeId(reqVo.getFranchiseeId());
+            approvalDetail.setOrderId(reqVo.getReturnOrderId());
             couponApprovalDetailDao.insertSelective(approvalDetail);
             log.info("同步审批信息到本地完成");
             //A品券发放审批申请提交

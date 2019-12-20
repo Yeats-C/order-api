@@ -1,5 +1,7 @@
 package com.aiqin.mgs.order.api.base;
 
+import java.math.BigDecimal;
+
 /**
  * description: ConstantData
  * date: 2019/12/19 11:06
@@ -11,9 +13,17 @@ public interface ConstantData {
     /**
      * A品卷类型
      */
-    int couponType = 1;
+    int couponType = 2;
     /**
-     * A品券发放申请工作流
+     * 优惠券名称--A品券
+     */
+    String aCouponName = "A品卷";
+    /**
+     * A品券面值--100
+     */
+    BigDecimal nominalValue= BigDecimal.valueOf(100.00);
+    /**
+     * A品券发放申请工作流，流程key
      */
     String applyCoupon01 = "ERP_COUPON01";
 

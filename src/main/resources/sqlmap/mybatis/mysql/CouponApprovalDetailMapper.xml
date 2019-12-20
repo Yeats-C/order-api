@@ -14,10 +14,11 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
     <result column="franchisee_id" property="franchiseeId" jdbcType="VARCHAR" />
+    <result column="order_id" property="orderId" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, form_no, coupon_type, total_money, store_id, store_name, start_time, end_time, 
-    creator, create_time, remark, franchisee_id
+    creator, create_time, remark, franchisee_id, order_id
   </sql>
   <select id="selectByFormNo" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -69,6 +70,9 @@
       <if test="franchiseeId != null" >
         franchisee_id,
       </if>
+      <if test="orderId != null" >
+        order_id,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -106,6 +110,9 @@
       </if>
       <if test="franchiseeId != null" >
         #{franchiseeId,jdbcType=VARCHAR},
+      </if>
+      <if test="orderId != null" >
+        #{orderId,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
