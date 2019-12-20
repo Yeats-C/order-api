@@ -39,7 +39,7 @@ public class ErpOrderLogistics extends ErpOrderBase {
     private BigDecimal couponPayFee;
     /***余额支付金额*/
     private BigDecimal balancePayFee;
-    /***物流券ids，多个用逗号间隔*/
+    /***物流券唯一标识，多个用逗号间隔*/
     private String couponIds;
 
     /***物流费用支付*/

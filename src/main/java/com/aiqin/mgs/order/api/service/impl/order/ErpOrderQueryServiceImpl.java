@@ -4,10 +4,13 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderLevelEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderNodeProcessTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.PageAutoHelperUtil;
@@ -15,11 +18,8 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
@@ -87,12 +87,15 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
             order.setItemList(orderItemList);
 
+            List<ErpOrderOperationLog> operationLogList = erpOrderOperationLogService.selectOrderOperationLogList(order.getOrderStoreCode());
+            order.setOperationLogList(operationLogList);
+
 //            if (ErpOrderLevelEnum.PRIMARY.getCode().equals(order.getOrderLevel())) {
 //                //主订单
 //
 //                //获取拆分订单
 //                if (YesOrNoEnum.YES.getCode().equals(order.getSplitStatus())) {
-//                    List<ErpOrderInfo> secondOrderList = getSecondOrderListByPrimaryCode(order.getOrderCode());
+//                    List<ErpOrderInfo> secondOrderList = getSecondOrderListByPrimaryCode(order.getOrderStoreCode());
 //                    order.setSecondaryOrderList(secondOrderList);
 //                }
 //
@@ -116,10 +119,6 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
 //                orderFee.setOrderPay(orderPay);
 //            }
 //            order.setOrderFee(orderFee);
-//
-//            //订单收货人信息
-//            ErpOrderConsignee orderConsignee = erpOrderConsigneeService.getOrderConsigneeByOrderId(order.getOrderId());
-//            order.setOrderConsignee(orderConsignee);
 //
 //            //订单操作日志
 //            List<ErpOrderOperationLog> orderOperationLogList = erpOrderOperationLogService.selectOrderOperationLogListByOrderId(order.getOrderId());
@@ -197,14 +196,14 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
 //            for (ErpOrderInfo item :
 //                    dataList) {
 //                if (secondaryOrderMap.containsKey(item.getOrderStoreCode())) {
-//                    item.setSecondaryOrderList(secondaryOrderMap.get(item.getOrderCode()));
+//                    item.setSecondaryOrderList(secondaryOrderMap.get(item.getOrderStoreCode()));
 //                }
 //
 //                //支付状态与订单中心不同步的订单标记
 //                item.setRepayOperation(YesOrNoEnum.NO.getCode());
 //                //只检查待支付和已取消的订单
 //                if (ErpOrderStatusEnum.ORDER_STATUS_1.getCode().equals(item.getOrderStatus()) || ErpOrderStatusEnum.ORDER_STATUS_99.getCode().equals(item.getOrderStatus())) {
-//                    ErpOrderPayStatusResponse orderPayStatusResponse = erpOrderRequestService.getOrderPayStatus(item.getOrderCode());
+//                    ErpOrderPayStatusResponse orderPayStatusResponse = erpOrderRequestService.getOrderPayStatus(item.getOrderStoreCode());
 //                    if (orderPayStatusResponse.isRequestSuccess() && ErpPayStatusEnum.SUCCESS == orderPayStatusResponse.getPayStatusEnum()) {
 //                        //如果支付状态是成功的
 //                        item.setRepayOperation(YesOrNoEnum.YES.getCode());
@@ -236,23 +235,9 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
             order.setItemList(orderItemList);
 
-            BigDecimal shareMoneyTotal = BigDecimal.ZERO;
-            BigDecimal moneyTotal = BigDecimal.ZERO;
-            for (ErpOrderItem item :
-                    orderItemList) {
-//                shareMoneyTotal = shareMoneyTotal.add(item.getShareMoney());
-//                moneyTotal = moneyTotal.add(item.getMoney());
-            }
-//            order.setTotalMoney(moneyTotal);
-//            order.setPayMoney(shareMoneyTotal);
-//
-//            //订单收货人信息
-//            ErpOrderConsignee orderConsignee = erpOrderConsigneeService.getOrderConsigneeByOrderId(order.getOrderId());
-//            order.setOrderConsignee(orderConsignee);
-//
-//            //订单物流信息
-//            ErpOrderLogistics orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsId(order.getLogisticsId());
-//            order.setOrderLogistics(orderLogistics);
+            //订单物流信息
+            ErpOrderLogistics orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsId(order.getLogisticsId());
+            order.setOrderLogistics(orderLogistics);
 
         }
         return order;
@@ -261,10 +246,6 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
     @Override
     public int getNeedSignOrderQuantity(String storeId) {
         int quantity = 0;
-        if (1 == 1) {
-            //TODO CT 测试接口使用
-            return 1;
-        }
         if (StringUtils.isEmpty(storeId)) {
             throw new BusinessException("缺失门店id");
         }
@@ -273,15 +254,13 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         query.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_11.getCode());
         List<ErpOrderInfo> select = erpOrderInfoDao.select(query);
         if (select != null && select.size() > 0) {
-//            for (ErpOrderInfo item :
-//                    select) {
-//                ErpOrderCategoryEnum orderTypeEnum = ErpOrderCategoryEnum.getEnum(item.getOrderType());
-//                if (orderTypeEnum != null) {
-//                    if (!orderTypeEnum.isHasLogisticsFee()) {
-//                        quantity++;
-//                    }
-//                }
-//            }
+            for (ErpOrderInfo item :
+                    select) {
+                ErpOrderNodeProcessTypeEnum processTypeEnum = ErpOrderNodeProcessTypeEnum.getEnum(item.getOrderTypeCode(), item.getOrderCategoryCode());
+                if (processTypeEnum != null && !processTypeEnum.isHasLogisticsFee()) {
+                    quantity++;
+                }
+            }
         }
 
         ErpOrderInfo logisticsQuery = new ErpOrderInfo();
@@ -289,10 +268,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         logisticsQuery.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_12.getCode());
         List<ErpOrderInfo> logisticsSelect = erpOrderInfoDao.select(logisticsQuery);
         if (logisticsSelect != null && logisticsSelect.size() > 0) {
-            for (ErpOrderInfo item :
-                    select) {
-                quantity++;
-            }
+            quantity += logisticsSelect.size();
         }
         return quantity;
     }

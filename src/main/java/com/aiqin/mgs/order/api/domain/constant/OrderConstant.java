@@ -18,4 +18,9 @@ public class OrderConstant {
     /***订单未支付取消订单最大时间（毫秒）*/
     public static final long MAX_PAY_TIME_OUT_TIME = 1000L * 60 * 60 * 12;
 
+    /***默认公司编码*/
+    public static final String DEFAULT_COMPANY_CODE = "01";
+    /***默认公司名称*/
+    public static final String DEFAULT_COMPANY_NAME = "北京爱亲科技股份有限公司";
+
 }

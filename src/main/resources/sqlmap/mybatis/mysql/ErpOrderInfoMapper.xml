@@ -331,8 +331,8 @@
         from order_store_info a1
         left join order_store_fee a2 on a1.fee_id = a2.fee_id
         where 1 = 1
-        <!--<if test="orderCode != null and orderCode != ''">-->
-        <!--and a1.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%')-->
+        <!--<if test="orderStoreCode != null and orderStoreCode != ''">-->
+        <!--and a1.order_code like concat('%',#{orderStoreCode,jdbcType=VARCHAR},'%')-->
         <!--</if>-->
         <!--<if test="storeName != null and storeName != ''">-->
         <!--and a1.store_name like concat('%',#{storeName,jdbcType=VARCHAR},'%')-->

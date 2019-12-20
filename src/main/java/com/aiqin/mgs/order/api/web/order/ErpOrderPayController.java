@@ -74,7 +74,7 @@ public class ErpOrderPayController {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {
             logger.error("订单支付结果查询异常：{}", e);
-            response = HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
         }
         return response;
     }

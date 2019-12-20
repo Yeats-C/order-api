@@ -114,7 +114,7 @@ public class ErpOrderCancelServiceImpl implements ErpOrderCancelService {
         }
         order.setItemList(erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId()));
 
-//        ErpOrderStatusEnum orderStatusEnum = ErpOrderStatusEnum.getEnum(order.getOrderCode());
+//        ErpOrderStatusEnum orderStatusEnum = ErpOrderStatusEnum.getEnum(order.getOrderStoreCode());
 //        if (ErpOrderStatusEnum.ORDER_STATUS_1 == orderStatusEnum) {
 //            //待支付
 //

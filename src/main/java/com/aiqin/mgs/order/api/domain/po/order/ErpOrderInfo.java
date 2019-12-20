@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.domain.po.order;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -23,6 +24,7 @@ public class ErpOrderInfo {
     /***业务id*/
     private String orderStoreId;
     /***订单编码*/
+    @ApiModelProperty(value="订单编号")
     private String orderStoreCode;
     /***公司编码*/
     private String companyCode;
@@ -192,7 +194,11 @@ public class ErpOrderInfo {
 
     /***订单费用*/
     private ErpOrderFee orderFee;
+    /***订单物流信息*/
+    private ErpOrderLogistics orderLogistics;
     /***订单商品明细*/
     private List<ErpOrderItem> itemList;
+    /***订单日志*/
+    private List<ErpOrderOperationLog> operationLogList;
 
 }

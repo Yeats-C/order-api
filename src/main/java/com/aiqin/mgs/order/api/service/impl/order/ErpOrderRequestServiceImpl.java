@@ -12,11 +12,13 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
+import com.aiqin.mgs.order.api.domain.response.ProductSkuDetailResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
 import com.aiqin.mgs.order.api.domain.response.order.StoreFranchiseeInfoResponse;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -68,24 +70,65 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     @Override
     public ProductInfo getProductDetail(String spuCode, String skuCode) {
 
+        String url = urlProperties.getProductApi() + "/search/spu/sku/detail";
+        url += "?companyCode=09";
+        url += "&skuCode=1001";
         ProductInfo product = new ProductInfo();
-        product.setSpuCode(spuCode);
-        product.setSpuName(spuCode + "名称");
-        product.setSkuCode(skuCode);
-        product.setSkuName(skuCode + "名称");
-        product.setSupplierCode("123456");
-        product.setSupplierName("供应商1");
+        try {
+            HttpClient httpClient = HttpClient.get(url);
+            HttpResponse<ProductSkuDetailResponse> response = httpClient.action().result(new TypeReference<HttpResponse<ProductSkuDetailResponse>>() {
+            });
+            if (!RequestReturnUtil.validateHttpResponse(response)) {
+                throw new BusinessException("获取商品信息失败");
+            }
+            ProductSkuDetailResponse data = response.getData();
+            if (data == null) {
+                throw new BusinessException("无效的商品");
+            }
 
-        product.setPictureUrl("https://www.baidu.com/img/bd_logo1.png");
-        product.setProductSpec("32K");
-        product.setColorCode("101");
-        product.setColorName("红色");
-        product.setModelCode("1234");
-        product.setUnitCode("1001");
-        product.setUnitName("盒");
-        product.setPrice(BigDecimal.TEN);
-        product.setBarCode("987456321156156");
-        product.setTaxRate(new BigDecimal(0.15));
+
+            //商品编码
+            product.setSpuCode(data.getProductCode());
+            product.setSpuName(data.getProductName());
+            product.setSkuCode(data.getSkuCode());
+            product.setSkuName(data.getSkuName());
+            product.setSupplierCode(data.getSupplyUnitCode());
+            product.setSupplierName(data.getSupplyUnitName());
+            product.setPictureUrl(data.getProductPicturePath());
+            product.setProductSpec(data.getSpec());
+            product.setColorCode(data.getColorCode());
+            product.setColorName(data.getColorName());
+            product.setModelCode(data.getModelNumber());
+            product.setUnitCode(data.getUnitCode());
+            product.setUnitName(data.getUnitName());
+            product.setPrice(data.getPriceTax());
+            product.setBarCode(data.getBarCode());
+            product.setTaxRate(data.getOutputTaxRate());
+
+        } catch (BusinessException e) {
+            logger.info("获取商品信息失败：{}", e.getMessage());
+            throw new BusinessException(e.getMessage());
+        } catch (Exception e) {
+            logger.info("获取商品信息失败：{}", e);
+            throw new BusinessException("获取商品信息失败");
+        }
+//        product.setSpuCode(spuCode);
+//        product.setSpuName(spuCode + "名称");
+//        product.setSkuCode(skuCode);
+//        product.setSkuName(skuCode + "名称");
+//        product.setSupplierCode("123456");
+//        product.setSupplierName("供应商1");
+//
+//        product.setPictureUrl("https://www.baidu.com/img/bd_logo1.png");
+//        product.setProductSpec("32K");
+//        product.setColorCode("101");
+//        product.setColorName("红色");
+//        product.setModelCode("1234");
+//        product.setUnitCode("1001");
+//        product.setUnitName("盒");
+//        product.setPrice(BigDecimal.TEN);
+//        product.setBarCode("987456321156156");
+//        product.setTaxRate(new BigDecimal(0.15));
 
         return product;
     }

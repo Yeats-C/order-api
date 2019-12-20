@@ -9,25 +9,30 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 订单销售渠道标识
+ * 日志类型枚举类
  *
  * @author: Tao.Chen
  * @version: v1.0.0
- * @date 2019/11/19 10:02
+ * @date 2019/12/19 20:36
  */
 @Getter
-public enum ErpOrderChannelTypeEnum {
+public enum ErpLogOperationTypeEnum {
 
-    /***总部向门店销售*/
-    CHANNEL_1(1, "1", "总部向门店销售"),
-    /***门店向会员销售*/
-    CHANNEL_2(2, "2", "门店向会员销售");
+    /***新增*/
+    ADD(0, "0", "新增"),
+    /***修改*/
+    UPDATE(1, "1", "修改"),
+    /***删除*/
+    DELETE(2, "2", "删除"),
+    /***下载*/
+    DOWNLOAD(3, "3", "下载"),
+    ;
 
     private Integer code;
     private String value;
     private String desc;
 
-    ErpOrderChannelTypeEnum(Integer code, String value, String desc) {
+    ErpLogOperationTypeEnum(Integer code, String value, String desc) {
         this.code = code;
         this.value = value;
         this.desc = desc;
@@ -36,17 +41,17 @@ public enum ErpOrderChannelTypeEnum {
     /***选项类型*/
     public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
     /***value-enum map*/
-    public static final Map<String, ErpOrderChannelTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<String, ErpLogOperationTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
     static {
-        for (ErpOrderChannelTypeEnum item :
-                ErpOrderChannelTypeEnum.values()) {
+        for (ErpLogOperationTypeEnum item :
+                ErpLogOperationTypeEnum.values()) {
             SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
             VALUE_ENUM_MAP.put(item.getValue(), item);
         }
     }
 
-    public static ErpOrderChannelTypeEnum getEnum(Object object) {
+    public static ErpLogOperationTypeEnum getEnum(Object object) {
         if (object != null) {
             return VALUE_ENUM_MAP.get(object.toString());
         }
@@ -55,19 +60,12 @@ public enum ErpOrderChannelTypeEnum {
 
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            ErpOrderChannelTypeEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            ErpLogOperationTypeEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
             }
         }
         return "";
-    }
-
-    public static boolean exist(Object object) {
-        if (object != null) {
-            return VALUE_ENUM_MAP.containsKey(object.toString());
-        }
-        return false;
     }
 
 }

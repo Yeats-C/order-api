@@ -27,8 +27,6 @@ public class ErpOrderPay {
     private Integer feeType;
     /***支付状态*/
     private Integer payStatus;
-    /***支付状态描述*/
-    private String payStatusDesc;
     /***支付方式*/
     private Integer payWay;
     /***费用*/
