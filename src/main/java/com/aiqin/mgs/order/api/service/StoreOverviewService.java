@@ -61,4 +61,11 @@ public interface StoreOverviewService {
      * @return
      */
     HttpResponse storeOrderOverView(String storeId);
+
+    /**
+     *  爱掌柜首页概览商品概览
+     * @param storeId
+     * @return
+     */
+    HttpResponse storeProductOverView(String storeId);
 }
