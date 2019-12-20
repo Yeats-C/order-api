@@ -1,16 +1,12 @@
 package com.aiqin.mgs.order.api.domain.response.returnorder;
 
-import com.aiqin.mgs.order.api.domain.ReturnOrderDetail;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 /**
  * description: ReturnOrderListVo
