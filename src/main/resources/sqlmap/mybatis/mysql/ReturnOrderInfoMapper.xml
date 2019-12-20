@@ -61,6 +61,20 @@
     <result column="return_reason_code" property="returnReasonCode" jdbcType="VARCHAR" />
     <result column="return_reason_content" property="returnReasonContent" jdbcType="VARCHAR" />
     <result column="inspection_remark" property="inspectionRemark" jdbcType="VARCHAR" />
+    <result column="return_discount_amount" property="returnDiscountAmount" jdbcType="DECIMAL" />
+    <result column="store_balance_amount" property="storeBalanceAmount" jdbcType="DECIMAL" />
+    <result column="store_discount_amount" property="storeDiscountAmount" jdbcType="DECIMAL" />
+    <result column="store_credit_line" property="storeCreditLine" jdbcType="VARCHAR" />
+    <result column="discount_amount_infos" property="discountAmountInfos" jdbcType="VARCHAR" />
+    <result column="store_id" property="storeId" jdbcType="VARCHAR" />
+    <result column="store_code" property="storeCode" jdbcType="VARCHAR" />
+    <result column="store_name" property="storeName" jdbcType="VARCHAR" />
+    <result column="nature_code" property="natureCode" jdbcType="VARCHAR" />
+    <result column="nature_name" property="natureName" jdbcType="VARCHAR" />
+    <result column="review_remark" property="reviewRemark" jdbcType="VARCHAR" />
+    <result column="review_operator" property="reviewOperator" jdbcType="VARCHAR" />
+    <result column="refund_status" property="refundStatus" jdbcType="BIT" />
+    <result column="process_type" property="processType" jdbcType="BIT" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
     <result column="use_status" property="useStatus" jdbcType="BIT" />
     <result column="create_by_id" property="createById" jdbcType="VARCHAR" />
@@ -69,40 +83,29 @@
     <result column="update_by_name" property="updateByName" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
-    <result column="nature_name" property="natureName" jdbcType="VARCHAR" />
-    <result column="store_id" property="storeId" jdbcType="VARCHAR" />
-    <result column="store_name" property="storeName" jdbcType="VARCHAR" />
-    <result column="store_code" property="storeCode" jdbcType="VARCHAR" />
-    <result column="nature_code" property="natureCode" jdbcType="VARCHAR" />
-    <result column="refund_status" property="refundStatus" jdbcType="BIT" />
-    <result column="process_type" property="processType" jdbcType="BIT" />
-    <result column="return_discount_amount" property="returnDiscountAmount" jdbcType="DECIMAL" />
-    <result column="store_balance_amount" property="storeBalanceAmount" jdbcType="DECIMAL" />
-    <result column="store_discount_amount" property="storeDiscountAmount" jdbcType="DECIMAL" />
-    <result column="store_credit_line" property="storeCreditLine" jdbcType="VARCHAR" />
-    <result column="review_remark" property="reviewRemark" jdbcType="VARCHAR" />
-    <result column="review_operator" property="reviewOperator" jdbcType="VARCHAR" />
-    <result column="discount_amount_infos" property="discountAmountInfos" jdbcType="VARCHAR" />
+    <result column="source_type" property="sourceType" jdbcType="BIT" />
+    <result column="return_money_type" property="returnMoneyType" jdbcType="BIT" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, return_order_id, return_order_code, order_store_code, company_code, company_name, 
-    supplier_code, supplier_name, transport_center_code, transport_center_name, warehouse_code, 
-    warehouse_name, purchase_group_code, purchase_group_name, return_order_status, order_type, 
-    return_order_type, customer_code, customer_name, return_lock, return_reason, payment_status, 
-    payment_code, payment_name, treatment_method, logistics_company_code, logistics_company_name, 
-    logistics_code, delivery_time, pre_expect_time, transport_time, receive_time, product_count, 
-    return_order_amount, actual_product_count, actual_return_order_amount, distribution_mode_code, 
-    distribution_mode_name, receive_person, receive_mobile, deliver_amount, zip_code, 
-    total_weight, actual_total_weight, total_volume, actual_total_volume, province_id, 
-    province_name, city_id, city_name, district_id, district_name, receive_address, valid_time, 
-    out_stock_time, finish_time, return_reason_code, return_reason_content, inspection_remark, 
-    remark, use_status, create_by_id, create_by_name, update_by_id, update_by_name, create_time, 
-    update_time, nature_name, store_id, store_name, store_code, nature_code, refund_status, 
-    process_type, return_discount_amount, store_balance_amount, store_discount_amount, 
-    store_credit_line, review_remark, review_operator, discount_amount_infos
+    id, return_order_id, return_order_code, order_store_code, company_code, company_name,
+    supplier_code, supplier_name, transport_center_code, transport_center_name, warehouse_code,
+    warehouse_name, purchase_group_code, purchase_group_name, return_order_status, order_type,
+    return_order_type, customer_code, customer_name, return_lock, return_reason, payment_status,
+    payment_code, payment_name, treatment_method, logistics_company_code, logistics_company_name,
+    logistics_code, delivery_time, pre_expect_time, transport_time, receive_time, product_count,
+    return_order_amount, actual_product_count, actual_return_order_amount, distribution_mode_code,
+    distribution_mode_name, receive_person, receive_mobile, deliver_amount, zip_code,
+    total_weight, actual_total_weight, total_volume, actual_total_volume, province_id,
+    province_name, city_id, city_name, district_id, district_name, receive_address, valid_time,
+    out_stock_time, finish_time, return_reason_code, return_reason_content, inspection_remark,
+    return_discount_amount, store_balance_amount, store_discount_amount, store_credit_line,
+    discount_amount_infos, store_id, store_code, store_name, nature_code, nature_name,
+    review_remark, review_operator, refund_status, process_type, remark, use_status,
+    create_by_id, create_by_name, update_by_id, update_by_name, create_time, update_time,
+    source_type, return_money_type
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
-    select 
+    select
     <include refid="Base_Column_List" />
     from return_order_info
     where id = #{id,jdbcType=BIGINT}
@@ -292,6 +295,48 @@
       <if test="inspectionRemark != null" >
         inspection_remark,
       </if>
+      <if test="returnDiscountAmount != null" >
+        return_discount_amount,
+      </if>
+      <if test="storeBalanceAmount != null" >
+        store_balance_amount,
+      </if>
+      <if test="storeDiscountAmount != null" >
+        store_discount_amount,
+      </if>
+      <if test="storeCreditLine != null" >
+        store_credit_line,
+      </if>
+      <if test="discountAmountInfos != null" >
+        discount_amount_infos,
+      </if>
+      <if test="storeId != null" >
+        store_id,
+      </if>
+      <if test="storeCode != null" >
+        store_code,
+      </if>
+      <if test="storeName != null" >
+        store_name,
+      </if>
+      <if test="natureCode != null" >
+        nature_code,
+      </if>
+      <if test="natureName != null" >
+        nature_name,
+      </if>
+      <if test="reviewRemark != null" >
+        review_remark,
+      </if>
+      <if test="reviewOperator != null" >
+        review_operator,
+      </if>
+      <if test="refundStatus != null" >
+        refund_status,
+      </if>
+      <if test="processType != null" >
+        process_type,
+      </if>
       <if test="remark != null" >
         remark,
       </if>
@@ -316,47 +361,11 @@
       <if test="updateTime != null" >
         update_time,
       </if>
-      <if test="natureName != null" >
-        nature_name,
+      <if test="sourceType != null" >
+        source_type,
       </if>
-      <if test="storeId != null" >
-        store_id,
-      </if>
-      <if test="storeName != null" >
-        store_name,
-      </if>
-      <if test="storeCode != null" >
-        store_code,
-      </if>
-      <if test="natureCode != null" >
-        nature_code,
-      </if>
-      <if test="refundStatus != null" >
-        refund_status,
-      </if>
-      <if test="processType != null" >
-        process_type,
-      </if>
-      <if test="returnDiscountAmount != null" >
-        return_discount_amount,
-      </if>
-      <if test="storeBalanceAmount != null" >
-        store_balance_amount,
-      </if>
-      <if test="storeDiscountAmount != null" >
-        store_discount_amount,
-      </if>
-      <if test="storeCreditLine != null" >
-        store_credit_line,
-      </if>
-      <if test="reviewRemark != null" >
-        review_remark,
-      </if>
-      <if test="reviewOperator != null" >
-        review_operator,
-      </if>
-      <if test="discountAmountInfos != null" >
-        discount_amount_infos,
+      <if test="returnMoneyType != null" >
+        return_money_type,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -537,6 +546,48 @@
       <if test="inspectionRemark != null" >
         #{inspectionRemark,jdbcType=VARCHAR},
       </if>
+      <if test="returnDiscountAmount != null" >
+        #{returnDiscountAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="storeBalanceAmount != null" >
+        #{storeBalanceAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="storeDiscountAmount != null" >
+        #{storeDiscountAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="storeCreditLine != null" >
+        #{storeCreditLine,jdbcType=VARCHAR},
+      </if>
+      <if test="discountAmountInfos != null" >
+        #{discountAmountInfos,jdbcType=VARCHAR},
+      </if>
+      <if test="storeId != null" >
+        #{storeId,jdbcType=VARCHAR},
+      </if>
+      <if test="storeCode != null" >
+        #{storeCode,jdbcType=VARCHAR},
+      </if>
+      <if test="storeName != null" >
+        #{storeName,jdbcType=VARCHAR},
+      </if>
+      <if test="natureCode != null" >
+        #{natureCode,jdbcType=VARCHAR},
+      </if>
+      <if test="natureName != null" >
+        #{natureName,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewRemark != null" >
+        #{reviewRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewOperator != null" >
+        #{reviewOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="refundStatus != null" >
+        #{refundStatus,jdbcType=BIT},
+      </if>
+      <if test="processType != null" >
+        #{processType,jdbcType=BIT},
+      </if>
       <if test="remark != null" >
         #{remark,jdbcType=VARCHAR},
       </if>
@@ -561,47 +612,11 @@
       <if test="updateTime != null" >
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="natureName != null" >
-        #{natureName,jdbcType=VARCHAR},
+      <if test="sourceType != null" >
+        #{sourceType,jdbcType=BIT},
       </if>
-      <if test="storeId != null" >
-        #{storeId,jdbcType=VARCHAR},
-      </if>
-      <if test="storeName != null" >
-        #{storeName,jdbcType=VARCHAR},
-      </if>
-      <if test="storeCode != null" >
-        #{storeCode,jdbcType=VARCHAR},
-      </if>
-      <if test="natureCode != null" >
-        #{natureCode,jdbcType=VARCHAR},
-      </if>
-      <if test="refundStatus != null" >
-        #{refundStatus,jdbcType=BIT},
-      </if>
-      <if test="processType != null" >
-        #{processType,jdbcType=BIT},
-      </if>
-      <if test="returnDiscountAmount != null" >
-        #{returnDiscountAmount,jdbcType=DECIMAL},
-      </if>
-      <if test="storeBalanceAmount != null" >
-        #{storeBalanceAmount,jdbcType=DECIMAL},
-      </if>
-      <if test="storeDiscountAmount != null" >
-        #{storeDiscountAmount,jdbcType=DECIMAL},
-      </if>
-      <if test="storeCreditLine != null" >
-        #{storeCreditLine,jdbcType=VARCHAR},
-      </if>
-      <if test="reviewRemark != null" >
-        #{reviewRemark,jdbcType=VARCHAR},
-      </if>
-      <if test="reviewOperator != null" >
-        #{reviewOperator,jdbcType=VARCHAR},
-      </if>
-      <if test="discountAmountInfos != null" >
-        #{discountAmountInfos,jdbcType=VARCHAR},
+      <if test="returnMoneyType != null" >
+        #{returnMoneyType,jdbcType=BIT},
       </if>
     </trim>
   </insert>
@@ -782,6 +797,48 @@
       <if test="inspectionRemark != null" >
         inspection_remark = #{inspectionRemark,jdbcType=VARCHAR},
       </if>
+      <if test="returnDiscountAmount != null" >
+        return_discount_amount = #{returnDiscountAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="storeBalanceAmount != null" >
+        store_balance_amount = #{storeBalanceAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="storeDiscountAmount != null" >
+        store_discount_amount = #{storeDiscountAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="storeCreditLine != null" >
+        store_credit_line = #{storeCreditLine,jdbcType=VARCHAR},
+      </if>
+      <if test="discountAmountInfos != null" >
+        discount_amount_infos = #{discountAmountInfos,jdbcType=VARCHAR},
+      </if>
+      <if test="storeId != null" >
+        store_id = #{storeId,jdbcType=VARCHAR},
+      </if>
+      <if test="storeCode != null" >
+        store_code = #{storeCode,jdbcType=VARCHAR},
+      </if>
+      <if test="storeName != null" >
+        store_name = #{storeName,jdbcType=VARCHAR},
+      </if>
+      <if test="natureCode != null" >
+        nature_code = #{natureCode,jdbcType=VARCHAR},
+      </if>
+      <if test="natureName != null" >
+        nature_name = #{natureName,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewRemark != null" >
+        review_remark = #{reviewRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewOperator != null" >
+        review_operator = #{reviewOperator,jdbcType=VARCHAR},
+      </if>
+      <if test="refundStatus != null" >
+        refund_status = #{refundStatus,jdbcType=BIT},
+      </if>
+      <if test="processType != null" >
+        process_type = #{processType,jdbcType=BIT},
+      </if>
       <if test="remark != null" >
         remark = #{remark,jdbcType=VARCHAR},
       </if>
@@ -806,47 +863,11 @@
       <if test="updateTime != null" >
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="natureName != null" >
-        nature_name = #{natureName,jdbcType=VARCHAR},
+      <if test="sourceType != null" >
+        source_type = #{sourceType,jdbcType=BIT},
       </if>
-      <if test="storeId != null" >
-        store_id = #{storeId,jdbcType=VARCHAR},
-      </if>
-      <if test="storeName != null" >
-        store_name = #{storeName,jdbcType=VARCHAR},
-      </if>
-      <if test="storeCode != null" >
-        store_code = #{storeCode,jdbcType=VARCHAR},
-      </if>
-      <if test="natureCode != null" >
-        nature_code = #{natureCode,jdbcType=VARCHAR},
-      </if>
-      <if test="refundStatus != null" >
-        refund_status = #{refundStatus,jdbcType=BIT},
-      </if>
-      <if test="processType != null" >
-        process_type = #{processType,jdbcType=BIT},
-      </if>
-      <if test="returnDiscountAmount != null" >
-        return_discount_amount = #{returnDiscountAmount,jdbcType=DECIMAL},
-      </if>
-      <if test="storeBalanceAmount != null" >
-        store_balance_amount = #{storeBalanceAmount,jdbcType=DECIMAL},
-      </if>
-      <if test="storeDiscountAmount != null" >
-        store_discount_amount = #{storeDiscountAmount,jdbcType=DECIMAL},
-      </if>
-      <if test="storeCreditLine != null" >
-        store_credit_line = #{storeCreditLine,jdbcType=VARCHAR},
-      </if>
-      <if test="reviewRemark != null" >
-        review_remark = #{reviewRemark,jdbcType=VARCHAR},
-      </if>
-      <if test="reviewOperator != null" >
-        review_operator = #{reviewOperator,jdbcType=VARCHAR},
-      </if>
-      <if test="discountAmountInfos != null" >
-        discount_amount_infos = #{discountAmountInfos,jdbcType=VARCHAR},
+      <if test="returnMoneyType != null" >
+        return_money_type = #{returnMoneyType,jdbcType=BIT},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
