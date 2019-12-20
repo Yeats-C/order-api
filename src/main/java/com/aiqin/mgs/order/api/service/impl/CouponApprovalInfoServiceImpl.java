@@ -7,11 +7,13 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
 import com.aiqin.mgs.order.api.dao.CouponInfoDao;
+import com.aiqin.mgs.order.api.dao.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.CouponApprovalDetail;
 import com.aiqin.mgs.order.api.domain.CouponApprovalInfo;
 import com.aiqin.mgs.order.api.domain.CouponInfo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.FranchiseeAsset;
 import com.aiqin.mgs.order.api.domain.request.returnorder.FranchiseeAssetVo;
+import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
 import com.aiqin.mgs.order.api.service.CouponApprovalInfoService;
 import com.aiqin.mgs.order.api.util.URLConnectionUtil;
 import com.aiqin.platform.flows.client.constant.Indicator;
@@ -19,11 +21,13 @@ import com.aiqin.platform.flows.client.constant.IndicatorStr;
 import com.aiqin.platform.flows.client.constant.StatusEnum;
 import com.aiqin.platform.flows.client.constant.TpmBpmUtils;
 import com.aiqin.platform.flows.client.domain.vo.FormCallBackVo;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,6 +60,8 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
     private CouponApprovalDetailDao couponApprovalDetailDao;
     @Autowired
     private CouponInfoDao couponInfoDao;
+    @Autowired
+    private ReturnOrderInfoDao returnOrderInfoDao;
 
 
     @Override
@@ -150,8 +156,18 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                     json.put("list",franchiseeAssets);
                     String request= URLConnectionUtil.doPost(url,null,json);
                     log.info("同步到虚拟资产:"+request);
+                    if(StringUtils.isNotBlank(request)){
+                        JSONObject jsonObject= JSON.parseObject(request);
+                        if(jsonObject.containsKey("code")&&"0".equals(jsonObject.getString("code"))){
+                            log.info("A品券虚拟资产同步成功，修改退货单状态");
+                            ReturnOrderReviewReqVo reqVo=new ReturnOrderReviewReqVo();
+                            reqVo.setReturnOrderId(couponApprovalDetail.getOrderId());
+                            reqVo.setOperateStatus(ConstantData.returnOrderSuccess);
+                            returnOrderInfoDao.updateReturnStatus(reqVo);
+                            log.info("退款完成");
+                        }
+                    }
                 }
-
             } else if (TpmBpmUtils.isPass(formCallBackVo.getUpdateFormStatus(), formCallBackVo.getOptBtn())) {
                 couponApprovalInfo.setStatus(StatusEnum.AUDIT.getValue());
                 couponApprovalInfo.setStatuStr(StatusEnum.AUDIT.getDesc());

@@ -886,7 +886,7 @@
         update return_order_info
         <set >
             <if test="operateStatus!=null">
-                after_sale_status=#{operateStatus,jdbcType=INTEGER},
+              return_order_status=#{operateStatus,jdbcType=INTEGER},
             </if>
             <if test="operator!=null">
                 review_operator=#{operator,jdbcType=VARCHAR},

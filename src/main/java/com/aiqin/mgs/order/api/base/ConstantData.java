@@ -13,7 +13,7 @@ public interface ConstantData {
     /**
      * A品卷类型
      */
-    int couponType = 2;
+    Integer couponType = 2;
     /**
      * 优惠券名称--A品券
      */
@@ -26,5 +26,8 @@ public interface ConstantData {
      * A品券发放申请工作流，流程key
      */
     String applyCoupon01 = "ERP_COUPON01";
-
+    /**
+     * 12-退款完成
+     */
+    Integer returnOrderSuccess = 12;
 }
