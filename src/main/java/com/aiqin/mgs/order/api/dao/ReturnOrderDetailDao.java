@@ -1,6 +1,9 @@
 package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.ReturnOrderDetail;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface ReturnOrderDetailDao {
 
@@ -11,5 +14,7 @@ public interface ReturnOrderDetailDao {
     ReturnOrderDetail selectByPrimaryKey(Long id);
 
     int updateByPrimaryKeySelective(ReturnOrderDetail record);
+
+    int insertBatch(@Param("records") List<ReturnOrderDetail> records);
 
 }

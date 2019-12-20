@@ -80,7 +80,7 @@
     <result column="store_balance_amount" property="storeBalanceAmount" jdbcType="DECIMAL" />
     <result column="store_discount_amount" property="storeDiscountAmount" jdbcType="DECIMAL" />
     <result column="store_credit_line" property="storeCreditLine" jdbcType="VARCHAR" />
-    <result column="review_note" property="reviewNote" jdbcType="VARCHAR" />
+    <result column="review_remark" property="reviewRemark" jdbcType="VARCHAR" />
     <result column="review_operator" property="reviewOperator" jdbcType="VARCHAR" />
     <result column="discount_amount_infos" property="discountAmountInfos" jdbcType="VARCHAR" />
   </resultMap>
@@ -99,7 +99,7 @@
     remark, use_status, create_by_id, create_by_name, update_by_id, update_by_name, create_time, 
     update_time, nature_name, store_id, store_name, store_code, nature_code, refund_status, 
     process_type, return_discount_amount, store_balance_amount, store_discount_amount, 
-    store_credit_line, review_note, review_operator, discount_amount_infos
+    store_credit_line, review_remark, review_operator, discount_amount_infos
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -349,8 +349,8 @@
       <if test="storeCreditLine != null" >
         store_credit_line,
       </if>
-      <if test="reviewNote != null" >
-        review_note,
+      <if test="reviewRemark != null" >
+        review_remark,
       </if>
       <if test="reviewOperator != null" >
         review_operator,
@@ -594,8 +594,8 @@
       <if test="storeCreditLine != null" >
         #{storeCreditLine,jdbcType=VARCHAR},
       </if>
-      <if test="reviewNote != null" >
-        #{reviewNote,jdbcType=VARCHAR},
+      <if test="reviewRemark != null" >
+        #{reviewRemark,jdbcType=VARCHAR},
       </if>
       <if test="reviewOperator != null" >
         #{reviewOperator,jdbcType=VARCHAR},
@@ -839,8 +839,8 @@
       <if test="storeCreditLine != null" >
         store_credit_line = #{storeCreditLine,jdbcType=VARCHAR},
       </if>
-      <if test="reviewNote != null" >
-        review_note = #{reviewNote,jdbcType=VARCHAR},
+      <if test="reviewRemark != null" >
+        review_remark = #{reviewRemark,jdbcType=VARCHAR},
       </if>
       <if test="reviewOperator != null" >
         review_operator = #{reviewOperator,jdbcType=VARCHAR},
@@ -851,5 +851,13 @@
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="selectByOrderCodeAndStatus"
+          resultType="com.aiqin.mgs.order.api.domain.ReturnOrderInfo">
+    select
+    <include refid="Base_Column_List"/>
+    from return_order_info
+    where order_store_code = #{orderStoreCode,jdbcType=VARCHAR} and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
+  </select>
 
 </mapper>

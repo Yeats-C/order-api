@@ -54,13 +54,13 @@ public class ReturnOrderInfo {
     private String purchaseGroupName;
 
     @ApiModelProperty(value = "1-待审核，2-审核通过，3-订单同步中，4-等待退货验收，5-等待退货入库，6-等待审批，11-退货完成，12-退款完成，97-退货终止，98-审核不通过，99-已取消")
-    private Boolean returnOrderStatus;
+    private Integer returnOrderStatus;
 
     @ApiModelProperty(value = "订单类型 0直送、1配送、2辅采")
-    private Boolean orderType;
+    private Integer orderType;
 
     @ApiModelProperty(value = "退货类型  0客户退货、1缺货退货、2售后退货")
-    private Boolean returnOrderType;
+    private Integer returnOrderType;
 
     @ApiModelProperty(value = "客户编码")
     private String customerCode;
@@ -69,13 +69,13 @@ public class ReturnOrderInfo {
     private String customerName;
 
     @ApiModelProperty(value = "是否锁定  0是 1否")
-    private Boolean returnLock;
+    private Integer returnLock;
 
     @ApiModelProperty(value = "锁定原因")
     private String returnReason;
 
     @ApiModelProperty(value = "支付状态  0 已支付 1未支付")
-    private Boolean paymentStatus;
+    private Integer paymentStatus;
 
     @ApiModelProperty(value = "支付方式编码")
     private String paymentCode;
@@ -84,7 +84,7 @@ public class ReturnOrderInfo {
     private String paymentName;
 
     @ApiModelProperty(value = "处理办法 0退货退款  1仅退款")
-    private Boolean treatmentMethod;
+    private Integer treatmentMethod;
 
     @ApiModelProperty(value = "物流公司编码")
     private String logisticsCompanyCode;
@@ -192,7 +192,7 @@ public class ReturnOrderInfo {
     private String remark;
 
     @ApiModelProperty(value = "0. 启用   1.禁用")
-    private Boolean useStatus;
+    private Integer useStatus;
 
     @ApiModelProperty(value = "创建人编码")
     private String createById;
@@ -228,10 +228,10 @@ public class ReturnOrderInfo {
     private String natureCode;
 
     @ApiModelProperty(value = "退款状态，0-未退款、1-已退款")
-    private Boolean refundStatus;
+    private Integer refundStatus;
 
     @ApiModelProperty(value = "处理方式，0-整单退、1-部分退")
-    private Boolean processType;
+    private Integer processType;
 
     @ApiModelProperty(value = "退回优惠额度")
     private BigDecimal returnDiscountAmount;
@@ -246,7 +246,7 @@ public class ReturnOrderInfo {
     private String storeCreditLine;
 
     @ApiModelProperty(value = "审核备注")
-    private String reviewNote;
+    private String reviewRemark;
 
     @ApiModelProperty(value = "审核人")
     private String reviewOperator;
@@ -254,5 +254,10 @@ public class ReturnOrderInfo {
     @ApiModelProperty(value = "退回优惠额度信息")
     private String discountAmountInfos;
 
+    @ApiModelProperty(value = "来源类型")
+    private Integer sourceType;
+
+    @ApiModelProperty(value = "退款方式 1:现金 2:微信 3:支付宝 4:银联")
+    private Integer returnMoneyType;
 
 }
