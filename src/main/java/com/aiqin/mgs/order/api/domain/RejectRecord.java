@@ -73,15 +73,15 @@ public class RejectRecord {
     private String districtName;
     @ApiModelProperty(value = "收货地址")
     private String receiveAddress;
-    @ApiModelProperty(value = "预计发货时间")
+    @ApiModelProperty(value = "预计发货时间",example = "2001-01-01 01:01:01")
     private Date preExpectTime;
-    @ApiModelProperty(value = "有效期")
+    @ApiModelProperty(value = "有效期",example = "2001-01-01 01:01:01")
     private Date validTime;
-    @ApiModelProperty(value = "出库时间")
+    @ApiModelProperty(value = "出库时间",example = "2001-01-01 01:01:01")
     private Date outStockTime;
-    @ApiModelProperty(value = "发运时间")
+    @ApiModelProperty(value = "发运时间",example = "2001-01-01 01:01:01")
     private Date deliveryTime;
-    @ApiModelProperty(value = "完成时间")
+    @ApiModelProperty(value = "完成时间",example = "2001-01-01 01:01:01")
     private Date finishTime;
     @ApiModelProperty(value = "备注")
     private String remark;
@@ -99,8 +99,8 @@ public class RejectRecord {
     private String updateById;
     @ApiModelProperty(value = "修改人名称")
     private String updateByName;
-    @ApiModelProperty(value = "创建时间")
-    private String createTime;
-    @ApiModelProperty(value = "修改时间")
-    private String updateTime;
+    @ApiModelProperty(value = "创建时间",example = "2001-01-01 01:01:01")
+    private Date createTime;
+    @ApiModelProperty(value = "修改时间",example = "2001-01-01 01:01:01")
+    private Date updateTime;
 }
