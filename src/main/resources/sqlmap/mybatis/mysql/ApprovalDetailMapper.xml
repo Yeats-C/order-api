@@ -18,11 +18,11 @@
     id, form_no, coupon_type, total_money, store_id, store_name, start_time, end_time, 
     creator, create_time, remark
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <select id="selectByFormNo" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
     from approval_detail
-    where id = #{id,jdbcType=INTEGER}
+    where form_no = #{formNo,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from approval_detail

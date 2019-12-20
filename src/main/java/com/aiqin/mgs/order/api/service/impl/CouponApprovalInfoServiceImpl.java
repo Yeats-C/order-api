@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.service.impl;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
 import com.aiqin.mgs.order.api.domain.CouponApprovalDetail;
 import com.aiqin.mgs.order.api.domain.CouponApprovalInfo;
@@ -41,6 +42,8 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
 
     @Autowired
     private CouponApprovalInfoDao couponApprovalInfoDao;
+    @Autowired
+    private CouponApprovalDetailDao couponApprovalDetailDao;
 
 
     @Override
@@ -84,15 +87,26 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
     public String callback(FormCallBackVo formCallBackVo) {
         String result = "success";
         log.info("A品券发放审批进入回调,request={}", formCallBackVo);
-        CouponApprovalInfo CouponApprovalInfo = couponApprovalInfoDao.selectByFormNo(formCallBackVo.getFormNo());
-        log.info("CouponApprovalInfo={}", CouponApprovalInfo);
-        if (CouponApprovalInfo != null) {
+        CouponApprovalInfo couponApprovalInfo = couponApprovalInfoDao.selectByFormNo(formCallBackVo.getFormNo());
+        CouponApprovalDetail couponApprovalDetail = couponApprovalDetailDao.selectByFormNo(formCallBackVo.getFormNo());
+        log.info("A品券发放审批回调,couponApprovalInfo={},couponApprovalDetail={}", couponApprovalInfo,couponApprovalDetail);
+        if (couponApprovalInfo != null) {
             if (formCallBackVo.getUpdateFormStatus().equals(Indicator.COST_FORM_STATUS_APPROVED.getCode())) {
                 //审核通过，修改本地主表状态
-                CouponApprovalInfo.setStatus(StatusEnum.AUDIT_PASS.getValue());
-                CouponApprovalInfo.setStatuStr(StatusEnum.AUDIT_PASS.getDesc());
+                couponApprovalInfo.setStatus(StatusEnum.AUDIT_PASS.getValue());
+                couponApprovalInfo.setStatuStr(StatusEnum.AUDIT_PASS.getDesc());
                 //计算A品券数量，同步到虚拟资产
                 List<FranchiseeAsset> list=new ArrayList();
+                Double totalMoney=couponApprovalDetail.getTotalMoney();
+                if(couponApprovalDetail!=null&&totalMoney!=null){
+                    int num=(int)(totalMoney/100);
+                    double balance=totalMoney%100;
+
+                    for(int i=0;i<num;i++){
+
+                    }
+
+                }
                 String url=slcsHost+"/franchiseeVirtual/VirtualA";
                 JSONObject json=new JSONObject();
                 json.put("list",null);
@@ -101,33 +115,33 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
 
 
             } else if (TpmBpmUtils.isPass(formCallBackVo.getUpdateFormStatus(), formCallBackVo.getOptBtn())) {
-                CouponApprovalInfo.setStatus(StatusEnum.AUDIT.getValue());
-                CouponApprovalInfo.setStatuStr(StatusEnum.AUDIT.getDesc());
+                couponApprovalInfo.setStatus(StatusEnum.AUDIT.getValue());
+                couponApprovalInfo.setStatuStr(StatusEnum.AUDIT.getDesc());
             } else {
                 if (formCallBackVo.getOptBtn().equals(IndicatorStr.PROCESS_BTN_REJECT_FIRST.getCode())) {
                     //驳回发起人
-                    CouponApprovalInfo.setStatus(StatusEnum.AUDIT_BACK.getValue());
-                    CouponApprovalInfo.setStatuStr(StatusEnum.AUDIT_BACK.getDesc());
+                    couponApprovalInfo.setStatus(StatusEnum.AUDIT_BACK.getValue());
+                    couponApprovalInfo.setStatuStr(StatusEnum.AUDIT_BACK.getDesc());
                 } else if (formCallBackVo.getOptBtn().equals(IndicatorStr.PROCESS_BTN_REJECT_END.getCode())) {
                     //驳回并结束
-                    CouponApprovalInfo.setStatus(StatusEnum.AUDIT_END.getValue());
-                    CouponApprovalInfo.setStatuStr(StatusEnum.AUDIT_END.getDesc());
+                    couponApprovalInfo.setStatus(StatusEnum.AUDIT_END.getValue());
+                    couponApprovalInfo.setStatuStr(StatusEnum.AUDIT_END.getDesc());
                 } else if (formCallBackVo.getOptBtn().equals(IndicatorStr.PROCESS_BTN_CANCEL.getCode())) {
                     //撤销
-                    CouponApprovalInfo.setStatus(StatusEnum.AUDIT_CANCEL.getValue());
-                    CouponApprovalInfo.setStatuStr(StatusEnum.AUDIT_CANCEL.getDesc());
+                    couponApprovalInfo.setStatus(StatusEnum.AUDIT_CANCEL.getValue());
+                    couponApprovalInfo.setStatuStr(StatusEnum.AUDIT_CANCEL.getDesc());
                 } else if (formCallBackVo.getOptBtn().equals(IndicatorStr.PROCESS_BTN_KILL.getCode())) {
                     //终止
-                    CouponApprovalInfo.setStatus(StatusEnum.AUDIT_END.getValue());
-                    CouponApprovalInfo.setStatuStr(StatusEnum.AUDIT_END.getDesc());
+                    couponApprovalInfo.setStatus(StatusEnum.AUDIT_END.getValue());
+                    couponApprovalInfo.setStatuStr(StatusEnum.AUDIT_END.getDesc());
                 } else {
                     //终止
-                    CouponApprovalInfo.setStatus(StatusEnum.AUDIT_END.getValue());
-                    CouponApprovalInfo.setStatuStr(StatusEnum.AUDIT_END.getDesc());
+                    couponApprovalInfo.setStatus(StatusEnum.AUDIT_END.getValue());
+                    couponApprovalInfo.setStatuStr(StatusEnum.AUDIT_END.getDesc());
                 }
             }
             //更新本地审批表数据
-            couponApprovalInfoDao.updateByFormNoSelective(CouponApprovalInfo);
+            couponApprovalInfoDao.updateByFormNoSelective(couponApprovalInfo);
         } else {
             //result = "false";
         }

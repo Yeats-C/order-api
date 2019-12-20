@@ -8,7 +8,7 @@ public interface CouponApprovalDetailDao {
 
     int insertSelective(CouponApprovalDetail record);
 
-    CouponApprovalDetail selectByPrimaryKey(Integer id);
+    CouponApprovalDetail selectByFormNo(String formNo);
 
     int updateByPrimaryKeySelective(CouponApprovalDetail record);
 
