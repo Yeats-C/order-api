@@ -97,7 +97,7 @@
     <delete id="deleteCart" >
 		delete from order_store_cart
 		<where>
-		    <if test="storeId != null " >
+		    <if test="storeId != null" >
                 and store_id =#{storeId}
             </if>
             <if test="skuCode != null">
