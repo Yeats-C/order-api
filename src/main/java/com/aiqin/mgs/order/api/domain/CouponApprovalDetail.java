@@ -43,4 +43,7 @@ public class CouponApprovalDetail {
     @ApiModelProperty("备注")
     private String remark;
 
+    @ApiModelProperty("加盟商id")
+    private String franchiseeId;
+
 }
