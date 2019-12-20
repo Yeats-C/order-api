@@ -157,33 +157,34 @@ public class CartOrderServiceImpl implements CartOrderService {
             lineCheckStatus = lineCheckStatus == null ? 0 : lineCheckStatus;
             //检查商品是否被勾选，勾选后，更新数据库标识
             LOGGER.info("商品勾选后，更新勾选状态：{}", lineCheckStatus);
-            if (null != skuId && lineCheckStatus.equals(Global.LINECHECKSTATUS_1) && null != number) {
+            if (null != skuId && lineCheckStatus.equals(Global.LINECHECKSTATUS_1) &&null !=productType) {
                 cartOrderInfo.setSkuCode(skuId);
                 cartOrderInfo.setLineCheckStatus(lineCheckStatus);
-                cartOrderInfo.setAmount(number);
+                cartOrderInfo.setProductType(productType);
+                if (null != number){
+                    cartOrderInfo.setAmount(number);
+                }
                 cartOrderDao.updateProductList(cartOrderInfo);
                 CartResponse cartResponse = getProductList(cartOrderInfo);
                 LOGGER.info("返回购物车中的数据给前端：{}", cartResponse);
                 response.setData(cartResponse);
-                return response;
                 //如果是全选，通过门店id更新所有标记
-            }else if(null != storeId && lineCheckStatus.equals(Global.LINECHECKSTATUS_2)) {
+            }else if(null != storeId && lineCheckStatus.equals(Global.LINECHECKSTATUS_2) && null !=productType) {
                 cartOrderInfo.setStoreId(storeId);
+                cartOrderInfo.setProductType(productType);
                 cartOrderInfo.setLineCheckStatus(Global.LINECHECKSTATUS_1);
                 cartOrderDao.updateProductList(cartOrderInfo);
                 //返回商品列表并结算价格
                 CartResponse cartResponse = getProductList(cartOrderInfo);
                 LOGGER.info("返回购物车中的数据给前端：{}", cartResponse);
                 response.setData(cartResponse);
-                return response;
             } else {
                 //返回商品列表并结算价格
                 CartResponse cartResponse = getProductList(cartOrderInfo);
                 LOGGER.info("返回购物车中的数据给前端：{}", cartResponse);
                 response.setData(cartResponse);
-                return response;
             }
-
+            return response;
         } catch (Exception e) {
             LOGGER.error("根据门店ID查询购物车数据异常：{}", e);
             return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);

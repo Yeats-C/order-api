@@ -26,7 +26,7 @@ public class CartOrderInfo {
     /***商品数量*/
     @ApiModelProperty(value = "商品数量")
     @JsonProperty("amount")
-    private int amount;
+    private Integer amount;
 
     /***商品最大订货数量*/
     @ApiModelProperty(value = "商品最大订货数量")

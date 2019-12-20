@@ -61,32 +61,40 @@
 
     <!-- 更新购物车里的商品标识 -->
     <update id="updateProductList" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo">
-        update order_store_cart set line_check_status=#{lineCheckStatus}
-        <where>
-            <if test="amount != null and amount != ''">
-                and amount = #{amount}
+        update order_store_cart
+        <set>
+            <if test="amount != null">
+                amount = #{amount,jdbcType=INTEGER},
             </if>
+            <if test="lineCheckStatus !=null">
+                line_check_status=#{lineCheckStatus,jdbcType=INTEGER},
+            </if>
+        </set>
+        <where>
             <if test="skuCode != null and skuCode != ''">
                 and sku_code = #{skuCode}
             </if>
             <if test="storeId != null and storeId != ''">
                 and store_id = #{storeId}
             </if>
+            <if test="productType != null">
+                and product_type = #{productType}
+            </if>
         </where>
     </update>
-
 
 
     <!-- 查询门店Id的购物车 -->
     <select id="selectCartByStoreId" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo"
             resultMap="CartOrderInfoMapping" resultType="java.util.List">
-        SELECT <include refid="Base_Column_List"/>
+        SELECT
+        <include refid="Base_Column_List"/>
         FROM order_store_cart
         <where>
             <if test="storeId != '' and storeId != null">
                 and store_id = #{storeId}
             </if>
-            <if test="productType != ''and productType != null">
+            <if test="productType != null">
                 and product_type = #{productType}
             </if>
         </where>
@@ -102,30 +110,31 @@
     </select>
 
     <!-- 清空购物车购物清单 -->
-    <delete id="deleteCart" >
-		delete from order_store_cart
-		<where>
-		    <if test="storeId != null and storeId != '' " >
+    <delete id="deleteCart">
+        delete from order_store_cart
+        <where>
+            <if test="storeId != null and storeId != '' ">
                 and store_id =#{storeId}
             </if>
             <if test="skuCode != null and skuCode != ''">
-              and sku_code = #{skuCode}
+                and sku_code = #{skuCode}
             </if>
-            <if test="lineCheckStatus != null and lineCheckStatus != ''">
+            <if test="lineCheckStatus != null">
                 and line_check_status = #{lineCheckStatus}
             </if>
         </where>
-     </delete>
+    </delete>
 
-    <select id="selectCartByLineCheckStatus" resultType="java.util.List" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo"
+    <select id="selectCartByLineCheckStatus" resultType="java.util.List"
+            parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo"
             resultMap="CartOrderInfoMapping">
-        select <include refid="Base_Column_List"/> from order_store_cart
+        select
+        <include refid="Base_Column_List"/>
+        from order_store_cart
         <where>
             line_check_status =#{lineCheckStatus}
         </where>
     </select>
-
-
 
 
 </mapper>
