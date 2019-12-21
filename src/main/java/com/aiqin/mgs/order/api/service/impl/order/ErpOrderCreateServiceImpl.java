@@ -216,7 +216,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         info1.setProductId("1000001");
         info1.setSpuId("1000001");
         info1.setProductName("奶粉");
-        info1.setSkuId("9001");
+        info1.setSkuCode("9001");
         info1.setPrice(new BigDecimal(5));
         info1.setAmount(11);
         list.add(info1);
@@ -225,7 +225,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         info2.setProductId("1000002");
         info2.setSpuId("1000002");
         info2.setProductName("玩具");
-        info2.setSkuId("9002");
+        info2.setSkuCode("9002");
         info2.setPrice(new BigDecimal(10));
         info2.setAmount(22);
         list.add(info2);
@@ -234,7 +234,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         info3.setProductId("1000003");
         info3.setSpuId("1000003");
         info3.setProductName("衣服");
-        info3.setSkuId("9003");
+        info3.setSkuCode("9003");
         info3.setPrice(new BigDecimal(15));
         info3.setAmount(8);
         list.add(info3);
@@ -262,11 +262,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         for (CartOrderInfo item :
                 cartProductList) {
             //获取商品详情
-            ProductInfo product = erpOrderRequestService.getProductDetail(item.getSpuId(), item.getSkuId());
+            ProductInfo product = erpOrderRequestService.getProductDetail(item.getSpuId(), item.getSkuCode());
             if (product == null) {
                 throw new BusinessException("未获取到商品" + item.getProductName() + "的信息");
             }
-            productMap.put(item.getSkuId(), product);
+            productMap.put(item.getSkuCode(), product);
         }
 
         //订单商品明细行
@@ -274,7 +274,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //遍历参数商品列表，构建订单商品明细行
         for (CartOrderInfo item :
                 cartProductList) {
-            ProductInfo productInfo = productMap.get(item.getSkuId());
+            ProductInfo productInfo = productMap.get(item.getSkuCode());
 
             ErpOrderItem orderItem = new ErpOrderItem();
             //spu编码

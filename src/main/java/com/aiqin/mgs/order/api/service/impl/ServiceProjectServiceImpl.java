@@ -399,6 +399,7 @@ public class ServiceProjectServiceImpl  implements ServiceProjectService {
                 serviceProjectReduceDetail.setGuideId(serviceProjectAsset.getGuideId());
                 serviceProjectReduceDetail.setGuideName(serviceProjectAsset.getGuideName());
                 serviceProjectReduceDetail.setCreateTime(serviceProjectAsset.getCreateTime());
+                serviceProjectReduceDetail.setTypeId(serviceProjectAsset.getTypeId());
                 for (ServiceProjectAsset serviceProjectAsset1 : serviceProjectAssetList) {
                     if (serviceProjectAsset.getConsumptionPattern().equals(0) && serviceProjectAsset.getIsDirectCustom().equals(0)) {
                         serviceProjectAsset1.setRemainCount(serviceProjectAsset1.getLimitCount() - 1);

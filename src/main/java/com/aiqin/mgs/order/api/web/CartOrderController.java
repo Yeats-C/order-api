@@ -3,11 +3,13 @@ package com.aiqin.mgs.order.api.web;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
-import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.request.cart.DeleteCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
+import com.aiqin.mgs.order.api.domain.response.cart.CartResponse;
 import com.aiqin.mgs.order.api.service.CartOrderService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +50,7 @@ public class CartOrderController {
      */
     @PostMapping("/getTotal")
     @ApiOperation(value = "返回购物车中的商品总数量")
-    public HttpResponse getTotal(@Valid @RequestBody ShoppingCartRequest shoppingCartRequest) {
+    public HttpResponse<Integer> getTotal(@Valid @RequestBody ShoppingCartRequest shoppingCartRequest) {
         return cartOrderService.getTotal(shoppingCartRequest.getStoreId());
     }
 
@@ -60,13 +62,14 @@ public class CartOrderController {
      */
     @GetMapping("/cartDisplay")
     @ApiOperation(value = "购物车展示列表,附带勾选功能")
-    public HttpResponse selectCartByStoreId(@Valid @RequestParam(name = "storeId", required = true) String storeId,
-                                            @Valid @RequestParam(name = "productType", required = true)Integer productType,
-                                            @Valid @RequestParam(name = "skuId", required = false)String skuId,
-                                            @Valid @RequestParam(name = "lineCheckStatus", required = false)Integer lineCheckStatus,
-                                            @Valid @RequestParam(name = "number", required = false)Integer number) {
-        LOGGER.info("购物车展示列表参数：{},{},{},{},{}", storeId,productType,skuId,lineCheckStatus,number);
-        return cartOrderService.selectCartByStoreId(storeId,productType,skuId,lineCheckStatus,number);
+    @ApiImplicitParams({@ApiImplicitParam(name = "store_id", value = "门店id", dataType = "String", paramType = "query", required = true),
+            @ApiImplicitParam(name = "product_type", value = "商品类型 1:直送 2:配送 3:货架", dataType = "Integer", paramType = "query", required = false),
+            @ApiImplicitParam(name = "sku_code", value = "sku编码", dataType = "String", paramType = "query", required = false),
+            @ApiImplicitParam(name = "line_check_status", value = "勾选标记,0:未勾选,1:勾选单个商品,2:全部勾选", dataType = "Integer", paramType = "query", required = false),
+            @ApiImplicitParam(name = "number", value = "商品数量", dataType = "Integer", paramType = "query", required = false)})
+    public HttpResponse<CartResponse> selectCartByStoreId(String store_id, Integer product_type, String sku_code, Integer line_check_status, Integer number) {
+        LOGGER.info("购物车展示列表参数：{},{},{},{},{}", store_id,product_type,sku_code,line_check_status,number);
+        return cartOrderService.selectCartByStoreId(store_id,product_type,sku_code,line_check_status,number);
     }
 
     /**
