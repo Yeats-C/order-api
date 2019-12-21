@@ -38,7 +38,7 @@ public class ErpOrderOperationLogServiceImpl implements ErpOrderOperationLogServ
         operationLog.setCreateById(auth.getPersonId());
         operationLog.setCreateByName(auth.getPersonName());
         operationLog.setUpdateTime(now);
-        operationLog.setUpdateByName(auth.getPersonName());
+        operationLog.setUpdateById(auth.getPersonId());
         operationLog.setUpdateByName(auth.getPersonName());
         Integer insert = erpOrderOperationLogDao.insert(operationLog);
     }

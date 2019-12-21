@@ -17,6 +17,7 @@ public class ErpOrderPay {
 
     /***主键*/
     private Long id;
+
     /***支付id*/
     private String payId;
     /***业务外键*/
@@ -35,6 +36,7 @@ public class ErpOrderPay {
     private Date payStartTime;
     /***结束支付时间*/
     private Date payEndTime;
+
     /***创建时间*/
     private Date createTime;
     /***创建人id*/

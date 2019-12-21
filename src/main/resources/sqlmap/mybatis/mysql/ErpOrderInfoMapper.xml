@@ -173,8 +173,26 @@
         <if test="splitStatus != null and splitStatus != '' or splitStatus == 0">
             split_status = #{splitStatus},
         </if>
+        <if test="orderException != null and orderException != '' or orderException == 0">
+            order_exception = #{orderException},
+        </if>
+        <if test="orderLock != null and orderLock != '' or orderLock == 0">
+            order_lock = #{orderLock},
+        </if>
+        <if test="orderDelete != null and orderDelete != '' or orderDelete == 0">
+            order_delete = #{orderDelete},
+        </if>
+        <if test="paymentStatus != null and paymentStatus != '' or paymentStatus == 0">
+            payment_status = #{paymentStatus},
+        </if>
         <if test="beforeCancelStatus != null and beforeCancelStatus != '' or beforeCancelStatus == 0">
             before_cancel_status = #{beforeCancelStatus},
+        </if>
+        <if test="exceptionReason != null and exceptionReason != ''">
+            exception_reason = #{exceptionReason},
+        </if>
+        <if test="lockReason != null and lockReason != ''">
+            lock_reason = #{lockReason},
         </if>
         <if test="mainOrderCode != null and mainOrderCode != ''">
             main_order_code = #{mainOrderCode},
@@ -182,14 +200,113 @@
         <if test="supplierCode != null and supplierCode != ''">
             supplier_code = #{supplierCode},
         </if>
+        <if test="supplierName != null and supplierName != ''">
+            supplier_name = #{supplierName},
+        </if>
         <if test="transportCenterCode != null and transportCenterCode != ''">
             transport_center_code = #{transportCenterCode},
+        </if>
+        <if test="transportCenterName != null and transportCenterName != ''">
+            transport_center_name = #{transportCenterName},
+        </if>
+        <if test="distributionModeCode != null and distributionModeCode != ''">
+            distribution_mode_code = #{distributionModeCode},
+        </if>
+        <if test="distributionModeName != null and distributionModeName != ''">
+            distribution_mode_name = #{distributionModeName},
+        </if>
+        <if test="transportCompanyCode != null and transportCompanyCode != ''">
+            transport_company_code = #{transportCompanyCode},
+        </if>
+        <if test="transportCompanyName != null and transportCompanyName != ''">
+            transport_company_name = #{transportCompanyName},
         </if>
         <if test="warehouseCode != null and warehouseCode != ''">
             warehouse_code = #{warehouseCode},
         </if>
+        <if test="warehouseName != null and warehouseName != ''">
+            warehouse_name = #{warehouseName},
+        </if>
+        <if test="customerCode != null and customerCode != ''">
+            customer_code = #{customerCode},
+        </if>
+        <if test="customerName != null and customerName != ''">
+            customer_name = #{customerName},
+        </if>
+        <if test="paymentCode != null and paymentCode != ''">
+            payment_code = #{paymentCode},
+        </if>
+        <if test="paymentName != null and paymentName != ''">
+            payment_name = #{paymentName},
+        </if>
+        <if test="sourceCode != null and sourceCode != ''">
+            source_code = #{sourceCode},
+        </if>
+        <if test="sourceName != null and sourceName != ''">
+            source_name = #{sourceName},
+        </if>
         <if test="logisticsId != null and logisticsId != ''">
             logistics_id = #{logisticsId},
+        </if>
+        <if test="zipCode != null and zipCode != ''">
+            zip_code = #{zipCode},
+        </if>
+        <if test="deliverAmount != null">
+            deliver_amount = #{deliverAmount},
+        </if>
+        <if test="totalProductAmount != null">
+            total_product_amount = #{totalProductAmount},
+        </if>
+        <if test="actualTotalProductAmount != null">
+            actual_total_product_amount = #{actualTotalProductAmount},
+        </if>
+        <if test="discountAmount != null">
+            discount_amount = #{discountAmount},
+        </if>
+        <if test="orderAmount != null">
+            order_amount = #{orderAmount},
+        </if>
+        <if test="paymentTime != null">
+            payment_time = #{paymentTime},
+        </if>
+        <if test="deliveryTime != null">
+            delivery_time = #{deliveryTime},
+        </if>
+        <if test="transportTime != null">
+            transport_time = #{transportTime},
+        </if>
+        <if test="receiveTime != null">
+            receive_time = #{receiveTime},
+        </if>
+        <if test="invoiceTitle != null and invoiceTitle != '' ">
+            invoice_title = #{invoiceTitle},
+        </if>
+        <if test="remake != null and remake != '' ">
+            remake = #{remake},
+        </if>
+        <if test="transportCode != null and transportCode != '' ">
+            transport_code = #{transportCode},
+        </if>
+        <if test="invoiceType != null and invoiceType != '' or invoiceType == 0 ">
+            invoice_type = #{invoiceType},
+        </if>
+        <if test="totalVolume != null and totalVolume != '' or totalVolume == 0 ">
+            total_volume = #{totalVolume},
+        </if>
+        <if test="actualTotalVolume != null and actualTotalVolume != '' or actualTotalVolume == 0 ">
+            actual_total_volume = #{actualTotalVolume},
+        </if>
+        <if test="totalWeight != null and totalWeight != '' or totalWeight == 0 ">
+            total_weight = #{totalWeight},
+        </if>
+        <if test="actualTotalWeight != null and actualTotalWeight != '' or actualTotalWeight == 0 ">
+            actual_total_weight = #{actualTotalWeight},
+        </if>
+        <if test="transportStatus != null and transportStatus != '' or transportStatus == 0 ">
+            transport_status = #{transportStatus},
+        </if>
+        <if test="actualProductCount != null and actualProductCount != '' or actualProductCount == 0 ">
+            actual_product_count = #{actualProductCount},
         </if>
         update_by_id = #{updateById},
         update_by_name = #{updateByName},

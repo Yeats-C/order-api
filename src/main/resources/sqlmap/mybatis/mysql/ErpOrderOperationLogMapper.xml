@@ -35,13 +35,12 @@
         <if test="useStatus != null and useStatus != '' or useStatus == 0 ">
             and use_status = #{useStatus}
         </if>
-        order by create_time desc
+        order by create_time desc,id desc
     </select>
 
     <insert id="insert">
         insert into operation_log (operation_code, operation_type, source_type, operation_content, remark, use_status,
-                                   create_by_id, create_by_name, update_by_id, update_by_name, create_time, update_time
-        )
+                                   create_by_id, create_by_name, update_by_id, update_by_name, create_time, update_time)
         values (#{operationCode}, #{operationType}, #{sourceType}, #{operationContent}, #{remark},
                 #{useStatus}, #{createById}, #{createByName}, #{updateById}, #{updateByName}, #{createTime},
                 #{updateTime})

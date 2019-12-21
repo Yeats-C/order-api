@@ -6,7 +6,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderDeliverRequest;
-import com.aiqin.mgs.order.api.service.order.ErpOrderInfoService;
+import com.aiqin.mgs.order.api.service.order.ErpOrderDeliverService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import io.swagger.annotations.Api;
@@ -35,9 +35,7 @@ public class ErpOrderDeliverController {
     private static final Logger logger = LoggerFactory.getLogger(ErpOrderDeliverController.class);
 
     @Resource
-    private ErpOrderInfoService erpOrderInfoService;
-    @Resource
-    private ErpOrderQueryService erpOrderQueryService;
+    private ErpOrderDeliverService erpOrderDeliverService;
 
     @PostMapping("/orderDeliver")
     @ApiOperation(value = "订单发货")
@@ -45,11 +43,11 @@ public class ErpOrderDeliverController {
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
-            erpOrderInfoService.orderDeliver(erpOrderSendRequest);
+            erpOrderDeliverService.orderDeliver(erpOrderSendRequest);
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {
-            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+            response = HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
         }
         return response;
     }
