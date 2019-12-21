@@ -19,11 +19,11 @@ import java.util.Map;
 public enum ErpOrderOriginTypeEnum {
 
     /***POS*/
-    ORIGIN_COME_3(3, "3", "POS"),
+    ORIGIN_COME_0(101, "101", "POS"),
     /***微商城*/
-    ORIGIN_COME_4(4, "4", "微商城"),
+    ORIGIN_COME_1(102, "102", "微商城"),
     /***WEB*/
-    ORIGIN_COME_5(5, "5", "WEB");
+    ORIGIN_COME_2(103, "103", "WEB");
 
     private Integer code;
     private String value;
@@ -37,8 +37,6 @@ public enum ErpOrderOriginTypeEnum {
 
     /***选项类型*/
     public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
-    /***code-enum map*/
-    public static final Map<Integer, ErpOrderOriginTypeEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
     /***value-enum map*/
     public static final Map<String, ErpOrderOriginTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
@@ -46,7 +44,6 @@ public enum ErpOrderOriginTypeEnum {
         for (ErpOrderOriginTypeEnum item :
                 ErpOrderOriginTypeEnum.values()) {
             SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
-            CODE_ENUM_MAP.put(item.getCode(), item);
             VALUE_ENUM_MAP.put(item.getValue(), item);
         }
     }

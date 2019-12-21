@@ -39,8 +39,6 @@ public enum ErpPayStatusEnum {
 
     /***选项类型*/
     public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
-    /***code-enum map*/
-    public static final Map<Integer, ErpPayStatusEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
     /***value-enum map*/
     public static final Map<String, ErpPayStatusEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
@@ -48,7 +46,6 @@ public enum ErpPayStatusEnum {
         for (ErpPayStatusEnum item :
                 ErpPayStatusEnum.values()) {
             SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
-            CODE_ENUM_MAP.put(item.getCode(), item);
             VALUE_ENUM_MAP.put(item.getValue(), item);
         }
     }

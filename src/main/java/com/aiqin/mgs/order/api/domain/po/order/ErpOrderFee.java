@@ -4,6 +4,7 @@ import com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 订单费用
@@ -13,8 +14,10 @@ import java.math.BigDecimal;
  * @date 2019/12/11 20:18
  */
 @Data
-public class ErpOrderFee extends ErpOrderBase {
+public class ErpOrderFee {
 
+    /***主键*/
+    private Long id;
     /***订单费用id*/
     private String feeId;
     /***关联订单id*/
@@ -37,6 +40,21 @@ public class ErpOrderFee extends ErpOrderBase {
     private BigDecimal payMoney;
     /***返还物流券金额*/
     private BigDecimal goodsCoupon;
+
+    /***创建时间*/
+    private Date createTime;
+    /***创建人id*/
+    private String createById;
+    /***创建人姓名*/
+    private String createByName;
+    /***更新时间*/
+    private Date updateTime;
+    /***修改人id*/
+    private String updateById;
+    /***修改人姓名*/
+    private String updateByName;
+    /***数据状态 1有效 0删除*/
+    private Integer status;
 
     /***订单支付*/
     private ErpOrderPay orderPay;
