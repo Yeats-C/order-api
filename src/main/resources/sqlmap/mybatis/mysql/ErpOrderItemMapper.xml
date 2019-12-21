@@ -4,79 +4,94 @@
 
     <select id="select" parameterType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem"
             resultType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem">
-        select id as id,
-        order_id as orderId,
-        order_item_id as orderItemId,
-        order_item_code as orderItemCode,
-        product_id as productId,
-        product_code as productCode,
-        product_name as productName,
+        select
+        id as id,
+        order_info_detail_id as orderInfoDetailId,
+        order_store_id as orderStoreId,
+        order_store_code as orderStoreCode,
+        spu_code as spuCode,
+        spu_name as spuName,
         sku_code as skuCode,
         sku_name as skuName,
-        unit as unit,
-        activity_id as activityId,
-        product_gift as productGift,
-        quantity as quantity,
-        deliver_quantity as deliverQuantity,
-        deliver_difference_reason as deliverDifferenceReason,
-        sign_quantity as signQuantity,
+        picture_url as pictureUrl,
+        product_spec as productSpec,
+        color_code as colorCode,
+        color_name as colorName,
+        model_code as modelCode,
+        unit_code as unitCode,
+        unit_name as unitName,
+        zero_disassembly_coefficient as zeroDisassemblyCoefficient,
+        product_type as productType,
+        product_count as productCount,
+        product_amount as productAmount,
+        purchase_amount as purchaseAmount,
+        total_product_amount as totalProductAmount,
+        actual_total_product_amount as actualTotalProductAmount,
+        total_preferential_amount as totalPreferentialAmount,
+        total_acivity_amount as totalAcivityAmount,
+        actual_inbound_count as actualInboundCount,
+        actual_product_count as actualProductCount,
+        return_product_count as returnProductCount,
+        tax_rate as taxRate,
+        activity_code as activityCode,
+        line_code as lineCode,
+        gift_line_code as giftLineCode,
+        company_code as companyCode,
+        company_name as companyName,
         sign_difference_reason as signDifferenceReason,
-        price as price,
-        tax_purchase_price as taxPurchasePrice,
-        money as money,
-        activity_money as activityMoney,
-        actual_money as actualMoney,
-        share_money as shareMoney,
-        create_time as createTime,
+        use_status as useStatus,
         create_by_id as createById,
         create_by_name as createByName,
-        update_time as updateTime,
         update_by_id as updateById,
         update_by_name as updateByName,
-        status as status
-        from order_store_product_item
+        create_time as createTime,
+        update_time as updateTime
+        from order_store_detail
         where 1 = 1
         <if test=" id != null and id != '' ">
             and id = #{id}
         </if>
-        <if test=" orderId != null and orderId != '' ">
-            and order_id = #{orderId}
+        <if test=" orderInfoDetailId != null and orderInfoDetailId != '' ">
+            and order_info_detail_id = #{orderInfoDetailId}
         </if>
-        <if test=" orderItemId != null and orderItemId != '' ">
-            and order_item_id = #{orderItemId}
+        <if test=" orderStoreId != null and orderStoreId != '' ">
+            and order_store_id = #{orderStoreId}
         </if>
-        <if test=" orderItemCode != null and orderItemCode != '' ">
-            and order_item_code = #{orderItemCode}
+        <if test=" orderStoreCode != null and orderStoreCode != '' ">
+            and order_store_code = #{orderStoreCode}
         </if>
-        order by create_time asc, order_item_code asc
+        <if test=" useStatus != null and useStatus != '' or useStatus == 0 ">
+            and use_status = #{useStatus}
+        </if>
+        order by create_time asc
     </select>
 
     <update id="updateByPrimaryKeySelective">
-        update order_store_product_item
+        update order_store_detail
         set
-        <if test="quantity != null and quantity != '' or quantity == 0 ">
-            quantity = #{quantity},
+        <if test="productCount != null and productCount != '' or productCount == 0 ">
+            product_count = #{productCount},
         </if>
-        <if test="deliverQuantity != null and deliverQuantity != '' or deliverQuantity == 0 ">
-            deliver_quantity = #{deliverQuantity},
+        <if test="actualProductCount != null and actualProductCount != '' or actualProductCount == 0 ">
+            actual_product_count = #{actualProductCount},
         </if>
-        <if test="signQuantity != null and signQuantity != '' or signQuantity == 0 ">
-            sign_quantity = #{signQuantity},
+        <if test="actualInboundCount != null and actualInboundCount != '' or actualInboundCount == 0 ">
+            actual_inbound_count = #{actualInboundCount},
         </if>
-        <if test="money != null and money != '' or money == 0 ">
-            money = #{money},
+        <if test="totalProductAmount != null and totalProductAmount != '' or totalProductAmount == 0 ">
+            total_product_amount = #{totalProductAmount},
         </if>
-        <if test="activityMoney != null and activityMoney != '' or activityMoney == 0 ">
-            activity_money = #{activityMoney},
+        <if test="totalPreferentialAmount != null and totalPreferentialAmount != '' or totalPreferentialAmount == 0 ">
+            total_preferential_amount = #{totalPreferentialAmount},
         </if>
-        <if test="shareMoney != null and shareMoney != '' or shareMoney == 0 ">
-            share_money = #{shareMoney},
+        <if test="totalAcivityAmount != null and totalAcivityAmount != '' or totalAcivityAmount == 0 ">
+            total_acivity_amount = #{totalAcivityAmount},
         </if>
-        <if test="activityMoney != null and activityMoney != '' or activityMoney == 0 ">
-            activity_money = #{activityMoney},
+        <if test="actualTotalProductAmount != null and actualTotalProductAmount != '' or actualTotalProductAmount == 0 ">
+            actual_total_product_amount = #{actualTotalProductAmount},
         </if>
-        <if test="deliverDifferenceReason != null and deliverDifferenceReason != '' ">
-            deliver_difference_reason = #{deliverDifferenceReason},
+        <if test="useStatus != null and useStatus != '' or useStatus == 0">
+            use_status = #{useStatus},
         </if>
         <if test="signDifferenceReason != null and signDifferenceReason != '' ">
             sign_difference_reason = #{signDifferenceReason},
@@ -88,20 +103,27 @@
     </update>
 
     <insert id="insert">
-        insert into order_store_product_item (order_id, order_item_id, order_item_code, product_id,
-                                              product_code, product_name, sku_code, sku_name, unit,
-                                              activity_id, product_gift, quantity, deliver_quantity,
-                                              deliver_difference_reason, sign_quantity, sign_difference_reason,
-                                              price, tax_purchase_price, money, activity_money, actual_money,
-                                              share_money, create_time, create_by_id, create_by_name,
-                                              update_time, update_by_id, update_by_name)
-        values (#{orderId}, #{orderItemId}, #{orderItemCode}, #{productId},
-                #{productCode}, #{productName}, #{skuCode}, #{skuName}, #{unit},
-                #{activityId}, #{productGift}, #{quantity}, #{deliverQuantity},
-                #{deliverDifferenceReason}, #{signQuantity}, #{signDifferenceReason},
-                #{price}, #{taxPurchasePrice}, #{money}, #{activityMoney}, #{actualMoney},
-                #{shareMoney}, sysdate(), #{createById}, #{createByName},
-                sysdate(), #{updateById}, #{updateByName})
+        insert into order_store_detail(order_info_detail_id, order_store_id, order_store_code, spu_code, spu_name,
+                                       sku_code,
+                                       sku_name, picture_url, product_spec, color_code, color_name, model_code,
+                                       unit_code,
+                                       unit_name, zero_disassembly_coefficient, product_type, product_count,
+                                       product_amount,
+                                       purchase_amount, total_product_amount, actual_total_product_amount,
+                                       total_preferential_amount, total_acivity_amount, actual_inbound_count,
+                                       actual_product_count, return_product_count, tax_rate, activity_code, line_code,
+                                       gift_line_code, company_code, company_name, sign_difference_reason, use_status,
+                                       create_by_id, create_by_name, update_by_id, update_by_name, create_time,
+                                       update_time)
+        values (#{orderInfoDetailId}, #{orderStoreId}, #{orderStoreCode}, #{spuCode}, #{spuName},
+                #{skuCode}, #{skuName}, #{pictureUrl}, #{productSpec}, #{colorCode}, #{colorName},
+                #{modelCode}, #{unitCode}, #{unitName}, #{zeroDisassemblyCoefficient}, #{productType},
+                #{productCount}, #{productAmount}, #{purchaseAmount}, #{totalProductAmount},
+                #{actualTotalProductAmount}, #{totalPreferentialAmount}, #{totalAcivityAmount},
+                #{actualInboundCount}, #{actualProductCount}, #{returnProductCount}, #{taxRate},
+                #{activityCode}, #{lineCode}, #{giftLineCode}, #{companyCode}, #{companyName},
+                #{signDifferenceReason}, #{useStatus}, #{createById}, #{createByName}, #{updateById},
+                #{updateByName}, #{createTime}, #{updateTime})
     </insert>
 
 </mapper>

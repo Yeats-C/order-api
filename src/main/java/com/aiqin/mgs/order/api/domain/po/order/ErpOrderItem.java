@@ -1,8 +1,11 @@
 package com.aiqin.mgs.order.api.domain.po.order;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 订单商品明细行实体
@@ -12,60 +15,112 @@ import java.math.BigDecimal;
  * @date 2019/12/9 10:11
  */
 @Data
-public class ErpOrderItem extends ErpOrderBase {
+@JsonInclude(JsonInclude.Include.ALWAYS)
+public class ErpOrderItem {
 
+    /***主键*/
+    private Long id;
+    /***业务id*/
+    @ApiModelProperty(value = "订单行id")
+    private String orderInfoDetailId;
     /***订单id*/
-    private String orderId;
-    /***订单明细id*/
-    private String orderItemId;
-    /***订单明细行编号*/
-    private String orderItemCode;
-
-    /***商品ID*/
-    private String productId;
-    /***商品编码*/
-    private String productCode;
-    /***商品名称*/
-    private String productName;
-    /***商品sku码*/
+    private String orderStoreId;
+    /***订单号*/
+    private String orderStoreCode;
+    /***spu编码*/
+    @ApiModelProperty(value = "spu编码")
+    private String spuCode;
+    /***spu名称*/
+    @ApiModelProperty(value = "spu名称")
+    private String spuName;
+    /***sku编码*/
+    @ApiModelProperty(value = "sku编码")
     private String skuCode;
-    /***商品名称*/
+    /***sku名称*/
+    @ApiModelProperty(value = "sku名称")
     private String skuName;
-    /***单位*/
-    private String unit;
-
-    /***活动id*/
-    private String activityId;
-    /***本品赠品标记 ErpProductGiftEnum */
-    private Integer productGift;
-
-    /***订货数量*/
-    private Integer quantity;
-    /***仓库实际发货数量*/
-    private Integer deliverQuantity;
-    /***仓库发货数量差异原因*/
-    private String deliverDifferenceReason;
-    /***门店实际签收数量*/
-    private Integer signQuantity;
+    /***图片地址*/
+    @ApiModelProperty(value = "图片url")
+    private String pictureUrl;
+    /***规格*/
+    @ApiModelProperty(value = "规格")
+    private String productSpec;
+    /***颜色编码*/
+    @ApiModelProperty(value = "颜色编码")
+    private String colorCode;
+    /***颜色名称*/
+    @ApiModelProperty(value = "颜色名称")
+    private String colorName;
+    /***型号*/
+    @ApiModelProperty(value = "型号")
+    private String modelCode;
+    /***单位编码*/
+    @ApiModelProperty(value = "单位编码")
+    private String unitCode;
+    /***单位名称*/
+    @ApiModelProperty(value = "单位名称")
+    private String unitName;
+    /***折零系数*/
+    private Long zeroDisassemblyCoefficient;
+    /***商品类型  0商品 1赠品*/
+    @ApiModelProperty(value = "商品类型 0商品（本品） 1赠品")
+    private Integer productType;
+    /***商品数量*/
+    @ApiModelProperty(value = "数量")
+    private Long productCount;
+    /***商品单价*/
+    @ApiModelProperty(value = "单价")
+    private BigDecimal productAmount;
+    /***含税采购价*/
+    @ApiModelProperty(value = "含税采购价")
+    private BigDecimal purchaseAmount;
+    /***商品总价*/
+    @ApiModelProperty(value = "行总价")
+    private BigDecimal totalProductAmount;
+    /***实际商品总价（发货商品总价）*/
+    @ApiModelProperty(value = "发货商品总价")
+    private BigDecimal actualTotalProductAmount;
+    /***优惠分摊总金额（分摊后金额）*/
+    @ApiModelProperty(value = "行均摊总价")
+    private BigDecimal totalPreferentialAmount;
+    /***活动优惠总金额*/
+    private BigDecimal totalAcivityAmount;
+    /***实收数量（门店）*/
+    @ApiModelProperty(value = "门店实收数量")
+    private Long actualInboundCount;
+    /***实发商品数量*/
+    @ApiModelProperty(value = "实发数量")
+    private Long actualProductCount;
+    /***退货数量*/
+    private Long returnProductCount;
+    /***税率*/
+    private BigDecimal taxRate;
+    /***活动编码(多个，隔开）*/
+    private String activityCode;
+    /***行号*/
+    @ApiModelProperty(value = "行号")
+    private Long lineCode;
+    /***赠品行号*/
+    private Long giftLineCode;
+    /***公司编码*/
+    private String companyCode;
+    /***公司名称*/
+    private String companyName;
     /***签收数量差异原因*/
     private String signDifferenceReason;
 
-    /***订货价*/
-    private BigDecimal price;
-    /***含税采购价*/
-    private BigDecimal taxPurchasePrice;
-
-    /***订货金额*/
-    private BigDecimal money;
-    /***活动优惠金额*/
-    private BigDecimal activityMoney;
-    /***实际支付金额*/
-    private BigDecimal actualMoney;
-    /***分摊后金额*/
-    private BigDecimal shareMoney;
-
-    /***仓库编码 接收供应链参数使用*/
-    private String repertoryCode;
-    /***库存名称 接收供应链参数使用*/
-    private String repertoryName;
+    /***0. 启用   1.禁用*/
+    private String useStatus;
+    /***创建人编码*/
+    private String createById;
+    /***创建人名称*/
+    private String createByName;
+    /***更新人编码*/
+    private String updateById;
+    /***更新人名称*/
+    private String updateByName;
+    /***创建时间*/
+    private Date createTime;
+    /***更新时间*/
+    private Date updateTime;
 }

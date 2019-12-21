@@ -53,8 +53,8 @@
         <if test="payStatus != null and payStatus != '' or payStatus == 0 ">
             pay_status = #{payStatus},
         </if>
-        <if test="coupon_ids != null and coupon_ids != '' ">
-            coupon_ids = #{coupon_ids},
+        <if test="couponIds != null and couponIds != '' ">
+            coupon_ids = #{couponIds},
         </if>
         <if test="couponPayFee != null and couponPayFee != '' or couponPayFee == 0 ">
             coupon_pay_fee = #{couponPayFee},
@@ -82,9 +82,6 @@
             coupon_pay_fee        = #{couponPayFee},
             balance_pay_fee       = #{balancePayFee},
             coupon_ids            = #{couponIds},
-            create_time           = #{createTime},
-            create_by_id          = #{createById},
-            create_by_name        = #{createByName},
             update_time           = sysdate(),
             update_by_id          = #{updateById},
             update_by_name        = #{updateByName},

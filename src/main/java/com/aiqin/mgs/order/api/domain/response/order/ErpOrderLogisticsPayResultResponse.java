@@ -1,8 +1,10 @@
 package com.aiqin.mgs.order.api.domain.response.order;
 
 import com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -15,21 +17,39 @@ import java.util.Date;
 @Data
 public class ErpOrderLogisticsPayResultResponse {
 
-    /***订单编号*/
+    @ApiModelProperty(value = "订单号")
     private String orderCode;
-    /***物流id*/
-    private String logisticsId;
-    /***物流单号*/
-    private String logisticsCode;
-    /***支付状态*/
+    @ApiModelProperty(value = "加盟商id")
+    private String franchiseeId;
+    @ApiModelProperty(value = "加盟商编码")
+    private String franchiseeCode;
+    @ApiModelProperty(value = "加盟商名称")
+    private String franchiseeName;
+
+    @ApiModelProperty(value = "物流费用支付状态")
     private Integer payStatus;
-    /***支付状态描述*/
+    @ApiModelProperty(value = "物流费用支付状态描述")
     private String payStatusDesc;
-    /***支付流水号*/
+    @ApiModelProperty(value = "物流公司编码")
+    private String logisticsCentreCode;
+    @ApiModelProperty(value = "物流公司名称")
+    private String logisticsCentreName;
+    @ApiModelProperty(value = "物流单号")
+    private String logisticsCode;
+    @ApiModelProperty(value = "发货仓库编码")
+    private String sendRepertoryCode;
+    @ApiModelProperty(value = "发货仓库名称")
+    private String sendRepertoryName;
+    @ApiModelProperty(value = "物流费用")
+    private BigDecimal logisticsFee;
+
+    @ApiModelProperty(value = "支付流水号")
     private String payCode;
-    /***支付开始时间*/
+    /***支付id*/
+    private String payId;
+    @ApiModelProperty(value = "支付开始时间")
     private Date payStartTime;
-    /***支付完成时间*/
+    @ApiModelProperty(value = "支付完成时间")
     private Date payEndTime;
 
     public String getPayStatusDesc() {
