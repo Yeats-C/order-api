@@ -49,4 +49,11 @@ public interface ReturnOrderInfoService {
      */
     Boolean updateReturnStatusApi(ReturnOrderReviewApiReqVo reqVo);
 
+    /**
+     *
+     * @param orderCode
+     * @return
+     */
+    Boolean check(String orderCode);
+
 }
