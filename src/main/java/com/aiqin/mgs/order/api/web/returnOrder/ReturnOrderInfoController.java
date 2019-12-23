@@ -1,10 +1,10 @@
-package com.aiqin.mgs.order.api.web;
+package com.aiqin.mgs.order.api.web.returnOrder;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailVO;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReqVo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
-import com.aiqin.mgs.order.api.service.ReturnOrderInfoService;
+import com.aiqin.mgs.order.api.service.returnOrder.ReturnOrderInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,15 +34,7 @@ public class ReturnOrderInfoController {
         return new HttpResponse<>(returnOrderInfoService.save(reqVo));
     }
 
-//    @ApiOperation("列表搜索")
-//    @PostMapping("/list")
-//    public HttpResponse<PageResData<OrderAfterSaleListVo>> list(@RequestBody OrderAfterSaleSearchVo searchVo) {
-//        //todo:放开注释
-////        String companyCode = UrlInterceptor.getCurrentAuthToken().getCompanyCode();
-////        searchVo.setCompanyCode(companyCode);
-//        searchVo.setCompanyCode("01");
-//        return new HttpResponse<>(orderAfterSaleService.list(searchVo));
-//    }
+
 
     @ApiOperation("操作审核退货单")
     @PostMapping("/updateStatus")
