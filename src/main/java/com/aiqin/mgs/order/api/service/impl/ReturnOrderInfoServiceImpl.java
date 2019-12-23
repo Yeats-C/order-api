@@ -206,6 +206,15 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         return returnOrderInfoDao.updateReturnStatus(re)>0;
     }
 
+    @Override
+    public Boolean check(String orderCode) {
+        List<ReturnOrderInfo> returnOrderInfo = returnOrderInfoDao.selectByOrderId(orderCode);
+        if(CollectionUtils.isNotEmpty(returnOrderInfo)){
+            return true;
+        }
+        return false;
+    }
+
     /**
      * 生成16位唯一性的审批编码
      * @return

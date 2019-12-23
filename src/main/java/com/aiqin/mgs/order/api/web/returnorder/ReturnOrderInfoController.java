@@ -71,5 +71,12 @@ public class ReturnOrderInfoController {
         return new HttpResponse<>(review);
     }
 
+    @ApiOperation("退货单校验--查看此订单是否已经生成一条退货单，且流程未结束。如果已存在返回true")
+    @PostMapping("/check")
+    public HttpResponse<Boolean> check(String orderCode) {
+        Boolean review = returnOrderInfoService.check(orderCode);
+        return new HttpResponse<>(review);
+    }
+
 
 }
