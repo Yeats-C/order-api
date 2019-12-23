@@ -41,7 +41,7 @@ public class ReturnOrderReviewReqVo implements Serializable {
     private String operator;
 
     @NotBlank(message = "售后类型不能为空")
-    @ApiModelProperty("审核操作状态：1--通过 2--挂账 3--不通过（驳回）")
+    @ApiModelProperty("审核操作状态(erp内部使用)：1--通过 2--挂账 3--不通过（驳回）,(供应链使用)4-等待退货验收，5-等待退货入库 11-退货完成")
     @JsonProperty("operate_status")
     private Integer operateStatus;
 

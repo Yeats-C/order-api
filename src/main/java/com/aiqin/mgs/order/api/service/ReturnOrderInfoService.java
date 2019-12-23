@@ -30,7 +30,7 @@ public interface ReturnOrderInfoService {
 //    PageResData<ReturnOrderListVo> list(OrderAfterSaleSearchVo searchVo);
 
     /**
-     * 审核操作
+     * 审核操作-erp使用
      * @param reqVo
      * @return
      */
@@ -42,5 +42,12 @@ public interface ReturnOrderInfoService {
      * @return
      */
     Boolean updateOrderAfterSaleDetail(ReturnOrderDetailVO records);
+
+    /**
+     * 提供给供应链--退货单状态修改
+     * @param reqVo
+     * @return
+     */
+    Boolean updateReturnStatusApi(ReturnOrderReviewReqVo reqVo);
 
 }

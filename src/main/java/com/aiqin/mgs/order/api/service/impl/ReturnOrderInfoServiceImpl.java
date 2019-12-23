@@ -196,6 +196,12 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         return false;
     }
 
+    @Override
+    @Transactional
+    public Boolean updateReturnStatusApi(ReturnOrderReviewReqVo reqVo) {
+        return returnOrderInfoDao.updateReturnStatus(reqVo)>0;
+    }
+
     /**
      * 生成16位唯一性的审批编码
      * @return
