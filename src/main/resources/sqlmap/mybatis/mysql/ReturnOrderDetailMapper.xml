@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aiqin.mgs.order.api.dao.ReturnOrderDetailDao">
+    <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.ReturnOrderDetail">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="return_order_detail_id" property="returnOrderDetailId" jdbcType="VARCHAR"/>
+        <result column="return_order_code" property="returnOrderCode" jdbcType="VARCHAR"/>
+        <result column="sku_code" property="skuCode" jdbcType="VARCHAR"/>
+        <result column="sku_name" property="skuName" jdbcType="VARCHAR"/>
+        <result column="picture_url" property="pictureUrl" jdbcType="VARCHAR"/>
+        <result column="product_spec" property="productSpec" jdbcType="VARCHAR"/>
+        <result column="color_code" property="colorCode" jdbcType="VARCHAR"/>
+        <result column="color_name" property="colorName" jdbcType="VARCHAR"/>
+        <result column="model_code" property="modelCode" jdbcType="VARCHAR"/>
+        <result column="base_product_spec" property="baseProductSpec" jdbcType="BIGINT"/>
+        <result column="unit_code" property="unitCode" jdbcType="VARCHAR"/>
+        <result column="unit_name" property="unitName" jdbcType="VARCHAR"/>
+        <result column="product_type" property="productType" jdbcType="BIT"/>
+        <result column="zero_disassembly_coefficient" property="zeroDisassemblyCoefficient" jdbcType="BIGINT"/>
+        <result column="activity_code" property="activityCode" jdbcType="VARCHAR"/>
+        <result column="product_amount" property="productAmount" jdbcType="DECIMAL"/>
+        <result column="total_product_amount" property="totalProductAmount" jdbcType="DECIMAL"/>
+        <result column="return_product_count" property="returnProductCount" jdbcType="BIGINT"/>
+        <result column="actual_return_product_count" property="actualReturnProductCount" jdbcType="BIGINT"/>
+        <result column="actual_total_product_amount" property="actualTotalProductAmount" jdbcType="DECIMAL"/>
+        <result column="product_status" property="productStatus" jdbcType="BIT"/>
+        <result column="tax_rate" property="taxRate" jdbcType="DECIMAL"/>
+        <result column="line_code" property="lineCode" jdbcType="BIGINT"/>
+        <result column="use_status" property="useStatus" jdbcType="BIT"/>
+        <result column="source_code" property="sourceCode" jdbcType="VARCHAR"/>
+        <result column="source_type" property="sourceType" jdbcType="BIT"/>
+        <result column="create_by_id" property="createById" jdbcType="VARCHAR"/>
+        <result column="create_by_name" property="createByName" jdbcType="VARCHAR"/>
+        <result column="update_by_id" property="updateById" jdbcType="VARCHAR"/>
+        <result column="update_by_name" property="updateByName" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, return_order_detail_id, return_order_code, sku_code, sku_name, picture_url, product_spec, 
+    color_code, color_name, model_code, base_product_spec, unit_code, unit_name, product_type, 
+    zero_disassembly_coefficient, activity_code, product_amount, total_product_amount, 
+    return_product_count, actual_return_product_count, actual_total_product_amount, product_status, 
+    tax_rate, line_code, use_status, source_code, source_type, create_by_id, create_by_name, 
+    update_by_id, update_by_name, create_time, update_time
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from return_order_detail
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from return_order_detail
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
+    <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.ReturnOrderDetail">
+        insert into return_order_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="returnOrderDetailId != null">
+                return_order_detail_id,
+            </if>
+            <if test="returnOrderCode != null">
+                return_order_code,
+            </if>
+            <if test="skuCode != null">
+                sku_code,
+            </if>
+            <if test="skuName != null">
+                sku_name,
+            </if>
+            <if test="pictureUrl != null">
+                picture_url,
+            </if>
+            <if test="productSpec != null">
+                product_spec,
+            </if>
+            <if test="colorCode != null">
+                color_code,
+            </if>
+            <if test="colorName != null">
+                color_name,
+            </if>
+            <if test="modelCode != null">
+                model_code,
+            </if>
+            <if test="baseProductSpec != null">
+                base_product_spec,
+            </if>
+            <if test="unitCode != null">
+                unit_code,
+            </if>
+            <if test="unitName != null">
+                unit_name,
+            </if>
+            <if test="productType != null">
+                product_type,
+            </if>
+            <if test="zeroDisassemblyCoefficient != null">
+                zero_disassembly_coefficient,
+            </if>
+            <if test="activityCode != null">
+                activity_code,
+            </if>
+            <if test="productAmount != null">
+                product_amount,
+            </if>
+            <if test="totalProductAmount != null">
+                total_product_amount,
+            </if>
+            <if test="returnProductCount != null">
+                return_product_count,
+            </if>
+            <if test="actualReturnProductCount != null">
+                actual_return_product_count,
+            </if>
+            <if test="actualTotalProductAmount != null">
+                actual_total_product_amount,
+            </if>
+            <if test="productStatus != null">
+                product_status,
+            </if>
+            <if test="taxRate != null">
+                tax_rate,
+            </if>
+            <if test="lineCode != null">
+                line_code,
+            </if>
+            <if test="useStatus != null">
+                use_status,
+            </if>
+            <if test="sourceCode != null">
+                source_code,
+            </if>
+            <if test="sourceType != null">
+                source_type,
+            </if>
+            <if test="createById != null">
+                create_by_id,
+            </if>
+            <if test="createByName != null">
+                create_by_name,
+            </if>
+            <if test="updateById != null">
+                update_by_id,
+            </if>
+            <if test="updateByName != null">
+                update_by_name,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="returnOrderDetailId != null">
+                #{returnOrderDetailId,jdbcType=VARCHAR},
+            </if>
+            <if test="returnOrderCode != null">
+                #{returnOrderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="skuCode != null">
+                #{skuCode,jdbcType=VARCHAR},
+            </if>
+            <if test="skuName != null">
+                #{skuName,jdbcType=VARCHAR},
+            </if>
+            <if test="pictureUrl != null">
+                #{pictureUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="productSpec != null">
+                #{productSpec,jdbcType=VARCHAR},
+            </if>
+            <if test="colorCode != null">
+                #{colorCode,jdbcType=VARCHAR},
+            </if>
+            <if test="colorName != null">
+                #{colorName,jdbcType=VARCHAR},
+            </if>
+            <if test="modelCode != null">
+                #{modelCode,jdbcType=VARCHAR},
+            </if>
+            <if test="baseProductSpec != null">
+                #{baseProductSpec,jdbcType=BIGINT},
+            </if>
+            <if test="unitCode != null">
+                #{unitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="unitName != null">
+                #{unitName,jdbcType=VARCHAR},
+            </if>
+            <if test="productType != null">
+                #{productType,jdbcType=BIT},
+            </if>
+            <if test="zeroDisassemblyCoefficient != null">
+                #{zeroDisassemblyCoefficient,jdbcType=BIGINT},
+            </if>
+            <if test="activityCode != null">
+                #{activityCode,jdbcType=VARCHAR},
+            </if>
+            <if test="productAmount != null">
+                #{productAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="totalProductAmount != null">
+                #{totalProductAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="returnProductCount != null">
+                #{returnProductCount,jdbcType=BIGINT},
+            </if>
+            <if test="actualReturnProductCount != null">
+                #{actualReturnProductCount,jdbcType=BIGINT},
+            </if>
+            <if test="actualTotalProductAmount != null">
+                #{actualTotalProductAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="productStatus != null">
+                #{productStatus,jdbcType=BIT},
+            </if>
+            <if test="taxRate != null">
+                #{taxRate,jdbcType=DECIMAL},
+            </if>
+            <if test="lineCode != null">
+                #{lineCode,jdbcType=BIGINT},
+            </if>
+            <if test="useStatus != null">
+                #{useStatus,jdbcType=BIT},
+            </if>
+            <if test="sourceCode != null">
+                #{sourceCode,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceType != null">
+                #{sourceType,jdbcType=BIT},
+            </if>
+            <if test="createById != null">
+                #{createById,jdbcType=VARCHAR},
+            </if>
+            <if test="createByName != null">
+                #{createByName,jdbcType=VARCHAR},
+            </if>
+            <if test="updateById != null">
+                #{updateById,jdbcType=VARCHAR},
+            </if>
+            <if test="updateByName != null">
+                #{updateByName,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.ReturnOrderDetail">
+        update return_order_detail
+        <set>
+            <if test="returnOrderDetailId != null">
+                return_order_detail_id = #{returnOrderDetailId,jdbcType=VARCHAR},
+            </if>
+            <if test="returnOrderCode != null">
+                return_order_code = #{returnOrderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="skuCode != null">
+                sku_code = #{skuCode,jdbcType=VARCHAR},
+            </if>
+            <if test="skuName != null">
+                sku_name = #{skuName,jdbcType=VARCHAR},
+            </if>
+            <if test="pictureUrl != null">
+                picture_url = #{pictureUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="productSpec != null">
+                product_spec = #{productSpec,jdbcType=VARCHAR},
+            </if>
+            <if test="colorCode != null">
+                color_code = #{colorCode,jdbcType=VARCHAR},
+            </if>
+            <if test="colorName != null">
+                color_name = #{colorName,jdbcType=VARCHAR},
+            </if>
+            <if test="modelCode != null">
+                model_code = #{modelCode,jdbcType=VARCHAR},
+            </if>
+            <if test="baseProductSpec != null">
+                base_product_spec = #{baseProductSpec,jdbcType=BIGINT},
+            </if>
+            <if test="unitCode != null">
+                unit_code = #{unitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="unitName != null">
+                unit_name = #{unitName,jdbcType=VARCHAR},
+            </if>
+            <if test="productType != null">
+                product_type = #{productType,jdbcType=BIT},
+            </if>
+            <if test="zeroDisassemblyCoefficient != null">
+                zero_disassembly_coefficient = #{zeroDisassemblyCoefficient,jdbcType=BIGINT},
+            </if>
+            <if test="activityCode != null">
+                activity_code = #{activityCode,jdbcType=VARCHAR},
+            </if>
+            <if test="productAmount != null">
+                product_amount = #{productAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="totalProductAmount != null">
+                total_product_amount = #{totalProductAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="returnProductCount != null">
+                return_product_count = #{returnProductCount,jdbcType=BIGINT},
+            </if>
+            <if test="actualReturnProductCount != null">
+                actual_return_product_count = #{actualReturnProductCount,jdbcType=BIGINT},
+            </if>
+            <if test="actualTotalProductAmount != null">
+                actual_total_product_amount = #{actualTotalProductAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="productStatus != null">
+                product_status = #{productStatus,jdbcType=BIT},
+            </if>
+            <if test="taxRate != null">
+                tax_rate = #{taxRate,jdbcType=DECIMAL},
+            </if>
+            <if test="lineCode != null">
+                line_code = #{lineCode,jdbcType=BIGINT},
+            </if>
+            <if test="useStatus != null">
+                use_status = #{useStatus,jdbcType=BIT},
+            </if>
+            <if test="sourceCode != null">
+                source_code = #{sourceCode,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceType != null">
+                source_type = #{sourceType,jdbcType=BIT},
+            </if>
+            <if test="createById != null">
+                create_by_id = #{createById,jdbcType=VARCHAR},
+            </if>
+            <if test="createByName != null">
+                create_by_name = #{createByName,jdbcType=VARCHAR},
+            </if>
+            <if test="updateById != null">
+                update_by_id = #{updateById,jdbcType=VARCHAR},
+            </if>
+            <if test="updateByName != null">
+                update_by_name = #{updateByName,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <insert id="insertBatch" parameterType="list">
+        insert into return_order_detail (return_order_detail_id, return_order_code,product_type,
+        sku_code, sku_name,total_product_amount,return_product_count,model_code,product_status,
+        product_spec,unit_name,color_code,color_name,create_by_id, create_by_name,picture_url,
+        create_time)
+        values
+        <foreach collection="records" item="item" index="index" separator=",">
+            (
+            #{item.returnOrderDetailId,jdbcType=VARCHAR},
+            #{item.returnOrderCode,jdbcType=VARCHAR},#{item.productType,jdbcType=BIT},
+            #{item.skuCode,jdbcType=VARCHAR}, #{item.skuName,jdbcType=VARCHAR},
+            #{item.totalProductAmount,jdbcType=DECIMAL},#{item.returnProductCount,jdbcType=BIGINT},
+            #{item.modelCode,jdbcType=VARCHAR},#{item.productStatus,jdbcType=BIT},#{item.productSpec,jdbcType=VARCHAR},
+            #{item.unitName,jdbcType=VARCHAR},
+            #{item.colorCode,jdbcType=VARCHAR}, #{item.colorName,jdbcType=VARCHAR}, #{item.createById,jdbcType=VARCHAR},
+            #{item.createByName,jdbcType=VARCHAR},
+            #{item.pictureUrl,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="deleteByReturnOrderCode" parameterType="java.lang.String">
+    delete from return_order_detail
+    where return_order_code = #{returnOrderCode,jdbcType=VARCHAR}
+    </delete>
+
+</mapper>

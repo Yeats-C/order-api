@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aiqin.mgs.order.api.dao.CouponInfoDao">
+    <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.CouponInfo">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="order_id" property="orderId" jdbcType="VARCHAR"/>
+        <result column="franchisee_id" property="franchiseeId" jdbcType="VARCHAR"/>
+        <result column="coupon_code" property="couponCode" jdbcType="VARCHAR"/>
+        <result column="coupon_type" property="couponType" jdbcType="INTEGER"/>
+        <result column="coupon_name" property="couponName" jdbcType="VARCHAR"/>
+        <result column="nominal_value" property="nominalValue" jdbcType="DECIMAL"/>
+        <result column="validity_start_time" property="validityStartTime" jdbcType="TIMESTAMP"/>
+        <result column="validity_end_time" property="validityEndTime" jdbcType="TIMESTAMP"/>
+        <result column="state" property="state" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, order_id, franchisee_id, coupon_code, coupon_type, coupon_name, nominal_value, 
+    validity_start_time, validity_end_time, state, create_time
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from coupon_info
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from coupon_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+    <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.CouponInfo">
+        insert into coupon_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="orderId != null">
+                order_id,
+            </if>
+            <if test="franchiseeId != null">
+                franchisee_id,
+            </if>
+            <if test="couponCode != null">
+                coupon_code,
+            </if>
+            <if test="couponType != null">
+                coupon_type,
+            </if>
+            <if test="couponName != null">
+                coupon_name,
+            </if>
+            <if test="nominalValue != null">
+                nominal_value,
+            </if>
+            <if test="validityStartTime != null">
+                validity_start_time,
+            </if>
+            <if test="validityEndTime != null">
+                validity_end_time,
+            </if>
+            <if test="state != null">
+                state,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="orderId != null">
+                #{orderId,jdbcType=VARCHAR},
+            </if>
+            <if test="franchiseeId != null">
+                #{franchiseeId,jdbcType=VARCHAR},
+            </if>
+            <if test="couponCode != null">
+                #{couponCode,jdbcType=VARCHAR},
+            </if>
+            <if test="couponType != null">
+                #{couponType,jdbcType=INTEGER},
+            </if>
+            <if test="couponName != null">
+                #{couponName,jdbcType=VARCHAR},
+            </if>
+            <if test="nominalValue != null">
+                #{nominalValue,jdbcType=DECIMAL},
+            </if>
+            <if test="validityStartTime != null">
+                #{validityStartTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="validityEndTime != null">
+                #{validityEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="state != null">
+                #{state,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.CouponInfo">
+        update coupon_info
+        <set>
+            <if test="orderId != null">
+                order_id = #{orderId,jdbcType=VARCHAR},
+            </if>
+            <if test="franchiseeId != null">
+                franchisee_id = #{franchiseeId,jdbcType=VARCHAR},
+            </if>
+            <if test="couponCode != null">
+                coupon_code = #{couponCode,jdbcType=VARCHAR},
+            </if>
+            <if test="couponType != null">
+                coupon_type = #{couponType,jdbcType=INTEGER},
+            </if>
+            <if test="couponName != null">
+                coupon_name = #{couponName,jdbcType=VARCHAR},
+            </if>
+            <if test="nominalValue != null">
+                nominal_value = #{nominalValue,jdbcType=DECIMAL},
+            </if>
+            <if test="validityStartTime != null">
+                validity_start_time = #{validityStartTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="validityEndTime != null">
+                validity_end_time = #{validityEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="state != null">
+                state = #{state,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <insert id="insertBatch" parameterType="list">
+        insert into coupon_info (order_id, franchisee_id,
+        coupon_code, coupon_type, coupon_name,
+        nominal_value, validity_start_time, validity_end_time)
+        values
+        <foreach collection="records" item="item" index="index" separator=",">
+            (
+            #{item.orderId,jdbcType=VARCHAR}, #{item.franchiseeId,jdbcType=VARCHAR},
+            #{item.couponCode,jdbcType=VARCHAR}, #{item.couponType,jdbcType=INTEGER},
+            #{item.couponName,jdbcType=VARCHAR},#{item.nominalValue,jdbcType=DECIMAL},
+            #{item.validityStartTime,jdbcType=TIMESTAMP}, #{item.validityEndTime,jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+</mapper>
