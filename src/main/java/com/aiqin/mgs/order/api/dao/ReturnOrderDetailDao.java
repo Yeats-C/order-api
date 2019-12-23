@@ -19,4 +19,6 @@ public interface ReturnOrderDetailDao {
 
     int deleteByReturnOrderCode(@Param("returnOrderCode")String returnOrderCode);
 
+    List<ReturnOrderDetail> selectListByReturnOrderCode(String returnOrderCode);
+
 }

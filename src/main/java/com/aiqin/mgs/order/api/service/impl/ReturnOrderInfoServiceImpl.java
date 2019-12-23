@@ -10,10 +10,7 @@ import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
 import com.aiqin.mgs.order.api.dao.ReturnOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.ReturnOrderInfoDao;
-import com.aiqin.mgs.order.api.domain.CouponApprovalDetail;
-import com.aiqin.mgs.order.api.domain.CouponApprovalInfo;
-import com.aiqin.mgs.order.api.domain.ReturnOrderDetail;
-import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
+import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.request.bill.RejectRecordReq;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailVO;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReqVo;
@@ -36,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -292,10 +290,17 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
      */
     public void createRejectRecord(String returnOrderId){
         RejectRecordReq rejectRecordReq=new RejectRecordReq();
+        //根据退货单id查询退货信息
         ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderId(returnOrderId);
-//        returnOrderDetailDao;
+        //根据退货单id查询退货详细信息
+        List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderId);
+        RejectRecord rejectRecord=new RejectRecord();
+        List<RejectRecordDetail> rejectRecordDetail=new ArrayList<>();
+        rejectRecord.setRejectRecordCode(returnOrderInfo.getReturnOrderCode());
 
 
+        rejectRecordReq.setRejectRecord(rejectRecord);
+        rejectRecordReq.setRejectRecordDetail(rejectRecordDetail);
 
     }
 

@@ -389,4 +389,11 @@
     where return_order_code = #{returnOrderCode,jdbcType=VARCHAR}
     </delete>
 
+    <select id="selectListByReturnOrderCode" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from return_order_detail
+        where return_order_code = #{returnOrderCode}
+    </select>
+
 </mapper>
