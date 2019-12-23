@@ -137,6 +137,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             case 3:
                 reqVo.setOperateStatus(98);
                 break;
+            default:
+                return false;
         }
         //修改退货单状态
         Integer review = returnOrderInfoDao.updateReturnStatus(reqVo);
