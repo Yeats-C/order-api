@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.service;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailVO;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReqVo;
+import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewApiReqVo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
 import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderListVo;
 
@@ -48,6 +49,6 @@ public interface ReturnOrderInfoService {
      * @param reqVo
      * @return
      */
-    Boolean updateReturnStatusApi(ReturnOrderReviewReqVo reqVo);
+    Boolean updateReturnStatusApi(ReturnOrderReviewApiReqVo reqVo);
 
 }

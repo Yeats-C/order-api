@@ -2,7 +2,6 @@ package com.aiqin.mgs.order.api.domain.request.returnorder;
 
 import com.aiqin.mgs.order.api.domain.CouponApprovalDetail;
 import com.alibaba.fastjson.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -25,15 +24,12 @@ public class ReturnOrderReviewReqVo implements Serializable {
 
     @NotBlank(message = "售后类型不能为空")
     @ApiModelProperty("售后单ID")
-    @JsonProperty("return_order_id")
     private String returnOrderId;
 
     @ApiModelProperty("是否通过，true-通过，false-不通过")
-    @JsonProperty("pass_status")
     private Boolean passStatus;
 
     @ApiModelProperty("审核备注")
-    @JsonProperty("review_note")
     private String reviewNote;
 
     @JSONField(serialize = false)
@@ -42,7 +38,6 @@ public class ReturnOrderReviewReqVo implements Serializable {
 
     @NotBlank(message = "售后类型不能为空")
     @ApiModelProperty("审核操作状态(erp内部使用)：1--通过 2--挂账 3--不通过（驳回）,(供应链使用)4-等待退货验收，5-等待退货入库 11-退货完成")
-    @JsonProperty("operate_status")
     private Integer operateStatus;
 
     @NotBlank(message = "售后类型不能为空")

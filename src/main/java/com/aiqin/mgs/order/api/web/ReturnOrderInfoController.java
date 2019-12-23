@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.web;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailVO;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReqVo;
+import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewApiReqVo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
 import com.aiqin.mgs.order.api.service.ReturnOrderInfoService;
 import io.swagger.annotations.Api;
@@ -65,7 +66,7 @@ public class ReturnOrderInfoController {
 
     @ApiOperation("提供给供应链--退货单状态修改")
     @PostMapping("/updateStatusApi")
-    public HttpResponse<Boolean> updateReturnStatusApi(@RequestBody ReturnOrderReviewReqVo reqVo) {
+    public HttpResponse<Boolean> updateReturnStatusApi(@RequestBody ReturnOrderReviewApiReqVo reqVo) {
         Boolean review = returnOrderInfoService.updateReturnStatusApi(reqVo);
         return new HttpResponse<>(review);
     }

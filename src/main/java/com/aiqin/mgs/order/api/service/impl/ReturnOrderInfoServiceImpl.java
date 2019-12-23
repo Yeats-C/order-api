@@ -17,6 +17,7 @@ import com.aiqin.mgs.order.api.domain.ReturnOrderDetail;
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailVO;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReqVo;
+import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewApiReqVo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
 import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderListVo;
 import com.aiqin.mgs.order.api.service.ReturnOrderInfoService;
@@ -198,8 +199,13 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 
     @Override
     @Transactional
-    public Boolean updateReturnStatusApi(ReturnOrderReviewReqVo reqVo) {
-        return returnOrderInfoDao.updateReturnStatus(reqVo)>0;
+    public Boolean updateReturnStatusApi(ReturnOrderReviewApiReqVo reqVo) {
+        ReturnOrderReviewReqVo re=new ReturnOrderReviewReqVo();
+        BeanUtils.copyProperties(reqVo,re);
+        if(null!=reqVo.getReturnOrderDetail()){
+            // todo 修改实退数量
+        }
+        return returnOrderInfoDao.updateReturnStatus(re)>0;
     }
 
     /**
