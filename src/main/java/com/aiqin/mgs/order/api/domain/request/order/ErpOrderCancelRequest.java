@@ -11,7 +11,7 @@ import lombok.Data;
  * @date 2019/12/4 16:38
  */
 @Data
-public class ErpOrderCancelResultRequest {
+public class ErpOrderCancelRequest {
 
     @ApiModelProperty(value = "订单编号")
     private String orderCode;

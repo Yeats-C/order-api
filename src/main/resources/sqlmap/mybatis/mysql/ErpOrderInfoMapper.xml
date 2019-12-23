@@ -6,47 +6,99 @@
             resultType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo">
         select
         id as id,
-        order_id as orderId,
-        order_code as orderCode,
-        order_status as orderStatus,
-        order_type as orderType,
-        order_origin_type as orderOriginType,
+        order_store_id as orderStoreId,
+        order_store_code as orderStoreCode,
+        company_code as companyCode,
+        company_name as companyName,
+        order_type_code as orderTypeCode,
+        order_type_name as orderTypeName,
+        order_category_code as orderCategoryCode,
+        order_category_name as orderCategoryName,
         order_channel_type as orderChannelType,
-        order_level as orderLevel,
-        primary_code as primaryCode,
-        split_status as splitStatus,
-        return_status as returnStatus,
-        before_cancel_status as beforeCancelStatus,
-        fee_id as feeId,
-        logistics_id as logisticsId,
         supplier_code as supplierCode,
         supplier_name as supplierName,
-        repertory_code as repertoryCode,
-        repertory_name as repertoryName,
-        franchisee_id as franchiseeId,
-        franchisee_code as franchiseeCode,
-        franchisee_name as franchiseeName,
+        transport_center_code as transportCenterCode,
+        transport_center_name as transportCenterName,
+        warehouse_code as warehouseCode,
+        warehouse_name as warehouseName,
+        customer_code as customerCode,
+        customer_name as customerName,
+        order_status as orderStatus,
+        order_lock as orderLock,
+        lock_reason as lockReason,
+        order_exception as orderException,
+        exception_reason as exceptionReason,
+        order_delete as orderDelete,
+        payment_status as paymentStatus,
+        province_id as provinceId,
+        province_name as provinceName,
+        city_id as cityId,
+        city_name as cityName,
+        district_id as districtId,
+        district_name as districtName,
+        receive_address as receiveAddress,
+        distribution_mode_code as distributionModeCode,
+        distribution_mode_name as distributionModeName,
+        receive_person as receivePerson,
+        receive_mobile as receiveMobile,
+        zip_code as zipCode,
+        payment_code as paymentCode,
+        payment_name as paymentName,
+        deliver_amount as deliverAmount,
+        total_product_amount as totalProductAmount,
+        actual_total_product_amount as actualTotalProductAmount,
+        actual_product_count as actualProductCount,
+        discount_amount as discountAmount,
+        order_amount as orderAmount,
+        payment_time as paymentTime,
+        delivery_time as deliveryTime,
+        transport_time as transportTime,
+        transport_status as transportStatus,
+        receive_time as receiveTime,
+        invoice_type as invoiceType,
+        invoice_title as invoiceTitle,
+        total_volume as totalVolume,
+        actual_total_volume as actualTotalVolume,
+        total_weight as totalWeight,
+        actual_total_weight as actualTotalWeight,
+        main_order_code as mainOrderCode,
+        order_level as orderLevel,
+        split_status as splitStatus,
+        before_cancel_status as beforeCancelStatus,
+        remake as remake,
+        store_type as storeType,
         store_id as storeId,
         store_code as storeCode,
         store_name as storeName,
-        create_time as createTime,
+        transport_company_code as transportCompanyCode,
+        transport_company_name as transportCompanyName,
+        transport_code as transportCode,
+        logistics_id as logisticsId,
+        fee_id as feeId,
+        order_return as orderReturn,
+        franchisee_id as franchiseeId,
+        franchisee_code as franchiseeCode,
+        franchisee_name as franchiseeName,
+        use_status as useStatus,
+        source_code as sourceCode,
+        source_name as sourceName,
+        source_type as sourceType,
         create_by_id as createById,
         create_by_name as createByName,
-        update_time as updateTime,
         update_by_id as updateById,
         update_by_name as updateByName,
-        status as status
+        create_time as createTime,
+        update_time as updateTime
         from order_store_info
         where 1 = 1
-        and status = 1
         <if test="id != null and id != ''">
             and id = #{id}
         </if>
-        <if test="orderId != null and orderId != ''">
-            and order_id = #{orderId}
+        <if test="orderStoreId != null and orderStoreId != ''">
+            and order_store_id = #{orderStoreId}
         </if>
-        <if test="orderCode != null and orderCode != ''">
-            and order_code = #{orderCode}
+        <if test="orderStoreCode != null and orderStoreCode != ''">
+            and order_store_code = #{orderStoreCode}
         </if>
         <if test="orderStatus != null and orderStatus != '' or orderStatus == 0">
             and order_status = #{orderStatus}
@@ -54,17 +106,20 @@
         <if test="orderLevel != null and orderLevel != '' or orderLevel == 0">
             and order_level = #{orderLevel}
         </if>
-        <if test="orderType != null and orderType != '' or orderType == 0">
-            and order_type = #{orderType}
+        <if test="orderTypeCode != null and orderTypeCode != '' or orderTypeCode == 0">
+            and order_type_code = #{orderTypeCode}
+        </if>
+        <if test="orderCategoryCode != null and orderCategoryCode != '' or orderCategoryCode == 0">
+            and order_category_code = #{orderCategoryCode}
         </if>
         <if test="splitStatus != null and splitStatus != '' or splitStatus == 0">
             and split_status = #{splitStatus}
         </if>
-        <if test="returnStatus != null and returnStatus != '' or returnStatus == 0">
-            and return_status = #{returnStatus}
+        <if test="orderReturn != null and orderReturn != '' or orderReturn == 0">
+            and order_return = #{orderReturn}
         </if>
-        <if test="orderOriginType != null and orderOriginType != '' or orderOriginType == 0">
-            and order_origin_type = #{orderOriginType}
+        <if test="sourceType != null and sourceType != '' or sourceType == 0">
+            and source_type = #{sourceType}
         </if>
         <if test="orderChannelType != null and orderChannelType != '' or orderChannelType == 0">
             and order_channel_type = #{orderChannelType}
@@ -72,8 +127,8 @@
         <if test="beforeCancelStatus != null and beforeCancelStatus != '' or beforeCancelStatus == 0">
             and before_cancel_status = #{beforeCancelStatus}
         </if>
-        <if test="primaryCode != null and primaryCode != ''">
-            and primary_code = #{primaryCode}
+        <if test="mainOrderCode != null and mainOrderCode != ''">
+            and main_order_code = #{mainOrderCode}
         </if>
         <if test="logisticsId != null and logisticsId != ''">
             and logistics_id = #{logisticsId}
@@ -84,8 +139,11 @@
         <if test="supplierCode != null and supplierCode != ''">
             and supplier_code = #{supplierCode}
         </if>
-        <if test="repertoryCode != null and repertoryCode != ''">
-            and repertory_code = #{repertoryCode}
+        <if test="transportCenterCode != null and transportCenterCode != ''">
+            and transport_center_code = #{transportCenterCode}
+        </if>
+        <if test="warehouseCode != null and warehouseCode != ''">
+            and warehouse_code = #{warehouseCode}
         </if>
         <if test="franchiseeId != null and franchiseeId != ''">
             and franchisee_id = #{franchiseeId}
@@ -109,17 +167,35 @@
         <if test="orderStatus != null and orderStatus != '' or orderStatus == 0">
             order_status = #{orderStatus},
         </if>
-        <if test="returnStatus != null and returnStatus != '' or returnStatus == 0">
-            return_status = #{returnStatus},
+        <if test="orderReturn != null and orderReturn != '' or orderReturn == 0">
+            order_return = #{orderReturn},
         </if>
         <if test="splitStatus != null and splitStatus != '' or splitStatus == 0">
             split_status = #{splitStatus},
         </if>
+        <if test="orderException != null and orderException != '' or orderException == 0">
+            order_exception = #{orderException},
+        </if>
+        <if test="orderLock != null and orderLock != '' or orderLock == 0">
+            order_lock = #{orderLock},
+        </if>
+        <if test="orderDelete != null and orderDelete != '' or orderDelete == 0">
+            order_delete = #{orderDelete},
+        </if>
+        <if test="paymentStatus != null and paymentStatus != '' or paymentStatus == 0">
+            payment_status = #{paymentStatus},
+        </if>
         <if test="beforeCancelStatus != null and beforeCancelStatus != '' or beforeCancelStatus == 0">
             before_cancel_status = #{beforeCancelStatus},
         </if>
-        <if test="primaryCode != null and primaryCode != ''">
-            primary_code = #{primaryCode},
+        <if test="exceptionReason != null and exceptionReason != ''">
+            exception_reason = #{exceptionReason},
+        </if>
+        <if test="lockReason != null and lockReason != ''">
+            lock_reason = #{lockReason},
+        </if>
+        <if test="mainOrderCode != null and mainOrderCode != ''">
+            main_order_code = #{mainOrderCode},
         </if>
         <if test="supplierCode != null and supplierCode != ''">
             supplier_code = #{supplierCode},
@@ -127,14 +203,110 @@
         <if test="supplierName != null and supplierName != ''">
             supplier_name = #{supplierName},
         </if>
-        <if test="repertoryCode != null and repertoryCode != ''">
-            repertory_code = #{repertoryCode},
+        <if test="transportCenterCode != null and transportCenterCode != ''">
+            transport_center_code = #{transportCenterCode},
         </if>
-        <if test="repertoryName != null and repertoryName != ''">
-            repertory_name = #{repertoryName},
+        <if test="transportCenterName != null and transportCenterName != ''">
+            transport_center_name = #{transportCenterName},
+        </if>
+        <if test="distributionModeCode != null and distributionModeCode != ''">
+            distribution_mode_code = #{distributionModeCode},
+        </if>
+        <if test="distributionModeName != null and distributionModeName != ''">
+            distribution_mode_name = #{distributionModeName},
+        </if>
+        <if test="transportCompanyCode != null and transportCompanyCode != ''">
+            transport_company_code = #{transportCompanyCode},
+        </if>
+        <if test="transportCompanyName != null and transportCompanyName != ''">
+            transport_company_name = #{transportCompanyName},
+        </if>
+        <if test="warehouseCode != null and warehouseCode != ''">
+            warehouse_code = #{warehouseCode},
+        </if>
+        <if test="warehouseName != null and warehouseName != ''">
+            warehouse_name = #{warehouseName},
+        </if>
+        <if test="customerCode != null and customerCode != ''">
+            customer_code = #{customerCode},
+        </if>
+        <if test="customerName != null and customerName != ''">
+            customer_name = #{customerName},
+        </if>
+        <if test="paymentCode != null and paymentCode != ''">
+            payment_code = #{paymentCode},
+        </if>
+        <if test="paymentName != null and paymentName != ''">
+            payment_name = #{paymentName},
+        </if>
+        <if test="sourceCode != null and sourceCode != ''">
+            source_code = #{sourceCode},
+        </if>
+        <if test="sourceName != null and sourceName != ''">
+            source_name = #{sourceName},
         </if>
         <if test="logisticsId != null and logisticsId != ''">
             logistics_id = #{logisticsId},
+        </if>
+        <if test="zipCode != null and zipCode != ''">
+            zip_code = #{zipCode},
+        </if>
+        <if test="deliverAmount != null">
+            deliver_amount = #{deliverAmount},
+        </if>
+        <if test="totalProductAmount != null">
+            total_product_amount = #{totalProductAmount},
+        </if>
+        <if test="actualTotalProductAmount != null">
+            actual_total_product_amount = #{actualTotalProductAmount},
+        </if>
+        <if test="discountAmount != null">
+            discount_amount = #{discountAmount},
+        </if>
+        <if test="orderAmount != null">
+            order_amount = #{orderAmount},
+        </if>
+        <if test="paymentTime != null">
+            payment_time = #{paymentTime},
+        </if>
+        <if test="deliveryTime != null">
+            delivery_time = #{deliveryTime},
+        </if>
+        <if test="transportTime != null">
+            transport_time = #{transportTime},
+        </if>
+        <if test="receiveTime != null">
+            receive_time = #{receiveTime},
+        </if>
+        <if test="invoiceTitle != null and invoiceTitle != '' ">
+            invoice_title = #{invoiceTitle},
+        </if>
+        <if test="remake != null and remake != '' ">
+            remake = #{remake},
+        </if>
+        <if test="transportCode != null and transportCode != '' ">
+            transport_code = #{transportCode},
+        </if>
+        <if test="invoiceType != null and invoiceType != '' or invoiceType == 0 ">
+            invoice_type = #{invoiceType},
+        </if>
+        <if test="totalVolume != null and totalVolume != '' or totalVolume == 0 ">
+            total_volume = #{totalVolume},
+        </if>
+        <if test="actualTotalVolume != null and actualTotalVolume != '' or actualTotalVolume == 0 ">
+            actual_total_volume = #{actualTotalVolume},
+        </if>
+        <if test="totalWeight != null and totalWeight != '' or totalWeight == 0 ">
+            total_weight = #{totalWeight},
+        </if>
+        <if test="actualTotalWeight != null and actualTotalWeight != '' or actualTotalWeight == 0 ">
+            actual_total_weight = #{actualTotalWeight},
+        </if>
+        <if test="transportStatus != null and transportStatus != '' or transportStatus == 0 ">
+            transport_status = #{transportStatus},
+        </if>
+        <if test="actualProductCount != null and actualProductCount != '' or actualProductCount == 0 ">
+            actual_product_count = #{actualProductCount},
         </if>
         update_by_id = #{updateById},
         update_by_name = #{updateByName},
@@ -143,94 +315,167 @@
     </update>
 
     <insert id="insert">
-        insert into order_store_info (order_id, order_code, order_status, order_type, order_origin_type,
-                                      order_channel_type, order_level, primary_code, split_status,
-                                      return_status, before_cancel_status,
-                                      logistics_id, fee_id, supplier_code, supplier_name, repertory_code,
-                                      repertory_name, franchisee_id, franchisee_code, franchisee_name,
-                                      store_id, store_code, store_name, create_time, create_by_id,
-                                      create_by_name, update_time, update_by_id, update_by_name, status)
-        values (#{orderId}, #{orderCode}, #{orderStatus}, #{orderType}, #{orderOriginType},
-                #{orderChannelType}, #{orderLevel}, #{primaryCode}, #{splitStatus},
-                #{returnStatus}, #{beforeCancelStatus},
-                #{logisticsId}, #{feeId}, #{supplierCode}, #{supplierName}, #{repertoryCode},
-                #{repertoryName}, #{franchiseeId}, #{franchiseeCode}, #{franchiseeName},
-                #{storeId}, #{storeCode}, #{storeName}, sysdate(), #{createById},
-                #{createByName}, sysdate(), #{updateById}, #{updateByName}, #{status})
+        insert into order_store_info (order_store_id, order_store_code, company_code, company_name,
+                                      order_type_code, order_type_name, order_category_code,
+                                      order_category_name, order_channel_type, supplier_code, supplier_name,
+                                      transport_center_code, transport_center_name, warehouse_code,
+                                      warehouse_name, customer_code, customer_name, order_status, order_lock,
+                                      lock_reason, order_exception, exception_reason, order_delete,
+                                      payment_status, province_id, province_name, city_id, city_name,
+                                      district_id, district_name, receive_address, distribution_mode_code,
+                                      distribution_mode_name, receive_person, receive_mobile, zip_code,
+                                      payment_code, payment_name, deliver_amount, total_product_amount,
+                                      actual_total_product_amount, actual_product_count, discount_amount,
+                                      order_amount, payment_time, delivery_time, transport_time,
+                                      transport_status, receive_time, invoice_type, invoice_title,
+                                      total_volume, actual_total_volume, total_weight, actual_total_weight,
+                                      main_order_code, order_level, split_status, before_cancel_status, remake,
+                                      store_type, store_id,
+                                      store_code, store_name, transport_company_code, transport_company_name,
+                                      transport_code, logistics_id, fee_id, order_return, franchisee_id,
+                                      franchisee_code, franchisee_name, use_status, source_code, source_name,
+                                      source_type, create_by_id, create_by_name, update_by_id, update_by_name,
+                                      create_time, update_time)
+        values (#{orderStoreId}, #{orderStoreCode}, #{companyCode}, #{companyName},
+                #{orderTypeCode}, #{orderTypeName}, #{orderCategoryCode},
+                #{orderCategoryName}, #{orderChannelType}, #{supplierCode}, #{supplierName},
+                #{transportCenterCode}, #{transportCenterName}, #{warehouseCode},
+                #{warehouseName}, #{customerCode}, #{customerName}, #{orderStatus}, #{orderLock},
+                #{lockReason}, #{orderException}, #{exceptionReason}, #{orderDelete},
+                #{paymentStatus}, #{provinceId}, #{provinceName}, #{cityId}, #{cityName},
+                #{districtId}, #{districtName}, #{receiveAddress}, #{distributionModeCode},
+                #{distributionModeName}, #{receivePerson}, #{receiveMobile}, #{zipCode},
+                #{paymentCode}, #{paymentName}, #{deliverAmount}, #{totalProductAmount},
+                #{actualTotalProductAmount}, #{actualProductCount}, #{discountAmount},
+                #{orderAmount}, #{paymentTime}, #{deliveryTime}, #{transportTime},
+                #{transportStatus}, #{receiveTime}, #{invoiceType}, #{invoiceTitle},
+                #{totalVolume}, #{actualTotalVolume}, #{totalWeight}, #{actualTotalWeight},
+                #{mainOrderCode}, #{orderLevel}, #{splitStatus}, #{beforeCancelStatus}, #{remake}, #{storeType},
+                #{storeId},
+                #{storeCode}, #{storeName}, #{transportCompanyCode}, #{transportCompanyName},
+                #{transportCode}, #{logisticsId}, #{feeId}, #{orderReturn}, #{franchiseeId},
+                #{franchiseeCode}, #{franchiseeName}, #{useStatus}, #{sourceCode}, #{sourceName},
+                #{sourceType}, #{createById}, #{createByName}, #{updateById}, #{updateByName},
+                sysdate(), sysdate())
     </insert>
 
     <select id="findOrderList" parameterType="com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest"
             resultType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo">
         select
         a1.id as id,
-        a1.order_id as orderId,
-        a1.order_code as orderCode,
-        a1.order_status as orderStatus,
-        a2.pay_status as payStatus,
-        a1.order_type as orderType,
-        a1.order_origin_type as orderOriginType,
+        a1.order_store_id as orderStoreId,
+        a1.order_store_code as orderStoreCode,
+        a1.company_code as companyCode,
+        a1.company_name as companyName,
+        a1.order_type_code as orderTypeCode,
+        a1.order_type_name as orderTypeName,
+        a1.order_category_code as orderCategoryCode,
+        a1.order_category_name as orderCategoryName,
         a1.order_channel_type as orderChannelType,
-        a1.order_level as orderLevel,
-        a1.primary_code as primaryCode,
-        a1.split_status as splitStatus,
-        a1.return_status as returnStatus,
-        a2.total_money as totalMoney,
-        a2.activity_money as activityMoney,
-        a2.suit_coupon_money as suitCouponMoney,
-        a2.top_coupon_money as topCouponMoney,
-        a2.pay_money as payMoney,
-        a2.goods_coupon as goodsCoupon,
-        a1.before_cancel_status as beforeCancelStatus,
-        a1.logistics_id as logisticsId,
-        a1.fee_id as feeId,
         a1.supplier_code as supplierCode,
         a1.supplier_name as supplierName,
-        a1.repertory_code as repertoryCode,
-        a1.repertory_name as repertoryName,
-        a1.franchisee_id as franchiseeId,
-        a1.franchisee_code as franchiseeCode,
-        a1.franchisee_name as franchiseeName,
+        a1.transport_center_code as transportCenterCode,
+        a1.transport_center_name as transportCenterName,
+        a1.warehouse_code as warehouseCode,
+        a1.warehouse_name as warehouseName,
+        a1.customer_code as customerCode,
+        a1.customer_name as customerName,
+        a1.order_status as orderStatus,
+        a1.order_lock as orderLock,
+        a1.lock_reason as lockReason,
+        a1.order_exception as orderException,
+        a1.exception_reason as exceptionReason,
+        a1.order_delete as orderDelete,
+        a1.payment_status as paymentStatus,
+        a1.province_id as provinceId,
+        a1.province_name as provinceName,
+        a1.city_id as cityId,
+        a1.city_name as cityName,
+        a1.district_id as districtId,
+        a1.district_name as districtName,
+        a1.receive_address as receiveAddress,
+        a1.distribution_mode_code as distributionModeCode,
+        a1.distribution_mode_name as distributionModeName,
+        a1.receive_person as receivePerson,
+        a1.receive_mobile as receiveMobile,
+        a1.zip_code as zipCode,
+        a1.payment_code as paymentCode,
+        a1.payment_name as paymentName,
+        a1.deliver_amount as deliverAmount,
+        a1.total_product_amount as totalProductAmount,
+        a1.actual_total_product_amount as actualTotalProductAmount,
+        a1.actual_product_count as actualProductCount,
+        a1.discount_amount as discountAmount,
+        a1.order_amount as orderAmount,
+        a1.payment_time as paymentTime,
+        a1.delivery_time as deliveryTime,
+        a1.transport_time as transportTime,
+        a1.transport_status as transportStatus,
+        a1.receive_time as receiveTime,
+        a1.invoice_type as invoiceType,
+        a1.invoice_title as invoiceTitle,
+        a1.total_volume as totalVolume,
+        a1.actual_total_volume as actualTotalVolume,
+        a1.total_weight as totalWeight,
+        a1.actual_total_weight as actualTotalWeight,
+        a1.main_order_code as mainOrderCode,
+        a1.order_level as orderLevel,
+        a1.remake as remake,
+        a1.store_type as storeType,
         a1.store_id as storeId,
         a1.store_code as storeCode,
         a1.store_name as storeName,
-        a1.create_time as createTime,
+        a1.transport_company_code as transportCompanyCode,
+        a1.transport_company_name as transportCompanyName,
+        a1.transport_code as transportCode,
+        a1.logistics_id as logisticsId,
+        a1.fee_id as feeId,
+        a1.order_return as orderReturn,
+        a1.franchisee_id as franchiseeId,
+        a1.franchisee_code as franchiseeCode,
+        a1.franchisee_name as franchiseeName,
+        a1.use_status as useStatus,
+        a1.source_code as sourceCode,
+        a1.source_name as sourceName,
+        a1.source_type as sourceType,
         a1.create_by_id as createById,
         a1.create_by_name as createByName,
-        a1.update_time as updateTime,
         a1.update_by_id as updateById,
         a1.update_by_name as updateByName,
-        a1.status as status
+        a1.create_time as createTime,
+        a1.update_time as updateTime,
+        a2.goods_coupon as goodsCoupon
         from order_store_info a1
         left join order_store_fee a2 on a1.fee_id = a2.fee_id
         where 1 = 1
-        <if test="orderCode != null and orderCode != ''">
-            and a1.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%')
-        </if>
-        <if test="storeName != null and storeName != ''">
-            and a1.store_name like concat('%',#{storeName,jdbcType=VARCHAR},'%')
-        </if>
-        <if test="orderStatus != null and orderStatus != '' or orderStatus == 0 ">
-            and a1.order_status = #{orderStatus}
-        </if>
-        <if test="payStatus != null and payStatus != '' or payStatus == 0 ">
-            and a2.pay_status = #{payStatus}
-        </if>
-        <if test="orderType != null and orderType != '' or orderType == 0 ">
-            and a1.order_type = #{orderType}
-        </if>
-        <if test="orderTypeQueryList != null">
-            and a1.order_type in (
-            <foreach collection="orderTypeQueryList" item="queryOrderType" separator=",">
-                '${queryOrderType}'
-            </foreach>
-            )
-        </if>
-        <if test="createTimeStart != null and createTimeStart != ''">
-            and date_format(a1.create_time,'%Y-%m-%d') &gt;= #{createTimeStart,jdbcType=VARCHAR}
-        </if>
-        <if test="createTimeEnd != null and createTimeEnd != ''">
-            and date_format(a1.create_time,'%Y-%m-%d') &lt;= #{createTimeEnd,jdbcType=VARCHAR}
-        </if>
+        <!--<if test="orderStoreCode != null and orderStoreCode != ''">-->
+        <!--and a1.order_code like concat('%',#{orderStoreCode,jdbcType=VARCHAR},'%')-->
+        <!--</if>-->
+        <!--<if test="storeName != null and storeName != ''">-->
+        <!--and a1.store_name like concat('%',#{storeName,jdbcType=VARCHAR},'%')-->
+        <!--</if>-->
+        <!--<if test="orderStatus != null and orderStatus != '' or orderStatus == 0 ">-->
+        <!--and a1.order_status = #{orderStatus}-->
+        <!--</if>-->
+        <!--<if test="payStatus != null and payStatus != '' or payStatus == 0 ">-->
+        <!--and a2.pay_status = #{payStatus}-->
+        <!--</if>-->
+        <!--<if test="orderType != null and orderType != '' or orderType == 0 ">-->
+        <!--and a1.order_type = #{orderType}-->
+        <!--</if>-->
+        <!--<if test="orderTypeQueryList != null">-->
+        <!--and a1.order_type in (-->
+        <!--<foreach collection="orderTypeQueryList" item="queryOrderType" separator=",">-->
+        <!--'${queryOrderType}'-->
+        <!--</foreach>-->
+        <!--)-->
+        <!--</if>-->
+        <!--<if test="createTimeStart != null and createTimeStart != ''">-->
+        <!--and date_format(a1.create_time,'%Y-%m-%d') &gt;= #{createTimeStart,jdbcType=VARCHAR}-->
+        <!--</if>-->
+        <!--<if test="createTimeEnd != null and createTimeEnd != ''">-->
+        <!--and date_format(a1.create_time,'%Y-%m-%d') &lt;= #{createTimeEnd,jdbcType=VARCHAR}-->
+        <!--</if>-->
         order by a1.create_time desc
     </select>
 

@@ -12,11 +12,13 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
-import com.aiqin.mgs.order.api.domain.response.StoreBackInfoResponse;
+import com.aiqin.mgs.order.api.domain.response.ProductSkuDetailResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
+import com.aiqin.mgs.order.api.domain.response.order.StoreFranchiseeInfoResponse;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -40,98 +42,94 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public StoreInfo getStoreInfoByStoreId(String storeId) {
+        storeId = "3604f41aba22481da201e0c3d7a7451a";
         StoreInfo storeInfo = new StoreInfo();
         try {
-            HttpClient httpClient = HttpClient.get(urlProperties.getSlcsApi() + "/store/getStoreInfo?store_id=" + storeId);
-            HttpResponse<StoreBackInfoResponse> response = httpClient.action().result(new TypeReference<HttpResponse<StoreBackInfoResponse>>() {
+            HttpClient httpClient = HttpClient.get(urlProperties.getSlcsApi() + "/store/info?store_id=" + storeId);
+            HttpResponse<StoreFranchiseeInfoResponse> response = httpClient.action().result(new TypeReference<HttpResponse<StoreFranchiseeInfoResponse>>() {
             });
-            if (RequestReturnUtil.validateHttpResponse(response)) {
+            if (!RequestReturnUtil.validateHttpResponse(response)) {
                 throw new BusinessException("获取门店信息失败");
             }
-            StoreBackInfoResponse data = response.getData();
-            storeInfo.setStoreId(data.getStoreId());
-            storeInfo.setStoreCode(data.getStoreCode());
-            storeInfo.setStoreName(data.getStoreName());
-            storeInfo.setAddress(data.getAddress());
-            storeInfo.setContacts(data.getContacts());
-            storeInfo.setContactsPhone(data.getContactsPhone());
-            storeInfo.setFranchiseeId("franchiseeId");
-            storeInfo.setFranchiseeCode("franchiseeCode");
-            storeInfo.setFranchiseeName("加盟商名称");
+            StoreFranchiseeInfoResponse data = response.getData();
+            if (data == null) {
+                throw new BusinessException("无效的门店");
+            }
+            storeInfo = data.getStoreInfo();
+        } catch (BusinessException e) {
+            logger.info("获取门店信息失败：{}", e.getMessage());
+            throw new BusinessException(e.getMessage());
         } catch (Exception e) {
             logger.info("获取门店信息失败：{}", e);
-//            throw new BusinessException("获取门店信息失败");
-        }
-
-        if (StringUtils.isEmpty(storeInfo.getStoreId())) {
-            //生成临时假数据
-            storeInfo.setStoreId(storeId);
-            storeInfo.setStoreCode("123456");
-            storeInfo.setStoreName("门店1");
-            storeInfo.setFranchiseeId("franchiseeId");
-            storeInfo.setFranchiseeCode("franchiseeCode");
-            storeInfo.setFranchiseeName("加盟商名称");
-            storeInfo.setContacts("张三");
-            storeInfo.setContactsPhone("12345678910");
-            storeInfo.setAddress("北京市朝阳区");
-            storeInfo.setAreaId("01");
-            storeInfo.setAreaName("华南大区");
-            storeInfo.setProvinceId("01");
-            storeInfo.setProvinceName("北京");
-            storeInfo.setCityId("01");
-            storeInfo.setCityName("北京市");
-            storeInfo.setDistrictId("01");
-            storeInfo.setDistrictName("朝阳区");
+            throw new BusinessException("获取门店信息失败");
         }
 
         return storeInfo;
     }
 
     @Override
-    public ProductInfo getProductDetail(String storeId, String productId, String skuCode) {
+    public ProductInfo getProductDetail(String spuCode, String skuCode) {
+
+        String url = urlProperties.getProductApi() + "/search/spu/sku/detail";
+        url += "?companyCode=09";
+        url += "&skuCode=1001";
         ProductInfo product = new ProductInfo();
         try {
-            product.setProductId(productId);
-            product.setProductCode(productId + System.currentTimeMillis());
-            product.setProductName("商品名称" + System.currentTimeMillis());
-            product.setSkuCode(skuCode);
-            product.setSkuName(skuCode + System.currentTimeMillis());
-            product.setSkuCode("123456");
-            product.setSkuName("123456" + System.currentTimeMillis());
-            product.setUnit("个");
-            product.setPrice(BigDecimal.TEN);
-            product.setTaxPurchasePrice(BigDecimal.TEN.add(BigDecimal.ONE));
+            HttpClient httpClient = HttpClient.get(url);
+            HttpResponse<ProductSkuDetailResponse> response = httpClient.action().result(new TypeReference<HttpResponse<ProductSkuDetailResponse>>() {
+            });
+            if (!RequestReturnUtil.validateHttpResponse(response)) {
+                throw new BusinessException("获取商品信息失败");
+            }
+            ProductSkuDetailResponse data = response.getData();
+            if (data == null) {
+                throw new BusinessException("无效的商品");
+            }
 
-            List<ProductRepertoryQuantity> productRepertoryQuantityList = new ArrayList<>();
-            ProductRepertoryQuantity repertoryQuantity1 = new ProductRepertoryQuantity();
-            repertoryQuantity1.setRepertoryCode("10001");
-            repertoryQuantity1.setRepertoryName("仓库1");
-            repertoryQuantity1.setQuantity(10);
-            productRepertoryQuantityList.add(repertoryQuantity1);
-            ProductRepertoryQuantity repertoryQuantity2 = new ProductRepertoryQuantity();
-            repertoryQuantity2.setRepertoryCode("10002");
-            repertoryQuantity2.setRepertoryName("仓库2");
-            repertoryQuantity2.setQuantity(50);
-            productRepertoryQuantityList.add(repertoryQuantity2);
-            ProductRepertoryQuantity repertoryQuantity3 = new ProductRepertoryQuantity();
-            repertoryQuantity3.setRepertoryCode("10003");
-            repertoryQuantity3.setRepertoryName("仓库3");
-            repertoryQuantity3.setQuantity(200);
-            productRepertoryQuantityList.add(repertoryQuantity3);
-            product.setRepertoryQuantityList(productRepertoryQuantityList);
 
-            //TODO CT 从供应链获取商品详情
-//            Map<String, Object> paramMap = new HashMap<>();
-//            paramMap.put("storeId", storeId);
-//            paramMap.put("productId", productId);
-//            paramMap.put("skuCode", skuCode);
-//            HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/test").json(paramMap);
-//            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
-//            });
+            //商品编码
+            product.setSpuCode(data.getProductCode());
+            product.setSpuName(data.getProductName());
+            product.setSkuCode(data.getSkuCode());
+            product.setSkuName(data.getSkuName());
+            product.setSupplierCode(data.getSupplyUnitCode());
+            product.setSupplierName(data.getSupplyUnitName());
+            product.setPictureUrl(data.getProductPicturePath());
+            product.setProductSpec(data.getSpec());
+            product.setColorCode(data.getColorCode());
+            product.setColorName(data.getColorName());
+            product.setModelCode(data.getModelNumber());
+            product.setUnitCode(data.getUnitCode());
+            product.setUnitName(data.getUnitName());
+            product.setPrice(data.getPriceTax());
+            product.setBarCode(data.getBarCode());
+            product.setTaxRate(data.getOutputTaxRate());
+
+        } catch (BusinessException e) {
+            logger.info("获取商品信息失败：{}", e.getMessage());
+            throw new BusinessException(e.getMessage());
         } catch (Exception e) {
-            logger.error("获取商品信息失败：{}", e);
-            throw new BusinessException("获取商品详情信息失败");
+            logger.info("获取商品信息失败：{}", e);
+            throw new BusinessException("获取商品信息失败");
         }
+//        product.setSpuCode(spuCode);
+//        product.setSpuName(spuCode + "名称");
+//        product.setSkuCode(skuCode);
+//        product.setSkuName(skuCode + "名称");
+//        product.setSupplierCode("123456");
+//        product.setSupplierName("供应商1");
+//
+//        product.setPictureUrl("https://www.baidu.com/img/bd_logo1.png");
+//        product.setProductSpec("32K");
+//        product.setColorCode("101");
+//        product.setColorName("红色");
+//        product.setModelCode("1234");
+//        product.setUnitCode("1001");
+//        product.setUnitName("盒");
+//        product.setPrice(BigDecimal.TEN);
+//        product.setBarCode("987456321156156");
+//        product.setTaxRate(new BigDecimal(0.15));
+
         return product;
     }
 

@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.service.order;
 
+import com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
@@ -62,7 +63,18 @@ public interface ErpOrderPayService {
      * @version: v1.0.0
      * @date 2019/12/10 9:47
      */
-    String orderPay(ErpOrderPayRequest erpOrderPayRequest);
+    void orderPay(ErpOrderPayRequest erpOrderPayRequest);
+
+    /**
+     * 自动发起支付
+     *
+     * @param orderId
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/19 17:02
+     */
+    void autoPay(String orderId);
 
     /**
      * 查询订单支付结果
@@ -107,7 +119,7 @@ public interface ErpOrderPayService {
      * @version: v1.0.0
      * @date 2019/12/10 9:48
      */
-    String endPay(String payId, boolean manual);
+    String endPay(String payId, ErpPayStatusEnum payStatusEnum, boolean manual);
 
     /**
      * 查询确认收款信息
@@ -143,26 +155,15 @@ public interface ErpOrderPayService {
     void orderTimeoutUnpaid(ErpOrderPayRequest erpOrderPayRequest);
 
     /**
-     * 获取需要支付的物流费用信息
-     *
-     * @param erpOrderPayRequest
-     * @return com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/12/10 15:13
-     */
-    ErpOrderLogistics getOrderLogisticsFee(ErpOrderPayRequest erpOrderPayRequest);
-
-    /**
      * 发起支付物流费用
      *
      * @param erpOrderPayRequest
-     * @return java.lang.String
+     * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/10 15:41
      */
-    String orderLogisticsPay(ErpOrderPayRequest erpOrderPayRequest);
+    void orderLogisticsPay(ErpOrderPayRequest erpOrderPayRequest);
 
     /**
      * 查询订单物流费用支付结果

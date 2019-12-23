@@ -33,6 +33,8 @@ public class ErpOrderPayResultResponse {
     private BigDecimal goodsCoupon;
     /***支付流水号*/
     private String payCode;
+    /***支付id*/
+    private String payId;
     /***支付开始时间*/
     private Date payStartTime;
     /***支付完成时间*/

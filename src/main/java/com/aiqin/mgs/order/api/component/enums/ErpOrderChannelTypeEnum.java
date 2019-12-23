@@ -19,9 +19,9 @@ import java.util.Map;
 public enum ErpOrderChannelTypeEnum {
 
     /***总部向门店销售*/
-    CHANNEL_3(3, "3", "总部向门店销售"),
+    CHANNEL_1(1, "1", "总部向门店销售"),
     /***门店向会员销售*/
-    CHANNEL_4(4, "4", "门店向会员销售");
+    CHANNEL_2(2, "2", "门店向会员销售");
 
     private Integer code;
     private String value;
@@ -35,8 +35,6 @@ public enum ErpOrderChannelTypeEnum {
 
     /***选项类型*/
     public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
-    /***code-enum map*/
-    public static final Map<Integer, ErpOrderChannelTypeEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
     /***value-enum map*/
     public static final Map<String, ErpOrderChannelTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
@@ -44,7 +42,6 @@ public enum ErpOrderChannelTypeEnum {
         for (ErpOrderChannelTypeEnum item :
                 ErpOrderChannelTypeEnum.values()) {
             SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
-            CODE_ENUM_MAP.put(item.getCode(), item);
             VALUE_ENUM_MAP.put(item.getValue(), item);
         }
     }

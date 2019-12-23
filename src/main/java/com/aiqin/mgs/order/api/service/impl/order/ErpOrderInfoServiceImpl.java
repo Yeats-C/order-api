@@ -8,10 +8,10 @@ import com.aiqin.mgs.order.api.domain.ProductInfo;
 import com.aiqin.mgs.order.api.domain.po.order.*;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderDeliverRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderEditRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,11 +40,13 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     @Resource
     private ErpOrderLogisticsService erpOrderLogisticsService;
     @Resource
+    private ErpOrderFeeService erpOrderFeeService;
+    @Resource
     private ErpOrderOperationLogService erpOrderOperationLogService;
     @Resource
     private ErpOrderRequestService erpOrderRequestService;
     @Resource
-    private ErpOrderConsigneeService erpOrderConsigneeService;
+    private ErpOrderPayService erpOrderPayService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -53,11 +55,11 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         po.setCreateByName(auth.getPersonName());
         po.setUpdateById(auth.getPersonId());
         po.setUpdateByName(auth.getPersonName());
-        po.setStatus(YesOrNoEnum.YES.getCode());
+        po.setUseStatus(StatusEnum.YES.getCode());
         Integer insert = erpOrderInfoDao.insert(po);
 
         //保存日志
-        erpOrderOperationLogService.saveOrderOperationLog(po.getOrderId(), ErpOrderStatusEnum.ORDER_STATUS_1, auth);
+        erpOrderOperationLogService.saveOrderOperationLog(po.getOrderStoreCode(), ErpLogSourceTypeEnum.SALES, ErpLogOperationTypeEnum.ADD, ErpOrderStatusEnum.ORDER_STATUS_1.getDesc(), null, auth);
     }
 
     @Override
@@ -80,7 +82,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         Integer integer = erpOrderInfoDao.updateByPrimaryKeySelective(po);
 
         //保存订单操作日志
-        erpOrderOperationLogService.saveOrderOperationLog(po.getOrderId(), ErpOrderStatusEnum.getEnum(po.getOrderStatus()), auth);
+        erpOrderOperationLogService.saveOrderOperationLog(po.getOrderStoreCode(), ErpLogSourceTypeEnum.SALES, ErpLogOperationTypeEnum.ADD, ErpOrderStatusEnum.getEnumDesc(po.getOrderStatus()), null, auth);
+
     }
 
     @Override
@@ -102,44 +105,53 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         if (erpOrderEditRequest.getProductGiftList() == null || erpOrderEditRequest.getProductGiftList().size() == 0) {
             throw new BusinessException("缺失赠品行");
         }
-        ErpOrderInfo order = erpOrderQueryService.getOrderDetailByOrderCode(erpOrderEditRequest.getOrderCode());
+        ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(erpOrderEditRequest.getOrderCode());
         if (order == null) {
             throw new BusinessException("无效的订单编号");
         }
 
-        //订单类型
-        ErpOrderTypeEnum orderTypeEnum = ErpOrderTypeEnum.getEnum(order.getOrderType());
-        if (!orderTypeEnum.isAddProductGift()) {
-            throw new BusinessException(orderTypeEnum.getDesc() + "的订单不能增加赠品行");
+        ErpOrderNodeProcessTypeEnum processTypeEnum = ErpOrderNodeProcessTypeEnum.getEnum(order.getOrderTypeCode(), order.getOrderCategoryCode());
+        if (processTypeEnum == null) {
+            throw new BusinessException("异常的订单类型");
         }
 
+        if (!processTypeEnum.isAddProductGift()) {
+            throw new BusinessException("该类型的订单不能增加赠品行");
+        }
         if (!ErpOrderStatusEnum.ORDER_STATUS_1.getCode().equals(order.getOrderStatus())) {
             throw new BusinessException("只有" + ErpOrderStatusEnum.ORDER_STATUS_1.getDesc() + "的订单才能增加赠品行");
         }
-        if (!ErpPayStatusEnum.UNPAID.getCode().equals(order.getPayStatus())) {
-            throw new BusinessException("订单已经发起支付，不能编辑");
+        ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByFeeId(order.getFeeId());
+        if (orderFee == null) {
+            throw new BusinessException("订单费用信息异常");
+        }
+        if (StringUtils.isNotEmpty(orderFee.getPayId())) {
+            ErpOrderPay orderPay = erpOrderPayService.getOrderPayByPayId(orderFee.getPayId());
+            if (orderPay != null) {
+//                if (ErpPayPollingBackStatusEnum.) {
+                //TODO 判断是否已经发起支付，抛异常
+//                }
+            }
+
         }
 
         //订单原商品明细行
-        List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderId());
+        List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
         //记录原订单明细行最大行号最后三位数的值
-        int maxLineIndex = 0;
+        long maxLineIndex = 0;
         for (ErpOrderItem item :
                 orderItemList) {
-            String orderItemCode = item.getOrderItemCode();
-            Integer integer = Integer.valueOf(orderItemCode.substring(orderItemCode.length() - 3));
-            maxLineIndex = maxLineIndex > integer ? maxLineIndex : integer;
+            maxLineIndex = maxLineIndex > item.getLineCode() ? maxLineIndex : item.getLineCode();
         }
 
         List<ErpOrderItem> addGiftList = new ArrayList<>();
-        Map<String, ProductInfo> skuProductMap = new HashMap<>(16);
         int lineIndex = 0;
-        for (ErpOrderItem item :
+        for (ErpOrderProductItemRequest item :
                 erpOrderEditRequest.getProductGiftList()) {
             lineIndex++;
             maxLineIndex++;
-            if (StringUtils.isEmpty(item.getProductId())) {
-                throw new BusinessException("赠品行第" + lineIndex + "行缺失商品id");
+            if (StringUtils.isEmpty(item.getSpuCode())) {
+                throw new BusinessException("赠品行第" + lineIndex + "行缺失spu编码");
             }
             if (StringUtils.isEmpty(item.getSkuCode())) {
                 throw new BusinessException("赠品行第" + lineIndex + "行缺失sku");
@@ -147,48 +159,64 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             if (item.getQuantity() == null) {
                 throw new BusinessException("赠品行第" + lineIndex + "行缺少数量");
             }
-            ProductInfo product = erpOrderRequestService.getProductDetail(order.getStoreId(), item.getProductId(), item.getSkuCode());
+            ProductInfo product = erpOrderRequestService.getProductDetail(item.getSkuCode(), item.getSkuCode());
             if (product == null) {
                 throw new BusinessException("赠品行第" + lineIndex + "行商品未找到");
             }
-            skuProductMap.put(item.getSkuCode(), product);
 
             ErpOrderItem orderItem = new ErpOrderItem();
-            //订单ID
-            orderItem.setOrderId(order.getOrderId());
-            //订单商品明细ID
-            orderItem.setOrderItemId(OrderPublic.getUUID());
-            //订单商品明细编码
-            orderItem.setOrderItemCode(order.getOrderCode() + String.format("%03d", maxLineIndex));
-            //商品ID
-            orderItem.setProductId(product.getProductId());
-            //商品编码
-            orderItem.setProductCode(product.getProductCode());
-            //商品名称
-            orderItem.setProductName(product.getProductName());
-            //商品sku码
+            //spu编码
+            orderItem.setSpuCode(product.getSpuCode());
+            //spu名称
+            orderItem.setSpuName(product.getSpuName());
+            //sku编码
             orderItem.setSkuCode(product.getSkuCode());
-            //商品名称
+            //sku名称
             orderItem.setSkuName(product.getSkuName());
-            //单位
-            orderItem.setUnit(product.getUnit());
-            //本品赠品标记 ErpProductGiftEnum
-            orderItem.setProductGift(ErpProductGiftEnum.GIFT.getCode());
-            //活动id
-            orderItem.setActivityId(null);
-            //订货数量
-            orderItem.setQuantity(item.getQuantity());
-            //订货价
-            orderItem.setPrice(BigDecimal.ZERO);
-            //订货金额
-            orderItem.setMoney(BigDecimal.ZERO);
-            //活动优惠金额
-            orderItem.setActivityMoney(BigDecimal.ZERO);
-            //实际支付金额
-            orderItem.setActualMoney(BigDecimal.ZERO);
-            //行均摊金额
-            orderItem.setShareMoney(BigDecimal.ZERO);
+            //图片地址
+            orderItem.setPictureUrl(product.getPictureUrl());
+            //规格
+            orderItem.setProductSpec(product.getProductSpec());
+            //颜色编码
+            orderItem.setColorCode(product.getColorCode());
+            //颜色名称
+            orderItem.setColorName(product.getColorName());
+            //型号
+            orderItem.setModelCode(product.getModelCode());
+            //单位编码
+            orderItem.setUnitCode(product.getUnitCode());
+            //单位名称
+            orderItem.setUnitName(product.getUnitName());
+            //折零系数 不填
+            orderItem.setZeroDisassemblyCoefficient(null);
+            //商品类型  0商品 1赠品
+            orderItem.setProductType(ErpProductGiftEnum.PRODUCT.getCode());
+            //商品数量
+            orderItem.setProductCount((long) item.getQuantity());
+            //商品单价
+            orderItem.setProductAmount(item.getPrice());
+            //商品总价
+            orderItem.setTotalProductAmount(item.getPrice().multiply(new BigDecimal(item.getQuantity())));
+            //实际商品总价
+            orderItem.setActualTotalProductAmount(orderItem.getTotalProductAmount());
+            //优惠分摊总金额
+            orderItem.setTotalPreferentialAmount(BigDecimal.ZERO);
+            //活动优惠总金额
+            orderItem.setTotalAcivityAmount(BigDecimal.ZERO);
+            //实际商品数量
+            orderItem.setActualProductCount(null);
+            //税率
+            orderItem.setTaxRate(product.getTaxRate());
+            //公司编码
+            orderItem.setCompanyCode(order.getCompanyCode());
+            //公司名称
+            orderItem.setCompanyName(order.getCompanyName());
             addGiftList.add(orderItem);
+        }
+
+        if (processTypeEnum.isLockStock()) {
+            //TODO 锁库存
+//            erpOrderRequestService.lockStockInSupplyChain();
         }
 
         erpOrderItemService.saveOrderItemList(addGiftList, auth);
@@ -198,14 +226,14 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void orderSplit(ErpOrderInfo orderInfo) {
-        AuthToken auth = AuthUtil.getSystemAuth();
-        String orderCode = orderInfo.getOrderCode();
-        if (StringUtils.isEmpty(orderCode)) {
+        /*AuthToken auth = AuthUtil.getSystemAuth();
+        String orderStoreCode = orderInfo.getOrderStoreCode();
+        if (StringUtils.isEmpty(orderStoreCode)) {
             throw new BusinessException("订单号为空");
         }
 
         //原订单
-        ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
+        ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderStoreCode);
         if (order == null) {
             throw new BusinessException("无效的订单编号");
         }
@@ -220,12 +248,12 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         if (!ErpOrderStatusEnum.ORDER_STATUS_2.getCode().equals(order.getOrderStatus()) && !ErpOrderStatusEnum.ORDER_STATUS_92.getCode().equals(order.getOrderStatus()) && !ErpOrderStatusEnum.ORDER_STATUS_93.getCode().equals(order.getOrderStatus())) {
             throw new BusinessException("只有支付成功且未拆分的的订单才能拆分");
         }
-        ErpOrderTypeEnum orderTypeEnum = ErpOrderTypeEnum.getEnum(order.getOrderType());
+        ErpOrderCategoryEnum orderTypeEnum = ErpOrderCategoryEnum.getEnum(order.getOrderType());
         if (orderTypeEnum == null) {
             throw new BusinessException("订单类型异常");
         }
 
-        if (ErpProductTypeEnum.STORAGE_RACK == orderTypeEnum.getErpProductTypeEnum() || ErpProductTypeEnum.DIRECT_SEND == orderTypeEnum.getErpProductTypeEnum()) {
+        if (ErpOrderTypeEnum.STORAGE_RACK == orderTypeEnum.getErpOrderTypeEnum() || ErpOrderTypeEnum.DIRECT_SEND == orderTypeEnum.getErpOrderTypeEnum()) {
             //按照供应商拆分订单
 
 //            //sku - 商品详情 map
@@ -273,7 +301,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 //                    //生成订单id
 //                    String newOrderId = OrderPublic.getUUID();
 //                    //生成订单code
-//                    String newOrderCode = OrderPublic.generateOrderCode(order.getOrderOriginType(), order.getOrderChannel());
+//                    String newOrderCode = OrderPublic.generateOrderCode(order.getOrderOriginType(), order.getOrderChannelType());
 //
 //                    //订货金额汇总
 //                    BigDecimal moneyTotal = BigDecimal.ZERO;
@@ -292,7 +320,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 //                        //订单id
 //                        item.setOrderId(newOrderId);
 //                        //订单编号
-//                        item.setOrderCode(newOrderCode);
+//                        item.setOrderStoreCode(newOrderCode);
 //                        //订单明细行编号
 //                        item.setOrderItemCode(newOrderCode + String.format("%03d", orderItemNum++));
 //
@@ -311,7 +339,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 //
 //                    //保存订单信息
 //                    OrderStoreOrderInfo orderInfo = new OrderStoreOrderInfo();
-//                    orderInfo.setOrderCode(newOrderCode);
+//                    orderInfo.setOrderStoreCode(newOrderCode);
 //                    orderInfo.setOrderId(newOrderId);
 //                    orderInfo.setPayStatus(order.getPayStatus());
 //                    orderInfo.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
@@ -324,7 +352,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 //                    orderInfo.setStoreName(order.getStoreName());
 //                    orderInfo.setOrderLevel(OrderLevelEnum.SECONDARY.getCode());
 //                    orderInfo.setSplitStatus(YesOrNoEnum.NO.getCode());
-//                    orderInfo.setPrimaryCode(order.getOrderCode());
+//                    orderInfo.setPrimaryCode(order.getOrderStoreCode());
 //                    orderInfo.setSupplierCode(entry.getKey());
 //                    orderInfo.setSupplierCode(supplierCodeNameMap.get(entry.getKey()));
 //                    erpOrderOperationService.saveOrder(orderInfo, auth);
@@ -486,7 +514,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
                     //保存新订单信息
                     ErpOrderInfo newOrder = new ErpOrderInfo();
-                    newOrder.setOrderCode(newOrderCode);
+                    newOrder.setOrderStoreCode(newOrderCode);
                     newOrder.setOrderId(newOrderId);
                     newOrder.setOrderChannelType(order.getOrderChannelType());
                     newOrder.setOrderOriginType(order.getOrderOriginType());
@@ -505,7 +533,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     newOrder.setOrderLevel(ErpOrderLevelEnum.SECONDARY.getCode());
                     newOrder.setReturnStatus(YesOrNoEnum.NO.getCode());
                     newOrder.setSplitStatus(YesOrNoEnum.NO.getCode());
-                    newOrder.setPrimaryCode(order.getOrderCode());
+                    newOrder.setPrimaryCode(order.getOrderStoreCode());
                     newOrder.setRepertoryCode(entry.getKey());
                     newOrder.setRepertoryName(repertoryCodeNameMap.get(entry.getKey()));
                     this.saveOrderNoLog(newOrder, auth);
@@ -557,183 +585,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 this.updateOrderByPrimaryKeySelective(order, auth);
             }
         }
-
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void orderDeliver(ErpOrderDeliverRequest erpOrderDeliverRequest) {
-        AuthToken auth = AuthUtil.getSystemAuth();
-
-        if (erpOrderDeliverRequest == null) {
-            throw new BusinessException("空参数");
-        }
-        List<ErpOrderInfo> paramOrderList = erpOrderDeliverRequest.getOrderList();
-        if (paramOrderList == null || paramOrderList.size() <= 0) {
-            throw new BusinessException("缺失发货订单为空");
-        }
-        ErpOrderLogistics paramOrderLogistics = erpOrderDeliverRequest.getOrderLogistics();
-        if (paramOrderLogistics == null) {
-            throw new BusinessException("缺失物流信息为空");
-        } else {
-            if (StringUtils.isEmpty(paramOrderLogistics.getLogisticsCode())) {
-                throw new BusinessException("缺失物流单号");
-            }
-            if (StringUtils.isEmpty(paramOrderLogistics.getLogisticsCentreCode())) {
-                throw new BusinessException("缺失物流公司编码");
-            }
-            if (StringUtils.isEmpty(paramOrderLogistics.getLogisticsCentreName())) {
-                throw new BusinessException("缺失物流公司名称");
-            }
-            if (paramOrderLogistics.getLogisticsFee() == null) {
-                throw new BusinessException("缺失物流费用");
-            } else {
-                if (paramOrderLogistics.getLogisticsFee().compareTo(BigDecimal.ZERO) < 0) {
-                    throw new BusinessException("物流费用不能小于0");
-                }
-            }
-            if (StringUtils.isEmpty(paramOrderLogistics.getSendRepertoryCode())) {
-                throw new BusinessException("缺失发货仓库编码");
-            }
-            if (StringUtils.isEmpty(paramOrderLogistics.getSendRepertoryName())) {
-                throw new BusinessException("缺失发货仓库名称");
-            }
-        }
-
-        ErpOrderLogistics orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsCode(paramOrderLogistics.getLogisticsCode());
-        if (orderLogistics == null) {
-            paramOrderLogistics.setLogisticsId(OrderPublic.getUUID());
-            paramOrderLogistics.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
-            erpOrderLogisticsService.saveOrderLogistics(paramOrderLogistics, auth);
-        } else {
-            if (orderLogistics.getLogisticsFee().compareTo(paramOrderLogistics.getLogisticsFee()) != 0) {
-                throw new BusinessException("物流单费用与已有物流单费用不相等");
-            }
-            if (!orderLogistics.getLogisticsCentreCode().equals(paramOrderLogistics.getLogisticsCentreCode())) {
-                throw new BusinessException("物流公司编码与已有物流单物流公司编码不相同");
-            }
-            if (!orderLogistics.getLogisticsCentreName().equals(paramOrderLogistics.getLogisticsCentreName())) {
-                throw new BusinessException("物流公司名称与已有物流单物流公司名称不相同");
-            }
-            if (!orderLogistics.getSendRepertoryCode().equals(paramOrderLogistics.getSendRepertoryCode())) {
-                throw new BusinessException("发货仓库编码与已有物流单发货仓库编码不相同");
-            }
-            if (!orderLogistics.getSendRepertoryName().equals(paramOrderLogistics.getSendRepertoryName())) {
-                throw new BusinessException("发货仓库名称与已有物流单发货仓库名称不相同");
-            }
-            paramOrderLogistics.setLogisticsId(orderLogistics.getLogisticsId());
-            paramOrderLogistics.setPayStatus(orderLogistics.getPayStatus());
-        }
-
-        int paramOrderIndex = 0;
-        for (ErpOrderInfo paramOrder :
-                paramOrderList) {
-            paramOrderIndex++;
-            if (paramOrder == null) {
-                throw new BusinessException("发货订单参数第" + paramOrderIndex + "个订单为空");
-            }
-            if (StringUtils.isEmpty(paramOrder.getOrderCode())) {
-                throw new BusinessException("发货订单参数第" + paramOrderIndex + "个订单编号缺失");
-            }
-            List<ErpOrderItem> paramItemList = paramOrder.getOrderItemList();
-            if (paramItemList == null || paramItemList.size() <= 0) {
-                throw new BusinessException("订单" + paramOrder.getOrderCode() + "缺少发货商品明细行");
-            }
-            ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(paramOrder.getOrderCode());
-            if (order == null) {
-                throw new BusinessException("订单号" + paramOrder.getOrderCode() + "无效");
-            }
-            if (!ErpOrderStatusEnum.ORDER_STATUS_6.getCode().equals(order.getOrderStatus())) {
-                throw new BusinessException("订单" + order.getOrderCode() + "不是" + ErpOrderStatusEnum.ORDER_STATUS_6.getDesc() + "的订单不能发货");
-            }
-
-            //待发货订单商品明细行
-            List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderId());
-            //待发货订单商品明细行 key:orderItemCode
-            Map<String, ErpOrderItem> orderItemMap = new HashMap<>(16);
-            for (ErpOrderItem item :
-                    orderItemList) {
-                orderItemMap.put(item.getOrderItemCode(), item);
-            }
-
-            //校验参数订单商品行
-            Map<String, ErpOrderItem> paramItemMap = new HashMap<>(16);
-            int lineIndex = 0;
-            for (ErpOrderItem item :
-                    paramItemList) {
-                lineIndex++;
-                if (item == null) {
-                    throw new BusinessException("订单" + order.getOrderCode() + "第" + lineIndex + "行发货商品行数据为空");
-                }
-                if (StringUtils.isEmpty(item.getOrderItemCode())) {
-                    throw new BusinessException("订单" + order.getOrderCode() + "第" + lineIndex + "行缺失订单商品行编码");
-                }
-                if (!orderItemMap.containsKey(item.getOrderItemCode())) {
-                    throw new BusinessException("订单" + order.getOrderCode() + "第" + lineIndex + "行订单商品明细行编码无效");
-                }
-                if (paramItemMap.containsKey(item.getOrderItemCode())) {
-                    throw new BusinessException("订单" + order.getOrderCode() + "第" + lineIndex + "行订单商品明细行重复");
-                }
-                if (item.getDeliverQuantity() == null) {
-                    throw new BusinessException("订单" + order.getOrderCode() + "第" + lineIndex + "行缺失发货数量");
-                } else {
-                    if (item.getDeliverQuantity() < 0) {
-                        throw new BusinessException("订单" + order.getOrderCode() + "第" + lineIndex + "行发货数量不能小于0");
-                    }
-                }
-                paramItemMap.put(item.getOrderItemCode(), item);
-            }
-
-            //需要更新的明细行
-            List<ErpOrderItem> updateProductItemList = new ArrayList<>();
-
-            boolean reductionFlag = false;
-            //遍历修改订单商品行
-            for (ErpOrderItem item :
-                    orderItemList) {
-                if (!paramItemMap.containsKey(item.getOrderItemCode())) {
-                    throw new BusinessException("订单" + order.getOrderCode() + "缺失订单行号为" + item.getOrderItemCode() + "的订单商品行");
-                }
-                ErpOrderItem paramItem = paramItemMap.get(item.getOrderItemCode());
-                if (paramItem.getDeliverQuantity() > item.getQuantity()) {
-                    throw new BusinessException("订单" + order.getOrderCode() + "订单明细行" + item.getOrderItemCode() + "发货数量大于下单数量");
-                }
-
-                ErpOrderItem updateItem = new ErpOrderItem();
-                updateItem.setId(item.getId());
-                updateItem.setDeliverQuantity(item.getDeliverQuantity());
-                updateProductItemList.add(updateItem);
-
-                if (paramItem.getDeliverQuantity() < item.getQuantity()) {
-                    //发货数量小于下单数量，该订单需要生成冲减单
-                    reductionFlag = true;
-                }
-            }
-
-            //订单自动跳过正在拣货
-            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_7.getCode());
-            this.updateOrderByPrimaryKeySelective(order, auth);
-
-            //订单自动跳过扫描完成
-            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_8.getCode());
-            this.updateOrderByPrimaryKeySelective(order, auth);
-
-            //修改订单明细行
-            erpOrderItemService.updateOrderItemList(updateProductItemList, auth);
-            //订单修改为已发货
-            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_11.getCode());
-            if (reductionFlag) {
-                //TODO 标记订单需要生成冲减单
-            }
-            this.updateOrderByPrimaryKeySelective(order, auth);
-
-            if (ErpPayStatusEnum.SUCCESS.getCode().equals(paramOrderLogistics.getPayStatus())) {
-                //如果物流单已经支付成功，订单修改为已支付物流费用
-                order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_12.getCode());
-                this.updateOrderByPrimaryKeySelective(order, auth);
-            }
-
-        }
+*/
     }
 
     @Override
@@ -743,61 +595,57 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         if (erpOrderInfo == null) {
             throw new BusinessException("空参数");
         }
-        if (StringUtils.isEmpty(erpOrderInfo.getOrderCode())) {
+        if (StringUtils.isEmpty(erpOrderInfo.getOrderStoreCode())) {
             throw new BusinessException("订单编号为空");
         }
 
-        List<ErpOrderItem> paramItemList = erpOrderInfo.getOrderItemList();
+        List<ErpOrderItem> paramItemList = erpOrderInfo.getItemList();
         if (paramItemList == null || paramItemList.size() <= 0) {
             throw new BusinessException("商品明细为空");
         }
-        Map<String, ErpOrderItem> orderItemSignMap = new HashMap<>(16);
-        int lineIndex = 0;
+        Map<Long, ErpOrderItem> orderItemSignMap = new HashMap<>(16);
         for (ErpOrderItem item :
                 paramItemList) {
-            lineIndex++;
-            if (item == null) {
-                throw new BusinessException("第" + lineIndex + "行数据为空");
+            if (item.getLineCode() == null) {
+                throw new BusinessException("缺失行号");
             }
-            if (StringUtils.isEmpty(item.getOrderItemCode())) {
-                throw new BusinessException("第" + lineIndex + "行订单行号为空");
+            if (item.getActualInboundCount() == null || item.getActualInboundCount() <= 0) {
+                throw new BusinessException("第" + item.getLineCode() + "行签收数量有误");
             }
-            if (item.getSignQuantity() == null || item.getSignQuantity() <= 0) {
-                throw new BusinessException("第" + lineIndex + "行签收数量有误");
-            }
-            orderItemSignMap.put(item.getOrderItemCode(), item);
+            orderItemSignMap.put(item.getLineCode(), item);
         }
 
-        ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(erpOrderInfo.getOrderCode());
+        ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(erpOrderInfo.getOrderStoreCode());
         if (order == null) {
             throw new BusinessException("无效的订单编号");
         }
-        ErpOrderTypeEnum orderTypeEnum = ErpOrderTypeEnum.getEnum(order.getOrderType());
-        if (orderTypeEnum == null) {
+
+        //节点控制类型
+        ErpOrderNodeProcessTypeEnum processTypeEnum = ErpOrderNodeProcessTypeEnum.getEnum(order.getOrderTypeCode(), order.getOrderCategoryCode());
+        if (processTypeEnum == null) {
             throw new BusinessException("订单类型有误");
         }
-        ErpProductTypeEnum productTypeEnum = orderTypeEnum.getErpProductTypeEnum();
-        if (productTypeEnum == ErpProductTypeEnum.DISTRIBUTION) {
-            //配送订单
+        if (processTypeEnum.isHasLogisticsFee()) {
+            //需要先支付物流费用
             if (!ErpOrderStatusEnum.ORDER_STATUS_12.getCode().equals(order.getOrderStatus())) {
-                throw new BusinessException("该" + productTypeEnum.getDesc() + "订单不是" + ErpOrderStatusEnum.ORDER_STATUS_12.getDesc() + "的订单，不能签收");
+                throw new BusinessException("该订单不是" + ErpOrderStatusEnum.ORDER_STATUS_12.getDesc() + "的订单，不能签收");
             }
         } else {
             if (!ErpOrderStatusEnum.ORDER_STATUS_11.getCode().equals(order.getOrderStatus())) {
-                throw new BusinessException("该" + productTypeEnum.getDesc() + "订单不是" + ErpOrderStatusEnum.ORDER_STATUS_12.getDesc() + "的订单，不能签收");
+                throw new BusinessException("该订单不是" + ErpOrderStatusEnum.ORDER_STATUS_11.getDesc() + "的订单，不能签收");
             }
         }
-        List<ErpOrderItem> itemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderId());
+        List<ErpOrderItem> itemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
         List<ErpOrderItem> updateItemList = new ArrayList<>();
         for (ErpOrderItem item :
                 itemList) {
-            if (!orderItemSignMap.containsKey(item.getOrderItemCode())) {
-                throw new BusinessException("商品" + item.getProductName() + item.getSkuName() + "签收信息为空");
+            if (!orderItemSignMap.containsKey(item.getLineCode())) {
+                throw new BusinessException("第" + item.getLineCode() + "行签收信息为空");
             }
-            ErpOrderItem signItem = orderItemSignMap.get(item.getOrderItemCode());
+            ErpOrderItem signItem = orderItemSignMap.get(item.getLineCode());
             ErpOrderItem updateItem = new ErpOrderItem();
             updateItem.setId(item.getId());
-            updateItem.setSignQuantity(signItem.getSignQuantity());
+            updateItem.setActualInboundCount(signItem.getActualInboundCount());
             updateItem.setSignDifferenceReason(signItem.getSignDifferenceReason());
             updateItemList.add(updateItem);
         }
@@ -805,8 +653,9 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
         ErpOrderInfo updateOrder = new ErpOrderInfo();
         updateOrder.setId(order.getId());
+        updateOrder.setOrderStoreCode(order.getOrderStoreCode());
         updateOrder.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_13.getCode());
-        updateOrderByPrimaryKeySelective(updateOrder, auth);
+        this.updateOrderByPrimaryKeySelective(updateOrder, auth);
     }
 
 }
