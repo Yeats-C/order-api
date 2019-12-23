@@ -178,22 +178,27 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                     //驳回发起人
                     couponApprovalInfo.setStatus(StatusEnum.AUDIT_BACK.getValue());
                     couponApprovalInfo.setStatuStr(StatusEnum.AUDIT_BACK.getDesc());
+                    updateReturnOrderStatus(ConstantData.returnOrderStatusWait,couponApprovalDetail.getOrderId());
                 } else if (formCallBackVo.getOptBtn().equals(IndicatorStr.PROCESS_BTN_REJECT_END.getCode())) {
                     //驳回并结束
                     couponApprovalInfo.setStatus(StatusEnum.AUDIT_END.getValue());
                     couponApprovalInfo.setStatuStr(StatusEnum.AUDIT_END.getDesc());
+                    updateReturnOrderStatus(ConstantData.returnOrderStatusWait,couponApprovalDetail.getOrderId());
                 } else if (formCallBackVo.getOptBtn().equals(IndicatorStr.PROCESS_BTN_CANCEL.getCode())) {
                     //撤销
                     couponApprovalInfo.setStatus(StatusEnum.AUDIT_CANCEL.getValue());
                     couponApprovalInfo.setStatuStr(StatusEnum.AUDIT_CANCEL.getDesc());
+                    updateReturnOrderStatus(ConstantData.returnOrderStatusWait,couponApprovalDetail.getOrderId());
                 } else if (formCallBackVo.getOptBtn().equals(IndicatorStr.PROCESS_BTN_KILL.getCode())) {
                     //终止
                     couponApprovalInfo.setStatus(StatusEnum.AUDIT_END.getValue());
                     couponApprovalInfo.setStatuStr(StatusEnum.AUDIT_END.getDesc());
+                    updateReturnOrderStatus(ConstantData.returnOrderStatusWait,couponApprovalDetail.getOrderId());
                 } else {
                     //终止
                     couponApprovalInfo.setStatus(StatusEnum.AUDIT_END.getValue());
                     couponApprovalInfo.setStatuStr(StatusEnum.AUDIT_END.getDesc());
+                    updateReturnOrderStatus(ConstantData.returnOrderStatusWait,couponApprovalDetail.getOrderId());
                 }
             }
             //更新本地审批表数据
@@ -214,6 +219,21 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
         str="AC"+str+String.format("%04d",new Random().nextInt(9999));
         return str;
     }
+
+    /**
+     * 修改退货单状态--A品卷审批为非“同意”状态时，全部改为01待审核状态
+     * @param status
+     * @param returnOrderId
+     * @return
+     */
+    public Boolean updateReturnOrderStatus(Integer status,String returnOrderId){
+        ReturnOrderReviewReqVo reqVo=new ReturnOrderReviewReqVo();
+        reqVo.setOperateStatus(status);
+        reqVo.setReturnOrderId(returnOrderId);
+        Integer res=returnOrderInfoDao.updateReturnStatus(reqVo);
+        return res>0;
+    }
+
 
     public static void main(String[] args) {
 //        System.out.println(IdUtil.activityId());

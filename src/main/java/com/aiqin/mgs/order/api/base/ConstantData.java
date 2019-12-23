@@ -30,4 +30,10 @@ public interface ConstantData {
      * 12-退款完成
      */
     Integer returnOrderSuccess = 12;
+
+    /**
+     * 退货单审核状态：01-待审核
+     */
+    Integer returnOrderStatusWait = 1;
+
 }
