@@ -1,4 +1,4 @@
-package com.aiqin.mgs.order.api.dao;
+package com.aiqin.mgs.order.api.dao.returnorder;
 
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
@@ -13,6 +13,8 @@ public interface ReturnOrderInfoDao {
     int insertSelective(ReturnOrderInfo record);
 
     ReturnOrderInfo selectByPrimaryKey(Long id);
+
+    ReturnOrderInfo selectByReturnOrderId(String returnOrderId);
 
     int updateByPrimaryKeySelective(ReturnOrderInfo record);
 
