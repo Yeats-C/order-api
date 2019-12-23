@@ -898,4 +898,11 @@
         where return_order_id=#{returnOrderId,jdbcType=VARCHAR}
     </update>
 
+  <select id="selectByReturnOrderId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from return_order_info
+    where return_order_id = #{returnOrderId}
+  </select>
+
 </mapper>

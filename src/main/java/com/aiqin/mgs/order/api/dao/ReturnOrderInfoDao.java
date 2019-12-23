@@ -14,6 +14,8 @@ public interface ReturnOrderInfoDao {
 
     ReturnOrderInfo selectByPrimaryKey(Long id);
 
+    ReturnOrderInfo selectByReturnOrderId(String returnOrderId);
+
     int updateByPrimaryKeySelective(ReturnOrderInfo record);
 
     List<ReturnOrderInfo> selectByOrderCodeAndStatus(@Param("orderStoreCode") String orderStoreCode, @Param("returnOrderStatus") Integer returnOrderStatus);
