@@ -58,6 +58,9 @@ public class PrestorageResponse {
     @JsonProperty("distributor_code")
     private String distributorCode;
 
+    @ApiModelProperty("分销机构编码")
+    @JsonProperty("distributor_id")
+    private String distributorId;
 
     @ApiModelProperty(value="下单时间",example = "2001-01-01 01:01:01")
     @JsonProperty("create_time")
