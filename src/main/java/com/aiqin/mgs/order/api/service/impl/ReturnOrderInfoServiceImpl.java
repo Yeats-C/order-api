@@ -17,6 +17,7 @@ import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReqVo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewApiReqVo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
 import com.aiqin.mgs.order.api.service.ReturnOrderInfoService;
+import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
 import com.aiqin.platform.flows.client.constant.AjaxJson;
 import com.aiqin.platform.flows.client.constant.FormUpdateUrlType;
 import com.aiqin.platform.flows.client.constant.StatusEnum;
@@ -62,6 +63,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     private CouponApprovalInfoDao couponApprovalInfoDao;
     @Resource
     private CouponApprovalDetailDao couponApprovalDetailDao;
+    @Resource
+    private RejectRecordService rejectRecordService;
 
     @Override
     @Transactional
@@ -141,8 +144,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         Integer review = returnOrderInfoDao.updateReturnStatus(reqVo);
         if (flag) {
             //todo 同步到供应链
-
-
+            createRejectRecord(reqVo.getReturnOrderId());
         }
         if (flag1) {
             log.info("驳回--进入A品券发放审批");
@@ -289,6 +291,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
      * @param returnOrderId 退货单id
      */
     public void createRejectRecord(String returnOrderId){
+        log.info("供应链同步退货单开始,returnOrderId={}",returnOrderId);
         RejectRecordReq rejectRecordReq=new RejectRecordReq();
         //根据退货单id查询退货信息
         ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderId(returnOrderId);
@@ -296,12 +299,36 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderId);
         RejectRecord rejectRecord=new RejectRecord();
         List<RejectRecordDetail> rejectRecordDetail=new ArrayList<>();
-        rejectRecord.setRejectRecordCode(returnOrderInfo.getReturnOrderCode());
-
-
+        BeanUtils.copyProperties(returnOrderInfo,rejectRecord);
+        rejectRecord.setSettlementMethodCode(returnOrderInfo.getReturnMoneyType().toString());
+        if(null!=returnOrderInfo.getReturnMoneyType()){
+            //退款方式 1:现金 2:微信 3:支付宝 4:银联
+            switch (returnOrderInfo.getReturnMoneyType()) {
+                case 1:
+                    rejectRecord.setSettlementMethodName("现金");
+                    break;
+                case 2:
+                    rejectRecord.setSettlementMethodName("微信");
+                    break;
+                case 3:
+                    rejectRecord.setSettlementMethodName("支付宝");
+                    break;
+                case 4:
+                    rejectRecord.setSettlementMethodName("银联");
+                    break;
+            }
+        }
+        //todo 退供单状态
+//        rejectRecord.setRejectRecordStatus(1);
+        for(ReturnOrderDetail rod:returnOrderDetails){
+            RejectRecordDetail rrd=new RejectRecordDetail();
+            BeanUtils.copyProperties(rod,rrd);
+            rejectRecordDetail.add(rrd);
+        }
         rejectRecordReq.setRejectRecord(rejectRecord);
         rejectRecordReq.setRejectRecordDetail(rejectRecordDetail);
-
+        HttpResponse httpResponse=rejectRecordService.createRejectRecord(rejectRecordReq);
+        log.info("供应链同步退货单结束,httpResponse={}",httpResponse);
     }
 
 }
