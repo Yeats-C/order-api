@@ -9,27 +9,30 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 购物车商品类型
+ * 日志类型枚举类
  *
  * @author: Tao.Chen
  * @version: v1.0.0
- * @date 2019/11/15 11:09
+ * @date 2019/12/19 20:36
  */
 @Getter
-public enum ErpProductTypeEnum {
+public enum ErpLogOperationTypeEnum {
 
-    /***配送*/
-    DISTRIBUTION(1, "1", "配送"),
-    /***直送*/
-    DIRECT_SEND(2, "2", "直送"),
-    /***货架*/
-    STORAGE_RACK(3, "3", "货架");
+    /***新增*/
+    ADD(0, "0", "新增"),
+    /***修改*/
+    UPDATE(1, "1", "修改"),
+    /***删除*/
+    DELETE(2, "2", "删除"),
+    /***下载*/
+    DOWNLOAD(3, "3", "下载"),
+    ;
 
     private Integer code;
     private String value;
     private String desc;
 
-    ErpProductTypeEnum(Integer code, String value, String desc) {
+    ErpLogOperationTypeEnum(Integer code, String value, String desc) {
         this.code = code;
         this.value = value;
         this.desc = desc;
@@ -37,21 +40,18 @@ public enum ErpProductTypeEnum {
 
     /***选项类型*/
     public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
-    /***code-enum map*/
-    public static final Map<Integer, ErpProductTypeEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
     /***value-enum map*/
-    public static final Map<String, ErpProductTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
+    public static final Map<String, ErpLogOperationTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
     static {
-        for (ErpProductTypeEnum item :
-                ErpProductTypeEnum.values()) {
+        for (ErpLogOperationTypeEnum item :
+                ErpLogOperationTypeEnum.values()) {
             SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
-            CODE_ENUM_MAP.put(item.getCode(), item);
             VALUE_ENUM_MAP.put(item.getValue(), item);
         }
     }
 
-    public static ErpProductTypeEnum getEnum(Object object) {
+    public static ErpLogOperationTypeEnum getEnum(Object object) {
         if (object != null) {
             return VALUE_ENUM_MAP.get(object.toString());
         }
@@ -60,7 +60,7 @@ public enum ErpProductTypeEnum {
 
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            ErpProductTypeEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            ErpLogOperationTypeEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
             }
@@ -68,10 +68,4 @@ public enum ErpProductTypeEnum {
         return "";
     }
 
-    public static boolean exist(Object object) {
-        if (object != null) {
-            return VALUE_ENUM_MAP.containsKey(object.toString());
-        }
-        return false;
-    }
 }

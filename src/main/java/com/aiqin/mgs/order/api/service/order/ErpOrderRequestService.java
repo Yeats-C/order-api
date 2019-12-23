@@ -30,18 +30,7 @@ public interface ErpOrderRequestService {
      */
     StoreInfo getStoreInfoByStoreId(String storeId);
 
-    /**
-     * 查询商品明细
-     *
-     * @param storeId   门店id
-     * @param productId 商品id
-     * @param skuCode   商品sku编码
-     * @return com.aiqin.mgs.order.api.domain.ProductInfo
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/12/2 15:37
-     */
-    ProductInfo getProductDetail(String storeId, String productId, String skuCode);
+    ProductInfo getProductDetail(String spuCode, String skuCode);
 
     /**
      * 锁库存

@@ -42,9 +42,9 @@ public class ErpOrderPayTimeOutTaskJob {
 //                    try {
 //                        erpOrderPayService.orderTimeoutUnpaid(item);
 //                    } catch (BusinessException e) {
-//                        logger.info("取消超时未支付订单定时任务=====>失败：订单号：{}，异常信息：{}", item.getOrderCode(), e.getMessage());
+//                        logger.info("取消超时未支付订单定时任务=====>失败：订单号：{}，异常信息：{}", item.getOrderStoreCode(), e.getMessage());
 //                    } catch (Exception e) {
-//                        logger.info("取消超时未支付订单定时任务=====>失败：订单号：{}，异常信息：{}", item.getOrderCode(), e);
+//                        logger.info("取消超时未支付订单定时任务=====>失败：订单号：{}，异常信息：{}", item.getOrderStoreCode(), e);
 //                    }
 //                }
 //            }

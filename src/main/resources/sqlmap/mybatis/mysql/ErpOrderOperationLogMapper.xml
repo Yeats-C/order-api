@@ -4,35 +4,46 @@
 
     <select id="select" parameterType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog"
             resultType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog">
-        select id as id,
-        order_id as orderId,
-        order_status as orderStatus,
+        select
+        id as id,
+        operation_code as operationCode,
+        operation_type as operationType,
+        source_type as sourceType,
         operation_content as operationContent,
-        create_time as createTime,
+        remark as remark,
+        use_status as useStatus,
         create_by_id as createById,
         create_by_name as createByName,
-        update_time as updateTime,
         update_by_id as updateById,
         update_by_name as updateByName,
-        status as status
-        from order_store_operation_log
+        create_time as createTime,
+        update_time as updateTime
+        from operation_log
         where 1 = 1
         <if test="id != null and id != ''">
             and id = #{id}
         </if>
-        <if test="orderId != null and orderId != ''">
-            and order_id = #{orderId}
+        <if test="operationCode != null and operationCode != ''">
+            and operation_code = #{operationCode}
         </if>
-        order by create_time desc
+        <if test="operationType != null and operationType != '' or operationType == 0 ">
+            and operation_type = #{operationType}
+        </if>
+        <if test="sourceType != null and sourceType != '' or sourceType == 0 ">
+            and source_type = #{sourceType}
+        </if>
+        <if test="useStatus != null and useStatus != '' or useStatus == 0 ">
+            and use_status = #{useStatus}
+        </if>
+        order by create_time desc,id desc
     </select>
 
     <insert id="insert">
-        insert into order_store_operation_log (order_id, order_status, operation_content, create_time,
-                                               create_by_id, create_by_name, update_time, update_by_id,
-                                               update_by_name)
-        values (#{orderId}, #{orderStatus}, #{operationContent}, #{createTime},
-                #{createById}, #{createByName}, #{updateTime}, #{updateById},
-                #{updateByName})
+        insert into operation_log (operation_code, operation_type, source_type, operation_content, remark, use_status,
+                                   create_by_id, create_by_name, update_by_id, update_by_name, create_time, update_time)
+        values (#{operationCode}, #{operationType}, #{sourceType}, #{operationContent}, #{remark},
+                #{useStatus}, #{createById}, #{createByName}, #{updateById}, #{updateByName}, #{createTime},
+                #{updateTime})
     </insert>
 
 </mapper>

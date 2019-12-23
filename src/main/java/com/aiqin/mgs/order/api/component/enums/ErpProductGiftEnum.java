@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 商品本品赠品枚举类
+ * 商品本品赠品枚举
  *
  * @author: Tao.Chen
  * @version: v1.0.0
@@ -18,10 +18,10 @@ import java.util.Map;
 @Getter
 public enum ErpProductGiftEnum {
 
-    /***本品*/
-    PRODUCT(1, "1", "本品"),
+    /***商品*/
+    PRODUCT(0, "0", "商品"),
     /***赠品*/
-    GIFT(2, "2", "赠品");
+    GIFT(1, "1", "赠品");
 
     private Integer code;
     private String value;
@@ -35,8 +35,6 @@ public enum ErpProductGiftEnum {
 
     /***选项类型*/
     public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
-    /***code-enum map*/
-    public static final Map<Integer, ErpProductGiftEnum> CODE_ENUM_MAP = new LinkedHashMap<>(16);
     /***value-enum map*/
     public static final Map<String, ErpProductGiftEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
@@ -44,13 +42,13 @@ public enum ErpProductGiftEnum {
         for (ErpProductGiftEnum item :
                 ErpProductGiftEnum.values()) {
             SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
-            CODE_ENUM_MAP.put(item.getCode(), item);
             VALUE_ENUM_MAP.put(item.getValue(), item);
         }
     }
 
     /**
      * 返回枚举对象
+     *
      * @param object
      * @return
      */
@@ -63,6 +61,7 @@ public enum ErpProductGiftEnum {
 
     /**
      * 返回枚举对象的描述信息
+     *
      * @param object
      * @return
      */
@@ -77,37 +76,8 @@ public enum ErpProductGiftEnum {
     }
 
     /**
-     * 返回枚举对象的值
-     * @param object
-     * @return
-     */
-    public static String getEnumValue(Object object) {
-        if (object != null) {
-            ErpProductGiftEnum erpProductGiftEnum = VALUE_ENUM_MAP.get(object.toString());
-            if (erpProductGiftEnum != null){
-                return erpProductGiftEnum.getValue();
-            }
-        }
-        return "";
-    }
-
-    /**
-     * 返回枚举对象的编码
-     * @param object
-     * @return
-     */
-    public static Integer getEnumCode(Object object){
-        if (object != null){
-            ErpProductGiftEnum erpProductGiftEnum = CODE_ENUM_MAP.get(object.toString());
-            if (erpProductGiftEnum != null){
-                return erpProductGiftEnum.getCode();
-            }
-        }
-        return null;
-    }
-
-    /**
      * 判断枚举类型是否存在
+     *
      * @param object
      * @return
      */

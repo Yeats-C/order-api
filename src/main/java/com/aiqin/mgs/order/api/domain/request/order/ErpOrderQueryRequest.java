@@ -22,7 +22,7 @@ public class ErpOrderQueryRequest {
     private Integer orderStatus;
     @ApiModelProperty(value = "订单支付状态 ErpPayStatusEnum")
     private Integer payStatus;
-    @ApiModelProperty(value = "订单类型 枚举 ErpOrderTypeEnum")
+    @ApiModelProperty(value = "订单类型 枚举 ErpOrderCategoryEnum")
     private Integer orderType;
     @ApiModelProperty(value = "门店名称")
     private String storeName;

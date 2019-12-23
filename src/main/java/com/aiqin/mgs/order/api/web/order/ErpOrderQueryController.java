@@ -7,7 +7,7 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
-import com.aiqin.mgs.order.api.component.enums.ErpOrderTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderCategoryEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpPayWayEnum;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
@@ -87,7 +87,7 @@ public class ErpOrderQueryController {
     public HttpResponse findOrderTypeList() {
         HttpResponse response = HttpResponse.success();
         try {
-            response.setData(ErpOrderTypeEnum.SELECT_LIST);
+            response.setData(ErpOrderCategoryEnum.SELECT_LIST);
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {
@@ -101,7 +101,7 @@ public class ErpOrderQueryController {
     public HttpResponse findRackOrderTypeList() {
         HttpResponse response = HttpResponse.success();
         try {
-            response.setData(ErpOrderTypeEnum.STORAGE_RACK_SELECT_LIST);
+//            response.setData(ErpOrderCategoryEnum.STORAGE_RACK_SELECT_LIST);
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {

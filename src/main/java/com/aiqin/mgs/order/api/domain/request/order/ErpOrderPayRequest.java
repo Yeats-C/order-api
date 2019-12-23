@@ -13,15 +13,12 @@ import lombok.Data;
 @Data
 public class ErpOrderPayRequest {
 
-    /***订单编号*/
     @ApiModelProperty(value = "订单编号")
     private String orderCode;
 
-    /***支付方式*/
     @ApiModelProperty(value = "支付方式")
     private Integer payWay;
 
-    /***物流券id，多个用逗号间隔*/
-    @ApiModelProperty(value = "物流券id")
+    @ApiModelProperty(value = "物流券唯一标识，多个用逗号间隔")
     private String couponIds;
 }

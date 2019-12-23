@@ -82,7 +82,7 @@ public class ErpOrderLogisticsServiceImpl implements ErpOrderLogisticsService {
     public void updateOrderLogistics(ErpOrderLogistics po, AuthToken auth) {
         po.setUpdateById(auth.getPersonId());
         po.setUpdateByName(auth.getPersonName());
-        Integer integer = erpOrderLogisticsDao.updateByPrimaryKeySelective(po);
+        Integer integer = erpOrderLogisticsDao.updateByPrimaryKey(po);
     }
 
 }
