@@ -14,6 +14,7 @@ public enum SequenceType {
     ORDER("order", "", "", "订单"),
     DISCOUNT_AMOUNT("discountAmount", "YH", "", "优惠额"),
     RETURN_REASON("returnReason","","","退货原因"),
+    ORDER_AFTER_SALE("orderAfterSale", "", "", "退货单编号"),
     LOGISTICS_REDUCTION("logisticsReduction","","","物流减免序号");
     /**
      * Redis key
