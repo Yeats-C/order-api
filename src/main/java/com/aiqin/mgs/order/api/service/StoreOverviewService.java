@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.service;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.domain.request.ProductOverViewReq;
 
 public interface StoreOverviewService {
 
@@ -68,4 +69,11 @@ public interface StoreOverviewService {
      * @return
      */
     HttpResponse storeProductOverView(String storeId);
+
+    /**
+     *  爱掌柜商品总库商品概览畅销滞销毛利排行
+     * @param productOverViewReq
+     * @return
+     */
+    HttpResponse productBaseUnInfo(ProductOverViewReq productOverViewReq);
 }
