@@ -1751,6 +1751,10 @@ public class OrderServiceImpl implements OrderService {
                     payReq.setOrderTime(orderInfo.getCreateTime());
                     payReq.setPayType(orderAndSoOnRequest.getOrderPayList().get(0).getPayType());
                     payReq.setOrderSource(orderInfo.getOrderType());
+                    payReq.setCreateName(orderInfo.getCashierName());
+                    payReq.setStoreName(orderInfo.getDistributorName());
+                    payReq.setCreateBy(orderInfo.getCashierId());
+                    payReq.setFranchiseeId(orderInfo.getDistributorId());
                     payService.doPay(payReq);
                 }
             }
