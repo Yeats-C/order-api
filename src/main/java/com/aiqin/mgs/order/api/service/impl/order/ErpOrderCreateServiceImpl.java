@@ -6,15 +6,12 @@ import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.ProductInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
-import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.OrderConfirmResponse;
-import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
 import com.aiqin.mgs.order.api.service.CartOrderService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
@@ -26,9 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 创建订单service
@@ -262,7 +256,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         for (CartOrderInfo item :
                 cartProductList) {
             //获取商品详情
-            ProductInfo product = erpOrderRequestService.getProductDetail(item.getSpuId(), item.getSkuCode());
+            ProductInfo product = erpOrderRequestService.getSkuDetail(storeInfo.getCompanyCode(), item.getSkuCode());
             if (product == null) {
                 throw new BusinessException("未获取到商品" + item.getProductName() + "的信息");
             }
@@ -285,6 +279,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             orderItem.setSkuCode(productInfo.getSkuCode());
             //sku名称
             orderItem.setSkuName(productInfo.getSkuName());
+            //条形码
+            orderItem.setBarCode(productInfo.getBarCode());
             //图片地址
             orderItem.setPictureUrl(productInfo.getPictureUrl());
             //规格
@@ -703,7 +699,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             }
 
             //获取商品详情
-            ProductInfo product = erpOrderRequestService.getProductDetail(item.getSpuCode(), item.getSkuCode());
+            ProductInfo product = erpOrderRequestService.getSkuDetail(storeInfo.getCompanyCode(), item.getSkuCode());
             if (product == null) {
                 throw new BusinessException("第" + lineIndex + "行商品不存在");
             }
@@ -726,6 +722,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             orderItem.setSkuCode(productInfo.getSkuCode());
             //sku名称
             orderItem.setSkuName(productInfo.getSkuName());
+            //条形码
+            orderItem.setBarCode(productInfo.getBarCode());
             //图片地址
             orderItem.setPictureUrl(productInfo.getPictureUrl());
             //规格

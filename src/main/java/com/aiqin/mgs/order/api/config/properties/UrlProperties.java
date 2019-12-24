@@ -36,5 +36,6 @@ public class UrlProperties {
      * 营运中心api
      */
     private String omsApi;
+    private String marketApi;
 
 }

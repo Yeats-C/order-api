@@ -1,12 +1,10 @@
 package com.aiqin.mgs.order.api.component.enums;
 
-import com.aiqin.mgs.order.api.domain.EnumItemInfo;
+import com.aiqin.mgs.order.api.domain.SelectOptionItem;
 import lombok.Getter;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 支付状态枚举类
@@ -37,29 +35,21 @@ public enum ErpPayStatusEnum {
         this.desc = desc;
     }
 
-    /***选项类型*/
-    public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
-    /***value-enum map*/
-    public static final Map<String, ErpPayStatusEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
-
-    static {
-        for (ErpPayStatusEnum item :
-                ErpPayStatusEnum.values()) {
-            SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
-            VALUE_ENUM_MAP.put(item.getValue(), item);
-        }
-    }
-
     public static ErpPayStatusEnum getEnum(Object object) {
         if (object != null) {
-            return VALUE_ENUM_MAP.get(object.toString());
+            for (ErpPayStatusEnum item :
+                    ErpPayStatusEnum.values()) {
+                if (item.getValue().equals(object.toString())) {
+                    return item;
+                }
+            }
         }
         return null;
     }
 
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            ErpPayStatusEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            ErpPayStatusEnum anEnum = getEnum(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
             }
@@ -67,10 +57,12 @@ public enum ErpPayStatusEnum {
         return "";
     }
 
-    public static boolean exist(Object object) {
-        if (object != null) {
-            return VALUE_ENUM_MAP.containsKey(object.toString());
+    public static List<SelectOptionItem> getSelectOptionList() {
+        List<SelectOptionItem> list = new ArrayList<>();
+        for (ErpPayStatusEnum item :
+                ErpPayStatusEnum.values()) {
+            list.add(new SelectOptionItem(item.getValue(), item.getDesc()));
         }
-        return false;
+        return list;
     }
 }

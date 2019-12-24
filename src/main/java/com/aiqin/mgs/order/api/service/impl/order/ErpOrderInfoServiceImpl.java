@@ -6,12 +6,10 @@ import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.ProductInfo;
 import com.aiqin.mgs.order.api.domain.po.order.*;
-import com.aiqin.mgs.order.api.domain.request.order.ErpOrderDeliverRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderEditRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
-import com.aiqin.mgs.order.api.util.OrderPublic;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -159,7 +156,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             if (item.getQuantity() == null) {
                 throw new BusinessException("赠品行第" + lineIndex + "行缺少数量");
             }
-            ProductInfo product = erpOrderRequestService.getProductDetail(item.getSkuCode(), item.getSkuCode());
+            ProductInfo product = erpOrderRequestService.getSkuDetail(order.getCompanyCode(), item.getSkuCode());
             if (product == null) {
                 throw new BusinessException("赠品行第" + lineIndex + "行商品未找到");
             }
@@ -173,6 +170,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             orderItem.setSkuCode(product.getSkuCode());
             //sku名称
             orderItem.setSkuName(product.getSkuName());
+            //条形码
+            orderItem.setBarCode(product.getBarCode());
             //图片地址
             orderItem.setPictureUrl(product.getPictureUrl());
             //规格
@@ -261,7 +260,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 //            for (OrderStoreOrderProductItem item :
 //                    orderItemList) {
 //                if (!skuProductMap.containsKey(item.getSkuCode())) {
-//                    ProductInfo productInfo = erpOrderRequestService.getProductDetail(order.getStoreId(), item.getProductId(), item.getSkuCode());
+//                    ProductInfo productInfo = erpOrderRequestService.getSkuDetail(order.getStoreId(), item.getProductId(), item.getSkuCode());
 //                    if (productInfo == null) {
 //                        throw new BusinessException("未找到商品" + item.getProductName() + item.getSkuName());
 //                    }

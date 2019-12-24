@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.service.order;
 
+import com.aiqin.mgs.order.api.component.enums.ErpOrderLockStockTypeEnum;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
@@ -30,7 +31,17 @@ public interface ErpOrderRequestService {
      */
     StoreInfo getStoreInfoByStoreId(String storeId);
 
-    ProductInfo getProductDetail(String spuCode, String skuCode);
+    /**
+     * 查询sku详情
+     *
+     * @param companyCode 公司编码
+     * @param skuCode     锁库编码
+     * @return com.aiqin.mgs.order.api.domain.ProductInfo
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/23 15:06
+     */
+    ProductInfo getSkuDetail(String companyCode, String skuCode);
 
     /**
      * 锁库存
@@ -46,13 +57,14 @@ public interface ErpOrderRequestService {
     /**
      * 解锁库存
      *
-     * @param order
+     * @param order                  订单信息
+     * @param orderLockStockTypeEnum 操作类型
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/10 13:38
      */
-    void unlockStockInSupplyChain(ErpOrderInfo order);
+    void unlockStockInSupplyChain(ErpOrderInfo order, ErpOrderLockStockTypeEnum orderLockStockTypeEnum);
 
     /**
      * 根据支付id获取订单支付状态
@@ -90,7 +102,7 @@ public interface ErpOrderRequestService {
     boolean sendLogisticsPayRequest(ErpOrderLogistics orderLogistics, ErpOrderPay orderPay);
 
     /**
-     * 获取物流券
+     * 支付成功获取返还物流券金额
      *
      * @param order 订单信息
      * @return java.math.BigDecimal
@@ -122,7 +134,7 @@ public interface ErpOrderRequestService {
      * @date 2019/12/3 17:26
      */
     boolean sendSplitOrderToSupplyChain(ErpOrderInfo order, List<ErpOrderInfo> splitOrderList);
-    
+
     /**
      * 请求供应链取消订单
      *

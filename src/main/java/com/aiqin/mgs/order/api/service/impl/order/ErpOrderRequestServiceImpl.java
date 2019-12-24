@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.service.impl.order;
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderLockStockTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.ProductInfo;
@@ -13,9 +14,11 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
 import com.aiqin.mgs.order.api.domain.response.ProductSkuDetailResponse;
+import com.aiqin.mgs.order.api.domain.response.order.ErpOrderGoodsCouponResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
 import com.aiqin.mgs.order.api.domain.response.order.StoreFranchiseeInfoResponse;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
+import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.alibaba.fastjson.JSON;
@@ -68,7 +71,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     }
 
     @Override
-    public ProductInfo getProductDetail(String spuCode, String skuCode) {
+    public ProductInfo getSkuDetail(String companyCode, String skuCode) {
 
         String url = urlProperties.getProductApi() + "/search/spu/sku/detail";
         url += "?companyCode=09";
@@ -139,7 +142,72 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     }
 
     @Override
-    public void unlockStockInSupplyChain(ErpOrderInfo order) {
+    public void unlockStockInSupplyChain(ErpOrderInfo order, ErpOrderLockStockTypeEnum orderLockStockTypeEnum) {
+
+        String personId = "";
+        String personName = "";
+
+        String url = urlProperties.getProductApi() + "/stock/change";
+
+        Map<String, Object> paramMap = new HashMap<>(16);
+        paramMap.put("operation_person_id", personId);
+        paramMap.put("operation_person_name", personName);
+        paramMap.put("order_code", order.getOrderStoreCode());
+//        paramMap.put("order_type", null);
+        paramMap.put("order_vo", order.getOrderStoreCode());
+
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (ErpOrderItem item :
+                order.getItemList()) {
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("company_code", item.getCompanyCode());
+            map.put("company_name", item.getCompanyName());
+//            map.put("new_delivery_code", null);
+//            map.put("new_delivery_name", null);
+//            map.put("new_purchase_amount", null);
+//            map.put("purchase_group_code", null);
+//            map.put("purchase_group_name", null);
+            map.put("sku_code", item.getSkuCode());
+            map.put("sku_name", item.getSkuName());
+            map.put("tax_rate", item.getTaxRate());
+            map.put("transport_center_code", null);
+            map.put("transport_center_name", null);
+            map.put("warehouse_code", null);
+            map.put("warehouse_name", null);
+            map.put("warehouse_type", null);
+
+
+        }
+
+//        {
+//            "operation_person_id": "string",
+//                "operation_person_name": "string",
+//                "operation_type": 0,
+//                "order_code": "string",
+//                "order_type": 0,
+//                "stock_vo": [
+//            {
+//                "change_count": 0,
+//                    "company_code": "string",
+//                    "company_name": "string",
+//                    "new_delivery_code": "string",
+//                    "new_delivery_name": "string",
+//                    "new_purchase_amount": 0,
+//                    "purchase_group_code": "string",
+//                    "purchase_group_name": "string",
+//                    "sku_code": "string",
+//                    "sku_name": "string",
+//                    "tax_rate": 0,
+//                    "transport_center_code": "string",
+//                    "transport_center_name": "string",
+//                    "warehouse_code": "string",
+//                    "warehouse_name": "string",
+//                    "warehouse_type": "string"
+//            }
+//  ]
+//        }
+
 
     }
 
@@ -185,14 +253,47 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public BigDecimal getGoodsCoupon(ErpOrderInfo order) {
-        BigDecimal goodsCoupon = null;
+        BigDecimal goodsCoupon = BigDecimal.ZERO;
         try {
-            //TODO CT 获取本次支付成功返回物流券
-//            Map<String, Object> paramMap = new HashMap<>();
-//            HttpClient httpClient = HttpClient.post(urlProperties.getPaymentApi() + "/test").json(paramMap);
-//            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
-//            });
-            goodsCoupon = BigDecimal.TEN;
+
+            Map<String, Object> paramMap = new HashMap<>(16);
+            List<Map<String, Object>> list = new ArrayList<>();
+            for (ErpOrderItem item :
+                    order.getItemList()) {
+                Map<String, Object> paramItemMap = new HashMap<>(4);
+                paramItemMap.put("skuCode", item.getSkuCode());
+                paramItemMap.put("price", item.getTotalPreferentialAmount());
+                list.add(paramItemMap);
+            }
+            paramMap.put("franchiseeId", order.getFranchiseeId());
+            paramMap.put("logisticsVoucherModel", list);
+            paramMap.put("orderId", order.getOrderStoreId());
+
+//            Map<String, Object> paramMap2 = new HashMap<>(16);
+//            List<Map<String, Object>> list2 = new ArrayList<>();
+//            Map<String, Object> paramItemMap2 = new HashMap<>(4);
+//            paramItemMap2.put("skuCode", "1003");
+//            paramItemMap2.put("price", "2634");
+//            list2.add(paramItemMap2);
+//
+//            Map<String, Object> paramItemMap3 = new HashMap<>(4);
+//            paramItemMap3.put("skuCode", "1004");
+//            paramItemMap3.put("price", "1234");
+//            list2.add(paramItemMap3);
+//
+//            paramMap2.put("franchiseeId", "1001");
+//            paramMap2.put("logisticsVoucherModel", list2);
+//            paramMap2.put("orderId", "1002");
+
+
+            HttpClient httpClient = HttpClient.post(urlProperties.getMarketApi() + "//logisticsVoucher/getBySkuCodes").json(paramMap);
+            HttpResponse<ErpOrderGoodsCouponResponse> response = httpClient.action().result(new TypeReference<HttpResponse<ErpOrderGoodsCouponResponse>>() {
+            });
+
+            if (!RequestReturnUtil.validateHttpResponse(response)) {
+                throw new BusinessException("获取返还物流券失败");
+            }
+            goodsCoupon = response.getData().getMoney();
         } catch (Exception e) {
             logger.error("获取返回物流券失败：{}", e);
         }

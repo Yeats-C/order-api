@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.component.enums;
 
 import com.aiqin.mgs.order.api.domain.EnumItemInfo;
+import com.aiqin.mgs.order.api.domain.SelectOptionItem;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -75,34 +76,34 @@ public enum ErpOrderStatusEnum {
         this.remark = remark;
     }
 
-    /***选项类型*/
-    public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
-    /***value-enum map*/
-    public static final Map<String, ErpOrderStatusEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
-
-    static {
-        for (ErpOrderStatusEnum item :
-                ErpOrderStatusEnum.values()) {
-            SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
-            VALUE_ENUM_MAP.put(item.getValue(), item);
-        }
-    }
-
     public static ErpOrderStatusEnum getEnum(Object object) {
         if (object != null) {
-            return VALUE_ENUM_MAP.get(object.toString());
+            for (ErpOrderStatusEnum item :
+                    ErpOrderStatusEnum.values()) {
+                if (item.getValue().equals(object.toString())) {
+                    return item;
+                }
+            }
         }
         return null;
     }
 
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            ErpOrderStatusEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
-            if (anEnum != null) {
-                return anEnum.getDesc();
+            ErpOrderStatusEnum orderStatusEnum = getEnum(object);
+            if (orderStatusEnum != null) {
+                return orderStatusEnum.getDesc();
             }
         }
         return "";
     }
-    
+
+    public static List<SelectOptionItem> getSelectOptionList() {
+        List<SelectOptionItem> list = new ArrayList<>();
+        for (ErpOrderStatusEnum item :
+                ErpOrderStatusEnum.values()) {
+            list.add(new SelectOptionItem(item.getValue(), item.getDesc()));
+        }
+        return list;
+    }
 }
