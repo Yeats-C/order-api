@@ -85,6 +85,7 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="source_type" property="sourceType" jdbcType="BIT" />
     <result column="return_money_type" property="returnMoneyType" jdbcType="BIT" />
+    <result column="order_category" property="orderCategory" jdbcType="BIT" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, return_order_id, return_order_code, order_store_code, company_code, company_name,
@@ -102,7 +103,7 @@
     discount_amount_infos, store_id, store_code, store_name, nature_code, nature_name,
     review_remark, review_operator, refund_status, process_type, remark, use_status,
     create_by_id, create_by_name, update_by_id, update_by_name, create_time, update_time,
-    source_type, return_money_type
+    source_type, return_money_type, order_category
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
@@ -367,6 +368,9 @@
       <if test="returnMoneyType != null" >
         return_money_type,
       </if>
+      <if test="orderCategory != null" >
+        order_category,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -618,6 +622,9 @@
       <if test="returnMoneyType != null" >
         #{returnMoneyType,jdbcType=BIT},
       </if>
+      <if test="orderCategory != null" >
+        #{orderCategory,jdbcType=BIT},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.ReturnOrderInfo" >
@@ -868,6 +875,9 @@
       </if>
       <if test="returnMoneyType != null" >
         return_money_type = #{returnMoneyType,jdbcType=BIT},
+      </if>
+      <if test="orderCategory != null" >
+        order_category=#{orderCategory,jdbcType=BIT},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
