@@ -45,18 +45,23 @@ public class ErpOrderInfo {
     /***供应商名称*/
     private String supplierName;
     /***仓库编码*/
+    @ApiModelProperty(value="仓库编码")
     private String transportCenterCode;
     /***仓库名称*/
+    @ApiModelProperty(value="仓库名称")
     private String transportCenterName;
     /***库房编码*/
+    @ApiModelProperty(value="库房编码")
     private String warehouseCode;
     /***库房名称*/
+    @ApiModelProperty(value="库房名称")
     private String warehouseName;
     /***客户编码*/
     private String customerCode;
     /***客户名称*/
     private String customerName;
     /***订单状态*/
+    @ApiModelProperty(value="订单状态")
     private Integer orderStatus;
     /***是否锁定(0是1否）*/
     private Integer orderLock;
@@ -120,7 +125,7 @@ public class ErpOrderInfo {
     private Date transportTime;
     /***发运状态*/
     private Integer transportStatus;
-    /***发运时间 TODO ？*/
+    /***发运时间*/
     private Date receiveTime;
     /***发票类型 1不开 2增普 3增专*/
     private Integer invoiceType;
@@ -197,6 +202,7 @@ public class ErpOrderInfo {
     /***订单物流信息*/
     private ErpOrderLogistics orderLogistics;
     /***订单商品明细*/
+    @ApiModelProperty(value="订单商品明细行")
     private List<ErpOrderItem> itemList;
     /***订单日志*/
     private List<ErpOrderOperationLog> operationLogList;

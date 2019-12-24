@@ -8,16 +8,16 @@ import com.aiqin.mgs.order.api.base.ConstantData;
 import com.aiqin.mgs.order.api.component.SequenceService;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
-import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
-import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
-import com.aiqin.mgs.order.api.domain.*;
-import com.aiqin.mgs.order.api.domain.request.bill.RejectRecordReq;
+import com.aiqin.mgs.order.api.dao.returnOrder.ReturnOrderDetailDao;
+import com.aiqin.mgs.order.api.dao.returnOrder.ReturnOrderInfoDao;
+import com.aiqin.mgs.order.api.domain.CouponApprovalDetail;
+import com.aiqin.mgs.order.api.domain.CouponApprovalInfo;
+import com.aiqin.mgs.order.api.domain.ReturnOrderDetail;
+import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailVO;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReqVo;
-import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewApiReqVo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
-import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
-import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
+import com.aiqin.mgs.order.api.service.returnOrder.ReturnOrderInfoService;
 import com.aiqin.platform.flows.client.constant.AjaxJson;
 import com.aiqin.platform.flows.client.constant.FormUpdateUrlType;
 import com.aiqin.platform.flows.client.constant.StatusEnum;
@@ -34,7 +34,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -63,8 +62,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     private CouponApprovalInfoDao couponApprovalInfoDao;
     @Resource
     private CouponApprovalDetailDao couponApprovalDetailDao;
-    @Resource
-    private RejectRecordService rejectRecordService;
 
     @Override
     @Transactional
@@ -137,14 +134,13 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             case 3:
                 reqVo.setOperateStatus(98);
                 break;
-            default:
-                return false;
         }
         //修改退货单状态
         Integer review = returnOrderInfoDao.updateReturnStatus(reqVo);
         if (flag) {
             //todo 同步到供应链
-            createRejectRecord(reqVo.getReturnOrderId());
+
+
         }
         if (flag1) {
             log.info("驳回--进入A品券发放审批");
@@ -160,7 +156,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             approvalDetail.setCreator(reqVo.getUserName());
             approvalDetail.setRemark(reqVo.getReviewNote());
             approvalDetail.setFranchiseeId(reqVo.getFranchiseeId());
-            approvalDetail.setOrderId(reqVo.getReturnOrderId());
             couponApprovalDetailDao.insertSelective(approvalDetail);
             log.info("同步审批信息到本地完成");
             //A品券发放审批申请提交
@@ -191,26 +186,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 returnOrderDetailDao.insertBatch(details);
                 return true;
             }
-        }
-        return false;
-    }
-
-    @Override
-    @Transactional
-    public Boolean updateReturnStatusApi(ReturnOrderReviewApiReqVo reqVo) {
-        ReturnOrderReviewReqVo re=new ReturnOrderReviewReqVo();
-        BeanUtils.copyProperties(reqVo,re);
-        if(null!=reqVo.getReturnOrderDetail()){
-            // todo 修改实退数量
-        }
-        return returnOrderInfoDao.updateReturnStatus(re)>0;
-    }
-
-    @Override
-    public Boolean check(String orderCode) {
-        List<ReturnOrderInfo> returnOrderInfo = returnOrderInfoDao.selectByOrderId(orderCode);
-        if(CollectionUtils.isNotEmpty(returnOrderInfo)){
-            return true;
         }
         return false;
     }
@@ -295,49 +270,5 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         return HttpResponse.success();
     }
 
-    /**
-     * 调用供应链封装
-     * @param returnOrderId 退货单id
-     */
-    public void createRejectRecord(String returnOrderId){
-        log.info("供应链同步退货单开始,returnOrderId={}",returnOrderId);
-        RejectRecordReq rejectRecordReq=new RejectRecordReq();
-        //根据退货单id查询退货信息
-        ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderId(returnOrderId);
-        //根据退货单id查询退货详细信息
-        List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderId);
-        RejectRecord rejectRecord=new RejectRecord();
-        List<RejectRecordDetail> rejectRecordDetail=new ArrayList<>();
-        BeanUtils.copyProperties(returnOrderInfo,rejectRecord);
-        rejectRecord.setSettlementMethodCode(returnOrderInfo.getReturnMoneyType().toString());
-        if(null!=returnOrderInfo.getReturnMoneyType()){
-            //退款方式 1:现金 2:微信 3:支付宝 4:银联
-            switch (returnOrderInfo.getReturnMoneyType()) {
-                case 1:
-                    rejectRecord.setSettlementMethodName("现金");
-                    break;
-                case 2:
-                    rejectRecord.setSettlementMethodName("微信");
-                    break;
-                case 3:
-                    rejectRecord.setSettlementMethodName("支付宝");
-                    break;
-                case 4:
-                    rejectRecord.setSettlementMethodName("银联");
-                    break;
-            }
-        }
-        //todo 退供单状态
-//        rejectRecord.setRejectRecordStatus(1);
-        for(ReturnOrderDetail rod:returnOrderDetails){
-            RejectRecordDetail rrd=new RejectRecordDetail();
-            BeanUtils.copyProperties(rod,rrd);
-            rejectRecordDetail.add(rrd);
-        }
-        rejectRecordReq.setRejectRecord(rejectRecord);
-        rejectRecordReq.setRejectRecordDetail(rejectRecordDetail);
-        HttpResponse httpResponse=rejectRecordService.createRejectRecord(rejectRecordReq);
-        log.info("供应链同步退货单结束,httpResponse={}",httpResponse);
-    }
 
 }

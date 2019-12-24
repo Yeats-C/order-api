@@ -1,4 +1,4 @@
-package com.aiqin.mgs.order.api.dao.returnorder;
+package com.aiqin.mgs.order.api.dao.returnOrder;
 
 import com.aiqin.mgs.order.api.domain.ReturnOrderDetail;
 import org.apache.ibatis.annotations.Param;
@@ -17,8 +17,6 @@ public interface ReturnOrderDetailDao {
 
     int insertBatch(@Param("records") List<ReturnOrderDetail> records);
 
-    int deleteByReturnOrderCode(@Param("returnOrderCode") String returnOrderCode);
-
-    List<ReturnOrderDetail> selectListByReturnOrderCode(String returnOrderCode);
+    int deleteByReturnOrderCode(@Param("returnOrderCode")String returnOrderCode);
 
 }

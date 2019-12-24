@@ -1,12 +1,10 @@
 package com.aiqin.mgs.order.api.component.enums;
 
-import com.aiqin.mgs.order.api.domain.EnumItemInfo;
+import com.aiqin.mgs.order.api.domain.SelectOptionItem;
 import lombok.Getter;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 支付方式枚举
@@ -31,29 +29,21 @@ public enum ErpPayWayEnum {
         this.desc = desc;
     }
 
-    /***选项类型*/
-    public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
-    /***value-enum map*/
-    public static final Map<String, ErpPayWayEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
-
-    static {
-        for (ErpPayWayEnum item :
-                ErpPayWayEnum.values()) {
-            SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
-            VALUE_ENUM_MAP.put(item.getValue(), item);
-        }
-    }
-
     public static ErpPayWayEnum getEnum(Object object) {
         if (object != null) {
-            return VALUE_ENUM_MAP.get(object.toString());
+            for (ErpPayWayEnum item :
+                    ErpPayWayEnum.values()) {
+                if (item.getValue().equals(object.toString())) {
+                    return item;
+                }
+            }
         }
         return null;
     }
 
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            ErpPayWayEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            ErpPayWayEnum anEnum = getEnum(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
             }
@@ -63,9 +53,21 @@ public enum ErpPayWayEnum {
 
     public static boolean exist(Object object) {
         if (object != null) {
-            return VALUE_ENUM_MAP.containsKey(object.toString());
+            ErpPayWayEnum anEnum = getEnum(object.toString());
+            if (anEnum != null) {
+                return true;
+            }
         }
         return false;
+    }
+
+    public static List<SelectOptionItem> getSelectOptionList() {
+        List<SelectOptionItem> list = new ArrayList<>();
+        for (ErpPayWayEnum item :
+                ErpPayWayEnum.values()) {
+            list.add(new SelectOptionItem(item.getValue(), item.getDesc()));
+        }
+        return list;
     }
 
 }

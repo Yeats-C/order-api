@@ -39,6 +39,8 @@ public class ErpOrderItem {
     /***sku名称*/
     @ApiModelProperty(value = "sku名称")
     private String skuName;
+    @ApiModelProperty(value = "条形码")
+    private String barCode;
     /***图片地址*/
     @ApiModelProperty(value = "图片url")
     private String pictureUrl;

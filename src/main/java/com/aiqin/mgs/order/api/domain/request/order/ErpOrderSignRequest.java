@@ -15,7 +15,7 @@ public class ErpOrderSignRequest {
 
     /***订单编号*/
     @ApiModelProperty(value = "订单编号")
-    private String orderStoreCode;
+    private String orderCode;
     /***门店id*/
     @ApiModelProperty(value = "门店id")
     private String storeId;

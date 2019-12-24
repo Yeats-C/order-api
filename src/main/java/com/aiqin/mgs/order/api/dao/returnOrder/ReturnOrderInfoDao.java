@@ -1,4 +1,4 @@
-package com.aiqin.mgs.order.api.dao.returnorder;
+package com.aiqin.mgs.order.api.dao.returnOrder;
 
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
@@ -6,6 +6,11 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+/**
+ * @author jinghaibo
+ * Date: 2019/12/24 12:57
+ * Description:
+ */
 public interface ReturnOrderInfoDao {
 
     int deleteByPrimaryKey(Long id);
@@ -14,15 +19,11 @@ public interface ReturnOrderInfoDao {
 
     ReturnOrderInfo selectByPrimaryKey(Long id);
 
-    ReturnOrderInfo selectByReturnOrderId(String returnOrderId);
-
     int updateByPrimaryKeySelective(ReturnOrderInfo record);
 
     List<ReturnOrderInfo> selectByOrderCodeAndStatus(@Param("orderStoreCode") String orderStoreCode, @Param("returnOrderStatus") Integer returnOrderStatus);
 
     Integer updateReturnStatus(ReturnOrderReviewReqVo reqVo);
 
-    //根据订单id查询是否生成了退货单，且未完成流程。这里订单状态不为12-退款完成，97-退货终止，98-审核不通过，99-已取消
-    List<ReturnOrderInfo> selectByOrderId(@Param("orderStoreCode")String orderStoreCode);
 
 }

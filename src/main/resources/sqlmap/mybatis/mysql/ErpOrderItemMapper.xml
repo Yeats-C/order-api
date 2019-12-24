@@ -13,6 +13,7 @@
         spu_name as spuName,
         sku_code as skuCode,
         sku_name as skuName,
+        bar_code as barCode,
         picture_url as pictureUrl,
         product_spec as productSpec,
         color_code as colorCode,
@@ -105,7 +106,7 @@
     <insert id="insert">
         insert into order_store_detail(order_info_detail_id, order_store_id, order_store_code, spu_code, spu_name,
                                        sku_code,
-                                       sku_name, picture_url, product_spec, color_code, color_name, model_code,
+                                       sku_name,bar_code, picture_url, product_spec, color_code, color_name, model_code,
                                        unit_code,
                                        unit_name, zero_disassembly_coefficient, product_type, product_count,
                                        product_amount,
@@ -116,7 +117,7 @@
                                        create_by_id, create_by_name, update_by_id, update_by_name, create_time,
                                        update_time)
         values (#{orderInfoDetailId}, #{orderStoreId}, #{orderStoreCode}, #{spuCode}, #{spuName},
-                #{skuCode}, #{skuName}, #{pictureUrl}, #{productSpec}, #{colorCode}, #{colorName},
+                #{skuCode}, #{skuName}, #{barCode}, #{pictureUrl}, #{productSpec}, #{colorCode}, #{colorName},
                 #{modelCode}, #{unitCode}, #{unitName}, #{zeroDisassemblyCoefficient}, #{productType},
                 #{productCount}, #{productAmount}, #{purchaseAmount}, #{totalProductAmount},
                 #{actualTotalProductAmount}, #{totalPreferentialAmount}, #{totalAcivityAmount},
