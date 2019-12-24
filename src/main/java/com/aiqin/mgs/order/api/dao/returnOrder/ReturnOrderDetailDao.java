@@ -17,6 +17,8 @@ public interface ReturnOrderDetailDao {
 
     int insertBatch(@Param("records") List<ReturnOrderDetail> records);
 
-    int deleteByReturnOrderCode(@Param("returnOrderCode")String returnOrderCode);
+    int deleteByReturnOrderCode(@Param("returnOrderCode") String returnOrderCode);
+
+    List<ReturnOrderDetail> selectListByReturnOrderCode(String returnOrderCode);
 
 }
