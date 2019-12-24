@@ -78,5 +78,12 @@ public class ReturnOrderInfoController {
         return new HttpResponse<>(review);
     }
 
+    @ApiOperation("更新物流单信息（向爱掌柜提供接口）")
+    @PostMapping("/updateLogistics")
+    public HttpResponse<Boolean> updateLogistics(String returnOrderCode,String logisticsCompanyCode,String logisticsCompanyName,String logisticsNo) {
+        Boolean review = returnOrderInfoService.updateLogistics(returnOrderCode,logisticsCompanyCode,logisticsCompanyName,logisticsNo);
+        return new HttpResponse<>(review);
+    }
+
 
 }

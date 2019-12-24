@@ -22,6 +22,8 @@ public interface ReturnOrderInfoDao {
 
     Integer updateReturnStatus(ReturnOrderReviewReqVo reqVo);
 
+    Integer updateLogistics(@Param("orderStoreCode") String orderStoreCode,@Param("logisticsCompanyCode") String logisticsCompanyCode,@Param("logisticsCompanyName") String logisticsCompanyName,@Param("logisticsCode") String logisticsCode);
+
     //根据订单id查询是否生成了退货单，且未完成流程。这里订单状态不为12-退款完成，97-退货终止，98-审核不通过，99-已取消
     List<ReturnOrderInfo> selectByOrderId(@Param("orderStoreCode") String orderStoreCode);
 
