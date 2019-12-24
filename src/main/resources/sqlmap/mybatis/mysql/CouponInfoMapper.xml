@@ -139,4 +139,19 @@
         where id = #{id,jdbcType=INTEGER}
     </update>
 
+    <insert id="insertBatch" parameterType="list">
+        insert into coupon_info (order_id, franchisee_id,
+        coupon_code, coupon_type, coupon_name,
+        nominal_value, validity_start_time, validity_end_time)
+        values
+        <foreach collection="records" item="item" index="index" separator=",">
+            (
+            #{item.orderId,jdbcType=VARCHAR}, #{item.franchiseeId,jdbcType=VARCHAR},
+            #{item.couponCode,jdbcType=VARCHAR}, #{item.couponType,jdbcType=INTEGER},
+            #{item.couponName,jdbcType=VARCHAR},#{item.nominalValue,jdbcType=DECIMAL},
+            #{item.validityStartTime,jdbcType=TIMESTAMP}, #{item.validityEndTime,jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
 </mapper>

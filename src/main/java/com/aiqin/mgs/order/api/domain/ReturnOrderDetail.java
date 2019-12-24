@@ -110,4 +110,7 @@ public class ReturnOrderDetail {
     @ApiModelProperty(value = "修改时间")
     private Date updateTime;
 
+    @ApiModelProperty(value = "问题描述")
+    private String remark;
+
 }

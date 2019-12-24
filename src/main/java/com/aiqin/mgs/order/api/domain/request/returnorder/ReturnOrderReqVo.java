@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * description: ReturnOrderReqVo
+ * description: 退货单添加实体类
  * date: 2019/12/19 17:50
  * author: hantao
  * version: 1.0
@@ -35,15 +35,9 @@ public class ReturnOrderReqVo implements Serializable {
     @ApiModelProperty(value = "公司编码")
     private String companyCode;
 
-    @ApiModelProperty(value = "公司名称")
-    private String companyName;
-
     @NotBlank(message = "门店id不能为空")
     @ApiModelProperty(value = "门店id")
     private String storeId;
-
-    @ApiModelProperty(value = "门店名称")
-    private String storeName;
 
     @NotBlank(message = "门店编码不能为空")
     @ApiModelProperty(value = "门店编码")
@@ -65,6 +59,16 @@ public class ReturnOrderReqVo implements Serializable {
     @ApiModelProperty("仓库名称")
     private String warehouseName;
 
+    @NotBlank(message = "售后类型不能为空")
+    @ApiModelProperty(value = "退货类型  0客户退货、1缺货退货、2售后退货")
+    private Integer returnOrderType;
+
+    @ApiModelProperty(value = "公司名称")
+    private String companyName;
+
+    @ApiModelProperty(value = "门店名称")
+    private String storeName;
+
     @ApiModelProperty("配送中心编码")
     private String transportCenterCode;
 
@@ -73,10 +77,6 @@ public class ReturnOrderReqVo implements Serializable {
 
     @ApiModelProperty(value = "售后备注信息")
     private String remark;
-
-    @NotBlank(message = "售后类型不能为空")
-    @ApiModelProperty(value = "退货类型  0客户退货、1缺货退货、2售后退货")
-    private Integer returnOrderType;
 
     @ApiModelProperty(value = "处理方式，0-整单退、1-部分退")
     private Integer processType;

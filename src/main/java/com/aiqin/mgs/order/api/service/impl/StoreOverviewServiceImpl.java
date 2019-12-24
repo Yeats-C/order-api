@@ -4,6 +4,8 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.dao.StoreOverviewDao;
 import com.aiqin.mgs.order.api.domain.constant.Global;
+import com.aiqin.mgs.order.api.domain.request.ProductOverViewReq;
+import com.aiqin.mgs.order.api.domain.response.ProductBaseUnResp;
 import com.aiqin.mgs.order.api.domain.response.ProductLabelStatusResp;
 import com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateDaily;
 import com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateResp;
@@ -230,5 +232,15 @@ public class StoreOverviewServiceImpl implements StoreOverviewService {
         }
         ProductLabelStatusResp psr = storeOverviewDao.selectProductCountByStoreId(storeId);
         return HttpResponse.success(psr);
+    }
+
+    @Override
+    public HttpResponse productBaseUnInfo(ProductOverViewReq productOverViewReq) {
+
+        if(StringUtils.isEmpty(productOverViewReq.getStoreId()) && productOverViewReq.getProductStatus() != null){
+            return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER,"storeId="+productOverViewReq.getStoreId()+",status="+productOverViewReq.getProductStatus());
+        }
+        List<ProductBaseUnResp> productBaseUnResps = storeOverviewDao.productBaseUnInfo(productOverViewReq);
+        return HttpResponse.success(productBaseUnResps);
     }
 }

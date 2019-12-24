@@ -6,12 +6,13 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 @Data
 @ApiModel("虚拟资产")
-public class FranchiseeAsset {
+public class FranchiseeAsset implements Serializable {
 
     private Long id;
 

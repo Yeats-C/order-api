@@ -6,6 +6,11 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+/**
+ * @author jinghaibo
+ * Date: 2019/12/24 12:57
+ * Description:
+ */
 public interface ReturnOrderInfoDao {
 
     int deleteByPrimaryKey(Long id);

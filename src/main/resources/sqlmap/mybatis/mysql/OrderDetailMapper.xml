@@ -379,7 +379,7 @@
         FROM
         order_consumer_detail a
         LEFT JOIN order_consumer_info b ON a.order_id=b.order_id
-        where 1=1 and order_type = 1
+        where 1=1
         <if test="memberidList != null">
             and b.member_id in (
             <foreach collection="memberidList" item="member_id" separator=",">
@@ -497,7 +497,7 @@
          actual_price = #{actualPrice},
          update_time = now(),
          update_by = #{updateBy,jdbcType=VARCHAR}
-         where order_code =#{orderCode}
+         where order_code =#{orderCode} and order_detail_id=#{orderDetailId}
      </update>
 
     <!--顾客可能还想购买-->

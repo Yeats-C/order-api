@@ -368,7 +368,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
                         public void run() {
 
                             //请求供应链解锁库存
-                            erpOrderRequestService.unlockStockInSupplyChain(order);
+                            erpOrderRequestService.unlockStockInSupplyChain(order, ErpOrderLockStockTypeEnum.UNLOCK);
 
                             unlockStockService.shutdown();
                         }

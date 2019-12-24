@@ -1,5 +1,7 @@
 package com.aiqin.mgs.order.api.dao;
 
+import com.aiqin.mgs.order.api.domain.request.ProductOverViewReq;
+import com.aiqin.mgs.order.api.domain.response.ProductBaseUnResp;
 import com.aiqin.mgs.order.api.domain.response.ProductLabelStatusResp;
 import com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateDaily;
 import com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateYearMonth;
@@ -153,4 +155,11 @@ public interface StoreOverviewDao {
      * @return
      */
     ProductLabelStatusResp selectProductCountByStoreId(@Param("storeId") String storeId);
+
+    /**
+     *  商品概览（畅销滞销毛利排行）
+     * @param productOverViewReq
+     * @return
+     */
+    List<ProductBaseUnResp> productBaseUnInfo(ProductOverViewReq productOverViewReq);
 }
