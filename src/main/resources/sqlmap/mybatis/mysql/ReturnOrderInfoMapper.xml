@@ -922,4 +922,16 @@
     where order_store_code = #{orderStoreCode,jdbcType=VARCHAR} and return_order_status not in (12,97,98,99)
   </select>
 
+  <update id="updateLogistics">
+    update return_order_info
+    set
+    logistics_company_code = #{logisticsCompanyCode,jdbcType=VARCHAR},
+    logistics_company_name = #{logisticsCompanyName,jdbcType=VARCHAR},
+    logistics_code = #{logisticsCode,jdbcType=VARCHAR}
+    where return_order_code=#{orderStoreCode,jdbcType=VARCHAR}
+  </update>
+
+
+
+
 </mapper>

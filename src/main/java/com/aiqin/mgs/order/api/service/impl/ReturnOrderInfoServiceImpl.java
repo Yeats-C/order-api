@@ -12,17 +12,17 @@ import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.request.bill.RejectRecordReq;
-import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailVO;
-import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReqVo;
-import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewApiReqVo;
-import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
+import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
+import com.aiqin.mgs.order.api.util.URLConnectionUtil;
 import com.aiqin.platform.flows.client.constant.AjaxJson;
 import com.aiqin.platform.flows.client.constant.FormUpdateUrlType;
 import com.aiqin.platform.flows.client.constant.StatusEnum;
 import com.aiqin.platform.flows.client.domain.vo.ActBaseProcessEntity;
 import com.aiqin.platform.flows.client.domain.vo.StartProcessParamVO;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -52,6 +52,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 
     @Value("${activiti.host}")
     private String activitiHost;
+
+    @Value("${bridge.url.pay-api}")
+    private String paymentHost;
 
     @Autowired
     private ReturnOrderInfoDao returnOrderInfoDao;
@@ -215,6 +218,12 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         return false;
     }
 
+    @Override
+    public Boolean updateLogistics(String returnOrderCode, String logisticsCompanyCode, String logisticsCompanyName, String logisticsNo) {
+        int res=returnOrderInfoDao.updateLogistics(returnOrderCode,logisticsCompanyCode,logisticsCompanyName,logisticsNo);
+        return res>0;
+    }
+
     /**
      * 生成16位唯一性的审批编码
      * @return
@@ -339,5 +348,44 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         HttpResponse httpResponse=rejectRecordService.createRejectRecord(rejectRecordReq);
         log.info("供应链同步退货单结束,httpResponse={}",httpResponse);
     }
+
+    /**
+     * 发起退款
+     * @param payRequest
+     */
+//    public void refund(PayRequest payRequest){
+//        log.info("发起退款单申请，payRequest={}",payRequest);
+//        String url=paymentHost+"/payment/pay/payTobAll";
+//        JSONObject json=new JSONObject();
+//        json.put("order_no",franchiseeAssets);
+//        json.put("order_amount",franchiseeAssets);
+//        json.put("fee",franchiseeAssets);
+//        json.put("order_time",franchiseeAssets);
+//        json.put("pay_type",franchiseeAssets);
+//        json.put("order_source",franchiseeAssets);
+//        json.put("create_by",franchiseeAssets);
+//        json.put("update_by",franchiseeAssets);
+//        json.put("pay_origin_type",franchiseeAssets);
+//        json.put("order_type",franchiseeAssets);
+//        json.put("franchisee_id",franchiseeAssets);
+//        json.put("store_name",franchiseeAssets);
+//        json.put("store_id",franchiseeAssets);
+//        json.put("transactionType","RETURN_REFUND");
+//        json.put("pay_order_type",franchiseeAssets);
+//        json.put("back_url",franchiseeAssets);
+//        String request= URLConnectionUtil.doPost(url,null,json);
+//        log.info("发起退款单申请，request={}",request);
+//        if(StringUtils.isNotBlank(request)){
+//            JSONObject jsonObject= JSON.parseObject(request);
+//            if(jsonObject.containsKey("code")&&"0".equals(jsonObject.getString("code"))){
+//                log.info("A品券虚拟资产同步成功，修改退货单状态");
+//                ReturnOrderReviewReqVo reqVo=new ReturnOrderReviewReqVo();
+//                reqVo.setReturnOrderId(couponApprovalDetail.getOrderId());
+//                reqVo.setOperateStatus(ConstantData.returnOrderSuccess);
+//                returnOrderInfoDao.updateReturnStatus(reqVo);
+//                log.info("退款完成");
+//            }
+//        }
+//    }
 
 }
