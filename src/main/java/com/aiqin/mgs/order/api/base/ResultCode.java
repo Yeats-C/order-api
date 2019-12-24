@@ -70,7 +70,8 @@ public interface ResultCode {
 
     String CART = "购物车";
     String ORDER = "订单";
-    
+
+    MessageId OPT_ERROR = MessageId.create(Project.ZERO, 28, "操作失败");
     
     
     /** 黄祉壹   2018-11-05 结束     */
