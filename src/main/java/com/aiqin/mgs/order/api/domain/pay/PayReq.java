@@ -46,7 +46,7 @@ public class PayReq implements Serializable {
 
     @ApiModelProperty("订单手续费--不传")
     @JsonProperty("fee")
-    private Long fee;
+    private Long fee=0L;
     @ApiModelProperty("下单时间")
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonProperty("order_time")
@@ -59,7 +59,7 @@ public class PayReq implements Serializable {
     private String openid;
     @ApiModelProperty("订单来源（0:pos 1：微商城  2：全部  3：web ）")
     @JsonProperty("order_source")
-    private Integer orderSource;
+    private Integer orderSource=3;
     @ApiModelProperty("支付授权码---扫码枪扫码，主扫不传")
     @JsonProperty("auth_code")
     private String authCode;
