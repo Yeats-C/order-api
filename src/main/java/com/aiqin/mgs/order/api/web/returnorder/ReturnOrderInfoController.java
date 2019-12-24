@@ -1,11 +1,11 @@
-package com.aiqin.mgs.order.api.web;
+package com.aiqin.mgs.order.api.web.returnorder;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailVO;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReqVo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewApiReqVo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
-import com.aiqin.mgs.order.api.service.ReturnOrderInfoService;
+import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -68,6 +68,13 @@ public class ReturnOrderInfoController {
     @PostMapping("/updateStatusApi")
     public HttpResponse<Boolean> updateReturnStatusApi(@RequestBody ReturnOrderReviewApiReqVo reqVo) {
         Boolean review = returnOrderInfoService.updateReturnStatusApi(reqVo);
+        return new HttpResponse<>(review);
+    }
+
+    @ApiOperation("退货单校验--查看此订单是否已经生成一条退货单，且流程未结束。如果已存在返回true")
+    @PostMapping("/check")
+    public HttpResponse<Boolean> check(String orderCode) {
+        Boolean review = returnOrderInfoService.check(orderCode);
         return new HttpResponse<>(review);
     }
 
