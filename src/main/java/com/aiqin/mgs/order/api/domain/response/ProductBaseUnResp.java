@@ -17,7 +17,7 @@ public class ProductBaseUnResp {
 
     @ApiModelProperty(value = "sku名称")
     @JsonProperty("sku_name")
-    private String sku_Name;
+    private String skuName;
 
     @ApiModelProperty(value = "畅销度")
     @JsonProperty("saleout_dgree")
