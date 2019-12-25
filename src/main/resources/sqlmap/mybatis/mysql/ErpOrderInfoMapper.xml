@@ -458,6 +458,9 @@
         <if test="orderStatus != null and orderStatus != '' or orderStatus == 0 ">
             and a1.order_status = #{orderStatus}
         </if>
+        <if test="orderLevel != null and orderLevel != '' or orderLevel == 0 ">
+            and a1.order_level = #{orderLevel}
+        </if>
         <if test="paymentStatus != null and paymentStatus != '' or paymentStatus == 0 ">
             and a1.payment_status = #{paymentStatus}
         </if>

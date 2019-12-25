@@ -404,6 +404,11 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Override
+    public HttpResponse orderCount(String skuCode, String storeId, int day) {
+        return HttpResponse.successGenerics(orderDao.querySaleSkuCount(skuCode,DateUtil.getBeforeDate(new Date(),day),storeId));
+    }
+
     private OrderQuery trans(OrderQuery orderQuery) {
         if (orderQuery.getOrderStatus() != null) {
             if (orderQuery.getOrderStatus() == 2) {

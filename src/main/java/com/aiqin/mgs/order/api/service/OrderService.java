@@ -212,4 +212,13 @@ public interface OrderService {
 	 * @return
 	 */
 	HttpResponse cashierQuery(CashierReqVo cashierReqVo);
+
+	/**
+	 * 订单中心获取近30天销量
+	 * @param skuCode
+	 * @param storeId
+	 * @param day
+	 * @return
+	 */
+    HttpResponse orderCount(String skuCode, String storeId, int day);
 }
