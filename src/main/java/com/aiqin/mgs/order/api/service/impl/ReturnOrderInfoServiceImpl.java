@@ -57,6 +57,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     @Value("${bridge.url.pay-api}")
     private String paymentHost;
 
+    @Value("${bridge.url.slcs_api}")
+    private String slcsHost;
+
     @Autowired
     private ReturnOrderInfoDao returnOrderInfoDao;
     @Autowired
@@ -412,7 +415,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             json.put("create_by",returnOrderInfo.getCityId());
             json.put("update_by",returnOrderInfo.getCreateByName());
             json.put("order_type",4);
-//            json.put("franchisee_id",franchiseeAssets);
+            //根据门店id获取加盟商id
+            String franchiseeId=getFranchiseeId(returnOrderInfo.getStoreId());
+            json.put("franchisee_id",franchiseeId);
             json.put("store_name",returnOrderInfo.getStoreName());
             json.put("store_id",returnOrderInfo.getStoreCode());
             Integer method=returnOrderInfo.getTreatmentMethod();
@@ -432,7 +437,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 json.put("pay_origin_type",6);
             }
             json.put("pay_order_type",returnOrderInfo.getOrderType());
-//            json.put("back_url",franchiseeAssets);
+            json.put("back_url","http://order.api.aiqin.com/returnOrder/callback");
             String request= URLConnectionUtil.doPost(url,null,json);
             log.info("发起退款单申请，request={}",request);
             if(StringUtils.isNotBlank(request)){
@@ -452,6 +457,26 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             }
         }
         return false;
+    }
+
+    /**
+     * 根据门店id获取加盟商id
+     * @param storeId
+     * @return
+     */
+    public String getFranchiseeId(String storeId){
+        log.info("根据门店id获取加盟商id,storeId={}",storeId);
+        String franchiseeId=null;
+        String url=slcsHost+"/store/getFranchiseeId?store_id="+storeId;
+        String request= URLConnectionUtil.doGet(url,null,null);
+        log.info("根据门店id获取加盟商id,request={}",request);
+        if(StringUtils.isNotBlank(request)){
+            JSONObject json=JSON.parseObject(request);
+            if(json.containsKey("code")&&"0".equals(json.get("code"))){
+                franchiseeId=json.getString("data");
+            }
+        }
+        return franchiseeId;
     }
 
 }
