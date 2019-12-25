@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -67,6 +68,23 @@ public class ErpSelectOptionController {
         HttpResponse response = HttpResponse.success();
         try {
             response.setData(ErpOrderStatusEnum.getSelectOptionList());
+        } catch (BusinessException e) {
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
+    }
+
+    @GetMapping("/findStoreOrderStatusTabList")
+    @ApiOperation(value = "爱掌柜查询订单列表tab页订单状态")
+    public HttpResponse findStoreOrderStatusTabList() {
+        HttpResponse response = HttpResponse.success();
+        try {
+            List<SelectOptionItem> list = new ArrayList<>();
+            list.add(new SelectOptionItem(ErpOrderStatusEnum.ORDER_STATUS_1.getValue(), ErpOrderStatusEnum.ORDER_STATUS_1.getDesc()));
+            list.add(new SelectOptionItem(ErpOrderStatusEnum.ORDER_STATUS_11.getValue(), ErpOrderStatusEnum.ORDER_STATUS_11.getDesc()));
+            response.setData(list);
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {
