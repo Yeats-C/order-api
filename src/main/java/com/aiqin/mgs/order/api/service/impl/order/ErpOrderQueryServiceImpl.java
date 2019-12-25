@@ -245,6 +245,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             if (secondaryOrderList != null && secondaryOrderList.size() > 0) {
                 for (ErpOrderInfo item :
                         secondaryOrderList) {
+                    item.setOperation(new ErpOrderOperationControlResponse());
                     String primaryCode = item.getMainOrderCode();
                     if (secondaryOrderMap.containsKey(primaryCode)) {
                         secondaryOrderMap.get(primaryCode).add(item);
