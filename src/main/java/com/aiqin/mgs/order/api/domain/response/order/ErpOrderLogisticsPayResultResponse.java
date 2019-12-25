@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.domain.response.order;
 
 import com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -15,6 +16,7 @@ import java.util.Date;
  * @date 2019/11/25 14:49
  */
 @Data
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class ErpOrderLogisticsPayResultResponse {
 
     @ApiModelProperty(value = "订单号")
@@ -26,7 +28,7 @@ public class ErpOrderLogisticsPayResultResponse {
     @ApiModelProperty(value = "加盟商名称")
     private String franchiseeName;
 
-    @ApiModelProperty(value = "物流费用支付状态")
+    @ApiModelProperty(value = "物流费用支付状态 0待支付 1已发起支付（支付中） 2支付成功 3支付失败")
     private Integer payStatus;
     @ApiModelProperty(value = "物流费用支付状态描述")
     private String payStatusDesc;

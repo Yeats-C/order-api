@@ -3,6 +3,8 @@ package com.aiqin.mgs.order.api.domain.request.order;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * 订单支付请求参数
  *
@@ -19,6 +21,6 @@ public class ErpOrderPayRequest {
     @ApiModelProperty(value = "支付方式")
     private Integer payWay;
 
-    @ApiModelProperty(value = "物流券唯一标识，多个用逗号间隔")
-    private String couponIds;
+    @ApiModelProperty(value = "物流券唯一标识，可能是物流券编码")
+    private List<String> couponIds;
 }
