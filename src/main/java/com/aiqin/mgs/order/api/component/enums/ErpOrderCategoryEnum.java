@@ -1,12 +1,6 @@
 package com.aiqin.mgs.order.api.component.enums;
 
-import com.aiqin.mgs.order.api.domain.EnumItemInfo;
 import lombok.Getter;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 订单类别枚举
@@ -44,29 +38,33 @@ public enum ErpOrderCategoryEnum {
         this.desc = desc;
     }
 
-    /***选项类型*/
-    public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
-    /***value-enum map*/
-    public static final Map<String, ErpOrderCategoryEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
-
-    static {
-        for (ErpOrderCategoryEnum item :
-                ErpOrderCategoryEnum.values()) {
-            SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
-            VALUE_ENUM_MAP.put(item.getValue(), item);
-        }
-    }
-
+    /**
+     * 根据值获取枚举类
+     *
+     * @param object
+     * @return
+     */
     public static ErpOrderCategoryEnum getEnum(Object object) {
         if (object != null) {
-            return VALUE_ENUM_MAP.get(object.toString());
+            for (ErpOrderCategoryEnum item :
+                    ErpOrderCategoryEnum.values()) {
+                if (item.getValue().equals(object.toString())) {
+                    return item;
+                }
+            }
         }
         return null;
     }
 
+    /**
+     * 根据枚举类的值获取枚举的描述
+     *
+     * @param object
+     * @return
+     */
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            ErpOrderCategoryEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            ErpOrderCategoryEnum anEnum = getEnum(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
             }
@@ -74,9 +72,19 @@ public enum ErpOrderCategoryEnum {
         return "";
     }
 
+
+    /**
+     * 校验值是否存在
+     *
+     * @param object
+     * @return
+     */
     public static boolean exist(Object object) {
         if (object != null) {
-            return VALUE_ENUM_MAP.containsKey(object.toString());
+            ErpOrderCategoryEnum anEnum = getEnum(object.toString());
+            if (anEnum != null) {
+                return true;
+            }
         }
         return false;
     }

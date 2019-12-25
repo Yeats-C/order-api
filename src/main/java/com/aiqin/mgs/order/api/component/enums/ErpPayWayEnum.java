@@ -29,6 +29,12 @@ public enum ErpPayWayEnum {
         this.desc = desc;
     }
 
+    /**
+     * 根据值获取枚举类
+     *
+     * @param object
+     * @return
+     */
     public static ErpPayWayEnum getEnum(Object object) {
         if (object != null) {
             for (ErpPayWayEnum item :
@@ -41,6 +47,12 @@ public enum ErpPayWayEnum {
         return null;
     }
 
+    /**
+     * 根据枚举类的值获取枚举的描述
+     *
+     * @param object
+     * @return
+     */
     public static String getEnumDesc(Object object) {
         if (object != null) {
             ErpPayWayEnum anEnum = getEnum(object.toString());
@@ -51,6 +63,13 @@ public enum ErpPayWayEnum {
         return "";
     }
 
+
+    /**
+     * 校验值是否存在
+     *
+     * @param object
+     * @return
+     */
     public static boolean exist(Object object) {
         if (object != null) {
             ErpPayWayEnum anEnum = getEnum(object.toString());

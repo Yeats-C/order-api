@@ -1,5 +1,7 @@
 package com.aiqin.mgs.order.api.domain.po.order;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -13,6 +15,7 @@ import java.util.Date;
  * @date 2019/12/9 9:56
  */
 @Data
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class ErpOrderPay {
 
     /***主键*/
@@ -23,6 +26,7 @@ public class ErpOrderPay {
     /***业务外键*/
     private String businessKey;
     /***支付流水号*/
+    @ApiModelProperty(value = "支付流水号")
     private String payCode;
     /***费用类型*/
     private Integer feeType;
@@ -31,10 +35,13 @@ public class ErpOrderPay {
     /***支付方式*/
     private Integer payWay;
     /***费用*/
+    @ApiModelProperty(value = "支付费用")
     private BigDecimal payFee;
     /***开始支付时间*/
+    @ApiModelProperty(value = "开始支付时间")
     private Date payStartTime;
     /***结束支付时间*/
+    @ApiModelProperty(value = "结束支付时间")
     private Date payEndTime;
 
     /***创建时间*/

@@ -141,7 +141,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
         erpOrderFeeService.updateOrderFeeByPrimaryKeySelective(orderFee, auth);
 
         //开启轮询
-        payPolling(payId);
+//        payPolling(payId);
     }
 
     @Override

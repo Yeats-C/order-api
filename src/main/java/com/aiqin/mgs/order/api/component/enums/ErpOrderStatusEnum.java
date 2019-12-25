@@ -1,13 +1,10 @@
 package com.aiqin.mgs.order.api.component.enums;
 
-import com.aiqin.mgs.order.api.domain.EnumItemInfo;
 import com.aiqin.mgs.order.api.domain.SelectOptionItem;
 import lombok.Getter;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 订单状态枚举
