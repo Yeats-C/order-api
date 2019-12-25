@@ -35,5 +35,9 @@ public interface ConstantData {
      * 退货单审核状态：01-待审核
      */
     Integer returnOrderStatusWait = 1;
+    /**
+     * 退货单状态(供应链使用):4-等待退货验收，5-等待退货入库 11-退货完成
+     */
+    Integer returnOrderStatusComplete = 11;
 
 }

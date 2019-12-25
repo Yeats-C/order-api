@@ -931,6 +931,14 @@
     where return_order_code=#{orderStoreCode,jdbcType=VARCHAR}
   </update>
 
+  <update id="updateLogisticsCountAndAmount">
+    update return_order_info
+    set
+    actual_product_count = #{actualProductCount},
+    actual_return_order_amount = #{actualReturnOrderAmount}
+    where return_order_code=#{orderStoreCode}
+  </update>
+
 
 
 
