@@ -806,5 +806,20 @@ public class OrderController {
         return orderService.getUnPayMemberIdList(unPayVo);
     }
 
+    /**
+     * 订单中心获取近30天销量
+     * @param skuCode
+     * @param storeId
+     * @param day
+     * @return
+     */
+    @GetMapping("/cashier/orderCount")
+    @ApiOperation(value = "接口-订单中心获取近30天销量")
+    public HttpResponse orderCount(@Valid @RequestParam(name = "sku_code") String skuCode,
+                                   @Valid @RequestParam(name = "store_id") String storeId,
+                                   @Valid @RequestParam(name = "day") int day) {
 
+        LOGGER.info("订单中心获取近30天销量：{}",skuCode,storeId,day);
+        return orderService.orderCount(skuCode,storeId,day);
+    }
 }

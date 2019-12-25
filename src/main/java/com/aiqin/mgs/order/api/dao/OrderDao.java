@@ -208,5 +208,13 @@ public interface OrderDao {
 
     List<String> getUnPayMemberIdList(UnPayVo unPayVo);
 
-
+    /**
+     * @param distributorId
+     * @param startDate
+     * @param skuCode
+     * @return 查询门店sku在一定时间内的销量
+     */
+    int querySaleSkuCount(@Param("distributorId") String distributorId,
+                                   @Param("startDate") Date startDate,
+                                   @Param("skuCode") String skuCode);
 }

@@ -1314,7 +1314,16 @@
         group by b.sku_code
         having count(b.sku_code) &gt;= #{num}
     </select>
+    <select id="querySaleSkuCount" resultType="integer">
+        select count(d.id) from
+        order_consumer_detail d,order_consumer_info o
+        where
+        d.order_id=o.order_id
+       and  o.distributor_id = #{distributorId}
+        and d.create_time &gt;= #{startDate}
+        and d.product_code = #{skuCode}
 
+    </select>
     <!--获取特定sku集合指定时间段内销量数据信息-->
     <select id="querySkuSale" parameterType="com.aiqin.mgs.order.api.domain.request.statistical.SkuSalesRequest"
             resultType="com.aiqin.mgs.order.api.domain.statistical.SkuSales">
