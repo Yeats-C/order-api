@@ -1,5 +1,8 @@
 package com.aiqin.mgs.order.api.domain.po.order;
 
+import com.aiqin.mgs.order.api.component.enums.ErpOrderLevelEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.StatusEnum;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderOperationControlResponse;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
@@ -25,7 +28,7 @@ public class ErpOrderInfo {
     /***业务id*/
     private String orderStoreId;
     /***订单编码*/
-    @ApiModelProperty(value="订单编号")
+    @ApiModelProperty(value = "订单编号")
     private String orderStoreCode;
     /***公司编码*/
     private String companyCode;
@@ -44,24 +47,26 @@ public class ErpOrderInfo {
     /***供应商名称*/
     private String supplierName;
     /***仓库编码*/
-    @ApiModelProperty(value="仓库编码")
+    @ApiModelProperty(value = "仓库编码")
     private String transportCenterCode;
     /***仓库名称*/
-    @ApiModelProperty(value="仓库名称")
+    @ApiModelProperty(value = "仓库名称")
     private String transportCenterName;
     /***库房编码*/
-    @ApiModelProperty(value="库房编码")
+    @ApiModelProperty(value = "库房编码")
     private String warehouseCode;
     /***库房名称*/
-    @ApiModelProperty(value="库房名称")
+    @ApiModelProperty(value = "库房名称")
     private String warehouseName;
     /***客户编码*/
     private String customerCode;
     /***客户名称*/
     private String customerName;
     /***订单状态*/
-    @ApiModelProperty(value="订单状态")
+    @ApiModelProperty(value = "订单状态")
     private Integer orderStatus;
+    @ApiModelProperty(value = "订单状态描述")
+    private String orderStatusDesc;
     /***是否锁定(0是1否）*/
     private Integer orderLock;
     /***锁定原因*/
@@ -72,8 +77,10 @@ public class ErpOrderInfo {
     private String exceptionReason;
     /***是否删除(0是1否)*/
     private Integer orderDelete;
-    /***支付状态0已支付  1未支付*/
+    @ApiModelProperty(value = "支付状态 0已支付  1未支付")
     private Integer paymentStatus;
+    @ApiModelProperty(value = "支付状态描述")
+    private String paymentStatusDesc;
 
     /***收货区域 :省编码*/
     private String provinceId;
@@ -140,8 +147,10 @@ public class ErpOrderInfo {
     private Long actualTotalWeight;
     /***主订单号  如果非子订单 此处存order_code*/
     private String mainOrderCode;
-    /***订单级别(0主1子订单)*/
+    @ApiModelProperty(value = "订单级别(0主1子订单)")
     private Integer orderLevel;
+    @ApiModelProperty(value = "订单级别描述")
+    private String orderLevelDesc;
     /***是否被拆分 (0是 1否)*/
     private Integer splitStatus;
     /***申请取消时的状态*/
@@ -198,16 +207,27 @@ public class ErpOrderInfo {
 
     /***订单费用*/
     private ErpOrderFee orderFee;
-    @ApiModelProperty(value="订单按钮控制")
+    @ApiModelProperty(value = "订单按钮控制")
     private ErpOrderOperationControlResponse operation;
     /***订单物流信息*/
     private ErpOrderLogistics orderLogistics;
     /***订单商品明细*/
-    @ApiModelProperty(value="订单商品明细行")
+    @ApiModelProperty(value = "订单商品明细行")
     private List<ErpOrderItem> itemList;
-    @ApiModelProperty(value="订单关联子订单列表")
+    @ApiModelProperty(value = "订单关联子订单列表")
     private List<ErpOrderInfo> secondaryOrderList;
     /***订单日志*/
     private List<ErpOrderOperationLog> operationLogList;
 
+    public String getOrderStatusDesc() {
+        return ErpOrderStatusEnum.getEnumDesc(orderStatus);
+    }
+
+    public String getPaymentStatusDesc() {
+        return StatusEnum.getPaymentStatusDesc(paymentStatus);
+    }
+
+    public String getOrderLevelDesc() {
+        return ErpOrderLevelEnum.getEnumDesc(orderLevel);
+    }
 }
