@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.service.impl;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.dao.StoreOverviewDao;
 import com.aiqin.mgs.order.api.domain.constant.Global;
@@ -263,6 +264,10 @@ public class StoreOverviewServiceImpl implements StoreOverviewService {
         productSeachSkuReq.setPageNo(Integer.parseInt(pageNo));
         productSeachSkuReq.setPageSize(Integer.parseInt(pageSize));
         List<String> skuCodes = storeOverviewDao.storeProductSku(productSeachSkuReq);
-        return HttpResponse.success(skuCodes);
+        Integer count = storeOverviewDao.storeProductSkuCount(productSeachSkuReq);
+        PageResData page = new PageResData();
+        page.setDataList(skuCodes);
+        page.setTotalCount(count);
+        return HttpResponse.success(page);
     }
 }

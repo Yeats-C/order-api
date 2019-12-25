@@ -9,6 +9,7 @@ import com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateY
 import com.aiqin.mgs.order.api.domain.response.customer.CustomreFlowDaily;
 import com.aiqin.mgs.order.api.domain.response.customer.CustomreFlowYearMonth;
 import com.aiqin.mgs.order.api.domain.response.sales.*;
+import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -170,4 +171,6 @@ public interface StoreOverviewDao {
      * @return
      */
     List<String> storeProductSku(ProductSeachSkuReq productSeachSkuReq);
+
+    Integer storeProductSkuCount(ProductSeachSkuReq productSeachSkuReq);
 }

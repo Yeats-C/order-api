@@ -146,7 +146,7 @@ public class ErpOrderPayController {
 
     @PostMapping("/orderLogisticsPayResult")
     @ApiOperation(value = "订单物流费用支付结果轮询")
-    public HttpResponse orderLogisticsPayResult(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
+    public HttpResponse<ErpOrderLogisticsPayResultResponse> orderLogisticsPayResult(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
         HttpResponse response = HttpResponse.success();
         try {
             ErpOrderLogisticsPayResultResponse resultResponse = erpOrderPayService.orderLogisticsPayResult(erpOrderPayRequest);
@@ -163,7 +163,7 @@ public class ErpOrderPayController {
 
     @PostMapping("/orderLogisticsPrintQuery")
     @ApiOperation(value = "订单物流费用支付凭证")
-    public HttpResponse orderLogisticsPrintQuery(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
+    public HttpResponse<ErpOrderLogisticsPrintQueryResponse> orderLogisticsPrintQuery(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
         HttpResponse response = HttpResponse.success();
         try {
             ErpOrderLogisticsPrintQueryResponse queryResponse = erpOrderPayService.orderLogisticsPrintQuery(erpOrderPayRequest);

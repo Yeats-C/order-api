@@ -9,6 +9,7 @@ import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderTypeCategoryControlEnum;
 import com.aiqin.mgs.order.api.component.enums.StatusEnum;
 import com.aiqin.mgs.order.api.domain.SelectOptionItem;
+import com.aiqin.mgs.order.api.domain.response.order.ErpStoreOrderStatusTabResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -30,7 +31,7 @@ public class ErpSelectOptionController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "queryType", value = "查询类型 1：运营ERP查询销售单列表； 2：运营ERP查询货架订单列表； 3：运营ERP查询购物车可创建订单类型类别； 4：运营ERP查询货架订单可创建订单类型类别； 5：爱掌柜查询订单列表订单类型类别； 6：爱掌柜查询购物车可创建订单类型类别；", dataType = "int", required = true)
     })
-    public HttpResponse findOrderTypeList(Integer queryType) {
+    public HttpResponse<List<SelectOptionItem>> findOrderTypeList(Integer queryType) {
         HttpResponse response = HttpResponse.success();
         try {
             List<SelectOptionItem> list = ErpOrderTypeCategoryControlEnum.getOrderTypeSelectOptionList(queryType);
@@ -49,7 +50,7 @@ public class ErpSelectOptionController {
             @ApiImplicitParam(name = "queryType", value = "查询类型 1：运营ERP查询销售单列表； 2：运营ERP查询货架订单列表； 3：运营ERP查询购物车可创建订单类型类别； 4：运营ERP查询货架订单可创建订单类型类别； 5：爱掌柜查询订单列表订单类型类别； 6：爱掌柜查询购物车可创建订单类型类别；", dataType = "int", required = true),
             @ApiImplicitParam(name = "orderType", value = "订单类型", dataType = "int", required = true)
     })
-    public HttpResponse findOrderCategoryList(Integer queryType, Integer orderType) {
+    public HttpResponse<List<SelectOptionItem>> findOrderCategoryList(Integer queryType, Integer orderType) {
         HttpResponse response = HttpResponse.success();
         try {
             List<SelectOptionItem> list = ErpOrderTypeCategoryControlEnum.getOrderCategorySelectOptionList(queryType, orderType);
@@ -64,7 +65,7 @@ public class ErpSelectOptionController {
 
     @GetMapping("/findOrderStatusList")
     @ApiOperation(value = "获取订单状态选项列表")
-    public HttpResponse findOrderStatusList() {
+    public HttpResponse<List<SelectOptionItem>> findOrderStatusList() {
         HttpResponse response = HttpResponse.success();
         try {
             response.setData(ErpOrderStatusEnum.getSelectOptionList());
@@ -76,15 +77,15 @@ public class ErpSelectOptionController {
         return response;
     }
 
-    @GetMapping("/findStoreOrderStatusTabList")
+    @GetMapping("/findStoreTabOrderStatus")
     @ApiOperation(value = "爱掌柜查询订单列表tab页订单状态")
-    public HttpResponse findStoreOrderStatusTabList() {
+    public HttpResponse<ErpStoreOrderStatusTabResponse> findStoreTabOrderStatus() {
         HttpResponse response = HttpResponse.success();
         try {
-            List<SelectOptionItem> list = new ArrayList<>();
-            list.add(new SelectOptionItem(ErpOrderStatusEnum.ORDER_STATUS_1.getValue(), ErpOrderStatusEnum.ORDER_STATUS_1.getDesc()));
-            list.add(new SelectOptionItem(ErpOrderStatusEnum.ORDER_STATUS_11.getValue(), ErpOrderStatusEnum.ORDER_STATUS_11.getDesc()));
-            response.setData(list);
+            ErpStoreOrderStatusTabResponse tabStatusResponse = new ErpStoreOrderStatusTabResponse();
+            tabStatusResponse.setUnpaidStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
+            tabStatusResponse.setWaitReceive(ErpOrderStatusEnum.ORDER_STATUS_11.getCode());
+            response.setData(tabStatusResponse);
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {
@@ -95,7 +96,7 @@ public class ErpSelectOptionController {
 
     @GetMapping("/findOrderPaymentStatusList")
     @ApiOperation(value = "获取订单支付状态（二进制）选项列表")
-    public HttpResponse findOrderPaymentStatusList() {
+    public HttpResponse<List<SelectOptionItem>> findOrderPaymentStatusList() {
         HttpResponse response = HttpResponse.success();
         try {
             response.setData(StatusEnum.getPaymentSelectOptionList());
