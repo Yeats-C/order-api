@@ -19,6 +19,7 @@ import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.mgs.order.api.component.*;
 import com.aiqin.mgs.order.api.component.PayTypeEnum;
+import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
@@ -123,7 +124,8 @@ public class OrderServiceImpl implements OrderService {
     //商品项目地址
     @Value("${slcsIp}")
     public String slcsIp;
-
+    @Resource
+    private UrlProperties urlProperties;
 
     //模糊查询订单列表
     @Override
@@ -1760,6 +1762,10 @@ public class OrderServiceImpl implements OrderService {
                     payReq.setStoreName(orderInfo.getDistributorName());
                     payReq.setCreateBy(orderInfo.getCashierId());
                     payReq.setFranchiseeId(orderInfo.getDistributorId());
+                    payReq.setMemberPhone(orderInfo.getMemberPhone());
+                    payReq.setMemberName(orderInfo.getMemberName());
+                    payReq.setMemberId(orderInfo.getMemberId());
+                    payReq.setBackUrl(urlProperties.getOrderApi() + "/order/back");
                     payService.doPay(payReq);
                 }
             }
