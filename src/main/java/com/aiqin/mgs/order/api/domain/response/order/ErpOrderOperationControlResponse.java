@@ -23,5 +23,9 @@ public class ErpOrderOperationControlResponse {
     private int sign = 0;
     @ApiModelProperty(value = "支付物流费用 1有 0无")
     private int payLogistics = 0;
+    @ApiModelProperty(value = "取消 1有 0无")
+    private int cancel = 0;
+    @ApiModelProperty(value = "查看 1有 0无")
+    private int detail = 1;
 
 }
