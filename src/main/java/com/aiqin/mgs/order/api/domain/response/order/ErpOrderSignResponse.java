@@ -13,7 +13,6 @@ import lombok.Data;
 @Data
 public class ErpOrderSignResponse {
 
-    /***未签收订单数量*/
     @ApiModelProperty(value = "门店未签收订单数量")
     private Integer needSignOrderQuantity;
 }

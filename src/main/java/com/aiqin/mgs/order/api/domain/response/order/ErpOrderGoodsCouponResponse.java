@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.response.order;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -14,7 +15,10 @@ import java.math.BigDecimal;
 @Data
 public class ErpOrderGoodsCouponResponse {
 
+    @ApiModelProperty(value = "面值为100的物流券数量")
     private Integer hundredNum;
+    @ApiModelProperty(value = "面值为50的物流券数量")
     private Integer fiftyNum;
+    @ApiModelProperty(value = "总的物流券额度")
     private BigDecimal money;
 }

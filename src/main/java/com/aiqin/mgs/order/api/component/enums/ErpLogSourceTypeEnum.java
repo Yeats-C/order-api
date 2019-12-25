@@ -1,12 +1,6 @@
 package com.aiqin.mgs.order.api.component.enums;
 
-import com.aiqin.mgs.order.api.domain.EnumItemInfo;
 import lombok.Getter;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 日志来源类型
@@ -38,29 +32,33 @@ public enum ErpLogSourceTypeEnum {
         this.desc = desc;
     }
 
-    /***选项类型*/
-    public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
-    /***value-enum map*/
-    public static final Map<String, ErpLogSourceTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
-
-    static {
-        for (ErpLogSourceTypeEnum item :
-                ErpLogSourceTypeEnum.values()) {
-            SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
-            VALUE_ENUM_MAP.put(item.getValue(), item);
-        }
-    }
-
+    /**
+     * 根据值获取枚举类
+     *
+     * @param object
+     * @return
+     */
     public static ErpLogSourceTypeEnum getEnum(Object object) {
         if (object != null) {
-            return VALUE_ENUM_MAP.get(object.toString());
+            for (ErpLogSourceTypeEnum item :
+                    ErpLogSourceTypeEnum.values()) {
+                if (item.getValue().equals(object.toString())) {
+                    return item;
+                }
+            }
         }
         return null;
     }
 
+    /**
+     * 根据枚举类的值获取枚举的描述
+     *
+     * @param object
+     * @return
+     */
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            ErpLogSourceTypeEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            ErpLogSourceTypeEnum anEnum = getEnum(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
             }

@@ -1,12 +1,6 @@
 package com.aiqin.mgs.order.api.component.enums;
 
-import com.aiqin.mgs.order.api.domain.EnumItemInfo;
 import lombok.Getter;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 发票类型枚举类
@@ -37,40 +31,38 @@ public enum ErpInvoiceTypeEnum {
         this.value = value;
         this.desc = desc;
     }
-    /***选项类型*/
-    public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
-    /***value-enum map*/
-    public static final Map<String, ErpInvoiceTypeEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
 
-    static {
-        for (ErpInvoiceTypeEnum item :
-                ErpInvoiceTypeEnum.values()) {
-            SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
-            VALUE_ENUM_MAP.put(item.getValue(), item);
-        }
-    }
-
+    /**
+     * 根据值获取枚举类
+     *
+     * @param object
+     * @return
+     */
     public static ErpInvoiceTypeEnum getEnum(Object object) {
         if (object != null) {
-            return VALUE_ENUM_MAP.get(object.toString());
+            for (ErpInvoiceTypeEnum item :
+                    ErpInvoiceTypeEnum.values()) {
+                if (item.getValue().equals(object.toString())) {
+                    return item;
+                }
+            }
         }
         return null;
     }
 
+    /**
+     * 根据枚举类的值获取枚举的描述
+     *
+     * @param object
+     * @return
+     */
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            ErpInvoiceTypeEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            ErpInvoiceTypeEnum anEnum = getEnum(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
             }
         }
         return "";
-    }
-
-    public static boolean exist(Object object) {
-        if (object != null) {
-            return VALUE_ENUM_MAP.containsKey(object.toString());
-        }
-        return false;
     }
 }
