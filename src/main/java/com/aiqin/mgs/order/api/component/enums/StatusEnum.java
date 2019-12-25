@@ -37,6 +37,30 @@ public enum StatusEnum {
         this.desc = desc;
         this.paymentDesc = paymentDesc;
     }
+    
+    
+
+    public static StatusEnum getEnum(Object object) {
+        if (object != null) {
+            for (StatusEnum item :
+                    StatusEnum.values()) {
+                if (item.getValue().equals(object.toString())) {
+                    return item;
+                }
+            }
+        }
+        return null;
+    } 
+
+    public static String getPaymentStatusDesc(Object object) {
+        if (object != null) {
+            StatusEnum anEnum = getEnum(object);
+            if (anEnum != null) {
+                return anEnum.getPaymentDesc();
+            }
+        }
+        return "";
+    }
 
     /**
      * 获取二进制支付状态选项列表

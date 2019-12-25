@@ -5,6 +5,7 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.dao.StoreOverviewDao;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.request.ProductOverViewReq;
+import com.aiqin.mgs.order.api.domain.request.ProductSeachSkuReq;
 import com.aiqin.mgs.order.api.domain.response.ProductBaseUnResp;
 import com.aiqin.mgs.order.api.domain.response.ProductLabelStatusResp;
 import com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateDaily;
@@ -242,5 +243,26 @@ public class StoreOverviewServiceImpl implements StoreOverviewService {
         }
         List<ProductBaseUnResp> productBaseUnResps = storeOverviewDao.productBaseUnInfo(productOverViewReq);
         return HttpResponse.success(productBaseUnResps);
+    }
+
+    /**
+     *  爱掌柜商品总库商品列表畅销滞销sku
+     * @param storeId
+     * @param status
+     * @return
+     */
+    @Override
+    public HttpResponse storeProductSku(String storeId, String status, String pageNo, String pageSize) {
+
+        if(StringUtils.isEmpty(storeId) && StringUtils.isEmpty(status)){
+            return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER,"storeId="+storeId+",status="+status);
+        }
+        ProductSeachSkuReq productSeachSkuReq = new ProductSeachSkuReq();
+        productSeachSkuReq.setStoreId(storeId);
+        productSeachSkuReq.setStatus(Integer.parseInt(status));
+        productSeachSkuReq.setPageNo(Integer.parseInt(pageNo));
+        productSeachSkuReq.setPageSize(Integer.parseInt(pageSize));
+        List<String> skuCodes = storeOverviewDao.storeProductSku(productSeachSkuReq);
+        return HttpResponse.success(skuCodes);
     }
 }

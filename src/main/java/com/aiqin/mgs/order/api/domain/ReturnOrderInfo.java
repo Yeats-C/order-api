@@ -254,10 +254,13 @@ public class ReturnOrderInfo {
     @ApiModelProperty(value = "退回优惠额度信息")
     private String discountAmountInfos;
 
-    @ApiModelProperty(value = "来源类型")
+    @ApiModelProperty(value = "来源类型:1-web收银台 2-安卓收银台 3-微信公众号")
     private Integer sourceType;
 
     @ApiModelProperty(value = "退款方式 1:现金 2:微信 3:支付宝 4:银联")
     private Integer returnMoneyType;
+
+    @ApiModelProperty(value = "订单类别：1：收单配送 2：首单赠送 3：配送补货 4：首单直送 5：直送补货")
+    private Integer orderCategory;
 
 }

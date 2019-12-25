@@ -104,7 +104,10 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByFeeId(order.getFeeId());
             if (orderFee != null) {
                 ErpOrderPay orderPay = erpOrderPayService.getOrderPayByPayId(orderFee.getPayId());
-                orderFee.setOrderPay(orderPay);
+                if (orderPay != null) {
+                    orderFee.setOrderPay(orderPay);
+                    orderFee.setPayCode(orderPay.getPayCode());
+                }
             }
             order.setOrderFee(orderFee);
 
@@ -118,7 +121,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
 
             ErpOrderNodeProcessTypeEnum processTypeEnum = ErpOrderNodeProcessTypeEnum.getEnum(order.getOrderTypeCode(), order.getOrderCategoryCode());
             if (processTypeEnum != null && processTypeEnum.isAddProductGift()) {
-                order.getOperation().setAddGift(YesOrNoEnum.YES.getCode());
+                order.getOperation().setAddGift(StatusEnum.YES.getCode());
             }
 
         }
@@ -245,6 +248,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             if (secondaryOrderList != null && secondaryOrderList.size() > 0) {
                 for (ErpOrderInfo item :
                         secondaryOrderList) {
+                    item.setOperation(new ErpOrderOperationControlResponse());
                     String primaryCode = item.getMainOrderCode();
                     if (secondaryOrderMap.containsKey(primaryCode)) {
                         secondaryOrderMap.get(primaryCode).add(item);
@@ -268,7 +272,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                     ErpOrderPayStatusResponse orderPayStatusResponse = erpOrderRequestService.getOrderPayStatus(item.getOrderStoreCode());
                     if (orderPayStatusResponse.isRequestSuccess() && ErpPayStatusEnum.SUCCESS == orderPayStatusResponse.getPayStatusEnum()) {
                         //如果支付状态是成功的
-                        item.getOperation().setRepay(YesOrNoEnum.YES.getCode());
+                        item.getOperation().setRepay(StatusEnum.YES.getCode());
                     }
                 }
             }
