@@ -31,5 +31,4 @@ public class ShoppingCartRequest {
     @JsonProperty("create_source")
     private String createSource;
 
-
 }

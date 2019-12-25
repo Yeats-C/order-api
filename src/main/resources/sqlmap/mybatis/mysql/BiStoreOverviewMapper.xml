@@ -173,5 +173,26 @@
         from bi_product_overview
         where product_label_code=0 and store_id = #{storeId}
     </select>
+    <select id="productBaseUnInfo" parameterType="com.aiqin.mgs.order.api.domain.request.ProductOverViewReq"
+                resultType="com.aiqin.mgs.order.api.domain.response.ProductBaseUnResp">
+        select
+        sku_code skuCode,sku_name skuName,saleout_dgree saleoutDgree,sale_margin saleMargin
+        -- ,color_name colorName,spec,model_number modelNumber
+        from bi_product_overview
+        where store_id = #{storeId}
+        <if test="categoryId != null and categoryId != ''" >
+            and category_id like concat('',#{categoryId},'%')
+        </if>
+        order by
+        <if test="productStatus != null and productStatus == 0" >
+            saleout_dgree desc
+        </if>
+        <if test="productStatus != null and productStatus == 1" >
+            saleout_dgree
+        </if>
+        <if test="productStatus != null and productStatus == 2" >
+            sale_margin desc
+        </if>
+    </select>
 </mapper>
 

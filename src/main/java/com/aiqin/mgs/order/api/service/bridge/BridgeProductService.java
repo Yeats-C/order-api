@@ -70,7 +70,7 @@ public class BridgeProductService {
         data.setStoreId("12345");
         data.setSkuCode("12345");
         data.setAmount(20);
-        data.setPrice(new BigDecimal(29.10));
+        data.setPrice(BigDecimal.valueOf(29.10));
         data.setProductType(1);
         ArrayList<CartOrderInfo> list = new ArrayList<>();
         list.add(data);
