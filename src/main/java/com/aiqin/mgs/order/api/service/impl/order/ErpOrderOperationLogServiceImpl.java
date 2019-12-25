@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.service.impl.order;
 
 import com.aiqin.mgs.order.api.component.enums.ErpLogOperationTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.StatusEnum;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderOperationLogDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
@@ -23,14 +24,17 @@ public class ErpOrderOperationLogServiceImpl implements ErpOrderOperationLogServ
     private ErpOrderOperationLogDao erpOrderOperationLogDao;
 
     @Override
-    public void saveOrderOperationLog(String operationCode, ErpLogSourceTypeEnum sourceTypeEnum, ErpLogOperationTypeEnum operationTypeEnum, String operationContent, String remark, AuthToken auth) {
+    public void saveOrderOperationLog(String operationCode, ErpLogOperationTypeEnum operationTypeEnum, Integer orderStatus, String remark, AuthToken auth) {
+
+        ErpLogSourceTypeEnum sourceTypeEnum = ErpLogSourceTypeEnum.SALES;
         ErpOrderOperationLog operationLog = new ErpOrderOperationLog();
         Date now = new Date();
 
         operationLog.setOperationCode(operationCode);
         operationLog.setOperationType(operationTypeEnum.getCode());
         operationLog.setSourceType(sourceTypeEnum.getCode());
-        operationLog.setOperationContent(operationContent);
+        operationLog.setOperationStatus(orderStatus);
+        operationLog.setOperationContent(ErpOrderStatusEnum.getEnumDesc(orderStatus));
         operationLog.setRemark(remark);
 
         operationLog.setUseStatus(StatusEnum.YES.getCode());

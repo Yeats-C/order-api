@@ -7,7 +7,7 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderTypeCategoryControlEnum;
-import com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.StatusEnum;
 import com.aiqin.mgs.order.api.domain.SelectOptionItem;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -75,12 +75,12 @@ public class ErpSelectOptionController {
         return response;
     }
 
-    @GetMapping("/findOrderPayStatusList")
-    @ApiOperation(value = "获取订单支付状态选项列表")
-    public HttpResponse findOrderPayStatusList() {
+    @GetMapping("/findOrderPaymentStatusList")
+    @ApiOperation(value = "获取订单支付状态（二进制）选项列表")
+    public HttpResponse findOrderPaymentStatusList() {
         HttpResponse response = HttpResponse.success();
         try {
-            response.setData(ErpPayStatusEnum.getSelectOptionList());
+            response.setData(StatusEnum.getPaymentSelectOptionList());
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {
@@ -88,19 +88,5 @@ public class ErpSelectOptionController {
         }
         return response;
     }
-
-//    @GetMapping("/findOrderPayWayList")
-//    @ApiOperation(value = "获取订单支付方式选项列表")
-//    public HttpResponse findOrderPayWayList() {
-//        HttpResponse response = HttpResponse.success();
-//        try {
-//            response.setData(ErpPayWayEnum.getSelectOptionList());
-//        } catch (BusinessException e) {
-//            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
-//        } catch (Exception e) {
-//            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
-//        }
-//        return response;
-//    }
 
 }

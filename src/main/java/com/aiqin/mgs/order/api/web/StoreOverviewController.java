@@ -1,6 +1,8 @@
 package com.aiqin.mgs.order.api.web;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.domain.request.ProductOverViewReq;
+import com.aiqin.mgs.order.api.domain.response.ProductBaseUnResp;
 import com.aiqin.mgs.order.api.service.StoreOverviewService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -9,10 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -122,6 +121,13 @@ public class StoreOverviewController {
     public HttpResponse storeProductOverView(@RequestParam(value = "store_id") String storeId){
         LOGGER.info("获取门店商品概览（畅销度）......",storeId);
         return storeOverviewService.storeProductOverView(storeId);
+    }
+
+    @PostMapping("/status/product")
+    @ApiOperation(value = "商品概览（畅销滞销毛利排行）")
+    public HttpResponse productBaseUnInfo(@RequestBody ProductOverViewReq productOverViewReq) {
+        LOGGER.info("获取门店商品概览（畅销滞销毛利排行）......",productOverViewReq);
+        return storeOverviewService.productBaseUnInfo(productOverViewReq);
     }
 
 }
