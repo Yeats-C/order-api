@@ -9,6 +9,7 @@
         operation_code as operationCode,
         operation_type as operationType,
         source_type as sourceType,
+        operation_status as operationStatus,
         operation_content as operationContent,
         remark as remark,
         use_status as useStatus,
@@ -39,9 +40,9 @@
     </select>
 
     <insert id="insert">
-        insert into operation_log (operation_code, operation_type, source_type, operation_content, remark, use_status,
+        insert into operation_log (operation_code, operation_type, source_type, operation_status, operation_content, remark, use_status,
                                    create_by_id, create_by_name, update_by_id, update_by_name, create_time, update_time)
-        values (#{operationCode}, #{operationType}, #{sourceType}, #{operationContent}, #{remark},
+        values (#{operationCode}, #{operationType}, #{sourceType}, #{operationStatus}, #{operationContent}, #{remark},
                 #{useStatus}, #{createById}, #{createByName}, #{updateById}, #{updateByName}, #{createTime},
                 #{updateTime})
     </insert>

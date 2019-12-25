@@ -30,12 +30,12 @@ public class ErpOrderQueryController {
     @Resource
     private ErpOrderQueryService erpOrderQueryService;
 
-    @PostMapping("/findOrderList")
-    @ApiOperation(value = "查询销售单订单列表")
-    public HttpResponse findOrderList(@RequestBody ErpOrderQueryRequest erpOrderQueryRequest) {
+    @PostMapping("/findErpOrderList")
+    @ApiOperation(value = "ERP查询销售单订单列表")
+    public HttpResponse findErpOrderList(@RequestBody ErpOrderQueryRequest erpOrderQueryRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-            PageResData<ErpOrderInfo> orderList = erpOrderQueryService.findOrderList(erpOrderQueryRequest);
+            PageResData<ErpOrderInfo> orderList = erpOrderQueryService.findErpOrderList(erpOrderQueryRequest);
             response.setData(orderList);
         } catch (BusinessException e) {
             logger.error("查询销售单订单列表异常：{}", e);
@@ -47,12 +47,29 @@ public class ErpOrderQueryController {
         return response;
     }
 
-    @PostMapping("/findRackOrderList")
-    @ApiOperation(value = "查询货架订单列表")
-    public HttpResponse findRackOrderList(@RequestBody ErpOrderQueryRequest erpOrderQueryRequest) {
+    @PostMapping("/findStoreOrderList")
+    @ApiOperation(value = "爱掌柜查询销售单订单列表")
+    public HttpResponse findStoreOrderList(@RequestBody ErpOrderQueryRequest erpOrderQueryRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-            PageResData<ErpOrderInfo> orderList = erpOrderQueryService.findRackOrderList(erpOrderQueryRequest);
+            PageResData<ErpOrderInfo> orderList = erpOrderQueryService.findStoreOrderList(erpOrderQueryRequest);
+            response.setData(orderList);
+        } catch (BusinessException e) {
+            logger.error("查询销售单订单列表异常：{}", e);
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            logger.error("查询销售单订单列表异常：{}", e);
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
+    }
+
+    @PostMapping("/findErpRackOrderList")
+    @ApiOperation(value = "查询货架订单列表")
+    public HttpResponse findErpRackOrderList(@RequestBody ErpOrderQueryRequest erpOrderQueryRequest) {
+        HttpResponse response = HttpResponse.success();
+        try {
+            PageResData<ErpOrderInfo> orderList = erpOrderQueryService.findErpRackOrderList(erpOrderQueryRequest);
             response.setData(orderList);
         } catch (BusinessException e) {
             logger.error("查询销售单订单列表异常：{}", e);
@@ -69,7 +86,7 @@ public class ErpOrderQueryController {
     public HttpResponse getOrderDetail(@RequestBody ErpOrderQueryRequest erpOrderQueryRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-            ErpOrderInfo orderDetailByOrderCode = erpOrderQueryService.getOrderDetailByOrderCode(erpOrderQueryRequest.getOrderCode());
+            ErpOrderInfo orderDetailByOrderCode = erpOrderQueryService.getOrderDetailByOrderCode(erpOrderQueryRequest.getOrderStoreCode());
             response.setData(orderDetailByOrderCode);
         } catch (BusinessException e) {
             logger.error("查询订单详情异常：{}", e);

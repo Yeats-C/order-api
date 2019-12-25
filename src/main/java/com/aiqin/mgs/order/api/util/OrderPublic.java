@@ -7,18 +7,15 @@
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.util;
 
-import java.util.List;
-import java.util.UUID;
-
 import com.aiqin.mgs.order.api.base.PageResData;
-import com.aiqin.mgs.order.api.base.exception.BusinessException;
-import com.aiqin.mgs.order.api.component.enums.ErpOrderChannelTypeEnum;
-import com.aiqin.mgs.order.api.component.enums.ErpOrderOriginTypeEnum;
 import com.aiqin.mgs.order.api.domain.OrderAfterSaleQuery;
 import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
 import com.aiqin.mgs.order.api.domain.OrderLog;
 import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.constant.Global;
+
+import java.util.List;
+import java.util.UUID;
 
 public class OrderPublic {
 	
@@ -162,31 +159,6 @@ public class OrderPublic {
 	
 	return uuid; 
 	}
-
-    /**
-     * 生成订单编号
-     *
-     * @param originType   订单来源
-     * @param orderChannel 销售渠道
-     * @return java.lang.String
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/11/20 11:19
-     */
-    public static String generateOrderCode(Integer originType, Integer orderChannel) {
-
-        //判断订单来源和销售渠道是否合法
-        if (!ErpOrderOriginTypeEnum.exist(originType)) {
-            throw new BusinessException("无效的订单来源");
-        }
-        if (!ErpOrderChannelTypeEnum.exist(orderChannel)) {
-            throw new BusinessException("无效的销售渠道类型");
-        }
-
-        //订单号 yyMMddHHmmss+订单来源+销售渠道标识+4位数的随机数
-        return DateUtil.sysDate() + originType + orderChannel + OrderPublic.randomNumberF();
-    }
-
 	
 	/**
 	 * 订单日志参数

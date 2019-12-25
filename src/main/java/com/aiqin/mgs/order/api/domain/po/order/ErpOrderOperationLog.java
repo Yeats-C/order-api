@@ -22,6 +22,8 @@ public class ErpOrderOperationLog {
     private Integer operationType;
     /***来源类型 0.销售 1.采购 2.退货  3.退供*/
     private Integer sourceType;
+    /***关联单据状态*/
+    private Integer operationStatus;
     /***日志内容*/
     private String operationContent;
     /***备注*/

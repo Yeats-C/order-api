@@ -56,7 +56,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         Integer insert = erpOrderInfoDao.insert(po);
 
         //保存日志
-        erpOrderOperationLogService.saveOrderOperationLog(po.getOrderStoreCode(), ErpLogSourceTypeEnum.SALES, ErpLogOperationTypeEnum.ADD, ErpOrderStatusEnum.ORDER_STATUS_1.getDesc(), null, auth);
+        erpOrderOperationLogService.saveOrderOperationLog(po.getOrderStoreCode(),  ErpLogOperationTypeEnum.ADD, ErpOrderStatusEnum.ORDER_STATUS_1.getCode(), null, auth);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         Integer integer = erpOrderInfoDao.updateByPrimaryKeySelective(po);
 
         //保存订单操作日志
-        erpOrderOperationLogService.saveOrderOperationLog(po.getOrderStoreCode(), ErpLogSourceTypeEnum.SALES, ErpLogOperationTypeEnum.ADD, ErpOrderStatusEnum.getEnumDesc(po.getOrderStatus()), null, auth);
+        erpOrderOperationLogService.saveOrderOperationLog(po.getOrderStoreCode(), ErpLogOperationTypeEnum.ADD, po.getOrderStatus(), null, auth);
 
     }
 

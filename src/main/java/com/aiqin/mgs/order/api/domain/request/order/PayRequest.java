@@ -65,7 +65,7 @@ public class PayRequest implements Serializable {
     private String createName;
 
 
-    @ApiModelProperty(value = "支付来源-TOB_PAY(7,\"配送订货-toB配送订单支付\"), 11,\"直送订货-toB直送订单支付\" 24,\"TOB-物流支付(包含所有订单状态下的支付)\"")
+    @ApiModelProperty(value = "支付来源-TOB_PAY(7,配送订货-toB配送订单支付), 11,直送订货-toB直送订单支付 24,TOB-物流支付(包含所有订单状态下的支付)")
     @JsonProperty("pay_origin_type")
     @NotNull(message = "支付来源不能为空")
     private Integer payOriginType;
@@ -106,5 +106,9 @@ public class PayRequest implements Serializable {
     @JsonProperty("pay_order_type")
     @NotNull(message = "订单类型不能为空")
     private Integer payOrderType;
+
+    @ApiModelProperty("回调地址")
+    @JsonProperty("back_url")
+    private String backUrl;
 
 }

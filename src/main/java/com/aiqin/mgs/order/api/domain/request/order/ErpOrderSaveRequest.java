@@ -27,14 +27,6 @@ public class ErpOrderSaveRequest {
     @ApiModelProperty(value = "订单类别")
     private Integer orderCategory;
 
-    /***订单来源 ErpOrderOriginTypeEnum*/
-    @ApiModelProperty(value = "订单来源")
-    private Integer orderOriginType;
-
-    /***订单销售渠道标识 ErpOrderChannelTypeEnum*/
-    @ApiModelProperty(value = "销售渠道")
-    private Integer orderChannelType;
-
     /***货架商品列表*/
     @ApiModelProperty(value = "货架商品列表")
     private List<ErpOrderProductItemRequest> itemList;
