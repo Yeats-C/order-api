@@ -113,4 +113,7 @@ public class ReturnOrderDetail {
     @ApiModelProperty(value = "问题描述")
     private String remark;
 
+    @ApiModelProperty(value = "多个凭证以逗号隔开")
+    private String evidenceUrl;
+
 }
