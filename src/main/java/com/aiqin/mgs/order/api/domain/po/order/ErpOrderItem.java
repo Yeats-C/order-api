@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.po.order;
 
+import com.aiqin.mgs.order.api.component.enums.ErpProductGiftEnum;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -41,25 +42,18 @@ public class ErpOrderItem {
     private String skuName;
     @ApiModelProperty(value = "条形码")
     private String barCode;
-    /***图片地址*/
     @ApiModelProperty(value = "图片url")
     private String pictureUrl;
-    /***规格*/
     @ApiModelProperty(value = "规格")
     private String productSpec;
-    /***颜色编码*/
     @ApiModelProperty(value = "颜色编码")
     private String colorCode;
-    /***颜色名称*/
     @ApiModelProperty(value = "颜色名称")
     private String colorName;
-    /***型号*/
     @ApiModelProperty(value = "型号")
     private String modelCode;
-    /***单位编码*/
     @ApiModelProperty(value = "单位编码")
     private String unitCode;
-    /***单位名称*/
     @ApiModelProperty(value = "单位名称")
     private String unitName;
     /***折零系数*/
@@ -67,6 +61,8 @@ public class ErpOrderItem {
     /***商品类型  0商品 1赠品*/
     @ApiModelProperty(value = "商品类型 0商品（本品） 1赠品")
     private Integer productType;
+    @ApiModelProperty(value = "商品类型描述")
+    private String productTypeDesc;
     @ApiModelProperty(value = "数量")
     private Long productCount;
     @ApiModelProperty(value = "单价")
@@ -117,4 +113,8 @@ public class ErpOrderItem {
     private Date createTime;
     /***更新时间*/
     private Date updateTime;
+
+    public String getProductTypeDesc() {
+        return ErpProductGiftEnum.getEnumDesc(productType);
+    }
 }

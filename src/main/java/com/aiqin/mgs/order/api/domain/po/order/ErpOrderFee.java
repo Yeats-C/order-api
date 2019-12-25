@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.domain.po.order;
 
 import com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -14,6 +15,7 @@ import java.util.Date;
  * @date 2019/12/11 20:18
  */
 @Data
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class ErpOrderFee {
 
     /***主键*/
@@ -56,6 +58,8 @@ public class ErpOrderFee {
     /***数据状态 1有效 0删除*/
     private Integer status;
 
+    /***支付流水号*/
+    private String payCode;
     /***订单支付*/
     private ErpOrderPay orderPay;
 

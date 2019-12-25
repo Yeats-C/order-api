@@ -104,7 +104,10 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByFeeId(order.getFeeId());
             if (orderFee != null) {
                 ErpOrderPay orderPay = erpOrderPayService.getOrderPayByPayId(orderFee.getPayId());
-                orderFee.setOrderPay(orderPay);
+                if (orderPay != null) {
+                    orderFee.setOrderPay(orderPay);
+                    orderFee.setPayCode(orderPay.getPayCode());
+                }
             }
             order.setOrderFee(orderFee);
 
