@@ -118,7 +118,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
 
             ErpOrderNodeProcessTypeEnum processTypeEnum = ErpOrderNodeProcessTypeEnum.getEnum(order.getOrderTypeCode(), order.getOrderCategoryCode());
             if (processTypeEnum != null && processTypeEnum.isAddProductGift()) {
-                order.getOperation().setAddGift(YesOrNoEnum.YES.getCode());
+                order.getOperation().setAddGift(StatusEnum.YES.getCode());
             }
 
         }
@@ -269,7 +269,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                     ErpOrderPayStatusResponse orderPayStatusResponse = erpOrderRequestService.getOrderPayStatus(item.getOrderStoreCode());
                     if (orderPayStatusResponse.isRequestSuccess() && ErpPayStatusEnum.SUCCESS == orderPayStatusResponse.getPayStatusEnum()) {
                         //如果支付状态是成功的
-                        item.getOperation().setRepay(YesOrNoEnum.YES.getCode());
+                        item.getOperation().setRepay(StatusEnum.YES.getCode());
                     }
                 }
             }
