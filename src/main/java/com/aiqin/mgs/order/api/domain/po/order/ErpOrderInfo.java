@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.po.order;
 
+import com.aiqin.mgs.order.api.domain.response.order.ErpOrderOperationControlResponse;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -38,8 +39,6 @@ public class ErpOrderInfo {
     private String orderCategoryCode;
     /***订单类别名称*/
     private String orderCategoryName;
-    /***销售渠道 ErpOrderChannelTypeEnum*/
-    private Integer orderChannelType;
     /***供应商编码*/
     private String supplierCode;
     /***供应商名称*/
@@ -199,11 +198,15 @@ public class ErpOrderInfo {
 
     /***订单费用*/
     private ErpOrderFee orderFee;
+    @ApiModelProperty(value="订单按钮控制")
+    private ErpOrderOperationControlResponse operation;
     /***订单物流信息*/
     private ErpOrderLogistics orderLogistics;
     /***订单商品明细*/
     @ApiModelProperty(value="订单商品明细行")
     private List<ErpOrderItem> itemList;
+    @ApiModelProperty(value="订单关联子订单列表")
+    private List<ErpOrderInfo> secondaryOrderList;
     /***订单日志*/
     private List<ErpOrderOperationLog> operationLogList;
 

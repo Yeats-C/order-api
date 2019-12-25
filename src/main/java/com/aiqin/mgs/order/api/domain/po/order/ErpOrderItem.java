@@ -67,30 +67,22 @@ public class ErpOrderItem {
     /***商品类型  0商品 1赠品*/
     @ApiModelProperty(value = "商品类型 0商品（本品） 1赠品")
     private Integer productType;
-    /***商品数量*/
     @ApiModelProperty(value = "数量")
     private Long productCount;
-    /***商品单价*/
     @ApiModelProperty(value = "单价")
     private BigDecimal productAmount;
-    /***含税采购价*/
     @ApiModelProperty(value = "含税采购价")
     private BigDecimal purchaseAmount;
-    /***商品总价*/
     @ApiModelProperty(value = "行总价")
     private BigDecimal totalProductAmount;
-    /***实际商品总价（发货商品总价）*/
-    @ApiModelProperty(value = "发货商品总价")
+    @ApiModelProperty(value = "实际商品总价（发货商品总价）")
     private BigDecimal actualTotalProductAmount;
-    /***优惠分摊总金额（分摊后金额）*/
-    @ApiModelProperty(value = "行均摊总价")
+    @ApiModelProperty(value = "优惠分摊总金额（分摊后金额）")
     private BigDecimal totalPreferentialAmount;
-    /***活动优惠总金额*/
+    @ApiModelProperty(value = "活动优惠总金额")
     private BigDecimal totalAcivityAmount;
-    /***实收数量（门店）*/
     @ApiModelProperty(value = "门店实收数量")
     private Long actualInboundCount;
-    /***实发商品数量*/
     @ApiModelProperty(value = "实发数量")
     private Long actualProductCount;
     /***退货数量*/

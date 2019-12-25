@@ -6,6 +6,7 @@ import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.ProductInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
+import com.aiqin.mgs.order.api.domain.constant.ErpOrderCodeSequence;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -162,20 +164,6 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         } else {
             if (!ErpOrderCategoryEnum.exist(erpOrderSaveRequest.getOrderCategory())) {
                 throw new BusinessException("无效的订单类别");
-            }
-        }
-        if (erpOrderSaveRequest.getOrderOriginType() == null) {
-            throw new BusinessException("请选择订单来源");
-        } else {
-            if (!ErpOrderOriginTypeEnum.exist(erpOrderSaveRequest.getOrderOriginType())) {
-                throw new BusinessException("无效的订单来源");
-            }
-        }
-        if (erpOrderSaveRequest.getOrderChannelType() == null) {
-            throw new BusinessException("请选择销售渠道");
-        } else {
-            if (!ErpOrderChannelTypeEnum.exist(erpOrderSaveRequest.getOrderChannelType())) {
-                throw new BusinessException("无效的销售渠道");
             }
         }
     }
@@ -429,8 +417,6 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setOrderCategoryCode(erpOrderSaveRequest.getOrderCategory().toString());
         //订单类别名称
         order.setOrderCategoryName(ErpOrderCategoryEnum.getEnumDesc(erpOrderSaveRequest.getOrderCategory()));
-        //销售渠道 1.总部向们门店销售  2.门店向会员销售
-        order.setOrderChannelType(erpOrderSaveRequest.getOrderChannelType());
         //供应商编码
         order.setSupplierCode(null);
         //供应商名称
@@ -562,9 +548,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //来源单号
         order.setSourceCode(null);
         //来源名称
-        order.setSourceName(ErpOrderOriginTypeEnum.getEnumDesc(erpOrderSaveRequest.getOrderOriginType()));
+        order.setSourceName(null);
         //来源类型
-        order.setSourceType(erpOrderSaveRequest.getOrderOriginType());
+        order.setSourceType(null);
 
         return order;
     }
@@ -606,7 +592,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //生成费用id
         String feeId = OrderPublic.getUUID();
         //生成订单code
-        String orderCode = OrderPublic.generateOrderCode(erpOrderSaveRequest.getOrderOriginType(), erpOrderSaveRequest.getOrderChannelType());
+        String orderCode = getOrderCode();
         //初始支付状态
         ErpPayStatusEnum payStatusEnum = ErpPayStatusEnum.UNPAID;
         long lineCode = 1;
@@ -790,7 +776,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //生成费用id
         String feeId = OrderPublic.getUUID();
         //生成订单code
-        String orderCode = OrderPublic.generateOrderCode(erpOrderSaveRequest.getOrderOriginType(), erpOrderSaveRequest.getOrderChannelType());
+        String orderCode = getOrderCode();
         //初始支付状态
         ErpPayStatusEnum payStatusEnum = ErpPayStatusEnum.UNPAID;
 
@@ -835,8 +821,6 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setOrderCategoryCode(erpOrderSaveRequest.getOrderCategory().toString());
         //订单类别名称
         order.setOrderCategoryName(ErpOrderCategoryEnum.getEnumDesc(erpOrderSaveRequest.getOrderCategory()));
-        //销售渠道
-        order.setOrderChannelType(erpOrderSaveRequest.getOrderChannelType());
         //供应商编码
         order.setSupplierCode(null);
         //供应商名称
@@ -968,9 +952,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //来源单号是什么
         order.setSourceCode(null);
         //来源名称
-        order.setSourceName(ErpOrderOriginTypeEnum.getEnumDesc(erpOrderSaveRequest.getOrderOriginType()));
+        order.setSourceName(null);
         //来源类型
-        order.setSourceType(erpOrderSaveRequest.getOrderOriginType());
+        order.setSourceType(null);
         erpOrderInfoService.saveOrder(order, auth);
 
         //保存订单费用信息
@@ -996,6 +980,32 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         erpOrderFeeService.saveOrderFee(orderFee, auth);
 
         return orderId;
+    }
+
+    /**
+     * 生成订单号
+     *
+     * @param
+     * @return java.lang.String
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/24 20:24
+     */
+    private String getOrderCode() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        String curDay = sdf.format(new Date());
+        if (StringUtils.isEmpty(ErpOrderCodeSequence.currentDay) || !curDay.equals(ErpOrderCodeSequence.currentDay)) {
+            //如果是
+            ErpOrderCodeSequence.currentDay = curDay;
+            //查询数据库，获取最新序列
+            String maxOrderCode = erpOrderQueryService.getMaxOrderCodeByCurrentDay(curDay);
+            if (StringUtils.isNotEmpty(maxOrderCode)) {
+                ErpOrderCodeSequence.num = Long.valueOf(maxOrderCode.substring(maxOrderCode.length() - 6, 0));
+            } else {
+                ErpOrderCodeSequence.num = 0L;
+            }
+        }
+        return curDay + String.format("%06d", ++ErpOrderCodeSequence.num);
     }
 
 }

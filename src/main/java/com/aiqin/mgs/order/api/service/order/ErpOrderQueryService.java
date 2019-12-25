@@ -71,28 +71,6 @@ public interface ErpOrderQueryService {
     List<ErpOrderInfo> getOrderByLogisticsId(String logisticsId);
 
     /**
-     * 查询订单列表
-     *
-     * @param erpOrderQueryRequest
-     * @return com.aiqin.mgs.order.api.base.PageResData<com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo>
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/12/10 21:44
-     */
-    PageResData<ErpOrderInfo> findOrderList(ErpOrderQueryRequest erpOrderQueryRequest);
-
-    /**
-     * 查询货架订单列表
-     *
-     * @param erpOrderQueryRequest
-     * @return com.aiqin.mgs.order.api.base.PageResData<com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo>
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/12/13 15:27
-     */
-    PageResData<ErpOrderInfo> findRackOrderList(ErpOrderQueryRequest erpOrderQueryRequest);
-
-    /**
      * 根据订单编号查询待签收订单和商品行详情
      *
      * @param orderCode
@@ -113,4 +91,59 @@ public interface ErpOrderQueryService {
      * @date 2019/12/14 14:20
      */
     int getNeedSignOrderQuantity(String storeId);
+
+    /**
+     * 查询订单列表
+     *
+     * @param erpOrderQueryRequest
+     * @return com.aiqin.mgs.order.api.base.PageResData<com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo>
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/10 21:44
+     */
+    PageResData<ErpOrderInfo> findOrderList(ErpOrderQueryRequest erpOrderQueryRequest);
+
+    /**
+     * erp查询销售订单列表
+     *
+     * @param erpOrderQueryRequest
+     * @return com.aiqin.mgs.order.api.base.PageResData<com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo>
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/24 16:15
+     */
+    PageResData<ErpOrderInfo> findErpOrderList(ErpOrderQueryRequest erpOrderQueryRequest);
+
+    /**
+     * erp查询货架订单列表
+     *
+     * @param erpOrderQueryRequest
+     * @return com.aiqin.mgs.order.api.base.PageResData<com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo>
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/24 16:15
+     */
+    PageResData<ErpOrderInfo> findErpRackOrderList(ErpOrderQueryRequest erpOrderQueryRequest);
+
+    /**
+     * 爱掌柜查询订单列表
+     *
+     * @param erpOrderQueryRequest
+     * @return com.aiqin.mgs.order.api.base.PageResData<com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo>
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/24 16:15
+     */
+    PageResData<ErpOrderInfo> findStoreOrderList(ErpOrderQueryRequest erpOrderQueryRequest);
+
+    /**
+     * 获取当前天最大的订单号
+     *
+     * @param currentDay 当前天 yyyyMMdd
+     * @return java.lang.String
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/24 18:53
+     */
+    String getMaxOrderCodeByCurrentDay(String currentDay);
 }

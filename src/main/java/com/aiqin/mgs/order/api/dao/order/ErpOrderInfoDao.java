@@ -62,12 +62,22 @@ public interface ErpOrderInfoDao {
     /**
      * 查询子订单列表
      *
-     * @param primaryOrderCodeList
+     * @param erpOrderQueryRequest
      * @return java.util.List<com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo>
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/10 20:05
      */
-    List<ErpOrderInfo> findSecondaryOrderList(@Param("primaryOrderCodeList") List<String> primaryOrderCodeList);
+    List<ErpOrderInfo> findSecondaryOrderList(ErpOrderQueryRequest erpOrderQueryRequest);
 
+    /**
+     * 获取当前天最大的订单号
+     *
+     * @param currentDay 当前天字符串yyyyMMdd
+     * @return java.lang.String
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/24 18:52
+     */
+    String getMaxOrderCodeByCurrentDay(@Param("currentDay") String currentDay);
 }

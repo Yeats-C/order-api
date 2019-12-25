@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.request.order;
 
+import com.aiqin.mgs.order.api.component.enums.ErpOrderTypeCategoryQueryTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -17,13 +18,15 @@ import java.util.List;
 public class ErpOrderQueryRequest {
 
     @ApiModelProperty(value = "订单编号")
-    private String orderCode;
-    @ApiModelProperty(value = "订单状态 枚举 ErpOrderStatusEnum")
+    private String orderStoreCode;
+    @ApiModelProperty(value = "订单状态")
     private Integer orderStatus;
-    @ApiModelProperty(value = "订单支付状态 ErpPayStatusEnum")
-    private Integer payStatus;
-    @ApiModelProperty(value = "订单类型 枚举 ErpOrderCategoryEnum")
-    private Integer orderType;
+    @ApiModelProperty(value = "订单支付状态")
+    private Integer paymentStatus;
+    @ApiModelProperty(value = "订单类型")
+    private Integer orderTypeCode;
+    @ApiModelProperty(value = "订单类型")
+    private Integer orderCategoryCode;
     @ApiModelProperty(value = "门店名称")
     private String storeName;
     @ApiModelProperty(value = "查询开始时间 yyyy-MM-dd")
@@ -39,4 +42,10 @@ public class ErpOrderQueryRequest {
 
     @JsonIgnore
     private List<Integer> orderTypeQueryList;
+    @JsonIgnore
+    private List<Integer> orderCategoryQueryList;
+    @JsonIgnore
+    private List<String> primaryOrderCodeList;
+    @JsonIgnore
+    private ErpOrderTypeCategoryQueryTypeEnum queryTypeEnum;
 }
