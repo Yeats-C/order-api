@@ -76,4 +76,12 @@ public interface StoreOverviewService {
      * @return
      */
     HttpResponse productBaseUnInfo(ProductOverViewReq productOverViewReq);
+
+    /**
+     *  爱掌柜商品总库商品列表畅销滞销sku
+     * @param storeId
+     * @param status
+     * @return
+     */
+    HttpResponse storeProductSku(String storeId, String status, String pageNo, String pageSize);
 }
