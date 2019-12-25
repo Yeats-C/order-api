@@ -13,9 +13,9 @@ import lombok.Data;
 @Data
 public class SelectOptionItem {
 
-    @ApiModelProperty("值")
+    @ApiModelProperty(value = "选项值")
     private String value;
-    @ApiModelProperty("文本")
+    @ApiModelProperty(value = "选项文本")
     private String desc;
 
     public SelectOptionItem(String value, String desc) {
