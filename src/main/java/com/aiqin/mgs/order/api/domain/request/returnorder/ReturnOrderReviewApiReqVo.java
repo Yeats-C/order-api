@@ -23,8 +23,8 @@ public class ReturnOrderReviewApiReqVo implements Serializable {
 
     private static final long serialVersionUID = 731706668149842489L;
 
-    @NotBlank(message = "售后单ID")
-    @ApiModelProperty("售后单ID")
+    @NotBlank(message = "退货单编码不能为空")
+    @ApiModelProperty("退货单编码")
     private String returnOrderId;
 
     @ApiModelProperty(value = "操作人", hidden = true)

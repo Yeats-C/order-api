@@ -15,7 +15,7 @@ public interface ReturnOrderInfoDao {
 
     ReturnOrderInfo selectByPrimaryKey(Long id);
 
-    ReturnOrderInfo selectByReturnOrderId(String returnOrderId);
+    ReturnOrderInfo selectByReturnOrderCode(String returnOrderCode);
 
     int updateByPrimaryKeySelective(ReturnOrderInfo record);
 
@@ -31,5 +31,6 @@ public interface ReturnOrderInfoDao {
     //修改实退数量和实退金额
     Integer updateLogisticsCountAndAmount(@Param("orderStoreCode") String orderStoreCode, @Param("actualReturnOrderAmount") BigDecimal actualReturnOrderAmount, @Param("actualProductCount") Long actualProductCount);
 
-
+    //修改退款状态
+    Integer updateRefundStatus(String orderStoreCode);
 }

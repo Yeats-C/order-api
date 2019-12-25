@@ -107,7 +107,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             BeanUtils.copyProperties(detailVo, detail);
             detail.setCreateTime(now);
             detail.setReturnOrderDetailId(IdUtil.uuid());
-            detail.setReturnOrderCode(returnOrderId);
+            detail.setReturnOrderCode(afterSaleCode);
             detail.setCreateById(reqVo.getCreateById());
             detail.setCreateByName(reqVo.getCreateByName());
             return detail;
@@ -257,6 +257,17 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         return res>0;
     }
 
+    @Override
+    public Boolean callback(RefundReq reqVo) {
+        //查询退货单状态是否修改成功
+        ReturnOrderInfo returnOrderInfo=returnOrderInfoDao.selectByReturnOrderCode(reqVo.getOrderNo());
+        //退款状态，0-未退款、1-已退款
+        if(returnOrderInfo!=null&&returnOrderInfo.getRefundStatus().equals(ConstantData.refundStatus)){//1-已退款
+            return true;
+        }
+        return returnOrderInfoDao.updateRefundStatus(reqVo.getOrderNo())>0;
+    }
+
     /**
      * 生成16位唯一性的审批编码
      * @return
@@ -339,15 +350,15 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 
     /**
      * 调用供应链封装
-     * @param returnOrderId 退货单id
+     * @param returnOrderCode 退货单编码
      */
-    public void createRejectRecord(String returnOrderId){
-        log.info("供应链同步退货单开始,returnOrderId={}",returnOrderId);
+    public void createRejectRecord(String returnOrderCode){
+        log.info("供应链同步退货单开始,returnOrderId={}",returnOrderCode);
         RejectRecordReq rejectRecordReq=new RejectRecordReq();
-        //根据退货单id查询退货信息
-        ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderId(returnOrderId);
-        //根据退货单id查询退货详细信息
-        List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderId);
+        //根据退货单编码查询退货信息
+        ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(returnOrderCode);
+        //根据退货单编码查询退货详细信息
+        List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderCode);
         RejectRecord rejectRecord=new RejectRecord();
         List<RejectRecordDetail> rejectRecordDetail=new ArrayList<>();
         BeanUtils.copyProperties(returnOrderInfo,rejectRecord);
@@ -384,10 +395,10 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 
     /**
      * 发起退款
-     * @param returnOrderId
+     * @param returnOrderCode
      */
-    public boolean refund(String returnOrderId){
-        ReturnOrderInfo returnOrderInfo=returnOrderInfoDao.selectByReturnOrderId(returnOrderId);
+    public boolean refund(String returnOrderCode){
+        ReturnOrderInfo returnOrderInfo=returnOrderInfoDao.selectByReturnOrderCode(returnOrderCode);
         log.info("发起退款单申请，returnOrderInfo={}",returnOrderInfo);
         if(returnOrderInfo!=null){
             String url=paymentHost+"/payment/pay/payTobAll";
@@ -429,7 +440,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 if(jsonObject.containsKey("code")&&"0".equals(jsonObject.getString("code"))){
                     log.info("退款完成，修改退货单状态");
                     ReturnOrderReviewReqVo reqVo=new ReturnOrderReviewReqVo();
-                    reqVo.setReturnOrderId(returnOrderId);
+                    reqVo.setReturnOrderId(returnOrderCode);
                     reqVo.setOperateStatus(ConstantData.returnOrderSuccess);
                     returnOrderInfoDao.updateReturnStatus(reqVo);
                     log.info("退款完成");

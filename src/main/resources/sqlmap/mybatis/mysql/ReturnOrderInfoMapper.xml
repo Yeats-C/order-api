@@ -905,14 +905,14 @@
                 review_remark=#{reviewNote,jdbcType=VARCHAR},
             </if>
         </set>
-        where return_order_id=#{returnOrderId,jdbcType=VARCHAR}
+        where return_order_code=#{returnOrderId,jdbcType=VARCHAR}
     </update>
 
-  <select id="selectByReturnOrderId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  <select id="selectByReturnOrderCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
     <include refid="Base_Column_List" />
     from return_order_info
-    where return_order_id = #{returnOrderId}
+    where return_order_code = #{returnOrderCode}
   </select>
 
   <select id="selectByOrderId" resultMap="BaseResultMap">
@@ -939,7 +939,13 @@
     where return_order_code=#{orderStoreCode}
   </update>
 
-
+  <update id="updateRefundStatus">
+    update return_order_info
+    set
+    return_order_status=12,
+    refund_status = 1
+    where return_order_code=#{orderStoreCode}
+  </update>
 
 
 </mapper>
