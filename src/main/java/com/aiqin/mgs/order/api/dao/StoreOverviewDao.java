@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.request.ProductOverViewReq;
+import com.aiqin.mgs.order.api.domain.request.ProductSeachSkuReq;
 import com.aiqin.mgs.order.api.domain.response.ProductBaseUnResp;
 import com.aiqin.mgs.order.api.domain.response.ProductLabelStatusResp;
 import com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateDaily;
@@ -162,4 +163,11 @@ public interface StoreOverviewDao {
      * @return
      */
     List<ProductBaseUnResp> productBaseUnInfo(ProductOverViewReq productOverViewReq);
+
+    /**
+     *  爱掌柜商品总库商品列表畅销滞销sku
+     * @param productSeachSkuReq
+     * @return
+     */
+    List<String> storeProductSku(ProductSeachSkuReq productSeachSkuReq);
 }
