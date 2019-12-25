@@ -36,6 +36,7 @@
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
         <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="evidence_url" property="evidenceUrl" jdbcType="VARCHAR"/>
     </resultMap>
     <sql id="Base_Column_List">
     id, return_order_detail_id, return_order_code, sku_code, sku_name, picture_url, product_spec, 
@@ -43,7 +44,7 @@
     zero_disassembly_coefficient, activity_code, product_amount, total_product_amount, 
     return_product_count, actual_return_product_count, actual_total_product_amount, product_status, 
     tax_rate, line_code, use_status, source_code, source_type, create_by_id, create_by_name, 
-    update_by_id, update_by_name, create_time, update_time,remark
+    update_by_id, update_by_name, create_time, update_time, remark, evidence_url
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
         select
@@ -161,6 +162,9 @@
             <if test="remark != null">
                 remark,
             </if>
+            <if test="evidenceUrl != null">
+                evidence_url,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -264,6 +268,9 @@
             </if>
             <if test="remark != null">
                 #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="evidenceUrl != null">
+                #{evidenceUrl,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
@@ -369,6 +376,9 @@
             <if test="remark != null">
                 remark = #{updateTime,jdbcType=VARCHAR},
             </if>
+            <if test="evidenceUrl != null">
+                evidence_url =#{evidenceUrl,jdbcType=VARCHAR},
+            </if>
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
@@ -377,7 +387,7 @@
         insert into return_order_detail (return_order_detail_id, return_order_code,product_type,
         sku_code, sku_name,total_product_amount,return_product_count,model_code,product_status,
         product_spec,unit_name,color_code,color_name,create_by_id, create_by_name,picture_url,
-        create_time,remark)
+        create_time,remark,evidence_url)
         values
         <foreach collection="records" item="item" index="index" separator=",">
             (
@@ -390,7 +400,7 @@
             #{item.colorCode,jdbcType=VARCHAR}, #{item.colorName,jdbcType=VARCHAR}, #{item.createById,jdbcType=VARCHAR},
             #{item.createByName,jdbcType=VARCHAR},
             #{item.pictureUrl,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP},
-            #{item.remark,jdbcType=VARCHAR}
+            #{item.remark,jdbcType=VARCHAR},#{item.evidenceUrl,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
