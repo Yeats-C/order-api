@@ -394,7 +394,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     }
 
     /**
-     * 发起退款
+     * 封装--发起退款
      * @param returnOrderCode
      */
     public boolean refund(String returnOrderCode){
@@ -439,10 +439,13 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 JSONObject jsonObject= JSON.parseObject(request);
                 if(jsonObject.containsKey("code")&&"0".equals(jsonObject.getString("code"))){
                     log.info("退款完成，修改退货单状态");
-                    ReturnOrderReviewReqVo reqVo=new ReturnOrderReviewReqVo();
-                    reqVo.setReturnOrderId(returnOrderCode);
-                    reqVo.setOperateStatus(ConstantData.returnOrderSuccess);
-                    returnOrderInfoDao.updateReturnStatus(reqVo);
+                    //查询退货单状态是否修改成功
+                    ReturnOrderInfo returnOrderInfo1=returnOrderInfoDao.selectByReturnOrderCode(returnOrderCode);
+                    //退款状态，0-未退款、1-已退款
+                    if(returnOrderInfo1!=null&&returnOrderInfo1.getRefundStatus().equals(ConstantData.refundStatus)){//1-已退款
+                        return true;
+                    }
+                    returnOrderInfoDao.updateRefundStatus(returnOrderCode);
                     log.info("退款完成");
                     return true;
                 }
