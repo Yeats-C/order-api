@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.request.order;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -16,11 +17,14 @@ import java.util.List;
 public class ErpOrderPayRequest {
 
     @ApiModelProperty(value = "订单编号")
+    @JsonProperty("order_code")
     private String orderCode;
 
-    @ApiModelProperty(value = "支付方式")
+    @ApiModelProperty(value = "支付方式 支付订单费用时使用")
+    @JsonProperty("pay_way")
     private Integer payWay;
 
-    @ApiModelProperty(value = "物流券唯一标识，可能是物流券编码")
+    @ApiModelProperty(value = "物流券唯一标识，可能是物流券编码 支付物流费用时使用")
+    @JsonProperty("coupon_ids")
     private List<String> couponIds;
 }

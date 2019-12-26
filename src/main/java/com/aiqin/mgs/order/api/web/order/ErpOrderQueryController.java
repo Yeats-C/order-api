@@ -32,7 +32,7 @@ public class ErpOrderQueryController {
 
     @PostMapping("/findErpOrderList")
     @ApiOperation(value = "ERP查询销售单订单列表")
-    public HttpResponse findErpOrderList(@RequestBody ErpOrderQueryRequest erpOrderQueryRequest) {
+    public HttpResponse<PageResData<ErpOrderInfo>> findErpOrderList(@RequestBody ErpOrderQueryRequest erpOrderQueryRequest) {
         HttpResponse response = HttpResponse.success();
         try {
             PageResData<ErpOrderInfo> orderList = erpOrderQueryService.findErpOrderList(erpOrderQueryRequest);
@@ -49,7 +49,7 @@ public class ErpOrderQueryController {
 
     @PostMapping("/findStoreOrderList")
     @ApiOperation(value = "爱掌柜查询销售单订单列表")
-    public HttpResponse findStoreOrderList(@RequestBody ErpOrderQueryRequest erpOrderQueryRequest) {
+    public HttpResponse<PageResData<ErpOrderInfo>> findStoreOrderList(@RequestBody ErpOrderQueryRequest erpOrderQueryRequest) {
         HttpResponse response = HttpResponse.success();
         try {
             PageResData<ErpOrderInfo> orderList = erpOrderQueryService.findStoreOrderList(erpOrderQueryRequest);
@@ -66,7 +66,7 @@ public class ErpOrderQueryController {
 
     @PostMapping("/findErpRackOrderList")
     @ApiOperation(value = "查询货架订单列表")
-    public HttpResponse findErpRackOrderList(@RequestBody ErpOrderQueryRequest erpOrderQueryRequest) {
+    public HttpResponse<PageResData<ErpOrderInfo>> findErpRackOrderList(@RequestBody ErpOrderQueryRequest erpOrderQueryRequest) {
         HttpResponse response = HttpResponse.success();
         try {
             PageResData<ErpOrderInfo> orderList = erpOrderQueryService.findErpRackOrderList(erpOrderQueryRequest);
@@ -83,7 +83,7 @@ public class ErpOrderQueryController {
 
     @PostMapping("/getOrderDetail")
     @ApiOperation(value = "查询订单详情")
-    public HttpResponse getOrderDetail(@RequestBody ErpOrderQueryRequest erpOrderQueryRequest) {
+    public HttpResponse<ErpOrderInfo> getOrderDetail(@RequestBody ErpOrderQueryRequest erpOrderQueryRequest) {
         HttpResponse response = HttpResponse.success();
         try {
             ErpOrderInfo orderDetailByOrderCode = erpOrderQueryService.getOrderDetailByOrderCode(erpOrderQueryRequest.getOrderStoreCode());

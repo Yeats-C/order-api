@@ -5,6 +5,7 @@ import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.StatusEnum;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderOperationControlResponse;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -23,200 +24,372 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class ErpOrderInfo {
 
-    /***主键*/
+    @ApiModelProperty(value = "主键")
+    @JsonProperty("id")
     private Long id;
-    /***业务id*/
+
+    @ApiModelProperty(value = "订单id")
+    @JsonProperty("order_store_id")
     private String orderStoreId;
-    /***订单编码*/
+
     @ApiModelProperty(value = "订单编号")
+    @JsonProperty("order_store_code")
     private String orderStoreCode;
-    /***公司编码*/
+
+    @ApiModelProperty(value = "公司编码")
+    @JsonProperty("company_code")
     private String companyCode;
-    /***公司名称*/
+
+    @ApiModelProperty(value = "公司名称")
+    @JsonProperty("company_name")
     private String companyName;
-    /***订单类型编码 ErpOrderTypeEnum */
+
+    @ApiModelProperty(value = "订单类型编码")
+    @JsonProperty("order_type_code")
     private String orderTypeCode;
-    /***订单类型名称*/
+
+    @ApiModelProperty(value = "订单类型名称")
+    @JsonProperty("order_type_name")
     private String orderTypeName;
-    /***订单类别编码 ErpOrderCategoryEnum*/
+
+    @ApiModelProperty(value = "订单类别编码")
+    @JsonProperty("order_category_code")
     private String orderCategoryCode;
-    /***订单类别名称*/
+
+    @ApiModelProperty(value = "订单类别名称")
+    @JsonProperty("order_category_name")
     private String orderCategoryName;
-    /***供应商编码*/
+
+    @ApiModelProperty(value = "供应商编码")
+    @JsonProperty("supplier_code")
     private String supplierCode;
-    /***供应商名称*/
+
+    @JsonProperty("supplier_name")
+    @ApiModelProperty(value = "供应商名称")
     private String supplierName;
-    /***仓库编码*/
+
     @ApiModelProperty(value = "仓库编码")
+    @JsonProperty("transport_center_code")
     private String transportCenterCode;
-    /***仓库名称*/
+
     @ApiModelProperty(value = "仓库名称")
+    @JsonProperty("transport_center_name")
     private String transportCenterName;
-    /***库房编码*/
+
     @ApiModelProperty(value = "库房编码")
+    @JsonProperty("warehouse_code")
     private String warehouseCode;
-    /***库房名称*/
+
     @ApiModelProperty(value = "库房名称")
+    @JsonProperty("warehouse_name")
     private String warehouseName;
-    /***客户编码*/
+
+    @ApiModelProperty(value = "客户编码")
+    @JsonProperty("customer_code")
     private String customerCode;
-    /***客户名称*/
+
+    @ApiModelProperty(value = "客户名称")
+    @JsonProperty("customer_name")
     private String customerName;
-    /***订单状态*/
+
     @ApiModelProperty(value = "订单状态")
+    @JsonProperty("order_status")
     private Integer orderStatus;
+
     @ApiModelProperty(value = "订单状态描述")
+    @JsonProperty("order_status_desc")
     private String orderStatusDesc;
-    /***是否锁定(0是1否）*/
+
+    @ApiModelProperty(value = "是否是锁定的订单 0是 1否")
+    @JsonProperty("order_lock")
     private Integer orderLock;
-    /***锁定原因*/
+
+    @ApiModelProperty(value = "锁定原因")
+    @JsonProperty("lock_reason")
     private String lockReason;
-    /***是否是异常订单(0是1否)*/
+
+    @ApiModelProperty(value = "是否异常订单 0是 1否")
+    @JsonProperty("order_exception")
     private Integer orderException;
-    /***异常原因*/
+
+    @ApiModelProperty(value = "异常原因")
+    @JsonProperty("exception_reason")
     private String exceptionReason;
-    /***是否删除(0是1否)*/
+
+    @ApiModelProperty(value = "是否删除 0是 1否")
+    @JsonProperty("order_delete")
     private Integer orderDelete;
+
     @ApiModelProperty(value = "支付状态 0已支付  1未支付")
+    @JsonProperty("payment_status")
     private Integer paymentStatus;
+
     @ApiModelProperty(value = "支付状态描述")
+    @JsonProperty("payment_status_desc")
     private String paymentStatusDesc;
 
-    /***收货区域 :省编码*/
+    @ApiModelProperty(value = "省编码")
+    @JsonProperty("province_id")
     private String provinceId;
-    /***收货区域 :省*/
+
+    @ApiModelProperty(value = "省名称")
+    @JsonProperty("province_name")
     private String provinceName;
-    /***收货区域 :市编码*/
+
+    @ApiModelProperty(value = "市编码")
+    @JsonProperty("city_id")
     private String cityId;
-    /***收货区域 :市*/
+
+    @ApiModelProperty(value = "市名称")
+    @JsonProperty("city_name")
     private String cityName;
-    /***收货区域 :区县编码*/
+
+    @ApiModelProperty(value = "区县编码")
+    @JsonProperty("district_id")
     private String districtId;
-    /***收货区域 :区县*/
+
+    @ApiModelProperty(value = "区县名称")
+    @JsonProperty("district_name")
     private String districtName;
 
-    /***收货地址*/
+    @ApiModelProperty(value = "收货地址")
+    @JsonProperty("receive_address")
     private String receiveAddress;
-    /***配送方式编码*/
+
+    @ApiModelProperty(value = "配送方式编码")
+    @JsonProperty("distribution_mode_code")
     private String distributionModeCode;
-    /***配送方式名称*/
+
+    @ApiModelProperty(value = "配送方式名称")
+    @JsonProperty("distribution_mode_name")
     private String distributionModeName;
-    /***收货人*/
+
+    @ApiModelProperty(value = "收货人")
+    @JsonProperty("receive_person")
     private String receivePerson;
-    /***收货人电话*/
+
+    @ApiModelProperty(value = "收货人电话")
+    @JsonProperty("receive_mobile")
     private String receiveMobile;
-    /***邮编*/
+
+    @ApiModelProperty(value = "邮编")
+    @JsonProperty("zip_code")
     private String zipCode;
-    /***支付方式编码*/
+
+    @ApiModelProperty(value = "支付方式编码")
+    @JsonProperty("payment_code")
     private String paymentCode;
-    /***支付方式名称*/
+
+    @ApiModelProperty(value = "支付方式名称")
+    @JsonProperty("payment_name")
     private String paymentName;
-    /***运费*/
+
+    @ApiModelProperty(value = "运费")
+    @JsonProperty("deliver_amount")
     private BigDecimal deliverAmount;
-    /***商品总价*/
+
+    @ApiModelProperty(value = "商品总价")
+    @JsonProperty("total_product_amount")
     private BigDecimal totalProductAmount;
-    /***实际商品总价 （发货商品的总价格） */
+
+    @ApiModelProperty(value = "实际商品总价（发货商品总价）")
+    @JsonProperty("actual_total_product_amount")
     private BigDecimal actualTotalProductAmount;
-    /***实际发货数量*/
+
+    @ApiModelProperty(value = "实际发货数量")
+    @JsonProperty("actual_product_count")
     private Long actualProductCount;
-    /***优惠额度*/
+
+    @ApiModelProperty(value = "优惠额度")
+    @JsonProperty("discount_amount")
     private BigDecimal discountAmount;
-    /***实际支付金额 */
+
+    @ApiModelProperty(value = "实际支付金额")
+    @JsonProperty("order_amount")
     private BigDecimal orderAmount;
-    /***付款日期*/
+
+    @ApiModelProperty(value = "付款日期")
+    @JsonProperty("payment_time")
     private Date paymentTime;
-    /***发货时间*/
+
+    @ApiModelProperty(value = "发货时间")
+    @JsonProperty("delivery_time")
     private Date deliveryTime;
-    /***发运时间*/
+
+    @ApiModelProperty(value = "发运时间")
+    @JsonProperty("transport_time")
     private Date transportTime;
-    /***发运状态*/
-    private Integer transportStatus;
-    /***发运时间*/
+
+    @ApiModelProperty(value = "发运时间")
+    @JsonProperty("receive_time")
     private Date receiveTime;
-    /***发票类型 1不开 2增普 3增专*/
+
+    @ApiModelProperty(value = "发运状态")
+    @JsonProperty("transport_status")
+    private Integer transportStatus;
+
+    @ApiModelProperty(value = "发票类型 1不开 2增普 3增专")
+    @JsonProperty("invoice_type")
     private Integer invoiceType;
-    /***发票抬头*/
+
+    @ApiModelProperty(value = "发票抬头")
+    @JsonProperty("invoice_title")
     private String invoiceTitle;
-    /***体积*/
+
+    @ApiModelProperty(value = "体积")
+    @JsonProperty("total_volume")
     private Long totalVolume;
-    /***实际体积*/
+
+    @ApiModelProperty(value = "实际体积")
+    @JsonProperty("actual_total_volume")
     private Long actualTotalVolume;
-    /***重量*/
+
+    @ApiModelProperty(value = "重量")
+    @JsonProperty("total_weight")
     private Long totalWeight;
-    /***实际重量*/
+
+    @ApiModelProperty(value = "实际重量")
+    @JsonProperty("actual_total_weight")
     private Long actualTotalWeight;
-    /***主订单号  如果非子订单 此处存order_code*/
+
+    @ApiModelProperty(value = "关联主订单号  如果是主订单，该字段存自己的订单号")
+    @JsonProperty("main_order_code")
     private String mainOrderCode;
+
     @ApiModelProperty(value = "订单级别(0主1子订单)")
+    @JsonProperty("order_level")
     private Integer orderLevel;
+
     @ApiModelProperty(value = "订单级别描述")
+    @JsonProperty("order_level_desc")
     private String orderLevelDesc;
-    /***是否被拆分 (0是 1否)*/
+
+    @ApiModelProperty(value = "是否被拆分 0是 1否")
+    @JsonProperty("split_status")
     private Integer splitStatus;
+
     /***申请取消时的状态*/
+    @JsonProperty("before_cancel_status")
     private Integer beforeCancelStatus;
-    /***备注*/
+
+    @ApiModelProperty(value = "备注")
+    @JsonProperty("remake")
     private String remake;
-    /***门店类型*/
+
+    @ApiModelProperty(value = "门店类型")
+    @JsonProperty("store_type")
     private Integer storeType;
-    /***门店id*/
+
+    @ApiModelProperty(value = "门店id")
+    @JsonProperty("store_id")
     private String storeId;
-    /***门店编码*/
+
+    @ApiModelProperty(value = "门店编码")
+    @JsonProperty("store_code")
     private String storeCode;
-    /***门店名称*/
+
+    @ApiModelProperty(value = "门店名称")
+    @JsonProperty("store_name")
     private String storeName;
-    /***运输公司编码*/
+
+    @ApiModelProperty(value = "运输公司编码")
+    @JsonProperty("transport_company_code")
     private String transportCompanyCode;
-    /***运输公司名称*/
+
+    @ApiModelProperty(value = "运输公司名称")
+    @JsonProperty("transport_company_name")
     private String transportCompanyName;
-    /***运输单号*/
+
+    @ApiModelProperty(value = "运输单号，物流单号")
+    @JsonProperty("transport_code")
     private String transportCode;
-    /***物流id*/
+
+    @ApiModelProperty(value = "物流单id")
+    @JsonProperty("logistics_id")
     private String logisticsId;
-    /***费用id*/
+
+    @ApiModelProperty(value = "费用id")
+    @JsonProperty("fee_id")
     private String feeId;
-    /***是否发生退货  0 是  1.否*/
+
+    @ApiModelProperty(value = "是否发生退货 0是 1否")
+    @JsonProperty("order_return")
     private Integer orderReturn;
-    /***加盟商id*/
+
+    @ApiModelProperty(value = "加盟商id")
+    @JsonProperty("franchisee_id")
     private String franchiseeId;
-    /***加盟商编码*/
+
+    @ApiModelProperty(value = "加盟商编码")
+    @JsonProperty("franchisee_code")
     private String franchiseeCode;
-    /***加盟商名称*/
+
+    @ApiModelProperty(value = "加盟商名称")
+    @JsonProperty("franchisee_name")
     private String franchiseeName;
-    /***来源单号*/
+
+    @ApiModelProperty(value = "来源单号")
+    @JsonProperty("source_code")
     private String sourceCode;
-    /***来源名称*/
+
+    @ApiModelProperty(value = "来源名称")
+    @JsonProperty("source_name")
     private String sourceName;
-    /***来源类型*/
+
+    @ApiModelProperty(value = "来源类型")
+    @JsonProperty("source_type")
     private Integer sourceType;
 
-    /***0. 启用   1.禁用*/
+    @ApiModelProperty(value = "启用停用 0启用 1启用")
+    @JsonProperty("use_status")
     private Integer useStatus;
-    /***创建人编码*/
+
+    @ApiModelProperty(value = "创建人编码")
+    @JsonProperty("create_by_id")
     private String createById;
-    /***创建人名称*/
+
+    @ApiModelProperty(value = "创建人名称")
+    @JsonProperty("create_by_name")
     private String createByName;
-    /***更新人编码*/
+
+    @ApiModelProperty(value = "最近更新人编码")
+    @JsonProperty("update_by_id")
     private String updateById;
-    /***更新人名称*/
+
+    @ApiModelProperty(value = "最近更新人名称")
+    @JsonProperty("update_by_name")
     private String updateByName;
-    /***创建时间*/
+
+    @ApiModelProperty(value = "创建时间")
+    @JsonProperty("create_time")
     private Date createTime;
-    /***更新时间*/
+
+    @ApiModelProperty(value = "最近更新时间")
+    @JsonProperty("update_time")
     private Date updateTime;
 
-    /***订单费用*/
+    @ApiModelProperty(value = "主订单费用详情")
+    @JsonProperty("order_fee")
     private ErpOrderFee orderFee;
-    @ApiModelProperty(value = "订单按钮控制")
+
+    @ApiModelProperty(value = "按钮组件控制")
+    @JsonProperty("operation")
     private ErpOrderOperationControlResponse operation;
-    /***订单物流信息*/
+
+    @ApiModelProperty(value = "订单物流信息")
+    @JsonProperty("order_logistics")
     private ErpOrderLogistics orderLogistics;
-    /***订单商品明细*/
+
     @ApiModelProperty(value = "订单商品明细行")
+    @JsonProperty("item_list")
     private List<ErpOrderItem> itemList;
+
     @ApiModelProperty(value = "订单关联子订单列表")
+    @JsonProperty("secondary_order_list")
     private List<ErpOrderInfo> secondaryOrderList;
-    /***订单日志*/
+
+    @ApiModelProperty(value = "订单日志")
+    @JsonProperty("operation_log_list")
     private List<ErpOrderOperationLog> operationLogList;
 
     public String getOrderStatusDesc() {
