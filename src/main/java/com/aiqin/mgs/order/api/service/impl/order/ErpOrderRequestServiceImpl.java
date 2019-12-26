@@ -7,7 +7,6 @@ import com.aiqin.mgs.order.api.component.enums.ErpOrderLockStockTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.ProductInfo;
-import com.aiqin.mgs.order.api.domain.ProductRepertoryQuantity;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
@@ -18,12 +17,9 @@ import com.aiqin.mgs.order.api.domain.response.order.ErpOrderGoodsCouponResponse
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
 import com.aiqin.mgs.order.api.domain.response.order.StoreFranchiseeInfoResponse;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
-import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
-import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -107,6 +103,8 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             product.setPrice(data.getPriceTax());
             product.setBarCode(data.getBarCode());
             product.setTaxRate(data.getOutputTaxRate());
+            product.setProductPropertyCode(data.getProductPropertyCode());
+            product.setProductPropertyName(data.getProductPropertyName());
 
         } catch (BusinessException e) {
             logger.info("获取商品信息失败：{}", e.getMessage());
