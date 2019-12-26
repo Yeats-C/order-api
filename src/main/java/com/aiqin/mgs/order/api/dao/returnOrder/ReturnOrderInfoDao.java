@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.dao.returnOrder;
 
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
+import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderSearchVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -33,4 +34,10 @@ public interface ReturnOrderInfoDao {
 
     //修改退款状态
     Integer updateRefundStatus(String orderStoreCode);
+
+    //后台销售退货单管理列表（搜索）
+    List<ReturnOrderInfo> page(ReturnOrderSearchVo searchVo);
+
+    //后台销售退货单管理列表条数（搜索）
+    Integer pageCount(ReturnOrderSearchVo searchVo);
 }

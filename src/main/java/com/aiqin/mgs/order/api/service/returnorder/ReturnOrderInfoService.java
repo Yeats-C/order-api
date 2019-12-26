@@ -1,5 +1,7 @@
 package com.aiqin.mgs.order.api.service.returnorder;
 
+import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 
 /**
@@ -71,4 +73,5 @@ public interface ReturnOrderInfoService {
     Boolean callback(RefundReq reqVo);
 
 
+    PageResData<ReturnOrderInfo> list(ReturnOrderSearchVo searchVo);
 }

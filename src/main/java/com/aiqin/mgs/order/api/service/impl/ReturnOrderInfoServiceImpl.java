@@ -5,6 +5,7 @@ import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ConstantData;
+import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.component.SequenceService;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
@@ -122,10 +123,12 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         return true;
     }
 
-//    @Override
-//    public PageResData<ReturnOrderListVo> list(OrderAfterSaleSearchVo searchVo) {
-//        return null;
-//    }
+    @Override
+    public PageResData<ReturnOrderInfo> list(ReturnOrderSearchVo searchVo) {
+        List<ReturnOrderInfo> content = returnOrderInfoDao.page(searchVo);
+        Integer pageCount = returnOrderInfoDao.pageCount(searchVo);
+        return new PageResData<>(pageCount, content);
+    }
 
     @Override
     @Transactional
