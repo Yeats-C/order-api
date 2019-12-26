@@ -979,7 +979,7 @@
   </select>
 
   <!--后台销售退货单管理列表数量（搜索）-->
-  <select id="pageCount" resultType="integer" parameterType="com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderSearchVo" >
+  <select id="pageCount" resultType="Integer" parameterType="com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderSearchVo" >
     select
     count(1)
     from return_order_info
