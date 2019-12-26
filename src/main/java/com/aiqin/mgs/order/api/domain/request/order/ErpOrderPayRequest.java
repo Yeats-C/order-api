@@ -27,4 +27,12 @@ public class ErpOrderPayRequest {
     @ApiModelProperty(value = "物流券唯一标识，可能是物流券编码 支付物流费用时使用")
     @JsonProperty("coupon_ids")
     private List<String> couponIds;
+
+    @ApiModelProperty(value = "用户id")
+    @JsonProperty("person_id")
+    private String personId;
+
+    @ApiModelProperty(value = "用户名称")
+    @JsonProperty("person_name")
+    private String personName;
 }
