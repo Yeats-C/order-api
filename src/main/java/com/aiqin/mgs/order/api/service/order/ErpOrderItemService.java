@@ -72,4 +72,16 @@ public interface ErpOrderItemService {
      * @date 2019/12/10 9:41
      */
     List<ErpOrderItem> selectOrderItemListByOrderId(String orderId);
+
+    /**
+     * 根据订单号+行号查询订单商品明细行
+     *
+     * @param orderCode 订单号
+     * @param lineCode  行号
+     * @return java.util.List<com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem>
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/26 14:18
+     */
+    ErpOrderItem getItemByOrderCodeAndLine(String orderCode, Long lineCode);
 }

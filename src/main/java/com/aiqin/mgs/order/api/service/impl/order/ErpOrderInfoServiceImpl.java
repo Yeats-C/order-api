@@ -8,6 +8,7 @@ import com.aiqin.mgs.order.api.domain.ProductInfo;
 import com.aiqin.mgs.order.api.domain.po.order.*;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderEditRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSignRequest;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import org.apache.commons.lang.StringUtils;
@@ -589,21 +590,26 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void orderSign(ErpOrderInfo erpOrderInfo) {
-        AuthToken auth = AuthUtil.getCurrentAuth();
-        if (erpOrderInfo == null) {
-            throw new BusinessException("空参数");
+    public void orderSign(ErpOrderSignRequest erpOrderSignRequest) {
+        if (erpOrderSignRequest == null || StringUtils.isEmpty(erpOrderSignRequest.getPersonId())) {
+            throw new BusinessException("缺失用户id");
         }
-        if (StringUtils.isEmpty(erpOrderInfo.getOrderStoreCode())) {
+        if (StringUtils.isEmpty(erpOrderSignRequest.getPersonName())) {
+            throw new BusinessException("缺失用户名称");
+        }
+        AuthToken auth = new AuthToken();
+        auth.setPersonId(erpOrderSignRequest.getPersonId());
+        auth.setPersonName(erpOrderSignRequest.getPersonName());
+        if (StringUtils.isEmpty(erpOrderSignRequest.getOrderCode())) {
             throw new BusinessException("订单编号为空");
         }
 
-        List<ErpOrderItem> paramItemList = erpOrderInfo.getItemList();
+        List<ErpOrderProductItemRequest> paramItemList = erpOrderSignRequest.getItemList();
         if (paramItemList == null || paramItemList.size() <= 0) {
             throw new BusinessException("商品明细为空");
         }
-        Map<Long, ErpOrderItem> orderItemSignMap = new HashMap<>(16);
-        for (ErpOrderItem item :
+        Map<Long, ErpOrderProductItemRequest> orderItemSignMap = new HashMap<>(16);
+        for (ErpOrderProductItemRequest item :
                 paramItemList) {
             if (item.getLineCode() == null) {
                 throw new BusinessException("缺失行号");
@@ -614,7 +620,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             orderItemSignMap.put(item.getLineCode(), item);
         }
 
-        ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(erpOrderInfo.getOrderStoreCode());
+        ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(erpOrderSignRequest.getOrderCode());
         if (order == null) {
             throw new BusinessException("无效的订单编号");
         }
@@ -641,7 +647,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             if (!orderItemSignMap.containsKey(item.getLineCode())) {
                 throw new BusinessException("第" + item.getLineCode() + "行签收信息为空");
             }
-            ErpOrderItem signItem = orderItemSignMap.get(item.getLineCode());
+            ErpOrderProductItemRequest signItem = orderItemSignMap.get(item.getLineCode());
             ErpOrderItem updateItem = new ErpOrderItem();
             updateItem.setId(item.getId());
             updateItem.setActualInboundCount(signItem.getActualInboundCount());

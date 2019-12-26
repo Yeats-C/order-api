@@ -6,7 +6,6 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.util.ExcelUtil;
-import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -55,16 +54,16 @@ public class ErpOrderExcelUtilController {
             for (String[] item :
                     excelData) {
                 Map<String, String> map = new LinkedHashMap<>(16);
-                map.put("spuCode", item[0]);
-                map.put("spuName", item[1]);
-                map.put("skuCode", item[2]);
-                map.put("skuName", item[3]);
-                map.put("taxPrice", item[4]);
+                map.put("spu_code", item[0]);
+                map.put("spu_name", item[1]);
+                map.put("sku_code", item[2]);
+                map.put("sku_name", item[3]);
+                map.put("tax_price", item[4]);
                 map.put("price", item[5]);
                 map.put("quantity", item[6]);
                 resultList.add(map);
             }
-            httpResponse.setData(JSON.toJSON(resultList));
+            httpResponse.setData(resultList);
         } catch (BusinessException e) {
             httpResponse = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {
