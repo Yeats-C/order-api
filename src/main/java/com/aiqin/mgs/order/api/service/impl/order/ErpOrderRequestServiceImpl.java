@@ -74,8 +74,8 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     public ProductInfo getSkuDetail(String companyCode, String skuCode) {
 
         String url = urlProperties.getProductApi() + "/search/spu/sku/detail";
-        url += "?companyCode=09";
-        url += "&skuCode=1001";
+        url += "?company_code=01";
+        url += "&sku_code=102423";
         ProductInfo product = new ProductInfo();
         try {
             HttpClient httpClient = HttpClient.get(url);
