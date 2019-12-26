@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.response.order;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -13,7 +14,7 @@ import lombok.Data;
 @Data
 public class ErpOrderSignResponse {
 
-    /***未签收订单数量*/
     @ApiModelProperty(value = "门店未签收订单数量")
+    @JsonProperty("need_sign_order_quantity")
     private Integer needSignOrderQuantity;
 }

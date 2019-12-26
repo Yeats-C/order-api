@@ -2,6 +2,8 @@ package com.aiqin.mgs.order.api.domain.request.order;
 
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.List;
@@ -16,9 +18,11 @@ import java.util.List;
 @Data
 public class ErpOrderDeliverRequest {
 
-    /***订单物流信息*/
+    @ApiModelProperty(value = "订单物流信息")
+    @JsonProperty("order_logistics")
     private ErpOrderLogistics orderLogistics;
 
-    /***订单信息*/
+    @ApiModelProperty(value = "订单信息")
+    @JsonProperty("order_list")
     private List<ErpOrderInfo> orderList;
 }

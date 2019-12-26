@@ -2,6 +2,8 @@ package com.aiqin.mgs.order.api.domain.po.order;
 
 import com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -18,49 +20,88 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class ErpOrderFee {
 
-    /***主键*/
+    @ApiModelProperty(value = "主键")
+    @JsonProperty("id")
     private Long id;
-    /***订单费用id*/
+
+    @ApiModelProperty(value = "费用id")
+    @JsonProperty("fee_id")
     private String feeId;
-    /***关联订单id*/
+
+    @ApiModelProperty(value = "关联订单id")
+    @JsonProperty("关联订单id")
     private String orderId;
-    /***支付单id*/
+
+    @ApiModelProperty(value = "支付单id")
+    @JsonProperty("pay_id")
     private String payId;
-    /***支付状态*/
+
+    @ApiModelProperty(value = "费用支付状态")
+    @JsonProperty("pay_status")
     private Integer payStatus;
-    /***支付状态描述*/
+
+    @ApiModelProperty(value = "支付状态描述")
+    @JsonProperty("pay_status_desc")
     private String payStatusDesc;
-    /***订单总额*/
+
+    @ApiModelProperty(value = "订单总额")
+    @JsonProperty("total_money")
     private BigDecimal totalMoney;
-    /***活动优惠金额*/
+
+    @ApiModelProperty(value = "活动优惠金额")
+    @JsonProperty("activity_money")
     private BigDecimal activityMoney;
-    /***服纺券优惠金额*/
+
+    @ApiModelProperty(value = "服纺券优惠金额")
+    @JsonProperty("suit_coupon_money")
     private BigDecimal suitCouponMoney;
-    /***A品券优惠金额*/
+
+    @ApiModelProperty(value = "A品券优惠金额")
+    @JsonProperty("top_coupon_money")
     private BigDecimal topCouponMoney;
-    /***实付金额*/
+
+    @ApiModelProperty(value = "实付金额")
+    @JsonProperty("pay_money")
     private BigDecimal payMoney;
-    /***返还物流券金额*/
+
+    @ApiModelProperty(value = "返还物流券金额")
+    @JsonProperty("goods_coupon")
     private BigDecimal goodsCoupon;
 
-    /***创建时间*/
+    @ApiModelProperty(value = "创建时间")
+    @JsonProperty("create_time")
     private Date createTime;
-    /***创建人id*/
+
+    @ApiModelProperty(value = "创建人id")
+    @JsonProperty("create_by_id")
     private String createById;
-    /***创建人姓名*/
+
+    @ApiModelProperty(value = "创建人姓名")
+    @JsonProperty("create_by_name")
     private String createByName;
-    /***更新时间*/
+
+    @ApiModelProperty(value = "更新时间")
+    @JsonProperty("update_time")
     private Date updateTime;
-    /***修改人id*/
+
+    @ApiModelProperty(value = "修改人id")
+    @JsonProperty("update_by_id")
     private String updateById;
-    /***修改人姓名*/
+
+    @ApiModelProperty(value = "修改人姓名")
+    @JsonProperty("update_by_name")
     private String updateByName;
-    /***数据状态 1有效 0删除*/
+
+    @ApiModelProperty(value = "数据状态 1有效 0删除")
+    @JsonProperty("status")
     private Integer status;
 
-    /***支付流水号*/
+    @ApiModelProperty(value = "支付流水号")
+    @JsonProperty("pay_code")
     private String payCode;
-    /***订单支付*/
+
+    @ApiModelProperty(value = "关联支付单")
+    @JsonProperty("order_pay")
     private ErpOrderPay orderPay;
 
     public String getPayStatusDesc() {

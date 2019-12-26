@@ -1,12 +1,6 @@
 package com.aiqin.mgs.order.api.component.enums;
 
-import com.aiqin.mgs.order.api.domain.EnumItemInfo;
 import lombok.Getter;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 逻辑状态枚举类
@@ -36,29 +30,33 @@ public enum YesOrNoEnum {
         this.desc = desc;
     }
 
-    /***选项类型*/
-    public static final List<EnumItemInfo> SELECT_LIST = new ArrayList<>();
-    /***value-enum map*/
-    public static final Map<String, YesOrNoEnum> VALUE_ENUM_MAP = new LinkedHashMap<>(16);
-
-    static {
-        for (YesOrNoEnum item :
-                YesOrNoEnum.values()) {
-            SELECT_LIST.add(new EnumItemInfo(item.getCode(), item.getValue(), item.getDesc()));
-            VALUE_ENUM_MAP.put(item.getValue(), item);
-        }
-    }
-
+    /**
+     * 根据值获取枚举类
+     *
+     * @param object
+     * @return
+     */
     public static YesOrNoEnum getEnum(Object object) {
         if (object != null) {
-            return VALUE_ENUM_MAP.get(object.toString());
+            for (YesOrNoEnum item :
+                    YesOrNoEnum.values()) {
+                if (item.getValue().equals(object.toString())) {
+                    return item;
+                }
+            }
         }
         return null;
     }
 
+    /**
+     * 根据枚举类的值获取枚举的描述
+     *
+     * @param object
+     * @return
+     */
     public static String getEnumDesc(Object object) {
         if (object != null) {
-            YesOrNoEnum anEnum = VALUE_ENUM_MAP.get(object.toString());
+            YesOrNoEnum anEnum = getEnum(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
             }
@@ -66,9 +64,19 @@ public enum YesOrNoEnum {
         return "";
     }
 
+
+    /**
+     * 校验值是否存在
+     *
+     * @param object
+     * @return
+     */
     public static boolean exist(Object object) {
         if (object != null) {
-            return VALUE_ENUM_MAP.containsKey(object.toString());
+            YesOrNoEnum anEnum = getEnum(object.toString());
+            if (anEnum != null) {
+                return true;
+            }
         }
         return false;
     }

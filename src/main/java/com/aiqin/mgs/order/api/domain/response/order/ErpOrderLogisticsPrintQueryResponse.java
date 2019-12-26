@@ -1,5 +1,8 @@
 package com.aiqin.mgs.order.api.domain.response.order;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -13,29 +16,51 @@ import java.util.Date;
  * @date 2019/12/10 16:40
  */
 @Data
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class ErpOrderLogisticsPrintQueryResponse {
 
-    /***门店名称*/
+    @ApiModelProperty(value = "门店名称")
+    @JsonProperty("store_name")
     private String storeName;
-    /***订单编号*/
+
+    @ApiModelProperty(value = "订单编号")
+    @JsonProperty("order_code")
     private String orderCode;
-    /***物流公司编码*/
+
+    @ApiModelProperty(value = "物流公司编码")
+    @JsonProperty("logistic_centre_code")
     private String logisticCentreCode;
-    /***物流公司名称*/
+
+    @ApiModelProperty(value = "物流公司名称")
+    @JsonProperty("logistic_centre_name")
     private String logisticCentreName;
-    /***物流单号*/
+
+    @ApiModelProperty(value = "物流单号")
+    @JsonProperty("logistic_code")
     private String logisticCode;
-    /***物流费用*/
+
+    @ApiModelProperty(value = "物流费用")
+    @JsonProperty("logistic_fee")
     private BigDecimal logisticFee;
-    /***物流券支付金额*/
+
+    @ApiModelProperty(value = "物流券支付金额")
+    @JsonProperty("coupon_pay_fee")
     private BigDecimal couponPayFee;
-    /***余额支付金额*/
+
+    @ApiModelProperty(value = "余额支付金额")
+    @JsonProperty("balance_pay_fee")
     private BigDecimal balancePayFee;
-    /***支付流水号*/
+
+    @ApiModelProperty(value = "支付流水号")
+    @JsonProperty("pay_code")
     private String payCode;
-    /***支付完成时间*/
+
+    @ApiModelProperty(value = "支付完成时间")
+    @JsonProperty("pay_end_time")
     private Date payEndTime;
-    /***支付人姓名*/
+
+    @ApiModelProperty(value = "支付人姓名")
+    @JsonProperty("pay_user")
     private String payUser;
 
 }

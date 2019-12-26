@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.request.order;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -13,11 +14,12 @@ import lombok.Data;
 @Data
 public class ErpOrderSignRequest {
 
-    /***订单编号*/
     @ApiModelProperty(value = "订单编号")
+    @JsonProperty("order_code")
     private String orderCode;
-    /***门店id*/
+
     @ApiModelProperty(value = "门店id")
+    @JsonProperty("store_id")
     private String storeId;
 
 }

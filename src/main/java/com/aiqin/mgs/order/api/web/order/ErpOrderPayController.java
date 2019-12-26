@@ -5,7 +5,6 @@ import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayCallbackRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
@@ -61,7 +60,7 @@ public class ErpOrderPayController {
 
     @PostMapping("/orderPayResult")
     @ApiOperation(value = "订单支付结果查询")
-    public HttpResponse orderPayResult(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
+    public HttpResponse<ErpOrderPayResultResponse> orderPayResult(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
         HttpResponse response = HttpResponse.success();
         try {
             ErpOrderPayResultResponse erpOrderPayResultResponse = erpOrderPayService.orderPayResult(erpOrderPayRequest);
@@ -94,7 +93,7 @@ public class ErpOrderPayController {
 
     @PostMapping("/getOrderPayRepayInfo")
     @ApiOperation(value = "查询确认收款信息")
-    public HttpResponse getOrderPayRepayInfo(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
+    public HttpResponse<ErpOrderPay> getOrderPayRepayInfo(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
         HttpResponse response = HttpResponse.success();
         try {
             ErpOrderPay payRepayInfo = erpOrderPayService.getOrderPayRepayInfo(erpOrderPayRequest);
@@ -131,7 +130,6 @@ public class ErpOrderPayController {
     public HttpResponse orderLogisticsPay(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-            AuthUtil.loginCheck();
             //发起支付
             erpOrderPayService.orderLogisticsPay(erpOrderPayRequest);
         } catch (BusinessException e) {
@@ -146,7 +144,7 @@ public class ErpOrderPayController {
 
     @PostMapping("/orderLogisticsPayResult")
     @ApiOperation(value = "订单物流费用支付结果轮询")
-    public HttpResponse orderLogisticsPayResult(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
+    public HttpResponse<ErpOrderLogisticsPayResultResponse> orderLogisticsPayResult(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
         HttpResponse response = HttpResponse.success();
         try {
             ErpOrderLogisticsPayResultResponse resultResponse = erpOrderPayService.orderLogisticsPayResult(erpOrderPayRequest);
@@ -163,7 +161,7 @@ public class ErpOrderPayController {
 
     @PostMapping("/orderLogisticsPrintQuery")
     @ApiOperation(value = "订单物流费用支付凭证")
-    public HttpResponse orderLogisticsPrintQuery(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
+    public HttpResponse<ErpOrderLogisticsPrintQueryResponse> orderLogisticsPrintQuery(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
         HttpResponse response = HttpResponse.success();
         try {
             ErpOrderLogisticsPrintQueryResponse queryResponse = erpOrderPayService.orderLogisticsPrintQuery(erpOrderPayRequest);

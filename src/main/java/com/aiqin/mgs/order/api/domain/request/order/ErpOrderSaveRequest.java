@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.request.order;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -15,19 +16,19 @@ import java.util.List;
 @Data
 public class ErpOrderSaveRequest {
 
-    /***门店id*/
     @ApiModelProperty(value = "门店id")
+    @JsonProperty("store_id")
     private String storeId;
 
-    /***订单类型 ErpOrderTypeEnum*/
     @ApiModelProperty(value = "订单类型")
+    @JsonProperty("order_type")
     private Integer orderType;
 
-    /***订单类别 ErpOrderCategoryEnum*/
     @ApiModelProperty(value = "订单类别")
+    @JsonProperty("order_category")
     private Integer orderCategory;
 
-    /***货架商品列表*/
     @ApiModelProperty(value = "货架商品列表")
+    @JsonProperty("item_list")
     private List<ErpOrderProductItemRequest> itemList;
 }

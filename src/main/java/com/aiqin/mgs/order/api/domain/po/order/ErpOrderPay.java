@@ -1,5 +1,8 @@
 package com.aiqin.mgs.order.api.domain.po.order;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -13,41 +16,71 @@ import java.util.Date;
  * @date 2019/12/9 9:56
  */
 @Data
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class ErpOrderPay {
 
-    /***主键*/
+    @ApiModelProperty(value = "主键")
+    @JsonProperty("id")
     private Long id;
 
-    /***支付id*/
+    @ApiModelProperty(value = "支付id")
+    @JsonProperty("pay_id")
     private String payId;
-    /***业务外键*/
+
+    @ApiModelProperty(value = "业务外键")
+    @JsonProperty("business_key")
     private String businessKey;
-    /***支付流水号*/
+
+    @ApiModelProperty(value = "支付流水号")
+    @JsonProperty("pay_code")
     private String payCode;
-    /***费用类型*/
+
+    @ApiModelProperty(value = "费用类型")
+    @JsonProperty("fee_type")
     private Integer feeType;
-    /***支付状态*/
+
+    @ApiModelProperty(value = "支付状态")
+    @JsonProperty("pay_status")
     private Integer payStatus;
-    /***支付方式*/
+
+    @ApiModelProperty(value = "支付方式")
+    @JsonProperty("pay_way")
     private Integer payWay;
-    /***费用*/
+
+    @ApiModelProperty(value = "支付费用")
+    @JsonProperty("pay_fee")
     private BigDecimal payFee;
-    /***开始支付时间*/
+
+    @ApiModelProperty(value = "开始支付时间")
+    @JsonProperty("pay_start_time")
     private Date payStartTime;
-    /***结束支付时间*/
+
+    @ApiModelProperty(value = "结束支付时间")
+    @JsonProperty("pay_end_time")
     private Date payEndTime;
 
-    /***创建时间*/
+    @ApiModelProperty(value = "创建时间")
+    @JsonProperty("create_time")
     private Date createTime;
-    /***创建人id*/
+
+    @ApiModelProperty(value = "创建人id")
+    @JsonProperty("create_by_id")
     private String createById;
-    /***创建人姓名*/
+
+    @ApiModelProperty(value = "创建人姓名")
+    @JsonProperty("create_by_name")
     private String createByName;
-    /***更新时间*/
+
+    @ApiModelProperty(value = "更新时间")
+    @JsonProperty("update_time")
     private Date updateTime;
-    /***修改人id*/
+
+    @ApiModelProperty(value = "修改人id")
+    @JsonProperty("update_by_id")
     private String updateById;
-    /***修改人姓名*/
+
+    @ApiModelProperty(value = "修改人姓名")
+    @JsonProperty("update_by_name")
     private String updateByName;
 
 }

@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.request.order;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -15,11 +16,11 @@ import java.util.List;
 @Data
 public class ErpOrderEditRequest {
 
-    /***订单编号*/
     @ApiModelProperty(value = "订单编号")
+    @JsonProperty("order_code")
     private String orderCode;
 
-    /***赠品行*/
     @ApiModelProperty(value = "赠品行")
+    @JsonProperty("product_gift_list")
     private List<ErpOrderProductItemRequest> productGiftList;
 }

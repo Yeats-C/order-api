@@ -141,7 +141,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
         erpOrderFeeService.updateOrderFeeByPrimaryKeySelective(orderFee, auth);
 
         //开启轮询
-        payPolling(payId);
+//        payPolling(payId);
     }
 
     @Override
@@ -519,8 +519,16 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void orderLogisticsPay(ErpOrderPayRequest erpOrderPayRequest) {
-        AuthToken auth = AuthUtil.getCurrentAuth();
-        if (erpOrderPayRequest == null || StringUtils.isEmpty(erpOrderPayRequest.getOrderCode())) {
+        if (erpOrderPayRequest == null || StringUtils.isEmpty(erpOrderPayRequest.getPersonId())) {
+            throw new BusinessException("缺失用户id");
+        }
+        if (StringUtils.isEmpty(erpOrderPayRequest.getPersonName())) {
+            throw new BusinessException("缺失用户名称");
+        }
+        AuthToken auth = new AuthToken();
+        auth.setPersonId(erpOrderPayRequest.getPersonId());
+        auth.setPersonName(erpOrderPayRequest.getPersonName());
+        if (StringUtils.isEmpty(erpOrderPayRequest.getOrderCode())) {
             throw new BusinessException("缺失订单号");
         }
         ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(erpOrderPayRequest.getOrderCode());
@@ -546,7 +554,17 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
             throw new BusinessException("物流单已经支付成功，不能重复支付");
         }
 
-        String couponIds = erpOrderPayRequest.getCouponIds();
+        List<String> couponIdList = erpOrderPayRequest.getCouponIds();
+        String couponIds = null;
+        if (couponIdList != null && couponIdList.size() > 0) {
+            couponIds = String.join(",", couponIdList);
+        }
+
+        if (1==1) {
+            //TODO CT 临时测试接口返回值
+            return;
+        }
+
         //TODO CT 获取物流券信息
         //TODO CT 计算物流费用
         BigDecimal couponPayFee = BigDecimal.ZERO;
