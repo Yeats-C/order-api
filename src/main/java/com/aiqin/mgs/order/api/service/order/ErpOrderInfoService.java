@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.service.order;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderEditRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSignRequest;
 
 /**
  * 订单新增修改封装原子操作service
@@ -86,11 +87,11 @@ public interface ErpOrderInfoService {
     /**
      * 订单签收
      *
-     * @param erpOrderInfo
+     * @param erpOrderSignRequest
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/10 9:39
      */
-    void orderSign(ErpOrderInfo erpOrderInfo);
+    void orderSign(ErpOrderSignRequest erpOrderSignRequest);
 }

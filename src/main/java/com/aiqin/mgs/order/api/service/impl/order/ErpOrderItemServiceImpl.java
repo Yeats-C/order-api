@@ -69,4 +69,19 @@ public class ErpOrderItemServiceImpl implements ErpOrderItemService {
         return list;
     }
 
+    @Override
+    public ErpOrderItem getItemByOrderCodeAndLine(String orderCode, Long lineCode) {
+        ErpOrderItem erpOrderItem = null;
+        if (StringUtils.isNotEmpty(orderCode) && lineCode != null) {
+            ErpOrderItem query = new ErpOrderItem();
+            query.setOrderStoreCode(orderCode);
+            query.setLineCode(lineCode);
+            List<ErpOrderItem> select = erpOrderItemDao.select(query);
+            if (select != null && select.size() > 0) {
+                erpOrderItem = select.get(0);
+            }
+        }
+        return erpOrderItem;
+    }
+
 }

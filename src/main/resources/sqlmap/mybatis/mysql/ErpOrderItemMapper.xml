@@ -61,6 +61,9 @@
         <if test=" orderStoreCode != null and orderStoreCode != '' ">
             and order_store_code = #{orderStoreCode}
         </if>
+        <if test=" lineCode != null and lineCode != '' ">
+            and line_code = #{lineCode}
+        </if>
         <if test=" useStatus != null and useStatus != '' or useStatus == 0 ">
             and use_status = #{useStatus}
         </if>

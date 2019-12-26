@@ -36,4 +36,16 @@ public class ErpOrderProductItemRequest {
     @JsonProperty("tax_price")
     private BigDecimal taxPrice;
 
+    @ApiModelProperty(value = "行号 签收时使用")
+    @JsonProperty("line_code")
+    private Long lineCode;
+
+    @ApiModelProperty(value = "门店实收数量 签收时使用")
+    @JsonProperty("actual_inbound_count")
+    private Long actualInboundCount;
+
+    @ApiModelProperty(value = "签收数量差异原因 签收时使用")
+    @JsonProperty("sign_difference_reason")
+    private String signDifferenceReason;
+
 }
