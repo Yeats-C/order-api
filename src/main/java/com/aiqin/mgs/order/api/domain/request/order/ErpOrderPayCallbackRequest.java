@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.request.order;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -13,10 +14,11 @@ import lombok.Data;
 @Data
 public class ErpOrderPayCallbackRequest {
 
-    /***支付id*/
     @ApiModelProperty(value = "支付id")
+    @JsonProperty("pay_id")
     private String payId;
-    /***支付流水号*/
+
     @ApiModelProperty(value = "支付流水号")
+    @JsonProperty("pay_code")
     private String payCode;
 }

@@ -130,7 +130,6 @@ public class ErpOrderPayController {
     public HttpResponse orderLogisticsPay(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-            AuthUtil.loginCheck();
             //发起支付
             erpOrderPayService.orderLogisticsPay(erpOrderPayRequest);
         } catch (BusinessException e) {

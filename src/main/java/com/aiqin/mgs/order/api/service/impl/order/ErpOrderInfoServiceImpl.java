@@ -193,11 +193,11 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             //商品数量
             orderItem.setProductCount((long) item.getQuantity());
             //商品单价
-            orderItem.setProductAmount(item.getPrice());
+            orderItem.setProductAmount(BigDecimal.ZERO);
             //商品总价
-            orderItem.setTotalProductAmount(item.getPrice().multiply(new BigDecimal(item.getQuantity())));
+            orderItem.setTotalProductAmount(BigDecimal.ZERO);
             //实际商品总价
-            orderItem.setActualTotalProductAmount(orderItem.getTotalProductAmount());
+            orderItem.setActualTotalProductAmount(BigDecimal.ZERO);
             //优惠分摊总金额
             orderItem.setTotalPreferentialAmount(BigDecimal.ZERO);
             //活动优惠总金额
