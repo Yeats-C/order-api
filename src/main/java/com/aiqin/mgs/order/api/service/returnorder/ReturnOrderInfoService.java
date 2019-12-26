@@ -72,6 +72,16 @@ public interface ReturnOrderInfoService {
      */
     Boolean callback(RefundReq reqVo);
 
-
+    /**
+     *后台销售管理--退货单列表--后台销售退货单管理列表（搜索）
+     * @param searchVo
+     * @return
+     */
     PageResData<ReturnOrderInfo> list(ReturnOrderSearchVo searchVo);
+    /**
+     *后台销售管理--退货单列表--退货单号（退货详情）
+     * @param returnOrderCode
+     * @return
+     */
+    ReturnOrderDetailVO detail(String returnOrderCode);
 }

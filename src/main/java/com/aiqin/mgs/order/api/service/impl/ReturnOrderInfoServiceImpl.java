@@ -37,10 +37,7 @@ import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -509,6 +506,23 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         record.setPayType(payType);
         int res=refundInfoDao.insertSelective(record);
         return res>0;
+    }
+
+    @Override
+    public ReturnOrderDetailVO detail(String returnOrderCode) {
+        //通过退货单号校验退货单是否存在
+        Map queryData = new HashMap();
+        queryData.put("returnOrderCode",returnOrderCode);
+        ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByParameter(queryData);
+        Assert.notNull(returnOrderInfo, "退货单不存在");
+
+        //查询退货单详情
+        List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderCode);
+        ReturnOrderDetailVO respVo = new ReturnOrderDetailVO();
+        respVo.setReturnOrderInfo(returnOrderInfo);
+        respVo.setDetails(returnOrderDetails);
+
+        return respVo;
     }
 
 }

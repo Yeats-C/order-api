@@ -8,10 +8,8 @@ import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.annotations.ApiParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -93,6 +91,12 @@ public class ReturnOrderInfoController {
             return  HttpResponse.success();
         }
         return HttpResponse.failure(ResultCode.PAY_ERROR);
+    }
+
+    @ApiOperation("退货单号（退货详情）")
+    @GetMapping("/detail")
+    public HttpResponse<ReturnOrderDetailVO> detail(@ApiParam("退货单号") @RequestParam("ReturnOrderCode") String ReturnOrderCode) {
+        return new HttpResponse<>(returnOrderInfoService.detail(ReturnOrderCode));
     }
 
 }
