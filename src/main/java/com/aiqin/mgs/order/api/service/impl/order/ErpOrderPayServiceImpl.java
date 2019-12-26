@@ -519,8 +519,16 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void orderLogisticsPay(ErpOrderPayRequest erpOrderPayRequest) {
-        AuthToken auth = AuthUtil.getCurrentAuth();
-        if (erpOrderPayRequest == null || StringUtils.isEmpty(erpOrderPayRequest.getOrderCode())) {
+        if (erpOrderPayRequest == null || StringUtils.isEmpty(erpOrderPayRequest.getPersonId())) {
+            throw new BusinessException("缺失用户id");
+        }
+        if (StringUtils.isEmpty(erpOrderPayRequest.getPersonName())) {
+            throw new BusinessException("缺失用户名称");
+        }
+        AuthToken auth = new AuthToken();
+        auth.setPersonId(erpOrderPayRequest.getPersonId());
+        auth.setPersonName(erpOrderPayRequest.getPersonName());
+        if (StringUtils.isEmpty(erpOrderPayRequest.getOrderCode())) {
             throw new BusinessException("缺失订单号");
         }
         ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(erpOrderPayRequest.getOrderCode());

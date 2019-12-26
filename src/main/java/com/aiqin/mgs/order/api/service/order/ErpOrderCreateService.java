@@ -13,7 +13,7 @@ import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
 public interface ErpOrderCreateService {
 
     /**
-     * 创建订单
+     * erp从购物车创建订单
      *
      * @param erpOrderSaveRequest
      * @return com.aiqin.mgs.order.api.domain.vo.order.ErpOrderInfoVO
@@ -21,7 +21,18 @@ public interface ErpOrderCreateService {
      * @version: v1.0.0
      * @date 2019/12/9 13:59
      */
-    ErpOrderInfo saveOrder(ErpOrderSaveRequest erpOrderSaveRequest);
+    ErpOrderInfo erpSaveOrder(ErpOrderSaveRequest erpOrderSaveRequest);
+
+    /**
+     * 爱掌柜从购物车创建订单
+     *
+     * @param erpOrderSaveRequest
+     * @return com.aiqin.mgs.order.api.domain.vo.order.ErpOrderInfoVO
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/9 13:59
+     */
+    ErpOrderInfo storeSaveOrder(ErpOrderSaveRequest erpOrderSaveRequest);
 
     /**
      * 创建货架订单
