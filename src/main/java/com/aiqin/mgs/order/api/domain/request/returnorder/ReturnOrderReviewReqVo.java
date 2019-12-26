@@ -22,7 +22,7 @@ public class ReturnOrderReviewReqVo implements Serializable {
 
     private static final long serialVersionUID = 731706668149842489L;
 
-    @NotBlank(message = "售后类型不能为空")
+    @NotBlank(message = "售后单ID")
     @ApiModelProperty("售后单ID")
     private String returnOrderId;
 
@@ -36,22 +36,22 @@ public class ReturnOrderReviewReqVo implements Serializable {
     @ApiModelProperty(value = "操作人", hidden = true)
     private String operator;
 
-    @NotBlank(message = "售后类型不能为空")
+    @NotBlank(message = "审核操作状态")
     @ApiModelProperty("审核操作状态(erp内部使用)：1--通过 2--挂账 3--不通过（驳回）,(供应链使用)4-等待退货验收，5-等待退货入库 11-退货完成")
     private Integer operateStatus;
 
-    @NotBlank(message = "售后类型不能为空")
+    @NotBlank(message = "申请人姓名")
     @ApiModelProperty(value="申请人姓名")
     private String userName;
 
-    @NotBlank(message = "售后类型不能为空")
+    @NotBlank(message = "申请人编码")
     @ApiModelProperty(value="申请人编码")
     private String applier;
 
     @ApiModelProperty(value="审批人所属部门")
     private String deptCode;
 
-    @NotBlank(message = "售后类型不能为空")
+    @NotBlank(message = "加盟商id")
     @ApiModelProperty("加盟商id")
     private String franchiseeId;
 

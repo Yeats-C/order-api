@@ -1,9 +1,6 @@
 package com.aiqin.mgs.order.api.service.returnorder;
 
-import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailVO;
-import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReqVo;
-import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewApiReqVo;
-import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
+import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 
 /**
  * description: ReturnOrderInfoService
@@ -65,5 +62,13 @@ public interface ReturnOrderInfoService {
      * @return
      */
     Boolean updateLogistics(String returnOrderCode,String logisticsCompanyCode,String logisticsCompanyName,String logisticsNo);
+
+    /**
+     * 支付中心---发起退款单回调
+     * @param reqVo
+     * @return
+     */
+    Boolean callback(RefundReq reqVo);
+
 
 }
