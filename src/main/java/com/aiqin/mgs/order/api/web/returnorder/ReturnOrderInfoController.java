@@ -1,10 +1,8 @@
 package com.aiqin.mgs.order.api.web.returnorder;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailVO;
-import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReqVo;
-import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewApiReqVo;
-import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
+import com.aiqin.mgs.order.api.base.ResultCode;
+import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -85,5 +83,14 @@ public class ReturnOrderInfoController {
         return new HttpResponse<>(review);
     }
 
+    @ApiOperation("支付中心---发起退款单回调")
+    @PostMapping("/callback")
+    public HttpResponse callback(@RequestBody RefundReq reqVo) {
+        Boolean review = returnOrderInfoService.callback(reqVo);
+        if(review){
+            return  HttpResponse.success();
+        }
+        return HttpResponse.failure(ResultCode.PAY_ERROR);
+    }
 
 }

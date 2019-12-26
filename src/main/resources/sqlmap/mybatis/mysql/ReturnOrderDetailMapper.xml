@@ -417,4 +417,22 @@
         where return_order_code = #{returnOrderCode}
     </select>
 
+    <update id="updateActualCountBatch" parameterType="java.util.List">
+        <!-- collection可以是List对于list,数组对于array,Map对应ids -->
+        <foreach collection="list" item="item" separator=";">
+            update return_order_detail
+            actual_return_product_count = #{item.actualReturnProductCount}
+            where return_order_detail_id = #{item.returnOrderDetailId}
+        </foreach>
+    </update>
+
+    <update id="updateActualAmountBatch" parameterType="java.util.List">
+        <!-- collection可以是List对于list,数组对于array,Map对应ids -->
+        <foreach collection="list" item="item" separator=";">
+            update return_order_detail
+            actual_total_product_amount = #{item.actualTotalProductAmount}
+            where return_order_detail_id = #{item.returnOrderDetailId}
+        </foreach>
+    </update>
+
 </mapper>
