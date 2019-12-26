@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.request.ProductOverViewReq;
+import com.aiqin.mgs.order.api.domain.request.ProductSeachSkuReq;
 import com.aiqin.mgs.order.api.domain.response.ProductBaseUnResp;
 import com.aiqin.mgs.order.api.domain.response.ProductLabelStatusResp;
 import com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateDaily;
@@ -8,6 +9,7 @@ import com.aiqin.mgs.order.api.domain.response.conversionrate.StoreTransforRateY
 import com.aiqin.mgs.order.api.domain.response.customer.CustomreFlowDaily;
 import com.aiqin.mgs.order.api.domain.response.customer.CustomreFlowYearMonth;
 import com.aiqin.mgs.order.api.domain.response.sales.*;
+import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -162,4 +164,13 @@ public interface StoreOverviewDao {
      * @return
      */
     List<ProductBaseUnResp> productBaseUnInfo(ProductOverViewReq productOverViewReq);
+
+    /**
+     *  爱掌柜商品总库商品列表畅销滞销sku
+     * @param productSeachSkuReq
+     * @return
+     */
+    List<String> storeProductSku(ProductSeachSkuReq productSeachSkuReq);
+
+    Integer storeProductSkuCount(ProductSeachSkuReq productSeachSkuReq);
 }

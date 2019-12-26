@@ -1,5 +1,7 @@
 package com.aiqin.mgs.order.api.domain.response.order;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -13,29 +15,30 @@ import java.util.Date;
  * @date 2019/12/10 16:40
  */
 @Data
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class ErpOrderLogisticsPrintQueryResponse {
 
-    /***门店名称*/
+    @ApiModelProperty(value = "门店名称")
     private String storeName;
-    /***订单编号*/
+    @ApiModelProperty(value = "订单编号")
     private String orderCode;
-    /***物流公司编码*/
+    @ApiModelProperty(value = "物流公司编码")
     private String logisticCentreCode;
-    /***物流公司名称*/
+    @ApiModelProperty(value = "物流公司名称")
     private String logisticCentreName;
-    /***物流单号*/
+    @ApiModelProperty(value = "物流单号")
     private String logisticCode;
-    /***物流费用*/
+    @ApiModelProperty(value = "物流费用")
     private BigDecimal logisticFee;
-    /***物流券支付金额*/
+    @ApiModelProperty(value = "物流券支付金额")
     private BigDecimal couponPayFee;
-    /***余额支付金额*/
+    @ApiModelProperty(value = "余额支付金额")
     private BigDecimal balancePayFee;
-    /***支付流水号*/
+    @ApiModelProperty(value = "支付流水号")
     private String payCode;
-    /***支付完成时间*/
+    @ApiModelProperty(value = "支付完成时间")
     private Date payEndTime;
-    /***支付人姓名*/
+    @ApiModelProperty(value = "支付人姓名")
     private String payUser;
 
 }

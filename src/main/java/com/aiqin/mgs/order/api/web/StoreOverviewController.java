@@ -130,4 +130,24 @@ public class StoreOverviewController {
         return storeOverviewService.productBaseUnInfo(productOverViewReq);
     }
 
+    /**
+     *  爱掌柜商品总库商品列表畅销滞销sku
+     * @param storeId
+     * @param status
+     * @return
+     */
+    @GetMapping("/store/product/sku")
+    @ApiOperation(value = "商品列表（获取畅销滞销sku）")
+    @ApiImplicitParams({@ApiImplicitParam(name = "store_id", value = "门店id", dataType = "String"),
+            @ApiImplicitParam(name = "status", value = "状态：0畅销，1滞销", dataType = "String"),
+            @ApiImplicitParam(name = "page_no", value = "当前页", dataType = "String"),
+            @ApiImplicitParam(name = "page_size", value = "每页条数", dataType = "String"),
+    })
+    public HttpResponse storeProductSku(@RequestParam(value = "store_id") String storeId,
+                                        @RequestParam(value = "status") String status,
+                                        @RequestParam(value = "page_no") String pageNo,
+                                        @RequestParam(value = "page_size") String pageSize){
+        LOGGER.info("获取门店商品列表（获取畅销滞销sku）......",storeId,status,pageNo,pageSize);
+        return storeOverviewService.storeProductSku(storeId,status,pageNo,pageSize);
+    }
 }

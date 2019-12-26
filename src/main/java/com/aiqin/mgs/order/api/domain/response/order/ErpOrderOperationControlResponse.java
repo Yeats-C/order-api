@@ -13,15 +13,19 @@ import lombok.Data;
 @Data
 public class ErpOrderOperationControlResponse {
 
-    @ApiModelProperty(value = "确认收款按钮 1有 0无")
-    private int repay = 0;
-    @ApiModelProperty(value = "编辑订单添加赠品按钮 1有 0无")
-    private int addGift = 0;
-    @ApiModelProperty(value = "支付订单费用 1有 0无")
-    private int payOrder = 0;
-    @ApiModelProperty(value = "订单签收 1有 0无")
-    private int sign = 0;
-    @ApiModelProperty(value = "支付物流费用 1有 0无")
-    private int payLogistics = 0;
+    @ApiModelProperty(value = "确认收款按钮 0有 1无")
+    private int repay = 1;
+    @ApiModelProperty(value = "编辑订单添加赠品按钮 0有 1无")
+    private int addGift = 1;
+    @ApiModelProperty(value = "支付订单费用 0有 1无")
+    private int payOrder = 1;
+    @ApiModelProperty(value = "订单签收 0有 1无")
+    private int sign = 1;
+    @ApiModelProperty(value = "支付物流费用 0有 1无")
+    private int payLogistics = 1;
+    @ApiModelProperty(value = "取消 0有 1无")
+    private int cancel = 1;
+    @ApiModelProperty(value = "查看 0有 1无")
+    private int detail = 0;
 
 }

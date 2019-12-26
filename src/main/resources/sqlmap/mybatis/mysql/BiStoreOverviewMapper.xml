@@ -194,5 +194,28 @@
             sale_margin desc
         </if>
     </select>
+    <select id="storeProductSku" parameterType="com.aiqin.mgs.order.api.domain.request.ProductSeachSkuReq"
+            resultType="java.lang.String">
+        select sku_code from bi_product_overview
+        where store_id = #{storeId}
+        <if test="status != null and status == 0">
+            and product_label_code=0
+        </if>
+        <if test="status != null and status == 1">
+            and product_label_code=2
+        </if>
+        limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </select>
+    <select id="storeProductSkuCount" parameterType="com.aiqin.mgs.order.api.domain.request.ProductSeachSkuReq"
+            resultType="java.lang.Integer">
+        select count(1) from bi_product_overview
+        where store_id = #{storeId}
+        <if test="status != null and status == 0">
+            and product_label_code=0
+        </if>
+        <if test="status != null and status == 1">
+            and product_label_code=2
+        </if>
+    </select>
 </mapper>
 
