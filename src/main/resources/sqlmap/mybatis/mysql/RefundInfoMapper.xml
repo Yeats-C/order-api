@@ -108,4 +108,11 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
 
+  <update id="updateByOrderCode" parameterType="com.aiqin.mgs.order.api.domain.RefundInfo" >
+    update refund_info
+    set pay_num = #{payNum},status = #{status},update_time = #{updateTime}
+    where order_code = #{orderCode}
+  </update>
+
+
 </mapper>

@@ -8,6 +8,7 @@ import com.aiqin.mgs.order.api.base.ConstantData;
 import com.aiqin.mgs.order.api.component.SequenceService;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
+import com.aiqin.mgs.order.api.dao.returnorder.RefundInfoDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
@@ -72,6 +73,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     private CouponApprovalDetailDao couponApprovalDetailDao;
     @Resource
     private RejectRecordService rejectRecordService;
+    @Resource
+    private RefundInfoDao refundInfoDao;
 
     @Override
     @Transactional
@@ -262,12 +265,19 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 
     @Override
     public Boolean callback(RefundReq reqVo) {
+        log.info("退款回调开始，reqVo={}",reqVo);
         //查询退货单状态是否修改成功
         ReturnOrderInfo returnOrderInfo=returnOrderInfoDao.selectByReturnOrderCode(reqVo.getOrderNo());
         //退款状态，0-未退款、1-已退款
         if(returnOrderInfo!=null&&returnOrderInfo.getRefundStatus().equals(ConstantData.refundStatus)){//1-已退款
             return true;
         }
+        RefundInfo record=new RefundInfo();
+        record.setOrderCode(reqVo.getOrderNo());
+        record.setPayNum(reqVo.getPayNum());
+        record.setUpdateTime(new Date());
+        record.setStatus(ConstantData.refundStatus);
+        refundInfoDao.updateByOrderCode(record);
         return returnOrderInfoDao.updateRefundStatus(reqVo.getOrderNo())>0;
     }
 
@@ -404,9 +414,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         ReturnOrderInfo returnOrderInfo=returnOrderInfoDao.selectByReturnOrderCode(returnOrderCode);
         log.info("发起退款单申请，returnOrderInfo={}",returnOrderInfo);
         if(returnOrderInfo!=null){
+            //同步至支付流水表
+            insertRefundInfo(returnOrderInfo.getActualReturnOrderAmount(),returnOrderInfo.getReturnOrderCode(),ConstantData.payTypeRefund);
             String url=paymentHost+"/payment/pay/payTobAll";
             JSONObject json=new JSONObject();
-            json.put("order_no",returnOrderInfo.getReturnOrderId());
+            json.put("order_no",returnOrderInfo.getReturnOrderCode());
             json.put("order_amount",returnOrderInfo.getActualReturnOrderAmount());
             json.put("fee",0);
             json.put("order_time",returnOrderInfo.getCreateTime());
@@ -443,14 +455,14 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             if(StringUtils.isNotBlank(request)){
                 JSONObject jsonObject= JSON.parseObject(request);
                 if(jsonObject.containsKey("code")&&"0".equals(jsonObject.getString("code"))){
-                    log.info("退款完成，修改退货单状态");
-                    //查询退货单状态是否修改成功
-                    ReturnOrderInfo returnOrderInfo1=returnOrderInfoDao.selectByReturnOrderCode(returnOrderCode);
-                    //退款状态，0-未退款、1-已退款
-                    if(returnOrderInfo1!=null&&returnOrderInfo1.getRefundStatus().equals(ConstantData.refundStatus)){//1-已退款
-                        return true;
-                    }
-                    returnOrderInfoDao.updateRefundStatus(returnOrderCode);
+//                    log.info("退款完成，修改退货单状态");
+//                    //查询退货单状态是否修改成功
+//                    ReturnOrderInfo returnOrderInfo1=returnOrderInfoDao.selectByReturnOrderCode(returnOrderCode);
+//                    //退款状态，0-未退款、1-已退款
+//                    if(returnOrderInfo1!=null&&returnOrderInfo1.getRefundStatus().equals(ConstantData.refundStatus)){//1-已退款
+//                        return true;
+//                    }
+//                    returnOrderInfoDao.updateRefundStatus(returnOrderCode);
                     log.info("退款完成");
                     return true;
                 }
@@ -477,6 +489,23 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             }
         }
         return franchiseeId;
+    }
+
+    /**
+     * 同步至支付流水表
+     * @param amount
+     * @param orderCode
+     * @param payType
+     * @return
+     */
+    public Boolean insertRefundInfo(BigDecimal amount,String orderCode,Integer payType){
+        RefundInfo record=new RefundInfo();
+        record.setOrderAmount(amount);
+        record.setOrderCode(orderCode);
+//        record.setPayNum(payNum);
+        record.setPayType(payType);
+        int res=refundInfoDao.insertSelective(record);
+        return res>0;
     }
 
 }

@@ -12,4 +12,11 @@ public interface RefundInfoDao {
 
     int updateByPrimaryKeySelective(RefundInfo record);
 
+    /**
+     * 根据订单编码修改支付流水信息
+     * @param record
+     * @return
+     */
+    int updateByOrderCode(RefundInfo record);
+
 }

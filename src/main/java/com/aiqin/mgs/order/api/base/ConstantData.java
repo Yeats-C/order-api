@@ -43,5 +43,9 @@ public interface ConstantData {
      * 退款状态，0-未退款、1-已退款
      */
     Integer refundStatus = 1;
+    /**
+     * 支付流水--支付类型 1:付款  2:退款
+     */
+    Integer payTypeRefund = 2;
 
 }
