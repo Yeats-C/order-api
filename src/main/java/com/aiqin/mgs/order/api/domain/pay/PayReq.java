@@ -80,6 +80,10 @@ public class PayReq implements Serializable {
     @JsonProperty("create_name")
     private String createName;
 
+    @ApiModelProperty(value = "创建人-退款使用 ", hidden = true)
+    @JsonProperty("update_by")
+    private String updateBy;
+
     @ApiModelProperty(value = "回调地址", hidden = true)
     @JsonProperty("back_url")
     private String backUrl;
