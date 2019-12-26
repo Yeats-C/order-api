@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.web.returnorder;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
@@ -97,6 +98,12 @@ public class ReturnOrderInfoController {
     @GetMapping("/detail")
     public HttpResponse<ReturnOrderDetailVO> detail(@ApiParam("退货单号") @RequestParam("ReturnOrderCode") String ReturnOrderCode) {
         return new HttpResponse<>(returnOrderInfoService.detail(ReturnOrderCode));
+    }
+
+    @ApiOperation("erp售后管理--退货单列表")
+    @PostMapping("/getlist")
+    public HttpResponse<PageResData<ReturnOrderInfo>> getlist(@RequestBody PageRequestVO<AfterReturnOrderSearchVo> searchVo) {
+        return new HttpResponse<>(returnOrderInfoService.getlist(searchVo));
     }
 
 }

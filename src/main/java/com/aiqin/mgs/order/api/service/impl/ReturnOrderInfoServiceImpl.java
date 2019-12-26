@@ -5,6 +5,7 @@ import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ConstantData;
+import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.component.SequenceService;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
@@ -26,6 +27,8 @@ import com.aiqin.platform.flows.client.domain.vo.ActBaseProcessEntity;
 import com.aiqin.platform.flows.client.domain.vo.StartProcessParamVO;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -524,6 +527,17 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         respVo.setDetails(returnOrderDetails);
 
         return respVo;
+    }
+
+    @Override
+    public PageResData<ReturnOrderInfo> getlist(PageRequestVO<AfterReturnOrderSearchVo> searchVo) {
+        if(searchVo.getSearchVO()!=null&&null!=searchVo.getSearchVO().getAreaReq()){
+            //todo 调用门店查询
+            searchVo.getSearchVO().setStoreIds(null);
+        }
+        PageHelper.startPage(searchVo.getPageNo(),searchVo.getPageSize());
+        List<ReturnOrderInfo> content = returnOrderInfoDao.selectAll(searchVo.getSearchVO());
+        return new PageResData(Integer.valueOf((int)((Page) content).getTotal()) , content);
     }
 
     public void getss(){

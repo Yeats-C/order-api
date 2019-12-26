@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.dao.returnorder;
 
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
+import com.aiqin.mgs.order.api.domain.request.returnorder.AfterReturnOrderSearchVo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderSearchVo;
 import org.apache.ibatis.annotations.Param;
@@ -44,4 +45,8 @@ public interface ReturnOrderInfoDao {
 
     //通过条件查询退货单
     ReturnOrderInfo selectByParameter(Map queryData);
+
+    //售后管理--退货单列表
+    List<ReturnOrderInfo> selectAll(AfterReturnOrderSearchVo searchVo);
+
 }

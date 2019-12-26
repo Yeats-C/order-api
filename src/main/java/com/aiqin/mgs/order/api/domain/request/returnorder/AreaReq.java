@@ -17,12 +17,12 @@ import java.io.Serializable;
 public class AreaReq implements Serializable {
 
     @ApiModelProperty(value="省编码")
-    private String proCode;
+    private String provinceId;
 
     @ApiModelProperty(value="市编码")
-    private String cityCode;
+    private String cityId;
 
     @ApiModelProperty(value="区编码")
-    private String districtCode;
+    private String districtId;
 
 }

@@ -1,8 +1,11 @@
 package com.aiqin.mgs.order.api.service.returnorder;
 
+import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
+
+import java.util.List;
 
 /**
  * description: ReturnOrderInfoService
@@ -84,4 +87,12 @@ public interface ReturnOrderInfoService {
      * @return
      */
     ReturnOrderDetailVO detail(String returnOrderCode);
+
+    /**
+     *售后管理--退货单列表
+     * @param searchVo
+     * @return
+     */
+    PageResData<ReturnOrderInfo> getlist(PageRequestVO<AfterReturnOrderSearchVo> searchVo);
+
 }
