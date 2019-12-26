@@ -26,6 +26,7 @@ import com.aiqin.platform.flows.client.constant.StatusEnum;
 import com.aiqin.platform.flows.client.domain.vo.ActBaseProcessEntity;
 import com.aiqin.platform.flows.client.domain.vo.StartProcessParamVO;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -532,21 +533,27 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     @Override
     public PageResData<ReturnOrderInfo> getlist(PageRequestVO<AfterReturnOrderSearchVo> searchVo) {
         if(searchVo.getSearchVO()!=null&&null!=searchVo.getSearchVO().getAreaReq()){
-            //todo 调用门店查询
-            searchVo.getSearchVO().setStoreIds(null);
+            String url=slcsHost+"/store/getStoreAllId";
+            JSONObject json=new JSONObject();
+            json.put("cityId",searchVo.getSearchVO().getAreaReq().getCityId());
+            json.put("districtId",searchVo.getSearchVO().getAreaReq().getDistrictId());
+            json.put("provinceId",searchVo.getSearchVO().getAreaReq().getProvinceId());
+            String request= URLConnectionUtil.doPost(url,null,json);
+            log.info("根据省市区id查询门店请求结果，request={}",request);
+            if(StringUtils.isNotBlank(request)){
+                JSONObject jsonObject=JSON.parseObject(request);
+                if(jsonObject.containsKey("code")&&jsonObject.get("code").equals("0")&&jsonObject.containsKey("data")){
+                    List<String> ids=JSON.parseArray(jsonObject.getString("data"),String.class);
+                    if(CollectionUtils.isNotEmpty(ids)){
+                        searchVo.getSearchVO().setStoreIds(ids);
+                    }
+                }
+            }
         }
         PageHelper.startPage(searchVo.getPageNo(),searchVo.getPageSize());
+        log.info("erp售后管理--退货单列表入参，searchVo={}",searchVo);
         List<ReturnOrderInfo> content = returnOrderInfoDao.selectAll(searchVo.getSearchVO());
         return new PageResData(Integer.valueOf((int)((Page) content).getTotal()) , content);
     }
-
-    public void getss(){
-        ErpOrderItem erpOrderItem=new ErpOrderItem();
-
-
-
-
-    }
-
 
 }

@@ -1046,29 +1046,29 @@
     select
     <include refid="Base_Column_List" />
     from return_order_info
-    where
-    1=1
-    <if test="returnOrderStatus!=null and returnOrderStatus!=''">
-      and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
-    </if>
-    <if test="ReturnOrderCode!=null and ReturnOrderCode!=''">
-      and return_order_code=#{ReturnOrderCode,jdbcType=VARCHAR}
-    </if>
-    <if test="storeName!=null and storeName!=''">
-      and store_name=#{storeName,jdbcType=VARCHAR}
-    </if>
-    <if test="storeIds!=null">
-      and store_id in
-      <foreach collection="storeIds"  item="item" open="(" separator="," close=")"  >
-        #{item}
-      </foreach>
-    </if>
-    <if test="applyStartTime!=null and applyStartTime!=''">
-      and create_time &gt;={applyStartTime}
-    </if>
-    <if test="applyEndTime!=null and applyEndTime!=''">
-      and create_time &lt;={applyEndTime}
-    </if>
+    <where>
+        <if test="returnOrderStatus!=null">
+          and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
+        </if>
+        <if test="ReturnOrderCode!=null and ReturnOrderCode!=''">
+          and return_order_code=#{ReturnOrderCode,jdbcType=VARCHAR}
+        </if>
+        <if test="storeName!=null and storeName!=''">
+          and store_name=#{storeName,jdbcType=VARCHAR}
+        </if>
+        <if test="storeIds!=null">
+          and store_id in
+          <foreach collection="storeIds"  item="item" open="(" separator="," close=")"  >
+            #{item}
+          </foreach>
+        </if>
+        <if test="applyStartTime!=null and applyStartTime!=''">
+          and create_time &gt;={applyStartTime}
+        </if>
+        <if test="applyEndTime!=null and applyEndTime!=''">
+          and create_time &lt;={applyEndTime}
+        </if>
+    </where>
     order by create_time desc
   </select>
 
