@@ -6,6 +6,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayCallbackRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
+import com.aiqin.mgs.order.api.domain.request.order.PayCallbackRequest;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPayResultResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPrintQueryResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayResultResponse;
@@ -101,13 +102,13 @@ public interface ErpOrderPayService {
     /**
      * 支付回调方法
      *
-     * @param erpOrderPayCallbackRequest
+     * @param payCallbackRequest
      * @return java.lang.String
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/10 9:48
      */
-    void orderPayCallback(ErpOrderPayCallbackRequest erpOrderPayCallbackRequest);
+    void orderPayCallback(PayCallbackRequest payCallbackRequest);
 
     /**
      * 支付完成后续处理
