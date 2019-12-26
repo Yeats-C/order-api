@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 public interface ReturnOrderInfoDao {
 
@@ -40,4 +41,7 @@ public interface ReturnOrderInfoDao {
 
     //后台销售退货单管理列表条数（搜索）
     Integer pageCount(ReturnOrderSearchVo searchVo);
+
+    //通过条件查询退货单
+    ReturnOrderInfo selectByParameter(Map queryData);
 }

@@ -979,7 +979,7 @@
   </select>
 
   <!--后台销售退货单管理列表数量（搜索）-->
-  <select id="pageCount" resultMap="integer" parameterType="com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderSearchVo" >
+  <select id="pageCount" resultType="integer" parameterType="com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderSearchVo" >
     select
     count(1)
     from return_order_info
@@ -1008,5 +1008,37 @@
     </if>
   </select>
 
+  <!--通过条件查询退货单-->
+  <select id="selectByParameter" resultMap="BaseResultMap" parameterType="map" >
+    select
+    <include refid="Base_Column_List" />
+    from return_order_info
+    where
+    1=1
+    <if test="id!=null and id!=''">
+    id = #{id,jdbcType=BIGINT}
+    </if>
+    <if test="returnOrderStatus!=null and returnOrderStatus!=''">
+      and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
+    </if>
+    <if test="ReturnOrderCode!=null and ReturnOrderCode!=''">
+      and return_order_code=#{ReturnOrderCode,jdbcType=VARCHAR}
+    </if>
+    <if test="storeName!=null and storeName!=''">
+      and store_name=#{storeName,jdbcType=VARCHAR}
+    </if>
+    <if test="provinceName!=null and provinceName!=''">
+      and province_name=#{provinceName,jdbcType=VARCHAR}
+    </if>
+    <if test="cityName!=null and cityName!=''">
+      and city_name=#{cityName,jdbcType=VARCHAR}
+    </if>
+    <if test="applyStartTime!=null and applyStartTime!=''">
+      and create_time &gt;={applyStartTime}
+    </if>
+    <if test="applyEndTime!=null and applyEndTime!=''">
+      and create_time &lt;={applyEndTime}
+    </if>
+  </select>
 
 </mapper>
