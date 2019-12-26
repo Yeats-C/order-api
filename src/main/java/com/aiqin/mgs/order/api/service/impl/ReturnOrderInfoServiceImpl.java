@@ -12,6 +12,7 @@ import com.aiqin.mgs.order.api.dao.returnorder.RefundInfoDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.bill.RejectRecordReq;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
@@ -507,5 +508,14 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         int res=refundInfoDao.insertSelective(record);
         return res>0;
     }
+
+    public void getss(){
+        ErpOrderItem erpOrderItem=new ErpOrderItem();
+
+
+
+
+    }
+
 
 }
