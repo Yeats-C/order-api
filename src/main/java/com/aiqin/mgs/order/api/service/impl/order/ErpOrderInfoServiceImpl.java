@@ -133,6 +133,11 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
         }
 
+        if (1 == 1) {
+            //TODO CT 测试中断操作
+            throw new BusinessException("test");
+        }
+
         //订单原商品明细行
         List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
         //记录原订单明细行最大行号最后三位数的值
@@ -191,6 +196,14 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             orderItem.setZeroDisassemblyCoefficient(null);
             //商品类型  0商品 1赠品
             orderItem.setProductType(ErpProductGiftEnum.PRODUCT.getCode());
+            //商品属性编码
+            orderItem.setProductPropertyCode(product.getProductPropertyCode());
+            //商品属性名称
+            orderItem.setProductPropertyName(product.getProductPropertyName());
+            //供应商编码
+            orderItem.setSupplierCode(product.getSupplierCode());
+            //供应商名称
+            orderItem.setSupplierName(product.getSupplierName());
             //商品数量
             orderItem.setProductCount((long) item.getQuantity());
             //商品单价
@@ -200,6 +213,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             //实际商品总价
             orderItem.setActualTotalProductAmount(BigDecimal.ZERO);
             //优惠分摊总金额
+            orderItem.setTotalPreferentialAmount(BigDecimal.ZERO);
+            //分摊后单价
             orderItem.setTotalPreferentialAmount(BigDecimal.ZERO);
             //活动优惠总金额
             orderItem.setTotalAcivityAmount(BigDecimal.ZERO);
