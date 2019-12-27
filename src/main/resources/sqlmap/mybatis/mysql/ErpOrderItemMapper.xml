@@ -51,7 +51,8 @@
         update_by_id as updateById,
         update_by_name as updateByName,
         create_time as createTime,
-        update_time as updateTime
+        update_time as updateTime,
+        preferential_amount as preferentialAmount
         from order_store_detail
         where 1 = 1
         <if test=" id != null and id != '' ">
