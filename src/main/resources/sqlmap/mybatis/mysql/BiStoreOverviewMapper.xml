@@ -217,5 +217,26 @@
             and product_label_code=2
         </if>
     </select>
+    <select id="productStoreSaleoutDgree" parameterType="com.aiqin.mgs.order.api.domain.request.ProductOverViewReq"
+            resultType="com.aiqin.mgs.order.api.domain.response.ProductBaseUnResp">
+        select sku_code skuCode,saleout_dgree saleoutDgree,product_label_code productLabelCode,product_label productLabel
+        from bi_product_overview
+        where store_id = #{storeId}
+        <if test="skuCodeList != null">
+            and sku_code in (
+            <foreach collection="skuCodeList" item="sku_code" separator=",">
+                '${sku_code}'
+            </foreach>
+            )
+        </if>
+        order by saleout_dgree
+        <if test="productSalabilityReorder != null and productSalabilityReorder == 0">
+            desc
+        </if>
+        <if test="productSalabilityReorder != null and productSalabilityReorder == 1">
+            asc
+        </if>
+        limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </select>
 </mapper>
 

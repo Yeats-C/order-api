@@ -150,4 +150,11 @@ public class StoreOverviewController {
         LOGGER.info("获取门店商品列表（获取畅销滞销sku）......",storeId,status,pageNo,pageSize);
         return storeOverviewService.storeProductSku(storeId,status,pageNo,pageSize);
     }
+
+    @PostMapping("/store/saleout/dgree")
+    @ApiOperation(value = "通过门店id和sku获取对应畅销度")
+    public HttpResponse productStoreSaleoutDgree(@RequestBody ProductOverViewReq productOverViewReq) {
+        LOGGER.info("通过门店id和sku获取对应畅销度......",productOverViewReq);
+        return storeOverviewService.productStoreSaleoutDgree(productOverViewReq);
+    }
 }
