@@ -19,7 +19,7 @@ import java.util.List;
 public class AfterReturnOrderSearchVo implements Serializable {
 
     @ApiModelProperty("退货单号")
-    private String ReturnOrderCode;
+    private String returnOrderCode;
 
     @ApiModelProperty("门店名称")
     private String storeName;
