@@ -7,9 +7,7 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -104,6 +102,15 @@ public class ReturnOrderInfoController {
     @PostMapping("/getlist")
     public HttpResponse<PageResData<ReturnOrderInfo>> getlist(@RequestBody PageRequestVO<AfterReturnOrderSearchVo> searchVo) {
         return new HttpResponse<>(returnOrderInfoService.getlist(searchVo));
+    }
+
+    @ApiOperation("发起退货---根据订单id和和行号计算商品金额")
+    @GetMapping("/getAmount")
+    @ApiImplicitParams({@ApiImplicitParam(name = "orderCode", value = "订单编码", dataType = "String", paramType = "query", required = true),
+            @ApiImplicitParam(name = "lineCode", value = "行号", dataType = "Long", paramType = "query", required = true),
+            @ApiImplicitParam(name = "number", value = "数量", dataType = "Long", paramType = "query", required = true)})
+    public HttpResponse getAmount(String orderCode, Long lineCode, Long number) {
+        return returnOrderInfoService.getAmount(orderCode,lineCode,number);
     }
 
 }

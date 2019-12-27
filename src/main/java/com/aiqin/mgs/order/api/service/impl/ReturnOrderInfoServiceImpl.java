@@ -7,6 +7,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ConstantData;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.component.SequenceService;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
@@ -18,6 +19,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.bill.RejectRecordReq;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
+import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import com.aiqin.mgs.order.api.util.URLConnectionUtil;
 import com.aiqin.platform.flows.client.constant.AjaxJson;
@@ -78,6 +80,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     private RejectRecordService rejectRecordService;
     @Resource
     private RefundInfoDao refundInfoDao;
+    @Resource
+    private ErpOrderItemService erpOrderItemService;
 
     @Override
     @Transactional
@@ -554,6 +558,34 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         log.info("erp售后管理--退货单列表入参，searchVo={}",searchVo);
         List<ReturnOrderInfo> content = returnOrderInfoDao.selectAll(searchVo.getSearchVO());
         return new PageResData(Integer.valueOf((int)((Page) content).getTotal()) , content);
+    }
+
+    @Override
+    public HttpResponse getAmount(String orderCode, Long lineCode,Long number) {
+        ErpOrderItem erpOrderItem = erpOrderItemService.getItemByOrderCodeAndLine(orderCode, lineCode);
+        //此商品退货总金额
+        BigDecimal totalMoney=new BigDecimal(0);
+        if(erpOrderItem!=null){
+            //已退数量
+            Long returnProductCount=erpOrderItem.getReturnProductCount();
+            //分摊后单价
+            BigDecimal preferentialAmount = erpOrderItem.getPreferentialAmount();
+            //优惠分摊总金额（分摊后金额）
+            BigDecimal totalPreferentialAmount = erpOrderItem.getTotalPreferentialAmount();
+            //实收数量（门店）
+            Long actualInboundCount = erpOrderItem.getActualInboundCount();
+            if((actualInboundCount-returnProductCount)>number){//可退数量大于前端入参退货数量
+                //计算公式：此商品退货总金额=分摊后单价 X 前端入参退货数量
+                totalMoney=preferentialAmount.multiply(BigDecimal.valueOf(number));
+                return HttpResponse.success(totalMoney);
+            }else if((actualInboundCount-returnProductCount)==number){//可退数量等于前端入参退货数量
+                //计算公式：此商品退货总金额=分摊总金额-分摊后单价 X 已退数量
+                totalMoney=totalPreferentialAmount.subtract(preferentialAmount.multiply(BigDecimal.valueOf(returnProductCount)));
+                return HttpResponse.success(totalMoney);
+            }
+            return HttpResponse.failure(ResultCode.RETURN_NUM_WRONG_ERROR);
+        }
+        return HttpResponse.failure(ResultCode.RETURN_AMOUNT_ERROR);
     }
 
 }
