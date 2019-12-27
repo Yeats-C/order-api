@@ -1,10 +1,13 @@
 package com.aiqin.mgs.order.api.service.returnorder;
 
+import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -94,5 +97,13 @@ public interface ReturnOrderInfoService {
      * @return
      */
     PageResData<ReturnOrderInfo> getlist(PageRequestVO<AfterReturnOrderSearchVo> searchVo);
+
+    /**
+     *
+     * @param orderCode
+     * @param lineCode
+     * @return
+     */
+    HttpResponse getAmount(String orderCode, Long lineCode, Long number);
 
 }
