@@ -1006,6 +1006,15 @@
     <if test="applyEndTime!=null and applyEndTime!=''">
       and create_time &lt;={applyEndTime}
     </if>
+    <if test="orderCategory!=null and orderCategory!=''">
+      and order_category=#{orderCategory,jdbcType=INTEGER}
+    </if>
+    <if test="treatmentMethod!=null and treatmentMethod!=''">
+      and treatment_method=#{treatmentMethod,jdbcType=INTEGER}
+    </if>
+    <if test="returnOrderType!=null and returnOrderType!=''">
+      and return_order_type=#{returnOrderType,jdbcType=INTEGER}
+    </if>
   </select>
 
   <!--通过条件查询退货单-->
@@ -1038,6 +1047,15 @@
     </if>
     <if test="applyEndTime!=null and applyEndTime!=''">
       and create_time &lt;={applyEndTime}
+    </if>
+    <if test="orderCategory!=null and orderCategory!=''">
+      and order_category=#{orderCategory,jdbcType=INTEGER}
+    </if>
+    <if test="treatmentMethod!=null and treatmentMethod!=''">
+      and treatment_method=#{treatmentMethod,jdbcType=INTEGER}
+    </if>
+    <if test="returnOrderType!=null and returnOrderType!=''">
+      and return_order_type=#{returnOrderType,jdbcType=INTEGER}
     </if>
   </select>
 
