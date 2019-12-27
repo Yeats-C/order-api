@@ -51,7 +51,7 @@ public class ReturnOrderDetail {
     private String unitName;
 
     @ApiModelProperty(value = "商品类型 0商品 1赠品")
-    private Boolean productType;
+    private Integer productType;
 
     @ApiModelProperty(value = "拆零系数")
     private Long zeroDisassemblyCoefficient;
@@ -75,7 +75,7 @@ public class ReturnOrderDetail {
     private BigDecimal actualTotalProductAmount;
 
     @ApiModelProperty(value = "商品状态0新品1残品")
-    private Boolean productStatus;
+    private Integer productStatus;
 
     @ApiModelProperty(value = "税率")
     private BigDecimal taxRate;
@@ -84,13 +84,13 @@ public class ReturnOrderDetail {
     private Long lineCode;
 
     @ApiModelProperty(value = "0. 启用   1.禁用")
-    private Boolean useStatus;
+    private Integer useStatus;
 
     @ApiModelProperty(value = "来源单号")
     private String sourceCode;
 
     @ApiModelProperty(value = "来源类型")
-    private Boolean sourceType;
+    private Integer sourceType;
 
     @ApiModelProperty(value = "创建人编码")
     private String createById;

@@ -5,17 +5,21 @@ import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ConstantData;
+import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.component.SequenceService;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
+import com.aiqin.mgs.order.api.dao.returnorder.RefundInfoDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
-import com.aiqin.mgs.order.api.dao.returnorder.RefundInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.bill.RejectRecordReq;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
+import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import com.aiqin.mgs.order.api.util.URLConnectionUtil;
 import com.aiqin.platform.flows.client.constant.AjaxJson;
@@ -24,7 +28,10 @@ import com.aiqin.platform.flows.client.constant.StatusEnum;
 import com.aiqin.platform.flows.client.domain.vo.ActBaseProcessEntity;
 import com.aiqin.platform.flows.client.domain.vo.StartProcessParamVO;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -73,6 +80,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     private RejectRecordService rejectRecordService;
     @Resource
     private RefundInfoDao refundInfoDao;
+    @Resource
+    private ErpOrderItemService erpOrderItemService;
 
     @Override
     @Transactional
@@ -523,6 +532,80 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         respVo.setDetails(returnOrderDetails);
 
         return respVo;
+    }
+
+    @Override
+    public PageResData<ReturnOrderInfo> getlist(PageRequestVO<AfterReturnOrderSearchVo> searchVo) {
+        if(searchVo.getSearchVO()!=null&&null!=searchVo.getSearchVO().getAreaReq()){
+            String url=slcsHost+"/store/getStoreAllId";
+            JSONObject json=new JSONObject();
+            if(StringUtils.isNotBlank(searchVo.getSearchVO().getAreaReq().getCityId())){
+                json.put("cityId",searchVo.getSearchVO().getAreaReq().getCityId());
+            }
+            if(StringUtils.isNotBlank(searchVo.getSearchVO().getAreaReq().getDistrictId())){
+                json.put("districtId",searchVo.getSearchVO().getAreaReq().getDistrictId());
+            }
+            if(StringUtils.isNotBlank(searchVo.getSearchVO().getAreaReq().getProvinceId())){
+                json.put("provinceId",searchVo.getSearchVO().getAreaReq().getProvinceId());
+            }
+            if(!json.isEmpty()){
+                String request= URLConnectionUtil.doPost(url,null,json);
+                log.info("根据省市区id查询门店请求结果，request={}",request);
+                if(StringUtils.isNotBlank(request)){
+                    JSONObject jsonObject=JSON.parseObject(request);
+                    if(jsonObject.containsKey("code")&&jsonObject.get("code").equals("0")&&jsonObject.containsKey("data")){
+                        List<String> ids=JSON.parseArray(jsonObject.getString("data"),String.class);
+                        if(CollectionUtils.isNotEmpty(ids)){
+                            searchVo.getSearchVO().setStoreIds(ids);
+                        }
+                    }
+                }
+            }
+        }
+        PageHelper.startPage(searchVo.getPageNo(),searchVo.getPageSize());
+        log.info("erp售后管理--退货单列表入参，searchVo={}",searchVo);
+        List<ReturnOrderInfo> content = returnOrderInfoDao.selectAll(searchVo.getSearchVO());
+        return new PageResData(Integer.valueOf((int)((Page) content).getTotal()) , content);
+    }
+
+    @Override
+    public HttpResponse getAmount(String orderCode, Long lineCode,Long number) {
+        ErpOrderItem erpOrderItem = erpOrderItemService.getItemByOrderCodeAndLine(orderCode, lineCode);
+        //此商品退货总金额
+        BigDecimal totalMoney=new BigDecimal(0);
+        if(erpOrderItem!=null){
+            //已退数量
+            Long returnProductCount=erpOrderItem.getReturnProductCount();
+            if(returnProductCount==null){
+                returnProductCount=0L;
+            }
+            //分摊后单价
+            BigDecimal preferentialAmount = erpOrderItem.getPreferentialAmount();
+            if(preferentialAmount==null){
+                return HttpResponse.failure(ResultCode.RETURN_PRE_AMOUNT_ERROR);
+            }
+            //优惠分摊总金额（分摊后金额）
+            BigDecimal totalPreferentialAmount = erpOrderItem.getTotalPreferentialAmount();
+            if(totalPreferentialAmount==null){
+                return HttpResponse.failure(ResultCode.RETURN_TOTAL_AMOUNT_ERROR);
+            }
+            //实收数量（门店）
+            Long actualInboundCount = erpOrderItem.getActualInboundCount();
+            if(actualInboundCount==null){
+                return HttpResponse.failure(ResultCode.RETURN_ACUNUM_WRONG_ERROR);
+            }
+            if((actualInboundCount-returnProductCount)>number){//可退数量大于前端入参退货数量
+                //计算公式：此商品退货总金额=分摊后单价 X 前端入参退货数量
+                totalMoney=preferentialAmount.multiply(BigDecimal.valueOf(number));
+                return HttpResponse.success(totalMoney);
+            }else if((actualInboundCount-returnProductCount)==number){//可退数量等于前端入参退货数量
+                //计算公式：此商品退货总金额=分摊总金额-分摊后单价 X 已退数量
+                totalMoney=totalPreferentialAmount.subtract(preferentialAmount.multiply(BigDecimal.valueOf(returnProductCount)));
+                return HttpResponse.success(totalMoney);
+            }
+            return HttpResponse.failure(ResultCode.RETURN_NUM_WRONG_ERROR);
+        }
+        return HttpResponse.failure(ResultCode.RETURN_AMOUNT_ERROR);
     }
 
 }

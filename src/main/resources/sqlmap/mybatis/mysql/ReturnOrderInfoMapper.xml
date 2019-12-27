@@ -1041,4 +1041,41 @@
     </if>
   </select>
 
+  <!--后台销售退货单管理列表（搜索）-->
+  <select id="selectAll" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.request.returnorder.AfterReturnOrderSearchVo" >
+    select
+    <include refid="Base_Column_List" />
+    from return_order_info
+    <where>
+        <if test="returnOrderStatus!=null">
+          and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
+        </if>
+        <if test="ReturnOrderCode!=null and ReturnOrderCode!=''">
+          and return_order_code=#{ReturnOrderCode,jdbcType=VARCHAR}
+        </if>
+        <if test="storeName!=null and storeName!=''">
+          and store_name=#{storeName,jdbcType=VARCHAR}
+        </if>
+        <if test="storeIds!=null">
+          and store_id in
+          <foreach collection="storeIds"  item="item" open="(" separator="," close=")"  >
+            #{item}
+          </foreach>
+        </if>
+        <if test="applyStartTime!=null and applyStartTime!=''">
+          and create_time &gt;= #{applyStartTime}
+        </if>
+        <if test="applyEndTime!=null and applyEndTime!=''">
+          and create_time &lt;= #{applyEndTime}
+        </if>
+      <if test="returnReasonCode!=null and returnReasonCode!=''">
+        and return_reason_code =#{returnReasonCode}
+      </if>
+      <if test="orderType!=null">
+        and order_type =#{orderType}
+      </if>
+    </where>
+    order by create_time desc
+  </select>
+
 </mapper>
