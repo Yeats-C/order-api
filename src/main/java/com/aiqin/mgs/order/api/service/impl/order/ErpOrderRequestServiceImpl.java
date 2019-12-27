@@ -4,7 +4,10 @@ import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderLockStockTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOrderSourceEnum;
+import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayTypeEnum;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.ProductInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
@@ -12,6 +15,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
+import com.aiqin.mgs.order.api.domain.request.order.PayRequest;
 import com.aiqin.mgs.order.api.domain.response.ProductSkuDetailResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderGoodsCouponResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
@@ -26,10 +30,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
@@ -68,10 +69,12 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public ProductInfo getSkuDetail(String companyCode, String skuCode) {
+        companyCode = "01";
+        skuCode = "102423";
 
         String url = urlProperties.getProductApi() + "/search/spu/sku/detail";
-        url += "?company_code=01";
-        url += "&sku_code=102423";
+        url += "?company_code="+companyCode;
+        url += "&sku_code=" + skuCode;
         ProductInfo product = new ProductInfo();
         try {
             HttpClient httpClient = HttpClient.get(url);
@@ -84,7 +87,6 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             if (data == null) {
                 throw new BusinessException("无效的商品");
             }
-
 
             //商品编码
             product.setSpuCode(data.getProductCode());
@@ -113,23 +115,6 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             logger.info("获取商品信息失败：{}", e);
             throw new BusinessException("获取商品信息失败");
         }
-//        product.setSpuCode(spuCode);
-//        product.setSpuName(spuCode + "名称");
-//        product.setSkuCode(skuCode);
-//        product.setSkuName(skuCode + "名称");
-//        product.setSupplierCode("123456");
-//        product.setSupplierName("供应商1");
-//
-//        product.setPictureUrl("https://www.baidu.com/img/bd_logo1.png");
-//        product.setProductSpec("32K");
-//        product.setColorCode("101");
-//        product.setColorName("红色");
-//        product.setModelCode("1234");
-//        product.setUnitCode("1001");
-//        product.setUnitName("盒");
-//        product.setPrice(BigDecimal.TEN);
-//        product.setBarCode("987456321156156");
-//        product.setTaxRate(new BigDecimal(0.15));
 
         return product;
     }
@@ -229,9 +214,31 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     }
 
     @Override
-    public boolean sendPayRequest(ErpOrderInfo order, ErpOrderPay orderPay) {
+    public boolean sendOrderPayRequest(ErpOrderInfo order, ErpOrderPay orderPay) {
         boolean flag = false;
         try {
+
+            ErpOrderTypeEnum orderTypeEnum = ErpOrderTypeEnum.getEnum(order.getOrderStoreId());
+            PayRequest payRequest = new PayRequest();
+            payRequest.setOrderNo(order.getOrderStoreCode());
+            payRequest.setOrderAmount(2000L);
+            payRequest.setFee(0L);
+            payRequest.setOrderTime(order.getCreateTime());
+            payRequest.setPayType(ErpRequestPayTypeEnum.PAY_10.getCode());
+            payRequest.setOrderSource(ErpRequestPayOrderSourceEnum.WEB.getCode());
+            payRequest.setCreateBy(order.getCreateById());
+            payRequest.setCreateName(order.getCreateByName());
+
+            payRequest.setPayOriginType(1);
+            payRequest.setOrderType(2);
+            payRequest.setFranchiseeId("BG895ED81C04D445EE9CB554945098922B");
+            payRequest.setStoreName("门店1");
+            payRequest.setStoreId("AB988458F192C747478210CC01D4D4135C");
+            payRequest.setTransactionType("STORE_ORDER");
+            payRequest.setPayOrderType(14);
+            payRequest.setBackUrl("http://order.api.aiqin.com/erpOrderPayController/orderPayCallback");
+
+
             //TODO CT 请求支付中心接口查询订单支付状态
 //            Map<String, Object> paramMap = new HashMap<>();
 //            HttpClient httpClient = HttpClient.post(urlProperties.getPaymentApi() + "/test").json(paramMap);

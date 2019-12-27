@@ -133,6 +133,11 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
         }
 
+        if (1 == 1) {
+            //TODO CT 测试中断操作
+            throw new BusinessException("test");
+        }
+
         //订单原商品明细行
         List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
         //记录原订单明细行最大行号最后三位数的值

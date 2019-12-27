@@ -1046,18 +1046,19 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @date 2019/12/24 20:24
      */
     private String getOrderCode() {
+        ErpOrderCodeSequence.currentDay = "";
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String curDay = sdf.format(new Date());
         if (StringUtils.isEmpty(ErpOrderCodeSequence.currentDay) || !curDay.equals(ErpOrderCodeSequence.currentDay)) {
             //如果是
-            ErpOrderCodeSequence.currentDay = curDay;
             //查询数据库，获取最新序列
             String maxOrderCode = erpOrderQueryService.getMaxOrderCodeByCurrentDay(curDay);
             if (StringUtils.isNotEmpty(maxOrderCode)) {
-                ErpOrderCodeSequence.num = Long.valueOf(maxOrderCode.substring(maxOrderCode.length() - 6, 0));
+                ErpOrderCodeSequence.num = Long.valueOf(maxOrderCode.substring(maxOrderCode.length() - 6));
             } else {
                 ErpOrderCodeSequence.num = 0L;
             }
+            ErpOrderCodeSequence.currentDay = curDay;
         }
         return curDay + String.format("%06d", ++ErpOrderCodeSequence.num);
     }

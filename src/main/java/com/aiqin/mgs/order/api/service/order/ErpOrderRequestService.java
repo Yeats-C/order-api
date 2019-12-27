@@ -87,7 +87,7 @@ public interface ErpOrderRequestService {
      * @version: v1.0.0
      * @date 2019/12/2 15:37
      */
-    boolean sendPayRequest(ErpOrderInfo order, ErpOrderPay orderPay);
+    boolean sendOrderPayRequest(ErpOrderInfo order, ErpOrderPay orderPay);
 
     /**
      * 发起支付物流费用申请
