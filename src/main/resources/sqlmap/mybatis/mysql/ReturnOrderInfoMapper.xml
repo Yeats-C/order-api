@@ -928,7 +928,7 @@
     logistics_company_code = #{logisticsCompanyCode,jdbcType=VARCHAR},
     logistics_company_name = #{logisticsCompanyName,jdbcType=VARCHAR},
     logistics_code = #{logisticsCode,jdbcType=VARCHAR}
-    where return_order_code=#{orderStoreCode,jdbcType=VARCHAR}
+    where return_order_code=#{returnOrderCode,jdbcType=VARCHAR}
   </update>
 
   <update id="updateLogisticsCountAndAmount">
@@ -936,7 +936,7 @@
     set
     actual_product_count = #{actualProductCount},
     actual_return_order_amount = #{actualReturnOrderAmount}
-    where return_order_code=#{orderStoreCode}
+    where return_order_code=#{returnOrderCode}
   </update>
 
   <update id="updateRefundStatus">
@@ -1051,7 +1051,7 @@
           and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
         </if>
         <if test="returnOrderCode!=null and returnOrderCode!=''">
-          and return_order_code=#{ReturnOrderCode,jdbcType=VARCHAR}
+          and return_order_code=#{returnOrderCode,jdbcType=VARCHAR}
         </if>
         <if test="storeName!=null and storeName!=''">
           and store_name=#{storeName,jdbcType=VARCHAR}
@@ -1076,6 +1076,12 @@
       </if>
     </where>
     order by create_time desc
+  </select>
+
+  <select id="selectOrderId" parameterType="java.lang.String" resultType="java.lang.String">
+    select order_store_code
+    from return_order_info
+    where return_order_code = #{returnOrderCode,jdbcType=VARCHAR}
   </select>
 
 </mapper>
