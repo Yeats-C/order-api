@@ -225,6 +225,25 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             returnOrderDetailDao.updateActualCountBatch(reqVo.getReturnOrderDetailReviewApiReqVo().getList());
             //根据退货单id查询详情计算金额
             List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(reqVo.getReturnOrderId());
+            //查询原始订单详情
+            String orderId = returnOrderInfoDao.selectOrderId(reqVo.getReturnOrderId());
+            List<ErpOrderItem> erpOrderItems = erpOrderItemService.selectOrderItemListByOrderId(orderId);
+            Map<String,BigDecimal> map=new HashMap<>();
+            Map<String,BigDecimal> map2=new HashMap<>();
+            Map<String,BigDecimal> map3=new HashMap<>();
+            Map<String,BigDecimal> map4=new HashMap<>();
+            for(ErpOrderItem eoi:erpOrderItems){
+                //存储订单号+linecode 分摊单价
+                map.put(eoi.getOrderStoreCode()+eoi.getLineCode(),eoi.getPreferentialAmount());
+                //存储订单号+linecode 分摊总价
+                map2.put(eoi.getOrderStoreCode()+eoi.getLineCode(),eoi.getTotalPreferentialAmount());
+                //存储订单号+linecode 可退总数量
+                Long actualInboundCount = eoi.getActualInboundCount();//可退总数量
+                map2.put(eoi.getOrderStoreCode()+eoi.getLineCode(),eoi.getTotalPreferentialAmount());
+                //存储订单号+linecode 已退数量
+                Long returnProductCount=eoi.getReturnProductCount();//已退数量
+                map2.put(eoi.getOrderStoreCode()+eoi.getLineCode(),eoi.getTotalPreferentialAmount());
+            }
             //此退货单实际退款总金额
             BigDecimal totalMoney=BigDecimal.valueOf(0);
             String returnOrderId="";
@@ -240,6 +259,19 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 totalMoney.add(total);
                 returnOrderId=rod.getReturnOrderCode();
                 totalCount=totalCount+count;
+
+//                if((actualInboundCount-returnProductCount)>number){//可退数量大于前端入参退货数量
+//                    //计算公式：此商品退货总金额=分摊后单价 X 前端入参退货数量
+//                    totalMoney=preferentialAmount.multiply(BigDecimal.valueOf(number));
+//                    return HttpResponse.success(totalMoney);
+//                }else if((actualInboundCount-returnProductCount)==number){//可退数量等于前端入参退货数量
+//                    //计算公式：此商品退货总金额=分摊总金额-分摊后单价 X 已退数量
+//                    totalMoney=totalPreferentialAmount.subtract(preferentialAmount.multiply(BigDecimal.valueOf(returnProductCount)));
+//                    return HttpResponse.success(totalMoney);
+//                }
+
+
+
             }
             //修改主订单实际退货数量、实际退款总金额
             returnOrderInfoDao.updateLogisticsCountAndAmount(returnOrderId,totalMoney,totalCount);
