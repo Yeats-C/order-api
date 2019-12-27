@@ -113,4 +113,10 @@ public class ReturnOrderInfoController {
         return returnOrderInfoService.getAmount(orderCode,lineCode,number);
     }
 
+    @ApiOperation("erp售后管理--退货单状态下拉选")
+    @GetMapping("/getReturnStatus")
+    public HttpResponse getReturnStatus() {
+        return returnOrderInfoService.getReturnStatus();
+    }
+
 }

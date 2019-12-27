@@ -99,11 +99,17 @@ public interface ReturnOrderInfoService {
     PageResData<ReturnOrderInfo> getlist(PageRequestVO<AfterReturnOrderSearchVo> searchVo);
 
     /**
-     *
+     * 发起退货---根据订单id和和行号计算商品金额
      * @param orderCode
      * @param lineCode
      * @return
      */
     HttpResponse getAmount(String orderCode, Long lineCode, Long number);
+
+    /**
+     * erp售后管理--退货单状态
+     * @return
+     */
+    HttpResponse getReturnStatus();
 
 }
