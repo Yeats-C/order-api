@@ -626,6 +626,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 				OrderDetailQuery query = new OrderDetailQuery();
 				query.setSukList(sukList);
 				query.setOriginTypeList(originTypeList);
+				query.setStoreId(prodisorRequest.getStoreId());
 				list = orderDetailDao.prodisor(OrderPublic.getOrderDetailQuery(query));
 			}else {
 				return HttpResponse.success(null);

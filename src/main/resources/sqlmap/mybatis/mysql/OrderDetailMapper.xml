@@ -427,6 +427,9 @@
             </foreach>
             )
         </if>
+        <if test="storeId != null and storeId != ''">
+            and b.distributor_id = #{storeId}
+        </if>
         AND b.order_status NOT IN (0,4)
         GROUP BY a.sku_code
     </select>

@@ -19,7 +19,10 @@ import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel("订单明细查询条件")
 public class OrderDetailQuery extends PagesRequest {
-    
+
+	@ApiModelProperty(value = "门店id")
+	@JsonProperty("store_id")
+	private String storeId;
 	
 	@ApiModelProperty(value="不传参不返回 0:全部")
 	@JsonProperty("icount")
@@ -101,6 +104,15 @@ public class OrderDetailQuery extends PagesRequest {
 //	@ApiModelProperty(value="月份")
 //	@JsonProperty("month")
 //	private String month ;
+
+
+	public String getStoreId() {
+		return storeId;
+	}
+
+	public void setStoreId(String storeId) {
+		this.storeId = storeId;
+	}
 
 	public Integer getOrderType() {
 		return orderType;
