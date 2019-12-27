@@ -4,10 +4,7 @@ import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.base.ConstantData;
-import com.aiqin.mgs.order.api.base.PageRequestVO;
-import com.aiqin.mgs.order.api.base.PageResData;
-import com.aiqin.mgs.order.api.base.ResultCode;
+import com.aiqin.mgs.order.api.base.*;
 import com.aiqin.mgs.order.api.component.SequenceService;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
@@ -18,6 +15,7 @@ import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.bill.RejectRecordReq;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
+import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderStatusVo;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
@@ -606,6 +604,18 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             return HttpResponse.failure(ResultCode.RETURN_NUM_WRONG_ERROR);
         }
         return HttpResponse.failure(ResultCode.RETURN_AMOUNT_ERROR);
+    }
+
+    @Override
+    public HttpResponse getReturnStatus() {
+        List<ReturnOrderStatusVo> list=new ArrayList<>();
+        for (ReturnOrderStatusEnum s : ReturnOrderStatusEnum.values()){
+            ReturnOrderStatusVo returnOrderStatusVo=new ReturnOrderStatusVo();
+            returnOrderStatusVo.setStatus(s.getKey());
+            returnOrderStatusVo.setName(s.getMsg());
+            list.add(returnOrderStatusVo);
+        }
+        return HttpResponse.success(list);
     }
 
 }
