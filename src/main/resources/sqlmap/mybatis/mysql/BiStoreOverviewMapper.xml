@@ -176,8 +176,8 @@
     <select id="productBaseUnInfo" parameterType="com.aiqin.mgs.order.api.domain.request.ProductOverViewReq"
                 resultType="com.aiqin.mgs.order.api.domain.response.ProductBaseUnResp">
         select
-        sku_code skuCode,sku_name skuName,saleout_dgree saleoutDgree,sale_margin saleMargin
-        -- ,color_name colorName,spec,model_number modelNumber
+        sku_code skuCode,sku_name skuName,saleout_dgree saleoutDgree,sale_margin saleMargin,
+        color_name colorName,spec,model_number modelNumber
         from bi_product_overview
         where store_id = #{storeId}
         <if test="categoryId != null and categoryId != ''" >
