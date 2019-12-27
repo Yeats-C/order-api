@@ -1050,7 +1050,7 @@
         <if test="returnOrderStatus!=null">
           and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
         </if>
-        <if test="ReturnOrderCode!=null and ReturnOrderCode!=''">
+        <if test="returnOrderCode!=null and returnOrderCode!=''">
           and return_order_code=#{ReturnOrderCode,jdbcType=VARCHAR}
         </if>
         <if test="storeName!=null and storeName!=''">
