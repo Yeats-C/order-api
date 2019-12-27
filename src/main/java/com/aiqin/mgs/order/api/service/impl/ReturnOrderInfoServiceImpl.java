@@ -539,17 +539,25 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         if(searchVo.getSearchVO()!=null&&null!=searchVo.getSearchVO().getAreaReq()){
             String url=slcsHost+"/store/getStoreAllId";
             JSONObject json=new JSONObject();
-            json.put("cityId",searchVo.getSearchVO().getAreaReq().getCityId());
-            json.put("districtId",searchVo.getSearchVO().getAreaReq().getDistrictId());
-            json.put("provinceId",searchVo.getSearchVO().getAreaReq().getProvinceId());
-            String request= URLConnectionUtil.doPost(url,null,json);
-            log.info("根据省市区id查询门店请求结果，request={}",request);
-            if(StringUtils.isNotBlank(request)){
-                JSONObject jsonObject=JSON.parseObject(request);
-                if(jsonObject.containsKey("code")&&jsonObject.get("code").equals("0")&&jsonObject.containsKey("data")){
-                    List<String> ids=JSON.parseArray(jsonObject.getString("data"),String.class);
-                    if(CollectionUtils.isNotEmpty(ids)){
-                        searchVo.getSearchVO().setStoreIds(ids);
+            if(StringUtils.isNotBlank(searchVo.getSearchVO().getAreaReq().getCityId())){
+                json.put("cityId",searchVo.getSearchVO().getAreaReq().getCityId());
+            }
+            if(StringUtils.isNotBlank(searchVo.getSearchVO().getAreaReq().getDistrictId())){
+                json.put("districtId",searchVo.getSearchVO().getAreaReq().getDistrictId());
+            }
+            if(StringUtils.isNotBlank(searchVo.getSearchVO().getAreaReq().getProvinceId())){
+                json.put("provinceId",searchVo.getSearchVO().getAreaReq().getProvinceId());
+            }
+            if(!json.isEmpty()){
+                String request= URLConnectionUtil.doPost(url,null,json);
+                log.info("根据省市区id查询门店请求结果，request={}",request);
+                if(StringUtils.isNotBlank(request)){
+                    JSONObject jsonObject=JSON.parseObject(request);
+                    if(jsonObject.containsKey("code")&&jsonObject.get("code").equals("0")&&jsonObject.containsKey("data")){
+                        List<String> ids=JSON.parseArray(jsonObject.getString("data"),String.class);
+                        if(CollectionUtils.isNotEmpty(ids)){
+                            searchVo.getSearchVO().setStoreIds(ids);
+                        }
                     }
                 }
             }
@@ -568,12 +576,24 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         if(erpOrderItem!=null){
             //已退数量
             Long returnProductCount=erpOrderItem.getReturnProductCount();
+            if(returnProductCount==null){
+                returnProductCount=0L;
+            }
             //分摊后单价
             BigDecimal preferentialAmount = erpOrderItem.getPreferentialAmount();
+            if(preferentialAmount==null){
+                return HttpResponse.failure(ResultCode.RETURN_PRE_AMOUNT_ERROR);
+            }
             //优惠分摊总金额（分摊后金额）
             BigDecimal totalPreferentialAmount = erpOrderItem.getTotalPreferentialAmount();
+            if(totalPreferentialAmount==null){
+                return HttpResponse.failure(ResultCode.RETURN_TOTAL_AMOUNT_ERROR);
+            }
             //实收数量（门店）
             Long actualInboundCount = erpOrderItem.getActualInboundCount();
+            if(actualInboundCount==null){
+                return HttpResponse.failure(ResultCode.RETURN_ACUNUM_WRONG_ERROR);
+            }
             if((actualInboundCount-returnProductCount)>number){//可退数量大于前端入参退货数量
                 //计算公式：此商品退货总金额=分摊后单价 X 前端入参退货数量
                 totalMoney=preferentialAmount.multiply(BigDecimal.valueOf(number));

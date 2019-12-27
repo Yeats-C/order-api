@@ -179,7 +179,7 @@ public class ReturnOrderInfo {
     @ApiModelProperty(value = "完成时间")
     private Date finishTime;
 
-    @ApiModelProperty(value = "退货原因编码")
+    @ApiModelProperty(value = "退货原因编码 14:质量问题 15:无理由退货 16:物流破损")
     private String returnReasonCode;
 
     @ApiModelProperty(value = "退货原因描述")

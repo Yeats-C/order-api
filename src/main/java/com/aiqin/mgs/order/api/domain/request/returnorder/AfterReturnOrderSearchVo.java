@@ -1,6 +1,5 @@
 package com.aiqin.mgs.order.api.domain.request.returnorder;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -39,4 +38,12 @@ public class AfterReturnOrderSearchVo implements Serializable {
 
     @ApiModelProperty("所有门店id")
     private List<String> storeIds;
+
+    @ApiModelProperty(value = "订单类型 0直送、1配送、2辅采")
+    private Integer orderType;
+
+    @ApiModelProperty(value = "退货原因编码 14:质量问题退货 15:一般退货")
+    private String returnReasonCode;
+
+
 }
