@@ -230,8 +230,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             List<ErpOrderItem> erpOrderItems = erpOrderItemService.selectOrderItemListByOrderId(orderId);
             Map<String,BigDecimal> map=new HashMap<>();
             Map<String,BigDecimal> map2=new HashMap<>();
-            Map<String,BigDecimal> map3=new HashMap<>();
-            Map<String,BigDecimal> map4=new HashMap<>();
+            Map<String,Long> map3=new HashMap<>();
+            Map<String,Long> map4=new HashMap<>();
             for(ErpOrderItem eoi:erpOrderItems){
                 //存储订单号+linecode 分摊单价
                 map.put(eoi.getOrderStoreCode()+eoi.getLineCode(),eoi.getPreferentialAmount());
@@ -239,39 +239,43 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 map2.put(eoi.getOrderStoreCode()+eoi.getLineCode(),eoi.getTotalPreferentialAmount());
                 //存储订单号+linecode 可退总数量
                 Long actualInboundCount = eoi.getActualInboundCount();//可退总数量
-                map2.put(eoi.getOrderStoreCode()+eoi.getLineCode(),eoi.getTotalPreferentialAmount());
+                map3.put(eoi.getOrderStoreCode()+eoi.getLineCode(),actualInboundCount);
                 //存储订单号+linecode 已退数量
-                Long returnProductCount=eoi.getReturnProductCount();//已退数量
-                map2.put(eoi.getOrderStoreCode()+eoi.getLineCode(),eoi.getTotalPreferentialAmount());
+                Long returnProductCount=eoi.getReturnProductCount();
+                if(returnProductCount==null){
+                    returnProductCount=0L;
+                }
+                //已退数量
+                map4.put(eoi.getOrderStoreCode()+eoi.getLineCode(),returnProductCount);
             }
             //此退货单实际退款总金额
             BigDecimal totalMoney=BigDecimal.valueOf(0);
             String returnOrderId="";
             long totalCount=0;
             for(ReturnOrderDetail rod:returnOrderDetails){
-                //商品单价
-                BigDecimal amount=rod.getProductAmount();
                 //商品实退数量
                 long count=rod.getActualReturnProductCount();
-                BigDecimal total = amount.multiply(BigDecimal.valueOf(count));
+                //已退数量
+                Long returnProductCount=map4.get(orderId+rod.getLineCode());
+                //分摊后单价
+                BigDecimal preferentialAmount = map.get(orderId+rod.getLineCode());
+                //优惠分摊总金额（分摊后金额）
+                BigDecimal totalPreferentialAmount = map2.get(orderId+rod.getLineCode());
+                //实收数量（门店）
+                Long actualInboundCount = map3.get(orderId+rod.getLineCode());
+                BigDecimal totalMoney1=new BigDecimal(0);
+                if((actualInboundCount-returnProductCount)>count){//可退数量大于前端入参退货数量
+                    //计算公式：此商品退货总金额=分摊后单价 X 前端入参退货数量
+                    totalMoney1=preferentialAmount.multiply(BigDecimal.valueOf(count));
+                }else if((actualInboundCount-returnProductCount)==count){//可退数量等于前端入参退货数量
+                    //计算公式：此商品退货总金额=分摊总金额-分摊后单价 X 已退数量
+                    totalMoney1=totalPreferentialAmount.subtract(preferentialAmount.multiply(BigDecimal.valueOf(returnProductCount)));
+                }
                 //实退商品总价
-                rod.setActualTotalProductAmount(total);
-                totalMoney.add(total);
+                rod.setActualTotalProductAmount(totalMoney1);
+                totalMoney.add(totalMoney1);
                 returnOrderId=rod.getReturnOrderCode();
                 totalCount=totalCount+count;
-
-//                if((actualInboundCount-returnProductCount)>number){//可退数量大于前端入参退货数量
-//                    //计算公式：此商品退货总金额=分摊后单价 X 前端入参退货数量
-//                    totalMoney=preferentialAmount.multiply(BigDecimal.valueOf(number));
-//                    return HttpResponse.success(totalMoney);
-//                }else if((actualInboundCount-returnProductCount)==number){//可退数量等于前端入参退货数量
-//                    //计算公式：此商品退货总金额=分摊总金额-分摊后单价 X 已退数量
-//                    totalMoney=totalPreferentialAmount.subtract(preferentialAmount.multiply(BigDecimal.valueOf(returnProductCount)));
-//                    return HttpResponse.success(totalMoney);
-//                }
-
-
-
             }
             //修改主订单实际退货数量、实际退款总金额
             returnOrderInfoDao.updateLogisticsCountAndAmount(returnOrderId,totalMoney,totalCount);
