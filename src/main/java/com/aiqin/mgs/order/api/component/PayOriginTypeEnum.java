@@ -24,7 +24,11 @@ public enum PayOriginTypeEnum {
     RECHARGE(14,"配送账户-充值"),
     DIRECT_SEND_WITHDRAW_CASH_ONLINE(15,"直送账户-线上提现"),
     DIRECT_SEND_FEE(16,"直送账户-手续费"),
-    DIRECT_SEND_RECHARGE(17,"直送账户-充值");
+    DIRECT_SEND_RECHARGE(17,"直送账户-充值"),
+    TOC_REFUNDMON_WEB(20,"toC-WEB仅退款(包含所有订单状态下的支付)"),
+    TOC_REFUNDMONGOOD_WEB(21,"toC-WEB退款退货(包含所有订单状态下的支付)"),
+    TOC_REFUNDMON_POS(22,"toC-POS仅退款(包含所有订单状态下的支付)"),
+    TOC_REFUNDMONGOOD_POS(23,"toC-POS退款退货(包含所有订单状态下的支付)");
 
     private Integer code;
 
