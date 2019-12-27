@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-@ApiModel("退货单列表")
+@ApiModel("退货单列表搜索项")
 public class ReturnOrderSearchVo {
 
     @ApiModelProperty("退货单号")

@@ -37,13 +37,31 @@ public class ErpOrderCreateController {
     @Resource
     private ErpOrderCreateService erpOrderCreateService;
 
-    @PostMapping("/saveOrder")
-    @ApiOperation(value = "创建订单")
-    public HttpResponse saveOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
+    @PostMapping("/erpSaveOrder")
+    @ApiOperation(value = "erp从购物车创建订单")
+    public HttpResponse<ErpOrderInfo> erpSaveOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
-            ErpOrderInfo erpOrderInfo = erpOrderCreateService.saveOrder(erpOrderSaveRequest);
+            ErpOrderInfo erpOrderInfo = erpOrderCreateService.erpSaveOrder(erpOrderSaveRequest);
+            response.setData(erpOrderInfo);
+        } catch (BusinessException e) {
+            logger.info("创建订单失败：{}", e);
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            logger.info("创建订单失败：{}", e);
+            response = HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+        }
+        return response;
+    }
+
+    @PostMapping("/storeSaveOrder")
+    @ApiOperation(value = "爱掌柜从购物车创建订单")
+    public HttpResponse<ErpOrderInfo> storeSaveOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
+        HttpResponse response = HttpResponse.success();
+        try {
+            AuthUtil.loginCheck();
+            ErpOrderInfo erpOrderInfo = erpOrderCreateService.storeSaveOrder(erpOrderSaveRequest);
             response.setData(erpOrderInfo);
         } catch (BusinessException e) {
             logger.info("创建订单失败：{}", e);
@@ -57,7 +75,7 @@ public class ErpOrderCreateController {
 
     @PostMapping("/saveRackOrder")
     @ApiOperation(value = "创建货架订单")
-    public HttpResponse saveRackOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
+    public HttpResponse<ErpOrderInfo> saveRackOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();

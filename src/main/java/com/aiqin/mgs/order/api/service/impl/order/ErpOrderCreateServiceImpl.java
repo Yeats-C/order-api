@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.service.impl.order;
 
+import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.domain.AuthToken;
@@ -17,6 +18,7 @@ import com.aiqin.mgs.order.api.service.CartOrderService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
+import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,12 +55,44 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ErpOrderInfo saveOrder(ErpOrderSaveRequest erpOrderSaveRequest) {
+    public ErpOrderInfo erpSaveOrder(ErpOrderSaveRequest erpOrderSaveRequest) {
+        //校验参数
+        validateSaveOrderRequest(erpOrderSaveRequest);
+
+        ErpOrderTypeCategoryControlEnum controlEnum = ErpOrderTypeCategoryControlEnum.getEnum(erpOrderSaveRequest.getOrderType(), erpOrderSaveRequest.getOrderCategory());
+        if (controlEnum == null || !controlEnum.isErpCartCreate()) {
+            throw new BusinessException("不支持创建该类型和类别的订单");
+        }
+        return saveOrder(erpOrderSaveRequest);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ErpOrderInfo storeSaveOrder(ErpOrderSaveRequest erpOrderSaveRequest) {
+        //校验参数
+        validateSaveOrderRequest(erpOrderSaveRequest);
+
+        ErpOrderTypeCategoryControlEnum controlEnum = ErpOrderTypeCategoryControlEnum.getEnum(erpOrderSaveRequest.getOrderType(), erpOrderSaveRequest.getOrderCategory());
+        if (controlEnum == null || !controlEnum.isStoreCartCreate()) {
+            throw new BusinessException("不支持创建该类型和类别的订单");
+        }
+        return saveOrder(erpOrderSaveRequest);
+    }
+
+    /**
+     * 从购物车创建订单
+     *
+     * @param erpOrderSaveRequest
+     * @return com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/26 9:49
+     */
+    private ErpOrderInfo saveOrder(ErpOrderSaveRequest erpOrderSaveRequest) {
 
         //操作人信息
         AuthToken auth = AuthUtil.getCurrentAuth();
-        //校验参数
-        validateSaveOrderRequest(erpOrderSaveRequest);
+
         //获取门店信息
         StoreInfo storeInfo = erpOrderRequestService.getStoreInfoByStoreId(erpOrderSaveRequest.getStoreId());
         //获取购物车商品
@@ -89,7 +123,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //自动支付
         if (processTypeEnum.isAutoPay()) {
-            erpOrderPayService.autoPay(orderId);
+//            erpOrderPayService.autoPay(orderId);
         }
 
         //返回订单信息
@@ -129,7 +163,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //自动发起支付
         if (processTypeEnum.isAutoPay()) {
-            erpOrderPayService.autoPay(orderId);
+//            erpOrderPayService.autoPay(orderId);
         }
 
         //返回订单
@@ -180,47 +214,47 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private OrderConfirmResponse getStoreCartProduct(String storeId) {
 
         //TODO 调用查询购物车接口
-//        CartOrderInfo cartOrderInfoQuery = new CartOrderInfo();
-//        cartOrderInfoQuery.setStoreId(storeId);
-//        cartOrderInfoQuery.setLineCheckStatus(YesOrNoEnum.YES.getCode());
-//        HttpResponse listHttpResponse = cartOrderService.displayCartLineCheckProduct(cartOrderInfoQuery);
-//        if (!RequestReturnUtil.validateHttpResponse(listHttpResponse)) {
-//            throw new BusinessException("获取购物车商品失败");
-//        }
-//        OrderConfirmResponse data = (OrderConfirmResponse) listHttpResponse.getData();
-//        if (data == null || data.getCartOrderInfos() == null || data.getCartOrderInfos().size() == 0) {
-//            throw new BusinessException("购物车没有勾选的商品");
-//        }
+        CartOrderInfo cartOrderInfoQuery = new CartOrderInfo();
+        cartOrderInfoQuery.setStoreId(storeId);
+        cartOrderInfoQuery.setLineCheckStatus(YesOrNoEnum.YES.getCode());
+        HttpResponse listHttpResponse = cartOrderService.displayCartLineCheckProduct(cartOrderInfoQuery);
+        if (!RequestReturnUtil.validateHttpResponse(listHttpResponse)) {
+            throw new BusinessException("获取购物车商品失败");
+        }
+        OrderConfirmResponse data = (OrderConfirmResponse) listHttpResponse.getData();
+        if (data == null || data.getCartOrderInfos() == null || data.getCartOrderInfos().size() == 0) {
+            throw new BusinessException("购物车没有勾选的商品");
+        }
 
-        OrderConfirmResponse data = new OrderConfirmResponse();
-        List<CartOrderInfo> list = new ArrayList<>();
-        CartOrderInfo info1 = new CartOrderInfo();
-        info1.setProductId("1000001");
-        info1.setSpuId("1000001");
-        info1.setProductName("奶粉");
-        info1.setSkuCode("9001");
-        info1.setPrice(new BigDecimal(5));
-        info1.setAmount(11);
-        list.add(info1);
-
-        CartOrderInfo info2 = new CartOrderInfo();
-        info2.setProductId("1000002");
-        info2.setSpuId("1000002");
-        info2.setProductName("玩具");
-        info2.setSkuCode("9002");
-        info2.setPrice(new BigDecimal(10));
-        info2.setAmount(22);
-        list.add(info2);
-
-        CartOrderInfo info3 = new CartOrderInfo();
-        info3.setProductId("1000003");
-        info3.setSpuId("1000003");
-        info3.setProductName("衣服");
-        info3.setSkuCode("9003");
-        info3.setPrice(new BigDecimal(15));
-        info3.setAmount(8);
-        list.add(info3);
-        data.setCartOrderInfos(list);
+//        OrderConfirmResponse data = new OrderConfirmResponse();
+//        List<CartOrderInfo> list = new ArrayList<>();
+//        CartOrderInfo info1 = new CartOrderInfo();
+//        info1.setProductId("1000001");
+//        info1.setSpuId("1000001");
+//        info1.setProductName("奶粉");
+//        info1.setSkuCode("9001");
+//        info1.setPrice(new BigDecimal(5));
+//        info1.setAmount(11);
+//        list.add(info1);
+//
+//        CartOrderInfo info2 = new CartOrderInfo();
+//        info2.setProductId("1000002");
+//        info2.setSpuId("1000002");
+//        info2.setProductName("玩具");
+//        info2.setSkuCode("9002");
+//        info2.setPrice(new BigDecimal(10));
+//        info2.setAmount(22);
+//        list.add(info2);
+//
+//        CartOrderInfo info3 = new CartOrderInfo();
+//        info3.setProductId("1000003");
+//        info3.setSpuId("1000003");
+//        info3.setProductName("衣服");
+//        info3.setSkuCode("9003");
+//        info3.setPrice(new BigDecimal(15));
+//        info3.setAmount(8);
+//        list.add(info3);
+//        data.setCartOrderInfos(list);
 
         return data;
     }
@@ -287,6 +321,14 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             orderItem.setZeroDisassemblyCoefficient(null);
             //商品类型  0商品 1赠品
             orderItem.setProductType(ErpProductGiftEnum.PRODUCT.getCode());
+            //商品属性编码
+            orderItem.setProductPropertyCode(productInfo.getProductPropertyCode());
+            //商品属性名称
+            orderItem.setProductPropertyName(productInfo.getProductPropertyName());
+            //供应商编码
+            orderItem.setSupplierCode(productInfo.getSupplierCode());
+            //供应商名称
+            orderItem.setSupplierName(productInfo.getSupplierName());
             //商品数量
             orderItem.setProductCount((long) item.getAmount());
             //商品单价
@@ -297,6 +339,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             orderItem.setActualTotalProductAmount(null);
             //优惠分摊总金额
             orderItem.setTotalPreferentialAmount(orderItem.getTotalProductAmount());
+            //分摊后单价
+            orderItem.setPreferentialAmount(orderItem.getProductAmount());
             //活动优惠总金额
             orderItem.setTotalAcivityAmount(BigDecimal.ZERO);
             //实发商品数量
@@ -728,6 +772,14 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             orderItem.setZeroDisassemblyCoefficient(null);
             //商品类型  0商品 1赠品
             orderItem.setProductType(ErpProductGiftEnum.PRODUCT.getCode());
+            //商品属性编码
+            orderItem.setProductPropertyCode(productInfo.getProductPropertyCode());
+            //商品属性名称
+            orderItem.setProductPropertyName(productInfo.getProductPropertyName());
+            //供应商编码
+            orderItem.setSupplierCode(productInfo.getSupplierCode());
+            //供应商名称
+            orderItem.setSupplierName(productInfo.getSupplierName());
             //商品数量
             orderItem.setProductCount(Long.valueOf(item.getQuantity()));
             //商品单价
@@ -740,6 +792,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             orderItem.setActualTotalProductAmount(null);
             //优惠分摊总金额
             orderItem.setTotalPreferentialAmount(orderItem.getTotalProductAmount());
+            //分摊后单价
+            orderItem.setPreferentialAmount(orderItem.getProductAmount());
             //活动优惠总金额
             orderItem.setTotalAcivityAmount(BigDecimal.ZERO);
             //实发商品数量

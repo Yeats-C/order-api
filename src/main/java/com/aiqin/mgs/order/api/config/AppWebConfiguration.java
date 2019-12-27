@@ -34,9 +34,9 @@ public class AppWebConfiguration implements WebMvcConfigurer {
                     "/webjars/**",
                     "/init/**");
         }
-        registry.addInterceptor(new IPInterceptor())
-                .addPathPatterns("/swagger-ui.html")
-                .addPathPatterns("/doc.html");
+//        registry.addInterceptor(new IPInterceptor())
+//                .addPathPatterns("/swagger-ui.html")
+//                .addPathPatterns("/doc.html");
     }
 
     @Override

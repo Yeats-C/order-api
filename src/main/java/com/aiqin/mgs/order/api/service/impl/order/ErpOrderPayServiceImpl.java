@@ -11,6 +11,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayCallbackRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
+import com.aiqin.mgs.order.api.domain.request.order.PayCallbackRequest;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPayResultResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPrintQueryResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayResultResponse;
@@ -247,6 +248,35 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public void orderPayCallback(PayCallbackRequest payCallbackRequest) {
+
+        ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(payCallbackRequest.getOrderNo());
+
+        ErpOrderStatusEnum orderStatus = null;
+        StatusEnum statusEnum = null;
+        if (StatusEnum.YES.getValue().equals(payCallbackRequest.getReturnCode())) {
+            orderStatus = ErpOrderStatusEnum.ORDER_STATUS_2;
+            statusEnum = StatusEnum.YES;
+        } else {
+            orderStatus = ErpOrderStatusEnum.ORDER_STATUS_99;
+            statusEnum = StatusEnum.NO;
+        }
+
+        order.setOrderStatus(orderStatus.getCode());
+        order.setPaymentStatus(statusEnum.getCode());
+        erpOrderInfoService.updateOrderByPrimaryKeySelective(order, AuthUtil.getSystemAuth());
+
+//        if (order != null) {
+//            ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByFeeId(order.getFeeId());
+//            if (orderFee != null) {
+//                ErpOrderPay orderPay = this.getOrderPayByPayId(orderFee.getPayId());
+//            }
+//        }
+
+    }
+
+//    @Override
+//    @Transactional(rollbackFor = Exception.class)
     public void orderPayCallback(ErpOrderPayCallbackRequest erpOrderPayCallbackRequest) {
 
         //TODO CT 校验参数
@@ -519,8 +549,16 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void orderLogisticsPay(ErpOrderPayRequest erpOrderPayRequest) {
-        AuthToken auth = AuthUtil.getCurrentAuth();
-        if (erpOrderPayRequest == null || StringUtils.isEmpty(erpOrderPayRequest.getOrderCode())) {
+        if (erpOrderPayRequest == null || StringUtils.isEmpty(erpOrderPayRequest.getPersonId())) {
+            throw new BusinessException("缺失用户id");
+        }
+        if (StringUtils.isEmpty(erpOrderPayRequest.getPersonName())) {
+            throw new BusinessException("缺失用户名称");
+        }
+        AuthToken auth = new AuthToken();
+        auth.setPersonId(erpOrderPayRequest.getPersonId());
+        auth.setPersonName(erpOrderPayRequest.getPersonName());
+        if (StringUtils.isEmpty(erpOrderPayRequest.getOrderCode())) {
             throw new BusinessException("缺失订单号");
         }
         ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(erpOrderPayRequest.getOrderCode());

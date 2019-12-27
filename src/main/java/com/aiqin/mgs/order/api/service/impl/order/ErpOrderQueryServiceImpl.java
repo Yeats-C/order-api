@@ -8,7 +8,6 @@ import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.po.order.*;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderOperationControlResponse;
-import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.PageAutoHelperUtil;
 import org.apache.commons.lang.StringUtils;
@@ -117,13 +116,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             order.setOrderLogistics(orderLogistics);
 
             //能不能编辑新增赠品行
-            order.setOperation(new ErpOrderOperationControlResponse());
-
-            ErpOrderNodeProcessTypeEnum processTypeEnum = ErpOrderNodeProcessTypeEnum.getEnum(order.getOrderTypeCode(), order.getOrderCategoryCode());
-            if (processTypeEnum != null && processTypeEnum.isAddProductGift()) {
-                order.getOperation().setAddGift(StatusEnum.YES.getCode());
-            }
-
+            orderOperationConfig(order);
         }
         return order;
     }
@@ -248,7 +241,10 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             if (secondaryOrderList != null && secondaryOrderList.size() > 0) {
                 for (ErpOrderInfo item :
                         secondaryOrderList) {
-                    item.setOperation(new ErpOrderOperationControlResponse());
+
+                    //设置子订单按钮
+                    orderOperationConfig(item);
+
                     String primaryCode = item.getMainOrderCode();
                     if (secondaryOrderMap.containsKey(primaryCode)) {
                         secondaryOrderMap.get(primaryCode).add(item);
@@ -266,15 +262,8 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                     item.setSecondaryOrderList(secondaryOrderMap.get(item.getOrderStoreCode()));
                 }
 
-                item.setOperation(new ErpOrderOperationControlResponse());
-                //只检查待支付和已取消的订单
-                if (ErpOrderStatusEnum.ORDER_STATUS_1.getCode().equals(item.getOrderStatus()) || ErpOrderStatusEnum.ORDER_STATUS_99.getCode().equals(item.getOrderStatus())) {
-                    ErpOrderPayStatusResponse orderPayStatusResponse = erpOrderRequestService.getOrderPayStatus(item.getOrderStoreCode());
-                    if (orderPayStatusResponse.isRequestSuccess() && ErpPayStatusEnum.SUCCESS == orderPayStatusResponse.getPayStatusEnum()) {
-                        //如果支付状态是成功的
-                        item.getOperation().setRepay(StatusEnum.YES.getCode());
-                    }
-                }
+                //设置按钮
+                orderOperationConfig(item);
             }
         }
 
@@ -304,4 +293,73 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         return erpOrderInfoDao.getMaxOrderCodeByCurrentDay(currentDay);
     }
 
+    /**
+     * 设置订单按钮控制参数
+     *
+     * @param order 订单
+     */
+    private void orderOperationConfig(ErpOrderInfo order) {
+
+        if (order == null) {
+            return;
+        }
+        ErpOrderOperationControlResponse control = new ErpOrderOperationControlResponse();
+        order.setOperation(control);
+        //订单状态
+        ErpOrderStatusEnum orderStatusEnum = ErpOrderStatusEnum.getEnum(order.getOrderStatus());
+        if (orderStatusEnum == null) {
+            return;
+        }
+        ErpOrderNodeProcessTypeEnum processTypeEnum = ErpOrderNodeProcessTypeEnum.getEnum(order.getOrderTypeCode(), order.getOrderCategoryCode());
+        if (processTypeEnum == null) {
+            return;
+        }
+
+        //确认收款按钮
+        if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_1 || orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_99) {
+            control.setRepay(StatusEnum.YES.getCode());
+        }
+
+        //添加赠品
+        if (processTypeEnum.isAddProductGift() && orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_1) {
+            control.setAddGift(StatusEnum.YES.getCode());
+        }
+
+        //支付订单费用
+        if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_1) {
+            control.setPayOrder(StatusEnum.YES.getCode());
+        }
+
+        //签收按钮
+        boolean allowedSign = (processTypeEnum.isHasLogisticsFee() && orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_12) || (!processTypeEnum.isHasLogisticsFee() && orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_11);
+        if (allowedSign) {
+            control.setSign(StatusEnum.YES.getCode());
+        }
+
+        //支付物流费用
+        if (processTypeEnum.isHasLogisticsFee() && orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_11) {
+            control.setPayLogistics(StatusEnum.YES.getCode());
+        }
+
+        //取消
+        if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_1 || orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_6) {
+            control.setCancel(StatusEnum.YES.getCode());
+        }
+
+        //是否显示物流详情
+        if (processTypeEnum.isHasLogisticsFee()) {
+            control.setLogisticsArea(StatusEnum.YES.getCode());
+        }
+
+        //重新加入购物车
+        if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_99 || orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_98) {
+            control.setRejoinCart(StatusEnum.YES.getCode());
+        }
+
+        //退货
+        if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_13) {
+            control.setOrderReturn(StatusEnum.YES.getCode());
+        }
+
+    }
 }

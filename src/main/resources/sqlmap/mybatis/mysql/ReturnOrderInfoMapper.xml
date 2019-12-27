@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.aiqin.mgs.order.api.dao.returnOrder.ReturnOrderInfoDao" >
+<mapper namespace="com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao" >
   <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.ReturnOrderInfo" >
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="return_order_id" property="returnOrderId" jdbcType="VARCHAR" />
@@ -905,14 +905,14 @@
                 review_remark=#{reviewNote,jdbcType=VARCHAR},
             </if>
         </set>
-        where return_order_id=#{returnOrderId,jdbcType=VARCHAR}
+        where return_order_code=#{returnOrderId,jdbcType=VARCHAR}
     </update>
 
-  <select id="selectByReturnOrderId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  <select id="selectByReturnOrderCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
     <include refid="Base_Column_List" />
     from return_order_info
-    where return_order_id = #{returnOrderId}
+    where return_order_code = #{returnOrderCode}
   </select>
 
   <select id="selectByOrderId" resultMap="BaseResultMap">
@@ -931,7 +931,114 @@
     where return_order_code=#{orderStoreCode,jdbcType=VARCHAR}
   </update>
 
+  <update id="updateLogisticsCountAndAmount">
+    update return_order_info
+    set
+    actual_product_count = #{actualProductCount},
+    actual_return_order_amount = #{actualReturnOrderAmount}
+    where return_order_code=#{orderStoreCode}
+  </update>
 
+  <update id="updateRefundStatus">
+    update return_order_info
+    set
+    return_order_status=12,
+    refund_status = 1
+    where return_order_code=#{orderStoreCode}
+  </update>
 
+  <!--后台销售退货单管理列表（搜索）-->
+  <select id="page" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderSearchVo" >
+    select
+    <include refid="Base_Column_List" />
+    from return_order_info
+    where
+    1=1
+    <if test="returnOrderStatus!=null and returnOrderStatus!=''">
+     and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
+    </if>
+    <if test="ReturnOrderCode!=null and ReturnOrderCode!=''">
+     and return_order_code=#{ReturnOrderCode,jdbcType=VARCHAR}
+    </if>
+    <if test="storeName!=null and storeName!=''">
+     and store_name=#{storeName,jdbcType=VARCHAR}
+    </if>
+    <if test="provinceName!=null and provinceName!=''">
+     and province_name=#{provinceName,jdbcType=VARCHAR}
+    </if>
+    <if test="cityName!=null and cityName!=''">
+     and city_name=#{cityName,jdbcType=VARCHAR}
+    </if>
+    <if test="applyStartTime!=null and applyStartTime!=''">
+     and create_time &gt;={applyStartTime}
+    </if>
+    <if test="applyEndTime!=null and applyEndTime!=''">
+     and create_time &lt;={applyEndTime}
+    </if>
+    order by create_time desc
+  </select>
+
+  <!--后台销售退货单管理列表数量（搜索）-->
+  <select id="pageCount" resultType="Integer" parameterType="com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderSearchVo" >
+    select
+    count(1)
+    from return_order_info
+    where
+    1=1
+    <if test="returnOrderStatus!=null and returnOrderStatus!=''">
+      and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
+    </if>
+    <if test="ReturnOrderCode!=null and ReturnOrderCode!=''">
+      and return_order_code=#{ReturnOrderCode,jdbcType=VARCHAR}
+    </if>
+    <if test="storeName!=null and storeName!=''">
+      and store_name=#{storeName,jdbcType=VARCHAR}
+    </if>
+    <if test="provinceName!=null and provinceName!=''">
+      and province_name=#{provinceName,jdbcType=VARCHAR}
+    </if>
+    <if test="cityName!=null and cityName!=''">
+      and city_name=#{cityName,jdbcType=VARCHAR}
+    </if>
+    <if test="applyStartTime!=null and applyStartTime!=''">
+      and create_time &gt;={applyStartTime}
+    </if>
+    <if test="applyEndTime!=null and applyEndTime!=''">
+      and create_time &lt;={applyEndTime}
+    </if>
+  </select>
+
+  <!--通过条件查询退货单-->
+  <select id="selectByParameter" resultMap="BaseResultMap" parameterType="map" >
+    select
+    <include refid="Base_Column_List" />
+    from return_order_info
+    where
+    1=1
+    <if test="id!=null and id!=''">
+    id = #{id,jdbcType=BIGINT}
+    </if>
+    <if test="returnOrderStatus!=null and returnOrderStatus!=''">
+      and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
+    </if>
+    <if test="ReturnOrderCode!=null and ReturnOrderCode!=''">
+      and return_order_code=#{ReturnOrderCode,jdbcType=VARCHAR}
+    </if>
+    <if test="storeName!=null and storeName!=''">
+      and store_name=#{storeName,jdbcType=VARCHAR}
+    </if>
+    <if test="provinceName!=null and provinceName!=''">
+      and province_name=#{provinceName,jdbcType=VARCHAR}
+    </if>
+    <if test="cityName!=null and cityName!=''">
+      and city_name=#{cityName,jdbcType=VARCHAR}
+    </if>
+    <if test="applyStartTime!=null and applyStartTime!=''">
+      and create_time &gt;={applyStartTime}
+    </if>
+    <if test="applyEndTime!=null and applyEndTime!=''">
+      and create_time &lt;={applyEndTime}
+    </if>
+  </select>
 
 </mapper>

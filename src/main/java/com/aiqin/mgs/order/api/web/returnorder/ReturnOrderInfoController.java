@@ -1,17 +1,15 @@
 package com.aiqin.mgs.order.api.web.returnorder;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailVO;
-import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReqVo;
-import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewApiReqVo;
-import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
+import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.ResultCode;
+import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
+import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.annotations.ApiParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -35,15 +33,15 @@ public class ReturnOrderInfoController {
         return new HttpResponse<>(returnOrderInfoService.save(reqVo));
     }
 
-//    @ApiOperation("列表搜索")
-//    @PostMapping("/list")
-//    public HttpResponse<PageResData<OrderAfterSaleListVo>> list(@RequestBody OrderAfterSaleSearchVo searchVo) {
-//        //todo:放开注释
-////        String companyCode = UrlInterceptor.getCurrentAuthToken().getCompanyCode();
-////        searchVo.setCompanyCode(companyCode);
+    @ApiOperation("后台销售退货单管理列表（搜索）")
+    @PostMapping("/list")
+    public HttpResponse<PageResData<ReturnOrderInfo>> list(@RequestBody ReturnOrderSearchVo searchVo) {
+        //todo:放开注释
+//        String companyCode = UrlInterceptor.getCurrentAuthToken().getCompanyCode();
+//        searchVo.setCompanyCode(companyCode);
 //        searchVo.setCompanyCode("01");
-//        return new HttpResponse<>(orderAfterSaleService.list(searchVo));
-//    }
+        return new HttpResponse<>(returnOrderInfoService.list(searchVo));
+    }
 
     @ApiOperation("操作审核退货单")
     @PostMapping("/updateStatus")
@@ -85,5 +83,20 @@ public class ReturnOrderInfoController {
         return new HttpResponse<>(review);
     }
 
+    @ApiOperation("支付中心---发起退款单回调")
+    @PostMapping("/callback")
+    public HttpResponse callback(@RequestBody RefundReq reqVo) {
+        Boolean review = returnOrderInfoService.callback(reqVo);
+        if(review){
+            return  HttpResponse.success();
+        }
+        return HttpResponse.failure(ResultCode.PAY_ERROR);
+    }
+
+    @ApiOperation("退货单号（退货详情）")
+    @GetMapping("/detail")
+    public HttpResponse<ReturnOrderDetailVO> detail(@ApiParam("退货单号") @RequestParam("ReturnOrderCode") String ReturnOrderCode) {
+        return new HttpResponse<>(returnOrderInfoService.detail(ReturnOrderCode));
+    }
 
 }

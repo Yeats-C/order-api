@@ -72,7 +72,9 @@ public interface ResultCode {
     String ORDER = "订单";
 
     MessageId OPT_ERROR = MessageId.create(Project.ZERO, 28, "操作失败");
-    
+
+    MessageId PAY_ERROR = MessageId.create(Project.PAYMENT_API, 1, "回调失败");
+
     
     /** 黄祉壹   2018-11-05 结束     */
 }

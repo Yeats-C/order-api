@@ -79,11 +79,10 @@ public class ErpOrderSignController {
 
     @PostMapping("/orderSign")
     @ApiOperation(value = "订单签收")
-    public HttpResponse orderSign(@RequestBody ErpOrderInfo erpOrderInfo) {
+    public HttpResponse orderSign(@RequestBody ErpOrderSignRequest erpOrderSignRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-            AuthUtil.loginCheck();
-            erpOrderInfoService.orderSign(erpOrderInfo);
+            erpOrderInfoService.orderSign(erpOrderSignRequest);
         } catch (BusinessException e) {
             logger.error("订单签收异常：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));

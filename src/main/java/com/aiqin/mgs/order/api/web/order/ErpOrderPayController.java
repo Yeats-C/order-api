@@ -8,6 +8,7 @@ import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayCallbackRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
+import com.aiqin.mgs.order.api.domain.request.order.PayCallbackRequest;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPayResultResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPrintQueryResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayResultResponse;
@@ -77,10 +78,10 @@ public class ErpOrderPayController {
 
     @PostMapping("/orderPayCallback")
     @ApiOperation(value = "订单支付回调")
-    public HttpResponse orderPayCallback(@RequestBody ErpOrderPayCallbackRequest erpOrderPayCallbackRequest) {
+    public HttpResponse orderPayCallback(@RequestBody PayCallbackRequest payCallbackRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-            erpOrderPayService.orderPayCallback(erpOrderPayCallbackRequest);
+            erpOrderPayService.orderPayCallback(payCallbackRequest);
         } catch (BusinessException e) {
             logger.error("订单支付回调异常：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
@@ -130,7 +131,6 @@ public class ErpOrderPayController {
     public HttpResponse orderLogisticsPay(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-            AuthUtil.loginCheck();
             //发起支付
             erpOrderPayService.orderLogisticsPay(erpOrderPayRequest);
         } catch (BusinessException e) {
