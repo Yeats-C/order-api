@@ -166,7 +166,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         Integer review = returnOrderInfoDao.updateReturnStatus(reqVo);
         if (flag) {
             //todo 同步到供应链
-            createRejectRecord(reqVo.getReturnOrderCode());
+//            createRejectRecord(reqVo.getReturnOrderCode());
         }
         if (flag1) {
             log.info("驳回--进入A品券发放审批");
