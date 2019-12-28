@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.validation.Valid;
@@ -39,6 +40,7 @@ public class RejectRecordServiceImpl implements RejectRecordService {
     OperationLogDao operationLogDao;
 
     @Override
+    @Transactional
     public HttpResponse createRejectRecord(@Valid RejectRecordReq rejectRecordReq) {
         //异步执行
         rejectRecordExecutor(rejectRecordReq);
