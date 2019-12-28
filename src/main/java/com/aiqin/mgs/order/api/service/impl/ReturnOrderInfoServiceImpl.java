@@ -678,13 +678,4 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         return HttpResponse.success(list);
     }
 
-
-    public static void main(String[] args) {
-        BigDecimal totalMoneyAll=BigDecimal.valueOf(0);
-        for(int i=0;i<10;i++){
-            totalMoneyAll=totalMoneyAll.add(BigDecimal.valueOf(i));
-        }
-        System.out.println(totalMoneyAll);
-    }
-
 }
