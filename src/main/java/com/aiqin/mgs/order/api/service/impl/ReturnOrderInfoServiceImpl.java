@@ -254,7 +254,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 map4.put(eoi.getOrderStoreCode()+eoi.getLineCode(),returnProductCount);
             }
             //此退货单实际退款总金额
-            BigDecimal totalMoney=BigDecimal.valueOf(0);
+            BigDecimal totalMoneyAll=BigDecimal.valueOf(0);
             String returnOrderId="";
             long totalCount=0;
             for(ReturnOrderDetail rod:returnOrderDetails){
@@ -268,22 +268,22 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 BigDecimal totalPreferentialAmount = map2.get(orderId+rod.getLineCode());
                 //实收数量（门店）
                 Long actualInboundCount = map3.get(orderId+rod.getLineCode());
-                BigDecimal totalMoney1=new BigDecimal(0);
+                BigDecimal totalMoney=new BigDecimal(0);
                 if((actualInboundCount-returnProductCount)>count){//可退数量大于前端入参退货数量
                     //计算公式：此商品退货总金额=分摊后单价 X 前端入参退货数量
-                    totalMoney1=preferentialAmount.multiply(BigDecimal.valueOf(count));
+                    totalMoney=preferentialAmount.multiply(BigDecimal.valueOf(count));
                 }else if((actualInboundCount-returnProductCount)==count){//可退数量等于前端入参退货数量
                     //计算公式：此商品退货总金额=分摊总金额-分摊后单价 X 已退数量
-                    totalMoney1=totalPreferentialAmount.subtract(preferentialAmount.multiply(BigDecimal.valueOf(returnProductCount)));
+                    totalMoney=totalPreferentialAmount.subtract(preferentialAmount.multiply(BigDecimal.valueOf(returnProductCount)));
                 }
                 //实退商品总价
-                rod.setActualTotalProductAmount(totalMoney1);
-                totalMoney.add(totalMoney1);
+                rod.setActualTotalProductAmount(totalMoney);
+                totalMoneyAll.add(totalMoney);
                 returnOrderId=rod.getReturnOrderCode();
                 totalCount=totalCount+count;
             }
             //修改主订单实际退货数量、实际退款总金额
-            returnOrderInfoDao.updateLogisticsCountAndAmount(returnOrderId,totalMoney,totalCount);
+            returnOrderInfoDao.updateLogisticsCountAndAmount(returnOrderId,totalMoneyAll,totalCount);
             //修改详情表实际退款金额
             returnOrderDetailDao.updateActualAmountBatch(returnOrderDetails);
             flag=true;
