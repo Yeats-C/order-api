@@ -112,6 +112,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 //        if (reqVo.getReturnDiscountAmount() > 0) {//退回优惠额度
 //            record.setDiscountAmountInfoStr(JSON.toJSONString(reqVo.getDiscountAmountInfos()));
 //        }
+        //tui
+        record.setReturnMoneyType(ConstantData.returnMoneyType);
         returnOrderInfoDao.insertSelective(record);
         List<ReturnOrderDetail> details = reqVo.getDetails().stream().map(detailVo -> {
             ReturnOrderDetail detail = new ReturnOrderDetail();

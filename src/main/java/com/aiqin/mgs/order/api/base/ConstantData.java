@@ -47,5 +47,9 @@ public interface ConstantData {
      * 支付流水--支付类型 1:付款  2:退款
      */
     Integer payTypeRefund = 2;
+    /**
+     * 退货单--退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户
+     */
+    Integer returnMoneyType = 5;
 
 }
