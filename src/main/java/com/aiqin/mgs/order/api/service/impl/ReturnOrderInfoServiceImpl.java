@@ -268,7 +268,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 BigDecimal totalPreferentialAmount = map2.get(orderId+rod.getLineCode());
                 //实收数量（门店）
                 Long actualInboundCount = map3.get(orderId+rod.getLineCode());
-                BigDecimal totalMoney=new BigDecimal(0);
+                BigDecimal totalMoney=new BigDecimal(1);
                 if((actualInboundCount-returnProductCount)>count){//可退数量大于前端入参退货数量
                     //计算公式：此商品退货总金额=分摊后单价 X 前端入参退货数量
                     totalMoney=preferentialAmount.multiply(BigDecimal.valueOf(count));
@@ -278,7 +278,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 }
                 //实退商品总价
                 rod.setActualTotalProductAmount(totalMoney);
-                totalMoneyAll.add(totalMoney);
+                totalMoneyAll=totalMoneyAll.add(totalMoney);
                 returnOrderId=rod.getReturnOrderCode();
                 totalCount=totalCount+count;
             }
@@ -630,7 +630,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     public HttpResponse getAmount(String orderCode, Long lineCode,Long number) {
         ErpOrderItem erpOrderItem = erpOrderItemService.getItemByOrderCodeAndLine(orderCode, lineCode);
         //此商品退货总金额
-        BigDecimal totalMoney=new BigDecimal(0);
+        BigDecimal totalMoney=new BigDecimal(1);
         if(erpOrderItem!=null){
             //已退数量
             Long returnProductCount=erpOrderItem.getReturnProductCount();
@@ -676,6 +676,15 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             list.add(returnOrderStatusVo);
         }
         return HttpResponse.success(list);
+    }
+
+
+    public static void main(String[] args) {
+        BigDecimal totalMoneyAll=BigDecimal.valueOf(0);
+        for(int i=0;i<10;i++){
+            totalMoneyAll=totalMoneyAll.add(BigDecimal.valueOf(i));
+        }
+        System.out.println(totalMoneyAll);
     }
 
 }
