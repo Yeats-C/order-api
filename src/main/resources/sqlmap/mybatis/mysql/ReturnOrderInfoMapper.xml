@@ -924,10 +924,17 @@
 
   <update id="updateLogistics">
     update return_order_info
-    set
-    logistics_company_code = #{logisticsCompanyCode,jdbcType=VARCHAR},
-    logistics_company_name = #{logisticsCompanyName,jdbcType=VARCHAR},
-    logistics_code = #{logisticsCode,jdbcType=VARCHAR}
+    <set >
+      <if test="logisticsCompanyCode!=null">
+        logistics_company_code = #{logisticsCompanyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="logisticsCompanyName!=null">
+        logistics_company_name = #{logisticsCompanyName,jdbcType=VARCHAR},
+      </if>
+      <if test="logisticsCode!=null">
+        logistics_code = #{logisticsCode,jdbcType=VARCHAR},
+      </if>
+    </set>
     where return_order_code=#{returnOrderCode,jdbcType=VARCHAR}
   </update>
 
