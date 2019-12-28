@@ -122,7 +122,7 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                     //存储A品卷信息
                     List<CouponInfo> couponInfoList=new ArrayList<>();
                     CouponInfo couponInfo=new CouponInfo();
-                    couponInfo.setCouponName(ConstantData.aCouponName);
+                    couponInfo.setCouponName(ConstantData.COUPON_NAME_A);
                     couponInfo.setCouponType(ConstantData.COUPON_TYPE);
                     couponInfo.setFranchiseeId(couponApprovalDetail.getFranchiseeId());
                     couponInfo.setOrderId(couponApprovalDetail.getOrderId());
@@ -130,7 +130,7 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                     couponInfo.setValidityEndTime(couponApprovalDetail.getEndTime());
                     for(int i=0;i<num;i++){
                         couponInfo.setCouponCode(couponCode());
-                        couponInfo.setNominalValue(ConstantData.nominalValue);
+                        couponInfo.setNominalValue(ConstantData.NOMINAL_VALUE);
                         couponInfoList.add(couponInfo);
                         FranchiseeAssetVo franchiseeAsset=new FranchiseeAssetVo();
                         BeanUtils.copyProperties(couponInfo,franchiseeAsset);
@@ -162,7 +162,7 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                             log.info("A品券虚拟资产同步成功，修改退货单状态");
                             ReturnOrderReviewReqVo reqVo=new ReturnOrderReviewReqVo();
                             reqVo.setReturnOrderCode(couponApprovalDetail.getOrderId());
-                            reqVo.setOperateStatus(ConstantData.returnOrderSuccess);
+                            reqVo.setOperateStatus(ConstantData.RETURN_ORDER_SUCCESS);
                             returnOrderInfoDao.updateReturnStatus(reqVo);
                             log.info("退款完成");
                         }
@@ -176,27 +176,27 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                     //驳回发起人
                     couponApprovalInfo.setStatus(StatusEnum.AUDIT_BACK.getValue());
                     couponApprovalInfo.setStatuStr(StatusEnum.AUDIT_BACK.getDesc());
-                    updateReturnOrderStatus(ConstantData.returnOrderStatusWait,couponApprovalDetail.getOrderId());
+                    updateReturnOrderStatus(ConstantData.RETURN_ORDER_STATUS_WAIT,couponApprovalDetail.getOrderId());
                 } else if (formCallBackVo.getOptBtn().equals(IndicatorStr.PROCESS_BTN_REJECT_END.getCode())) {
                     //驳回并结束
                     couponApprovalInfo.setStatus(StatusEnum.AUDIT_END.getValue());
                     couponApprovalInfo.setStatuStr(StatusEnum.AUDIT_END.getDesc());
-                    updateReturnOrderStatus(ConstantData.returnOrderStatusWait,couponApprovalDetail.getOrderId());
+                    updateReturnOrderStatus(ConstantData.RETURN_ORDER_STATUS_WAIT,couponApprovalDetail.getOrderId());
                 } else if (formCallBackVo.getOptBtn().equals(IndicatorStr.PROCESS_BTN_CANCEL.getCode())) {
                     //撤销
                     couponApprovalInfo.setStatus(StatusEnum.AUDIT_CANCEL.getValue());
                     couponApprovalInfo.setStatuStr(StatusEnum.AUDIT_CANCEL.getDesc());
-                    updateReturnOrderStatus(ConstantData.returnOrderStatusWait,couponApprovalDetail.getOrderId());
+                    updateReturnOrderStatus(ConstantData.RETURN_ORDER_STATUS_WAIT,couponApprovalDetail.getOrderId());
                 } else if (formCallBackVo.getOptBtn().equals(IndicatorStr.PROCESS_BTN_KILL.getCode())) {
                     //终止
                     couponApprovalInfo.setStatus(StatusEnum.AUDIT_END.getValue());
                     couponApprovalInfo.setStatuStr(StatusEnum.AUDIT_END.getDesc());
-                    updateReturnOrderStatus(ConstantData.returnOrderStatusWait,couponApprovalDetail.getOrderId());
+                    updateReturnOrderStatus(ConstantData.RETURN_ORDER_STATUS_WAIT,couponApprovalDetail.getOrderId());
                 } else {
                     //终止
                     couponApprovalInfo.setStatus(StatusEnum.AUDIT_END.getValue());
                     couponApprovalInfo.setStatuStr(StatusEnum.AUDIT_END.getDesc());
-                    updateReturnOrderStatus(ConstantData.returnOrderStatusWait,couponApprovalDetail.getOrderId());
+                    updateReturnOrderStatus(ConstantData.RETURN_ORDER_STATUS_WAIT,couponApprovalDetail.getOrderId());
                 }
             }
             //更新本地审批表数据
@@ -244,14 +244,14 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
         String url="http://127.0.0.1:9011/franchiseeVirtual/VirtualA";
         List<FranchiseeAssetVo> franchiseeAssets=new ArrayList<>();
         CouponInfo couponInfo=new CouponInfo();
-        couponInfo.setCouponName(ConstantData.aCouponName);
+        couponInfo.setCouponName(ConstantData.COUPON_NAME_A);
         couponInfo.setCouponType(ConstantData.COUPON_TYPE);
         couponInfo.setFranchiseeId("1001");
         couponInfo.setOrderId("1002");
         couponInfo.setValidityStartTime(new Date());
         couponInfo.setValidityEndTime(new Date());
         couponInfo.setCouponCode(couponCode());
-        couponInfo.setNominalValue(ConstantData.nominalValue);
+        couponInfo.setNominalValue(ConstantData.NOMINAL_VALUE);
         couponInfo.setCreateTime(new Date());
         FranchiseeAssetVo franchiseeAsset=new FranchiseeAssetVo();
         BeanUtils.copyProperties(couponInfo,franchiseeAsset);

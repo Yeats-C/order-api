@@ -113,7 +113,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 //            record.setDiscountAmountInfoStr(JSON.toJSONString(reqVo.getDiscountAmountInfos()));
 //        }
         //tui
-        record.setReturnMoneyType(ConstantData.returnMoneyType);
+        record.setReturnMoneyType(ConstantData.RETURN_MONEY_TYPE);
         returnOrderInfoDao.insertSelective(record);
         List<ReturnOrderDetail> details = reqVo.getDetails().stream().map(detailVo -> {
             ReturnOrderDetail detail = new ReturnOrderDetail();
@@ -289,7 +289,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             flag=true;
         }
         //退货单状态(供应链使用):4-等待退货验收，5-等待退货入库 11-退货完成
-        if(reqVo.getOperateStatus().equals(ConstantData.returnOrderStatusComplete)){
+        if(reqVo.getOperateStatus().equals(ConstantData.RETURN_ORDER_STATUS_COMPLETE)){
             //发起退款
             flag=refund(reqVo.getReturnOrderId());
         }
@@ -317,14 +317,14 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //查询退货单状态是否修改成功
         ReturnOrderInfo returnOrderInfo=returnOrderInfoDao.selectByReturnOrderCode(reqVo.getOrderNo());
         //退款状态，0-未退款、1-已退款
-        if(returnOrderInfo!=null&&returnOrderInfo.getRefundStatus().equals(ConstantData.refundStatus)){//1-已退款
+        if(returnOrderInfo!=null&&returnOrderInfo.getRefundStatus().equals(ConstantData.REFUND_STATUS)){//1-已退款
             return true;
         }
         RefundInfo record=new RefundInfo();
         record.setOrderCode(reqVo.getOrderNo());
         record.setPayNum(reqVo.getPayNum());
         record.setUpdateTime(new Date());
-        record.setStatus(ConstantData.refundStatus);
+        record.setStatus(ConstantData.REFUND_STATUS);
         refundInfoDao.updateByOrderCode(record);
         return returnOrderInfoDao.updateRefundStatus(reqVo.getOrderNo())>0;
     }
@@ -377,8 +377,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     public HttpResponse submitActBaseProcess(String approvalCode, String applier, String positionCode) {
         StartProcessParamVO paramVO = new StartProcessParamVO();
         // A品券发放申请
-        paramVO.setCostType(ConstantData.applyCoupon01);
-        paramVO.setFormType(ConstantData.applyCoupon01);
+        paramVO.setCostType(ConstantData.APPLY_COUPON01_KEY);
+        paramVO.setFormType(ConstantData.APPLY_COUPON01_KEY);
         paramVO.setFormUrl("http://order.api.aiqin.com/approval/formDetail/" + approvalCode);//表单详情页面地址 必传
         paramVO.setCurrentUser(applier);
         paramVO.setFormNo(approvalCode);
@@ -439,7 +439,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //结算方式编码--退款方式
         rejectRecord.setSettlementMethodCode(returnOrderInfo.getReturnMoneyType().toString());
         //退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户
-        rejectRecord.setSettlementMethodName(ConstantData.returnMoneyTypeName);
+        rejectRecord.setSettlementMethodName(ConstantData.RETURN_MONEY_TYPE_NAME);
 //        if(null!=returnOrderInfo.getReturnMoneyType()){
 //            //退款方式 1:现金 2:微信 3:支付宝 4:银联
 //            switch (returnOrderInfo.getReturnMoneyType()) {
@@ -482,7 +482,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         log.info("发起退款单申请，returnOrderInfo={}",returnOrderInfo);
         if(returnOrderInfo!=null){
             //同步至支付流水表
-            insertRefundInfo(returnOrderInfo.getActualReturnOrderAmount(),returnOrderInfo.getReturnOrderCode(),ConstantData.payTypeRefund);
+            insertRefundInfo(returnOrderInfo.getActualReturnOrderAmount(),returnOrderInfo.getReturnOrderCode(),ConstantData.PAY_TYPE_REFUND);
             String url=paymentHost+"/payment/pay/payTobAll";
             JSONObject json=new JSONObject();
             json.put("order_no",returnOrderInfo.getReturnOrderCode());
