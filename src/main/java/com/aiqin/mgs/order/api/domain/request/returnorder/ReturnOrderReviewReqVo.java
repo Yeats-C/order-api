@@ -32,8 +32,7 @@ public class ReturnOrderReviewReqVo implements Serializable {
     @ApiModelProperty("审核备注")
     private String reviewNote;
 
-    @JSONField(serialize = false)
-    @ApiModelProperty(value = "操作人", hidden = true)
+    @ApiModelProperty(value = "操作人")
     private String operator;
 
     @NotBlank(message = "审核操作状态")
