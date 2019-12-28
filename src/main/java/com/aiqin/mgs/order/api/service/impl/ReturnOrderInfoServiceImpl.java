@@ -304,8 +304,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     }
 
     @Override
-    public Boolean updateLogistics(String returnOrderCode, String logisticsCompanyCode, String logisticsCompanyName, String logisticsNo) {
-        int res=returnOrderInfoDao.updateLogistics(returnOrderCode,logisticsCompanyCode,logisticsCompanyName,logisticsNo);
+    public Boolean updateLogistics(LogisticsVo logisticsVo) {
+        int res=returnOrderInfoDao.updateLogistics(logisticsVo);
         return res>0;
     }
 

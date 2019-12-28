@@ -77,12 +77,8 @@ public class ReturnOrderInfoController {
 
     @ApiOperation("更新物流单信息（向爱掌柜提供接口）")
     @PostMapping("/updateLogistics")
-    @ApiImplicitParams({@ApiImplicitParam(name = "returnOrderCode", value = "退货编码", dataType = "String", paramType = "query", required = true),
-            @ApiImplicitParam(name = "logisticsCompanyCode", value = "物流公司编码", dataType = "String", paramType = "query", required = false),
-            @ApiImplicitParam(name = "logisticsCompanyName", value = "物流公司名称", dataType = "String", paramType = "query", required = false),
-            @ApiImplicitParam(name = "logisticsNo", value = "物流单号", dataType = "String", paramType = "query", required = false)})
-    public HttpResponse<Boolean> updateLogistics(String returnOrderCode,String logisticsCompanyCode,String logisticsCompanyName,String logisticsNo) {
-        Boolean review = returnOrderInfoService.updateLogistics(returnOrderCode,logisticsCompanyCode,logisticsCompanyName,logisticsNo);
+    public HttpResponse<Boolean> updateLogistics(@RequestBody LogisticsVo logisticsVo) {
+        Boolean review = returnOrderInfoService.updateLogistics(logisticsVo);
         return new HttpResponse<>(review);
     }
 

@@ -63,13 +63,9 @@ public interface ReturnOrderInfoService {
 
     /**
      * 获取物流单信息（向爱掌柜提供接口）
-     * @param returnOrderCode
-     * @param logisticsCompanyCode
-     * @param logisticsCompanyName
-     * @param logisticsNo
      * @return
      */
-    Boolean updateLogistics(String returnOrderCode,String logisticsCompanyCode,String logisticsCompanyName,String logisticsNo);
+    Boolean updateLogistics(LogisticsVo logisticsVo);
 
     /**
      * 支付中心---发起退款单回调

@@ -925,13 +925,13 @@
   <update id="updateLogistics">
     update return_order_info
     <set >
-      <if test="logisticsCompanyCode!=null">
+      <if test="logisticsCompanyCode!=null and logisticsCompanyCode!=''">
         logistics_company_code = #{logisticsCompanyCode,jdbcType=VARCHAR},
       </if>
-      <if test="logisticsCompanyName!=null">
+      <if test="logisticsCompanyName!=null and logisticsCompanyName!=''">
         logistics_company_name = #{logisticsCompanyName,jdbcType=VARCHAR},
       </if>
-      <if test="logisticsCode!=null">
+      <if test="logisticsCode!=null and logisticsCode!=''">
         logistics_code = #{logisticsCode,jdbcType=VARCHAR},
       </if>
     </set>
