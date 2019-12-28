@@ -13,7 +13,8 @@ public interface ConstantData {
     /**
      * A品卷类型
      */
-    Integer couponType = 2;
+//    Integer couponType = 2;
+    Integer COUPON_TYPE = 2;
     /**
      * 优惠券名称--A品券
      */

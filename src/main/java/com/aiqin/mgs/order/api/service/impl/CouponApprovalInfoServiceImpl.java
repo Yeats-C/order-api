@@ -123,7 +123,7 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                     List<CouponInfo> couponInfoList=new ArrayList<>();
                     CouponInfo couponInfo=new CouponInfo();
                     couponInfo.setCouponName(ConstantData.aCouponName);
-                    couponInfo.setCouponType(ConstantData.couponType);
+                    couponInfo.setCouponType(ConstantData.COUPON_TYPE);
                     couponInfo.setFranchiseeId(couponApprovalDetail.getFranchiseeId());
                     couponInfo.setOrderId(couponApprovalDetail.getOrderId());
                     couponInfo.setValidityStartTime(couponApprovalDetail.getStartTime());
@@ -245,7 +245,7 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
         List<FranchiseeAssetVo> franchiseeAssets=new ArrayList<>();
         CouponInfo couponInfo=new CouponInfo();
         couponInfo.setCouponName(ConstantData.aCouponName);
-        couponInfo.setCouponType(ConstantData.couponType);
+        couponInfo.setCouponType(ConstantData.COUPON_TYPE);
         couponInfo.setFranchiseeId("1001");
         couponInfo.setOrderId("1002");
         couponInfo.setValidityStartTime(new Date());

@@ -178,7 +178,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             couponApprovalInfoDao.insertSelective(record);
             CouponApprovalDetail approvalDetail=reqVo.getApprovalDetail();
             approvalDetail.setFormNo(approvalCode);
-            approvalDetail.setCouponType(ConstantData.couponType);
+            approvalDetail.setCouponType(ConstantData.COUPON_TYPE);
             approvalDetail.setCreator(reqVo.getUserName());
             approvalDetail.setRemark(reqVo.getReviewNote());
             approvalDetail.setFranchiseeId(reqVo.getFranchiseeId());
