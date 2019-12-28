@@ -139,7 +139,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     public Boolean updateReturnStatus(ReturnOrderReviewReqVo reqVo) {
         boolean flag = false;
         boolean flag1 = false;
-        //1--通过 2--挂账 3--不通过（驳回）"
+        //1--通过 2--挂账 3--不通过（驳回）99-已取消"
         switch (reqVo.getOperateStatus()) {
             case 1:
                 reqVo.setOperateStatus(2);
@@ -154,6 +154,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             case 3:
                 reqVo.setOperateStatus(98);
                 break;
+            case 99:
+                reqVo.setOperateStatus(99);
+                break;
             default:
                 return false;
         }
@@ -161,7 +164,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         Integer review = returnOrderInfoDao.updateReturnStatus(reqVo);
         if (flag) {
             //todo 同步到供应链
-            createRejectRecord(reqVo.getReturnOrderId());
+            createRejectRecord(reqVo.getReturnOrderCode());
         }
         if (flag1) {
             log.info("驳回--进入A品券发放审批");
@@ -177,7 +180,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             approvalDetail.setCreator(reqVo.getUserName());
             approvalDetail.setRemark(reqVo.getReviewNote());
             approvalDetail.setFranchiseeId(reqVo.getFranchiseeId());
-            approvalDetail.setOrderId(reqVo.getReturnOrderId());
+            approvalDetail.setOrderId(reqVo.getReturnOrderCode());
             couponApprovalDetailDao.insertSelective(approvalDetail);
             log.info("同步审批信息到本地完成");
             //A品券发放审批申请提交

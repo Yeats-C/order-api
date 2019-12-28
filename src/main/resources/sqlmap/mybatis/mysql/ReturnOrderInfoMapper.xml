@@ -905,7 +905,7 @@
                 review_remark=#{reviewNote,jdbcType=VARCHAR},
             </if>
         </set>
-        where return_order_code=#{returnOrderId,jdbcType=VARCHAR}
+        where return_order_code=#{returnOrderCode,jdbcType=VARCHAR}
     </update>
 
   <select id="selectByReturnOrderCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
