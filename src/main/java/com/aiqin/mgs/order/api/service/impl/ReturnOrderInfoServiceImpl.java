@@ -166,7 +166,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         Integer review = returnOrderInfoDao.updateReturnStatus(reqVo);
         if (flag) {
             //todo 同步到供应链
-//            createRejectRecord(reqVo.getReturnOrderCode());
+            createRejectRecord(reqVo.getReturnOrderCode());
         }
         if (flag1) {
             log.info("驳回--进入A品券发放审批");
@@ -413,6 +413,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
      * 调用供应链封装
      * @param returnOrderCode 退货单编码
      */
+    @Transactional
     public void createRejectRecord(String returnOrderCode){
         log.info("供应链同步退货单开始,returnOrderId={}",returnOrderCode);
         RejectRecordReq rejectRecordReq=new RejectRecordReq();
@@ -423,26 +424,44 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         RejectRecord rejectRecord=new RejectRecord();
         List<RejectRecordDetail> rejectRecordDetail=new ArrayList<>();
         BeanUtils.copyProperties(returnOrderInfo,rejectRecord);
+        //来源单号
+        rejectRecord.setSourceCode(returnOrderInfo.getReturnOrderCode());
+        //
+//        rejectRecord.setSourceType();
+        //最小单位数量--商品数量
+        rejectRecord.setTotalCount(returnOrderInfo.getProductCount());
+        //商品含税金额--退货金额
+        rejectRecord.setTotalTaxAmount(returnOrderInfo.getReturnOrderAmount());
+        //联系人--收货人
+        rejectRecord.setContactPerson(returnOrderInfo.getReceivePerson());
+        //联系人电话--收货人电话
+        rejectRecord.setContactMobile(returnOrderInfo.getReceiveMobile());
+        //结算方式编码--退款方式
         rejectRecord.setSettlementMethodCode(returnOrderInfo.getReturnMoneyType().toString());
-        if(null!=returnOrderInfo.getReturnMoneyType()){
-            //退款方式 1:现金 2:微信 3:支付宝 4:银联
-            switch (returnOrderInfo.getReturnMoneyType()) {
-                case 1:
-                    rejectRecord.setSettlementMethodName("现金");
-                    break;
-                case 2:
-                    rejectRecord.setSettlementMethodName("微信");
-                    break;
-                case 3:
-                    rejectRecord.setSettlementMethodName("支付宝");
-                    break;
-                case 4:
-                    rejectRecord.setSettlementMethodName("银联");
-                    break;
-            }
-        }
+        //退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户
+        rejectRecord.setSettlementMethodName(ConstantData.returnMoneyTypeName);
+//        if(null!=returnOrderInfo.getReturnMoneyType()){
+//            //退款方式 1:现金 2:微信 3:支付宝 4:银联
+//            switch (returnOrderInfo.getReturnMoneyType()) {
+//                case 1:
+//                    rejectRecord.setSettlementMethodName("现金");
+//                    break;
+//                case 2:
+//                    rejectRecord.setSettlementMethodName("微信");
+//                    break;
+//                case 3:
+//                    rejectRecord.setSettlementMethodName("支付宝");
+//                    break;
+//                case 4:
+//                    rejectRecord.setSettlementMethodName("银联");
+//                    break;
+//            }
+//        }
         //todo 退供单状态
 //        rejectRecord.setRejectRecordStatus(1);
+        String afterSaleCode = sequenceService.generateOrderAfterSaleCode(returnOrderInfo.getCompanyCode(), returnOrderInfo.getReturnOrderType());
+        rejectRecord.setRejectRecordId(IdUtil.uuid());
+        rejectRecord.setRejectRecordCode(afterSaleCode);
         for(ReturnOrderDetail rod:returnOrderDetails){
             RejectRecordDetail rrd=new RejectRecordDetail();
             BeanUtils.copyProperties(rod,rrd);
