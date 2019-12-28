@@ -1765,6 +1765,7 @@ public class OrderServiceImpl implements OrderService {
                     payReq.setMemberPhone(orderInfo.getMemberPhone());
                     payReq.setMemberName(orderInfo.getMemberName());
                     payReq.setMemberId(orderInfo.getMemberId());
+                    payReq.setStoreName(orderInfo.getDistributorName());
                     payReq.setBackUrl(urlProperties.getOrderApi() + "/order/back");
                     payService.doPay(payReq);
                 }
