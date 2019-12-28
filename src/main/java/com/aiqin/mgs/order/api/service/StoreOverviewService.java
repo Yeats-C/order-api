@@ -84,4 +84,11 @@ public interface StoreOverviewService {
      * @return
      */
     HttpResponse storeProductSku(String storeId, String status, String pageNo, String pageSize);
+
+    /**
+     *  通过门店id和sku获取对应畅销度
+     * @param productOverViewReq
+     * @return
+     */
+    HttpResponse productStoreSaleoutDgree(ProductOverViewReq productOverViewReq);
 }

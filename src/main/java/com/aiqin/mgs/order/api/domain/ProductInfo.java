@@ -48,5 +48,9 @@ public class ProductInfo {
     private String barCode;
     /***税率*/
     private BigDecimal taxRate;
+    /***商品属性编码*/
+    private String productPropertyCode;
+    /***商品属性名称*/
+    private String productPropertyName;
 
 }

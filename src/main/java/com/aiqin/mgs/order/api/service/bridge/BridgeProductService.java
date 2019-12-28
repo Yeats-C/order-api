@@ -1,6 +1,9 @@
 package com.aiqin.mgs.order.api.service.bridge;
 
+import com.aiqin.ground.util.exception.GroundRuntimeException;
 import com.aiqin.ground.util.http.HttpClient;
+import com.aiqin.ground.util.json.JsonUtil;
+import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
@@ -8,6 +11,8 @@ import com.aiqin.mgs.order.api.domain.dto.ProductDistributorOrderDTO;
 import com.aiqin.mgs.order.api.domain.request.OperateStockVo;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
+import com.aiqin.mgs.order.api.domain.response.NewFranchiseeResponse;
+import com.aiqin.mgs.order.api.domain.response.order.StoreFranchiseeInfoResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Createed by sunx on 2019/4/8.<br/>
@@ -103,4 +106,16 @@ public class BridgeProductService {
         return cartOrderInfoHttpResponse;
     }
 
+    public NewFranchiseeResponse getStoreFranchiseeData(String distributorId) {
+        HttpClient httpClient = HttpClient.get(urlProperties.getSlcsApi() + "/franchisee/getData?store_id=" + distributorId);//http://slcs.api.aiqin.com
+        HttpResponse httpResponse = httpClient.action().result(new TypeReference<HttpResponse>() {
+        });
+        if(httpResponse.getCode().equals(MessageId.SUCCESS_CODE)&& Objects.nonNull(httpResponse.getData())){
+            Map<String,Objects> result = JsonUtil.fromJson(JsonUtil.toJson(httpResponse.getData()), HashMap.class);
+            log.info("通过门店查询加盟商信息:{}",JsonUtil.toJson(result));
+            NewFranchiseeResponse franchiseeResponse = JsonUtil.fromJson(JsonUtil.toJson(result),NewFranchiseeResponse.class);
+            return franchiseeResponse;
+        }
+        throw new GroundRuntimeException("查询门店对应的加盟商信息异常,无法下单");
+    }
 }

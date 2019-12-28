@@ -43,7 +43,7 @@ public class PayRequest implements Serializable {
     @PastOrPresent(message = "下单时间不能为空且为过去某个或现在的日期")
     private Date orderTime;
 
-    @ApiModelProperty("支付方式 -10 tob余额支付 0-在线微信 1-在线支付")
+    @ApiModelProperty("支付方式 - 10 tob余额支付 0-在线微信 1-在线支付")
     @JsonProperty("pay_type")
     @NotNull(message = "支付类型不能为空")
     private Integer payType;

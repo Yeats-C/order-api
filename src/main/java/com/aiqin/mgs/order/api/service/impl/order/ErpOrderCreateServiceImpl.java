@@ -321,6 +321,14 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             orderItem.setZeroDisassemblyCoefficient(null);
             //商品类型  0商品 1赠品
             orderItem.setProductType(ErpProductGiftEnum.PRODUCT.getCode());
+            //商品属性编码
+            orderItem.setProductPropertyCode(productInfo.getProductPropertyCode());
+            //商品属性名称
+            orderItem.setProductPropertyName(productInfo.getProductPropertyName());
+            //供应商编码
+            orderItem.setSupplierCode(productInfo.getSupplierCode());
+            //供应商名称
+            orderItem.setSupplierName(productInfo.getSupplierName());
             //商品数量
             orderItem.setProductCount((long) item.getAmount());
             //商品单价
@@ -331,6 +339,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             orderItem.setActualTotalProductAmount(null);
             //优惠分摊总金额
             orderItem.setTotalPreferentialAmount(orderItem.getTotalProductAmount());
+            //分摊后单价
+            orderItem.setPreferentialAmount(orderItem.getProductAmount());
             //活动优惠总金额
             orderItem.setTotalAcivityAmount(BigDecimal.ZERO);
             //实发商品数量
@@ -762,6 +772,14 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             orderItem.setZeroDisassemblyCoefficient(null);
             //商品类型  0商品 1赠品
             orderItem.setProductType(ErpProductGiftEnum.PRODUCT.getCode());
+            //商品属性编码
+            orderItem.setProductPropertyCode(productInfo.getProductPropertyCode());
+            //商品属性名称
+            orderItem.setProductPropertyName(productInfo.getProductPropertyName());
+            //供应商编码
+            orderItem.setSupplierCode(productInfo.getSupplierCode());
+            //供应商名称
+            orderItem.setSupplierName(productInfo.getSupplierName());
             //商品数量
             orderItem.setProductCount(Long.valueOf(item.getQuantity()));
             //商品单价
@@ -774,6 +792,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             orderItem.setActualTotalProductAmount(null);
             //优惠分摊总金额
             orderItem.setTotalPreferentialAmount(orderItem.getTotalProductAmount());
+            //分摊后单价
+            orderItem.setPreferentialAmount(orderItem.getProductAmount());
             //活动优惠总金额
             orderItem.setTotalAcivityAmount(BigDecimal.ZERO);
             //实发商品数量
@@ -1026,18 +1046,19 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @date 2019/12/24 20:24
      */
     private String getOrderCode() {
+        ErpOrderCodeSequence.currentDay = "";
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String curDay = sdf.format(new Date());
         if (StringUtils.isEmpty(ErpOrderCodeSequence.currentDay) || !curDay.equals(ErpOrderCodeSequence.currentDay)) {
             //如果是
-            ErpOrderCodeSequence.currentDay = curDay;
             //查询数据库，获取最新序列
             String maxOrderCode = erpOrderQueryService.getMaxOrderCodeByCurrentDay(curDay);
             if (StringUtils.isNotEmpty(maxOrderCode)) {
-                ErpOrderCodeSequence.num = Long.valueOf(maxOrderCode.substring(maxOrderCode.length() - 6, 0));
+                ErpOrderCodeSequence.num = Long.valueOf(maxOrderCode.substring(maxOrderCode.length() - 6));
             } else {
                 ErpOrderCodeSequence.num = 0L;
             }
+            ErpOrderCodeSequence.currentDay = curDay;
         }
         return curDay + String.format("%06d", ++ErpOrderCodeSequence.num);
     }

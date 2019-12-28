@@ -39,5 +39,12 @@ public class ProductBaseUnResp {
     @JsonProperty("model_number")
     private String modelNumber;
 
+    @ApiModelProperty(value = "商品标签编码(0,畅销 1,普通商品 3,滞销")
+    @JsonProperty("product_label_code")
+    private String productLabelCode;
+
+    @ApiModelProperty(value = "商品标签")
+    @JsonProperty("product_label")
+    private String productLabel;
 
 }

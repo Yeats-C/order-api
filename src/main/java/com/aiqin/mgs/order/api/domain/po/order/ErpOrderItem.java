@@ -27,7 +27,7 @@ public class ErpOrderItem {
     @ApiModelProperty(value = "订单行id")
     @JsonProperty("orderInfo_detail_id")
     private String orderInfoDetailId;
-    
+
     @ApiModelProperty(value = "订单id")
     @JsonProperty("order_store_sd")
     private String orderStoreId;
@@ -35,6 +35,10 @@ public class ErpOrderItem {
     @ApiModelProperty(value = "订单号")
     @JsonProperty("order_store_code")
     private String orderStoreCode;
+
+    @ApiModelProperty(value = "行号")
+    @JsonProperty("line_code")
+    private Long lineCode;
 
     @ApiModelProperty(value = "spu编码")
     @JsonProperty("spu_code")
@@ -96,6 +100,22 @@ public class ErpOrderItem {
     @JsonProperty("product_type_desc")
     private String productTypeDesc;
 
+    @ApiModelProperty(value = "商品属性编码")
+    @JsonProperty("product_property_code")
+    private String productPropertyCode;
+
+    @ApiModelProperty(value = "商品属性名称")
+    @JsonProperty("product_property_name")
+    private String productPropertyName;
+
+    @ApiModelProperty(value = "供应商编码")
+    @JsonProperty("supplier_code")
+    private String supplierCode;
+
+    @ApiModelProperty(value = "供应商名称")
+    @JsonProperty("supplier_name")
+    private String supplierName;
+
     @ApiModelProperty(value = "数量")
     @JsonProperty("product_count")
     private Long productCount;
@@ -147,10 +167,6 @@ public class ErpOrderItem {
     @ApiModelProperty(value = "活动编码(多个，隔开）")
     @JsonProperty("activity_code")
     private String activityCode;
-
-    @ApiModelProperty(value = "行号")
-    @JsonProperty("line_code")
-    private Long lineCode;
 
     @ApiModelProperty(value = "赠品行号")
     @JsonProperty("gift_line_code")

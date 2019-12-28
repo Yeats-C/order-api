@@ -1940,7 +1940,7 @@ public class OrderServiceImpl implements OrderService {
 
             //查询订单编码
             OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
-
+            orderDetailQuery.setOrderId(orderId);
             OrderInfo order = new OrderInfo();
             order = orderDao.selecOrderById(orderDetailQuery);
             String orderCode = "";
@@ -1969,13 +1969,23 @@ public class OrderServiceImpl implements OrderService {
             orderDao.updateOrder(orderInfo);
             //如果订单状态是已支付此处增加支付中心现金支付
             if (orderInfo.getOrderStatus().equals(Global.ORDER_STATUS_2)||orderInfo.getOrderStatus().equals(Global.ORDER_STATUS_5)){
+                NewFranchiseeResponse newFranchiseeResponse=bridgeProductService.getStoreFranchiseeData(order.getDistributorId());
                 PayReq payReq=new PayReq();
-                payReq.setOrderAmount(Long.valueOf(orderInfo.getActualPrice()));
-                payReq.setAiqinMerchantId(orderInfo.getDistributorId());
-                payReq.setOrderNo(orderInfo.getOrderCode());
-                payReq.setOrderTime(orderInfo.getCreateTime());
+                payReq.setOrderAmount(Long.valueOf(order.getActualPrice()));
+                payReq.setAiqinMerchantId(order.getDistributorId());
+                payReq.setOrderNo(order.getOrderCode());
+                payReq.setOrderTime(order.getCreateTime());
                 payReq.setPayType(orderPayList.get(0).getPayType());
-                payReq.setOrderSource(orderInfo.getOrderType());
+                payReq.setOrderSource(order.getOrderType());
+                payReq.setStoreId(order.getDistributorId());
+                payReq.setOrderSource(order.getOriginType());
+                payReq.setOrderNo(order.getOrderCode());
+                if (newFranchiseeResponse!=null){
+                    payReq.setFranchiseeId(newFranchiseeResponse.getFranchiseeId());
+                }
+                payReq.setCreateName(order.getCashierName());
+                payReq.setStoreName(order.getDistributorName());
+                payReq.setCreateBy(order.getCashierId());
                 payService.doPay(payReq);
             }
             return HttpResponse.success();

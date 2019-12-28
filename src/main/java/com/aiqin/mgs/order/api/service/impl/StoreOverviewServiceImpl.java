@@ -270,4 +270,18 @@ public class StoreOverviewServiceImpl implements StoreOverviewService {
         page.setTotalCount(count);
         return HttpResponse.success(page);
     }
+
+    /**
+     *  通过门店id和sku获取对应畅销度
+     * @param productOverViewReq
+     * @return
+     */
+    @Override
+    public HttpResponse productStoreSaleoutDgree(ProductOverViewReq productOverViewReq) {
+        if(StringUtils.isEmpty(productOverViewReq.getStoreId())){
+            return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER,"storeId="+productOverViewReq.getStoreId());
+        }
+        List<ProductBaseUnResp> productBaseUnResp = storeOverviewDao.productStoreSaleoutDgree(productOverViewReq);
+        return HttpResponse.success(productBaseUnResp);
+    }
 }

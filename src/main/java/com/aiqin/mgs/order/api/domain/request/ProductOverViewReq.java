@@ -1,16 +1,19 @@
 package com.aiqin.mgs.order.api.domain.request;
 
+import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * Createed by ch on 2019/12/24.<br/>
  */
 @Data
 @ApiModel("分销机构商品")
-public class ProductOverViewReq {
+public class ProductOverViewReq extends PagesRequest {
 
     private static final long serialVersionUID = -2067479393862211291L;
     @ApiModelProperty(value = "分销机构编码")
@@ -51,4 +54,12 @@ public class ProductOverViewReq {
     @ApiModelProperty(value = "商品状态(0畅销，1滞销，2缺货/毛利（互用），3库存预警)")
     @JsonProperty("product_status")
     private Integer productStatus;
+
+    @ApiModelProperty(value = "skuCode集合")
+    @JsonProperty("sku_code_list")
+    private List<String> skuCodeList;
+
+    @JsonProperty("product_salability_reorder")
+    @ApiModelProperty("商品畅销度高低（0:高 1:低）")
+    private Integer productSalabilityReorder;
 }

@@ -14,6 +14,10 @@
         sku_code as skuCode,
         sku_name as skuName,
         bar_code as barCode,
+        product_property_code as productPropertyCode,
+        product_property_name as productPropertyName,
+        supplier_code as supplierCode,
+        supplier_name as supplierName,
         picture_url as pictureUrl,
         product_spec as productSpec,
         color_code as colorCode,
@@ -29,6 +33,7 @@
         total_product_amount as totalProductAmount,
         actual_total_product_amount as actualTotalProductAmount,
         total_preferential_amount as totalPreferentialAmount,
+        preferential_amount as preferentialAmount,
         total_acivity_amount as totalAcivityAmount,
         actual_inbound_count as actualInboundCount,
         actual_product_count as actualProductCount,
@@ -89,6 +94,9 @@
         <if test="totalPreferentialAmount != null and totalPreferentialAmount != '' or totalPreferentialAmount == 0 ">
             total_preferential_amount = #{totalPreferentialAmount},
         </if>
+        <if test="preferentialAmount != null and preferentialAmount != '' or preferentialAmount == 0 ">
+            preferential_amount = #{preferentialAmount},
+        </if>
         <if test="totalAcivityAmount != null and totalAcivityAmount != '' or totalAcivityAmount == 0 ">
             total_acivity_amount = #{totalAcivityAmount},
         </if>
@@ -110,21 +118,26 @@
     <insert id="insert">
         insert into order_store_detail(order_info_detail_id, order_store_id, order_store_code, spu_code, spu_name,
                                        sku_code,
-                                       sku_name,bar_code, picture_url, product_spec, color_code, color_name, model_code,
+                                       sku_name, product_property_code, product_property_name, supplier_code,
+                                       supplier_name,
+                                       bar_code, picture_url, product_spec, color_code, color_name, model_code,
                                        unit_code,
                                        unit_name, zero_disassembly_coefficient, product_type, product_count,
                                        product_amount,
                                        purchase_amount, total_product_amount, actual_total_product_amount,
-                                       total_preferential_amount, total_acivity_amount, actual_inbound_count,
+                                       total_preferential_amount, preferential_amount, total_acivity_amount,
+                                       actual_inbound_count,
                                        actual_product_count, return_product_count, tax_rate, activity_code, line_code,
                                        gift_line_code, company_code, company_name, sign_difference_reason, use_status,
                                        create_by_id, create_by_name, update_by_id, update_by_name, create_time,
                                        update_time)
         values (#{orderInfoDetailId}, #{orderStoreId}, #{orderStoreCode}, #{spuCode}, #{spuName},
-                #{skuCode}, #{skuName}, #{barCode}, #{pictureUrl}, #{productSpec}, #{colorCode}, #{colorName},
+                #{skuCode}, #{skuName}, #{productPropertyCode}, #{productPropertyName}, #{supplierCode},
+                #{supplierName},
+                #{barCode}, #{pictureUrl}, #{productSpec}, #{colorCode}, #{colorName},
                 #{modelCode}, #{unitCode}, #{unitName}, #{zeroDisassemblyCoefficient}, #{productType},
                 #{productCount}, #{productAmount}, #{purchaseAmount}, #{totalProductAmount},
-                #{actualTotalProductAmount}, #{totalPreferentialAmount}, #{totalAcivityAmount},
+                #{actualTotalProductAmount}, #{totalPreferentialAmount}, #{preferentialAmount}, #{totalAcivityAmount},
                 #{actualInboundCount}, #{actualProductCount}, #{returnProductCount}, #{taxRate},
                 #{activityCode}, #{lineCode}, #{giftLineCode}, #{companyCode}, #{companyName},
                 #{signDifferenceReason}, #{useStatus}, #{createById}, #{createByName}, #{updateById},
