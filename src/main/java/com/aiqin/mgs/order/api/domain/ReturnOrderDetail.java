@@ -116,4 +116,6 @@ public class ReturnOrderDetail {
     @ApiModelProperty(value = "多个凭证以逗号隔开")
     private String evidenceUrl;
 
+    @ApiModelProperty(value = "均摊后单价")
+    private BigDecimal preferentialAmount;
 }
