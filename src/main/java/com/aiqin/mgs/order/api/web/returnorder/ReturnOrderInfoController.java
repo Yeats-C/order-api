@@ -94,8 +94,8 @@ public class ReturnOrderInfoController {
 
     @ApiOperation("退货单号（退货详情）")
     @GetMapping("/detail")
-    public HttpResponse<ReturnOrderDetailVO> detail(@ApiParam("退货单号") @RequestParam("ReturnOrderCode") String ReturnOrderCode) {
-        return new HttpResponse<>(returnOrderInfoService.detail(ReturnOrderCode));
+    public HttpResponse<ReturnOrderDetailVO> detail(@ApiParam("退货单号") @RequestParam("returnOrderCode") String returnOrderCode) {
+        return new HttpResponse<>(returnOrderInfoService.detail(returnOrderCode));
     }
 
     @ApiOperation("erp售后管理--退货单列表")
