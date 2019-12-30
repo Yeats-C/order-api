@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.service.bill;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.domain.PurchaseInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 
 /**
@@ -13,4 +14,6 @@ public interface PurchaseOrderService {
      * @return
      */
     HttpResponse createPurchaseOrder (ErpOrderInfo erpOrderInfo);
+
+    HttpResponse<PurchaseInfo> selectPurchaseInfo();
 }

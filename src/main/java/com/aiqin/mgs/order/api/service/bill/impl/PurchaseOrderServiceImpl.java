@@ -8,6 +8,8 @@ import com.aiqin.mgs.order.api.dao.OperationLogDao;
 import com.aiqin.mgs.order.api.dao.PurchaseOrderDao;
 import com.aiqin.mgs.order.api.dao.PurchaseOrderDetailBatchDao;
 import com.aiqin.mgs.order.api.dao.PurchaseOrderDetailDao;
+import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
+import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
@@ -46,7 +48,10 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     OperationLogDao operationLogDao;
     @Autowired
     PurchaseOrderDetailBatchDao purchaseOrderDetailBatchDao;
-
+    @Autowired
+    ErpOrderInfoDao erpOrderInfoDao;
+    @Autowired
+    ErpOrderItemDao erpOrderItemDao;
     @Override
     public HttpResponse createPurchaseOrder(@Valid ErpOrderInfo erpOrderInfo) {
         LOGGER.info("同步采购单，erpOrderInfo{}", erpOrderInfo);
@@ -57,6 +62,19 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             return HttpResponse.success();
         }
         return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+    }
+
+    @Override
+    public HttpResponse<PurchaseInfo> selectPurchaseInfo() {
+        ErpOrderInfo erpOrderInfo = new ErpOrderInfo();
+        //订单查询
+        erpOrderInfoDao.select(erpOrderInfo);
+        ErpOrderItem erpOrderItem = new ErpOrderItem();
+        //订单明细查询
+        erpOrderItemDao.select(erpOrderItem);
+        //订单批次明细查询（仓卡）
+
+        return null;
     }
 
     /**
@@ -90,7 +108,6 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 LOGGER.info("根据爱亲采购单，生成耘链销售单结束");
                 //添加操作日志
                 LOGGER.info("添加操作日志开始");
-                addOperationLog(erpOrderInfo);
             }
         });
     }
