@@ -1006,10 +1006,10 @@
      and city_name=#{cityName,jdbcType=VARCHAR}
     </if>
     <if test="applyStartTime!=null and applyStartTime!=''">
-     and create_time &gt;={applyStartTime}
+      and create_time &gt;= #{applyStartTime}
     </if>
     <if test="applyEndTime!=null and applyEndTime!=''">
-     and create_time &lt;={applyEndTime}
+      and create_time &lt;= #{applyEndTime}
     </if>
     <if test="orderType!=null">
       and order_type =#{orderType}
@@ -1040,10 +1040,10 @@
       and city_name=#{cityName,jdbcType=VARCHAR}
     </if>
     <if test="applyStartTime!=null and applyStartTime!=''">
-      and create_time &gt;={applyStartTime}
+      and create_time &gt;= #{applyStartTime}
     </if>
     <if test="applyEndTime!=null and applyEndTime!=''">
-      and create_time &lt;={applyEndTime}
+      and create_time &lt;= #{applyEndTime}
     </if>
     <if test="orderCategory!=null and orderCategory!=''">
       and order_category=#{orderCategory,jdbcType=INTEGER}
@@ -1085,10 +1085,10 @@
       and city_name=#{cityName,jdbcType=VARCHAR}
     </if>
     <if test="applyStartTime!=null and applyStartTime!=''">
-      and create_time &gt;={applyStartTime}
+      and create_time &gt;= #{applyStartTime}
     </if>
     <if test="applyEndTime!=null and applyEndTime!=''">
-      and create_time &lt;={applyEndTime}
+      and create_time &lt;= #{applyEndTime}
     </if>
     <if test="orderCategory!=null and orderCategory!=''">
       and order_category=#{orderCategory,jdbcType=INTEGER}
