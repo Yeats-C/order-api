@@ -153,7 +153,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         boolean flag = false;
         boolean flag1 = false;
         //1--通过 2--挂账 3--不通过（驳回）99-已取消"
-        //处理办法 1--退货退款 2--挂账 3--不通过(驳回) 4--仅退款
+        //处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款 99--已取消
         String content="";
         switch (reqVo.getOperateStatus()) {
             case 1:
