@@ -158,21 +158,21 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         switch (reqVo.getOperateStatus()) {
             case 1:
                 reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey());
-                reqVo.setTreatmentMethod(reqVo.getOperateStatus());
+                reqVo.setTreatmentMethod(1);
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg();
                 //同步数据到供应链
                 flag = true;
                 break;
             case 2:
                 reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_APPLY.getKey());
-                reqVo.setTreatmentMethod(reqVo.getOperateStatus());
+                reqVo.setTreatmentMethod(2);
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_APPLY.getMsg();
                 //调用A品卷审批
                 flag1 = true;
                 break;
             case 3:
                 reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getKey());
-                reqVo.setTreatmentMethod(reqVo.getOperateStatus());
+                reqVo.setTreatmentMethod(3);
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getMsg();
                 break;
             case 99:
