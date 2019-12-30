@@ -196,20 +196,20 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //生成审批编码
             String approvalCode=createFormNo();
             //同步审批信息到本地表中（新增）
-            CouponApprovalInfo record=approvalInfoInsert(reqVo.getApplier(),reqVo.getUserName(),approvalCode);
+            CouponApprovalInfo record=approvalInfoInsert(reqVo.getOperatorId(),reqVo.getOperator(),approvalCode);
             log.info("同步审批信息入参: reqVo={},approvalCode={}", reqVo,approvalCode);
             couponApprovalInfoDao.insertSelective(record);
             CouponApprovalDetail approvalDetail=reqVo.getApprovalDetail();
             approvalDetail.setFormNo(approvalCode);
             approvalDetail.setCouponType(ConstantData.COUPON_TYPE);
-            approvalDetail.setCreator(reqVo.getUserName());
+            approvalDetail.setCreator(reqVo.getOperator());
             approvalDetail.setRemark(reqVo.getReviewNote());
             approvalDetail.setFranchiseeId(reqVo.getFranchiseeId());
             approvalDetail.setOrderId(reqVo.getReturnOrderCode());
             couponApprovalDetailDao.insertSelective(approvalDetail);
             log.info("同步审批信息到本地完成");
             //A品券发放审批申请提交
-            submitActBaseProcess(approvalCode,reqVo.getApplier(),reqVo.getDeptCode());
+            submitActBaseProcess(approvalCode,reqVo.getOperatorId(),reqVo.getDeptCode());
         }
         return review > 0;
     }
