@@ -17,16 +17,16 @@
     <result column="purchase_group_name" jdbcType="VARCHAR" property="purchaseGroupName" />
     <result column="settlement_method_code" jdbcType="VARCHAR" property="settlementMethodCode" />
     <result column="settlement_method_name" jdbcType="VARCHAR" property="settlementMethodName" />
-    <result column="purchase_order_status" jdbcType="BIT" property="purchaseOrderStatus" />
-    <result column="purchase_mode" jdbcType="BIT" property="purchaseMode" />
-    <result column="purchase_type" jdbcType="BIT" property="purchaseType" />
+    <result column="purchase_order_status" jdbcType="INTEGER" property="purchaseOrderStatus" />
+    <result column="purchase_mode" jdbcType="INTEGER" property="purchaseMode" />
+    <result column="purchase_type" jdbcType="INTEGER" property="purchaseType" />
     <result column="total_count" jdbcType="BIGINT" property="totalCount" />
     <result column="total_tax_amount" jdbcType="DECIMAL" property="totalTaxAmount" />
     <result column="actual_total_count" jdbcType="BIGINT" property="actualTotalCount" />
     <result column="actual_total_tax_amount" jdbcType="DECIMAL" property="actualTotalTaxAmount" />
     <result column="cancel_reason" jdbcType="VARCHAR" property="cancelReason" />
     <result column="cancel_remark" jdbcType="VARCHAR" property="cancelRemark" />
-    <result column="use_status" jdbcType="BIT" property="useStatus" />
+    <result column="use_status" jdbcType="INTEGER" property="useStatus" />
     <result column="charge_person" jdbcType="VARCHAR" property="chargePerson" />
     <result column="account_code" jdbcType="VARCHAR" property="accountCode" />
     <result column="account_name" jdbcType="VARCHAR" property="accountName" />
@@ -47,7 +47,7 @@
     <result column="pre_amount" jdbcType="DECIMAL" property="preAmount" />
     <result column="remark" jdbcType="VARCHAR" property="remark" />
     <result column="source_code" jdbcType="VARCHAR" property="sourceCode" />
-    <result column="source_type" jdbcType="BIT" property="sourceType" />
+    <result column="source_type" jdbcType="INTEGER" property="sourceType" />
     <result column="create_by_id" jdbcType="VARCHAR" property="createById" />
     <result column="create_by_name" jdbcType="VARCHAR" property="createByName" />
     <result column="update_by_id" jdbcType="VARCHAR" property="updateById" />
@@ -102,17 +102,17 @@
       #{supplierName,jdbcType=VARCHAR}, #{transportCenterCode,jdbcType=VARCHAR}, #{transportCenterName,jdbcType=VARCHAR}, 
       #{warehouseCode,jdbcType=VARCHAR}, #{warehouseName,jdbcType=VARCHAR}, #{purchaseGroupCode,jdbcType=VARCHAR}, 
       #{purchaseGroupName,jdbcType=VARCHAR}, #{settlementMethodCode,jdbcType=VARCHAR}, 
-      #{settlementMethodName,jdbcType=VARCHAR}, #{purchaseOrderStatus,jdbcType=BIT}, 
-      #{purchaseMode,jdbcType=BIT}, #{purchaseType,jdbcType=BIT}, #{totalCount,jdbcType=BIGINT}, 
+      #{settlementMethodName,jdbcType=VARCHAR}, #{purchaseOrderStatus,jdbcType=INTEGER},
+      #{purchaseMode,jdbcType=INTEGER}, #{purchaseType,jdbcType=INTEGER}, #{totalCount,jdbcType=BIGINT},
       #{totalTaxAmount,jdbcType=DECIMAL}, #{actualTotalCount,jdbcType=BIGINT}, #{actualTotalTaxAmount,jdbcType=DECIMAL}, 
-      #{cancelReason,jdbcType=VARCHAR}, #{cancelRemark,jdbcType=VARCHAR}, #{useStatus,jdbcType=BIT}, 
+      #{cancelReason,jdbcType=VARCHAR}, #{cancelRemark,jdbcType=VARCHAR}, #{useStatus,jdbcType=INTEGER},
       #{chargePerson,jdbcType=VARCHAR}, #{accountCode,jdbcType=VARCHAR}, #{accountName,jdbcType=VARCHAR}, 
       #{contractCode,jdbcType=VARCHAR}, #{contractName,jdbcType=VARCHAR}, #{contactPerson,jdbcType=VARCHAR}, 
       #{contactMobile,jdbcType=VARCHAR}, #{preArrivalTime,jdbcType=TIMESTAMP}, #{validTime,jdbcType=TIMESTAMP}, 
       #{deliveryAddress,jdbcType=VARCHAR}, #{deliveryTime,jdbcType=TIMESTAMP}, #{inStockTime,jdbcType=TIMESTAMP}, 
       #{inStockAddress,jdbcType=VARCHAR}, #{prePurchaseOrder,jdbcType=VARCHAR}, #{paymentCode,jdbcType=VARCHAR}, 
       #{paymentName,jdbcType=VARCHAR}, #{paymentTime,jdbcType=BIGINT}, #{preAmount,jdbcType=DECIMAL}, 
-      #{remark,jdbcType=VARCHAR}, #{sourceCode,jdbcType=VARCHAR}, #{sourceType,jdbcType=BIT}, 
+      #{remark,jdbcType=VARCHAR}, #{sourceCode,jdbcType=VARCHAR}, #{sourceType,jdbcType=INTEGER},
       #{createById,jdbcType=VARCHAR}, #{createByName,jdbcType=VARCHAR}, #{updateById,jdbcType=VARCHAR}, 
       #{updateByName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
       )
@@ -120,9 +120,6 @@
   <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.PurchaseOrder">
     insert into purchase_order
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        id,
-      </if>
       <if test="purchaseOrderId != null">
         purchase_order_id,
       </if>
@@ -278,9 +275,6 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=BIGINT},
-      </if>
       <if test="purchaseOrderId != null">
         #{purchaseOrderId,jdbcType=VARCHAR},
       </if>
@@ -324,13 +318,13 @@
         #{settlementMethodName,jdbcType=VARCHAR},
       </if>
       <if test="purchaseOrderStatus != null">
-        #{purchaseOrderStatus,jdbcType=BIT},
+        #{purchaseOrderStatus,jdbcType=INTEGER},
       </if>
       <if test="purchaseMode != null">
-        #{purchaseMode,jdbcType=BIT},
+        #{purchaseMode,jdbcType=INTEGER},
       </if>
       <if test="purchaseType != null">
-        #{purchaseType,jdbcType=BIT},
+        #{purchaseType,jdbcType=INTEGER},
       </if>
       <if test="totalCount != null">
         #{totalCount,jdbcType=BIGINT},
@@ -351,7 +345,7 @@
         #{cancelRemark,jdbcType=VARCHAR},
       </if>
       <if test="useStatus != null">
-        #{useStatus,jdbcType=BIT},
+        #{useStatus,jdbcType=INTEGER},
       </if>
       <if test="chargePerson != null">
         #{chargePerson,jdbcType=VARCHAR},
@@ -414,7 +408,7 @@
         #{sourceCode,jdbcType=VARCHAR},
       </if>
       <if test="sourceType != null">
-        #{sourceType,jdbcType=BIT},
+        #{sourceType,jdbcType=INTEGER},
       </if>
       <if test="createById != null">
         #{createById,jdbcType=VARCHAR},
@@ -482,13 +476,13 @@
         settlement_method_name = #{settlementMethodName,jdbcType=VARCHAR},
       </if>
       <if test="purchaseOrderStatus != null">
-        purchase_order_status = #{purchaseOrderStatus,jdbcType=BIT},
+        purchase_order_status = #{purchaseOrderStatus,jdbcType=INTEGER},
       </if>
       <if test="purchaseMode != null">
-        purchase_mode = #{purchaseMode,jdbcType=BIT},
+        purchase_mode = #{purchaseMode,jdbcType=INTEGER},
       </if>
       <if test="purchaseType != null">
-        purchase_type = #{purchaseType,jdbcType=BIT},
+        purchase_type = #{purchaseType,jdbcType=INTEGER},
       </if>
       <if test="totalCount != null">
         total_count = #{totalCount,jdbcType=BIGINT},
@@ -509,7 +503,7 @@
         cancel_remark = #{cancelRemark,jdbcType=VARCHAR},
       </if>
       <if test="useStatus != null">
-        use_status = #{useStatus,jdbcType=BIT},
+        use_status = #{useStatus,jdbcType=INTEGER},
       </if>
       <if test="chargePerson != null">
         charge_person = #{chargePerson,jdbcType=VARCHAR},
@@ -572,7 +566,7 @@
         source_code = #{sourceCode,jdbcType=VARCHAR},
       </if>
       <if test="sourceType != null">
-        source_type = #{sourceType,jdbcType=BIT},
+        source_type = #{sourceType,jdbcType=INTEGER},
       </if>
       <if test="createById != null">
         create_by_id = #{createById,jdbcType=VARCHAR},
@@ -611,16 +605,16 @@
       purchase_group_name = #{purchaseGroupName,jdbcType=VARCHAR},
       settlement_method_code = #{settlementMethodCode,jdbcType=VARCHAR},
       settlement_method_name = #{settlementMethodName,jdbcType=VARCHAR},
-      purchase_order_status = #{purchaseOrderStatus,jdbcType=BIT},
-      purchase_mode = #{purchaseMode,jdbcType=BIT},
-      purchase_type = #{purchaseType,jdbcType=BIT},
+      purchase_order_status = #{purchaseOrderStatus,jdbcType=INTEGER},
+      purchase_mode = #{purchaseMode,jdbcType=INTEGER},
+      purchase_type = #{purchaseType,jdbcType=INTEGER},
       total_count = #{totalCount,jdbcType=BIGINT},
       total_tax_amount = #{totalTaxAmount,jdbcType=DECIMAL},
       actual_total_count = #{actualTotalCount,jdbcType=BIGINT},
       actual_total_tax_amount = #{actualTotalTaxAmount,jdbcType=DECIMAL},
       cancel_reason = #{cancelReason,jdbcType=VARCHAR},
       cancel_remark = #{cancelRemark,jdbcType=VARCHAR},
-      use_status = #{useStatus,jdbcType=BIT},
+      use_status = #{useStatus,jdbcType=INTEGER},
       charge_person = #{chargePerson,jdbcType=VARCHAR},
       account_code = #{accountCode,jdbcType=VARCHAR},
       account_name = #{accountName,jdbcType=VARCHAR},
@@ -641,7 +635,7 @@
       pre_amount = #{preAmount,jdbcType=DECIMAL},
       remark = #{remark,jdbcType=VARCHAR},
       source_code = #{sourceCode,jdbcType=VARCHAR},
-      source_type = #{sourceType,jdbcType=BIT},
+      source_type = #{sourceType,jdbcType=INTEGER},
       create_by_id = #{createById,jdbcType=VARCHAR},
       create_by_name = #{createByName,jdbcType=VARCHAR},
       update_by_id = #{updateById,jdbcType=VARCHAR},
