@@ -226,6 +226,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     detail.setReturnOrderCode(returnOrderCode);
                     detail.setCreateById(records.getCreateId());
                     detail.setCreateByName(records.getCreator());
+                    detail.setRemark("");
+                    detail.setEvidenceUrl("");
                     return detail;
                 }).collect(Collectors.toList());
                 returnOrderDetailDao.insertBatch(details);
