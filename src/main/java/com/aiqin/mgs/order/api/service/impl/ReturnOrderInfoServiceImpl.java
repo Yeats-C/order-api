@@ -153,22 +153,26 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         boolean flag = false;
         boolean flag1 = false;
         //1--通过 2--挂账 3--不通过（驳回）99-已取消"
+        //处理办法 1--退货退款 2--挂账 3--不通过(驳回) 4--仅退款
         String content="";
         switch (reqVo.getOperateStatus()) {
             case 1:
                 reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey());
+                reqVo.setTreatmentMethod(reqVo.getOperateStatus());
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg();
                 //同步数据到供应链
                 flag = true;
                 break;
             case 2:
                 reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_APPLY.getKey());
+                reqVo.setTreatmentMethod(reqVo.getOperateStatus());
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_APPLY.getMsg();
                 //调用A品卷审批
                 flag1 = true;
                 break;
             case 3:
                 reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getKey());
+                reqVo.setTreatmentMethod(reqVo.getOperateStatus());
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getMsg();
                 break;
             case 99:

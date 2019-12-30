@@ -83,7 +83,7 @@ public class ReturnOrderInfo {
     @ApiModelProperty(value = "支付方式名称")
     private String paymentName;
 
-    @ApiModelProperty(value = "处理办法 0退货退款  1仅退款")
+    @ApiModelProperty(value = "处理办法 1--通过 2--挂账 3--不通过(驳回) 4--仅退款")
     private Integer treatmentMethod;
 
     @ApiModelProperty(value = "物流公司编码")

@@ -57,4 +57,7 @@ public class ReturnOrderReviewReqVo implements Serializable {
     @ApiModelProperty(value="A品券发放审批申请详情")
     private CouponApprovalDetail approvalDetail;
 
+    @ApiModelProperty(value = "处理办法 1--通过(退货退款) 2--挂账 3--不通过(驳回) 4--仅退款")
+    private Integer treatmentMethod;
+
 }
