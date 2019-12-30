@@ -6,18 +6,25 @@ import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.*;
 import com.aiqin.mgs.order.api.component.SequenceService;
+import com.aiqin.mgs.order.api.component.enums.ErpLogOperationTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
+import com.aiqin.mgs.order.api.dao.OperationLogDao;
+import com.aiqin.mgs.order.api.dao.order.ErpOrderOperationLogDao;
 import com.aiqin.mgs.order.api.dao.returnorder.RefundInfoDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
 import com.aiqin.mgs.order.api.domain.request.bill.RejectRecordReq;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderStatusVo;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
+import com.aiqin.mgs.order.api.service.order.ErpOrderOperationLogService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import com.aiqin.mgs.order.api.util.URLConnectionUtil;
 import com.aiqin.platform.flows.client.constant.AjaxJson;
@@ -80,6 +87,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     private RefundInfoDao refundInfoDao;
     @Resource
     private ErpOrderItemService erpOrderItemService;
+    @Resource
+    private ErpOrderOperationLogDao erpOrderOperationLogDao;
 
     @Override
     @Transactional
@@ -126,6 +135,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             return detail;
         }).collect(Collectors.toList());
         returnOrderDetailDao.insertBatch(details);
+        //添加日志
+        insertLog(afterSaleCode,reqVo.getCreateById(),reqVo.getCreateByName(),ErpLogOperationTypeEnum.ADD.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getMsg());
         return true;
     }
 
@@ -142,28 +153,35 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         boolean flag = false;
         boolean flag1 = false;
         //1--通过 2--挂账 3--不通过（驳回）99-已取消"
+        String content="";
         switch (reqVo.getOperateStatus()) {
             case 1:
-                reqVo.setOperateStatus(2);
+                reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey());
+                content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg();
                 //同步数据到供应链
                 flag = true;
                 break;
             case 2:
-                reqVo.setOperateStatus(6);
+                reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_APPLY.getKey());
+                content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_APPLY.getMsg();
                 //调用A品卷审批
                 flag1 = true;
                 break;
             case 3:
-                reqVo.setOperateStatus(98);
+                reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getKey());
+                content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getMsg();
                 break;
             case 99:
-                reqVo.setOperateStatus(99);
+                reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REMOVE.getKey());
+                content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getMsg();
                 break;
             default:
                 return false;
         }
         //修改退货单状态
         Integer review = returnOrderInfoDao.updateReturnStatus(reqVo);
+        //添加日志
+        insertLog(reqVo.getReturnOrderCode(),reqVo.getOperator(),reqVo.getOperator(),ErpLogOperationTypeEnum.UPDATE.getCode(),reqVo.getOperateStatus(),content);
         if (flag) {
             //todo 同步到供应链
             createRejectRecord(reqVo.getReturnOrderCode());
@@ -326,6 +344,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         record.setUpdateTime(new Date());
         record.setStatus(ConstantData.REFUND_STATUS);
         refundInfoDao.updateByOrderCode(record);
+        //添加日志
+        insertLog(reqVo.getOrderNo(),"","",ErpLogOperationTypeEnum.UPDATE.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getMsg());
         return returnOrderInfoDao.updateRefundStatus(reqVo.getOrderNo())>0;
     }
 
@@ -676,6 +696,34 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             list.add(returnOrderStatusVo);
         }
         return HttpResponse.success(list);
+    }
+
+    /**
+     * 插入日志表
+     * @param orderCode
+     * @param persionId
+     * @param persionName
+     * @param type
+     * @param status
+     * @param content
+     */
+    public void insertLog(String orderCode,String persionId,String persionName,Integer type,Integer status,String content){
+        ErpOrderOperationLog operationLog=new ErpOrderOperationLog();
+        operationLog.setOperationCode(orderCode);
+        operationLog.setOperationType(ErpLogOperationTypeEnum.ADD.getCode());
+        operationLog.setSourceType(type);
+        operationLog.setOperationStatus(status);
+        operationLog.setOperationContent(content);
+        operationLog.setRemark("");
+        operationLog.setCreateTime(new Date());
+        operationLog.setCreateById(persionId);
+        operationLog.setCreateByName(persionName);
+        operationLog.setUpdateTime(new Date());
+        operationLog.setUpdateById(persionId);
+        operationLog.setUpdateByName(persionName);
+        operationLog.setOperationContent("");
+        erpOrderOperationLogDao.insert(operationLog);
+
     }
 
 }
