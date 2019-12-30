@@ -226,6 +226,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     detail.setReturnOrderCode(returnOrderCode);
                     detail.setCreateById(records.getCreateId());
                     detail.setCreateByName(records.getCreator());
+                    detail.setRemark("");
+                    detail.setEvidenceUrl("");
                     return detail;
                 }).collect(Collectors.toList());
                 returnOrderDetailDao.insertBatch(details);
@@ -700,6 +702,16 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             list.add(returnOrderStatusVo);
         }
         return HttpResponse.success(list);
+    }
+
+    @Override
+    public HttpResponse getEvidenceUrl(String returnOrderDetailId) {
+        String url = returnOrderDetailDao.selectUrlsByReturnOrderDetailId(returnOrderDetailId);
+        String[] urls=new String[]{};
+        if(StringUtils.isNotBlank(url)){
+            urls=url.split(",");
+        }
+        return HttpResponse.success(urls);
     }
 
     /**

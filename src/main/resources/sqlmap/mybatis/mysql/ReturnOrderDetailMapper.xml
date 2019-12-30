@@ -397,7 +397,7 @@
         insert into return_order_detail (return_order_detail_id, return_order_code,product_type,
         sku_code, sku_name,total_product_amount,return_product_count,model_code,product_status,
         product_spec,unit_name,color_code,color_name,create_by_id, create_by_name,picture_url,
-        create_time,remark,evidence_url,preferential_amount)
+        create_time,remark,evidence_url,preferential_amount,line_code)
         values
         <foreach collection="records" item="item" index="index" separator=",">
             (
@@ -410,7 +410,8 @@
             #{item.colorCode,jdbcType=VARCHAR}, #{item.colorName,jdbcType=VARCHAR}, #{item.createById,jdbcType=VARCHAR},
             #{item.createByName,jdbcType=VARCHAR},
             #{item.pictureUrl,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP},
-            #{item.remark,jdbcType=VARCHAR},#{item.evidenceUrl,jdbcType=VARCHAR},#{item.preferentialAmount,jdbcType=DECIMAL}
+            #{item.remark,jdbcType=VARCHAR},#{item.evidenceUrl,jdbcType=VARCHAR},#{item.preferentialAmount,jdbcType=DECIMAL},
+            #{item.lineCode}
             )
         </foreach>
     </insert>
@@ -444,5 +445,12 @@
             where return_order_detail_id = #{item.returnOrderDetailId}
         </foreach>
     </update>
+
+    <select id="selectUrlsByReturnOrderDetailId" resultType="java.lang.String" parameterType="java.lang.String">
+        select evidence_url
+        from return_order_detail
+        where return_order_detail_id = #{returnOrderDetailId}
+    </select>
+
 
 </mapper>
