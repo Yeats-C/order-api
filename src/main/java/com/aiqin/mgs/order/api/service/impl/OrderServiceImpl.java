@@ -297,6 +297,8 @@ public class OrderServiceImpl implements OrderService {
                 createPrestorageOrder(orderInfo);
             }
 
+            //会员订单 传到会员中心
+
             return HttpResponse.success();
         } catch (Exception e) {
             log.info("修改订单状态失败{}", e.getMessage());
@@ -480,6 +482,7 @@ public class OrderServiceImpl implements OrderService {
             /*stockVo.setStoragePosition(ReturnGoodsToStockEnum.DISPLAY_STOCK.getCode());*/
             stockVo.setProductSku(input.getSkuCode());
             stockVo.setOperator("系统设置");
+            stockVo.setStoragePosition(1);
             stockVo.setReleaseStatus(ReleaseStatusEnum.RELEASE.getCode());
             stockVo.setRelateNumber(orderInfo.getOrderInfo().getOrderId());
             operateStockVos.add(stockVo);
