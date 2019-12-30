@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.request.returnorder;
 
+import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -7,7 +8,7 @@ import lombok.Data;
 
 @Data
 @ApiModel("退货单列表搜索项")
-public class ReturnOrderSearchVo {
+public class ReturnOrderSearchVo extends PagesRequest {
 
     @ApiModelProperty("退货单号")
     @JsonProperty("return_order_code")
