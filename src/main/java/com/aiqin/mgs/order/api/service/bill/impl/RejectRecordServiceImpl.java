@@ -6,10 +6,7 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.component.enums.ErpLogOperationTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpLogStatusTypeEnum;
-import com.aiqin.mgs.order.api.dao.OperationLogDao;
-import com.aiqin.mgs.order.api.dao.RejectRecordDao;
-import com.aiqin.mgs.order.api.dao.RejectRecordDetailBatchDao;
-import com.aiqin.mgs.order.api.dao.RejectRecordDetailDao;
+import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
@@ -51,7 +48,8 @@ public class RejectRecordServiceImpl implements RejectRecordService {
     private ReturnOrderInfoDao returnOrderInfoDao;
     @Autowired
     private ReturnOrderDetailDao returnOrderDetailDao;
-
+    @Autowired
+    ReturnOrderDetailBatchDao returnOrderDetailBatchDao;
 
     @Override
     @Transactional
@@ -75,6 +73,7 @@ public class RejectRecordServiceImpl implements RejectRecordService {
         String returnOrderCode = "";
         returnOrderDetailDao.selectListByReturnOrderCode(returnOrderCode);
 
+        returnOrderDetailBatchDao.select(new ReturnOrderDetailBatch());
         return null;
     }
 
@@ -227,5 +226,4 @@ public class RejectRecordServiceImpl implements RejectRecordService {
         operationLog.setCreateTime(formatter.format(new Date()));
         return operationLog;
     }
-
 }
