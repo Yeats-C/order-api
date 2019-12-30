@@ -1,13 +1,11 @@
 package com.aiqin.mgs.order.api.service.bill.impl;
+import com.aiqin.mgs.order.api.domain.PurchaseBanchInfo;
 import java.math.BigDecimal;
 
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
-import com.aiqin.mgs.order.api.dao.OperationLogDao;
-import com.aiqin.mgs.order.api.dao.PurchaseOrderDao;
-import com.aiqin.mgs.order.api.dao.PurchaseOrderDetailBatchDao;
-import com.aiqin.mgs.order.api.dao.PurchaseOrderDetailDao;
+import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.domain.*;
@@ -52,6 +50,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     ErpOrderInfoDao erpOrderInfoDao;
     @Autowired
     ErpOrderItemDao erpOrderItemDao;
+    @Autowired
+    OrderStoreDetailBatchDao orderStoreDetailBatchDao;
     @Override
     public HttpResponse createPurchaseOrder(@Valid ErpOrderInfo erpOrderInfo) {
         LOGGER.info("同步采购单，erpOrderInfo{}", erpOrderInfo);
@@ -65,16 +65,57 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     }
 
     @Override
-    public HttpResponse<PurchaseInfo> selectPurchaseInfo() {
+    public HttpResponse<List<PurchaseInfo>> selectPurchaseInfo() {
+        LOGGER.info("耘链销售单回传");
         ErpOrderInfo erpOrderInfo = new ErpOrderInfo();
         //订单查询
-        erpOrderInfoDao.select(erpOrderInfo);
+        List<ErpOrderInfo> resultErpOrderInfos = erpOrderInfoDao.select(erpOrderInfo);
+
         ErpOrderItem erpOrderItem = new ErpOrderItem();
         //订单明细查询
-        erpOrderItemDao.select(erpOrderItem);
-        //订单批次明细查询（仓卡）
+        List<ErpOrderItem> resultErpOrderItems = erpOrderItemDao.select(erpOrderItem);
 
-        return null;
+        OrderStoreDetailBatch orderStoreDetailBatch = new OrderStoreDetailBatch();
+        //订单批次明细查询（仓卡）
+        List<OrderStoreDetailBatch> resultOrderStoreDetailBatchs = orderStoreDetailBatchDao.select(orderStoreDetailBatch);
+
+        List<PurchaseInfo> listtPurchaseInfo = new ArrayList<>();
+        PurchaseInfo purchaseInfo = new PurchaseInfo();
+        for (ErpOrderInfo resultErpOrderInfo : resultErpOrderInfos){
+            purchaseInfo.setOrderCode(resultErpOrderInfo.getOrderStoreCode());
+            purchaseInfo.setActualTotalCount(resultErpOrderInfo.getActualProductCount());
+            purchaseInfo.setDeliveryTime(resultErpOrderInfo.getDeliveryTime());
+            purchaseInfo.setDeliveryPersionId(resultErpOrderInfo.getOrderStoreId());
+
+            //组装订单详情
+            List<PurchaseDetailInfo> listPurchaseDetailInfos = new ArrayList<>();
+            for(ErpOrderItem resultErpOrderItem : resultErpOrderItems){
+                for(PurchaseDetailInfo purchaseDetailInfo :purchaseInfo.getPurchaseDetailInfo()){
+                    purchaseDetailInfo.setActualToalCount(resultErpOrderItem.getActualProductCount());
+                    purchaseDetailInfo.setLineCode(resultErpOrderItem.getLineCode());
+                    purchaseDetailInfo.setSkuCode(resultErpOrderItem.getSkuCode());
+                    purchaseDetailInfo.setSkuName(resultErpOrderItem.getSkuName());
+                    listPurchaseDetailInfos.add(purchaseDetailInfo);
+                }
+                purchaseInfo.setPurchaseDetailInfo(listPurchaseDetailInfos);
+            }
+
+            //组装订单详情批次
+            List<PurchaseBanchInfo> listBanchPurchaseInfo = new ArrayList<>();
+            for(OrderStoreDetailBatch resultOrderStoreDetailBatch : resultOrderStoreDetailBatchs){
+                for(PurchaseBanchInfo banchPurchaseInfo : purchaseInfo.getPurchaseBanchInfo()){
+                    banchPurchaseInfo.setBatchCode(resultOrderStoreDetailBatch.getBatchCode());
+                    //banchPurchaseInfo.setActualToalCount();//实际销售数量
+                    banchPurchaseInfo.setBatchCode(resultOrderStoreDetailBatch.getSkuCode());
+                    banchPurchaseInfo.setSkuName(resultOrderStoreDetailBatch.getSkuName());
+                    banchPurchaseInfo.setLineCode(resultOrderStoreDetailBatch.getLineCode());
+                    banchPurchaseInfo.setProductDate(resultOrderStoreDetailBatch.getProductDate());
+                }
+                purchaseInfo.setPurchaseBanchInfo(listBanchPurchaseInfo);
+            }
+            listtPurchaseInfo.add(purchaseInfo);
+        }
+        return HttpResponse.success(listtPurchaseInfo);
     }
 
     /**

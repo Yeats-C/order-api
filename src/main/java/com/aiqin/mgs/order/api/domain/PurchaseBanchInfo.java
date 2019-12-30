@@ -10,7 +10,7 @@ public class PurchaseBanchInfo implements Serializable {
     @ApiModelProperty(value = "行号")
     private Long lineCode;
     @ApiModelProperty(value = "SKU编码")
-    private String bskuCode;
+    private String skuCode;
     @ApiModelProperty(value = "SKU名称")
     private String skuName;
     @ApiModelProperty(value = "批次编号")

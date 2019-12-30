@@ -23,5 +23,5 @@ public class PurchaseInfo implements Serializable {
     private List<PurchaseDetailInfo> purchaseDetailInfo;
     //订单批次明细
     @ApiModelProperty(value = "订单批次明细")
-    private  PurchaseBanchInfo PurchaseBanchInfo;
+    private  List<PurchaseBanchInfo> PurchaseBanchInfo;
 }
