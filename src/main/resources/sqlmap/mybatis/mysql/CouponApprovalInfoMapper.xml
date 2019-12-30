@@ -21,16 +21,16 @@
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
-    from approval_info
+    from coupon_approval_info
     where id = #{id,jdbcType=INTEGER}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
-    delete from approval_info
+    delete from coupon_approval_info
     where id = #{id,jdbcType=INTEGER}
   </delete>
 
   <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.CouponApprovalInfo" >
-    insert into approval_info
+    insert into coupon_approval_info
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,
@@ -103,7 +103,7 @@
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.CouponApprovalInfo" >
-    update approval_info
+    update coupon_approval_info
     <set >
       <if test="formNo != null" >
         form_no = #{formNo,jdbcType=VARCHAR},
@@ -141,7 +141,7 @@
 
   <!--根据审批编号修改记录-->
   <update id="updateByFormNoSelective" parameterType="com.aiqin.mgs.order.api.domain.CouponApprovalInfo" >
-    update approval_info
+    update coupon_approval_info
     <set >
       <if test="status != null" >
         status = #{status,jdbcType=INTEGER},
@@ -162,7 +162,7 @@
   <select id="selectList" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.CouponApprovalInfo">
     select
     <include refid="Base_Column_List" />
-    from approval_info
+    from coupon_approval_info
     <where>
       <if test="processType != null" >
         process_type = #{processType,jdbcType=VARCHAR}
@@ -192,7 +192,7 @@
   <select id="selectByFormNo" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
     <include refid="Base_Column_List" />
-    from approval_info
+    from coupon_approval_info
     where form_no = #{formNo,jdbcType=INTEGER}
   </select>
 
