@@ -95,7 +95,7 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
 
     @Override
     public CouponApprovalDetail getDetailByformNo(String formNo) {
-        return null;
+        return couponApprovalDetailDao.selectByFormNo(formNo);
     }
 
     @Override
