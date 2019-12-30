@@ -1,4 +1,7 @@
 package com.aiqin.mgs.order.api.service.bill.impl;
+import com.aiqin.mgs.order.api.component.enums.ErpLogOperationTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpLogStatusTypeEnum;
 import com.aiqin.mgs.order.api.domain.PurchaseBanchInfo;
 import java.math.BigDecimal;
 
@@ -19,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
 import java.text.SimpleDateFormat;
@@ -127,28 +129,33 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
         singleThreadExecutor.execute(new Runnable() {
             @Override
-            @Transactional
             public void run() {
                 //添加采购单
                 LOGGER.info("开始同步采购单，参数为：erpOrderInfo{}", erpOrderInfo);
                 addPurchaseOrder(erpOrderInfo);
                 LOGGER.info("同步采购单完成");
                 //添加操作日志
-                LOGGER.info("添加操作日志开始");
+                LOGGER.info("开始添加同步采购单,操作日志");
+                addPurchaseOrderLog(erpOrderInfo);
+                LOGGER.info("添加同步采购单,操作日志结束");
 
                 //添加采购商品信息
                 LOGGER.info("开始同步采购单商品详情，erpOrderInfo{}", erpOrderInfo);
                 addPurchaseOrderDetail(erpOrderInfo);
                 LOGGER.info("同步采购单商品详结束");
                 //添加操作日志
-                LOGGER.info("添加操作日志开始");
+                LOGGER.info("开始开始添加同步采购单商品详，操作日志");
+                addPurchaseOrderDetailLog(erpOrderInfo);
+                LOGGER.info("开始添加同步采购单商品详，操作日志结束");
 
                 //根据爱亲采购单，生成耘链销售单
                 LOGGER.info("开始根据爱亲采购单，生成耘链销售单，参数为：erpOrderInfo{}", erpOrderInfo);
                 createSaleOrder(erpOrderInfo);
                 LOGGER.info("根据爱亲采购单，生成耘链销售单结束");
                 //添加操作日志
-                LOGGER.info("添加操作日志开始");
+                LOGGER.info("开始根据爱亲采购单，生成耘链销售单，添加操作日志");
+                createSaleOrderLog(erpOrderInfo);
+                LOGGER.info("开始根据爱亲采购单，生成耘链销售单，添加操作日志结束");
             }
         });
     }
@@ -273,35 +280,74 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     }
 
     /**
-     * 添加操作日志
-     *
+     * 定时扫描同步失败的销售单
+     * 每半小时执行一次
+     */
+    @Scheduled(cron = "0 0/30 * * * ? ")
+    public void TimedFailedPurchaseOrder() {
+        PurchaseOrderDetailBatch purchaseOrderDetailBatch = new PurchaseOrderDetailBatch();
+        purchaseOrderDetailBatchDao.updateByPrimaryKeySelective(purchaseOrderDetailBatch);
+        //调用销售单 TODO
+    }
+
+
+    /**
+     * 添加同步采购单,操作日志
      * @param erpOrderInfo
      */
-    private void addOperationLog(ErpOrderInfo erpOrderInfo) {
-        AuthToken auth = AuthUtil.getCurrentAuth();
-        OperationLog operationLog = new OperationLog();
+    private void addPurchaseOrderLog(ErpOrderInfo erpOrderInfo) {
+        OperationLog operationLog = addOperationLog();
         operationLog.setOperationCode(erpOrderInfo.getOrderStoreCode());//来源编码
-        operationLog.setOperationType(null);//日志类型 0 .新增 1.修改 2.删除 3.下载
-        operationLog.setSourceType(1);//来源类型 0.销售 1.采购 2.退货  3.退供
-        //operationLog.setOperationContent();//日志内容
-        //operationLog.setRemark();//备注
-        //operationLog.setUseStatus();//0. 启用 1.禁用
+        operationLog.setOperationContent("添加同步采购单");//日志内容
+        operationLog.setRemark("");//备注
 
-        operationLog.setCreateById(auth.getPersonId());
-        operationLog.setCreateByName(auth.getPersonName());
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        operationLog.setCreateTime(formatter.format(new Date()));
         operationLogDao.insertSelective(operationLog);
     }
 
     /**
-     * 销售定时任务扫描失败订单
-     * 每半小时执行一次
+     * 开始添加同步采购单商品详，操作日志
+     * @param erpOrderInfo
      */
-    @Scheduled(cron = "0 0/30 * * * ? ")
-    public void reportCurrentTime() {
-        PurchaseOrderDetailBatch purchaseOrderDetailBatch = new PurchaseOrderDetailBatch();
-        purchaseOrderDetailBatchDao.updateByPrimaryKeySelective(purchaseOrderDetailBatch);
-        //调用销售单 TODO
+    private void addPurchaseOrderDetailLog(ErpOrderInfo erpOrderInfo) {
+        OperationLog operationLog = addOperationLog();
+        operationLog.setOperationCode(erpOrderInfo.getOrderStoreCode());//来源编码
+        operationLog.setOperationContent("添加同步采购单商品详");//日志内容
+        operationLog.setRemark("");//备注
+
+        operationLogDao.insertSelective(operationLog);
+    }
+
+    /**
+     * 根据爱亲采购单，生成耘链销售单，添加操作日志
+     * @param erpOrderInfo
+     */
+    private void createSaleOrderLog(ErpOrderInfo erpOrderInfo) {
+        OperationLog operationLog = addOperationLog();
+        operationLog.setOperationCode(erpOrderInfo.getOrderStoreCode());//来源编码
+        operationLog.setOperationContent("根据爱亲采购单，生成耘链销售单");//日志内容
+        operationLog.setRemark("");//备注
+
+        operationLogDao.insertSelective(operationLog);
+    }
+
+    /**
+     * 添加操作日志
+     *
+     * @param
+     */
+    private OperationLog addOperationLog() {
+        OperationLog operationLog = new OperationLog();
+        ErpLogSourceTypeEnum purchase =  ErpLogSourceTypeEnum.PURCHASE;
+        operationLog.setOperationType(purchase.getCode());//日志类型 0 .新增 1.修改 2.删除 3.下载
+        ErpLogOperationTypeEnum add = ErpLogOperationTypeEnum.ADD;
+        operationLog.setSourceType(add.getCode());//来源类型 0.销售 1.采购 2.退货  3.退供
+        ErpLogStatusTypeEnum using = ErpLogStatusTypeEnum.USING;
+        operationLog.setUseStatus(String.valueOf(using.getCode()));//0. 启用 1.禁用
+        AuthToken auth = AuthUtil.getCurrentAuth();
+        operationLog.setCreateById(auth.getPersonId());
+        operationLog.setCreateByName(auth.getPersonName());
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        operationLog.setCreateTime(formatter.format(new Date()));
+        return operationLog;
     }
 }
