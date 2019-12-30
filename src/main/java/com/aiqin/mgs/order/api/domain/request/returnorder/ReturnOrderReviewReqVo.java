@@ -43,12 +43,12 @@ public class ReturnOrderReviewReqVo implements Serializable {
     @ApiModelProperty("审核操作状态(erp内部使用)：处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款 99--已取消")
     private Integer operateStatus;
 
-    @NotBlank(message = "申请人姓名")
-    @ApiModelProperty(value="申请人姓名")
+    @NotBlank(message = "A品券申请人姓名")
+    @ApiModelProperty(value="A品券申请人姓名")
     private String userName;
 
-    @NotBlank(message = "申请人编码")
-    @ApiModelProperty(value="申请人编码")
+    @NotBlank(message = "A品券申请人编码")
+    @ApiModelProperty(value="A品券申请人编码")
     private String applier;
 
     @ApiModelProperty(value="审批人所属部门")
