@@ -183,6 +183,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 return false;
         }
         //修改退货单状态
+        reqVo.setReviewTime(new Date());
         Integer review = returnOrderInfoDao.updateReturnStatus(reqVo);
         //添加日志
         insertLog(reqVo.getReturnOrderCode(),reqVo.getOperator(),reqVo.getOperator(),ErpLogOperationTypeEnum.UPDATE.getCode(),reqVo.getOperateStatus(),content);

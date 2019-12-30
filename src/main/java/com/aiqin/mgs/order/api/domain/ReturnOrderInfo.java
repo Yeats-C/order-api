@@ -263,4 +263,10 @@ public class ReturnOrderInfo {
     @ApiModelProperty(value = "订单类别：1：收单配送 2：首单赠送 3：配送补货 4：首单直送 5：直送补货")
     private Integer orderCategory;
 
+    @ApiModelProperty(value = "审核人编码")
+    private String reviewOperatorId;
+
+    @ApiModelProperty(value = "审核时间")
+    private Date reviewTime;
+
 }
