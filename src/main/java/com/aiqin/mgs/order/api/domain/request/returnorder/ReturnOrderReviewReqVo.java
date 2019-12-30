@@ -36,7 +36,7 @@ public class ReturnOrderReviewReqVo implements Serializable {
     private String operator;
 
     @NotBlank(message = "审核操作状态")
-    @ApiModelProperty("审核操作状态(erp内部使用)：1--通过 2--挂账 3--不通过（驳回）99-已取消")
+    @ApiModelProperty("审核操作状态(erp内部使用)：处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款 99--已取消")
     private Integer operateStatus;
 
     @NotBlank(message = "申请人姓名")
