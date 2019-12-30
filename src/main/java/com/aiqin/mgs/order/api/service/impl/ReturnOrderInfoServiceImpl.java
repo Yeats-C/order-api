@@ -704,6 +704,16 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         return HttpResponse.success(list);
     }
 
+    @Override
+    public HttpResponse getEvidenceUrl(String returnOrderDetailId) {
+        String url = returnOrderDetailDao.selectUrlsByReturnOrderDetailId(returnOrderDetailId);
+        String[] urls=new String[]{};
+        if(StringUtils.isNotBlank(url)){
+            urls=url.split(",");
+        }
+        return HttpResponse.success(urls);
+    }
+
     /**
      * 插入日志表
      * @param orderCode

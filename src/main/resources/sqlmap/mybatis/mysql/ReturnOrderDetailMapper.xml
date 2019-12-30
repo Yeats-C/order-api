@@ -446,4 +446,11 @@
         </foreach>
     </update>
 
+    <select id="selectUrlsByReturnOrderDetailId" resultType="java.lang.String" parameterType="java.lang.String">
+        select evidence_url
+        from return_order_detail
+        where return_order_detail_id = #{returnOrderDetailId}
+    </select>
+
+
 </mapper>
