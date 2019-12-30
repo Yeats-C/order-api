@@ -521,23 +521,23 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
         }
 
         //调用支付中心接口 查询支付状态是否成功
-        ErpOrderPayStatusResponse orderPayStatusResponse = erpOrderRequestService.getOrderPayStatus(orderPay.getPayId());
-        if (orderPayStatusResponse.isRequestSuccess()) {
-            if (orderPayStatusResponse.getPayStatusEnum() == ErpPayStatusEnum.SUCCESS) {
-
-                orderPay.setPayStatus(orderPayStatusResponse.getPayPollingBackStatusEnum().getCode());
-                orderPay.setPayEndTime(new Date());
-                this.updateOrderPaySelective(orderPay, auth);
-
-                //更新订单状态和支付状态
-                this.endPay(orderPay.getPayId(), ErpPayStatusEnum.SUCCESS, true);
-
-            } else {
-                throw new BusinessException("订单未支付成功");
-            }
-        } else {
-            throw new BusinessException("查询支付中心订单支付状态失败");
-        }
+//        ErpOrderPayStatusResponse orderPayStatusResponse = erpOrderRequestService.getOrderPayStatus(orderPay.getPayId());
+//        if (orderPayStatusResponse.isRequestSuccess()) {
+//            if (orderPayStatusResponse.getPayStatusEnum() == ErpPayStatusEnum.SUCCESS) {
+//
+//                orderPay.setPayStatus(orderPayStatusResponse.getPayPollingBackStatusEnum().getCode());
+//                orderPay.setPayEndTime(new Date());
+//                this.updateOrderPaySelective(orderPay, auth);
+//
+//                //更新订单状态和支付状态
+//                this.endPay(orderPay.getPayId(), ErpPayStatusEnum.SUCCESS, true);
+//
+//            } else {
+//                throw new BusinessException("订单未支付成功");
+//            }
+//        } else {
+//            throw new BusinessException("查询支付中心订单支付状态失败");
+//        }
     }
 
     @Override

@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.aiqin.mgs.order.api.base.PagesRequest;
+import com.aiqin.mgs.order.api.component.PayOriginTypeEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -171,6 +172,9 @@ public class OrderAfterSaleInfo extends PagesRequest {
 	@JsonProperty("franchisee_id")
 	private String franchiseeId;
 
+	@ApiModelProperty(value = "支付来源")
+	@JsonProperty("pay_origin_type")
+	private Integer payOriginType= PayOriginTypeEnum.TOC_POS.getCode();
 }
 
 

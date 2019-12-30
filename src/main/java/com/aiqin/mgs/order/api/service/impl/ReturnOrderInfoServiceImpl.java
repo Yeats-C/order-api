@@ -4,18 +4,20 @@ import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.base.ConstantData;
-import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.*;
 import com.aiqin.mgs.order.api.component.SequenceService;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
+import com.aiqin.mgs.order.api.dao.returnorder.RefundInfoDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
-import com.aiqin.mgs.order.api.dao.returnorder.RefundInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.bill.RejectRecordReq;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
+import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderStatusVo;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
+import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import com.aiqin.mgs.order.api.util.URLConnectionUtil;
 import com.aiqin.platform.flows.client.constant.AjaxJson;
@@ -24,7 +26,10 @@ import com.aiqin.platform.flows.client.constant.StatusEnum;
 import com.aiqin.platform.flows.client.domain.vo.ActBaseProcessEntity;
 import com.aiqin.platform.flows.client.domain.vo.StartProcessParamVO;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -73,6 +78,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     private RejectRecordService rejectRecordService;
     @Resource
     private RefundInfoDao refundInfoDao;
+    @Resource
+    private ErpOrderItemService erpOrderItemService;
 
     @Override
     @Transactional
@@ -105,6 +112,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 //        if (reqVo.getReturnDiscountAmount() > 0) {//退回优惠额度
 //            record.setDiscountAmountInfoStr(JSON.toJSONString(reqVo.getDiscountAmountInfos()));
 //        }
+        //tui
+        record.setReturnMoneyType(ConstantData.returnMoneyType);
         returnOrderInfoDao.insertSelective(record);
         List<ReturnOrderDetail> details = reqVo.getDetails().stream().map(detailVo -> {
             ReturnOrderDetail detail = new ReturnOrderDetail();
@@ -132,7 +141,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     public Boolean updateReturnStatus(ReturnOrderReviewReqVo reqVo) {
         boolean flag = false;
         boolean flag1 = false;
-        //1--通过 2--挂账 3--不通过（驳回）"
+        //1--通过 2--挂账 3--不通过（驳回）99-已取消"
         switch (reqVo.getOperateStatus()) {
             case 1:
                 reqVo.setOperateStatus(2);
@@ -147,6 +156,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             case 3:
                 reqVo.setOperateStatus(98);
                 break;
+            case 99:
+                reqVo.setOperateStatus(99);
+                break;
             default:
                 return false;
         }
@@ -154,7 +166,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         Integer review = returnOrderInfoDao.updateReturnStatus(reqVo);
         if (flag) {
             //todo 同步到供应链
-            createRejectRecord(reqVo.getReturnOrderId());
+            createRejectRecord(reqVo.getReturnOrderCode());
         }
         if (flag1) {
             log.info("驳回--进入A品券发放审批");
@@ -170,7 +182,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             approvalDetail.setCreator(reqVo.getUserName());
             approvalDetail.setRemark(reqVo.getReviewNote());
             approvalDetail.setFranchiseeId(reqVo.getFranchiseeId());
-            approvalDetail.setOrderId(reqVo.getReturnOrderId());
+            approvalDetail.setOrderId(reqVo.getReturnOrderCode());
             couponApprovalDetailDao.insertSelective(approvalDetail);
             log.info("同步审批信息到本地完成");
             //A品券发放审批申请提交
@@ -218,24 +230,60 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             returnOrderDetailDao.updateActualCountBatch(reqVo.getReturnOrderDetailReviewApiReqVo().getList());
             //根据退货单id查询详情计算金额
             List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(reqVo.getReturnOrderId());
+            //查询原始订单详情
+            String orderId = returnOrderInfoDao.selectOrderId(reqVo.getReturnOrderId());
+            List<ErpOrderItem> erpOrderItems = erpOrderItemService.selectOrderItemListByOrderId(orderId);
+            Map<String,BigDecimal> map=new HashMap<>();
+            Map<String,BigDecimal> map2=new HashMap<>();
+            Map<String,Long> map3=new HashMap<>();
+            Map<String,Long> map4=new HashMap<>();
+            for(ErpOrderItem eoi:erpOrderItems){
+                //存储订单号+linecode 分摊单价
+                map.put(eoi.getOrderStoreCode()+eoi.getLineCode(),eoi.getPreferentialAmount());
+                //存储订单号+linecode 分摊总价
+                map2.put(eoi.getOrderStoreCode()+eoi.getLineCode(),eoi.getTotalPreferentialAmount());
+                //存储订单号+linecode 可退总数量
+                Long actualInboundCount = eoi.getActualInboundCount();//可退总数量
+                map3.put(eoi.getOrderStoreCode()+eoi.getLineCode(),actualInboundCount);
+                //存储订单号+linecode 已退数量
+                Long returnProductCount=eoi.getReturnProductCount();
+                if(returnProductCount==null){
+                    returnProductCount=0L;
+                }
+                //已退数量
+                map4.put(eoi.getOrderStoreCode()+eoi.getLineCode(),returnProductCount);
+            }
             //此退货单实际退款总金额
-            BigDecimal totalMoney=BigDecimal.valueOf(0);
+            BigDecimal totalMoneyAll=BigDecimal.valueOf(0);
             String returnOrderId="";
             long totalCount=0;
             for(ReturnOrderDetail rod:returnOrderDetails){
-                //商品单价
-                BigDecimal amount=rod.getProductAmount();
                 //商品实退数量
                 long count=rod.getActualReturnProductCount();
-                BigDecimal total = amount.multiply(BigDecimal.valueOf(count));
+                //已退数量
+                Long returnProductCount=map4.get(orderId+rod.getLineCode());
+                //分摊后单价
+                BigDecimal preferentialAmount = map.get(orderId+rod.getLineCode());
+                //优惠分摊总金额（分摊后金额）
+                BigDecimal totalPreferentialAmount = map2.get(orderId+rod.getLineCode());
+                //实收数量（门店）
+                Long actualInboundCount = map3.get(orderId+rod.getLineCode());
+                BigDecimal totalMoney=new BigDecimal(1);
+                if((actualInboundCount-returnProductCount)>count){//可退数量大于前端入参退货数量
+                    //计算公式：此商品退货总金额=分摊后单价 X 前端入参退货数量
+                    totalMoney=preferentialAmount.multiply(BigDecimal.valueOf(count));
+                }else if((actualInboundCount-returnProductCount)==count){//可退数量等于前端入参退货数量
+                    //计算公式：此商品退货总金额=分摊总金额-分摊后单价 X 已退数量
+                    totalMoney=totalPreferentialAmount.subtract(preferentialAmount.multiply(BigDecimal.valueOf(returnProductCount)));
+                }
                 //实退商品总价
-                rod.setActualTotalProductAmount(total);
-                totalMoney.add(total);
+                rod.setActualTotalProductAmount(totalMoney);
+                totalMoneyAll=totalMoneyAll.add(totalMoney);
                 returnOrderId=rod.getReturnOrderCode();
                 totalCount=totalCount+count;
             }
             //修改主订单实际退货数量、实际退款总金额
-            returnOrderInfoDao.updateLogisticsCountAndAmount(returnOrderId,totalMoney,totalCount);
+            returnOrderInfoDao.updateLogisticsCountAndAmount(returnOrderId,totalMoneyAll,totalCount);
             //修改详情表实际退款金额
             returnOrderDetailDao.updateActualAmountBatch(returnOrderDetails);
             flag=true;
@@ -258,8 +306,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     }
 
     @Override
-    public Boolean updateLogistics(String returnOrderCode, String logisticsCompanyCode, String logisticsCompanyName, String logisticsNo) {
-        int res=returnOrderInfoDao.updateLogistics(returnOrderCode,logisticsCompanyCode,logisticsCompanyName,logisticsNo);
+    public Boolean updateLogistics(LogisticsVo logisticsVo) {
+        int res=returnOrderInfoDao.updateLogistics(logisticsVo);
         return res>0;
     }
 
@@ -365,6 +413,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
      * 调用供应链封装
      * @param returnOrderCode 退货单编码
      */
+    @Transactional
     public void createRejectRecord(String returnOrderCode){
         log.info("供应链同步退货单开始,returnOrderId={}",returnOrderCode);
         RejectRecordReq rejectRecordReq=new RejectRecordReq();
@@ -375,26 +424,44 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         RejectRecord rejectRecord=new RejectRecord();
         List<RejectRecordDetail> rejectRecordDetail=new ArrayList<>();
         BeanUtils.copyProperties(returnOrderInfo,rejectRecord);
+        //来源单号
+        rejectRecord.setSourceCode(returnOrderInfo.getReturnOrderCode());
+        //
+//        rejectRecord.setSourceType();
+        //最小单位数量--商品数量
+        rejectRecord.setTotalCount(returnOrderInfo.getProductCount());
+        //商品含税金额--退货金额
+        rejectRecord.setTotalTaxAmount(returnOrderInfo.getReturnOrderAmount());
+        //联系人--收货人
+        rejectRecord.setContactPerson(returnOrderInfo.getReceivePerson());
+        //联系人电话--收货人电话
+        rejectRecord.setContactMobile(returnOrderInfo.getReceiveMobile());
+        //结算方式编码--退款方式
         rejectRecord.setSettlementMethodCode(returnOrderInfo.getReturnMoneyType().toString());
-        if(null!=returnOrderInfo.getReturnMoneyType()){
-            //退款方式 1:现金 2:微信 3:支付宝 4:银联
-            switch (returnOrderInfo.getReturnMoneyType()) {
-                case 1:
-                    rejectRecord.setSettlementMethodName("现金");
-                    break;
-                case 2:
-                    rejectRecord.setSettlementMethodName("微信");
-                    break;
-                case 3:
-                    rejectRecord.setSettlementMethodName("支付宝");
-                    break;
-                case 4:
-                    rejectRecord.setSettlementMethodName("银联");
-                    break;
-            }
-        }
+        //退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户
+        rejectRecord.setSettlementMethodName(ConstantData.returnMoneyTypeName);
+//        if(null!=returnOrderInfo.getReturnMoneyType()){
+//            //退款方式 1:现金 2:微信 3:支付宝 4:银联
+//            switch (returnOrderInfo.getReturnMoneyType()) {
+//                case 1:
+//                    rejectRecord.setSettlementMethodName("现金");
+//                    break;
+//                case 2:
+//                    rejectRecord.setSettlementMethodName("微信");
+//                    break;
+//                case 3:
+//                    rejectRecord.setSettlementMethodName("支付宝");
+//                    break;
+//                case 4:
+//                    rejectRecord.setSettlementMethodName("银联");
+//                    break;
+//            }
+//        }
         //todo 退供单状态
 //        rejectRecord.setRejectRecordStatus(1);
+        String afterSaleCode = sequenceService.generateOrderAfterSaleCode(returnOrderInfo.getCompanyCode(), returnOrderInfo.getReturnOrderType());
+        rejectRecord.setRejectRecordId(IdUtil.uuid());
+        rejectRecord.setRejectRecordCode(afterSaleCode);
         for(ReturnOrderDetail rod:returnOrderDetails){
             RejectRecordDetail rrd=new RejectRecordDetail();
             BeanUtils.copyProperties(rod,rrd);
@@ -523,6 +590,92 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         respVo.setDetails(returnOrderDetails);
 
         return respVo;
+    }
+
+    @Override
+    public PageResData<ReturnOrderInfo> getlist(PageRequestVO<AfterReturnOrderSearchVo> searchVo) {
+        if(searchVo.getSearchVO()!=null&&null!=searchVo.getSearchVO().getAreaReq()){
+            String url=slcsHost+"/store/getStoreAllId";
+            JSONObject json=new JSONObject();
+            if(StringUtils.isNotBlank(searchVo.getSearchVO().getAreaReq().getCityId())){
+                json.put("cityId",searchVo.getSearchVO().getAreaReq().getCityId());
+            }
+            if(StringUtils.isNotBlank(searchVo.getSearchVO().getAreaReq().getDistrictId())){
+                json.put("districtId",searchVo.getSearchVO().getAreaReq().getDistrictId());
+            }
+            if(StringUtils.isNotBlank(searchVo.getSearchVO().getAreaReq().getProvinceId())){
+                json.put("provinceId",searchVo.getSearchVO().getAreaReq().getProvinceId());
+            }
+            if(!json.isEmpty()){
+                String request= URLConnectionUtil.doPost(url,null,json);
+                log.info("根据省市区id查询门店请求结果，request={}",request);
+                if(StringUtils.isNotBlank(request)){
+                    JSONObject jsonObject=JSON.parseObject(request);
+                    if(jsonObject.containsKey("code")&&jsonObject.get("code").equals("0")&&jsonObject.containsKey("data")){
+                        List<String> ids=JSON.parseArray(jsonObject.getString("data"),String.class);
+                        if(CollectionUtils.isNotEmpty(ids)){
+                            searchVo.getSearchVO().setStoreIds(ids);
+                        }
+                    }
+                }
+            }
+        }
+        PageHelper.startPage(searchVo.getPageNo(),searchVo.getPageSize());
+        log.info("erp售后管理--退货单列表入参，searchVo={}",searchVo);
+        List<ReturnOrderInfo> content = returnOrderInfoDao.selectAll(searchVo.getSearchVO());
+        return new PageResData(Integer.valueOf((int)((Page) content).getTotal()) , content);
+    }
+
+    @Override
+    public HttpResponse getAmount(String orderCode, Long lineCode,Long number) {
+        ErpOrderItem erpOrderItem = erpOrderItemService.getItemByOrderCodeAndLine(orderCode, lineCode);
+        //此商品退货总金额
+        BigDecimal totalMoney=new BigDecimal(1);
+        if(erpOrderItem!=null){
+            //已退数量
+            Long returnProductCount=erpOrderItem.getReturnProductCount();
+            if(returnProductCount==null){
+                returnProductCount=0L;
+            }
+            //分摊后单价
+            BigDecimal preferentialAmount = erpOrderItem.getPreferentialAmount();
+            if(preferentialAmount==null){
+                return HttpResponse.failure(ResultCode.RETURN_PRE_AMOUNT_ERROR);
+            }
+            //优惠分摊总金额（分摊后金额）
+            BigDecimal totalPreferentialAmount = erpOrderItem.getTotalPreferentialAmount();
+            if(totalPreferentialAmount==null){
+                return HttpResponse.failure(ResultCode.RETURN_TOTAL_AMOUNT_ERROR);
+            }
+            //实收数量（门店）
+            Long actualInboundCount = erpOrderItem.getActualInboundCount();
+            if(actualInboundCount==null){
+                return HttpResponse.failure(ResultCode.RETURN_ACUNUM_WRONG_ERROR);
+            }
+            if((actualInboundCount-returnProductCount)>number){//可退数量大于前端入参退货数量
+                //计算公式：此商品退货总金额=分摊后单价 X 前端入参退货数量
+                totalMoney=preferentialAmount.multiply(BigDecimal.valueOf(number));
+                return HttpResponse.success(totalMoney);
+            }else if((actualInboundCount-returnProductCount)==number){//可退数量等于前端入参退货数量
+                //计算公式：此商品退货总金额=分摊总金额-分摊后单价 X 已退数量
+                totalMoney=totalPreferentialAmount.subtract(preferentialAmount.multiply(BigDecimal.valueOf(returnProductCount)));
+                return HttpResponse.success(totalMoney);
+            }
+            return HttpResponse.failure(ResultCode.RETURN_NUM_WRONG_ERROR);
+        }
+        return HttpResponse.failure(ResultCode.RETURN_AMOUNT_ERROR);
+    }
+
+    @Override
+    public HttpResponse getReturnStatus() {
+        List<ReturnOrderStatusVo> list=new ArrayList<>();
+        for (ReturnOrderStatusEnum s : ReturnOrderStatusEnum.values()){
+            ReturnOrderStatusVo returnOrderStatusVo=new ReturnOrderStatusVo();
+            returnOrderStatusVo.setStatus(s.getKey());
+            returnOrderStatusVo.setName(s.getMsg());
+            list.add(returnOrderStatusVo);
+        }
+        return HttpResponse.success(list);
     }
 
 }

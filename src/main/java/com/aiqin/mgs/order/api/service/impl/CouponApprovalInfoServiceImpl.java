@@ -161,7 +161,7 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                         if(jsonObject.containsKey("code")&&"0".equals(jsonObject.getString("code"))){
                             log.info("A品券虚拟资产同步成功，修改退货单状态");
                             ReturnOrderReviewReqVo reqVo=new ReturnOrderReviewReqVo();
-                            reqVo.setReturnOrderId(couponApprovalDetail.getOrderId());
+                            reqVo.setReturnOrderCode(couponApprovalDetail.getOrderId());
                             reqVo.setOperateStatus(ConstantData.returnOrderSuccess);
                             returnOrderInfoDao.updateReturnStatus(reqVo);
                             log.info("退款完成");
@@ -227,7 +227,7 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
     public Boolean updateReturnOrderStatus(Integer status,String returnOrderId){
         ReturnOrderReviewReqVo reqVo=new ReturnOrderReviewReqVo();
         reqVo.setOperateStatus(status);
-        reqVo.setReturnOrderId(returnOrderId);
+        reqVo.setReturnOrderCode(returnOrderId);
         Integer res=returnOrderInfoDao.updateReturnStatus(reqVo);
         return res>0;
     }

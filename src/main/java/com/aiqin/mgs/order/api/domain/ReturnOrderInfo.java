@@ -179,7 +179,7 @@ public class ReturnOrderInfo {
     @ApiModelProperty(value = "完成时间")
     private Date finishTime;
 
-    @ApiModelProperty(value = "退货原因编码")
+    @ApiModelProperty(value = "退货原因编码 14:质量问题 15:无理由退货 16:物流破损")
     private String returnReasonCode;
 
     @ApiModelProperty(value = "退货原因描述")
@@ -257,7 +257,7 @@ public class ReturnOrderInfo {
     @ApiModelProperty(value = "来源类型:1-web收银台 2-安卓收银台 3-微信公众号")
     private Integer sourceType;
 
-    @ApiModelProperty(value = "退款方式 1:现金 2:微信 3:支付宝 4:银联")
+    @ApiModelProperty(value = "退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户")
     private Integer returnMoneyType;
 
     @ApiModelProperty(value = "订单类别：1：收单配送 2：首单赠送 3：配送补货 4：首单直送 5：直送补货")

@@ -173,4 +173,10 @@ public interface StoreOverviewDao {
     List<String> storeProductSku(ProductSeachSkuReq productSeachSkuReq);
 
     Integer storeProductSkuCount(ProductSeachSkuReq productSeachSkuReq);
+
+    /**
+     *  通过门店id和sku获取对应畅销度
+     * @param productOverViewReq
+     */
+    List<ProductBaseUnResp> productStoreSaleoutDgree(ProductOverViewReq productOverViewReq);
 }
