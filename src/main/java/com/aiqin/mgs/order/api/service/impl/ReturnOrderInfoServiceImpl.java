@@ -229,6 +229,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     return detail;
                 }).collect(Collectors.toList());
                 returnOrderDetailDao.insertBatch(details);
+                //添加日志
+                insertLog(returnOrderCode,records.getCreateId(),records.getCreator(),ErpLogOperationTypeEnum.UPDATE.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey(),ConstantData.RETURN_ORDER_DETAIL);
                 return true;
             }
         }

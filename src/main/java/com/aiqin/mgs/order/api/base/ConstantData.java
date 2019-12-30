@@ -58,8 +58,8 @@ public interface ConstantData {
     String RETURN_MONEY_TYPE_NAME = "退到加盟商账户";
 
     /**
-     * 日志信息-来源类型 0.销售 1.采购 2.退货  3.退供
+     * 退货处理--修改商品详情
      */
-    Integer OPERATION_LOG_TYPE = 2;
+    String RETURN_ORDER_DETAIL = "修改商品详情";
 
 }
