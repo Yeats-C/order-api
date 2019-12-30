@@ -605,10 +605,12 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 
         //查询退货单详情
         List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderCode);
+        //查询日志详情
+        List<ErpOrderOperationLog> erpOrderOperationLogs = getOrderOperationLogList(returnOrderCode);
         ReturnOrderDetailVO respVo = new ReturnOrderDetailVO();
         respVo.setReturnOrderInfo(returnOrderInfo);
         respVo.setDetails(returnOrderDetails);
-
+        respVo.setLogDetails(erpOrderOperationLogs);
         return respVo;
     }
 
@@ -723,7 +725,30 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         operationLog.setUpdateByName(persionName);
         operationLog.setOperationContent("");
         erpOrderOperationLogDao.insert(operationLog);
+    }
 
+    /**
+     * 根据单号查询操作日志
+     * @param orderCode
+     * @return
+     */
+    public List<ErpOrderOperationLog> getOrderOperationLogList(String orderCode){
+        List<ErpOrderOperationLog> list = new ArrayList<>();
+        if (StringUtils.isNotEmpty(orderCode)) {
+            ErpOrderOperationLog query = new ErpOrderOperationLog();
+            query.setOperationCode(orderCode);
+            query.setSourceType(ErpLogSourceTypeEnum.RETURN.getCode());
+            List<ErpOrderOperationLog> select = erpOrderOperationLogDao.select(query);
+            if (select != null && select.size() > 0) {
+                for (ErpOrderOperationLog item :
+                        select) {
+                    if (!ErpLogOperationTypeEnum.DOWNLOAD.getCode().equals(item.getOperationType())) {
+                        list.add(item);
+                    }
+                }
+            }
+        }
+        return list;
     }
 
 }
