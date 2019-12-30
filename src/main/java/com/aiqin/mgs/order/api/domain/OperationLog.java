@@ -17,7 +17,7 @@ public class OperationLog {
     @ApiModelProperty(value = "日志类型 0 .新增 1.修改 2.删除 3.下载 ")
     private Byte operationType;
     @ApiModelProperty(value = "来源类型 0.销售 1.采购 2.退货  3.退供")
-    private Boolean sourceType;
+    private Integer sourceType;
     @ApiModelProperty(value = "日志内容")
     private String operationContent;
     @ApiModelProperty(value = "备注")
