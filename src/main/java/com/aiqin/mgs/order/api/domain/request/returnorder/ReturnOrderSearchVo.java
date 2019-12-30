@@ -12,7 +12,7 @@ public class ReturnOrderSearchVo extends PagesRequest {
 
     @ApiModelProperty("退货单号")
     @JsonProperty("return_order_code")
-    private String ReturnOrderCode;
+    private String returnOrderCode;
 
     @ApiModelProperty("门店名称")
     @JsonProperty("store_name")
