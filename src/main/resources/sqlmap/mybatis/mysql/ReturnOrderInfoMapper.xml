@@ -904,6 +904,9 @@
             <if test="reviewNote!=null">
                 review_remark=#{reviewNote,jdbcType=VARCHAR},
             </if>
+            <if test="treatmentMethod!=null">
+                treatment_method=#{treatmentMethod},
+            </if>
         </set>
         where return_order_code=#{returnOrderCode,jdbcType=VARCHAR}
     </update>
