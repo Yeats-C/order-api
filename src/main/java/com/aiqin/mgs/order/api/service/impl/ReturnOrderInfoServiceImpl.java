@@ -742,6 +742,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         operationLog.setUpdateById(persionId);
         operationLog.setUpdateByName(persionName);
         operationLog.setOperationContent("");
+        operationLog.setUseStatus(0);
         erpOrderOperationLogDao.insert(operationLog);
     }
 
