@@ -26,4 +26,6 @@ public interface ReturnOrderDetailDao {
 
     int updateActualAmountBatch(List<ReturnOrderDetail> list);
 
+    String selectUrlsByReturnOrderDetailId(String returnOrderDetailId);
+
 }

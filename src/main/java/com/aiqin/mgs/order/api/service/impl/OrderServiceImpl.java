@@ -258,7 +258,16 @@ public class OrderServiceImpl implements OrderService {
                 orderInfo = (OrderodrInfo) response.getData();
             }
 
+
+
             if (Objects.nonNull(orderInfo)) {
+                log.info("------------------------------------------------------防止多次处理start" );
+                //防止多次处理
+                if (orderInfo.getOrderInfo().getPayStatus().equals(PayStatusEnum.HAS_PAY.getCode())){
+                    log.info("------------------------------------------------------防止多次处理ing" );
+                    return HttpResponse.success();
+                }
+                log.info("------------------------------------------------------防止多次处理end" );
                 //Toc 订单
                 if (orderInfo.getOrderInfo().getOrderType() == 1||orderInfo.getOrderInfo().getOrderType() == 4) {
                     orderInfo.getOrderInfo().setPayType(String.valueOf(vo.getPayType()));
@@ -294,8 +303,10 @@ public class OrderServiceImpl implements OrderService {
                 changeProductStock(orderInfo);
             } else {
                 //预存订单提出记录初始化
+                log.info("预存订单提出记录初始化{}", "===========" + orderInfo);
                 createPrestorageOrder(orderInfo);
             }
+
 
             return HttpResponse.success();
         } catch (Exception e) {
@@ -480,6 +491,8 @@ public class OrderServiceImpl implements OrderService {
             /*stockVo.setStoragePosition(ReturnGoodsToStockEnum.DISPLAY_STOCK.getCode());*/
             stockVo.setProductSku(input.getSkuCode());
             stockVo.setOperator("系统设置");
+            stockVo.setCreateByName("系统设置");
+            stockVo.setStoragePosition(1);
             stockVo.setReleaseStatus(ReleaseStatusEnum.RELEASE.getCode());
             stockVo.setRelateNumber(orderInfo.getOrderInfo().getOrderId());
             operateStockVos.add(stockVo);

@@ -108,4 +108,11 @@ public interface ReturnOrderInfoService {
      */
     HttpResponse getReturnStatus();
 
+    /**
+     * 退货单列表--查看附件
+     * @param returnOrderDetailId
+     * @return
+     */
+    HttpResponse getEvidenceUrl(String returnOrderDetailId);
+
 }

@@ -49,4 +49,9 @@ public class ReturnOrderSearchVo extends PagesRequest {
     @ApiModelProperty("退货类型  0客户退货、1缺货退货、2售后退货")
     @JsonProperty("return_order_type")
     private Integer returnOrderType;
+
+    @ApiModelProperty(value = "订单类型 0直送、1配送、2辅采")
+    @JsonProperty("order_type")
+    private Integer orderType;
+
 }
