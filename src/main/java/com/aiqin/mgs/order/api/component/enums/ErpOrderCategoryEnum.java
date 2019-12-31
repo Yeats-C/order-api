@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.component.enums;
 
+import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayTransactionTypeEnum;
 import lombok.Getter;
 
 /**
@@ -13,17 +14,17 @@ import lombok.Getter;
 public enum ErpOrderCategoryEnum {
 
     /***首单配送*/
-    ORDER_TYPE_1(1, "1", "正常补货"),
+    ORDER_TYPE_1(1, "1", "正常补货", ErpRequestPayTransactionTypeEnum.STORE_ORDER),
     /***首单赠送*/
-    ORDER_TYPE_2(2, "2", "普通首单"),
+    ORDER_TYPE_2(2, "2", "普通首单", ErpRequestPayTransactionTypeEnum.STORE_ORDER),
     /***配送补货*/
-    ORDER_TYPE_4(4, "4", "首单赠送"),
+    ORDER_TYPE_4(4, "4", "首单赠送", ErpRequestPayTransactionTypeEnum.STORE_ORDER),
     /***首单直送*/
-    ORDER_TYPE_16(16, "16", "新店货架"),
+    ORDER_TYPE_16(16, "16", "新店货架", ErpRequestPayTransactionTypeEnum.STORE_ORDER),
     /***直送补货*/
-    ORDER_TYPE_17(17, "17", "货架补货"),
+    ORDER_TYPE_17(17, "17", "货架补货", ErpRequestPayTransactionTypeEnum.STORE_ORDER),
     /***首单货架*/
-    ORDER_TYPE_172(172, "172", "游泳游乐");
+    ORDER_TYPE_172(172, "172", "游泳游乐", ErpRequestPayTransactionTypeEnum.STORE_ORDER);
 
     /***数字编码*/
     private Integer code;
@@ -31,11 +32,14 @@ public enum ErpOrderCategoryEnum {
     private String value;
     /***描述*/
     private String desc;
+    /***订单支付交易类型*/
+    private ErpRequestPayTransactionTypeEnum payTransactionTypeEnum;
 
-    ErpOrderCategoryEnum(Integer code, String value, String desc) {
+    ErpOrderCategoryEnum(Integer code, String value, String desc, ErpRequestPayTransactionTypeEnum payTransactionTypeEnum) {
         this.code = code;
         this.value = value;
         this.desc = desc;
+        this.payTransactionTypeEnum = payTransactionTypeEnum;
     }
 
     /**

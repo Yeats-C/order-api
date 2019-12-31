@@ -1,4 +1,4 @@
-package com.aiqin.mgs.order.api.component.enums;
+package com.aiqin.mgs.order.api.component.enums.pay;
 
 import com.aiqin.mgs.order.api.domain.SelectOptionItem;
 import lombok.Getter;

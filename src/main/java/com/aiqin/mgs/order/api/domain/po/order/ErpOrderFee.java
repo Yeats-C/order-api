@@ -1,6 +1,6 @@
 package com.aiqin.mgs.order.api.domain.po.order;
 
-import com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
@@ -96,6 +96,9 @@ public class ErpOrderFee {
     @JsonProperty("status")
     private Integer status;
 
+    /**
+     * 非数据库字段
+     */
     @ApiModelProperty(value = "支付流水号")
     @JsonProperty("pay_code")
     private String payCode;

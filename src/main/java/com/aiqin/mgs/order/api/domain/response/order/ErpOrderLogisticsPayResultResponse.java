@@ -1,6 +1,6 @@
 package com.aiqin.mgs.order.api.domain.response.order;
 
-import com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
