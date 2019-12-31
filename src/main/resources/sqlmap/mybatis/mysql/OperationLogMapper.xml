@@ -5,7 +5,7 @@
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="operation_code" jdbcType="VARCHAR" property="operationCode" />
     <result column="operation_type" jdbcType="TINYINT" property="operationType" />
-    <result column="source_type" jdbcType="BIT" property="sourceType" />
+    <result column="source_type" jdbcType="INTEGER" property="sourceType" />
     <result column="operation_content" jdbcType="VARCHAR" property="operationContent" />
     <result column="remark" jdbcType="VARCHAR" property="remark" />
     <result column="use_status" jdbcType="VARCHAR" property="useStatus" />
@@ -37,7 +37,7 @@
       update_by_id, update_by_name, create_time, 
       update_time)
     values (#{operationCode,jdbcType=VARCHAR}, #{operationType,jdbcType=TINYINT},
-      #{sourceType,jdbcType=BIT}, #{operationContent,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
+      #{sourceType,jdbcType=INTEGER}, #{operationContent,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR},
       #{useStatus,jdbcType=VARCHAR}, #{createById,jdbcType=VARCHAR}, #{createByName,jdbcType=VARCHAR}, 
       #{updateById,jdbcType=VARCHAR}, #{updateByName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP})
@@ -93,7 +93,7 @@
         #{operationType,jdbcType=TINYINT},
       </if>
       <if test="sourceType != null">
-        #{sourceType,jdbcType=BIT},
+        #{sourceType,jdbcType=INTEGER},
       </if>
       <if test="operationContent != null">
         #{operationContent,jdbcType=VARCHAR},
@@ -134,7 +134,7 @@
         operation_type = #{operationType,jdbcType=TINYINT},
       </if>
       <if test="sourceType != null">
-        source_type = #{sourceType,jdbcType=BIT},
+        source_type = #{sourceType,jdbcType=INTEGER},
       </if>
       <if test="operationContent != null">
         operation_content = #{operationContent,jdbcType=VARCHAR},
@@ -170,7 +170,7 @@
     update operation_log
     set operation_code = #{operationCode,jdbcType=VARCHAR},
       operation_type = #{operationType,jdbcType=TINYINT},
-      source_type = #{sourceType,jdbcType=BIT},
+      source_type = #{sourceType,jdbcType=INTEGER},
       operation_content = #{operationContent,jdbcType=VARCHAR},
       remark = #{remark,jdbcType=VARCHAR},
       use_status = #{useStatus,jdbcType=VARCHAR},

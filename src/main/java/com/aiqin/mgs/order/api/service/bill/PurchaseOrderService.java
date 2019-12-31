@@ -1,16 +1,16 @@
 package com.aiqin.mgs.order.api.service.bill;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.domain.request.bill.PurchaseOrderReq;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 
 /**
  * 销售 接口
  */
 public interface PurchaseOrderService {
     /**
-     * 创建销售
-     * @param purchaseOrderReq
+     * 同步采购单
+     * @param erpOrderInfo
      * @return
      */
-    HttpResponse createSaleOrder (PurchaseOrderReq purchaseOrderReq);
+    HttpResponse createPurchaseOrder (ErpOrderInfo erpOrderInfo);
 }

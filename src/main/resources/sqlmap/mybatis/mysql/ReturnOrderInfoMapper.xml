@@ -993,8 +993,8 @@
     <if test="returnOrderStatus!=null and returnOrderStatus!=''">
      and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
     </if>
-    <if test="ReturnOrderCode!=null and ReturnOrderCode!=''">
-     and return_order_code=#{ReturnOrderCode,jdbcType=VARCHAR}
+    <if test="returnOrderCode!=null and returnOrderCode!=''">
+     and return_order_code=#{returnOrderCode,jdbcType=VARCHAR}
     </if>
     <if test="storeName!=null and storeName!=''">
      and store_name=#{storeName,jdbcType=VARCHAR}
@@ -1014,6 +1014,15 @@
     <if test="orderType!=null">
       and order_type =#{orderType}
     </if>
+    <if test="orderCategory!=null and orderCategory!=''">
+      and order_category=#{orderCategory,jdbcType=INTEGER}
+    </if>
+    <if test="treatmentMethod!=null and treatmentMethod!=''">
+      and treatment_method=#{treatmentMethod,jdbcType=INTEGER}
+    </if>
+    <if test="returnOrderType!=null and returnOrderType!=''">
+      and return_order_type=#{returnOrderType,jdbcType=INTEGER}
+    </if>
     order by create_time desc
   </select>
 
@@ -1027,8 +1036,8 @@
     <if test="returnOrderStatus!=null and returnOrderStatus!=''">
       and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
     </if>
-    <if test="ReturnOrderCode!=null and ReturnOrderCode!=''">
-      and return_order_code=#{ReturnOrderCode,jdbcType=VARCHAR}
+    <if test="returnOrderCode!=null and returnOrderCode!=''">
+      and return_order_code=#{returnOrderCode,jdbcType=VARCHAR}
     </if>
     <if test="storeName!=null and storeName!=''">
       and store_name=#{storeName,jdbcType=VARCHAR}
