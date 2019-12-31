@@ -19,7 +19,7 @@ public enum ErpPayStatusEnum {
     /***待支付*/
     UNPAID(0, "0", "待支付"),
     /***已发起支付*/
-    PAYING(1, "1", "已发起支付"),
+    PAYING(1, "1", "支付中"),
     /***支付成功*/
     SUCCESS(2, "2", "支付成功"),
     /***支付失败*/

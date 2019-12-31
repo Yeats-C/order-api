@@ -208,17 +208,23 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
         }
         ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByFeeId(order.getFeeId());
 
-        ErpOrderPay orderPay = this.getOrderPayByPayId(orderFee.getPayId());
         result.setOrderCode(order.getOrderStoreCode());
         result.setOrderId(order.getOrderStoreId());
-        result.setOrderStatus(order.getOrderStatus());
         result.setGoodsCoupon(orderFee.getGoodsCoupon());
         result.setPayStatus(orderFee.getPayStatus());
-        if (orderPay != null) {
-            result.setPayId(orderPay.getPayId());
-            result.setPayCode(orderPay.getPayCode());
-            result.setPayStartTime(orderPay.getPayStartTime());
-            result.setPayEndTime(orderPay.getPayEndTime());
+        if (ErpPayStatusEnum.SUCCESS.getCode().equals(orderFee.getPayStatus())) {
+            ErpOrderPay orderPay = this.getOrderPayByPayId(orderFee.getPayId());
+            if (orderPay != null) {
+                result.setPayCode(orderPay.getPayCode());
+                result.setPayStartTime(orderPay.getPayStartTime());
+                result.setPayEndTime(orderPay.getPayEndTime());
+            }
+        }
+        if (ErpOrderStatusEnum.ORDER_STATUS_2.getCode().equals(order.getOrderStatus())) {
+            if (ErpOrderNodeStatusEnum.STATUS_3.getCode().equals(order.getOrderNodeStatus())) {
+                //如果是支付成功，但是还没获取到物流券时，就给前端返回支付中
+                result.setPayStatus(ErpPayStatusEnum.PAYING.getCode());
+            }
         }
         return result;
     }

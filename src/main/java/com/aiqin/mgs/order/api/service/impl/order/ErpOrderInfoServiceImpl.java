@@ -9,6 +9,7 @@ import com.aiqin.mgs.order.api.domain.po.order.*;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderEditRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSignRequest;
+import com.aiqin.mgs.order.api.domain.response.order.ErpOrderItemSplitGroupResponse;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.CopyBeanUtil;
@@ -285,6 +286,14 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         if (processTypeEnum.isSplitByRepertory()) {
             //按照库存分组拆单
 
+            List<ErpOrderItemSplitGroupResponse> lineSplitGroupList = erpOrderRequestService.getRepositorySplitGroup(order);
+            if (lineSplitGroupList == null || lineSplitGroupList.size() == 0) {
+                throw new BusinessException("未获取到供应链商品分组");
+            }
+
+//            Map<String,Map<String,>>
+
+
         } else {
             //按照供应商拆单
 
@@ -379,51 +388,122 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             }
 
         }
-/*
+
+
         if (processTypeEnum.isSplitByRepertory()) {
             //按照供应商拆分订单
 
-//            //sku - 商品详情 map
-//            Map<String, ProductInfo> skuProductMap = new HashMap<>(16);
-//            for (OrderStoreOrderProductItem item :
-//                    orderItemList) {
-//                if (!skuProductMap.containsKey(item.getSkuCode())) {
-//                    ProductInfo productInfo = erpOrderRequestService.getSkuDetail(order.getStoreId(), item.getProductId(), item.getSkuCode());
-//                    if (productInfo == null) {
-//                        throw new BusinessException("未找到商品" + item.getProductName() + item.getSkuName());
+//
+        } else {
+            //按照库存拆分
+
+
+//            if (paramItemList == null || paramItemList.size() <= 0) {
+//                throw new BusinessException("订单商品明细行为空");
+//            }
+//
+//            //订单行号-(仓库编码-数量)
+//            Map<String, Map<String, Integer>> itemCodeRepertoryQuantityMap = new HashMap<>(16);
+//            //仓库编码-仓库名称
+//            Map<String, String> repertoryCodeNameMap = new HashMap<>(16);
+//            //分组Map
+//            Map<String, List<ErpOrderItem>> splitMap = new HashMap<>(16);
+//
+//            int lineIndex = 0;
+//            //遍历参数商品行
+//            for (ErpOrderItem item :
+//                    paramItemList) {
+//                lineIndex++;
+//                if (item == null) {
+//                    throw new BusinessException("第" + lineIndex + "行参数为空");
+//                }
+//                if (StringUtils.isEmpty(item.getOrderItemCode())) {
+//                    throw new BusinessException("第" + lineIndex + "行商品明细行编号为空");
+//                }
+//                if (StringUtils.isEmpty(item.getRepertoryCode())) {
+//                    throw new BusinessException("第" + lineIndex + "行仓库编码为空");
+//                }
+//                if (StringUtils.isEmpty(item.getRepertoryName())) {
+//                    throw new BusinessException("第" + lineIndex + "行仓库名称为空");
+//                }
+//                if (item.getQuantity() == null) {
+//                    throw new BusinessException("第" + lineIndex + "行商品数量为空");
+//                } else {
+//                    if (item.getQuantity() <= 0) {
+//                        throw new BusinessException("第" + lineIndex + "行商品数量必须大于0");
 //                    }
-//                    skuProductMap.put(productInfo.getSkuCode(), productInfo);
 //                }
+//
+//                //记录发货仓库编码名称
+//                if (!repertoryCodeNameMap.containsKey(item.getRepertoryCode())) {
+//                    repertoryCodeNameMap.put(item.getRepertoryCode(), item.getRepertoryName());
+//                }
+//
+//                //记录商品行拆分库房数量
+//                Map<String, Integer> repertoryQuantityMap = itemCodeRepertoryQuantityMap.containsKey(item.getOrderItemCode()) ? itemCodeRepertoryQuantityMap.get(item.getOrderItemCode()) : new HashMap<>();
+//                repertoryQuantityMap.put(item.getRepertoryCode(), (repertoryQuantityMap.get(item.getRepertoryCode()) != null ? repertoryQuantityMap.get(item.getRepertoryCode()) : 0) + item.getQuantity());
+//                itemCodeRepertoryQuantityMap.put(item.getOrderItemCode(), repertoryQuantityMap);
 //            }
 //
-//            //供应商编码-订单商品行 Map
-//            Map<String, List<OrderStoreOrderProductItem>> supplierItemMap = new LinkedHashMap<>(16);
-//            //供应商编码-供应商名称 Map
-//            Map<String, String> supplierCodeNameMap = new LinkedHashMap<>(16);
-//
-//            for (OrderStoreOrderProductItem item :
+//            //遍历原订单商品行
+//            for (ErpOrderItem item :
 //                    orderItemList) {
-//                ProductInfo productInfo = skuProductMap.get(item.getSkuCode());
-//                //供应商编码
-//                String supplierCode = productInfo.getSupplierCode();
-//                if (!supplierCodeNameMap.containsKey(supplierCode)) {
-//                    supplierCodeNameMap.put(supplierCode, productInfo.getSupplierName());
+//                if (!itemCodeRepertoryQuantityMap.containsKey(item.getOrderItemCode())) {
+//                    throw new BusinessException("缺少商品行" + item.getOrderItemCode() + "的库存信息");
 //                }
 //
-//                List<OrderStoreOrderProductItem> list = new ArrayList<>();
-//                if (supplierItemMap.containsKey(supplierCode)) {
-//                    list.addAll(supplierItemMap.get(supplierCode));
+//                Map<String, Integer> repertoryQuantityMap = itemCodeRepertoryQuantityMap.get(item.getOrderItemCode());
+//                Integer quantityTotal = 0;
+//                for (Map.Entry<String, Integer> entry :
+//                        repertoryQuantityMap.entrySet()) {
+//                    quantityTotal += entry.getValue();
+//
+//                    List<ErpOrderItem> splitItemList = new ArrayList<>();
+//                    if (splitMap.containsKey(entry.getKey())) {
+//                        splitItemList.addAll(splitMap.get(entry.getKey()));
+//                    }
+//                    ErpOrderItem splitItem = new ErpOrderItem();
+//                    try {
+//                        PropertyUtils.copyProperties(splitItem, item);
+//                    } catch (Exception e) {
+//                        logger.info("操作异常：{}", e);
+//                    }
+//                    splitItem.setId(null);
+//                    splitItem.setQuantity(entry.getValue());
+//                    splitItem.setMoney(splitItem.getPrice().multiply(new BigDecimal(splitItem.getQuantity())));
+//
+//                    //TODO 尾差处理 如果有活动或者优惠券的情况下可能会除不尽
+//                    splitItem.setActualMoney(item.getActualMoney().multiply(new BigDecimal(entry.getValue())).divide(BigDecimal.TEN, 4, RoundingMode.HALF_UP));
+//                    splitItem.setActivityMoney(item.getActivityMoney().multiply(new BigDecimal(entry.getValue())).divide(BigDecimal.TEN, 4, RoundingMode.HALF_UP));
+//
+//                    splitItemList.add(splitItem);
+//                    splitMap.put(entry.getKey(), splitItemList);
 //                }
-//                list.add(item);
-//                supplierItemMap.put(supplierCode, list);
+//                if (!quantityTotal.equals(item.getQuantity())) {
+//                    throw new BusinessException("商品行" + item.getOrderItemCode() + "数量汇总与原数量不相等");
+//                }
+//
 //            }
 //
-//            if (supplierItemMap.size() > 1) {
+//            //更新订单状态为拆分中
+//            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_3.getCode());
+//            updateOrderByPrimaryKeySelective(order, auth);
 //
-//                //拆单
-//                for (Map.Entry<String, List<OrderStoreOrderProductItem>> entry :
-//                        supplierItemMap.entrySet()) {
-//                    List<OrderStoreOrderProductItem> splitOrderProductItemList = entry.getValue();
+//
+//            List<ErpOrderInfo> newSplitOrderList = new ArrayList<>();
+//            //是否拆分
+//            boolean splitFlag = false;
+//            if (splitMap.size() == 1) {
+//                //不拆分
+//
+//            } else {
+//                //拆分订单
+//
+//                splitFlag = true;
+//                for (Map.Entry<String, List<ErpOrderItem>> entry :
+//                        splitMap.entrySet()) {
+//
+//                    List<ErpOrderItem> splitOrderItemList = entry.getValue();
 //
 //                    //生成订单id
 //                    String newOrderId = OrderPublic.getUUID();
@@ -434,285 +514,108 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 //                    BigDecimal moneyTotal = BigDecimal.ZERO;
 //                    //实际支付金额汇总
 //                    BigDecimal realMoneyTotal = BigDecimal.ZERO;
-//                    //活动优惠金额汇总
+////                    //活动优惠金额汇总
 //                    BigDecimal activityMoneyTotal = BigDecimal.ZERO;
-//                    //服纺券优惠金额汇总
-//                    BigDecimal spinCouponMoneyTotal = BigDecimal.ZERO;
-//                    //A品券优惠金额汇总
-//                    BigDecimal topCouponMoneyTotal = BigDecimal.ZERO;
+////                    //服纺券优惠金额汇总
+////                    BigDecimal spinCouponMoneyTotal = BigDecimal.ZERO;
+////                    //A品券优惠金额汇总
+////                    BigDecimal topCouponMoneyTotal = BigDecimal.ZERO;
 //                    int orderItemNum = 1;
-//                    for (OrderStoreOrderProductItem item :
-//                            splitOrderProductItemList) {
+//                    for (ErpOrderItem item :
+//                            splitOrderItemList) {
 //
 //                        //订单id
 //                        item.setOrderId(newOrderId);
-//                        //订单编号
-//                        item.setOrderStoreCode(newOrderCode);
 //                        //订单明细行编号
 //                        item.setOrderItemCode(newOrderCode + String.format("%03d", orderItemNum++));
 //
 //                        //订货金额汇总
 //                        moneyTotal = moneyTotal.add(item.getMoney() == null ? BigDecimal.ZERO : item.getMoney());
 //                        //实际支付金额汇总
-//                        realMoneyTotal = realMoneyTotal.add(item.getPayMoney() == null ? BigDecimal.ZERO : item.getPayMoney());
-////                        //活动优惠金额汇总
-////                        activityMoneyTotal = activityMoneyTotal.add(item.getActivityMoney() == null ? BigDecimal.ZERO : item.getActivityMoney());
-////                        //服纺券优惠金额汇总
-////                        spinCouponMoneyTotal = spinCouponMoneyTotal.add(item.getSpinCouponMoney() == null ? BigDecimal.ZERO : item.getSpinCouponMoney());
-////                        //A品券优惠金额汇总
-////                        topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponMoney() == null ? BigDecimal.ZERO : item.getTopCouponMoney())
+//                        realMoneyTotal = realMoneyTotal.add(item.getActualMoney() == null ? BigDecimal.ZERO : item.getActualMoney());
+//                        //活动优惠金额汇总
+//                        activityMoneyTotal = activityMoneyTotal.add(item.getActivityMoney() == null ? BigDecimal.ZERO : item.getActivityMoney());
+////                    //服纺券优惠金额汇总
+////                    spinCouponMoneyTotal = spinCouponMoneyTotal.add(item.getSpinCouponMoney() == null ? BigDecimal.ZERO : item.getSpinCouponMoney());
+////                    //A品券优惠金额汇总
+////                    topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponMoney() == null ? BigDecimal.ZERO : item.getTopCouponMoney())
 //                    }
-//                    erpOrderProductItemService.saveOrderProductItemList(orderItemList, auth);
+//                    erpOrderItemService.saveOrderItemList(splitOrderItemList, auth);
 //
-//                    //保存订单信息
-//                    OrderStoreOrderInfo orderInfo = new OrderStoreOrderInfo();
-//                    orderInfo.setOrderStoreCode(newOrderCode);
-//                    orderInfo.setOrderId(newOrderId);
-//                    orderInfo.setPayStatus(order.getPayStatus());
-//                    orderInfo.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
-//                    orderInfo.setActualPrice(realMoneyTotal);
-//                    orderInfo.setTotalPrice(moneyTotal);
-//                    orderInfo.setOrderType(order.getOrderType());
-//                    orderInfo.setReturnStatus(YesOrNoEnum.NO.getCode());
-//                    orderInfo.setFranchiseeId(order.getFranchiseeId());
-//                    orderInfo.setStoreId(order.getStoreId());
-//                    orderInfo.setStoreName(order.getStoreName());
-//                    orderInfo.setOrderLevel(OrderLevelEnum.SECONDARY.getCode());
-//                    orderInfo.setSplitStatus(YesOrNoEnum.NO.getCode());
-//                    orderInfo.setPrimaryCode(order.getOrderStoreCode());
-//                    orderInfo.setSupplierCode(entry.getKey());
-//                    orderInfo.setSupplierCode(supplierCodeNameMap.get(entry.getKey()));
-//                    erpOrderOperationService.saveOrder(orderInfo, auth);
+//                    //保存新订单信息
+//                    ErpOrderInfo newOrder = new ErpOrderInfo();
+//                    newOrder.setOrderStoreCode(newOrderCode);
+//                    newOrder.setOrderId(newOrderId);
+//                    newOrder.setOrderChannelType(order.getOrderChannelType());
+//                    newOrder.setOrderOriginType(order.getOrderOriginType());
+//                    newOrder.setPayStatus(order.getPayStatus());
+//                    newOrder.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_3.getCode());
+//                    //TODO CT 金额需要重新计算
+////                    newOrder.setPayMoney(realMoneyTotal);
+////                    newOrder.setTotalMoney(moneyTotal);
+//                    newOrder.setOrderType(order.getOrderType());
+//                    newOrder.setFranchiseeId(order.getFranchiseeId());
+//                    newOrder.setFranchiseeCode(order.getFranchiseeCode());
+//                    newOrder.setFranchiseeName(order.getFranchiseeName());
+//                    newOrder.setStoreId(order.getStoreId());
+//                    newOrder.setStoreCode(order.getStoreCode());
+//                    newOrder.setStoreName(order.getStoreName());
+//                    newOrder.setOrderLevel(ErpOrderLevelEnum.SECONDARY.getCode());
+//                    newOrder.setReturnStatus(YesOrNoEnum.NO.getCode());
+//                    newOrder.setSplitStatus(YesOrNoEnum.NO.getCode());
+//                    newOrder.setPrimaryCode(order.getOrderStoreCode());
+//                    newOrder.setRepertoryCode(entry.getKey());
+//                    newOrder.setRepertoryName(repertoryCodeNameMap.get(entry.getKey()));
+//                    this.saveOrderNoLog(newOrder, auth);
+//
+//                    //保存收货人信息
+//                    ErpOrderConsignee newOrderConsignee = new ErpOrderConsignee();
+//                    try {
+//                        PropertyUtils.copyProperties(newOrderConsignee, orderConsignee);
+//                        newOrderConsignee.setOrderId(newOrderId);
+//                    } catch (Exception e) {
+//                        throw new BusinessException("操作异常");
+//                    }
+//                    erpOrderConsigneeService.saveOrderConsignee(newOrderConsignee, auth);
+//
+//                    //复制日志
+//                    erpOrderOperationLogService.copySplitOrderLog(newOrderId, orderOperationLogList);
+//
+//                    ErpOrderInfo orderByOrderId = erpOrderQueryService.getOrderByOrderId(newOrderId);
+//                    orderByOrderId.setOrderConsignee(newOrderConsignee);
+//                    orderByOrderId.setOrderItemList(splitOrderItemList);
+//                    newSplitOrderList.add(orderByOrderId);
 //                }
+//
+//            }
+//
+//            //订单同步
+//            if (splitFlag) {
+//                for (ErpOrderInfo item :
+//                        newSplitOrderList) {
+//                    item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
+//                    this.updateOrderByPrimaryKeySelective(item, auth);
+//                }
+//                order.setSplitStatus(YesOrNoEnum.YES.getCode());
 //            }
 //            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
-//            erpOrderOperationService.updateOrderByPrimaryKeySelective(order, auth);
-        } else {
-            //按照库存拆分
-
-            //请求供应链获取订单商品库存分组
-            ErpOrderInfo paramOrder = erpOrderRequestService.getRepositorySplitGroup(order);
-
-            List<ErpOrderItem> paramItemList = paramOrder.getOrderItemList();
-
-            if (paramItemList == null || paramItemList.size() <= 0) {
-                throw new BusinessException("订单商品明细行为空");
-            }
-
-            //订单行号-(仓库编码-数量)
-            Map<String, Map<String, Integer>> itemCodeRepertoryQuantityMap = new HashMap<>(16);
-            //仓库编码-仓库名称
-            Map<String, String> repertoryCodeNameMap = new HashMap<>(16);
-            //分组Map
-            Map<String, List<ErpOrderItem>> splitMap = new HashMap<>(16);
-
-            int lineIndex = 0;
-            //遍历参数商品行
-            for (ErpOrderItem item :
-                    paramItemList) {
-                lineIndex++;
-                if (item == null) {
-                    throw new BusinessException("第" + lineIndex + "行参数为空");
-                }
-                if (StringUtils.isEmpty(item.getOrderItemCode())) {
-                    throw new BusinessException("第" + lineIndex + "行商品明细行编号为空");
-                }
-                if (StringUtils.isEmpty(item.getRepertoryCode())) {
-                    throw new BusinessException("第" + lineIndex + "行仓库编码为空");
-                }
-                if (StringUtils.isEmpty(item.getRepertoryName())) {
-                    throw new BusinessException("第" + lineIndex + "行仓库名称为空");
-                }
-                if (item.getQuantity() == null) {
-                    throw new BusinessException("第" + lineIndex + "行商品数量为空");
-                } else {
-                    if (item.getQuantity() <= 0) {
-                        throw new BusinessException("第" + lineIndex + "行商品数量必须大于0");
-                    }
-                }
-
-                //记录发货仓库编码名称
-                if (!repertoryCodeNameMap.containsKey(item.getRepertoryCode())) {
-                    repertoryCodeNameMap.put(item.getRepertoryCode(), item.getRepertoryName());
-                }
-
-                //记录商品行拆分库房数量
-                Map<String, Integer> repertoryQuantityMap = itemCodeRepertoryQuantityMap.containsKey(item.getOrderItemCode()) ? itemCodeRepertoryQuantityMap.get(item.getOrderItemCode()) : new HashMap<>();
-                repertoryQuantityMap.put(item.getRepertoryCode(), (repertoryQuantityMap.get(item.getRepertoryCode()) != null ? repertoryQuantityMap.get(item.getRepertoryCode()) : 0) + item.getQuantity());
-                itemCodeRepertoryQuantityMap.put(item.getOrderItemCode(), repertoryQuantityMap);
-            }
-
-            //遍历原订单商品行
-            for (ErpOrderItem item :
-                    orderItemList) {
-                if (!itemCodeRepertoryQuantityMap.containsKey(item.getOrderItemCode())) {
-                    throw new BusinessException("缺少商品行" + item.getOrderItemCode() + "的库存信息");
-                }
-
-                Map<String, Integer> repertoryQuantityMap = itemCodeRepertoryQuantityMap.get(item.getOrderItemCode());
-                Integer quantityTotal = 0;
-                for (Map.Entry<String, Integer> entry :
-                        repertoryQuantityMap.entrySet()) {
-                    quantityTotal += entry.getValue();
-
-                    List<ErpOrderItem> splitItemList = new ArrayList<>();
-                    if (splitMap.containsKey(entry.getKey())) {
-                        splitItemList.addAll(splitMap.get(entry.getKey()));
-                    }
-                    ErpOrderItem splitItem = new ErpOrderItem();
-                    try {
-                        PropertyUtils.copyProperties(splitItem, item);
-                    } catch (Exception e) {
-                        logger.info("操作异常：{}", e);
-                    }
-                    splitItem.setId(null);
-                    splitItem.setQuantity(entry.getValue());
-                    splitItem.setMoney(splitItem.getPrice().multiply(new BigDecimal(splitItem.getQuantity())));
-
-                    //TODO 尾差处理 如果有活动或者优惠券的情况下可能会除不尽
-                    splitItem.setActualMoney(item.getActualMoney().multiply(new BigDecimal(entry.getValue())).divide(BigDecimal.TEN, 4, RoundingMode.HALF_UP));
-                    splitItem.setActivityMoney(item.getActivityMoney().multiply(new BigDecimal(entry.getValue())).divide(BigDecimal.TEN, 4, RoundingMode.HALF_UP));
-
-                    splitItemList.add(splitItem);
-                    splitMap.put(entry.getKey(), splitItemList);
-                }
-                if (!quantityTotal.equals(item.getQuantity())) {
-                    throw new BusinessException("商品行" + item.getOrderItemCode() + "数量汇总与原数量不相等");
-                }
-
-            }
-
-            //更新订单状态为拆分中
-            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_3.getCode());
-            updateOrderByPrimaryKeySelective(order, auth);
-
-
-            List<ErpOrderInfo> newSplitOrderList = new ArrayList<>();
-            //是否拆分
-            boolean splitFlag = false;
-            if (splitMap.size() == 1) {
-                //不拆分
-
-            } else {
-                //拆分订单
-
-                splitFlag = true;
-                for (Map.Entry<String, List<ErpOrderItem>> entry :
-                        splitMap.entrySet()) {
-
-                    List<ErpOrderItem> splitOrderItemList = entry.getValue();
-
-                    //生成订单id
-                    String newOrderId = OrderPublic.getUUID();
-                    //生成订单code
-                    String newOrderCode = OrderPublic.generateOrderCode(order.getOrderOriginType(), order.getOrderChannelType());
-
-                    //订货金额汇总
-                    BigDecimal moneyTotal = BigDecimal.ZERO;
-                    //实际支付金额汇总
-                    BigDecimal realMoneyTotal = BigDecimal.ZERO;
-//                    //活动优惠金额汇总
-                    BigDecimal activityMoneyTotal = BigDecimal.ZERO;
-//                    //服纺券优惠金额汇总
-//                    BigDecimal spinCouponMoneyTotal = BigDecimal.ZERO;
-//                    //A品券优惠金额汇总
-//                    BigDecimal topCouponMoneyTotal = BigDecimal.ZERO;
-                    int orderItemNum = 1;
-                    for (ErpOrderItem item :
-                            splitOrderItemList) {
-
-                        //订单id
-                        item.setOrderId(newOrderId);
-                        //订单明细行编号
-                        item.setOrderItemCode(newOrderCode + String.format("%03d", orderItemNum++));
-
-                        //订货金额汇总
-                        moneyTotal = moneyTotal.add(item.getMoney() == null ? BigDecimal.ZERO : item.getMoney());
-                        //实际支付金额汇总
-                        realMoneyTotal = realMoneyTotal.add(item.getActualMoney() == null ? BigDecimal.ZERO : item.getActualMoney());
-                        //活动优惠金额汇总
-                        activityMoneyTotal = activityMoneyTotal.add(item.getActivityMoney() == null ? BigDecimal.ZERO : item.getActivityMoney());
-//                    //服纺券优惠金额汇总
-//                    spinCouponMoneyTotal = spinCouponMoneyTotal.add(item.getSpinCouponMoney() == null ? BigDecimal.ZERO : item.getSpinCouponMoney());
-//                    //A品券优惠金额汇总
-//                    topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponMoney() == null ? BigDecimal.ZERO : item.getTopCouponMoney())
-                    }
-                    erpOrderItemService.saveOrderItemList(splitOrderItemList, auth);
-
-                    //保存新订单信息
-                    ErpOrderInfo newOrder = new ErpOrderInfo();
-                    newOrder.setOrderStoreCode(newOrderCode);
-                    newOrder.setOrderId(newOrderId);
-                    newOrder.setOrderChannelType(order.getOrderChannelType());
-                    newOrder.setOrderOriginType(order.getOrderOriginType());
-                    newOrder.setPayStatus(order.getPayStatus());
-                    newOrder.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_3.getCode());
-                    //TODO CT 金额需要重新计算
-//                    newOrder.setPayMoney(realMoneyTotal);
-//                    newOrder.setTotalMoney(moneyTotal);
-                    newOrder.setOrderType(order.getOrderType());
-                    newOrder.setFranchiseeId(order.getFranchiseeId());
-                    newOrder.setFranchiseeCode(order.getFranchiseeCode());
-                    newOrder.setFranchiseeName(order.getFranchiseeName());
-                    newOrder.setStoreId(order.getStoreId());
-                    newOrder.setStoreCode(order.getStoreCode());
-                    newOrder.setStoreName(order.getStoreName());
-                    newOrder.setOrderLevel(ErpOrderLevelEnum.SECONDARY.getCode());
-                    newOrder.setReturnStatus(YesOrNoEnum.NO.getCode());
-                    newOrder.setSplitStatus(YesOrNoEnum.NO.getCode());
-                    newOrder.setPrimaryCode(order.getOrderStoreCode());
-                    newOrder.setRepertoryCode(entry.getKey());
-                    newOrder.setRepertoryName(repertoryCodeNameMap.get(entry.getKey()));
-                    this.saveOrderNoLog(newOrder, auth);
-
-                    //保存收货人信息
-                    ErpOrderConsignee newOrderConsignee = new ErpOrderConsignee();
-                    try {
-                        PropertyUtils.copyProperties(newOrderConsignee, orderConsignee);
-                        newOrderConsignee.setOrderId(newOrderId);
-                    } catch (Exception e) {
-                        throw new BusinessException("操作异常");
-                    }
-                    erpOrderConsigneeService.saveOrderConsignee(newOrderConsignee, auth);
-
-                    //复制日志
-                    erpOrderOperationLogService.copySplitOrderLog(newOrderId, orderOperationLogList);
-
-                    ErpOrderInfo orderByOrderId = erpOrderQueryService.getOrderByOrderId(newOrderId);
-                    orderByOrderId.setOrderConsignee(newOrderConsignee);
-                    orderByOrderId.setOrderItemList(splitOrderItemList);
-                    newSplitOrderList.add(orderByOrderId);
-                }
-
-            }
-
-            //订单同步
-            if (splitFlag) {
-                for (ErpOrderInfo item :
-                        newSplitOrderList) {
-                    item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
-                    this.updateOrderByPrimaryKeySelective(item, auth);
-                }
-                order.setSplitStatus(YesOrNoEnum.YES.getCode());
-            }
-            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
-            this.updateOrderByPrimaryKeySelective(order, auth);
-
-            //调用同步到供应链接口
-            erpOrderRequestService.sendSplitOrderToSupplyChain(order, newSplitOrderList);
-
-            if (splitFlag) {
-                for (ErpOrderInfo item :
-                        newSplitOrderList) {
-                    item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
-                    this.updateOrderByPrimaryKeySelective(item, auth);
-                }
-            } else {
-                order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
-                this.updateOrderByPrimaryKeySelective(order, auth);
-            }
+//            this.updateOrderByPrimaryKeySelective(order, auth);
+//
+//            //调用同步到供应链接口
+//            erpOrderRequestService.sendSplitOrderToSupplyChain(order, newSplitOrderList);
+//
+//            if (splitFlag) {
+//                for (ErpOrderInfo item :
+//                        newSplitOrderList) {
+//                    item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
+//                    this.updateOrderByPrimaryKeySelective(item, auth);
+//                }
+//            } else {
+//                order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
+//                this.updateOrderByPrimaryKeySelective(order, auth);
+//            }
         }
-*/
+
     }
 
     @Override

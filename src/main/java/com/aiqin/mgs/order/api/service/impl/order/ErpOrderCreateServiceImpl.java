@@ -51,8 +51,6 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private CartOrderService cartOrderService;
     @Resource
     private ErpOrderFeeService erpOrderFeeService;
-    @Resource
-    private ErpOrderPayService erpOrderPayService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -647,6 +645,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //保存订单
         order.setOrderStoreId(orderId);
         order.setOrderStoreCode(orderCode);
+        order.setMainOrderCode(orderCode);
         order.setFeeId(feeId);
         erpOrderInfoService.saveOrder(order, auth);
 
@@ -1031,15 +1030,6 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         return orderCode;
     }
 
-    /**
-     * 生成订单号
-     *
-     * @param
-     * @return java.lang.String
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/12/24 20:24
-     */
     @Override
     public String getOrderCode() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");

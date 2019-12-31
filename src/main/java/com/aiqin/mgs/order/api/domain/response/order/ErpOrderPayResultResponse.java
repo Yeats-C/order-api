@@ -29,14 +29,6 @@ public class ErpOrderPayResultResponse {
     @JsonProperty("order_code")
     private String orderCode;
 
-    @ApiModelProperty(value = "订单状态")
-    @JsonProperty("order_status")
-    private Integer orderStatus;
-
-    @ApiModelProperty(value = "订单状态描述")
-    @JsonProperty("order_status_desc")
-    private String orderStatusDesc;
-
     @ApiModelProperty(value = "支付状态 0待支付 1已发起支付（支付中） 2支付成功 3支付失败")
     @JsonProperty("pay_status")
     private Integer payStatus;
@@ -45,17 +37,13 @@ public class ErpOrderPayResultResponse {
     @JsonProperty("pay_status_desc")
     private String payStatusDesc;
 
-    @ApiModelProperty(value = "物流券")
+    @ApiModelProperty(value = "返还物流券金额")
     @JsonProperty("goods_coupon")
     private BigDecimal goodsCoupon;
 
     @ApiModelProperty(value = "支付流水号")
     @JsonProperty("pay_code")
     private String payCode;
-
-    @ApiModelProperty(value = "支付id")
-    @JsonProperty("pay_id")
-    private String payId;
 
     @ApiModelProperty(value = "支付开始时间")
     @JsonProperty("pay_start_time")
@@ -64,10 +52,6 @@ public class ErpOrderPayResultResponse {
     @ApiModelProperty(value = "支付完成时间")
     @JsonProperty("pay_end_time")
     private Date payEndTime;
-
-    public String getOrderStatusDesc() {
-        return ErpOrderStatusEnum.getEnumDesc(orderStatus);
-    }
 
     public String getPayStatusDesc() {
         return ErpPayStatusEnum.getEnumDesc(payStatus);
