@@ -76,13 +76,26 @@ public interface ErpOrderInfoService {
     /**
      * 订单拆单逻辑
      *
-     * @param orderInfo
+     * @param orderCode 订单号
+     * @param auth      操作人
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/10 13:50
      */
-    void orderSplit(ErpOrderInfo orderInfo);
+    void orderSplit(String orderCode, AuthToken auth);
+
+    /**
+     * 同步订单到供应链
+     *
+     * @param orderCode 订单号
+     * @param auth      操作人
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/30 15:26
+     */
+    void orderSendToSupply(String orderCode, AuthToken auth);
 
     /**
      * 订单签收

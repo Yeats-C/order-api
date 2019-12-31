@@ -66,6 +66,15 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
     }
 
     @Override
+    public ErpOrderInfo getOrderAndItemByOrderCode(String orderCode) {
+        ErpOrderInfo order = getOrderByOrderCode(orderCode);
+        if (order != null) {
+            order.setItemList(erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId()));
+        }
+        return order;
+    }
+
+    @Override
     public List<ErpOrderInfo> getSecondOrderListByPrimaryCode(String orderCode) {
         List<ErpOrderInfo> list = new ArrayList<>();
         if (StringUtils.isNotEmpty(orderCode)) {
@@ -130,6 +139,11 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             list = erpOrderInfoDao.select(orderInfoQuery);
         }
         return list;
+    }
+
+    @Override
+    public List<ErpOrderInfo> select(ErpOrderInfo erpOrderInfo) {
+        return erpOrderInfoDao.select(erpOrderInfo);
     }
 
     @Override

@@ -44,4 +44,15 @@ public interface ErpOrderCreateService {
      * @date 2019/12/9 14:00
      */
     ErpOrderInfo saveRackOrder(ErpOrderSaveRequest erpOrderSaveRequest);
+
+    /**
+     * 生成订单号
+     *
+     * @param
+     * @return java.lang.String
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/28 15:18
+     */
+    String getOrderCode();
 }
