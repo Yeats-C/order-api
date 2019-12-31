@@ -990,7 +990,7 @@
     from return_order_info
     where
     1=1
-    <if test="returnOrderStatus!=null and returnOrderStatus!=''">
+    <if test="returnOrderStatus!=null">
      and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
     </if>
     <if test="returnOrderCode!=null and returnOrderCode!=''">
@@ -1014,13 +1014,13 @@
     <if test="orderType!=null">
       and order_type =#{orderType}
     </if>
-    <if test="orderCategory!=null and orderCategory!=''">
+    <if test="orderCategory!=null">
       and order_category=#{orderCategory,jdbcType=INTEGER}
     </if>
-    <if test="treatmentMethod!=null and treatmentMethod!=''">
+    <if test="treatmentMethod!=null">
       and treatment_method=#{treatmentMethod,jdbcType=INTEGER}
     </if>
-    <if test="returnOrderType!=null and returnOrderType!=''">
+    <if test="returnOrderType!=null">
       and return_order_type=#{returnOrderType,jdbcType=INTEGER}
     </if>
     order by create_time desc
@@ -1033,39 +1033,39 @@
     from return_order_info
     where
     1=1
-    <if test="returnOrderStatus!=null and returnOrderStatus!=''">
-      and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
-    </if>
-    <if test="returnOrderCode!=null and returnOrderCode!=''">
-      and return_order_code=#{returnOrderCode,jdbcType=VARCHAR}
-    </if>
-    <if test="storeName!=null and storeName!=''">
-      and store_name=#{storeName,jdbcType=VARCHAR}
-    </if>
-    <if test="provinceName!=null and provinceName!=''">
-      and province_name=#{provinceName,jdbcType=VARCHAR}
-    </if>
-    <if test="cityName!=null and cityName!=''">
-      and city_name=#{cityName,jdbcType=VARCHAR}
-    </if>
-    <if test="applyStartTime!=null and applyStartTime!=''">
-      and create_time &gt;= #{applyStartTime}
-    </if>
-    <if test="applyEndTime!=null and applyEndTime!=''">
-      and create_time &lt;= #{applyEndTime}
-    </if>
-    <if test="orderCategory!=null and orderCategory!=''">
-      and order_category=#{orderCategory,jdbcType=INTEGER}
-    </if>
-    <if test="treatmentMethod!=null and treatmentMethod!=''">
-      and treatment_method=#{treatmentMethod,jdbcType=INTEGER}
-    </if>
-    <if test="returnOrderType!=null and returnOrderType!=''">
-      and return_order_type=#{returnOrderType,jdbcType=INTEGER}
-    </if>
-    <if test="orderType!=null">
-      and order_type =#{orderType}
-    </if>
+      <if test="returnOrderStatus!=null">
+          and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
+      </if>
+      <if test="returnOrderCode!=null and returnOrderCode!=''">
+          and return_order_code=#{returnOrderCode,jdbcType=VARCHAR}
+      </if>
+      <if test="storeName!=null and storeName!=''">
+          and store_name=#{storeName,jdbcType=VARCHAR}
+      </if>
+      <if test="provinceName!=null and provinceName!=''">
+          and province_name=#{provinceName,jdbcType=VARCHAR}
+      </if>
+      <if test="cityName!=null and cityName!=''">
+          and city_name=#{cityName,jdbcType=VARCHAR}
+      </if>
+      <if test="applyStartTime!=null and applyStartTime!=''">
+          and create_time &gt;= #{applyStartTime}
+      </if>
+      <if test="applyEndTime!=null and applyEndTime!=''">
+          and create_time &lt;= #{applyEndTime}
+      </if>
+      <if test="orderType!=null">
+          and order_type =#{orderType}
+      </if>
+      <if test="orderCategory!=null">
+          and order_category=#{orderCategory,jdbcType=INTEGER}
+      </if>
+      <if test="treatmentMethod!=null">
+          and treatment_method=#{treatmentMethod,jdbcType=INTEGER}
+      </if>
+      <if test="returnOrderType!=null">
+          and return_order_type=#{returnOrderType,jdbcType=INTEGER}
+      </if>
   </select>
 
   <!--通过条件查询退货单-->
