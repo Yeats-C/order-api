@@ -25,6 +25,10 @@ public class OrderStoreDetailBatch {
 
     private String unitName;
 
+    private Long productCount;
+
+    private Long actualProductCount;
+
     private Long lineCode;
 
     private Integer useStatus;

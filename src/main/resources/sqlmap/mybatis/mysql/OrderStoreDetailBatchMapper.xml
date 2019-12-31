@@ -12,6 +12,8 @@
     <result column="batch_remark" jdbcType="VARCHAR" property="batchRemark" />
     <result column="unit_code" jdbcType="VARCHAR" property="unitCode" />
     <result column="unit_name" jdbcType="VARCHAR" property="unitName" />
+    <result column="product_count" jdbcType="BIGINT" property="productCount" />
+    <result column="actual_product_count" jdbcType="BIGINT" property="actualProductCount" />
     <result column="line_code" jdbcType="BIGINT" property="lineCode" />
     <result column="use_status" jdbcType="INTEGER" property="useStatus" />
     <result column="create_by_id" jdbcType="VARCHAR" property="createById" />
@@ -23,7 +25,7 @@
   </resultMap>
   <sql id="Base_Column_List">
     id, order_store_detail_batch_id, order_store_code, sku_code, sku_name, batch_code, 
-    product_date, batch_remark, unit_code, unit_name, line_code, use_status, create_by_id, 
+    product_date, batch_remark, unit_code, unit_name, product_count, actual_product_count, line_code, use_status, create_by_id,
     create_by_name, update_by_id, update_by_name, create_time, update_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -40,14 +42,14 @@
     insert into order_store_detail_batch (id, order_store_detail_batch_id, order_store_code, 
       sku_code, sku_name, batch_code, 
       product_date, batch_remark, unit_code, 
-      unit_name, line_code, use_status, 
+      unit_name, product_count, actual_product_count, line_code, use_status,
       create_by_id, create_by_name, update_by_id, 
       update_by_name, create_time, update_time
       )
     values (#{id,jdbcType=BIGINT}, #{orderStoreDetailBatchId,jdbcType=VARCHAR}, #{orderStoreCode,jdbcType=VARCHAR}, 
       #{skuCode,jdbcType=VARCHAR}, #{skuName,jdbcType=VARCHAR}, #{batchCode,jdbcType=VARCHAR}, 
       #{productDate,jdbcType=TIMESTAMP}, #{batchRemark,jdbcType=VARCHAR}, #{unitCode,jdbcType=VARCHAR}, 
-      #{unitName,jdbcType=VARCHAR}, #{lineCode,jdbcType=BIGINT}, #{useStatus,jdbcType=INTEGER},
+      #{unitName,jdbcType=VARCHAR},#{productCount,jdbcType=BIGINT},#{actualProductCount,jdbcType=BIGINT}, #{lineCode,jdbcType=BIGINT}, #{useStatus,jdbcType=INTEGER},
       #{createById,jdbcType=VARCHAR}, #{createByName,jdbcType=VARCHAR}, #{updateById,jdbcType=VARCHAR}, 
       #{updateByName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
       )
@@ -84,6 +86,12 @@
       </if>
       <if test="unitName != null">
         unit_name,
+      </if>
+      <if test="productCount != null">
+      product_count,
+      </if>
+      <if test="actualProductCount != null">
+      actual_product_count,
       </if>
       <if test="lineCode != null">
         line_code,
@@ -141,6 +149,12 @@
       <if test="unitName != null">
         #{unitName,jdbcType=VARCHAR},
       </if>
+      <if test="unitName != null">
+        #{productCount,jdbcType=BIGINT},
+      </if>
+      <if test="unitName != null">
+        #{actualProductCount,jdbcType=BIGINT},
+      </if>
       <if test="lineCode != null">
         #{lineCode,jdbcType=BIGINT},
       </if>
@@ -197,6 +211,12 @@
       <if test="unitName != null">
         unit_name = #{unitName,jdbcType=VARCHAR},
       </if>
+      <if test="productCount != null">
+        product_count = #{productCount,jdbcType=BIGINT},
+      </if>
+      <if test="unitName != null">
+      actual_product_count = #{actualProductCount,jdbcType=BIGINT},
+      </if>
       <if test="lineCode != null">
         line_code = #{lineCode,jdbcType=BIGINT},
       </if>
@@ -235,6 +255,8 @@
       batch_remark = #{batchRemark,jdbcType=VARCHAR},
       unit_code = #{unitCode,jdbcType=VARCHAR},
       unit_name = #{unitName,jdbcType=VARCHAR},
+      product_count = #{productCount,jdbcType=BIGINT},
+      actual_product_count = #{actualProductCount,jdbcType=BIGINT},
       line_code = #{lineCode,jdbcType=BIGINT},
       use_status = #{useStatus,jdbcType=INTEGER},
       create_by_id = #{createById,jdbcType=VARCHAR},
@@ -279,6 +301,12 @@
     </if>
     <if test="unitName != null">
       #{unitName,jdbcType=VARCHAR},
+    </if>
+    <if test="productCount != null">
+      #{productCount,jdbcType=BIGINT},
+    </if>
+    <if test="actualProductCount != null">
+      #{actualProductCount,jdbcType=BIGINT},
     </if>
     <if test="lineCode != null">
       #{lineCode,jdbcType=BIGINT},

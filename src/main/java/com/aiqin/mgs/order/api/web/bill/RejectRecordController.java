@@ -1,7 +1,6 @@
 package com.aiqin.mgs.order.api.web.bill;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.domain.PurchaseInfo;
 import com.aiqin.mgs.order.api.domain.RejectRecordInfo;
 import com.aiqin.mgs.order.api.domain.request.bill.RejectRecordReq;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
@@ -16,13 +15,15 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
 
+/**
+ * 爱亲退供单 控制器
+ */
 @RestController
 @RequestMapping("/reject")
-@Api(tags = "退货相关操作接口")
+@Api(tags = "爱亲退供单")
 public class RejectRecordController {
     @Resource
     private RejectRecordService rejectRecordService;
-
 
     /**
      * 同步退供单

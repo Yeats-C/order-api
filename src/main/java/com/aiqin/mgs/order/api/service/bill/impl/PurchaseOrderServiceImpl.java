@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.service.bill.impl;
 import com.aiqin.mgs.order.api.component.enums.ErpLogOperationTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpLogStatusTypeEnum;
+import com.aiqin.mgs.order.api.dao.order.ErpOrderLogisticsDao;
 import com.aiqin.mgs.order.api.domain.PurchaseBanchInfo;
 import java.math.BigDecimal;
 
@@ -14,6 +15,7 @@ import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import org.slf4j.Logger;
@@ -22,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
 import java.text.SimpleDateFormat;
@@ -32,7 +35,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * 销售 实现类
+ * 爱亲采购单 实现类
  */
 @Service
 public class PurchaseOrderServiceImpl implements PurchaseOrderService {
@@ -54,6 +57,9 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     ErpOrderItemDao erpOrderItemDao;
     @Autowired
     OrderStoreDetailBatchDao orderStoreDetailBatchDao;
+    @Autowired
+    ErpOrderLogisticsDao erpOrderLogisticsDao;
+
     @Override
     public HttpResponse createPurchaseOrder(@Valid ErpOrderInfo erpOrderInfo) {
         LOGGER.info("同步采购单，erpOrderInfo{}", erpOrderInfo);
@@ -67,57 +73,60 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     }
 
     @Override
-    public HttpResponse<List<PurchaseInfo>> selectPurchaseInfo() {
-        LOGGER.info("耘链销售单回传");
-        ErpOrderInfo erpOrderInfo = new ErpOrderInfo();
-        //订单查询
-        List<ErpOrderInfo> resultErpOrderInfos = erpOrderInfoDao.select(erpOrderInfo);
+    @Transactional
+    public HttpResponse updatePurchaseInfo(List<PurchaseInfoVo> purchaseInfo) {
+        LOGGER.info("耘链销售单回传更新开始 参数purchaseInfo{}"+purchaseInfo);
+        try {
+        for (PurchaseInfoVo order : purchaseInfo) {
+            //更新订单
 
-        ErpOrderItem erpOrderItem = new ErpOrderItem();
-        //订单明细查询
-        List<ErpOrderItem> resultErpOrderItems = erpOrderItemDao.select(erpOrderItem);
+            PurchaseOrder purchaseOrder = new PurchaseOrder();
+            purchaseOrder.setPurchaseOrderCode(order.getOrderCode());
+            purchaseOrder.setActualTotalCount(order.getActualTotalCount());
+            purchaseOrder.setDeliveryTime(order.getDeliveryTime());
+            purchaseOrder.setContactPerson(order.getDeliveryPersionId());
+            //更新采购单
+            purchaseOrderDao.updateByPrimaryKeySelective(purchaseOrder);
 
-        OrderStoreDetailBatch orderStoreDetailBatch = new OrderStoreDetailBatch();
-        //订单批次明细查询（仓卡）
-        List<OrderStoreDetailBatch> resultOrderStoreDetailBatchs = orderStoreDetailBatchDao.select(orderStoreDetailBatch);
+            //更新订单明细
 
-        List<PurchaseInfo> listtPurchaseInfo = new ArrayList<>();
-        PurchaseInfo purchaseInfo = new PurchaseInfo();
-        for (ErpOrderInfo resultErpOrderInfo : resultErpOrderInfos){
-            purchaseInfo.setOrderCode(resultErpOrderInfo.getOrderStoreCode());
-            purchaseInfo.setActualTotalCount(resultErpOrderInfo.getActualProductCount());
-            purchaseInfo.setDeliveryTime(resultErpOrderInfo.getDeliveryTime());
-            purchaseInfo.setDeliveryPersionId(resultErpOrderInfo.getOrderStoreId());
-
-            //组装订单详情
-            List<PurchaseDetailInfo> listPurchaseDetailInfos = new ArrayList<>();
-            for(ErpOrderItem resultErpOrderItem : resultErpOrderItems){
-                for(PurchaseDetailInfo purchaseDetailInfo :purchaseInfo.getPurchaseDetailInfo()){
-                    purchaseDetailInfo.setActualToalCount(resultErpOrderItem.getActualProductCount());
-                    purchaseDetailInfo.setLineCode(resultErpOrderItem.getLineCode());
-                    purchaseDetailInfo.setSkuCode(resultErpOrderItem.getSkuCode());
-                    purchaseDetailInfo.setSkuName(resultErpOrderItem.getSkuName());
-                    listPurchaseDetailInfos.add(purchaseDetailInfo);
-                }
-                purchaseInfo.setPurchaseDetailInfo(listPurchaseDetailInfos);
+            //更新采购单明细
+            for(PurchaseDetailInfo orderDetail : order.getPurchaseDetailInfo()){
+                PurchaseOrderDetail purchaseOrderDetail = new PurchaseOrderDetail();
+                purchaseOrderDetail.setLineCode(orderDetail.getLineCode());
+                purchaseOrderDetail.setSkuCode(orderDetail.getSkuCode());
+                purchaseOrderDetail.setSkuName(orderDetail.getSkuName());
+                purchaseOrderDetail.setTotalCount(orderDetail.getActualToalCount());
+                purchaseOrderDetailDao.updateByPrimaryKeySelective(purchaseOrderDetail);
             }
 
-            //组装订单详情批次
-            List<PurchaseBanchInfo> listBanchPurchaseInfo = new ArrayList<>();
-            for(OrderStoreDetailBatch resultOrderStoreDetailBatch : resultOrderStoreDetailBatchs){
-                for(PurchaseBanchInfo banchPurchaseInfo : purchaseInfo.getPurchaseBanchInfo()){
-                    banchPurchaseInfo.setBatchCode(resultOrderStoreDetailBatch.getBatchCode());
-                    //banchPurchaseInfo.setActualToalCount();//实际销售数量
-                    banchPurchaseInfo.setBatchCode(resultOrderStoreDetailBatch.getSkuCode());
-                    banchPurchaseInfo.setSkuName(resultOrderStoreDetailBatch.getSkuName());
-                    banchPurchaseInfo.setLineCode(resultOrderStoreDetailBatch.getLineCode());
-                    banchPurchaseInfo.setProductDate(resultOrderStoreDetailBatch.getProductDate());
+            //添加销售明细批次
+            if (order.getPurchaseBanchInfo() != null && order.getPurchaseBanchInfo().size() > 0) {
+                for (PurchaseBanchInfo orderDetailBanch : order.getPurchaseBanchInfo()) {
+                    OrderStoreDetailBatch orderStoreDetailBatch = new OrderStoreDetailBatch();
+                    orderStoreDetailBatch.setLineCode(orderDetailBanch.getLineCode());
+                    orderStoreDetailBatch.setBatchCode(orderDetailBanch.getBatchCode());
+                    orderStoreDetailBatch.setSkuCode(orderDetailBanch.getSkuCode());
+                    orderStoreDetailBatch.setSkuName(orderDetailBanch.getSkuName());
+                    orderStoreDetailBatch.setProductDate(orderDetailBanch.getProductDate());
+                    //orderDetailBanch.getActualToalCount()
+                    orderStoreDetailBatchDao.updateByPrimaryKeySelective(orderStoreDetailBatch);
                 }
-                purchaseInfo.setPurchaseBanchInfo(listBanchPurchaseInfo);
             }
-            listtPurchaseInfo.add(purchaseInfo);
+            LOGGER.info("耘链销售单回传,销售单单号为DeliveryPersionId："+order.getDeliveryPersionId()+"的更新成功");
         }
-        return HttpResponse.success(listtPurchaseInfo);
+        return HttpResponse.success();
+        } catch (Exception e) {
+            LOGGER.error("耘链销售单回传更新失败 {}", e);
+            return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
+        }
+    }
+
+    @Override
+    public HttpResponse updateOrderStoreLogistics(List<DeliveryInfoVo> deliveryInfoVo) {
+        ErpOrderLogistics erpOrderLogistics = new ErpOrderLogistics();
+        erpOrderLogisticsDao.select(erpOrderLogistics);
+        return null;
     }
 
     /**
@@ -134,30 +143,34 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 LOGGER.info("开始同步采购单，参数为：erpOrderInfo{}", erpOrderInfo);
                 addPurchaseOrder(erpOrderInfo);
                 LOGGER.info("同步采购单完成");
-                //添加操作日志
-                LOGGER.info("开始添加同步采购单,操作日志");
-                addPurchaseOrderLog(erpOrderInfo);
-                LOGGER.info("添加同步采购单,操作日志结束");
 
                 //添加采购商品信息
                 LOGGER.info("开始同步采购单商品详情，erpOrderInfo{}", erpOrderInfo);
                 addPurchaseOrderDetail(erpOrderInfo);
                 LOGGER.info("同步采购单商品详结束");
-                //添加操作日志
-                LOGGER.info("开始开始添加同步采购单商品详，操作日志");
-                addPurchaseOrderDetailLog(erpOrderInfo);
-                LOGGER.info("开始添加同步采购单商品详，操作日志结束");
+
+                //修改订单同步状态
+                updateOrderSuccess(erpOrderInfo);
 
                 //根据爱亲采购单，生成耘链销售单
                 LOGGER.info("开始根据爱亲采购单，生成耘链销售单，参数为：erpOrderInfo{}", erpOrderInfo);
                 createSaleOrder(erpOrderInfo);
                 LOGGER.info("根据爱亲采购单，生成耘链销售单结束");
+
                 //添加操作日志
-                LOGGER.info("开始根据爱亲采购单，生成耘链销售单，添加操作日志");
-                createSaleOrderLog(erpOrderInfo);
-                LOGGER.info("开始根据爱亲采购单，生成耘链销售单，添加操作日志结束");
+                LOGGER.info("根据订单生产爱亲采购单，添加操作日志开始···");
+                addPurchaseOrderLog(erpOrderInfo);
+                LOGGER.info("根据订单生产爱亲采购单，添加操作日志结束···");
             }
         });
+    }
+
+    /**
+     * 修改订单同步状态
+     * @param erpOrderInfo
+     */
+    private void updateOrderSuccess(ErpOrderInfo erpOrderInfo) {
+        erpOrderInfoDao.updateOrderSuccess(erpOrderInfo.getOrderStoreId());
     }
 
     /**
@@ -227,6 +240,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         purchaseOrder.setUpdateByName(erpOrderInfo.getUpdateByName());
         purchaseOrder.setCreateTime(erpOrderInfo.getCreateTime());
         purchaseOrder.setUpdateTime(erpOrderInfo.getUpdateTime());
+
         purchaseOrderDao.insertSelective(purchaseOrder);
     }
 
@@ -275,6 +289,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             purchaseOrderDetail.setCreateTime(item.getCreateTime());
             purchaseOrderDetail.setUpdateTime(item.getUpdateTime());
             purchaseOrderDetailList.add(purchaseOrderDetail);
+
             purchaseOrderDetailDao.insertSelective(purchaseOrderDetail);
         }
     }
@@ -290,52 +305,20 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         //调用销售单 TODO
     }
 
-
     /**
-     * 添加同步采购单,操作日志
+     * 根据订单生成爱亲采购单,添加操作日志
      * @param erpOrderInfo
      */
     private void addPurchaseOrderLog(ErpOrderInfo erpOrderInfo) {
-        OperationLog operationLog = addOperationLog();
+        OperationLog operationLog = insertSelective();
         operationLog.setOperationCode(erpOrderInfo.getOrderStoreCode());//来源编码
-        operationLog.setOperationContent("添加同步采购单");//日志内容
+        operationLog.setOperationContent("根据订单生成爱亲采购单");//日志内容
         operationLog.setRemark("");//备注
 
         operationLogDao.insertSelective(operationLog);
     }
 
-    /**
-     * 开始添加同步采购单商品详，操作日志
-     * @param erpOrderInfo
-     */
-    private void addPurchaseOrderDetailLog(ErpOrderInfo erpOrderInfo) {
-        OperationLog operationLog = addOperationLog();
-        operationLog.setOperationCode(erpOrderInfo.getOrderStoreCode());//来源编码
-        operationLog.setOperationContent("添加同步采购单商品详");//日志内容
-        operationLog.setRemark("");//备注
-
-        operationLogDao.insertSelective(operationLog);
-    }
-
-    /**
-     * 根据爱亲采购单，生成耘链销售单，添加操作日志
-     * @param erpOrderInfo
-     */
-    private void createSaleOrderLog(ErpOrderInfo erpOrderInfo) {
-        OperationLog operationLog = addOperationLog();
-        operationLog.setOperationCode(erpOrderInfo.getOrderStoreCode());//来源编码
-        operationLog.setOperationContent("根据爱亲采购单，生成耘链销售单");//日志内容
-        operationLog.setRemark("");//备注
-
-        operationLogDao.insertSelective(operationLog);
-    }
-
-    /**
-     * 添加操作日志
-     *
-     * @param
-     */
-    private OperationLog addOperationLog() {
+    private OperationLog insertSelective() {
         OperationLog operationLog = new OperationLog();
         ErpLogSourceTypeEnum purchase =  ErpLogSourceTypeEnum.PURCHASE;
         operationLog.setOperationType(purchase.getCode());//日志类型 0 .新增 1.修改 2.删除 3.下载

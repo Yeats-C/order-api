@@ -1,7 +1,8 @@
 package com.aiqin.mgs.order.api.web.bill;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.domain.PurchaseInfo;
+import com.aiqin.mgs.order.api.domain.DeliveryInfoVo;
+import com.aiqin.mgs.order.api.domain.PurchaseInfoVo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
 import io.swagger.annotations.Api;
@@ -15,9 +16,12 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
 
+/**
+ * 爱亲采购单 控制器
+ */
 @RestController
 @RequestMapping("/purchase")
-@Api(tags = "同步采购单")
+@Api(tags = "爱亲采购单")
 public class PurchaseOrderController {
 
     @Resource
@@ -40,7 +44,16 @@ public class PurchaseOrderController {
      */
     @PostMapping("info")
     @ApiOperation(value = "耘链销售单回传")
-    public HttpResponse<List<PurchaseInfo>> selectPurchaseInfo() {
-        return purchaseOrderService.selectPurchaseInfo();
+    public HttpResponse updatePurchaseInfo(List<PurchaseInfoVo> purchaseInfoVo) {
+        return purchaseOrderService.updatePurchaseInfo(purchaseInfoVo);
+    }
+
+    /**
+     * 发运单回传
+     */
+    @PostMapping("istics")
+    @ApiOperation(value = "发运单回传")
+    public HttpResponse updateOrderStoreLogistics(List<DeliveryInfoVo> deliveryInfoVo) {
+        return purchaseOrderService.updateOrderStoreLogistics(deliveryInfoVo);
     }
 }
