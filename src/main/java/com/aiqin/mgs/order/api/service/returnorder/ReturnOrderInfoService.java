@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.service.returnorder;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
@@ -114,5 +115,12 @@ public interface ReturnOrderInfoService {
      * @return
      */
     HttpResponse getEvidenceUrl(String returnOrderDetailId);
+
+    /**
+     * 发起冲减单并发起退款---订单使用
+     * @param orderCode
+     * @return
+     */
+    HttpResponse saveWriteDownOrder(String orderCode, AuthToken auth);
 
 }

@@ -17,8 +17,8 @@ import java.math.BigDecimal;
 @Data
 public class WriteDownOrderDetail implements Serializable {
 
-//    @ApiModelProperty(value="订单详情业务id")
-//    private String orderInfoDetailId;
+    @ApiModelProperty(value="订单详情业务id")
+    private String orderInfoDetailId;
 
 //    @ApiModelProperty(value="分摊总价价")
 //    private BigDecimal totalAmount;
@@ -29,11 +29,15 @@ public class WriteDownOrderDetail implements Serializable {
     @ApiModelProperty(value="行号")
     private Long lineCode;
 
-    @ApiModelProperty(value="退款数量")
-    private Long returnAmount;
+//    @ApiModelProperty(value="退款数量")
+//    private Long returnAmount;
 
 //    @ApiModelProperty(value="商品总数量")
 //    private Long productAmount;
 
 
+    public WriteDownOrderDetail(String orderInfoDetailId, Long lineCode) {
+        this.orderInfoDetailId = orderInfoDetailId;
+        this.lineCode = lineCode;
+    }
 }

@@ -59,7 +59,7 @@ public class ReturnOrderInfo {
     @ApiModelProperty(value = "订单类型 0直送、1配送、2辅采")
     private Integer orderType;
 
-    @ApiModelProperty(value = "退货类型  0客户退货、1缺货退货、2售后退货")
+    @ApiModelProperty(value = "退货类型  0客户退货、1缺货退货、2售后退货、3冲减单")
     private Integer returnOrderType;
 
     @ApiModelProperty(value = "客户编码")

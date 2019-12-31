@@ -6,6 +6,7 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
+import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,9 @@ public class ReturnOrderInfoController {
 
     @Resource
     private ReturnOrderInfoService returnOrderInfoService;
+
+    @Resource
+    private ErpOrderQueryService erpOrderQueryService;
 
     @ApiOperation("新增退货信息")
     @PostMapping("/add")
@@ -124,5 +128,12 @@ public class ReturnOrderInfoController {
     public HttpResponse getEvidenceUrl(String returnOrderDetailId) {
         return returnOrderInfoService.getEvidenceUrl(returnOrderDetailId);
     }
+
+    @ApiOperation("退货单列表--查看附件")
+    @GetMapping("/getEvidesnceUrl")
+    public HttpResponse getEvidesnceUrl(String returnOrderDetailId) {
+        return HttpResponse.success(erpOrderQueryService.getOrderAndItemByOrderCode(returnOrderDetailId));
+    }
+
 
 }
