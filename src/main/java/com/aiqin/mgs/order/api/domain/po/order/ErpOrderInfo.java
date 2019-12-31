@@ -96,6 +96,10 @@ public class ErpOrderInfo {
     @JsonProperty("order_status")
     private Integer orderStatus;
 
+    @ApiModelProperty(value = "订单节点控制状态")
+    @JsonProperty("order_node_status")
+    private Integer orderNodeStatus;
+
     @ApiModelProperty(value = "订单状态描述")
     @JsonProperty("order_status_desc")
     private String orderStatusDesc;
