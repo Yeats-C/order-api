@@ -238,14 +238,12 @@
                 and d.order_type = #{orderType,jdbcType=VARCHAR}
             </if>
             <if test="beginTime!=null">
-                and TO_DAYS(#{d.beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(create_time)
+                and TO_DAYS(#{beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(a.create_time)
             </if>
             <if test="finishTime!=null">
-                and TO_DAYS(#{d.finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(create_time)
+                and TO_DAYS(#{finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(a.create_time)
             </if>
-            <if test="queryTime!=null">
-                and TO_DAYS(#{d.queryTime,jdbcType=TIMESTAMP}) = TO_DAYS(create_time)
-            </if>
+
         </where>
         order by d.id desc
         limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
@@ -281,13 +279,10 @@
                 and d.order_type = #{orderType,jdbcType=VARCHAR}
             </if>
             <if test="beginTime!=null">
-                and TO_DAYS(#{d.beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(create_time)
+                and TO_DAYS(#{beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(a.create_time)
             </if>
             <if test="finishTime!=null">
-                and TO_DAYS(#{d.finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(create_time)
-            </if>
-            <if test="queryTime!=null">
-                and TO_DAYS(#{d.queryTime,jdbcType=TIMESTAMP}) = TO_DAYS(create_time)
+                and TO_DAYS(#{finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(a.create_time)
             </if>
         </where>
     </select>

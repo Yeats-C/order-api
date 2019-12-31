@@ -73,7 +73,17 @@ public interface ResultCode {
 
     MessageId OPT_ERROR = MessageId.create(Project.ZERO, 28, "操作失败");
 
-    MessageId PAY_ERROR = MessageId.create(Project.PAYMENT_API, 1, "回调失败");
+    MessageId PAY_ERROR = MessageId.create(Project.PAYMENT_API, 1, "支付中心---发起退款单回调失败");
+
+    MessageId RETURN_AMOUNT_ERROR = MessageId.create(Project.PAYMENT_API, 2, "退货金额计算失败--未查到此商品订单");
+
+    MessageId RETURN_NUM_WRONG_ERROR = MessageId.create(Project.PAYMENT_API, 3, "退货金额计算失败--退货数量输入有误");
+
+    MessageId RETURN_ACUNUM_WRONG_ERROR = MessageId.create(Project.PAYMENT_API, 4, "退货金额计算失败--订单中实收数量（门店）为null");
+
+    MessageId RETURN_PRE_AMOUNT_ERROR = MessageId.create(Project.PAYMENT_API, 5, "退货金额计算失败--订单中分摊后单价为null");
+
+    MessageId RETURN_TOTAL_AMOUNT_ERROR = MessageId.create(Project.PAYMENT_API, 5, "退货金额计算失败--优惠分摊总金额为null");
 
     
     /** 黄祉壹   2018-11-05 结束     */

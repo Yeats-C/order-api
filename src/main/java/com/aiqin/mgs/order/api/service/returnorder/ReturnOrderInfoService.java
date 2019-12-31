@@ -1,8 +1,14 @@
 package com.aiqin.mgs.order.api.service.returnorder;
 
+import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * description: ReturnOrderInfoService
@@ -57,13 +63,9 @@ public interface ReturnOrderInfoService {
 
     /**
      * 获取物流单信息（向爱掌柜提供接口）
-     * @param returnOrderCode
-     * @param logisticsCompanyCode
-     * @param logisticsCompanyName
-     * @param logisticsNo
      * @return
      */
-    Boolean updateLogistics(String returnOrderCode,String logisticsCompanyCode,String logisticsCompanyName,String logisticsNo);
+    Boolean updateLogistics(LogisticsVo logisticsVo);
 
     /**
      * 支付中心---发起退款单回调
@@ -84,4 +86,26 @@ public interface ReturnOrderInfoService {
      * @return
      */
     ReturnOrderDetailVO detail(String returnOrderCode);
+
+    /**
+     *售后管理--退货单列表
+     * @param searchVo
+     * @return
+     */
+    PageResData<ReturnOrderInfo> getlist(PageRequestVO<AfterReturnOrderSearchVo> searchVo);
+
+    /**
+     * 发起退货---根据订单id和和行号计算商品金额
+     * @param orderCode
+     * @param lineCode
+     * @return
+     */
+    HttpResponse getAmount(String orderCode, Long lineCode, Long number);
+
+    /**
+     * erp售后管理--退货单状态
+     * @return
+     */
+    HttpResponse getReturnStatus();
+
 }

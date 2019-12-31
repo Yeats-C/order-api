@@ -46,11 +46,11 @@ public class PurchaseOrder implements Serializable {
     @ApiModelProperty(value = "结算方式名称")
     private String settlementMethodName;
     @ApiModelProperty(value = "采购单状态  0.待审核 1.审核中 2.审核通过  3.备货确认 4.发货确认  5.入库开始 6.入库中 7.已入库  8.完成 9.取消 10.审核不通过")
-    private Boolean purchaseOrderStatus;
+    private Integer purchaseOrderStatus;
     @ApiModelProperty(value = "采购方式 0. 铺采直送  1.配送")
-    private Boolean purchaseMode;
+    private Integer purchaseMode;
     @ApiModelProperty(value = "采购单类型   0手动，1.自动")
-    private Boolean purchaseType;
+    private Integer purchaseType;
     @ApiModelProperty(value = "最小单位数量")
     private Long totalCount;
     @ApiModelProperty(value = "商品含税总金额")
@@ -64,7 +64,7 @@ public class PurchaseOrder implements Serializable {
     @ApiModelProperty(value = "取消备注")
     private String cancelRemark;
     @ApiModelProperty(value = "0. 启用   1.禁用")
-    private Boolean useStatus;
+    private Integer useStatus;
     @ApiModelProperty(value = "负责人")
     private String chargePerson;
     @ApiModelProperty(value = "账户编码")
@@ -98,7 +98,7 @@ public class PurchaseOrder implements Serializable {
     @ApiModelProperty(value = "付款方式名称")
     private String paymentName;
     @ApiModelProperty(value = "付款期")
-    private Long paymentTime;
+    private Date paymentTime;
     @ApiModelProperty(value = "预付付款金额")
     private BigDecimal preAmount;
     @ApiModelProperty(value = "备注")
@@ -106,7 +106,7 @@ public class PurchaseOrder implements Serializable {
     @ApiModelProperty(value = "来源单号")
     private String sourceCode;
     @ApiModelProperty(value = "来源类型")
-    private Boolean sourceType;
+    private Integer sourceType;
     @ApiModelProperty(value = "创建人编码")
     private String createById;
     @ApiModelProperty(value = "创建人名称")

@@ -12,6 +12,7 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import lombok.Data;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -21,7 +22,12 @@ import io.swagger.annotations.ApiModelProperty;
 
 
 @Api("封装参数-商品总库菜单-统计商品在各个渠道的订单数..")
+@Data
 public class ProdisorRequest {
+
+	@ApiModelProperty(value = "门店id")
+	@JsonProperty("store_id")
+	private String storeId;
 
 	@ApiModelProperty("skuidlist")
     @JsonProperty("sku_list")
