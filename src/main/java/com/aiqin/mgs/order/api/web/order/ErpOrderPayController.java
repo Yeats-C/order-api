@@ -48,7 +48,7 @@ public class ErpOrderPayController {
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
-            erpOrderPayService.orderPay(erpOrderPayRequest);
+//            erpOrderPayService.orderPay(erpOrderPayRequest);
         } catch (BusinessException e) {
             logger.error("订单支付异常：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));

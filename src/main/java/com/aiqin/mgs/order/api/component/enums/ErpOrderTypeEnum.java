@@ -14,22 +14,26 @@ import lombok.Getter;
 public enum ErpOrderTypeEnum {
 
     /***直送*/
-    DIRECT_SEND(0, "0", "直送",ErpRequestPayOriginTypeEnum.TYPE_11),
+    DIRECT_SEND(0, "0", "直送", 11, 2),
     /***配送*/
-    DISTRIBUTION(1, "1", "配送",ErpRequestPayOriginTypeEnum.TYPE_7),
+    DISTRIBUTION(1, "1", "配送", 7, 14),
     /***辅采直送*/
-    ASSIST_PURCHASING(2, "2", "辅采直送", ErpRequestPayOriginTypeEnum.TYPE_7);
+    ASSIST_PURCHASING(2, "2", "辅采直送", 7, 14);
 
     private Integer code;
     private String value;
     private String desc;
-    private ErpRequestPayOriginTypeEnum payOriginType;
+    /***发起支付参数支付来源*/
+    private Integer payOriginType;
+    /***发起支付参数订单类型*/
+    private Integer payOrderType;
 
-    ErpOrderTypeEnum(Integer code, String value, String desc, ErpRequestPayOriginTypeEnum payOriginType) {
+    ErpOrderTypeEnum(Integer code, String value, String desc, Integer payOriginType, Integer payOrderType) {
         this.code = code;
         this.value = value;
         this.desc = desc;
         this.payOriginType = payOriginType;
+        this.payOrderType = payOrderType;
     }
 
     /**

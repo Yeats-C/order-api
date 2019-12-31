@@ -50,7 +50,7 @@ public class PurchaseOrderDetail implements Serializable {
     @ApiModelProperty(value = "单位名称")
     private String unitName;
     @ApiModelProperty(value = "商品类型   0商品 1赠品 2实物返回")
-    private Boolean productType;
+    private Integer productType;
     @ApiModelProperty(value = "采购件数（整数）")
     private Long purchaseWhole;
     @ApiModelProperty(value = "采购件数（零数）")
@@ -74,7 +74,7 @@ public class PurchaseOrderDetail implements Serializable {
     @ApiModelProperty(value = "实际含税总价")
     private BigDecimal actualTotalTaxAmount;
     @ApiModelProperty(value = "0. 启用   1.禁用")
-    private Boolean useStatus;
+    private String useStatus;
     @ApiModelProperty(value = "创建人编码")
     private String createById;
     @ApiModelProperty(value = "创建人名称")

@@ -1,10 +1,8 @@
 package com.aiqin.mgs.order.api.service.order;
 
-import com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.domain.AuthToken;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
-import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayCallbackRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
 import com.aiqin.mgs.order.api.domain.request.order.PayCallbackRequest;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPayResultResponse;
@@ -55,27 +53,24 @@ public interface ErpOrderPayService {
      */
     void updateOrderPaySelective(ErpOrderPay po, AuthToken auth);
 
+    //发起支付或者创建订单自动发起支付时调用
+    void orderPayStartMethodGroup(ErpOrderPayRequest erpOrderPayRequest, AuthToken auth, boolean authCheck);
+
+    //轮询成功或者回调成功调用
+    void orderPaySuccessMethodGroup(String orderCode, AuthToken auth);
+
     /**
      * 订单支付
      *
      * @param erpOrderPayRequest
+     * @param auth
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/10 9:47
      */
-    void orderPay(ErpOrderPayRequest erpOrderPayRequest);
+    void orderPay(ErpOrderPayRequest erpOrderPayRequest, AuthToken auth, boolean autoCheck);
 
-    /**
-     * 自动发起支付
-     *
-     * @param orderId
-     * @return void
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/12/19 17:02
-     */
-    void autoPay(String orderId);
 
     /**
      * 查询订单支付结果
@@ -91,13 +86,41 @@ public interface ErpOrderPayService {
     /**
      * 轮询查询支付结果
      *
-     * @param payId 支付id
+     * @param orderCode 订单号
+     * @param auth      操作人
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/10 9:48
      */
-    void payPolling(String payId);
+    void orderPayPolling(String orderCode, AuthToken auth);
+
+    /**
+     * 完成支付状态
+     *
+     * @param orderCode     订单号
+     * @param payCode       支付流水号
+     * @param payStatusEnum 支付结果
+     * @param auth          操作人
+     * @param manual        是否人工操作
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/30 14:49
+     */
+    void endOrderPay(String orderCode, String payCode, ErpPayStatusEnum payStatusEnum, AuthToken auth, boolean manual);
+
+    /**
+     * 支付成功后获取物流券
+     *
+     * @param orderCode 订单号
+     * @param auth      操作人
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/30 15:10
+     */
+    void getGoodsCoupon(String orderCode, AuthToken auth);
 
     /**
      * 支付回调方法
@@ -109,18 +132,6 @@ public interface ErpOrderPayService {
      * @date 2019/12/10 9:48
      */
     void orderPayCallback(PayCallbackRequest payCallbackRequest);
-
-    /**
-     * 支付完成后续处理
-     *
-     * @param payId  支付id
-     * @param manual 是否人工操作
-     * @return java.lang.String
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/12/10 9:48
-     */
-    String endPay(String payId, ErpPayStatusEnum payStatusEnum, boolean manual);
 
     /**
      * 查询确认收款信息
@@ -147,13 +158,13 @@ public interface ErpOrderPayService {
     /**
      * 订单超时未支付取消订单
      *
-     * @param erpOrderPayRequest
+     * @param orderCode 订单号
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/10 9:49
      */
-    void orderTimeoutUnpaid(ErpOrderPayRequest erpOrderPayRequest);
+    void orderTimeoutUnpaid(String orderCode);
 
     /**
      * 发起支付物流费用

@@ -3,26 +3,19 @@ package com.aiqin.mgs.order.api.service.impl.order;
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
-import com.aiqin.mgs.order.api.component.enums.ErpOrderLockStockTypeEnum;
-import com.aiqin.mgs.order.api.component.enums.ErpOrderTypeEnum;
-import com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum;
-import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOrderSourceEnum;
-import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.*;
+import com.aiqin.mgs.order.api.component.enums.pay.*;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
+import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.ProductInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
+import com.aiqin.mgs.order.api.domain.po.order.*;
 import com.aiqin.mgs.order.api.domain.request.order.PayRequest;
 import com.aiqin.mgs.order.api.domain.response.ProductSkuDetailResponse;
-import com.aiqin.mgs.order.api.domain.response.order.ErpOrderGoodsCouponResponse;
-import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
-import com.aiqin.mgs.order.api.domain.response.order.StoreFranchiseeInfoResponse;
+import com.aiqin.mgs.order.api.domain.response.order.*;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
-import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 @Service
@@ -42,6 +36,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public StoreInfo getStoreInfoByStoreId(String storeId) {
+        //TODO CT 临时测试使用门店
         storeId = "3604f41aba22481da201e0c3d7a7451a";
         StoreInfo storeInfo = new StoreInfo();
         try {
@@ -69,11 +64,13 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public ProductInfo getSkuDetail(String companyCode, String skuCode) {
+
+        //TODO CT 临时测试使用
         companyCode = "01";
         skuCode = "102423";
 
         String url = urlProperties.getProductApi() + "/search/spu/sku/detail";
-        url += "?company_code="+companyCode;
+        url += "?company_code=" + companyCode;
         url += "&sku_code=" + skuCode;
         ProductInfo product = new ProductInfo();
         try {
@@ -120,108 +117,176 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     }
 
     @Override
-    public void lockStockInSupplyChain(ErpOrderInfo order) {
+    public boolean lockStockInSupplyChain(ErpOrderInfo order, AuthToken auth) {
 
+        boolean flag = true;
+        try {
+
+//            List<Map<String, Object>> list = new ArrayList<>();
+//            for (ErpOrderItem item :
+//                    order.getItemList()) {
+//                Map<String, Object> paramItemMap = new HashMap<>(16);
+//                paramItemMap.put("change_count", item.getProductCount());
+//                paramItemMap.put("city_code", order.getCityId());
+//                paramItemMap.put("province_code", order.getProvinceId());
+//                paramItemMap.put("sku_code", item.getSkuCode());
+//                list.add(paramItemMap);
+//            }
+//            Map<String, Object> paramMap = new HashMap<>();
+//            paramMap.put("company_code", order.getCompanyCode());
+//            paramMap.put("company_name", order.getCompanyName());
+//            paramMap.put("operation_person_id", auth.getPersonId());
+//            paramMap.put("operation_person_name", auth.getPersonName());
+//            paramMap.put("operation_type", ErpOrderLockStockTypeEnum.LOCK.getCode());
+//            paramMap.put("order_code", order.getOrderStoreCode());
+//            paramMap.put("order_type", order.getOrderTypeCode());
+//            paramMap.put("detail_list", list);
+
+            Map<String, Object> paramItemMap1 = new HashMap<>(16);
+            paramItemMap1.put("change_count", 10);
+            paramItemMap1.put("city_code", "1001");
+            paramItemMap1.put("province_code", "1001");
+            paramItemMap1.put("sku_code", "102423");
+            List<Map<String, Object>> list = new ArrayList<>();
+            list.add(paramItemMap1);
+
+
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("company_code", "01");
+            paramMap.put("company_name", "北京爱亲科技股份有限公司");
+            paramMap.put("operation_person_id", "12345");
+            paramMap.put("operation_person_name", "张三");
+            paramMap.put("operation_type", 1);
+            paramMap.put("order_code", "20191228000001");
+            paramMap.put("order_type", 1);
+            paramMap.put("detail_list", list);
+
+            System.out.println(JSON.toJSON(paramMap));
+
+            HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/lock/info").json(paramMap);
+            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
+            });
+
+            if (!RequestReturnUtil.validateHttpResponse(response)) {
+                throw new BusinessException(response.getMessage());
+            }
+        } catch (BusinessException e) {
+            flag = false;
+            logger.error("锁定库存失败：{}", e.getMessage());
+        } catch (Exception e) {
+            flag = false;
+            logger.error("锁定库存失败：{}", e);
+        }
+        return flag;
     }
 
     @Override
-    public void unlockStockInSupplyChain(ErpOrderInfo order, ErpOrderLockStockTypeEnum orderLockStockTypeEnum) {
+    public boolean unlockStockInSupplyChain(ErpOrderInfo order, ErpOrderLockStockTypeEnum orderLockStockTypeEnum, AuthToken auth) {
 
-        String personId = "";
-        String personName = "";
+        boolean flag = true;
+        try {
 
-        String url = urlProperties.getProductApi() + "/stock/change";
+//            List<Map<String, Object>> list = new ArrayList<>();
+//            for (ErpOrderItem item :
+//                    order.getItemList()) {
+//                Map<String, Object> paramItemMap = new HashMap<>(16);
+//                paramItemMap.put("change_count", item.getProductCount());
+//                paramItemMap.put("city_code", order.getCityId());
+//                paramItemMap.put("province_code", order.getProvinceId());
+//                paramItemMap.put("sku_code", item.getSkuCode());
+//                list.add(paramItemMap);
+//            }
+//            Map<String, Object> paramMap = new HashMap<>();
+//            paramMap.put("company_code", order.getCompanyCode());
+//            paramMap.put("company_name", order.getCompanyName());
+//            paramMap.put("operation_person_id", auth.getPersonId());
+//            paramMap.put("operation_person_name", auth.getPersonName());
+//            paramMap.put("operation_type", orderLockStockTypeEnum.getCode());
+//            paramMap.put("order_code", order.getOrderStoreCode());
+//            paramMap.put("order_type", order.getOrderTypeCode());
+//            paramMap.put("detail_list", list);
+//
+            Map<String, Object> paramItemMap1 = new HashMap<>(16);
+            paramItemMap1.put("change_count", 10);
+            paramItemMap1.put("city_code", "1001");
+            paramItemMap1.put("province_code", "1001");
+            paramItemMap1.put("sku_code", "102423");
+            List<Map<String, Object>> list = new ArrayList<>();
+            list.add(paramItemMap1);
 
-        Map<String, Object> paramMap = new HashMap<>(16);
-        paramMap.put("operation_person_id", personId);
-        paramMap.put("operation_person_name", personName);
-        paramMap.put("order_code", order.getOrderStoreCode());
-//        paramMap.put("order_type", null);
-        paramMap.put("order_vo", order.getOrderStoreCode());
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("company_code", "01");
+            paramMap.put("company_name", "北京爱亲科技股份有限公司");
+            paramMap.put("operation_person_id", "12345");
+            paramMap.put("operation_person_name", "张三");
+            paramMap.put("operation_type", 1);
+            paramMap.put("order_code", "20191228000001");
+            paramMap.put("order_type", 3);
+            paramMap.put("detail_list", list);
 
-        List<Map<String, Object>> list = new ArrayList<>();
-        for (ErpOrderItem item :
-                order.getItemList()) {
+            System.out.println(JSON.toJSON(paramMap));
 
-            Map<String, Object> map = new HashMap<>();
-            map.put("company_code", item.getCompanyCode());
-            map.put("company_name", item.getCompanyName());
-//            map.put("new_delivery_code", null);
-//            map.put("new_delivery_name", null);
-//            map.put("new_purchase_amount", null);
-//            map.put("purchase_group_code", null);
-//            map.put("purchase_group_name", null);
-            map.put("sku_code", item.getSkuCode());
-            map.put("sku_name", item.getSkuName());
-            map.put("tax_rate", item.getTaxRate());
-            map.put("transport_center_code", null);
-            map.put("transport_center_name", null);
-            map.put("warehouse_code", null);
-            map.put("warehouse_name", null);
-            map.put("warehouse_type", null);
+            HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/unlock/info").json(paramMap);
+            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
+            });
 
-
+            if (!RequestReturnUtil.validateHttpResponse(response)) {
+                throw new BusinessException(response.getMessage());
+            }
+        } catch (BusinessException e) {
+            flag = false;
+            logger.error("解锁库存失败：{}", e.getMessage());
+        } catch (Exception e) {
+            flag = false;
+            logger.error("解锁库存失败：{}", e);
         }
 
-//        {
-//            "operation_person_id": "string",
-//                "operation_person_name": "string",
-//                "operation_type": 0,
-//                "order_code": "string",
-//                "order_type": 0,
-//                "stock_vo": [
-//            {
-//                "change_count": 0,
-//                    "company_code": "string",
-//                    "company_name": "string",
-//                    "new_delivery_code": "string",
-//                    "new_delivery_name": "string",
-//                    "new_purchase_amount": 0,
-//                    "purchase_group_code": "string",
-//                    "purchase_group_name": "string",
-//                    "sku_code": "string",
-//                    "sku_name": "string",
-//                    "tax_rate": 0,
-//                    "transport_center_code": "string",
-//                    "transport_center_name": "string",
-//                    "warehouse_code": "string",
-//                    "warehouse_name": "string",
-//                    "warehouse_type": "string"
-//            }
-//  ]
-//        }
-
-
+        return flag;
     }
 
     @Override
-    public ErpOrderPayStatusResponse getOrderPayStatus(String payId) {
-        ErpOrderPayStatusResponse response = new ErpOrderPayStatusResponse();
-        response.setOrderCode(payId);
+    public ErpOrderPayStatusResponse getOrderPayStatus(String orderCode) {
+        ErpOrderPayStatusResponse payStatusResponse = new ErpOrderPayStatusResponse();
+        payStatusResponse.setOrderCode(orderCode);
+        payStatusResponse.setRequestSuccess(false);
         try {
-            //TODO CT 请求支付中心接口查询订单支付状态
-//            Map<String, Object> paramMap = new HashMap<>();
-//            HttpClient httpClient = HttpClient.post(urlProperties.getPaymentApi() + "/test").json(paramMap);
-//            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
-//            });
-            response.setPayCode(OrderPublic.getUUID());
-            response.setPayStatusEnum(ErpPayStatusEnum.SUCCESS);
+            //请求支付中心接口查询订单支付状态
+            HttpClient httpClient = HttpClient.get(urlProperties.getPaymentApi() + "/payment/pay/searchPayOrder");
+//            httpClient.addParameter("orderNo", orderCode);
+            httpClient.addParameter("orderNo", "20191226191116542103");
+            HttpResponse<ErpPayPollingResponse> httpResponse = httpClient.action().result(new TypeReference<HttpResponse<ErpPayPollingResponse>>() {
+            });
+
+            if (RequestReturnUtil.validateHttpResponse(httpResponse)) {
+                ErpPayPollingResponse data = httpResponse.getData();
+                payStatusResponse.setRequestSuccess(true);
+                ErpPayPollingBackStatusEnum payPollingBackStatusEnum = ErpPayPollingBackStatusEnum.getEnum(data.getOrderStatus());
+                if (payPollingBackStatusEnum == ErpPayPollingBackStatusEnum.STATUS_0) {
+                    payStatusResponse.setPayStatusEnum(ErpPayStatusEnum.PAYING);
+                } else if (payPollingBackStatusEnum == ErpPayPollingBackStatusEnum.STATUS_1) {
+                    payStatusResponse.setPayStatusEnum(ErpPayStatusEnum.SUCCESS);
+                    payStatusResponse.setPayCode(data.getPayNum());
+                } else {
+                    payStatusResponse.setPayStatusEnum(ErpPayStatusEnum.FAIL);
+                }
+            }
+
         } catch (Exception e) {
-            response.setRequestSuccess(false);
             logger.error("获取订单支付状态失败：{}", e);
         }
-        return response;
+        return payStatusResponse;
     }
 
     @Override
-    public boolean sendOrderPayRequest(ErpOrderInfo order, ErpOrderPay orderPay) {
-        boolean flag = false;
+    public boolean sendOrderPayRequest(ErpOrderInfo order, ErpOrderFee orderFee) {
+        boolean flag = true;
         try {
 
-            ErpOrderTypeEnum orderTypeEnum = ErpOrderTypeEnum.getEnum(order.getOrderStoreId());
+            ErpOrderTypeEnum orderTypeEnum = ErpOrderTypeEnum.getEnum(order.getOrderTypeCode());
+            ErpOrderCategoryEnum orderCategoryEnum = ErpOrderCategoryEnum.getEnum(order.getOrderCategoryCode());
             PayRequest payRequest = new PayRequest();
             payRequest.setOrderNo(order.getOrderStoreCode());
-            payRequest.setOrderAmount(2000L);
+            payRequest.setOrderAmount(Long.valueOf(orderFee.getPayMoney().multiply(new BigDecimal(100)).setScale(0, RoundingMode.DOWN).toString()));
             payRequest.setFee(0L);
             payRequest.setOrderTime(order.getCreateTime());
             payRequest.setPayType(ErpRequestPayTypeEnum.PAY_10.getCode());
@@ -229,24 +294,33 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             payRequest.setCreateBy(order.getCreateById());
             payRequest.setCreateName(order.getCreateByName());
 
-            payRequest.setPayOriginType(1);
-            payRequest.setOrderType(2);
-            payRequest.setFranchiseeId("BG895ED81C04D445EE9CB554945098922B");
-            payRequest.setStoreName("门店1");
-            payRequest.setStoreId("AB988458F192C747478210CC01D4D4135C");
-            payRequest.setTransactionType("STORE_ORDER");
-            payRequest.setPayOrderType(14);
-            payRequest.setBackUrl("http://order.api.aiqin.com/erpOrderPayController/orderPayCallback");
+            payRequest.setPayOriginType(orderTypeEnum.getPayOriginType());
+            payRequest.setOrderType(ErpRequestPayOperationTypeEnum.TYPE_2.getCode());
+//            payRequest.setFranchiseeId("BG895ED81C04D445EE9CB554945098922B");
+            payRequest.setFranchiseeId(order.getFranchiseeId());
+            payRequest.setStoreName(order.getStoreName());
+//            payRequest.setStoreId("AB988458F192C747478210CC01D4D4135C");
+            payRequest.setStoreId(order.getStoreId());
+            payRequest.setTransactionType(orderCategoryEnum.getPayTransactionTypeEnum().getValue());
+            payRequest.setPayOrderType(orderTypeEnum.getPayOrderType());
+            payRequest.setBackUrl("/erpOrderPayController/orderPayCallback");
 
 
-            //TODO CT 请求支付中心接口查询订单支付状态
-//            Map<String, Object> paramMap = new HashMap<>();
-//            HttpClient httpClient = HttpClient.post(urlProperties.getPaymentApi() + "/test").json(paramMap);
-//            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
-//            });
-            flag = true;
+            //请求支付中心接口查询订单支付状态
+            HttpClient httpClient = HttpClient.post(urlProperties.getPaymentApi() + "/payment/pay/payTobAll").json(payRequest);
+            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
+            });
+            if (!RequestReturnUtil.validateHttpResponse(response)) {
+                throw new BusinessException("发起支付失败：" + response.getMessage());
+            }
+        } catch (BusinessException e) {
+            flag = false;
+            logger.error("发起支付失败：{}", e.getMessage());
+//            throw new BusinessException(e.getMessage());
         } catch (Exception e) {
+            flag = false;
             logger.error("发起支付失败：{}", e);
+//            throw new BusinessException("发起支付失败");
         }
         return flag;
     }
@@ -306,18 +380,47 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     }
 
     @Override
-    public ErpOrderInfo sendOrderToSupplyChainAndGetSplitGroup(ErpOrderInfo order) {
-        ErpOrderInfo resultInfo = new ErpOrderInfo();
+    public List<ErpOrderItemSplitGroupResponse> getRepositorySplitGroup(ErpOrderInfo order) {
+        List<ErpOrderItemSplitGroupResponse> list = new ArrayList<>();
         try {
-            //TODO CT 订单支付成功通知供应链,返回商品库房分组
+
+//            List<Map<String, Object>> paramList = new ArrayList<>();
+//            for (ErpOrderItem item :
+//                    order.getItemList()) {
+//                Map<String, Object> paramItemMap = new HashMap<>(16);
+//                paramItemMap.put("line_code", item.getLineCode());
+//                paramItemMap.put("sku_code", item.getSkuCode());
+//                paramList.add(paramItemMap);
+//            }
 //            Map<String, Object> paramMap = new HashMap<>();
-//            HttpClient httpClient = HttpClient.post(urlProperties.getPaymentApi() + "/test").json(paramMap);
-//            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
-//            });
+//            paramMap.put("order_code", order.getOrderStoreCode());
+//            paramMap.put("detail_list", paramList);
+
+            List<Map<String, Object>> paramList = new ArrayList<>();
+            Map<String, Object> paramItemMap1 = new HashMap<>(16);
+            paramItemMap1.put("line_code", 1L);
+            paramItemMap1.put("sku_code", "0000109");
+            paramList.add(paramItemMap1);
+            Map<String, Object> paramItemMap2 = new HashMap<>(16);
+            paramItemMap2.put("line_code", 2L);
+            paramItemMap2.put("sku_code", "295110");
+            paramList.add(paramItemMap2);
+
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("order_code", "1234567");
+            paramMap.put("detail_list", paramList);
+
+            //获取商品库房分组
+            HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/product/warehouse/info").json(paramMap);
+            HttpResponse<List<ErpOrderItemSplitGroupResponse>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ErpOrderItemSplitGroupResponse>>>() {
+            });
+            if (RequestReturnUtil.validateHttpResponse(response)) {
+                list = response.getData();
+            }
         } catch (Exception e) {
             logger.error("获取商品库存仓库分组失败：{}", e);
         }
-        return resultInfo;
+        return list;
     }
 
     @Override

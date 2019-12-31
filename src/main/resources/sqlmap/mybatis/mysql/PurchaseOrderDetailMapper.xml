@@ -19,7 +19,7 @@
     <result column="model_code" jdbcType="VARCHAR" property="modelCode" />
     <result column="unit_code" jdbcType="VARCHAR" property="unitCode" />
     <result column="unit_name" jdbcType="VARCHAR" property="unitName" />
-    <result column="product_type" jdbcType="BIT" property="productType" />
+    <result column="product_type" jdbcType="INTEGER" property="productType" />
     <result column="purchase_whole" jdbcType="BIGINT" property="purchaseWhole" />
     <result column="purchase_single" jdbcType="BIGINT" property="purchaseSingle" />
     <result column="base_product_spec" jdbcType="BIGINT" property="baseProductSpec" />
@@ -31,7 +31,7 @@
     <result column="total_tax_amount" jdbcType="DECIMAL" property="totalTaxAmount" />
     <result column="total_count" jdbcType="BIGINT" property="totalCount" />
     <result column="actual_total_tax_amount" jdbcType="DECIMAL" property="actualTotalTaxAmount" />
-    <result column="use_status" jdbcType="BIT" property="useStatus" />
+    <result column="use_status" jdbcType="VARCHAR" property="useStatus" />
     <result column="create_by_id" jdbcType="VARCHAR" property="createById" />
     <result column="create_by_name" jdbcType="VARCHAR" property="createByName" />
     <result column="update_by_id" jdbcType="VARCHAR" property="updateById" />
@@ -58,7 +58,7 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insertList" parameterType="java.util.List">
-    insert into purchase_order_detail (id, purchase_order_detail_id, purchase_order_code, 
+    insert into purchase_order_detail (purchase_order_detail_id, purchase_order_code,
       spu_code, spu_name, sku_code, 
       sku_name, brand_code, brand_name, 
       category_code, category_name, product_spec, 
@@ -71,28 +71,25 @@
       create_by_id, create_by_name, update_by_id, 
       update_by_name, create_time, update_time
       )
-    <foreach collection="list" item="PurchaseOrderDetail" separator=",">
-    values (#{id,jdbcType=BIGINT}, #{purchaseOrderDetailId,jdbcType=VARCHAR}, #{purchaseOrderCode,jdbcType=VARCHAR}, 
-      #{spuCode,jdbcType=VARCHAR}, #{spuName,jdbcType=VARCHAR}, #{skuCode,jdbcType=VARCHAR}, 
-      #{skuName,jdbcType=VARCHAR}, #{brandCode,jdbcType=VARCHAR}, #{brandName,jdbcType=VARCHAR}, 
-      #{categoryCode,jdbcType=VARCHAR}, #{categoryName,jdbcType=VARCHAR}, #{productSpec,jdbcType=VARCHAR}, 
-      #{colorCode,jdbcType=VARCHAR}, #{colorName,jdbcType=VARCHAR}, #{modelCode,jdbcType=VARCHAR}, 
-      #{unitCode,jdbcType=VARCHAR}, #{unitName,jdbcType=VARCHAR}, #{productType,jdbcType=BIT}, 
-      #{purchaseWhole,jdbcType=BIGINT}, #{purchaseSingle,jdbcType=BIGINT}, #{baseProductSpec,jdbcType=BIGINT}, 
-      #{boxGauge,jdbcType=VARCHAR}, #{taxRate,jdbcType=DECIMAL}, #{lineCode,jdbcType=BIGINT}, 
-      #{factorySkuCode,jdbcType=VARCHAR}, #{taxAmount,jdbcType=DECIMAL}, #{totalTaxAmount,jdbcType=DECIMAL}, 
-      #{totalCount,jdbcType=BIGINT}, #{actualTotalTaxAmount,jdbcType=DECIMAL}, #{useStatus,jdbcType=BIT}, 
-      #{createById,jdbcType=VARCHAR}, #{createByName,jdbcType=VARCHAR}, #{updateById,jdbcType=VARCHAR}, 
-      #{updateByName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+    <foreach collection="list" item="item" separator="," index="index">
+    values (#{item.purchaseOrderDetailId,jdbcType=VARCHAR}, #{item.purchaseOrderCode,jdbcType=VARCHAR},
+      #{item.spuCode,jdbcType=VARCHAR}, #{item.spuName,jdbcType=VARCHAR}, #{item.skuCode,jdbcType=VARCHAR},
+      #{item.skuName,jdbcType=VARCHAR}, #{item.brandCode,jdbcType=VARCHAR}, #{item.brandName,jdbcType=VARCHAR},
+      #{item.categoryCode,jdbcType=VARCHAR}, #{item.categoryName,jdbcType=VARCHAR}, #{item.productSpec,jdbcType=VARCHAR},
+      #{item.colorCode,jdbcType=VARCHAR}, #{item.colorName,jdbcType=VARCHAR}, #{item.modelCode,jdbcType=VARCHAR},
+      #{item.unitCode,jdbcType=VARCHAR}, #{item.unitName,jdbcType=VARCHAR}, #{item.productType,jdbcType=INTEGER},
+      #{item.purchaseWhole,jdbcType=BIGINT}, #{item.purchaseSingle,jdbcType=BIGINT}, #{item.baseProductSpec,jdbcType=BIGINT},
+      #{item.boxGauge,jdbcType=VARCHAR}, #{item.taxRate,jdbcType=DECIMAL}, #{item.lineCode,jdbcType=BIGINT},
+      #{item.factorySkuCode,jdbcType=VARCHAR}, #{item.taxAmount,jdbcType=DECIMAL}, #{item.totalTaxAmount,jdbcType=DECIMAL},
+      #{item.totalCount,jdbcType=BIGINT}, #{item.actualTotalTaxAmount,jdbcType=DECIMAL}, #{item.useStatus,jdbcType=VARCHAR},
+      #{item.createById,jdbcType=VARCHAR}, #{item.createByName,jdbcType=VARCHAR}, #{item.updateById,jdbcType=VARCHAR},
+      #{item.updateByName,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}
       )
     </foreach>
   </insert>
   <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.PurchaseOrderDetail">
     insert into purchase_order_detail
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        id,
-      </if>
       <if test="purchaseOrderDetailId != null">
         purchase_order_detail_id,
       </if>
@@ -200,9 +197,6 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=BIGINT},
-      </if>
       <if test="purchaseOrderDetailId != null">
         #{purchaseOrderDetailId,jdbcType=VARCHAR},
       </if>
@@ -252,7 +246,7 @@
         #{unitName,jdbcType=VARCHAR},
       </if>
       <if test="productType != null">
-        #{productType,jdbcType=BIT},
+        #{productType,jdbcType=INTEGER},
       </if>
       <if test="purchaseWhole != null">
         #{purchaseWhole,jdbcType=BIGINT},
@@ -288,7 +282,7 @@
         #{actualTotalTaxAmount,jdbcType=DECIMAL},
       </if>
       <if test="useStatus != null">
-        #{useStatus,jdbcType=BIT},
+        #{useStatus,jdbcType=VARCHAR},
       </if>
       <if test="createById != null">
         #{createById,jdbcType=VARCHAR},
@@ -362,7 +356,7 @@
         unit_name = #{unitName,jdbcType=VARCHAR},
       </if>
       <if test="productType != null">
-        product_type = #{productType,jdbcType=BIT},
+        product_type = #{productType,jdbcType=INTEGER},
       </if>
       <if test="purchaseWhole != null">
         purchase_whole = #{purchaseWhole,jdbcType=BIGINT},
@@ -398,7 +392,7 @@
         actual_total_tax_amount = #{actualTotalTaxAmount,jdbcType=DECIMAL},
       </if>
       <if test="useStatus != null">
-        use_status = #{useStatus,jdbcType=BIT},
+        use_status = #{useStatus,jdbcType=VARCHAR},
       </if>
       <if test="createById != null">
         create_by_id = #{createById,jdbcType=VARCHAR},
@@ -439,7 +433,7 @@
       model_code = #{modelCode,jdbcType=VARCHAR},
       unit_code = #{unitCode,jdbcType=VARCHAR},
       unit_name = #{unitName,jdbcType=VARCHAR},
-      product_type = #{productType,jdbcType=BIT},
+      product_type = #{productType,jdbcType=INTEGER},
       purchase_whole = #{purchaseWhole,jdbcType=BIGINT},
       purchase_single = #{purchaseSingle,jdbcType=BIGINT},
       base_product_spec = #{baseProductSpec,jdbcType=BIGINT},
@@ -451,7 +445,7 @@
       total_tax_amount = #{totalTaxAmount,jdbcType=DECIMAL},
       total_count = #{totalCount,jdbcType=BIGINT},
       actual_total_tax_amount = #{actualTotalTaxAmount,jdbcType=DECIMAL},
-      use_status = #{useStatus,jdbcType=BIT},
+      use_status = #{useStatus,jdbcType=VARCHAR},
       create_by_id = #{createById,jdbcType=VARCHAR},
       create_by_name = #{createByName,jdbcType=VARCHAR},
       update_by_id = #{updateById,jdbcType=VARCHAR},

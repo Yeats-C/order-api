@@ -11,6 +11,8 @@ import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSignRequest;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
+import com.aiqin.mgs.order.api.util.CopyBeanUtil;
+import com.aiqin.mgs.order.api.util.OrderPublic;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +47,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     private ErpOrderRequestService erpOrderRequestService;
     @Resource
     private ErpOrderPayService erpOrderPayService;
+    @Resource
+    private ErpOrderCreateService erpOrderCreateService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -57,7 +61,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         Integer insert = erpOrderInfoDao.insert(po);
 
         //保存日志
-        erpOrderOperationLogService.saveOrderOperationLog(po.getOrderStoreCode(),  ErpLogOperationTypeEnum.ADD, ErpOrderStatusEnum.ORDER_STATUS_1.getCode(), null, auth);
+        erpOrderOperationLogService.saveOrderOperationLog(po.getOrderStoreCode(), ErpLogOperationTypeEnum.ADD, ErpOrderStatusEnum.ORDER_STATUS_1.getCode(), null, auth);
     }
 
     @Override
@@ -85,6 +89,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateOrderByPrimaryKeySelectiveNoLog(ErpOrderInfo po, AuthToken auth) {
         //更新订单数据
         po.setUpdateById(auth.getPersonId());
@@ -93,6 +98,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addProductGift(ErpOrderEditRequest erpOrderEditRequest) {
 
         AuthToken auth = AuthUtil.getCurrentAuth();
@@ -135,7 +141,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
         if (1 == 1) {
             //TODO CT 测试中断操作
-            throw new BusinessException("test");
+            return;
         }
 
         //订单原商品明细行
@@ -240,35 +246,141 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void orderSplit(ErpOrderInfo orderInfo) {
-        /*AuthToken auth = AuthUtil.getSystemAuth();
-        String orderStoreCode = orderInfo.getOrderStoreCode();
-        if (StringUtils.isEmpty(orderStoreCode)) {
-            throw new BusinessException("订单号为空");
-        }
+    public void orderSplit(String orderCode, AuthToken auth) {
 
         //原订单
-        ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderStoreCode);
+        ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
         if (order == null) {
             throw new BusinessException("无效的订单编号");
         }
-        //原订单商品明细
-        List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderId());
-        order.setOrderItemList(orderItemList);
-        //原订单收货人信息
-        ErpOrderConsignee orderConsignee = erpOrderConsigneeService.getOrderConsigneeByOrderId(order.getOrderId());
-        //原订单日志
-        List<ErpOrderOperationLog> orderOperationLogList = erpOrderOperationLogService.selectOrderOperationLogListByOrderId(order.getOrderId());
-
-        if (!ErpOrderStatusEnum.ORDER_STATUS_2.getCode().equals(order.getOrderStatus()) && !ErpOrderStatusEnum.ORDER_STATUS_92.getCode().equals(order.getOrderStatus()) && !ErpOrderStatusEnum.ORDER_STATUS_93.getCode().equals(order.getOrderStatus())) {
+        if (!ErpOrderStatusEnum.ORDER_STATUS_3.getCode().equals(order.getOrderStatus())) {
             throw new BusinessException("只有支付成功且未拆分的的订单才能拆分");
         }
-        ErpOrderCategoryEnum orderTypeEnum = ErpOrderCategoryEnum.getEnum(order.getOrderType());
-        if (orderTypeEnum == null) {
-            throw new BusinessException("订单类型异常");
+
+        //是否需要执行拆单操作
+        boolean flag = false;
+        if (ErpOrderStatusEnum.ORDER_STATUS_3.getCode().equals(order.getOrderStatus())) {
+            if (ErpOrderNodeStatusEnum.STATUS_5.getCode().equals(order.getOrderNodeStatus())) {
+                flag = true;
+            }
         }
 
-        if (ErpOrderTypeEnum.STORAGE_RACK == orderTypeEnum.getErpOrderTypeEnum() || ErpOrderTypeEnum.DIRECT_SEND == orderTypeEnum.getErpOrderTypeEnum()) {
+        if (!flag) {
+            //不是拆单状态
+            return;
+        }
+
+
+        //原订单商品明细
+        List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
+        order.setItemList(orderItemList);
+        //原订单日志
+        List<ErpOrderOperationLog> orderOperationLogList = erpOrderOperationLogService.selectOrderOperationLogList(order.getOrderStoreCode());
+
+        ErpOrderNodeProcessTypeEnum processTypeEnum = ErpOrderNodeProcessTypeEnum.getEnum(order.getOrderTypeCode(), order.getOrderCategoryCode());
+        if (processTypeEnum == null) {
+            throw new BusinessException("订单数据异常");
+        }
+
+        if (processTypeEnum.isSplitByRepertory()) {
+            //按照库存分组拆单
+
+        } else {
+            //按照供应商拆单
+
+            //根据供应商把订单行分组
+            Map<String, List<ErpOrderItem>> supplierItemMap = new HashMap<>(16);
+            for (ErpOrderItem item :
+                    orderItemList) {
+                String supplierCode = null;
+                List<ErpOrderItem> list = new ArrayList<>();
+                if (StringUtils.isNotEmpty(item.getSupplierCode())) {
+                    supplierCode = item.getSupplierCode();
+                }
+                if (supplierItemMap.containsKey(supplierCode)) {
+                    list.addAll(supplierItemMap.get(supplierCode));
+                }
+                list.add(item);
+                supplierItemMap.put(supplierCode, list);
+            }
+
+            List<ErpOrderInfo> splitOrderList = new ArrayList<>();
+            if (supplierItemMap.size() > 1) {
+                //不同的供应商，拆分
+
+                for (Map.Entry<String, List<ErpOrderItem>> entry :
+                        supplierItemMap.entrySet()) {
+                    ErpOrderInfo newOrder = new ErpOrderInfo();
+                    CopyBeanUtil.copySameBean(newOrder, order);
+
+                    String newOrderCode = erpOrderCreateService.getOrderCode();
+                    String orderId = OrderPublic.getUUID();
+                    newOrder.setId(null);
+                    newOrder.setOrderStoreCode(newOrderCode);
+                    newOrder.setOrderStoreId(orderId);
+                    newOrder.setOrderLevel(ErpOrderLevelEnum.SECONDARY.getCode());
+
+                    List<ErpOrderItem> splitItemList = new ArrayList<>();
+
+                    //商品总价
+                    BigDecimal totalProductAmount = BigDecimal.ZERO;
+                    //实际支付金额
+                    BigDecimal orderAmount = BigDecimal.ZERO;
+
+                    long lineCode = 1L;
+                    for (ErpOrderItem item :
+                            entry.getValue()) {
+
+                        ErpOrderItem newOrderItem = new ErpOrderItem();
+                        CopyBeanUtil.copySameBean(newOrderItem, item);
+                        newOrderItem.setId(null);
+                        newOrderItem.setOrderStoreId(orderId);
+                        newOrderItem.setOrderStoreCode(newOrderCode);
+                        newOrderItem.setOrderInfoDetailId(OrderPublic.getUUID());
+                        newOrderItem.setLineCode(lineCode++);
+                        splitItemList.add(newOrderItem);
+
+                        //TODO 如果后续增加了活动和优惠券，就需要考虑这样计算精不精确
+
+                        //商品总价
+                        totalProductAmount = totalProductAmount.add(item.getProductAmount());
+
+                        //实际支付金额 取分摊后金额汇总
+                        orderAmount = orderAmount.add(item.getTotalPreferentialAmount());
+
+                    }
+                    newOrder.setTotalProductAmount(totalProductAmount);
+                    newOrder.setOrderAmount(orderAmount);
+                    newOrder.setDiscountAmount(totalProductAmount.multiply(orderAmount));
+                    newOrder.setItemList(orderItemList);
+
+                    erpOrderItemService.saveOrderItemList(splitItemList, auth);
+                    erpOrderOperationLogService.copySplitOrderLog(orderCode, orderOperationLogList);
+                    this.saveOrderNoLog(newOrder, auth);
+                    splitOrderList.add(newOrder);
+
+                }
+
+                order.setSplitStatus(StatusEnum.YES.getCode());
+
+            }
+
+            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
+            order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
+            this.updateOrderByPrimaryKeySelective(order, auth);
+
+            if (splitOrderList.size() > 0) {
+                for (ErpOrderInfo item :
+                        splitOrderList) {
+                    item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
+                    item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
+                    this.updateOrderByPrimaryKeySelective(item, auth);
+                }
+            }
+
+        }
+/*
+        if (processTypeEnum.isSplitByRepertory()) {
             //按照供应商拆分订单
 
 //            //sku - 商品详情 map
@@ -379,7 +491,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             //按照库存拆分
 
             //请求供应链获取订单商品库存分组
-            ErpOrderInfo paramOrder = erpOrderRequestService.sendOrderToSupplyChainAndGetSplitGroup(order);
+            ErpOrderInfo paramOrder = erpOrderRequestService.getRepositorySplitGroup(order);
 
             List<ErpOrderItem> paramItemList = paramOrder.getOrderItemList();
 
@@ -601,6 +713,37 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             }
         }
 */
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void orderSendToSupply(String orderCode, AuthToken auth) {
+
+        List<ErpOrderInfo> list = new ArrayList<>();
+        ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
+        if (ErpOrderLevelEnum.PRIMARY.getCode().equals(order.getOrderLevel()) && StatusEnum.YES.getCode().equals(order.getSplitStatus())) {
+            list.addAll(erpOrderQueryService.getSecondOrderListByPrimaryCode(orderCode));
+        } else {
+            list.add(order);
+        }
+
+
+        for (ErpOrderInfo item :
+                list) {
+            if (ErpOrderStatusEnum.ORDER_STATUS_4.getCode().equals(item.getOrderStatus())) {
+                if (ErpOrderNodeStatusEnum.STATUS_6.getCode().equals(item.getOrderNodeStatus())) {
+
+                    //TODO CT 同步订单
+
+
+                    //同步之后修改状态
+                    item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
+                    item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_8.getCode());
+                    this.updateOrderByPrimaryKeySelective(order, auth);
+                }
+            }
+        }
+
     }
 
     @Override

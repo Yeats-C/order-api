@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.service.impl.order;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
+import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.ProductInfo;
@@ -118,12 +119,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //锁库存
         if (processTypeEnum.isLockStock()) {
-            erpOrderRequestService.lockStockInSupplyChain(order);
-        }
-
-        //自动支付
-        if (processTypeEnum.isAutoPay()) {
-//            erpOrderPayService.autoPay(orderId);
+            erpOrderRequestService.lockStockInSupplyChain(order, auth);
         }
 
         //返回订单信息
@@ -159,15 +155,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         productCheck(processTypeEnum, storeInfo, orderItemList);
 
         //构建和保存货架订单，返回订单编号
-        String orderId = generateAndSaveRackOrder(erpOrderSaveRequest, orderItemList, storeInfo, auth);
-
-        //自动发起支付
-        if (processTypeEnum.isAutoPay()) {
-//            erpOrderPayService.autoPay(orderId);
-        }
+        String orderCode = generateAndSaveRackOrder(erpOrderSaveRequest, orderItemList, storeInfo, auth);
 
         //返回订单
-        return erpOrderQueryService.getOrderByOrderId(orderId);
+        return erpOrderQueryService.getOrderByOrderCode(orderCode);
     }
 
     /**
@@ -479,6 +470,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setCustomerName(storeInfo.getStoreName());
         //订单状态
         order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
+        //订单流程节点状态
+        order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_1.getCode());
         //是否锁定(0是1否）
         order.setOrderLock(StatusEnum.NO.getCode());
         //锁定原因
@@ -893,6 +886,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setCustomerName(storeInfo.getStoreName());
         //订单状态
         order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
+        //订单节点流程状态
+        order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_1.getCode());
         //是否锁定(0是1否）
         order.setOrderLock(StatusEnum.NO.getCode());
         //锁定原因
@@ -1033,7 +1028,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         orderFee.setPayMoney(orderFee.getTotalMoney().subtract(orderFee.getActivityMoney()).subtract(orderFee.getSuitCouponMoney()).subtract(orderFee.getTopCouponMoney()));
         erpOrderFeeService.saveOrderFee(orderFee, auth);
 
-        return orderId;
+        return orderCode;
     }
 
     /**
@@ -1045,11 +1040,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @version: v1.0.0
      * @date 2019/12/24 20:24
      */
-    private String getOrderCode() {
-        ErpOrderCodeSequence.currentDay = "";
+    @Override
+    public String getOrderCode() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String curDay = sdf.format(new Date());
-        if (StringUtils.isEmpty(ErpOrderCodeSequence.currentDay) || !curDay.equals(ErpOrderCodeSequence.currentDay)) {
+        if (StringUtils.isEmpty(ErpOrderCodeSequence.currentDay) || !curDay.equals(ErpOrderCodeSequence.currentDay) || ErpOrderCodeSequence.num == null) {
             //如果是
             //查询数据库，获取最新序列
             String maxOrderCode = erpOrderQueryService.getMaxOrderCodeByCurrentDay(curDay);

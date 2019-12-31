@@ -42,6 +42,10 @@ public class ErpOrderQueryRequest {
     @JsonProperty("store_name")
     private String storeName;
 
+    @ApiModelProperty(value = "下单人")
+    @JsonProperty("create_by_name")
+    private String createByName;
+
     @ApiModelProperty(value = "查询开始时间 yyyy-MM-dd")
     @JsonProperty("create_time_start")
     private String createTimeStart;
