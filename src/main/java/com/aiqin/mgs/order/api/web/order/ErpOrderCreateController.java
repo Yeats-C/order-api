@@ -5,9 +5,14 @@ import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
+import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.pay.ErpPayWayEnum;
+import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
 import com.aiqin.mgs.order.api.service.order.ErpOrderCreateService;
+import com.aiqin.mgs.order.api.service.order.ErpOrderPayService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -37,14 +42,24 @@ public class ErpOrderCreateController {
     @Resource
     private ErpOrderCreateService erpOrderCreateService;
 
+    @Resource
+    private ErpOrderPayService erpOrderPayService;
+
     @PostMapping("/erpSaveOrder")
     @ApiOperation(value = "erp从购物车创建订单")
     public HttpResponse<ErpOrderInfo> erpSaveOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
+            AuthToken auth = AuthUtil.getCurrentAuth();
             ErpOrderInfo erpOrderInfo = erpOrderCreateService.erpSaveOrder(erpOrderSaveRequest);
             response.setData(erpOrderInfo);
+
+            ErpOrderPayRequest payRequest = new ErpOrderPayRequest();
+            payRequest.setOrderCode(erpOrderInfo.getOrderStoreCode());
+            payRequest.setPayWay(ErpPayWayEnum.PAY_1.getCode());
+            erpOrderPayService.orderPayStartMethodGroup(payRequest, auth, true);
+
         } catch (BusinessException e) {
             logger.info("创建订单失败：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
@@ -61,8 +76,15 @@ public class ErpOrderCreateController {
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
+            AuthToken auth = AuthUtil.getCurrentAuth();
             ErpOrderInfo erpOrderInfo = erpOrderCreateService.storeSaveOrder(erpOrderSaveRequest);
             response.setData(erpOrderInfo);
+
+            ErpOrderPayRequest payRequest = new ErpOrderPayRequest();
+            payRequest.setOrderCode(erpOrderInfo.getOrderStoreCode());
+            payRequest.setPayWay(ErpPayWayEnum.PAY_1.getCode());
+            erpOrderPayService.orderPayStartMethodGroup(payRequest, auth, true);
+
         } catch (BusinessException e) {
             logger.info("创建订单失败：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
@@ -79,8 +101,15 @@ public class ErpOrderCreateController {
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
+            AuthToken auth = AuthUtil.getCurrentAuth();
             ErpOrderInfo erpOrderInfo = erpOrderCreateService.saveRackOrder(erpOrderSaveRequest);
             response.setData(erpOrderInfo);
+
+            ErpOrderPayRequest payRequest = new ErpOrderPayRequest();
+            payRequest.setOrderCode(erpOrderInfo.getOrderStoreCode());
+            payRequest.setPayWay(ErpPayWayEnum.PAY_1.getCode());
+            erpOrderPayService.orderPayStartMethodGroup(payRequest, auth, true);
+
         } catch (BusinessException e) {
             logger.info("创建货架订单失败：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));

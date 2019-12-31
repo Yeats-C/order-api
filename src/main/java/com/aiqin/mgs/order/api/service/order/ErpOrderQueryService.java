@@ -38,6 +38,17 @@ public interface ErpOrderQueryService {
     ErpOrderInfo getOrderByOrderCode(String orderCode);
 
     /**
+     * 根据订单号查询订单头和订单行
+     *
+     * @param orderCode 订单号
+     * @return com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/31 11:06
+     */
+    ErpOrderInfo getOrderAndItemByOrderCode(String orderCode);
+
+    /**
      * 根据以及订单编码获取拆分列表
      *
      * @param orderCode
@@ -69,6 +80,17 @@ public interface ErpOrderQueryService {
      * @date 2019/12/10 9:53
      */
     List<ErpOrderInfo> getOrderByLogisticsId(String logisticsId);
+
+    /**
+     * 条件筛选订单
+     *
+     * @param erpOrderInfo
+     * @return java.util.List<com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo>
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/31 10:06
+     */
+    List<ErpOrderInfo> select(ErpOrderInfo erpOrderInfo);
 
     /**
      * 根据订单编号查询待签收订单和商品行详情

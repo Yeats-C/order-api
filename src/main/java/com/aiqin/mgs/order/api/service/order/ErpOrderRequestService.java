@@ -2,10 +2,8 @@ package com.aiqin.mgs.order.api.service.order;
 
 import com.aiqin.mgs.order.api.component.enums.ErpOrderLockStockTypeEnum;
 import com.aiqin.mgs.order.api.domain.*;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
+import com.aiqin.mgs.order.api.domain.po.order.*;
+import com.aiqin.mgs.order.api.domain.response.order.ErpOrderItemSplitGroupResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
 
 import java.math.BigDecimal;
@@ -47,47 +45,48 @@ public interface ErpOrderRequestService {
      * 锁库存
      *
      * @param order
-     * @return void
+     * @param auth
+     * @return boolean
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/10 13:38
      */
-    void lockStockInSupplyChain(ErpOrderInfo order);
+    boolean lockStockInSupplyChain(ErpOrderInfo order, AuthToken auth);
 
     /**
      * 解锁库存
      *
      * @param order                  订单信息
      * @param orderLockStockTypeEnum 操作类型
-     * @return void
+     * @return boolean
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/10 13:38
      */
-    void unlockStockInSupplyChain(ErpOrderInfo order, ErpOrderLockStockTypeEnum orderLockStockTypeEnum);
+    boolean unlockStockInSupplyChain(ErpOrderInfo order, ErpOrderLockStockTypeEnum orderLockStockTypeEnum,AuthToken auth);
 
     /**
-     * 根据支付id获取订单支付状态
+     * 根据订单编码获取订单支付状态
      *
-     * @param payId 订单编码
-     * @return com.aiqin.mgs.order.api.component.enums.ErpPayStatusEnum
+     * @param orderCode 订单编码
+     * @return com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/2 15:37
      */
-    ErpOrderPayStatusResponse getOrderPayStatus(String payId);
+    ErpOrderPayStatusResponse getOrderPayStatus(String orderCode);
 
     /**
      * 发起支付请求
      *
      * @param order    订单信息
-     * @param orderPay 订单支付信息
+     * @param orderFee 订单费用信息
      * @return boolean
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/2 15:37
      */
-    boolean sendOrderPayRequest(ErpOrderInfo order, ErpOrderPay orderPay);
+    boolean sendOrderPayRequest(ErpOrderInfo order, ErpOrderFee orderFee);
 
     /**
      * 发起支付物流费用申请
@@ -121,7 +120,7 @@ public interface ErpOrderRequestService {
      * @version: v1.0.0
      * @date 2019/12/2 15:48
      */
-    ErpOrderInfo sendOrderToSupplyChainAndGetSplitGroup(ErpOrderInfo order);
+    List<ErpOrderItemSplitGroupResponse> getRepositorySplitGroup(ErpOrderInfo order);
 
     /**
      * 推送拆分后的订单到供应链

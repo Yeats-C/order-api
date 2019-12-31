@@ -53,7 +53,7 @@ public class ErpOrderCancelServiceImpl implements ErpOrderCancelService {
 
         //TODO 返还物流券 优惠券
         //解锁库存
-        erpOrderRequestService.unlockStockInSupplyChain(order,ErpOrderLockStockTypeEnum.REDUCE_AND_UNLOCK);
+        erpOrderRequestService.unlockStockInSupplyChain(order,ErpOrderLockStockTypeEnum.REDUCE_AND_UNLOCK,null);
         //TODO 生成退款单
     }
 
@@ -92,7 +92,7 @@ public class ErpOrderCancelServiceImpl implements ErpOrderCancelService {
 
         //TODO 返还物流券 优惠券
         //解锁库存
-        erpOrderRequestService.unlockStockInSupplyChain(order,ErpOrderLockStockTypeEnum.REDUCE_AND_UNLOCK);
+        erpOrderRequestService.unlockStockInSupplyChain(order,ErpOrderLockStockTypeEnum.REDUCE_AND_UNLOCK,null);
         //TODO 发起退货退款
     }
 
@@ -177,7 +177,7 @@ public class ErpOrderCancelServiceImpl implements ErpOrderCancelService {
             order.setItemList(erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId()));
 
             //解锁库存
-            erpOrderRequestService.unlockStockInSupplyChain(order,ErpOrderLockStockTypeEnum.REDUCE_AND_UNLOCK);
+            erpOrderRequestService.unlockStockInSupplyChain(order,ErpOrderLockStockTypeEnum.REDUCE_AND_UNLOCK,auth);
 
             //TODO CT 生成退款单
 

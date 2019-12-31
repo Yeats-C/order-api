@@ -23,6 +23,7 @@
         customer_code as customerCode,
         customer_name as customerName,
         order_status as orderStatus,
+        order_node_status as orderNodeStatus,
         order_lock as orderLock,
         lock_reason as lockReason,
         order_exception as orderException,
@@ -99,6 +100,9 @@
         <if test="orderStoreCode != null and orderStoreCode != ''">
             and order_store_code = #{orderStoreCode}
         </if>
+        <if test="orderNodeStatus != null and orderNodeStatus != '' or orderNodeStatus == 0">
+            and order_node_status = #{orderNodeStatus}
+        </if>
         <if test="orderStatus != null and orderStatus != '' or orderStatus == 0">
             and order_status = #{orderStatus}
         </if>
@@ -162,6 +166,9 @@
         set
         <if test="orderStatus != null and orderStatus != '' or orderStatus == 0">
             order_status = #{orderStatus},
+        </if>
+        <if test="orderNodeStatus != null and orderNodeStatus != '' or orderNodeStatus == 0">
+            order_node_status = #{orderNodeStatus},
         </if>
         <if test="orderReturn != null and orderReturn != '' or orderReturn == 0">
             order_return = #{orderReturn},
@@ -315,7 +322,7 @@
                                       order_type_code, order_type_name, order_category_code,
                                       order_category_name, supplier_code, supplier_name,
                                       transport_center_code, transport_center_name, warehouse_code,
-                                      warehouse_name, customer_code, customer_name, order_status, order_lock,
+                                      warehouse_name, customer_code, customer_name, order_status,order_node_status, order_lock,
                                       lock_reason, order_exception, exception_reason, order_delete,
                                       payment_status, province_id, province_name, city_id, city_name,
                                       district_id, district_name, receive_address, distribution_mode_code,
@@ -336,7 +343,7 @@
                 #{orderTypeCode}, #{orderTypeName}, #{orderCategoryCode},
                 #{orderCategoryName}, #{supplierCode}, #{supplierName},
                 #{transportCenterCode}, #{transportCenterName}, #{warehouseCode},
-                #{warehouseName}, #{customerCode}, #{customerName}, #{orderStatus}, #{orderLock},
+                #{warehouseName}, #{customerCode}, #{customerName}, #{orderStatus}, #{orderNodeStatus}, #{orderLock},
                 #{lockReason}, #{orderException}, #{exceptionReason}, #{orderDelete},
                 #{paymentStatus}, #{provinceId}, #{provinceName}, #{cityId}, #{cityName},
                 #{districtId}, #{districtName}, #{receiveAddress}, #{distributionModeCode},
@@ -375,7 +382,8 @@
         a1.warehouse_name as warehouseName,
         a1.customer_code as customerCode,
         a1.customer_name as customerName,
-        a1.order_status as orderStatus,
+        a1.order_node_status as orderStatus,
+        a1.order_status as orderNodeStatus,
         a1.order_lock as orderLock,
         a1.lock_reason as lockReason,
         a1.order_exception as orderException,
@@ -457,6 +465,9 @@
         <if test="storeName != null and storeName != ''">
             and a1.store_name like concat('%',#{storeName,jdbcType=VARCHAR},'%')
         </if>
+        <if test="createByName != null and createByName != ''">
+            and a1.create_by_name like concat('%',#{createByName,jdbcType=VARCHAR},'%')
+        </if>
         <if test="orderStatus != null and orderStatus != '' or orderStatus == 0 ">
             and a1.order_status = #{orderStatus}
         </if>
@@ -517,6 +528,7 @@
         a1.customer_code as customerCode,
         a1.customer_name as customerName,
         a1.order_status as orderStatus,
+        a1.order_node_status as orderNodeStatus,
         a1.order_lock as orderLock,
         a1.lock_reason as lockReason,
         a1.order_exception as orderException,
