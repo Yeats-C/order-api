@@ -135,5 +135,11 @@ public class ReturnOrderInfoController {
         return HttpResponse.success(erpOrderQueryService.getOrderAndItemByOrderCode(returnOrderDetailId));
     }
 
+    @ApiOperation("退货单列表--查看附件发起冲减单")
+    @GetMapping("/saveWriteDownOrder")
+    public HttpResponse saveWriteDownOrder(String returnOrderDetailId) {
+        return returnOrderInfoService.saveWriteDownOrder(returnOrderDetailId);
+    }
+
 
 }

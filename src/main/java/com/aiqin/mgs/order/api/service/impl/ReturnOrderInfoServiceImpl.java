@@ -9,6 +9,8 @@ import com.aiqin.mgs.order.api.component.SequenceService;
 import com.aiqin.mgs.order.api.component.enums.ErpLogOperationTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOrderSourceEnum;
+import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayTypeEnum;
 import com.aiqin.mgs.order.api.component.returnenums.ReturnOrderTypeEnum;
 import com.aiqin.mgs.order.api.component.returnenums.TreatmentMethodEnum;
 import com.aiqin.mgs.order.api.component.returnenums.WriteDownOrderStatusEnum;
@@ -529,8 +531,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             json.put("order_amount",returnOrderInfo.getActualReturnOrderAmount());
             json.put("fee",0);
             json.put("order_time",returnOrderInfo.getCreateTime());
-            json.put("pay_type",returnOrderInfo.getPaymentCode());
-            json.put("order_source",returnOrderInfo.getSourceType());
+            //在线支付
+            json.put("pay_type", ErpRequestPayTypeEnum.PAY_1.getCode());
+            json.put("order_source", ErpRequestPayOrderSourceEnum.WEB.getCode());
             json.put("create_by",returnOrderInfo.getCityId());
             json.put("update_by",returnOrderInfo.getCreateByName());
             json.put("order_type",4);
@@ -731,7 +734,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     }
 
     @Override
-    public HttpResponse saveWriteDownOrder(String orderCode, AuthToken auth) {
+    public HttpResponse saveWriteDownOrder(String orderCode) {
         //根据订单编码查询原始订单数据及详情数据
         ErpOrderInfo erpOrderInfo=erpOrderQueryService.getOrderAndItemByOrderCode(orderCode);
         if(null==erpOrderInfo){
@@ -750,7 +753,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 //优惠分摊总金额（分摊后金额）
                 BigDecimal totalPreferentialAmount=eoi.getTotalPreferentialAmount();
                 //分摊后单价
-                BigDecimal preferentialAmount=eoi.getTotalPreferentialAmount();
+                BigDecimal preferentialAmount=eoi.getPreferentialAmount();
                 //数量
                 Long productCount=eoi.getProductCount();
                 //实发数量
@@ -760,7 +763,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 }
                 //发起冲减单数量
                 Long differenceCount=productCount-actualProductCount;
-                if(differenceCount.equals(0)){//无需退款
+                if(differenceCount.equals(0L)){//无需退款
                     continue;
                 }else if(differenceCount>0&&differenceCount<productCount){//部分退
                     //计算公式：此商品退货总金额=分摊后单价 X 发起冲减单数量
@@ -769,12 +772,16 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     totalCount=totalCount+differenceCount;
                     //todo 少参数
                     BeanUtils.copyProperties(eoi,returnOrderDetail);
+                    returnOrderDetail.setActualReturnProductCount(differenceCount);
+                    returnOrderDetail.setActualTotalProductAmount(amount);
                     detailsList.add(returnOrderDetail);
                 }else if(differenceCount.equals(productCount)){//全退
                     //计算公式：优惠分摊总金额（分摊后金额）
                     totalAmount=totalAmount.add(totalPreferentialAmount);
                     totalCount=totalCount+differenceCount;
                     BeanUtils.copyProperties(eoi,returnOrderDetail);
+                    returnOrderDetail.setActualReturnProductCount(differenceCount);
+                    returnOrderDetail.setActualTotalProductAmount(totalPreferentialAmount);
                     detailsList.add(returnOrderDetail);
                 }
             }
@@ -795,7 +802,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 returnOrderInfo.setReturnMoneyType(ReturnOrderTypeEnum.WRITE_DOWN_ORDER_TYPE.getCode());
                 //处理办法 4--仅退款
                 returnOrderInfo.setTreatmentMethod(TreatmentMethodEnum.RETURN_AMOUNT_TYPE.getCode());
-                //修改退款单主表
+                //生成退货单
+                returnOrderInfo.setId(null);
                 returnOrderInfoDao.insertSelective(returnOrderInfo);
                 List<ReturnOrderDetail> details = detailsList.stream().map(detailVo -> {
                     ReturnOrderDetail detail = new ReturnOrderDetail();
@@ -807,10 +815,10 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     detail.setCreateByName("系统操作");
                     return detail;
                 }).collect(Collectors.toList());
-                //修改退款单详情
-                returnOrderDetailDao.insertBatch(details);
+                //生成退货单详情
+                returnOrderDetailDao.insertWriteDownOrderBatch(details);
                 //添加日志
-                insertLog(returnOrderCode,null,"系统操作",ErpLogOperationTypeEnum.ADD.getCode(), WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getCode(),WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getName());
+                insertLog(returnOrderCode,"系统操作","系统操作",ErpLogOperationTypeEnum.ADD.getCode(), WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getCode(),WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getName());
                 //发起退款
                 refund(returnOrderCode);
                 return HttpResponse.success();
@@ -843,7 +851,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         operationLog.setUpdateTime(new Date());
         operationLog.setUpdateById(persionId);
         operationLog.setUpdateByName(persionName);
-        operationLog.setOperationContent("");
         operationLog.setUseStatus(0);
         erpOrderOperationLogDao.insert(operationLog);
     }

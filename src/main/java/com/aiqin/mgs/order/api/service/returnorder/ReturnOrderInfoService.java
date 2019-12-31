@@ -121,6 +121,6 @@ public interface ReturnOrderInfoService {
      * @param orderCode
      * @return
      */
-    HttpResponse saveWriteDownOrder(String orderCode, AuthToken auth);
+    HttpResponse saveWriteDownOrder(String orderCode);
 
 }
