@@ -23,16 +23,16 @@
   <select id="selectByFormNo" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
-    from approval_detail
+    from coupon_approval_detail
     where form_no = #{formNo,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
-    delete from approval_detail
+    delete from coupon_approval_detail
     where id = #{id,jdbcType=INTEGER}
   </delete>
 
   <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.CouponApprovalDetail" >
-    insert into approval_detail
+    insert into coupon_approval_detail
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,
@@ -117,7 +117,7 @@
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.CouponApprovalDetail" >
-    update approval_detail
+    update coupon_approval_detail
     <set >
       <if test="formNo != null" >
         form_no = #{formNo,jdbcType=VARCHAR},

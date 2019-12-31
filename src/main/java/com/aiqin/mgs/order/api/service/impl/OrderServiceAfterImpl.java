@@ -144,7 +144,7 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 			}
 			afterSaleCode = DateUtil.sysDate()+logo+String.valueOf(Global.ORDERID_CHANNEL_4)+OrderPublic.randomNumberF();
 			orderAfterSaleInfo.setAfterSaleCode(afterSaleCode);
-			
+
 			//保存订单售后
 			orderAfterDao.addAfterOrder(orderAfterSaleInfo);
 
@@ -207,7 +207,7 @@ public class OrderServiceAfterImpl implements OrderAfterService{
             //退款成功修改退款状态
             orderAfterSaleInfo.setRefundStatus(1);
             orderAfterDao.updateRefundStatus(orderAfterSaleInfo);
-			return HttpResponse.success(after_sale_code);
+			return HttpResponse.success(orderAfterSaleInfo);
 		
 
 	}

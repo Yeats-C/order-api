@@ -6,18 +6,25 @@ import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.*;
 import com.aiqin.mgs.order.api.component.SequenceService;
+import com.aiqin.mgs.order.api.component.enums.ErpLogOperationTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
+import com.aiqin.mgs.order.api.dao.OperationLogDao;
+import com.aiqin.mgs.order.api.dao.order.ErpOrderOperationLogDao;
 import com.aiqin.mgs.order.api.dao.returnorder.RefundInfoDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
 import com.aiqin.mgs.order.api.domain.request.bill.RejectRecordReq;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderStatusVo;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
+import com.aiqin.mgs.order.api.service.order.ErpOrderOperationLogService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import com.aiqin.mgs.order.api.util.URLConnectionUtil;
 import com.aiqin.platform.flows.client.constant.AjaxJson;
@@ -79,6 +86,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     private RefundInfoDao refundInfoDao;
     @Resource
     private ErpOrderItemService erpOrderItemService;
+    @Resource
+    private ErpOrderOperationLogDao erpOrderOperationLogDao;
 
     @Override
     @Transactional
@@ -112,7 +121,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 //            record.setDiscountAmountInfoStr(JSON.toJSONString(reqVo.getDiscountAmountInfos()));
 //        }
         //tui
-        record.setReturnMoneyType(ConstantData.returnMoneyType);
+        record.setReturnMoneyType(ConstantData.RETURN_MONEY_TYPE);
         returnOrderInfoDao.insertSelective(record);
         List<ReturnOrderDetail> details = reqVo.getDetails().stream().map(detailVo -> {
             ReturnOrderDetail detail = new ReturnOrderDetail();
@@ -125,6 +134,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             return detail;
         }).collect(Collectors.toList());
         returnOrderDetailDao.insertBatch(details);
+        //添加日志
+        insertLog(afterSaleCode,reqVo.getCreateById(),reqVo.getCreateByName(),ErpLogOperationTypeEnum.ADD.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getMsg());
         return true;
     }
 
@@ -142,28 +153,40 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         boolean flag = false;
         boolean flag1 = false;
         //1--通过 2--挂账 3--不通过（驳回）99-已取消"
+        //处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款 99--已取消
+        String content="";
         switch (reqVo.getOperateStatus()) {
             case 1:
-                reqVo.setOperateStatus(2);
+                reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey());
+                reqVo.setTreatmentMethod(1);
+                content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg();
                 //同步数据到供应链
                 flag = true;
                 break;
             case 2:
-                reqVo.setOperateStatus(6);
+                reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_APPLY.getKey());
+                reqVo.setTreatmentMethod(2);
+                content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_APPLY.getMsg();
                 //调用A品卷审批
                 flag1 = true;
                 break;
             case 3:
-                reqVo.setOperateStatus(98);
+                reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getKey());
+                reqVo.setTreatmentMethod(3);
+                content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getMsg();
                 break;
             case 99:
-                reqVo.setOperateStatus(99);
+                reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REMOVE.getKey());
+                content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getMsg();
                 break;
             default:
                 return false;
         }
         //修改退货单状态
+        reqVo.setReviewTime(new Date());
         Integer review = returnOrderInfoDao.updateReturnStatus(reqVo);
+        //添加日志
+        insertLog(reqVo.getReturnOrderCode(),reqVo.getOperator(),reqVo.getOperator(),ErpLogOperationTypeEnum.UPDATE.getCode(),reqVo.getOperateStatus(),content);
         if (flag) {
             //todo 同步到供应链
             createRejectRecord(reqVo.getReturnOrderCode());
@@ -173,20 +196,20 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //生成审批编码
             String approvalCode=createFormNo();
             //同步审批信息到本地表中（新增）
-            CouponApprovalInfo record=approvalInfoInsert(reqVo.getApplier(),reqVo.getUserName(),approvalCode);
+            CouponApprovalInfo record=approvalInfoInsert(reqVo.getOperatorId(),reqVo.getOperator(),approvalCode);
             log.info("同步审批信息入参: reqVo={},approvalCode={}", reqVo,approvalCode);
             couponApprovalInfoDao.insertSelective(record);
             CouponApprovalDetail approvalDetail=reqVo.getApprovalDetail();
             approvalDetail.setFormNo(approvalCode);
-            approvalDetail.setCouponType(ConstantData.couponType);
-            approvalDetail.setCreator(reqVo.getUserName());
+            approvalDetail.setCouponType(ConstantData.COUPON_TYPE);
+            approvalDetail.setCreator(reqVo.getOperator());
             approvalDetail.setRemark(reqVo.getReviewNote());
             approvalDetail.setFranchiseeId(reqVo.getFranchiseeId());
             approvalDetail.setOrderId(reqVo.getReturnOrderCode());
             couponApprovalDetailDao.insertSelective(approvalDetail);
             log.info("同步审批信息到本地完成");
             //A品券发放审批申请提交
-            submitActBaseProcess(approvalCode,reqVo.getApplier(),reqVo.getDeptCode());
+            submitActBaseProcess(approvalCode,reqVo.getOperatorId(),reqVo.getDeptCode());
         }
         return review > 0;
     }
@@ -208,9 +231,13 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     detail.setReturnOrderCode(returnOrderCode);
                     detail.setCreateById(records.getCreateId());
                     detail.setCreateByName(records.getCreator());
+                    detail.setRemark("");
+                    detail.setEvidenceUrl("");
                     return detail;
                 }).collect(Collectors.toList());
                 returnOrderDetailDao.insertBatch(details);
+                //添加日志
+                insertLog(returnOrderCode,records.getCreateId(),records.getCreator(),ErpLogOperationTypeEnum.UPDATE.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey(),ConstantData.RETURN_ORDER_DETAIL);
                 return true;
             }
         }
@@ -289,7 +316,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             flag=true;
         }
         //退货单状态(供应链使用):4-等待退货验收，5-等待退货入库 11-退货完成
-        if(reqVo.getOperateStatus().equals(ConstantData.returnOrderStatusComplete)){
+        if(reqVo.getOperateStatus().equals(ConstantData.RETURN_ORDER_STATUS_COMPLETE)){
             //发起退款
             flag=refund(reqVo.getReturnOrderId());
         }
@@ -317,15 +344,17 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //查询退货单状态是否修改成功
         ReturnOrderInfo returnOrderInfo=returnOrderInfoDao.selectByReturnOrderCode(reqVo.getOrderNo());
         //退款状态，0-未退款、1-已退款
-        if(returnOrderInfo!=null&&returnOrderInfo.getRefundStatus().equals(ConstantData.refundStatus)){//1-已退款
+        if(returnOrderInfo!=null&&returnOrderInfo.getRefundStatus().equals(ConstantData.REFUND_STATUS)){//1-已退款
             return true;
         }
         RefundInfo record=new RefundInfo();
         record.setOrderCode(reqVo.getOrderNo());
         record.setPayNum(reqVo.getPayNum());
         record.setUpdateTime(new Date());
-        record.setStatus(ConstantData.refundStatus);
+        record.setStatus(ConstantData.REFUND_STATUS);
         refundInfoDao.updateByOrderCode(record);
+        //添加日志
+        insertLog(reqVo.getOrderNo(),"","",ErpLogOperationTypeEnum.UPDATE.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getMsg());
         return returnOrderInfoDao.updateRefundStatus(reqVo.getOrderNo())>0;
     }
 
@@ -377,8 +406,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     public HttpResponse submitActBaseProcess(String approvalCode, String applier, String positionCode) {
         StartProcessParamVO paramVO = new StartProcessParamVO();
         // A品券发放申请
-        paramVO.setCostType(ConstantData.applyCoupon01);
-        paramVO.setFormType(ConstantData.applyCoupon01);
+        paramVO.setCostType(ConstantData.APPLY_COUPON01_KEY);
+        paramVO.setFormType(ConstantData.APPLY_COUPON01_KEY);
         paramVO.setFormUrl("http://order.api.aiqin.com/approval/formDetail/" + approvalCode);//表单详情页面地址 必传
         paramVO.setCurrentUser(applier);
         paramVO.setFormNo(approvalCode);
@@ -439,7 +468,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //结算方式编码--退款方式
         rejectRecord.setSettlementMethodCode(returnOrderInfo.getReturnMoneyType().toString());
         //退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户
-        rejectRecord.setSettlementMethodName(ConstantData.returnMoneyTypeName);
+        rejectRecord.setSettlementMethodName(ConstantData.RETURN_MONEY_TYPE_NAME);
 //        if(null!=returnOrderInfo.getReturnMoneyType()){
 //            //退款方式 1:现金 2:微信 3:支付宝 4:银联
 //            switch (returnOrderInfo.getReturnMoneyType()) {
@@ -482,7 +511,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         log.info("发起退款单申请，returnOrderInfo={}",returnOrderInfo);
         if(returnOrderInfo!=null){
             //同步至支付流水表
-            insertRefundInfo(returnOrderInfo.getActualReturnOrderAmount(),returnOrderInfo.getReturnOrderCode(),ConstantData.payTypeRefund);
+            insertRefundInfo(returnOrderInfo.getActualReturnOrderAmount(),returnOrderInfo.getReturnOrderCode(),ConstantData.PAY_TYPE_REFUND);
             String url=paymentHost+"/payment/pay/payTobAll";
             JSONObject json=new JSONObject();
             json.put("order_no",returnOrderInfo.getReturnOrderCode());
@@ -585,10 +614,12 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 
         //查询退货单详情
         List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderCode);
+        //查询日志详情
+        List<ErpOrderOperationLog> erpOrderOperationLogs = getOrderOperationLogList(returnOrderCode);
         ReturnOrderDetailVO respVo = new ReturnOrderDetailVO();
         respVo.setReturnOrderInfo(returnOrderInfo);
         respVo.setDetails(returnOrderDetails);
-
+        respVo.setLogDetails(erpOrderOperationLogs);
         return respVo;
     }
 
@@ -676,6 +707,68 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             list.add(returnOrderStatusVo);
         }
         return HttpResponse.success(list);
+    }
+
+    @Override
+    public HttpResponse getEvidenceUrl(String returnOrderDetailId) {
+        String url = returnOrderDetailDao.selectUrlsByReturnOrderDetailId(returnOrderDetailId);
+        String[] urls=new String[]{};
+        if(StringUtils.isNotBlank(url)){
+            urls=url.split(",");
+        }
+        return HttpResponse.success(urls);
+    }
+
+    /**
+     * 插入日志表
+     * @param orderCode
+     * @param persionId
+     * @param persionName
+     * @param type
+     * @param status
+     * @param content
+     */
+    public void insertLog(String orderCode,String persionId,String persionName,Integer type,Integer status,String content){
+        ErpOrderOperationLog operationLog=new ErpOrderOperationLog();
+        operationLog.setOperationCode(orderCode);
+        operationLog.setOperationType(ErpLogOperationTypeEnum.ADD.getCode());
+        operationLog.setSourceType(type);
+        operationLog.setOperationStatus(status);
+        operationLog.setOperationContent(content);
+        operationLog.setRemark("");
+        operationLog.setCreateTime(new Date());
+        operationLog.setCreateById(persionId);
+        operationLog.setCreateByName(persionName);
+        operationLog.setUpdateTime(new Date());
+        operationLog.setUpdateById(persionId);
+        operationLog.setUpdateByName(persionName);
+        operationLog.setOperationContent("");
+        operationLog.setUseStatus(0);
+        erpOrderOperationLogDao.insert(operationLog);
+    }
+
+    /**
+     * 根据单号查询操作日志
+     * @param orderCode
+     * @return
+     */
+    public List<ErpOrderOperationLog> getOrderOperationLogList(String orderCode){
+        List<ErpOrderOperationLog> list = new ArrayList<>();
+        if (StringUtils.isNotEmpty(orderCode)) {
+            ErpOrderOperationLog query = new ErpOrderOperationLog();
+            query.setOperationCode(orderCode);
+            query.setSourceType(ErpLogSourceTypeEnum.RETURN.getCode());
+            List<ErpOrderOperationLog> select = erpOrderOperationLogDao.select(query);
+            if (select != null && select.size() > 0) {
+                for (ErpOrderOperationLog item :
+                        select) {
+                    if (!ErpLogOperationTypeEnum.DOWNLOAD.getCode().equals(item.getOperationType())) {
+                        list.add(item);
+                    }
+                }
+            }
+        }
+        return list;
     }
 
 }

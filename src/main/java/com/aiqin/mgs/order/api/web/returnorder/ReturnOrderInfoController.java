@@ -119,4 +119,10 @@ public class ReturnOrderInfoController {
         return returnOrderInfoService.getReturnStatus();
     }
 
+    @ApiOperation("退货单列表--查看附件")
+    @GetMapping("/getEvidenceUrl")
+    public HttpResponse getEvidenceUrl(String returnOrderDetailId) {
+        return returnOrderInfoService.getEvidenceUrl(returnOrderDetailId);
+    }
+
 }

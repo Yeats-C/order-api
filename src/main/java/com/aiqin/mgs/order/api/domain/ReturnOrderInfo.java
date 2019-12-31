@@ -83,7 +83,7 @@ public class ReturnOrderInfo {
     @ApiModelProperty(value = "支付方式名称")
     private String paymentName;
 
-    @ApiModelProperty(value = "处理办法 0退货退款  1仅退款")
+    @ApiModelProperty(value = "处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款 99--已取消")
     private Integer treatmentMethod;
 
     @ApiModelProperty(value = "物流公司编码")
@@ -262,5 +262,11 @@ public class ReturnOrderInfo {
 
     @ApiModelProperty(value = "订单类别：1：收单配送 2：首单赠送 3：配送补货 4：首单直送 5：直送补货")
     private Integer orderCategory;
+
+    @ApiModelProperty(value = "审核人编码")
+    private String reviewOperatorId;
+
+    @ApiModelProperty(value = "审核时间")
+    private Date reviewTime;
 
 }

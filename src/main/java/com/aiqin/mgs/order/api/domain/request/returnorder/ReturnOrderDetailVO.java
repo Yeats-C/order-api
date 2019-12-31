@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.domain.request.returnorder;
 
 import com.aiqin.mgs.order.api.domain.ReturnOrderDetail;
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -39,5 +40,9 @@ public class ReturnOrderDetailVO implements Serializable {
     @ApiModelProperty(value = "退货单主表信息")
     @JsonProperty("returnOrderInfo")
     private ReturnOrderInfo returnOrderInfo;
+
+    @ApiModelProperty(value = "日志详情")
+    @JsonProperty("log_details")
+    private List<ErpOrderOperationLog> logDetails;
 
 }
