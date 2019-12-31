@@ -1111,7 +1111,7 @@
   </select>
 
   <!--后台销售退货单管理列表（搜索）-->
-  <select id="selectAll" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.request.returnorder.AfterReturnOrderSearchVo" >
+  <select id="selectAll" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderQueryVo" >
     select
     <include refid="Base_Column_List" />
     from return_order_info
@@ -1142,6 +1142,12 @@
       </if>
       <if test="orderType!=null">
         and order_type =#{orderType}
+      </if>
+      <if test="transportCenterName!=null and transportCenterName!=''">
+        and transport_center_name =#{transportCenterName}
+      </if>
+      <if test="returnOrderType!=null">
+        and return_order_type =#{returnOrderType}
       </if>
     </where>
     order by create_time desc

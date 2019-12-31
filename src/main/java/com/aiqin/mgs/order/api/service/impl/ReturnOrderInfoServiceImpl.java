@@ -532,7 +532,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             json.put("fee",0);
             json.put("order_time",returnOrderInfo.getCreateTime());
             //在线支付
-            json.put("pay_type", ErpRequestPayTypeEnum.PAY_1.getCode());
+            json.put("pay_type", ErpRequestPayTypeEnum.PAY_10.getCode());
             json.put("order_source", ErpRequestPayOrderSourceEnum.WEB.getCode());
             json.put("create_by",returnOrderInfo.getCityId());
             json.put("update_by",returnOrderInfo.getCreateByName());
@@ -667,7 +667,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         }
         PageHelper.startPage(searchVo.getPageNo(),searchVo.getPageSize());
         log.info("erp售后管理--退货单列表入参，searchVo={}",searchVo);
-        List<ReturnOrderInfo> content = returnOrderInfoDao.selectAll(searchVo.getSearchVO());
+        ReturnOrderQueryVo queryVo=new ReturnOrderQueryVo();
+        BeanUtils.copyProperties(searchVo.getSearchVO(),queryVo);
+        List<ReturnOrderInfo> content = returnOrderInfoDao.selectAll(queryVo);
         return new PageResData(Integer.valueOf((int)((Page) content).getTotal()) , content);
     }
 
@@ -826,6 +828,18 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 
         }
         return HttpResponse.failure(ResultCode.NOT_FOUND_ORDER_DATA);
+    }
+
+    @Override
+    public PageResData<ReturnOrderInfo> getWriteDownOrderList(PageRequestVO<WriteDownOrderSearchVo> searchVo) {
+        PageHelper.startPage(searchVo.getPageNo(),searchVo.getPageSize());
+        log.info("erp售后管理--退货单列表入参，searchVo={}",searchVo);
+        ReturnOrderQueryVo afterReturnOrderSearchVo=new ReturnOrderQueryVo();
+        BeanUtils.copyProperties(searchVo.getSearchVO(),afterReturnOrderSearchVo);
+        //退货类型 3冲减单
+        afterReturnOrderSearchVo.setReturnOrderType(ReturnOrderTypeEnum.WRITE_DOWN_ORDER_TYPE.getCode());
+        List<ReturnOrderInfo> content = returnOrderInfoDao.selectAll(afterReturnOrderSearchVo);
+        return new PageResData(Integer.valueOf((int)((Page) content).getTotal()) , content);
     }
 
     /**

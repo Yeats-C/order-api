@@ -141,5 +141,11 @@ public class ReturnOrderInfoController {
         return returnOrderInfoService.saveWriteDownOrder(returnOrderDetailId);
     }
 
+    @ApiOperation("erp售后管理--退货单列表")
+    @PostMapping("/getWriteDownOrderList")
+    public HttpResponse<PageResData<ReturnOrderInfo>> getWriteDownOrderList(@RequestBody PageRequestVO<WriteDownOrderSearchVo> searchVo) {
+        return new HttpResponse<>(returnOrderInfoService.getWriteDownOrderList(searchVo));
+    }
+
 
 }

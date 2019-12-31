@@ -123,4 +123,11 @@ public interface ReturnOrderInfoService {
      */
     HttpResponse saveWriteDownOrder(String orderCode);
 
+    /**
+     *售后管理--冲减单列表
+     * @param searchVo
+     * @return
+     */
+    PageResData<ReturnOrderInfo> getWriteDownOrderList(PageRequestVO<WriteDownOrderSearchVo> searchVo);
+
 }
