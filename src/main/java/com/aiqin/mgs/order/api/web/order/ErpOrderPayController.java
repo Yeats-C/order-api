@@ -94,6 +94,22 @@ public class ErpOrderPayController {
         return response;
     }
 
+    @PostMapping("/orderLogisticsPayCallback")
+    @ApiOperation(value = "订单物流费用支付回调")
+    public HttpResponse orderLogisticsPayCallback(@RequestBody PayCallbackRequest payCallbackRequest) {
+        HttpResponse response = HttpResponse.success();
+        try {
+            erpOrderPayService.orderLogisticsPayCallback(payCallbackRequest);
+        } catch (BusinessException e) {
+            logger.error("订单物流费支付回调异常：{}", e);
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            logger.error("订单物流费支付回调异常：{}", e);
+            response = HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
+        }
+        return response;
+    }
+
     @PostMapping("/getOrderPayRepayInfo")
     @ApiOperation(value = "查询确认收款信息")
     public HttpResponse<ErpOrderPay> getOrderPayRepayInfo(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {

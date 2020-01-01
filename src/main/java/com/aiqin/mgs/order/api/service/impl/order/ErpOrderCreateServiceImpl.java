@@ -154,9 +154,15 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //构建和保存货架订单，返回订单编号
         String orderCode = generateAndSaveRackOrder(erpOrderSaveRequest, orderItemList, storeInfo, auth);
+        ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
+
+        if (processTypeEnum.isLockStock()) {
+            //锁库
+            erpOrderRequestService.lockStockInSupplyChain(order, auth);
+        }
 
         //返回订单
-        return erpOrderQueryService.getOrderByOrderCode(orderCode);
+        return order;
     }
 
     /**
@@ -529,7 +535,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //发运时间
         order.setTransportTime(null);
         //发运状态
-        order.setTransportStatus(null);
+        order.setTransportStatus(StatusEnum.NO.getCode());
         //发运时间
         order.setReceiveTime(null);
         //发票类型 默认不开发票
@@ -605,6 +611,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         for (ErpOrderItem item :
                 erpOrderInfo.getItemList()) {
             item.setTotalPreferentialAmount(item.getTotalProductAmount());
+            item.setPreferentialAmount(item.getProductAmount());
         }
     }
 
@@ -946,7 +953,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //发运时间
         order.setTransportTime(null);
         //发运状态
-        order.setTransportStatus(null);
+        order.setTransportStatus(StatusEnum.NO.getCode());
         //发运时间 TODO ？
         order.setReceiveTime(null);
         //发票类型 1不开 2增普 3增专 TODO 新建枚举类

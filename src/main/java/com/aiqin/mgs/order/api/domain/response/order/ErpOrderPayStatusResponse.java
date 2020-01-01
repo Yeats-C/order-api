@@ -1,6 +1,5 @@
 package com.aiqin.mgs.order.api.domain.response.order;
 
-import com.aiqin.mgs.order.api.component.enums.pay.ErpPayPollingBackStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import lombok.Data;
 

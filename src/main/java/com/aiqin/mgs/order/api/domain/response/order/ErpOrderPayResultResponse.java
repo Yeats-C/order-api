@@ -1,6 +1,5 @@
 package com.aiqin.mgs.order.api.domain.response.order;
 
-import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -29,7 +28,7 @@ public class ErpOrderPayResultResponse {
     @JsonProperty("order_code")
     private String orderCode;
 
-    @ApiModelProperty(value = "支付状态 0待支付 1已发起支付（支付中） 2支付成功 3支付失败")
+    @ApiModelProperty(value = "支付状态 0待支付 1支付中 2支付成功 3支付失败")
     @JsonProperty("pay_status")
     private Integer payStatus;
 

@@ -2,10 +2,14 @@ package com.aiqin.mgs.order.api.service.impl.order;
 
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
+import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.ProductInfo;
-import com.aiqin.mgs.order.api.domain.po.order.*;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderEditRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSignRequest;
@@ -39,15 +43,11 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     @Resource
     private ErpOrderItemService erpOrderItemService;
     @Resource
-    private ErpOrderLogisticsService erpOrderLogisticsService;
-    @Resource
     private ErpOrderFeeService erpOrderFeeService;
     @Resource
     private ErpOrderOperationLogService erpOrderOperationLogService;
     @Resource
     private ErpOrderRequestService erpOrderRequestService;
-    @Resource
-    private ErpOrderPayService erpOrderPayService;
     @Resource
     private ErpOrderCreateService erpOrderCreateService;
 
@@ -130,24 +130,16 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         if (orderFee == null) {
             throw new BusinessException("订单费用信息异常");
         }
-        if (StringUtils.isNotEmpty(orderFee.getPayId())) {
-            ErpOrderPay orderPay = erpOrderPayService.getOrderPayByPayId(orderFee.getPayId());
-            if (orderPay != null) {
-//                if (ErpPayPollingBackStatusEnum.) {
-                //TODO 判断是否已经发起支付，抛异常
-//                }
-            }
-
+        if (ErpPayStatusEnum.PAYING.getCode().equals(orderFee.getPayStatus())) {
+            throw new BusinessException("订单正在支付中，不能添加赠品");
         }
-
-        if (1 == 1) {
-            //TODO CT 测试中断操作
-            return;
+        if (ErpPayStatusEnum.SUCCESS.getCode().equals(orderFee.getPayStatus())) {
+            throw new BusinessException("订单已经支付成功，不能添加赠品");
         }
 
         //订单原商品明细行
         List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
-        //记录原订单明细行最大行号最后三位数的值
+        //记录最大的行号
         long maxLineIndex = 0;
         for (ErpOrderItem item :
                 orderItemList) {
@@ -237,8 +229,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         }
 
         if (processTypeEnum.isLockStock()) {
-            //TODO 锁库存
-//            erpOrderRequestService.lockStockInSupplyChain();
+            //追加锁库存
+            erpOrderRequestService.lockStockInSupplyChain(order, auth);
         }
 
         erpOrderItemService.saveOrderItemList(addGiftList, auth);
@@ -291,7 +283,43 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 throw new BusinessException("未获取到供应链商品分组");
             }
 
-//            Map<String,Map<String,>>
+            //行号 -（仓库库房 - 数量）
+            Map<Long, Map<String, Long>> map = new HashMap<>(16);
+            //仓库库房 -（仓库库房编码名称信息）
+            Map<String, ErpOrderItemSplitGroupResponse> repertoryMap = new HashMap<>(16);
+            Map<String, List<ErpOrderItem>> splitMap = new HashMap<>(16);
+
+//            //订单行号-(仓库编码-数量)
+//            Map<String, Map<String, Integer>> itemCodeRepertoryQuantityMap = new HashMap<>(16);
+//            //仓库编码-仓库名称
+//            Map<String, String> repertoryCodeNameMap = new HashMap<>(16);
+//            //分组Map
+//            Map<String, List<ErpOrderItem>> splitMap = new HashMap<>(16);
+
+            for (ErpOrderItemSplitGroupResponse item :
+                    lineSplitGroupList) {
+                Long lineCode = item.getLineCode();
+                String transportCenterCode = item.getTransportCenterCode();
+                String warehouseCode = item.getWarehouseCode();
+                String repertoryKey = transportCenterCode + warehouseCode;
+                if (lineCode != null) {
+                    throw new BusinessException("缺失行号");
+                }
+                if (StringUtils.isEmpty(transportCenterCode)) {
+                    throw new BusinessException("缺失仓库编码");
+                }
+                if (StringUtils.isEmpty(warehouseCode)) {
+                    throw new BusinessException("缺失库房编码");
+                }
+                Map<String, Long> mapItem = new HashMap<>(16);
+                if (map.containsKey(lineCode)) {
+                    mapItem = map.get(lineCode);
+                }
+                mapItem.put(repertoryKey, item.getLockCount());
+                map.put(lineCode, mapItem);
+
+
+            }
 
 
         } else {
