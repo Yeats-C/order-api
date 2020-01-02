@@ -40,53 +40,53 @@ public class CartOrderInfo {
 
     /***库存数量*/
     @ApiModelProperty(value = "库存数量")
-    @JsonProperty("stock_number")
-    private int stockNumber;
+    @JsonProperty("stock_num")
+    private int stockNum;
 
     /***生产日期*/
     @ApiModelProperty(value = "生产日期")
     @JsonProperty("production_date")
-    private int productionDate;
+    private Date productionDate;
 
     /***商品标签名称*/
     @ApiModelProperty(value = "商品标签名称")
     @JsonProperty("label_name")
-    private int labelName;
+    private String labelName;
 
     /***商品标签名称*/
     @ApiModelProperty(value = "商品标签编码")
     @JsonProperty("label_code")
-    private int labelCode;
+    private String labelCode;
 
     /***商品属性名称*/
     @ApiModelProperty(value = "商品属性名称")
     @JsonProperty("product_property_name")
-    private int productPropertyName;
+    private String productPropertyName;
 
     /***商品属性编码*/
     @ApiModelProperty(value = "商品属性编码")
     @JsonProperty("product_property_code")
-    private int productPropertyCode;
+    private String productPropertyCode;
 
     /***商品品牌名称*/
     @ApiModelProperty(value = "商品品牌名称")
     @JsonProperty("product_brand_name")
-    private int productBrandName;
+    private String productBrandName;
 
     /***商品品牌编码*/
     @ApiModelProperty(value = "商品品牌编码")
     @JsonProperty("product_brand_code")
-    private int productBrandCode;
+    private String productBrandCode;
 
     /***商品品类名称*/
     @ApiModelProperty(value = "商品品类名称")
     @JsonProperty("`product_category_name")
-    private int productCategoryName;
+    private String productCategoryName;
 
     /***商品品类编码*/
     @ApiModelProperty(value = "商品品类编码")
     @JsonProperty("`product_category_code")
-    private int productCategoryCode;
+    private String productCategoryCode;
 
 
     /***商品logo图片*/
@@ -213,5 +213,22 @@ public class CartOrderInfo {
     @ApiModelProperty(value = "行是否选中 1:是 0:否")
     @JsonProperty("line_check_status")
     private Integer lineCheckStatus;
+
+
+    /***爱亲销售价*/
+    @ApiModelProperty(value = "爱亲销售价")
+    @JsonProperty("price_tax2")
+    private BigDecimal priceTax2;
+
+    /***创建者id*/
+    @ApiModelProperty(value = "创建者id")
+    @JsonProperty("create_by_id")
+    private String createById;
+
+    /***创建者名称*/
+    @ApiModelProperty(value = "创建者名称")
+    @JsonProperty("create_by_name")
+    private String createByName;
+
 
 }
