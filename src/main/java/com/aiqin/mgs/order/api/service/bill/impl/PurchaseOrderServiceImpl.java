@@ -143,17 +143,16 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             logistics.setLogisticsCode(deliveryInfoVo.getTransportCompanyCode());
             logistics.setLogisticsCentreCode(deliveryInfoVo.getCustomerCode());
             logistics.setLogisticsCentreName(deliveryInfoVo.getCustomerName());
-            logistics.setSendRepertoryCode(deliveryInfoVo.getSendRepertoryCode());
-            logistics.setSendRepertoryName(deliveryInfoVo.getSendRepertoryName());
-            logistics.setLogisticsFee(deliveryInfoVo.getLogisticsFee());
+            logistics.setSendRepertoryCode(deliveryInfoVo.getTransportCenterCode());
+            logistics.setSendRepertoryName(deliveryInfoVo.getTransportCenterName());
             orderTransport.setLogistics(logistics);//物流信息 不需要物流单的订单不需要传
-            orderTransport.setTransportTime(deliveryInfoVo.getCustomerTime());//发运时间
-            orderTransport.setDistributionModeCode(deliveryInfoVo.getDistributionModeCode());//配送方式编码
-            orderTransport.setDistributionModeName(deliveryInfoVo.getDistributionModeName());//配送方式名称
-            orderTransport.setPersonId(deliveryInfoVo.getCustomerPersonId());
+            orderTransport.setTransportTime(deliveryInfoVo.getDeliveryTime());//发运时间
+            //orderTransport.setDistributionModeCode(deliveryInfoVo.getDistributionModeCode());//配送方式编码
+            //orderTransport.setDistributionModeName(deliveryInfoVo.getDistributionModeName());//配送方式名称
+            orderTransport.setPersonId(deliveryInfoVo.getCustomerCode());
             orderTransport.setPersonName(deliveryInfoVo.getCustomerName());
             orderTransport.setTransportStatus(deliveryInfoVo.getTransportStatus());
-            orderTransport.setOrderCodeList(deliveryInfoVo.getTransportCode());//该物流单关联的订单，必须是同一个加盟商，同一个类型的订单
+            //orderTransport.setOrderCodeList(deliveryInfoVo.getTransportCode());//该物流单关联的订单，必须是同一个加盟商，同一个类型的订单
             erpOrderDeliverService.orderTransport(orderTransport);
             return HttpResponse.success();
         } catch (Exception e) {
