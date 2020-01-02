@@ -212,6 +212,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
         result.setOrderId(order.getOrderStoreId());
         result.setGoodsCoupon(orderFee.getGoodsCoupon());
         result.setPayStatus(orderFee.getPayStatus());
+        result.setPayMoney(orderFee.getPayMoney());
         if (ErpPayStatusEnum.SUCCESS.getCode().equals(orderFee.getPayStatus())) {
             ErpOrderPay orderPay = this.getOrderPayByPayId(orderFee.getPayId());
             if (orderPay != null) {
