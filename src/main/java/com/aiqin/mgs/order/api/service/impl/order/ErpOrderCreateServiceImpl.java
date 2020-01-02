@@ -89,6 +89,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      */
     private ErpOrderInfo saveOrder(ErpOrderSaveRequest erpOrderSaveRequest) {
 
+        erpOrderSaveRequest.setStoreId("AB988458F192C747478210CC01D4D4135C");
+
         //操作人信息
         AuthToken auth = AuthUtil.getCurrentAuth();
 
