@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.List;
 
 /**
  * 爱亲采购单 控制器
@@ -53,7 +52,7 @@ public class PurchaseOrderController {
      */
     @PostMapping("istics")
     @ApiOperation(value = "发运单回传")
-    public HttpResponse updateOrderStoreLogistics(@Valid @RequestBody List<DeliveryInfoVo> deliveryInfoVo) {
+    public HttpResponse updateOrderStoreLogistics(@Valid @RequestBody DeliveryInfoVo deliveryInfoVo) {
         return purchaseOrderService.updateOrderStoreLogistics(deliveryInfoVo);
     }
 }
