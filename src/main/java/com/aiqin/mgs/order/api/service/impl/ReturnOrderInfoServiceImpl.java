@@ -561,8 +561,10 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             }
             json.put("pay_order_type",returnOrderInfo.getOrderType());
             json.put("back_url","http://order.api.aiqin.com/returnOrder/callback");
+
+            log.info("发起退款单申请入参，url={},json={}",url,json);
             String request= URLConnectionUtil.doPost(url,null,json);
-            log.info("发起退款单申请，request={}",request);
+            log.info("发起退款单申请结果，request={}",request);
             if(StringUtils.isNotBlank(request)){
                 JSONObject jsonObject= JSON.parseObject(request);
                 if(jsonObject.containsKey("code")&&"0".equals(jsonObject.getString("code"))){
@@ -825,7 +827,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 //添加日志
                 insertLog(returnOrderCode,"系统操作","系统操作",ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(), WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getCode(),WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getName());
                 //发起退款
-//                refund(returnOrderCode);
+                refund(returnOrderCode);
                 return HttpResponse.success();
             }
 
