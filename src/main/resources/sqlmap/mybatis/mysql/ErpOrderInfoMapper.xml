@@ -612,6 +612,10 @@
         order by order_store_code desc
             limit 1
     </select>
-
+    <update id="updateOrderSuccess" parameterType="java.lang.String">
+        update order_store_info
+        set order_success = 0
+        where order_store_id = #{orderStoreId}
+   </update>
 </mapper>
 

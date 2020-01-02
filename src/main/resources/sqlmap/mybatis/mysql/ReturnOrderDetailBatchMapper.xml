@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.ReturnOrderDetailBatchDao">
+  <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.ReturnOrderDetailBatch">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="return_order_detail_batch_id" jdbcType="VARCHAR" property="returnOrderDetailBatchId" />
+    <result column="return_order_code" jdbcType="VARCHAR" property="returnOrderCode" />
+    <result column="sku_code" jdbcType="VARCHAR" property="skuCode" />
+    <result column="sku_name" jdbcType="VARCHAR" property="skuName" />
+    <result column="batch_code" jdbcType="VARCHAR" property="batchCode" />
+    <result column="product_date" jdbcType="TIMESTAMP" property="productDate" />
+    <result column="batch_remark" jdbcType="VARCHAR" property="batchRemark" />
+    <result column="unit_code" jdbcType="VARCHAR" property="unitCode" />
+    <result column="unit_name" jdbcType="VARCHAR" property="unitName" />
+    <result column="line_code" jdbcType="BIGINT" property="lineCode" />
+    <result column="use_status" jdbcType="INTEGER" property="useStatus" />
+    <result column="create_by_id" jdbcType="VARCHAR" property="createById" />
+    <result column="create_by_name" jdbcType="VARCHAR" property="createByName" />
+    <result column="update_by_id" jdbcType="VARCHAR" property="updateById" />
+    <result column="update_by_name" jdbcType="VARCHAR" property="updateByName" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, return_order_detail_batch_id, return_order_code, sku_code, sku_name, batch_code, 
+    product_date, batch_remark, unit_code, unit_name, line_code, use_status, create_by_id, 
+    create_by_name, update_by_id, update_by_name, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from return_order_detail_batch
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from return_order_detail_batch
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.ReturnOrderDetailBatch">
+    insert into return_order_detail_batch (id, return_order_detail_batch_id, return_order_code, 
+      sku_code, sku_name, batch_code, 
+      product_date, batch_remark, unit_code, 
+      unit_name, line_code, use_status, 
+      create_by_id, create_by_name, update_by_id, 
+      update_by_name, create_time, update_time
+      )
+    values (#{id,jdbcType=BIGINT}, #{returnOrderDetailBatchId,jdbcType=VARCHAR}, #{returnOrderCode,jdbcType=VARCHAR}, 
+      #{skuCode,jdbcType=VARCHAR}, #{skuName,jdbcType=VARCHAR}, #{batchCode,jdbcType=VARCHAR}, 
+      #{productDate,jdbcType=TIMESTAMP}, #{batchRemark,jdbcType=VARCHAR}, #{unitCode,jdbcType=VARCHAR}, 
+      #{unitName,jdbcType=VARCHAR}, #{lineCode,jdbcType=BIGINT}, #{useStatus,jdbcType=INTEGER},
+      #{createById,jdbcType=VARCHAR}, #{createByName,jdbcType=VARCHAR}, #{updateById,jdbcType=VARCHAR}, 
+      #{updateByName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.ReturnOrderDetailBatch">
+    insert into return_order_detail_batch
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="returnOrderDetailBatchId != null">
+        return_order_detail_batch_id,
+      </if>
+      <if test="returnOrderCode != null">
+        return_order_code,
+      </if>
+      <if test="skuCode != null">
+        sku_code,
+      </if>
+      <if test="skuName != null">
+        sku_name,
+      </if>
+      <if test="batchCode != null">
+        batch_code,
+      </if>
+      <if test="productDate != null">
+        product_date,
+      </if>
+      <if test="batchRemark != null">
+        batch_remark,
+      </if>
+      <if test="unitCode != null">
+        unit_code,
+      </if>
+      <if test="unitName != null">
+        unit_name,
+      </if>
+      <if test="lineCode != null">
+        line_code,
+      </if>
+      <if test="useStatus != null">
+        use_status,
+      </if>
+      <if test="createById != null">
+        create_by_id,
+      </if>
+      <if test="createByName != null">
+        create_by_name,
+      </if>
+      <if test="updateById != null">
+        update_by_id,
+      </if>
+      <if test="updateByName != null">
+        update_by_name,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="returnOrderDetailBatchId != null">
+        #{returnOrderDetailBatchId,jdbcType=VARCHAR},
+      </if>
+      <if test="returnOrderCode != null">
+        #{returnOrderCode,jdbcType=VARCHAR},
+      </if>
+      <if test="skuCode != null">
+        #{skuCode,jdbcType=VARCHAR},
+      </if>
+      <if test="skuName != null">
+        #{skuName,jdbcType=VARCHAR},
+      </if>
+      <if test="batchCode != null">
+        #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="productDate != null">
+        #{productDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="batchRemark != null">
+        #{batchRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="unitCode != null">
+        #{unitCode,jdbcType=VARCHAR},
+      </if>
+      <if test="unitName != null">
+        #{unitName,jdbcType=VARCHAR},
+      </if>
+      <if test="lineCode != null">
+        #{lineCode,jdbcType=BIGINT},
+      </if>
+      <if test="useStatus != null">
+        #{useStatus,jdbcType=INTEGER},
+      </if>
+      <if test="createById != null">
+        #{createById,jdbcType=VARCHAR},
+      </if>
+      <if test="createByName != null">
+        #{createByName,jdbcType=VARCHAR},
+      </if>
+      <if test="updateById != null">
+        #{updateById,jdbcType=VARCHAR},
+      </if>
+      <if test="updateByName != null">
+        #{updateByName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.ReturnOrderDetailBatch">
+    update return_order_detail_batch
+    <set>
+      <if test="returnOrderDetailBatchId != null">
+        return_order_detail_batch_id = #{returnOrderDetailBatchId,jdbcType=VARCHAR},
+      </if>
+      <if test="returnOrderCode != null">
+        return_order_code = #{returnOrderCode,jdbcType=VARCHAR},
+      </if>
+      <if test="skuCode != null">
+        sku_code = #{skuCode,jdbcType=VARCHAR},
+      </if>
+      <if test="skuName != null">
+        sku_name = #{skuName,jdbcType=VARCHAR},
+      </if>
+      <if test="batchCode != null">
+        batch_code = #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="productDate != null">
+        product_date = #{productDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="batchRemark != null">
+        batch_remark = #{batchRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="unitCode != null">
+        unit_code = #{unitCode,jdbcType=VARCHAR},
+      </if>
+      <if test="unitName != null">
+        unit_name = #{unitName,jdbcType=VARCHAR},
+      </if>
+      <if test="lineCode != null">
+        line_code = #{lineCode,jdbcType=BIGINT},
+      </if>
+      <if test="useStatus != null">
+        use_status = #{useStatus,jdbcType=INTEGER},
+      </if>
+      <if test="createById != null">
+        create_by_id = #{createById,jdbcType=VARCHAR},
+      </if>
+      <if test="createByName != null">
+        create_by_name = #{createByName,jdbcType=VARCHAR},
+      </if>
+      <if test="updateById != null">
+        update_by_id = #{updateById,jdbcType=VARCHAR},
+      </if>
+      <if test="updateByName != null">
+        update_by_name = #{updateByName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.aiqin.mgs.order.api.domain.ReturnOrderDetailBatch">
+    update return_order_detail_batch
+    set return_order_detail_batch_id = #{returnOrderDetailBatchId,jdbcType=VARCHAR},
+      return_order_code = #{returnOrderCode,jdbcType=VARCHAR},
+      sku_code = #{skuCode,jdbcType=VARCHAR},
+      sku_name = #{skuName,jdbcType=VARCHAR},
+      batch_code = #{batchCode,jdbcType=VARCHAR},
+      product_date = #{productDate,jdbcType=TIMESTAMP},
+      batch_remark = #{batchRemark,jdbcType=VARCHAR},
+      unit_code = #{unitCode,jdbcType=VARCHAR},
+      unit_name = #{unitName,jdbcType=VARCHAR},
+      line_code = #{lineCode,jdbcType=BIGINT},
+      use_status = #{useStatus,jdbcType=INTEGER},
+      create_by_id = #{createById,jdbcType=VARCHAR},
+      create_by_name = #{createByName,jdbcType=VARCHAR},
+      update_by_id = #{updateById,jdbcType=VARCHAR},
+      update_by_name = #{updateByName,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="select" parameterType="com.aiqin.mgs.order.api.domain.ReturnOrderDetailBatch" resultType="com.aiqin.mgs.order.api.domain.ReturnOrderDetailBatch">
+    select * from where 1=1
+    <if test="returnOrderDetailBatchId != null">
+      return_order_detail_batch_id = #{returnOrderDetailBatchId,jdbcType=VARCHAR},
+    </if>
+    <if test="returnOrderCode != null">
+      return_order_code = #{returnOrderCode,jdbcType=VARCHAR},
+    </if>
+    <if test="skuCode != null">
+      sku_code = #{skuCode,jdbcType=VARCHAR},
+    </if>
+    <if test="skuName != null">
+      sku_name = #{skuName,jdbcType=VARCHAR},
+    </if>
+    <if test="batchCode != null">
+      batch_code = #{batchCode,jdbcType=VARCHAR},
+    </if>
+    <if test="productDate != null">
+      product_date = #{productDate,jdbcType=TIMESTAMP},
+    </if>
+    <if test="batchRemark != null">
+      batch_remark = #{batchRemark,jdbcType=VARCHAR},
+    </if>
+    <if test="unitCode != null">
+      unit_code = #{unitCode,jdbcType=VARCHAR},
+    </if>
+    <if test="unitName != null">
+      unit_name = #{unitName,jdbcType=VARCHAR},
+    </if>
+    <if test="lineCode != null">
+      line_code = #{lineCode,jdbcType=BIGINT},
+    </if>
+    <if test="useStatus != null">
+      use_status = #{useStatus,jdbcType=INTEGER},
+    </if>
+    <if test="createById != null">
+      create_by_id = #{createById,jdbcType=VARCHAR},
+    </if>
+    <if test="createByName != null">
+      create_by_name = #{createByName,jdbcType=VARCHAR},
+    </if>
+    <if test="updateById != null">
+      update_by_id = #{updateById,jdbcType=VARCHAR},
+    </if>
+    <if test="updateByName != null">
+      update_by_name = #{updateByName,jdbcType=VARCHAR},
+    </if>
+    <if test="createTime != null">
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+    </if>
+    <if test="updateTime != null">
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+    </if>
+  </select>
+</mapper>
