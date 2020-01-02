@@ -78,6 +78,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     @Value("${bridge.url.slcs_api}")
     private String slcsHost;
 
+    @Value("${bridge.url.product-api}")
+    private String productHost;
+
     @Autowired
     private ReturnOrderInfoDao returnOrderInfoDao;
     @Autowired
@@ -122,16 +125,13 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 record.setReturnOrderStatus(12);
                 record.setActualProductCount(record.getProductCount());
                 record.setActualReturnOrderAmount(record.getReturnOrderAmount());
-//                refund(record, reqVo.getDiscountAmountInfos(), reqVo.getCreateBy());
                 break;
             default:
                 record.setReturnOrderStatus(1);
         }
-//        if (reqVo.getReturnDiscountAmount() > 0) {//退回优惠额度
-//            record.setDiscountAmountInfoStr(JSON.toJSONString(reqVo.getDiscountAmountInfos()));
-//        }
-        //tui
+        //退货单--退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户
         record.setReturnMoneyType(ConstantData.RETURN_MONEY_TYPE);
+        log.info("发起退货--插入退货信息，record={}",record);
         returnOrderInfoDao.insertSelective(record);
         List<ReturnOrderDetail> details = reqVo.getDetails().stream().map(detailVo -> {
             ReturnOrderDetail detail = new ReturnOrderDetail();
@@ -143,9 +143,48 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             detail.setCreateByName(reqVo.getCreateByName());
             return detail;
         }).collect(Collectors.toList());
+        log.info("发起退货--插入退货详情，details={}",details);
         returnOrderDetailDao.insertBatch(details);
         //添加日志
+        log.info("发起退货--插入日志，details={}",details);
         insertLog(afterSaleCode,reqVo.getCreateById(),reqVo.getCreateByName(),ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getMsg());
+        //门店退货申请-完成(门店)（erp回调）--修改商品库存
+        String url=productHost+"/order/return/insert";
+        JSONObject body=new JSONObject();
+        body.put("create_by_id",reqVo.getCreateById());
+        body.put("create_by_name",reqVo.getCreateByName());
+        body.put("create_time",new Date());
+        body.put("order_code",record.getOrderStoreCode());
+        body.put("order_return_code", afterSaleCode);
+        body.put("order_return_id", returnOrderId);
+        body.put("store_id",record.getStoreId());
+        List<OrderReturnProductReq> orderReturnProductReqList=new ArrayList<>();
+        for(ReturnOrderDetail rod:details){
+            String orderReturnId=rod.getReturnOrderDetailId();
+            String orderReturnCode=rod.getReturnOrderCode();
+            String skuCode=rod.getSkuCode();
+            Long returnQuantity=rod.getReturnProductCount();
+            OrderReturnProductReq orpr=new OrderReturnProductReq();
+            orpr.setOrderReturnId(orderReturnId);
+            orpr.setOrderReturnCode(orderReturnCode);
+            orpr.setSkuCode(skuCode);
+            orpr.setReturnQuantity(returnQuantity);
+            orpr.setCreateById(reqVo.getCreateById());
+            orpr.setCreateByName(reqVo.getCreateByName());
+            orpr.setCreateTime(new Date());
+            orderReturnProductReqList.add(orpr);
+        }
+        body.put("order_return_product_reqs",orderReturnProductReqList);
+        log.info("发起门店退货申请-完成(门店)（erp回调）--修改商品库存入参，url={},json={}",url,body);
+        String request= URLConnectionUtil.doPost(url,null,body);
+        log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存结果，request={}",request);
+        if(StringUtils.isNotBlank(request)){
+            JSONObject jsonObject= JSON.parseObject(request);
+            if(jsonObject.containsKey("code")&&"0".equals(jsonObject.getString("code"))){
+                log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存完成");
+                return true;
+            }
+        }
         return true;
     }
 
@@ -165,12 +204,14 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //1--通过 2--挂账 3--不通过（驳回）99-已取消"
         //处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款 99--已取消
         String content="";
+        String isPass="";
         switch (reqVo.getOperateStatus()) {
             case 1:
                 reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey());
                 //处理办法 1--退货退款(通过)
                 reqVo.setTreatmentMethod(TreatmentMethodEnum.RETURN_AMOUNT_AND_GOODS_TYPE.getCode());
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg();
+                isPass="1";
                 //同步数据到供应链
                 flag = true;
                 break;
@@ -179,6 +220,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 //处理办法 2--挂账
                 reqVo.setTreatmentMethod(TreatmentMethodEnum.BOOK_TYPE.getCode());
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_APPLY.getMsg();
+                isPass="1";
                 //调用A品卷审批
                 flag1 = true;
                 break;
@@ -186,6 +228,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getKey());
                 reqVo.setTreatmentMethod(TreatmentMethodEnum.FALL_TYPE.getCode());
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getMsg();
+                isPass="1";
                 break;
             case 99:
                 reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REMOVE.getKey());
@@ -224,6 +267,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             log.info("同步审批信息到本地完成");
             //A品券发放审批申请提交
             submitActBaseProcess(approvalCode,reqVo.getOperatorId(),reqVo.getDeptCode());
+        }
+        //调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单
+        if(StringUtils.isNotBlank(isPass)){
+            ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(reqVo.getReturnOrderCode());
+            updateStoreStatus(reqVo.getReturnOrderCode(),isPass,returnOrderInfo.getStoreId(),reqVo.getOperatorId(),reqVo.getOperator());
         }
         return review > 0;
     }
@@ -529,7 +577,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             String url=paymentHost+"/payment/pay/payTobAll";
             JSONObject json=new JSONObject();
             json.put("order_no",returnOrderInfo.getReturnOrderCode());
-            json.put("order_amount",returnOrderInfo.getActualReturnOrderAmount());
+            BigDecimal amount=returnOrderInfo.getActualReturnOrderAmount().multiply(BigDecimal.valueOf(100));
+            long amountFen=amount.longValue();
+            json.put("order_amount",amountFen);
             json.put("fee",0);
             json.put("order_time",returnOrderInfo.getCreateTime());
             //在线支付
@@ -545,24 +595,24 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             json.put("store_id",returnOrderInfo.getStoreCode());
             Integer method=returnOrderInfo.getTreatmentMethod();
             //处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款
-            if(null!=method&&method.equals(TreatmentMethodEnum.RETURN_AMOUNT_AND_GOODS_TYPE)){//RETURN_REFUND 退货退款
+            if(null!=method&&method==1){//RETURN_REFUND 退货退款
                 json.put("transactionType","RETURN_REFUND");
-            }else if(null!=method&&method.equals(TreatmentMethodEnum.RETURN_AMOUNT_TYPE)){//"REFUND_ONLY 仅退款
+            }else if(null!=method&&method==4){//"REFUND_ONLY 仅退款
                 json.put("transactionType","REFUND_ONLY");
             }
             //订单类型 0直送、1配送、2辅采
             Integer type=returnOrderInfo.getOrderType();
-            if(null!=type&&type.equals(0)){//订单类型 14配送tob 2直送tob
+            if(null!=type&&type==0){//订单类型 14配送tob 2直送tob
                 json.put("pay_order_type",2);
                 json.put("pay_origin_type",10);
-            }else if(null!=type&&type.equals(1)){
+            }else if(null!=type&&type==1){
                 json.put("pay_order_type",14);
                 json.put("pay_origin_type",6);
             }
-            json.put("pay_order_type",returnOrderInfo.getOrderType());
             json.put("back_url","http://order.api.aiqin.com/returnOrder/callback");
+            log.info("发起退款单申请入参，url={},json={}",url,json);
             String request= URLConnectionUtil.doPost(url,null,json);
-            log.info("发起退款单申请，request={}",request);
+            log.info("发起退款单申请结果，request={}",request);
             if(StringUtils.isNotBlank(request)){
                 JSONObject jsonObject= JSON.parseObject(request);
                 if(jsonObject.containsKey("code")&&"0".equals(jsonObject.getString("code"))){
@@ -825,7 +875,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 //添加日志
                 insertLog(returnOrderCode,"系统操作","系统操作",ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(), WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getCode(),WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getName());
                 //发起退款
-//                refund(returnOrderCode);
+                refund(returnOrderCode);
                 return HttpResponse.success();
             }
 
@@ -895,6 +945,28 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             }
         }
         return list;
+    }
+
+    /**
+     * 门店退货申请，完成门店（erp回调）--修改退货单申请
+     * @param orderReturnCode
+     * @param orderReturnStatus
+     * @param storeId
+     * @param updateById
+     * @param updateByName
+     */
+    public void updateStoreStatus(String orderReturnCode,String orderReturnStatus,String storeId,String updateById,String updateByName){
+        //修改商品库存
+        String url=productHost+"/order/return/update/status";
+        StringBuilder sb=new StringBuilder();
+        sb.append("?order_return_code="+orderReturnCode);
+        sb.append("&order_return_status="+orderReturnStatus);
+        sb.append("&store_id="+storeId);
+        sb.append("&update_by_id="+updateById);
+        sb.append("&update_by_name="+updateByName);
+        log.info("发起订货管理-修改退货申请单入参，url={},json={}",url);
+        String request= URLConnectionUtil.doGet(url,null);
+        log.info("发起订货管理-修改退货申请单结果，request={}",request);
     }
 
 }
