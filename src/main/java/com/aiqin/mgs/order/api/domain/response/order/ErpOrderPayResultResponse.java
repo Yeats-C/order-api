@@ -56,6 +56,18 @@ public class ErpOrderPayResultResponse {
     @JsonProperty("pay_end_time")
     private Date payEndTime;
 
+    @ApiModelProperty(value = "收货人")
+    @JsonProperty("receive_person")
+    private String receivePerson;
+
+    @ApiModelProperty(value = "收货人电话")
+    @JsonProperty("receive_mobile")
+    private String receiveMobile;
+
+    @ApiModelProperty(value = "收货地址")
+    @JsonProperty("receive_address")
+    private String receiveAddress;
+
     public String getPayStatusDesc() {
         return ErpPayStatusEnum.getEnumDesc(payStatus);
     }
