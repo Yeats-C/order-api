@@ -407,20 +407,20 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
 
             //请求支付中心接口查询订单支付状态
-            HttpClient httpClient = HttpClient.post(urlProperties.getPaymentApi() + "/payment/pay/payTobAll").json(payRequest);
-            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
-            });
-            if (!RequestReturnUtil.validateHttpResponse(response)) {
-                throw new BusinessException("发起支付失败：" + response.getMessage());
-            }
+//            HttpClient httpClient = HttpClient.post(urlProperties.getPaymentApi() + "/payment/pay/payTobAll").json(payRequest);
+//            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
+//            });
+//            if (!RequestReturnUtil.validateHttpResponse(response)) {
+//                throw new BusinessException("发起支付失败：" + response.getMessage());
+//            }
         } catch (BusinessException e) {
             flag = false;
             logger.error("发起支付失败：{}", e.getMessage());
-//            throw new BusinessException(e.getMessage());
+            throw new BusinessException("发起支付失败：" + e.getMessage());
         } catch (Exception e) {
             flag = false;
             logger.error("发起支付失败：{}", e);
-//            throw new BusinessException("发起支付失败");
+            throw new BusinessException("发起支付失败");
         }
         return flag;
     }
