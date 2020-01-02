@@ -100,7 +100,9 @@ public class ErpOrderCancelServiceImpl implements ErpOrderCancelService {
     @Transactional(rollbackFor = Exception.class)
     public void applyCancelOrder(ErpOrderCancelRequest erpOrderCancelRequest) {
 
-        AuthToken auth = AuthUtil.getCurrentAuth();
+        AuthToken auth = new AuthToken();
+        auth.setPersonId(erpOrderCancelRequest.getPersonId());
+        auth.setPersonName(erpOrderCancelRequest.getPersonName());
 
         if (erpOrderCancelRequest == null) {
             throw new BusinessException("空参数");

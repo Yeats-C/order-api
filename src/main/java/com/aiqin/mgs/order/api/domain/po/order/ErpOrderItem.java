@@ -29,7 +29,7 @@ public class ErpOrderItem {
     private String orderInfoDetailId;
 
     @ApiModelProperty(value = "订单id")
-    @JsonProperty("order_store_sd")
+    @JsonProperty("order_store_id")
     private String orderStoreId;
 
     @ApiModelProperty(value = "订单号")

@@ -5,6 +5,7 @@ import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
+import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayCallbackRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
@@ -48,7 +49,8 @@ public class ErpOrderPayController {
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
-//            erpOrderPayService.orderPay(erpOrderPayRequest);
+            AuthToken auth = AuthUtil.getCurrentAuth();
+            erpOrderPayService.orderPayStartMethodGroup(erpOrderPayRequest, auth, false);
         } catch (BusinessException e) {
             logger.error("订单支付异常：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
@@ -87,6 +89,22 @@ public class ErpOrderPayController {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {
             logger.error("订单支付回调异常：{}", e);
+            response = HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
+        }
+        return response;
+    }
+
+    @PostMapping("/orderLogisticsPayCallback")
+    @ApiOperation(value = "订单物流费用支付回调")
+    public HttpResponse orderLogisticsPayCallback(@RequestBody PayCallbackRequest payCallbackRequest) {
+        HttpResponse response = HttpResponse.success();
+        try {
+            erpOrderPayService.orderLogisticsPayCallback(payCallbackRequest);
+        } catch (BusinessException e) {
+            logger.error("订单物流费支付回调异常：{}", e);
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            logger.error("订单物流费支付回调异常：{}", e);
             response = HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
         }
         return response;

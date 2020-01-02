@@ -63,7 +63,7 @@ public interface ErpOrderRequestService {
      * @version: v1.0.0
      * @date 2019/12/10 13:38
      */
-    boolean unlockStockInSupplyChain(ErpOrderInfo order, ErpOrderLockStockTypeEnum orderLockStockTypeEnum,AuthToken auth);
+    boolean unlockStockInSupplyChain(ErpOrderInfo order, ErpOrderLockStockTypeEnum orderLockStockTypeEnum, AuthToken auth);
 
     /**
      * 根据订单编码获取订单支付状态
@@ -75,6 +75,17 @@ public interface ErpOrderRequestService {
      * @date 2019/12/2 15:37
      */
     ErpOrderPayStatusResponse getOrderPayStatus(String orderCode);
+
+    /**
+     * 根据物流单号查询物流单支付状态
+     *
+     * @param logisticsCode 物流单号
+     * @return com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2020/1/1 11:17
+     */
+    ErpOrderPayStatusResponse getOrderLogisticsPayStatus(String logisticsCode);
 
     /**
      * 发起支付请求
@@ -91,14 +102,14 @@ public interface ErpOrderRequestService {
     /**
      * 发起支付物流费用申请
      *
+     * @param order
      * @param orderLogistics
-     * @param orderPay
      * @return boolean
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/10 15:45
      */
-    boolean sendLogisticsPayRequest(ErpOrderLogistics orderLogistics, ErpOrderPay orderPay);
+    boolean sendLogisticsPayRequest(ErpOrderInfo order, ErpOrderLogistics orderLogistics);
 
     /**
      * 支付成功获取返还物流券金额

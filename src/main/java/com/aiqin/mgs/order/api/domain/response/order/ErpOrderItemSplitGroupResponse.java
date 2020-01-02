@@ -60,10 +60,10 @@ public class ErpOrderItemSplitGroupResponse {
 
     @ApiModelProperty(value = "锁定库存数")
     @JsonProperty("lock_count")
-    private String lockCount;
+    private Long lockCount;
 
     @ApiModelProperty(value = "行号")
     @JsonProperty("line_code")
-    private String lineCode;
+    private Long lineCode;
 
 }
