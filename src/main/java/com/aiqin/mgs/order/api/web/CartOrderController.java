@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.web;
 
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.cart.DeleteCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
@@ -38,9 +39,9 @@ public class CartOrderController {
      */
     @PostMapping("/add")
     @ApiOperation(value = "将商品添加到购物车")
-    public HttpResponse addCart(@Valid @RequestBody ShoppingCartRequest shoppingCartRequest) {
+    public HttpResponse addCart(@Valid @RequestBody ShoppingCartRequest shoppingCartRequest, AuthToken authToken) {
         //将商品添加到购物车
-        return cartOrderService.addCart(shoppingCartRequest);
+        return cartOrderService.addCart(shoppingCartRequest,authToken);
     }
 
     /**
