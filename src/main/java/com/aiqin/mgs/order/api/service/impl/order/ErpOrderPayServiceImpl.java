@@ -162,9 +162,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
 
         if (payFlag) {
             //调用支付中心支付发起支付
-//            boolean payRequestSuccess = erpOrderRequestService.sendOrderPayRequest(order, orderFee);
-            //TODO CT 临时测试
-            boolean payRequestSuccess = true;
+            boolean payRequestSuccess = erpOrderRequestService.sendOrderPayRequest(order, orderFee);
             if (payRequestSuccess) {
 
                 //支付单id
@@ -208,6 +206,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
         }
         ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByFeeId(order.getFeeId());
 
+        result.setOrderInfo(order);
         result.setOrderCode(order.getOrderStoreCode());
         result.setOrderId(order.getOrderStoreId());
         result.setReceivePerson(order.getReceivePerson());
