@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.domain.response.order;
 
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
@@ -19,6 +20,10 @@ import java.util.Date;
 @Data
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class ErpOrderPayResultResponse {
+
+    @ApiModelProperty(value = "订单头信息 方便取字段使用")
+    @JsonProperty("order_info")
+    private ErpOrderInfo orderInfo;
 
     @ApiModelProperty(value = "订单id")
     @JsonProperty("order_id")
