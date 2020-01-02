@@ -6,6 +6,7 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
+import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,9 @@ public class ReturnOrderInfoController {
 
     @Resource
     private ReturnOrderInfoService returnOrderInfoService;
+
+    @Resource
+    private ErpOrderQueryService erpOrderQueryService;
 
     @ApiOperation("新增退货信息")
     @PostMapping("/add")
@@ -124,5 +128,24 @@ public class ReturnOrderInfoController {
     public HttpResponse getEvidenceUrl(String returnOrderDetailId) {
         return returnOrderInfoService.getEvidenceUrl(returnOrderDetailId);
     }
+
+    @ApiOperation("根据订单编码查询主订单和详情")
+    @GetMapping("/getOrderAndItemByOrderCode")
+    public HttpResponse getOrderAndItemByOrderCode(String returnOrderCode) {
+        return HttpResponse.success(erpOrderQueryService.getOrderAndItemByOrderCode(returnOrderCode));
+    }
+
+    @ApiOperation("支付中心--发起冲减单")
+    @GetMapping("/saveWriteDownOrder")
+    public HttpResponse saveWriteDownOrder(String orderCode) {
+        return returnOrderInfoService.saveWriteDownOrder(orderCode);
+    }
+
+    @ApiOperation("erp售后管理--冲减单列表")
+    @PostMapping("/getWriteDownOrderList")
+    public HttpResponse<PageResData<ReturnOrderInfo>> getWriteDownOrderList(@RequestBody PageRequestVO<WriteDownOrderSearchVo> searchVo) {
+        return new HttpResponse<>(returnOrderInfoService.getWriteDownOrderList(searchVo));
+    }
+
 
 }

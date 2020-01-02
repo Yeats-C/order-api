@@ -1,4 +1,4 @@
-package com.aiqin.mgs.order.api.base;
+package com.aiqin.mgs.order.api.component.returnenums;
 
 /**
  * 退货单状态枚举类

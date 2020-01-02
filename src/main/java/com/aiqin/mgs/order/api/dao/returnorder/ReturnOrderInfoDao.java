@@ -1,10 +1,7 @@
 package com.aiqin.mgs.order.api.dao.returnorder;
 
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
-import com.aiqin.mgs.order.api.domain.request.returnorder.AfterReturnOrderSearchVo;
-import com.aiqin.mgs.order.api.domain.request.returnorder.LogisticsVo;
-import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
-import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderSearchVo;
+import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -48,7 +45,7 @@ public interface ReturnOrderInfoDao {
     ReturnOrderInfo selectByParameter(Map queryData);
 
     //售后管理--退货单列表
-    List<ReturnOrderInfo> selectAll(AfterReturnOrderSearchVo searchVo);
+    List<ReturnOrderInfo> selectAll(ReturnOrderQueryVo searchVo);
 
     String selectOrderId(@Param("returnOrderCode") String returnOrderCode);
 

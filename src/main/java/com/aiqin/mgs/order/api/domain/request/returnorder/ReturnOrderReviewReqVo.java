@@ -54,9 +54,9 @@ public class ReturnOrderReviewReqVo implements Serializable {
     @ApiModelProperty(value="审批人所属部门")
     private String deptCode;
 
-    @NotBlank(message = "加盟商id")
-    @ApiModelProperty("加盟商id")
-    private String franchiseeId;
+//    @NotBlank(message = "加盟商id")
+//    @ApiModelProperty("加盟商id")
+//    private String franchiseeId;
 
     @ApiModelProperty(value="A品券发放审批申请详情")
     private CouponApprovalDetail approvalDetail;

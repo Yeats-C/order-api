@@ -27,6 +27,8 @@ public interface ResultCode {
     
     MessageId NET_EXCEPTION = MessageId.create(Project.ORDER_API, 15, "网络异常");
 
+    MessageId NOT_FOUND_ORDER_DATA = MessageId.create(Project.ORDER_API, 16, "此单号有误，未查到订单数据");
+
     MessageId OVER_LIMIT = MessageId.create(Project.PRODUCT_API,20,"订购商品不能超过999");
     MessageId STORE_SHORT = MessageId.create(Project.PRODUCT_API,21,"库存不足");
     MessageId STOCK_SHORT1 = MessageId.create(Project.PRODUCT_API,22,"库存紧张");
@@ -83,7 +85,8 @@ public interface ResultCode {
 
     MessageId RETURN_PRE_AMOUNT_ERROR = MessageId.create(Project.PAYMENT_API, 5, "退货金额计算失败--订单中分摊后单价为null");
 
-    MessageId RETURN_TOTAL_AMOUNT_ERROR = MessageId.create(Project.PAYMENT_API, 5, "退货金额计算失败--优惠分摊总金额为null");
+    MessageId RETURN_TOTAL_AMOUNT_ERROR = MessageId.create(Project.PAYMENT_API, 6, "退货金额计算失败--优惠分摊总金额为null");
+
 
     
     /** 黄祉壹   2018-11-05 结束     */
