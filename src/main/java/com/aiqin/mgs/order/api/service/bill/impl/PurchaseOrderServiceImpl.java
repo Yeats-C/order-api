@@ -146,7 +146,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             logistics.setSendRepertoryCode(deliveryInfoVo.getTransportCenterCode());
             logistics.setSendRepertoryName(deliveryInfoVo.getTransportCenterName());
             orderTransport.setLogistics(logistics);//物流信息 不需要物流单的订单不需要传
-            orderTransport.setTransportTime(deliveryInfoVo.getDeliveryTime());//发运时间
+            orderTransport.setTransportTime(deliveryInfoVo.getTransportDate());//发运时间
             //orderTransport.setDistributionModeCode(deliveryInfoVo.getDistributionModeCode());//配送方式编码
             //orderTransport.setDistributionModeName(deliveryInfoVo.getDistributionModeName());//配送方式名称
             orderTransport.setPersonId(deliveryInfoVo.getCustomerCode());
