@@ -8,7 +8,6 @@ import com.aiqin.mgs.order.api.base.*;
 import com.aiqin.mgs.order.api.component.SequenceService;
 import com.aiqin.mgs.order.api.component.enums.ErpLogOperationTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
-import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOrderSourceEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayTypeEnum;
 import com.aiqin.mgs.order.api.component.returnenums.ReturnOrderStatusEnum;
@@ -17,7 +16,6 @@ import com.aiqin.mgs.order.api.component.returnenums.TreatmentMethodEnum;
 import com.aiqin.mgs.order.api.component.returnenums.WriteDownOrderStatusEnum;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
-import com.aiqin.mgs.order.api.dao.OperationLogDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderOperationLogDao;
 import com.aiqin.mgs.order.api.dao.returnorder.RefundInfoDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
@@ -31,7 +29,6 @@ import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderStatusVo;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
-import com.aiqin.mgs.order.api.service.order.ErpOrderOperationLogService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import com.aiqin.mgs.order.api.util.URLConnectionUtil;
@@ -480,11 +477,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         paramVO.setSignTicket(IdUtil.uuid());
         paramVO.setReceiptType(1);
         paramVO.setPositionCode(positionCode);
-//        if (StringUtils.isNotBlank(request.getAuditPersonId())) {
-//            Map<String, Object> map = new HashMap<>();
-//            map.put("auditPersonId", request.getAuditPersonId());
-//            paramVO.setVariables(map);
-//        }
         log.info("调用审批流发起申请,request={}", paramVO);
         String url = activitiHost + "/activiti/common/submit";
         HttpClient httpClient = HttpClient.post(url).json(paramVO).timeout(10000);
@@ -616,14 +608,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             if(StringUtils.isNotBlank(request)){
                 JSONObject jsonObject= JSON.parseObject(request);
                 if(jsonObject.containsKey("code")&&"0".equals(jsonObject.getString("code"))){
-//                    log.info("退款完成，修改退货单状态");
-//                    //查询退货单状态是否修改成功
-//                    ReturnOrderInfo returnOrderInfo1=returnOrderInfoDao.selectByReturnOrderCode(returnOrderCode);
-//                    //退款状态，0-未退款、1-已退款
-//                    if(returnOrderInfo1!=null&&returnOrderInfo1.getRefundStatus().equals(ConstantData.refundStatus)){//1-已退款
-//                        return true;
-//                    }
-//                    returnOrderInfoDao.updateRefundStatus(returnOrderCode);
                     log.info("退款完成");
                     return true;
                 }
@@ -663,7 +647,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         RefundInfo record=new RefundInfo();
         record.setOrderAmount(amount);
         record.setOrderCode(orderCode);
-//        record.setPayNum(payNum);
         record.setPayType(payType);
         int res=refundInfoDao.insertSelective(record);
         return res>0;
@@ -676,7 +659,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         queryData.put("returnOrderCode",returnOrderCode);
         ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByParameter(queryData);
         Assert.notNull(returnOrderInfo, "退货单不存在");
-
         //查询退货单详情
         List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderCode);
         //查询日志详情
@@ -866,7 +848,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     detail.setCreateTime(new Date());
                     detail.setReturnOrderDetailId(IdUtil.uuid());
                     detail.setReturnOrderCode(returnOrderCode);
-//                    detail.setCreateById(reqVo.getCreateById());
+                    detail.setCreateById("系统操作");
                     detail.setCreateByName("系统操作");
                     return detail;
                 }).collect(Collectors.toList());
