@@ -278,48 +278,45 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         if (processTypeEnum.isSplitByRepertory()) {
             //按照库存分组拆单
 
-            List<ErpOrderItemSplitGroupResponse> lineSplitGroupList = erpOrderRequestService.getRepositorySplitGroup(order);
-            if (lineSplitGroupList == null || lineSplitGroupList.size() == 0) {
-                throw new BusinessException("未获取到供应链商品分组");
-            }
+            //TODO CT 跳过拆单步骤
+            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
+            order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
+            this.updateOrderByPrimaryKeySelective(order, auth);
 
-            //行号 -（仓库库房 - 数量）
-            Map<Long, Map<String, Long>> map = new HashMap<>(16);
-            //仓库库房 -（仓库库房编码名称信息）
-            Map<String, ErpOrderItemSplitGroupResponse> repertoryMap = new HashMap<>(16);
-            Map<String, List<ErpOrderItem>> splitMap = new HashMap<>(16);
 
-//            //订单行号-(仓库编码-数量)
-//            Map<String, Map<String, Integer>> itemCodeRepertoryQuantityMap = new HashMap<>(16);
-//            //仓库编码-仓库名称
-//            Map<String, String> repertoryCodeNameMap = new HashMap<>(16);
-//            //分组Map
+//            List<ErpOrderItemSplitGroupResponse> lineSplitGroupList = erpOrderRequestService.getRepositorySplitGroup(order);
+//            if (lineSplitGroupList == null || lineSplitGroupList.size() == 0) {
+//                throw new BusinessException("未获取到供应链商品分组");
+//            }
+//
+//            //行号 -（仓库库房 - 数量）
+//            Map<Long, Map<String, Long>> map = new HashMap<>(16);
+//            //仓库库房 -（仓库库房编码名称信息）
+//            Map<String, ErpOrderItemSplitGroupResponse> repertoryMap = new HashMap<>(16);
 //            Map<String, List<ErpOrderItem>> splitMap = new HashMap<>(16);
-
-            for (ErpOrderItemSplitGroupResponse item :
-                    lineSplitGroupList) {
-                Long lineCode = item.getLineCode();
-                String transportCenterCode = item.getTransportCenterCode();
-                String warehouseCode = item.getWarehouseCode();
-                String repertoryKey = transportCenterCode + warehouseCode;
-                if (lineCode != null) {
-                    throw new BusinessException("缺失行号");
-                }
-                if (StringUtils.isEmpty(transportCenterCode)) {
-                    throw new BusinessException("缺失仓库编码");
-                }
-                if (StringUtils.isEmpty(warehouseCode)) {
-                    throw new BusinessException("缺失库房编码");
-                }
-                Map<String, Long> mapItem = new HashMap<>(16);
-                if (map.containsKey(lineCode)) {
-                    mapItem = map.get(lineCode);
-                }
-                mapItem.put(repertoryKey, item.getLockCount());
-                map.put(lineCode, mapItem);
-
-
-            }
+//
+//            for (ErpOrderItemSplitGroupResponse item :
+//                    lineSplitGroupList) {
+//                Long lineCode = item.getLineCode();
+//                String transportCenterCode = item.getTransportCenterCode();
+//                String warehouseCode = item.getWarehouseCode();
+//                String repertoryKey = transportCenterCode + warehouseCode;
+//                if (lineCode != null) {
+//                    throw new BusinessException("缺失行号");
+//                }
+//                if (StringUtils.isEmpty(transportCenterCode)) {
+//                    throw new BusinessException("缺失仓库编码");
+//                }
+//                if (StringUtils.isEmpty(warehouseCode)) {
+//                    throw new BusinessException("缺失库房编码");
+//                }
+//                Map<String, Long> mapItem = new HashMap<>(16);
+//                if (map.containsKey(lineCode)) {
+//                    mapItem = map.get(lineCode);
+//                }
+//                mapItem.put(repertoryKey, item.getLockCount());
+//                map.put(lineCode, mapItem);
+//            }
 
 
         } else {

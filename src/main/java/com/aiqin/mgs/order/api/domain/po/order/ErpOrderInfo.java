@@ -224,7 +224,7 @@ public class ErpOrderInfo {
     @JsonProperty("transport_time")
     private Date transportTime;
 
-    @ApiModelProperty(value = "发运时间")
+    @ApiModelProperty(value = "签收时间")
     @JsonProperty("receive_time")
     private Date receiveTime;
 

@@ -26,6 +26,10 @@ public class ErpOrderTransportRequest {
     @JsonProperty("transport_time")
     private Date transportTime;
 
+    @ApiModelProperty(value = "发运状态")
+    @JsonProperty("transport_status")
+    private Integer transportStatus;
+
     @ApiModelProperty(value = "配送方式编码")
     @JsonProperty("distribution_mode_code")
     private String distributionModeCode;
