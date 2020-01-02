@@ -8,16 +8,12 @@ import com.aiqin.mgs.order.api.base.*;
 import com.aiqin.mgs.order.api.component.SequenceService;
 import com.aiqin.mgs.order.api.component.enums.ErpLogOperationTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
-import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOperationTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOrderSourceEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayTypeEnum;
-import com.aiqin.mgs.order.api.component.returnenums.ReturnOrderStatusEnum;
-import com.aiqin.mgs.order.api.component.returnenums.ReturnOrderTypeEnum;
-import com.aiqin.mgs.order.api.component.returnenums.TreatmentMethodEnum;
-import com.aiqin.mgs.order.api.component.returnenums.WriteDownOrderStatusEnum;
+import com.aiqin.mgs.order.api.component.returnenums.*;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
-import com.aiqin.mgs.order.api.dao.OperationLogDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderOperationLogDao;
 import com.aiqin.mgs.order.api.dao.returnorder.RefundInfoDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
@@ -31,7 +27,6 @@ import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderStatusVo;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
-import com.aiqin.mgs.order.api.service.order.ErpOrderOperationLogService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import com.aiqin.mgs.order.api.util.URLConnectionUtil;
@@ -117,17 +112,18 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         record.setReturnOrderCode(afterSaleCode);
         record.setCreateTime(now);
         switch (reqVo.getReturnOrderType()) {
-            case 2:
-                record.setReturnOrderStatus(1);
-                break;
-            case 1:
             case 0:
-                record.setReturnOrderStatus(12);
+                record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getKey());
                 record.setActualProductCount(record.getProductCount());
                 record.setActualReturnOrderAmount(record.getReturnOrderAmount());
                 break;
+            case 1:
+
+            case 2:
+                record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey());
+                break;
             default:
-                record.setReturnOrderStatus(1);
+                record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey());
         }
         //退货单--退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户
         record.setReturnMoneyType(ConstantData.RETURN_MONEY_TYPE);
@@ -480,11 +476,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         paramVO.setSignTicket(IdUtil.uuid());
         paramVO.setReceiptType(1);
         paramVO.setPositionCode(positionCode);
-//        if (StringUtils.isNotBlank(request.getAuditPersonId())) {
-//            Map<String, Object> map = new HashMap<>();
-//            map.put("auditPersonId", request.getAuditPersonId());
-//            paramVO.setVariables(map);
-//        }
         log.info("调用审批流发起申请,request={}", paramVO);
         String url = activitiHost + "/activiti/common/submit";
         HttpClient httpClient = HttpClient.post(url).json(paramVO).timeout(10000);
@@ -587,7 +578,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             json.put("order_source", ErpRequestPayOrderSourceEnum.WEB.getCode());
             json.put("create_by",returnOrderInfo.getCityId());
             json.put("update_by",returnOrderInfo.getCreateByName());
-            json.put("order_type",4);
+            //4-退款
+            json.put("order_type", ErpRequestPayOperationTypeEnum.TYPE_4.getCode());
             //根据门店id获取加盟商id
             String franchiseeId=getFranchiseeId(returnOrderInfo.getStoreId());
             json.put("franchisee_id",franchiseeId);
@@ -595,19 +587,19 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             json.put("store_id",returnOrderInfo.getStoreCode());
             Integer method=returnOrderInfo.getTreatmentMethod();
             //处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款
-            if(null!=method&&method==1){//RETURN_REFUND 退货退款
+            if(null!=method&&method==TreatmentMethodEnum.RETURN_AMOUNT_AND_GOODS_TYPE.getCode()){//RETURN_REFUND 退货退款
                 json.put("transactionType","RETURN_REFUND");
-            }else if(null!=method&&method==4){//"REFUND_ONLY 仅退款
+            }else if(null!=method&&method==TreatmentMethodEnum.RETURN_AMOUNT_TYPE.getCode()){//"REFUND_ONLY 仅退款
                 json.put("transactionType","REFUND_ONLY");
             }
             //订单类型 0直送、1配送、2辅采
             Integer type=returnOrderInfo.getOrderType();
             if(null!=type&&type==0){//订单类型 14配送tob 2直送tob
-                json.put("pay_order_type",2);
-                json.put("pay_origin_type",10);
+                json.put("pay_order_type", PayOrderTypeEnum.PAY_ORDER_TYPE_PEI.getKey());
+                json.put("pay_origin_type",PayOriginTypeEnum.DIRECT_SEND_TOB_RETURN.getKey());
             }else if(null!=type&&type==1){
-                json.put("pay_order_type",14);
-                json.put("pay_origin_type",6);
+                json.put("pay_order_type",PayOrderTypeEnum.PAY_ORDER_TYPE_ZHI.getKey());
+                json.put("pay_origin_type",PayOriginTypeEnum.TOB_RETURN.getKey());
             }
             json.put("back_url","http://order.api.aiqin.com/returnOrder/callback");
             log.info("发起退款单申请入参，url={},json={}",url,json);
@@ -616,14 +608,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             if(StringUtils.isNotBlank(request)){
                 JSONObject jsonObject= JSON.parseObject(request);
                 if(jsonObject.containsKey("code")&&"0".equals(jsonObject.getString("code"))){
-//                    log.info("退款完成，修改退货单状态");
-//                    //查询退货单状态是否修改成功
-//                    ReturnOrderInfo returnOrderInfo1=returnOrderInfoDao.selectByReturnOrderCode(returnOrderCode);
-//                    //退款状态，0-未退款、1-已退款
-//                    if(returnOrderInfo1!=null&&returnOrderInfo1.getRefundStatus().equals(ConstantData.refundStatus)){//1-已退款
-//                        return true;
-//                    }
-//                    returnOrderInfoDao.updateRefundStatus(returnOrderCode);
                     log.info("退款完成");
                     return true;
                 }
@@ -663,7 +647,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         RefundInfo record=new RefundInfo();
         record.setOrderAmount(amount);
         record.setOrderCode(orderCode);
-//        record.setPayNum(payNum);
         record.setPayType(payType);
         int res=refundInfoDao.insertSelective(record);
         return res>0;
@@ -676,7 +659,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         queryData.put("returnOrderCode",returnOrderCode);
         ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByParameter(queryData);
         Assert.notNull(returnOrderInfo, "退货单不存在");
-
         //查询退货单详情
         List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderCode);
         //查询日志详情
@@ -866,7 +848,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     detail.setCreateTime(new Date());
                     detail.setReturnOrderDetailId(IdUtil.uuid());
                     detail.setReturnOrderCode(returnOrderCode);
-//                    detail.setCreateById(reqVo.getCreateById());
+                    detail.setCreateById("系统操作");
                     detail.setCreateByName("系统操作");
                     return detail;
                 }).collect(Collectors.toList());
