@@ -82,7 +82,16 @@ public interface ErpOrderInfoDao {
     String getMaxOrderCodeByCurrentDay(@Param("currentDay") String currentDay);
 
     /**
+     * 查询同步时失败的订单
+     *
+     * @param orderSuccess
+     */
+    List<ErpOrderInfo> selectByOrderSucess(Integer orderSuccess);
+
+    /**
      * 修改订单同步状态
+     * 
+     * @param orderStoreId
      * @return
      */
     Integer updateOrderSuccess(String orderStoreId);

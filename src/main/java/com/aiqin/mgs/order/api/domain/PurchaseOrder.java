@@ -17,9 +17,9 @@ import java.util.Date;
 @ToString(callSuper = true)
 @ApiModel("采购单")
 public class PurchaseOrder implements Serializable {
-    @ApiModelProperty(value = "采购单号")
+    @ApiModelProperty(value = "业务id")
     private String purchaseOrderId;
-    @ApiModelProperty(value = "公司编码")
+    @ApiModelProperty(value = "采购单号")
     private String purchaseOrderCode;
     @ApiModelProperty(value = "公司编码")
     private String companyCode;

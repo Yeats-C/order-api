@@ -1,4 +1,6 @@
 package com.aiqin.mgs.order.api.service.bill.impl;
+
+import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderDeliverItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderTransportLogisticsRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderTransportRequest;
@@ -9,8 +11,6 @@ import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpLogStatusTypeEnum;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderLogisticsDao;
 
-import java.math.BigDecimal;
-
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
@@ -20,15 +20,12 @@ import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderDeliverRequest;
 import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderDeliverService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
-import io.swagger.annotations.ApiModelProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -37,7 +34,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -94,12 +90,11 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             erpOrderDeliverRequest.setDeliveryTime(purchaseInfo.getDeliveryTime());
             erpOrderDeliverRequest.setPersonId(purchaseInfo.getPersonId());
             erpOrderDeliverRequest.setPersonName(purchaseInfo.getPersonName());
-            BeanUtils.copyProperties(purchaseInfo.getOrderStoreDelete(),erpOrderDeliverRequest.getItemList());
             List<ErpOrderDeliverItemRequest> orderDeliverItemList = Lists.newArrayList();
-            for(OrderStoreDelete orderStoreDelete :purchaseInfo.getOrderStoreDelete()){
+            for (OrderStoreDetail orderStoreDetail : purchaseInfo.getOrderStoreDetail()) {
                 ErpOrderDeliverItemRequest orderDeliverItem = new ErpOrderDeliverItemRequest();
-                orderDeliverItem.setLineCode(orderStoreDelete.getLineCode());
-                orderDeliverItem.setActualProductCount(orderStoreDelete.getActualProductCount());
+                orderDeliverItem.setLineCode(orderStoreDetail.getLineCode());
+                orderDeliverItem.setActualProductCount(orderStoreDetail.getActualProductCount());
                 orderDeliverItemList.add(orderDeliverItem);
             }
             erpOrderDeliverRequest.setItemList(orderDeliverItemList);
@@ -109,29 +104,30 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             PurchaseOrder purchaseOrder = new PurchaseOrder();
             purchaseOrder.setActualTotalCount(purchaseInfo.getActualTotalCount());//
             purchaseOrder.setDeliveryTime(purchaseInfo.getDeliveryTime());//
-            purchaseOrder.setContactPerson(purchaseInfo.getDeliveryPersionId());//
+            purchaseOrder.setContactPerson(purchaseInfo.getDeliveryPersonId());//
             purchaseOrderDao.updateByPrimaryKeySelective(purchaseOrder);
 
             //更新采购单明细
-            for (OrderStoreDelete orderStoreDelete : purchaseInfo.getOrderStoreDelete()) {
+            for (OrderStoreDetail orderStoreDetail : purchaseInfo.getOrderStoreDetail()) {
                 PurchaseOrderDetail purchaseOrderDetail = new PurchaseOrderDetail();
-                purchaseOrderDetail.setLineCode(orderStoreDelete.getLineCode());//行号
-                purchaseOrderDetail.setSkuCode(orderStoreDelete.getSkuCode());//SKU编码
-                purchaseOrderDetail.setSkuName(orderStoreDelete.getSkuName());//SKU名称
-                purchaseOrderDetail.setTotalCount(orderStoreDelete.getActualProductCount());//实发数量
+                purchaseOrderDetail.setLineCode(orderStoreDetail.getLineCode());//行号
+                purchaseOrderDetail.setSkuCode(orderStoreDetail.getSkuCode());//SKU编码
+                purchaseOrderDetail.setSkuName(orderStoreDetail.getSkuName());//SKU名称
+                purchaseOrderDetail.setTotalCount(orderStoreDetail.getActualProductCount());//实发数量
                 purchaseOrderDetailDao.updateByPrimaryKeySelective(purchaseOrderDetail);
             }
 
             //添加订单批次明细
-            OrderStoreDetailBatch orderStoreDetailBatch = new OrderStoreDetailBatch();
-            orderStoreDetailBatch.setSkuCode(purchaseInfo.getSkuCode());//SKU编码
-            orderStoreDetailBatch.setSkuName(purchaseInfo.getSkuName());//SKU名称
-            orderStoreDetailBatch.setBatchCode(purchaseInfo.getBatchCode());//批次编号
-            orderStoreDetailBatch.setProductDate(purchaseInfo.getProductDate());//生产日期
-            orderStoreDetailBatch.setActualProductCount(purchaseInfo.getActualToalCount());//实际销售数量
-            orderStoreDetailBatch.setLineCode(purchaseInfo.getLineCode());//行号
-            orderStoreDetailBatchDao.insert(orderStoreDetailBatch);
-
+            for (OrderBatchStoreDetail batchStoreDetail : purchaseInfo.getOrderBatchStoreDetail()) {
+                OrderStoreDetailBatch orderStoreDetailBatch = new OrderStoreDetailBatch();
+                orderStoreDetailBatch.setSkuCode(batchStoreDetail.getSkuCode());//SKU编码
+                orderStoreDetailBatch.setSkuName(batchStoreDetail.getSkuName());//SKU名称
+                orderStoreDetailBatch.setBatchCode(batchStoreDetail.getBatchCode());//批次编号
+                orderStoreDetailBatch.setProductDate(batchStoreDetail.getProductDate());//生产日期
+                orderStoreDetailBatch.setActualProductCount(purchaseInfo.getActualTotalCount());//实际销售数量
+                orderStoreDetailBatch.setLineCode(batchStoreDetail.getLineCode());//行号
+                orderStoreDetailBatchDao.insert(orderStoreDetailBatch);
+            }
             return HttpResponse.success();
         } catch (Exception e) {
             LOGGER.error("耘链销售单回传更新失败 {}", e);
@@ -140,29 +136,29 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     }
 
     @Override
-    public HttpResponse updateOrderStoreLogistics(List<DeliveryInfoVo> deliveryInfoVo) {
-
-        ErpOrderTransportRequest orderTransport = new ErpOrderTransportRequest();
-        for(DeliveryInfoVo deliveryInfo : deliveryInfoVo){
+    public HttpResponse updateOrderStoreLogistics(DeliveryInfoVo deliveryInfoVo) {
+        try {
+            ErpOrderTransportRequest orderTransport = new ErpOrderTransportRequest();
             ErpOrderTransportLogisticsRequest logistics = new ErpOrderTransportLogisticsRequest();
-            logistics.setLogisticsCode(deliveryInfo.getTransportCompanyCode());
-            logistics.setLogisticsCentreCode(deliveryInfo.getCustomerCode());
-            logistics.setLogisticsCentreName(deliveryInfo.getCustomerName());
-            logistics.setSendRepertoryCode(deliveryInfo.getSendRepertoryCode());
-            logistics.setSendRepertoryName(deliveryInfo.getSendRepertoryName());
-            logistics.setLogisticsFee(deliveryInfo.getLogisticsFee());
+            logistics.setLogisticsCode(deliveryInfoVo.getTransportCompanyCode());
+            logistics.setLogisticsCentreCode(deliveryInfoVo.getCustomerCode());
+            logistics.setLogisticsCentreName(deliveryInfoVo.getCustomerName());
+            logistics.setSendRepertoryCode(deliveryInfoVo.getTransportCenterCode());
+            logistics.setSendRepertoryName(deliveryInfoVo.getTransportCenterName());
             orderTransport.setLogistics(logistics);//物流信息 不需要物流单的订单不需要传
-            orderTransport.setTransportTime(deliveryInfo.getCustomerTime());//发运时间
-            orderTransport.setDistributionModeCode(deliveryInfo.getDistributionModeCode());//配送方式编码
-            orderTransport.setDistributionModeName(deliveryInfo.getDistributionModeName());//配送方式名称
-            orderTransport.setPersonId(deliveryInfo.getCustomerPersonId());
-            orderTransport.setPersonName(deliveryInfo.getCustomerName());
-            orderTransport.setTransportStatus(deliveryInfo.getTransportStatus());
-            orderTransport.setOrderCodeList(deliveryInfo.getTransportCode());//该物流单关联的订单，必须是同一个加盟商，同一个类型的订单
+            orderTransport.setTransportTime(deliveryInfoVo.getDeliveryTime());//发运时间
+            //orderTransport.setDistributionModeCode(deliveryInfoVo.getDistributionModeCode());//配送方式编码
+            //orderTransport.setDistributionModeName(deliveryInfoVo.getDistributionModeName());//配送方式名称
+            orderTransport.setPersonId(deliveryInfoVo.getCustomerCode());
+            orderTransport.setPersonName(deliveryInfoVo.getCustomerName());
+            orderTransport.setTransportStatus(deliveryInfoVo.getTransportStatus());
+            //orderTransport.setOrderCodeList(deliveryInfoVo.getTransportCode());//该物流单关联的订单，必须是同一个加盟商，同一个类型的订单
             erpOrderDeliverService.orderTransport(orderTransport);
+            return HttpResponse.success();
+        } catch (Exception e) {
+            LOGGER.error("发运单回传失败 {}", e);
+            return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
         }
-
-        return null;
     }
 
     /**
@@ -182,7 +178,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
                 //添加采购商品信息
                 LOGGER.info("开始同步采购单商品详情，erpOrderInfo{}", erpOrderInfo);
-                addPurchaseOrderDetail(erpOrderInfo);
+                addPurchaseOrderDetail(erpOrderInfo.getItemList());
                 LOGGER.info("同步采购单商品详结束");
 
                 //修改订单同步状态
@@ -228,107 +224,103 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
      */
     private void addPurchaseOrder(ErpOrderInfo erpOrderInfo) {
         PurchaseOrder purchaseOrder = new PurchaseOrder();
-        purchaseOrder.setPurchaseOrderId(erpOrderInfo.getOrderStoreId());
-        purchaseOrder.setPurchaseOrderCode(erpOrderInfo.getOrderStoreCode());
-        purchaseOrder.setCompanyCode(erpOrderInfo.getCompanyCode());
-        purchaseOrder.setCompanyName(erpOrderInfo.getCompanyName());
-        purchaseOrder.setSupplierCode(erpOrderInfo.getSupplierCode());
-        purchaseOrder.setSupplierName(erpOrderInfo.getSupplierName());
-        purchaseOrder.setTransportCenterCode(erpOrderInfo.getTransportCenterCode());
-        purchaseOrder.setTransportCenterName(erpOrderInfo.getTransportCenterName());
-        purchaseOrder.setWarehouseCode(erpOrderInfo.getWarehouseCode());
-        purchaseOrder.setWarehouseName(erpOrderInfo.getWarehouseName());
-        purchaseOrder.setPurchaseGroupCode("");
-        purchaseOrder.setPurchaseGroupName("");
-        purchaseOrder.setSettlementMethodCode(erpOrderInfo.getPaymentCode());
-        purchaseOrder.setSettlementMethodName(erpOrderInfo.getPaymentName());
-        purchaseOrder.setPurchaseOrderStatus(erpOrderInfo.getOrderStatus());
-        purchaseOrder.setPurchaseMode(0);
-        purchaseOrder.setPurchaseType(0);
-        purchaseOrder.setTotalCount(0L);
-        purchaseOrder.setTotalTaxAmount(erpOrderInfo.getTotalProductAmount());
-        purchaseOrder.setActualTotalCount(1L);
-        purchaseOrder.setActualTotalTaxAmount(new BigDecimal("0"));
-        purchaseOrder.setCancelReason("");
-        purchaseOrder.setCancelRemark(erpOrderInfo.getRemake());
-        purchaseOrder.setUseStatus(erpOrderInfo.getUseStatus());
-        purchaseOrder.setChargePerson("");
-        purchaseOrder.setAccountCode("");
-        purchaseOrder.setAccountName("");
-        purchaseOrder.setContractCode("");
-        purchaseOrder.setContractName("");
-        purchaseOrder.setContactPerson(erpOrderInfo.getReceivePerson());
-        purchaseOrder.setContactMobile("");
-        purchaseOrder.setPreArrivalTime(new Date());
-        purchaseOrder.setValidTime(new Date());
-        purchaseOrder.setDeliveryAddress(erpOrderInfo.getReceiveAddress());
-        purchaseOrder.setDeliveryTime(erpOrderInfo.getDeliveryTime());
-        purchaseOrder.setInStockTime(new Date());
-        purchaseOrder.setInStockAddress(erpOrderInfo.getReceiveAddress());
-        purchaseOrder.setPrePurchaseOrder(erpOrderInfo.getMainOrderCode());
-        purchaseOrder.setPaymentCode(erpOrderInfo.getPaymentCode());
-        purchaseOrder.setPaymentName(erpOrderInfo.getPaymentName());
-        purchaseOrder.setPaymentTime(erpOrderInfo.getPaymentTime());
-        purchaseOrder.setPreAmount(erpOrderInfo.getOrderAmount());
-        purchaseOrder.setRemark(erpOrderInfo.getRemake());
-        purchaseOrder.setSourceCode(erpOrderInfo.getOrderStoreCode());
-        purchaseOrder.setSourceType(erpOrderInfo.getSourceType());
-        purchaseOrder.setCreateById(erpOrderInfo.getCreateById());
-        purchaseOrder.setCreateByName(erpOrderInfo.getCreateByName());
-        purchaseOrder.setUpdateById(erpOrderInfo.getUpdateById());
-        purchaseOrder.setUpdateByName(erpOrderInfo.getUpdateByName());
-        purchaseOrder.setCreateTime(erpOrderInfo.getCreateTime());
-        purchaseOrder.setUpdateTime(erpOrderInfo.getUpdateTime());
-
+        purchaseOrder.setPurchaseOrderId(IdUtil.purchaseId());//业务id
+        purchaseOrder.setPurchaseOrderCode(erpOrderInfo.getOrderStoreCode());//采购单号
+        purchaseOrder.setCompanyCode(erpOrderInfo.getCompanyCode());//公司编码
+        purchaseOrder.setCompanyName(erpOrderInfo.getCompanyName());//公司名称
+        purchaseOrder.setSupplierCode(erpOrderInfo.getSupplierCode());//供应商编码
+        purchaseOrder.setSupplierName(erpOrderInfo.getSupplierName());//供应商名称
+        purchaseOrder.setTransportCenterCode(erpOrderInfo.getTransportCenterCode());//仓库编码
+        purchaseOrder.setTransportCenterName(erpOrderInfo.getTransportCenterName());//仓库名称
+        purchaseOrder.setWarehouseCode(erpOrderInfo.getWarehouseCode());//库房编码
+        purchaseOrder.setWarehouseName(erpOrderInfo.getWarehouseName());//库房名称
+        //purchaseOrder.setPurchaseGroupCode();//采购组编码
+        //purchaseOrder.setPurchaseGroupName();//采购组名称
+        purchaseOrder.setSettlementMethodCode(erpOrderInfo.getPaymentCode());//结算方式编码
+        purchaseOrder.setSettlementMethodName(erpOrderInfo.getPaymentName());//结算方式名称
+        purchaseOrder.setPurchaseOrderStatus(erpOrderInfo.getOrderStatus());//采购单状态  0.待审核 1.审核中 2.审核通过  3.备货确认 4.发货确认  5.入库开始 6.入库中 7.已入库  8.完成 9.取消 10.审核不通过
+        purchaseOrder.setPurchaseMode(Integer.valueOf(erpOrderInfo.getDistributionModeCode()));//采购方式 0. 铺采直送  1.配送
+        purchaseOrder.setPurchaseType(Integer.valueOf(erpOrderInfo.getOrderTypeCode()));//采购单类型   0手动，1.自动
+        purchaseOrder.setTotalCount(Long.valueOf(erpOrderInfo.getItemList().size()));//最小单位数量  商品明细总数量
+        purchaseOrder.setTotalTaxAmount(erpOrderInfo.getTotalProductAmount());//商品含税总金额
+        purchaseOrder.setActualTotalCount(erpOrderInfo.getActualProductCount());//实际最小单数数量
+        purchaseOrder.setActualTotalTaxAmount(erpOrderInfo.getActualTotalProductAmount());//实际商品含税总金额
+        //purchaseOrder.setCancelReason(null);//取消原因
+        //purchaseOrder.setCancelRemark(null);//取消备注
+        purchaseOrder.setUseStatus(erpOrderInfo.getUseStatus());//0. 启用   1.禁用
+        //purchaseOrder.setChargePerson();//负责人
+        //purchaseOrder.setAccountCode();//账户编码
+        //purchaseOrder.setAccountName();//账户名称
+        //purchaseOrder.setContractCode();//合同编码
+        //purchaseOrder.setContractName();//合同名称
+        purchaseOrder.setContactPerson(erpOrderInfo.getReceivePerson());//联系人
+        purchaseOrder.setContactMobile(erpOrderInfo.getReceiveMobile());//联系人电话
+        //purchaseOrder.setPreArrivalTime();//预计到货时间
+        //purchaseOrder.setValidTime();//有效期
+        purchaseOrder.setDeliveryAddress(erpOrderInfo.getReceiveAddress());//发货地址
+        purchaseOrder.setDeliveryTime(erpOrderInfo.getDeliveryTime());//发货时间
+        //purchaseOrder.setInStockTime();//入库时间
+        //purchaseOrder.setInStockAddress();//入库地址
+        //purchaseOrder.setPrePurchaseOrder();//预采购单号
+        purchaseOrder.setPaymentCode(erpOrderInfo.getPaymentCode());//付款方式编码
+        purchaseOrder.setPaymentName(erpOrderInfo.getPaymentName());//付款方式名称
+        purchaseOrder.setPaymentTime(erpOrderInfo.getPaymentTime());//付款期
+        purchaseOrder.setPreAmount(erpOrderInfo.getOrderAmount());//预付付款金额
+        purchaseOrder.setRemark(erpOrderInfo.getRemake());//备注
+        purchaseOrder.setSourceCode(erpOrderInfo.getSourceCode());//来源单号
+        purchaseOrder.setSourceType(erpOrderInfo.getSourceType());//来源类型
+        purchaseOrder.setCreateById(erpOrderInfo.getCreateById());//创建人编码
+        purchaseOrder.setCreateByName(erpOrderInfo.getCreateByName());//创建人名称
+        purchaseOrder.setUpdateById(erpOrderInfo.getUpdateById());//修改人编码
+        purchaseOrder.setUpdateByName(erpOrderInfo.getUpdateByName());//修改人名称
+        purchaseOrder.setCreateTime(erpOrderInfo.getCreateTime());//创建时间
+        purchaseOrder.setUpdateTime(erpOrderInfo.getUpdateTime());//修改时间
         purchaseOrderDao.insertSelective(purchaseOrder);
     }
 
     /**
      * 同步采购商品信息
      *
-     * @param erpOrderInfo
+     * @param itemList
      */
-    private void addPurchaseOrderDetail(ErpOrderInfo erpOrderInfo) {
-        List<ErpOrderItem> itemList = erpOrderInfo.getItemList();
-        List<PurchaseOrderDetail> purchaseOrderDetailList = new ArrayList<>();
+    private void addPurchaseOrderDetail(List<ErpOrderItem> itemList) {
         for (ErpOrderItem item : itemList) {
             PurchaseOrderDetail purchaseOrderDetail = new PurchaseOrderDetail();
-            purchaseOrderDetail.setPurchaseOrderDetailId(item.getOrderInfoDetailId());
-            purchaseOrderDetail.setPurchaseOrderCode(item.getOrderStoreCode());
-            purchaseOrderDetail.setSpuCode(item.getSpuCode());
-            purchaseOrderDetail.setSpuName(item.getSpuName());
-            purchaseOrderDetail.setSkuCode(item.getSkuCode());
-            purchaseOrderDetail.setSkuName(item.getSkuName());
-            purchaseOrderDetail.setBrandCode(item.getActivityCode());
-            purchaseOrderDetail.setBrandName(item.getColorName());
-            purchaseOrderDetail.setCategoryCode("");
-            purchaseOrderDetail.setCategoryName("");
-            purchaseOrderDetail.setProductSpec("");
-            purchaseOrderDetail.setColorCode("");
-            purchaseOrderDetail.setColorName("");
-            purchaseOrderDetail.setModelCode("");
-            purchaseOrderDetail.setUnitCode("");
-            purchaseOrderDetail.setUnitName("");
-            purchaseOrderDetail.setProductType(item.getProductType());
-            purchaseOrderDetail.setPurchaseWhole(0L);
-            purchaseOrderDetail.setPurchaseSingle(0L);
-            purchaseOrderDetail.setBaseProductSpec(0L);
-            purchaseOrderDetail.setBoxGauge("");
-            purchaseOrderDetail.setTaxRate(new BigDecimal("0"));
-            purchaseOrderDetail.setLineCode(0L);
-            purchaseOrderDetail.setFactorySkuCode("");
-            purchaseOrderDetail.setTaxAmount(item.getPurchaseAmount());
-            purchaseOrderDetail.setTotalTaxAmount(item.getTotalAcivityAmount());
-            purchaseOrderDetail.setTotalCount(item.getProductCount());
-            purchaseOrderDetail.setActualTotalTaxAmount(item.getActualTotalProductAmount());
-            purchaseOrderDetail.setUseStatus(item.getUseStatus());
-            purchaseOrderDetail.setCreateById(item.getCreateById());
-            purchaseOrderDetail.setCreateByName(item.getCreateByName());
-            purchaseOrderDetail.setUpdateById(item.getUpdateById());
-            purchaseOrderDetail.setUpdateByName(item.getUpdateByName());
-            purchaseOrderDetail.setCreateTime(item.getCreateTime());
-            purchaseOrderDetail.setUpdateTime(item.getUpdateTime());
-            purchaseOrderDetailList.add(purchaseOrderDetail);
+            purchaseOrderDetail.setPurchaseOrderDetailId(IdUtil.purchaseId());//业务id
+            purchaseOrderDetail.setPurchaseOrderCode(item.getOrderStoreCode());//采购单号
+            purchaseOrderDetail.setSpuCode(item.getSpuCode());//spu编码
+            purchaseOrderDetail.setSpuName(item.getSpuName());//spu名称
+            purchaseOrderDetail.setSkuCode(item.getSkuCode());//sku编号
+            purchaseOrderDetail.setSkuName(item.getSkuName());//sku名称
+            //purchaseOrderDetail.setBrandCode();//品牌编码
+            //purchaseOrderDetail.setBrandName();//品牌名称
+            //purchaseOrderDetail.setCategoryCode();//品类编码
+            //purchaseOrderDetail.setCategoryName();//品类名称
+            purchaseOrderDetail.setProductSpec(item.getProductSpec());//规格
+            purchaseOrderDetail.setColorCode(item.getColorCode());//颜色编码
+            purchaseOrderDetail.setColorName(item.getColorName());//颜色名称
+            purchaseOrderDetail.setModelCode(item.getModelCode());//型号
+            purchaseOrderDetail.setUnitCode(item.getUnitCode());//单位编码
+            purchaseOrderDetail.setUnitName(item.getUnitName());//单位名称
+            purchaseOrderDetail.setProductType(item.getProductType());//商品类型   0商品 1赠品 2实物返回
+            //purchaseOrderDetail.setPurchaseWhole();//采购件数（整数）
+            //purchaseOrderDetail.setPurchaseSingle();//采购件数（零数）
+            //purchaseOrderDetail.setBaseProductSpec();
+            //purchaseOrderDetail.setBoxGauge();//采购包装
+            purchaseOrderDetail.setTaxRate(item.getTaxRate());//税率
+            purchaseOrderDetail.setLineCode(item.getLineCode());//行号
+            purchaseOrderDetail.setFactorySkuCode(item.getSkuCode());//厂商SKU编码
+            purchaseOrderDetail.setTaxAmount(item.getPurchaseAmount());//商品含税单价
+            purchaseOrderDetail.setTotalTaxAmount(item.getTotalAcivityAmount());//商品含税总价
+            purchaseOrderDetail.setTotalCount(item.getProductCount());//最小单位数量
+            purchaseOrderDetail.setActualTotalTaxAmount(item.getActualTotalProductAmount());//实际含税总价
+            purchaseOrderDetail.setUseStatus(item.getUseStatus());//0. 启用   1.禁用
+            purchaseOrderDetail.setCreateById(item.getCreateById());//创建人编码
+            purchaseOrderDetail.setCreateByName(item.getCreateByName());//创建人名称
+            purchaseOrderDetail.setUpdateById(item.getUpdateById());//修改人编码
+            purchaseOrderDetail.setUpdateByName(item.getUpdateByName());//修改人名称
+            purchaseOrderDetail.setCreateTime(item.getCreateTime());//创建时间
+            purchaseOrderDetail.setUpdateTime(item.getUpdateTime());//修改时间
 
             purchaseOrderDetailDao.insertSelective(purchaseOrderDetail);
         }
@@ -341,11 +333,25 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     @Scheduled(cron = "0 0/30 * * * ? ")
     public void TimedFailedPurchaseOrder() {
         //查询同步时失败的订单
-        //erpOrderInfoDao.findOrderList();
-        PurchaseOrderDetailBatch purchaseOrderDetailBatch = new PurchaseOrderDetailBatch();
-        purchaseOrderDetailBatchDao.updateByPrimaryKeySelective(purchaseOrderDetailBatch);
-
-        //调用销售单 TODO
+        Integer orderSuccess = 0;
+        List<ErpOrderInfo> erpOrderInfos = erpOrderInfoDao.selectByOrderSucess(orderSuccess);
+        if (erpOrderInfos != null && erpOrderInfos.size() > 0) {
+            //同步采购单
+            for (ErpOrderInfo orderInfo : erpOrderInfos) {
+                addPurchaseOrder(orderInfo);
+                ErpOrderItem orderItem = new ErpOrderItem();
+                //同步采购单
+                orderItem.setOrderStoreCode(orderInfo.getOrderStoreId());
+                //根据采购单号查询采购单明细
+                List<ErpOrderItem> items = erpOrderItemDao.select(orderItem);
+                //同步采购单明细
+                addPurchaseOrderDetail(items);
+            }
+            //修改订单同步状态
+            for (ErpOrderInfo orderInfo : erpOrderInfos) {
+                erpOrderInfoDao.updateOrderSuccess(orderInfo.getOrderStoreId());
+            }
+        }
     }
 
     /**

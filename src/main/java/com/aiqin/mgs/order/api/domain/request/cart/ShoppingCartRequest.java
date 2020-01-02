@@ -31,4 +31,10 @@ public class ShoppingCartRequest {
     @JsonProperty("create_source")
     private String createSource;
 
+    /***订单类型*/
+    @ApiModelProperty(value = "订单类型 0直送、1配送、2辅采")
+    @JsonProperty("product_type")
+    private Integer productType;
+
+
 }

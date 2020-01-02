@@ -617,5 +617,9 @@
         set order_success = 0
         where order_store_id = #{orderStoreId}
    </update>
+    <!--查询订单到采购单同步失败的数据-->
+    <select id="selectByOrderSucess" parameterType="java.lang.Integer" resultType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo">
+        select * from order_store_info where order_success = #{orderSuccess}
+    </select>
 </mapper>
 
