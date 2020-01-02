@@ -11,6 +11,7 @@ import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOrderSourceEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayTypeEnum;
+import com.aiqin.mgs.order.api.component.returnenums.ReturnOrderStatusEnum;
 import com.aiqin.mgs.order.api.component.returnenums.ReturnOrderTypeEnum;
 import com.aiqin.mgs.order.api.component.returnenums.TreatmentMethodEnum;
 import com.aiqin.mgs.order.api.component.returnenums.WriteDownOrderStatusEnum;
@@ -144,7 +145,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         }).collect(Collectors.toList());
         returnOrderDetailDao.insertBatch(details);
         //添加日志
-        insertLog(afterSaleCode,reqVo.getCreateById(),reqVo.getCreateByName(),ErpLogOperationTypeEnum.ADD.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getMsg());
+        insertLog(afterSaleCode,reqVo.getCreateById(),reqVo.getCreateByName(),ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getMsg());
         return true;
     }
 
@@ -197,7 +198,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         reqVo.setReviewTime(new Date());
         Integer review = returnOrderInfoDao.updateReturnStatus(reqVo);
         //添加日志
-        insertLog(reqVo.getReturnOrderCode(),reqVo.getOperator(),reqVo.getOperator(),ErpLogOperationTypeEnum.UPDATE.getCode(),reqVo.getOperateStatus(),content);
+        insertLog(reqVo.getReturnOrderCode(),reqVo.getOperator(),reqVo.getOperator(),ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),reqVo.getOperateStatus(),content);
         if (flag) {
             //todo 同步到供应链
             createRejectRecord(reqVo.getReturnOrderCode());
@@ -250,7 +251,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 }).collect(Collectors.toList());
                 returnOrderDetailDao.insertBatch(details);
                 //添加日志
-                insertLog(returnOrderCode,records.getCreateId(),records.getCreator(),ErpLogOperationTypeEnum.UPDATE.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey(),ConstantData.RETURN_ORDER_DETAIL);
+                insertLog(returnOrderCode,records.getCreateId(),records.getCreator(),ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey(),ConstantData.RETURN_ORDER_DETAIL);
                 return true;
             }
         }
@@ -367,7 +368,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         record.setStatus(ConstantData.REFUND_STATUS);
         refundInfoDao.updateByOrderCode(record);
         //添加日志
-        insertLog(reqVo.getOrderNo(),"","系统操作",ErpLogOperationTypeEnum.UPDATE.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getMsg());
+        insertLog(reqVo.getOrderNo(),"","系统操作",ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getMsg());
         return returnOrderInfoDao.updateRefundStatus(reqVo.getOrderNo())>0;
     }
 
@@ -797,11 +798,13 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 returnOrderInfo.setReturnOrderCode(returnOrderCode);
                 returnOrderInfo.setCreateTime(new Date());
                 //退货状态 改为：11-退货完成
-                returnOrderInfo.setReturnOrderStatus(11);
+                returnOrderInfo.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_RETURN.getKey());
                 returnOrderInfo.setActualProductCount(totalCount);
                 returnOrderInfo.setActualReturnOrderAmount(totalAmount);
+                //退款方式 5:退到加盟商账户
+                returnOrderInfo.setReturnMoneyType(ConstantData.RETURN_MONEY_TYPE);
                 //退货类型 3冲减单
-                returnOrderInfo.setReturnMoneyType(ReturnOrderTypeEnum.WRITE_DOWN_ORDER_TYPE.getCode());
+                returnOrderInfo.setReturnOrderType(ReturnOrderTypeEnum.WRITE_DOWN_ORDER_TYPE.getCode());
                 //处理办法 4--仅退款
                 returnOrderInfo.setTreatmentMethod(TreatmentMethodEnum.RETURN_AMOUNT_TYPE.getCode());
                 //生成退货单
@@ -820,9 +823,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 //生成退货单详情
                 returnOrderDetailDao.insertWriteDownOrderBatch(details);
                 //添加日志
-                insertLog(returnOrderCode,"系统操作","系统操作",ErpLogOperationTypeEnum.ADD.getCode(), WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getCode(),WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getName());
+                insertLog(returnOrderCode,"系统操作","系统操作",ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(), WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getCode(),WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getName());
                 //发起退款
-                refund(returnOrderCode);
+//                refund(returnOrderCode);
                 return HttpResponse.success();
             }
 
@@ -833,11 +836,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     @Override
     public PageResData<ReturnOrderInfo> getWriteDownOrderList(PageRequestVO<WriteDownOrderSearchVo> searchVo) {
         PageHelper.startPage(searchVo.getPageNo(),searchVo.getPageSize());
-        log.info("erp售后管理--退货单列表入参，searchVo={}",searchVo);
         ReturnOrderQueryVo afterReturnOrderSearchVo=new ReturnOrderQueryVo();
         BeanUtils.copyProperties(searchVo.getSearchVO(),afterReturnOrderSearchVo);
         //退货类型 3冲减单
         afterReturnOrderSearchVo.setReturnOrderType(ReturnOrderTypeEnum.WRITE_DOWN_ORDER_TYPE.getCode());
+        log.info("erp售后管理--冲减单列表，searchVo={}",searchVo);
         List<ReturnOrderInfo> content = returnOrderInfoDao.selectAll(afterReturnOrderSearchVo);
         return new PageResData(Integer.valueOf((int)((Page) content).getTotal()) , content);
     }
@@ -847,15 +850,16 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
      * @param orderCode
      * @param persionId
      * @param persionName
-     * @param type
+     * @param operationType
+     * @param sourceType
      * @param status
      * @param content
      */
-    public void insertLog(String orderCode,String persionId,String persionName,Integer type,Integer status,String content){
+    public void insertLog(String orderCode,String persionId,String persionName,Integer operationType,Integer sourceType,Integer status,String content){
         ErpOrderOperationLog operationLog=new ErpOrderOperationLog();
         operationLog.setOperationCode(orderCode);
-        operationLog.setOperationType(ErpLogOperationTypeEnum.ADD.getCode());
-        operationLog.setSourceType(type);
+        operationLog.setOperationType(operationType);
+        operationLog.setSourceType(sourceType);
         operationLog.setOperationStatus(status);
         operationLog.setOperationContent(content);
         operationLog.setRemark("");

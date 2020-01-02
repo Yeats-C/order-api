@@ -129,19 +129,19 @@ public class ReturnOrderInfoController {
         return returnOrderInfoService.getEvidenceUrl(returnOrderDetailId);
     }
 
-    @ApiOperation("退货单列表--查看附件")
-    @GetMapping("/getEvidesnceUrl")
-    public HttpResponse getEvidesnceUrl(String returnOrderDetailId) {
-        return HttpResponse.success(erpOrderQueryService.getOrderAndItemByOrderCode(returnOrderDetailId));
+    @ApiOperation("根据订单编码查询主订单和详情")
+    @GetMapping("/getOrderAndItemByOrderCode")
+    public HttpResponse getOrderAndItemByOrderCode(String returnOrderCode) {
+        return HttpResponse.success(erpOrderQueryService.getOrderAndItemByOrderCode(returnOrderCode));
     }
 
-    @ApiOperation("退货单列表--查看附件发起冲减单")
+    @ApiOperation("支付中心--发起冲减单")
     @GetMapping("/saveWriteDownOrder")
-    public HttpResponse saveWriteDownOrder(String returnOrderDetailId) {
-        return returnOrderInfoService.saveWriteDownOrder(returnOrderDetailId);
+    public HttpResponse saveWriteDownOrder(String orderCode) {
+        return returnOrderInfoService.saveWriteDownOrder(orderCode);
     }
 
-    @ApiOperation("erp售后管理--退货单列表")
+    @ApiOperation("erp售后管理--冲减单列表")
     @PostMapping("/getWriteDownOrderList")
     public HttpResponse<PageResData<ReturnOrderInfo>> getWriteDownOrderList(@RequestBody PageRequestVO<WriteDownOrderSearchVo> searchVo) {
         return new HttpResponse<>(returnOrderInfoService.getWriteDownOrderList(searchVo));
