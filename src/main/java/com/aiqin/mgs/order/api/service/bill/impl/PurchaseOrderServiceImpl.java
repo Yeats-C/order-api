@@ -334,20 +334,23 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     public void TimedFailedPurchaseOrder() {
         //查询同步时失败的订单
         Integer orderSuccess = 0;
-        List<ErpOrderInfo> erpOrderInfo = erpOrderInfoDao.selectByOrderSucess(orderSuccess);
-        //同步采购单
-        for (ErpOrderInfo orderInfo : erpOrderInfo) {
-            addPurchaseOrder(orderInfo);
-            ErpOrderItem orderItem = new ErpOrderItem();
-            orderItem.setOrderStoreCode(orderInfo.getOrderStoreId());
-            //根据采购单号查询采购单明细
-            List<ErpOrderItem> items = erpOrderItemDao.select(orderItem);
-
-
-        }
-        //修改订单同步状态
-        for (ErpOrderInfo orderInfo : erpOrderInfo) {
-            erpOrderInfoDao.updateOrderSuccess(orderInfo.getOrderStoreId());
+        List<ErpOrderInfo> erpOrderInfos = erpOrderInfoDao.selectByOrderSucess(orderSuccess);
+        if (erpOrderInfos != null && erpOrderInfos.size() > 0) {
+            //同步采购单
+            for (ErpOrderInfo orderInfo : erpOrderInfos) {
+                addPurchaseOrder(orderInfo);
+                ErpOrderItem orderItem = new ErpOrderItem();
+                //同步采购单
+                orderItem.setOrderStoreCode(orderInfo.getOrderStoreId());
+                //根据采购单号查询采购单明细
+                List<ErpOrderItem> items = erpOrderItemDao.select(orderItem);
+                //同步采购单明细
+                addPurchaseOrderDetail(items);
+            }
+            //修改订单同步状态
+            for (ErpOrderInfo orderInfo : erpOrderInfos) {
+                erpOrderInfoDao.updateOrderSuccess(orderInfo.getOrderStoreId());
+            }
         }
     }
 
