@@ -51,7 +51,7 @@
         <!--reject_record
         reject_record_detail
         reject_record_detail_batch-->
-        <table schema="general" tableName="purchase_order_detail_batch" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
+        <table schema="general" tableName="return_order_detail_batch" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
                enableSelectByExample="false" selectByExampleQueryId="true" >
             <property name="useActualColumnNames" value="false"/>
     </table>

@@ -1,9 +1,14 @@
 package com.aiqin.mgs.order.api.service.bill.impl;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderDeliverItemRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderTransportLogisticsRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderTransportRequest;
+import com.google.common.collect.Lists;
+
 import com.aiqin.mgs.order.api.component.enums.ErpLogOperationTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpLogStatusTypeEnum;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderLogisticsDao;
-import com.aiqin.mgs.order.api.domain.PurchaseBanchInfo;
+
 import java.math.BigDecimal;
 
 import com.aiqin.ground.util.http.HttpClient;
@@ -16,10 +21,14 @@ import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderDeliverRequest;
 import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
+import com.aiqin.mgs.order.api.service.order.ErpOrderDeliverService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
+import io.swagger.annotations.ApiModelProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -59,13 +68,15 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     OrderStoreDetailBatchDao orderStoreDetailBatchDao;
     @Autowired
     ErpOrderLogisticsDao erpOrderLogisticsDao;
+    @Autowired
+    ErpOrderDeliverService erpOrderDeliverService;
 
     @Override
     public HttpResponse createPurchaseOrder(@Valid ErpOrderInfo erpOrderInfo) {
         LOGGER.info("同步采购单，erpOrderInfo{}", erpOrderInfo);
         //异步执行
         purchaseOrderExecutor(erpOrderInfo);
-        if(erpOrderInfo != null){
+        if (erpOrderInfo != null) {
             //返回
             return HttpResponse.success();
         }
@@ -74,48 +85,54 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
     @Override
     @Transactional
-    public HttpResponse updatePurchaseInfo(List<PurchaseInfoVo> purchaseInfo) {
-        LOGGER.info("耘链销售单回传更新开始 参数purchaseInfo{}"+purchaseInfo);
+    public HttpResponse updatePurchaseInfo(OrderIogisticsVo purchaseInfo) {
+        LOGGER.info("耘链销售单回传更新开始 参数purchaseInfo{}" + purchaseInfo);
         try {
-        for (PurchaseInfoVo order : purchaseInfo) {
-            //更新订单
+            //更新订单&订单明细
+            ErpOrderDeliverRequest erpOrderDeliverRequest = new ErpOrderDeliverRequest();
+            erpOrderDeliverRequest.setOrderCode(purchaseInfo.getOrderStoreCode());
+            erpOrderDeliverRequest.setDeliveryTime(purchaseInfo.getDeliveryTime());
+            erpOrderDeliverRequest.setPersonId(purchaseInfo.getPersonId());
+            erpOrderDeliverRequest.setPersonName(purchaseInfo.getPersonName());
+            BeanUtils.copyProperties(purchaseInfo.getOrderStoreDelete(),erpOrderDeliverRequest.getItemList());
+            List<ErpOrderDeliverItemRequest> orderDeliverItemList = Lists.newArrayList();
+            for(OrderStoreDelete orderStoreDelete :purchaseInfo.getOrderStoreDelete()){
+                ErpOrderDeliverItemRequest orderDeliverItem = new ErpOrderDeliverItemRequest();
+                orderDeliverItem.setLineCode(orderStoreDelete.getLineCode());
+                orderDeliverItem.setActualProductCount(orderStoreDelete.getActualProductCount());
+                orderDeliverItemList.add(orderDeliverItem);
+            }
+            erpOrderDeliverRequest.setItemList(orderDeliverItemList);
+            erpOrderDeliverService.orderDeliver(erpOrderDeliverRequest);
 
-            PurchaseOrder purchaseOrder = new PurchaseOrder();
-            purchaseOrder.setPurchaseOrderCode(order.getOrderCode());
-            purchaseOrder.setActualTotalCount(order.getActualTotalCount());
-            purchaseOrder.setDeliveryTime(order.getDeliveryTime());
-            purchaseOrder.setContactPerson(order.getDeliveryPersionId());
             //更新采购单
+            PurchaseOrder purchaseOrder = new PurchaseOrder();
+            purchaseOrder.setActualTotalCount(purchaseInfo.getActualTotalCount());//
+            purchaseOrder.setDeliveryTime(purchaseInfo.getDeliveryTime());//
+            purchaseOrder.setContactPerson(purchaseInfo.getDeliveryPersionId());//
             purchaseOrderDao.updateByPrimaryKeySelective(purchaseOrder);
 
-            //更新订单明细
-
             //更新采购单明细
-            for(PurchaseDetailInfo orderDetail : order.getPurchaseDetailInfo()){
+            for (OrderStoreDelete orderStoreDelete : purchaseInfo.getOrderStoreDelete()) {
                 PurchaseOrderDetail purchaseOrderDetail = new PurchaseOrderDetail();
-                purchaseOrderDetail.setLineCode(orderDetail.getLineCode());
-                purchaseOrderDetail.setSkuCode(orderDetail.getSkuCode());
-                purchaseOrderDetail.setSkuName(orderDetail.getSkuName());
-                purchaseOrderDetail.setTotalCount(orderDetail.getActualToalCount());
+                purchaseOrderDetail.setLineCode(orderStoreDelete.getLineCode());//行号
+                purchaseOrderDetail.setSkuCode(orderStoreDelete.getSkuCode());//SKU编码
+                purchaseOrderDetail.setSkuName(orderStoreDelete.getSkuName());//SKU名称
+                purchaseOrderDetail.setTotalCount(orderStoreDelete.getActualProductCount());//实发数量
                 purchaseOrderDetailDao.updateByPrimaryKeySelective(purchaseOrderDetail);
             }
 
-            //添加销售明细批次
-            if (order.getPurchaseBanchInfo() != null && order.getPurchaseBanchInfo().size() > 0) {
-                for (PurchaseBanchInfo orderDetailBanch : order.getPurchaseBanchInfo()) {
-                    OrderStoreDetailBatch orderStoreDetailBatch = new OrderStoreDetailBatch();
-                    orderStoreDetailBatch.setLineCode(orderDetailBanch.getLineCode());
-                    orderStoreDetailBatch.setBatchCode(orderDetailBanch.getBatchCode());
-                    orderStoreDetailBatch.setSkuCode(orderDetailBanch.getSkuCode());
-                    orderStoreDetailBatch.setSkuName(orderDetailBanch.getSkuName());
-                    orderStoreDetailBatch.setProductDate(orderDetailBanch.getProductDate());
-                    //orderDetailBanch.getActualToalCount()
-                    orderStoreDetailBatchDao.updateByPrimaryKeySelective(orderStoreDetailBatch);
-                }
-            }
-            LOGGER.info("耘链销售单回传,销售单单号为DeliveryPersionId："+order.getDeliveryPersionId()+"的更新成功");
-        }
-        return HttpResponse.success();
+            //添加订单批次明细
+            OrderStoreDetailBatch orderStoreDetailBatch = new OrderStoreDetailBatch();
+            orderStoreDetailBatch.setSkuCode(purchaseInfo.getSkuCode());//SKU编码
+            orderStoreDetailBatch.setSkuName(purchaseInfo.getSkuName());//SKU名称
+            orderStoreDetailBatch.setBatchCode(purchaseInfo.getBatchCode());//批次编号
+            orderStoreDetailBatch.setProductDate(purchaseInfo.getProductDate());//生产日期
+            orderStoreDetailBatch.setActualProductCount(purchaseInfo.getActualToalCount());//实际销售数量
+            orderStoreDetailBatch.setLineCode(purchaseInfo.getLineCode());//行号
+            orderStoreDetailBatchDao.insert(orderStoreDetailBatch);
+
+            return HttpResponse.success();
         } catch (Exception e) {
             LOGGER.error("耘链销售单回传更新失败 {}", e);
             return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
@@ -124,8 +141,27 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
     @Override
     public HttpResponse updateOrderStoreLogistics(List<DeliveryInfoVo> deliveryInfoVo) {
-        ErpOrderLogistics erpOrderLogistics = new ErpOrderLogistics();
-        erpOrderLogisticsDao.select(erpOrderLogistics);
+
+        ErpOrderTransportRequest orderTransport = new ErpOrderTransportRequest();
+        for(DeliveryInfoVo deliveryInfo : deliveryInfoVo){
+            ErpOrderTransportLogisticsRequest logistics = new ErpOrderTransportLogisticsRequest();
+            logistics.setLogisticsCode(deliveryInfo.getTransportCompanyCode());
+            logistics.setLogisticsCentreCode(deliveryInfo.getCustomerCode());
+            logistics.setLogisticsCentreName(deliveryInfo.getCustomerName());
+            logistics.setSendRepertoryCode(deliveryInfo.getSendRepertoryCode());
+            logistics.setSendRepertoryName(deliveryInfo.getSendRepertoryName());
+            logistics.setLogisticsFee(deliveryInfo.getLogisticsFee());
+            orderTransport.setLogistics(logistics);//物流信息 不需要物流单的订单不需要传
+            orderTransport.setTransportTime(deliveryInfo.getCustomerTime());//发运时间
+            orderTransport.setDistributionModeCode(deliveryInfo.getDistributionModeCode());//配送方式编码
+            orderTransport.setDistributionModeName(deliveryInfo.getDistributionModeName());//配送方式名称
+            orderTransport.setPersonId(deliveryInfo.getCustomerPersonId());
+            orderTransport.setPersonName(deliveryInfo.getCustomerName());
+            orderTransport.setTransportStatus(deliveryInfo.getTransportStatus());
+            orderTransport.setOrderCodeList(deliveryInfo.getTransportCode());//该物流单关联的订单，必须是同一个加盟商，同一个类型的订单
+            erpOrderDeliverService.orderTransport(orderTransport);
+        }
+
         return null;
     }
 
@@ -167,6 +203,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
     /**
      * 修改订单同步状态
+     *
      * @param erpOrderInfo
      */
     private void updateOrderSuccess(ErpOrderInfo erpOrderInfo) {
@@ -175,16 +212,18 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
     /**
      * 生成栖耘销售单
+     *
      * @param erpOrderInfo
      */
     private void createSaleOrder(ErpOrderInfo erpOrderInfo) {
-        String url =purchaseHost+"/order/aiqin/sale";
+        String url = purchaseHost + "/order/aiqin/sale";
         HttpClient httpGet = HttpClient.post(url.toString()).json(erpOrderInfo).timeout(10000);
         httpGet.action();
     }
 
     /**
      * 同步采购单
+     *
      * @param erpOrderInfo
      */
     private void addPurchaseOrder(ErpOrderInfo erpOrderInfo) {
@@ -246,13 +285,14 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
     /**
      * 同步采购商品信息
+     *
      * @param erpOrderInfo
      */
     private void addPurchaseOrderDetail(ErpOrderInfo erpOrderInfo) {
         List<ErpOrderItem> itemList = erpOrderInfo.getItemList();
-        List<PurchaseOrderDetail> purchaseOrderDetailList= new ArrayList<>();
-        for (ErpOrderItem item : itemList){
-            PurchaseOrderDetail purchaseOrderDetail =  new PurchaseOrderDetail();
+        List<PurchaseOrderDetail> purchaseOrderDetailList = new ArrayList<>();
+        for (ErpOrderItem item : itemList) {
+            PurchaseOrderDetail purchaseOrderDetail = new PurchaseOrderDetail();
             purchaseOrderDetail.setPurchaseOrderDetailId(item.getOrderInfoDetailId());
             purchaseOrderDetail.setPurchaseOrderCode(item.getOrderStoreCode());
             purchaseOrderDetail.setSpuCode(item.getSpuCode());
@@ -300,13 +340,17 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
      */
     @Scheduled(cron = "0 0/30 * * * ? ")
     public void TimedFailedPurchaseOrder() {
+        //查询同步时失败的订单
+        //erpOrderInfoDao.findOrderList();
         PurchaseOrderDetailBatch purchaseOrderDetailBatch = new PurchaseOrderDetailBatch();
         purchaseOrderDetailBatchDao.updateByPrimaryKeySelective(purchaseOrderDetailBatch);
+
         //调用销售单 TODO
     }
 
     /**
      * 根据订单生成爱亲采购单,添加操作日志
+     *
      * @param erpOrderInfo
      */
     private void addPurchaseOrderLog(ErpOrderInfo erpOrderInfo) {
@@ -320,7 +364,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
     private OperationLog insertSelective() {
         OperationLog operationLog = new OperationLog();
-        ErpLogSourceTypeEnum purchase =  ErpLogSourceTypeEnum.PURCHASE;
+        ErpLogSourceTypeEnum purchase = ErpLogSourceTypeEnum.PURCHASE;
         operationLog.setOperationType(purchase.getCode());//日志类型 0 .新增 1.修改 2.删除 3.下载
         ErpLogOperationTypeEnum add = ErpLogOperationTypeEnum.ADD;
         operationLog.setSourceType(add.getCode());//来源类型 0.销售 1.采购 2.退货  3.退供

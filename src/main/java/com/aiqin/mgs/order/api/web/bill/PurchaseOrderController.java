@@ -2,7 +2,7 @@ package com.aiqin.mgs.order.api.web.bill;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.DeliveryInfoVo;
-import com.aiqin.mgs.order.api.domain.PurchaseInfoVo;
+import com.aiqin.mgs.order.api.domain.OrderIogisticsVo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
 import io.swagger.annotations.Api;
@@ -44,8 +44,8 @@ public class PurchaseOrderController {
      */
     @PostMapping("info")
     @ApiOperation(value = "耘链销售单回传")
-    public HttpResponse updatePurchaseInfo(List<PurchaseInfoVo> purchaseInfoVo) {
-        return purchaseOrderService.updatePurchaseInfo(purchaseInfoVo);
+    public HttpResponse updatePurchaseInfo(OrderIogisticsVo orderIogisticsVo) {
+        return purchaseOrderService.updatePurchaseInfo(orderIogisticsVo);
     }
 
     /**
