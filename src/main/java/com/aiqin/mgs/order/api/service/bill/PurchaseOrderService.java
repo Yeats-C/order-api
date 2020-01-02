@@ -6,8 +6,6 @@ import com.aiqin.mgs.order.api.domain.OrderIogisticsVo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 /**
  * 爱亲采购单 接口
  */
@@ -15,13 +13,15 @@ import java.util.List;
 public interface PurchaseOrderService {
     /**
      * 同步采购单
+     *
      * @param erpOrderInfo
      * @return
      */
-    HttpResponse createPurchaseOrder (ErpOrderInfo erpOrderInfo);
+    HttpResponse createPurchaseOrder(ErpOrderInfo erpOrderInfo);
 
     /**
      * 耘链销售单回传
+     *
      * @param orderIogisticsVo
      * @return
      */
@@ -29,8 +29,9 @@ public interface PurchaseOrderService {
 
     /**
      * 发运单回传
+     *
      * @param deliveryInfoVo
      * @return
      */
-    HttpResponse updateOrderStoreLogistics(List<DeliveryInfoVo> deliveryInfoVo);
+    HttpResponse updateOrderStoreLogistics(DeliveryInfoVo deliveryInfoVo);
 }
