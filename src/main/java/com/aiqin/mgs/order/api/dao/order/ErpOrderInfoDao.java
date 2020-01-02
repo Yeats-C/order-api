@@ -80,4 +80,10 @@ public interface ErpOrderInfoDao {
      * @date 2019/12/24 18:52
      */
     String getMaxOrderCodeByCurrentDay(@Param("currentDay") String currentDay);
+
+    /**
+     * 修改订单同步状态
+     * @return
+     */
+    Integer updateOrderSuccess(String orderStoreId);
 }
