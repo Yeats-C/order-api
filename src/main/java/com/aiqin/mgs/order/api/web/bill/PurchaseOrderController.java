@@ -44,7 +44,7 @@ public class PurchaseOrderController {
      */
     @PostMapping("info")
     @ApiOperation(value = "耘链销售单回传")
-    public HttpResponse updatePurchaseInfo(OrderIogisticsVo orderIogisticsVo) {
+    public HttpResponse updatePurchaseInfo(@Valid @RequestBody OrderIogisticsVo orderIogisticsVo) {
         return purchaseOrderService.updatePurchaseInfo(orderIogisticsVo);
     }
 
@@ -53,7 +53,7 @@ public class PurchaseOrderController {
      */
     @PostMapping("istics")
     @ApiOperation(value = "发运单回传")
-    public HttpResponse updateOrderStoreLogistics(List<DeliveryInfoVo> deliveryInfoVo) {
+    public HttpResponse updateOrderStoreLogistics(@Valid @RequestBody List<DeliveryInfoVo> deliveryInfoVo) {
         return purchaseOrderService.updateOrderStoreLogistics(deliveryInfoVo);
     }
 }
