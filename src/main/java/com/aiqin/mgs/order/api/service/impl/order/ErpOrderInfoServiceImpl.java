@@ -284,39 +284,62 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             this.updateOrderByPrimaryKeySelective(order, auth);
 
 
-//            List<ErpOrderItemSplitGroupResponse> lineSplitGroupList = erpOrderRequestService.getRepositorySplitGroup(order);
-//            if (lineSplitGroupList == null || lineSplitGroupList.size() == 0) {
-//                throw new BusinessException("未获取到供应链商品分组");
-//            }
-//
-//            //行号 -（仓库库房 - 数量）
-//            Map<Long, Map<String, Long>> map = new HashMap<>(16);
-//            //仓库库房 -（仓库库房编码名称信息）
-//            Map<String, ErpOrderItemSplitGroupResponse> repertoryMap = new HashMap<>(16);
-//            Map<String, List<ErpOrderItem>> splitMap = new HashMap<>(16);
-//
-//            for (ErpOrderItemSplitGroupResponse item :
-//                    lineSplitGroupList) {
-//                Long lineCode = item.getLineCode();
-//                String transportCenterCode = item.getTransportCenterCode();
-//                String warehouseCode = item.getWarehouseCode();
-//                String repertoryKey = transportCenterCode + warehouseCode;
-//                if (lineCode != null) {
-//                    throw new BusinessException("缺失行号");
-//                }
-//                if (StringUtils.isEmpty(transportCenterCode)) {
-//                    throw new BusinessException("缺失仓库编码");
-//                }
-//                if (StringUtils.isEmpty(warehouseCode)) {
-//                    throw new BusinessException("缺失库房编码");
-//                }
-//                Map<String, Long> mapItem = new HashMap<>(16);
-//                if (map.containsKey(lineCode)) {
-//                    mapItem = map.get(lineCode);
-//                }
-//                mapItem.put(repertoryKey, item.getLockCount());
-//                map.put(lineCode, mapItem);
-//            }
+            //请求供应链获取分组情况
+            List<ErpOrderItemSplitGroupResponse> lineSplitGroupList = erpOrderRequestService.getRepositorySplitGroup(order);
+            if (lineSplitGroupList == null || lineSplitGroupList.size() == 0) {
+                throw new BusinessException("未获取到供应链商品分组");
+            }
+
+            //行号 -（仓库库房 - 数量）
+            Map<Long, Map<String, Long>> map = new HashMap<>(16);
+            //仓库库房 -（仓库库房编码名称信息）
+            Map<String, ErpOrderItemSplitGroupResponse> repertoryMap = new HashMap<>(16);
+
+            //行分组map  仓库库房 - 明细行
+            Map<String, List<ErpOrderItem>> splitMap = new HashMap<>(16);
+
+            for (ErpOrderItemSplitGroupResponse item :
+                    lineSplitGroupList) {
+                //行号
+                Long lineCode = item.getLineCode();
+                //仓库编码
+                String transportCenterCode = item.getTransportCenterCode();
+                //库房编码
+                String warehouseCode = item.getWarehouseCode();
+                //仓库编码+库房编码
+                String repertoryKey = transportCenterCode + warehouseCode;
+                if (!repertoryMap.containsKey(repertoryKey)) {
+                    repertoryMap.put(repertoryKey, item);
+                }
+
+                if (lineCode != null) {
+                    throw new BusinessException("缺失行号");
+                }
+                if (StringUtils.isEmpty(transportCenterCode)) {
+                    throw new BusinessException("缺失仓库编码");
+                }
+                if (StringUtils.isEmpty(warehouseCode)) {
+                    throw new BusinessException("缺失库房编码");
+                }
+                Map<String, Long> mapItem = new HashMap<>(16);
+                if (map.containsKey(lineCode)) {
+                    mapItem = map.get(lineCode);
+                }
+                mapItem.put(repertoryKey, item.getLockCount());
+                map.put(lineCode, mapItem);
+            }
+
+            for (Map.Entry<Long, Map<String, Long>> entry :
+                    map.entrySet()) {
+
+                //行号
+                Long lineCode = entry.getKey();
+                //仓库库房 - 数量
+                Map<String, Long> lineSplitMap = entry.getValue();
+
+
+
+            }
 
 
         } else {
