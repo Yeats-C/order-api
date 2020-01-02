@@ -561,9 +561,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             }
             json.put("pay_order_type",returnOrderInfo.getOrderType());
             json.put("back_url","http://order.api.aiqin.com/returnOrder/callback");
-            log.info("发起退款单申请入参，url={},json={}",url,json);
             String request= URLConnectionUtil.doPost(url,null,json);
-            log.info("发起退款单申请结果，request={}",request);
+            log.info("发起退款单申请，request={}",request);
             if(StringUtils.isNotBlank(request)){
                 JSONObject jsonObject= JSON.parseObject(request);
                 if(jsonObject.containsKey("code")&&"0".equals(jsonObject.getString("code"))){
@@ -826,7 +825,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 //添加日志
                 insertLog(returnOrderCode,"系统操作","系统操作",ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(), WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getCode(),WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getName());
                 //发起退款
-                refund(returnOrderCode);
+//                refund(returnOrderCode);
                 return HttpResponse.success();
             }
 
@@ -896,16 +895,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             }
         }
         return list;
-    }
-
-    public static void main(String[] args) {
-
-        ReturnOrderInfoServiceImpl re=new ReturnOrderInfoServiceImpl();
-        re.refund("202001021400003");
-//        String dd="{\"order_no\":\"202001021400004\",\"store_id\":\"60000028\",\"pay_origin_type\":10,\"fee\":0,\"back_url\":\"http://order.api.aiqin.com/returnOrder/callback\",\"order_time\":1577935777000,\"create_by\":\"110115\",\"franchisee_id\":\"5db59dd164f24ebb8d065166e22ea0e6\",\"order_amount\":16.0000,\"order_source\":3,\"store_name\":\"爱掌柜兴创大厦1店\",\"pay_type\":10,\"pay_order_type\":0,\"update_by\":\"周胜男\",\"order_type\":4}";
-//        String request= URLConnectionUtil.doPost("http://payment.api.aiqin.com/payment/pay/payTobAll",null,JSON.parseObject(dd));
-//        log.info("发起退款单申请，request={}",request);
-
     }
 
 }
