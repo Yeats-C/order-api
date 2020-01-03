@@ -512,7 +512,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         }
         rejectRecordReq.setRejectRecord(rejectRecord);
         rejectRecordReq.setRejectRecordDetail(rejectRecordDetail);
-        HttpResponse httpResponse=rejectRecordService.createRejectRecord(rejectRecordReq);
+        HttpResponse httpResponse=rejectRecordService.createRejectRecord(null);
         log.info("供应链同步退货单结束,httpResponse={}",httpResponse);
     }
 

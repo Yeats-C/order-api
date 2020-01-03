@@ -27,13 +27,13 @@ public class RejectRecordController {
 
     /**
      * 同步退供单
-     * @param RejectRecordReq
+     * @param returnOrderCode
      * @return
      */
     @PostMapping("/add")
     @ApiOperation(value = "根据退货单，生成爱亲采购单")
-    public HttpResponse synchronizationRejectRecord(@Valid @RequestBody RejectRecordReq RejectRecordReq){
-        return rejectRecordService.createRejectRecord(RejectRecordReq);
+    public HttpResponse synchronizationRejectRecord(String returnOrderCode){
+        return rejectRecordService.createRejectRecord(returnOrderCode);
     }
 
     /**
