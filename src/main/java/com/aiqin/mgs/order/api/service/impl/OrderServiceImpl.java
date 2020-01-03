@@ -422,6 +422,14 @@ public class OrderServiceImpl implements OrderService {
         return HttpResponse.successGenerics(orderDao.querySaleSkuCount(skuCode,DateUtil.getBeforeDate(new Date(),day),storeId));
     }
 
+    @Override
+    public HttpResponse<Integer> orderStoreCount(OrderCountReq orderCountReq) {
+        //1）正常销售订单-已完成状态2）预存订单-未提货状态3）服务订单已完成
+       int count1= orderDao.orderPrestorageCount( orderCountReq.getStoreId(),  orderCountReq.getStartDay(),  orderCountReq.getEndDay());
+        int count2= orderDao.orderStoreCount( orderCountReq.getStoreId(),  orderCountReq.getStartDay(),  orderCountReq.getEndDay());
+        return HttpResponse.successGenerics(count1+count2);
+    }
+
     private OrderQuery trans(OrderQuery orderQuery) {
         if (orderQuery.getOrderStatus() != null) {
             if (orderQuery.getOrderStatus() == 2) {

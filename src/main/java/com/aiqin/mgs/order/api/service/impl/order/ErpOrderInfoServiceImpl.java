@@ -773,7 +773,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
 
         //首单，修改门店状态
-        erpOrderRequestService.updateStoreStatus(order.getStoreId(),"010201");
+      if (order.getOrderTypeCode().equals("2")||order.getOrderTypeCode().equals("4")){
+            erpOrderRequestService.updateStoreStatus(order.getStoreId(),"010201");
+       }
+
     }
 
 }
