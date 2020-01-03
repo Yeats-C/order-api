@@ -14,9 +14,9 @@ import lombok.Data;
 @Data
 public class ErpOrderOperationControlResponse {
 
-    @ApiModelProperty(value = "erp确认收款按钮 0有 1无")
-    @JsonProperty("repay")
-    private int repay = 1;
+    @ApiModelProperty(value = "异常的订单，显示确认订单按钮 0是 1否")
+    @JsonProperty("abnormal")
+    private int abnormal = 1;
 
     @ApiModelProperty(value = "erp编辑订单添加赠品按钮 0有 1无")
     @JsonProperty("add_gift")
@@ -38,9 +38,13 @@ public class ErpOrderOperationControlResponse {
     @JsonProperty("cancel")
     private int cancel = 1;
 
-    @ApiModelProperty(value = "查看 0有 1无")
+    @ApiModelProperty(value = "爱掌柜查看按钮 0有 1无")
     @JsonProperty("detail")
     private int detail = 0;
+
+    @ApiModelProperty(value = "erp查看按钮 0有 1无")
+    @JsonProperty("erp_detail")
+    private int erpDetail = 0;
 
     @ApiModelProperty(value = "详情是否显示物流信息 0有 1无")
     @JsonProperty("logistics_area")

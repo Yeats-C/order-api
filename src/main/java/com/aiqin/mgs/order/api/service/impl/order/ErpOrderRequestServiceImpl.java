@@ -117,51 +117,32 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     }
 
     @Override
-    public boolean lockStockInSupplyChain(ErpOrderInfo order, AuthToken auth) {
+    public boolean lockStockInSupplyChain(ErpOrderInfo order,List<ErpOrderItem> itemList, AuthToken auth) {
 
         boolean flag = true;
         try {
 
-//            List<Map<String, Object>> list = new ArrayList<>();
-//            for (ErpOrderItem item :
-//                    order.getItemList()) {
-//                Map<String, Object> paramItemMap = new HashMap<>(16);
-//                paramItemMap.put("change_count", item.getProductCount());
-//                paramItemMap.put("city_code", order.getCityId());
-//                paramItemMap.put("province_code", order.getProvinceId());
-//                paramItemMap.put("sku_code", item.getSkuCode());
-//                list.add(paramItemMap);
-//            }
-//            Map<String, Object> paramMap = new HashMap<>();
-//            paramMap.put("company_code", order.getCompanyCode());
-//            paramMap.put("company_name", order.getCompanyName());
-//            paramMap.put("operation_person_id", auth.getPersonId());
-//            paramMap.put("operation_person_name", auth.getPersonName());
-//            paramMap.put("operation_type", ErpOrderLockStockTypeEnum.LOCK.getCode());
-//            paramMap.put("order_code", order.getOrderStoreCode());
-//            paramMap.put("order_type", order.getOrderTypeCode());
-//            paramMap.put("detail_list", list);
+            List<Map<String, Object>> list = new ArrayList<>();
+            for (ErpOrderItem item :
+                    itemList) {
+                Map<String, Object> paramItemMap = new HashMap<>(16);
+                paramItemMap.put("change_count", item.getProductCount());
+                paramItemMap.put("city_code", order.getCityId());
+                paramItemMap.put("province_code", order.getProvinceId());
+                paramItemMap.put("sku_code", item.getSkuCode());
+                list.add(paramItemMap);
+            }
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("company_code", order.getCompanyCode());
+            paramMap.put("company_name", order.getCompanyName());
+            paramMap.put("operation_person_id", auth.getPersonId());
+            paramMap.put("operation_person_name", auth.getPersonName());
+            paramMap.put("operation_type", ErpOrderLockStockTypeEnum.LOCK.getCode());
+            paramMap.put("order_code", order.getOrderStoreCode());
+            paramMap.put("order_type", order.getOrderTypeCode());
+            paramMap.put("detail_list", list);
 
-
-//            Map<String, Object> paramItemMap1 = new HashMap<>(16);
-//            paramItemMap1.put("change_count", 10);
-//            paramItemMap1.put("city_code", "1001");
-//            paramItemMap1.put("province_code", "1001");
-//            paramItemMap1.put("sku_code", "102423");
-//            List<Map<String, Object>> list = new ArrayList<>();
-//            list.add(paramItemMap1);
-//
-//
-//            Map<String, Object> paramMap = new HashMap<>();
-//            paramMap.put("company_code", "01");
-//            paramMap.put("company_name", "北京爱亲科技股份有限公司");
-//            paramMap.put("operation_person_id", "12345");
-//            paramMap.put("operation_person_name", "张三");
-//            paramMap.put("operation_type", 1);
-//            paramMap.put("order_code", "20191228000001");
-//            paramMap.put("order_type", 1);
-//            paramMap.put("detail_list", list);
-//
+            //TODO CT 已经调通，暂时跳过锁库操作
 //            HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/lock/info").json(paramMap);
 //            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
 //            });
@@ -544,31 +525,44 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public boolean areaCheck(StoreInfo storeInfo, List<ErpOrderItem> orderProductItemList) {
-        boolean flag = false;
+        boolean flag = true;
         try {
-            //TODO CT 商品销售区域配置校验
-//            Map<String, Object> paramMap = new HashMap<>();
-//            HttpClient httpClient = HttpClient.post(urlProperties.getPaymentApi() + "/test").json(paramMap);
-//            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
-//            });
-            flag = true;
+            for (ErpOrderItem item :
+                    orderProductItemList) {
+                HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + "/stock/area/sale")
+                    .addParameter("province_code",storeInfo.getProvinceId())
+                    .addParameter("store_code",storeInfo.getStoreCode())
+                        .addParameter("sku_code", item.getSkuCode());
+                HttpResponse<Boolean> response = httpClient.action().result(new TypeReference<HttpResponse<Boolean>>() {
+                });
+                if (!RequestReturnUtil.validateHttpResponse(response)) {
+                    throw new BusinessException(item.getSkuName() + "商品销售区域校验失败");
+                }
+                Boolean data = response.getData();
+                if (!data) {
+                    throw new BusinessException(item.getSkuName() + "不在当前区域销售");
+                }
+            }
+        } catch (BusinessException e) {
+            logger.error("商品销售区域配置校验失败：{}", e);
+            flag = false;
+            throw new BusinessException("商品销售区域配置校验失败：" + e.getMessage());
         } catch (Exception e) {
             logger.error("商品销售区域配置校验失败：{}", e);
+            flag = false;
+            throw new BusinessException("商品销售区域配置校验失败：");
         }
         return flag;
     }
 
     @Override
     public boolean repertoryCheck(StoreInfo storeInfo, List<ErpOrderItem> orderProductItemList) {
-        boolean flag = false;
+        boolean flag = true;
         try {
-            //TODO CT 商品库存校验
-//            Map<String, Object> paramMap = new HashMap<>();
-//            HttpClient httpClient = HttpClient.post(urlProperties.getPaymentApi() + "/test").json(paramMap);
-//            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
-//            });
-            flag = true;
+            //TODO 商品可用库存校验
+
         } catch (Exception e) {
+            flag = false;
             logger.error("商品库存校验失败：{}", e);
         }
         return flag;
@@ -576,15 +570,11 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public boolean priceCheck(StoreInfo storeInfo, List<ErpOrderItem> orderProductItemList) {
-        boolean flag = false;
+        boolean flag = true;
         try {
-            //TODO CT 商品销售价格校验
-//            Map<String, Object> paramMap = new HashMap<>();
-//            HttpClient httpClient = HttpClient.post(urlProperties.getPaymentApi() + "/test").json(paramMap);
-//            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
-//            });
-            flag = true;
+            //TODO 商品销售价格校验
         } catch (Exception e) {
+            flag = false;
             logger.error("商品销售价格校验失败：{}", e);
         }
         return flag;
@@ -592,15 +582,11 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public boolean activityCheck(StoreInfo storeInfo, List<ErpOrderItem> orderProductItemList) {
-        boolean flag = false;
+        boolean flag = true;
         try {
-            //TODO CT 促销活动校验
-//            Map<String, Object> paramMap = new HashMap<>();
-//            HttpClient httpClient = HttpClient.post(urlProperties.getPaymentApi() + "/test").json(paramMap);
-//            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
-//            });
-            flag = true;
+            //TODO 促销活动校验
         } catch (Exception e) {
+            flag = false;
             logger.error("促销活动校验失败：{}", e);
         }
         return flag;

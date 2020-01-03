@@ -26,10 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
@@ -152,9 +149,6 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 erpOrderEditRequest.getProductGiftList()) {
             lineIndex++;
             maxLineIndex++;
-            if (StringUtils.isEmpty(item.getSpuCode())) {
-                throw new BusinessException("赠品行第" + lineIndex + "行缺失spu编码");
-            }
             if (StringUtils.isEmpty(item.getSkuCode())) {
                 throw new BusinessException("赠品行第" + lineIndex + "行缺失sku");
             }
@@ -230,7 +224,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
         if (processTypeEnum.isLockStock()) {
             //追加锁库存
-            erpOrderRequestService.lockStockInSupplyChain(order, auth);
+            erpOrderRequestService.lockStockInSupplyChain(order, addGiftList, auth);
         }
 
         erpOrderItemService.saveOrderItemList(addGiftList, auth);
@@ -285,61 +279,89 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
 
             //请求供应链获取分组情况
-            List<ErpOrderItemSplitGroupResponse> lineSplitGroupList = erpOrderRequestService.getRepositorySplitGroup(order);
-            if (lineSplitGroupList == null || lineSplitGroupList.size() == 0) {
-                throw new BusinessException("未获取到供应链商品分组");
-            }
-
-            //行号 -（仓库库房 - 数量）
-            Map<Long, Map<String, Long>> map = new HashMap<>(16);
-            //仓库库房 -（仓库库房编码名称信息）
-            Map<String, ErpOrderItemSplitGroupResponse> repertoryMap = new HashMap<>(16);
-
-            //行分组map  仓库库房 - 明细行
-            Map<String, List<ErpOrderItem>> splitMap = new HashMap<>(16);
-
-            for (ErpOrderItemSplitGroupResponse item :
-                    lineSplitGroupList) {
-                //行号
-                Long lineCode = item.getLineCode();
-                //仓库编码
-                String transportCenterCode = item.getTransportCenterCode();
-                //库房编码
-                String warehouseCode = item.getWarehouseCode();
-                //仓库编码+库房编码
-                String repertoryKey = transportCenterCode + warehouseCode;
-                if (!repertoryMap.containsKey(repertoryKey)) {
-                    repertoryMap.put(repertoryKey, item);
-                }
-
-                if (lineCode != null) {
-                    throw new BusinessException("缺失行号");
-                }
-                if (StringUtils.isEmpty(transportCenterCode)) {
-                    throw new BusinessException("缺失仓库编码");
-                }
-                if (StringUtils.isEmpty(warehouseCode)) {
-                    throw new BusinessException("缺失库房编码");
-                }
-                Map<String, Long> mapItem = new HashMap<>(16);
-                if (map.containsKey(lineCode)) {
-                    mapItem = map.get(lineCode);
-                }
-                mapItem.put(repertoryKey, item.getLockCount());
-                map.put(lineCode, mapItem);
-            }
-
-            for (Map.Entry<Long, Map<String, Long>> entry :
-                    map.entrySet()) {
-
-                //行号
-                Long lineCode = entry.getKey();
-                //仓库库房 - 数量
-                Map<String, Long> lineSplitMap = entry.getValue();
-
-
-
-            }
+//            List<ErpOrderItemSplitGroupResponse> lineSplitGroupList = erpOrderRequestService.getRepositorySplitGroup(order);
+//            if (lineSplitGroupList == null || lineSplitGroupList.size() == 0) {
+//                throw new BusinessException("未获取到供应链商品分组");
+//            }
+//
+//            //行号 -（仓库库房 - 数量）
+//            Map<Long, Map<String, Long>> lineRepertoryMap = new HashMap<>(16);
+//            //行号 - 参数根据行号分组的list
+//            Map<Long, List<ErpOrderItemSplitGroupResponse>> lineParamListMap = new HashMap<>(16);
+//            //仓库库房 -（仓库库房编码名称信息）
+//            Map<String, ErpOrderItemSplitGroupResponse> repertoryDetailMap = new HashMap<>(16);
+//
+//            //行分组结果map  仓库库房 - 明细行
+//            Map<String, List<ErpOrderItem>> splitMap = new HashMap<>(16);
+//
+//            //遍历分组参数
+//            for (ErpOrderItemSplitGroupResponse item :
+//                    lineSplitGroupList) {
+//                //行号
+//                Long lineCode = item.getLineCode();
+//
+//                //仓库编码
+//                String transportCenterCode = item.getTransportCenterCode();
+//                //库房编码
+//                String warehouseCode = item.getWarehouseCode();
+//                //仓库编码+库房编码
+//                String repertoryKey = transportCenterCode + warehouseCode;
+//
+//                if (lineCode != null) {
+//                    throw new BusinessException("缺失行号");
+//                }
+//                if (StringUtils.isEmpty(transportCenterCode)) {
+//                    throw new BusinessException("缺失仓库编码");
+//                }
+//                if (StringUtils.isEmpty(warehouseCode)) {
+//                    throw new BusinessException("缺失库房编码");
+//                }
+//                if (item.getLockCount() == null) {
+//                    throw new BusinessException("缺失锁定数量");
+//                }
+//
+//                //记录仓库库房编码名称
+//                if (!repertoryDetailMap.containsKey(repertoryKey)) {
+//                    repertoryDetailMap.put(repertoryKey, item);
+//                }
+//
+//                //行号对应参数再按照仓库编码分组
+//                Map<String, Long> mapItem = new HashMap<>(16);
+//                if (lineRepertoryMap.containsKey(lineCode)) {
+//                    mapItem = lineRepertoryMap.get(lineCode);
+//                }
+//                mapItem.put(repertoryKey, item.getLockCount());
+//                lineRepertoryMap.put(lineCode, mapItem);
+//
+//                //行号对应的拆分数据
+//                List<ErpOrderItemSplitGroupResponse> list = new ArrayList<>();
+//                if (lineParamListMap.containsKey(lineCode)) {
+//                    list.addAll(lineParamListMap.get(lineCode));
+//                }
+//            }
+//
+//            for (ErpOrderItem item :
+//                    orderItemList) {
+//
+//                if (!lineParamListMap.containsKey(item.getLineCode())) {
+//                    throw new BusinessException("未找到行号为" + item.getLineCode() + "的商品分组情况");
+//                }
+//
+//                //该行的拆分结果参数
+//                List<ErpOrderItemSplitGroupResponse> lineParamList = lineParamListMap.get(item.getLineCode());
+//                for (int i = 0; i < lineParamList.size(); i++) {
+//
+//                    ErpOrderItem newSplitItem = new ErpOrderItem();
+////                    CopyBeanUtil
+//
+//                    if (i < lineParamList.size() - 1) {
+//
+//                    }else {
+//                        //最后一条，用减法避免误差
+//                    }
+//                }
+//
+//            }
 
 
         } else {
@@ -765,18 +787,15 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         }
         erpOrderItemService.updateOrderItemList(updateItemList, auth);
 
-        ErpOrderInfo updateOrder = new ErpOrderInfo();
-        updateOrder.setId(order.getId());
-        updateOrder.setOrderStoreCode(order.getOrderStoreCode());
-        updateOrder.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_13.getCode());
-        this.updateOrderByPrimaryKeySelective(updateOrder, auth);
-
+        order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_13.getCode());
+        order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_12.getCode());
+        order.setReceiveTime(new Date());
+        this.updateOrderByPrimaryKeySelective(order, auth);
 
         //首单，修改门店状态
-      if (order.getOrderTypeCode().equals("2")||order.getOrderTypeCode().equals("4")){
+        if (order.getOrderTypeCode().equals("2")||order.getOrderTypeCode().equals("4")){
             erpOrderRequestService.updateStoreStatus(order.getStoreId(),"010201");
-       }
-
+        }
     }
 
 }
