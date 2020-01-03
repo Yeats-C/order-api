@@ -22,7 +22,6 @@ import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
-import com.aiqin.mgs.order.api.domain.request.bill.RejectRecordReq;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderStatusVo;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
@@ -226,9 +225,14 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getMsg();
                 isPass="1";
                 break;
-            case 99:
+            case 99://撤销
                 reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REMOVE.getKey());
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getMsg();
+                //如果退货状态为11，则不进行撤销，继续向下走流程
+                ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(reqVo.getReturnOrderCode());
+                if(returnOrderInfo.getReturnOrderStatus()==11){
+                    return false;
+                }
                 break;
             default:
                 return false;
@@ -498,60 +502,59 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     @Transactional
     public void createRejectRecord(String returnOrderCode){
         log.info("供应链同步退货单开始,returnOrderId={}",returnOrderCode);
-        RejectRecordReq rejectRecordReq=new RejectRecordReq();
-        //根据退货单编码查询退货信息
-        ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(returnOrderCode);
-        //根据退货单编码查询退货详细信息
-        List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderCode);
-        RejectRecord rejectRecord=new RejectRecord();
-        List<RejectRecordDetail> rejectRecordDetail=new ArrayList<>();
-        BeanUtils.copyProperties(returnOrderInfo,rejectRecord);
-        //来源单号
-        rejectRecord.setSourceCode(returnOrderInfo.getReturnOrderCode());
-        //
-//        rejectRecord.setSourceType();
-        //最小单位数量--商品数量
-        rejectRecord.setTotalCount(returnOrderInfo.getProductCount());
-        //商品含税金额--退货金额
-        rejectRecord.setTotalTaxAmount(returnOrderInfo.getReturnOrderAmount());
-        //联系人--收货人
-        rejectRecord.setContactPerson(returnOrderInfo.getReceivePerson());
-        //联系人电话--收货人电话
-        rejectRecord.setContactMobile(returnOrderInfo.getReceiveMobile());
-        //结算方式编码--退款方式
-        rejectRecord.setSettlementMethodCode(returnOrderInfo.getReturnMoneyType().toString());
-        //退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户
-        rejectRecord.setSettlementMethodName(ConstantData.RETURN_MONEY_TYPE_NAME);
-//        if(null!=returnOrderInfo.getReturnMoneyType()){
-//            //退款方式 1:现金 2:微信 3:支付宝 4:银联
-//            switch (returnOrderInfo.getReturnMoneyType()) {
-//                case 1:
-//                    rejectRecord.setSettlementMethodName("现金");
-//                    break;
-//                case 2:
-//                    rejectRecord.setSettlementMethodName("微信");
-//                    break;
-//                case 3:
-//                    rejectRecord.setSettlementMethodName("支付宝");
-//                    break;
-//                case 4:
-//                    rejectRecord.setSettlementMethodName("银联");
-//                    break;
-//            }
+//        RejectRecordReq rejectRecordReq=new RejectRecordReq();
+//        //根据退货单编码查询退货信息
+//        ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(returnOrderCode);
+//        //根据退货单编码查询退货详细信息
+//        List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderCode);
+//        RejectRecord rejectRecord=new RejectRecord();
+//        List<RejectRecordDetail> rejectRecordDetail=new ArrayList<>();
+//        BeanUtils.copyProperties(returnOrderInfo,rejectRecord);
+//        //来源单号
+//        rejectRecord.setSourceCode(returnOrderInfo.getReturnOrderCode());
+//        //
+////        rejectRecord.setSourceType();
+//        //最小单位数量--商品数量
+//        rejectRecord.setTotalCount(returnOrderInfo.getProductCount());
+//        //商品含税金额--退货金额
+//        rejectRecord.setTotalTaxAmount(returnOrderInfo.getReturnOrderAmount());
+//        //联系人--收货人
+//        rejectRecord.setContactPerson(returnOrderInfo.getReceivePerson());
+//        //联系人电话--收货人电话
+//        rejectRecord.setContactMobile(returnOrderInfo.getReceiveMobile());
+//        //结算方式编码--退款方式
+//        rejectRecord.setSettlementMethodCode(returnOrderInfo.getReturnMoneyType().toString());
+//        //退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户
+//        rejectRecord.setSettlementMethodName(ConstantData.RETURN_MONEY_TYPE_NAME);
+////        if(null!=returnOrderInfo.getReturnMoneyType()){
+////            //退款方式 1:现金 2:微信 3:支付宝 4:银联
+////            switch (returnOrderInfo.getReturnMoneyType()) {
+////                case 1:
+////                    rejectRecord.setSettlementMethodName("现金");
+////                    break;
+////                case 2:
+////                    rejectRecord.setSettlementMethodName("微信");
+////                    break;
+////                case 3:
+////                    rejectRecord.setSettlementMethodName("支付宝");
+////                    break;
+////                case 4:
+////                    rejectRecord.setSettlementMethodName("银联");
+////                    break;
+////            }
+////        }
+////        rejectRecord.setRejectRecordStatus(1);
+//        String afterSaleCode = sequenceService.generateOrderAfterSaleCode(returnOrderInfo.getCompanyCode(), returnOrderInfo.getReturnOrderType());
+//        rejectRecord.setRejectRecordId(IdUtil.uuid());
+//        rejectRecord.setRejectRecordCode(afterSaleCode);
+//        for(ReturnOrderDetail rod:returnOrderDetails){
+//            RejectRecordDetail rrd=new RejectRecordDetail();
+//            BeanUtils.copyProperties(rod,rrd);
+//            rejectRecordDetail.add(rrd);
 //        }
-        //todo 退供单状态
-//        rejectRecord.setRejectRecordStatus(1);
-        String afterSaleCode = sequenceService.generateOrderAfterSaleCode(returnOrderInfo.getCompanyCode(), returnOrderInfo.getReturnOrderType());
-        rejectRecord.setRejectRecordId(IdUtil.uuid());
-        rejectRecord.setRejectRecordCode(afterSaleCode);
-        for(ReturnOrderDetail rod:returnOrderDetails){
-            RejectRecordDetail rrd=new RejectRecordDetail();
-            BeanUtils.copyProperties(rod,rrd);
-            rejectRecordDetail.add(rrd);
-        }
-        rejectRecordReq.setRejectRecord(rejectRecord);
-        rejectRecordReq.setRejectRecordDetail(rejectRecordDetail);
-        HttpResponse httpResponse=rejectRecordService.createRejectRecord(null);
+//        rejectRecordReq.setRejectRecord(rejectRecord);
+//        rejectRecordReq.setRejectRecordDetail(rejectRecordDetail);
+        HttpResponse httpResponse=rejectRecordService.createRejectRecord(returnOrderCode);
         log.info("供应链同步退货单结束,httpResponse={}",httpResponse);
     }
 
@@ -875,6 +878,34 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         log.info("erp售后管理--冲减单列表，searchVo={}",searchVo);
         List<ReturnOrderInfo> content = returnOrderInfoDao.selectAll(afterReturnOrderSearchVo);
         return new PageResData(Integer.valueOf((int)((Page) content).getTotal()) , content);
+    }
+
+    @Override
+    @Transactional
+    public boolean searchPayOrder(String orderCode) {
+        String url=paymentHost+"/payment/pay/searchPayOrder?orderNo="+orderCode;
+        log.info("根据退货单号查询支付状态入参，url={}",url);
+        String request= URLConnectionUtil.doGet(url,null);
+        log.info("根据退货单号查询支付状态结果，request={}",request);
+        if(StringUtils.isNotBlank(request)){
+            JSONObject jsonObject= JSON.parseObject(request);
+            if(jsonObject.containsKey("code")&&"0".equals(jsonObject.getString("code"))){
+                log.info("退款成功");
+                //更新退货单表状态
+                returnOrderInfoDao.updateRefundStatus(orderCode);
+                //更新流水表状态
+                JSONObject json=jsonObject.getJSONObject("data");
+                RefundInfo refundInfo=new RefundInfo();
+                //1-已退款
+                refundInfo.setStatus(ConstantData.REFUND_STATUS);
+                refundInfo.setUpdateTime(new Date());
+                refundInfo.setPayNum(json.getString("payNum"));
+                refundInfo.setOrderCode(orderCode);
+                refundInfoDao.updateByOrderCode(refundInfo);
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

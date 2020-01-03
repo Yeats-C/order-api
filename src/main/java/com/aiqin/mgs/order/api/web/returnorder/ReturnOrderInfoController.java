@@ -147,5 +147,11 @@ public class ReturnOrderInfoController {
         return new HttpResponse<>(returnOrderInfoService.getWriteDownOrderList(searchVo));
     }
 
+    @ApiOperation("支付中心--查询订单状态,同时修改退货单和流水状态")
+    @GetMapping("/searchPayOrder")
+    public HttpResponse<Boolean> searchPayOrder(String orderCode) {
+        return new HttpResponse<>(returnOrderInfoService.searchPayOrder(orderCode));
+    }
+
 
 }
