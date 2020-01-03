@@ -56,6 +56,13 @@ public interface ReturnOrderInfoService {
     Boolean updateReturnStatusApi(ReturnOrderReviewApiReqVo reqVo);
 
     /**
+     * 提供给供应链--同步是否成功（创建退供单）修改
+     * @param returnOrderCode
+     * @return
+     */
+    Boolean updateOrderSuccessApi(String returnOrderCode);
+
+    /**
      * 退货单校验--查看此订单是否已经生成一条退货单，且流程未结束。如果已存在返回true
      * @param orderCode
      * @return
@@ -129,5 +136,12 @@ public interface ReturnOrderInfoService {
      * @return
      */
     PageResData<ReturnOrderInfo> getWriteDownOrderList(PageRequestVO<WriteDownOrderSearchVo> searchVo);
+
+    /**
+     * 根据退货单号查询支付状态 支付成功返回true
+     * @param orderCode
+     * @return
+     */
+    boolean searchPayOrder(String orderCode);
 
 }

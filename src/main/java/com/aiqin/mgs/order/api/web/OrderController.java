@@ -43,7 +43,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/order")
-@Api("订单相关操作接口")
+@Api(tags = "订单相关操作接口")
 @SuppressWarnings("all")
 public class OrderController {
 
@@ -813,7 +813,7 @@ public class OrderController {
      * @param day
      * @return
      */
-    @GetMapping("/cashier/orderCount")
+    @GetMapping ("/cashier/orderCount")
     @ApiOperation(value = "接口-订单中心获取近30天销量")
     public HttpResponse orderCount(@Valid @RequestParam(name = "sku_code") String skuCode,
                                    @Valid @RequestParam(name = "store_id") String storeId,
@@ -821,5 +821,20 @@ public class OrderController {
 
         LOGGER.info("订单中心获取近30天销量：{}",skuCode,storeId,day);
         return orderService.orderCount(skuCode,storeId,day);
+    }
+
+    /**
+     * 订单中心获取门店本月销售额
+     * @param storeId
+     * @param startDay
+     * @param endDay
+     * @return
+     */
+    @PostMapping("/orderStoreCount")
+    @ApiOperation(value = "接口-订单中心获取门店本月销售额")
+    public HttpResponse<Integer> orderStoreCount(@Valid OrderCountReq orderCountReq) {
+
+        LOGGER.info("订单中心获取门店本月销售额：{}",orderCountReq);
+        return orderService.orderStoreCount(orderCountReq);
     }
 }

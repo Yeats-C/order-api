@@ -204,4 +204,10 @@ public interface ErpOrderRequestService {
      */
     boolean activityCheck(StoreInfo storeInfo, List<ErpOrderItem> orderProductItemList);
 
+    /**
+     * 首单，修改门店状态
+     * @param storeId
+     * @param s
+     */
+    void updateStoreStatus(String storeId, String s);
 }

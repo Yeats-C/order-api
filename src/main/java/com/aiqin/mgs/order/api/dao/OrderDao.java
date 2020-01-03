@@ -217,4 +217,22 @@ public interface OrderDao {
     int querySaleSkuCount(@Param("distributorId") String distributorId,
                                    @Param("startDate") Date startDate,
                                    @Param("skuCode") String skuCode);
+
+    /**
+     * 预存商品的销售量
+     * @param storeId
+     * @param startDay
+     * @param endDay
+     * @return
+     */
+    int orderPrestorageCount(@Param("storeId")String storeId,@Param("startDate") Date startDay,@Param("endDay") Date endDay);
+
+    /**
+     * 正常销售订单的销售量-已完成状态2）
+     * @param storeId
+     * @param startDay
+     * @param endDay
+     * @return
+     */
+    int orderStoreCount(@Param("storeId")String storeId,@Param("startDate") Date startDay,@Param("endDay") Date endDay);
 }
