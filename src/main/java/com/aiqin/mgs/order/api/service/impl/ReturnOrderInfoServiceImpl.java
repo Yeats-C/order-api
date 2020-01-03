@@ -226,9 +226,14 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getMsg();
                 isPass="1";
                 break;
-            case 99:
+            case 99://撤销
                 reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REMOVE.getKey());
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getMsg();
+                //如果退货状态为11，则不进行撤销，继续向下走流程
+                ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(reqVo.getReturnOrderCode());
+                if(returnOrderInfo.getReturnOrderStatus()==11){
+                    return false;
+                }
                 break;
             default:
                 return false;
