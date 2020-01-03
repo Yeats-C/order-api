@@ -90,14 +90,14 @@ public class CartOrderServiceImpl implements CartOrderService {
                 }
                 CartOrderInfo cartOrderInfo = new CartOrderInfo();
                 cartOrderInfo.setSkuCode(cartOrderInfo1.getSkuCode());//skuId
-                cartOrderInfo.setSpuId(cartOrderInfo1.getSpuId());//spuId
-                cartOrderInfo.setProductId(shoppingCartRequest.getProductId());//商品id
+                cartOrderInfo.setSpuId(shoppingCartRequest.getProductId());//spuId
+                cartOrderInfo.setProductId(cartOrderInfo1.getSkuCode());//商品Code
                 cartOrderInfo.setStoreId(cartOrderInfo1.getStoreId());//门店id
                 cartOrderInfo.setPrice(cartOrderInfo1.getPrice());//商品价格
-                cartOrderInfo.setProductType(cartOrderInfo1.getProductType());//商品类型
-                cartOrderInfo.setProductName(cartOrderInfo1.getProductName());//商品名称
-                cartOrderInfo.setColor(cartOrderInfo1.getColor());//商品颜色
-                cartOrderInfo.setProductSize(cartOrderInfo1.getProductSize());//商品尺寸
+                cartOrderInfo.setProductType(shoppingCartRequest.getProductType());//商品类型
+                cartOrderInfo.setProductName(cartOrderInfo1.getSkuName());//商品名称
+                cartOrderInfo.setColor(cartOrderInfo1.getColorName());//商品颜色
+                cartOrderInfo.setProductSize(cartOrderInfo1.getModelNumber());//商品型号
                 cartOrderInfo.setCreateSource(shoppingCartRequest.getCreateSource());//插入商品来源
                 cartOrderInfo.setAmount(product.getAmount());//获取商品数量
                 cartOrderInfo.setPrice(cartOrderInfo1.getPriceTax2());//商品价格
@@ -105,8 +105,8 @@ public class CartOrderServiceImpl implements CartOrderService {
                 cartOrderInfo.setStoreId(shoppingCartRequest.getStoreId());//门店ID
                 cartOrderInfo.setCreateById(authToken.getPersonId());//创建者id
                 cartOrderInfo.setCreateByName(authToken.getPersonName());//创建者名称
-
-                //Todo 商品返回什么添加什么
+                cartOrderInfo.setStockNum(cartOrderInfo1.getStockNum());//库存数量
+                cartOrderInfo.setZeroRemovalCoefficient(cartOrderInfo1.getZeroRemovalCoefficient());//交易倍数
                 try {
                     if (cartOrderInfo != null) {
                         //判断sku是否在购物车里面存在

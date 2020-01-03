@@ -230,5 +230,30 @@ public class CartOrderInfo {
     @JsonProperty("create_by_name")
     private String createByName;
 
+    /****颜色名称--爱亲供应链字段*/
+    @ApiModelProperty(value = "颜色名称")
+    @JsonProperty("color_name")
+    private String colorName;
+
+    /****型号--爱亲供应链字段*/
+    @ApiModelProperty(value = "型号")
+    @JsonProperty("model_number")
+    private String modelNumber;
+
+    /**所属商品编码--爱亲供应链字段*/
+    @ApiModelProperty(value = "所属商品编码")
+    @JsonProperty("product_code")
+    private String productCode;
+
+     /**交易倍数--爱亲供应链字段*/
+    @ApiModelProperty(value = "交易倍数")
+    @JsonProperty("zero_removalCoefficient")
+    private Integer zeroRemovalCoefficient;
+
+    /**sku名称--爱亲供应链字段*/
+    @ApiModelProperty(value = "sku名称")
+    @JsonProperty("sku_name")
+    private String skuName;
+
 
 }
