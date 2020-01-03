@@ -21,7 +21,7 @@ import java.util.List;
  * @date 2019/11/20 16:54
  */
 @Component
-@EnableScheduling
+//@EnableScheduling
 public class ReturnOrderTaskJob {
 
     private static final Logger logger = LoggerFactory.getLogger(ReturnOrderTaskJob.class);
