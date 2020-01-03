@@ -999,11 +999,23 @@
     <if test="storeName!=null and storeName!=''">
      and store_name=#{storeName,jdbcType=VARCHAR}
     </if>
-    <if test="provinceName!=null and provinceName!=''">
-     and province_name=#{provinceName,jdbcType=VARCHAR}
+    <if test="provinceId != null and provinceId!=''" >
+      and province_id = #{provinceId,jdbcType=VARCHAR},
     </if>
-    <if test="cityName!=null and cityName!=''">
-     and city_name=#{cityName,jdbcType=VARCHAR}
+    <if test="provinceName != null and provinceName!=''" >
+      and province_name = #{provinceName,jdbcType=VARCHAR},
+    </if>
+    <if test="cityId != null and cityId!=''" >
+      and  city_id = #{cityId,jdbcType=VARCHAR},
+    </if>
+    <if test="cityName != null and cityName!=''" >
+      and  city_name = #{cityName,jdbcType=VARCHAR},
+    </if>
+    <if test="districtId != null and districtId!=''" >
+      and   district_id = #{districtId,jdbcType=VARCHAR},
+    </if>
+    <if test="districtName != null and districtName!=''" >
+      and  district_name = #{districtName,jdbcType=VARCHAR},
     </if>
     <if test="applyStartTime!=null and applyStartTime!=''">
       and create_time &gt;= #{applyStartTime}
@@ -1042,11 +1054,23 @@
       <if test="storeName!=null and storeName!=''">
           and store_name=#{storeName,jdbcType=VARCHAR}
       </if>
-      <if test="provinceName!=null and provinceName!=''">
-          and province_name=#{provinceName,jdbcType=VARCHAR}
+      <if test="provinceId != null and provinceId!=''" >
+        and province_id = #{provinceId,jdbcType=VARCHAR},
       </if>
-      <if test="cityName!=null and cityName!=''">
-          and city_name=#{cityName,jdbcType=VARCHAR}
+      <if test="provinceName != null and provinceName!=''" >
+        and province_name = #{provinceName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityId != null and cityId!=''" >
+        and  city_id = #{cityId,jdbcType=VARCHAR},
+      </if>
+      <if test="cityName != null and cityName!=''" >
+        and  city_name = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="districtId != null and districtId!=''" >
+        and   district_id = #{districtId,jdbcType=VARCHAR},
+      </if>
+      <if test="districtName != null and districtName!=''" >
+        and  district_name = #{districtName,jdbcType=VARCHAR},
       </if>
       <if test="applyStartTime!=null and applyStartTime!=''">
           and create_time &gt;= #{applyStartTime}
