@@ -386,6 +386,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     }
 
     @Override
+    public Boolean updateOrderSuccessApi(String returnOrderCode) {
+        return returnOrderInfoDao.updateOrderSuccess(returnOrderCode)>0;
+    }
+
+    @Override
     public Boolean check(String orderCode) {
         List<ReturnOrderInfo> returnOrderInfo = returnOrderInfoDao.selectByOrderId(orderCode);
         if(CollectionUtils.isNotEmpty(returnOrderInfo)){

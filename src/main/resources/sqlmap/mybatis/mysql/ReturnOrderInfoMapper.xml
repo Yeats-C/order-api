@@ -980,7 +980,7 @@
     set
     return_order_status=12,
     refund_status = 1
-    where return_order_code=#{orderStoreCode}
+    where return_order_code=#{returnOrderCode}
   </update>
 
   <!--后台销售退货单管理列表（搜索）-->
@@ -1182,5 +1182,14 @@
     from return_order_info
     where return_order_code = #{returnOrderCode,jdbcType=VARCHAR}
   </select>
+
+  <update id="updateOrderSuccess">
+    update return_order_info
+    set
+--     等待退货验收
+    return_order_status=4,
+    order_success = 1
+    where return_order_code=#{returnOrderCode}
+  </update>
 
 </mapper>
