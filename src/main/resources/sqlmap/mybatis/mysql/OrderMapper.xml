@@ -1326,7 +1326,7 @@
     </select>
 
     <select id="orderPrestorageCount" resultType="integer">
-        select count(d.actual_price) from
+        select sum(d.actual_price) from
         order_consumer_detail d,order_consumer_info o
         where
         d.order_id=o.order_id
@@ -1337,7 +1337,7 @@
         and o.order_status in (2,5)
     </select>
     <select id="orderStoreCount" resultType="integer">
-         select count(d.actual_price) from
+         select sum(d.actual_price) from
         order_consumer_detail d,order_consumer_info o
         where
         d.order_id=o.order_id
