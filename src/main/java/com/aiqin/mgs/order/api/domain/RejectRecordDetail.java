@@ -41,7 +41,7 @@ public class RejectRecordDetail {
     @ApiModelProperty(value = "型号")
     private String modelCode;
     @ApiModelProperty(value = "商品类型   0商品 1赠品 2实物返回")
-    private Boolean productType;
+    private Integer productType;
     @ApiModelProperty(value = "商品数量")
     private Long productCount;
     @ApiModelProperty(value = "单位编码")
@@ -51,7 +51,7 @@ public class RejectRecordDetail {
     @ApiModelProperty(value = "税率")
     private BigDecimal taxRate;
     @ApiModelProperty(value = "行号")
-    private String lineCode;
+    private Long lineCode;
     @ApiModelProperty(value = "厂商SKU编码")
     private String factorySkuCode;
     @ApiModelProperty(value = "商品含税单价")
@@ -65,7 +65,7 @@ public class RejectRecordDetail {
     @ApiModelProperty(value = "实际含税总价")
     private BigDecimal actualTotalTaxAmount;
     @ApiModelProperty(value = "0. 启用   1.禁用")
-    private Boolean useStatus;
+    private Integer useStatus;
     @ApiModelProperty(value = "创建人编码")
     private String createById;
     @ApiModelProperty(value = "创建人名称")
