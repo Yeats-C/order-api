@@ -17,11 +17,11 @@
     <result column="purchase_group_name" jdbcType="VARCHAR" property="purchaseGroupName" />
     <result column="settlement_method_code" jdbcType="VARCHAR" property="settlementMethodCode" />
     <result column="settlement_method_name" jdbcType="VARCHAR" property="settlementMethodName" />
-    <result column="reject_record_status" jdbcType="BIT" property="rejectRecordStatus" />
+    <result column="reject_record_status" jdbcType="INTEGER" property="rejectRecordStatus" />
     <result column="total_count" jdbcType="BIGINT" property="totalCount" />
     <result column="total_tax_amount" jdbcType="DECIMAL" property="totalTaxAmount" />
     <result column="actual_total_count" jdbcType="BIGINT" property="actualTotalCount" />
-    <result column="actual_total_tax_amount" jdbcType="VARCHAR" property="actualTotalTaxAmount" />
+    <result column="actual_total_tax_amount" jdbcType="DECIMAL" property="actualTotalTaxAmount" />
     <result column="charge_person" jdbcType="VARCHAR" property="chargePerson" />
     <result column="contact_person" jdbcType="VARCHAR" property="contactPerson" />
     <result column="contact_mobile" jdbcType="VARCHAR" property="contactMobile" />
@@ -38,9 +38,9 @@
     <result column="delivery_time" jdbcType="TIMESTAMP" property="deliveryTime" />
     <result column="finish_time" jdbcType="TIMESTAMP" property="finishTime" />
     <result column="remark" jdbcType="VARCHAR" property="remark" />
-    <result column="use_status" jdbcType="BIT" property="useStatus" />
+    <result column="use_status" jdbcType="INTEGER" property="useStatus" />
     <result column="source_code" jdbcType="VARCHAR" property="sourceCode" />
-    <result column="source_type" jdbcType="BIT" property="sourceType" />
+    <result column="source_type" jdbcType="INTEGER" property="sourceType" />
     <result column="create_by_id" jdbcType="VARCHAR" property="createById" />
     <result column="create_by_name" jdbcType="VARCHAR" property="createByName" />
     <result column="update_by_id" jdbcType="VARCHAR" property="updateById" />
@@ -90,15 +90,15 @@
       #{supplierName,jdbcType=VARCHAR}, #{transportCenterCode,jdbcType=VARCHAR}, #{transportCenterName,jdbcType=VARCHAR}, 
       #{warehouseCode,jdbcType=VARCHAR}, #{warehouseName,jdbcType=VARCHAR}, #{purchaseGroupCode,jdbcType=VARCHAR}, 
       #{purchaseGroupName,jdbcType=VARCHAR}, #{settlementMethodCode,jdbcType=VARCHAR}, 
-      #{settlementMethodName,jdbcType=VARCHAR}, #{rejectRecordStatus,jdbcType=BIT}, #{totalCount,jdbcType=BIGINT}, 
-      #{totalTaxAmount,jdbcType=DECIMAL}, #{actualTotalCount,jdbcType=BIGINT}, #{actualTotalTaxAmount,jdbcType=VARCHAR}, 
+      #{settlementMethodName,jdbcType=VARCHAR}, #{rejectRecordStatus,jdbcType=INTEGER}, #{totalCount,jdbcType=BIGINT},
+      #{totalTaxAmount,jdbcType=DECIMAL}, #{actualTotalCount,jdbcType=BIGINT}, #{actualTotalTaxAmount,jdbcType=DECIMAL},
       #{chargePerson,jdbcType=VARCHAR}, #{contactPerson,jdbcType=VARCHAR}, #{contactMobile,jdbcType=VARCHAR}, 
       #{provinceId,jdbcType=VARCHAR}, #{provinceName,jdbcType=VARCHAR}, #{cityId,jdbcType=VARCHAR}, 
       #{cityName,jdbcType=VARCHAR}, #{districtId,jdbcType=VARCHAR}, #{districtName,jdbcType=VARCHAR}, 
       #{receiveAddress,jdbcType=VARCHAR}, #{preExpectTime,jdbcType=TIMESTAMP}, #{validTime,jdbcType=TIMESTAMP}, 
       #{outStockTime,jdbcType=TIMESTAMP}, #{deliveryTime,jdbcType=TIMESTAMP}, #{finishTime,jdbcType=TIMESTAMP}, 
-      #{remark,jdbcType=VARCHAR}, #{useStatus,jdbcType=BIT}, #{sourceCode,jdbcType=VARCHAR}, 
-      #{sourceType,jdbcType=BIT}, #{createById,jdbcType=VARCHAR}, #{createByName,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{useStatus,jdbcType=INTEGER}, #{sourceCode,jdbcType=VARCHAR},
+      #{sourceType,jdbcType=INTEGER}, #{createById,jdbcType=VARCHAR}, #{createByName,jdbcType=VARCHAR},
       #{updateById,jdbcType=VARCHAR}, #{updateByName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP})
   </insert>
@@ -282,7 +282,7 @@
         #{settlementMethodName,jdbcType=VARCHAR},
       </if>
       <if test="rejectRecordStatus != null">
-        #{rejectRecordStatus,jdbcType=BIT},
+        #{rejectRecordStatus,jdbcType=INTEGER},
       </if>
       <if test="totalCount != null">
         #{totalCount,jdbcType=BIGINT},
@@ -294,7 +294,7 @@
         #{actualTotalCount,jdbcType=BIGINT},
       </if>
       <if test="actualTotalTaxAmount != null">
-        #{actualTotalTaxAmount,jdbcType=VARCHAR},
+        #{actualTotalTaxAmount,jdbcType=DECIMAL},
       </if>
       <if test="chargePerson != null">
         #{chargePerson,jdbcType=VARCHAR},
@@ -345,13 +345,13 @@
         #{remark,jdbcType=VARCHAR},
       </if>
       <if test="useStatus != null">
-        #{useStatus,jdbcType=BIT},
+        #{useStatus,jdbcType=INTEGER},
       </if>
       <if test="sourceCode != null">
         #{sourceCode,jdbcType=VARCHAR},
       </if>
       <if test="sourceType != null">
-        #{sourceType,jdbcType=BIT},
+        #{sourceType,jdbcType=INTEGER},
       </if>
       <if test="createById != null">
         #{createById,jdbcType=VARCHAR},
@@ -419,7 +419,7 @@
         settlement_method_name = #{settlementMethodName,jdbcType=VARCHAR},
       </if>
       <if test="rejectRecordStatus != null">
-        reject_record_status = #{rejectRecordStatus,jdbcType=BIT},
+        reject_record_status = #{rejectRecordStatus,jdbcType=INTEGER},
       </if>
       <if test="totalCount != null">
         total_count = #{totalCount,jdbcType=BIGINT},
@@ -431,7 +431,7 @@
         actual_total_count = #{actualTotalCount,jdbcType=BIGINT},
       </if>
       <if test="actualTotalTaxAmount != null">
-        actual_total_tax_amount = #{actualTotalTaxAmount,jdbcType=VARCHAR},
+        actual_total_tax_amount = #{actualTotalTaxAmount,jdbcType=DECIMAL},
       </if>
       <if test="chargePerson != null">
         charge_person = #{chargePerson,jdbcType=VARCHAR},
@@ -482,13 +482,13 @@
         remark = #{remark,jdbcType=VARCHAR},
       </if>
       <if test="useStatus != null">
-        use_status = #{useStatus,jdbcType=BIT},
+        use_status = #{useStatus,jdbcType=INTEGER},
       </if>
       <if test="sourceCode != null">
         source_code = #{sourceCode,jdbcType=VARCHAR},
       </if>
       <if test="sourceType != null">
-        source_type = #{sourceType,jdbcType=BIT},
+        source_type = #{sourceType,jdbcType=INTEGER},
       </if>
       <if test="createById != null">
         create_by_id = #{createById,jdbcType=VARCHAR},
@@ -527,11 +527,11 @@
       purchase_group_name = #{purchaseGroupName,jdbcType=VARCHAR},
       settlement_method_code = #{settlementMethodCode,jdbcType=VARCHAR},
       settlement_method_name = #{settlementMethodName,jdbcType=VARCHAR},
-      reject_record_status = #{rejectRecordStatus,jdbcType=BIT},
+      reject_record_status = #{rejectRecordStatus,jdbcType=INTEGER},
       total_count = #{totalCount,jdbcType=BIGINT},
       total_tax_amount = #{totalTaxAmount,jdbcType=DECIMAL},
       actual_total_count = #{actualTotalCount,jdbcType=BIGINT},
-      actual_total_tax_amount = #{actualTotalTaxAmount,jdbcType=VARCHAR},
+      actual_total_tax_amount = #{actualTotalTaxAmount,jdbcType=DECIMAL},
       charge_person = #{chargePerson,jdbcType=VARCHAR},
       contact_person = #{contactPerson,jdbcType=VARCHAR},
       contact_mobile = #{contactMobile,jdbcType=VARCHAR},
@@ -548,9 +548,9 @@
       delivery_time = #{deliveryTime,jdbcType=TIMESTAMP},
       finish_time = #{finishTime,jdbcType=TIMESTAMP},
       remark = #{remark,jdbcType=VARCHAR},
-      use_status = #{useStatus,jdbcType=BIT},
+      use_status = #{useStatus,jdbcType=INTEGER},
       source_code = #{sourceCode,jdbcType=VARCHAR},
-      source_type = #{sourceType,jdbcType=BIT},
+      source_type = #{sourceType,jdbcType=INTEGER},
       create_by_id = #{createById,jdbcType=VARCHAR},
       create_by_name = #{createByName,jdbcType=VARCHAR},
       update_by_id = #{updateById,jdbcType=VARCHAR},

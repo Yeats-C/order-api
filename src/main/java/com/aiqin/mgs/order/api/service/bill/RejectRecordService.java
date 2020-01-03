@@ -16,7 +16,7 @@ public interface RejectRecordService {
      * 根据退货单，生成爱亲采购单
      * @return
      */
-    HttpResponse createRejectRecord(RejectRecordReq RejectRecordReq);
+    HttpResponse createRejectRecord(String returnOrderCode);
 
     HttpResponse<List<RejectRecordInfo>> selectPurchaseInfo();
 }
