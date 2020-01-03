@@ -107,6 +107,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                 cartOrderInfo.setCreateByName(authToken.getPersonName());//创建者名称
                 cartOrderInfo.setStockNum(cartOrderInfo1.getStockNum());//库存数量
                 cartOrderInfo.setZeroRemovalCoefficient(cartOrderInfo1.getZeroRemovalCoefficient());//交易倍数
+                cartOrderInfo.setSpec(cartOrderInfo1.getSpec());//规格
                 try {
                     if (cartOrderInfo != null) {
                         //判断sku是否在购物车里面存在
@@ -200,6 +201,9 @@ public class CartOrderServiceImpl implements CartOrderService {
                 cartOrderInfo.setStoreId(storeId);
                 cartOrderInfo.setProductType(productType);
                 cartOrderInfo.setLineCheckStatus(Global.LINECHECKSTATUS_1);
+                if (null != number){
+                    cartOrderInfo.setAmount(number);
+                }
                 cartOrderDao.updateProductList(cartOrderInfo);
                 //返回商品列表并结算价格
                 CartResponse cartResponse = getProductList(cartOrderInfo);

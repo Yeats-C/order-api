@@ -591,4 +591,22 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
         }
         return flag;
     }
+
+    @Override
+    public void updateStoreStatus(String storeId, String s) {
+
+        try {
+            HttpClient httpPost = HttpClient.get(urlProperties.getSlcsApi() + "/store/open/Status" );
+            httpPost.addParameter("store_id", storeId);
+            httpPost.addParameter("business_stage_code ", s);
+            httpPost.action().status();
+           httpPost.action().result(new TypeReference<HttpResponse>() {  });
+        } catch (BusinessException e) {
+            logger.info("首单，修改门店状态：{}", e.getMessage());
+            throw new BusinessException(e.getMessage());
+        } catch (Exception e) {
+            logger.info("首单，修改门店状态：{}", e);
+            throw new BusinessException("首单，修改门店状态");
+        }
+    }
 }

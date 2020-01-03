@@ -21,13 +21,13 @@ public class DeliveryInfoVo implements Serializable {
     private String deliveryCode;
 
     @ApiModelProperty(value = "发运时间")
-    @JsonProperty("delivery_time")
+    @JsonProperty("transport_date")
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date deliveryTime;
+    private Date transportDate;
 
     @ApiModelProperty(value = "发运人")
-    @JsonProperty("customer_person")
-    private String customerPerson;
+    @JsonProperty("transport_person")
+    private String transportPerson;
 
     @ApiModelProperty(value = "发运单明细")
     @JsonProperty("delivery_detail")

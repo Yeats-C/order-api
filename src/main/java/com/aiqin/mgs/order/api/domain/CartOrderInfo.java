@@ -255,5 +255,12 @@ public class CartOrderInfo {
     @JsonProperty("sku_name")
     private String skuName;
 
+    /**规格--爱亲供应链字段*/
+    @ApiModelProperty(value = "规格")
+    @JsonProperty("spec")
+    private String spec;
+
+
+
 
 }
