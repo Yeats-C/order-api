@@ -44,7 +44,7 @@ public class RejectRecord {
     @ApiModelProperty(value = "结算方式名称")
     private String settlementMethodName;
     @ApiModelProperty(value = "退供单状态")
-    private Boolean rejectRecordStatus;
+    private Integer rejectRecordStatus;
     @ApiModelProperty(value = "最小单位数量")
     private Long totalCount;
     @ApiModelProperty(value = "商品含税金额")
@@ -52,7 +52,7 @@ public class RejectRecord {
     @ApiModelProperty(value = "实际最小单数数量")
     private Long actualTotalCount;
     @ApiModelProperty(value = "实际商品含税金额")
-    private String actualTotalTaxAmount;
+    private BigDecimal actualTotalTaxAmount;
     @ApiModelProperty(value = "负责人")
     private String chargePerson;
     @ApiModelProperty(value = "联系人")
@@ -86,11 +86,11 @@ public class RejectRecord {
     @ApiModelProperty(value = "备注")
     private String remark;
     @ApiModelProperty(value = "0. 启用   1.禁用")
-    private Boolean useStatus;
+    private Integer useStatus;
     @ApiModelProperty(value = "来源单号")
     private String sourceCode;
     @ApiModelProperty(value = "来源类型")
-    private Boolean sourceType;
+    private Integer sourceType;
     @ApiModelProperty(value = "创建人编码")
     private String createById;
     @ApiModelProperty(value = "创建人名称")
