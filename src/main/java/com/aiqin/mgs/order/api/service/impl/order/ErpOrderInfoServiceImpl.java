@@ -770,6 +770,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         updateOrder.setOrderStoreCode(order.getOrderStoreCode());
         updateOrder.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_13.getCode());
         this.updateOrderByPrimaryKeySelective(updateOrder, auth);
+
+
+        //首单，修改门店状态
+        erpOrderRequestService.updateStoreStatus(order.getStoreId(),"010201");
     }
 
 }
