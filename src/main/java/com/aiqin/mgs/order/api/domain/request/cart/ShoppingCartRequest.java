@@ -27,7 +27,7 @@ public class ShoppingCartRequest {
     private String storeId;
 
     /***创建来源*/
-    @ApiModelProperty(value = "商品添加来源 1:门店 2:erp")
+    @ApiModelProperty(value = "创建来源")
     @JsonProperty("create_source")
     private String createSource;
 
@@ -35,5 +35,6 @@ public class ShoppingCartRequest {
     @ApiModelProperty(value = "订单类型 0直送、1配送、2辅采")
     @JsonProperty("product_type")
     private Integer productType;
+
 
 }

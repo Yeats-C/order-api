@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -20,27 +21,17 @@ public class DeliveryInfoVo implements Serializable {
     private String deliveryCode;
 
     @ApiModelProperty(value = "发运时间")
-    @JsonProperty("customer_time")
-    private Date customerTime;
-    @ApiModelProperty(value = "配送方式编码")
-    @JsonProperty("distribution_mode_code")
-    private String distributionModeCode;
+    @JsonProperty("transport_date")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date transportDate;
 
-    @ApiModelProperty(value = "配送方式名称")
-    @JsonProperty("distribution_mode_name")
-    private String distributionModeName;
-
-    @ApiModelProperty(value = "发运人id")
-    @JsonProperty("customer_person_id")
-    private String customerPersonId;
-
-    @ApiModelProperty(value = "发运人id")
-    @JsonProperty("customer_person_name")
-    private String customerPersonName;
+    @ApiModelProperty(value = "发运人")
+    @JsonProperty("transport_person")
+    private String transportPerson;
 
     @ApiModelProperty(value = "发运单明细")
-    @JsonProperty("deliverydetail_infos")
-    private List<DeliveryDetailInfo> deliveryDetailInfos;
+    @JsonProperty("delivery_detail")
+    private List<DeliveryDetailInfo> deliveryDetail;
 
     @ApiModelProperty(value = "客户编号")
     @JsonProperty("customer_code")
@@ -65,21 +56,17 @@ public class DeliveryInfoVo implements Serializable {
     @ApiModelProperty(value = "物流单号")
     @JsonProperty("transport_code")
     @NotEmpty(message = "物流单号不能为空")
-    private List<String> transportCode;
+    private String transportCode;
 
     @ApiModelProperty(value = "发运状态")
     @JsonProperty("transport_status")
     private Integer transportStatus;
 
-    @ApiModelProperty(value = "仓库名称")
-    @JsonProperty("send_repertory_name")
-    private String sendRepertoryName;
+    @ApiModelProperty(value = "发货仓库名称")
+    @JsonProperty("transport_center_name")
+    private String transportCenterName;
 
-    @ApiModelProperty(value = "仓库编码")
-    @JsonProperty("send_repertory_code")
-    private String sendRepertoryCode;
-
-    @ApiModelProperty(value = "物流费用")
-    @JsonProperty("logistics_fee")
-    private BigDecimal logisticsFee;
+    @ApiModelProperty(value = "发货仓库编码")
+    @JsonProperty("transport_center_code")
+    private String transportCenterCode;
 }

@@ -490,8 +490,8 @@ public class OrderServiceImpl implements OrderService {
             stockVo.setStorageType(StorageTypeEnum.DOOR_STORE.getCode());
             /*stockVo.setStoragePosition(ReturnGoodsToStockEnum.DISPLAY_STOCK.getCode());*/
             stockVo.setProductSku(input.getSkuCode());
-            stockVo.setOperator("系统设置");
-            stockVo.setCreateByName("系统设置");
+            stockVo.setOperator(orderInfo.getOrderInfo().getCashierName());
+            stockVo.setCreateByName(orderInfo.getOrderInfo().getCashierName());
             stockVo.setStoragePosition(1);
             stockVo.setReleaseStatus(ReleaseStatusEnum.RELEASE.getCode());
             stockVo.setRelateNumber(orderInfo.getOrderInfo().getOrderId());
