@@ -2212,7 +2212,6 @@ public class OrderServiceImpl implements OrderService {
             }
             Integer actualPrice = storeValueOrderPayRequest.getActualPrice();
             String updateBy = storeValueOrderPayRequest.getUpdateBy();
-            orderInfo.setPayStatus(1);
             //支付完成由回调修改
             //orderInfo.setOrderStatus(5);
             orderInfo.setPayType("7");
