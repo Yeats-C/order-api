@@ -33,7 +33,10 @@ public interface ReturnOrderInfoDao {
     Integer updateLogisticsCountAndAmount(@Param("returnOrderCode") String returnOrderCode, @Param("actualReturnOrderAmount") BigDecimal actualReturnOrderAmount, @Param("actualProductCount") Long actualProductCount);
 
     //修改退款状态
-    Integer updateRefundStatus(String orderStoreCode);
+    Integer updateRefundStatus(String returnOrderCode);
+
+    //修改退工单同步状态
+    Integer updateOrderSuccess(String returnOrderCode);
 
     //后台销售退货单管理列表（搜索）
     List<ReturnOrderInfo> page(ReturnOrderSearchVo searchVo);
