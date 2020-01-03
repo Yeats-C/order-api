@@ -130,4 +130,11 @@ public interface ReturnOrderInfoService {
      */
     PageResData<ReturnOrderInfo> getWriteDownOrderList(PageRequestVO<WriteDownOrderSearchVo> searchVo);
 
+    /**
+     * 根据退货单号查询支付状态 支付成功返回true
+     * @param orderCode
+     * @return
+     */
+    boolean searchPayOrder(String orderCode);
+
 }

@@ -22,7 +22,6 @@ import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
-import com.aiqin.mgs.order.api.domain.request.bill.RejectRecordReq;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderStatusVo;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
@@ -879,6 +878,34 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         log.info("erp售后管理--冲减单列表，searchVo={}",searchVo);
         List<ReturnOrderInfo> content = returnOrderInfoDao.selectAll(afterReturnOrderSearchVo);
         return new PageResData(Integer.valueOf((int)((Page) content).getTotal()) , content);
+    }
+
+    @Override
+    @Transactional
+    public boolean searchPayOrder(String orderCode) {
+        String url=paymentHost+"/payment/pay/searchPayOrder?orderNo="+orderCode;
+        log.info("根据退货单号查询支付状态入参，url={}",url);
+        String request= URLConnectionUtil.doGet(url,null);
+        log.info("根据退货单号查询支付状态结果，request={}",request);
+        if(StringUtils.isNotBlank(request)){
+            JSONObject jsonObject= JSON.parseObject(request);
+            if(jsonObject.containsKey("code")&&"0".equals(jsonObject.getString("code"))){
+                log.info("退款成功");
+                //更新退货单表状态
+                returnOrderInfoDao.updateRefundStatus(orderCode);
+                //更新流水表状态
+                JSONObject json=jsonObject.getJSONObject("data");
+                RefundInfo refundInfo=new RefundInfo();
+                //1-已退款
+                refundInfo.setStatus(ConstantData.REFUND_STATUS);
+                refundInfo.setUpdateTime(new Date());
+                refundInfo.setPayNum(json.getString("payNum"));
+                refundInfo.setOrderCode(orderCode);
+                refundInfoDao.updateByOrderCode(refundInfo);
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
