@@ -17,7 +17,6 @@ import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.OrderConfirmResponse;
 import com.aiqin.mgs.order.api.service.CartOrderService;
 import com.aiqin.mgs.order.api.service.order.*;
-import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import org.apache.commons.lang.StringUtils;
@@ -54,7 +53,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ErpOrderInfo erpSaveOrder(ErpOrderSaveRequest erpOrderSaveRequest) {
+    public ErpOrderInfo erpSaveOrder(ErpOrderSaveRequest erpOrderSaveRequest, AuthToken auth) {
         //校验参数
         validateSaveOrderRequest(erpOrderSaveRequest);
 
@@ -62,12 +61,12 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         if (controlEnum == null || !controlEnum.isErpCartCreate()) {
             throw new BusinessException("不支持创建该类型和类别的订单");
         }
-        return saveOrder(erpOrderSaveRequest);
+        return saveOrder(erpOrderSaveRequest, auth);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ErpOrderInfo storeSaveOrder(ErpOrderSaveRequest erpOrderSaveRequest) {
+    public ErpOrderInfo storeSaveOrder(ErpOrderSaveRequest erpOrderSaveRequest, AuthToken auth) {
         //校验参数
         validateSaveOrderRequest(erpOrderSaveRequest);
 
@@ -75,7 +74,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         if (controlEnum == null || !controlEnum.isStoreCartCreate()) {
             throw new BusinessException("不支持创建该类型和类别的订单");
         }
-        return saveOrder(erpOrderSaveRequest);
+        return saveOrder(erpOrderSaveRequest, auth);
     }
 
     /**
@@ -87,12 +86,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @version: v1.0.0
      * @date 2019/12/26 9:49
      */
-    private ErpOrderInfo saveOrder(ErpOrderSaveRequest erpOrderSaveRequest) {
+    private ErpOrderInfo saveOrder(ErpOrderSaveRequest erpOrderSaveRequest, AuthToken auth) {
 
         erpOrderSaveRequest.setStoreId("AB988458F192C747478210CC01D4D4135C");
-
-        //操作人信息
-        AuthToken auth = AuthUtil.getCurrentAuth();
 
         //获取门店信息
         StoreInfo storeInfo = erpOrderRequestService.getStoreInfoByStoreId(erpOrderSaveRequest.getStoreId());
@@ -115,11 +111,14 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //保存订单、订单明细、订单支付、订单收货人信息、订单日志
         String orderId = insertOrder(order, storeInfo, auth, erpOrderSaveRequest);
         //删除购物车商品
-        deleteOrderProductFromCart(erpOrderSaveRequest.getStoreId(), storeCartProduct);
+//        deleteOrderProductFromCart(erpOrderSaveRequest.getStoreId(), storeCartProduct);
 
         //锁库存
         if (processTypeEnum.isLockStock()) {
-            erpOrderRequestService.lockStockInSupplyChain(order, auth);
+            boolean flag = erpOrderRequestService.lockStockInSupplyChain(order, erpOrderItemList,auth);
+            if (!flag) {
+                throw new BusinessException("锁库存失败");
+            }
         }
 
         //返回订单信息
@@ -128,10 +127,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ErpOrderInfo saveRackOrder(ErpOrderSaveRequest erpOrderSaveRequest) {
+    public ErpOrderInfo saveRackOrder(ErpOrderSaveRequest erpOrderSaveRequest, AuthToken auth) {
 
-        //操作人信息
-        AuthToken auth = AuthUtil.getCurrentAuth();
         //校验参数
         validateSaveOrderRequest(erpOrderSaveRequest);
         if (!ErpOrderTypeEnum.ASSIST_PURCHASING.getCode().equals(erpOrderSaveRequest.getOrderType())) {
@@ -156,11 +153,15 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //构建和保存货架订单，返回订单编号
         String orderCode = generateAndSaveRackOrder(erpOrderSaveRequest, orderItemList, storeInfo, auth);
+
         ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
 
         if (processTypeEnum.isLockStock()) {
             //锁库
-            erpOrderRequestService.lockStockInSupplyChain(order, auth);
+            boolean flag = erpOrderRequestService.lockStockInSupplyChain(order,orderItemList, auth);
+            if (!flag) {
+                throw new BusinessException("锁库存失败");
+            }
         }
 
         //返回订单
@@ -609,7 +610,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @date 2019/12/9 15:35
      */
     private void sharePrice(ErpOrderNodeProcessTypeEnum processTypeEnum, ErpOrderInfo erpOrderInfo) {
-        //TODO CT 计算均摊金额
+        //TODO 计算均摊金额
         for (ErpOrderItem item :
                 erpOrderInfo.getItemList()) {
             item.setTotalPreferentialAmount(item.getTotalProductAmount());
@@ -683,7 +684,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private void deleteOrderProductFromCart(String storeId, OrderConfirmResponse orderConfirmResponse) {
         for (CartOrderInfo item :
                 orderConfirmResponse.getCartOrderInfos()) {
-//            cartOrderService.deleteCartInfo(storeId, item.getSkuId(), YesOrNoEnum.YES.getCode());
+            cartOrderService.deleteCartInfo(storeId, item.getSkuCode(), YesOrNoEnum.YES.getCode());
         }
     }
 

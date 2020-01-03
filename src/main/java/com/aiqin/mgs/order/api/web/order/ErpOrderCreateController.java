@@ -52,7 +52,7 @@ public class ErpOrderCreateController {
         try {
             AuthUtil.loginCheck();
             AuthToken auth = AuthUtil.getCurrentAuth();
-            ErpOrderInfo erpOrderInfo = erpOrderCreateService.erpSaveOrder(erpOrderSaveRequest);
+            ErpOrderInfo erpOrderInfo = erpOrderCreateService.erpSaveOrder(erpOrderSaveRequest, auth);
             response.setData(erpOrderInfo);
 
             ErpOrderPayRequest payRequest = new ErpOrderPayRequest();
@@ -77,7 +77,7 @@ public class ErpOrderCreateController {
         try {
             AuthUtil.loginCheck();
             AuthToken auth = AuthUtil.getCurrentAuth();
-            ErpOrderInfo erpOrderInfo = erpOrderCreateService.storeSaveOrder(erpOrderSaveRequest);
+            ErpOrderInfo erpOrderInfo = erpOrderCreateService.storeSaveOrder(erpOrderSaveRequest, auth);
             response.setData(erpOrderInfo);
 
             ErpOrderPayRequest payRequest = new ErpOrderPayRequest();
@@ -102,7 +102,7 @@ public class ErpOrderCreateController {
         try {
             AuthUtil.loginCheck();
             AuthToken auth = AuthUtil.getCurrentAuth();
-            ErpOrderInfo erpOrderInfo = erpOrderCreateService.saveRackOrder(erpOrderSaveRequest);
+            ErpOrderInfo erpOrderInfo = erpOrderCreateService.saveRackOrder(erpOrderSaveRequest, auth);
             response.setData(erpOrderInfo);
 
             ErpOrderPayRequest payRequest = new ErpOrderPayRequest();
