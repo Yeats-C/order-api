@@ -1,24 +1,16 @@
 package com.aiqin.mgs.order.api.domain.constant;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
+/**
+ * 订单号生成全局变量类
+ *
+ * @author: Tao.Chen
+ * @version: v1.0.0
+ * @date 2020/1/3 10:55
+ */
 public class ErpOrderCodeSequence {
 
+    /***当前天*/
     public static String currentDay = "";
+    /***当前自增长数*/
     public static Long num;
-
-//    public static String getOrderCode() {
-//        String curDayStr = getCurDayStr();
-//        if (!currentDay.equals(curDayStr)) {
-//            currentDay = curDayStr;
-//            num = 0L;
-//        }
-//        return null;
-//    }
-//
-//    private static String getCurDayStr() {
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-//        return sdf.format(new Date());
-//    }
 }
