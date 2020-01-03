@@ -1,6 +1,5 @@
 package com.aiqin.mgs.order.api.service.bill.impl;
 
-import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
@@ -11,7 +10,6 @@ import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
-import com.aiqin.mgs.order.api.domain.request.bill.RejectRecordReq;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderSearchVo;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
