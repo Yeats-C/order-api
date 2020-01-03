@@ -25,19 +25,20 @@
         <result column="line_check_status" jdbcType="INTEGER" property="lineCheckStatus"/>
         <result column="stock_num" jdbcType="INTEGER" property="stockNum"/>
         <result column="zero_removalCoefficient" jdbcType="INTEGER" property="zeroRemovalCoefficient"/>
+        <result column="spec" jdbcType="VARCHAR" property="spec"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         product_id,cart_id,franchisee_id,store_id,sku_code,spu_id,product_name,amount,logo,price,color,create_time,update_time,product_size,activity_id,
-        activity_name,product_type,create_source,product_gift,gift_parent_cart_id,line_check_status,stock_num,zero_removalCoefficient
+        activity_name,product_type,create_source,product_gift,gift_parent_cart_id,line_check_status,stock_num,zero_removalCoefficient,spec
     </sql>
 
     <!-- 将商品添加添加购物车 -->
     <insert id="insertCart" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo">
         insert into order_store_cart
-			(product_id,cart_id,product_name,amount,logo,create_time,update_time,price,color,product_size,activity_id,activity_name,product_type,sku_code,spu_id,store_id,create_source,stock_num,zero_removalCoefficient)
+			(product_id,cart_id,product_name,amount,logo,create_time,update_time,price,color,product_size,activity_id,activity_name,product_type,sku_code,spu_id,store_id,create_source,stock_num,zero_removalCoefficient,spec)
 		values
-		    (#{productId},#{cartId},#{productName},#{amount},#{logo},#{createTime},#{updateTime},#{price},#{color},#{productSize},#{activityId},#{activityName},#{productType},#{skuCode},#{spuId},#{storeId},#{createSource},#{stockNum},#{zeroRemovalCoefficient})
+		    (#{productId},#{cartId},#{productName},#{amount},#{logo},#{createTime},#{updateTime},#{price},#{color},#{productSize},#{activityId},#{activityName},#{productType},#{skuCode},#{spuId},#{storeId},#{createSource},#{stockNum},#{zeroRemovalCoefficient},#{spec})
     </insert>
 
     <!-- 判断SKU商品是否已存在购物车中 -->
