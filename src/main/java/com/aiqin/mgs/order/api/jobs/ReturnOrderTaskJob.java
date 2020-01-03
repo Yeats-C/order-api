@@ -3,7 +3,6 @@ package com.aiqin.mgs.order.api.jobs;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderQueryVo;
-import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +27,7 @@ public class ReturnOrderTaskJob {
     private static final Logger logger = LoggerFactory.getLogger(ReturnOrderTaskJob.class);
 
     @Resource
-    private ReturnOrderInfoService returnOrderInfoService;
+    private ReturnOrderTaskService returnOrderTaskService;
     @Resource
     private ReturnOrderInfoDao returnOrderInfoDao;
 
@@ -43,7 +42,7 @@ public class ReturnOrderTaskJob {
         searchVo.setReturnOrderStatus(11);
         List<ReturnOrderInfo> returnOrderInfos = returnOrderInfoDao.selectAll(searchVo);
         for(ReturnOrderInfo roi:returnOrderInfos){
-            returnOrderInfoService.searchPayOrder(roi.getReturnOrderCode());
+            returnOrderTaskService.searchPayOrder(roi.getReturnOrderCode());
         }
         //计时器结束
         watch.stop();
