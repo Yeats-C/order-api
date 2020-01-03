@@ -339,6 +339,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 //                if (lineParamListMap.containsKey(lineCode)) {
 //                    list.addAll(lineParamListMap.get(lineCode));
 //                }
+//                lineParamListMap.put(lineCode, list);
 //            }
 //
 //            for (ErpOrderItem item :
@@ -353,11 +354,25 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 //                for (int i = 0; i < lineParamList.size(); i++) {
 //
 //                    ErpOrderItem newSplitItem = new ErpOrderItem();
-////                    CopyBeanUtil
+//                    CopyBeanUtil.copySameBean(newSplitItem, item);
+//                    item.setLineCode(null);
+//
+//                    //订货数量汇总
+//                    long lineProductCount = 0L;
+//                    //行总价
+//                    BigDecimal lineTotalProductAmount = BigDecimal.ZERO;
+//                    //优惠分摊总金额（分摊后金额）
+//                    BigDecimal totalPreferentialAmount = BigDecimal.ZERO;
+//                    //分摊后单价
+//                    BigDecimal preferentialAmount = BigDecimal.ZERO;
+//                    //活动优惠总金额
+//                    BigDecimal totalAcivityAmount = BigDecimal.ZERO;
 //
 //                    if (i < lineParamList.size() - 1) {
 //
-//                    }else {
+//
+//
+//                    } else {
 //                        //最后一条，用减法避免误差
 //                    }
 //                }
@@ -794,8 +809,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         this.updateOrderByPrimaryKeySelective(order, auth);
 
         //首单，修改门店状态
-        if (order.getOrderTypeCode().equals("2")||order.getOrderTypeCode().equals("4")){
-            erpOrderRequestService.updateStoreStatus(order.getStoreId(),"010201");
+        if (order.getOrderTypeCode().equals("2") || order.getOrderTypeCode().equals("4")) {
+            erpOrderRequestService.updateStoreStatus(order.getStoreId(), "010201");
         }
     }
 
