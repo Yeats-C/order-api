@@ -10,6 +10,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCarryOutNextStepRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderEditRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSignRequest;
@@ -791,6 +792,20 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_12.getCode());
         order.setReceiveTime(new Date());
         this.updateOrderByPrimaryKeySelective(order, auth);
+    }
+
+    @Override
+    public void orderCarryOutNextStep(ErpOrderCarryOutNextStepRequest erpOrderCarryOutNextStepRequest, AuthToken auth) {
+
+        if (erpOrderCarryOutNextStepRequest == null || StringUtils.isEmpty(erpOrderCarryOutNextStepRequest.getOrderCode())) {
+            throw new BusinessException("缺失订单号");
+        }
+
+        ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(erpOrderCarryOutNextStepRequest.getOrderCode());
+        if (order == null) {
+            throw new BusinessException("无效的订单号");
+        }
+
     }
 
 }

@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.service.order;
 
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCarryOutNextStepRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderEditRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSignRequest;
 
@@ -107,4 +108,6 @@ public interface ErpOrderInfoService {
      * @date 2019/12/10 9:39
      */
     void orderSign(ErpOrderSignRequest erpOrderSignRequest);
+
+    void orderCarryOutNextStep(ErpOrderCarryOutNextStepRequest erpOrderCarryOutNextStepRequest,AuthToken auth);
 }
