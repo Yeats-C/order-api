@@ -109,5 +109,15 @@ public interface ErpOrderInfoService {
      */
     void orderSign(ErpOrderSignRequest erpOrderSignRequest);
 
-    void orderCarryOutNextStep(ErpOrderCarryOutNextStepRequest erpOrderCarryOutNextStepRequest,AuthToken auth);
+    /**
+     * 订单流程校正
+     *
+     * @param erpOrderCarryOutNextStepRequest
+     * @param auth
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2020/1/4 14:10
+     */
+    void orderCarryOutNextStep(ErpOrderCarryOutNextStepRequest erpOrderCarryOutNextStepRequest, AuthToken auth);
 }

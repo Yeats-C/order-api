@@ -18,7 +18,7 @@ public class ErpOrderCancelRequest {
     @JsonProperty("order_code")
     private String orderCode;
 
-    @ApiModelProperty(value = "结果 1可以取消 0不可取消  供应链回调时候使用")
+    @ApiModelProperty(value = "结果 0可以取消 1不可取消  供应链回调时候使用")
     @JsonProperty("status")
     private Integer status;
 

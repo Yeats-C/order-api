@@ -230,26 +230,32 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
         payStatusResponse.setOrderCode(orderCode);
         payStatusResponse.setRequestSuccess(false);
         try {
-            //请求支付中心接口查询订单支付状态
-            HttpClient httpClient = HttpClient.get(urlProperties.getPaymentApi() + "/payment/pay/searchPayOrder");
-//            httpClient.addParameter("orderNo", orderCode);
-            httpClient.addParameter("orderNo", "20191226191116542103");
-            HttpResponse<ErpPayPollingResponse> httpResponse = httpClient.action().result(new TypeReference<HttpResponse<ErpPayPollingResponse>>() {
-            });
 
-            if (RequestReturnUtil.validateHttpResponse(httpResponse)) {
-                ErpPayPollingResponse data = httpResponse.getData();
-                payStatusResponse.setRequestSuccess(true);
-                ErpPayPollingBackStatusEnum payPollingBackStatusEnum = ErpPayPollingBackStatusEnum.getEnum(data.getOrderStatus());
-                if (payPollingBackStatusEnum == ErpPayPollingBackStatusEnum.STATUS_0) {
-                    payStatusResponse.setPayStatusEnum(ErpPayStatusEnum.PAYING);
-                } else if (payPollingBackStatusEnum == ErpPayPollingBackStatusEnum.STATUS_1) {
-                    payStatusResponse.setPayStatusEnum(ErpPayStatusEnum.SUCCESS);
-                    payStatusResponse.setPayCode(data.getPayNum());
-                } else {
-                    payStatusResponse.setPayStatusEnum(ErpPayStatusEnum.FAIL);
-                }
-            }
+            //TODO CT 临时测试
+            payStatusResponse.setRequestSuccess(true);
+            payStatusResponse.setPayCode(System.currentTimeMillis() + "");
+            payStatusResponse.setOrderCode(orderCode);
+            payStatusResponse.setPayStatusEnum(ErpPayStatusEnum.SUCCESS);
+
+            //请求支付中心接口查询订单支付状态
+//            HttpClient httpClient = HttpClient.get(urlProperties.getPaymentApi() + "/payment/pay/searchPayOrder");
+//            httpClient.addParameter("orderNo", orderCode);
+//            HttpResponse<ErpPayPollingResponse> httpResponse = httpClient.action().result(new TypeReference<HttpResponse<ErpPayPollingResponse>>() {
+//            });
+//
+//            if (RequestReturnUtil.validateHttpResponse(httpResponse)) {
+//                ErpPayPollingResponse data = httpResponse.getData();
+//                payStatusResponse.setRequestSuccess(true);
+//                ErpPayPollingBackStatusEnum payPollingBackStatusEnum = ErpPayPollingBackStatusEnum.getEnum(data.getOrderStatus());
+//                if (payPollingBackStatusEnum == ErpPayPollingBackStatusEnum.STATUS_0) {
+//                    payStatusResponse.setPayStatusEnum(ErpPayStatusEnum.PAYING);
+//                } else if (payPollingBackStatusEnum == ErpPayPollingBackStatusEnum.STATUS_1) {
+//                    payStatusResponse.setPayStatusEnum(ErpPayStatusEnum.SUCCESS);
+//                    payStatusResponse.setPayCode(data.getPayNum());
+//                } else {
+//                    payStatusResponse.setPayStatusEnum(ErpPayStatusEnum.FAIL);
+//                }
+//            }
 
         } catch (Exception e) {
             logger.error("获取订单支付状态失败：{}", e);
