@@ -4,6 +4,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.pay.ErpPayWayEnum;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.ProductInfo;
@@ -11,10 +12,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
-import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCarryOutNextStepRequest;
-import com.aiqin.mgs.order.api.domain.request.order.ErpOrderEditRequest;
-import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
-import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSignRequest;
+import com.aiqin.mgs.order.api.domain.request.order.*;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderItemSplitGroupResponse;
 import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
 import com.aiqin.mgs.order.api.service.order.*;
@@ -53,6 +51,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     private ErpOrderRequestService erpOrderRequestService;
     @Resource
     private ErpOrderCreateService erpOrderCreateService;
+    @Resource
+    private ErpOrderPayService erpOrderPayService;
     @Resource
     private PurchaseOrderService purchaseOrderService;
 
@@ -707,7 +707,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         this.updateOrderByPrimaryKeySelective(order, auth);
 
         //首单，修改门店状态
-        if (order.getOrderTypeCode().equals("2") || order.getOrderTypeCode().equals("4")) {
+        if (ErpOrderCategoryEnum.ORDER_TYPE_2.getValue().equals(order.getOrderCategoryCode()) || ErpOrderCategoryEnum.ORDER_TYPE_4.getValue().equals(order.getOrderCategoryCode())) {
             erpOrderRequestService.updateStoreStatus(order.getStoreId(), "010201");
         }
     }
@@ -724,8 +724,56 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             throw new BusinessException("无效的订单号");
         }
 
-        if (ErpOrderStatusEnum.ORDER_STATUS_1.getCode().equals(order.getOrderStatus())) {
+        ErpOrderNodeProcessTypeEnum processTypeEnum = ErpOrderNodeProcessTypeEnum.getEnum(order.getOrderTypeCode(), order.getOrderCategoryCode());
+        if (processTypeEnum == null) {
+            throw new BusinessException("订单类型异常");
+        }
+        ErpOrderNodeStatusEnum orderNodeStatusEnum = ErpOrderNodeStatusEnum.getEnum(order.getOrderNodeStatus());
 
+        //需不需要发起支付或者轮询
+        boolean payFlag = false;
+        //需不需要支付成功后续操作
+        boolean payAfterFlag = false;
+
+        switch (orderNodeStatusEnum) {
+            case STATUS_1:
+                if (processTypeEnum.isAutoPay()) {
+                    payFlag = true;
+                }
+                break;
+            case STATUS_2:
+                payFlag = true;
+                break;
+            case STATUS_3:
+                payAfterFlag = true;
+                break;
+            case STATUS_4:
+                if (processTypeEnum.isAutoPay()) {
+                    payFlag = true;
+                }
+                break;
+            case STATUS_5:
+                payAfterFlag = true;
+                break;
+            case STATUS_6:
+                payAfterFlag = true;
+                break;
+            default:
+                ;
+        }
+
+        if (payFlag) {
+            //重新发起支付或者轮询结果
+
+            ErpOrderPayRequest erpOrderPayRequest = new ErpOrderPayRequest();
+            erpOrderPayRequest.setOrderCode(order.getOrderStoreCode());
+            erpOrderPayRequest.setPayWay(ErpPayWayEnum.PAY_1.getCode());
+            erpOrderPayService.orderPayStartMethodGroup(erpOrderPayRequest, auth, true);
+        }
+        if (payAfterFlag) {
+            //重新执行支付成功后续操作
+
+            erpOrderPayService.orderPaySuccessMethodGroup(order.getOrderStoreCode(), auth);
         }
 
     }
