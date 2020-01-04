@@ -45,9 +45,19 @@
     <select id="isYesCart" resultType="java.lang.String" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo">
         select SUM(amount) as amount from order_store_cart
         <where>
-            store_id =#{storeId}
+         1=1
+            <if test="storeId != null">
+            and   store_id =#{storeId}
+            </if>
+            <if test="productId != null">
             and product_id = #{productId}
+            </if>
+            <if test="skuCode != null">
             and sku_code = #{skuCode}
+            </if>
+            <if test="productType != null">
+                and product_type = #{productType}
+            </if>
         </where>
         GROUP BY store_id,product_id,sku_code
     </select>
