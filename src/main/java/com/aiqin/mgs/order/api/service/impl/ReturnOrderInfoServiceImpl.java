@@ -125,6 +125,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         }
         //退货单--退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户
         record.setReturnMoneyType(ConstantData.RETURN_MONEY_TYPE);
+        record.setOrderSuccess(1);
         log.info("发起退货--插入退货信息，record={}",record);
         returnOrderInfoDao.insertSelective(record);
         List<ReturnOrderDetail> details = reqVo.getDetails().stream().map(detailVo -> {
