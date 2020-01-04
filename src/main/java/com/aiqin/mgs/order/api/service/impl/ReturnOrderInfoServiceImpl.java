@@ -230,7 +230,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getMsg();
                 //如果退货状态为11，则不进行撤销，继续向下走流程
                 ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(reqVo.getReturnOrderCode());
-                if(returnOrderInfo.getReturnOrderStatus()==11){
+                if(returnOrderInfo.getReturnOrderStatus().equals(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_RETURN.getKey())){
                     return false;
                 }
                 break;
@@ -596,17 +596,17 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             json.put("store_id",returnOrderInfo.getStoreCode());
             Integer method=returnOrderInfo.getTreatmentMethod();
             //处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款
-            if(null!=method&&method==TreatmentMethodEnum.RETURN_AMOUNT_AND_GOODS_TYPE.getCode()){//RETURN_REFUND 退货退款
+            if(null!=method&&method.equals(TreatmentMethodEnum.RETURN_AMOUNT_AND_GOODS_TYPE.getCode())){//RETURN_REFUND 退货退款
                 json.put("transactionType","RETURN_REFUND");
-            }else if(null!=method&&method==TreatmentMethodEnum.RETURN_AMOUNT_TYPE.getCode()){//"REFUND_ONLY 仅退款
+            }else if(null!=method&&method.equals(TreatmentMethodEnum.RETURN_AMOUNT_TYPE.getCode())){//"REFUND_ONLY 仅退款
                 json.put("transactionType","REFUND_ONLY");
             }
             //订单类型 0直送、1配送、2辅采
             Integer type=returnOrderInfo.getOrderType();
-            if(null!=type&&type==0){//订单类型 14配送tob 2直送tob
+            if(null!=type&&type.equals(0)){//订单类型 14配送tob 2直送tob
                 json.put("pay_order_type", PayOrderTypeEnum.PAY_ORDER_TYPE_PEI.getKey());
                 json.put("pay_origin_type",PayOriginTypeEnum.DIRECT_SEND_TOB_RETURN.getKey());
-            }else if(null!=type&&type==1){
+            }else if(null!=type&&type.equals(1)){
                 json.put("pay_order_type",PayOrderTypeEnum.PAY_ORDER_TYPE_ZHI.getKey());
                 json.put("pay_origin_type",PayOriginTypeEnum.TOB_RETURN.getKey());
             }
@@ -987,5 +987,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         String request= URLConnectionUtil.doGet(url,null);
         log.info("发起订货管理-修改退货申请单结果，request={}",request);
     }
+
 
 }
