@@ -109,6 +109,8 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
 
             //TODO CT 计算体积和重量
 
+            erpOrderItemService.updateOrderItemList(itemList, auth);
+
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_9.getCode());
             order.setActualProductCount(totalActualProductCount);
             order.setActualTotalProductAmount(actualTotalProductAmount);

@@ -274,13 +274,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
                     }
 
                     //调用支付中心，查看结果
-                    //ErpOrderPayStatusResponse payStatusResponse = erpOrderRequestService.getOrderPayStatus(orderCode);
-                    //TODO CT 临时测试
-                    ErpOrderPayStatusResponse payStatusResponse = new ErpOrderPayStatusResponse();
-                    payStatusResponse.setRequestSuccess(true);
-                    payStatusResponse.setPayCode(System.currentTimeMillis() + "");
-                    payStatusResponse.setOrderCode(orderCode);
-                    payStatusResponse.setPayStatusEnum(ErpPayStatusEnum.SUCCESS);
+                    ErpOrderPayStatusResponse payStatusResponse = erpOrderRequestService.getOrderPayStatus(orderCode);
 
                     if (payStatusResponse.isRequestSuccess()) {
                         ErpPayStatusEnum payStatusEnum = payStatusResponse.getPayStatusEnum();

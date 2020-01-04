@@ -88,6 +88,7 @@
     <result column="order_category" property="orderCategory" jdbcType="BIT" />
     <result column="review_operator_id" property="reviewOperatorId" jdbcType="VARCHAR" />
     <result column="review_time" property="reviewTime" jdbcType="TIMESTAMP" />
+    <result column="order_success" property="orderSuccess" jdbcType="BIT" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, return_order_id, return_order_code, order_store_code, company_code, company_name,
@@ -105,7 +106,7 @@
     discount_amount_infos, store_id, store_code, store_name, nature_code, nature_name,
     review_remark, review_operator, refund_status, process_type, remark, use_status,
     create_by_id, create_by_name, update_by_id, update_by_name, create_time, update_time,
-    source_type, return_money_type, order_category, review_operator_id, review_time
+    source_type, return_money_type, order_category, review_operator_id, review_time, order_success
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
@@ -379,6 +380,9 @@
       <if test="reviewTime != null" >
         review_time,
       </if>
+      <if test="orderSuccess != null" >
+        order_success,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -638,6 +642,9 @@
       </if>
       <if test="reviewTime != null" >
         #{reviewTime},
+      </if>
+      <if test="orderSuccess != null" >
+        #{orderSuccess},
       </if>
     </trim>
   </insert>
@@ -1188,8 +1195,9 @@
     set
 --     等待退货验收
     return_order_status=4,
-    order_success = 1
+    order_success = 2
     where return_order_code=#{returnOrderCode}
   </update>
+
 
 </mapper>

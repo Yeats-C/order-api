@@ -71,10 +71,16 @@ public class CartOrderServiceImpl implements CartOrderService {
         shoppingCartProductRequest.setProvinceCode(storeInfo.getData().getProvinceId());
         shoppingCartProductRequest.setCompanyCode(storeInfo.getData().getCompanyCode());
         shoppingCartProductRequest.setSkuCodes(skuCodeList);
-
-        //通过商品id、门店Id、skuid调用商品模块，返回商品信息
+        if(shoppingCartProductRequest.getCompanyCode()==null
+                || shoppingCartProductRequest.getCityCode()==null
+                || shoppingCartProductRequest.getProvinceCode()==null
+                || shoppingCartProductRequest.getSkuCodes()==null){
+            return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
+        }
+        //通过省市公司ID、skuid调用商品模块，返回商品信息
         HttpResponse<List<CartOrderInfo>> productInfo = bridgeProductService.getProduct(shoppingCartProductRequest);
         List<CartOrderInfo> cartOrderInfoList = productInfo.getData();
+
         for (CartOrderInfo cartOrderInfo1 : cartOrderInfoList) {
             //获取库房的商品数量和sku码
             int stockProductAmount = cartOrderInfo1.getStockNum();
@@ -188,7 +194,21 @@ public class CartOrderServiceImpl implements CartOrderService {
             if (null != skuId && lineCheckStatus.equals(Global.LINECHECKSTATUS_1) &&null !=productType) {
                 cartOrderInfo.setSkuCode(skuId);
                 cartOrderInfo.setLineCheckStatus(lineCheckStatus);
+                cartOrderInfo.setStoreId(storeId);
                 cartOrderInfo.setProductType(productType);
+                if (null != number){
+                    cartOrderInfo.setAmount(number);
+                }
+                cartOrderDao.updateProductList(cartOrderInfo);
+                CartResponse cartResponse = getProductList(cartOrderInfo);
+                LOGGER.info("返回购物车中的数据给前端：{}", cartResponse);
+                response.setData(cartResponse);
+                //如果是取消勾选，通过门店id所有标记
+            }else if (null != skuId && lineCheckStatus.equals(Global.LINECHECKSTATUS_0) &&null !=productType) {
+                cartOrderInfo.setSkuCode(skuId);
+                cartOrderInfo.setLineCheckStatus(lineCheckStatus);
+                cartOrderInfo.setProductType(productType);
+                cartOrderInfo.setStoreId(storeId);
                 if (null != number){
                     cartOrderInfo.setAmount(number);
                 }
@@ -201,6 +221,19 @@ public class CartOrderServiceImpl implements CartOrderService {
                 cartOrderInfo.setStoreId(storeId);
                 cartOrderInfo.setProductType(productType);
                 cartOrderInfo.setLineCheckStatus(Global.LINECHECKSTATUS_1);
+                if (null != number){
+                    cartOrderInfo.setAmount(number);
+                }
+                cartOrderDao.updateProductList(cartOrderInfo);
+                //返回商品列表并结算价格
+                CartResponse cartResponse = getProductList(cartOrderInfo);
+                LOGGER.info("返回购物车中的数据给前端：{}", cartResponse);
+                response.setData(cartResponse);
+                //如果是全部取消，通过门店id更新所有标记
+            } else if(null != storeId && lineCheckStatus.equals(Global.LINECHECKSTATUS_3) && null !=productType) {
+                cartOrderInfo.setStoreId(storeId);
+                cartOrderInfo.setProductType(productType);
+                cartOrderInfo.setLineCheckStatus(Global.LINECHECKSTATUS_0);
                 if (null != number){
                     cartOrderInfo.setAmount(number);
                 }
@@ -234,13 +267,18 @@ public class CartOrderServiceImpl implements CartOrderService {
         //计算商品总价格
         BigDecimal acountActualprice = new BigDecimal(0);
         for (CartOrderInfo cartOrderInfo1 : cartInfoList) {
-            BigDecimal total = cartOrderInfo1.getPrice().multiply(new BigDecimal(cartOrderInfo1.getAmount()));
-            acountActualprice = acountActualprice.add(total);
+            if(cartOrderInfo1.getLineCheckStatus()==1){
+                BigDecimal total = cartOrderInfo1.getPrice().multiply(new BigDecimal(cartOrderInfo1.getAmount()));
+                acountActualprice = acountActualprice.add(total);
+            }
+
         }
         //计算商品总数量
         int totalNumber = 0;
         for (CartOrderInfo cartOrderInfo2 : cartInfoList) {
-            totalNumber += cartOrderInfo2.getAmount();
+            if(cartOrderInfo2.getLineCheckStatus()==1){
+                totalNumber += cartOrderInfo2.getAmount();
+            }
         }
         CartResponse cartResponse = new CartResponse();
         cartResponse.setCartInfoList(cartInfoList);

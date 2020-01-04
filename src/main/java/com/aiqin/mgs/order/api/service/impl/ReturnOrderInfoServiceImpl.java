@@ -28,14 +28,13 @@ import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
-import com.aiqin.mgs.order.api.util.URLConnectionUtil;
 import com.aiqin.platform.flows.client.constant.AjaxJson;
 import com.aiqin.platform.flows.client.constant.FormUpdateUrlType;
 import com.aiqin.platform.flows.client.constant.StatusEnum;
 import com.aiqin.platform.flows.client.domain.vo.ActBaseProcessEntity;
 import com.aiqin.platform.flows.client.domain.vo.StartProcessParamVO;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -126,6 +125,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         }
         //退货单--退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户
         record.setReturnMoneyType(ConstantData.RETURN_MONEY_TYPE);
+        record.setOrderSuccess(1);
         log.info("发起退货--插入退货信息，record={}",record);
         returnOrderInfoDao.insertSelective(record);
         List<ReturnOrderDetail> details = reqVo.getDetails().stream().map(detailVo -> {
@@ -171,16 +171,15 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         }
         body.put("order_return_product_reqs",orderReturnProductReqList);
         log.info("发起门店退货申请-完成(门店)（erp回调）--修改商品库存入参，url={},json={}",url,body);
-        String request= URLConnectionUtil.doPost(url,null,body);
-        log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存结果，request={}",request);
-        if(StringUtils.isNotBlank(request)){
-            JSONObject jsonObject= JSON.parseObject(request);
-            if(jsonObject.containsKey("code")&&"0".equals(jsonObject.getString("code"))){
-                log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存完成");
-                return true;
-            }
+        HttpClient httpClient = HttpClient.post(url).json(body);
+        Map<String ,Object> result=null;
+        result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+        log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存结果，request={}",result);
+        if(result!=null&&"0".equals(result.get("code"))){
+            log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存完成");
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -230,7 +229,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getMsg();
                 //如果退货状态为11，则不进行撤销，继续向下走流程
                 ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(reqVo.getReturnOrderCode());
-                if(returnOrderInfo.getReturnOrderStatus()==11){
+                if(returnOrderInfo.getReturnOrderStatus().equals(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_RETURN.getKey())){
                     return false;
                 }
                 break;
@@ -596,30 +595,29 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             json.put("store_id",returnOrderInfo.getStoreCode());
             Integer method=returnOrderInfo.getTreatmentMethod();
             //处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款
-            if(null!=method&&method==TreatmentMethodEnum.RETURN_AMOUNT_AND_GOODS_TYPE.getCode()){//RETURN_REFUND 退货退款
+            if(null!=method&&method.equals(TreatmentMethodEnum.RETURN_AMOUNT_AND_GOODS_TYPE.getCode())){//RETURN_REFUND 退货退款
                 json.put("transactionType","RETURN_REFUND");
-            }else if(null!=method&&method==TreatmentMethodEnum.RETURN_AMOUNT_TYPE.getCode()){//"REFUND_ONLY 仅退款
+            }else if(null!=method&&method.equals(TreatmentMethodEnum.RETURN_AMOUNT_TYPE.getCode())){//"REFUND_ONLY 仅退款
                 json.put("transactionType","REFUND_ONLY");
             }
             //订单类型 0直送、1配送、2辅采
             Integer type=returnOrderInfo.getOrderType();
-            if(null!=type&&type==0){//订单类型 14配送tob 2直送tob
+            if(null!=type&&type.equals(0)){//订单类型 14配送tob 2直送tob
                 json.put("pay_order_type", PayOrderTypeEnum.PAY_ORDER_TYPE_PEI.getKey());
                 json.put("pay_origin_type",PayOriginTypeEnum.DIRECT_SEND_TOB_RETURN.getKey());
-            }else if(null!=type&&type==1){
+            }else if(null!=type&&type.equals(1)){
                 json.put("pay_order_type",PayOrderTypeEnum.PAY_ORDER_TYPE_ZHI.getKey());
                 json.put("pay_origin_type",PayOriginTypeEnum.TOB_RETURN.getKey());
             }
             json.put("back_url","http://order.api.aiqin.com/returnOrder/callback");
             log.info("发起退款单申请入参，url={},json={}",url,json);
-            String request= URLConnectionUtil.doPost(url,null,json);
-            log.info("发起退款单申请结果，request={}",request);
-            if(StringUtils.isNotBlank(request)){
-                JSONObject jsonObject= JSON.parseObject(request);
-                if(jsonObject.containsKey("code")&&"0".equals(jsonObject.getString("code"))){
-                    log.info("退款完成");
-                    return true;
-                }
+            HttpClient httpClient = HttpClient.post(url).json(json);
+            Map<String ,Object> result=null;
+            result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+            log.info("发起退款单申请结果，request={}",result);
+            if(result!=null&&"0".equals(result.get("code"))){
+                log.info("退款完成");
+                return true;
             }
         }
         return false;
@@ -634,13 +632,12 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         log.info("根据门店id获取加盟商id,storeId={}",storeId);
         String franchiseeId=null;
         String url=slcsHost+"/store/getFranchiseeId?store_id="+storeId;
-        String request= URLConnectionUtil.doGet(url,null,null);
-        log.info("根据门店id获取加盟商id,request={}",request);
-        if(StringUtils.isNotBlank(request)){
-            JSONObject json=JSON.parseObject(request);
-            if(json.containsKey("code")&&"0".equals(json.get("code"))){
-                franchiseeId=json.getString("data");
-            }
+        HttpClient httpClient = HttpClient.get(url);
+        Map<String ,Object> result=null;
+        result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+        log.info("根据门店id获取加盟商id，request={}",result);
+        if(result!=null&&"0".equals(result.get("code"))){
+            franchiseeId=result.get("data").toString();
         }
         return franchiseeId;
     }
@@ -694,15 +691,15 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 json.put("provinceId",searchVo.getSearchVO().getAreaReq().getProvinceId());
             }
             if(!json.isEmpty()){
-                String request= URLConnectionUtil.doPost(url,null,json);
-                log.info("根据省市区id查询门店请求结果，request={}",request);
-                if(StringUtils.isNotBlank(request)){
-                    JSONObject jsonObject=JSON.parseObject(request);
-                    if(jsonObject.containsKey("code")&&jsonObject.get("code").equals("0")&&jsonObject.containsKey("data")){
-                        List<String> ids=JSON.parseArray(jsonObject.getString("data"),String.class);
-                        if(CollectionUtils.isNotEmpty(ids)){
-                            searchVo.getSearchVO().setStoreIds(ids);
-                        }
+                log.info("根据省市区id查询门店请求入参，url={},body={}",url,json);
+                HttpClient httpClient = HttpClient.post(url).json(json);
+                Map<String ,Object> result=null;
+                result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+                log.info("根据省市区id查询门店请求结果，request={}",result);
+                if(result!=null&&"0".equals(result.get("code"))){
+                    List<String> ids=(List<String>)result.get("data");
+                    if(CollectionUtils.isNotEmpty(ids)){
+                        searchVo.getSearchVO().setStoreIds(ids);
                     }
                 }
             }
@@ -891,25 +888,24 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     public boolean searchPayOrder(String orderCode) {
         String url=paymentHost+"/payment/pay/searchPayOrder?orderNo="+orderCode;
         log.info("根据退货单号查询支付状态入参，url={}",url);
-        String request= URLConnectionUtil.doGet(url,null);
-        log.info("根据退货单号查询支付状态结果，request={}",request);
-        if(StringUtils.isNotBlank(request)){
-            JSONObject jsonObject= JSON.parseObject(request);
-            if(jsonObject.containsKey("code")&&"0".equals(jsonObject.getString("code"))){
-                log.info("退款成功");
-                //更新退货单表状态
-                returnOrderInfoDao.updateRefundStatus(orderCode);
-                //更新流水表状态
-                JSONObject json=jsonObject.getJSONObject("data");
-                RefundInfo refundInfo=new RefundInfo();
-                //1-已退款
-                refundInfo.setStatus(ConstantData.REFUND_STATUS);
-                refundInfo.setUpdateTime(new Date());
-                refundInfo.setPayNum(json.getString("payNum"));
-                refundInfo.setOrderCode(orderCode);
-                refundInfoDao.updateByOrderCode(refundInfo);
-                return true;
-            }
+        HttpClient httpClient = HttpClient.get(url);
+        Map<String ,Object> result=null;
+        result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+        log.info("根据退货单号查询支付状态结果，request={}",result);
+        if(result!=null&&"0".equals(result.get("code"))){
+            log.info("根据退货单号查询支付状态结果---退款成功");
+            //更新退货单表状态
+            returnOrderInfoDao.updateRefundStatus(orderCode);
+            //更新流水表状态
+            Map map=(Map)result.get("data");
+            RefundInfo refundInfo=new RefundInfo();
+            //1-已退款
+            refundInfo.setStatus(ConstantData.REFUND_STATUS);
+            refundInfo.setUpdateTime(new Date());
+            refundInfo.setPayNum(map.get("payNum").toString());
+            refundInfo.setOrderCode(orderCode);
+            refundInfoDao.updateByOrderCode(refundInfo);
+            return true;
         }
         return false;
     }
@@ -983,9 +979,17 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         sb.append("&store_id="+storeId);
         sb.append("&update_by_id="+updateById);
         sb.append("&update_by_name="+updateByName);
-        log.info("发起订货管理-修改退货申请单入参，url={},json={}",url);
-        String request= URLConnectionUtil.doGet(url,null);
-        log.info("发起订货管理-修改退货申请单结果，request={}",request);
+        log.info("发起订货管理-修改退货申请单入参，url={},json={}",url+sb);
+        HttpClient httpClient = HttpClient.get(url+sb);
+        Map<String ,Object> result=null;
+        result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+        log.info("发起订货管理-修改退货申请单结果，request={}",result);
+        if(result!=null&&"0".equals(result.get("code").toString())){
+            log.info("发起订货管理-修改退货申请单结果--成功");
+        }
+
+
     }
+
 
 }

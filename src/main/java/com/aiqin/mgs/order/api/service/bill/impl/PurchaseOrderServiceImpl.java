@@ -70,13 +70,28 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     @Override
     public HttpResponse createPurchaseOrder(@Valid ErpOrderInfo erpOrderInfo) {
         LOGGER.info("同步采购单，erpOrderInfo{}", erpOrderInfo);
+        try {
+            //添加采购单
+            LOGGER.info("开始同步采购单，参数为：erpOrderInfo{}", erpOrderInfo);
+            addPurchaseOrder(erpOrderInfo);
+            LOGGER.info("同步采购单完成");
+
+            //添加采购商品信息
+            LOGGER.info("开始同步采购单商品详情，erpOrderInfo{}", erpOrderInfo);
+            addPurchaseOrderDetail(erpOrderInfo.getItemList());
+            LOGGER.info("同步采购单商品详结束");
+
+            //修改订单同步状态
+            //updateOrderSuccess(erpOrderInfo);
+
+        }catch (Exception e){
+            LOGGER.error("同步采购单失败" + e);
+            return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+        }
+
         //异步执行
         purchaseOrderExecutor(erpOrderInfo);
-        if (erpOrderInfo != null) {
-            //返回
-            return HttpResponse.success();
-        }
-        return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+        return HttpResponse.success();
     }
 
     @Override
@@ -171,19 +186,6 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         singleThreadExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                //添加采购单
-                LOGGER.info("开始同步采购单，参数为：erpOrderInfo{}", erpOrderInfo);
-                addPurchaseOrder(erpOrderInfo);
-                LOGGER.info("同步采购单完成");
-
-                //添加采购商品信息
-                LOGGER.info("开始同步采购单商品详情，erpOrderInfo{}", erpOrderInfo);
-                addPurchaseOrderDetail(erpOrderInfo.getItemList());
-                LOGGER.info("同步采购单商品详结束");
-
-                //修改订单同步状态
-                updateOrderSuccess(erpOrderInfo);
-
                 //根据爱亲采购单，生成耘链销售单
                 LOGGER.info("开始根据爱亲采购单，生成耘链销售单，参数为：erpOrderInfo{}", erpOrderInfo);
                 createSaleOrder(erpOrderInfo);

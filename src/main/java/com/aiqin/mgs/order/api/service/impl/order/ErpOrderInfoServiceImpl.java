@@ -1,8 +1,10 @@
 package com.aiqin.mgs.order.api.service.impl.order;
 
+import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.pay.ErpPayWayEnum;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.ProductInfo;
@@ -10,15 +12,15 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
-import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCarryOutNextStepRequest;
-import com.aiqin.mgs.order.api.domain.request.order.ErpOrderEditRequest;
-import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
-import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSignRequest;
+import com.aiqin.mgs.order.api.domain.request.order.*;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderItemSplitGroupResponse;
+import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.CopyBeanUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
+import com.aiqin.mgs.order.api.util.RequestReturnUtil;
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +51,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     private ErpOrderRequestService erpOrderRequestService;
     @Resource
     private ErpOrderCreateService erpOrderCreateService;
+    @Resource
+    private ErpOrderPayService erpOrderPayService;
+    @Resource
+    private PurchaseOrderService purchaseOrderService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -241,9 +247,6 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
         if (order == null) {
             throw new BusinessException("无效的订单编号");
-        }
-        if (!ErpOrderStatusEnum.ORDER_STATUS_3.getCode().equals(order.getOrderStatus())) {
-            throw new BusinessException("只有支付成功且未拆分的的订单才能拆分");
         }
 
         //是否需要执行拆单操作
@@ -613,14 +616,17 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 list) {
             if (ErpOrderStatusEnum.ORDER_STATUS_4.getCode().equals(item.getOrderStatus())) {
                 if (ErpOrderNodeStatusEnum.STATUS_6.getCode().equals(item.getOrderNodeStatus())) {
+                    item.setItemList(erpOrderItemService.selectOrderItemListByOrderId(item.getOrderStoreId()));
 
                     //TODO CT 同步订单
-
-
-                    //同步之后修改状态
-                    item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
-                    item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_8.getCode());
-                    this.updateOrderByPrimaryKeySelective(order, auth);
+                    HttpResponse httpResponse = purchaseOrderService.createPurchaseOrder(item);
+                    System.out.println(JSON.toJSON(httpResponse));
+                    if (RequestReturnUtil.validateHttpResponse(httpResponse)) {
+                        //同步之后修改状态
+                        item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
+                        item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_8.getCode());
+                        this.updateOrderByPrimaryKeySelective(order, auth);
+                    }
                 }
             }
         }
@@ -701,7 +707,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         this.updateOrderByPrimaryKeySelective(order, auth);
 
         //首单，修改门店状态
-        if (order.getOrderTypeCode().equals("2") || order.getOrderTypeCode().equals("4")) {
+        if (ErpOrderCategoryEnum.ORDER_TYPE_2.getValue().equals(order.getOrderCategoryCode()) || ErpOrderCategoryEnum.ORDER_TYPE_4.getValue().equals(order.getOrderCategoryCode())) {
             erpOrderRequestService.updateStoreStatus(order.getStoreId(), "010201");
         }
     }
@@ -716,6 +722,58 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(erpOrderCarryOutNextStepRequest.getOrderCode());
         if (order == null) {
             throw new BusinessException("无效的订单号");
+        }
+
+        ErpOrderNodeProcessTypeEnum processTypeEnum = ErpOrderNodeProcessTypeEnum.getEnum(order.getOrderTypeCode(), order.getOrderCategoryCode());
+        if (processTypeEnum == null) {
+            throw new BusinessException("订单类型异常");
+        }
+        ErpOrderNodeStatusEnum orderNodeStatusEnum = ErpOrderNodeStatusEnum.getEnum(order.getOrderNodeStatus());
+
+        //需不需要发起支付或者轮询
+        boolean payFlag = false;
+        //需不需要支付成功后续操作
+        boolean payAfterFlag = false;
+
+        switch (orderNodeStatusEnum) {
+            case STATUS_1:
+                if (processTypeEnum.isAutoPay()) {
+                    payFlag = true;
+                }
+                break;
+            case STATUS_2:
+                payFlag = true;
+                break;
+            case STATUS_3:
+                payAfterFlag = true;
+                break;
+            case STATUS_4:
+                if (processTypeEnum.isAutoPay()) {
+                    payFlag = true;
+                }
+                break;
+            case STATUS_5:
+                payAfterFlag = true;
+                break;
+            case STATUS_6:
+                payAfterFlag = true;
+                break;
+            default:
+                ;
+        }
+
+        if (payFlag) {
+            //重新发起支付或者轮询结果
+
+            ErpOrderPayRequest erpOrderPayRequest = new ErpOrderPayRequest();
+            erpOrderPayRequest.setOrderCode(order.getOrderStoreCode());
+            erpOrderPayRequest.setPayWay(ErpPayWayEnum.PAY_1.getCode());
+            erpOrderPayService.orderPayStartMethodGroup(erpOrderPayRequest, auth, true);
+        }
+        if (payAfterFlag) {
+            //重新执行支付成功后续操作
+
+            erpOrderPayService.orderPaySuccessMethodGroup(order.getOrderStoreCode(), auth);
         }
 
     }
