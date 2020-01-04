@@ -910,6 +910,52 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         return false;
     }
 
+    @Override
+    @Transactional
+    public HttpResponse saveCancelOrder(String orderCode) {
+        //根据订单编码查询原始订单数据及详情数据
+        ErpOrderInfo erpOrderInfo=erpOrderQueryService.getOrderAndItemByOrderCode(orderCode);
+        if(null==erpOrderInfo){
+            //此单号有误，未查到订单数据
+            return HttpResponse.failure(ResultCode.NOT_FOUND_ORDER_DATA);
+        }
+        List<ErpOrderItem> itemList=erpOrderInfo.getItemList();
+        ReturnOrderInfo returnOrderInfo=new ReturnOrderInfo();
+        BeanUtils.copyProperties(erpOrderInfo,returnOrderInfo);
+        //插入数据库
+        String returnOrderId = IdUtil.uuid();
+        String returnOrderCode = sequenceService.generateOrderAfterSaleCode(erpOrderInfo.getCompanyCode(), ReturnOrderTypeEnum.WRITE_DOWN_ORDER_TYPE.getCode());
+        returnOrderInfo.setReturnOrderId(returnOrderId);
+        returnOrderInfo.setReturnOrderCode(returnOrderCode);
+        returnOrderInfo.setCreateTime(new Date());
+        //退货状态 改为：11-退货完成
+        returnOrderInfo.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_RETURN.getKey());
+        //退款方式 5:退到加盟商账户
+        returnOrderInfo.setReturnMoneyType(ConstantData.RETURN_MONEY_TYPE);
+        //退货类型 4客户取消
+        returnOrderInfo.setReturnOrderType(ReturnOrderTypeEnum.CANCEL_ORDER.getCode());
+        //处理办法 4--仅退款
+        returnOrderInfo.setTreatmentMethod(TreatmentMethodEnum.RETURN_AMOUNT_TYPE.getCode());
+        //生成退货单
+        returnOrderInfo.setId(null);
+        returnOrderInfoDao.insertSelective(returnOrderInfo);
+        List<ReturnOrderDetail> details = itemList.stream().map(detailVo -> {
+            ReturnOrderDetail detail = new ReturnOrderDetail();
+            BeanUtils.copyProperties(detailVo, detail);
+            detail.setCreateTime(new Date());
+            detail.setReturnOrderDetailId(IdUtil.uuid());
+            detail.setReturnOrderCode(returnOrderCode);
+            detail.setCreateById("系统操作");
+            detail.setCreateByName("系统操作");
+            return detail;
+        }).collect(Collectors.toList());
+        //生成退货单详情
+        returnOrderDetailDao.insertWriteDownOrderBatch(details);
+        //添加日志
+        insertLog(returnOrderCode,"系统操作","系统操作",ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(), WriteDownOrderStatusEnum.CANCEL_ORDER.getCode(),WriteDownOrderStatusEnum.CANCEL_ORDER.getName());
+        return HttpResponse.success(returnOrderCode);
+    }
+
     /**
      * 插入日志表
      * @param orderCode
