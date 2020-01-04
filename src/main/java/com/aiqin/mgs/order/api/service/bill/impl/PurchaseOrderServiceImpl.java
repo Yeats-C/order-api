@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.service.bill.impl;
 
 import com.aiqin.ground.util.id.IdUtil;
+import com.aiqin.mgs.order.api.component.enums.OrderSucessEnum;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderDeliverItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderTransportLogisticsRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderTransportRequest;
@@ -70,25 +71,6 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     @Override
     public HttpResponse createPurchaseOrder(@Valid ErpOrderInfo erpOrderInfo) {
         LOGGER.info("同步采购单，erpOrderInfo{}", erpOrderInfo);
-        try {
-            //添加采购单
-            LOGGER.info("开始同步采购单，参数为：erpOrderInfo{}", erpOrderInfo);
-            addPurchaseOrder(erpOrderInfo);
-            LOGGER.info("同步采购单完成");
-
-            //添加采购商品信息
-            LOGGER.info("开始同步采购单商品详情，erpOrderInfo{}", erpOrderInfo);
-            addPurchaseOrderDetail(erpOrderInfo.getItemList());
-            LOGGER.info("同步采购单商品详结束");
-
-            //修改订单同步状态
-            //updateOrderSuccess(erpOrderInfo);
-
-        }catch (Exception e){
-            LOGGER.error("同步采购单失败" + e);
-            return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
-        }
-
         //异步执行
         purchaseOrderExecutor(erpOrderInfo);
         return HttpResponse.success();
@@ -186,15 +168,35 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         singleThreadExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                //根据爱亲采购单，生成耘链销售单
-                LOGGER.info("开始根据爱亲采购单，生成耘链销售单，参数为：erpOrderInfo{}", erpOrderInfo);
-                createSaleOrder(erpOrderInfo);
-                LOGGER.info("根据爱亲采购单，生成耘链销售单结束");
+                try {
+                    //添加采购单
+                    LOGGER.info("开始同步采购单，参数为：erpOrderInfo{}", erpOrderInfo);
+                    addPurchaseOrder(erpOrderInfo);
+                    LOGGER.info("同步采购单完成");
 
-                //添加操作日志
-                LOGGER.info("根据订单生产爱亲采购单，添加操作日志开始···");
-                addPurchaseOrderLog(erpOrderInfo);
-                LOGGER.info("根据订单生产爱亲采购单，添加操作日志结束···");
+                    //添加采购商品信息
+                    LOGGER.info("开始同步采购单商品详情，erpOrderInfo{}", erpOrderInfo);
+                    addPurchaseOrderDetail(erpOrderInfo.getItemList());
+                    LOGGER.info("同步采购单商品详结束");
+
+                    //修改订单同步状态
+                    updateOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_SUCCESS.getCode(), erpOrderInfo.getOrderStoreId());
+
+
+                    //根据爱亲采购单，生成耘链销售单
+                    LOGGER.info("开始根据爱亲采购单，生成耘链销售单，参数为：erpOrderInfo{}", erpOrderInfo);
+                    createSaleOrder(erpOrderInfo);
+                    LOGGER.info("根据爱亲采购单，生成耘链销售单结束");
+
+                    //添加操作日志
+                    LOGGER.info("根据订单生产爱亲采购单，添加操作日志开始···");
+                    addPurchaseOrderLog(erpOrderInfo);
+                    LOGGER.info("根据订单生产爱亲采购单，添加操作日志结束···");
+                } catch (Exception e) {
+                    LOGGER.error("同步采购单失败" + e);
+                    throw new RuntimeException();
+                }
+
             }
         });
     }
@@ -202,10 +204,10 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     /**
      * 修改订单同步状态
      *
-     * @param erpOrderInfo
+     * @param orderSucess
      */
-    private void updateOrderSuccess(ErpOrderInfo erpOrderInfo) {
-        erpOrderInfoDao.updateOrderSuccess(erpOrderInfo.getOrderStoreId());
+    private void updateOrderSuccess(Integer orderSucess, String orderStoreId) {
+        erpOrderInfoDao.updateOrderSuccess(orderSucess, orderStoreId);
     }
 
     /**
@@ -241,7 +243,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         purchaseOrder.setSettlementMethodCode(erpOrderInfo.getPaymentCode());//结算方式编码
         purchaseOrder.setSettlementMethodName(erpOrderInfo.getPaymentName());//结算方式名称
         purchaseOrder.setPurchaseOrderStatus(erpOrderInfo.getOrderStatus());//采购单状态  0.待审核 1.审核中 2.审核通过  3.备货确认 4.发货确认  5.入库开始 6.入库中 7.已入库  8.完成 9.取消 10.审核不通过
-        purchaseOrder.setPurchaseMode(Integer.valueOf(erpOrderInfo.getDistributionModeCode()));//采购方式 0. 铺采直送  1.配送
+        //purchaseOrder.setPurchaseMode(Integer.valueOf(erpOrderInfo.getDistributionModeCode()));//采购方式 0. 铺采直送  1.配送
         purchaseOrder.setPurchaseType(Integer.valueOf(erpOrderInfo.getOrderTypeCode()));//采购单类型   0手动，1.自动
         purchaseOrder.setTotalCount(Long.valueOf(erpOrderInfo.getItemList().size()));//最小单位数量  商品明细总数量
         purchaseOrder.setTotalTaxAmount(erpOrderInfo.getTotalProductAmount());//商品含税总金额
@@ -266,7 +268,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         //purchaseOrder.setPrePurchaseOrder();//预采购单号
         purchaseOrder.setPaymentCode(erpOrderInfo.getPaymentCode());//付款方式编码
         purchaseOrder.setPaymentName(erpOrderInfo.getPaymentName());//付款方式名称
-        purchaseOrder.setPaymentTime(erpOrderInfo.getPaymentTime());//付款期
+        //purchaseOrder.setPaymentTime(erpOrderInfo.getPaymentTime());//付款期
         purchaseOrder.setPreAmount(erpOrderInfo.getOrderAmount());//预付付款金额
         purchaseOrder.setRemark(erpOrderInfo.getRemake());//备注
         purchaseOrder.setSourceCode(erpOrderInfo.getSourceCode());//来源单号
@@ -348,11 +350,10 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 List<ErpOrderItem> items = erpOrderItemDao.select(orderItem);
                 //同步采购单明细
                 addPurchaseOrderDetail(items);
+                //修改订单同步状态
+                updateOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_SUCCESS.getCode(), orderInfo.getOrderStoreId());
             }
-            //修改订单同步状态
-            for (ErpOrderInfo orderInfo : erpOrderInfos) {
-                erpOrderInfoDao.updateOrderSuccess(orderInfo.getOrderStoreId());
-            }
+
         }
     }
 
@@ -385,4 +386,6 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         operationLog.setCreateTime(formatter.format(new Date()));
         return operationLog;
     }
+
+
 }

@@ -612,9 +612,9 @@
         order by order_store_code desc
             limit 1
     </select>
-    <update id="updateOrderSuccess" parameterType="java.lang.String">
+    <update id="updateOrderSuccess" parameterType="java.lang.Integer">
         update order_store_info
-        set order_success = 0
+        set order_success = #{orderSucess}
         where order_store_id = #{orderStoreId}
    </update>
     <!--查询订单到采购单同步失败的数据-->
