@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.service.impl.order;
 
+import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
@@ -15,10 +16,13 @@ import com.aiqin.mgs.order.api.domain.request.order.ErpOrderEditRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSignRequest;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderItemSplitGroupResponse;
+import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.CopyBeanUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
+import com.aiqin.mgs.order.api.util.RequestReturnUtil;
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +53,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     private ErpOrderRequestService erpOrderRequestService;
     @Resource
     private ErpOrderCreateService erpOrderCreateService;
+    @Resource
+    private PurchaseOrderService purchaseOrderService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -241,9 +247,6 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
         if (order == null) {
             throw new BusinessException("无效的订单编号");
-        }
-        if (!ErpOrderStatusEnum.ORDER_STATUS_3.getCode().equals(order.getOrderStatus())) {
-            throw new BusinessException("只有支付成功且未拆分的的订单才能拆分");
         }
 
         //是否需要执行拆单操作
@@ -613,14 +616,17 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 list) {
             if (ErpOrderStatusEnum.ORDER_STATUS_4.getCode().equals(item.getOrderStatus())) {
                 if (ErpOrderNodeStatusEnum.STATUS_6.getCode().equals(item.getOrderNodeStatus())) {
+                    item.setItemList(erpOrderItemService.selectOrderItemListByOrderId(item.getOrderStoreId()));
 
                     //TODO CT 同步订单
-
-
-                    //同步之后修改状态
-                    item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
-                    item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_8.getCode());
-                    this.updateOrderByPrimaryKeySelective(order, auth);
+                    HttpResponse httpResponse = purchaseOrderService.createPurchaseOrder(item);
+                    System.out.println(JSON.toJSON(httpResponse));
+                    if (RequestReturnUtil.validateHttpResponse(httpResponse)) {
+                        //同步之后修改状态
+                        item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
+                        item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_8.getCode());
+                        this.updateOrderByPrimaryKeySelective(order, auth);
+                    }
                 }
             }
         }
@@ -716,6 +722,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(erpOrderCarryOutNextStepRequest.getOrderCode());
         if (order == null) {
             throw new BusinessException("无效的订单号");
+        }
+
+        if (ErpOrderStatusEnum.ORDER_STATUS_1.getCode().equals(order.getOrderStatus())) {
+
         }
 
     }
