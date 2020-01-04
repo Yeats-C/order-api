@@ -5,8 +5,9 @@ import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
+import com.aiqin.mgs.order.api.domain.AuthToken;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCarryOutNextStepRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderEditRequest;
-import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
 import com.aiqin.mgs.order.api.service.order.ErpOrderInfoService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import io.swagger.annotations.Api;
@@ -53,5 +54,25 @@ public class ErpOrderEditController {
         }
         return response;
     }
+
+
+    @PostMapping("/orderCarryOutNextStep")
+    @ApiOperation(value = "订单流程校正")
+    public HttpResponse orderCarryOutNextStep(@RequestBody ErpOrderCarryOutNextStepRequest erpOrderCarryOutNextStepRequest) {
+        HttpResponse response = HttpResponse.success();
+        try {
+            AuthUtil.loginCheck();
+            AuthToken auth = AuthUtil.getCurrentAuth();
+            erpOrderInfoService.orderCarryOutNextStep(erpOrderCarryOutNextStepRequest, auth);
+        } catch (BusinessException e) {
+            logger.error("订单流程校正失败：{}", e);
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            logger.error("订单流程校正失败：{}", e);
+            response = HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
+        }
+        return response;
+    }
+
 
 }

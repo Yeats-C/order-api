@@ -14,11 +14,11 @@ import lombok.Getter;
 public enum ErpOrderTypeEnum {
 
     /***直送*/
-    DIRECT_SEND(0, "0", "直送", 11, 2),
+    DIRECT_SEND(1, "1", "直送", 11, 2),
     /***配送*/
-    DISTRIBUTION(1, "1", "配送", 7, 14),
+    DISTRIBUTION(2, "2", "配送", 7, 14),
     /***辅采直送*/
-    ASSIST_PURCHASING(2, "2", "辅采直送", 7, 14);
+    ASSIST_PURCHASING(3, "3", "辅采直送", 7, 14);
 
     private Integer code;
     private String value;

@@ -45,9 +45,19 @@
     <select id="isYesCart" resultType="java.lang.String" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo">
         select SUM(amount) as amount from order_store_cart
         <where>
-            store_id =#{storeId}
+         1=1
+            <if test="storeId != null">
+            and   store_id =#{storeId}
+            </if>
+            <if test="productId != null">
             and product_id = #{productId}
+            </if>
+            <if test="skuCode != null">
             and sku_code = #{skuCode}
+            </if>
+            <if test="productType != null">
+                and product_type = #{productType}
+            </if>
         </where>
         GROUP BY store_id,product_id,sku_code
     </select>
@@ -56,9 +66,19 @@
     <update id="updateCartById" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo">
         update order_store_cart set amount=#{amount}
         <where>
-            and store_id = #{storeId}
-            and product_id = #{productId}
-            and sku_code = #{skuCode}
+            1=1
+            <if test="storeId != null">
+                and   store_id =#{storeId}
+            </if>
+            <if test="productId != null">
+                and product_id = #{productId}
+            </if>
+            <if test="skuCode != null">
+                and sku_code = #{skuCode}
+            </if>
+            <if test="productType != null">
+                and product_type = #{productType}
+            </if>
         </where>
     </update>
 
@@ -74,6 +94,7 @@
             </if>
         </set>
         <where>
+        1=1
             <if test="skuCode != null and skuCode != ''">
                 and sku_code = #{skuCode}
             </if>
@@ -94,6 +115,7 @@
         <include refid="Base_Column_List"/>
         FROM order_store_cart
         <where>
+        1=1
             <if test="storeId != '' and storeId != null">
                 and store_id = #{storeId}
             </if>
@@ -108,7 +130,13 @@
     <select id="getTotal" resultType="java.lang.Integer" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo">
         select SUM(amount) as amount from order_store_cart
         <where>
-            store_id =#{storeId}
+        1=1
+            <if test="storeId != null and storeId != '' ">
+                and store_id =#{storeId}
+            </if>
+            <if test="productType != null">
+                and product_type = #{productType}
+            </if>
         </where>
     </select>
 
@@ -116,6 +144,7 @@
     <delete id="deleteCart">
         delete from order_store_cart
         <where>
+        1=1
             <if test="storeId != null and storeId != '' ">
                 and store_id =#{storeId}
             </if>
@@ -124,6 +153,9 @@
             </if>
             <if test="lineCheckStatus != null">
                 and line_check_status = #{lineCheckStatus}
+            </if>
+            <if test="productType != null">
+                and product_type = #{productType}
             </if>
         </where>
     </delete>
@@ -135,7 +167,13 @@
         <include refid="Base_Column_List"/>
         from order_store_cart
         <where>
-            line_check_status =#{lineCheckStatus}
+        1=1
+            <if test="lineCheckStatus != null">
+                and line_check_status = #{lineCheckStatus}
+            </if>
+            <if test="productType != null">
+                and product_type = #{productType}
+            </if>
         </where>
     </select>
 

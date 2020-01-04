@@ -201,6 +201,9 @@ public class CartOrderServiceImpl implements CartOrderService {
                 cartOrderInfo.setStoreId(storeId);
                 cartOrderInfo.setProductType(productType);
                 cartOrderInfo.setLineCheckStatus(Global.LINECHECKSTATUS_1);
+                if (null != number){
+                    cartOrderInfo.setAmount(number);
+                }
                 cartOrderDao.updateProductList(cartOrderInfo);
                 //返回商品列表并结算价格
                 CartResponse cartResponse = getProductList(cartOrderInfo);

@@ -55,7 +55,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     @Transactional(rollbackFor = Exception.class)
     public ErpOrderInfo erpSaveOrder(ErpOrderSaveRequest erpOrderSaveRequest, AuthToken auth) {
         //校验参数
-        validateSaveOrderRequest(erpOrderSaveRequest);
+        validateSaveOrderRequest(erpOrderSaveRequest, true);
 
         ErpOrderTypeCategoryControlEnum controlEnum = ErpOrderTypeCategoryControlEnum.getEnum(erpOrderSaveRequest.getOrderType(), erpOrderSaveRequest.getOrderCategory());
         if (controlEnum == null || !controlEnum.isErpCartCreate()) {
@@ -68,7 +68,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     @Transactional(rollbackFor = Exception.class)
     public ErpOrderInfo storeSaveOrder(ErpOrderSaveRequest erpOrderSaveRequest, AuthToken auth) {
         //校验参数
-        validateSaveOrderRequest(erpOrderSaveRequest);
+        validateSaveOrderRequest(erpOrderSaveRequest, false);
 
         ErpOrderTypeCategoryControlEnum controlEnum = ErpOrderTypeCategoryControlEnum.getEnum(erpOrderSaveRequest.getOrderType(), erpOrderSaveRequest.getOrderCategory());
         if (controlEnum == null || !controlEnum.isStoreCartCreate()) {
@@ -115,7 +115,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //锁库存
         if (processTypeEnum.isLockStock()) {
-            boolean flag = erpOrderRequestService.lockStockInSupplyChain(order, erpOrderItemList,auth);
+            boolean flag = erpOrderRequestService.lockStockInSupplyChain(order, erpOrderItemList, auth);
             if (!flag) {
                 throw new BusinessException("锁库存失败");
             }
@@ -130,7 +130,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     public ErpOrderInfo saveRackOrder(ErpOrderSaveRequest erpOrderSaveRequest, AuthToken auth) {
 
         //校验参数
-        validateSaveOrderRequest(erpOrderSaveRequest);
+        validateSaveOrderRequest(erpOrderSaveRequest, true);
         if (!ErpOrderTypeEnum.ASSIST_PURCHASING.getCode().equals(erpOrderSaveRequest.getOrderType())) {
             throw new BusinessException("只能创建" + ErpOrderTypeEnum.ASSIST_PURCHASING.getDesc() + "的订单");
         }
@@ -158,7 +158,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         if (processTypeEnum.isLockStock()) {
             //锁库
-            boolean flag = erpOrderRequestService.lockStockInSupplyChain(order,orderItemList, auth);
+            boolean flag = erpOrderRequestService.lockStockInSupplyChain(order, orderItemList, auth);
             if (!flag) {
                 throw new BusinessException("锁库存失败");
             }
@@ -172,12 +172,13 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * 校验保存订单参数
      *
      * @param erpOrderSaveRequest
+     * @param erpOrder            erp的订单
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/11/25 9:40
      */
-    private void validateSaveOrderRequest(ErpOrderSaveRequest erpOrderSaveRequest) {
+    private void validateSaveOrderRequest(ErpOrderSaveRequest erpOrderSaveRequest, boolean erpOrder) {
         if (erpOrderSaveRequest == null) {
             throw new BusinessException("空参数");
         }
@@ -191,11 +192,15 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 throw new BusinessException("无效的订单类型");
             }
         }
-        if (erpOrderSaveRequest.getOrderCategory() == null) {
-            throw new BusinessException("请传入订单类别");
+        if (ErpOrderTypeEnum.DIRECT_SEND.getCode().equals(erpOrderSaveRequest.getOrderType()) && erpOrder) {
+            erpOrderSaveRequest.setOrderCategory(ErpOrderCategoryEnum.ORDER_TYPE_1.getCode());
         } else {
-            if (!ErpOrderCategoryEnum.exist(erpOrderSaveRequest.getOrderCategory())) {
-                throw new BusinessException("无效的订单类别");
+            if (erpOrderSaveRequest.getOrderCategory() == null) {
+                throw new BusinessException("请传入订单类别");
+            } else {
+                if (!ErpOrderCategoryEnum.exist(erpOrderSaveRequest.getOrderCategory())) {
+                    throw new BusinessException("无效的订单类别");
+                }
             }
         }
     }
