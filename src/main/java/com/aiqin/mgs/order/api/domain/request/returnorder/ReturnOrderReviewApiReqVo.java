@@ -22,7 +22,7 @@ public class ReturnOrderReviewApiReqVo implements Serializable {
 
     @NotBlank(message = "退货单编码不能为空")
     @ApiModelProperty("退货单编码")
-    private String returnOrderId;
+    private String returnOrderCode;
 
     @ApiModelProperty(value = "操作人", hidden = true)
     private String operator;
