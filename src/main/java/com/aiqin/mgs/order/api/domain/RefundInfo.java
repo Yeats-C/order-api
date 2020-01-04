@@ -4,12 +4,13 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
 @ApiModel("支付流水表")
-public class RefundInfo {
+public class RefundInfo implements Serializable {
 
     @ApiModelProperty(value="ID")
     private Integer id;

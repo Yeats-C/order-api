@@ -1,13 +1,14 @@
 package com.aiqin.mgs.order.api.jobs.impl;
 
+import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.mgs.order.api.base.ConstantData;
 import com.aiqin.mgs.order.api.dao.returnorder.RefundInfoDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.RefundInfo;
 import com.aiqin.mgs.order.api.jobs.ReturnOrderTaskService;
-import com.aiqin.mgs.order.api.util.URLConnectionUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * description: ReturnOrderTaskServiceImpl
@@ -40,25 +42,24 @@ public class ReturnOrderTaskServiceImpl implements ReturnOrderTaskService {
     public boolean searchPayOrder(String orderCode) {
         String url=paymentHost+"/payment/pay/searchPayOrder?orderNo="+orderCode;
         log.info("根据退货单号查询支付状态入参，url={}",url);
-        String request= URLConnectionUtil.doGet(url,null);
-        log.info("根据退货单号查询支付状态结果，request={}",request);
-        if(StringUtils.isNotBlank(request)){
-            JSONObject jsonObject= JSON.parseObject(request);
-            if(jsonObject.containsKey("code")&&"0".equals(jsonObject.getString("code"))){
-                log.info("退款成功");
-                //更新退货单表状态
-                returnOrderInfoDao.updateRefundStatus(orderCode);
-                //更新流水表状态
-                JSONObject json=jsonObject.getJSONObject("data");
-                RefundInfo refundInfo=new RefundInfo();
-                //1-已退款
-                refundInfo.setStatus(ConstantData.REFUND_STATUS);
-                refundInfo.setUpdateTime(new Date());
-                refundInfo.setPayNum(json.getString("payNum"));
-                refundInfo.setOrderCode(orderCode);
-                refundInfoDao.updateByOrderCode(refundInfo);
-                return true;
-            }
+        HttpClient httpClient = HttpClient.get(url);
+        Map<String ,Object> result=null;
+        result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+        log.info("根据退货单号查询支付状态结果，request={}",result);
+        if(result!=null&&"0".equals(result.get("code"))){
+            log.info("根据退货单号查询支付状态结果---退款成功");
+            //更新退货单表状态
+            returnOrderInfoDao.updateRefundStatus(orderCode);
+            //更新流水表状态
+            Map map=(Map)result.get("data");
+            RefundInfo refundInfo=new RefundInfo();
+            //1-已退款
+            refundInfo.setStatus(ConstantData.REFUND_STATUS);
+            refundInfo.setUpdateTime(new Date());
+            refundInfo.setPayNum(map.get("payNum").toString());
+            refundInfo.setOrderCode(orderCode);
+            refundInfoDao.updateByOrderCode(refundInfo);
+            return true;
         }
         return false;
     }
