@@ -314,9 +314,10 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         BeanUtils.copyProperties(reqVo,re);
         //根据供应链请求修改退货单状态
         returnOrderInfoDao.updateReturnStatus(re);
-        if(null!=reqVo.getReturnOrderDetailReviewApiReqVo()&&null!=reqVo.getReturnOrderDetailReviewApiReqVo().getList()){
+//        if(null!=reqVo.getReturnOrderDetailReviewApiReqVo()&&null!=reqVo.getReturnOrderDetailReviewApiReqVo().getList()){
+        if(CollectionUtils.isNotEmpty(reqVo.getDetails())){
             //根据供应链请求修改退货单详情表数量
-            returnOrderDetailDao.updateActualCountBatch(reqVo.getReturnOrderDetailReviewApiReqVo().getList());
+            returnOrderDetailDao.updateActualCountBatch(reqVo.getDetails());
             //根据退货单id查询详情计算金额
             List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(reqVo.getReturnOrderCode());
             //查询原始订单详情

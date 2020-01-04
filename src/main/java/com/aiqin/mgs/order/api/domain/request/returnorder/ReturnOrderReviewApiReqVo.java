@@ -6,6 +6,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 供应链调用实体类
@@ -38,7 +39,10 @@ public class ReturnOrderReviewApiReqVo implements Serializable {
 //    @ApiModelProperty(value="退货单详情")
 //    private List<ReturnOrderDetail> details;
 
+//    @ApiModelProperty(value="修改退货单详情实退数量")
+//    private ReturnOrderDetailReviewApiReqVo returnOrderDetailReviewApiReqVo;
+
     @ApiModelProperty(value="修改退货单详情实退数量")
-    private ReturnOrderDetailReviewApiReqVo returnOrderDetailReviewApiReqVo;
+    private List<ReturnOrderDetailReviewApiReqVo> details;
 
 }
