@@ -35,7 +35,7 @@ public interface ReturnOrderInfoDao {
     //修改退款状态
     Integer updateRefundStatus(String returnOrderCode);
 
-    //修改退工单同步状态
+    //修改退供单同步状态
     Integer updateOrderSuccess(String returnOrderCode);
 
     //后台销售退货单管理列表（搜索）
