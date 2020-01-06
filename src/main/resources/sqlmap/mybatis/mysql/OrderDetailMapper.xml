@@ -148,9 +148,9 @@
 
 
     <!-- 订单明细查询byOrderId 未用到分页-->
-    <select id="selectDetailById" resultMap="OrderInfoDetailMapping" resultType="java.util.List">
+    <select id="selectDetailById" resultMap="OrderInfoDetailMapping" resultType="java.util.List" >
 
-        SELECT a.* FROM order_consumer_detail a where 1=1
+        SELECT SQL_NO_CACHE a.* FROM order_consumer_detail a where 1=1
 
         <if test="orderId!=null">
             and a.order_id =#{orderId}
