@@ -258,9 +258,10 @@ public class OrderServiceImpl implements OrderService {
                 orderInfo = (OrderodrInfo) response.getData();
             }
 
-            log.info("------------------------------------------------------orderInfo："+ orderInfo.getDetailList());
+
 
             if (Objects.nonNull(orderInfo)) {
+                log.info("------------------------------------------------------orderInfo："+ orderInfo.getDetailList());
                 log.info("------------------------------------------------------防止多次处理start" );
                 //防止多次处理
                 if (orderInfo.getOrderInfo().getPayStatus().equals(PayStatusEnum.HAS_PAY.getCode())){
@@ -303,7 +304,7 @@ public class OrderServiceImpl implements OrderService {
                 changeProductStock(orderInfo);
             } else {
                 //预存订单提出记录初始化
-                log.info("预存订单提出记录初始化{}", "===========" + orderInfo.toString());
+                log.info("预存订单提出记录初始化{}", "===========" + orderInfo.getDetailList().toString());
                 createPrestorageOrder(orderInfo);
             }
 
@@ -1721,14 +1722,14 @@ public class OrderServiceImpl implements OrderService {
                     }
                     //删除订单明细数据
                     try {
-                        orderDetailDao.deleteOrderDetailInfo(orderInfo);
+                    //    orderDetailDao.deleteOrderDetailInfo(orderInfo);
                     } catch (Exception e) {
                         LOGGER.error("删除订单明细数据异常：{}", e);
                     }
                     //新增订单明细数据
                     if (detailList != null && detailList.size() > 0) {
                         try {
-                            detailList = orderDetailService.addDetailList(detailList, orderId, orderCode);
+                            detailList = orderDetailService.updateDetailList(detailList, orderId, orderCode);
                         } catch (Exception e) {
                             LOGGER.error("新增订单明细数据异常：{}", e);
                         }

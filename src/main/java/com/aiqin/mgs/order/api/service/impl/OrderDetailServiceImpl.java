@@ -515,7 +515,23 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		}
 		return list;
 	}
+	@Override
+	@Transactional
+	public List<OrderDetailInfo> updateDetailList(@Valid List<OrderDetailInfo> detailList, @Valid String orderId,@Valid String orderCode) throws Exception {
 
+		List<OrderDetailInfo> list = new ArrayList();
+		if(detailList !=null && detailList.size()>0) {
+			for(OrderDetailInfo info : detailList) {
+
+
+				orderDetailDao.updateOrderDetail(info);
+				list.add(info);
+			}
+		}else {
+			LOGGER.warn("未获取订单明细数据.orderId: {}",orderId);
+		}
+		return list;
+	}
 
 //	//查询会员下的所有订单ID下的商品集合...
 //	@Override
@@ -736,6 +752,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			if(orderInfo !=null && orderInfo.getOrderId() !=null ) {
 				orderId = orderInfo.getOrderId();
 				orderDetailQuery.setOrderId(orderInfo.getOrderId());
+				orderDetailQuery.setOrderCode(orderInfo.getOrderCode());
 			}
 			
 			//获取SKU数量
