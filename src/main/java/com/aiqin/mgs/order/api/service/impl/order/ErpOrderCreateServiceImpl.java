@@ -600,6 +600,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setSourceName(null);
         //来源类型
         order.setSourceType(null);
+        //同步供应链状态
+        order.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_NO.getCode());
 
         return order;
     }
@@ -928,7 +930,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //收货地址
         order.setReceiveAddress(storeInfo.getAddress());
-        //配送方式编码 TODO 有哪些？
+        //配送方式编码
         order.setDistributionModeCode(null);
         //配送方式名称
         order.setDistributionModeName(null);
@@ -938,7 +940,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setReceiveMobile(storeInfo.getContactsPhone());
         //邮编
         order.setZipCode(null);
-        //支付方式编码 TODO 有哪些？
+        //支付方式编码
         order.setPaymentCode(null);
         //支付方式名称
         order.setPaymentName(null);
@@ -952,7 +954,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setActualProductCount(null);
         //优惠额度
         order.setDiscountAmount(BigDecimal.ZERO);
-        // TODO ？
+        //实付金额
         order.setOrderAmount(null);
         //付款日期
         order.setPaymentTime(null);
@@ -962,9 +964,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setTransportTime(null);
         //发运状态
         order.setTransportStatus(StatusEnum.NO.getCode());
-        //发运时间 TODO ？
+        //签收时间
         order.setReceiveTime(null);
-        //发票类型 1不开 2增普 3增专 TODO 新建枚举类
+        //发票类型
         order.setInvoiceType(ErpInvoiceTypeEnum.NO_INVOICE.getCode());
         //发票抬头
         order.setInvoiceTitle(null);
@@ -1018,6 +1020,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setSourceName(null);
         //来源类型
         order.setSourceType(null);
+        //同步供应链状态
+        order.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_NO.getCode());
         erpOrderInfoService.saveOrder(order, auth);
 
         //保存订单费用信息

@@ -271,5 +271,4 @@ public class ReturnOrderInfo {
 
     @ApiModelProperty(value = "同步是否成功（创建退供单） 0 不生成采购单 1 待生成采购单 2采购单生成成功")
     private Integer orderSuccess;
-
 }

@@ -387,7 +387,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 
     @Override
     public Boolean updateOrderSuccessApi(String returnOrderCode) {
-        return returnOrderInfoDao.updateOrderSuccess(returnOrderCode)>0;
+        //return returnOrderInfoDao.updateOrderSuccess(returnOrderCode)>0;
+        return false;
     }
 
     @Override
@@ -483,7 +484,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         paramVO.setFormUpdateUrl("http://order.api.aiqin.com/approval/callback");//回调地址
         paramVO.setFormUpdateUrlType(FormUpdateUrlType.HTTP);
         paramVO.setSignTicket(IdUtil.uuid());
-        paramVO.setReceiptType("1");
+        //paramVO.setReceiptType("1");
         paramVO.setPositionCode(positionCode);
         log.info("调用审批流发起申请,request={}", paramVO);
         String url = activitiHost + "/activiti/common/submit";

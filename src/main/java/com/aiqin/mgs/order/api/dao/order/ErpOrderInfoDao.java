@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.dao.order;
 
+import com.aiqin.mgs.order.api.component.enums.OrderSucessEnum;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest;
 import org.apache.ibatis.annotations.Param;
@@ -91,8 +92,8 @@ public interface ErpOrderInfoDao {
     /**
      * 修改订单同步状态
      * 
-     * @param orderStoreId
+     * @param orderSucess
      * @return
      */
-    Integer updateOrderSuccess(String orderStoreId);
+    Integer updateOrderSuccess(@Param("orderSucess") Integer orderSucess, @Param("orderStoreCode") String orderStoreCode);
 }

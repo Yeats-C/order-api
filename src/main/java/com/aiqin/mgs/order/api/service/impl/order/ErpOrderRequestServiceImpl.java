@@ -117,7 +117,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     }
 
     @Override
-    public boolean lockStockInSupplyChain(ErpOrderInfo order,List<ErpOrderItem> itemList, AuthToken auth) {
+    public boolean lockStockInSupplyChain(ErpOrderInfo order, List<ErpOrderItem> itemList, AuthToken auth) {
 
         boolean flag = true;
         try {

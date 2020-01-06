@@ -344,6 +344,10 @@ public class ErpOrderInfo {
     @JsonProperty("source_type")
     private Integer sourceType;
 
+    @ApiModelProperty(value = "同步供应链状态")
+    @JsonProperty("order_success")
+    private Integer orderSuccess;
+
     @ApiModelProperty(value = "启用停用 0启用 1启用")
     @JsonProperty("use_status")
     private Integer useStatus;

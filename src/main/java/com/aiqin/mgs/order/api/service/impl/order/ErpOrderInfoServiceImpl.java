@@ -483,6 +483,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
             order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
+            order.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
             this.updateOrderByPrimaryKeySelective(order, auth);
 
             if (splitOrderList.size() > 0) {
@@ -490,6 +491,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                         splitOrderList) {
                     item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
                     item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
+                    item.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
                     this.updateOrderByPrimaryKeySelective(item, auth);
                 }
             }
@@ -584,6 +586,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
             order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
+            order.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
             this.updateOrderByPrimaryKeySelective(order, auth);
 
             if (splitOrderList.size() > 0) {
@@ -591,6 +594,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                         splitOrderList) {
                     item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
                     item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
+                    item.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
                     this.updateOrderByPrimaryKeySelective(item, auth);
                 }
             }
@@ -620,13 +624,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
                     //TODO CT 同步订单
                     HttpResponse httpResponse = purchaseOrderService.createPurchaseOrder(item);
-                    System.out.println(JSON.toJSON(httpResponse));
-                    if (RequestReturnUtil.validateHttpResponse(httpResponse)) {
-                        //同步之后修改状态
-                        item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
-                        item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_8.getCode());
-                        this.updateOrderByPrimaryKeySelective(order, auth);
-                    }
+                    //同步之后修改订单状态
+                    item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
+                    item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_8.getCode());
+                    this.updateOrderByPrimaryKeySelective(order, auth);
                 }
             }
         }

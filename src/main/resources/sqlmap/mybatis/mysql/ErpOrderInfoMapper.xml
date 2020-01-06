@@ -79,6 +79,7 @@
         franchisee_id as franchiseeId,
         franchisee_code as franchiseeCode,
         franchisee_name as franchiseeName,
+        order_success as orderSuccess,
         use_status as useStatus,
         source_code as sourceCode,
         source_name as sourceName,
@@ -190,6 +191,9 @@
         </if>
         <if test="beforeCancelStatus != null and beforeCancelStatus != '' or beforeCancelStatus == 0">
             before_cancel_status = #{beforeCancelStatus},
+        </if>
+        <if test="orderSuccess != null and orderSuccess != '' or orderSuccess == 0">
+            order_success = #{orderSuccess},
         </if>
         <if test="exceptionReason != null and exceptionReason != ''">
             exception_reason = #{exceptionReason},
@@ -336,7 +340,7 @@
                                       store_type, store_id,
                                       store_code, store_name, transport_company_code, transport_company_name,
                                       transport_code, logistics_id, fee_id, order_return, franchisee_id,
-                                      franchisee_code, franchisee_name, use_status, source_code, source_name,
+                                      franchisee_code, franchisee_name, order_success, use_status, source_code, source_name,
                                       source_type, create_by_id, create_by_name, update_by_id, update_by_name,
                                       create_time, update_time)
         values (#{orderStoreId}, #{orderStoreCode}, #{companyCode}, #{companyName},
@@ -357,7 +361,7 @@
                 #{storeId},
                 #{storeCode}, #{storeName}, #{transportCompanyCode}, #{transportCompanyName},
                 #{transportCode}, #{logisticsId}, #{feeId}, #{orderReturn}, #{franchiseeId},
-                #{franchiseeCode}, #{franchiseeName}, #{useStatus}, #{sourceCode}, #{sourceName},
+                #{franchiseeCode}, #{franchiseeName}, #{orderSuccess}, #{useStatus}, #{sourceCode}, #{sourceName},
                 #{sourceType}, #{createById}, #{createByName}, #{updateById}, #{updateByName},
                 sysdate(), sysdate())
     </insert>
@@ -439,6 +443,7 @@
         a1.franchisee_id as franchiseeId,
         a1.franchisee_code as franchiseeCode,
         a1.franchisee_name as franchiseeName,
+        a1.order_success as orderSuccess,
         a1.use_status as useStatus,
         a1.source_code as sourceCode,
         a1.source_name as sourceName,
@@ -584,6 +589,7 @@
         a1.franchisee_id as franchiseeId,
         a1.franchisee_code as franchiseeCode,
         a1.franchisee_name as franchiseeName,
+        a1.order_success as orderSuccess,
         a1.use_status as useStatus,
         a1.source_code as sourceCode,
         a1.source_name as sourceName,
@@ -612,14 +618,101 @@
         order by order_store_code desc
             limit 1
     </select>
-    <update id="updateOrderSuccess" parameterType="java.lang.String">
+    <update id="updateOrderSuccess">
         update order_store_info
-        set order_success = 0
-        where order_store_id = #{orderStoreId}
+        set order_success = #{orderSucess}
+        where order_store_code = #{orderStoreCode}
    </update>
     <!--查询订单到采购单同步失败的数据-->
     <select id="selectByOrderSucess" parameterType="java.lang.Integer" resultType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo">
-        select * from order_store_info where order_success = #{orderSuccess}
+        select
+         a1.id as id,
+        a1.order_store_id as orderStoreId,
+        a1.order_store_code as orderStoreCode,
+        a1.company_code as companyCode,
+        a1.company_name as companyName,
+        a1.order_type_code as orderTypeCode,
+        a1.order_type_name as orderTypeName,
+        a1.order_category_code as orderCategoryCode,
+        a1.order_category_name as orderCategoryName,
+        a1.supplier_code as supplierCode,
+        a1.supplier_name as supplierName,
+        a1.transport_center_code as transportCenterCode,
+        a1.transport_center_name as transportCenterName,
+        a1.warehouse_code as warehouseCode,
+        a1.warehouse_name as warehouseName,
+        a1.customer_code as customerCode,
+        a1.customer_name as customerName,
+        a1.order_status as orderStatus,
+        a1.order_node_status as orderNodeStatus,
+        a1.order_lock as orderLock,
+        a1.lock_reason as lockReason,
+        a1.order_exception as orderException,
+        a1.exception_reason as exceptionReason,
+        a1.order_delete as orderDelete,
+        a1.payment_status as paymentStatus,
+        a1.province_id as provinceId,
+        a1.province_name as provinceName,
+        a1.city_id as cityId,
+        a1.city_name as cityName,
+        a1.district_id as districtId,
+        a1.district_name as districtName,
+        a1.receive_address as receiveAddress,
+        a1.distribution_mode_code as distributionModeCode,
+        a1.distribution_mode_name as distributionModeName,
+        a1.receive_person as receivePerson,
+        a1.receive_mobile as receiveMobile,
+        a1.zip_code as zipCode,
+        a1.payment_code as paymentCode,
+        a1.payment_name as paymentName,
+        a1.deliver_amount as deliverAmount,
+        a1.total_product_amount as totalProductAmount,
+        a1.actual_total_product_amount as actualTotalProductAmount,
+        a1.actual_product_count as actualProductCount,
+        a1.discount_amount as discountAmount,
+        a1.order_amount as orderAmount,
+        a1.payment_time as paymentTime,
+        a1.delivery_time as deliveryTime,
+        a1.transport_time as transportTime,
+        a1.transport_status as transportStatus,
+        a1.receive_time as receiveTime,
+        a1.invoice_type as invoiceType,
+        a1.invoice_title as invoiceTitle,
+        a1.total_volume as totalVolume,
+        a1.actual_total_volume as actualTotalVolume,
+        a1.total_weight as totalWeight,
+        a1.actual_total_weight as actualTotalWeight,
+        a1.main_order_code as mainOrderCode,
+        a1.order_level as orderLevel,
+        a1.split_status as splitStatus,
+        a1.before_cancel_status as beforeCancelStatus,
+        a1.remake as remake,
+        a1.store_type as storeType,
+        a1.store_id as storeId,
+        a1.store_code as storeCode,
+        a1.store_name as storeName,
+        a1.transport_company_code as transportCompanyCode,
+        a1.transport_company_name as transportCompanyName,
+        a1.transport_code as transportCode,
+        a1.logistics_id as logisticsId,
+        a1.fee_id as feeId,
+        a1.order_return as orderReturn,
+        a1.franchisee_id as franchiseeId,
+        a1.franchisee_code as franchiseeCode,
+        a1.franchisee_name as franchiseeName,
+        a1.order_success as orderSuccess,
+        a1.use_status as useStatus,
+        a1.source_code as sourceCode,
+        a1.source_name as sourceName,
+        a1.source_type as sourceType,
+        a1.create_by_id as createById,
+        a1.create_by_name as createByName,
+        a1.update_by_id as updateById,
+        a1.update_by_name as updateByName,
+        a1.create_time as createTime,
+        a1.update_time as updateTime
+        from order_store_info a1
+         where a1.order_success = #{orderSuccess}
     </select>
 </mapper>
 

@@ -4,12 +4,11 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.DeliveryInfoVo;
 import com.aiqin.mgs.order.api.domain.OrderIogisticsVo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
-import org.springframework.stereotype.Service;
 
 /**
  * 爱亲采购单 接口
  */
-@Service
+
 public interface PurchaseOrderService {
     /**
      * 同步采购单

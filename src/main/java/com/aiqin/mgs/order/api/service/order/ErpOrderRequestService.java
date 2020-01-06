@@ -54,7 +54,7 @@ public interface ErpOrderRequestService {
     boolean lockStockInSupplyChain(ErpOrderInfo order,List<ErpOrderItem> itemList, AuthToken auth);
 
     /**
-     * 解锁库存
+     * 解锁库存（根据明细解锁）
      *
      * @param order                  订单信息
      * @param orderLockStockTypeEnum 操作类型
