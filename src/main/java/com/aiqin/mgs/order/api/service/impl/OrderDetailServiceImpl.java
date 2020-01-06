@@ -736,6 +736,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			if(orderInfo !=null && orderInfo.getOrderId() !=null ) {
 				orderId = orderInfo.getOrderId();
 				orderDetailQuery.setOrderId(orderInfo.getOrderId());
+				orderDetailQuery.setOrderCode(orderInfo.getOrderCode());
 			}
 			
 			//获取SKU数量

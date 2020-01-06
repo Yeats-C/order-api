@@ -258,9 +258,10 @@ public class OrderServiceImpl implements OrderService {
                 orderInfo = (OrderodrInfo) response.getData();
             }
 
-            log.info("------------------------------------------------------orderInfo："+ orderInfo.getDetailList());
+
 
             if (Objects.nonNull(orderInfo)) {
+                log.info("------------------------------------------------------orderInfo："+ orderInfo.getDetailList());
                 log.info("------------------------------------------------------防止多次处理start" );
                 //防止多次处理
                 if (orderInfo.getOrderInfo().getPayStatus().equals(PayStatusEnum.HAS_PAY.getCode())){
@@ -303,7 +304,7 @@ public class OrderServiceImpl implements OrderService {
                 changeProductStock(orderInfo);
             } else {
                 //预存订单提出记录初始化
-                log.info("预存订单提出记录初始化{}", "===========" + orderInfo.toString());
+                log.info("预存订单提出记录初始化{}", "===========" + orderInfo.getDetailList().toString());
                 createPrestorageOrder(orderInfo);
             }
 
