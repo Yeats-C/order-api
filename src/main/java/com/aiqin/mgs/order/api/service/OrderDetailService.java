@@ -54,7 +54,9 @@ public interface OrderDetailService {
 	HttpResponse selectorderany(@Valid String orderId);
 
 	//添加新的订单明细数据
-	public List<OrderDetailInfo> addDetailList(@Valid List<OrderDetailInfo> detailList, @Valid String orderId,@Valid String orderCode) throws Exception; 
+	public List<OrderDetailInfo> addDetailList(@Valid List<OrderDetailInfo> detailList, @Valid String orderId,@Valid String orderCode) throws Exception;
+
+	public List<OrderDetailInfo> updateDetailList(@Valid List<OrderDetailInfo> detailList, @Valid String orderId,@Valid String orderCode) throws Exception;
 
 //	//查询会员下的所有订单ID下的商品集合...
 //	HttpResponse selectproductbyorders(@Valid List<String> orderidslList, @Valid String memberId); 

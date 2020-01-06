@@ -1722,14 +1722,14 @@ public class OrderServiceImpl implements OrderService {
                     }
                     //删除订单明细数据
                     try {
-                        orderDetailDao.deleteOrderDetailInfo(orderInfo);
+                    //    orderDetailDao.deleteOrderDetailInfo(orderInfo);
                     } catch (Exception e) {
                         LOGGER.error("删除订单明细数据异常：{}", e);
                     }
                     //新增订单明细数据
                     if (detailList != null && detailList.size() > 0) {
                         try {
-                            detailList = orderDetailService.addDetailList(detailList, orderId, orderCode);
+                            detailList = orderDetailService.updateDetailList(detailList, orderId, orderCode);
                         } catch (Exception e) {
                             LOGGER.error("新增订单明细数据异常：{}", e);
                         }
