@@ -523,11 +523,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		if(detailList !=null && detailList.size()>0) {
 			for(OrderDetailInfo info : detailList) {
 
-				//订单ID、订单明细ID
-				info.setOrderId(orderId);
-				info.setOrderCode(orderCode);
-				info.setOrderDetailId(OrderPublic.getUUID());
-				//保存
+
 				orderDetailDao.updateOrderDetail(info);
 				list.add(info);
 			}
