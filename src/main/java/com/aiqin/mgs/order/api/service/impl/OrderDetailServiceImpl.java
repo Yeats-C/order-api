@@ -522,7 +522,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		List<OrderDetailInfo> list = new ArrayList();
 		if(detailList !=null && detailList.size()>0) {
 			for(OrderDetailInfo info : detailList) {
-
+				info.setOrderCode(orderCode);
 
 				orderDetailDao.updateOrderDetail(info);
 				list.add(info);
