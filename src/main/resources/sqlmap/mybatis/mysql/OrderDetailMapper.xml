@@ -155,6 +155,9 @@
         <if test="orderId!=null">
             and a.order_id =#{orderId}
         </if>
+        <if test="orderCode!=null">
+            and a.order_code =#{orderCode}
+        </if>
         ORDER BY a.create_time DESC
     </select>
 
