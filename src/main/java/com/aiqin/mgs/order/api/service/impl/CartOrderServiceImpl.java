@@ -114,6 +114,8 @@ public class CartOrderServiceImpl implements CartOrderService {
                 cartOrderInfo.setStockNum(cartOrderInfo1.getStockNum());//库存数量
                 cartOrderInfo.setZeroRemovalCoefficient(cartOrderInfo1.getZeroRemovalCoefficient());//交易倍数
                 cartOrderInfo.setSpec(cartOrderInfo1.getSpec());//规格
+                cartOrderInfo.setProductPropertyCode(cartOrderInfo1.getProductPropertyCode());//商品属性码
+                cartOrderInfo.setProductPropertyName(cartOrderInfo1.getProductPropertyName());//商品属性码
                 try {
                     if (cartOrderInfo != null) {
                         //判断sku是否在购物车里面存在
@@ -348,7 +350,7 @@ public class CartOrderServiceImpl implements CartOrderService {
      */
     @Override
     public HttpResponse displayCartLineCheckProduct(CartOrderInfo cartOrderInfo) {
-
+        BigDecimal priceProductA=BigDecimal.ZERO;
         HttpResponse response = HttpResponse.success();
         //调用门店接口，返回门店的基本信息
         ShoppingCartRequest shoppingCartRequest = new ShoppingCartRequest();
@@ -369,9 +371,14 @@ public class CartOrderServiceImpl implements CartOrderService {
                 for (CartOrderInfo cartOrderInfo1 : cartOrderInfos) {
                     BigDecimal total = cartOrderInfo1.getPrice().multiply(new BigDecimal(cartOrderInfo1.getAmount()));
                     orderTotalPrice = orderTotalPrice.add(total);
-                    orderConfirmResponse.setHaveProductA(1);
-                    orderConfirmResponse.setPriceProductA(new BigDecimal(200));
+                    //TODO 判断商品为A类以上商品 此处最好是按照字典表接口比对，防止供应链更改类型code
+                    if(cartOrderInfo1.getProductPropertyCode()=="1" ||cartOrderInfo1.getProductPropertyCode()=="6"){//A品与A+品
+                        orderConfirmResponse.setHaveProductA(1);
+                        priceProductA=priceProductA.add(cartOrderInfo1.getPrice());
+                    }
+
                 }
+                orderConfirmResponse.setPriceProductA(priceProductA);
                 //封装订货金额合计
                 orderConfirmResponse.setAcountActualprice(orderTotalPrice);
                 response.setData(orderConfirmResponse);
