@@ -81,7 +81,7 @@ public class CartOrderController {
     @PostMapping("/deleteCart")
     @ApiOperation(value = "清空购物车、删除单个商品、删除勾选商品")
     public HttpResponse deleteCart(@Valid @RequestBody DeleteCartProductRequest deleteCartProductRequest){
-        return cartOrderService.deleteCartInfo(deleteCartProductRequest.getStoreId(),deleteCartProductRequest.getSkuId(),deleteCartProductRequest.getLineCheckStatus());
+        return cartOrderService.deleteCartInfo(deleteCartProductRequest.getStoreId(),deleteCartProductRequest.getSkuId(),deleteCartProductRequest.getLineCheckStatus(),deleteCartProductRequest.getProductType());
     }
 
     /**
