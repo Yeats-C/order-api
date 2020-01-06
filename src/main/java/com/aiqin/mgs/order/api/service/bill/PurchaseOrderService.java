@@ -33,4 +33,11 @@ public interface PurchaseOrderService {
      * @return
      */
     HttpResponse updateOrderStoreLogistics(DeliveryInfoVo deliveryInfoVo);
+
+    /**
+     * 取消订单
+     * @param orderStoreCode
+     * @return
+     */
+    HttpResponse updateCancelOrderinfo(String orderStoreCode);
 }

@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -96,15 +97,19 @@ public class ReturnOrderInfo {
     private String logisticsCode;
 
     @ApiModelProperty(value = "发货时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date deliveryTime;
 
     @ApiModelProperty(value = "预计发货时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date preExpectTime;
 
     @ApiModelProperty(value = "发运时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date transportTime;
 
     @ApiModelProperty(value = "收货时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date receiveTime;
 
     @ApiModelProperty(value = "商品数量")
@@ -171,12 +176,15 @@ public class ReturnOrderInfo {
     private String receiveAddress;
 
     @ApiModelProperty(value = "有效期")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date validTime;
 
     @ApiModelProperty(value = "出库时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date outStockTime;
 
     @ApiModelProperty(value = "完成时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date finishTime;
 
     @ApiModelProperty(value = "退货原因编码 14:质量问题 15:无理由退货 16:物流破损")
@@ -207,9 +215,11 @@ public class ReturnOrderInfo {
     private String updateByName;
 
     @ApiModelProperty(value = "创建时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     @ApiModelProperty(value = "修改时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
     @ApiModelProperty(value = "门店类型名称")
@@ -267,6 +277,7 @@ public class ReturnOrderInfo {
     private String reviewOperatorId;
 
     @ApiModelProperty(value = "审核时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date reviewTime;
 
     @ApiModelProperty(value = "同步是否成功（创建退供单） 0 不生成采购单 1 待生成采购单 2采购单生成成功")
