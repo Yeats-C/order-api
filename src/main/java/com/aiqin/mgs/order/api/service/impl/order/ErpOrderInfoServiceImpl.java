@@ -447,6 +447,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     BigDecimal totalProductAmount = BigDecimal.ZERO;
                     //实际支付金额
                     BigDecimal orderAmount = BigDecimal.ZERO;
+                    //商品毛重(kg)
+                    BigDecimal boxGrossWeightTotal = BigDecimal.ZERO;
+                    //商品包装体积(mm³)
+                    BigDecimal boxVolumeTotal = BigDecimal.ZERO;
 
                     long lineCode = 1L;
                     for (ErpOrderItem item :
@@ -463,14 +467,19 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
                         //商品总价
                         totalProductAmount = totalProductAmount.add(item.getProductAmount());
-
                         //实际支付金额 取分摊后金额汇总
                         orderAmount = orderAmount.add(item.getTotalPreferentialAmount());
+                        //商品毛重汇总
+                        boxGrossWeightTotal = boxGrossWeightTotal.add((newOrderItem.getBoxGrossWeight() == null ? BigDecimal.ZERO : newOrderItem.getBoxGrossWeight()).multiply(new BigDecimal(newOrderItem.getProductCount())));
+                        //商品体积汇总
+                        boxVolumeTotal = boxVolumeTotal.add((newOrderItem.getBoxVolume() == null ? BigDecimal.ZERO : newOrderItem.getBoxVolume()).multiply(new BigDecimal(newOrderItem.getProductCount())));
 
                     }
                     newOrder.setTotalProductAmount(totalProductAmount);
                     newOrder.setOrderAmount(orderAmount);
                     newOrder.setDiscountAmount(totalProductAmount.multiply(orderAmount));
+                    newOrder.setTotalWeight(boxGrossWeightTotal);
+                    newOrder.setTotalVolume(boxVolumeTotal);
                     newOrder.setItemList(orderItemList);
 
                     erpOrderItemService.saveOrderItemList(splitItemList, auth);
@@ -546,6 +555,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     BigDecimal totalProductAmount = BigDecimal.ZERO;
                     //实际支付金额
                     BigDecimal orderAmount = BigDecimal.ZERO;
+                    //商品毛重(kg)
+                    BigDecimal boxGrossWeightTotal = BigDecimal.ZERO;
+                    //商品包装体积(mm³)
+                    BigDecimal boxVolumeTotal = BigDecimal.ZERO;
 
                     long lineCode = 1L;
                     for (ErpOrderItem item :
@@ -568,10 +581,17 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                         //实际支付金额 取分摊后金额汇总
                         orderAmount = orderAmount.add(item.getTotalPreferentialAmount());
 
+                        //商品毛重汇总
+                        boxGrossWeightTotal = boxGrossWeightTotal.add((newOrderItem.getBoxGrossWeight() == null ? BigDecimal.ZERO : newOrderItem.getBoxGrossWeight()).multiply(new BigDecimal(newOrderItem.getProductCount())));
+                        //商品体积汇总
+                        boxVolumeTotal = boxVolumeTotal.add((newOrderItem.getBoxVolume() == null ? BigDecimal.ZERO : newOrderItem.getBoxVolume()).multiply(new BigDecimal(newOrderItem.getProductCount())));
+
                     }
                     newOrder.setTotalProductAmount(totalProductAmount);
                     newOrder.setOrderAmount(orderAmount);
                     newOrder.setDiscountAmount(totalProductAmount.multiply(orderAmount));
+                    newOrder.setTotalWeight(boxGrossWeightTotal);
+                    newOrder.setTotalVolume(boxVolumeTotal);
                     newOrder.setItemList(orderItemList);
 
                     erpOrderItemService.saveOrderItemList(splitItemList, auth);
@@ -626,11 +646,11 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     item.setItemList(erpOrderItemService.selectOrderItemListByOrderId(item.getOrderStoreId()));
 
                     //同步订单到供应链，只调用一次接口，不管成功失败都算执行完成这一步
-                    HttpResponse httpResponse = purchaseOrderService.createPurchaseOrder(item);
+//                    HttpResponse httpResponse = purchaseOrderService.createPurchaseOrder(item);
                     //同步之后修改订单状态
                     item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
                     item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_8.getCode());
-                    this.updateOrderByPrimaryKeySelective(order, auth);
+                    this.updateOrderByPrimaryKeySelective(item, auth);
                 }
             }
         }

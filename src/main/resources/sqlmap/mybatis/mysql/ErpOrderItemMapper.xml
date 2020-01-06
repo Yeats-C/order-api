@@ -46,6 +46,8 @@
         company_name as companyName,
         sign_difference_reason as signDifferenceReason,
         use_status as useStatus,
+        box_gross_weight as boxGrossWeight,
+        box_volume as boxVolume,
         create_by_id as createById,
         create_by_name as createByName,
         update_by_id as updateById,
@@ -128,8 +130,8 @@
                                        total_preferential_amount, preferential_amount, total_acivity_amount,
                                        actual_inbound_count,
                                        actual_product_count, return_product_count, tax_rate, activity_code, line_code,
-                                       gift_line_code, company_code, company_name, sign_difference_reason, use_status,
-                                       create_by_id, create_by_name, update_by_id, update_by_name, create_time,
+                                       gift_line_code, company_code, company_name, sign_difference_reason, box_gross_weight, box_volume,
+                                       use_status, create_by_id, create_by_name, update_by_id, update_by_name, create_time,
                                        update_time)
         values (#{orderInfoDetailId}, #{orderStoreId}, #{orderStoreCode}, #{spuCode}, #{spuName},
                 #{skuCode}, #{skuName}, #{productPropertyCode}, #{productPropertyName}, #{supplierCode},
@@ -140,8 +142,8 @@
                 #{actualTotalProductAmount}, #{totalPreferentialAmount}, #{preferentialAmount}, #{totalAcivityAmount},
                 #{actualInboundCount}, #{actualProductCount}, #{returnProductCount}, #{taxRate},
                 #{activityCode}, #{lineCode}, #{giftLineCode}, #{companyCode}, #{companyName},
-                #{signDifferenceReason}, #{useStatus}, #{createById}, #{createByName}, #{updateById},
-                #{updateByName}, #{createTime}, #{updateTime})
+                #{signDifferenceReason}, #{boxGrossWeight}, #{boxVolume}, #{useStatus}, #{createById}, #{createByName}, #{updateById},
+                #{updateByName}, sysdate(), sysdate())
     </insert>
 
 </mapper>
