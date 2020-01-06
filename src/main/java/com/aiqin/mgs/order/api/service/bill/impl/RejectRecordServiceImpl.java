@@ -99,7 +99,7 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                         LOGGER.info("开始根据爱亲退供单，生成耘链退货单，参数为：returnOrderCode{}", returnOrderCode);
                         createSaleOrder(returnOrderCode);
                         LOGGER.info("根据爱亲退供单，生成耘链退货单结束");
-
+                        
                         //添加操作日志
                         LOGGER.info("添加根据爱亲退供单，生成耘链退货单，操作日志开始");
                         createSaleOrderLog(returnOrderCode);
