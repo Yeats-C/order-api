@@ -627,7 +627,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     //同步之后修改订单状态
                     item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
                     item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_8.getCode());
-                    this.updateOrderByPrimaryKeySelective(order, auth);
+                    //this.updateOrderByPrimaryKeySelective(order, auth);
                 }
             }
         }

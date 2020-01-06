@@ -5,6 +5,7 @@ import com.aiqin.mgs.order.api.domain.request.order.ErpOrderDeliverItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderTransportLogisticsRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderTransportRequest;
 import com.aiqin.mgs.order.api.service.bill.CreatePurchaseOrderService;
+import com.aiqin.mgs.order.api.service.bill.OperationLogService;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
@@ -25,14 +26,14 @@ import com.aiqin.mgs.order.api.service.order.ErpOrderDeliverService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -51,13 +52,13 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     @Resource
     PurchaseOrderDetailDao purchaseOrderDetailDao;
     @Resource
-    OperationLogDao operationLogDao;
-    @Resource
     OrderStoreDetailBatchDao orderStoreDetailBatchDao;
     @Resource
     ErpOrderDeliverService erpOrderDeliverService;
     @Resource
     CreatePurchaseOrderService createPurchaseOrderService;
+    @Resource
+    OperationLogService operationLogService;
 
     @Override
     public HttpResponse createPurchaseOrder(@Valid ErpOrderInfo erpOrderInfo) {
@@ -173,7 +174,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
                     //添加操作日志
                     LOGGER.info("根据订单生产爱亲采购单，添加操作日志开始···");
-                    addPurchaseOrderLog(erpOrderInfo);
+                    //
+                    addOperationLog(erpOrderInfo);
                     LOGGER.info("根据订单生产爱亲采购单，添加操作日志结束···");
                 } catch (Exception e) {
                     LOGGER.error("同步采购单失败" + e);
@@ -181,6 +183,15 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 }
             }
         });
+    }
+
+    private void addOperationLog(ErpOrderInfo erpOrderInfo) {
+        String operationCode = erpOrderInfo.getOrderStoreCode();
+        Integer operationType = ErpLogSourceTypeEnum.PURCHASE.getCode();
+        Integer sourceType = ErpLogOperationTypeEnum.ADD.getCode();
+        Integer useStatus = ErpLogStatusTypeEnum.USING.getCode();
+        String operationContent = "根据ERP订单和订单明细生成爱亲采购单和采购单明细";
+        operationLogService.insert( operationCode,  operationType,  sourceType,  operationContent,  null,  useStatus, null);
     }
 
     /**
@@ -196,29 +207,5 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         if (!RequestReturnUtil.validateHttpResponse(response)) {
             throw new BusinessException(response.getMessage());
         }
-    }
-
-    /**
-     * 根据订单生成爱亲采购单,添加操作日志
-     *
-     * @param erpOrderInfo
-     */
-    private void addPurchaseOrderLog(ErpOrderInfo erpOrderInfo) {
-        OperationLog operationLog = new OperationLog();
-        ErpLogSourceTypeEnum purchase = ErpLogSourceTypeEnum.PURCHASE;
-        operationLog.setOperationType(purchase.getCode());//日志类型 0 .新增 1.修改 2.删除 3.下载
-        ErpLogOperationTypeEnum add = ErpLogOperationTypeEnum.ADD;
-        operationLog.setSourceType(add.getCode());//来源类型 0.销售 1.采购 2.退货  3.退供
-        ErpLogStatusTypeEnum using = ErpLogStatusTypeEnum.USING;
-        operationLog.setUseStatus(String.valueOf(using.getCode()));//0. 启用 1.禁用
-        AuthToken auth = AuthUtil.getCurrentAuth();
-        operationLog.setCreateById(auth.getPersonId());
-        operationLog.setCreateByName(auth.getPersonName());
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        operationLog.setCreateTime(formatter.format(new Date()));
-        operationLog.setOperationCode(erpOrderInfo.getOrderStoreCode());//来源编码
-        operationLog.setOperationContent("根据ERP订单和订单明细生成爱亲采购单和采购单明细");//日志内容
-        operationLog.setRemark("");//备注
-        operationLogDao.insertSelective(operationLog);
     }
 }
