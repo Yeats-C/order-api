@@ -10,5 +10,5 @@ public class ReturnOrderReq implements Serializable {
     @ApiModelProperty(value = "退供单")
     private ReturnOrderInfo returnOrderInfo;
     @ApiModelProperty(value = "退供单明细")
-    private List<ReturnOrderDetail> returnOrderDetails;
+    private List<ReturnOrderDetail> returnOrderDetailReqList;
 }

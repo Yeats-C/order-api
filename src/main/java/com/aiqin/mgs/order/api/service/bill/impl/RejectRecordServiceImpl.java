@@ -15,16 +15,20 @@ import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderSearchVo;
 import com.aiqin.mgs.order.api.service.bill.CreateRejectRecordService;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
+import com.aiqin.mgs.order.api.util.BeanCopyUtils;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sun.rmi.runtime.Log;
 
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -84,8 +88,8 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                     //添加退货单
                     LOGGER.info("开始生成退供单&退供单明细，参数为：returnOrderCode{}", returnOrderCode);
                     Integer orderSynchroSuccess = OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode();
-                    ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndSuccess(orderSynchroSuccess,returnOrderCode);
-                    createRejectRecordService.addRejectRecord(returnOrderInfo);
+                    //ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndSuccess(orderSynchroSuccess,returnOrderCode);
+                    //createRejectRecordService.addRejectRecord(returnOrderInfo);
                     LOGGER.info("生成退供单&退供单明细结束");
 
                     //根据爱亲退供单，生成耘链退货单
@@ -111,18 +115,29 @@ public class RejectRecordServiceImpl implements RejectRecordService {
      * @param returnOrderCode
      */
     private void createSaleOrder(String returnOrderCode) {
-        //根据订单号查询为同步的订单
-        ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(returnOrderCode);
-        List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderCode);
-        ReturnOrderReq returnOrderReq = new ReturnOrderReq();
-        BeanUtils.copyProperties(returnOrderInfo,returnOrderReq.getReturnOrderInfo());
-        BeanUtils.copyProperties(returnOrderDetails,returnOrderReq.getReturnOrderDetails());
-        String url = "";
-        HttpClient httpGet = HttpClient.post(url).json(returnOrderReq).timeout(10000);
-        HttpResponse<Object> response = httpGet.action().result(new TypeReference<HttpResponse<Object>>() {
-        });
-        if (!RequestReturnUtil.validateHttpResponse(response)) {
-            throw new BusinessException(response.getMessage());
+        LOGGER.info("根据爱亲退供单，生成耘链退货单开始 returnOrderCode： "+ returnOrderCode);
+        try {
+            //查询退供单
+            ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(returnOrderCode);
+            //查询退供单明细
+            List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderCode);
+            if(returnOrderInfo != null && returnOrderDetails !=null && returnOrderDetails.size()>0){
+                ReturnOrderInfo orderInfo = new ReturnOrderInfo();
+                BeanUtils.copyProperties(returnOrderInfo,orderInfo);
+                List<ReturnOrderDetail> orderDetails = BeanCopyUtils.copyList(returnOrderDetails,ReturnOrderDetail.class);
+                ReturnOrderReq returnOrderReq = new ReturnOrderReq();
+                returnOrderReq.setReturnOrderDetailReqList(orderDetails);
+                returnOrderReq.setReturnOrderInfo(orderInfo);
+                String url = "http://192.168.10.183:80/returnGoods/record/return";
+                LOGGER.info("returnOrderReq"+returnOrderReq);
+                HttpClient httpGet = HttpClient.post(url).json(returnOrderReq).timeout(10000);
+                HttpResponse<Object> response = httpGet.action().result(new TypeReference<HttpResponse<Object>>() {});
+                if (!RequestReturnUtil.validateHttpResponse(response)) {
+                    throw new BusinessException(response.getMessage());
+                }
+            }
+        }catch (Exception e){
+            LOGGER.error("根据爱亲退供单，生成耘链退货单失败returnOrderCode： "+ returnOrderCode);
         }
     }
 
