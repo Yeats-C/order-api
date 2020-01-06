@@ -691,7 +691,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private void deleteOrderProductFromCart(String storeId, OrderConfirmResponse orderConfirmResponse) {
         for (CartOrderInfo item :
                 orderConfirmResponse.getCartOrderInfos()) {
-            cartOrderService.deleteCartInfo(storeId, item.getSkuCode(), YesOrNoEnum.YES.getCode());
+            cartOrderService.deleteCartInfo(storeId, item.getSkuCode(), YesOrNoEnum.YES.getCode(),item.getProductType());
         }
     }
 

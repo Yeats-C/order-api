@@ -317,16 +317,17 @@ public class CartOrderServiceImpl implements CartOrderService {
      * @param storeId
      * @param skuId
      * @param lineCheckStatus
+     * @param productType
      * @return
      */
     @Override
-    public HttpResponse deleteCartInfo(String storeId, String skuId, Integer lineCheckStatus) {
+    public HttpResponse deleteCartInfo(String storeId, String skuId, Integer lineCheckStatus, Integer productType) {
         try {
             //清空购物车
             if (storeId != null) {
                 LOGGER.info("删除购物车中的商品：{}", storeId);
                 //可以清空，可以删除单条，删除勾选数据。
-                cartOrderDao.deleteCart(storeId, skuId, lineCheckStatus);
+                cartOrderDao.deleteCart(storeId, skuId, lineCheckStatus,productType);
             } else {
                 LOGGER.error("删除购物车中的商品失败：{}", storeId);
                 return HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
@@ -368,6 +369,8 @@ public class CartOrderServiceImpl implements CartOrderService {
                 for (CartOrderInfo cartOrderInfo1 : cartOrderInfos) {
                     BigDecimal total = cartOrderInfo1.getPrice().multiply(new BigDecimal(cartOrderInfo1.getAmount()));
                     orderTotalPrice = orderTotalPrice.add(total);
+                    orderConfirmResponse.setHaveProductA(1);
+                    orderConfirmResponse.setPriceProductA(new BigDecimal(200));
                 }
                 //封装订货金额合计
                 orderConfirmResponse.setAcountActualprice(orderTotalPrice);
