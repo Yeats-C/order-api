@@ -200,12 +200,17 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
      * @param erpOrderInfo
      */
     private void createSaleOrder(ErpOrderInfo erpOrderInfo) {
-        String url = purchaseHost + "/order/aiqin/sale";
-        HttpClient httpGet = HttpClient.post(url).json(erpOrderInfo).timeout(10000);
-        HttpResponse<Object> response = httpGet.action().result(new TypeReference<HttpResponse<Object>>() {
-        });
-        if (!RequestReturnUtil.validateHttpResponse(response)) {
-            throw new BusinessException(response.getMessage());
+        LOGGER.info("根据爱亲采购单单，生成耘链退销售单开始 erpOrderInfo： "+ erpOrderInfo);
+        try {
+            String url = purchaseHost + "/order/aiqin/sale";
+            HttpClient httpGet = HttpClient.post(url).json(erpOrderInfo).timeout(10000);
+            HttpResponse<Object> response = httpGet.action().result(new TypeReference<HttpResponse<Object>>() {
+            });
+            if (!RequestReturnUtil.validateHttpResponse(response)) {
+                throw new BusinessException(response.getMessage());
+            }
+        } catch(Exception e){
+            LOGGER.error("根据爱亲退供单，生成耘链退货单失败returnOrderCode： "+ erpOrderInfo);
         }
     }
 }

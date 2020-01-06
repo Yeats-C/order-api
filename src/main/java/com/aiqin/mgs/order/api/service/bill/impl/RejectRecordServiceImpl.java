@@ -88,19 +88,25 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                     //添加退货单
                     LOGGER.info("开始生成退供单&退供单明细，参数为：returnOrderCode{}", returnOrderCode);
                     Integer orderSynchroSuccess = OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode();
-                    //ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndSuccess(orderSynchroSuccess,returnOrderCode);
-                    //createRejectRecordService.addRejectRecord(returnOrderInfo);
-                    LOGGER.info("生成退供单&退供单明细结束");
 
-                    //根据爱亲退供单，生成耘链退货单
-                    LOGGER.info("开始根据爱亲退供单，生成耘链退货单，参数为：returnOrderCode{}", returnOrderCode);
-                    createSaleOrder(returnOrderCode);
-                    LOGGER.info("根据爱亲退供单，生成耘链退货单结束");
+                    ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndSuccess(orderSynchroSuccess,returnOrderCode);
+                    if(returnOrderInfo != null){
+                        LOGGER.info("生成退供单&退供单明细开始");
+                        createRejectRecordService.addRejectRecord(returnOrderInfo);
+                        LOGGER.info("生成退供单&退供单明细结束");
 
-                    ////添加操作日志
-                    LOGGER.info("添加根据爱亲退供单，生成耘链退货单，操作日志开始");
-                    createSaleOrderLog(returnOrderCode);
-                    LOGGER.info("根据爱亲退供单，生成耘链退货单，添加操作日志结束");
+                        //根据爱亲退供单，生成耘链退货单
+                        LOGGER.info("开始根据爱亲退供单，生成耘链退货单，参数为：returnOrderCode{}", returnOrderCode);
+                        createSaleOrder(returnOrderCode);
+                        LOGGER.info("根据爱亲退供单，生成耘链退货单结束");
+
+                        //添加操作日志
+                        LOGGER.info("添加根据爱亲退供单，生成耘链退货单，操作日志开始");
+                        createSaleOrderLog(returnOrderCode);
+                        LOGGER.info("根据爱亲退供单，生成耘链退货单，添加操作日志结束");
+                    }else {
+                        throw new IllegalArgumentException();
+                    }
                 } catch (Exception e) {
                     LOGGER.error("同步退供单失败" + e);
                     throw new RuntimeException();
