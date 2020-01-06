@@ -36,8 +36,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public StoreInfo getStoreInfoByStoreId(String storeId) {
-        //TODO CT 临时测试使用门店
-        storeId = "3604f41aba22481da201e0c3d7a7451a";
+
         StoreInfo storeInfo = new StoreInfo();
         try {
             HttpClient httpClient = HttpClient.get(urlProperties.getSlcsApi() + "/store/info?store_id=" + storeId);
@@ -66,8 +65,8 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     public ProductInfo getSkuDetail(String companyCode, String skuCode) {
 
         //TODO CT 临时测试使用
-        companyCode = "01";
-        skuCode = "102423";
+//        companyCode = "01";
+//        skuCode = "102423";
 
         String url = urlProperties.getProductApi() + "/search/spu/sku/detail";
         url += "?company_code=" + companyCode;
@@ -76,27 +75,45 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
         try {
 
 
-//            product.setSpuCode("1000006");
-//            product.setSpuName("日本花王纸尿裤");
-//            product.setSkuCode(skuCode);
-//            product.setSkuName(skuCode + "名称");
-//            product.setSupplierCode("123456");
-//            product.setSupplierName("供应商1");
-//
-//            product.setPictureUrl("https://www.baidu.com/img/bd_logo1.png");
-//            product.setProductSpec("32K");
-//            product.setColorCode("101");
-//            product.setColorName("红色");
-//            product.setModelCode("1234");
-//            product.setUnitCode("1001");
-//            product.setUnitName("盒");
-//            product.setPrice(BigDecimal.TEN);
-//            product.setBarCode("987456321156156");
-//            product.setTaxRate(new BigDecimal(0.15));
-//            product.setProductPropertyCode("C");
-//            product.setProductPropertyName("C品");
+            product.setSpuCode("1000006");
+            product.setSpuName("日本花王纸尿裤");
+            product.setSkuCode(skuCode);
+            product.setSkuName(skuCode + "名称");
+            product.setSupplierCode(skuCode + "1");
+            product.setSupplierName("供应商1");
 
-//                        product.setSpuCode(data.getProductCode());
+            product.setPictureUrl("https://www.baidu.com/img/bd_logo1.png");
+            product.setProductSpec("32K");
+            product.setColorCode("101");
+            product.setColorName("红色");
+            product.setModelCode("1234");
+            product.setUnitCode("1001");
+            product.setUnitName("盒");
+            product.setPrice(BigDecimal.TEN);
+            product.setBarCode("987456321156156");
+            product.setTaxRate(new BigDecimal(0.15));
+            product.setProductPropertyCode("C");
+            product.setProductPropertyName("C品");
+            product.setBoxGrossWeight(BigDecimal.TEN);
+            product.setBoxVolume(BigDecimal.TEN);
+
+
+//            HttpClient httpClient = HttpClient.get(url);
+//            HttpResponse<ProductSkuDetailResponse> response = httpClient.action().result(new TypeReference<HttpResponse<ProductSkuDetailResponse>>() {
+//            });
+//            if (!RequestReturnUtil.validateHttpResponse(response)) {
+//                throw new BusinessException("获取商品信息失败");
+//            }
+//            ProductSkuDetailResponse data = response.getData();
+//            if (data == null) {
+//                throw new BusinessException("无效的商品");
+//            }
+//            if (data.getProductSkuBoxPackings() == null) {
+//                throw new BusinessException("商品缺少包装信息");
+//            }
+//
+//            //商品编码
+//            product.setSpuCode(data.getProductCode());
 //            product.setSpuName(data.getProductName());
 //            product.setSkuCode(data.getSkuCode());
 //            product.setSkuName(data.getSkuName());
@@ -114,39 +131,8 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 //            product.setTaxRate(data.getOutputTaxRate());
 //            product.setProductPropertyCode(data.getProductPropertyCode());
 //            product.setProductPropertyName(data.getProductPropertyName());
-
-
-
-            HttpClient httpClient = HttpClient.get(url);
-            HttpResponse<ProductSkuDetailResponse> response = httpClient.action().result(new TypeReference<HttpResponse<ProductSkuDetailResponse>>() {
-            });
-            if (!RequestReturnUtil.validateHttpResponse(response)) {
-                throw new BusinessException("获取商品信息失败");
-            }
-            ProductSkuDetailResponse data = response.getData();
-            if (data == null) {
-                throw new BusinessException("无效的商品");
-            }
-
-            //商品编码
-            product.setSpuCode(data.getProductCode());
-            product.setSpuName(data.getProductName());
-            product.setSkuCode(data.getSkuCode());
-            product.setSkuName(data.getSkuName());
-            product.setSupplierCode(data.getSupplyUnitCode());
-            product.setSupplierName(data.getSupplyUnitName());
-            product.setPictureUrl(data.getProductPicturePath());
-            product.setProductSpec(data.getSpec());
-            product.setColorCode(data.getColorCode());
-            product.setColorName(data.getColorName());
-            product.setModelCode(data.getModelNumber());
-            product.setUnitCode(data.getUnitCode());
-            product.setUnitName(data.getUnitName());
-            product.setPrice(data.getPriceTax());
-            product.setBarCode(data.getBarCode());
-            product.setTaxRate(data.getOutputTaxRate());
-            product.setProductPropertyCode(data.getProductPropertyCode());
-            product.setProductPropertyName(data.getProductPropertyName());
+//            product.setBoxGrossWeight(data.getProductSkuBoxPackings().getBoxGrossWeight());
+//            product.setBoxVolume(data.getProductSkuBoxPackings().getBoxVolume());
 
         } catch (BusinessException e) {
             logger.info("获取商品信息失败：{}", e.getMessage());
@@ -510,23 +496,6 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             paramMap.put("logisticsVoucherModel", list);
             paramMap.put("orderId", order.getOrderStoreId());
 
-//            Map<String, Object> paramMap2 = new HashMap<>(16);
-//            List<Map<String, Object>> list2 = new ArrayList<>();
-//            Map<String, Object> paramItemMap2 = new HashMap<>(4);
-//            paramItemMap2.put("skuCode", "1003");
-//            paramItemMap2.put("price", "2634");
-//            list2.add(paramItemMap2);
-//
-//            Map<String, Object> paramItemMap3 = new HashMap<>(4);
-//            paramItemMap3.put("skuCode", "1004");
-//            paramItemMap3.put("price", "1234");
-//            list2.add(paramItemMap3);
-//
-//            paramMap2.put("franchiseeId", "1001");
-//            paramMap2.put("logisticsVoucherModel", list2);
-//            paramMap2.put("orderId", "1002");
-
-
             HttpClient httpClient = HttpClient.post(urlProperties.getMarketApi() + "//logisticsVoucher/getBySkuCodes").json(paramMap);
             HttpResponse<ErpOrderGoodsCouponResponse> response = httpClient.action().result(new TypeReference<HttpResponse<ErpOrderGoodsCouponResponse>>() {
             });
@@ -681,8 +650,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     @Override
     public void updateStoreBusinessStage(String storeId, String origCode, String destCode) {
         try {
-//            HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/store/updateStoreBusinessStage")
-            HttpClient httpClient = HttpClient.post( "http://192.168.11.186:9011/store/updateStoreBusinessStage")
+            HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/store/updateStoreBusinessStage")
                     .addParameter("store_id", storeId)
                     .addParameter("orig_code", origCode)
                     .addParameter("dest_code", destCode);

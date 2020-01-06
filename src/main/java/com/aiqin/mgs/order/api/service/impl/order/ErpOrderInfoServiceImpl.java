@@ -481,20 +481,21 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 }
             }
 
-            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
-            order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
-            order.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
-            this.updateOrderByPrimaryKeySelective(order, auth);
-
             if (splitOrderList.size() > 0) {
                 for (ErpOrderInfo item :
                         splitOrderList) {
-                    item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
-                    item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
-                    item.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
-                    this.updateOrderByPrimaryKeySelective(item, auth);
+                    ErpOrderInfo updateOrder = erpOrderQueryService.getOrderByOrderCode(item.getOrderStoreCode());
+                    updateOrder.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
+                    updateOrder.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
+                    updateOrder.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
+                    this.updateOrderByPrimaryKeySelective(updateOrder, auth);
                 }
+            } else {
+                order.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
             }
+            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
+            order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
+            this.updateOrderByPrimaryKeySelective(order, auth);
 
 
         } else {
@@ -574,7 +575,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     newOrder.setItemList(orderItemList);
 
                     erpOrderItemService.saveOrderItemList(splitItemList, auth);
-                    erpOrderOperationLogService.copySplitOrderLog(orderCode, orderOperationLogList);
+                    erpOrderOperationLogService.copySplitOrderLog(newOrderCode, orderOperationLogList);
                     this.saveOrderNoLog(newOrder, auth);
                     splitOrderList.add(newOrder);
 
@@ -584,21 +585,23 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
             }
 
-            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
-            order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
-            order.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
-            this.updateOrderByPrimaryKeySelective(order, auth);
 
             if (splitOrderList.size() > 0) {
                 for (ErpOrderInfo item :
                         splitOrderList) {
-                    item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
-                    item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
-                    item.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
-                    this.updateOrderByPrimaryKeySelective(item, auth);
+                    ErpOrderInfo updateOrder = erpOrderQueryService.getOrderByOrderCode(item.getOrderStoreCode());
+                    updateOrder.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
+                    updateOrder.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
+                    updateOrder.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
+                    this.updateOrderByPrimaryKeySelective(updateOrder, auth);
                 }
+            } else {
+                order.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
             }
 
+            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
+            order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
+            this.updateOrderByPrimaryKeySelective(order, auth);
         }
 
     }
