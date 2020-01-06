@@ -269,4 +269,6 @@ public class ReturnOrderInfo {
     @ApiModelProperty(value = "审核时间")
     private Date reviewTime;
 
+    @ApiModelProperty(value = "同步状态")
+    private Integer orderSuccess;
 }

@@ -10,7 +10,6 @@ import java.util.List;
 /**
  * 根据退货单，生成爱亲采购单 接口
  */
-@Service
 public interface RejectRecordService {
     /**
      * 根据退货单，生成爱亲采购单
