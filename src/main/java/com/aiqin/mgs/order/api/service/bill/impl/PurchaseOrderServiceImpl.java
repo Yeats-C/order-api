@@ -23,17 +23,14 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderDeliverRequest;
 import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderDeliverService;
-import com.aiqin.mgs.order.api.util.AuthUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -191,7 +188,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         Integer sourceType = ErpLogOperationTypeEnum.ADD.getCode();
         Integer useStatus = ErpLogStatusTypeEnum.USING.getCode();
         String operationContent = "根据ERP订单和订单明细生成爱亲采购单和采购单明细";
-        operationLogService.insert( operationCode,  operationType,  sourceType,  operationContent,  null,  useStatus, null);
+        operationLogService.insert(operationCode, operationType, sourceType, operationContent, null, useStatus, null);
     }
 
     /**
@@ -200,7 +197,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
      * @param erpOrderInfo
      */
     private void createSaleOrder(ErpOrderInfo erpOrderInfo) {
-        LOGGER.info("根据爱亲采购单单，生成耘链退销售单开始 erpOrderInfo： "+ erpOrderInfo);
+        LOGGER.info("根据爱亲采购单单，生成耘链退销售单开始 erpOrderInfo： " + erpOrderInfo);
         try {
             String url = purchaseHost + "/order/aiqin/sale";
             HttpClient httpGet = HttpClient.post(url).json(erpOrderInfo).timeout(10000);
@@ -209,8 +206,19 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             if (!RequestReturnUtil.validateHttpResponse(response)) {
                 throw new BusinessException(response.getMessage());
             }
-        } catch(Exception e){
-            LOGGER.error("根据爱亲退供单，生成耘链退货单失败returnOrderCode： "+ erpOrderInfo);
+        } catch (Exception e) {
+            LOGGER.error("根据爱亲退供单，生成耘链退货单失败returnOrderCode： " + erpOrderInfo);
         }
+    }
+
+    @Override
+    public HttpResponse updateCancelOrderinfo(String orderStoreCode) {
+        PurchaseOrder purchaseOrder = new PurchaseOrder();
+        int result = purchaseOrderDao.updateByPrimaryKeySelective(purchaseOrder);
+        if (result == 1) {
+            return HttpResponse.success();
+        }
+        LOGGER.error("耘链销售单回传更新失败");
+        return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
     }
 }
