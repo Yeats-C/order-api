@@ -74,6 +74,49 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
         url += "&sku_code=" + skuCode;
         ProductInfo product = new ProductInfo();
         try {
+
+
+//            product.setSpuCode("1000006");
+//            product.setSpuName("日本花王纸尿裤");
+//            product.setSkuCode(skuCode);
+//            product.setSkuName(skuCode + "名称");
+//            product.setSupplierCode("123456");
+//            product.setSupplierName("供应商1");
+//
+//            product.setPictureUrl("https://www.baidu.com/img/bd_logo1.png");
+//            product.setProductSpec("32K");
+//            product.setColorCode("101");
+//            product.setColorName("红色");
+//            product.setModelCode("1234");
+//            product.setUnitCode("1001");
+//            product.setUnitName("盒");
+//            product.setPrice(BigDecimal.TEN);
+//            product.setBarCode("987456321156156");
+//            product.setTaxRate(new BigDecimal(0.15));
+//            product.setProductPropertyCode("C");
+//            product.setProductPropertyName("C品");
+
+//                        product.setSpuCode(data.getProductCode());
+//            product.setSpuName(data.getProductName());
+//            product.setSkuCode(data.getSkuCode());
+//            product.setSkuName(data.getSkuName());
+//            product.setSupplierCode(data.getSupplyUnitCode());
+//            product.setSupplierName(data.getSupplyUnitName());
+//            product.setPictureUrl(data.getProductPicturePath());
+//            product.setProductSpec(data.getSpec());
+//            product.setColorCode(data.getColorCode());
+//            product.setColorName(data.getColorName());
+//            product.setModelCode(data.getModelNumber());
+//            product.setUnitCode(data.getUnitCode());
+//            product.setUnitName(data.getUnitName());
+//            product.setPrice(data.getPriceTax());
+//            product.setBarCode(data.getBarCode());
+//            product.setTaxRate(data.getOutputTaxRate());
+//            product.setProductPropertyCode(data.getProductPropertyCode());
+//            product.setProductPropertyName(data.getProductPropertyName());
+
+
+
             HttpClient httpClient = HttpClient.get(url);
             HttpResponse<ProductSkuDetailResponse> response = httpClient.action().result(new TypeReference<HttpResponse<ProductSkuDetailResponse>>() {
             });
