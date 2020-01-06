@@ -3,13 +3,9 @@ package com.aiqin.mgs.order.api.service.returnorder;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
-import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 
-import java.math.BigDecimal;
-import java.util.List;
 
 /**
  * description: ReturnOrderInfoService
@@ -143,5 +139,12 @@ public interface ReturnOrderInfoService {
      * @return
      */
     boolean searchPayOrder(String orderCode);
+
+    /**
+     * 客户取消订单---订单使用
+     * @param orderCode
+     * @return
+     */
+    HttpResponse saveCancelOrder(String orderCode);
 
 }

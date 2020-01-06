@@ -84,10 +84,12 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="source_type" property="sourceType" jdbcType="BIT" />
+    <result column="order_success" property="orderSuccess" jdbcType="BIT" />
     <result column="return_money_type" property="returnMoneyType" jdbcType="BIT" />
     <result column="order_category" property="orderCategory" jdbcType="BIT" />
     <result column="review_operator_id" property="reviewOperatorId" jdbcType="VARCHAR" />
     <result column="review_time" property="reviewTime" jdbcType="TIMESTAMP" />
+    <result column="order_success" property="orderSuccess" jdbcType="BIT" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, return_order_id, return_order_code, order_store_code, company_code, company_name,
@@ -105,7 +107,7 @@
     discount_amount_infos, store_id, store_code, store_name, nature_code, nature_name,
     review_remark, review_operator, refund_status, process_type, remark, use_status,
     create_by_id, create_by_name, update_by_id, update_by_name, create_time, update_time,
-    source_type, return_money_type, order_category, review_operator_id, review_time
+    source_type, order_success, return_money_type, order_category, review_operator_id, review_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
@@ -367,6 +369,9 @@
       <if test="sourceType != null" >
         source_type,
       </if>
+      <if test="orderSuccess != null" >
+        order_success,
+      </if>
       <if test="returnMoneyType != null" >
         return_money_type,
       </if>
@@ -378,6 +383,9 @@
       </if>
       <if test="reviewTime != null" >
         review_time,
+      </if>
+      <if test="orderSuccess != null" >
+        order_success,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -627,6 +635,9 @@
       <if test="sourceType != null" >
         #{sourceType,jdbcType=BIT},
       </if>
+      <if test="orderSuccess != null" >
+        #{orderSuccess,jdbcType=BIT},
+      </if>
       <if test="returnMoneyType != null" >
         #{returnMoneyType,jdbcType=BIT},
       </if>
@@ -638,6 +649,9 @@
       </if>
       <if test="reviewTime != null" >
         #{reviewTime},
+      </if>
+      <if test="orderSuccess != null" >
+        #{orderSuccess},
       </if>
     </trim>
   </insert>
@@ -886,6 +900,9 @@
       </if>
       <if test="sourceType != null" >
         source_type = #{sourceType,jdbcType=BIT},
+      </if>
+      <if test="orderSuccess != null" >
+        order_success = #{orderSuccess,jdbcType=BIT},
       </if>
       <if test="returnMoneyType != null" >
         return_money_type = #{returnMoneyType,jdbcType=BIT},
@@ -1186,10 +1203,22 @@
   <update id="updateOrderSuccess">
     update return_order_info
     set
---     等待退货验收
-    return_order_status=4,
-    order_success = 1
-    where return_order_code=#{returnOrderCode}
+    order_success = #{orderSuccess}
+    where return_order_code = #{returnOrderCode}
   </update>
 
+  <select id="selectByOrderCodeAndSuccess" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from return_order_info
+    where
+      return_order_code = #{returnOrderCode} and order_success = #{orderSuccess}
+  </select>
+  <select id="selectByOrderSuccess" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from return_order_info
+    where
+      order_success = #{orderSuccess}
+  </select>
 </mapper>

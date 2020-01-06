@@ -95,5 +95,5 @@ public interface ErpOrderInfoDao {
      * @param orderSucess
      * @return
      */
-    Integer updateOrderSuccess(@Param("orderSucess") Integer orderSucess, @Param("orderStoreId") String orderStoreId);
+    Integer updateOrderSuccess(@Param("orderSucess") Integer orderSucess, @Param("orderStoreCode") String orderStoreCode);
 }

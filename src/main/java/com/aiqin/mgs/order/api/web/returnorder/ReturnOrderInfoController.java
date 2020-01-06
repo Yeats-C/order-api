@@ -148,6 +148,14 @@ public class ReturnOrderInfoController {
         return returnOrderInfoService.saveWriteDownOrder(orderCode);
     }
 
+    @ApiOperation("支付中心--发起客户退货")
+    @GetMapping("/saveCancelOrder")
+    public HttpResponse saveCancelOrder(String orderCode) {
+        return returnOrderInfoService.saveCancelOrder(orderCode);
+    }
+
+
+
     @ApiOperation("erp售后管理--冲减单列表")
     @PostMapping("/getWriteDownOrderList")
     public HttpResponse<PageResData<ReturnOrderInfo>> getWriteDownOrderList(@RequestBody PageRequestVO<WriteDownOrderSearchVo> searchVo) {

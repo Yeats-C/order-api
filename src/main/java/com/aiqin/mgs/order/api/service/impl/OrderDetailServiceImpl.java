@@ -465,10 +465,13 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			//结算信息
 			OrderQuery orderQuery = new OrderQuery();
 			orderQuery.setOrderId(orderId);
-			info.setSettlementInfo(settlementDao.jkselectsettlement(orderQuery));
+			SettlementInfo settlementInfo=settlementDao.jkselectsettlement(orderQuery);
+			settlementInfo.setTotalCouponsDiscount(settlementInfo.getActivityDiscount());
+			info.setSettlementInfo(settlementInfo);
 			if (orderInfo!=null&&orderInfo.getOrderType()==4){
 				//预存订单 储值卡金额
 			}
+
 			return HttpResponse.success(info);
 			} catch (Exception e) {
 				LOGGER.error("查询BYorderid-返回订单结算信息",e);
