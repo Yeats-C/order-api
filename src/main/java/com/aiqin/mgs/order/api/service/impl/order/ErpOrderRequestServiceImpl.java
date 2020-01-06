@@ -161,8 +161,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     }
 
     @Override
-    public boolean unlockStockInSupplyChain(ErpOrderInfo order, ErpOrderLockStockTypeEnum orderLockStockTypeEnum, AuthToken auth) {
-
+    public boolean unlockStockInSupplyChainByDetail(ErpOrderInfo order, ErpOrderLockStockTypeEnum orderLockStockTypeEnum, AuthToken auth) {
         boolean flag = true;
         try {
 
@@ -205,6 +204,38 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             paramMap.put("detail_list", list);
 
             System.out.println(JSON.toJSON(paramMap));
+
+            HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/change/stock").json(paramMap);
+            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
+            });
+
+            if (!RequestReturnUtil.validateHttpResponse(response)) {
+                throw new BusinessException(response.getMessage());
+            }
+        } catch (BusinessException e) {
+            flag = false;
+            logger.error("解锁库存失败：{}", e.getMessage());
+        } catch (Exception e) {
+            flag = false;
+            logger.error("解锁库存失败：{}", e);
+        }
+
+        return flag;
+    }
+
+    @Override
+    public boolean unlockStockInSupplyChainByOrderCode(ErpOrderInfo order, ErpOrderLockStockTypeEnum orderLockStockTypeEnum, AuthToken auth) {
+        boolean flag = true;
+        try {
+
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("company_code", order.getCompanyCode());
+            paramMap.put("company_name", order.getCompanyName());
+            paramMap.put("operation_person_id", auth.getPersonId());
+            paramMap.put("operation_person_name", auth.getPersonName());
+            paramMap.put("operation_type", ErpOrderLockStockTypeEnum.UNLOCK.getCode());
+            paramMap.put("order_code", order.getOrderStoreCode());
+            paramMap.put("order_type", order.getOrderTypeCode());
 
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/unlock/info").json(paramMap);
             HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
@@ -269,10 +300,16 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
         payStatusResponse.setOrderCode(logisticsCode);
         payStatusResponse.setRequestSuccess(false);
         try {
+
+            //TODO CT 临时测试
+            payStatusResponse.setRequestSuccess(true);
+            payStatusResponse.setPayCode(System.currentTimeMillis() + "");
+            payStatusResponse.setOrderCode(logisticsCode);
+            payStatusResponse.setPayStatusEnum(ErpPayStatusEnum.SUCCESS);
+
             //请求支付中心接口查询订单支付状态
             HttpClient httpClient = HttpClient.get(urlProperties.getPaymentApi() + "/payment/pay/searchPayOrder");
-//            httpClient.addParameter("orderNo", orderCode);
-            httpClient.addParameter("orderNo", "20191226191116542103");
+            httpClient.addParameter("orderNo", logisticsCode);
             HttpResponse<ErpPayPollingResponse> httpResponse = httpClient.action().result(new TypeReference<HttpResponse<ErpPayPollingResponse>>() {
             });
 
@@ -291,7 +328,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             }
 
         } catch (Exception e) {
-            logger.error("获取订单支付状态失败：{}", e);
+            logger.error("获取订单物流费支付状态失败：{}", e);
         }
         return payStatusResponse;
     }
@@ -339,7 +376,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             payRequest.setStoreId("tobtranspaytest");
             payRequest.setTransactionType("STORE_RECHARGE");
             payRequest.setPayOrderType(2);
-            payRequest.setBackUrl("http://order.api.aiqin.com/erpOrderPayController/orderPayCallback");
+            payRequest.setBackUrl(urlProperties.getOrderApi() + "/erpOrderPayController/orderPayCallback");
 
             System.out.println(JSON.toJSON(payRequest));
 
@@ -390,7 +427,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             payRequest.setStoreId(order.getStoreId());
             payRequest.setTransactionType("LOGISTICS_PAYMENT");
             payRequest.setPayOrderType(orderTypeEnum.getPayOrderType());
-            payRequest.setBackUrl("/erpOrderPayController/orderLogisticsPayCallback");
+            payRequest.setBackUrl(urlProperties.getOrderApi() + "/erpOrderPayController/orderLogisticsPayCallback");
 
 
             //请求支付中心接口查询订单支付状态
@@ -536,8 +573,8 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             for (ErpOrderItem item :
                     orderProductItemList) {
                 HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + "/stock/area/sale")
-                    .addParameter("province_code",storeInfo.getProvinceId())
-                    .addParameter("store_code",storeInfo.getStoreCode())
+                        .addParameter("province_code", storeInfo.getProvinceId())
+                        .addParameter("store_code", storeInfo.getStoreCode())
                         .addParameter("sku_code", item.getSkuCode());
                 HttpResponse<Boolean> response = httpClient.action().result(new TypeReference<HttpResponse<Boolean>>() {
                 });
@@ -599,14 +636,31 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     }
 
     @Override
+    public void updateStoreBusinessStage(String storeId, String origCode, String destCode) {
+        try {
+//            HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/store/updateStoreBusinessStage")
+            HttpClient httpClient = HttpClient.post( "http://192.168.11.186:9011/store/updateStoreBusinessStage")
+                    .addParameter("store_id", storeId)
+                    .addParameter("orig_code", origCode)
+                    .addParameter("dest_code", destCode);
+            HttpResponse response = httpClient.action().result(new TypeReference<HttpResponse>() {
+            });
+            System.out.println(JSON.toJSON(response));
+        } catch (Exception e) {
+            logger.error("修改门店营业状态失败：{}", e);
+        }
+    }
+
+    @Override
     public void updateStoreStatus(String storeId, String s) {
 
         try {
-            HttpClient httpPost = HttpClient.get(urlProperties.getSlcsApi() + "/store/open/Status" );
+            HttpClient httpPost = HttpClient.get(urlProperties.getSlcsApi() + "/store/open/Status");
             httpPost.addParameter("store_id", storeId);
             httpPost.addParameter("business_stage_code ", s);
             httpPost.action().status();
-           httpPost.action().result(new TypeReference<HttpResponse>() {  });
+            httpPost.action().result(new TypeReference<HttpResponse>() {
+            });
         } catch (BusinessException e) {
             logger.info("首单，修改门店状态：{}", e.getMessage());
             throw new BusinessException(e.getMessage());

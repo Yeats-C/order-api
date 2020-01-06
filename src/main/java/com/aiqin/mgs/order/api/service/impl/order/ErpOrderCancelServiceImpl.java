@@ -70,7 +70,7 @@ public class ErpOrderCancelServiceImpl implements ErpOrderCancelService {
         ErpOrderNodeProcessTypeEnum processTypeEnum = ErpOrderNodeProcessTypeEnum.getEnum(order.getOrderTypeCode(), order.getOrderCategoryCode());
         if (processTypeEnum.isLockStock()) {
             //解锁库存
-            erpOrderRequestService.unlockStockInSupplyChain(order, ErpOrderLockStockTypeEnum.REDUCE_AND_UNLOCK, auth);
+            erpOrderRequestService.unlockStockInSupplyChainByDetail(order, ErpOrderLockStockTypeEnum.REDUCE_AND_UNLOCK, auth);
         }
     }
 
@@ -109,7 +109,7 @@ public class ErpOrderCancelServiceImpl implements ErpOrderCancelService {
 
         //TODO 返还物流券 优惠券
         //解锁库存
-        erpOrderRequestService.unlockStockInSupplyChain(order, ErpOrderLockStockTypeEnum.REDUCE_AND_UNLOCK, null);
+        erpOrderRequestService.unlockStockInSupplyChainByDetail(order, ErpOrderLockStockTypeEnum.REDUCE_AND_UNLOCK, null);
         //TODO 发起退货退款
     }
 

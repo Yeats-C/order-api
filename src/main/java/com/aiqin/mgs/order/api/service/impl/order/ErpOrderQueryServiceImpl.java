@@ -101,7 +101,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                 //主订单
 
                 //获取拆分订单
-                if (YesOrNoEnum.YES.getCode().equals(order.getSplitStatus())) {
+                if (StatusEnum.YES.getCode().equals(order.getSplitStatus())) {
                     List<ErpOrderInfo> secondOrderList = getSecondOrderListByPrimaryCode(order.getOrderStoreCode());
                     order.setSecondaryOrderList(secondOrderList);
                 }

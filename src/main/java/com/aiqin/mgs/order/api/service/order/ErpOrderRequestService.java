@@ -63,7 +63,9 @@ public interface ErpOrderRequestService {
      * @version: v1.0.0
      * @date 2019/12/10 13:38
      */
-    boolean unlockStockInSupplyChain(ErpOrderInfo order, ErpOrderLockStockTypeEnum orderLockStockTypeEnum, AuthToken auth);
+    boolean unlockStockInSupplyChainByDetail(ErpOrderInfo order, ErpOrderLockStockTypeEnum orderLockStockTypeEnum, AuthToken auth);
+
+    boolean unlockStockInSupplyChainByOrderCode(ErpOrderInfo order, ErpOrderLockStockTypeEnum orderLockStockTypeEnum, AuthToken auth);
 
     /**
      * 根据订单编码获取订单支付状态
@@ -203,6 +205,8 @@ public interface ErpOrderRequestService {
      * @date 2019/12/2 16:11
      */
     boolean activityCheck(StoreInfo storeInfo, List<ErpOrderItem> orderProductItemList);
+
+    void updateStoreBusinessStage(String storeId, String origCode, String destCode);
 
     /**
      * 首单，修改门店状态

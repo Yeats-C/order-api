@@ -622,7 +622,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 if (ErpOrderNodeStatusEnum.STATUS_6.getCode().equals(item.getOrderNodeStatus())) {
                     item.setItemList(erpOrderItemService.selectOrderItemListByOrderId(item.getOrderStoreId()));
 
-                    //TODO CT 同步订单
+                    //同步订单到供应链，只调用一次接口，不管成功失败都算执行完成这一步
                     HttpResponse httpResponse = purchaseOrderService.createPurchaseOrder(item);
                     //同步之后修改订单状态
                     item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
