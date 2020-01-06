@@ -46,7 +46,7 @@ public class FrozenController {
      * @return
      */
     @PostMapping("")
-    @ApiOperation(value = "将商品列表挂起")
+    @ApiOperation(value = "将商品列表挂起1111")
     public HttpResponse addFrozenInfo(@Valid @RequestBody List<FrozenInfo> frozenInfolist) {
     	
         LOGGER.info("将商品列表挂起参数：{}",frozenInfolist);
