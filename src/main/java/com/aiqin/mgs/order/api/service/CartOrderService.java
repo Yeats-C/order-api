@@ -40,9 +40,10 @@ public interface CartOrderService {
      * @param storeId 门店id
      * @param skuId skuID
      * @param lineCheckStatus 勾选标记
+     * @param productType 订单类型 1直送 2配送 3货架
      * @return
      */
-    HttpResponse deleteCartInfo(String storeId,String skuId,Integer lineCheckStatus);
+    HttpResponse deleteCartInfo(String storeId, String skuId, Integer lineCheckStatus, Integer productType);
 
     /**
      * 显示购物车中的勾选商品
