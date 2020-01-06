@@ -184,6 +184,14 @@ public class ErpOrderItem {
     @JsonProperty("sign_difference_reason")
     private String signDifferenceReason;
 
+    @ApiModelProperty(value = "单个商品毛重(kg)")
+    @JsonProperty("box_gross_weight")
+    private BigDecimal boxGrossWeight;
+
+    @ApiModelProperty(value = "单个商品包装体积(mm³)")
+    @JsonProperty("box_volume")
+    private BigDecimal boxVolume;
+
     @ApiModelProperty(value = "0. 启用   1.禁用")
     @JsonProperty("use_status")
     private String useStatus;
