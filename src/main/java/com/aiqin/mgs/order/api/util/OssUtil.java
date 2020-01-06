@@ -147,7 +147,7 @@ public class OssUtil {
                     InputStream is = putObjectResult.getCallbackResponseBody();
                     int count = 0;
                     while ((count = is.read(buffer)) > 0) {
-                        is.read(buffer);
+//                        is.read(buffer);
                     }
                     putObjectResult.getCallbackResponseBody().close();
                 }
