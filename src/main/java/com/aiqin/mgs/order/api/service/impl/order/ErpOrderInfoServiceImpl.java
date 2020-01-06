@@ -447,6 +447,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     BigDecimal totalProductAmount = BigDecimal.ZERO;
                     //实际支付金额
                     BigDecimal orderAmount = BigDecimal.ZERO;
+                    //商品毛重(kg)
+                    BigDecimal boxGrossWeightTotal = BigDecimal.ZERO;
+                    //商品包装体积(mm³)
+                    BigDecimal boxVolumeTotal = BigDecimal.ZERO;
 
                     long lineCode = 1L;
                     for (ErpOrderItem item :
@@ -463,14 +467,19 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
                         //商品总价
                         totalProductAmount = totalProductAmount.add(item.getProductAmount());
-
                         //实际支付金额 取分摊后金额汇总
                         orderAmount = orderAmount.add(item.getTotalPreferentialAmount());
+                        //商品毛重汇总
+                        boxGrossWeightTotal = boxGrossWeightTotal.add((newOrderItem.getBoxGrossWeight() == null ? BigDecimal.ZERO : newOrderItem.getBoxGrossWeight()).multiply(new BigDecimal(newOrderItem.getProductCount())));
+                        //商品体积汇总
+                        boxVolumeTotal = boxVolumeTotal.add((newOrderItem.getBoxVolume() == null ? BigDecimal.ZERO : newOrderItem.getBoxVolume()).multiply(new BigDecimal(newOrderItem.getProductCount())));
 
                     }
                     newOrder.setTotalProductAmount(totalProductAmount);
                     newOrder.setOrderAmount(orderAmount);
                     newOrder.setDiscountAmount(totalProductAmount.multiply(orderAmount));
+                    newOrder.setTotalWeight(boxGrossWeightTotal);
+                    newOrder.setTotalVolume(boxVolumeTotal);
                     newOrder.setItemList(orderItemList);
 
                     erpOrderItemService.saveOrderItemList(splitItemList, auth);
@@ -481,20 +490,21 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 }
             }
 
-            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
-            order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
-            order.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
-            this.updateOrderByPrimaryKeySelective(order, auth);
-
             if (splitOrderList.size() > 0) {
                 for (ErpOrderInfo item :
                         splitOrderList) {
-                    item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
-                    item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
-                    item.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
-                    this.updateOrderByPrimaryKeySelective(item, auth);
+                    ErpOrderInfo updateOrder = erpOrderQueryService.getOrderByOrderCode(item.getOrderStoreCode());
+                    updateOrder.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
+                    updateOrder.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
+                    updateOrder.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
+                    this.updateOrderByPrimaryKeySelective(updateOrder, auth);
                 }
+            } else {
+                order.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
             }
+            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
+            order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
+            this.updateOrderByPrimaryKeySelective(order, auth);
 
 
         } else {
@@ -545,6 +555,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     BigDecimal totalProductAmount = BigDecimal.ZERO;
                     //实际支付金额
                     BigDecimal orderAmount = BigDecimal.ZERO;
+                    //商品毛重(kg)
+                    BigDecimal boxGrossWeightTotal = BigDecimal.ZERO;
+                    //商品包装体积(mm³)
+                    BigDecimal boxVolumeTotal = BigDecimal.ZERO;
 
                     long lineCode = 1L;
                     for (ErpOrderItem item :
@@ -567,14 +581,21 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                         //实际支付金额 取分摊后金额汇总
                         orderAmount = orderAmount.add(item.getTotalPreferentialAmount());
 
+                        //商品毛重汇总
+                        boxGrossWeightTotal = boxGrossWeightTotal.add((newOrderItem.getBoxGrossWeight() == null ? BigDecimal.ZERO : newOrderItem.getBoxGrossWeight()).multiply(new BigDecimal(newOrderItem.getProductCount())));
+                        //商品体积汇总
+                        boxVolumeTotal = boxVolumeTotal.add((newOrderItem.getBoxVolume() == null ? BigDecimal.ZERO : newOrderItem.getBoxVolume()).multiply(new BigDecimal(newOrderItem.getProductCount())));
+
                     }
                     newOrder.setTotalProductAmount(totalProductAmount);
                     newOrder.setOrderAmount(orderAmount);
                     newOrder.setDiscountAmount(totalProductAmount.multiply(orderAmount));
+                    newOrder.setTotalWeight(boxGrossWeightTotal);
+                    newOrder.setTotalVolume(boxVolumeTotal);
                     newOrder.setItemList(orderItemList);
 
                     erpOrderItemService.saveOrderItemList(splitItemList, auth);
-                    erpOrderOperationLogService.copySplitOrderLog(orderCode, orderOperationLogList);
+                    erpOrderOperationLogService.copySplitOrderLog(newOrderCode, orderOperationLogList);
                     this.saveOrderNoLog(newOrder, auth);
                     splitOrderList.add(newOrder);
 
@@ -584,21 +605,23 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
             }
 
-            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
-            order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
-            order.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
-            this.updateOrderByPrimaryKeySelective(order, auth);
 
             if (splitOrderList.size() > 0) {
                 for (ErpOrderInfo item :
                         splitOrderList) {
-                    item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
-                    item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
-                    item.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
-                    this.updateOrderByPrimaryKeySelective(item, auth);
+                    ErpOrderInfo updateOrder = erpOrderQueryService.getOrderByOrderCode(item.getOrderStoreCode());
+                    updateOrder.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
+                    updateOrder.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
+                    updateOrder.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
+                    this.updateOrderByPrimaryKeySelective(updateOrder, auth);
                 }
+            } else {
+                order.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
             }
 
+            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
+            order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
+            this.updateOrderByPrimaryKeySelective(order, auth);
         }
 
     }
@@ -627,7 +650,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     //同步之后修改订单状态
                     item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
                     item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_8.getCode());
-                    this.updateOrderByPrimaryKeySelective(order, auth);
+                    this.updateOrderByPrimaryKeySelective(item, auth);
                 }
             }
         }

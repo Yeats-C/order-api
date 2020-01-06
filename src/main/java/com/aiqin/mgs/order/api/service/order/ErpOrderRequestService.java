@@ -65,6 +65,17 @@ public interface ErpOrderRequestService {
      */
     boolean unlockStockInSupplyChainByDetail(ErpOrderInfo order, ErpOrderLockStockTypeEnum orderLockStockTypeEnum, AuthToken auth);
 
+    /**
+     * 解锁库存（按照订单号解锁）
+     *
+     * @param order
+     * @param orderLockStockTypeEnum
+     * @param auth
+     * @return boolean
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2020/1/6 13:58
+     */
     boolean unlockStockInSupplyChainByOrderCode(ErpOrderInfo order, ErpOrderLockStockTypeEnum orderLockStockTypeEnum, AuthToken auth);
 
     /**
@@ -206,6 +217,17 @@ public interface ErpOrderRequestService {
      */
     boolean activityCheck(StoreInfo storeInfo, List<ErpOrderItem> orderProductItemList);
 
+    /**
+     * 修改门店营业状态，从A到B,如果不是A状态则不修改
+     *
+     * @param storeId  门店id
+     * @param origCode 原状态
+     * @param destCode 目标状态
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2020/1/6 13:56
+     */
     void updateStoreBusinessStage(String storeId, String origCode, String destCode);
 
     /**

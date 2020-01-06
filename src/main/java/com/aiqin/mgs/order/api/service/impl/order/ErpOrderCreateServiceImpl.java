@@ -9,6 +9,7 @@ import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.ProductInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.aiqin.mgs.order.api.domain.constant.ErpOrderCodeSequence;
+import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
@@ -163,6 +164,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 throw new BusinessException("锁库存失败");
             }
         }
+
+        //更新门店营业状态
+        erpOrderRequestService.updateStoreBusinessStage(storeInfo.getStoreId(), OrderConstant.OPEN_STATUS_CODE_17, OrderConstant.OPEN_STATUS_CODE_18);
 
         //返回订单
         return order;
@@ -354,6 +358,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             orderItem.setCompanyCode(storeInfo.getCompanyCode());
             //公司名称
             orderItem.setCompanyName(storeInfo.getCompanyName());
+            //单个商品毛重(kg)
+            orderItem.setBoxGrossWeight(productInfo.getBoxGrossWeight());
+            //单个商品包装体积(mm³)
+            orderItem.setBoxVolume(productInfo.getBoxVolume());
 
             orderItemList.add(orderItem);
         }
@@ -425,6 +433,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         BigDecimal realMoneyTotal = BigDecimal.ZERO;
         //活动优惠金额汇总
         BigDecimal activityMoneyTotal = BigDecimal.ZERO;
+        //商品毛重(kg)
+        BigDecimal boxGrossWeightTotal = BigDecimal.ZERO;
+        //商品包装体积(mm³)
+        BigDecimal boxVolumeTotal = BigDecimal.ZERO;
 
         for (ErpOrderItem item :
                 orderItemList) {
@@ -433,6 +445,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             moneyTotal = moneyTotal.add(item.getTotalProductAmount() == null ? BigDecimal.ZERO : item.getTotalProductAmount());
             //活动优惠金额汇总
             activityMoneyTotal = activityMoneyTotal.add(item.getTotalAcivityAmount() == null ? BigDecimal.ZERO : item.getTotalAcivityAmount());
+            //商品毛重汇总
+            boxGrossWeightTotal = boxGrossWeightTotal.add((item.getBoxGrossWeight() == null ? BigDecimal.ZERO : item.getBoxGrossWeight()).multiply(new BigDecimal(item.getProductCount())));
+            //商品体积汇总
+            boxVolumeTotal = boxVolumeTotal.add((item.getBoxVolume() == null ? BigDecimal.ZERO : item.getBoxVolume()).multiply(new BigDecimal(item.getProductCount())));
+
         }
 
         //保存订单费用信息
@@ -544,18 +561,18 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setTransportTime(null);
         //发运状态
         order.setTransportStatus(StatusEnum.NO.getCode());
-        //发运时间
+        //签收时间
         order.setReceiveTime(null);
         //发票类型 默认不开发票
         order.setInvoiceType(ErpInvoiceTypeEnum.NO_INVOICE.getCode());
         //发票抬头
         order.setInvoiceTitle(null);
         //体积
-        order.setTotalVolume(null);
+        order.setTotalVolume(boxVolumeTotal);
         //实际体积
         order.setActualTotalVolume(null);
         //重量
-        order.setTotalWeight(null);
+        order.setTotalWeight(boxGrossWeightTotal);
         //实际重量
         order.setActualTotalWeight(null);
         //主订单号  如果非子订单 此处存order_code
@@ -602,6 +619,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setSourceType(null);
         //同步供应链状态
         order.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_NO.getCode());
+        //生成冲减单状态
+        order.setScourSheetStatus(ErpOrderScourSheetStatusEnum.NOT_NEED.getCode());
 
         return order;
     }
@@ -658,6 +677,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             item.setOrderInfoDetailId(OrderPublic.getUUID());
             //订单明细行编号
             item.setLineCode(lineCode++);
+            item.setUseStatus(StatusEnum.YES.getValue());
         }
         //保存订单
         order.setOrderStoreId(orderId);
@@ -813,6 +833,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             orderItem.setCompanyCode(storeInfo.getCompanyCode());
             //公司名称
             orderItem.setCompanyName(storeInfo.getCompanyName());
+            //单个商品毛重(kg)
+            orderItem.setBoxGrossWeight(productInfo.getBoxGrossWeight());
+            //单个商品包装体积(mm³)
+            orderItem.setBoxVolume(productInfo.getBoxVolume());
 
             orderItemList.add(orderItem);
         }
@@ -845,6 +869,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //订货金额汇总
         BigDecimal moneyTotal = BigDecimal.ZERO;
+        //商品毛重(kg)
+        BigDecimal boxGrossWeightTotal = BigDecimal.ZERO;
+        //商品包装体积(mm³)
+        BigDecimal boxVolumeTotal = BigDecimal.ZERO;
 
         long lineCode = 1L;
 
@@ -860,9 +888,14 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             item.setOrderInfoDetailId(OrderPublic.getUUID());
             //订单明细行编号
             item.setLineCode(lineCode++);
+            item.setUseStatus(StatusEnum.YES.getValue());
 
             //金额汇总
             moneyTotal = moneyTotal.add(item.getTotalProductAmount() == null ? BigDecimal.ZERO : item.getTotalProductAmount());
+            //商品毛重汇总
+            boxGrossWeightTotal = boxGrossWeightTotal.add((item.getBoxGrossWeight() == null ? BigDecimal.ZERO : item.getBoxGrossWeight()).multiply(new BigDecimal(item.getProductCount())));
+            //商品体积汇总
+            boxVolumeTotal = boxVolumeTotal.add((item.getBoxVolume() == null ? BigDecimal.ZERO : item.getBoxVolume()).multiply(new BigDecimal(item.getProductCount())));
         }
 
         erpOrderItemService.saveOrderItemList(orderItemList, auth);
@@ -971,11 +1004,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //发票抬头
         order.setInvoiceTitle(null);
         //体积
-        order.setTotalVolume(null);
+        order.setTotalVolume(boxVolumeTotal);
         //实际体积
         order.setActualTotalVolume(null);
         //重量
-        order.setTotalWeight(null);
+        order.setTotalWeight(boxGrossWeightTotal);
         //实际重量
         order.setActualTotalWeight(null);
         //主订单号  如果非子订单 此处存order_code
@@ -1022,6 +1055,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setSourceType(null);
         //同步供应链状态
         order.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_NO.getCode());
+        //生成冲减单状态
+        order.setScourSheetStatus(ErpOrderScourSheetStatusEnum.NOT_NEED.getCode());
         erpOrderInfoService.saveOrder(order, auth);
 
         //保存订单费用信息
@@ -1051,6 +1086,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
     @Override
     public String getOrderCode() {
+        ErpOrderCodeSequence.num = null;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String curDay = sdf.format(new Date());
         if (StringUtils.isEmpty(ErpOrderCodeSequence.currentDay) || !curDay.equals(ErpOrderCodeSequence.currentDay) || ErpOrderCodeSequence.num == null) {

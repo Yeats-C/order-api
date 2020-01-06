@@ -111,4 +111,30 @@ public class PayRequest implements Serializable {
     @JsonProperty("back_url")
     private String backUrl;
 
+    /**************支付物流费用所需参数******************/
+    @ApiModelProperty("物流券支付金额--支付物流所需参数")
+    private Long couponPaymentAmount;
+
+    @ApiModelProperty("物流公司名称--支付物流所需参数")
+    private String logisticsCompany;
+
+    @ApiModelProperty("物流支付人--支付物流所需参数")
+    private String paymentFreightName;
+
+    @ApiModelProperty("订单号--支付物流所需参数")
+    private String relationOrderCode;
+
+    //物流支付时间
+    @ApiModelProperty("物流支付时间--支付物流所需参数")
+    private String paymentFreightTime;
+
+    //物流支付时间
+    @ApiModelProperty("门店编码--支付物流所需参数")
+    private String storeCode;
+
+    //物流支付金额
+    @ApiModelProperty("物流支付金额--支付物流所需参数")
+    private Long paymentFreightAmount;
+    /**************支付物流费用所需参数******************/
+
 }

@@ -80,6 +80,7 @@
         franchisee_code as franchiseeCode,
         franchisee_name as franchiseeName,
         order_success as orderSuccess,
+        scour_sheet_status as scourSheetStatus,
         use_status as useStatus,
         source_code as sourceCode,
         source_name as sourceName,
@@ -127,6 +128,9 @@
         </if>
         <if test="beforeCancelStatus != null and beforeCancelStatus != '' or beforeCancelStatus == 0">
             and before_cancel_status = #{beforeCancelStatus}
+        </if>
+        <if test="scourSheetStatus != null and scourSheetStatus != '' or scourSheetStatus == 0">
+            and scour_sheet_status = #{scourSheetStatus}
         </if>
         <if test="mainOrderCode != null and mainOrderCode != ''">
             and main_order_code = #{mainOrderCode}
@@ -315,6 +319,9 @@
         <if test="actualProductCount != null and actualProductCount != '' or actualProductCount == 0 ">
             actual_product_count = #{actualProductCount},
         </if>
+        <if test="scourSheetStatus != null and scourSheetStatus != '' or scourSheetStatus == 0 ">
+            scour_sheet_status = #{scourSheetStatus},
+        </if>
         update_by_id = #{updateById},
         update_by_name = #{updateByName},
         update_time = sysdate()
@@ -340,7 +347,7 @@
                                       store_type, store_id,
                                       store_code, store_name, transport_company_code, transport_company_name,
                                       transport_code, logistics_id, fee_id, order_return, franchisee_id,
-                                      franchisee_code, franchisee_name, order_success, use_status, source_code, source_name,
+                                      franchisee_code, franchisee_name, order_success, scour_sheet_status, use_status, source_code, source_name,
                                       source_type, create_by_id, create_by_name, update_by_id, update_by_name,
                                       create_time, update_time)
         values (#{orderStoreId}, #{orderStoreCode}, #{companyCode}, #{companyName},
@@ -361,7 +368,7 @@
                 #{storeId},
                 #{storeCode}, #{storeName}, #{transportCompanyCode}, #{transportCompanyName},
                 #{transportCode}, #{logisticsId}, #{feeId}, #{orderReturn}, #{franchiseeId},
-                #{franchiseeCode}, #{franchiseeName}, #{orderSuccess}, #{useStatus}, #{sourceCode}, #{sourceName},
+                #{franchiseeCode}, #{franchiseeName}, #{orderSuccess}, #{scourSheetStatus}, #{useStatus}, #{sourceCode}, #{sourceName},
                 #{sourceType}, #{createById}, #{createByName}, #{updateById}, #{updateByName},
                 sysdate(), sysdate())
     </insert>
@@ -444,6 +451,7 @@
         a1.franchisee_code as franchiseeCode,
         a1.franchisee_name as franchiseeName,
         a1.order_success as orderSuccess,
+        a1.scour_sheet_status as scourSheetStatus,
         a1.use_status as useStatus,
         a1.source_code as sourceCode,
         a1.source_name as sourceName,
@@ -590,6 +598,7 @@
         a1.franchisee_code as franchiseeCode,
         a1.franchisee_name as franchiseeName,
         a1.order_success as orderSuccess,
+        a1.scour_sheet_status as scourSheetStatus,
         a1.use_status as useStatus,
         a1.source_code as sourceCode,
         a1.source_name as sourceName,
