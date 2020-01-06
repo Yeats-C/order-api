@@ -1214,4 +1214,11 @@
     where
       return_order_code = #{returnOrderCode} and order_success = #{orderSuccess}
   </select>
+  <select id="selectByOrderSuccess" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from return_order_info
+    where
+      order_success = #{orderSuccess}
+  </select>
 </mapper>

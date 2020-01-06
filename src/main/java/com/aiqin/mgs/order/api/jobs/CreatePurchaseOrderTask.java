@@ -23,9 +23,10 @@ public class CreatePurchaseOrderTask {
 
     /**
      * 定时扫描生成采购三失败的定单
-     * 每半小时执行一次
+     * 每5秒执行一次 @Scheduled(fixedRate = 1000 * 5)
      */
-    @Scheduled(cron = "0 * * * * ?")
+    //在固定时间执行 @Scheduled(cron = "0 */1 *  * * * ")
+    //@Scheduled(fixedRate = 1000 * 5)
     public void TimedFailedPurchaseOrder() {
         try {
             //查询同步时失败的订单

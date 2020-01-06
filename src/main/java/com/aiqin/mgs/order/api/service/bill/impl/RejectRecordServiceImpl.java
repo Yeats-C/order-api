@@ -6,6 +6,7 @@ import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpLogOperationTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpLogStatusTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.OrderSucessEnum;
 import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
@@ -82,7 +83,9 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                 try {
                     //添加退货单
                     LOGGER.info("开始生成退供单&退供单明细，参数为：returnOrderCode{}", returnOrderCode);
-                    createRejectRecordService.addRejectRecord(returnOrderCode);
+                    Integer orderSynchroSuccess = OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode();
+                    ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndSuccess(orderSynchroSuccess,returnOrderCode);
+                    createRejectRecordService.addRejectRecord(returnOrderInfo);
                     LOGGER.info("生成退供单&退供单明细结束");
 
                     //根据爱亲退供单，生成耘链退货单

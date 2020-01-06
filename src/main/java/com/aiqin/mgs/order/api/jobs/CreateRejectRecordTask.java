@@ -25,11 +25,11 @@ public class CreateRejectRecordTask {
      * 定时扫描同步失败的拖货单
      * 每半小时执行一次
      */
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(fixedRate = 1000 * 5)
     public void TimedFailedRejectOrder() {
         try {
             //根据订单号查询为同步的订单
-            Integer orderSynchroSuccess = OrderSucessEnum.ORDER_SYNCHRO_SUCCESS.getCode();
+            Integer orderSynchroSuccess = OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode();
             List<ReturnOrderInfo> returnOrderInfos = returnOrderInfoDao.selectByOrderSuccess(orderSynchroSuccess);
             if (returnOrderInfos != null && returnOrderInfos.size() > 0) {
                 //计时器
@@ -38,11 +38,11 @@ public class CreateRejectRecordTask {
                 watch.start();
                 logger.info("根据退货单生成退供单订单定时任务=====>开始");
                 for (ReturnOrderInfo returnOrderInfo : returnOrderInfos) {
-                    createRejectRecordService.addRejectRecord(returnOrderInfo.getReturnOrderCode());
+                    createRejectRecordService.addRejectRecord(returnOrderInfo);
                 }
                 //计时器结束
                 watch.stop();
-                logger.info("根据退货单生成退供单订单定时任务=====>结束，本次用时：{}毫秒", watch.getTime() + "，生成：" + returnOrderInfos.size() + "单");
+                logger.info("根据退货单生成退供单订单定时任务=====>结束，本次用时：毫秒", watch.getTime() + "，本次生成：" + returnOrderInfos.size() + "单");
             }
         } catch (Exception e) {
             logger.error("根据退货单生成退供单订单定时任务=====>失败" + e);
