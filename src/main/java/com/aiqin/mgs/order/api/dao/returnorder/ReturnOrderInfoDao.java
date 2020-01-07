@@ -55,6 +55,6 @@ public interface ReturnOrderInfoDao {
     //查询同步失败的退货单
     List<ReturnOrderInfo> selectByOrderSuccess(Integer orderSuccess);
 
-    //查询同步失败的退货单
+    //查询待ERP退货单，待生成爱亲退供单数据
     ReturnOrderInfo selectByOrderCodeAndSuccess(@Param("orderSuccess") Integer orderSuccess, @Param("returnOrderCode")String returnOrderCode);
 }

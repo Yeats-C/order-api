@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.service.bill.impl;
 
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
+import com.aiqin.mgs.order.api.component.enums.PurchaseOrderStatusEnum;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderDeliverItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderTransportLogisticsRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderTransportRequest;
@@ -59,10 +60,13 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
     @Override
     public HttpResponse createPurchaseOrder(@Valid ErpOrderInfo erpOrderInfo) {
-        LOGGER.info("同步采购单，erpOrderInfo{}", erpOrderInfo);
-        //异步执行
-        purchaseOrderExecutor(erpOrderInfo);
-        return HttpResponse.success();
+        LOGGER.info("根据ERP订单生成爱亲采购单，采购单开始，erpOrderInfo{}", erpOrderInfo);
+        if(erpOrderInfo != null){
+            //异步执行
+            purchaseOrderExecutor(erpOrderInfo);
+            return HttpResponse.success();
+        }
+        return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
     }
 
     @Override
@@ -149,7 +153,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     }
 
     /**
-     * 异步执行
+     * 异步执行.
      *
      * @param erpOrderInfo
      */
@@ -159,66 +163,74 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             @Override
             public void run() {
                 try {
-                    //生成采购单¥&采购单明细&修改订单同步状态
-                    LOGGER.info("开始生成采购单¥&采购单明细&修改订单同步状态，参数为：erpOrderInfo{}", erpOrderInfo);
+                    LOGGER.info("根据ERP订单生成爱亲采购单&采购单明细&修改订单同步状态，参数为：erpOrderInfo{}", erpOrderInfo);
                     createPurchaseOrderService.addOrderAndDetail(erpOrderInfo);
-                    LOGGER.info("生成采购单¥&采购单明细&修改订单同步状态,结束");
+                    LOGGER.info("根据ERP订单生成爱亲采购单&采购单明细&修改订单同步状态,结束");
 
-                    //根据爱亲采购单，生成耘链销售单
-                    LOGGER.info("开始根据爱亲采购单，生成耘链销售单，参数为：erpOrderInfo{}", erpOrderInfo);
+                    LOGGER.info("根据爱亲采购单，生成耘链销售单开始，参数为：erpOrderInfo{}", erpOrderInfo);
                     createSaleOrder(erpOrderInfo);
                     LOGGER.info("根据爱亲采购单，生成耘链销售单结束");
 
-                    //添加操作日志
-                    LOGGER.info("根据订单生产爱亲采购单，添加操作日志开始···");
-                    //
+                    LOGGER.info("根据ERP订单生成爱亲采购单,采购单明细,修改订单同步状态&根据爱亲采购单，生成耘链销售单，添加操作日志开始");
                     addOperationLog(erpOrderInfo);
-                    LOGGER.info("根据订单生产爱亲采购单，添加操作日志结束···");
+                    LOGGER.info("根据ERP订单生成爱亲采购单,采购单明细,修改订单同步状态&根据爱亲采购单，生成耘链销售单，添加操作日志结束");
                 } catch (Exception e) {
-                    LOGGER.error("同步采购单失败" + e);
+                    LOGGER.error("同步ERP采购单失败" + e);
                     throw new RuntimeException();
                 }
             }
         });
     }
 
+    /**
+     * 根据ERP订单生成爱亲采购单,采购单明细,修改订单同步状态&根据爱亲采购单，生成耘链销售单.
+     *
+     * @param erpOrderInfo
+     */
     private void addOperationLog(ErpOrderInfo erpOrderInfo) {
         String operationCode = erpOrderInfo.getOrderStoreCode();
         Integer operationType = ErpLogSourceTypeEnum.PURCHASE.getCode();
         Integer sourceType = ErpLogOperationTypeEnum.ADD.getCode();
         Integer useStatus = ErpLogStatusTypeEnum.USING.getCode();
-        String operationContent = "根据ERP订单和订单明细生成爱亲采购单和采购单明细";
+        String operationContent = "根据ERP订单生成爱亲采购单,采购单明细,修改订单同步状态&根据爱亲采购单，生成耘链销售单";
         operationLogService.insert(operationCode, operationType, sourceType, operationContent, null, useStatus, null);
     }
 
     /**
-     * 生成栖耘销售单
+     * 生成栖耘销售单.
      *
      * @param erpOrderInfo
      */
     private void createSaleOrder(ErpOrderInfo erpOrderInfo) {
-        LOGGER.info("根据爱亲采购单单，生成耘链退销售单开始 erpOrderInfo： " + erpOrderInfo);
+
         try {
             String url = purchaseHost + "/order/aiqin/sale";
             HttpClient httpGet = HttpClient.post(url).json(erpOrderInfo).timeout(10000);
+            LOGGER.info("根据爱亲采购单，生成耘链销售单开始url:" + url + " httpGet:" + httpGet);
             HttpResponse<Object> response = httpGet.action().result(new TypeReference<HttpResponse<Object>>() {
             });
             if (!RequestReturnUtil.validateHttpResponse(response)) {
                 throw new BusinessException(response.getMessage());
             }
         } catch (Exception e) {
-            LOGGER.error("根据爱亲退供单，生成耘链退货单失败returnOrderCode： " + erpOrderInfo);
+            LOGGER.error("根据爱亲采购单，生成耘链销售单失败returnOrderCode： " + erpOrderInfo);
         }
     }
 
+    //取消订单
     @Override
     public HttpResponse updateCancelOrderinfo(String orderStoreCode) {
         PurchaseOrder purchaseOrder = new PurchaseOrder();
-        int result = purchaseOrderDao.updateByPrimaryKeySelective(purchaseOrder);
+        Integer purchaseOrderStatusRemove = PurchaseOrderStatusEnum.PURCHASE_ORDER_STATUS_REMOVE.getCode();
+        purchaseOrder.setPurchaseOrderStatus(purchaseOrderStatusRemove);//采购单状态
+        purchaseOrder.setPurchaseOrderCode(orderStoreCode);
+        int result = purchaseOrderDao.updateByorderStoreCode(purchaseOrder);
         if (result == 1) {
+            LOGGER.info("采购单取消成功");
             return HttpResponse.success();
+        }else {
+            LOGGER.error("采购单取消失败");
+            return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
         }
-        LOGGER.error("耘链销售单回传更新失败");
-        return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
     }
 }

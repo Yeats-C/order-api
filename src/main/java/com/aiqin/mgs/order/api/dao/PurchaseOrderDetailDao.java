@@ -10,6 +10,11 @@ public interface PurchaseOrderDetailDao {
 
     int insertList(@Param("record") List<PurchaseOrderDetail> record);
 
+    /**
+     * 根据ERP订单生成爱亲采购单明细
+     * @param record
+     * @return
+     */
     int insertSelective(PurchaseOrderDetail record);
 
     PurchaseOrderDetail selectByPrimaryKey(Long id);
