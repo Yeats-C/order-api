@@ -88,14 +88,15 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 orderDeliverItemList.add(orderDeliverItem);
             }
             erpOrderDeliverRequest.setItemList(orderDeliverItemList);
-            erpOrderDeliverService.orderDeliver(erpOrderDeliverRequest);
+            //erpOrderDeliverService.orderDeliver(erpOrderDeliverRequest);
 
             //更新采购单
             PurchaseOrder purchaseOrder = new PurchaseOrder();
             purchaseOrder.setActualTotalCount(purchaseInfo.getActualTotalCount());//
             purchaseOrder.setDeliveryTime(purchaseInfo.getDeliveryTime());//
             purchaseOrder.setContactPerson(purchaseInfo.getDeliveryPersonId());//
-            purchaseOrderDao.updateByPrimaryKeySelective(purchaseOrder);
+            purchaseOrder.setPurchaseOrderCode(purchaseInfo.getOrderStoreCode());
+            purchaseOrderDao.updateByOrderCode(purchaseOrder);
 
             //更新采购单明细
             for (OrderStoreDetail orderStoreDetail : purchaseInfo.getOrderStoreDetail()) {
@@ -104,7 +105,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 purchaseOrderDetail.setSkuCode(orderStoreDetail.getSkuCode());//SKU编码
                 purchaseOrderDetail.setSkuName(orderStoreDetail.getSkuName());//SKU名称
                 purchaseOrderDetail.setTotalCount(orderStoreDetail.getActualProductCount());//实发数量
-                purchaseOrderDetailDao.updateByPrimaryKeySelective(purchaseOrderDetail);
+                purchaseOrderDetail.setPurchaseOrderCode(purchaseInfo.getOrderStoreCode());
+                purchaseOrderDetailDao.updateByPurchaseOrderCode(purchaseOrderDetail);
             }
 
             //添加订单批次明细

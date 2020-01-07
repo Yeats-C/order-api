@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.web.bill;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.RejectRecordInfo;
+import com.aiqin.mgs.order.api.domain.request.bill.ReturnDLReq;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,11 +35,11 @@ public class RejectRecordController {
     }
 
     /**
-     * 耘链销售单回传
+     * 耘链退货单回传
      */
     @PostMapping("info")
-    @ApiOperation(value = "耘链销售单回传")
-    public HttpResponse<List<RejectRecordInfo>> selectPurchaseInfo() {
-        return rejectRecordService.selectPurchaseInfo();
+    @ApiOperation(value = "耘链退货单回传")
+    public HttpResponse selectPurchaseInfo(ReturnDLReq returnDLReq) {
+        return rejectRecordService.selectPurchaseInfo(returnDLReq);
     }
 }

@@ -12,7 +12,7 @@ import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
-import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderSearchVo;
+import com.aiqin.mgs.order.api.domain.request.bill.ReturnDLReq;
 import com.aiqin.mgs.order.api.service.bill.CreateRejectRecordService;
 import com.aiqin.mgs.order.api.service.bill.OperationLogService;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
@@ -61,16 +61,19 @@ public class RejectRecordServiceImpl implements RejectRecordService {
         return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
     }
 
+    //耘链退货单回传
     @Override
-    public HttpResponse<List<RejectRecordInfo>> selectPurchaseInfo() {
-        ReturnOrderSearchVo returnOrderSearch = new ReturnOrderSearchVo();
+    public HttpResponse selectPurchaseInfo(ReturnDLReq returnDLReq) {
+        /*ReturnOrderSearchVo returnOrderSearch = new ReturnOrderSearchVo();
         returnOrderInfoDao.page(returnOrderSearch);
 
         String returnOrderCode = "";
         returnOrderDetailDao.selectListByReturnOrderCode(returnOrderCode);
 
         returnOrderDetailBatchDao.select(new ReturnOrderDetailBatch());
-        return null;
+        return null;*/
+         System.err.println(returnDLReq);
+        return HttpResponse.success();
     }
 
     /**
@@ -90,7 +93,7 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                     ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndSuccess(orderSynchroSuccess, returnOrderCode);
                     if (returnOrderInfo != null) {
                         LOGGER.info("根据ERP退货单生成爱亲退供单&爱亲退供单明细&修改ERP订单同步状态开始");
-                        createRejectRecordService.addRejectRecord(returnOrderInfo);
+                        //createRejectRecordService.addRejectRecord(returnOrderInfo);
                         LOGGER.info("根据ERP退货单生成爱亲退供单&爱亲退供单明细&修改ERP订单同步状态结束");
 
                         //根据爱亲退供单，生成耘链退货单

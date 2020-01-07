@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.service.bill;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.RejectRecordInfo;
 import com.aiqin.mgs.order.api.domain.request.bill.RejectRecordReq;
+import com.aiqin.mgs.order.api.domain.request.bill.ReturnDLReq;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,5 +18,10 @@ public interface RejectRecordService {
      */
     HttpResponse createRejectRecord(String returnOrderCode);
 
-    HttpResponse<List<RejectRecordInfo>> selectPurchaseInfo();
+    /**
+     * 耘链退货单回传
+     * @param returnDLReq
+     * @return
+     */
+    HttpResponse selectPurchaseInfo(ReturnDLReq returnDLReq);
 }
