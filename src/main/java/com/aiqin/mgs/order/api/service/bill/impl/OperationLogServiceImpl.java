@@ -9,6 +9,10 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+/**
+ * 爱亲供应链，操作日志 实现类
+ */
 @Service
 public class OperationLogServiceImpl implements OperationLogService {
     @Resource
@@ -27,6 +31,7 @@ public class OperationLogServiceImpl implements OperationLogService {
         //operationLog.setCreateByName(auth.getPersonName());
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         operationLog.setCreateTime(formatter.format(new Date()));
+        //添加日志
         operationLogDao.insert(operationLog);
     }
 }

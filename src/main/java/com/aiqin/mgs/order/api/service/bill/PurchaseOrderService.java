@@ -11,7 +11,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 
 public interface PurchaseOrderService {
     /**
-     * 同步采购单
+     * 根据ERP订单生成爱亲采购单，采购单
      *
      * @param erpOrderInfo
      * @return

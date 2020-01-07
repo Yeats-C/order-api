@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.service.bill.impl;
 
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpLogOperationTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
@@ -18,6 +19,7 @@ import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
 import com.aiqin.mgs.order.api.util.BeanCopyUtils;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -30,7 +32,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * 根据退货单，生成爱亲采购单 实现类
+ * 爱亲退供单 实现类
  */
 @Service
 public class RejectRecordServiceImpl implements RejectRecordService {
@@ -50,10 +52,13 @@ public class RejectRecordServiceImpl implements RejectRecordService {
     @Override
     @Transactional
     public HttpResponse createRejectRecord(String returnOrderCode) {
-        LOGGER.info("同步推供单，rejectRecordReq{}", returnOrderCode);
-        //异步执行
-        rejectRecordExecutor(returnOrderCode);
-        return HttpResponse.success();
+        LOGGER.info("根据ERP退货单生成爱亲退供单，开始，returnOrderCode{}", returnOrderCode);
+        if (StringUtils.isNotEmpty(returnOrderCode)) {
+            //异步执行
+            rejectRecordExecutor(returnOrderCode);
+            return HttpResponse.success();
+        }
+        return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
     }
 
     @Override
@@ -80,17 +85,16 @@ public class RejectRecordServiceImpl implements RejectRecordService {
             @Override
             public void run() {
                 try {
-                    //添加退货单
-                    LOGGER.info("开始生成退供单&退供单明细，参数为：returnOrderCode{}", returnOrderCode);
                     Integer orderSynchroSuccess = OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode();
+                    //查询待ERP退货单，待生成爱亲退供单数据
                     ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndSuccess(orderSynchroSuccess, returnOrderCode);
                     if (returnOrderInfo != null) {
-                        LOGGER.info("生成退供单&退供单明细开始");
+                        LOGGER.info("根据ERP退货单生成爱亲退供单&爱亲退供单明细&修改ERP订单同步状态开始");
                         createRejectRecordService.addRejectRecord(returnOrderInfo);
-                        LOGGER.info("生成退供单&退供单明细结束");
+                        LOGGER.info("根据ERP退货单生成爱亲退供单&爱亲退供单明细&修改ERP订单同步状态结束");
 
                         //根据爱亲退供单，生成耘链退货单
-                        LOGGER.info("开始根据爱亲退供单，生成耘链退货单，参数为：returnOrderCode{}", returnOrderCode);
+                        LOGGER.info("根据爱亲退供单，生成耘链退货单开始，returnOrderCode{}", returnOrderCode);
                         createSaleOrder(returnOrderCode);
                         LOGGER.info("根据爱亲退供单，生成耘链退货单结束");
 
@@ -115,7 +119,6 @@ public class RejectRecordServiceImpl implements RejectRecordService {
      * @param returnOrderCode
      */
     private void createSaleOrder(String returnOrderCode) {
-        LOGGER.info("根据爱亲退供单，生成耘链退货单开始 returnOrderCode： " + returnOrderCode);
         try {
             //查询退供单
             ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(returnOrderCode);

@@ -17,6 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
+/**
+ * 采购单 实现类
+ */
 @Service
 public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CreatePurchaseOrderServiceImpl.class);
@@ -27,7 +30,6 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
     @Resource
     ErpOrderInfoDao erpOrderInfoDao;
 
-    //生成采购单
     @Override
     @Transactional
     public void addOrderAndDetail(ErpOrderInfo erpOrderInfo) {
@@ -85,10 +87,9 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
                 purchaseOrder.setUpdateByName(erpOrderInfo.getUpdateByName());//修改人名称
                 purchaseOrder.setCreateTime(erpOrderInfo.getCreateTime());//创建时间
                 purchaseOrder.setUpdateTime(erpOrderInfo.getUpdateTime());//修改时间
-                //生成采购单
+                //根据ERP订单生成爱亲采购单
                 purchaseOrderDao.insertSelective(purchaseOrder);
 
-                //生成采购商品信息
                 for (ErpOrderItem item : erpOrderInfo.getItemList()) {
                     PurchaseOrderDetail purchaseOrderDetail = new PurchaseOrderDetail();
                     purchaseOrderDetail.setPurchaseOrderDetailId(IdUtil.purchaseId());//业务id
@@ -126,17 +127,17 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
                     purchaseOrderDetail.setUpdateByName(item.getUpdateByName());//修改人名称
                     purchaseOrderDetail.setCreateTime(item.getCreateTime());//创建时间
                     purchaseOrderDetail.setUpdateTime(item.getUpdateTime());//修改时间
-                    //生成采购商品信息
+                    //根据ERP订单生成爱亲采购单明细
                     purchaseOrderDetailDao.insertSelective(purchaseOrderDetail);
                 }
                 //修改订单同步状态
                 erpOrderInfoDao.updateOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_SUCCESS.getCode(), erpOrderInfo.getOrderStoreCode());
             } else {
-                LOGGER.error("订单为空");
+                LOGGER.error("订单为空 erpOrderInfo {}"+erpOrderInfo);
                 throw new IllegalArgumentException();
             }
         } catch (Exception e) {
-            LOGGER.error("生成采购单异常" + e);
+            LOGGER.error("根据ERP订单生成爱亲采购单异常" + e);
             throw new RuntimeException();
         }
     }

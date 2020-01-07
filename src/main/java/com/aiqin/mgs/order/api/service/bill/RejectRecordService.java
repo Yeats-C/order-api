@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * 根据退货单，生成爱亲采购单 接口
+ * 爱亲退供单 接口
  */
 public interface RejectRecordService {
     /**
-     * 根据退货单，生成爱亲采购单
+     * 根据ERP退货单生成爱亲退供单
      * @return
      */
     HttpResponse createRejectRecord(String returnOrderCode);

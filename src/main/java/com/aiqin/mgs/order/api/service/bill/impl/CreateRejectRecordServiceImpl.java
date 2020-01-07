@@ -19,6 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.List;
 
+/**
+ * 退供单 实现类
+ */
 @Service
 public class CreateRejectRecordServiceImpl implements CreateRejectRecordService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CreateRejectRecordServiceImpl.class);
@@ -36,7 +39,6 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
     public void addRejectRecord(ReturnOrderInfo returnOrderInfo) {
         try {
             if (returnOrderInfo != null) {
-                //根据订单号查询为同步的订单
                 RejectRecord rejectRecord = new RejectRecord();
                 rejectRecord.setRejectRecordId(IdUtil.purchaseId());//业务id
                 rejectRecord.setRejectRecordCode(returnOrderInfo.getReturnOrderCode());//退供单号
@@ -82,10 +84,10 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
                 rejectRecord.setUpdateByName(returnOrderInfo.getUpdateByName());//修改人名称
                 rejectRecord.setCreateTime(returnOrderInfo.getCreateTime());//创建时间
                 rejectRecord.setUpdateTime(returnOrderInfo.getUpdateTime());//修改时间
-                //生成退供单
+                //根据ERP退货单生成爱亲退供单
                 rejectRecordDao.insertSelective(rejectRecord);
             } else {
-                LOGGER.error("退货单为空");
+                LOGGER.error("ERP退货单为空");
                 throw new IllegalArgumentException();
             }
             List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderInfo.getReturnOrderCode());
@@ -123,17 +125,17 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
                     rejectRecordDetail.setUpdateByName(returnOrderInfo.getUpdateByName());//修改人名称
                     rejectRecordDetail.setCreateTime(returnOrderInfo.getCreateTime());//创建时间
                     rejectRecordDetail.setUpdateTime(returnOrderInfo.getUpdateTime());//修改时间
-                    //生成退供单详情
+                    //根据ERP退货单生成爱亲退供单详情
                     rejectRecordDetailDao.insertSelective(rejectRecordDetail);
                 }
             } else {
-                LOGGER.error("退货单明细为空");
+                LOGGER.error("ERP退货单明细为空");
                 throw new IllegalArgumentException();
             }
             //修改退货单同步状态
             returnOrderInfoDao.updateOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode(), returnOrderInfo.getReturnOrderCode());
         } catch (Exception e) {
-            LOGGER.error("生成退供单异常" + e);
+            LOGGER.error("根据ERP退货单生成爱亲退供单异常" + e);
             throw new RuntimeException();
         }
     }

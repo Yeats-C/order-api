@@ -58,7 +58,7 @@ public class PurchaseOrderController {
      */
     @PostMapping("/cancel/info")
     @ApiOperation(value = "取消订单")
-    public HttpResponse updateCancelOrderinfo(@PathVariable(value = "order_storeCode") String orderStoreCode) {
+    public HttpResponse updateCancelOrderinfo(String orderStoreCode) {
         return purchaseOrderService.updateCancelOrderinfo(orderStoreCode);
     }
 }
