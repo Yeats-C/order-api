@@ -597,8 +597,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款
             if(null!=method&&method.equals(TreatmentMethodEnum.RETURN_AMOUNT_AND_GOODS_TYPE.getCode())){//RETURN_REFUND 退货退款
                 json.put("transactionType","RETURN_REFUND");
-            }else if(null!=method&&method.equals(TreatmentMethodEnum.RETURN_AMOUNT_TYPE.getCode())){//"REFUND_ONLY 仅退款
-                json.put("transactionType","REFUND_ONLY");
+            }else if(null!=method&&method.equals(TreatmentMethodEnum.RETURN_AMOUNT_TYPE.getCode())){//"DELIVER_GOODS_DEDUCT 仅退款--发货冲减
+                json.put("transactionType","DELIVER_GOODS_DEDUCT");
             }
             //订单类型 0直送、1配送、2辅采
             Integer type=returnOrderInfo.getOrderType();
