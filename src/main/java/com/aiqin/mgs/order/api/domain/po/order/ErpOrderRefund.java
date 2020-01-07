@@ -1,5 +1,7 @@
 package com.aiqin.mgs.order.api.domain.po.order;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -15,32 +17,59 @@ import java.util.Date;
 @Data
 public class ErpOrderRefund {
 
-    /***主键*/
+    @ApiModelProperty(value = "主键")
+    @JsonProperty("id")
     private Long id;
-    /***退款单id*/
+
+    @ApiModelProperty(value = "退款单id")
+    @JsonProperty("refund_id")
     private String refundId;
-    /***关联订单id*/
+
+    @ApiModelProperty(value = "关联订单id")
+    @JsonProperty("order_id")
     private String orderId;
-    /***退款金额*/
+
+    @ApiModelProperty(value = "关联支付单id")
+    @JsonProperty("pay_id")
+    private String payId;
+
+    @ApiModelProperty(value = "退款金额")
+    @JsonProperty("refund_fee")
     private BigDecimal refundFee;
-    /***退款状态*/
+
+    @ApiModelProperty(value = "退款状态")
+    @JsonProperty("refund_status")
     private Integer refundStatus;
-    /***退款开始时间*/
-    private Date refundStartTime;
-    /***退款结束时间*/
-    private Date refundEndTime;
-    /***创建时间*/
+
+    @ApiModelProperty(value = "退款类型")
+    @JsonProperty("refund_type")
+    private Integer refundType;
+
+    @ApiModelProperty(value = "创建时间")
+    @JsonProperty("create_time")
     private Date createTime;
-    /***创建人id*/
+
+    @ApiModelProperty(value = "创建人id")
+    @JsonProperty("create_by_id")
     private String createById;
-    /***创建人姓名*/
+
+    @ApiModelProperty(value = "创建人姓名")
+    @JsonProperty("create_by_name")
     private String createByName;
-    /***更新时间*/
+
+    @ApiModelProperty(value = "更新时间")
+    @JsonProperty("update_time")
     private Date updateTime;
-    /***修改人id*/
+
+    @ApiModelProperty(value = "修改人id")
+    @JsonProperty("update_by_id")
     private String updateById;
-    /***修改人姓名*/
+
+    @ApiModelProperty(value = "修改人姓名")
+    @JsonProperty("update_by_name")
     private String updateByName;
-    /***数据状态 1有效 0删除*/
+
+    @ApiModelProperty(value = "据状态 1有效 0删除")
+    @JsonProperty("status")
     private Integer status;
 }
