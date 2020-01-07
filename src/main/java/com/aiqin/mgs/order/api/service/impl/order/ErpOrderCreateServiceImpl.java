@@ -89,8 +89,6 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      */
     private ErpOrderInfo saveOrder(ErpOrderSaveRequest erpOrderSaveRequest, AuthToken auth) {
 
-        erpOrderSaveRequest.setStoreId("AB988458F192C747478210CC01D4D4135C");
-
         //获取门店信息
         StoreInfo storeInfo = erpOrderRequestService.getStoreInfoByStoreId(erpOrderSaveRequest.getStoreId());
         //获取购物车商品
@@ -112,7 +110,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //保存订单、订单明细、订单支付、订单收货人信息、订单日志
         String orderId = insertOrder(order, storeInfo, auth, erpOrderSaveRequest);
         //删除购物车商品
-//        deleteOrderProductFromCart(erpOrderSaveRequest.getStoreId(), storeCartProduct);
+        deleteOrderProductFromCart(erpOrderSaveRequest.getStoreId(), storeCartProduct);
 
         //锁库存
         if (processTypeEnum.isLockStock()) {
