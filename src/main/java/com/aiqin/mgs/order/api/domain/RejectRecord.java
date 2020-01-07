@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -73,15 +74,15 @@ public class RejectRecord {
     private String districtName;
     @ApiModelProperty(value = "收货地址")
     private String receiveAddress;
-    @ApiModelProperty(value = "预计发货时间",example = "2001-01-01 01:01:01")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date preExpectTime;
-    @ApiModelProperty(value = "有效期",example = "2001-01-01 01:01:01")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date validTime;
-    @ApiModelProperty(value = "出库时间",example = "2001-01-01 01:01:01")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date outStockTime;
-    @ApiModelProperty(value = "发运时间",example = "2001-01-01 01:01:01")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date deliveryTime;
-    @ApiModelProperty(value = "完成时间",example = "2001-01-01 01:01:01")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date finishTime;
     @ApiModelProperty(value = "备注")
     private String remark;
@@ -99,8 +100,8 @@ public class RejectRecord {
     private String updateById;
     @ApiModelProperty(value = "修改人名称")
     private String updateByName;
-    @ApiModelProperty(value = "创建时间",example = "2001-01-01 01:01:01")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
-    @ApiModelProperty(value = "修改时间",example = "2001-01-01 01:01:01")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 }

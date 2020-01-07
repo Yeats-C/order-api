@@ -19,4 +19,11 @@ public interface RejectRecordDao {
     int updateByPrimaryKeySelective(RejectRecord record);
 
     int updateByPrimaryKey(RejectRecord record);
+
+    /**
+     * 修改退货单
+     * @param rejectRecord
+     * @return
+     */
+    int updateByReturnOrderCode(RejectRecord rejectRecord);
 }

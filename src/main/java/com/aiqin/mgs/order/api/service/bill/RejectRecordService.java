@@ -23,5 +23,5 @@ public interface RejectRecordService {
      * @param returnDLReq
      * @return
      */
-    HttpResponse selectPurchaseInfo(ReturnDLReq returnDLReq);
+    Boolean selectPurchaseInfo(ReturnDLReq returnDLReq);
 }
