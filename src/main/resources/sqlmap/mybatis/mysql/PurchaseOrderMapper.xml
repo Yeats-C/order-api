@@ -644,4 +644,9 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  <update id="updateByorderStoreCode" parameterType="com.aiqin.mgs.order.api.domain.PurchaseOrder">
+    update purchase_order
+    set purchase_order_status = #{purchaseOrderStatus,jdbcType=INTEGER}
+    where purchase_order_code = #{purchaseOrderCode,jdbcType=VARCHAR}
+  </update>
 </mapper>
