@@ -551,11 +551,13 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
         BigDecimal couponPayFee = BigDecimal.ZERO;
         //需要余额支付的金额
         BigDecimal balancePayFee = orderLogistics.getLogisticsFee().subtract(couponPayFee);
-
         orderLogistics.setCouponPayFee(couponPayFee);
         orderLogistics.setBalancePayFee(balancePayFee);
+
+        List<ErpOrderInfo> logisticsOrderList = erpOrderQueryService.getOrderByLogisticsId(orderLogistics.getLogisticsId());
+
         //调用支付中心接口发起支付
-        boolean flag = erpOrderRequestService.sendLogisticsPayRequest(order, orderLogistics);
+        boolean flag = erpOrderRequestService.sendLogisticsPayRequest(order, logisticsOrderList, orderLogistics, auth);
         if (flag) {
             String payId = OrderPublic.getUUID();
 

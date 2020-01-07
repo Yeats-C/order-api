@@ -3,19 +3,26 @@ package com.aiqin.mgs.order.api.service.impl.order;
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
-import com.aiqin.mgs.order.api.component.enums.*;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderCategoryEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderLockStockTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderNodeProcessTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.*;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.ProductInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
-import com.aiqin.mgs.order.api.domain.po.order.*;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.domain.request.order.PayRequest;
-import com.aiqin.mgs.order.api.domain.response.ProductSkuDetailResponse;
-import com.aiqin.mgs.order.api.domain.response.order.*;
+import com.aiqin.mgs.order.api.domain.response.order.ErpOrderGoodsCouponResponse;
+import com.aiqin.mgs.order.api.domain.response.order.ErpOrderItemSplitGroupResponse;
+import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
+import com.aiqin.mgs.order.api.domain.response.order.StoreFranchiseeInfoResponse;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
-import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +31,9 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
@@ -194,6 +203,8 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
         boolean flag = true;
         try {
 
+            //TODO 按照明细解锁，未完成
+
 //            List<Map<String, Object>> list = new ArrayList<>();
 //            for (ErpOrderItem item :
 //                    order.getItemList()) {
@@ -232,7 +243,6 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             paramMap.put("order_type", 3);
             paramMap.put("detail_list", list);
 
-            System.out.println(JSON.toJSON(paramMap));
 
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/change/stock").json(paramMap);
             HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
@@ -302,7 +312,6 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 //            httpClient.addParameter("orderNo", orderCode);
 //            HttpResponse<ErpPayPollingResponse> httpResponse = httpClient.action().result(new TypeReference<HttpResponse<ErpPayPollingResponse>>() {
 //            });
-//
 //            if (RequestReturnUtil.validateHttpResponse(httpResponse)) {
 //                ErpPayPollingResponse data = httpResponse.getData();
 //                payStatusResponse.setRequestSuccess(true);
@@ -337,24 +346,24 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             payStatusResponse.setPayStatusEnum(ErpPayStatusEnum.SUCCESS);
 
             //请求支付中心接口查询订单支付状态
-            HttpClient httpClient = HttpClient.get(urlProperties.getPaymentApi() + "/payment/pay/searchPayOrder");
-            httpClient.addParameter("orderNo", logisticsCode);
-            HttpResponse<ErpPayPollingResponse> httpResponse = httpClient.action().result(new TypeReference<HttpResponse<ErpPayPollingResponse>>() {
-            });
-
-            if (RequestReturnUtil.validateHttpResponse(httpResponse)) {
-                ErpPayPollingResponse data = httpResponse.getData();
-                payStatusResponse.setRequestSuccess(true);
-                ErpPayPollingBackStatusEnum payPollingBackStatusEnum = ErpPayPollingBackStatusEnum.getEnum(data.getOrderStatus());
-                if (payPollingBackStatusEnum == ErpPayPollingBackStatusEnum.STATUS_1) {
-                    payStatusResponse.setPayStatusEnum(ErpPayStatusEnum.SUCCESS);
-                    payStatusResponse.setPayCode(data.getPayNum());
-                } else if (payPollingBackStatusEnum == ErpPayPollingBackStatusEnum.STATUS_0) {
-                    payStatusResponse.setPayStatusEnum(ErpPayStatusEnum.PAYING);
-                } else {
-                    payStatusResponse.setPayStatusEnum(ErpPayStatusEnum.FAIL);
-                }
-            }
+//            HttpClient httpClient = HttpClient.get(urlProperties.getPaymentApi() + "/payment/pay/searchPayOrder");
+//            httpClient.addParameter("orderNo", logisticsCode);
+//            HttpResponse<ErpPayPollingResponse> httpResponse = httpClient.action().result(new TypeReference<HttpResponse<ErpPayPollingResponse>>() {
+//            });
+//
+//            if (RequestReturnUtil.validateHttpResponse(httpResponse)) {
+//                ErpPayPollingResponse data = httpResponse.getData();
+//                payStatusResponse.setRequestSuccess(true);
+//                ErpPayPollingBackStatusEnum payPollingBackStatusEnum = ErpPayPollingBackStatusEnum.getEnum(data.getOrderStatus());
+//                if (payPollingBackStatusEnum == ErpPayPollingBackStatusEnum.STATUS_1) {
+//                    payStatusResponse.setPayStatusEnum(ErpPayStatusEnum.SUCCESS);
+//                    payStatusResponse.setPayCode(data.getPayNum());
+//                } else if (payPollingBackStatusEnum == ErpPayPollingBackStatusEnum.STATUS_0) {
+//                    payStatusResponse.setPayStatusEnum(ErpPayStatusEnum.PAYING);
+//                } else {
+//                    payStatusResponse.setPayStatusEnum(ErpPayStatusEnum.FAIL);
+//                }
+//            }
 
         } catch (Exception e) {
             logger.error("获取订单物流费支付状态失败：{}", e);
@@ -369,110 +378,117 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
             ErpOrderTypeEnum orderTypeEnum = ErpOrderTypeEnum.getEnum(order.getOrderTypeCode());
             ErpOrderCategoryEnum orderCategoryEnum = ErpOrderCategoryEnum.getEnum(order.getOrderCategoryCode());
-//            PayRequest payRequest = new PayRequest();
-//            payRequest.setOrderNo(order.getOrderStoreCode());
-//            payRequest.setOrderAmount(Long.valueOf(orderFee.getPayMoney().multiply(new BigDecimal(100)).setScale(0, RoundingMode.DOWN).toString()));
-//            payRequest.setFee(0L);
-//            payRequest.setOrderTime(order.getCreateTime());
-//            payRequest.setPayType(ErpRequestPayTypeEnum.PAY_10.getCode());
-//            payRequest.setOrderSource(ErpRequestPayOrderSourceEnum.WEB.getCode());
-//            payRequest.setCreateBy(order.getCreateById());
-//            payRequest.setCreateName(order.getCreateByName());
-//
-//            payRequest.setPayOriginType(orderTypeEnum.getPayOriginType());
-//            payRequest.setOrderType(ErpRequestPayOperationTypeEnum.TYPE_2.getCode());
-//            payRequest.setFranchiseeId(order.getFranchiseeId());
-//            payRequest.setStoreName(order.getStoreName());
-//            payRequest.setStoreId(order.getStoreId());
-//            payRequest.setTransactionType(orderCategoryEnum.getPayTransactionTypeEnum().getValue());
-//            payRequest.setPayOrderType(orderTypeEnum.getPayOrderType());
-//            payRequest.setBackUrl("/erpOrderPayController/orderPayCallback");
-
+            ErpOrderNodeProcessTypeEnum processTypeEnum = ErpOrderNodeProcessTypeEnum.getEnum(order.getOrderTypeCode(), order.getOrderCategoryCode());
             PayRequest payRequest = new PayRequest();
             payRequest.setOrderNo(order.getOrderStoreCode());
-            payRequest.setOrderAmount(1L);
+            payRequest.setOrderAmount(Long.valueOf(orderFee.getPayMoney().multiply(new BigDecimal(100)).setScale(0, RoundingMode.DOWN).toString()));
             payRequest.setFee(0L);
-            payRequest.setOrderTime(new Date());
-            payRequest.setPayType(10);
-            payRequest.setOrderSource(0);
-            payRequest.setCreateBy("13140");
-            payRequest.setCreateName("张富月");
+            payRequest.setOrderTime(order.getCreateTime());
+            payRequest.setPayType(ErpRequestPayTypeEnum.PAY_10.getCode());
+            payRequest.setOrderSource(ErpRequestPayOrderSourceEnum.WEB.getCode());
+            payRequest.setCreateBy(order.getCreateById());
+            payRequest.setCreateName(order.getCreateByName());
 
-            payRequest.setPayOriginType(orderTypeEnum.getPayOriginType());
-            payRequest.setOrderType(2);
-            payRequest.setFranchiseeId("BGF0A27812BD8E450CB51D1AC81F3FE5F5");
-            payRequest.setStoreName("tob门店配送账户充值测试");
-            payRequest.setStoreId("tobtranspaytest");
-            payRequest.setTransactionType("STORE_RECHARGE");
-            payRequest.setPayOrderType(2);
+            payRequest.setPayOriginType(orderTypeEnum.getPayOriginType().getCode());
+            payRequest.setOrderType(ErpRequestPayOperationTypeEnum.TYPE_2.getCode());
+            payRequest.setFranchiseeId(order.getFranchiseeId());
+            payRequest.setStoreName(order.getStoreName());
+            payRequest.setStoreId(order.getStoreId());
+            payRequest.setTransactionType(processTypeEnum.getPayTransactionTypeEnum().getValue());
+            payRequest.setPayOrderType(orderTypeEnum.getPayOrderType().getCode());
             payRequest.setBackUrl(urlProperties.getOrderApi() + "/erpOrderPayController/orderPayCallback");
 
-            System.out.println(JSON.toJSON(payRequest));
+//            PayRequest payRequest = new PayRequest();
+//            payRequest.setOrderNo(order.getOrderStoreCode());
+//            payRequest.setOrderAmount(1L);
+//            payRequest.setFee(0L);
+//            payRequest.setOrderTime(new Date());
+//            payRequest.setPayType(10);
+//            payRequest.setOrderSource(0);
+//            payRequest.setCreateBy("13140");
+//            payRequest.setCreateName("张富月");
+//
+//            payRequest.setPayOriginType(orderTypeEnum.getPayOriginType().getCode());
+//            payRequest.setOrderType(2);
+//            payRequest.setFranchiseeId("BGF0A27812BD8E450CB51D1AC81F3FE5F5");
+//            payRequest.setStoreName("tob门店配送账户充值测试");
+//            payRequest.setStoreId("tobtranspaytest");
+//            payRequest.setTransactionType("STORE_RECHARGE");
+//            payRequest.setPayOrderType(2);
+//            payRequest.setBackUrl(urlProperties.getOrderApi() + "/erpOrderPayController/orderPayCallback");
 
-            //请求支付中心接口查询订单支付状态
+            //请求支付中心接口查询订单支付状态 TODO 临时屏蔽
 //            HttpClient httpClient = HttpClient.post(urlProperties.getPaymentApi() + "/payment/pay/payTobAll").json(payRequest);
 //            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
 //            });
-
-//            System.out.println(JSON.toJSON(response));
+//
 //            if (!RequestReturnUtil.validateHttpResponse(response)) {
 //                throw new BusinessException("发起支付失败：" + response.getMessage());
 //            }
         } catch (BusinessException e) {
             flag = false;
             logger.error("发起支付失败：{}", e.getMessage());
-//            throw new BusinessException(e.getMessage());
+            throw new BusinessException("发起支付失败:" + e.getMessage());
         } catch (Exception e) {
             flag = false;
             logger.error("发起支付失败：{}", e);
-//            throw new BusinessException("发起支付失败");
+            throw new BusinessException("发起支付失败");
         }
         return flag;
     }
 
     @Override
-    public boolean sendLogisticsPayRequest(ErpOrderInfo order, ErpOrderLogistics orderLogistics) {
+    public boolean sendLogisticsPayRequest(ErpOrderInfo order, List<ErpOrderInfo> orderList, ErpOrderLogistics orderLogistics, AuthToken auth) {
         boolean flag = true;
         try {
 
+            //订单号
+            String collect = orderList.stream().map(ErpOrderInfo::getOrderStoreCode).collect(Collectors.joining(","));
+
             ErpOrderTypeEnum orderTypeEnum = ErpOrderTypeEnum.getEnum(order.getOrderTypeCode());
-            ErpOrderCategoryEnum orderCategoryEnum = ErpOrderCategoryEnum.getEnum(order.getOrderCategoryCode());
             PayRequest payRequest = new PayRequest();
             payRequest.setOrderNo(orderLogistics.getLogisticsCode());
-            payRequest.setOrderAmount(Long.valueOf(orderLogistics.getLogisticsFee().multiply(new BigDecimal(100)).setScale(0, RoundingMode.DOWN).toString()));
+            payRequest.setOrderAmount(Long.valueOf(orderLogistics.getBalancePayFee().multiply(new BigDecimal(100)).setScale(0, RoundingMode.DOWN).toString()));
             payRequest.setFee(0L);
             payRequest.setOrderTime(orderLogistics.getCreateTime());
             payRequest.setPayType(ErpRequestPayTypeEnum.PAY_10.getCode());
             payRequest.setOrderSource(ErpRequestPayOrderSourceEnum.WEB.getCode());
             payRequest.setCreateBy(order.getCreateById());
             payRequest.setCreateName(order.getCreateByName());
-
             payRequest.setPayOriginType(ErpRequestPayOriginTypeEnum.TYPE_24.getCode());
             payRequest.setOrderType(ErpRequestPayOperationTypeEnum.TYPE_2.getCode());
-//            payRequest.setFranchiseeId("BG895ED81C04D445EE9CB554945098922B");
             payRequest.setFranchiseeId(order.getFranchiseeId());
             payRequest.setStoreName(order.getStoreName());
-//            payRequest.setStoreId("AB988458F192C747478210CC01D4D4135C");
             payRequest.setStoreId(order.getStoreId());
-            payRequest.setTransactionType("LOGISTICS_PAYMENT");
-            payRequest.setPayOrderType(orderTypeEnum.getPayOrderType());
+            payRequest.setTransactionType(ErpRequestPayTransactionTypeEnum.LOGISTICS_PAYMENT.getValue());
+            payRequest.setPayOrderType(orderTypeEnum.getPayOrderType().getCode());
             payRequest.setBackUrl(urlProperties.getOrderApi() + "/erpOrderPayController/orderLogisticsPayCallback");
 
+            //支付物流费用所需参数
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            payRequest.setCouponPaymentAmount(Long.valueOf(orderLogistics.getCouponPayFee().multiply(new BigDecimal(100)).setScale(0, RoundingMode.DOWN).toString()));
+            payRequest.setLogisticsCompany(orderLogistics.getLogisticsCentreName());
+            payRequest.setPaymentFreightName(auth.getPersonName());
+            payRequest.setRelationOrderCode(collect);
+            payRequest.setPaymentFreightTime(sdf.format(new Date()));
+            payRequest.setStoreCode(order.getStoreCode());
+            payRequest.setPaymentFreightAmount(Long.valueOf(orderLogistics.getLogisticsFee().multiply(new BigDecimal(100)).setScale(0, RoundingMode.DOWN).toString()));
 
-            //请求支付中心接口查询订单支付状态
+            //请求支付中心接口查询订单支付状态 TODO 临时屏蔽
 //            HttpClient httpClient = HttpClient.post(urlProperties.getPaymentApi() + "/payment/pay/payTobAll").json(payRequest);
 //            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
 //            });
 //            if (!RequestReturnUtil.validateHttpResponse(response)) {
 //                throw new BusinessException("发起支付失败：" + response.getMessage());
 //            }
+
         } catch (BusinessException e) {
             flag = false;
-            logger.error("发起支付失败：{}", e.getMessage());
+            logger.error("发起支付物流费失败：{}", e.getMessage());
             throw new BusinessException("发起支付失败：" + e.getMessage());
         } catch (Exception e) {
             flag = false;
-            logger.error("发起支付失败：{}", e);
+            logger.error("发起支付物流费失败：{}", e);
             throw new BusinessException("发起支付失败");
         }
         return flag;
@@ -541,9 +557,6 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             paramMap.put("order_code", "1234567");
             paramMap.put("detail_list", paramList);
 
-            System.out.println(JSON.toJSON(paramMap));
-
-
             //获取商品库房分组
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/product/warehouse/info").json(paramMap);
             HttpResponse<List<ErpOrderItemSplitGroupResponse>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ErpOrderItemSplitGroupResponse>>>() {
@@ -555,22 +568,6 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             logger.error("获取商品库存仓库分组失败：{}", e);
         }
         return list;
-    }
-
-    @Override
-    public boolean sendSplitOrderToSupplyChain(ErpOrderInfo order, List<ErpOrderInfo> splitOrderList) {
-        boolean flag = false;
-        try {
-            //TODO CT 推送拆分后的订单到供应链
-//            Map<String, Object> paramMap = new HashMap<>();
-//            HttpClient httpClient = HttpClient.post(urlProperties.getPaymentApi() + "/test").json(paramMap);
-//            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
-//            });
-            flag = true;
-        } catch (Exception e) {
-            logger.error("推送供应链失败：{}", e);
-        }
-        return flag;
     }
 
     @Override
@@ -656,7 +653,6 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                     .addParameter("dest_code", destCode);
             HttpResponse response = httpClient.action().result(new TypeReference<HttpResponse>() {
             });
-            System.out.println(JSON.toJSON(response));
         } catch (Exception e) {
             logger.error("修改门店营业状态失败：{}", e);
         }

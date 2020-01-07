@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.component.enums;
 
+import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOrderTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOriginTypeEnum;
 import lombok.Getter;
 
@@ -14,21 +15,21 @@ import lombok.Getter;
 public enum ErpOrderTypeEnum {
 
     /***直送*/
-    DIRECT_SEND(1, "1", "直送", 11, 2),
+    DIRECT_SEND(1, "1", "直送", ErpRequestPayOriginTypeEnum.TYPE_11, ErpRequestPayOrderTypeEnum.TYPE_2),
     /***配送*/
-    DISTRIBUTION(2, "2", "配送", 7, 14),
+    DISTRIBUTION(2, "2", "配送", ErpRequestPayOriginTypeEnum.TYPE_7, ErpRequestPayOrderTypeEnum.TYPE_14),
     /***辅采直送*/
-    ASSIST_PURCHASING(3, "3", "辅采直送", 7, 14);
+    ASSIST_PURCHASING(3, "3", "辅采直送", ErpRequestPayOriginTypeEnum.TYPE_7, ErpRequestPayOrderTypeEnum.TYPE_14);
 
     private Integer code;
     private String value;
     private String desc;
     /***发起支付参数支付来源*/
-    private Integer payOriginType;
+    private ErpRequestPayOriginTypeEnum payOriginType;
     /***发起支付参数订单类型*/
-    private Integer payOrderType;
+    private ErpRequestPayOrderTypeEnum payOrderType;
 
-    ErpOrderTypeEnum(Integer code, String value, String desc, Integer payOriginType, Integer payOrderType) {
+    ErpOrderTypeEnum(Integer code, String value, String desc, ErpRequestPayOriginTypeEnum payOriginType, ErpRequestPayOrderTypeEnum payOrderType) {
         this.code = code;
         this.value = value;
         this.desc = desc;

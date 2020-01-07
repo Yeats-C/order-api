@@ -51,7 +51,7 @@ public interface ErpOrderRequestService {
      * @version: v1.0.0
      * @date 2019/12/10 13:38
      */
-    boolean lockStockInSupplyChain(ErpOrderInfo order,List<ErpOrderItem> itemList, AuthToken auth);
+    boolean lockStockInSupplyChain(ErpOrderInfo order, List<ErpOrderItem> itemList, AuthToken auth);
 
     /**
      * 解锁库存（根据明细解锁）
@@ -113,16 +113,18 @@ public interface ErpOrderRequestService {
     boolean sendOrderPayRequest(ErpOrderInfo order, ErpOrderFee orderFee);
 
     /**
-     * 发起支付物流费用申请
+     * 发起物流费支付请求
      *
-     * @param order
-     * @param orderLogistics
+     * @param order          基数据订单
+     * @param orderList      物流单关联的全部订单
+     * @param orderLogistics 物流单
+     * @param auth           操作人
      * @return boolean
      * @author: Tao.Chen
      * @version: v1.0.0
-     * @date 2019/12/10 15:45
+     * @date 2020/1/7 10:13
      */
-    boolean sendLogisticsPayRequest(ErpOrderInfo order, ErpOrderLogistics orderLogistics);
+    boolean sendLogisticsPayRequest(ErpOrderInfo order, List<ErpOrderInfo> orderList, ErpOrderLogistics orderLogistics, AuthToken auth);
 
     /**
      * 支付成功获取返还物流券金额
@@ -145,18 +147,6 @@ public interface ErpOrderRequestService {
      * @date 2019/12/2 15:48
      */
     List<ErpOrderItemSplitGroupResponse> getRepositorySplitGroup(ErpOrderInfo order);
-
-    /**
-     * 推送拆分后的订单到供应链
-     *
-     * @param order
-     * @param splitOrderList
-     * @return boolean
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/12/3 17:26
-     */
-    boolean sendSplitOrderToSupplyChain(ErpOrderInfo order, List<ErpOrderInfo> splitOrderList);
 
     /**
      * 请求供应链取消订单
@@ -232,6 +222,7 @@ public interface ErpOrderRequestService {
 
     /**
      * 首单，修改门店状态
+     *
      * @param storeId
      * @param s
      */
