@@ -366,13 +366,15 @@ public class CartOrderServiceImpl implements CartOrderService {
                 List<CartOrderInfo> cartOrderInfos = cartOrderDao.selectCartByLineCheckStatus(cartOrderInfo);
                 //封装返回的勾选的商品信息
                 orderConfirmResponse.setCartOrderInfos(cartOrderInfos);
+                orderConfirmResponse.setHaveProductA(0);
+
                 //计算订货金额合计
                 BigDecimal orderTotalPrice = new BigDecimal(0);
                 for (CartOrderInfo cartOrderInfo1 : cartOrderInfos) {
                     BigDecimal total = cartOrderInfo1.getPrice().multiply(new BigDecimal(cartOrderInfo1.getAmount()));
                     orderTotalPrice = orderTotalPrice.add(total);
                     //TODO 判断商品为A类以上商品 此处最好是按照字典表接口比对，防止供应链更改类型code
-                    if(cartOrderInfo1.getProductPropertyCode()=="1" ||cartOrderInfo1.getProductPropertyCode()=="6"){//A品与A+品
+                    if(cartOrderInfo1.getProductPropertyCode().equals("1") ||cartOrderInfo1.getProductPropertyCode().equals("6")){//A品与A+品
                         orderConfirmResponse.setHaveProductA(1);
                         priceProductA=priceProductA.add(cartOrderInfo1.getPrice());
                     }
