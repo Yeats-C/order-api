@@ -380,11 +380,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         return flag;
     }
 
-//    @Override
-//    public Boolean updateOrderSuccessApi(String returnOrderCode) {
-//        //return returnOrderInfoDao.updateOrderSuccess(returnOrderCode)>0;
-//        return false;
-//    }
+    @Override
+    public Boolean updateOrderSuccessApi(String returnOrderCode) {
+        //return returnOrderInfoDao.updateOrderSuccess(returnOrderCode)>0;
+        return false;
+    }
 
     @Override
     public Boolean check(String orderCode) {
