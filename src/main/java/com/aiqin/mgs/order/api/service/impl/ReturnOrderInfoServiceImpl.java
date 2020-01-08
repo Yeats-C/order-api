@@ -151,7 +151,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         body.put("create_time",new Date());
         body.put("order_code",record.getOrderStoreCode());
         body.put("order_return_code", afterSaleCode);
-        body.put("order_return_id", returnOrderId);
+//        body.put("order_return_id", returnOrderId);
         body.put("store_id",record.getStoreId());
 //        OrderReturnReq orr=new OrderReturnReq();
 //        orr.setCreateById(reqVo.getCreateById());
@@ -176,13 +176,13 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 //            orpr.setCreateByName(reqVo.getCreateByName());
 //            orpr.setCreateTime(new Date());
             Map<String,Object> map=new HashMap<>();
-            map.put("order_return_id",orderReturnId);
-            map.put("order_return_code",orderReturnCode);
+//            map.put("order_return_id",orderReturnId);
+//            map.put("order_return_code",orderReturnCode);
             map.put("sku_code",skuCode);
             map.put("return_quantity",returnQuantity);
             map.put("create_by_id",reqVo.getCreateById());
             map.put("create_by_name",reqVo.getCreateByName());
-            map.put("create_time",new Date());
+//            map.put("create_time",new Date());
             list.add(map);
         }
         body.put("order_return_product_reqs",list);
