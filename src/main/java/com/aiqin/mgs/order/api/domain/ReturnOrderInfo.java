@@ -1,6 +1,5 @@
 package com.aiqin.mgs.order.api.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import io.swagger.annotations.ApiModel;
@@ -143,7 +142,7 @@ public class ReturnOrderInfo {
     private Date receiveTime;
 
     @ApiModelProperty(value = "商品数量")
-    @JsonProperty("product_count")
+//    @JsonProperty("product_count")
     private Long productCount;
 
     @ApiModelProperty(value = "有效期",example = "2001-01-01 01:01:01")
