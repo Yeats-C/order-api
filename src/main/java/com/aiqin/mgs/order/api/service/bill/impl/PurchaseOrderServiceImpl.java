@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.*;
@@ -90,7 +91,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 orderDeliverItemList.add(orderDeliverItem);
             }
             erpOrderDeliverRequest.setItemList(orderDeliverItemList);
-            //erpOrderDeliverService.orderDeliver(erpOrderDeliverRequest);
+            erpOrderDeliverService.orderDeliver(erpOrderDeliverRequest);
 
             //更新采购单
             PurchaseOrder purchaseOrder = new PurchaseOrder();
@@ -140,11 +141,12 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         try {
             ErpOrderTransportRequest orderTransport = new ErpOrderTransportRequest();
             ErpOrderTransportLogisticsRequest logistics = new ErpOrderTransportLogisticsRequest();
-            logistics.setLogisticsCode(deliveryInfoVo.getTransportCompanyCode());
-            logistics.setLogisticsCentreCode(deliveryInfoVo.getCustomerCode());
-            logistics.setLogisticsCentreName(deliveryInfoVo.getCustomerName());
-            logistics.setSendRepertoryCode(deliveryInfoVo.getTransportCenterCode());
-            logistics.setSendRepertoryName(deliveryInfoVo.getTransportCenterName());
+            logistics.setLogisticsCode(deliveryInfoVo.getTransportCompanyCode());//物流单号
+            logistics.setLogisticsCentreCode(deliveryInfoVo.getCustomerCode());//物流公司编码
+            logistics.setLogisticsCentreName(deliveryInfoVo.getCustomerName());//物流公司名称
+            logistics.setSendRepertoryCode(deliveryInfoVo.getTransportCenterCode());//发货仓库编码
+            logistics.setSendRepertoryName(deliveryInfoVo.getTransportCenterName());//发货仓库名称
+            logistics.setLogisticsFee(deliveryInfoVo.getTransportAmount());//物流费用
             orderTransport.setLogistics(logistics);//物流信息 不需要物流单的订单不需要传
             orderTransport.setTransportTime(deliveryInfoVo.getTransportDate());//发运时间
             //orderTransport.setDistributionModeCode(deliveryInfoVo.getDistributionModeCode());//配送方式编码
@@ -152,6 +154,12 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             orderTransport.setPersonId(deliveryInfoVo.getCustomerCode());
             orderTransport.setPersonName(deliveryInfoVo.getCustomerName());
             orderTransport.setTransportStatus(deliveryInfoVo.getTransportStatus());
+            List<String> listDeliveryDetail = new ArrayList<>();
+            deliveryInfoVo.getDeliveryDetail();
+            for(DeliveryDetailInfo deliveryDetails : deliveryInfoVo.getDeliveryDetail()){
+                listDeliveryDetail.add(deliveryDetails.getOrderCode());
+            }
+            orderTransport.setOrderCodeList(listDeliveryDetail);
             //orderTransport.setOrderCodeList(deliveryInfoVo.getTransportCode());//该物流单关联的订单，必须是同一个加盟商，同一个类型的订单
             erpOrderDeliverService.orderTransport(orderTransport);
             return HttpResponse.success();
