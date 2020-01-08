@@ -559,6 +559,7 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
   <update id="updateByReturnOrderCode" parameterType="com.aiqin.mgs.order.api.domain.RejectRecord">
     update reject_record
     <set>
@@ -697,4 +698,46 @@
     </set>
     where reject_record_code = #{rejectRecordCode,jdbcType=VARCHAR}
   </update>
+
+  <select id="selectByRequest" parameterType="com.aiqin.mgs.order.api.domain.request.RejectRequest" resultMap="BaseResultMap">
+        select * from reject_record
+    <where>
+      <if test="rejectRecordStatus!=null">
+        and reject_record_status=#{rejectRecordStatus,jdbcType=INTEGER}
+      </if>
+      <if test="purchaseGroupName!=null and purchaseGroupName!=''">
+        and purchase_group_name=#{rejectRecordCode,jdbcType=VARCHAR}
+      </if>
+      <if test="rejectRecordCode!=null and rejectRecordCode!=''">
+        and reject_record_code=#{rejectRecordCode,jdbcType=VARCHAR}
+      </if>
+      <if test="beginTime!=null and beginTime!=''">
+        and create_time &gt;= #{beginTime}
+      </if>
+      <if test="finishTime!=null and finishTime!=''">
+        and create_time &lt;= #{finishTime}
+      </if>
+      <if test="supplierName!=null and supplierName!=''">
+        and supplier_name =#{supplierName}
+      </if>
+      <if test="transportCenterName!=null and transportCenterName!=''">
+        and transport_center_name =#{transportCenterName}
+      </if>
+      <if test="warehouseName!=null and warehouseName!=''">
+        and warehouse_name =#{warehouseName}
+      </if>
+      <if test="companyCode!=null and companyCode!=''">
+        and company_code =#{companyCode}
+      </if>
+    </where>
+  </select>
+  <select id="selectByRejectRecordCode" resultMap="BaseResultMap">
+    select * from
+    reject_record
+    <where>
+      <if test="rejectRecordCode!=null and rejectRecordCode!=''">
+        and reject_record_code=#{rejectRecordCode,jdbcType=VARCHAR}
+      </if>
+    </where>
+  </select>
 </mapper>

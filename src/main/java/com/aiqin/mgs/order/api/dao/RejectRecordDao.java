@@ -1,13 +1,15 @@
 package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.RejectRecord;
+import com.aiqin.mgs.order.api.domain.request.RejectRequest;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface RejectRecordDao {
     int deleteByPrimaryKey(Long id);
 
     int insert(RejectRecord record);
-
-    RejectRecord selectByPrimaryKey(Long id);
 
     int updateByPrimaryKeySelective(RejectRecord record);
 
@@ -26,4 +28,10 @@ public interface RejectRecordDao {
      * @return
      */
     int updateByReturnOrderCode(RejectRecord rejectRecord);
+
+    RejectRecord selectByPrimaryKey(Long id);
+
+    List<RejectRecord> selectByRequest(RejectRequest rejectRequest);
+
+    RejectRecord selectByRejectRecordCode(@Param("rejectRecordCode")String rejectRecordCode);
 }

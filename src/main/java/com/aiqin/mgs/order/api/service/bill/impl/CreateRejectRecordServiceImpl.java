@@ -70,7 +70,7 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
                 rejectRecord.setDistrictName(returnOrderInfo.getDistrictName());//收货区域 :区/县
                 rejectRecord.setReceiveAddress(returnOrderInfo.getReceiveAddress());//收货地址
                 rejectRecord.setPreExpectTime(returnOrderInfo.getPreExpectTime());//预计发货时间
-                rejectRecord.setValidTime(returnOrderInfo.getValidTime());//有效期
+                rejectRecord.setValidTime(returnOrderInfo.getReviewTime());//有效期
                 rejectRecord.setOutStockTime(returnOrderInfo.getOutStockTime());//出库时间
                 rejectRecord.setDeliveryTime(returnOrderInfo.getDeliveryTime());//发运时间
                 rejectRecord.setFinishTime(returnOrderInfo.getFinishTime());//完成时间

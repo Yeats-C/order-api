@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.RejectRecordDetail;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -21,4 +22,6 @@ public interface RejectRecordDetailDao {
     int updateByPrimaryKeySelective(RejectRecordDetail record);
 
     int updateByPrimaryKey(RejectRecordDetail record);
+
+    List<RejectRecordDetail> selectByRejectRecordCode(@Param("rejectRecordCode") String rejectRecordCode);
 }

@@ -56,7 +56,7 @@ public interface ReturnOrderInfoService {
      * @param returnOrderCode
      * @return
      */
-    Boolean updateOrderSuccessApi(String returnOrderCode);
+    //Boolean updateOrderSuccessApi(String returnOrderCode);
 
     /**
      * 退货单校验--查看此订单是否已经生成一条退货单，且流程未结束。如果已存在返回true

@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 @Component
@@ -136,7 +137,6 @@ public class OssUtil {
         throw new Exception(ce.getErrorMessage(), ce);
     }
 
-
     public static void putObject(OSSClient client, PutObjectRequest putObjectRequest) throws Exception, IOException {
         try {
             try {
@@ -144,7 +144,11 @@ public class OssUtil {
                 PutObjectResult putObjectResult = client.putObject(putObjectRequest);
                 if (putObjectRequest.getCallback() != null) {
                     byte[] buffer = new byte[1024];
-                    putObjectResult.getCallbackResponseBody().read(buffer);
+                    InputStream is = putObjectResult.getCallbackResponseBody();
+                    int count = 0;
+                    while ((count = is.read(buffer)) > 0) {
+//                        is.read(buffer);
+                    }
                     putObjectResult.getCallbackResponseBody().close();
                 }
             } catch (OSSException var8) {

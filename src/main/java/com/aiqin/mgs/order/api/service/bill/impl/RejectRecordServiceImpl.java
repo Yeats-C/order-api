@@ -15,12 +15,17 @@ import com.aiqin.mgs.order.api.domain.request.bill.ReturnBatchDetailDLReq;
 import com.aiqin.mgs.order.api.domain.request.bill.ReturnDLReq;
 import com.aiqin.mgs.order.api.domain.request.bill.ReturnOrderDetailDLReq;
 import com.aiqin.mgs.order.api.domain.request.bill.ReturnOrderInfoDLReq;
+import com.aiqin.mgs.order.api.domain.request.RejectRequest;
+import com.aiqin.mgs.order.api.domain.response.RejectResponse;
+import com.aiqin.mgs.order.api.domain.response.RejectVoResponse;
+import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
+import com.aiqin.mgs.order.api.util.BeanHelper;
+import com.github.pagehelper.PageHelper;
+import org.apache.commons.collections.CollectionUtils;
 import com.aiqin.mgs.order.api.service.bill.CreateRejectRecordService;
 import com.aiqin.mgs.order.api.service.bill.OperationLogService;
-import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
 import com.aiqin.mgs.order.api.util.BeanCopyUtils;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -29,10 +34,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sun.rmi.runtime.Log;
 
 import javax.annotation.Resource;
-import javax.xml.crypto.Data;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.*;
@@ -59,6 +62,7 @@ public class RejectRecordServiceImpl implements RejectRecordService {
     RejectRecordDetailBatchDao rejectRecordDetailBatchDao;
     @Resource
     CreateRejectRecordService createRejectRecordService;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -139,6 +143,61 @@ public class RejectRecordServiceImpl implements RejectRecordService {
             }
         }
         return true;
+    }
+
+    /**
+     * 根据条件查询退供单
+     *
+     * @param rejectRequest
+     * @return
+     */
+    @Override
+    public HttpResponse<List<RejectResponse>> selectByRejectRequest(RejectRequest rejectRequest) {
+        /*if (rejectRequest == null){
+            //return ResultCode.PARAMETER_EXCEPTION;
+            return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
+        }*/
+        PageHelper.startPage(rejectRequest.getPageNo(),rejectRequest.getPageSize());
+        List<RejectRecord> rejectRecords = rejectRecordDao.selectByRequest(rejectRequest);
+        //Assert.notNull(rejectRecords, "退供单不存在");
+
+        if (CollectionUtils.isEmpty(rejectRecords)){
+            return HttpResponse.failure(ResultCode.NO_FOUND_REJECT_ERROR);
+        }
+
+        List<RejectResponse> responses = BeanHelper.copyWithCollection(rejectRecords, RejectResponse.class);
+
+        return HttpResponse.success(responses);
+    }
+
+    /**
+     * 根据退供单号查询退供单详情
+     *
+     * @param rejectRecordCode
+     * @return
+     */
+    @Override
+    public HttpResponse<RejectVoResponse> searchRejectDetailByRejectCode(String rejectRecordCode) {
+        //判断参数是否合法
+        if (org.apache.commons.lang.StringUtils.isBlank(rejectRecordCode)){
+            //返回无效参数
+            return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
+        }
+        RejectRecord rejectRecord = rejectRecordDao.selectByRejectRecordCode(rejectRecordCode);
+        //Assert.notNull(rejectRecord, "退供单不存在");
+        //LOGGER.info();
+        if (rejectRecord == null){
+            //返回找不到该退供单
+            return  HttpResponse.failure(ResultCode.NOT_FOUND_REJECT_RECORD_DATA);
+        }
+        List<RejectRecordDetail> rejectRecordDetails = rejectRecordDetailDao.selectByRejectRecordCode(rejectRecordCode);
+        List<RejectRecordDetailBatch> rejectRecordDetailBatches = rejectRecordDetailBatchDao.selectByRejectRecordCode(rejectRecordCode);
+
+        RejectVoResponse resp = new RejectVoResponse();
+        resp.setDetails(rejectRecordDetails);
+        resp.setRejectRecord(rejectRecord);
+        resp.setRejectRecordDetailBatches(rejectRecordDetailBatches);
+        return HttpResponse.success(resp);
     }
 
     /**
