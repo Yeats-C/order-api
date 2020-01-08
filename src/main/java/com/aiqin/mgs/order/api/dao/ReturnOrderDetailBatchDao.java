@@ -18,4 +18,6 @@ public interface ReturnOrderDetailBatchDao {
     int updateByPrimaryKey(ReturnOrderDetailBatch record);
 
     List<ReturnOrderDetailBatch> select(ReturnOrderDetailBatch returnOrderDetailBatch);
+
+    List<ReturnOrderDetailBatch> selectListByReturnOrderCode(String returnOrderCode);
 }

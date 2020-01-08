@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.dao.returnorder;
 
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
+import com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo3;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import org.apache.ibatis.annotations.Param;
 
@@ -49,4 +50,6 @@ public interface ReturnOrderInfoDao {
 
     String selectOrderId(@Param("returnOrderCode") String returnOrderCode);
 
+    //根据搜索条件查询退货单
+    List<ReturnOrderInfo> selectByParames(OrderListVo3 orderListVo3);
 }

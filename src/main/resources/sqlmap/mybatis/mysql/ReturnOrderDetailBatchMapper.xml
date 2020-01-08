@@ -299,4 +299,11 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP},
     </if>
   </select>
+
+  <select id="selectListByReturnOrderCode" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select
+    <include refid="Base_Column_List"/>
+    from return_order_detail_batch
+    where return_order_code = #{returnOrderCode}
+  </select>
 </mapper>

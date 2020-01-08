@@ -406,4 +406,13 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  <select id="selectByRejectRecordCode" resultMap="BaseResultMap">
+    select * from
+    reject_record_detail
+    <where>
+      <if test="rejectRecordCode!=null and rejectRecordCode!=''">
+        and reject_record_code=#{rejectRecordCode,jdbcType=VARCHAR}
+      </if>
+    </where>
+  </select>
 </mapper>
