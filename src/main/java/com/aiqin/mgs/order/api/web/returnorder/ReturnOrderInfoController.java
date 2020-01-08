@@ -32,8 +32,8 @@ public class ReturnOrderInfoController {
 
     @ApiOperation("新增退货信息")
     @PostMapping("/add")
-    public HttpResponse<Boolean> save(@RequestBody ReturnOrderReqVo reqVo) {
-        return new HttpResponse<>(returnOrderInfoService.save(reqVo));
+    public HttpResponse save(@RequestBody ReturnOrderReqVo reqVo) {
+        return returnOrderInfoService.save(reqVo);
     }
 
     @ApiOperation("后台销售退货单管理列表（搜索）")
