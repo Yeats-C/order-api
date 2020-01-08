@@ -146,6 +146,10 @@ public class ReturnOrderInfo {
     @JsonProperty("product_count")
     private Long productCount;
 
+    @ApiModelProperty(value = "有效期",example = "2001-01-01 01:01:01")
+    @JsonProperty("valid_time")
+    private Date validTime;
+
     @ApiModelProperty(value = "退货金额")
     @JsonProperty("return_order_amount")
     private BigDecimal returnOrderAmount;
