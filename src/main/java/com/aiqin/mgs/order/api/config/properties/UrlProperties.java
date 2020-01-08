@@ -38,5 +38,6 @@ public class UrlProperties {
     private String omsApi;
     private String marketApi;
     private String orderApi;
+    private String scmpApi;
 
 }

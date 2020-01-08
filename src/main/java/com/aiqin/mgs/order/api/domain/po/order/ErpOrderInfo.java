@@ -392,6 +392,10 @@ public class ErpOrderInfo {
     @JsonProperty("order_logistics")
     private ErpOrderLogistics orderLogistics;
 
+    @ApiModelProperty(value = "订单退款信息")
+    @JsonProperty("order_refund")
+    private ErpOrderRefund orderRefund;
+
     @ApiModelProperty(value = "订单商品明细行")
     @JsonProperty("item_list")
     private List<ErpOrderItem> itemList;

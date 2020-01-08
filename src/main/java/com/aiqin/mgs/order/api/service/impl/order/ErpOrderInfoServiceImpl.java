@@ -277,13 +277,13 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         if (processTypeEnum.isSplitByRepertory()) {
             //按照库存分组拆单
 
-            if (1 == 1) {
-                //TODO CT 暂时没有真实数据，先跳过拆单步骤
-                order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
-                order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
-                this.updateOrderByPrimaryKeySelective(order, auth);
-                return;
-            }
+//            if (1 == 1) {
+//                //TODO CT 暂时没有真实数据，先跳过拆单步骤
+//                order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
+//                order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
+//                this.updateOrderByPrimaryKeySelective(order, auth);
+//                return;
+//            }
 
             List<ErpOrderInfo> splitOrderList = new ArrayList<>();
 
@@ -316,7 +316,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 //仓库编码+库房编码
                 String repertoryKey = transportCenterCode + warehouseCode;
 
-                if (lineCode != null) {
+                if (lineCode == null) {
                     throw new BusinessException("缺失行号");
                 }
                 if (StringUtils.isEmpty(transportCenterCode)) {
@@ -347,6 +347,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 if (lineParamListMap.containsKey(lineCode)) {
                     list.addAll(lineParamListMap.get(lineCode));
                 }
+                list.add(item);
                 lineParamListMap.put(lineCode, list);
             }
 
@@ -500,7 +501,21 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     this.updateOrderByPrimaryKeySelective(updateOrder, auth);
                 }
             } else {
+                ErpOrderItemSplitGroupResponse repertoryDetail = null;
+                for (Map.Entry<String, ErpOrderItemSplitGroupResponse> entry :
+                        repertoryDetailMap.entrySet()) {
+                    repertoryDetail = entry.getValue();
+                    if (repertoryDetail != null) {
+                        break;
+                    }
+                }
                 order.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
+                if (repertoryDetail != null) {
+                    order.setTransportCenterCode(repertoryDetail.getTransportCenterCode());
+                    order.setTransportCenterName(repertoryDetail.getTransportCenterName());
+                    order.setWarehouseCode(repertoryDetail.getWarehouseCode());
+                    order.setWarehouseName(repertoryDetail.getWarehouseName());
+                }
             }
             order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
@@ -616,6 +631,14 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     this.updateOrderByPrimaryKeySelective(updateOrder, auth);
                 }
             } else {
+                for (Map.Entry<String, String> entry :
+                        supplierCodeNameMap.entrySet()) {
+                    order.setSupplierCode(entry.getKey());
+                    order.setSupplierName(supplierCodeNameMap.get(entry.getKey()));
+                    if (entry.getValue() != null) {
+                        break;
+                    }
+                }
                 order.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
             }
 
@@ -646,11 +669,11 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     item.setItemList(erpOrderItemService.selectOrderItemListByOrderId(item.getOrderStoreId()));
 
                     //同步订单到供应链，只调用一次接口，不管成功失败都算执行完成这一步
-                    HttpResponse httpResponse = purchaseOrderService.createPurchaseOrder(item);
+//                    HttpResponse httpResponse = purchaseOrderService.createPurchaseOrder(item);
                     //同步之后修改订单状态
-                    item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
-                    item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_8.getCode());
-                    this.updateOrderByPrimaryKeySelective(item, auth);
+//                    item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
+//                    item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_8.getCode());
+//                    this.updateOrderByPrimaryKeySelective(item, auth);
                 }
             }
         }

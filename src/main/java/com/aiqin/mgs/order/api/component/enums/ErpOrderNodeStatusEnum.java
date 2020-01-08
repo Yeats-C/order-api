@@ -25,6 +25,9 @@ public enum ErpOrderNodeStatusEnum {
     STATUS_10(10, "10", "已发运等待支付物流费用"),
     STATUS_11(11, "11", "已支付物流费用(或者不需要支付物流费用)，等待签收"),
     STATUS_12(12, "12", "已签收"),
+    STATUS_21(21, "21", "超时未支付成功取消"),
+    STATUS_22(22, "22", "交易异常终止"),
+    STATUS_23(23, "23", "缺货取消"),
     ;
 
     private Integer code;

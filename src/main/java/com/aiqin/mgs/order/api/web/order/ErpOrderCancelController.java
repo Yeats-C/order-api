@@ -52,23 +52,6 @@ public class ErpOrderCancelController {
         return response;
     }
 
-    @PostMapping("/cancelOrderRejectSign")
-    @ApiOperation(value = "拒收终止交易")
-    public HttpResponse cancelOrderRejectSign(@RequestBody ErpOrderCancelRequest erpOrderCancelRequest) {
-        HttpResponse response = HttpResponse.success();
-        try {
-            AuthUtil.loginCheck();
-            erpOrderCancelService.cancelOrderRejectSign(erpOrderCancelRequest);
-        } catch (BusinessException e) {
-            logger.error("异常信息：{}", e);
-            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
-        } catch (Exception e) {
-            logger.error("异常信息：{}", e);
-            response = HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
-        }
-        return response;
-    }
-
     @PostMapping("/applyCancelOrder")
     @ApiOperation(value = "申请取消订单")
     public HttpResponse applyCancelOrder(@RequestBody ErpOrderCancelRequest erpOrderCancelRequest) {
@@ -86,20 +69,4 @@ public class ErpOrderCancelController {
         return response;
     }
 
-    @PostMapping("/orderCancelResultCallback")
-    @ApiOperation(value = "供应链返回订单是否可以取消")
-    public HttpResponse orderCancelResultCallback(@RequestBody ErpOrderCancelRequest erpOrderCancelRequest) {
-        HttpResponse response = HttpResponse.success();
-        try {
-            AuthUtil.loginCheck();
-            erpOrderCancelService.orderCancelResultCallback(erpOrderCancelRequest);
-        } catch (BusinessException e) {
-            logger.error("异常信息：{}", e);
-            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
-        } catch (Exception e) {
-            logger.error("异常信息：{}", e);
-            response = HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
-        }
-        return response;
-    }
 }

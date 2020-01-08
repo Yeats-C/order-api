@@ -15,7 +15,10 @@ public enum ErpPayFeeTypeEnum {
     /***订单费用*/
     ORDER_FEE(1, "1", "订单费用"),
     /***物流单费用*/
-    LOGISTICS_FEE(2, "2", "物流费用");
+    LOGISTICS_FEE(2, "2", "物流费用"),
+    /***退款费用*/
+    REFUND_FEE(3, "3", "退款费用"),
+    ;
 
     /***数字类型状态*/
     private Integer code;
