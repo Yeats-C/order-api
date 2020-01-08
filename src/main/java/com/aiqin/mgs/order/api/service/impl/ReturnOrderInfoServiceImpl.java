@@ -98,7 +98,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 
     @Override
     @Transactional
-    public Boolean save(ReturnOrderReqVo reqVo) {
+    public HttpResponse save(ReturnOrderReqVo reqVo) {
         log.info("发起退货--入参，reqVo={}",reqVo);
         //查询订单是否存在未处理售后单
         List<ReturnOrderInfo> returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndStatus(reqVo.getOrderStoreCode(), 1);
@@ -166,15 +166,24 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         }
         body.put("order_return_product_reqs",list);
         log.info("发起门店退货申请-完成(门店)（erp回调）--修改商品库存入参，url={},json={}",url,body);
-        HttpClient httpClient = HttpClient.post(url).json(body);
-        Map<String ,Object> result=null;
-        result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
-        log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存结果，request={}",result);
-        if(result!=null&&"0".equals(result.get("code"))){
-            log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存完成");
-            return true;
-        }
-        return false;
+//        HttpClient httpClient = HttpClient.post(url).json(body);
+//        Map<String ,Object> result=null;
+//        try{
+//            result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+//            log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存结果，request={}",result);
+//            if(result!=null&&"0".equals(result.get("code"))){
+//                log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存完成");
+//                return HttpResponse.success();
+//            }else {
+//                log.info("发起发起门店退货申请-完成(门店)（erp回调）--第三方修改商品库存失败");
+//                throw new RuntimeException();
+//            }
+//        }catch (Exception e){
+//            log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存失败");
+//            throw e;
+////            return HttpResponse.failure(ResultCode.STORE_REQUEST_FALL);
+//        }
+        return HttpResponse.success();
     }
 
     @Override
@@ -1078,7 +1087,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 "      \"sku_code\": \"0000109\"\n" +
                 "    }\n" +
                 "  ],\n" +
-                "  \"store_id\": \"AB957AE69917B34B35BEFFF8A23573F01E\"\n" +
+//                "  \"store_id\": \"AB957AE69917B34B35BEFFF8A23573F01E\"\n" +
+                "  \"store_id\": \"ABEC8D65036E5A45DBABCBA413FA56AEA2\"\n" +
                 "}";
         JSONObject json= JSON.parseObject(str);
         log.info("发起门店退货申请-完成(门店)（erp回调）--修改商品库存入参，url={},json={}",url,json);

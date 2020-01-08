@@ -28,6 +28,7 @@ public interface ResultCode {
     MessageId NET_EXCEPTION = MessageId.create(Project.ORDER_API, 15, "网络异常");
 
     MessageId NOT_FOUND_ORDER_DATA = MessageId.create(Project.ORDER_API, 16, "此单号有误，未查到订单数据");
+    MessageId STORE_REQUEST_FALL = MessageId.create(Project.ORDER_API, 17, "发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存失败");
     MessageId NOT_FOUND_RETURN_ORDER_DATA = MessageId.create(Project.ORDER_API, 17, "此单号有误，未查到退货单数据");
     MessageId NO_FOUND_REJECT_ERROR = MessageId.create(Project.ORDER_API, 18, "未查询到对应退供单信息");
     MessageId NOT_FOUND_REJECT_RECORD_DATA = MessageId.create(Project.ORDER_API, 19, "此单号有误，未查到退供单数据");
