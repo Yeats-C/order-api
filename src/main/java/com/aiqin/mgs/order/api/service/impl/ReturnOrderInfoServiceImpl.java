@@ -153,23 +153,39 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         body.put("order_return_code", afterSaleCode);
         body.put("order_return_id", returnOrderId);
         body.put("store_id",record.getStoreId());
-        List<OrderReturnProductReq> orderReturnProductReqList=new ArrayList<>();
+//        OrderReturnReq orr=new OrderReturnReq();
+//        orr.setCreateById(reqVo.getCreateById());
+//        orr.setCreateByName(reqVo.getCreateByName());
+//        orr.setCreateTime(new Date());
+//        orr.setOrderCode(record.getOrderStoreCode());
+//        orr.setOrderReturnCode(afterSaleCode);
+//        orr.setOrderReturnId(returnOrderId);
+//        orr.setStoreId(record.getStoreId());
+        List<Map<String, Object>> list = new ArrayList<>();
         for(ReturnOrderDetail rod:details){
             String orderReturnId=rod.getReturnOrderDetailId();
             String orderReturnCode=rod.getReturnOrderCode();
             String skuCode=rod.getSkuCode();
             Long returnQuantity=rod.getReturnProductCount();
-            OrderReturnProductReq orpr=new OrderReturnProductReq();
-            orpr.setOrderReturnId(orderReturnId);
-            orpr.setOrderReturnCode(orderReturnCode);
-            orpr.setSkuCode(skuCode);
-            orpr.setReturnQuantity(returnQuantity);
-            orpr.setCreateById(reqVo.getCreateById());
-            orpr.setCreateByName(reqVo.getCreateByName());
-            orpr.setCreateTime(new Date());
-            orderReturnProductReqList.add(orpr);
+//            OrderReturnProductReq orpr=new OrderReturnProductReq();
+//            orpr.setOrderReturnId(orderReturnId);
+//            orpr.setOrderReturnCode(orderReturnCode);
+//            orpr.setSkuCode(skuCode);
+//            orpr.setReturnQuantity(returnQuantity);
+//            orpr.setCreateById(reqVo.getCreateById());
+//            orpr.setCreateByName(reqVo.getCreateByName());
+//            orpr.setCreateTime(new Date());
+            Map<String,Object> map=new HashMap<>();
+            map.put("order_return_id",orderReturnId);
+            map.put("order_return_code",orderReturnCode);
+            map.put("sku_code",skuCode);
+            map.put("return_quantity",returnQuantity);
+            map.put("create_by_id",reqVo.getCreateById());
+            map.put("create_by_name",reqVo.getCreateByName());
+            map.put("create_time",new Date());
+            list.add(map);
         }
-        body.put("order_return_product_reqs",orderReturnProductReqList);
+        body.put("order_return_product_reqs",list);
         log.info("发起门店退货申请-完成(门店)（erp回调）--修改商品库存入参，url={},json={}",url,body);
         HttpClient httpClient = HttpClient.post(url).json(body);
         Map<String ,Object> result=null;
@@ -1038,5 +1054,35 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 
     }
 
-
+    public static void main(String[] args) {
+//        String url="http://product.api.aiqin.com"+"/order/return/insert";
+//        OrderReturnReq orr=new OrderReturnReq();
+//        orr.setCreateById("reqVo");
+//        orr.setCreateByName("reqVo");
+//        orr.setCreateTime(new Date());
+//        orr.setOrderCode("reqVo");
+//        orr.setOrderReturnCode("reqVo");
+//        orr.setOrderReturnId("reqVo");
+//        orr.setStoreId("reqVo");
+//        List<OrderReturnProductReq> orderReturnProductReqList=new ArrayList<>();
+//        String orderReturnId="1111";
+//        String orderReturnCode="225";
+//        String skuCode="5588";
+//        Long returnQuantity=2L;
+//        OrderReturnProductReq orpr=new OrderReturnProductReq();
+//        orpr.setOrderReturnId(orderReturnId);
+//        orpr.setOrderReturnCode(orderReturnCode);
+//        orpr.setSkuCode(skuCode);
+//        orpr.setReturnQuantity(returnQuantity);
+//        orpr.setCreateById("ID");
+//        orpr.setCreateByName("HAN");
+//        orpr.setCreateTime(new Date());
+//        orderReturnProductReqList.add(orpr);
+//        orr.setOrderReturnProductReqs(orderReturnProductReqList);
+//        log.info("发起门店退货申请-完成(门店)（erp回调）--修改商品库存入参，url={},json={}",url,orr);
+//        HttpClient httpClient = HttpClient.post(url).json(orr);
+//        Map<String ,Object> result=null;
+//        result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+//        log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存结果，request={}",result);
+    }
 }
