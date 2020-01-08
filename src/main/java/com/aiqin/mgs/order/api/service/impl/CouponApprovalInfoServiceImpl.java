@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.service.impl;
 
 import com.aiqin.ground.util.http.HttpClient;
+import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.mgs.order.api.base.ConstantData;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
@@ -34,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * description: ApprovalInfoServiceImpl
@@ -147,6 +149,8 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                 //产生的A品券不为空，同步到虚拟资产
                 if(CollectionUtils.isNotEmpty(franchiseeAssets)){
                     log.info("A品券同步到虚拟资产开始，franchiseeAssets={}",franchiseeAssets);
+                    franchiseeAssets.forEach(p -> p.setFranchiseeId(couponApprovalDetail.getFranchiseeId()));
+                    franchiseeAssets.forEach(p -> p.setCreateTime(new Date()));
                     String url=slcsHost+"/franchiseeVirtual/VirtualA";
                     JSONObject json=new JSONObject();
                     json.put("list",franchiseeAssets);
@@ -160,6 +164,7 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                         reqVo.setReturnOrderCode(couponApprovalDetail.getOrderId());
                         reqVo.setOperateStatus(ConstantData.RETURN_ORDER_SUCCESS);
                         returnOrderInfoDao.updateReturnStatus(reqVo);
+                        couponInfoDao.updateByOrderId(couponApprovalDetail.getOrderId());
                         log.info("退款完成");
                     }
                 }
@@ -261,6 +266,25 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
             log.info("同步到虚拟资产完成");
         }
 
+    }
+
+    /**
+     * 根据门店id获取加盟商id
+     * @param storeId
+     * @return
+     */
+    public String getFranchiseeId(String storeId){
+        log.info("根据门店id获取加盟商id,storeId={}",storeId);
+        String franchiseeId=null;
+        String url=slcsHost+"/store/getFranchiseeId?store_id="+storeId;
+        HttpClient httpClient = HttpClient.get(url);
+        Map<String ,Object> result=null;
+        result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+        log.info("根据门店id获取加盟商id，request={}",result);
+        if(result!=null&&"0".equals(result.get("code"))){
+            franchiseeId=result.get("data").toString();
+        }
+        return franchiseeId;
     }
 
 }

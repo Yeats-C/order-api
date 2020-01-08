@@ -32,8 +32,8 @@ public class ReturnOrderInfoController {
 
     @ApiOperation("新增退货信息")
     @PostMapping("/add")
-    public HttpResponse<Boolean> save(@RequestBody ReturnOrderReqVo reqVo) {
-        return new HttpResponse<>(returnOrderInfoService.save(reqVo));
+    public HttpResponse save(@RequestBody ReturnOrderReqVo reqVo) {
+        return returnOrderInfoService.save(reqVo);
     }
 
     @ApiOperation("后台销售退货单管理列表（搜索）")
@@ -72,12 +72,12 @@ public class ReturnOrderInfoController {
         return new HttpResponse<>(review);
     }
 
-    @ApiOperation("提供给供应链--同步是否成功（创建退供单）修改")
+    /*@ApiOperation("提供给供应链--同步是否成功（创建退供单）修改")
     @GetMapping("/updateOrderSuccessApi")
     public HttpResponse<Boolean> updateOrderSuccessApi(String returnOrderCode) {
         Boolean review = returnOrderInfoService.updateOrderSuccessApi(returnOrderCode);
         return new HttpResponse<>(review);
-    }
+    }*/
 
     @ApiOperation("退货单校验--查看此订单是否已经生成一条退货单，且流程未结束。如果已存在返回true")
     @GetMapping("/check")

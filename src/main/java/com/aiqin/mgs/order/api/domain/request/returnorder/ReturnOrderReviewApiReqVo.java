@@ -32,16 +32,6 @@ public class ReturnOrderReviewApiReqVo implements Serializable {
     @ApiModelProperty("退货单状态(供应链使用):4-等待退货验收，5-等待退货入库 11-退货完成")
     private Integer operateStatus;
 
-//    @NotBlank(message = "加盟商id")
-//    @ApiModelProperty("加盟商id")
-//    private String franchiseeId;
-
-//    @ApiModelProperty(value="退货单详情")
-//    private List<ReturnOrderDetail> details;
-
-//    @ApiModelProperty(value="修改退货单详情实退数量")
-//    private ReturnOrderDetailReviewApiReqVo returnOrderDetailReviewApiReqVo;
-
     @ApiModelProperty(value="修改退货单详情实退数量")
     private List<ReturnOrderDetailReviewApiReqVo> details;
 

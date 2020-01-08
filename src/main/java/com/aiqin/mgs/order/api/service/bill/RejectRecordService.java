@@ -1,9 +1,10 @@
 package com.aiqin.mgs.order.api.service.bill;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.domain.RejectRecordInfo;
-import com.aiqin.mgs.order.api.domain.request.bill.RejectRecordReq;
-import org.springframework.stereotype.Service;
+import com.aiqin.mgs.order.api.domain.request.bill.ReturnDLReq;
+import com.aiqin.mgs.order.api.domain.request.RejectRequest;
+import com.aiqin.mgs.order.api.domain.response.RejectResponse;
+import com.aiqin.mgs.order.api.domain.response.RejectVoResponse;
 
 import java.util.List;
 
@@ -17,5 +18,35 @@ public interface RejectRecordService {
      */
     HttpResponse createRejectRecord(String returnOrderCode);
 
-    HttpResponse<List<RejectRecordInfo>> selectPurchaseInfo();
+    /**
+     * 耘链退货单回传
+     * @param returnDLReq
+     * @return
+     */
+    Boolean selectPurchaseInfo(ReturnDLReq returnDLReq);
+
+
+    /**
+     * 取消退供单
+     */
+    Boolean removeRejectRecordStatus(String rejectRecordCode);
+
+
+    //HttpResponse<List<RejectRecordInfo>> selectPurchaseInfo();
+
+    /**
+     * 根据条件查询退供单
+     *
+     * @param rejectRequest
+     * @return
+     */
+    HttpResponse<List<RejectResponse>> selectByRejectRequest(RejectRequest rejectRequest);
+
+    /**
+     * 根据退供单号查询退供单详情
+     *
+     * @param rejectRecordCode
+     * @return
+     */
+    HttpResponse<RejectVoResponse> searchRejectDetailByRejectCode(String rejectRecordCode);
 }

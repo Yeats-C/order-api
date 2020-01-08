@@ -13,6 +13,7 @@
         <result column="product_name" jdbcType="VARCHAR" property="productName"/>
         <result column="list_name" jdbcType="VARCHAR" property="listName"/>
         <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
+        <result column="sku_name" jdbcType="VARCHAR" property="skuName"/>
         <result column="spu_code" jdbcType="VARCHAR" property="spuCode"/>
         <result column="bar_code" jdbcType="VARCHAR" property="barCode"/>
         <result column="spec" jdbcType="VARCHAR" property="spec"/>
@@ -110,12 +111,16 @@
         <if test="returnAmount!=null">
             return_amount,
         </if>
+
         activity_id,activity_name,
         <if test="couponDiscount!=null">
             coupon_discount,
         </if>
         <if test="costPrice!=null">
             cost_price,
+        </if>
+        <if test="skuName!=null">
+            sku_name,
         </if>
         create_time,update_time,create_by,update_by)
         values
@@ -135,6 +140,9 @@
         </if>
         <if test="costPrice!=null">
             #{costPrice},
+        </if>
+        <if test="skuName!=null">
+            #{skuName},
         </if>
         CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy})
     </insert>
@@ -502,6 +510,9 @@
          set
          actual_price = #{actualPrice},
          update_time = now(),
+        <if test="retailPrice!=null and retailPrice!='' ">
+           retail_price =#{retailPrice},
+        </if>
          update_by = #{updateBy,jdbcType=VARCHAR}
          where order_code =#{orderCode} and order_detail_id=#{orderDetailId}
      </update>

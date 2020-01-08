@@ -154,4 +154,10 @@
         </foreach>
     </insert>
 
+    <update id="updateByOrderId" parameterType="com.aiqin.mgs.order.api.domain.CouponInfo">
+        update coupon_info
+        set  state = 1
+        where  order_id = #{orderId,jdbcType=VARCHAR}
+    </update>
+
 </mapper>

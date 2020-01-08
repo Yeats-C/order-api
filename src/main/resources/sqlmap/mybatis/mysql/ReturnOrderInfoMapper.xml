@@ -384,9 +384,6 @@
       <if test="reviewTime != null" >
         review_time,
       </if>
-      <if test="orderSuccess != null" >
-        order_success,
-      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -649,9 +646,6 @@
       </if>
       <if test="reviewTime != null" >
         #{reviewTime},
-      </if>
-      <if test="orderSuccess != null" >
-        #{orderSuccess},
       </if>
     </trim>
   </insert>
@@ -1200,6 +1194,38 @@
     where return_order_code = #{returnOrderCode,jdbcType=VARCHAR}
   </select>
 
+  <select id="selectByParames" parameterType="com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo3" resultMap="BaseResultMap">
+    select * from return_order_info
+    <where>
+      <if test="returnOrderStatus!=null">
+        and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
+      </if>
+      <if test="returnOrderCode!=null and returnOrderCode!=''">
+        and return_order_code=#{returnOrderCode,jdbcType=VARCHAR}
+      </if>
+      <if test="orderStoreCode!=null and orderStoreCode!=''">
+        and order_store_code=#{orderStoreCode,jdbcType=VARCHAR}
+      </if>
+      <if test="beginTime!=null and beginTime!=''">
+        and create_time &gt;= #{beginTime}
+      </if>
+      <if test="finishTime!=null and finishTime!=''">
+        and create_time &lt;= #{finishTime}
+      </if>
+      <if test="customerName!=null and customerName!=''">
+        and customer_name =#{customerName}
+      </if>
+      <if test="transportCenterName!=null and transportCenterName!=''">
+        and transport_center_name =#{transportCenterName}
+      </if>
+      <if test="warehouseName!=null and warehouseName!=''">
+        and warehouse_name =#{warehouseName}
+      </if>
+      <if test="companyCode!=null and companyCode!=''">
+        and company_code =#{companyCode}
+      </if>
+    </where>
+  </select>
   <update id="updateOrderSuccess">
     update return_order_info
     set
@@ -1207,14 +1233,16 @@
     where return_order_code = #{returnOrderCode}
   </update>
 
-  <select id="selectByOrderCodeAndSuccess" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  <!---->
+  <select id="selectByOrderCodeAndSuccess" resultMap="BaseResultMap" >
     select
     <include refid="Base_Column_List" />
     from return_order_info
     where
       return_order_code = #{returnOrderCode} and order_success = #{orderSuccess}
   </select>
-  <select id="selectByOrderSuccess" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+
+  <select id="selectByOrderSuccess" resultMap="BaseResultMap" >
     select
     <include refid="Base_Column_List" />
     from return_order_info

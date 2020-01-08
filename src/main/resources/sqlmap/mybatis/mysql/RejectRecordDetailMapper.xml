@@ -404,6 +404,15 @@
       update_by_name = #{updateByName,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP}
-    where id = #{id,jdbcType=BIGINT}
+    where reject_record_code = #{rejectRecordCode,jdbcType=VARCHAR}
   </update>
+  <select id="selectByRejectRecordCode" resultMap="BaseResultMap">
+    select * from
+    reject_record_detail
+    <where>
+      <if test="rejectRecordCode!=null and rejectRecordCode!=''">
+        and reject_record_code=#{rejectRecordCode,jdbcType=VARCHAR}
+      </if>
+    </where>
+  </select>
 </mapper>
