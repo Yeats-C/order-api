@@ -207,8 +207,8 @@ public class RejectRecordServiceImpl implements RejectRecordService {
      */
     private void rejectRecordExecutor(String returnOrderCode) {
         //异步执行
-        ScheduledExecutorService service = new ScheduledThreadPoolExecutor(1);
-        service.scheduleAtFixedRate(new Runnable() {
+        ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
+        singleThreadExecutor.execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -238,7 +238,7 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                     throw new RuntimeException();
                 }
             }
-        }, BillConstant.MAX_PAY_POLLING_INITIALDELAY, BillConstant.MAX_PAY_POLLING_PERIOD, TimeUnit.MILLISECONDS);
+        });
     }
 
     /**
