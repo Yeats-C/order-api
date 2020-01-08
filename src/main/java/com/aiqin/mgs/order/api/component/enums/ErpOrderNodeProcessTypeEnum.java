@@ -16,7 +16,7 @@ public enum ErpOrderNodeProcessTypeEnum {
     /***配送	- 普通首单*/
     PROCESS_1(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_2, ErpRequestPayTransactionTypeEnum.FIRST_DELIVERY, true, true, true, false, true, true, false, true, true, true, false, true),
     /***配送	- 首单赠送*/
-    PROCESS_2(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_4, null, true, true, false, false, true, true, false, true, true, true, false, true),
+    PROCESS_2(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_4, ErpRequestPayTransactionTypeEnum.FIRST_DELIVERY, true, true, false, false, true, true, false, true, true, true, false, true),
     /***配送	- 正常补货*/
     PROCESS_3(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_1, ErpRequestPayTransactionTypeEnum.DELIVERY_REPLENISHMENT, true, true, true, true, true, true, true, true, false, true, true, true),
     /***直送	- 普通首单*/

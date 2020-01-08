@@ -6,15 +6,13 @@
             resultType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderRefund">
         select
         id as id,
+        refund_id as refundId,
+        refund_code as refundCode,
+        order_id as orderId,
         pay_id as payId,
-        business_key as businessKey,
-        pay_code as payCode,
-        fee_type as feeType,
-        pay_status as payStatus,
-        pay_way as payWay,
-        pay_fee as payFee,
-        pay_start_time as payStartTime,
-        pay_end_time as payEndTime,
+        refund_fee as refundFee,
+        refund_status as refundStatus,
+        refund_type as refundType,
         create_time as createTime,
         create_by_id as createById,
         create_by_name as createByName,
@@ -22,49 +20,46 @@
         update_by_id as updateById,
         update_by_name as updateByName,
         status as status
-        from order_store_pay
+        from order_store_refund
         where 1 = 1
         <if test="id != null and id != ''">
             and id = #{id}
         </if>
-        <if test="payStatus != null and payStatus != '' or payStatus == 0">
-            and pay_status = #{payStatus}
+        <if test="refundStatus != null and refundStatus != '' or refundStatus == 0">
+            and refund_status = #{refundStatus}
+        </if>
+        <if test="refundId != null and refundId != ''">
+            and refund_id = #{refundId}
+        </if>
+        <if test="refundCode != null and refundCode != ''">
+            and refund_code = #{refundCode}
+        </if>
+        <if test="orderId != null and orderId != ''">
+            and order_id = #{orderId}
         </if>
         <if test="payId != null and payId != ''">
             and pay_id = #{payId}
         </if>
-        <if test="businessKey != null and businessKey != ''">
-            and business_key = #{businessKey}
+        <if test="refundType != null and refundType != ''">
+            and refund_type = #{refundType}
         </if>
-        <if test="payCode != null and payCode != ''">
-            and pay_code = #{payCode}
-        </if>
-        <if test="feeType != null and feeType != '' or feeType == 0">
-            and fee_type = #{feeType}
-        </if>
-        <if test="payWay != null and payWay != '' or payWay == 0">
-            and pay_way = #{payWay}
+        <if test="status != null and status != '' or status == 0">
+            and status = #{status}
         </if>
         order by create_time desc
     </select>
 
     <update id="updateByPrimaryKeySelective">
-        update order_store_pay
+        update order_store_refund
         set
-        <if test="payStartTime != null">
-            pay_start_time = #{payStartTime},
+        <if test="refundCode != null and refundCode != ''">
+            refund_code = #{refundCode},
         </if>
-        <if test="payEndTime != null">
-            pay_end_time = #{payEndTime},
+        <if test="payId != null and payId != ''">
+            pay_id = #{payId},
         </if>
-        <if test="payStatus != null and payStatus != '' or payStatus == 0">
-            pay_status = #{payStatus},
-        </if>
-        <if test="payWay != null and payWay != '' or payWay == 0">
-            pay_way = #{payWay},
-        </if>
-        <if test="payCode != null and payCode != ''">
-            pay_code = #{payCode},
+        <if test="refundStatus != null and refundStatus != '' or refundStatus == 0">
+            refund_status = #{refundStatus},
         </if>
         update_by_id = #{updateById},
         update_by_name = #{updateByName},
@@ -73,12 +68,12 @@
     </update>
 
     <insert id="insert">
-        insert into order_store_pay (pay_id, business_key, pay_code, fee_type, pay_status, pay_way,
-                                     pay_fee, pay_start_time, pay_end_time, create_time, create_by_id,
-                                     create_by_name, update_time, update_by_id, update_by_name)
-        values (#{payId}, #{businessKey}, #{payCode}, #{feeType}, #{payStatus}, #{payWay},
-                #{payFee}, #{payStartTime}, #{payEndTime}, sysdate(), #{createById},
-                #{createByName}, sysdate(), #{updateById}, #{updateByName})
+        insert into order_store_refund (refund_id, refund_code, order_id, pay_id, refund_fee, refund_status,
+                                        refund_type, create_time, create_by_id, create_by_name, update_time,
+                                        update_by_id, update_by_name)
+        values (#{refundId}, #{refundCode}, #{orderId}, #{payId}, #{refundFee}, #{refundStatus},
+                #{refundType}, sysdate(), #{createById}, #{createByName}, sysdate(),
+                #{updateById}, #{updateByName})
     </insert>
 
 </mapper>

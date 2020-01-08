@@ -47,7 +47,7 @@ public interface ErpOrderCreateService {
     ErpOrderInfo saveRackOrder(ErpOrderSaveRequest erpOrderSaveRequest, AuthToken auth);
 
     /**
-     * 生成订单号
+     * 生成订单号，方法需要优化
      *
      * @param
      * @return java.lang.String

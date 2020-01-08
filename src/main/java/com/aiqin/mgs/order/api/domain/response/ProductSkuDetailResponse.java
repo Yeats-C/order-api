@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @JsonInclude(JsonInclude.Include.ALWAYS)
@@ -72,5 +73,5 @@ public class ProductSkuDetailResponse {
     private String productPropertyName;
     /***SKU整包装信息返回*/
     @JsonProperty("productSkuBoxPackings")
-    private ProductSkuBoxPackings productSkuBoxPackings;
+    private List<ProductSkuBoxPackings> productSkuBoxPackings;
 }

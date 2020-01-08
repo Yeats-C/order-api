@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.po.order;
 
+import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -25,6 +26,10 @@ public class ErpOrderRefund {
     @JsonProperty("refund_id")
     private String refundId;
 
+    @ApiModelProperty(value = "退款单编号")
+    @JsonProperty("refund_code")
+    private String refundCode;
+
     @ApiModelProperty(value = "关联订单id")
     @JsonProperty("order_id")
     private String orderId;
@@ -40,6 +45,10 @@ public class ErpOrderRefund {
     @ApiModelProperty(value = "退款状态")
     @JsonProperty("refund_status")
     private Integer refundStatus;
+
+    @ApiModelProperty(value = "退款状态描述")
+    @JsonProperty("refund_status_desc")
+    private String refundStatusDesc;
 
     @ApiModelProperty(value = "退款类型")
     @JsonProperty("refund_type")
@@ -72,4 +81,8 @@ public class ErpOrderRefund {
     @ApiModelProperty(value = "据状态 1有效 0删除")
     @JsonProperty("status")
     private Integer status;
+
+    public String getRefundStatusDesc() {
+        return ErpPayStatusEnum.getRefundDesc(refundStatus);
+    }
 }
