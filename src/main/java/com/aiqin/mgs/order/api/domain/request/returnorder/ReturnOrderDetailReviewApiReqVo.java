@@ -34,7 +34,7 @@ public class ReturnOrderDetailReviewApiReqVo implements Serializable {
 //    @ApiModelProperty(value = "修改人编码")
 //    private String updateById;
 
-    @ApiModelProperty(value = "修改人编码")
-    List<ReturnOrderDetailReviewApiReqVo> list;
+//    @ApiModelProperty(value = "修改人编码")
+//    List<ReturnOrderDetailReviewApiReqVo> list;
 
 }

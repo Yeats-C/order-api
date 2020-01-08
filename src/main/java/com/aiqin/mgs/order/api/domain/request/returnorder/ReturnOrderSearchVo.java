@@ -54,4 +54,20 @@ public class ReturnOrderSearchVo extends PagesRequest {
     @JsonProperty("order_type")
     private Integer orderType;
 
+    @ApiModelProperty("收货区域 :区/县")
+    @JsonProperty("district_name")
+    private String districtName;
+
+    @ApiModelProperty("收货区域 :省编码")
+    @JsonProperty("province_id")
+    private String provinceId;
+
+    @ApiModelProperty("收货区域 :市编码")
+    @JsonProperty("city_id")
+    private String cityId;
+
+    @ApiModelProperty("收货区域 :区/县编码")
+    @JsonProperty("district_id")
+    private String districtId;
+
 }

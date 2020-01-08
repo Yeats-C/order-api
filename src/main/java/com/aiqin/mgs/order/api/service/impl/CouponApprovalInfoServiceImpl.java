@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.service.impl;
 
+import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.mgs.order.api.base.ConstantData;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
@@ -13,19 +14,17 @@ import com.aiqin.mgs.order.api.domain.CouponInfo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.FranchiseeAssetVo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
 import com.aiqin.mgs.order.api.service.CouponApprovalInfoService;
-import com.aiqin.mgs.order.api.util.URLConnectionUtil;
 import com.aiqin.platform.flows.client.constant.Indicator;
 import com.aiqin.platform.flows.client.constant.IndicatorStr;
 import com.aiqin.platform.flows.client.constant.StatusEnum;
 import com.aiqin.platform.flows.client.constant.TpmBpmUtils;
 import com.aiqin.platform.flows.client.domain.vo.FormCallBackVo;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,10 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * description: ApprovalInfoServiceImpl
@@ -154,18 +150,17 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                     String url=slcsHost+"/franchiseeVirtual/VirtualA";
                     JSONObject json=new JSONObject();
                     json.put("list",franchiseeAssets);
-                    String request= URLConnectionUtil.doPost(url,null,json);
-                    log.info("同步到虚拟资产:"+request);
-                    if(StringUtils.isNotBlank(request)){
-                        JSONObject jsonObject= JSON.parseObject(request);
-                        if(jsonObject.containsKey("code")&&"0".equals(jsonObject.getString("code"))){
-                            log.info("A品券虚拟资产同步成功，修改退货单状态");
-                            ReturnOrderReviewReqVo reqVo=new ReturnOrderReviewReqVo();
-                            reqVo.setReturnOrderCode(couponApprovalDetail.getOrderId());
-                            reqVo.setOperateStatus(ConstantData.RETURN_ORDER_SUCCESS);
-                            returnOrderInfoDao.updateReturnStatus(reqVo);
-                            log.info("退款完成");
-                        }
+                    HttpClient httpClient = HttpClient.post(url).json(json);
+                    Map<String ,Object> res=null;
+                    res = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+                    log.info("同步到虚拟资产:"+res);
+                    if(res!=null&&"0".equals(res.get("code"))){
+                        log.info("A品券虚拟资产同步成功，修改退货单状态");
+                        ReturnOrderReviewReqVo reqVo=new ReturnOrderReviewReqVo();
+                        reqVo.setReturnOrderCode(couponApprovalDetail.getOrderId());
+                        reqVo.setOperateStatus(ConstantData.RETURN_ORDER_SUCCESS);
+                        returnOrderInfoDao.updateReturnStatus(reqVo);
+                        log.info("退款完成");
                     }
                 }
             } else if (TpmBpmUtils.isPass(formCallBackVo.getUpdateFormStatus(), formCallBackVo.getOptBtn())) {
@@ -239,9 +234,9 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
 //            System.out.println(couponCode());
 //        }
 
-//        String url="http://slcs.api.aiqin.com/franchiseeVirtual/VirtualA";
+        String url="http://slcs.api.aiqin.com/franchiseeVirtual/VirtualA";
 //        String url="http://192.168.200.127:9011/franchiseeVirtual/VirtualA";
-        String url="http://127.0.0.1:9011/franchiseeVirtual/VirtualA";
+//        String url="http://127.0.0.1:9011/franchiseeVirtual/VirtualA";
         List<FranchiseeAssetVo> franchiseeAssets=new ArrayList<>();
         CouponInfo couponInfo=new CouponInfo();
         couponInfo.setCouponName(ConstantData.COUPON_NAME_A);
@@ -258,9 +253,13 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
         franchiseeAssets.add(franchiseeAsset);
         JSONObject json=new JSONObject();
         json.put("list",franchiseeAssets);
-        String request= URLConnectionUtil.doPost(url,null,json);
-        log.info("同步到虚拟资产:"+request);
-
+        HttpClient httpClient = HttpClient.post(url).json(json);
+        Map<String ,Object> result=null;
+        result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+        log.info("同步到虚拟资产结果，request={}",result);
+        if(result!=null&&"0".equals(result.get("code"))){
+            log.info("同步到虚拟资产完成");
+        }
 
     }
 

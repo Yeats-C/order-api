@@ -43,7 +43,7 @@
     <result column="pre_purchase_order" jdbcType="VARCHAR" property="prePurchaseOrder" />
     <result column="payment_code" jdbcType="VARCHAR" property="paymentCode" />
     <result column="payment_name" jdbcType="VARCHAR" property="paymentName" />
-    <result column="payment_time" jdbcType="BIGINT" property="paymentTime" />
+    <result column="payment_time" jdbcType="TIMESTAMP" property="paymentTime" />
     <result column="pre_amount" jdbcType="DECIMAL" property="preAmount" />
     <result column="remark" jdbcType="VARCHAR" property="remark" />
     <result column="source_code" jdbcType="VARCHAR" property="sourceCode" />
@@ -78,7 +78,7 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.PurchaseOrder">
-    insert into purchase_order (id, purchase_order_id, purchase_order_code, 
+    insert into purchase_order (purchase_order_id, purchase_order_code,
       company_code, company_name, supplier_code, 
       supplier_name, transport_center_code, transport_center_name, 
       warehouse_code, warehouse_name, purchase_group_code, 
@@ -97,7 +97,7 @@
       create_by_id, create_by_name, update_by_id, 
       update_by_name, create_time, update_time
       )
-    values (#{id,jdbcType=BIGINT}, #{purchaseOrderId,jdbcType=VARCHAR}, #{purchaseOrderCode,jdbcType=VARCHAR}, 
+    values (#{purchaseOrderId,jdbcType=VARCHAR}, #{purchaseOrderCode,jdbcType=VARCHAR},
       #{companyCode,jdbcType=VARCHAR}, #{companyName,jdbcType=VARCHAR}, #{supplierCode,jdbcType=VARCHAR}, 
       #{supplierName,jdbcType=VARCHAR}, #{transportCenterCode,jdbcType=VARCHAR}, #{transportCenterName,jdbcType=VARCHAR}, 
       #{warehouseCode,jdbcType=VARCHAR}, #{warehouseName,jdbcType=VARCHAR}, #{purchaseGroupCode,jdbcType=VARCHAR}, 
@@ -111,7 +111,7 @@
       #{contactMobile,jdbcType=VARCHAR}, #{preArrivalTime,jdbcType=TIMESTAMP}, #{validTime,jdbcType=TIMESTAMP}, 
       #{deliveryAddress,jdbcType=VARCHAR}, #{deliveryTime,jdbcType=TIMESTAMP}, #{inStockTime,jdbcType=TIMESTAMP}, 
       #{inStockAddress,jdbcType=VARCHAR}, #{prePurchaseOrder,jdbcType=VARCHAR}, #{paymentCode,jdbcType=VARCHAR}, 
-      #{paymentName,jdbcType=VARCHAR}, #{paymentTime,jdbcType=BIGINT}, #{preAmount,jdbcType=DECIMAL}, 
+      #{paymentName,jdbcType=VARCHAR}, #{paymentTime,jdbcType=TIMESTAMP}, #{preAmount,jdbcType=DECIMAL},
       #{remark,jdbcType=VARCHAR}, #{sourceCode,jdbcType=VARCHAR}, #{sourceType,jdbcType=INTEGER},
       #{createById,jdbcType=VARCHAR}, #{createByName,jdbcType=VARCHAR}, #{updateById,jdbcType=VARCHAR}, 
       #{updateByName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
@@ -396,7 +396,7 @@
         #{paymentName,jdbcType=VARCHAR},
       </if>
       <if test="paymentTime != null">
-        #{paymentTime,jdbcType=BIGINT},
+        #{paymentTime,jdbcType=TIMESTAMP},
       </if>
       <if test="preAmount != null">
         #{preAmount,jdbcType=DECIMAL},
@@ -554,7 +554,7 @@
         payment_name = #{paymentName,jdbcType=VARCHAR},
       </if>
       <if test="paymentTime != null">
-        payment_time = #{paymentTime,jdbcType=BIGINT},
+        payment_time = #{paymentTime,jdbcType=TIMESTAMP},
       </if>
       <if test="preAmount != null">
         pre_amount = #{preAmount,jdbcType=DECIMAL},
@@ -631,7 +631,7 @@
       pre_purchase_order = #{prePurchaseOrder,jdbcType=VARCHAR},
       payment_code = #{paymentCode,jdbcType=VARCHAR},
       payment_name = #{paymentName,jdbcType=VARCHAR},
-      payment_time = #{paymentTime,jdbcType=BIGINT},
+      payment_time = #{paymentTime,jdbcType=TIMESTAMP},
       pre_amount = #{preAmount,jdbcType=DECIMAL},
       remark = #{remark,jdbcType=VARCHAR},
       source_code = #{sourceCode,jdbcType=VARCHAR},
@@ -643,5 +643,10 @@
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByorderStoreCode" parameterType="com.aiqin.mgs.order.api.domain.PurchaseOrder">
+    update purchase_order
+    set purchase_order_status = #{purchaseOrderStatus,jdbcType=INTEGER}
+    where purchase_order_code = #{purchaseOrderCode,jdbcType=VARCHAR}
   </update>
 </mapper>

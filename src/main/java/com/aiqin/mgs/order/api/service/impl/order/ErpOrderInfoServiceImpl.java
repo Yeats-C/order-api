@@ -1,8 +1,10 @@
 package com.aiqin.mgs.order.api.service.impl.order;
 
+import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.pay.ErpPayWayEnum;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.ProductInfo;
@@ -10,14 +12,15 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
-import com.aiqin.mgs.order.api.domain.request.order.ErpOrderEditRequest;
-import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
-import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSignRequest;
+import com.aiqin.mgs.order.api.domain.request.order.*;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderItemSplitGroupResponse;
+import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.CopyBeanUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
+import com.aiqin.mgs.order.api.util.RequestReturnUtil;
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 @Service
@@ -47,6 +51,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     private ErpOrderRequestService erpOrderRequestService;
     @Resource
     private ErpOrderCreateService erpOrderCreateService;
+    @Resource
+    private ErpOrderPayService erpOrderPayService;
+    @Resource
+    private PurchaseOrderService purchaseOrderService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -240,9 +248,6 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         if (order == null) {
             throw new BusinessException("无效的订单编号");
         }
-        if (!ErpOrderStatusEnum.ORDER_STATUS_3.getCode().equals(order.getOrderStatus())) {
-            throw new BusinessException("只有支付成功且未拆分的的订单才能拆分");
-        }
 
         //是否需要执行拆单操作
         boolean flag = false;
@@ -272,96 +277,234 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         if (processTypeEnum.isSplitByRepertory()) {
             //按照库存分组拆单
 
-            //TODO CT 跳过拆单步骤
+            if (1 == 1) {
+                //TODO CT 暂时没有真实数据，先跳过拆单步骤
+                order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
+                order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
+                this.updateOrderByPrimaryKeySelective(order, auth);
+                return;
+            }
+
+            List<ErpOrderInfo> splitOrderList = new ArrayList<>();
+
+            //请求供应链获取分组情况
+            List<ErpOrderItemSplitGroupResponse> lineSplitGroupList = erpOrderRequestService.getRepositorySplitGroup(order);
+            if (lineSplitGroupList == null || lineSplitGroupList.size() == 0) {
+                throw new BusinessException("未获取到供应链商品分组");
+            }
+
+            //行号 -（仓库库房 - 数量）
+            Map<Long, Map<String, Long>> lineRepertoryMap = new HashMap<>(16);
+            //行号 - 参数根据行号分组的list
+            Map<Long, List<ErpOrderItemSplitGroupResponse>> lineParamListMap = new HashMap<>(16);
+            //仓库库房 -（仓库库房编码名称信息）
+            Map<String, ErpOrderItemSplitGroupResponse> repertoryDetailMap = new HashMap<>(16);
+
+            //行分组结果map  仓库库房 - 明细行
+            Map<String, List<ErpOrderItem>> repertorySplitMap = new HashMap<>(16);
+
+            //遍历分组参数
+            for (ErpOrderItemSplitGroupResponse item :
+                    lineSplitGroupList) {
+                //行号
+                Long lineCode = item.getLineCode();
+
+                //仓库编码
+                String transportCenterCode = item.getTransportCenterCode();
+                //库房编码
+                String warehouseCode = item.getWarehouseCode();
+                //仓库编码+库房编码
+                String repertoryKey = transportCenterCode + warehouseCode;
+
+                if (lineCode != null) {
+                    throw new BusinessException("缺失行号");
+                }
+                if (StringUtils.isEmpty(transportCenterCode)) {
+                    throw new BusinessException("缺失仓库编码");
+                }
+                if (StringUtils.isEmpty(warehouseCode)) {
+                    throw new BusinessException("缺失库房编码");
+                }
+                if (item.getLockCount() == null) {
+                    throw new BusinessException("缺失锁定数量");
+                }
+
+                //记录仓库库房编码名称
+                if (!repertoryDetailMap.containsKey(repertoryKey)) {
+                    repertoryDetailMap.put(repertoryKey, item);
+                }
+
+                //行号对应参数再按照仓库编码分组
+                Map<String, Long> mapItem = new HashMap<>(16);
+                if (lineRepertoryMap.containsKey(lineCode)) {
+                    mapItem = lineRepertoryMap.get(lineCode);
+                }
+                mapItem.put(repertoryKey, item.getLockCount());
+                lineRepertoryMap.put(lineCode, mapItem);
+
+                //行号对应的拆分数据
+                List<ErpOrderItemSplitGroupResponse> list = new ArrayList<>();
+                if (lineParamListMap.containsKey(lineCode)) {
+                    list.addAll(lineParamListMap.get(lineCode));
+                }
+                lineParamListMap.put(lineCode, list);
+            }
+
+            //遍历原订单明细行
+            for (ErpOrderItem item :
+                    orderItemList) {
+
+                if (!lineParamListMap.containsKey(item.getLineCode())) {
+                    throw new BusinessException("未找到行号为" + item.getLineCode() + "的商品分组信息");
+                }
+
+                //该行的拆分结果参数
+                List<ErpOrderItemSplitGroupResponse> lineParamList = lineParamListMap.get(item.getLineCode());
+                //订货数量汇总
+                long lineProductCount = 0L;
+                //优惠分摊总金额（分摊后金额）
+                BigDecimal lineTotalPreferentialAmount = BigDecimal.ZERO;
+                //活动优惠总金额
+                BigDecimal lineTotalAcivityAmount = BigDecimal.ZERO;
+
+                //遍历原订单明细行一行的拆分情况
+                for (int i = 0; i < lineParamList.size(); i++) {
+                    ErpOrderItemSplitGroupResponse lineParam = lineParamList.get(i);
+                    String repertoryKey = lineParam.getTransportCenterCode() + lineParam.getWarehouseCode();
+                    List<ErpOrderItem> lineSplitList = new ArrayList<>();
+                    if (repertorySplitMap.containsKey(repertoryKey)) {
+                        lineSplitList.addAll(repertorySplitMap.get(repertoryKey));
+                    }
+
+                    Long lockCount = lineParam.getLockCount();
+
+                    lineProductCount += lockCount;
+
+                    ErpOrderItem newSplitItem = new ErpOrderItem();
+                    CopyBeanUtil.copySameBean(newSplitItem, item);
+                    newSplitItem.setLineCode(null);
+
+                    //拆出来的行订货金额
+                    newSplitItem.setTotalProductAmount(item.getProductAmount().multiply(new BigDecimal(lockCount)));
+                    if (i < lineParamList.size() - 1) {
+
+                        //拆出来的行均摊总金额
+                        BigDecimal totalPreferentialAmount = item.getTotalProductAmount().multiply(new BigDecimal(lockCount)).divide(new BigDecimal(item.getProductCount()), 4, RoundingMode.HALF_UP);
+                        lineTotalPreferentialAmount = lineTotalPreferentialAmount.add(totalPreferentialAmount);
+                        newSplitItem.setTotalPreferentialAmount(totalPreferentialAmount);
+
+                        //拆出来的行活动优惠金额
+                        BigDecimal totalAcivityAmount = item.getTotalAcivityAmount().multiply(new BigDecimal(lockCount)).divide(new BigDecimal(item.getProductCount()), 4, RoundingMode.HALF_UP);
+                        lineTotalAcivityAmount = lineTotalAcivityAmount.add(totalAcivityAmount);
+                        newSplitItem.setTotalAcivityAmount(totalAcivityAmount);
+
+                    } else {
+                        //最后一条，用减法避免误差
+
+                        //拆出来的行均摊总金额
+                        newSplitItem.setTotalPreferentialAmount(item.getTotalPreferentialAmount().subtract(lineTotalPreferentialAmount));
+
+                        //拆出来的行活动优惠金额
+                        newSplitItem.setTotalAcivityAmount(item.getTotalAcivityAmount().subtract(lineTotalAcivityAmount));
+                    }
+
+                    lineSplitList.add(newSplitItem);
+                    repertorySplitMap.put(repertoryKey, lineSplitList);
+
+                }
+
+                if (!item.getProductCount().equals(lineProductCount)) {
+                    throw new BusinessException("行号为" + item.getLineCode() + "的行库存分组数不等于订货数量");
+                }
+
+            }
+
+            if (repertorySplitMap.size() > 1) {
+                //多个仓库库房组，拆分订单
+
+                for (Map.Entry<String, List<ErpOrderItem>> entry :
+                        repertorySplitMap.entrySet()) {
+                    ErpOrderInfo newOrder = new ErpOrderInfo();
+                    CopyBeanUtil.copySameBean(newOrder, order);
+
+                    String newOrderCode = erpOrderCreateService.getOrderCode();
+                    String orderId = OrderPublic.getUUID();
+                    newOrder.setId(null);
+                    newOrder.setOrderStoreCode(newOrderCode);
+                    newOrder.setOrderStoreId(orderId);
+                    newOrder.setOrderLevel(ErpOrderLevelEnum.SECONDARY.getCode());
+                    newOrder.setMainOrderCode(order.getOrderStoreCode());
+                    String repertoryKey = entry.getKey();
+                    ErpOrderItemSplitGroupResponse repertoryDetail = repertoryDetailMap.get(repertoryKey);
+                    newOrder.setTransportCenterCode(repertoryDetail.getTransportCenterCode());
+                    newOrder.setTransportCenterName(repertoryDetail.getTransportCenterName());
+                    newOrder.setWarehouseCode(repertoryDetail.getWarehouseCode());
+                    newOrder.setWarehouseName(repertoryDetail.getWarehouseName());
+
+                    List<ErpOrderItem> splitItemList = new ArrayList<>();
+
+                    //商品总价
+                    BigDecimal totalProductAmount = BigDecimal.ZERO;
+                    //实际支付金额
+                    BigDecimal orderAmount = BigDecimal.ZERO;
+                    //商品毛重(kg)
+                    BigDecimal boxGrossWeightTotal = BigDecimal.ZERO;
+                    //商品包装体积(mm³)
+                    BigDecimal boxVolumeTotal = BigDecimal.ZERO;
+
+                    long lineCode = 1L;
+                    for (ErpOrderItem item :
+                            entry.getValue()) {
+
+                        ErpOrderItem newOrderItem = new ErpOrderItem();
+                        CopyBeanUtil.copySameBean(newOrderItem, item);
+                        newOrderItem.setId(null);
+                        newOrderItem.setOrderStoreId(orderId);
+                        newOrderItem.setOrderStoreCode(newOrderCode);
+                        newOrderItem.setOrderInfoDetailId(OrderPublic.getUUID());
+                        newOrderItem.setLineCode(lineCode++);
+                        splitItemList.add(newOrderItem);
+
+                        //商品总价
+                        totalProductAmount = totalProductAmount.add(item.getProductAmount());
+                        //实际支付金额 取分摊后金额汇总
+                        orderAmount = orderAmount.add(item.getTotalPreferentialAmount());
+                        //商品毛重汇总
+                        boxGrossWeightTotal = boxGrossWeightTotal.add((newOrderItem.getBoxGrossWeight() == null ? BigDecimal.ZERO : newOrderItem.getBoxGrossWeight()).multiply(new BigDecimal(newOrderItem.getProductCount())));
+                        //商品体积汇总
+                        boxVolumeTotal = boxVolumeTotal.add((newOrderItem.getBoxVolume() == null ? BigDecimal.ZERO : newOrderItem.getBoxVolume()).multiply(new BigDecimal(newOrderItem.getProductCount())));
+
+                    }
+                    newOrder.setTotalProductAmount(totalProductAmount);
+                    newOrder.setOrderAmount(orderAmount);
+                    newOrder.setDiscountAmount(totalProductAmount.multiply(orderAmount));
+                    newOrder.setTotalWeight(boxGrossWeightTotal);
+                    newOrder.setTotalVolume(boxVolumeTotal);
+                    newOrder.setItemList(orderItemList);
+
+                    erpOrderItemService.saveOrderItemList(splitItemList, auth);
+                    erpOrderOperationLogService.copySplitOrderLog(orderCode, orderOperationLogList);
+                    this.saveOrderNoLog(newOrder, auth);
+                    splitOrderList.add(newOrder);
+
+                }
+            }
+
+            if (splitOrderList.size() > 0) {
+                for (ErpOrderInfo item :
+                        splitOrderList) {
+                    ErpOrderInfo updateOrder = erpOrderQueryService.getOrderByOrderCode(item.getOrderStoreCode());
+                    updateOrder.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
+                    updateOrder.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
+                    updateOrder.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
+                    this.updateOrderByPrimaryKeySelective(updateOrder, auth);
+                }
+            } else {
+                order.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
+            }
             order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
             this.updateOrderByPrimaryKeySelective(order, auth);
-
-
-            //请求供应链获取分组情况
-//            List<ErpOrderItemSplitGroupResponse> lineSplitGroupList = erpOrderRequestService.getRepositorySplitGroup(order);
-//            if (lineSplitGroupList == null || lineSplitGroupList.size() == 0) {
-//                throw new BusinessException("未获取到供应链商品分组");
-//            }
-//
-//            //行号 -（仓库库房 - 数量）
-//            Map<Long, Map<String, Long>> lineRepertoryMap = new HashMap<>(16);
-//            //行号 - 参数根据行号分组的list
-//            Map<Long, List<ErpOrderItemSplitGroupResponse>> lineParamListMap = new HashMap<>(16);
-//            //仓库库房 -（仓库库房编码名称信息）
-//            Map<String, ErpOrderItemSplitGroupResponse> repertoryDetailMap = new HashMap<>(16);
-//
-//            //行分组结果map  仓库库房 - 明细行
-//            Map<String, List<ErpOrderItem>> splitMap = new HashMap<>(16);
-//
-//            //遍历分组参数
-//            for (ErpOrderItemSplitGroupResponse item :
-//                    lineSplitGroupList) {
-//                //行号
-//                Long lineCode = item.getLineCode();
-//
-//                //仓库编码
-//                String transportCenterCode = item.getTransportCenterCode();
-//                //库房编码
-//                String warehouseCode = item.getWarehouseCode();
-//                //仓库编码+库房编码
-//                String repertoryKey = transportCenterCode + warehouseCode;
-//
-//                if (lineCode != null) {
-//                    throw new BusinessException("缺失行号");
-//                }
-//                if (StringUtils.isEmpty(transportCenterCode)) {
-//                    throw new BusinessException("缺失仓库编码");
-//                }
-//                if (StringUtils.isEmpty(warehouseCode)) {
-//                    throw new BusinessException("缺失库房编码");
-//                }
-//                if (item.getLockCount() == null) {
-//                    throw new BusinessException("缺失锁定数量");
-//                }
-//
-//                //记录仓库库房编码名称
-//                if (!repertoryDetailMap.containsKey(repertoryKey)) {
-//                    repertoryDetailMap.put(repertoryKey, item);
-//                }
-//
-//                //行号对应参数再按照仓库编码分组
-//                Map<String, Long> mapItem = new HashMap<>(16);
-//                if (lineRepertoryMap.containsKey(lineCode)) {
-//                    mapItem = lineRepertoryMap.get(lineCode);
-//                }
-//                mapItem.put(repertoryKey, item.getLockCount());
-//                lineRepertoryMap.put(lineCode, mapItem);
-//
-//                //行号对应的拆分数据
-//                List<ErpOrderItemSplitGroupResponse> list = new ArrayList<>();
-//                if (lineParamListMap.containsKey(lineCode)) {
-//                    list.addAll(lineParamListMap.get(lineCode));
-//                }
-//            }
-//
-//            for (ErpOrderItem item :
-//                    orderItemList) {
-//
-//                if (!lineParamListMap.containsKey(item.getLineCode())) {
-//                    throw new BusinessException("未找到行号为" + item.getLineCode() + "的商品分组情况");
-//                }
-//
-//                //该行的拆分结果参数
-//                List<ErpOrderItemSplitGroupResponse> lineParamList = lineParamListMap.get(item.getLineCode());
-//                for (int i = 0; i < lineParamList.size(); i++) {
-//
-//                    ErpOrderItem newSplitItem = new ErpOrderItem();
-////                    CopyBeanUtil
-//
-//                    if (i < lineParamList.size() - 1) {
-//
-//                    }else {
-//                        //最后一条，用减法避免误差
-//                    }
-//                }
-//
-//            }
 
 
         } else {
@@ -369,6 +512,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
             //根据供应商把订单行分组
             Map<String, List<ErpOrderItem>> supplierItemMap = new HashMap<>(16);
+            Map<String, String> supplierCodeNameMap = new HashMap<>(16);
             for (ErpOrderItem item :
                     orderItemList) {
                 String supplierCode = null;
@@ -381,6 +525,9 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 }
                 list.add(item);
                 supplierItemMap.put(supplierCode, list);
+                if (!supplierCodeNameMap.containsKey(supplierCode)) {
+                    supplierCodeNameMap.put(supplierCode, item.getSupplierName());
+                }
             }
 
             List<ErpOrderInfo> splitOrderList = new ArrayList<>();
@@ -398,6 +545,9 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     newOrder.setOrderStoreCode(newOrderCode);
                     newOrder.setOrderStoreId(orderId);
                     newOrder.setOrderLevel(ErpOrderLevelEnum.SECONDARY.getCode());
+                    newOrder.setMainOrderCode(order.getOrderStoreCode());
+                    newOrder.setSupplierCode(entry.getKey());
+                    newOrder.setSupplierName(supplierCodeNameMap.get(entry.getKey()));
 
                     List<ErpOrderItem> splitItemList = new ArrayList<>();
 
@@ -405,6 +555,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     BigDecimal totalProductAmount = BigDecimal.ZERO;
                     //实际支付金额
                     BigDecimal orderAmount = BigDecimal.ZERO;
+                    //商品毛重(kg)
+                    BigDecimal boxGrossWeightTotal = BigDecimal.ZERO;
+                    //商品包装体积(mm³)
+                    BigDecimal boxVolumeTotal = BigDecimal.ZERO;
 
                     long lineCode = 1L;
                     for (ErpOrderItem item :
@@ -427,14 +581,21 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                         //实际支付金额 取分摊后金额汇总
                         orderAmount = orderAmount.add(item.getTotalPreferentialAmount());
 
+                        //商品毛重汇总
+                        boxGrossWeightTotal = boxGrossWeightTotal.add((newOrderItem.getBoxGrossWeight() == null ? BigDecimal.ZERO : newOrderItem.getBoxGrossWeight()).multiply(new BigDecimal(newOrderItem.getProductCount())));
+                        //商品体积汇总
+                        boxVolumeTotal = boxVolumeTotal.add((newOrderItem.getBoxVolume() == null ? BigDecimal.ZERO : newOrderItem.getBoxVolume()).multiply(new BigDecimal(newOrderItem.getProductCount())));
+
                     }
                     newOrder.setTotalProductAmount(totalProductAmount);
                     newOrder.setOrderAmount(orderAmount);
                     newOrder.setDiscountAmount(totalProductAmount.multiply(orderAmount));
+                    newOrder.setTotalWeight(boxGrossWeightTotal);
+                    newOrder.setTotalVolume(boxVolumeTotal);
                     newOrder.setItemList(orderItemList);
 
                     erpOrderItemService.saveOrderItemList(splitItemList, auth);
-                    erpOrderOperationLogService.copySplitOrderLog(orderCode, orderOperationLogList);
+                    erpOrderOperationLogService.copySplitOrderLog(newOrderCode, orderOperationLogList);
                     this.saveOrderNoLog(newOrder, auth);
                     splitOrderList.add(newOrder);
 
@@ -444,246 +605,23 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
             }
 
-            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
-            order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
-            this.updateOrderByPrimaryKeySelective(order, auth);
 
             if (splitOrderList.size() > 0) {
                 for (ErpOrderInfo item :
                         splitOrderList) {
-                    item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
-                    item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
-                    this.updateOrderByPrimaryKeySelective(item, auth);
+                    ErpOrderInfo updateOrder = erpOrderQueryService.getOrderByOrderCode(item.getOrderStoreCode());
+                    updateOrder.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
+                    updateOrder.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
+                    updateOrder.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
+                    this.updateOrderByPrimaryKeySelective(updateOrder, auth);
                 }
+            } else {
+                order.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode());
             }
 
-        }
-
-
-        if (processTypeEnum.isSplitByRepertory()) {
-            //按照供应商拆分订单
-
-//
-        } else {
-            //按照库存拆分
-
-
-//            if (paramItemList == null || paramItemList.size() <= 0) {
-//                throw new BusinessException("订单商品明细行为空");
-//            }
-//
-//            //订单行号-(仓库编码-数量)
-//            Map<String, Map<String, Integer>> itemCodeRepertoryQuantityMap = new HashMap<>(16);
-//            //仓库编码-仓库名称
-//            Map<String, String> repertoryCodeNameMap = new HashMap<>(16);
-//            //分组Map
-//            Map<String, List<ErpOrderItem>> splitMap = new HashMap<>(16);
-//
-//            int lineIndex = 0;
-//            //遍历参数商品行
-//            for (ErpOrderItem item :
-//                    paramItemList) {
-//                lineIndex++;
-//                if (item == null) {
-//                    throw new BusinessException("第" + lineIndex + "行参数为空");
-//                }
-//                if (StringUtils.isEmpty(item.getOrderItemCode())) {
-//                    throw new BusinessException("第" + lineIndex + "行商品明细行编号为空");
-//                }
-//                if (StringUtils.isEmpty(item.getRepertoryCode())) {
-//                    throw new BusinessException("第" + lineIndex + "行仓库编码为空");
-//                }
-//                if (StringUtils.isEmpty(item.getRepertoryName())) {
-//                    throw new BusinessException("第" + lineIndex + "行仓库名称为空");
-//                }
-//                if (item.getQuantity() == null) {
-//                    throw new BusinessException("第" + lineIndex + "行商品数量为空");
-//                } else {
-//                    if (item.getQuantity() <= 0) {
-//                        throw new BusinessException("第" + lineIndex + "行商品数量必须大于0");
-//                    }
-//                }
-//
-//                //记录发货仓库编码名称
-//                if (!repertoryCodeNameMap.containsKey(item.getRepertoryCode())) {
-//                    repertoryCodeNameMap.put(item.getRepertoryCode(), item.getRepertoryName());
-//                }
-//
-//                //记录商品行拆分库房数量
-//                Map<String, Integer> repertoryQuantityMap = itemCodeRepertoryQuantityMap.containsKey(item.getOrderItemCode()) ? itemCodeRepertoryQuantityMap.get(item.getOrderItemCode()) : new HashMap<>();
-//                repertoryQuantityMap.put(item.getRepertoryCode(), (repertoryQuantityMap.get(item.getRepertoryCode()) != null ? repertoryQuantityMap.get(item.getRepertoryCode()) : 0) + item.getQuantity());
-//                itemCodeRepertoryQuantityMap.put(item.getOrderItemCode(), repertoryQuantityMap);
-//            }
-//
-//            //遍历原订单商品行
-//            for (ErpOrderItem item :
-//                    orderItemList) {
-//                if (!itemCodeRepertoryQuantityMap.containsKey(item.getOrderItemCode())) {
-//                    throw new BusinessException("缺少商品行" + item.getOrderItemCode() + "的库存信息");
-//                }
-//
-//                Map<String, Integer> repertoryQuantityMap = itemCodeRepertoryQuantityMap.get(item.getOrderItemCode());
-//                Integer quantityTotal = 0;
-//                for (Map.Entry<String, Integer> entry :
-//                        repertoryQuantityMap.entrySet()) {
-//                    quantityTotal += entry.getValue();
-//
-//                    List<ErpOrderItem> splitItemList = new ArrayList<>();
-//                    if (splitMap.containsKey(entry.getKey())) {
-//                        splitItemList.addAll(splitMap.get(entry.getKey()));
-//                    }
-//                    ErpOrderItem splitItem = new ErpOrderItem();
-//                    try {
-//                        PropertyUtils.copyProperties(splitItem, item);
-//                    } catch (Exception e) {
-//                        logger.info("操作异常：{}", e);
-//                    }
-//                    splitItem.setId(null);
-//                    splitItem.setQuantity(entry.getValue());
-//                    splitItem.setMoney(splitItem.getPrice().multiply(new BigDecimal(splitItem.getQuantity())));
-//
-//                    //TODO 尾差处理 如果有活动或者优惠券的情况下可能会除不尽
-//                    splitItem.setActualMoney(item.getActualMoney().multiply(new BigDecimal(entry.getValue())).divide(BigDecimal.TEN, 4, RoundingMode.HALF_UP));
-//                    splitItem.setActivityMoney(item.getActivityMoney().multiply(new BigDecimal(entry.getValue())).divide(BigDecimal.TEN, 4, RoundingMode.HALF_UP));
-//
-//                    splitItemList.add(splitItem);
-//                    splitMap.put(entry.getKey(), splitItemList);
-//                }
-//                if (!quantityTotal.equals(item.getQuantity())) {
-//                    throw new BusinessException("商品行" + item.getOrderItemCode() + "数量汇总与原数量不相等");
-//                }
-//
-//            }
-//
-//            //更新订单状态为拆分中
-//            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_3.getCode());
-//            updateOrderByPrimaryKeySelective(order, auth);
-//
-//
-//            List<ErpOrderInfo> newSplitOrderList = new ArrayList<>();
-//            //是否拆分
-//            boolean splitFlag = false;
-//            if (splitMap.size() == 1) {
-//                //不拆分
-//
-//            } else {
-//                //拆分订单
-//
-//                splitFlag = true;
-//                for (Map.Entry<String, List<ErpOrderItem>> entry :
-//                        splitMap.entrySet()) {
-//
-//                    List<ErpOrderItem> splitOrderItemList = entry.getValue();
-//
-//                    //生成订单id
-//                    String newOrderId = OrderPublic.getUUID();
-//                    //生成订单code
-//                    String newOrderCode = OrderPublic.generateOrderCode(order.getOrderOriginType(), order.getOrderChannelType());
-//
-//                    //订货金额汇总
-//                    BigDecimal moneyTotal = BigDecimal.ZERO;
-//                    //实际支付金额汇总
-//                    BigDecimal realMoneyTotal = BigDecimal.ZERO;
-////                    //活动优惠金额汇总
-//                    BigDecimal activityMoneyTotal = BigDecimal.ZERO;
-////                    //服纺券优惠金额汇总
-////                    BigDecimal spinCouponMoneyTotal = BigDecimal.ZERO;
-////                    //A品券优惠金额汇总
-////                    BigDecimal topCouponMoneyTotal = BigDecimal.ZERO;
-//                    int orderItemNum = 1;
-//                    for (ErpOrderItem item :
-//                            splitOrderItemList) {
-//
-//                        //订单id
-//                        item.setOrderId(newOrderId);
-//                        //订单明细行编号
-//                        item.setOrderItemCode(newOrderCode + String.format("%03d", orderItemNum++));
-//
-//                        //订货金额汇总
-//                        moneyTotal = moneyTotal.add(item.getMoney() == null ? BigDecimal.ZERO : item.getMoney());
-//                        //实际支付金额汇总
-//                        realMoneyTotal = realMoneyTotal.add(item.getActualMoney() == null ? BigDecimal.ZERO : item.getActualMoney());
-//                        //活动优惠金额汇总
-//                        activityMoneyTotal = activityMoneyTotal.add(item.getActivityMoney() == null ? BigDecimal.ZERO : item.getActivityMoney());
-////                    //服纺券优惠金额汇总
-////                    spinCouponMoneyTotal = spinCouponMoneyTotal.add(item.getSpinCouponMoney() == null ? BigDecimal.ZERO : item.getSpinCouponMoney());
-////                    //A品券优惠金额汇总
-////                    topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponMoney() == null ? BigDecimal.ZERO : item.getTopCouponMoney())
-//                    }
-//                    erpOrderItemService.saveOrderItemList(splitOrderItemList, auth);
-//
-//                    //保存新订单信息
-//                    ErpOrderInfo newOrder = new ErpOrderInfo();
-//                    newOrder.setOrderStoreCode(newOrderCode);
-//                    newOrder.setOrderId(newOrderId);
-//                    newOrder.setOrderChannelType(order.getOrderChannelType());
-//                    newOrder.setOrderOriginType(order.getOrderOriginType());
-//                    newOrder.setPayStatus(order.getPayStatus());
-//                    newOrder.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_3.getCode());
-//                    //TODO CT 金额需要重新计算
-////                    newOrder.setPayMoney(realMoneyTotal);
-////                    newOrder.setTotalMoney(moneyTotal);
-//                    newOrder.setOrderType(order.getOrderType());
-//                    newOrder.setFranchiseeId(order.getFranchiseeId());
-//                    newOrder.setFranchiseeCode(order.getFranchiseeCode());
-//                    newOrder.setFranchiseeName(order.getFranchiseeName());
-//                    newOrder.setStoreId(order.getStoreId());
-//                    newOrder.setStoreCode(order.getStoreCode());
-//                    newOrder.setStoreName(order.getStoreName());
-//                    newOrder.setOrderLevel(ErpOrderLevelEnum.SECONDARY.getCode());
-//                    newOrder.setReturnStatus(YesOrNoEnum.NO.getCode());
-//                    newOrder.setSplitStatus(YesOrNoEnum.NO.getCode());
-//                    newOrder.setPrimaryCode(order.getOrderStoreCode());
-//                    newOrder.setRepertoryCode(entry.getKey());
-//                    newOrder.setRepertoryName(repertoryCodeNameMap.get(entry.getKey()));
-//                    this.saveOrderNoLog(newOrder, auth);
-//
-//                    //保存收货人信息
-//                    ErpOrderConsignee newOrderConsignee = new ErpOrderConsignee();
-//                    try {
-//                        PropertyUtils.copyProperties(newOrderConsignee, orderConsignee);
-//                        newOrderConsignee.setOrderId(newOrderId);
-//                    } catch (Exception e) {
-//                        throw new BusinessException("操作异常");
-//                    }
-//                    erpOrderConsigneeService.saveOrderConsignee(newOrderConsignee, auth);
-//
-//                    //复制日志
-//                    erpOrderOperationLogService.copySplitOrderLog(newOrderId, orderOperationLogList);
-//
-//                    ErpOrderInfo orderByOrderId = erpOrderQueryService.getOrderByOrderId(newOrderId);
-//                    orderByOrderId.setOrderConsignee(newOrderConsignee);
-//                    orderByOrderId.setOrderItemList(splitOrderItemList);
-//                    newSplitOrderList.add(orderByOrderId);
-//                }
-//
-//            }
-//
-//            //订单同步
-//            if (splitFlag) {
-//                for (ErpOrderInfo item :
-//                        newSplitOrderList) {
-//                    item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
-//                    this.updateOrderByPrimaryKeySelective(item, auth);
-//                }
-//                order.setSplitStatus(YesOrNoEnum.YES.getCode());
-//            }
-//            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
-//            this.updateOrderByPrimaryKeySelective(order, auth);
-//
-//            //调用同步到供应链接口
-//            erpOrderRequestService.sendSplitOrderToSupplyChain(order, newSplitOrderList);
-//
-//            if (splitFlag) {
-//                for (ErpOrderInfo item :
-//                        newSplitOrderList) {
-//                    item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
-//                    this.updateOrderByPrimaryKeySelective(item, auth);
-//                }
-//            } else {
-//                order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
-//                this.updateOrderByPrimaryKeySelective(order, auth);
-//            }
+            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
+            order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
+            this.updateOrderByPrimaryKeySelective(order, auth);
         }
 
     }
@@ -705,14 +643,14 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 list) {
             if (ErpOrderStatusEnum.ORDER_STATUS_4.getCode().equals(item.getOrderStatus())) {
                 if (ErpOrderNodeStatusEnum.STATUS_6.getCode().equals(item.getOrderNodeStatus())) {
+                    item.setItemList(erpOrderItemService.selectOrderItemListByOrderId(item.getOrderStoreId()));
 
-                    //TODO CT 同步订单
-
-
-                    //同步之后修改状态
+                    //同步订单到供应链，只调用一次接口，不管成功失败都算执行完成这一步
+                    HttpResponse httpResponse = purchaseOrderService.createPurchaseOrder(item);
+                    //同步之后修改订单状态
                     item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
                     item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_8.getCode());
-                    this.updateOrderByPrimaryKeySelective(order, auth);
+                    this.updateOrderByPrimaryKeySelective(item, auth);
                 }
             }
         }
@@ -791,6 +729,77 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_12.getCode());
         order.setReceiveTime(new Date());
         this.updateOrderByPrimaryKeySelective(order, auth);
+
+        //首单，修改门店状态
+        if (ErpOrderCategoryEnum.ORDER_TYPE_2.getValue().equals(order.getOrderCategoryCode()) || ErpOrderCategoryEnum.ORDER_TYPE_4.getValue().equals(order.getOrderCategoryCode())) {
+            erpOrderRequestService.updateStoreStatus(order.getStoreId(), "010201");
+        }
+    }
+
+    @Override
+    public void orderCarryOutNextStep(ErpOrderCarryOutNextStepRequest erpOrderCarryOutNextStepRequest, AuthToken auth) {
+
+        if (erpOrderCarryOutNextStepRequest == null || StringUtils.isEmpty(erpOrderCarryOutNextStepRequest.getOrderCode())) {
+            throw new BusinessException("缺失订单号");
+        }
+
+        ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(erpOrderCarryOutNextStepRequest.getOrderCode());
+        if (order == null) {
+            throw new BusinessException("无效的订单号");
+        }
+
+        ErpOrderNodeProcessTypeEnum processTypeEnum = ErpOrderNodeProcessTypeEnum.getEnum(order.getOrderTypeCode(), order.getOrderCategoryCode());
+        if (processTypeEnum == null) {
+            throw new BusinessException("订单类型异常");
+        }
+        ErpOrderNodeStatusEnum orderNodeStatusEnum = ErpOrderNodeStatusEnum.getEnum(order.getOrderNodeStatus());
+
+        //需不需要发起支付或者轮询
+        boolean payFlag = false;
+        //需不需要支付成功后续操作
+        boolean payAfterFlag = false;
+
+        switch (orderNodeStatusEnum) {
+            case STATUS_1:
+                if (processTypeEnum.isAutoPay()) {
+                    payFlag = true;
+                }
+                break;
+            case STATUS_2:
+                payFlag = true;
+                break;
+            case STATUS_3:
+                payAfterFlag = true;
+                break;
+            case STATUS_4:
+                if (processTypeEnum.isAutoPay()) {
+                    payFlag = true;
+                }
+                break;
+            case STATUS_5:
+                payAfterFlag = true;
+                break;
+            case STATUS_6:
+                payAfterFlag = true;
+                break;
+            default:
+                ;
+        }
+
+        if (payFlag) {
+            //重新发起支付或者轮询结果
+
+            ErpOrderPayRequest erpOrderPayRequest = new ErpOrderPayRequest();
+            erpOrderPayRequest.setOrderCode(order.getOrderStoreCode());
+            erpOrderPayRequest.setPayWay(ErpPayWayEnum.PAY_1.getCode());
+            erpOrderPayService.orderPayStartMethodGroup(erpOrderPayRequest, auth, true);
+        }
+        if (payAfterFlag) {
+            //重新执行支付成功后续操作
+
+            erpOrderPayService.orderPaySuccessMethodGroup(order.getOrderStoreCode(), auth);
+        }
+
     }
 
 }

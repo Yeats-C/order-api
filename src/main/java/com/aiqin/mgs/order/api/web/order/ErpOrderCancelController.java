@@ -41,7 +41,6 @@ public class ErpOrderCancelController {
     public HttpResponse cancelOrderWithoutStock(@RequestBody ErpOrderCancelRequest erpOrderCancelRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-            AuthUtil.loginCheck();
             erpOrderCancelService.cancelOrderWithoutStock(erpOrderCancelRequest);
         } catch (BusinessException e) {
             logger.error("异常信息：{}", e);

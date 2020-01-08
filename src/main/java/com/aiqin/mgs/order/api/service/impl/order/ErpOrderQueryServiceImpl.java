@@ -101,7 +101,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                 //主订单
 
                 //获取拆分订单
-                if (YesOrNoEnum.YES.getCode().equals(order.getSplitStatus())) {
+                if (StatusEnum.YES.getCode().equals(order.getSplitStatus())) {
                     List<ErpOrderInfo> secondOrderList = getSecondOrderListByPrimaryCode(order.getOrderStoreCode());
                     order.setSecondaryOrderList(secondOrderList);
                 }
@@ -324,14 +324,31 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         if (orderStatusEnum == null) {
             return;
         }
+        ErpOrderNodeStatusEnum orderNodeStatusEnum = ErpOrderNodeStatusEnum.getEnum(order.getOrderNodeStatus());
+        if (orderNodeStatusEnum == null) {
+            return;
+        }
         ErpOrderNodeProcessTypeEnum processTypeEnum = ErpOrderNodeProcessTypeEnum.getEnum(order.getOrderTypeCode(), order.getOrderCategoryCode());
         if (processTypeEnum == null) {
             return;
         }
 
-        //确认收款按钮
-        if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_1 || orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_99) {
-            control.setRepay(StatusEnum.YES.getCode());
+        //爱掌柜查看按钮
+        if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_1) {
+            control.setDetail(StatusEnum.NO.getCode());
+        }
+
+        //确认订单按钮
+        if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_2 || orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_3 || orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_4) {
+            control.setAbnormal(StatusEnum.YES.getCode());
+        } else {
+            if (processTypeEnum.isAutoPay()) {
+                if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_1) {
+                    if (orderNodeStatusEnum == ErpOrderNodeStatusEnum.STATUS_1 || orderNodeStatusEnum == ErpOrderNodeStatusEnum.STATUS_4) {
+                        control.setAbnormal(StatusEnum.YES.getCode());
+                    }
+                }
+            }
         }
 
         //添加赠品

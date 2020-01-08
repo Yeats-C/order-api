@@ -34,7 +34,10 @@ public interface ReturnOrderInfoDao {
     Integer updateLogisticsCountAndAmount(@Param("returnOrderCode") String returnOrderCode, @Param("actualReturnOrderAmount") BigDecimal actualReturnOrderAmount, @Param("actualProductCount") Long actualProductCount);
 
     //修改退款状态
-    Integer updateRefundStatus(String orderStoreCode);
+    Integer updateRefundStatus(String returnOrderCode);
+
+    //修改退货单同步状态
+    Integer updateOrderSuccess(@Param("orderSuccess") Integer orderSuccess, @Param("returnOrderCode") String returnOrderCode);
 
     //后台销售退货单管理列表（搜索）
     List<ReturnOrderInfo> page(ReturnOrderSearchVo searchVo);
@@ -50,6 +53,14 @@ public interface ReturnOrderInfoDao {
 
     String selectOrderId(@Param("returnOrderCode") String returnOrderCode);
 
+
     //根据搜索条件查询退货单
     List<ReturnOrderInfo> selectByParames(OrderListVo3 orderListVo3);
+
+    //查询同步失败的退货单
+    List<ReturnOrderInfo> selectByOrderSuccess(Integer orderSuccess);
+
+    //查询待ERP退货单，待生成爱亲退供单数据
+    ReturnOrderInfo selectByOrderCodeAndSuccess(@Param("orderSuccess") Integer orderSuccess, @Param("returnOrderCode")String returnOrderCode);
+
 }

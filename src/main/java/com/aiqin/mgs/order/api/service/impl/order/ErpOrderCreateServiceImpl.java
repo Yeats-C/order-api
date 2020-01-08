@@ -9,6 +9,7 @@ import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.ProductInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.aiqin.mgs.order.api.domain.constant.ErpOrderCodeSequence;
+import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
@@ -55,7 +56,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     @Transactional(rollbackFor = Exception.class)
     public ErpOrderInfo erpSaveOrder(ErpOrderSaveRequest erpOrderSaveRequest, AuthToken auth) {
         //校验参数
-        validateSaveOrderRequest(erpOrderSaveRequest);
+        validateSaveOrderRequest(erpOrderSaveRequest, true);
 
         ErpOrderTypeCategoryControlEnum controlEnum = ErpOrderTypeCategoryControlEnum.getEnum(erpOrderSaveRequest.getOrderType(), erpOrderSaveRequest.getOrderCategory());
         if (controlEnum == null || !controlEnum.isErpCartCreate()) {
@@ -68,7 +69,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     @Transactional(rollbackFor = Exception.class)
     public ErpOrderInfo storeSaveOrder(ErpOrderSaveRequest erpOrderSaveRequest, AuthToken auth) {
         //校验参数
-        validateSaveOrderRequest(erpOrderSaveRequest);
+        validateSaveOrderRequest(erpOrderSaveRequest, false);
 
         ErpOrderTypeCategoryControlEnum controlEnum = ErpOrderTypeCategoryControlEnum.getEnum(erpOrderSaveRequest.getOrderType(), erpOrderSaveRequest.getOrderCategory());
         if (controlEnum == null || !controlEnum.isStoreCartCreate()) {
@@ -87,8 +88,6 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @date 2019/12/26 9:49
      */
     private ErpOrderInfo saveOrder(ErpOrderSaveRequest erpOrderSaveRequest, AuthToken auth) {
-
-        erpOrderSaveRequest.setStoreId("AB988458F192C747478210CC01D4D4135C");
 
         //获取门店信息
         StoreInfo storeInfo = erpOrderRequestService.getStoreInfoByStoreId(erpOrderSaveRequest.getStoreId());
@@ -111,11 +110,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //保存订单、订单明细、订单支付、订单收货人信息、订单日志
         String orderId = insertOrder(order, storeInfo, auth, erpOrderSaveRequest);
         //删除购物车商品
-//        deleteOrderProductFromCart(erpOrderSaveRequest.getStoreId(), storeCartProduct);
+        deleteOrderProductFromCart(erpOrderSaveRequest.getStoreId(), storeCartProduct);
 
         //锁库存
         if (processTypeEnum.isLockStock()) {
-            boolean flag = erpOrderRequestService.lockStockInSupplyChain(order, erpOrderItemList,auth);
+            boolean flag = erpOrderRequestService.lockStockInSupplyChain(order, erpOrderItemList, auth);
             if (!flag) {
                 throw new BusinessException("锁库存失败");
             }
@@ -130,7 +129,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     public ErpOrderInfo saveRackOrder(ErpOrderSaveRequest erpOrderSaveRequest, AuthToken auth) {
 
         //校验参数
-        validateSaveOrderRequest(erpOrderSaveRequest);
+        validateSaveOrderRequest(erpOrderSaveRequest, true);
         if (!ErpOrderTypeEnum.ASSIST_PURCHASING.getCode().equals(erpOrderSaveRequest.getOrderType())) {
             throw new BusinessException("只能创建" + ErpOrderTypeEnum.ASSIST_PURCHASING.getDesc() + "的订单");
         }
@@ -158,11 +157,14 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         if (processTypeEnum.isLockStock()) {
             //锁库
-            boolean flag = erpOrderRequestService.lockStockInSupplyChain(order,orderItemList, auth);
+            boolean flag = erpOrderRequestService.lockStockInSupplyChain(order, orderItemList, auth);
             if (!flag) {
                 throw new BusinessException("锁库存失败");
             }
         }
+
+        //更新门店营业状态
+        erpOrderRequestService.updateStoreBusinessStage(storeInfo.getStoreId(), OrderConstant.OPEN_STATUS_CODE_17, OrderConstant.OPEN_STATUS_CODE_18);
 
         //返回订单
         return order;
@@ -172,12 +174,13 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * 校验保存订单参数
      *
      * @param erpOrderSaveRequest
+     * @param erpOrder            erp的订单
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/11/25 9:40
      */
-    private void validateSaveOrderRequest(ErpOrderSaveRequest erpOrderSaveRequest) {
+    private void validateSaveOrderRequest(ErpOrderSaveRequest erpOrderSaveRequest, boolean erpOrder) {
         if (erpOrderSaveRequest == null) {
             throw new BusinessException("空参数");
         }
@@ -191,11 +194,15 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 throw new BusinessException("无效的订单类型");
             }
         }
-        if (erpOrderSaveRequest.getOrderCategory() == null) {
-            throw new BusinessException("请传入订单类别");
+        if (ErpOrderTypeEnum.DIRECT_SEND.getCode().equals(erpOrderSaveRequest.getOrderType()) && erpOrder) {
+            erpOrderSaveRequest.setOrderCategory(ErpOrderCategoryEnum.ORDER_TYPE_1.getCode());
         } else {
-            if (!ErpOrderCategoryEnum.exist(erpOrderSaveRequest.getOrderCategory())) {
-                throw new BusinessException("无效的订单类别");
+            if (erpOrderSaveRequest.getOrderCategory() == null) {
+                throw new BusinessException("请传入订单类别");
+            } else {
+                if (!ErpOrderCategoryEnum.exist(erpOrderSaveRequest.getOrderCategory())) {
+                    throw new BusinessException("无效的订单类别");
+                }
             }
         }
     }
@@ -349,6 +356,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             orderItem.setCompanyCode(storeInfo.getCompanyCode());
             //公司名称
             orderItem.setCompanyName(storeInfo.getCompanyName());
+            //单个商品毛重(kg)
+            orderItem.setBoxGrossWeight(productInfo.getBoxGrossWeight());
+            //单个商品包装体积(mm³)
+            orderItem.setBoxVolume(productInfo.getBoxVolume());
 
             orderItemList.add(orderItem);
         }
@@ -420,6 +431,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         BigDecimal realMoneyTotal = BigDecimal.ZERO;
         //活动优惠金额汇总
         BigDecimal activityMoneyTotal = BigDecimal.ZERO;
+        //商品毛重(kg)
+        BigDecimal boxGrossWeightTotal = BigDecimal.ZERO;
+        //商品包装体积(mm³)
+        BigDecimal boxVolumeTotal = BigDecimal.ZERO;
 
         for (ErpOrderItem item :
                 orderItemList) {
@@ -428,6 +443,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             moneyTotal = moneyTotal.add(item.getTotalProductAmount() == null ? BigDecimal.ZERO : item.getTotalProductAmount());
             //活动优惠金额汇总
             activityMoneyTotal = activityMoneyTotal.add(item.getTotalAcivityAmount() == null ? BigDecimal.ZERO : item.getTotalAcivityAmount());
+            //商品毛重汇总
+            boxGrossWeightTotal = boxGrossWeightTotal.add((item.getBoxGrossWeight() == null ? BigDecimal.ZERO : item.getBoxGrossWeight()).multiply(new BigDecimal(item.getProductCount())));
+            //商品体积汇总
+            boxVolumeTotal = boxVolumeTotal.add((item.getBoxVolume() == null ? BigDecimal.ZERO : item.getBoxVolume()).multiply(new BigDecimal(item.getProductCount())));
+
         }
 
         //保存订单费用信息
@@ -539,18 +559,18 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setTransportTime(null);
         //发运状态
         order.setTransportStatus(StatusEnum.NO.getCode());
-        //发运时间
+        //签收时间
         order.setReceiveTime(null);
         //发票类型 默认不开发票
         order.setInvoiceType(ErpInvoiceTypeEnum.NO_INVOICE.getCode());
         //发票抬头
         order.setInvoiceTitle(null);
         //体积
-        order.setTotalVolume(null);
+        order.setTotalVolume(boxVolumeTotal);
         //实际体积
         order.setActualTotalVolume(null);
         //重量
-        order.setTotalWeight(null);
+        order.setTotalWeight(boxGrossWeightTotal);
         //实际重量
         order.setActualTotalWeight(null);
         //主订单号  如果非子订单 此处存order_code
@@ -595,6 +615,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setSourceName(null);
         //来源类型
         order.setSourceType(null);
+        //同步供应链状态
+        order.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_NO.getCode());
+        //生成冲减单状态
+        order.setScourSheetStatus(ErpOrderScourSheetStatusEnum.NOT_NEED.getCode());
 
         return order;
     }
@@ -651,6 +675,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             item.setOrderInfoDetailId(OrderPublic.getUUID());
             //订单明细行编号
             item.setLineCode(lineCode++);
+            item.setUseStatus(StatusEnum.YES.getValue());
         }
         //保存订单
         order.setOrderStoreId(orderId);
@@ -684,7 +709,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private void deleteOrderProductFromCart(String storeId, OrderConfirmResponse orderConfirmResponse) {
         for (CartOrderInfo item :
                 orderConfirmResponse.getCartOrderInfos()) {
-            cartOrderService.deleteCartInfo(storeId, item.getSkuCode(), YesOrNoEnum.YES.getCode());
+            cartOrderService.deleteCartInfo(storeId, item.getSkuCode(), YesOrNoEnum.YES.getCode(),item.getProductType());
         }
     }
 
@@ -806,6 +831,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             orderItem.setCompanyCode(storeInfo.getCompanyCode());
             //公司名称
             orderItem.setCompanyName(storeInfo.getCompanyName());
+            //单个商品毛重(kg)
+            orderItem.setBoxGrossWeight(productInfo.getBoxGrossWeight());
+            //单个商品包装体积(mm³)
+            orderItem.setBoxVolume(productInfo.getBoxVolume());
 
             orderItemList.add(orderItem);
         }
@@ -838,6 +867,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //订货金额汇总
         BigDecimal moneyTotal = BigDecimal.ZERO;
+        //商品毛重(kg)
+        BigDecimal boxGrossWeightTotal = BigDecimal.ZERO;
+        //商品包装体积(mm³)
+        BigDecimal boxVolumeTotal = BigDecimal.ZERO;
 
         long lineCode = 1L;
 
@@ -853,9 +886,14 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             item.setOrderInfoDetailId(OrderPublic.getUUID());
             //订单明细行编号
             item.setLineCode(lineCode++);
+            item.setUseStatus(StatusEnum.YES.getValue());
 
             //金额汇总
             moneyTotal = moneyTotal.add(item.getTotalProductAmount() == null ? BigDecimal.ZERO : item.getTotalProductAmount());
+            //商品毛重汇总
+            boxGrossWeightTotal = boxGrossWeightTotal.add((item.getBoxGrossWeight() == null ? BigDecimal.ZERO : item.getBoxGrossWeight()).multiply(new BigDecimal(item.getProductCount())));
+            //商品体积汇总
+            boxVolumeTotal = boxVolumeTotal.add((item.getBoxVolume() == null ? BigDecimal.ZERO : item.getBoxVolume()).multiply(new BigDecimal(item.getProductCount())));
         }
 
         erpOrderItemService.saveOrderItemList(orderItemList, auth);
@@ -923,7 +961,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //收货地址
         order.setReceiveAddress(storeInfo.getAddress());
-        //配送方式编码 TODO 有哪些？
+        //配送方式编码
         order.setDistributionModeCode(null);
         //配送方式名称
         order.setDistributionModeName(null);
@@ -933,7 +971,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setReceiveMobile(storeInfo.getContactsPhone());
         //邮编
         order.setZipCode(null);
-        //支付方式编码 TODO 有哪些？
+        //支付方式编码
         order.setPaymentCode(null);
         //支付方式名称
         order.setPaymentName(null);
@@ -947,7 +985,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setActualProductCount(null);
         //优惠额度
         order.setDiscountAmount(BigDecimal.ZERO);
-        // TODO ？
+        //实付金额
         order.setOrderAmount(null);
         //付款日期
         order.setPaymentTime(null);
@@ -957,18 +995,18 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setTransportTime(null);
         //发运状态
         order.setTransportStatus(StatusEnum.NO.getCode());
-        //发运时间 TODO ？
+        //签收时间
         order.setReceiveTime(null);
-        //发票类型 1不开 2增普 3增专 TODO 新建枚举类
+        //发票类型
         order.setInvoiceType(ErpInvoiceTypeEnum.NO_INVOICE.getCode());
         //发票抬头
         order.setInvoiceTitle(null);
         //体积
-        order.setTotalVolume(null);
+        order.setTotalVolume(boxVolumeTotal);
         //实际体积
         order.setActualTotalVolume(null);
         //重量
-        order.setTotalWeight(null);
+        order.setTotalWeight(boxGrossWeightTotal);
         //实际重量
         order.setActualTotalWeight(null);
         //主订单号  如果非子订单 此处存order_code
@@ -1013,6 +1051,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setSourceName(null);
         //来源类型
         order.setSourceType(null);
+        //同步供应链状态
+        order.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_NO.getCode());
+        //生成冲减单状态
+        order.setScourSheetStatus(ErpOrderScourSheetStatusEnum.NOT_NEED.getCode());
         erpOrderInfoService.saveOrder(order, auth);
 
         //保存订单费用信息
@@ -1042,6 +1084,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
     @Override
     public String getOrderCode() {
+        ErpOrderCodeSequence.num = null;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String curDay = sdf.format(new Date());
         if (StringUtils.isEmpty(ErpOrderCodeSequence.currentDay) || !curDay.equals(ErpOrderCodeSequence.currentDay) || ErpOrderCodeSequence.num == null) {

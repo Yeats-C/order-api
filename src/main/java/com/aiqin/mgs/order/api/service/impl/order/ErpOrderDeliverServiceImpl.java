@@ -78,11 +78,20 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             Long totalActualProductCount = 0L;
             //实发均摊金额
             BigDecimal actualTotalProductAmount = BigDecimal.ZERO;
+
+            //商品毛重(kg)
+            BigDecimal boxGrossWeightTotal = BigDecimal.ZERO;
+            //商品包装体积(mm³)
+            BigDecimal boxVolumeTotal = BigDecimal.ZERO;
+
+            //是否需要标记生成冲减单
+            boolean scourSheetFlag = false;
+
             for (ErpOrderItem item :
                     itemList) {
                 //行订货数量
                 Long productCount = item.getProductCount();
-                //行签收数量
+                //行发货数量
                 Long actualProductCount = paramLineQuantityMap.get(item.getLineCode());
                 if (actualProductCount == null) {
                     throw new BusinessException("缺少行号为" + item.getLineCode() + "的发货数量");
@@ -92,6 +101,9 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 }
                 if (actualProductCount > productCount) {
                     throw new BusinessException("发货数量不能超过订货数量");
+                }
+                if (actualProductCount < productCount) {
+                    scourSheetFlag = true;
                 }
                 item.setActualProductCount(actualProductCount);
                 totalActualProductCount += actualProductCount;
@@ -105,14 +117,24 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 }
                 actualTotalProductAmount = actualTotalProductAmount.add(actualProductAmount);
 
+                //商品毛重汇总
+                boxGrossWeightTotal = boxGrossWeightTotal.add((item.getBoxGrossWeight() == null ? BigDecimal.ZERO : item.getBoxGrossWeight()).multiply(new BigDecimal(actualProductCount)));
+                //商品体积汇总
+                boxVolumeTotal = boxVolumeTotal.add((item.getBoxVolume() == null ? BigDecimal.ZERO : item.getBoxVolume()).multiply(new BigDecimal(actualProductCount)));
+
             }
 
-            //TODO CT 计算体积和重量
+            erpOrderItemService.updateOrderItemList(itemList, auth);
 
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_9.getCode());
             order.setActualProductCount(totalActualProductCount);
             order.setActualTotalProductAmount(actualTotalProductAmount);
             order.setDeliveryTime(erpOrderDeliverRequest.getDeliveryTime());
+            order.setActualTotalVolume(boxVolumeTotal);
+            order.setActualTotalWeight(boxGrossWeightTotal);
+            if (scourSheetFlag) {
+                order.setScourSheetStatus(ErpOrderScourSheetStatusEnum.WAIT.getCode());
+            }
             erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
 
         } else {
@@ -239,6 +261,9 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             }
             if (orderLogistics != null) {
                 order.setLogisticsId(orderLogistics.getLogisticsId());
+                order.setTransportCompanyCode(orderLogistics.getLogisticsCentreCode());
+                order.setTransportCompanyName(orderLogistics.getLogisticsCentreName());
+                order.setTransportCode(orderLogistics.getLogisticsCode());
             } else {
                 if (processTypeEnum.isHasLogisticsFee()) {
                     //如果物流单信息为空但是订单类型必须要物流单信息

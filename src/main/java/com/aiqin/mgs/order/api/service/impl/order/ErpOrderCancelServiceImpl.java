@@ -38,23 +38,40 @@ public class ErpOrderCancelServiceImpl implements ErpOrderCancelService {
         if (StringUtils.isEmpty(erpOrderCancelRequest.getOrderCode())) {
             throw new BusinessException("缺失订单编号");
         }
+        AuthToken auth = new AuthToken();
+        auth.setPersonId(erpOrderCancelRequest.getPersonId());
+        auth.setPersonName(erpOrderCancelRequest.getPersonName());
+
         ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(erpOrderCancelRequest.getOrderCode());
         if (order == null) {
             throw new BusinessException("无效的订单编号");
         }
-        if (!ErpOrderStatusEnum.ORDER_STATUS_6.getCode().equals(order.getOrderStatus())) {
-            throw new BusinessException(ErpOrderStatusEnum.getEnumDesc(order.getOrderStatus()) + "的订单不支持该操作");
+
+        boolean cancelFlag = false;
+
+        if (ErpOrderStatusEnum.ORDER_STATUS_6.getCode().equals(order.getOrderStatus())) {
+            if (ErpOrderNodeStatusEnum.STATUS_8.getCode().equals(order.getOrderStatus())) {
+                cancelFlag = true;
+            }
+        }
+
+        if (!cancelFlag) {
+            throw new BusinessException("不是等待拣货状态不能执行该操作");
         }
 
         //修改订单状态为缺货终止交易
-//        order.setBeforeCancelStatus(order.getOrderStatus());
         order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_97.getCode());
-        erpOrderInfoService.updateOrderByPrimaryKeySelective(order, AuthUtil.getCurrentAuth());
+        erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
 
-        //TODO 返还物流券 优惠券
-        //解锁库存
-        erpOrderRequestService.unlockStockInSupplyChain(order,ErpOrderLockStockTypeEnum.REDUCE_AND_UNLOCK,null);
-        //TODO 生成退款单
+
+        //TODO 返还订单生成的 物流券 优惠券
+        //TODO 退款
+
+        ErpOrderNodeProcessTypeEnum processTypeEnum = ErpOrderNodeProcessTypeEnum.getEnum(order.getOrderTypeCode(), order.getOrderCategoryCode());
+        if (processTypeEnum.isLockStock()) {
+            //解锁库存
+            erpOrderRequestService.unlockStockInSupplyChainByDetail(order, ErpOrderLockStockTypeEnum.REDUCE_AND_UNLOCK, auth);
+        }
     }
 
     @Override
@@ -92,7 +109,7 @@ public class ErpOrderCancelServiceImpl implements ErpOrderCancelService {
 
         //TODO 返还物流券 优惠券
         //解锁库存
-        erpOrderRequestService.unlockStockInSupplyChain(order,ErpOrderLockStockTypeEnum.REDUCE_AND_UNLOCK,null);
+        erpOrderRequestService.unlockStockInSupplyChainByDetail(order, ErpOrderLockStockTypeEnum.REDUCE_AND_UNLOCK, null);
         //TODO 发起退货退款
     }
 
@@ -100,16 +117,16 @@ public class ErpOrderCancelServiceImpl implements ErpOrderCancelService {
     @Transactional(rollbackFor = Exception.class)
     public void applyCancelOrder(ErpOrderCancelRequest erpOrderCancelRequest) {
 
-        AuthToken auth = new AuthToken();
-        auth.setPersonId(erpOrderCancelRequest.getPersonId());
-        auth.setPersonName(erpOrderCancelRequest.getPersonName());
-
         if (erpOrderCancelRequest == null) {
             throw new BusinessException("空参数");
         }
         if (StringUtils.isEmpty(erpOrderCancelRequest.getOrderCode())) {
             throw new BusinessException("缺失订单编号");
         }
+        AuthToken auth = new AuthToken();
+        auth.setPersonId(erpOrderCancelRequest.getPersonId());
+        auth.setPersonName(erpOrderCancelRequest.getPersonName());
+
         ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(erpOrderCancelRequest.getOrderCode());
         if (order == null) {
             throw new BusinessException("无效的订单编号");
@@ -151,52 +168,52 @@ public class ErpOrderCancelServiceImpl implements ErpOrderCancelService {
     @Override
     public void orderCancelResultCallback(ErpOrderCancelRequest erpOrderCancelRequest) {
 
-        AuthToken auth = AuthUtil.getCurrentAuth();
-
-        if (erpOrderCancelRequest == null || StringUtils.isEmpty(erpOrderCancelRequest.getOrderCode())) {
-            throw new BusinessException("缺失订单编号");
-        }
-        if (erpOrderCancelRequest.getStatus() == null) {
-            throw new BusinessException("缺失状态");
-        }
-        if (YesOrNoEnum.exist(erpOrderCancelRequest.getStatus())) {
-            throw new BusinessException("不合法的参数");
-        }
-        ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(erpOrderCancelRequest.getOrderCode());
-        if (order == null) {
-            throw new BusinessException("无效的订单编码");
-        }
-        if (!ErpOrderStatusEnum.ORDER_STATUS_106.getCode().equals(order.getOrderStatus())) {
-            throw new BusinessException("不是" + ErpOrderStatusEnum.ORDER_STATUS_106.getDesc() + "的订单不能执行该操作");
-        }
-
-        if (YesOrNoEnum.YES.getCode().equals(erpOrderCancelRequest.getStatus())) {
-            //可以取消
-
-            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_98.getCode());
-            erpOrderInfoService.updateOrderByPrimaryKeySelective(order,auth);
-
-            order.setItemList(erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId()));
-
-            //解锁库存
-            erpOrderRequestService.unlockStockInSupplyChain(order,ErpOrderLockStockTypeEnum.REDUCE_AND_UNLOCK,auth);
-
-            //TODO CT 生成退款单
-
-
-        } else {
-
-//            if (order.getBeforeCancelStatus() == null) {
-//                throw new BusinessException("订单数据异常");
-//            }
-
-            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_94.getCode());
-            erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
-
-//            order.setOrderStatus(order.getBeforeCancelStatus());
-//            erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
-
-        }
+//        AuthToken auth = AuthUtil.getCurrentAuth();
+//
+//        if (erpOrderCancelRequest == null || StringUtils.isEmpty(erpOrderCancelRequest.getOrderCode())) {
+//            throw new BusinessException("缺失订单编号");
+//        }
+//        if (erpOrderCancelRequest.getStatus() == null) {
+//            throw new BusinessException("缺失状态");
+//        }
+//        if (YesOrNoEnum.exist(erpOrderCancelRequest.getStatus())) {
+//            throw new BusinessException("不合法的参数");
+//        }
+//        ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(erpOrderCancelRequest.getOrderCode());
+//        if (order == null) {
+//            throw new BusinessException("无效的订单编码");
+//        }
+//        if (!ErpOrderStatusEnum.ORDER_STATUS_106.getCode().equals(order.getOrderStatus())) {
+//            throw new BusinessException("不是" + ErpOrderStatusEnum.ORDER_STATUS_106.getDesc() + "的订单不能执行该操作");
+//        }
+//
+//        if (YesOrNoEnum.YES.getCode().equals(erpOrderCancelRequest.getStatus())) {
+//            //可以取消
+//
+//            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_98.getCode());
+//            erpOrderInfoService.updateOrderByPrimaryKeySelective(order,auth);
+//
+//            order.setItemList(erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId()));
+//
+//            //解锁库存
+//            erpOrderRequestService.unlockStockInSupplyChain(order,ErpOrderLockStockTypeEnum.REDUCE_AND_UNLOCK,auth);
+//
+//            //TODO CT 生成退款单
+//
+//
+//        } else {
+//
+////            if (order.getBeforeCancelStatus() == null) {
+////                throw new BusinessException("订单数据异常");
+////            }
+//
+//            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_94.getCode());
+//            erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
+//
+////            order.setOrderStatus(order.getBeforeCancelStatus());
+////            erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
+//
+//        }
 
 
     }

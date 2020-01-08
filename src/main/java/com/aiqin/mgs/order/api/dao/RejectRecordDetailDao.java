@@ -10,6 +10,11 @@ public interface RejectRecordDetailDao {
 
     int insert(List<RejectRecordDetail> record);
 
+    /**
+     * 根据ERP退货单生成爱亲退供单详情
+     * @param record
+     * @return
+     */
     int insertSelective(RejectRecordDetail record);
 
     RejectRecordDetail selectByPrimaryKey(Long id);

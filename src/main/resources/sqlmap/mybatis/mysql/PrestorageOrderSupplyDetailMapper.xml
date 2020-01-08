@@ -71,6 +71,7 @@
         <if test="endTime!=null ">
             and d.create_time &lt;= #{endTime}
         </if>
+        ORDER BY l.id desc
     </select>
     <select id="selectPrestorageOrderLogsCount" resultType="integer"
             parameterType="com.aiqin.mgs.order.api.domain.OrderQuery">

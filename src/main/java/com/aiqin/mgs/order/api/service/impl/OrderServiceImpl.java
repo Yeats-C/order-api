@@ -261,6 +261,7 @@ public class OrderServiceImpl implements OrderService {
 
 
             if (Objects.nonNull(orderInfo)) {
+                log.info("------------------------------------------------------orderInfo："+ orderInfo.getDetailList());
                 log.info("------------------------------------------------------防止多次处理start" );
                 //防止多次处理
                 if (orderInfo.getOrderInfo().getPayStatus().equals(PayStatusEnum.HAS_PAY.getCode())){
@@ -303,7 +304,7 @@ public class OrderServiceImpl implements OrderService {
                 changeProductStock(orderInfo);
             } else {
                 //预存订单提出记录初始化
-                log.info("预存订单提出记录初始化{}", "===========" + orderInfo);
+                log.info("预存订单提出记录初始化{}", "===========" + orderInfo.getDetailList().toString());
                 createPrestorageOrder(orderInfo);
             }
 
@@ -420,6 +421,14 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public HttpResponse orderCount(String skuCode, String storeId, int day) {
         return HttpResponse.successGenerics(orderDao.querySaleSkuCount(skuCode,DateUtil.getBeforeDate(new Date(),day),storeId));
+    }
+
+    @Override
+    public HttpResponse<Integer> orderStoreCount(OrderCountReq orderCountReq) {
+        //1）正常销售订单-已完成状态2）预存订单-未提货状态3）服务订单已完成
+       int count1= orderDao.orderPrestorageCount( orderCountReq.getStoreId(),  orderCountReq.getStartDay(),  orderCountReq.getEndDay());
+        int count2= orderDao.orderStoreCount( orderCountReq.getStoreId(),  orderCountReq.getStartDay(),  orderCountReq.getEndDay());
+        return HttpResponse.successGenerics(count1+count2);
     }
 
     private OrderQuery trans(OrderQuery orderQuery) {
@@ -1713,14 +1722,14 @@ public class OrderServiceImpl implements OrderService {
                     }
                     //删除订单明细数据
                     try {
-                        orderDetailDao.deleteOrderDetailInfo(orderInfo);
+                    //    orderDetailDao.deleteOrderDetailInfo(orderInfo);
                     } catch (Exception e) {
                         LOGGER.error("删除订单明细数据异常：{}", e);
                     }
                     //新增订单明细数据
                     if (detailList != null && detailList.size() > 0) {
                         try {
-                            detailList = orderDetailService.addDetailList(detailList, orderId, orderCode);
+                            detailList = orderDetailService.updateDetailList(detailList, orderId, orderCode);
                         } catch (Exception e) {
                             LOGGER.error("新增订单明细数据异常：{}", e);
                         }
@@ -2212,7 +2221,6 @@ public class OrderServiceImpl implements OrderService {
             }
             Integer actualPrice = storeValueOrderPayRequest.getActualPrice();
             String updateBy = storeValueOrderPayRequest.getUpdateBy();
-            orderInfo.setPayStatus(1);
             //支付完成由回调修改
             //orderInfo.setOrderStatus(5);
             orderInfo.setPayType("7");

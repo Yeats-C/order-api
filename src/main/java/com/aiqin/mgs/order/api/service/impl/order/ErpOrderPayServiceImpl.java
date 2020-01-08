@@ -274,13 +274,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
                     }
 
                     //调用支付中心，查看结果
-                    //ErpOrderPayStatusResponse payStatusResponse = erpOrderRequestService.getOrderPayStatus(orderCode);
-                    //TODO CT 临时测试
-                    ErpOrderPayStatusResponse payStatusResponse = new ErpOrderPayStatusResponse();
-                    payStatusResponse.setRequestSuccess(true);
-                    payStatusResponse.setPayCode(System.currentTimeMillis() + "");
-                    payStatusResponse.setOrderCode(orderCode);
-                    payStatusResponse.setPayStatusEnum(ErpPayStatusEnum.SUCCESS);
+                    ErpOrderPayStatusResponse payStatusResponse = erpOrderRequestService.getOrderPayStatus(orderCode);
 
                     if (payStatusResponse.isRequestSuccess()) {
                         ErpPayStatusEnum payStatusEnum = payStatusResponse.getPayStatusEnum();
@@ -557,11 +551,13 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
         BigDecimal couponPayFee = BigDecimal.ZERO;
         //需要余额支付的金额
         BigDecimal balancePayFee = orderLogistics.getLogisticsFee().subtract(couponPayFee);
-
         orderLogistics.setCouponPayFee(couponPayFee);
         orderLogistics.setBalancePayFee(balancePayFee);
+
+        List<ErpOrderInfo> logisticsOrderList = erpOrderQueryService.getOrderByLogisticsId(orderLogistics.getLogisticsId());
+
         //调用支付中心接口发起支付
-        boolean flag = erpOrderRequestService.sendLogisticsPayRequest(order, orderLogistics);
+        boolean flag = erpOrderRequestService.sendLogisticsPayRequest(order, logisticsOrderList, orderLogistics, auth);
         if (flag) {
             String payId = OrderPublic.getUUID();
 

@@ -242,19 +242,19 @@ public class ErpOrderInfo {
 
     @ApiModelProperty(value = "体积")
     @JsonProperty("total_volume")
-    private Long totalVolume;
+    private BigDecimal totalVolume;
 
     @ApiModelProperty(value = "实际体积")
     @JsonProperty("actual_total_volume")
-    private Long actualTotalVolume;
+    private BigDecimal actualTotalVolume;
 
     @ApiModelProperty(value = "重量")
     @JsonProperty("total_weight")
-    private Long totalWeight;
+    private BigDecimal totalWeight;
 
     @ApiModelProperty(value = "实际重量")
     @JsonProperty("actual_total_weight")
-    private Long actualTotalWeight;
+    private BigDecimal actualTotalWeight;
 
     @ApiModelProperty(value = "关联主订单号  如果是主订单，该字段存自己的订单号")
     @JsonProperty("main_order_code")
@@ -343,6 +343,14 @@ public class ErpOrderInfo {
     @ApiModelProperty(value = "来源类型")
     @JsonProperty("source_type")
     private Integer sourceType;
+
+    @ApiModelProperty(value = "同步供应链状态")
+    @JsonProperty("order_success")
+    private Integer orderSuccess;
+
+    @ApiModelProperty(value = "冲减单状态 1不需要生成冲减单 2待生成冲减单 3生成冲减单完成")
+    @JsonProperty("scour_sheet_status")
+    private Integer scourSheetStatus;
 
     @ApiModelProperty(value = "启用停用 0启用 1启用")
     @JsonProperty("use_status")

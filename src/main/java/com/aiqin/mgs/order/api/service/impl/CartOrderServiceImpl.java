@@ -71,10 +71,16 @@ public class CartOrderServiceImpl implements CartOrderService {
         shoppingCartProductRequest.setProvinceCode(storeInfo.getData().getProvinceId());
         shoppingCartProductRequest.setCompanyCode(storeInfo.getData().getCompanyCode());
         shoppingCartProductRequest.setSkuCodes(skuCodeList);
-
-        //通过商品id、门店Id、skuid调用商品模块，返回商品信息
+        if(shoppingCartProductRequest.getCompanyCode()==null
+                || shoppingCartProductRequest.getCityCode()==null
+                || shoppingCartProductRequest.getProvinceCode()==null
+                || shoppingCartProductRequest.getSkuCodes()==null){
+            return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
+        }
+        //通过省市公司ID、skuid调用商品模块，返回商品信息
         HttpResponse<List<CartOrderInfo>> productInfo = bridgeProductService.getProduct(shoppingCartProductRequest);
         List<CartOrderInfo> cartOrderInfoList = productInfo.getData();
+
         for (CartOrderInfo cartOrderInfo1 : cartOrderInfoList) {
             //获取库房的商品数量和sku码
             int stockProductAmount = cartOrderInfo1.getStockNum();
@@ -90,14 +96,14 @@ public class CartOrderServiceImpl implements CartOrderService {
                 }
                 CartOrderInfo cartOrderInfo = new CartOrderInfo();
                 cartOrderInfo.setSkuCode(cartOrderInfo1.getSkuCode());//skuId
-                cartOrderInfo.setSpuId(cartOrderInfo1.getSpuId());//spuId
-                cartOrderInfo.setProductId(shoppingCartRequest.getProductId());//商品id
+                cartOrderInfo.setSpuId(shoppingCartRequest.getProductId());//spuId
+                cartOrderInfo.setProductId(cartOrderInfo1.getSkuCode());//商品Code
                 cartOrderInfo.setStoreId(cartOrderInfo1.getStoreId());//门店id
                 cartOrderInfo.setPrice(cartOrderInfo1.getPrice());//商品价格
-                cartOrderInfo.setProductType(cartOrderInfo1.getProductType());//商品类型
-                cartOrderInfo.setProductName(cartOrderInfo1.getProductName());//商品名称
-                cartOrderInfo.setColor(cartOrderInfo1.getColor());//商品颜色
-                cartOrderInfo.setProductSize(cartOrderInfo1.getProductSize());//商品尺寸
+                cartOrderInfo.setProductType(shoppingCartRequest.getProductType());//商品类型
+                cartOrderInfo.setProductName(cartOrderInfo1.getSkuName());//商品名称
+                cartOrderInfo.setColor(cartOrderInfo1.getColorName());//商品颜色
+                cartOrderInfo.setProductSize(cartOrderInfo1.getModelNumber());//商品型号
                 cartOrderInfo.setCreateSource(shoppingCartRequest.getCreateSource());//插入商品来源
                 cartOrderInfo.setAmount(product.getAmount());//获取商品数量
                 cartOrderInfo.setPrice(cartOrderInfo1.getPriceTax2());//商品价格
@@ -105,8 +111,11 @@ public class CartOrderServiceImpl implements CartOrderService {
                 cartOrderInfo.setStoreId(shoppingCartRequest.getStoreId());//门店ID
                 cartOrderInfo.setCreateById(authToken.getPersonId());//创建者id
                 cartOrderInfo.setCreateByName(authToken.getPersonName());//创建者名称
-
-                //Todo 商品返回什么添加什么
+                cartOrderInfo.setStockNum(cartOrderInfo1.getStockNum());//库存数量
+                cartOrderInfo.setZeroRemovalCoefficient(cartOrderInfo1.getZeroRemovalCoefficient());//交易倍数
+                cartOrderInfo.setSpec(cartOrderInfo1.getSpec());//规格
+                cartOrderInfo.setProductPropertyCode(cartOrderInfo1.getProductPropertyCode());//商品属性码
+                cartOrderInfo.setProductPropertyName(cartOrderInfo1.getProductPropertyName());//商品属性码
                 try {
                     if (cartOrderInfo != null) {
                         //判断sku是否在购物车里面存在
@@ -187,7 +196,21 @@ public class CartOrderServiceImpl implements CartOrderService {
             if (null != skuId && lineCheckStatus.equals(Global.LINECHECKSTATUS_1) &&null !=productType) {
                 cartOrderInfo.setSkuCode(skuId);
                 cartOrderInfo.setLineCheckStatus(lineCheckStatus);
+                cartOrderInfo.setStoreId(storeId);
                 cartOrderInfo.setProductType(productType);
+                if (null != number){
+                    cartOrderInfo.setAmount(number);
+                }
+                cartOrderDao.updateProductList(cartOrderInfo);
+                CartResponse cartResponse = getProductList(cartOrderInfo);
+                LOGGER.info("返回购物车中的数据给前端：{}", cartResponse);
+                response.setData(cartResponse);
+                //如果是取消勾选，通过门店id所有标记
+            }else if (null != skuId && lineCheckStatus.equals(Global.LINECHECKSTATUS_0) &&null !=productType) {
+                cartOrderInfo.setSkuCode(skuId);
+                cartOrderInfo.setLineCheckStatus(lineCheckStatus);
+                cartOrderInfo.setProductType(productType);
+                cartOrderInfo.setStoreId(storeId);
                 if (null != number){
                     cartOrderInfo.setAmount(number);
                 }
@@ -200,6 +223,22 @@ public class CartOrderServiceImpl implements CartOrderService {
                 cartOrderInfo.setStoreId(storeId);
                 cartOrderInfo.setProductType(productType);
                 cartOrderInfo.setLineCheckStatus(Global.LINECHECKSTATUS_1);
+                if (null != number){
+                    cartOrderInfo.setAmount(number);
+                }
+                cartOrderDao.updateProductList(cartOrderInfo);
+                //返回商品列表并结算价格
+                CartResponse cartResponse = getProductList(cartOrderInfo);
+                LOGGER.info("返回购物车中的数据给前端：{}", cartResponse);
+                response.setData(cartResponse);
+                //如果是全部取消，通过门店id更新所有标记
+            } else if(null != storeId && lineCheckStatus.equals(Global.LINECHECKSTATUS_3) && null !=productType) {
+                cartOrderInfo.setStoreId(storeId);
+                cartOrderInfo.setProductType(productType);
+                cartOrderInfo.setLineCheckStatus(Global.LINECHECKSTATUS_0);
+                if (null != number){
+                    cartOrderInfo.setAmount(number);
+                }
                 cartOrderDao.updateProductList(cartOrderInfo);
                 //返回商品列表并结算价格
                 CartResponse cartResponse = getProductList(cartOrderInfo);
@@ -230,13 +269,18 @@ public class CartOrderServiceImpl implements CartOrderService {
         //计算商品总价格
         BigDecimal acountActualprice = new BigDecimal(0);
         for (CartOrderInfo cartOrderInfo1 : cartInfoList) {
-            BigDecimal total = cartOrderInfo1.getPrice().multiply(new BigDecimal(cartOrderInfo1.getAmount()));
-            acountActualprice = acountActualprice.add(total);
+            if(cartOrderInfo1.getLineCheckStatus()==1){
+                BigDecimal total = cartOrderInfo1.getPrice().multiply(new BigDecimal(cartOrderInfo1.getAmount()));
+                acountActualprice = acountActualprice.add(total);
+            }
+
         }
         //计算商品总数量
         int totalNumber = 0;
         for (CartOrderInfo cartOrderInfo2 : cartInfoList) {
-            totalNumber += cartOrderInfo2.getAmount();
+            if(cartOrderInfo2.getLineCheckStatus()==1){
+                totalNumber += cartOrderInfo2.getAmount();
+            }
         }
         CartResponse cartResponse = new CartResponse();
         cartResponse.setCartInfoList(cartInfoList);
@@ -275,16 +319,17 @@ public class CartOrderServiceImpl implements CartOrderService {
      * @param storeId
      * @param skuId
      * @param lineCheckStatus
+     * @param productType
      * @return
      */
     @Override
-    public HttpResponse deleteCartInfo(String storeId, String skuId, Integer lineCheckStatus) {
+    public HttpResponse deleteCartInfo(String storeId, String skuId, Integer lineCheckStatus, Integer productType) {
         try {
             //清空购物车
             if (storeId != null) {
                 LOGGER.info("删除购物车中的商品：{}", storeId);
                 //可以清空，可以删除单条，删除勾选数据。
-                cartOrderDao.deleteCart(storeId, skuId, lineCheckStatus);
+                cartOrderDao.deleteCart(storeId, skuId, lineCheckStatus,productType);
             } else {
                 LOGGER.error("删除购物车中的商品失败：{}", storeId);
                 return HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
@@ -305,7 +350,7 @@ public class CartOrderServiceImpl implements CartOrderService {
      */
     @Override
     public HttpResponse displayCartLineCheckProduct(CartOrderInfo cartOrderInfo) {
-
+        BigDecimal priceProductA=BigDecimal.ZERO;
         HttpResponse response = HttpResponse.success();
         //调用门店接口，返回门店的基本信息
         ShoppingCartRequest shoppingCartRequest = new ShoppingCartRequest();
@@ -321,12 +366,21 @@ public class CartOrderServiceImpl implements CartOrderService {
                 List<CartOrderInfo> cartOrderInfos = cartOrderDao.selectCartByLineCheckStatus(cartOrderInfo);
                 //封装返回的勾选的商品信息
                 orderConfirmResponse.setCartOrderInfos(cartOrderInfos);
+                orderConfirmResponse.setHaveProductA(0);
+
                 //计算订货金额合计
                 BigDecimal orderTotalPrice = new BigDecimal(0);
                 for (CartOrderInfo cartOrderInfo1 : cartOrderInfos) {
                     BigDecimal total = cartOrderInfo1.getPrice().multiply(new BigDecimal(cartOrderInfo1.getAmount()));
                     orderTotalPrice = orderTotalPrice.add(total);
+                    //TODO 判断商品为A类以上商品 此处最好是按照字典表接口比对，防止供应链更改类型code
+                    if(cartOrderInfo1.getProductPropertyCode().equals("1") ||cartOrderInfo1.getProductPropertyCode().equals("6")){//A品与A+品
+                        orderConfirmResponse.setHaveProductA(1);
+                        priceProductA=priceProductA.add(cartOrderInfo1.getPrice());
+                    }
+
                 }
+                orderConfirmResponse.setPriceProductA(priceProductA);
                 //封装订货金额合计
                 orderConfirmResponse.setAcountActualprice(orderTotalPrice);
                 response.setData(orderConfirmResponse);
