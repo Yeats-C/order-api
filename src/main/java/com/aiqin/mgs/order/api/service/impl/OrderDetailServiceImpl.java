@@ -466,11 +466,14 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			OrderQuery orderQuery = new OrderQuery();
 			orderQuery.setOrderId(orderId);
 			SettlementInfo settlementInfo=settlementDao.jkselectsettlement(orderQuery);
-			settlementInfo.setTotalCouponsDiscount(settlementInfo.getActivityDiscount());
-			info.setSettlementInfo(settlementInfo);
-			if (orderInfo!=null&&orderInfo.getOrderType()==4){
-				//预存订单 储值卡金额
+			if (settlementInfo!=null){
+				settlementInfo.setTotalCouponsDiscount(settlementInfo.getActivityDiscount());
+				info.setSettlementInfo(settlementInfo);
+				if (orderInfo!=null&&orderInfo.getOrderType()==4){
+					//预存订单 储值卡金额
+				}
 			}
+
 
 			return HttpResponse.success(info);
 			} catch (Exception e) {
@@ -522,7 +525,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		List<OrderDetailInfo> list = new ArrayList();
 		if(detailList !=null && detailList.size()>0) {
 			for(OrderDetailInfo info : detailList) {
-
+				info.setOrderCode(orderCode);
 
 				orderDetailDao.updateOrderDetail(info);
 				list.add(info);

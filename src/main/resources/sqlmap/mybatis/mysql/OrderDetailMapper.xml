@@ -502,6 +502,9 @@
          set
          actual_price = #{actualPrice},
          update_time = now(),
+        <if test="retailPrice!=null and retailPrice!='' ">
+           retail_price =#{retailPrice},
+        </if>
          update_by = #{updateBy,jdbcType=VARCHAR}
          where order_code =#{orderCode} and order_detail_id=#{orderDetailId}
      </update>
