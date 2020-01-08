@@ -384,9 +384,6 @@
       <if test="reviewTime != null" >
         review_time,
       </if>
-      <if test="orderSuccess != null" >
-        order_success,
-      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -649,9 +646,6 @@
       </if>
       <if test="reviewTime != null" >
         #{reviewTime},
-      </if>
-      <if test="orderSuccess != null" >
-        #{orderSuccess},
       </if>
     </trim>
   </insert>
