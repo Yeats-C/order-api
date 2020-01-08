@@ -167,8 +167,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
      * @param erpOrderInfo
      */
     private void purchaseOrderExecutor(ErpOrderInfo erpOrderInfo) {
-        ScheduledExecutorService service = new ScheduledThreadPoolExecutor(1);
-        service.scheduleAtFixedRate(new Runnable() {
+        ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
+        singleThreadExecutor.execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -188,7 +188,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                     throw new RuntimeException();
                 }
             }
-        }, BillConstant.MAX_PAY_POLLING_INITIALDELAY, BillConstant.MAX_PAY_POLLING_PERIOD, TimeUnit.MILLISECONDS);
+        });
     }
 
     /**
