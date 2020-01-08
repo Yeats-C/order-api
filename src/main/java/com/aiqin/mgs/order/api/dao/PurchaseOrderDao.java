@@ -24,5 +24,5 @@ public interface PurchaseOrderDao {
      * @param record
      * @return
      */
-    int updateByorderStoreCode(PurchaseOrder record);
+    int updateByPurchaseOrderStatus(PurchaseOrder record);
 }

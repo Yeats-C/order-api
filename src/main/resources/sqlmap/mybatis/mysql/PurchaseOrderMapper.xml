@@ -430,10 +430,10 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.PurchaseOrder">
+  <update id="updateByPrimaryKey" parameterType="com.aiqin.mgs.order.api.domain.PurchaseOrder">
     update purchase_order
     <set>
-      <if test="purchaseOrderId != null">
+      <if test="purchaseOrderId != null ">
         purchase_order_id = #{purchaseOrderId,jdbcType=VARCHAR},
       </if>
       <if test="purchaseOrderCode != null">
@@ -587,9 +587,9 @@
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
-    where id = #{id,jdbcType=BIGINT}
+    where purchase_order_code = #{purchaseOrderCode,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.aiqin.mgs.order.api.domain.PurchaseOrder">
+  <update id="updateByOrderCode" parameterType="com.aiqin.mgs.order.api.domain.PurchaseOrder">
     update purchase_order
     set purchase_order_id = #{purchaseOrderId,jdbcType=VARCHAR},
       purchase_order_code = #{purchaseOrderCode,jdbcType=VARCHAR},
@@ -644,7 +644,7 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where purchase_order_code = #{purchaseOrderCode,jdbcType=VARCHAR}
   </update>
-  <update id="updateByorderStoreCode" parameterType="com.aiqin.mgs.order.api.domain.PurchaseOrder">
+  <update id="updateByPurchaseOrderStatus" parameterType="com.aiqin.mgs.order.api.domain.PurchaseOrder">
     update purchase_order
     set purchase_order_status = #{purchaseOrderStatus,jdbcType=INTEGER}
     where purchase_order_code = #{purchaseOrderCode,jdbcType=VARCHAR}

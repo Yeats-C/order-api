@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.service.bill.impl;
 
+import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.PurchaseOrderStatusEnum;
 import com.aiqin.mgs.order.api.domain.constant.BillConstant;
@@ -33,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -50,13 +52,13 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     @Resource
     PurchaseOrderDetailDao purchaseOrderDetailDao;
     @Resource
-    OrderStoreDetailBatchDao orderStoreDetailBatchDao;
-    @Resource
     ErpOrderDeliverService erpOrderDeliverService;
     @Resource
     CreatePurchaseOrderService createPurchaseOrderService;
     @Resource
     OperationLogService operationLogService;
+    @Resource
+    PurchaseOrderDetailBatchDao purchaseOrderDetailBatchDao;
 
     @Override
     public HttpResponse createPurchaseOrder(@Valid ErpOrderInfo erpOrderInfo) {
@@ -96,7 +98,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             purchaseOrder.setDeliveryTime(purchaseInfo.getDeliveryTime());//
             purchaseOrder.setContactPerson(purchaseInfo.getDeliveryPersonId());//
             purchaseOrder.setPurchaseOrderCode(purchaseInfo.getOrderStoreCode());
-            purchaseOrderDao.updateByOrderCode(purchaseOrder);
+            purchaseOrder.setUpdateTime(new Date());
+            purchaseOrderDao.updateByPrimaryKey(purchaseOrder);
 
             //更新采购单明细
             for (OrderStoreDetail orderStoreDetail : purchaseInfo.getOrderStoreDetail()) {
@@ -106,19 +109,23 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 purchaseOrderDetail.setSkuName(orderStoreDetail.getSkuName());//SKU名称
                 purchaseOrderDetail.setTotalCount(orderStoreDetail.getActualProductCount());//实发数量
                 purchaseOrderDetail.setPurchaseOrderCode(purchaseInfo.getOrderStoreCode());
+                purchaseOrderDetail.setUpdateTime(new Date());
                 purchaseOrderDetailDao.updateByPurchaseOrderCode(purchaseOrderDetail);
             }
 
             //添加订单批次明细
             for (OrderBatchStoreDetail batchStoreDetail : purchaseInfo.getOrderBatchStoreDetail()) {
-                OrderStoreDetailBatch orderStoreDetailBatch = new OrderStoreDetailBatch();
-                orderStoreDetailBatch.setSkuCode(batchStoreDetail.getSkuCode());//SKU编码
-                orderStoreDetailBatch.setSkuName(batchStoreDetail.getSkuName());//SKU名称
-                orderStoreDetailBatch.setBatchCode(batchStoreDetail.getBatchCode());//批次编号
-                orderStoreDetailBatch.setProductDate(batchStoreDetail.getProductDate());//生产日期
-                orderStoreDetailBatch.setActualProductCount(purchaseInfo.getActualTotalCount());//实际销售数量
-                orderStoreDetailBatch.setLineCode(batchStoreDetail.getLineCode());//行号
-                orderStoreDetailBatchDao.insert(orderStoreDetailBatch);
+                PurchaseOrderDetailBatch purchaseOrderDetailBatch = new PurchaseOrderDetailBatch();
+                purchaseOrderDetailBatch.setPurchaseOrderDetailBatchId(IdUtil.purchaseId());
+                purchaseOrderDetailBatch.setPurchaseOrderCode(purchaseInfo.getOrderStoreCode());
+                purchaseOrderDetailBatch.setBatchCode(batchStoreDetail.getBatchCode());
+                purchaseOrderDetailBatch.setCreateTime(new Date());
+                purchaseOrderDetailBatch.setSkuCode(batchStoreDetail.getSkuCode());//SKU编码
+                purchaseOrderDetailBatch.setSkuCode(batchStoreDetail.getSkuName());//SKU名称
+                purchaseOrderDetailBatch.setActualTotalCount(purchaseInfo.getActualTotalCount());//实际销售数量
+                purchaseOrderDetailBatch.setBatchCode(batchStoreDetail.getSkuName());//SKU名称
+                purchaseOrderDetailBatch.setLineCode(batchStoreDetail.getLineCode());//行号
+                purchaseOrderDetailBatchDao.insert(purchaseOrderDetailBatch);
             }
             return HttpResponse.success();
         } catch (Exception e) {
@@ -225,7 +232,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         Integer purchaseOrderStatusRemove = PurchaseOrderStatusEnum.PURCHASE_ORDER_STATUS_REMOVE.getCode();
         purchaseOrder.setPurchaseOrderStatus(purchaseOrderStatusRemove);//采购单状态
         purchaseOrder.setPurchaseOrderCode(orderStoreCode);
-        int result = purchaseOrderDao.updateByorderStoreCode(purchaseOrder);
+        int result = purchaseOrderDao.updateByPurchaseOrderStatus(purchaseOrder);
         if (result == 1) {
             LOGGER.info("采购单取消成功");
             return HttpResponse.success();
