@@ -116,9 +116,9 @@ public class ErpOrderRefundServiceImpl implements ErpOrderRefundService {
             throw new BusinessException("无效的订单编号");
         }
 
-//        HttpResponse response = returnOrderInfoService.saveCancelOrder(order.getOrderStoreCode());
-//        String returnCode = (String) response.getData();
-        String returnCode = System.currentTimeMillis() + "";
+        HttpResponse response = returnOrderInfoService.saveCancelOrder(order.getOrderStoreCode());
+        String returnCode = (String) response.getData();
+//        String returnCode = System.currentTimeMillis() + "";
 
 
 
