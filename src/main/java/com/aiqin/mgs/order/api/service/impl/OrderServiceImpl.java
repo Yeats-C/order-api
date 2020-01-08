@@ -215,6 +215,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public HttpResponse prestorageOut(PrestorageOutInfo prestorageOutVo) {
+        boolean isUpdate=false;
         //查询
         PrestorageOrderSupplyDetail prestorageOrderSupplyDetail = prestorageOrderSupplyDetailDao.selectprestorageorderDetailsById(prestorageOutVo.getPrestorageOrderSupplyDetailId());
         //判断可取数量
@@ -235,12 +236,38 @@ public class OrderServiceImpl implements OrderService {
             prestorageOrderSupplyLogsDao.addLogs(prestorageOrderSupplyLogs);
 
         }
-        if (prestorageOrderSupplyDetail != null && prestorageOrderSupplyDetail.getAmount() - prestorageOrderSupplyDetail.getSupplyAmount() == prestorageOutVo.getAmount()) {
+        //购买数量<=已提货数量+未提货的退货数量
+        if (prestorageOrderSupplyDetail != null && prestorageOrderSupplyDetail.getAmount() <=prestorageOrderSupplyDetail.getSupplyAmount() + prestorageOrderSupplyDetail.getReturnPrestorageAmount()) {
             //修改状态
-            prestorageOrderSupplyDetail.setPrestorageOrderSupplyStatus(Global.ORDER_STATUS_5);
+            prestorageOrderSupplyDetail.setPrestorageOrderSupplyStatus(Global.ORDER_STATUS_6);
             prestorageOrderSupplyDetailDao.updateById(prestorageOrderSupplyDetail);
             updateprestorageOrderSupplyStatus(prestorageOrderSupplyDetail.getPrestorageOrderSupplyId());
-
+            isUpdate=true;
+        }
+        //修改订单状态
+        if(isUpdate){
+            boolean stateUpdate=true;
+            List<PrestorageOrderSupplyDetail> prestorageOrderSupplyDetails=prestorageOrderSupplyDetailDao.selectprestorageorderDetailsListByOrderId(prestorageOrderSupplyDetail.getOrderId());
+            for (PrestorageOrderSupplyDetail prestorageOrderSupplyDetail1:prestorageOrderSupplyDetails){
+                if (prestorageOrderSupplyDetail1.getPrestorageOrderSupplyStatus()==2){
+                    stateUpdate=false;
+                }
+            }
+            if (stateUpdate){
+                PrestorageOrderSupply prestorageOrderSupply=new PrestorageOrderSupply();
+                prestorageOrderSupply.setPrestorageOrderSupplyStatus(Global.ORDER_STATUS_6);
+                prestorageOrderSupply.setPrestorageOrderSupplyId(prestorageOrderSupplyDetail.getPrestorageOrderSupplyId());
+                prestorageOrderSupply.setUpdateBy(prestorageOrderSupplyDetail.getUpdateBy());
+                prestorageOrderSupplyDao.updateById(prestorageOrderSupply);
+                OrderInfo orderInfo=new OrderInfo();
+                orderInfo.setOrderStatus(Global.ORDER_STATUS_6);
+                orderInfo.setOrderId(prestorageOrderSupplyDetail.getOrderId());
+                try {
+                    orderDao.updateOrder(orderInfo);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
 
