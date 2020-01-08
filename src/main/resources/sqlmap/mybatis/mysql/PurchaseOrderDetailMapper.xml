@@ -304,7 +304,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.PurchaseOrderDetail">
+  <update id="updateByPurchaseOrderCode" parameterType="com.aiqin.mgs.order.api.domain.PurchaseOrderDetail">
     update purchase_order_detail
     <set>
       <if test="purchaseOrderDetailId != null">
@@ -413,7 +413,7 @@
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
-    where id = #{id,jdbcType=BIGINT}
+    where purchase_order_code = #{purchaseOrderCode,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.aiqin.mgs.order.api.domain.PurchaseOrderDetail">
     update purchase_order_detail

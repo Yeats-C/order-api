@@ -19,7 +19,7 @@ public interface PurchaseOrderDetailDao {
 
     PurchaseOrderDetail selectByPrimaryKey(Long id);
 
-    int updateByPrimaryKeySelective(PurchaseOrderDetail record);
+    int updateByPurchaseOrderCode(PurchaseOrderDetail record);
 
     int updateByPrimaryKey(PurchaseOrderDetail record);
 }

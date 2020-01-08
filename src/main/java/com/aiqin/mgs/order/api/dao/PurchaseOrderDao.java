@@ -16,7 +16,7 @@ public interface PurchaseOrderDao {
 
     PurchaseOrder selectByPrimaryKey(Long id);
 
-    int updateByPrimaryKeySelective(PurchaseOrder record);
+    int updateByOrderCode(PurchaseOrder record);
 
     int updateByPrimaryKey(PurchaseOrder record);
     /**
@@ -24,5 +24,5 @@ public interface PurchaseOrderDao {
      * @param record
      * @return
      */
-    int updateByorderStoreCode(PurchaseOrder record);
+    int updateByPurchaseOrderStatus(PurchaseOrder record);
 }

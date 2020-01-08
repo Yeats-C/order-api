@@ -888,7 +888,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         return new PageResData(Integer.valueOf((int)((Page) content).getTotal()) , content);
     }
 
-    @Override
+    //@Override
     @Transactional
     public boolean searchPayOrder(String orderCode) {
         String url=paymentHost+"/payment/pay/searchPayOrder?orderNo="+orderCode;
@@ -915,7 +915,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         return false;
     }
 
-    @Override
+    //@Override
     @Transactional
     public HttpResponse saveCancelOrder(String orderCode) {
         //根据订单编码查询原始订单数据及详情数据

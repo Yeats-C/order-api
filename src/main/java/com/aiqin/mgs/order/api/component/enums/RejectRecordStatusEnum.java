@@ -3,8 +3,8 @@ package com.aiqin.mgs.order.api.component.enums;
 import lombok.Getter;
 
 @Getter
-public enum PurchaseOrderStatusEnum {
-    //采购单状态
+public enum RejectRecordStatusEnum {
+    //退供单状态
     PURCHASE_ORDER_STATUS_DC(0,"0","待确认"),
     PURCHASE_ORDER_STATUS_COMPLETE(1,"1","完成"),
     PURCHASE_ORDER_STATUS_REMOVE(2,"2","取消");
@@ -15,7 +15,7 @@ public enum PurchaseOrderStatusEnum {
     /***状态描述*/
     private String desc;
 
-    PurchaseOrderStatusEnum(Integer code, String value, String desc) {
+    RejectRecordStatusEnum(Integer code, String value, String desc) {
         this.code = code;
         this.value = value;
         this.desc = desc;

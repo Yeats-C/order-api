@@ -31,7 +31,7 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
     ErpOrderInfoDao erpOrderInfoDao;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void addOrderAndDetail(ErpOrderInfo erpOrderInfo) {
         try {
             if (erpOrderInfo != null) {
