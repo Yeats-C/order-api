@@ -33,6 +33,7 @@ import com.aiqin.platform.flows.client.constant.FormUpdateUrlType;
 import com.aiqin.platform.flows.client.constant.StatusEnum;
 import com.aiqin.platform.flows.client.domain.vo.ActBaseProcessEntity;
 import com.aiqin.platform.flows.client.domain.vo.StartProcessParamVO;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.pagehelper.Page;
@@ -98,6 +99,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     @Override
     @Transactional
     public Boolean save(ReturnOrderReqVo reqVo) {
+        log.info("发起退货--入参，reqVo={}",reqVo);
         //查询订单是否存在未处理售后单
         List<ReturnOrderInfo> returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndStatus(reqVo.getOrderStoreCode(), 1);
         Assert.isTrue(CollectionUtils.isEmpty(returnOrderInfo), "该订单还有未审核售后单，请稍后提交");
@@ -148,41 +150,18 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         JSONObject body=new JSONObject();
         body.put("create_by_id",reqVo.getCreateById());
         body.put("create_by_name",reqVo.getCreateByName());
-        body.put("create_time",new Date());
         body.put("order_code",record.getOrderStoreCode());
         body.put("order_return_code", afterSaleCode);
-//        body.put("order_return_id", returnOrderId);
         body.put("store_id",record.getStoreId());
-//        OrderReturnReq orr=new OrderReturnReq();
-//        orr.setCreateById(reqVo.getCreateById());
-//        orr.setCreateByName(reqVo.getCreateByName());
-//        orr.setCreateTime(new Date());
-//        orr.setOrderCode(record.getOrderStoreCode());
-//        orr.setOrderReturnCode(afterSaleCode);
-//        orr.setOrderReturnId(returnOrderId);
-//        orr.setStoreId(record.getStoreId());
         List<Map<String, Object>> list = new ArrayList<>();
         for(ReturnOrderDetail rod:details){
-            String orderReturnId=rod.getReturnOrderDetailId();
-            String orderReturnCode=rod.getReturnOrderCode();
             String skuCode=rod.getSkuCode();
             Long returnQuantity=rod.getReturnProductCount();
-//            OrderReturnProductReq orpr=new OrderReturnProductReq();
-//            orpr.setOrderReturnId(orderReturnId);
-//            orpr.setOrderReturnCode(orderReturnCode);
-//            orpr.setSkuCode(skuCode);
-//            orpr.setReturnQuantity(returnQuantity);
-//            orpr.setCreateById(reqVo.getCreateById());
-//            orpr.setCreateByName(reqVo.getCreateByName());
-//            orpr.setCreateTime(new Date());
             Map<String,Object> map=new HashMap<>();
-//            map.put("order_return_id",orderReturnId);
-//            map.put("order_return_code",orderReturnCode);
             map.put("sku_code",skuCode);
             map.put("return_quantity",returnQuantity);
             map.put("create_by_id",reqVo.getCreateById());
             map.put("create_by_name",reqVo.getCreateByName());
-//            map.put("create_time",new Date());
             list.add(map);
         }
         body.put("order_return_product_reqs",list);
@@ -1055,7 +1034,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     }
 
     public static void main(String[] args) {
-//        String url="http://product.api.aiqin.com"+"/order/return/insert";
+        String url="http://product.api.aiqin.com"+"/order/return/insert";
 //        OrderReturnReq orr=new OrderReturnReq();
 //        orr.setCreateById("reqVo");
 //        orr.setCreateByName("reqVo");
@@ -1084,5 +1063,29 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 //        Map<String ,Object> result=null;
 //        result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
 //        log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存结果，request={}",result);
+
+        String str="{\n" +
+                "  \"create_by_id\": \"12272\",\n" +
+                "  \"create_by_name\": \"张苗苗（CTO助理）\",\n" +
+                "  \"order_code\": \"20200107000017\",\n" +
+                "  \"order_return_code\": \"20200108045100004\",\n" +
+                "  \"order_return_product_reqs\": [\n" +
+                "    {\n" +
+                "      \"create_by_id\": \"12272\",\n" +
+                "      \"create_by_name\": \"张苗苗（CTO助理）\",\n" +
+                "      \"create_time\": \"2020-01-08T05:38:42.801Z\",\n" +
+                "      \"return_quantity\": 10,\n" +
+                "      \"sku_code\": \"0000109\"\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"store_id\": \"AB957AE69917B34B35BEFFF8A23573F01E\"\n" +
+                "}";
+        JSONObject json= JSON.parseObject(str);
+        log.info("发起门店退货申请-完成(门店)（erp回调）--修改商品库存入参，url={},json={}",url,json);
+        HttpClient httpClient = HttpClient.post(url).json(json);
+        Map<String ,Object> result=null;
+        result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+        log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存结果，request={}",result);
+
     }
 }
