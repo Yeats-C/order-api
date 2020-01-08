@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.order.ErpOrderRefundDao">
+
+    <select id="select" parameterType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderRefund"
+            resultType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderRefund">
+        select
+        id as id,
+        refund_id as refundId,
+        refund_code as refundCode,
+        order_id as orderId,
+        pay_id as payId,
+        refund_fee as refundFee,
+        refund_status as refundStatus,
+        refund_type as refundType,
+        create_time as createTime,
+        create_by_id as createById,
+        create_by_name as createByName,
+        update_time as updateTime,
+        update_by_id as updateById,
+        update_by_name as updateByName,
+        status as status
+        from order_store_refund
+        where 1 = 1
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="refundStatus != null and refundStatus != '' or refundStatus == 0">
+            and refund_status = #{refundStatus}
+        </if>
+        <if test="refundId != null and refundId != ''">
+            and refund_id = #{refundId}
+        </if>
+        <if test="refundCode != null and refundCode != ''">
+            and refund_code = #{refundCode}
+        </if>
+        <if test="orderId != null and orderId != ''">
+            and order_id = #{orderId}
+        </if>
+        <if test="payId != null and payId != ''">
+            and pay_id = #{payId}
+        </if>
+        <if test="refundType != null and refundType != ''">
+            and refund_type = #{refundType}
+        </if>
+        <if test="status != null and status != '' or status == 0">
+            and status = #{status}
+        </if>
+        order by create_time desc
+    </select>
+
+    <update id="updateByPrimaryKeySelective">
+        update order_store_refund
+        set
+        <if test="refundCode != null and refundCode != ''">
+            refund_code = #{refundCode},
+        </if>
+        <if test="payId != null and payId != ''">
+            pay_id = #{payId},
+        </if>
+        <if test="refundStatus != null and refundStatus != '' or refundStatus == 0">
+            refund_status = #{refundStatus},
+        </if>
+        update_by_id = #{updateById},
+        update_by_name = #{updateByName},
+        update_time = sysdate()
+        where id = #{id}
+    </update>
+
+    <insert id="insert">
+        insert into order_store_refund (refund_id, refund_code, order_id, pay_id, refund_fee, refund_status,
+                                        refund_type, create_time, create_by_id, create_by_name, update_time,
+                                        update_by_id, update_by_name)
+        values (#{refundId}, #{refundCode}, #{orderId}, #{payId}, #{refundFee}, #{refundStatus},
+                #{refundType}, sysdate(), #{createById}, #{createByName}, sysdate(),
+                #{updateById}, #{updateByName})
+    </insert>
+
+</mapper>
+

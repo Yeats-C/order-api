@@ -58,4 +58,8 @@ public class ErpOrderOperationControlResponse {
     @JsonProperty("order_return")
     private int orderReturn = 1;
 
+    @ApiModelProperty(value = "退款 0有 1无")
+    @JsonProperty("refund")
+    private int refund = 1;
+
 }

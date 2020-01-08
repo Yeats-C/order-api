@@ -17,22 +17,24 @@ import java.util.List;
 public enum ErpPayStatusEnum {
 
     /***待支付*/
-    UNPAID(0, "0", "待支付"),
+    UNPAID(0, "0", "待支付","待退款"),
     /***已发起支付*/
-    PAYING(1, "1", "支付中"),
+    PAYING(1, "1", "支付中","退款中"),
     /***支付成功*/
-    SUCCESS(2, "2", "支付成功"),
+    SUCCESS(2, "2", "支付成功","退款成功"),
     /***支付失败*/
-    FAIL(3, "3", "支付失败");
+    FAIL(3, "3", "支付失败","退款失败");
 
     private Integer code;
     private String value;
     private String desc;
+    private String refundDesc;
 
-    ErpPayStatusEnum(Integer code, String value, String desc) {
+    ErpPayStatusEnum(Integer code, String value, String desc, String refundDesc) {
         this.code = code;
         this.value = value;
         this.desc = desc;
+        this.refundDesc = refundDesc;
     }
 
     public static ErpPayStatusEnum getEnum(Object object) {
@@ -52,6 +54,16 @@ public enum ErpPayStatusEnum {
             ErpPayStatusEnum anEnum = getEnum(object.toString());
             if (anEnum != null) {
                 return anEnum.getDesc();
+            }
+        }
+        return "";
+    }
+
+    public static String getRefundDesc(Object object) {
+        if (object != null) {
+            ErpPayStatusEnum anEnum = getEnum(object.toString());
+            if (anEnum != null) {
+                return anEnum.getRefundDesc();
             }
         }
         return "";

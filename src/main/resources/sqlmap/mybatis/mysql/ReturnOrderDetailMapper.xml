@@ -397,7 +397,7 @@
         insert into return_order_detail (return_order_detail_id, return_order_code,product_type,
         sku_code, sku_name,total_product_amount,return_product_count,model_code,product_status,
         product_spec,unit_name,color_code,color_name,create_by_id, create_by_name,picture_url,
-        create_time,remark,evidence_url,preferential_amount,line_code)
+        create_time,remark,evidence_url,preferential_amount,line_code,unit_code,tax_rate,product_amount)
         values
         <foreach collection="records" item="item" index="index" separator=",">
             (
@@ -411,7 +411,7 @@
             #{item.createByName,jdbcType=VARCHAR},
             #{item.pictureUrl,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP},
             #{item.remark,jdbcType=VARCHAR},#{item.evidenceUrl,jdbcType=VARCHAR},#{item.preferentialAmount,jdbcType=DECIMAL},
-            #{item.lineCode}
+            #{item.lineCode},#{item.unitCode},#{item.taxRate},#{item.productAmount}
             )
         </foreach>
     </insert>

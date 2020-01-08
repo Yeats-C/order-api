@@ -36,6 +36,8 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
     private ErpOrderFeeService erpOrderFeeService;
     @Resource
     private ErpOrderRequestService erpOrderRequestService;
+    @Resource
+    private ErpOrderRefundService erpOrderRefundService;
 
     @Override
     public ErpOrderInfo getOrderByOrderId(String orderId) {
@@ -124,8 +126,14 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             ErpOrderLogistics orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsId(order.getLogisticsId());
             order.setOrderLogistics(orderLogistics);
 
-            //能不能编辑新增赠品行
+            //退款信息
+            ErpOrderRefund orderRefund = erpOrderRefundService.getOrderRefundByOrderIdAndRefundType(order.getOrderStoreId(), ErpOrderRefundTypeEnum.ORDER_CANCEL);
+            order.setOrderRefund(orderRefund);
+
+            //操作按钮配置
             orderOperationConfig(order);
+
+
         }
         return order;
     }
@@ -392,5 +400,14 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             control.setOrderReturn(StatusEnum.YES.getCode());
         }
 
+        //退款
+        if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_97 || orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_98) {
+            control.setRefund(StatusEnum.YES.getCode());
+            //获取退款状态
+            ErpOrderRefund orderRefund = erpOrderRefundService.getOrderRefundByOrderIdAndRefundType(order.getOrderStoreId(), ErpOrderRefundTypeEnum.ORDER_CANCEL);
+            if (orderRefund != null) {
+                order.setOrderRefund(orderRefund);
+            }
+        }
     }
 }
