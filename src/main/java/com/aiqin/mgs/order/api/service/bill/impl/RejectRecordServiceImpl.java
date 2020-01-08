@@ -5,14 +5,12 @@ import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
-import com.aiqin.mgs.order.api.component.enums.ErpLogOperationTypeEnum;
-import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
-import com.aiqin.mgs.order.api.component.enums.ErpLogStatusTypeEnum;
-import com.aiqin.mgs.order.api.component.enums.OrderSucessEnum;
+import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
+import com.aiqin.mgs.order.api.domain.constant.BillConstant;
 import com.aiqin.mgs.order.api.domain.request.bill.ReturnBatchDetailDLReq;
 import com.aiqin.mgs.order.api.domain.request.bill.ReturnDLReq;
 import com.aiqin.mgs.order.api.domain.request.bill.ReturnOrderDetailDLReq;
@@ -37,8 +35,7 @@ import javax.annotation.Resource;
 import javax.xml.crypto.Data;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 /**
  * 爱亲退供单 实现类
@@ -49,9 +46,9 @@ public class RejectRecordServiceImpl implements RejectRecordService {
     @Value("${reject.host}")
     private String rejectHost;
     @Resource
-    private ReturnOrderInfoDao returnOrderInfoDao;
+    ReturnOrderInfoDao returnOrderInfoDao;
     @Resource
-    private ReturnOrderDetailDao returnOrderDetailDao;
+    ReturnOrderDetailDao returnOrderDetailDao;
     @Resource
     OperationLogService operationLogService;
     @Resource
@@ -60,9 +57,11 @@ public class RejectRecordServiceImpl implements RejectRecordService {
     RejectRecordDetailDao rejectRecordDetailDao;
     @Resource
     RejectRecordDetailBatchDao rejectRecordDetailBatchDao;
+    @Resource
+    CreateRejectRecordService createRejectRecordService;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public HttpResponse createRejectRecord(String returnOrderCode) {
         LOGGER.info("根据ERP退货单生成爱亲退供单，开始，returnOrderCode{}", returnOrderCode);
         if (StringUtils.isNotEmpty(returnOrderCode)) {
@@ -75,6 +74,7 @@ public class RejectRecordServiceImpl implements RejectRecordService {
 
     //耘链退货单回传
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean selectPurchaseInfo(ReturnDLReq returnDLReq) {
         try {
             if (returnDLReq.getReturnOrderInfoDLReq() != null) {
@@ -123,6 +123,24 @@ public class RejectRecordServiceImpl implements RejectRecordService {
         return true;
     }
 
+    //取消退货单
+    @Override
+    public Boolean removeRejectRecordStatus(String rejectRecordCode) {
+        if (StringUtils.isNotBlank(rejectRecordCode)) {
+            try {
+                RejectRecord rejectRecord = new RejectRecord();
+                rejectRecord.setRejectRecordCode(rejectRecordCode);
+                rejectRecord.setRejectRecordStatus(RejectRecordStatusEnum.PURCHASE_ORDER_STATUS_REMOVE.getCode());
+                rejectRecordDao.updateByReturnOrderCode(rejectRecord);
+                LOGGER.error("取消退货单成功，取消单号：" + rejectRecordCode);
+            } catch (Exception e) {
+                LOGGER.error("取消退货单失败，，取消失败单号：" + rejectRecordCode);
+                throw new RuntimeException();
+            }
+        }
+        return true;
+    }
+
     /**
      * 异步执行
      *
@@ -130,8 +148,8 @@ public class RejectRecordServiceImpl implements RejectRecordService {
      */
     private void rejectRecordExecutor(String returnOrderCode) {
         //异步执行
-        ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
-        singleThreadExecutor.execute(new Runnable() {
+        ScheduledExecutorService service = new ScheduledThreadPoolExecutor(1);
+        service.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -140,7 +158,7 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                     ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndSuccess(orderSynchroSuccess, returnOrderCode);
                     if (returnOrderInfo != null) {
                         LOGGER.info("根据ERP退货单生成爱亲退供单&爱亲退供单明细&修改ERP订单同步状态开始");
-                        //createRejectRecordService.addRejectRecord(returnOrderInfo);
+                        createRejectRecordService.addRejectRecord(returnOrderInfo);
                         LOGGER.info("根据ERP退货单生成爱亲退供单&爱亲退供单明细&修改ERP订单同步状态结束");
 
                         //根据爱亲退供单，生成耘链退货单
@@ -161,7 +179,7 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                     throw new RuntimeException();
                 }
             }
-        });
+        }, BillConstant.MAX_PAY_POLLING_INITIALDELAY, BillConstant.MAX_PAY_POLLING_PERIOD, TimeUnit.MILLISECONDS);
     }
 
     /**

@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.service.bill.impl;
 
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.PurchaseOrderStatusEnum;
+import com.aiqin.mgs.order.api.domain.constant.BillConstant;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderDeliverItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderTransportLogisticsRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderTransportRequest;
@@ -33,8 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 /**
  * 爱亲采购单 实现类
@@ -61,7 +61,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     @Override
     public HttpResponse createPurchaseOrder(@Valid ErpOrderInfo erpOrderInfo) {
         LOGGER.info("根据ERP订单生成爱亲采购单，采购单开始，erpOrderInfo{}", erpOrderInfo);
-        if(erpOrderInfo != null){
+        if (erpOrderInfo != null) {
             //异步执行
             purchaseOrderExecutor(erpOrderInfo);
             return HttpResponse.success();
@@ -160,8 +160,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
      * @param erpOrderInfo
      */
     private void purchaseOrderExecutor(ErpOrderInfo erpOrderInfo) {
-        ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
-        singleThreadExecutor.execute(new Runnable() {
+        ScheduledExecutorService service = new ScheduledThreadPoolExecutor(1);
+        service.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -181,7 +181,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                     throw new RuntimeException();
                 }
             }
-        });
+        }, BillConstant.MAX_PAY_POLLING_INITIALDELAY, BillConstant.MAX_PAY_POLLING_PERIOD, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -204,7 +204,6 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
      * @param erpOrderInfo
      */
     private void createSaleOrder(ErpOrderInfo erpOrderInfo) {
-
         try {
             String url = purchaseHost + "/order/aiqin/sale";
             HttpClient httpGet = HttpClient.post(url).json(erpOrderInfo).timeout(10000);
@@ -230,7 +229,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         if (result == 1) {
             LOGGER.info("采购单取消成功");
             return HttpResponse.success();
-        }else {
+        } else {
             LOGGER.error("采购单取消失败");
             return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
         }

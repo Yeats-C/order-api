@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.service.bill;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.domain.RejectRecord;
 import com.aiqin.mgs.order.api.domain.RejectRecordInfo;
 import com.aiqin.mgs.order.api.domain.request.bill.RejectRecordReq;
 import com.aiqin.mgs.order.api.domain.request.bill.ReturnDLReq;
@@ -24,4 +25,11 @@ public interface RejectRecordService {
      * @return
      */
     Boolean selectPurchaseInfo(ReturnDLReq returnDLReq);
+
+
+    /**
+     * 取消退供单
+     */
+    Boolean removeRejectRecordStatus(String rejectRecordCode);
+
 }

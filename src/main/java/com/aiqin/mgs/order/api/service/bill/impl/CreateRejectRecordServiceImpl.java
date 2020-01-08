@@ -35,7 +35,7 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
     RejectRecordDetailDao rejectRecordDetailDao;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void addRejectRecord(ReturnOrderInfo returnOrderInfo) {
         try {
             if (returnOrderInfo != null) {

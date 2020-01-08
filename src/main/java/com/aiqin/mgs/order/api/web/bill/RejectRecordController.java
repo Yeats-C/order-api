@@ -46,5 +46,18 @@ public class RejectRecordController {
         }
         return HttpResponse.success(false);
     }
+
+    /**
+     * 耘链退货单回传
+     */
+    @PostMapping("remove")
+    @ApiOperation(value = "取消退供单")
+    public HttpResponse removeRejectRecordStatus(String rejectRecordCode) {
+        Boolean result = rejectRecordService.removeRejectRecordStatus(rejectRecordCode);
+        if (result == true) {
+            return HttpResponse.success(true);
+        }
+        return HttpResponse.success(false);
+    }
 }
 
