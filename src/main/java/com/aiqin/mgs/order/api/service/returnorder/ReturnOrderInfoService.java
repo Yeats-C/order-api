@@ -21,7 +21,7 @@ public interface ReturnOrderInfoService {
      * @param reqVo
      * @return
      */
-    Boolean save(ReturnOrderReqVo reqVo);
+    HttpResponse save(ReturnOrderReqVo reqVo);
 
     /**
      * 退货单列表
