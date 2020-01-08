@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 /**
  * 采购单 实现类
@@ -83,10 +84,7 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
                 purchaseOrder.setSourceType(erpOrderInfo.getSourceType());//来源类型
                 purchaseOrder.setCreateById(erpOrderInfo.getCreateById());//创建人编码
                 purchaseOrder.setCreateByName(erpOrderInfo.getCreateByName());//创建人名称
-                purchaseOrder.setUpdateById(erpOrderInfo.getUpdateById());//修改人编码
-                purchaseOrder.setUpdateByName(erpOrderInfo.getUpdateByName());//修改人名称
-                purchaseOrder.setCreateTime(erpOrderInfo.getCreateTime());//创建时间
-                purchaseOrder.setUpdateTime(erpOrderInfo.getUpdateTime());//修改时间
+                purchaseOrder.setCreateTime(new Date());//创建时间
                 //根据ERP订单生成爱亲采购单
                 purchaseOrderDao.insertSelective(purchaseOrder);
 
@@ -123,10 +121,7 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
                     purchaseOrderDetail.setUseStatus(item.getUseStatus());//0. 启用   1.禁用
                     purchaseOrderDetail.setCreateById(item.getCreateById());//创建人编码
                     purchaseOrderDetail.setCreateByName(item.getCreateByName());//创建人名称
-                    purchaseOrderDetail.setUpdateById(item.getUpdateById());//修改人编码
-                    purchaseOrderDetail.setUpdateByName(item.getUpdateByName());//修改人名称
-                    purchaseOrderDetail.setCreateTime(item.getCreateTime());//创建时间
-                    purchaseOrderDetail.setUpdateTime(item.getUpdateTime());//修改时间
+                    purchaseOrderDetail.setCreateTime(new Date());//创建时间
                     //根据ERP订单生成爱亲采购单明细
                     purchaseOrderDetailDao.insertSelective(purchaseOrderDetail);
                 }
