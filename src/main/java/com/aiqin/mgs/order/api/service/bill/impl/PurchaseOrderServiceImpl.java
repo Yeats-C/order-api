@@ -64,7 +64,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     public HttpResponse createPurchaseOrder(@Valid ErpOrderInfo erpOrderInfo) {
         LOGGER.info("根据ERP订单生成爱亲采购单，采购单开始，erpOrderInfo{}", erpOrderInfo);
         if (erpOrderInfo != null) {
-            //异步执行
+            //异步执行。
             purchaseOrderExecutor(erpOrderInfo);
             return HttpResponse.success();
         }
