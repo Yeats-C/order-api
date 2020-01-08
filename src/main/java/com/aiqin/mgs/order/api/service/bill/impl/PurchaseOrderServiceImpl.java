@@ -206,8 +206,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
      */
     private void addOperationLog(ErpOrderInfo erpOrderInfo) {
         String operationCode = erpOrderInfo.getOrderStoreCode();
-        Integer operationType = ErpLogSourceTypeEnum.PURCHASE.getCode();
-        Integer sourceType = ErpLogOperationTypeEnum.ADD.getCode();
+        Integer sourceType = ErpLogSourceTypeEnum.PURCHASE.getCode();
+        Integer operationType = ErpLogOperationTypeEnum.ADD.getCode();
         Integer useStatus = ErpLogStatusTypeEnum.USING.getCode();
         String operationContent = "根据ERP订单生成爱亲采购单,采购单明细,修改订单同步状态&根据爱亲采购单，生成耘链销售单";
         operationLogService.insert(operationCode, operationType, sourceType, operationContent, null, useStatus, null);
