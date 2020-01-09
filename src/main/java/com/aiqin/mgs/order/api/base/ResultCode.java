@@ -32,6 +32,8 @@ public interface ResultCode {
     MessageId NOT_FOUND_RETURN_ORDER_DATA = MessageId.create(Project.ORDER_API, 17, "此单号有误，未查到退货单数据");
     MessageId NO_FOUND_REJECT_ERROR = MessageId.create(Project.ORDER_API, 18, "未查询到对应退供单信息");
     MessageId NOT_FOUND_REJECT_RECORD_DATA = MessageId.create(Project.ORDER_API, 19, "此单号有误，未查到退供单数据");
+    MessageId RETURN_ORDER_CANCEL_FALL = MessageId.create(Project.ORDER_API, 20, "此退货单撤销失败，撤销单已退货完成，正在发起退款");
+    MessageId RETURN_ORDER_STATUS_NOT_FOUND = MessageId.create(Project.ORDER_API, 21, "此退货单审核失败，传入的审核状态有误");
 
     MessageId OVER_LIMIT = MessageId.create(Project.PRODUCT_API,20,"订购商品不能超过999");
     MessageId STORE_SHORT = MessageId.create(Project.PRODUCT_API,21,"库存不足");

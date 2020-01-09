@@ -199,7 +199,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 
     @Override
     @Transactional
-    public Boolean updateReturnStatus(ReturnOrderReviewReqVo reqVo) {
+    public HttpResponse updateReturnStatus(ReturnOrderReviewReqVo reqVo) {
         boolean flag = false;
         boolean flag1 = false;
         //1--通过 2--挂账 3--不通过（驳回）99-已取消"
@@ -237,11 +237,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 //如果退货状态为11，则不进行撤销，继续向下走流程
                 ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(reqVo.getReturnOrderCode());
                 if(returnOrderInfo.getReturnOrderStatus().equals(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_RETURN.getKey())){
-                    return false;
+                    return HttpResponse.failure(ResultCode.RETURN_ORDER_CANCEL_FALL);
                 }
                 break;
             default:
-                return false;
+                return HttpResponse.failure(ResultCode.RETURN_ORDER_STATUS_NOT_FOUND);
         }
         //修改退货单状态
         reqVo.setReviewTime(new Date());
@@ -280,7 +280,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(reqVo.getReturnOrderCode());
 //            updateStoreStatus(reqVo.getReturnOrderCode(),isPass,returnOrderInfo.getStoreId(),reqVo.getOperatorId(),reqVo.getOperator());
         }
-        return review > 0;
+//        return review > 0;
+        return HttpResponse.success();
     }
 
     @Override
@@ -928,7 +929,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         return false;
     }
 
-    //@Override
+    @Override
     @Transactional
     public HttpResponse saveCancelOrder(String orderCode) {
         //根据订单编码查询原始订单数据及详情数据
