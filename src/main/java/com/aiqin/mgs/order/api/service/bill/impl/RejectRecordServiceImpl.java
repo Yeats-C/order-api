@@ -143,6 +143,7 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                 throw new IllegalArgumentException();
             }
         } catch (Exception e) {
+            LOGGER.error("耘链退货单回传失败");
             throw new RuntimeException();
         }
         return true;
