@@ -475,6 +475,9 @@
         <if test="orderStoreCode != null and orderStoreCode != ''">
             and a1.order_store_code like concat('%',#{orderStoreCode,jdbcType=VARCHAR},'%')
         </if>
+        <if test="storeId != null and storeId != ''">
+            and a1.store_id = #{storeId,jdbcType=VARCHAR}
+        </if>
         <if test="storeName != null and storeName != ''">
             and a1.store_name like concat('%',#{storeName,jdbcType=VARCHAR},'%')
         </if>

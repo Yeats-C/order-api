@@ -279,7 +279,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_10.getCode());
             erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
 
-            /*if (!processTypeEnum.isHasLogisticsFee()) {
+            if (!processTypeEnum.isHasLogisticsFee()) {
                 //不需要支付物流费用的订单
                 order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_11.getCode());
                 erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
@@ -289,7 +289,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                     order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_11.getCode());
                     erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
                 }
-            }*/
+            }
         }
 
         if (orderLogistics != null) {
