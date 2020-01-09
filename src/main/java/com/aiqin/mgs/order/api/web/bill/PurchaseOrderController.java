@@ -1,10 +1,16 @@
 package com.aiqin.mgs.order.api.web.bill;
 
+import com.aiqin.ground.util.protocol.MessageId;
+import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.ResultCode;
+import com.aiqin.mgs.order.api.base.exception.BusinessException;
+import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.DeliveryInfoVo;
 import com.aiqin.mgs.order.api.domain.OrderIogisticsVo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
+import com.aiqin.mgs.order.api.service.order.ErpOrderPayService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +28,8 @@ public class PurchaseOrderController {
 
     @Resource
     private PurchaseOrderService purchaseOrderService;
-
+    @Resource
+    private ErpOrderPayService erpOrderPayService;
     /**
      * 同步采购单
      *
@@ -60,5 +67,23 @@ public class PurchaseOrderController {
     @ApiOperation(value = "取消订单")
     public HttpResponse updateCancelOrderinfo(String orderStoreCode) {
         return purchaseOrderService.updateCancelOrderinfo(orderStoreCode);
+    }
+
+    @GetMapping("/测试【触发订单 生成采购单】test1")
+    public HttpResponse test1(@RequestParam  String orderStoreCode) {
+        HttpResponse response = HttpResponse.success();
+        try {
+
+            AuthToken auth = new AuthToken();
+            auth.setPersonId("123456");
+            auth.setPersonName("1234567890");
+            erpOrderPayService.orderPaySuccessMethodGroup(orderStoreCode, auth);
+
+        } catch (BusinessException e) {
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
     }
 }

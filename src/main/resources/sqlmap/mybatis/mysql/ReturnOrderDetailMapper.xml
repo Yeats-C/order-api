@@ -432,8 +432,8 @@
         <!-- collection可以是List对于list,数组对于array,Map对应ids -->
         <foreach collection="list" item="item" separator=";">
             update return_order_detail
-            actual_return_product_count = #{item.actualReturnProductCount}
-            where return_order_detail_id = #{item.returnOrderDetailId}
+            set actual_return_product_count = #{item.actualReturnProductCount}
+            where return_order_code = #{item.returnOrderCode} and line_code=#{item.lineCode}
         </foreach>
     </update>
 
@@ -441,7 +441,7 @@
         <!-- collection可以是List对于list,数组对于array,Map对应ids -->
         <foreach collection="list" item="item" separator=";">
             update return_order_detail
-            actual_total_product_amount = #{item.actualTotalProductAmount}
+            set actual_total_product_amount = #{item.actualTotalProductAmount}
             where return_order_detail_id = #{item.returnOrderDetailId}
         </foreach>
     </update>

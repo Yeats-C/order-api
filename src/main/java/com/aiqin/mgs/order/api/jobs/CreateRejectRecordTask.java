@@ -25,7 +25,7 @@ public class CreateRejectRecordTask {
      * 定时扫描同步失败的拖货单
      * 每半小时执行一次
      */
-    @Scheduled(fixedRate = 1000 * 5)
+    //@Scheduled(fixedRate = 1000 * 5)
     public void TimedFailedRejectOrder() {
         try {
             //根据订单号查询为同步的订单

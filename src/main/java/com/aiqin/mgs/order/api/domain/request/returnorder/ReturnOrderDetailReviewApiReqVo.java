@@ -19,6 +19,9 @@ public class ReturnOrderDetailReviewApiReqVo implements Serializable {
 
     private static final long serialVersionUID = 731706668149842489L;
 
+    @ApiModelProperty("退货单编码")
+    private String returnOrderCode;
+
     @ApiModelProperty(value = "行号")
     private Integer lineCode;
 
