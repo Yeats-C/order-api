@@ -482,12 +482,32 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
 
         ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
 
-        if (ErpOrderNodeStatusEnum.STATUS_1.getCode().equals(order.getOrderNodeStatus())) {
+        AuthToken auth = new AuthToken();
+        auth.setPersonId(order.getCreateById());
+        auth.setPersonName(order.getCreateByName());
+
+        if (ErpOrderNodeStatusEnum.STATUS_1.getCode().equals(order.getOrderNodeStatus()) || ErpOrderNodeStatusEnum.STATUS_4.getCode().equals(order.getOrderNodeStatus())) {
             //未发起支付，直接取消
+            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_99.getCode());
+            ErpOrderNodeProcessTypeEnum processTypeEnum = ErpOrderNodeProcessTypeEnum.getEnum(order.getOrderTypeCode(), order.getOrderCategoryCode());
+            if (processTypeEnum.isLockStock()) {
+                boolean flag = erpOrderRequestService.unlockStockInSupplyChainByOrderCode(order, auth);
+                if (!flag) {
+                    throw new BusinessException("解锁库存失败");
+                }
+            }
         } else if (ErpOrderNodeStatusEnum.STATUS_2.getCode().equals(order.getOrderNodeStatus())) {
             //支付中，再查询一次结果
-        } else if (ErpOrderNodeStatusEnum.STATUS_4.getCode().equals(order.getOrderNodeStatus())) {
-            //支付失败，直接取消
+            ErpOrderPayStatusResponse payStatusResponse = erpOrderRequestService.getOrderPayStatus(order.getOrderStoreCode());
+            if (payStatusResponse.isRequestSuccess()) {
+                ErpPayStatusEnum payStatusEnum = payStatusResponse.getPayStatusEnum();
+                if (payStatusEnum == ErpPayStatusEnum.SUCCESS || payStatusEnum == ErpPayStatusEnum.FAIL) {
+                    endOrderPay(orderCode, payStatusResponse.getPayCode(), payStatusEnum, auth, false);
+                    //支付成功后续操作
+                    this.orderPaySuccessMethodGroup(orderCode, auth);
+                }
+            }
+        } else {
 
         }
     }
