@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * @author ch
  * Date: 2019/12/12 14:14
@@ -44,27 +46,27 @@ public class StoreSaleOverViewResp {
 
     @ApiModelProperty("订单数")
     @JsonProperty("order_num")
-    private Integer orderNum;
+    private Long orderNum;
 
     @ApiModelProperty("销售额(实销金额)")
     @JsonProperty("sale_amt")
-    private Integer saleAmt;
+    private BigDecimal saleAmt;
 
     @ApiModelProperty("上月销售额")
     @JsonProperty("last_month_sale_amt")
-    private Integer lastMonthSaleAmt;
+    private BigDecimal lastMonthSaleAmt;
 
     @ApiModelProperty("上年销售额")
     @JsonProperty("last_year_sale_amt")
-    private Integer lastYearSaleAmt;
+    private BigDecimal lastYearSaleAmt;
 
     @ApiModelProperty("环比增长率")
     @JsonProperty("chain_growth")
-    private Integer chainGrowth;
+    private BigDecimal chainGrowth;
 
     @ApiModelProperty("同比增长率")
     @JsonProperty("year_on_year_growth")
-    private Integer yearOnYearGrowth;
+    private BigDecimal yearOnYearGrowth;
 
 
 }
