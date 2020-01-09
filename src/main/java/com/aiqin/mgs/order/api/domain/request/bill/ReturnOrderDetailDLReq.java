@@ -1,12 +1,9 @@
 package com.aiqin.mgs.order.api.domain.request.bill;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.math.BigDecimal;
-import java.util.Date;
 
 @Data
 @ApiModel("退货单商品表")
