@@ -121,6 +121,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderAfterService orderAfterService;
     @Resource
     private CashierShiftScheduleDao cashierShiftScheduleDao;
+
+
     //商品项目地址
     @Value("${slcsIp}")
     public String slcsIp;
@@ -1821,7 +1823,8 @@ public class OrderServiceImpl implements OrderService {
                     payReq.setCreateName(orderInfo.getCashierName());
                     payReq.setStoreName(orderInfo.getDistributorName());
                     payReq.setCreateBy(orderInfo.getCashierId());
-                    payReq.setFranchiseeId(orderInfo.getDistributorId());
+                    NewFranchiseeResponse newFranchiseeResponse=bridgeProductService.getStoreFranchiseeData(orderInfo.getDistributorId());
+                    payReq.setFranchiseeId(newFranchiseeResponse.getFranchiseeId());
                     payReq.setMemberPhone(orderInfo.getMemberPhone());
                     payReq.setMemberName(orderInfo.getMemberName());
                     payReq.setMemberId(orderInfo.getMemberId());
