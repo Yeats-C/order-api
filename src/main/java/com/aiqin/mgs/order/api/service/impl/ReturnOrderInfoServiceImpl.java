@@ -198,7 +198,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor=Exception.class)
     public HttpResponse updateReturnStatus(ReturnOrderReviewReqVo reqVo) {
         boolean flag = false;
         boolean flag1 = false;
@@ -248,10 +248,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         Integer review = returnOrderInfoDao.updateReturnStatus(reqVo);
         //添加日志
         insertLog(reqVo.getReturnOrderCode(),reqVo.getOperator(),reqVo.getOperator(),ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),reqVo.getOperateStatus(),content);
-        if (flag) {
-            //todo 同步到供应链
-            createRejectRecord(reqVo.getReturnOrderCode());
-        }
         if (flag1) {
             log.info("驳回--进入A品券发放审批");
             //生成审批编码
@@ -273,6 +269,17 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             log.info("同步审批信息到本地完成");
             //A品券发放审批申请提交
             submitActBaseProcess(approvalCode,reqVo.getOperatorId(),reqVo.getDeptCode());
+        }
+        if (flag) {
+            // 同步到供应链，生成退供单
+            log.info("erp同步供应链，生成退供单开始,returnOrderCode={}",reqVo.getReturnOrderCode());
+            HttpResponse httpResponse=rejectRecordService.createRejectRecord(reqVo.getReturnOrderCode());
+            log.info("erp同步供应链，生成退供单结束,httpResponse={}",httpResponse);
+            if(!"0".equals(httpResponse.getCode())){
+                //erp同步供应链，生成退供单失败
+//                return HttpResponse.failure(ResultCode.RETURN_ORDER_SYNCHRONIZATION_FALL);
+                throw new RuntimeException("erp同步供应链，生成退供单失败");
+            }
         }
         //调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单
         if(StringUtils.isNotBlank(isPass)){
@@ -515,69 +522,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         }
         log.error("发起申请失败,request={}", paramVO);
         return HttpResponse.success();
-    }
-
-    /**
-     * 调用供应链封装
-     * @param returnOrderCode 退货单编码
-     */
-    @Transactional
-    public void createRejectRecord(String returnOrderCode){
-        log.info("供应链同步退货单开始,returnOrderId={}",returnOrderCode);
-//        RejectRecordReq rejectRecordReq=new RejectRecordReq();
-//        //根据退货单编码查询退货信息
-//        ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(returnOrderCode);
-//        //根据退货单编码查询退货详细信息
-//        List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderCode);
-//        RejectRecord rejectRecord=new RejectRecord();
-//        List<RejectRecordDetail> rejectRecordDetail=new ArrayList<>();
-//        BeanUtils.copyProperties(returnOrderInfo,rejectRecord);
-//        //来源单号
-//        rejectRecord.setSourceCode(returnOrderInfo.getReturnOrderCode());
-//        //
-////        rejectRecord.setSourceType();
-//        //最小单位数量--商品数量
-//        rejectRecord.setTotalCount(returnOrderInfo.getProductCount());
-//        //商品含税金额--退货金额
-//        rejectRecord.setTotalTaxAmount(returnOrderInfo.getReturnOrderAmount());
-//        //联系人--收货人
-//        rejectRecord.setContactPerson(returnOrderInfo.getReceivePerson());
-//        //联系人电话--收货人电话
-//        rejectRecord.setContactMobile(returnOrderInfo.getReceiveMobile());
-//        //结算方式编码--退款方式
-//        rejectRecord.setSettlementMethodCode(returnOrderInfo.getReturnMoneyType().toString());
-//        //退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户
-//        rejectRecord.setSettlementMethodName(ConstantData.RETURN_MONEY_TYPE_NAME);
-////        if(null!=returnOrderInfo.getReturnMoneyType()){
-////            //退款方式 1:现金 2:微信 3:支付宝 4:银联
-////            switch (returnOrderInfo.getReturnMoneyType()) {
-////                case 1:
-////                    rejectRecord.setSettlementMethodName("现金");
-////                    break;
-////                case 2:
-////                    rejectRecord.setSettlementMethodName("微信");
-////                    break;
-////                case 3:
-////                    rejectRecord.setSettlementMethodName("支付宝");
-////                    break;
-////                case 4:
-////                    rejectRecord.setSettlementMethodName("银联");
-////                    break;
-////            }
-////        }
-////        rejectRecord.setRejectRecordStatus(1);
-//        String afterSaleCode = sequenceService.generateOrderAfterSaleCode(returnOrderInfo.getCompanyCode(), returnOrderInfo.getReturnOrderType());
-//        rejectRecord.setRejectRecordId(IdUtil.uuid());
-//        rejectRecord.setRejectRecordCode(afterSaleCode);
-//        for(ReturnOrderDetail rod:returnOrderDetails){
-//            RejectRecordDetail rrd=new RejectRecordDetail();
-//            BeanUtils.copyProperties(rod,rrd);
-//            rejectRecordDetail.add(rrd);
-//        }
-//        rejectRecordReq.setRejectRecord(rejectRecord);
-//        rejectRecordReq.setRejectRecordDetail(rejectRecordDetail);
-        HttpResponse httpResponse=rejectRecordService.createRejectRecord(returnOrderCode);
-        log.info("供应链同步退货单结束,httpResponse={}",httpResponse);
     }
 
     /**
