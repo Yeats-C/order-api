@@ -6,19 +6,22 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
+import com.aiqin.mgs.order.api.component.returnenums.ReturnOrderStatusEnum;
 import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
-import com.aiqin.mgs.order.api.domain.constant.BillConstant;
 import com.aiqin.mgs.order.api.domain.request.bill.ReturnBatchDetailDLReq;
 import com.aiqin.mgs.order.api.domain.request.bill.ReturnDLReq;
 import com.aiqin.mgs.order.api.domain.request.bill.ReturnOrderDetailDLReq;
 import com.aiqin.mgs.order.api.domain.request.bill.ReturnOrderInfoDLReq;
 import com.aiqin.mgs.order.api.domain.request.RejectRequest;
+import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailReviewApiReqVo;
+import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewApiReqVo;
 import com.aiqin.mgs.order.api.domain.response.RejectResponse;
 import com.aiqin.mgs.order.api.domain.response.RejectVoResponse;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
+import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import com.aiqin.mgs.order.api.util.BeanHelper;
 import com.github.pagehelper.PageHelper;
 import org.apache.commons.collections.CollectionUtils;
@@ -36,6 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.*;
@@ -62,7 +66,8 @@ public class RejectRecordServiceImpl implements RejectRecordService {
     RejectRecordDetailBatchDao rejectRecordDetailBatchDao;
     @Resource
     CreateRejectRecordService createRejectRecordService;
-
+    @Resource
+    ReturnOrderInfoService returnOrderInfoService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -90,10 +95,10 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                 rejectRecord.setCreateTime(new Date());//创建时间
                 //修改退货单
                 rejectRecordDao.updateByReturnOrderCode(rejectRecord);
-            }
 
             if (returnDLReq.getReturnOrderDetailDLReqList() != null && returnDLReq.getReturnOrderDetailDLReqList().size() > 0) {
                 List<ReturnOrderDetailDLReq> returnOrderDetails = returnDLReq.getReturnOrderDetailDLReqList();
+                List<ReturnOrderDetailReviewApiReqVo> detailReviewApis = new ArrayList<>();
                 for (ReturnOrderDetailDLReq returnOrderDetail : returnOrderDetails) {
                     RejectRecordDetail rejectRecordDetail = new RejectRecordDetail();
                     rejectRecordDetail.setProductCount(returnOrderDetail.getActualReturnProductCount());
@@ -103,7 +108,19 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                     rejectRecordDetail.setUpdateTime(new Date());
                     //修改退货单明细
                     rejectRecordDetailDao.updateByPrimaryKey(rejectRecordDetail);
+
+                    ReturnOrderDetailReviewApiReqVo returnOrderDetailReviewApi = new ReturnOrderDetailReviewApiReqVo();
+                    returnOrderDetailReviewApi.setLineCode(new Long(returnOrderDetail.getLineCode()).intValue());
+                    returnOrderDetailReviewApi.setActualReturnProductCount(returnOrderDetail.getActualReturnProductCount());
+                    detailReviewApis.add(returnOrderDetailReviewApi);
                 }
+                ReturnOrderReviewApiReqVo returnOrderReviewApi = new ReturnOrderReviewApiReqVo();
+                returnOrderReviewApi.setReturnOrderCode(returnDLReq.getReturnOrderInfoDLReq().getReturnOrderCode());//退货单编码
+                returnOrderReviewApi.setOperator(returnDLReq.getReturnOrderInfoDLReq().getReturnById());//操作人
+                returnOrderReviewApi.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_CHECK.getKey());//退货单状态(供应链使用):4-等待退货验收，5-等待退货入库 11-退货完成
+                returnOrderReviewApi.setDetails(detailReviewApis);
+                //ERP 退货单状态修改
+                returnOrderInfoService.updateReturnStatusApi(returnOrderReviewApi);
             }
 
             if (returnDLReq.getReturnBatchDetailDLReqList() != null) {
@@ -120,6 +137,10 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                     //添加退货单明细批次
                     rejectRecordDetailBatchDao.insertSelective(rejectRecordDetailBatch);
                 }
+            }
+            } else {
+                LOGGER.error("耘链退货单回传参数为空 returnDLReq:"+returnDLReq);
+                throw new IllegalArgumentException();
             }
         } catch (Exception e) {
             throw new RuntimeException();
@@ -157,11 +178,11 @@ public class RejectRecordServiceImpl implements RejectRecordService {
             //return ResultCode.PARAMETER_EXCEPTION;
             return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
         }*/
-        PageHelper.startPage(rejectRequest.getPageNo(),rejectRequest.getPageSize());
+        PageHelper.startPage(rejectRequest.getPageNo(), rejectRequest.getPageSize());
         List<RejectRecord> rejectRecords = rejectRecordDao.selectByRequest(rejectRequest);
         //Assert.notNull(rejectRecords, "退供单不存在");
 
-        if (CollectionUtils.isEmpty(rejectRecords)){
+        if (CollectionUtils.isEmpty(rejectRecords)) {
             return HttpResponse.failure(ResultCode.NO_FOUND_REJECT_ERROR);
         }
 
@@ -179,16 +200,16 @@ public class RejectRecordServiceImpl implements RejectRecordService {
     @Override
     public HttpResponse<RejectVoResponse> searchRejectDetailByRejectCode(String rejectRecordCode) {
         //判断参数是否合法
-        if (org.apache.commons.lang.StringUtils.isBlank(rejectRecordCode)){
+        if (org.apache.commons.lang.StringUtils.isBlank(rejectRecordCode)) {
             //返回无效参数
             return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
         }
         RejectRecord rejectRecord = rejectRecordDao.selectByRejectRecordCode(rejectRecordCode);
         //Assert.notNull(rejectRecord, "退供单不存在");
         //LOGGER.info();
-        if (rejectRecord == null){
+        if (rejectRecord == null) {
             //返回找不到该退供单
-            return  HttpResponse.failure(ResultCode.NOT_FOUND_REJECT_RECORD_DATA);
+            return HttpResponse.failure(ResultCode.NOT_FOUND_REJECT_RECORD_DATA);
         }
         List<RejectRecordDetail> rejectRecordDetails = rejectRecordDetailDao.selectByRejectRecordCode(rejectRecordCode);
         List<RejectRecordDetailBatch> rejectRecordDetailBatches = rejectRecordDetailBatchDao.selectByRejectRecordCode(rejectRecordCode);
