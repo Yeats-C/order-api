@@ -410,6 +410,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			}else {
 				skuSum = getSkuSum(orderId);
 			}*/
+
 			Integer skuSum = getSkuSum(orderId);
 			orderInfo.setSkuSum(skuSum);
 			info.setOrderInfo(orderInfo);
@@ -468,10 +469,14 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			SettlementInfo settlementInfo=settlementDao.jkselectsettlement(orderQuery);
 			if (settlementInfo!=null){
 				settlementInfo.setTotalCouponsDiscount(settlementInfo.getActivityDiscount());
+				if (orderInfo.getOrderStatus()==0){
+					settlementInfo.setOrderActual(0);
+				}
 				info.setSettlementInfo(settlementInfo);
 				if (orderInfo!=null&&orderInfo.getOrderType()==4){
 					//预存订单 储值卡金额
 				}
+
 			}
 
 

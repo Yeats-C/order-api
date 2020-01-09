@@ -153,6 +153,12 @@ public class OrderServiceImpl implements OrderService {
                     OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
                     orderDetailQuery.setOrderId(info.getOrderId());
                     List<OrderDetailInfo> detailList = orderDetailDao.selectDetailById(orderDetailQuery);
+                    //未付款的支付金额为空
+                    if (info.getOrderStatus()==0){
+                        info.setActualPrice(0);
+                        info.setPayType(null);
+
+                    }
                     info.setOrderdetailList(detailList);
 
                     //特殊处理   (前端控制退货按钮使用字段:1:订单已全数退完)
@@ -369,6 +375,11 @@ public class OrderServiceImpl implements OrderService {
                     }
                 }
 
+            }
+            //未付款的支付金额为0
+            if(one.getOrderStatus()==0){
+                one.setActualPrice(0L);
+                one.setPayType(null);
             }
 
         });
