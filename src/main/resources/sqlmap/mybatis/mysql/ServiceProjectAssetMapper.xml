@@ -415,7 +415,7 @@
     </update>
     <select id="TotalAmount" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest"
             resultType="java.lang.Long">
-        select sum(actual_amount) from service_project_asset
+        select ifnull(sum(actual_amount),0) from service_project_asset
         <where>
             <if test="storeId!=null">
                 and store_id = #{storeId,jdbcType=VARCHAR}
@@ -424,7 +424,7 @@
     </select>
     <select id="yesTodayTotalAmount" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest"
             resultType="java.lang.Long">
-        select sum(actual_amount) from service_project_asset
+        select ifnull(sum(actual_amount),0) from service_project_asset
         <where>
             TO_DAYS(create_time) = TO_DAYS(now())-1
             <if test="storeId!=null">
