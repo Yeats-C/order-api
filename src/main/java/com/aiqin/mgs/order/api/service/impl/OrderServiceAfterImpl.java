@@ -229,6 +229,8 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 		payReq.setPayOrderType(orderAfterSaleInfo.getOrderType());
 		payReq.setRefundType(orderAfterSaleInfo.getReturnMoneyType());
 		payReq.setUpdateBy(orderAfterSaleInfo.getCreateByName());
+        payReq.setFranchiseeId(orderAfterSaleInfo.getFranchiseeId());
+        payReq.setRefundType(orderAfterSaleInfo.getReturnMoneyType());
 		bridgePayService.toRefund(payReq);
 	}
 
