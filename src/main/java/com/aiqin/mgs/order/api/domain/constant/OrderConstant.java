@@ -28,4 +28,7 @@ public class OrderConstant {
     /***门店营业状态 待首单*/
     public static final String OPEN_STATUS_CODE_18 = "010105";
 
+    /***模拟序列名称 订单号*/
+    public static final String SEQUENCE_NAME_ORDER_STORE_CODE = "order_store_code";
+
 }

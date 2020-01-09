@@ -4,11 +4,11 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
+import com.aiqin.mgs.order.api.dao.SequenceGeneratorDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.ProductInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
-import com.aiqin.mgs.order.api.domain.constant.ErpOrderCodeSequence;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
@@ -51,6 +51,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private CartOrderService cartOrderService;
     @Resource
     private ErpOrderFeeService erpOrderFeeService;
+    @Resource
+    private SequenceGeneratorDao sequenceGeneratorDao;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -89,18 +91,18 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      */
     private ErpOrderInfo saveOrder(ErpOrderSaveRequest erpOrderSaveRequest, AuthToken auth) {
 
-        //获取门店信息
-        StoreInfo storeInfo = erpOrderRequestService.getStoreInfoByStoreId(erpOrderSaveRequest.getStoreId());
-        //获取购物车商品
-        OrderConfirmResponse storeCartProduct = getStoreCartProduct(erpOrderSaveRequest.getStoreId());
-        //构建订单商品明细行
-        List<ErpOrderItem> erpOrderItemList = generateOrderItemList(storeCartProduct.getCartOrderInfos(), storeInfo);
-
         //获取订单节点进程控制枚举
         ErpOrderNodeProcessTypeEnum processTypeEnum = ErpOrderNodeProcessTypeEnum.getEnum(erpOrderSaveRequest.getOrderType(), erpOrderSaveRequest.getOrderCategory());
         if (processTypeEnum == null) {
             throw new BusinessException("不允许创建类型为" + ErpOrderTypeEnum.getEnumDesc(erpOrderSaveRequest.getOrderType()) + "，类别为" + ErpOrderCategoryEnum.getEnumDesc(erpOrderSaveRequest.getOrderCategory()) + "的订单");
         }
+        //获取门店信息
+        StoreInfo storeInfo = erpOrderRequestService.getStoreInfoByStoreId(erpOrderSaveRequest.getStoreId());
+        //获取购物车商品
+        OrderConfirmResponse storeCartProduct = getStoreCartProduct(erpOrderSaveRequest.getStoreId());
+        //构建订单商品明细行
+        List<ErpOrderItem> erpOrderItemList = generateOrderItemList(storeCartProduct.getCartOrderInfos(), storeInfo, processTypeEnum);
+
         //数据校验
         productCheck(processTypeEnum, storeInfo, erpOrderItemList);
         //生成订单主体信息
@@ -239,12 +241,13 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      *
      * @param cartProductList 购物车商品行
      * @param storeInfo       门店信息
+     * @param processTypeEnum 节点控制
      * @return java.util.List<com.aiqin.mgs.order.api.domain.ErpOrderItem>
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/11/27 19:02
      */
-    private List<ErpOrderItem> generateOrderItemList(List<CartOrderInfo> cartProductList, StoreInfo storeInfo) {
+    private List<ErpOrderItem> generateOrderItemList(List<CartOrderInfo> cartProductList, StoreInfo storeInfo,ErpOrderNodeProcessTypeEnum processTypeEnum) {
 
         //商品详情Map
         Map<String, ProductInfo> productMap = new HashMap<>(16);
@@ -310,16 +313,12 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             orderItem.setProductAmount(item.getPrice());
             //商品总价
             orderItem.setTotalProductAmount(item.getPrice().multiply(new BigDecimal(item.getAmount())));
-            //实际商品总价（发货商品总价）
-            orderItem.setActualTotalProductAmount(null);
             //优惠分摊总金额
             orderItem.setTotalPreferentialAmount(orderItem.getTotalProductAmount());
             //分摊后单价
             orderItem.setPreferentialAmount(orderItem.getProductAmount());
             //活动优惠总金额
             orderItem.setTotalAcivityAmount(BigDecimal.ZERO);
-            //实发商品数量
-            orderItem.setActualProductCount(null);
             //税率
             orderItem.setTaxRate(productInfo.getTaxRate());
             //公司编码
@@ -330,6 +329,23 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             orderItem.setBoxGrossWeight(productInfo.getBoxGrossWeight());
             //单个商品包装体积(mm³)
             orderItem.setBoxVolume(productInfo.getBoxVolume());
+
+            if (ErpOrderNodeProcessTypeEnum.PROCESS_2 == processTypeEnum) {
+                //配送-首单赠送 把价格都置为0
+
+                //商品单价
+                orderItem.setProductAmount(BigDecimal.ZERO);
+                //商品总价
+                orderItem.setTotalProductAmount(BigDecimal.ZERO);
+                //实际商品总价
+                orderItem.setActualTotalProductAmount(BigDecimal.ZERO);
+                //优惠分摊总金额
+                orderItem.setTotalPreferentialAmount(BigDecimal.ZERO);
+                //分摊后单价
+                orderItem.setTotalPreferentialAmount(BigDecimal.ZERO);
+                //活动优惠总金额
+                orderItem.setTotalAcivityAmount(BigDecimal.ZERO);
+            }
 
             orderItemList.add(orderItem);
         }
@@ -917,18 +933,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     public String getOrderCode() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String curDay = sdf.format(new Date());
-        if (StringUtils.isEmpty(ErpOrderCodeSequence.currentDay) || !curDay.equals(ErpOrderCodeSequence.currentDay) || ErpOrderCodeSequence.num == null) {
-            //如果是
-            //查询数据库，获取最新序列
-            String maxOrderCode = erpOrderQueryService.getMaxOrderCodeByCurrentDay(curDay);
-            if (StringUtils.isNotEmpty(maxOrderCode)) {
-                ErpOrderCodeSequence.num = Long.valueOf(maxOrderCode.substring(maxOrderCode.length() - 6));
-            } else {
-                ErpOrderCodeSequence.num = 0L;
-            }
-            ErpOrderCodeSequence.currentDay = curDay;
-        }
-        return curDay + String.format("%06d", ++ErpOrderCodeSequence.num);
+        Long sequenceNextVal = sequenceGeneratorDao.getSequenceNextVal(OrderConstant.SEQUENCE_NAME_ORDER_STORE_CODE);
+        return curDay + String.format("%06d", sequenceNextVal);
     }
 
 }

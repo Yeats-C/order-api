@@ -219,8 +219,6 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             orderItem.setTotalPreferentialAmount(BigDecimal.ZERO);
             //活动优惠总金额
             orderItem.setTotalAcivityAmount(BigDecimal.ZERO);
-            //实际商品数量
-            orderItem.setActualProductCount(null);
             //税率
             orderItem.setTaxRate(product.getTaxRate());
             //公司编码
