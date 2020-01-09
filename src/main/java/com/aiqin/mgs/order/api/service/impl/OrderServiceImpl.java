@@ -247,7 +247,7 @@ public class OrderServiceImpl implements OrderService {
             //修改状态
             prestorageOrderSupplyDetail.setPrestorageOrderSupplyStatus(Global.ORDER_STATUS_6);
             prestorageOrderSupplyDetailDao.updateById(prestorageOrderSupplyDetail);
-            updateprestorageOrderSupplyStatus(prestorageOrderSupplyDetail.getPrestorageOrderSupplyId());
+           // updateprestorageOrderSupplyStatus(prestorageOrderSupplyDetail.getPrestorageOrderSupplyId());
             isUpdate=true;
         }
         //修改订单状态
@@ -364,7 +364,7 @@ public class OrderServiceImpl implements OrderService {
             //设置不可退货状态
             if (one.getOrderStatus().equals(Global.ORDER_STATUS_0)){
                 one.setTurnReturnView(1);
-            }else if(one.getOrderStatus().equals(Global.ORDER_STATUS_5)){
+            }else if(one.getOrderStatus().equals(Global.ORDER_STATUS_5)||one.getOrderStatus().equals(Global.ORDER_STATUS_6)){
                 //设置不可退货状态：
                 //可退货 ：已提货-已提货退货 >0
                 List<PrestorageOrderSupplyDetail> p=   prestorageOrderSupplyDetailDao.selectPrestorageOrderDetailByOrderId(one.getOrderId());
