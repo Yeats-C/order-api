@@ -259,25 +259,25 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
                     if (!ErpPayStatusEnum.PAYING.getCode().equals(orderFee.getPayStatus())) {
                         logger.info("结束支付轮询：{}", orderCode);
                         service.shutdown();
-                    }
-                    if (pollingTimes > OrderConstant.MAX_PAY_POLLING_TIMES) {
+                    } else if (pollingTimes > OrderConstant.MAX_PAY_POLLING_TIMES) {
                         service.shutdown();
                         logger.info("结束支付轮询：{}", orderCode);
-                    }
+                    } else {
+                        //调用支付中心，查看结果
+                        ErpOrderPayStatusResponse payStatusResponse = erpOrderRequestService.getOrderPayStatus(orderCode);
 
-                    //调用支付中心，查看结果
-                    ErpOrderPayStatusResponse payStatusResponse = erpOrderRequestService.getOrderPayStatus(orderCode);
-
-                    if (payStatusResponse.isRequestSuccess()) {
-                        ErpPayStatusEnum payStatusEnum = payStatusResponse.getPayStatusEnum();
-                        if (payStatusEnum == ErpPayStatusEnum.SUCCESS || payStatusEnum == ErpPayStatusEnum.FAIL) {
-                            endOrderPay(orderCode, payStatusResponse.getPayCode(), payStatusEnum, auth, false);
-                            //支付成功后续操作
-                            orderPaySuccessMethodGroup(orderCode, auth);
-                            logger.info("结束支付轮询：{}", orderCode);
-                            service.shutdown();
+                        if (payStatusResponse.isRequestSuccess()) {
+                            ErpPayStatusEnum payStatusEnum = payStatusResponse.getPayStatusEnum();
+                            if (payStatusEnum == ErpPayStatusEnum.SUCCESS || payStatusEnum == ErpPayStatusEnum.FAIL) {
+                                endOrderPay(orderCode, payStatusResponse.getPayCode(), payStatusEnum, auth, false);
+                                //支付成功后续操作
+                                orderPaySuccessMethodGroup(orderCode, auth);
+                                logger.info("结束支付轮询：{}", orderCode);
+                                service.shutdown();
+                            }
                         }
                     }
+
                 }
                 //轮询时间控制
             }, OrderConstant.MAX_PAY_POLLING_INITIALDELAY, OrderConstant.MAX_PAY_POLLING_PERIOD, TimeUnit.MILLISECONDS);

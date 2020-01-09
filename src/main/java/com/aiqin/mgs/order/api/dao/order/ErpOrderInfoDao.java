@@ -1,6 +1,5 @@
 package com.aiqin.mgs.order.api.dao.order;
 
-import com.aiqin.mgs.order.api.component.enums.OrderSucessEnum;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest;
 import org.apache.ibatis.annotations.Param;
