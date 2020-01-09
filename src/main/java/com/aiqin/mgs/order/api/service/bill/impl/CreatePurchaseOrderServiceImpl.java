@@ -54,7 +54,7 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
                 purchaseOrder.setPurchaseOrderStatus(erpOrderInfo.getOrderStatus());//采购单状态  0.待审核 1.审核中 2.审核通过  3.备货确认 4.发货确认  5.入库开始 6.入库中 7.已入库  8.完成 9.取消 10.审核不通过
                 //purchaseOrder.setPurchaseMode(Integer.valueOf(erpOrderInfo.getDistributionModeCode()));//采购方式 0. 铺采直送  1.配送
                 purchaseOrder.setPurchaseType(Integer.valueOf(erpOrderInfo.getOrderTypeCode()));//采购单类型   0手动，1.自动
-                purchaseOrder.setTotalCount(Long.valueOf(erpOrderInfo.getItemList().size()));//最小单位数量  商品明细总数量
+                //purchaseOrder.setTotalCount(Long.valueOf(erpOrderInfo.getItemList().size()));//最小单位数量  商品明细总数量
                 purchaseOrder.setTotalTaxAmount(erpOrderInfo.getTotalProductAmount());//商品含税总金额
                 purchaseOrder.setActualTotalCount(erpOrderInfo.getActualProductCount());//实际最小单数数量
                 purchaseOrder.setActualTotalTaxAmount(erpOrderInfo.getActualTotalProductAmount());//实际商品含税总金额
@@ -87,48 +87,52 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
                 purchaseOrder.setCreateTime(new Date());//创建时间
                 //根据ERP订单生成爱亲采购单
                 purchaseOrderDao.insertSelective(purchaseOrder);
+                if (erpOrderInfo.getItemList() != null && erpOrderInfo.getItemList().size() > 0) {
 
-                for (ErpOrderItem item : erpOrderInfo.getItemList()) {
-                    PurchaseOrderDetail purchaseOrderDetail = new PurchaseOrderDetail();
-                    purchaseOrderDetail.setPurchaseOrderDetailId(IdUtil.purchaseId());//业务id
-                    purchaseOrderDetail.setPurchaseOrderCode(item.getOrderStoreCode());//采购单号
-                    purchaseOrderDetail.setSpuCode(item.getSpuCode());//spu编码
-                    purchaseOrderDetail.setSpuName(item.getSpuName());//spu名称
-                    purchaseOrderDetail.setSkuCode(item.getSkuCode());//sku编号
-                    purchaseOrderDetail.setSkuName(item.getSkuName());//sku名称
-                    //purchaseOrderDetail.setBrandCode();//品牌编码
-                    //purchaseOrderDetail.setBrandName();//品牌名称
-                    //purchaseOrderDetail.setCategoryCode();//品类编码
-                    //purchaseOrderDetail.setCategoryName();//品类名称
-                    purchaseOrderDetail.setProductSpec(item.getProductSpec());//规格
-                    purchaseOrderDetail.setColorCode(item.getColorCode());//颜色编码
-                    purchaseOrderDetail.setColorName(item.getColorName());//颜色名称
-                    purchaseOrderDetail.setModelCode(item.getModelCode());//型号
-                    purchaseOrderDetail.setUnitCode(item.getUnitCode());//单位编码
-                    purchaseOrderDetail.setUnitName(item.getUnitName());//单位名称
-                    purchaseOrderDetail.setProductType(item.getProductType());//商品类型   0商品 1赠品 2实物返回
-                    //purchaseOrderDetail.setPurchaseWhole();//采购件数（整数）
-                    //purchaseOrderDetail.setPurchaseSingle();//采购件数（零数）
-                    //purchaseOrderDetail.setBaseProductSpec();
-                    //purchaseOrderDetail.setBoxGauge();//采购包装
-                    purchaseOrderDetail.setTaxRate(item.getTaxRate());//税率
-                    purchaseOrderDetail.setLineCode(item.getLineCode());//行号
-                    purchaseOrderDetail.setFactorySkuCode(item.getSkuCode());//厂商SKU编码
-                    purchaseOrderDetail.setTaxAmount(item.getPurchaseAmount());//商品含税单价
-                    purchaseOrderDetail.setTotalTaxAmount(item.getTotalAcivityAmount());//商品含税总价
-                    purchaseOrderDetail.setTotalCount(item.getProductCount());//最小单位数量
-                    purchaseOrderDetail.setActualTotalTaxAmount(item.getActualTotalProductAmount());//实际含税总价
-                    purchaseOrderDetail.setUseStatus(item.getUseStatus());//0. 启用   1.禁用
-                    purchaseOrderDetail.setCreateById(item.getCreateById());//创建人编码
-                    purchaseOrderDetail.setCreateByName(item.getCreateByName());//创建人名称
-                    purchaseOrderDetail.setCreateTime(new Date());//创建时间
-                    //根据ERP订单生成爱亲采购单明细
-                    purchaseOrderDetailDao.insertSelective(purchaseOrderDetail);
+                    for (ErpOrderItem item : erpOrderInfo.getItemList()) {
+                        PurchaseOrderDetail purchaseOrderDetail = new PurchaseOrderDetail();
+                        purchaseOrderDetail.setPurchaseOrderDetailId(IdUtil.purchaseId());//业务id
+                        purchaseOrderDetail.setPurchaseOrderCode(item.getOrderStoreCode());//采购单号
+                        purchaseOrderDetail.setSpuCode(item.getSpuCode());//spu编码
+                        purchaseOrderDetail.setSpuName(item.getSpuName());//spu名称
+                        purchaseOrderDetail.setSkuCode(item.getSkuCode());//sku编号
+                        purchaseOrderDetail.setSkuName(item.getSkuName());//sku名称
+                        //purchaseOrderDetail.setBrandCode();//品牌编码
+                        //purchaseOrderDetail.setBrandName();//品牌名称
+                        //purchaseOrderDetail.setCategoryCode();//品类编码
+                        //purchaseOrderDetail.setCategoryName();//品类名称
+                        purchaseOrderDetail.setProductSpec(item.getProductSpec());//规格
+                        purchaseOrderDetail.setColorCode(item.getColorCode());//颜色编码
+                        purchaseOrderDetail.setColorName(item.getColorName());//颜色名称
+                        purchaseOrderDetail.setModelCode(item.getModelCode());//型号
+                        purchaseOrderDetail.setUnitCode(item.getUnitCode());//单位编码
+                        purchaseOrderDetail.setUnitName(item.getUnitName());//单位名称
+                        purchaseOrderDetail.setProductType(item.getProductType());//商品类型   0商品 1赠品 2实物返回
+                        //purchaseOrderDetail.setPurchaseWhole();//采购件数（整数）
+                        //purchaseOrderDetail.setPurchaseSingle();//采购件数（零数）
+                        //purchaseOrderDetail.setBaseProductSpec();
+                        //purchaseOrderDetail.setBoxGauge();//采购包装
+                        purchaseOrderDetail.setTaxRate(item.getTaxRate());//税率
+                        purchaseOrderDetail.setLineCode(item.getLineCode());//行号
+                        purchaseOrderDetail.setFactorySkuCode(item.getSkuCode());//厂商SKU编码
+                        purchaseOrderDetail.setTaxAmount(item.getPurchaseAmount());//商品含税单价
+                        purchaseOrderDetail.setTotalTaxAmount(item.getTotalAcivityAmount());//商品含税总价
+                        purchaseOrderDetail.setTotalCount(item.getProductCount());//最小单位数量
+                        purchaseOrderDetail.setActualTotalTaxAmount(item.getActualTotalProductAmount());//实际含税总价
+                        purchaseOrderDetail.setUseStatus(item.getUseStatus());//0. 启用   1.禁用
+                        purchaseOrderDetail.setCreateById(item.getCreateById());//创建人编码
+                        purchaseOrderDetail.setCreateByName(item.getCreateByName());//创建人名称
+                        purchaseOrderDetail.setCreateTime(new Date());//创建时间
+                        //根据ERP订单生成爱亲采购单明细
+                        purchaseOrderDetailDao.insertSelective(purchaseOrderDetail);
+                    }
+                } else {
+                    LOGGER.info("订单" + erpOrderInfo.getOrderStoreCode() + "无采购明细");
                 }
                 //修改订单同步状态
                 erpOrderInfoDao.updateOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_SUCCESS.getCode(), erpOrderInfo.getOrderStoreCode());
             } else {
-                LOGGER.error("订单为空 erpOrderInfo {}"+erpOrderInfo);
+                LOGGER.error("订单为空 erpOrderInfo {}" + erpOrderInfo);
                 throw new IllegalArgumentException();
             }
         } catch (Exception e) {

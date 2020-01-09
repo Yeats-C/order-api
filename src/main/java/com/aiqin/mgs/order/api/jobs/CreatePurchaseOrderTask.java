@@ -33,21 +33,25 @@ public class CreatePurchaseOrderTask {
             Integer orderSuccess = OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode();
             List<ErpOrderInfo> erpOrderInfos = erpOrderInfoDao.selectByOrderSucess(orderSuccess);
             if (erpOrderInfos != null && erpOrderInfos.size() > 0) {
-                //计时器
-                StopWatch watch = new StopWatch();
-                //计时器开始
-                watch.start();
-                logger.info("根据订单生成采购单定时任务=====>开始");
-                for (ErpOrderInfo orderInfo : erpOrderInfos) {
-                    createPurchaseOrderService.addOrderAndDetail(orderInfo);
+                try {
+                    //计时器
+                    StopWatch watch = new StopWatch();
+                    //计时器开始
+                    watch.start();
+                    logger.info("根据订单生成采购单定时任务=====>开始");
+                    for (ErpOrderInfo orderInfo : erpOrderInfos) {
+                        createPurchaseOrderService.addOrderAndDetail(orderInfo);
+                    }
+                    //计时器结束
+                    watch.stop();
+                    logger.info("根据订单生成采购单定时任务=====>结束，本次用时：{}毫秒", watch.getTime() + "，生成：" + erpOrderInfos.size() + "单");
+                } catch (Exception e) {
+                    logger.error("根据订单生成采购单定时任务=====>失败" + e);
                 }
-                //计时器结束
-                watch.stop();
-                logger.info("根据订单生成采购单定时任务=====>结束，本次用时：{}毫秒", watch.getTime() + "，生成：" + erpOrderInfos.size() + "单");
             }
         } catch (Exception e) {
             logger.error("根据订单生成采购单定时任务=====>失败" + e);
+            throw new RuntimeException();
         }
-
     }
 }
