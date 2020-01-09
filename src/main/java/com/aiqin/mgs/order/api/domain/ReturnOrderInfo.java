@@ -73,7 +73,8 @@ public class ReturnOrderInfo {
 //    @JsonProperty("return_order_status")
     private Integer returnOrderStatus;
 
-    @ApiModelProperty(value = "订单类型 0直送、1配送、2辅采")
+//    @ApiModelProperty(value = "订单类型 0直送、1配送、2辅采")
+    @ApiModelProperty(value = "订单类型 1直送 2配送 3货架")
 //    @JsonProperty("order_type")
     private Integer orderType;
 

@@ -14,6 +14,7 @@ import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayTypeEnum;
 import com.aiqin.mgs.order.api.component.returnenums.*;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
+import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderOperationLogDao;
 import com.aiqin.mgs.order.api.dao.returnorder.RefundInfoDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
@@ -95,6 +96,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     private ErpOrderOperationLogDao erpOrderOperationLogDao;
     @Resource
     private ErpOrderQueryService erpOrderQueryService;
+    @Resource
+    private ErpOrderItemDao erpOrderItemDao;
 
     @Override
     @Transactional
@@ -315,6 +318,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     public Boolean updateReturnStatusApi(ReturnOrderReviewApiReqVo reqVo) {
         Boolean flag=false;
         ReturnOrderReviewReqVo re=new ReturnOrderReviewReqVo();
+        //状态为11-退货完成
+        reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_RETURN.getKey());
         BeanUtils.copyProperties(reqVo,re);
         //根据供应链请求修改退货单状态
         returnOrderInfoDao.updateReturnStatus(re);
@@ -327,7 +332,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(reqVo.getReturnOrderCode());
             //查询原始订单详情
             String orderId = returnOrderInfoDao.selectOrderId(reqVo.getReturnOrderCode());
-            List<ErpOrderItem> erpOrderItems = erpOrderItemService.selectOrderItemListByOrderId(orderId);
+//            List<ErpOrderItem> erpOrderItems = erpOrderItemService.selectOrderItemListByOrderId(orderId);
+            ErpOrderItem query = new ErpOrderItem();
+            query.setOrderStoreCode(orderId);
+            //todo 如果没有抛异常
+            List<ErpOrderItem> erpOrderItems = erpOrderItemDao.select(query);
             Map<String,BigDecimal> map=new HashMap<>();
             Map<String,BigDecimal> map2=new HashMap<>();
             Map<String,Long> map3=new HashMap<>();
@@ -591,7 +600,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //在线支付
             json.put("pay_type", ErpRequestPayTypeEnum.PAY_10.getCode());
             json.put("order_source", ErpRequestPayOrderSourceEnum.WEB.getCode());
-            json.put("create_by",returnOrderInfo.getCityId());
+            json.put("create_by",returnOrderInfo.getCreateById());
             json.put("update_by",returnOrderInfo.getCreateByName());
             //4-退款
             json.put("order_type", ErpRequestPayOperationTypeEnum.TYPE_4.getCode());
@@ -603,16 +612,18 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             Integer method=returnOrderInfo.getTreatmentMethod();
             //处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款
             if(null!=method&&method.equals(TreatmentMethodEnum.RETURN_AMOUNT_AND_GOODS_TYPE.getCode())){//RETURN_REFUND 退货退款
-                json.put("transactionType","RETURN_REFUND");
+//                json.put("transactionType","RETURN_REFUND");
+                json.put("transactionType","AFTER_SALE_RETURNS");
             }else if(null!=method&&method.equals(TreatmentMethodEnum.RETURN_AMOUNT_TYPE.getCode())){//"DELIVER_GOODS_DEDUCT 仅退款--发货冲减
                 json.put("transactionType","DELIVER_GOODS_DEDUCT");
             }
             //订单类型 0直送、1配送、2辅采
+            //1直送 2配送 3货架
             Integer type=returnOrderInfo.getOrderType();
-            if(null!=type&&type.equals(0)){//订单类型 14配送tob 2直送tob
+            if(null!=type&&type.equals(1)){//订单类型 14配送tob 2直送tob
                 json.put("pay_order_type", PayOrderTypeEnum.PAY_ORDER_TYPE_PEI.getKey());
                 json.put("pay_origin_type",PayOriginTypeEnum.DIRECT_SEND_TOB_RETURN.getKey());
-            }else if(null!=type&&type.equals(1)){
+            }else if(null!=type&&type.equals(2)){
                 json.put("pay_order_type",PayOrderTypeEnum.PAY_ORDER_TYPE_ZHI.getKey());
                 json.put("pay_origin_type",PayOriginTypeEnum.TOB_RETURN.getKey());
             }
