@@ -14,6 +14,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
 import com.aiqin.mgs.order.api.domain.request.order.*;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderItemSplitGroupResponse;
+import com.aiqin.mgs.order.api.service.SequenceGeneratorService;
 import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
@@ -48,11 +49,11 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     @Resource
     private ErpOrderRequestService erpOrderRequestService;
     @Resource
-    private ErpOrderCreateService erpOrderCreateService;
-    @Resource
     private ErpOrderPayService erpOrderPayService;
     @Resource
     private PurchaseOrderService purchaseOrderService;
+    @Resource
+    private SequenceGeneratorService sequenceGeneratorService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -416,7 +417,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     ErpOrderInfo newOrder = new ErpOrderInfo();
                     CopyBeanUtil.copySameBean(newOrder, order);
 
-                    String newOrderCode = erpOrderCreateService.getOrderCode();
+                    String newOrderCode = sequenceGeneratorService.generateOrderCode();
                     String orderId = OrderPublic.getUUID();
                     newOrder.setId(null);
                     newOrder.setOrderStoreCode(newOrderCode);
@@ -542,7 +543,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     ErpOrderInfo newOrder = new ErpOrderInfo();
                     CopyBeanUtil.copySameBean(newOrder, order);
 
-                    String newOrderCode = erpOrderCreateService.getOrderCode();
+                    String newOrderCode = sequenceGeneratorService.generateOrderCode();
                     String orderId = OrderPublic.getUUID();
                     newOrder.setId(null);
                     newOrder.setOrderStoreCode(newOrderCode);
@@ -840,6 +841,23 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             erpOrderPayService.orderPaySuccessMethodGroup(order.getOrderStoreCode(), auth);
         }
 
+    }
+
+    @Override
+    public void orderScourSheetSuccess(String orderCode) {
+        if (StringUtils.isNotEmpty(orderCode)) {
+            ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
+            if (order != null) {
+                if (ErpOrderScourSheetStatusEnum.WAIT.getCode().equals(order.getScourSheetStatus())) {
+                    AuthToken auth = new AuthToken();
+                    auth.setPersonId(order.getCreateById());
+                    auth.setPersonName(order.getCreateByName());
+
+                    order.setScourSheetStatus(ErpOrderScourSheetStatusEnum.SUCCESS.getCode());
+                    this.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
+                }
+            }
+        }
     }
 
 }

@@ -4,7 +4,6 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
-import com.aiqin.mgs.order.api.dao.SequenceGeneratorDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.ProductInfo;
@@ -17,6 +16,7 @@ import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.OrderConfirmResponse;
 import com.aiqin.mgs.order.api.service.CartOrderService;
+import com.aiqin.mgs.order.api.service.SequenceGeneratorService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
@@ -26,8 +26,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 创建订单service
@@ -52,7 +54,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     @Resource
     private ErpOrderFeeService erpOrderFeeService;
     @Resource
-    private SequenceGeneratorDao sequenceGeneratorDao;
+    private SequenceGeneratorService sequenceGeneratorService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -574,7 +576,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //生成费用id
         String feeId = OrderPublic.getUUID();
         //生成订单code
-        String orderCode = getOrderCode();
+        String orderCode = sequenceGeneratorService.generateOrderCode();
         //初始支付状态
         ErpPayStatusEnum payStatusEnum = ErpPayStatusEnum.UNPAID;
         long lineCode = 1;
@@ -770,7 +772,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //生成费用id
         String feeId = OrderPublic.getUUID();
         //生成订单code
-        String orderCode = getOrderCode();
+        String orderCode = sequenceGeneratorService.generateOrderCode();
         //初始支付状态
         ErpPayStatusEnum payStatusEnum = ErpPayStatusEnum.UNPAID;
 
@@ -927,14 +929,6 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         erpOrderFeeService.saveOrderFee(orderFee, auth);
 
         return orderCode;
-    }
-
-    @Override
-    public String getOrderCode() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        String curDay = sdf.format(new Date());
-        Long sequenceNextVal = sequenceGeneratorDao.getSequenceNextVal(OrderConstant.SEQUENCE_NAME_ORDER_STORE_CODE);
-        return curDay + String.format("%06d", sequenceNextVal);
     }
 
 }
