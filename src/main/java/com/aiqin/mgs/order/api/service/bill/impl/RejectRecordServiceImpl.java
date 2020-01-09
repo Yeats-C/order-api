@@ -92,7 +92,7 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                 rejectRecord.setRejectRecordCode(returnOrderInfo.getReturnOrderCode());//退货单号
                 rejectRecord.setActualTotalCount(returnOrderInfo.getActualProductCount());//实退商品数量
                 rejectRecord.setChargePerson(returnOrderInfo.getReturnById());//退货人id
-                rejectRecord.setCreateTime(new Date());//创建时间
+                rejectRecord.setUpdateTime(new Date());//修改时间
                 //修改退货单
                 rejectRecordDao.updateByReturnOrderCode(rejectRecord);
 
@@ -143,8 +143,10 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                 throw new IllegalArgumentException();
             }
         } catch (Exception e) {
+            LOGGER.error("耘链退货单回传失败"+e);
             throw new RuntimeException();
         }
+        LOGGER.info("耘链退货单回传成功");
         return true;
     }
 

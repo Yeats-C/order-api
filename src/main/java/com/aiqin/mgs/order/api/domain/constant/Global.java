@@ -58,7 +58,7 @@ public interface Global {
     Integer ORDER_STATUS_4 = 4;  //已取消
     Integer ORDER_STATUS_5 = 5;  //已完成
     Integer ORDER_STATUS_6 = 6;  //已提货
-    
+    Integer ORDER_STATUS_7 = 7;  //退款完成
     
 //    /**
 //     * 退货状态
