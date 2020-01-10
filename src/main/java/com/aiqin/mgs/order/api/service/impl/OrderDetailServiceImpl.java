@@ -471,6 +471,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 				settlementInfo.setTotalCouponsDiscount(settlementInfo.getActivityDiscount());
 				if (orderInfo.getOrderStatus()==0){
 					settlementInfo.setOrderActual(0);
+					settlementInfo.setOrderReceivable(0);
 				}
 				info.setSettlementInfo(settlementInfo);
 				if (orderInfo!=null&&orderInfo.getOrderType()==4){
