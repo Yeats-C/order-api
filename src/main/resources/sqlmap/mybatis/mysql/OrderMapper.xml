@@ -151,7 +151,7 @@
         <if test="totalPrice!=null">
             #{totalPrice},
         </if>
-        #{customNote},#{businessNote},#{cashierId},#{cashierName},#{guideId},#{guideName},#{orderType},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},#{receiveCode},CURRENT_TIMESTAMP)
+        #{customNote},#{businessNote},#{cashierId},#{cashierName},#{guideId},#{guideName},#{orderType},CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,#{createBy},#{updateBy},#{receiveCode},CURRENT_TIMESTAMP)
     </insert>
 
     <!-- 订单查询byorderid -->
