@@ -26,6 +26,8 @@ public interface ErpOrderRefundService {
 
     void updateOrderRefundSelective(ErpOrderRefund po, AuthToken auth);
 
+    void generateOrderRefund(String orderCode,AuthToken auth);
+
     void orderRefundPay(String orderCode, ErpRequestPayTransactionTypeEnum payTransactionTypeEnum, AuthToken auth);
 
     void orderRefundCallback(PayCallbackRequest payCallbackRequest);
