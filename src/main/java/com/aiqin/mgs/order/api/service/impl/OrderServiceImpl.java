@@ -1256,12 +1256,12 @@ public class OrderServiceImpl implements OrderService {
 
             if (reorerRequest != null) {
                 if (reorerRequest.getBeginTime() != null && !reorerRequest.getBeginTime().equals("")) {
-                    reorerRequest.setBeginTime(DateUtil.formatDateLong(DateUtil.getDayBegin(reorerRequest.getBeginTime())));
+                    String beginTimetime=reorerRequest.getBeginTime();
+                    reorerRequest.setBeginTime(DateUtil.formatDateLong(DateUtil.getDayBegin(beginTimetime)));
                     if (reorerRequest.getEndTime() == null || reorerRequest.getEndTime().equals("")) {
-                        reorerRequest.setEndTime(DateUtil.formatDateLong(DateUtil.getDayEnd(reorerRequest.getBeginTime())));
+                        reorerRequest.setEndTime(DateUtil.formatDateLong(DateUtil.getDayEnd(beginTimetime)));
                     }
-                }
-                if (reorerRequest.getEndTime() != null && !reorerRequest.getEndTime().equals("")) {
+                }else   if (reorerRequest.getEndTime() != null && !reorerRequest.getEndTime().equals("")) {
                     reorerRequest.setEndTime(DateUtil.formatDateLong(DateUtil.getDayEnd(reorerRequest.getEndTime())));
                 }
             }
