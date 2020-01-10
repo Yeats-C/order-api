@@ -193,6 +193,7 @@
         <if test="productStatus != null and productStatus == 2" >
             sale_margin desc
         </if>
+        limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
     </select>
     <select id="storeProductSku" parameterType="com.aiqin.mgs.order.api.domain.request.ProductSeachSkuReq"
             resultType="java.lang.String">
