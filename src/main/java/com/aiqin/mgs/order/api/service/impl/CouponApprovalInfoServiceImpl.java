@@ -1,10 +1,10 @@
 package com.aiqin.mgs.order.api.service.impl;
 
 import com.aiqin.ground.util.http.HttpClient;
-import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.mgs.order.api.base.ConstantData;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.component.returnenums.StoreStatusEnum;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
 import com.aiqin.mgs.order.api.dao.CouponInfoDao;
@@ -35,7 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * description: ApprovalInfoServiceImpl
@@ -49,6 +48,9 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
 
     @Value("${bridge.url.slcs_api}")
     private String slcsHost;
+
+    @Value("${bridge.url.product-api}")
+    private String productHost;
 
     @Autowired
     private CouponApprovalInfoDao couponApprovalInfoDao;
@@ -168,6 +170,8 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                         log.info("退款完成");
                     }
                 }
+                //TODO 调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单
+//                updateStoreStatus(couponApprovalDetail.getOrderId(),StoreStatusEnum.PAY_ORDER_TYPE_PEI.getKey().toString(),couponApprovalDetail.getStoreId(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
             } else if (TpmBpmUtils.isPass(formCallBackVo.getUpdateFormStatus(), formCallBackVo.getOptBtn())) {
                 couponApprovalInfo.setStatus(StatusEnum.AUDIT.getValue());
                 couponApprovalInfo.setStatuStr(StatusEnum.AUDIT.getDesc());
@@ -285,6 +289,33 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
             franchiseeId=result.get("data").toString();
         }
         return franchiseeId;
+    }
+
+    /**
+     * 门店退货申请，完成门店（erp回调）--修改退货单申请
+     * @param orderReturnCode
+     * @param orderReturnStatus
+     * @param storeId
+     * @param updateById
+     * @param updateByName
+     */
+    public void updateStoreStatus(String orderReturnCode,String orderReturnStatus,String storeId,String updateById,String updateByName){
+        //修改商品库存
+        String url=productHost+"/order/return/update/status";
+        StringBuilder sb=new StringBuilder();
+        sb.append("?order_return_code="+orderReturnCode);
+        sb.append("&order_return_status="+orderReturnStatus);
+        sb.append("&store_id="+storeId);
+        sb.append("&update_by_id="+updateById);
+        sb.append("&update_by_name="+updateByName);
+        log.info("发起订货管理-修改退货申请单入参，url={},json={}",url+sb);
+        HttpClient httpClient = HttpClient.get(url+sb);
+        Map<String ,Object> result=null;
+        result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+        log.info("发起订货管理-修改退货申请单结果，request={}",result);
+        if(result!=null&&"0".equals(result.get("code").toString())){
+            log.info("发起订货管理-修改退货申请单结果--成功");
+        }
     }
 
 }
