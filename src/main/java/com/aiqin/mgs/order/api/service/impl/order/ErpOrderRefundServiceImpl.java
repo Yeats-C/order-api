@@ -120,8 +120,6 @@ public class ErpOrderRefundServiceImpl implements ErpOrderRefundService {
         String returnCode = (String) response.getData();
 //        String returnCode = System.currentTimeMillis() + "";
 
-
-
         //生成一条退款单
         ErpOrderRefund orderRefund = new ErpOrderRefund();
         orderRefund.setOrderId(order.getOrderStoreId());
@@ -154,7 +152,7 @@ public class ErpOrderRefundServiceImpl implements ErpOrderRefundService {
             this.saveOrderRefund(orderRefund, auth);
 
             //开启轮询
-            this.orderRefundPolling(order.getOrderStoreCode(), auth);
+            this.orderRefundPolling(returnCode, auth);
         } else {
             throw new BusinessException("发起退款申请失败");
         }
@@ -205,21 +203,20 @@ public class ErpOrderRefundServiceImpl implements ErpOrderRefundService {
                 if (!ErpPayStatusEnum.PAYING.getCode().equals(orderRefund.getRefundStatus())) {
                     logger.info("第{}次订单退款结果轮询：{}", refundCode);
                     service.shutdown();
-                }
-                if (pollingTimes > OrderConstant.MAX_PAY_POLLING_TIMES) {
+                } else if (pollingTimes > OrderConstant.MAX_PAY_POLLING_TIMES) {
                     //轮询次数超时
                     logger.info("第{}次订单退款结果轮询：{}", refundCode);
                     service.shutdown();
-                }
-
-                //调用支付中心，查看结果
-                ErpOrderPayStatusResponse payStatusResponse = erpOrderRequestService.getOrderRefundStatus(refundCode);
-                if (payStatusResponse.isRequestSuccess()) {
-                    ErpPayStatusEnum payStatusEnum = payStatusResponse.getPayStatusEnum();
-                    if (payStatusEnum == ErpPayStatusEnum.SUCCESS || payStatusEnum == ErpPayStatusEnum.FAIL) {
-                        endOrderRefund(refundCode, payStatusResponse.getPayCode(), payStatusEnum, auth);
-                        logger.info("结束订单退款结果轮询：{}", refundCode);
-                        service.shutdown();
+                } else {
+                    //调用支付中心，查看结果
+                    ErpOrderPayStatusResponse payStatusResponse = erpOrderRequestService.getOrderRefundStatus(refundCode);
+                    if (payStatusResponse.isRequestSuccess()) {
+                        ErpPayStatusEnum payStatusEnum = payStatusResponse.getPayStatusEnum();
+                        if (payStatusEnum == ErpPayStatusEnum.SUCCESS || payStatusEnum == ErpPayStatusEnum.FAIL) {
+                            endOrderRefund(refundCode, payStatusResponse.getPayCode(), payStatusEnum, auth);
+                            logger.info("结束订单退款结果轮询：{}", refundCode);
+                            service.shutdown();
+                        }
                     }
                 }
             }

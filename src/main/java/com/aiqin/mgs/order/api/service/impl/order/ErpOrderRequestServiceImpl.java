@@ -675,9 +675,9 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             for (ErpOrderItem item :
                     orderProductItemList) {
                 HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + "/stock/available/search")
-                        .addParameter("province_code", "1001")
-                        .addParameter("city_code", "1001")
-                        .addParameter("sku_code", "102423");
+                        .addParameter("province_code", storeInfo.getProvinceId())
+                        .addParameter("city_code", storeInfo.getCityId())
+                        .addParameter("sku_code", item.getSkuCode());
                 HttpResponse<Integer> response = httpClient.action().result(new TypeReference<HttpResponse<Integer>>() {
                 });
                 if (!RequestReturnUtil.validateHttpResponse(response)) {

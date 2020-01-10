@@ -76,7 +76,7 @@ public interface ErpOrderLogisticsService {
 
     /**
      * 根据主键更新物流信息（全字段）
-     *
+     * TODO 方法调用不成功，未找到原因
      * @param po
      * @param auth
      * @return void
@@ -84,6 +84,7 @@ public interface ErpOrderLogisticsService {
      * @version: v1.0.0
      * @date 2019/12/11 10:43
      */
+    @Deprecated
     void updateOrderLogistics(ErpOrderLogistics po, AuthToken auth);
 
 

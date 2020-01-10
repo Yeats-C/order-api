@@ -7,7 +7,7 @@ import com.aiqin.mgs.order.api.domain.request.order.ErpOrderEditRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSignRequest;
 
 /**
- * 订单新增修改封装原子操作service
+ * 订单操作service
  *
  * @author: Tao.Chen
  * @version: v1.0.0
@@ -120,4 +120,16 @@ public interface ErpOrderInfoService {
      * @date 2020/1/4 14:10
      */
     void orderCarryOutNextStep(ErpOrderCarryOutNextStepRequest erpOrderCarryOutNextStepRequest, AuthToken auth);
+
+    /**
+     * 修改订单生成冲减单状态为已完成冲减单
+     *
+     * @param orderCode 订单号
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2020/1/9 20:17
+     */
+    void orderScourSheetSuccess(String orderCode);
+
 }

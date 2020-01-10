@@ -345,23 +345,23 @@ public class ErpOrderLogisticsServiceImpl implements ErpOrderLogisticsService {
                 if (!ErpPayStatusEnum.PAYING.getCode().equals(orderLogistics.getPayStatus())) {
                     logger.info("结束物流单支付轮询：{}", logisticsCode);
                     service.shutdown();
-                }
-                if (pollingTimes > OrderConstant.MAX_PAY_POLLING_TIMES) {
+                } else if (pollingTimes > OrderConstant.MAX_PAY_POLLING_TIMES) {
                     //轮询次数超时
                     logger.info("结束物流单支付轮询：{}", logisticsCode);
                     service.shutdown();
-                }
-
-                //调用支付中心，查看结果
-                ErpOrderPayStatusResponse payStatusResponse = erpOrderRequestService.getOrderLogisticsPayStatus(logisticsCode);
-                if (payStatusResponse.isRequestSuccess()) {
-                    ErpPayStatusEnum payStatusEnum = payStatusResponse.getPayStatusEnum();
-                    if (payStatusEnum == ErpPayStatusEnum.SUCCESS || payStatusEnum == ErpPayStatusEnum.FAIL) {
-                        endOrderLogisticsPay(logisticsCode, payStatusResponse.getPayCode(), payStatusEnum, auth);
-                        logger.info("结束物流单支付轮询：{}", logisticsCode);
-                        service.shutdown();
+                } else {
+                    //调用支付中心，查看结果
+                    ErpOrderPayStatusResponse payStatusResponse = erpOrderRequestService.getOrderLogisticsPayStatus(logisticsCode);
+                    if (payStatusResponse.isRequestSuccess()) {
+                        ErpPayStatusEnum payStatusEnum = payStatusResponse.getPayStatusEnum();
+                        if (payStatusEnum == ErpPayStatusEnum.SUCCESS || payStatusEnum == ErpPayStatusEnum.FAIL) {
+                            endOrderLogisticsPay(logisticsCode, payStatusResponse.getPayCode(), payStatusEnum, auth);
+                            logger.info("结束物流单支付轮询：{}", logisticsCode);
+                            service.shutdown();
+                        }
                     }
                 }
+
             }
             //轮询时间控制
         }, OrderConstant.MAX_PAY_POLLING_INITIALDELAY, OrderConstant.MAX_PAY_POLLING_PERIOD, TimeUnit.MILLISECONDS);
@@ -425,7 +425,7 @@ public class ErpOrderLogisticsServiceImpl implements ErpOrderLogisticsService {
             orderLogistics.setCouponPayFee(null);
             orderLogistics.setBalancePayFee(null);
             orderLogistics.setCouponIds(null);
-            this.updateOrderLogistics(orderLogistics, auth);
+            this.updateOrderLogisticsSelective(orderLogistics, auth);
         } else {
 
         }

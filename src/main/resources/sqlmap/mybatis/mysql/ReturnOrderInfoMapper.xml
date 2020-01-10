@@ -1010,6 +1010,9 @@
     <if test="storeName!=null and storeName!=''">
      and store_name=#{storeName,jdbcType=VARCHAR}
     </if>
+    <if test="storeId!=null and storeId!=''">
+      and store_id=#{storeId,jdbcType=VARCHAR}
+    </if>
     <if test="provinceId != null and provinceId!=''" >
       and province_id = #{provinceId,jdbcType=VARCHAR}
     </if>
@@ -1064,6 +1067,9 @@
       </if>
       <if test="storeName!=null and storeName!=''">
           and store_name=#{storeName,jdbcType=VARCHAR}
+      </if>
+      <if test="storeId!=null and storeId!=''">
+          and store_id=#{storeId,jdbcType=VARCHAR}
       </if>
       <if test="provinceId != null and provinceId!=''" >
         and province_id = #{provinceId,jdbcType=VARCHAR}

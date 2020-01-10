@@ -14,13 +14,12 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
 import com.aiqin.mgs.order.api.domain.request.order.*;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderItemSplitGroupResponse;
+import com.aiqin.mgs.order.api.service.SequenceGeneratorService;
 import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.CopyBeanUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
-import com.aiqin.mgs.order.api.util.RequestReturnUtil;
-import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,11 +49,11 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     @Resource
     private ErpOrderRequestService erpOrderRequestService;
     @Resource
-    private ErpOrderCreateService erpOrderCreateService;
-    @Resource
     private ErpOrderPayService erpOrderPayService;
     @Resource
     private PurchaseOrderService purchaseOrderService;
+    @Resource
+    private SequenceGeneratorService sequenceGeneratorService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -275,14 +274,6 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         if (processTypeEnum.isSplitByRepertory()) {
             //按照库存分组拆单
 
-//            if (1 == 1) {
-//                //TODO CT 暂时没有真实数据，先跳过拆单步骤
-//                order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
-//                order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
-//                this.updateOrderByPrimaryKeySelective(order, auth);
-//                return;
-//            }
-
             List<ErpOrderInfo> splitOrderList = new ArrayList<>();
 
             //请求供应链获取分组情况
@@ -426,7 +417,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     ErpOrderInfo newOrder = new ErpOrderInfo();
                     CopyBeanUtil.copySameBean(newOrder, order);
 
-                    String newOrderCode = erpOrderCreateService.getOrderCode();
+                    String newOrderCode = sequenceGeneratorService.generateOrderCode();
                     String orderId = OrderPublic.getUUID();
                     newOrder.setId(null);
                     newOrder.setOrderStoreCode(newOrderCode);
@@ -552,7 +543,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     ErpOrderInfo newOrder = new ErpOrderInfo();
                     CopyBeanUtil.copySameBean(newOrder, order);
 
-                    String newOrderCode = erpOrderCreateService.getOrderCode();
+                    String newOrderCode = sequenceGeneratorService.generateOrderCode();
                     String orderId = OrderPublic.getUUID();
                     newOrder.setId(null);
                     newOrder.setOrderStoreCode(newOrderCode);
@@ -664,14 +655,43 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 list) {
             if (ErpOrderStatusEnum.ORDER_STATUS_4.getCode().equals(item.getOrderStatus())) {
                 if (ErpOrderNodeStatusEnum.STATUS_6.getCode().equals(item.getOrderNodeStatus())) {
-                    item.setItemList(erpOrderItemService.selectOrderItemListByOrderId(item.getOrderStoreId()));
+                    List<ErpOrderItem> itemList = erpOrderItemService.selectOrderItemListByOrderId(item.getOrderStoreId());
+                    item.setItemList(itemList);
 
                     //同步订单到供应链，只调用一次接口，不管成功失败都算执行完成这一步
                     HttpResponse httpResponse = purchaseOrderService.createPurchaseOrder(item);
-                    //同步之后修改订单状态
-                    item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
-                    item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_8.getCode());
-                    this.updateOrderByPrimaryKeySelective(item, auth);
+
+                    if (ErpOrderTypeEnum.ASSIST_PURCHASING.getValue().equals(item.getOrderTypeCode())) {
+                        //如果是货架订单，直接变成已签收状态
+
+                        long actualProductCount = 0L;
+                        for (ErpOrderItem orderLineItem :
+                                itemList) {
+                            actualProductCount += orderLineItem.getProductCount();
+                            orderLineItem.setActualProductCount(orderLineItem.getProductCount());
+                            orderLineItem.setActualInboundCount(orderLineItem.getProductCount());
+                        }
+                        erpOrderItemService.updateOrderItemList(itemList, auth);
+
+                        Date now = new Date();
+                        item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_13.getCode());
+                        item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_12.getCode());
+                        item.setActualProductCount(actualProductCount);
+                        item.setActualTotalProductAmount(item.getOrderAmount());
+                        item.setDeliveryTime(now);
+                        item.setActualTotalVolume(item.getTotalVolume());
+                        item.setActualTotalWeight(item.getTotalWeight());
+                        item.setTransportStatus(StatusEnum.YES.getCode());
+                        item.setTransportTime(now);
+                        item.setReceiveTime(now);
+                        this.updateOrderByPrimaryKeySelective(item, auth);
+                    } else {
+                        //非货架订单同步之后修改订单状态为等待拣货状态
+                        item.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_6.getCode());
+                        item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_8.getCode());
+                        this.updateOrderByPrimaryKeySelective(item, auth);
+                    }
+
                 }
             }
         }
@@ -821,6 +841,23 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             erpOrderPayService.orderPaySuccessMethodGroup(order.getOrderStoreCode(), auth);
         }
 
+    }
+
+    @Override
+    public void orderScourSheetSuccess(String orderCode) {
+        if (StringUtils.isNotEmpty(orderCode)) {
+            ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
+            if (order != null) {
+                if (ErpOrderScourSheetStatusEnum.WAIT.getCode().equals(order.getScourSheetStatus())) {
+                    AuthToken auth = new AuthToken();
+                    auth.setPersonId(order.getCreateById());
+                    auth.setPersonName(order.getCreateByName());
+
+                    order.setScourSheetStatus(ErpOrderScourSheetStatusEnum.SUCCESS.getCode());
+                    this.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
+                }
+            }
+        }
     }
 
 }
