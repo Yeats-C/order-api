@@ -649,4 +649,12 @@
     set purchase_order_status = #{purchaseOrderStatus,jdbcType=INTEGER}
     where purchase_order_code = #{purchaseOrderCode,jdbcType=VARCHAR}
   </update>
+
+  <select id="selectByOrderStoreCode" parameterType="java.lang.String"
+          resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from purchase_order
+    where purchase_order_code = #{purchaseOrderCode,jdbcType=VARCHAR}
+  </select>
 </mapper>
