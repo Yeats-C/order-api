@@ -35,7 +35,7 @@ public interface ReturnOrderInfoService {
      * @param reqVo
      * @return
      */
-    Boolean updateReturnStatus(ReturnOrderReviewReqVo reqVo);
+    HttpResponse updateReturnStatus(ReturnOrderReviewReqVo reqVo);
 
     /**
      * 修改退货单详情

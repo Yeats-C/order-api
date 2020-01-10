@@ -18,6 +18,10 @@ public class ReturnOrderSearchVo extends PagesRequest {
     @JsonProperty("store_name")
     private String storeName;
 
+    @ApiModelProperty("门店名称")
+    @JsonProperty("store_id")
+    private String storeId;
+
     @ApiModelProperty("省名称")
     @JsonProperty("province_name")
     private String provinceName;

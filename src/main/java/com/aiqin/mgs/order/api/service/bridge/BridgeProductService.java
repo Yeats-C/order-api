@@ -65,6 +65,7 @@ public class BridgeProductService {
      * @return
      */
     public HttpResponse<List<CartOrderInfo>> getProduct(ShoppingCartProductRequest shoppingCartProductRequest){
+        shoppingCartProductRequest.setCompanyCode("14");
         String path = "/search/spu/sku/detail2";
         HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest);
         HttpResponse<List<CartOrderInfo>> response = httpClient.action().result(new TypeReference<HttpResponse<List<CartOrderInfo>>>() {
