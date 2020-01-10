@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.domain.pay;
 import com.aiqin.mgs.order.api.component.OperationTypeEnum;
 import com.aiqin.mgs.order.api.component.PayOriginTypeEnum;
 import com.aiqin.mgs.order.api.component.ServiceSceneEnum;
+import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
@@ -149,9 +150,9 @@ public class PayReq implements Serializable {
     @NotNull(message = "退款支付方式不能为空")
     private Integer refundType;
 
-    @ApiModelProperty("业务类型(0.现金 1.储值卡)")
+    @ApiModelProperty("业务类型(0.正常销售订单 1.预存订单)")
     @JsonProperty("business_type")
     @NotNull(message = "业务类型不能为空")
-    private Integer businessType;
+    private Integer businessType= Global.PAY_ORDER_TYPE_0;
 
 }
