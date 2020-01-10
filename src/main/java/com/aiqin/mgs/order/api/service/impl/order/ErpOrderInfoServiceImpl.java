@@ -8,6 +8,7 @@ import com.aiqin.mgs.order.api.component.enums.pay.ErpPayWayEnum;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.ProductInfo;
+import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
@@ -54,6 +55,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     private PurchaseOrderService purchaseOrderService;
     @Resource
     private SequenceGeneratorService sequenceGeneratorService;
+    @Resource
+    private ErpOrderCancelService erpOrderCancelService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -162,7 +165,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             if (item.getQuantity() == null) {
                 throw new BusinessException("赠品行第" + lineIndex + "行缺少数量");
             }
-            ProductInfo product = erpOrderRequestService.getSkuDetail(order.getCompanyCode(), item.getSkuCode());
+            ProductInfo product = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, item.getSkuCode());
             if (product == null) {
                 throw new BusinessException("赠品行第" + lineIndex + "行商品未找到");
             }
@@ -772,7 +775,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         this.updateOrderByPrimaryKeySelective(order, auth);
 
         //首单，修改门店状态
-        if (ErpOrderCategoryEnum.ORDER_TYPE_2.getValue().equals(order.getOrderCategoryCode()) || ErpOrderCategoryEnum.ORDER_TYPE_4.getValue().equals(order.getOrderCategoryCode())) {
+        if (processTypeEnum.getOrderCategoryEnum().isFirstOrder()) {
             erpOrderRequestService.updateStoreStatus(order.getStoreId(), "010201");
         }
     }
@@ -839,6 +842,11 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             //重新执行支付成功后续操作
 
             erpOrderPayService.orderPaySuccessMethodGroup(order.getOrderStoreCode(), auth);
+        }
+
+        if (ErpOrderNodeStatusEnum.STATUS_31.getCode() <= order.getOrderNodeStatus() && order.getOrderNodeStatus() < ErpOrderNodeStatusEnum.STATUS_37.getCode()) {
+            //取消订单后续操作
+            erpOrderCancelService.cancelOrderRequestGroup(order.getOrderStoreCode(), auth);
         }
 
     }

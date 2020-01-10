@@ -258,7 +258,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         for (CartOrderInfo item :
                 cartProductList) {
             //获取商品详情
-            ProductInfo product = erpOrderRequestService.getSkuDetail(storeInfo.getCompanyCode(), item.getSkuCode());
+            ProductInfo product = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, item.getSkuCode());
             if (product == null) {
                 throw new BusinessException("未获取到商品" + item.getProductName() + "的信息");
             }
@@ -671,7 +671,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             }
 
             //获取商品详情
-            ProductInfo product = erpOrderRequestService.getSkuDetail(storeInfo.getCompanyCode(), item.getSkuCode());
+            ProductInfo product = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, item.getSkuCode());
             if (product == null) {
                 throw new BusinessException("第" + lineIndex + "行商品不存在");
             }
