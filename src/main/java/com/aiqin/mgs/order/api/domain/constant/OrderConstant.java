@@ -31,4 +31,7 @@ public class OrderConstant {
     /***模拟序列名称 订单号*/
     public static final String SEQUENCE_NAME_ORDER_STORE_CODE = "order_store_code";
 
+    /***到供应链查询商品传的公司编码*/
+    public static final String SELECT_PRODUCT_COMPANY_CODE = "14";
+
 }
