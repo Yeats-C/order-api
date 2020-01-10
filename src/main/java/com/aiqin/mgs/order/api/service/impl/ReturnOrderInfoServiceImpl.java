@@ -291,7 +291,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         if(StringUtils.isNotBlank(isPass)){
             //todo 调取门店
             ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(reqVo.getReturnOrderCode());
-//            updateStoreStatus(reqVo.getReturnOrderCode(),isPass,returnOrderInfo.getStoreId(),reqVo.getOperatorId(),reqVo.getOperator());
+//            updateStoreStatus(reqVo.getReturnOrderCode(),isPass,returnOrderInfo.getStoreId(),reqVo.getOperatorId(),reqVo.getOperator(),null);
         }
         return HttpResponse.success();
     }
@@ -465,7 +465,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         return returnOrderInfoDao.updateRefundStatus(reqVo.getOrderNo())>0;
 
         //todo 调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单（减库存）
-//        updateStoreStatus(reqVo.getOrderNo(),"1",returnOrderInfo.getStoreId(),"系统操作","系统操作");
+//        updateStoreStatus(reqVo.getOrderNo(),StoreStatusEnum.PAY_ORDER_TYPE_ZHI.toString(),returnOrderInfo.getStoreId(),"系统操作","系统操作",returnOrderInfo.getActualProductCount().toString());
     }
 
     /**
@@ -998,8 +998,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
      * @param updateById
      * @param updateByName
      */
-    public void updateStoreStatus(String orderReturnCode,String orderReturnStatus,String storeId,String updateById,String updateByName){
-        //修改商品库存
+    public void updateStoreStatus(String orderReturnCode,String orderReturnStatus,String storeId,String updateById,String updateByName,String actualAuantity){
         String url=productHost+"/order/return/update/status";
         StringBuilder sb=new StringBuilder();
         sb.append("?order_return_code="+orderReturnCode);
@@ -1007,6 +1006,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         sb.append("&store_id="+storeId);
         sb.append("&update_by_id="+updateById);
         sb.append("&update_by_name="+updateByName);
+        if(StringUtils.isNotBlank(actualAuantity)){
+            sb.append("&actual_quantity="+actualAuantity);
+        }
         log.info("发起订货管理-修改退货申请单入参，url={},json={}",url+sb);
         HttpClient httpClient = HttpClient.get(url+sb);
         Map<String ,Object> result=null;
