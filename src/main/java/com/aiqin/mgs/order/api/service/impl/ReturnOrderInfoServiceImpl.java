@@ -169,6 +169,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         }
         body.put("order_return_product_reqs",list);
         log.info("发起门店退货申请-完成(门店)（erp回调）--修改商品库存入参，url={},json={}",url,body);
+        //todo 放开注释
 //        HttpClient httpClient = HttpClient.post(url).json(body);
 //        Map<String ,Object> result=null;
 //        try{
@@ -447,6 +448,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //添加日志
         insertLog(reqVo.getOrderNo(),"","系统操作",ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getMsg());
         return returnOrderInfoDao.updateRefundStatus(reqVo.getOrderNo())>0;
+
+        //todo 调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单（减库存）
+//        updateStoreStatus(reqVo.getOrderNo(),"1",returnOrderInfo.getStoreId(),"系统操作","系统操作");
     }
 
     /**
