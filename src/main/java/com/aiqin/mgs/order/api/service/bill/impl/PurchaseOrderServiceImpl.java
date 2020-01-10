@@ -46,8 +46,6 @@ import java.util.concurrent.*;
 public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PurchaseOrderServiceImpl.class);
 
-    @Value("${purchase.host}")
-    private String purchaseHost;
     @Resource
     PurchaseOrderDao purchaseOrderDao;
     @Resource
@@ -56,20 +54,21 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     ErpOrderDeliverService erpOrderDeliverService;
     @Resource
     CreatePurchaseOrderService createPurchaseOrderService;
-    @Resource
-    OperationLogService operationLogService;
+
     @Resource
     PurchaseOrderDetailBatchDao purchaseOrderDetailBatchDao;
 
     @Override
     public HttpResponse createPurchaseOrder(@Valid ErpOrderInfo erpOrderInfo) {
         LOGGER.info("根据ERP订单生成爱亲采购单，采购单开始，erpOrderInfo{}", erpOrderInfo);
-        if (erpOrderInfo != null) {
+        if (erpOrderInfo != null & erpOrderInfo.getItemList() !=null && erpOrderInfo.getItemList().size()>0) {
             //异步执行。
             purchaseOrderExecutor(erpOrderInfo);
             return HttpResponse.success();
+        } else {
+            LOGGER.error("订单为空 erpOrderInfo {}" + erpOrderInfo);
+            return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
         }
-        return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
     }
 
     @Override
@@ -180,17 +179,13 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             @Override
             public void run() {
                 try {
-                    LOGGER.info("根据ERP订单生成爱亲采购单&采购单明细&修改订单同步状态，参数为：erpOrderInfo{}", erpOrderInfo);
+                    //根据ERP订单生成爱亲采购单&采购单明细&修改订单同步状态
                     createPurchaseOrderService.addOrderAndDetail(erpOrderInfo);
-                    LOGGER.info("根据ERP订单生成爱亲采购单&采购单明细&修改订单同步状态,结束");
 
-                    LOGGER.info("根据爱亲采购单，生成耘链销售单开始，参数为：erpOrderInfo{}", erpOrderInfo);
-                    createSaleOrder(erpOrderInfo);
-                    LOGGER.info("根据爱亲采购单，生成耘链销售单结束");
 
-                    LOGGER.info("根据ERP订单生成爱亲采购单,采购单明细,修改订单同步状态&根据爱亲采购单，生成耘链销售单，添加操作日志开始");
-                    addOperationLog(erpOrderInfo);
-                    LOGGER.info("根据ERP订单生成爱亲采购单,采购单明细,修改订单同步状态&根据爱亲采购单，生成耘链销售单，添加操作日志结束");
+
+
+
                 } catch (Exception e) {
                     LOGGER.error("同步ERP采购单失败" + e);
                     throw new RuntimeException();
@@ -199,39 +194,9 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         });
     }
 
-    /**
-     * 根据ERP订单生成爱亲采购单,采购单明细,修改订单同步状态&根据爱亲采购单，生成耘链销售单.
-     *
-     * @param erpOrderInfo
-     */
-    private void addOperationLog(ErpOrderInfo erpOrderInfo) {
-        String operationCode = erpOrderInfo.getOrderStoreCode();
-        Integer sourceType = ErpLogSourceTypeEnum.PURCHASE.getCode();
-        Integer operationType = ErpLogOperationTypeEnum.ADD.getCode();
-        Integer useStatus = ErpLogStatusTypeEnum.USING.getCode();
-        String operationContent = "根据ERP订单生成爱亲采购单,采购单明细,修改订单同步状态&根据爱亲采购单，生成耘链销售单";
-        operationLogService.insert(operationCode, operationType, sourceType, operationContent, null, useStatus, null);
-    }
 
-    /**
-     * 生成栖耘销售单.
-     *
-     * @param erpOrderInfo
-     */
-    private void createSaleOrder(ErpOrderInfo erpOrderInfo) {
-        try {
-            String url = purchaseHost + "/order/aiqin/sale";
-            HttpClient httpGet = HttpClient.post(url).json(erpOrderInfo).timeout(10000);
-            LOGGER.info("根据爱亲采购单，生成耘链销售单开始url:" + url + " httpGet:" + httpGet);
-            HttpResponse<Object> response = httpGet.action().result(new TypeReference<HttpResponse<Object>>() {
-            });
-            if (!RequestReturnUtil.validateHttpResponse(response)) {
-                throw new BusinessException(response.getMessage());
-            }
-        } catch (Exception e) {
-            LOGGER.error("根据爱亲采购单，生成耘链销售单失败returnOrderCode： " + erpOrderInfo);
-        }
-    }
+
+
 
     //取消订单
     @Override
