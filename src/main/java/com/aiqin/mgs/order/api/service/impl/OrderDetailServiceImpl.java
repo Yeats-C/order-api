@@ -456,7 +456,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 
 		try {
 		//收货信息
-		info.setReceivingInfo(orderReceivingDao.selecReceivingById(orderDetailQuery));
+		//info.setReceivingInfo(orderReceivingDao.selecReceivingById(orderDetailQuery));
 		     
 		} catch (Exception e) {
 			LOGGER.error("查询BYorderid-返回订单收货信息",e);
@@ -788,9 +788,8 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			LOGGER.error("查询BYorderid-返回订单明细数据 {}",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
-		try {
+		/*try {
 		//收货信息
-			
 	    OrderReceivingInfo orderReceivingInfo = new OrderReceivingInfo();
 	    orderReceivingInfo=orderReceivingDao.selecReceivingById(orderDetailQuery);
 
@@ -801,7 +800,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		} catch (Exception e) {
 			LOGGER.error("查询BYorderid-返回订单收货信息异常 {}",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
-		}
+		}*/
 		try {
 			//结算信息
 			OrderQuery orderQuery = new OrderQuery();
