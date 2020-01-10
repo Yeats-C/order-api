@@ -48,9 +48,8 @@ public class ReturnOrderInfoController {
 
     @ApiOperation("操作审核退货单")
     @PostMapping("/updateStatus")
-    public HttpResponse<Boolean> updateStatus(@RequestBody ReturnOrderReviewReqVo reqVo) {
-        Boolean review = returnOrderInfoService.updateReturnStatus(reqVo);
-        return new HttpResponse<>(review);
+    public HttpResponse updateStatus(@RequestBody ReturnOrderReviewReqVo reqVo) {
+        return returnOrderInfoService.updateReturnStatus(reqVo);
     }
 
     /**
