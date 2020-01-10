@@ -3,7 +3,6 @@ package com.aiqin.mgs.order.api.service.impl.order;
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
-import com.aiqin.mgs.order.api.component.enums.ErpOrderCategoryEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderLockStockTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderNodeProcessTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderTypeEnum;
@@ -533,8 +532,6 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
         try {
 
             ErpOrderTypeEnum orderTypeEnum = ErpOrderTypeEnum.getEnum(order.getOrderTypeCode());
-            ErpOrderCategoryEnum orderCategoryEnum = ErpOrderCategoryEnum.getEnum(order.getOrderCategoryCode());
-            ErpOrderNodeProcessTypeEnum processTypeEnum = ErpOrderNodeProcessTypeEnum.getEnum(order.getOrderTypeCode(), order.getOrderCategoryCode());
             PayRequest payRequest = new PayRequest();
             payRequest.setOrderNo(orderRefund.getRefundCode());
             payRequest.setOrderAmount(Long.valueOf(orderRefund.getRefundFee().multiply(new BigDecimal(100)).setScale(0, RoundingMode.DOWN).toString()));

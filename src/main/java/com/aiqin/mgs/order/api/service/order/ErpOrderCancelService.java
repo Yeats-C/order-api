@@ -1,5 +1,9 @@
 package com.aiqin.mgs.order.api.service.order;
 
+import com.aiqin.mgs.order.api.component.enums.ErpOrderNodeProcessTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderNodeStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
+import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCancelRequest;
 
 /**
@@ -10,6 +14,8 @@ import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCancelRequest;
  * @date 2019/12/12 17:46
  */
 public interface ErpOrderCancelService {
+
+    void cancelOrderRequestGroup(String orderCode, AuthToken auth);
 
     /**
      * 缺货终止交易
@@ -32,5 +38,12 @@ public interface ErpOrderCancelService {
      * @date 2019/12/12 17:46
      */
     void applyCancelOrder(ErpOrderCancelRequest erpOrderCancelRequest);
+
+    void turnOffCoupon(String orderCode, AuthToken auth);
+    void unlockStock(String orderCode, ErpOrderNodeProcessTypeEnum processTypeEnum, boolean skipStep, AuthToken auth);
+
+    void cancelPurchaseOrder(String orderCode, ErpOrderNodeProcessTypeEnum processTypeEnum, AuthToken auth);
+
+    void cancelOrderStatus(String orderCode, ErpOrderStatusEnum orderStatusEnum, ErpOrderNodeStatusEnum orderNodeStatusEnum, AuthToken auth);
 
 }
