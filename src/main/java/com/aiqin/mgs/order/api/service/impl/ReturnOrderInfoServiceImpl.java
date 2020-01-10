@@ -203,6 +203,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     public HttpResponse updateReturnStatus(ReturnOrderReviewReqVo reqVo) {
         boolean flag = false;
         boolean flag1 = false;
+        boolean flag2 = false;
         //1--通过 2--挂账 3--不通过（驳回）99-已取消"
         //处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款 99--已取消
         String content="";
@@ -240,6 +241,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 if(returnOrderInfo.getReturnOrderStatus().equals(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_RETURN.getKey())){
                     return HttpResponse.failure(ResultCode.RETURN_ORDER_CANCEL_FALL);
                 }
+                flag2=true;
                 break;
             default:
                 return HttpResponse.failure(ResultCode.RETURN_ORDER_STATUS_NOT_FOUND);
@@ -281,6 +283,12 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 //                return HttpResponse.failure(ResultCode.RETURN_ORDER_SYNCHRONIZATION_FALL);
                 throw new RuntimeException("erp同步供应链，生成退供单失败");
             }
+        }
+        if(flag2){
+            //通知退供单-撤销
+            log.info("通知退供单-撤销开始，rejectRecordCode={}",reqVo.getReturnOrderCode());
+            rejectRecordService.removeRejectRecordStatus(reqVo.getReturnOrderCode());
+            log.info("通知退供单-撤销结束");
         }
         //调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单
         if(StringUtils.isNotBlank(isPass)){
