@@ -24,13 +24,6 @@ public interface ReturnOrderInfoService {
     HttpResponse save(ReturnOrderReqVo reqVo);
 
     /**
-     * 退货单列表
-     * @param searchVo
-     * @return
-     */
-//    PageResData<ReturnOrderListVo> list(OrderAfterSaleSearchVo searchVo);
-
-    /**
      * 审核操作-erp使用
      * @param reqVo
      * @return
@@ -42,7 +35,7 @@ public interface ReturnOrderInfoService {
      * @param records
      * @return
      */
-    Boolean updateOrderAfterSaleDetail(ReturnOrderDetailVO records);
+    HttpResponse updateReturnOrderDetail(ReturnOrderDetailVO records);
 
     /**
      * 提供给供应链--退货单状态修改

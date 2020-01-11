@@ -298,32 +298,32 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 
     @Override
     @Transactional
-    public Boolean updateOrderAfterSaleDetail(ReturnOrderDetailVO records) {
+    public HttpResponse updateReturnOrderDetail(ReturnOrderDetailVO records) {
+        log.info("退货单详情修改开始,入参records={}",records);
         List<ReturnOrderDetail> details=records.getDetails();
         String returnOrderCode = records.getReturnOrderCode();
         if(StringUtils.isNotBlank(returnOrderCode)&&CollectionUtils.isNotEmpty(details)){
             //根据退货单id，删除详情记录
-            int res=returnOrderDetailDao.deleteByReturnOrderCode(returnOrderCode);
-            if(res>0){
-                details = details.stream().map(detailVo -> {
-                    ReturnOrderDetail detail = new ReturnOrderDetail();
-                    BeanUtils.copyProperties(detailVo, detail);
-                    detail.setCreateTime(new Date());
-                    detail.setReturnOrderDetailId(IdUtil.uuid());
-                    detail.setReturnOrderCode(returnOrderCode);
-                    detail.setCreateById(records.getCreateId());
-                    detail.setCreateByName(records.getCreator());
-                    detail.setRemark("");
-                    detail.setEvidenceUrl("");
-                    return detail;
-                }).collect(Collectors.toList());
-                returnOrderDetailDao.insertBatch(details);
-                //添加日志
-                insertLog(returnOrderCode,records.getCreateId(),records.getCreator(),ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey(),ConstantData.RETURN_ORDER_DETAIL);
-                return true;
-            }
+            returnOrderDetailDao.deleteByReturnOrderCode(returnOrderCode);
+            details = details.stream().map(detailVo -> {
+                ReturnOrderDetail detail = new ReturnOrderDetail();
+                BeanUtils.copyProperties(detailVo, detail);
+                detail.setCreateTime(new Date());
+                detail.setReturnOrderDetailId(IdUtil.uuid());
+                detail.setReturnOrderCode(returnOrderCode);
+                detail.setCreateById(records.getCreateId());
+                detail.setCreateByName(records.getCreator());
+                detail.setRemark("");
+                detail.setEvidenceUrl("");
+                return detail;
+            }).collect(Collectors.toList());
+            log.info("退货单详情修改,details={}",details);
+            returnOrderDetailDao.insertBatch(details);
+            //添加日志
+            insertLog(returnOrderCode,records.getCreateId(),records.getCreator(),ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey(),ConstantData.RETURN_ORDER_DETAIL);
+            return HttpResponse.success();
         }
-        return false;
+        return HttpResponse.failure(ResultCode.RETURN_ORDER_PARAMETER_FALL);
     }
 
     @Override
@@ -1072,12 +1072,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 //                "  \"store_id\": \"AB957AE69917B34B35BEFFF8A23573F01E\"\n" +
                 "  \"store_id\": \"ABEC8D65036E5A45DBABCBA413FA56AEA2\"\n" +
                 "}";
-        JSONObject json= JSON.parseObject(str);
-        log.info("发起门店退货申请-完成(门店)（erp回调）--修改商品库存入参，url={},json={}",url,json);
-        HttpClient httpClient = HttpClient.post(url).json(json);
-        Map<String ,Object> result=null;
-        result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
-        log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存结果，request={}",result);
-
+//        JSONObject json= JSON.parseObject(str);
+//        log.info("发起门店退货申请-完成(门店)（erp回调）--修改商品库存入参，url={},json={}",url,json);
+//        HttpClient httpClient = HttpClient.post(url).json(json);
+//        Map<String ,Object> result=null;
+//        result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+//        log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存结果，request={}",result);
     }
 }
