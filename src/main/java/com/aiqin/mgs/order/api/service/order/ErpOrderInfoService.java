@@ -67,12 +67,13 @@ public interface ErpOrderInfoService {
      * 待支付订单新增赠品行
      *
      * @param erpOrderEditRequest
+     * @param auth
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/11 10:56
      */
-    void addProductGift(ErpOrderEditRequest erpOrderEditRequest);
+    void addProductGift(ErpOrderEditRequest erpOrderEditRequest, AuthToken auth);
 
     /**
      * 订单拆单逻辑
@@ -122,14 +123,14 @@ public interface ErpOrderInfoService {
     void orderCarryOutNextStep(ErpOrderCarryOutNextStepRequest erpOrderCarryOutNextStepRequest, AuthToken auth);
 
     /**
-     * 修改订单生成冲减单状态为已完成冲减单
+     * 订单发起冲减单
      *
-     * @param orderCode 订单号
+     * @param orderCode
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
-     * @date 2020/1/9 20:17
+     * @date 2020/1/11 10:02
      */
-    void orderScourSheetSuccess(String orderCode);
+    void orderScourSheet(String orderCode);
 
 }

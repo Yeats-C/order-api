@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.jobs;
 
 import com.aiqin.mgs.order.api.component.enums.ErpOrderScourSheetStatusEnum;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
+import com.aiqin.mgs.order.api.service.order.ErpOrderInfoService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
@@ -26,6 +27,8 @@ public class ErpScourSheetTaskJob {
 
     @Resource
     private ErpOrderQueryService erpOrderQueryService;
+    @Resource
+    private ErpOrderInfoService erpOrderInfoService;
 
     @Scheduled(cron = "0 0 0/2 * * ? ")
     public void getTask() {
@@ -41,8 +44,7 @@ public class ErpScourSheetTaskJob {
         if (orderList != null && orderList.size() > 0) {
             for (ErpOrderInfo item :
                     orderList) {
-                //TODO 调用接口生成冲减单
-
+                erpOrderInfoService.orderScourSheet(item.getOrderStoreCode());
             }
         }
 

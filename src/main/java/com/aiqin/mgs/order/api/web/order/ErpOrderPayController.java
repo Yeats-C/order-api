@@ -6,7 +6,6 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.AuthToken;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
 import com.aiqin.mgs.order.api.domain.request.order.PayCallbackRequest;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPayResultResponse;
@@ -126,40 +125,6 @@ public class ErpOrderPayController {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {
             logger.error("订单物流费支付回调异常：{}", e);
-            response = HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
-        }
-        return response;
-    }
-
-    @PostMapping("/getOrderPayRepayInfo")
-    @ApiOperation(value = "查询确认收款信息")
-    public HttpResponse<ErpOrderPay> getOrderPayRepayInfo(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
-        HttpResponse response = HttpResponse.success();
-        try {
-            ErpOrderPay payRepayInfo = erpOrderPayService.getOrderPayRepayInfo(erpOrderPayRequest);
-            response.setData(payRepayInfo);
-        } catch (BusinessException e) {
-            logger.error("校验并同步订单支付状态异常：{}", e);
-            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
-        } catch (Exception e) {
-            logger.error("校验并同步订单支付状态异常：{}", e);
-            response = HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
-        }
-        return response;
-    }
-
-    @PostMapping("/orderPayRepay")
-    @ApiOperation(value = "校验并同步订单支付状态")
-    public HttpResponse orderPayRepay(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
-        HttpResponse response = HttpResponse.success();
-        try {
-            AuthUtil.loginCheck();
-            erpOrderPayService.orderPayRepay(erpOrderPayRequest);
-        } catch (BusinessException e) {
-            logger.error("校验并同步订单支付状态异常：{}", e);
-            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
-        } catch (Exception e) {
-            logger.error("校验并同步订单支付状态异常：{}", e);
             response = HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
         }
         return response;

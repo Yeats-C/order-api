@@ -5,8 +5,6 @@ import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
 import com.aiqin.mgs.order.api.domain.request.order.PayCallbackRequest;
-import com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPayResultResponse;
-import com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPrintQueryResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayResultResponse;
 
 /**
@@ -154,28 +152,6 @@ public interface ErpOrderPayService {
      * @date 2019/12/10 9:48
      */
     void orderPayCallback(PayCallbackRequest payCallbackRequest);
-
-    /**
-     * 查询确认收款信息
-     *
-     * @param erpOrderPayRequest
-     * @return void
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/12/10 9:48
-     */
-    ErpOrderPay getOrderPayRepayInfo(ErpOrderPayRequest erpOrderPayRequest);
-
-    /**
-     * 校验并更正订单支付信息
-     *
-     * @param erpOrderPayRequest
-     * @return void
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/12/10 9:48
-     */
-    void orderPayRepay(ErpOrderPayRequest erpOrderPayRequest);
 
     /**
      * 订单超时未支付取消订单

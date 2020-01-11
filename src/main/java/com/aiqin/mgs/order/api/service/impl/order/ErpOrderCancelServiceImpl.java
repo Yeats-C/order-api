@@ -67,8 +67,7 @@ public class ErpOrderCancelServiceImpl implements ErpOrderCancelService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void cancelOrderWithoutStock(ErpOrderCancelRequest erpOrderCancelRequest) {
+    public void cancelOrderWithoutStock(ErpOrderCancelRequest erpOrderCancelRequest, AuthToken auth) {
 
         if (erpOrderCancelRequest == null) {
             throw new BusinessException("空参数");
@@ -81,10 +80,6 @@ public class ErpOrderCancelServiceImpl implements ErpOrderCancelService {
         if (order == null) {
             throw new BusinessException("无效的订单编号");
         }
-
-        AuthToken auth = new AuthToken();
-        auth.setPersonId(erpOrderCancelRequest.getPersonId());
-        auth.setPersonName(erpOrderCancelRequest.getPersonName());
 
         boolean cancelFlag = false;
 
@@ -107,7 +102,7 @@ public class ErpOrderCancelServiceImpl implements ErpOrderCancelService {
     }
 
     @Override
-    public void applyCancelOrder(ErpOrderCancelRequest erpOrderCancelRequest) {
+    public void applyCancelOrder(ErpOrderCancelRequest erpOrderCancelRequest, AuthToken auth) {
 
         if (erpOrderCancelRequest == null) {
             throw new BusinessException("空参数");
@@ -115,10 +110,6 @@ public class ErpOrderCancelServiceImpl implements ErpOrderCancelService {
         if (StringUtils.isEmpty(erpOrderCancelRequest.getOrderCode())) {
             throw new BusinessException("缺失订单编号");
         }
-        AuthToken auth = new AuthToken();
-        auth.setPersonId(erpOrderCancelRequest.getPersonId());
-        auth.setPersonName(erpOrderCancelRequest.getPersonName());
-
         ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(erpOrderCancelRequest.getOrderCode());
         if (order == null) {
             throw new BusinessException("无效的订单编号");

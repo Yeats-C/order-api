@@ -14,6 +14,7 @@ import com.aiqin.mgs.order.api.domain.request.order.PayRequest;
 import com.aiqin.mgs.order.api.domain.response.ProductSkuDetailResponse;
 import com.aiqin.mgs.order.api.domain.response.order.*;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
+import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -156,6 +157,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                     .addParameter("operator_id", auth.getPersonId())
                     .addParameter("operator_name", auth.getPersonName())
                     .addParameter("order_code", orderCode);
+            AuthUtil.addParameter(httpClient, auth);
             HttpResponse<Boolean> response = httpClient.action().result(new TypeReference<HttpResponse<Boolean>>() {
             });
             if (RequestReturnUtil.validateHttpResponse(response)) {
