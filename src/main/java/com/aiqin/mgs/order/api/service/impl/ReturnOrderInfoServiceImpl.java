@@ -201,9 +201,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     @Override
     @Transactional(rollbackFor=Exception.class)
     public HttpResponse updateReturnStatus(ReturnOrderReviewReqVo reqVo) {
-        boolean flag = false;
-        boolean flag1 = false;
-        boolean flag2 = false;
+        boolean sysFlag = false;
+        boolean couponFlag = false;
+        boolean cancelFlag = false;
         //处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款 99--已取消
         String content="";
         String isPass="";
@@ -214,7 +214,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 reqVo.setTreatmentMethod(TreatmentMethodEnum.RETURN_AMOUNT_AND_GOODS_TYPE.getCode());
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg();
                 //同步数据到供应链
-                flag = true;
+                sysFlag = true;
                 break;
             case 2:
                 reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_APPLY.getKey());
@@ -222,7 +222,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 reqVo.setTreatmentMethod(TreatmentMethodEnum.BOOK_TYPE.getCode());
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_APPLY.getMsg();
                 //调用A品卷审批
-                flag1 = true;
+                couponFlag = true;
                 break;
             case 3:
                 reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getKey());
@@ -238,7 +238,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 if(returnOrderInfo.getReturnOrderStatus().equals(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_RETURN.getKey())){
                     return HttpResponse.failure(ResultCode.RETURN_ORDER_CANCEL_FALL);
                 }
-                flag2=true;
+                cancelFlag=true;
                 break;
             default:
                 return HttpResponse.failure(ResultCode.RETURN_ORDER_STATUS_NOT_FOUND);
@@ -248,7 +248,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         Integer review = returnOrderInfoDao.updateReturnStatus(reqVo);
         //添加日志
         insertLog(reqVo.getReturnOrderCode(),reqVo.getOperator(),reqVo.getOperator(),ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),reqVo.getOperateStatus(),content);
-        if (flag1) {
+        if (couponFlag) {
             log.info("驳回--进入A品券发放审批");
             //生成审批编码
             String approvalCode=createFormNo();
@@ -270,7 +270,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //A品券发放审批申请提交
             submitActBaseProcess(approvalCode,reqVo.getOperatorId(),reqVo.getDeptCode());
         }
-        if (flag) {
+        if (sysFlag) {
             // 同步到供应链，生成退供单
             log.info("erp同步供应链，生成退供单开始,returnOrderCode={}",reqVo.getReturnOrderCode());
             HttpResponse httpResponse=rejectRecordService.createRejectRecord(reqVo.getReturnOrderCode());
@@ -281,7 +281,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 throw new RuntimeException("erp同步供应链，生成退供单失败");
             }
         }
-        if(flag2){
+        if(cancelFlag){
             //通知退供单-撤销
             log.info("通知退供单-撤销开始，rejectRecordCode={}",reqVo.getReturnOrderCode());
             rejectRecordService.removeRejectRecordStatus(reqVo.getReturnOrderCode());
