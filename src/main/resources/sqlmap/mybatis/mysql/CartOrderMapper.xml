@@ -137,9 +137,6 @@
             <if test="storeId != null and storeId != '' ">
                 and store_id =#{storeId}
             </if>
-            <if test="productType != null">
-                and product_type = #{productType}
-            </if>
         </where>
     </select>
 
