@@ -1,7 +1,7 @@
 package com.aiqin.mgs.order.api.service;
 
 /**
- * 存储过程模拟序列service
+ * 模拟序列service
  *
  * @author: Tao.Chen
  * @version: v1.0.0

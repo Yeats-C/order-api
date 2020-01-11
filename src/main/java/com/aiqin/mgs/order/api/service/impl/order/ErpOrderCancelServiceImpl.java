@@ -156,7 +156,7 @@ public class ErpOrderCancelServiceImpl implements ErpOrderCancelService {
         if (ErpOrderNodeStatusEnum.STATUS_31.getCode().equals(order.getOrderNodeStatus())) {
 
             //注销订单关联优惠券物流券
-            erpOrderRequestService.turnOffCouponsByOrderId(order.getOrderStoreId());
+            erpOrderRequestService.turnOffCouponsByOrderId(order.getOrderStoreCode());
 
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_32.getCode());
             erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(order, auth);

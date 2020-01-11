@@ -173,28 +173,32 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     }
 
     @Override
-    public void turnOffCouponsByOrderId(String orderId) {
+    public void turnOffCouponsByOrderId(String orderCode) {
         try {
             HttpClient httpClient = HttpClient.put(urlProperties.getSlcsApi() + "/franchiseeVirtual/updateStatus")
-                    .addParameter("orderId", orderId);
+                    .addParameter("orderId", orderCode);
             HttpResponse response = httpClient.action().result(new TypeReference<HttpResponse>() {
             });
-            System.out.println(JSON.toJSON(response));
-        } catch (Exception e) {
+            if (!RequestReturnUtil.validateHttpResponse(response)) {
+                throw new BusinessException(response.getMessage());
+            }
+        } catch (BusinessException e) {
             logger.error("注销订单关联优惠券失败：{}", e);
+            throw new BusinessException("注销订单关联优惠券失败" + e.getMessage());
+        }catch (Exception e) {
+            logger.error("注销订单关联优惠券失败：{}", e);
+            throw new BusinessException("注销订单关联优惠券失败");
         }
     }
 
     @Override
-    public void updateCouponStatus(String franchiseeId, String couponCode, String businessCode, String storeName, String payCode, String balancePay) {
+    public void updateCouponStatus(String franchiseeId, String couponCode, String businessCode, String storeName) {
         try {
             Map<String, Object> paramMap = new HashMap<>(16);
             paramMap.put("franchisee_Id", franchiseeId);
             paramMap.put("coupon_code", couponCode);
             paramMap.put("Logistics_number", businessCode);
             paramMap.put("store_name", storeName);
-            paramMap.put("pay_serial_number", payCode);
-            paramMap.put("balance_pay", balancePay);
 
             HttpClient httpClient = HttpClient.put(urlProperties.getSlcsApi() + "/franchiseeVirtual/update").json(paramMap);
             HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
@@ -589,18 +593,22 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             }
             paramMap.put("franchiseeId", order.getFranchiseeId());
             paramMap.put("logisticsVoucherModel", list);
-            paramMap.put("orderId", order.getOrderStoreId());
+            paramMap.put("orderId", order.getOrderStoreCode());
 
-            HttpClient httpClient = HttpClient.post(urlProperties.getMarketApi() + "//logisticsVoucher/getBySkuCodes").json(paramMap);
+            HttpClient httpClient = HttpClient.post(urlProperties.getMarketApi() + "/logisticsVoucher/getBySkuCodes").json(paramMap);
             HttpResponse<ErpOrderGoodsCouponResponse> response = httpClient.action().result(new TypeReference<HttpResponse<ErpOrderGoodsCouponResponse>>() {
             });
 
             if (!RequestReturnUtil.validateHttpResponse(response)) {
-                throw new BusinessException("获取返还物流券失败");
+                throw new BusinessException(response.getMessage());
             }
             goodsCoupon = response.getData().getMoney();
+        } catch (BusinessException e) {
+            logger.error("获取返回物流券失败：{}", e);
+            throw new BusinessException("获取返还物流券失败" + e.getMessage());
         } catch (Exception e) {
             logger.error("获取返回物流券失败：{}", e);
+            throw new BusinessException("获取返还物流券失败");
         }
         return goodsCoupon;
     }
