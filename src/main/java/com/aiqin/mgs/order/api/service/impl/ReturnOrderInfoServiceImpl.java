@@ -758,7 +758,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 
     @Override
     public HttpResponse saveWriteDownOrder(String orderCode) {
-        log.info("发起冲减单开始,原始订单编码,orderCode={]",orderCode);
+        log.info("发起冲减单开始,原始订单编码,orderCode={}",orderCode);
         //根据订单编码查询原始订单数据及详情数据
         ErpOrderInfo erpOrderInfo=erpOrderQueryService.getOrderAndItemByOrderCode(orderCode);
         if(null==erpOrderInfo){
@@ -766,7 +766,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             return HttpResponse.failure(ResultCode.NOT_FOUND_ORDER_DATA);
         }
         List<ErpOrderItem> itemList=erpOrderInfo.getItemList();
-        log.info("发起冲减单,原始订单详情,itemList={]",itemList);
+        log.info("发起冲减单,原始订单详情,itemList={}",itemList);
         //冲减单总金额
         BigDecimal totalAmount=new BigDecimal(0);
         //发起冲减单所有商品总数量
@@ -810,7 +810,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     detailsList.add(returnOrderDetail);
                 }
             }
-            log.info("发起冲减单,退货单详情,detailsList={]",detailsList);
+            log.info("发起冲减单,退货单详情,detailsList={}",detailsList);
             if(CollectionUtils.isNotEmpty(detailsList)){
                 ReturnOrderInfo returnOrderInfo=new ReturnOrderInfo();
                 BeanUtils.copyProperties(erpOrderInfo,returnOrderInfo);
@@ -832,7 +832,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 returnOrderInfo.setTreatmentMethod(TreatmentMethodEnum.RETURN_AMOUNT_TYPE.getCode());
                 //生成退货单
                 returnOrderInfo.setId(null);
-                log.info("发起冲减单,生成退货单,returnOrderInfo={]",returnOrderInfo);
+                log.info("发起冲减单,生成退货单,returnOrderInfo={}",returnOrderInfo);
                 returnOrderInfoDao.insertSelective(returnOrderInfo);
                 List<ReturnOrderDetail> details = detailsList.stream().map(detailVo -> {
                     ReturnOrderDetail detail = new ReturnOrderDetail();
@@ -845,7 +845,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     return detail;
                 }).collect(Collectors.toList());
                 //生成退货单详情
-                log.info("发起冲减单,生成退货单详情,details={]",details);
+                log.info("发起冲减单,生成退货单详情,details={}",details);
                 returnOrderDetailDao.insertWriteDownOrderBatch(details);
                 //添加日志
                 insertLog(returnOrderCode,"系统操作","系统操作",ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(), WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getCode(),WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getName());
