@@ -192,14 +192,13 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     }
 
     @Override
-    public void updateCouponStatus(String franchiseeId, String couponCode, String businessCode, String storeName, String payCode, String balancePay) {
+    public void updateCouponStatus(String franchiseeId, String couponCode, String businessCode, String storeName) {
         try {
             Map<String, Object> paramMap = new HashMap<>(16);
             paramMap.put("franchisee_Id", franchiseeId);
             paramMap.put("coupon_code", couponCode);
             paramMap.put("Logistics_number", businessCode);
             paramMap.put("store_name", storeName);
-
 
             HttpClient httpClient = HttpClient.put(urlProperties.getSlcsApi() + "/franchiseeVirtual/update").json(paramMap);
             HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {

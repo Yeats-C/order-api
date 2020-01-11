@@ -83,14 +83,12 @@ public interface ErpOrderRequestService {
      * @param couponCode   优惠券编码
      * @param businessCode 业务编码（使用优惠券的单据号）
      * @param storeName    门店名称
-     * @param payCode      支付流水号
-     * @param balancePay   支付方式编码
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2020/1/7 17:42
      */
-    void updateCouponStatus(String franchiseeId, String couponCode, String businessCode, String storeName, String payCode, String balancePay);
+    void updateCouponStatus(String franchiseeId, String couponCode, String businessCode, String storeName);
 
     /**
      * 锁库存

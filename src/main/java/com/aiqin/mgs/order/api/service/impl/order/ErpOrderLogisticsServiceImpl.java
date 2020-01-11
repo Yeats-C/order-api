@@ -414,7 +414,7 @@ public class ErpOrderLogisticsServiceImpl implements ErpOrderLogisticsService {
                     for (String couponCode :
                             split) {
                         //优惠券消券变成已使用
-                        erpOrderRequestService.updateCouponStatus(order.getFranchiseeId(), couponCode, orderLogistics.getLogisticsCode(), order.getStoreName(), payCode, null);
+                        erpOrderRequestService.updateCouponStatus(order.getFranchiseeId(), couponCode, orderLogistics.getLogisticsCode(), order.getStoreName());
                     }
                 }
             }
