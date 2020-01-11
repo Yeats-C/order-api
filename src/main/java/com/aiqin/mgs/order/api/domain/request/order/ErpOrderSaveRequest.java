@@ -31,4 +31,8 @@ public class ErpOrderSaveRequest {
     @ApiModelProperty(value = "货架商品列表")
     @JsonProperty("item_list")
     private List<ErpOrderProductItemRequest> itemList;
+
+    @ApiModelProperty(value = "A品券编码")
+    @JsonProperty("top_coupon_code_list")
+    private List<String> topCouponCodeList;
 }
