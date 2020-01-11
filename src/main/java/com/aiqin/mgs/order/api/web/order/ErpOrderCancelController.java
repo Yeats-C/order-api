@@ -5,6 +5,7 @@ import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
+import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCancelRequest;
 import com.aiqin.mgs.order.api.service.order.ErpOrderCancelService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
@@ -41,7 +42,9 @@ public class ErpOrderCancelController {
     public HttpResponse cancelOrderWithoutStock(@RequestBody ErpOrderCancelRequest erpOrderCancelRequest) {
         HttpResponse response = HttpResponse.success();
         try {
-            erpOrderCancelService.cancelOrderWithoutStock(erpOrderCancelRequest);
+            AuthUtil.loginCheck();
+            AuthToken auth = AuthUtil.getCurrentAuth();
+            erpOrderCancelService.cancelOrderWithoutStock(erpOrderCancelRequest, auth);
         } catch (BusinessException e) {
             logger.error("异常信息：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
@@ -58,7 +61,8 @@ public class ErpOrderCancelController {
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
-            erpOrderCancelService.applyCancelOrder(erpOrderCancelRequest);
+            AuthToken auth = AuthUtil.getCurrentAuth();
+            erpOrderCancelService.applyCancelOrder(erpOrderCancelRequest, auth);
         } catch (BusinessException e) {
             logger.error("异常信息：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));

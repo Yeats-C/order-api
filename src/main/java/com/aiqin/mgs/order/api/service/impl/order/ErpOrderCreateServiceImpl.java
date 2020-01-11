@@ -249,7 +249,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @version: v1.0.0
      * @date 2019/11/27 19:02
      */
-    private List<ErpOrderItem> generateOrderItemList(List<CartOrderInfo> cartProductList, StoreInfo storeInfo,ErpOrderNodeProcessTypeEnum processTypeEnum) {
+    private List<ErpOrderItem> generateOrderItemList(List<CartOrderInfo> cartProductList, StoreInfo storeInfo, ErpOrderNodeProcessTypeEnum processTypeEnum) {
 
         //商品详情Map
         Map<String, ProductInfo> productMap = new HashMap<>(16);
@@ -624,7 +624,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private void deleteOrderProductFromCart(String storeId, OrderConfirmResponse orderConfirmResponse) {
         for (CartOrderInfo item :
                 orderConfirmResponse.getCartOrderInfos()) {
-            cartOrderService.deleteCartInfo(storeId, item.getSkuCode(), YesOrNoEnum.YES.getCode(),item.getProductType());
+            cartOrderService.deleteCartInfo(storeId, item.getSkuCode(), YesOrNoEnum.YES.getCode(), item.getProductType());
         }
     }
 

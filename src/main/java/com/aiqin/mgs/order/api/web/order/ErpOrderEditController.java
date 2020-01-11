@@ -44,7 +44,8 @@ public class ErpOrderEditController {
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
-            erpOrderInfoService.addProductGift(erpOrderEditRequest);
+            AuthToken auth = AuthUtil.getCurrentAuth();
+            erpOrderInfoService.addProductGift(erpOrderEditRequest, auth);
         } catch (BusinessException e) {
             logger.error("订单添加赠品失败：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));

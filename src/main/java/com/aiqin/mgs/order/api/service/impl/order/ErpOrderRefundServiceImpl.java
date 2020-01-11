@@ -166,7 +166,7 @@ public class ErpOrderRefundServiceImpl implements ErpOrderRefundService {
 
                 orderRefund.setRefundStatus(ErpPayStatusEnum.PAYING.getCode());
                 orderRefund.setPayId(payId);
-                this.saveOrderRefund(orderRefund, auth);
+                this.updateOrderRefundSelective(orderRefund, auth);
 
                 order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_36.getCode());
                 erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
@@ -226,11 +226,11 @@ public class ErpOrderRefundServiceImpl implements ErpOrderRefundService {
                     ErpOrderRefund orderRefund = getOrderRefundByRefundCode(refundCode);
 
                     if (!ErpPayStatusEnum.PAYING.getCode().equals(orderRefund.getRefundStatus())) {
-                        logger.info("第{}次订单退款结果轮询：{}", refundCode);
+                        logger.info("第{}次订单退款结果轮询：{}", pollingTimes, refundCode);
                         service.shutdown();
                     } else if (pollingTimes > OrderConstant.MAX_PAY_POLLING_TIMES) {
                         //轮询次数超时
-                        logger.info("第{}次订单退款结果轮询：{}", refundCode);
+                        logger.info("第{}次订单退款结果轮询：{}", pollingTimes, refundCode);
                         service.shutdown();
                     } else {
                         //调用支付中心，查看结果

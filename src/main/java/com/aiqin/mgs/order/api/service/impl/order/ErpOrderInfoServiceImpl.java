@@ -18,9 +18,10 @@ import com.aiqin.mgs.order.api.domain.response.order.ErpOrderItemSplitGroupRespo
 import com.aiqin.mgs.order.api.service.SequenceGeneratorService;
 import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
 import com.aiqin.mgs.order.api.service.order.*;
-import com.aiqin.mgs.order.api.util.AuthUtil;
+import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import com.aiqin.mgs.order.api.util.CopyBeanUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
+import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +58,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     private SequenceGeneratorService sequenceGeneratorService;
     @Resource
     private ErpOrderCancelService erpOrderCancelService;
+    @Resource
+    private ReturnOrderInfoService returnOrderInfoService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -107,9 +110,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addProductGift(ErpOrderEditRequest erpOrderEditRequest) {
-
-        AuthToken auth = AuthUtil.getCurrentAuth();
+    public void addProductGift(ErpOrderEditRequest erpOrderEditRequest, AuthToken auth) {
 
         if (erpOrderEditRequest == null || StringUtils.isEmpty(erpOrderEditRequest.getOrderCode())) {
             throw new BusinessException("缺失订单编号");
@@ -852,15 +853,16 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     }
 
     @Override
-    public void orderScourSheetSuccess(String orderCode) {
-        if (StringUtils.isNotEmpty(orderCode)) {
-            ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
-            if (order != null) {
-                if (ErpOrderScourSheetStatusEnum.WAIT.getCode().equals(order.getScourSheetStatus())) {
+    @Transactional(rollbackFor = Exception.class)
+    public void orderScourSheet(String orderCode) {
+        ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
+        if (order != null) {
+            if (ErpOrderScourSheetStatusEnum.WAIT.getCode().equals(order.getScourSheetStatus())) {
+                HttpResponse response = returnOrderInfoService.saveWriteDownOrder(orderCode);
+                if (RequestReturnUtil.validateHttpResponse(response)) {
                     AuthToken auth = new AuthToken();
                     auth.setPersonId(order.getCreateById());
                     auth.setPersonName(order.getCreateByName());
-
                     order.setScourSheetStatus(ErpOrderScourSheetStatusEnum.SUCCESS.getCode());
                     this.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
                 }

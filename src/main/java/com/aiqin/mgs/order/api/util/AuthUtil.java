@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.util;
 
+import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import org.apache.commons.lang.StringUtils;
@@ -7,7 +8,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Enumeration;
+import java.util.Objects;
 
 /**
  * 当前登录用户工具类
@@ -62,55 +63,6 @@ public class AuthUtil {
     }
 
     /**
-     * 获取定时任务操作人
-     *
-     * @param
-     * @return com.aiqin.mgs.order.api.domain.AuthToken
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/11/21 10:35
-     */
-    public static AuthToken getTaskAuth() {
-        AuthToken auth = new AuthToken();
-        auth.setPersonId("定时任务");
-        auth.setPersonName("定时任务");
-        return auth;
-    }
-
-    /**
-     * 获取系统操作人
-     *
-     * @param
-     * @return com.aiqin.mgs.order.api.domain.AuthToken
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/11/26 10:12
-     */
-    public static AuthToken getSystemAuth() {
-        AuthToken auth = new AuthToken();
-        auth.setPersonId("系统初始化");
-        auth.setPersonName("系统初始化");
-        return auth;
-    }
-
-    /**
-     * 请求接口调用，不能返回空操作人
-     *
-     * @param
-     * @return com.aiqin.mgs.order.api.domain.AuthToken
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/12/6 10:54
-     */
-    public static AuthToken getSendAuth() {
-        AuthToken auth = getCurrentAuth();
-        if (StringUtils.isEmpty(auth.getPersonId())) {
-            auth = getSystemAuth();
-        }
-        return auth;
-    }
-
-    /**
      * 登录检查
      *
      * @param
@@ -126,6 +78,26 @@ public class AuthUtil {
         }
         if (StringUtils.isEmpty(auth.getPersonName())) {
             throw new BusinessException("缺失公共参数person_name");
+        }
+    }
+
+    public static void addParameter(HttpClient client, AuthToken authToken) {
+        if (Objects.nonNull(authToken)) {
+            if (StringUtils.isNotBlank(authToken.getPersonId())) {
+                client.addParameter("person_id", authToken.getPersonId());
+            }
+            if (StringUtils.isNotBlank(authToken.getPersonName())) {
+                client.addParameter("person_name", authToken.getPersonName());
+            }
+            if (StringUtils.isNotBlank(authToken.getTicket())) {
+                client.addParameter("ticket", authToken.getTicket());
+            }
+            if (StringUtils.isNotBlank(authToken.getAccountId())) {
+                client.addParameter("account_id", authToken.getAccountId());
+            }
+            if (StringUtils.isNotBlank(authToken.getTicketPersonId())) {
+                client.addParameter("ticket_person_id", authToken.getTicketPersonId());
+            }
         }
     }
 }
