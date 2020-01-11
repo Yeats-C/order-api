@@ -59,9 +59,8 @@ public class ReturnOrderInfoController {
      */
     @ApiOperation("修改退货单详情")
     @PostMapping("/updateDetail")
-    public HttpResponse<Boolean> updateDetail(@RequestBody ReturnOrderDetailVO reqVo) {
-        Boolean review = returnOrderInfoService.updateOrderAfterSaleDetail(reqVo);
-        return new HttpResponse<>(review);
+    public HttpResponse updateDetail(@RequestBody ReturnOrderDetailVO reqVo) {
+        return returnOrderInfoService.updateReturnOrderDetail(reqVo);
     }
 
     @ApiOperation("提供给供应链--退货单状态修改")

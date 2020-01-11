@@ -43,15 +43,15 @@ public interface ErpOrderRequestService {
     ProductInfo getSkuDetail(String companyCode, String skuCode);
 
     /**
-     * 根据物流券编码获取物流券信息
+     * 根据优惠券编码获取优惠券信息
      *
-     * @param logisticsCode
+     * @param couponCode 优惠券编码
      * @return com.aiqin.mgs.order.api.domain.LogisticsCouponDetail
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2020/1/7 20:48
      */
-    LogisticsCouponDetail getLogisticsCouponByCode(String logisticsCode);
+    CouponDetail getCouponDetailByCode(String couponCode);
 
     /**
      * 申请取消订单
