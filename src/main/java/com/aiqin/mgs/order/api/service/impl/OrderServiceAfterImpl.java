@@ -231,7 +231,26 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 		payReq.setUpdateBy(orderAfterSaleInfo.getCreateByName());
         payReq.setFranchiseeId(orderAfterSaleInfo.getFranchiseeId());
         payReq.setRefundType(orderAfterSaleInfo.getReturnMoneyType());
+		payReq.setBusinessType(choseAfterType(orderAfterSaleInfo.getOrderType()));
 		bridgePayService.toRefund(payReq);
+	}
+
+	/**
+	 * 获取售后业务类型
+	 * @param orderType
+	 * @return
+	 */
+	private Integer choseAfterType(Integer orderType) {
+		if (orderType==null){
+			return Global.PAY_ORDER_TYPE_5;
+		}
+		if (orderType==3){
+			return Global.PAY_ORDER_TYPE_7;
+		}
+		if (orderType==4){
+			return Global.PAY_ORDER_TYPE_6;
+		}
+		return Global.PAY_ORDER_TYPE_5;
 	}
 
 

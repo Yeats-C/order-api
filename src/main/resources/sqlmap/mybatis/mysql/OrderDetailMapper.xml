@@ -144,7 +144,7 @@
         <if test="skuName!=null">
             #{skuName},
         </if>
-        CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy})
+        CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,#{createBy},#{updateBy})
     </insert>
 
     <!-- 修改订单明细退货数据-->

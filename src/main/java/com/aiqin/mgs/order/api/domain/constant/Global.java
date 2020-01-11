@@ -296,4 +296,26 @@ public interface Global {
     Integer STORE_STATUS_1 = 1;
     Integer STORE_STATUS_2 = 2;
     Integer STORE_STATUS_3 = 3;
+
+    /**
+     * 支付业务类型
+     */
+    //正常销售订单
+    Integer PAY_ORDER_TYPE_0=0;
+    //预存订单
+    Integer PAY_ORDER_TYPE_1=1;
+    //客户储值
+    Integer PAY_ORDER_TYPE_2=2;
+    //服务订单购买
+    Integer PAY_ORDER_TYPE_3=3;
+    //服务订单划次
+    Integer PAY_ORDER_TYPE_4=4;
+    //正常销售单退款
+    Integer PAY_ORDER_TYPE_5=5;
+    //预存订单退款
+    Integer PAY_ORDER_TYPE_6=6;
+    //服务订单退款
+    Integer PAY_ORDER_TYPE_7=7;
+
+
 }

@@ -1256,12 +1256,12 @@ public class OrderServiceImpl implements OrderService {
 
             if (reorerRequest != null) {
                 if (reorerRequest.getBeginTime() != null && !reorerRequest.getBeginTime().equals("")) {
-                    reorerRequest.setBeginTime(DateUtil.formatDateLong(DateUtil.getDayBegin(reorerRequest.getBeginTime())));
+                    String beginTimetime=reorerRequest.getBeginTime();
+                    reorerRequest.setBeginTime(DateUtil.formatDateLong(DateUtil.getDayBegin(beginTimetime)));
                     if (reorerRequest.getEndTime() == null || reorerRequest.getEndTime().equals("")) {
-                        reorerRequest.setEndTime(DateUtil.formatDateLong(DateUtil.getDayEnd(reorerRequest.getBeginTime())));
+                        reorerRequest.setEndTime(DateUtil.formatDateLong(DateUtil.getDayEnd(beginTimetime)));
                     }
-                }
-                if (reorerRequest.getEndTime() != null && !reorerRequest.getEndTime().equals("")) {
+                }else   if (reorerRequest.getEndTime() != null && !reorerRequest.getEndTime().equals("")) {
                     reorerRequest.setEndTime(DateUtil.formatDateLong(DateUtil.getDayEnd(reorerRequest.getEndTime())));
                 }
             }
@@ -1830,6 +1830,7 @@ public class OrderServiceImpl implements OrderService {
                     payReq.setMemberId(orderInfo.getMemberId());
                     payReq.setStoreName(orderInfo.getDistributorName());
                     payReq.setBackUrl(urlProperties.getOrderApi() + "/order/back");
+                    payReq.setBusinessType(choseBusinessType(orderInfo.getOrderType()));
                     payService.doPay(payReq);
                 }
             }
@@ -1839,6 +1840,24 @@ public class OrderServiceImpl implements OrderService {
             LOGGER.error("添加新的订单主数据以及其他订单关联数据异常：{}", e);
             throw new RuntimeException("添加新的订单主数据以及其他订单关联数据异常");
         }
+    }
+
+    /**
+     * 根据订单类型选择支付业务
+     * @param orderType
+     * @return
+     */
+    private Integer choseBusinessType(Integer orderType) {
+        if (orderType==null){
+            return Global.PAY_ORDER_TYPE_0;
+        }
+        if (orderType.intValue()==3){
+            return Global.PAY_ORDER_TYPE_3;
+        }
+        if (orderType.intValue()==4){
+            return Global.PAY_ORDER_TYPE_1;
+        }
+        return Global.PAY_ORDER_TYPE_0;
     }
 
 
@@ -2050,6 +2069,7 @@ public class OrderServiceImpl implements OrderService {
                 payReq.setCreateName(order.getCashierName());
                 payReq.setStoreName(order.getDistributorName());
                 payReq.setCreateBy(order.getCashierId());
+                payReq.setBusinessType(choseBusinessType(order.getOrderType()));
                 payService.doPay(payReq);
             }
             return HttpResponse.success();
