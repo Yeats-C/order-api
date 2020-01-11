@@ -1,9 +1,11 @@
 package com.aiqin.mgs.order.api.dao;
 
-import org.apache.ibatis.annotations.Param;
+import com.aiqin.mgs.order.api.domain.SequenceGenerator;
+
+import java.util.List;
 
 /**
- * 存储过程模拟序列工具
+ * 模拟序列Dao
  *
  * @author: Tao.Chen
  * @version: v1.0.0
@@ -12,14 +14,36 @@ import org.apache.ibatis.annotations.Param;
 public interface SequenceGeneratorDao {
 
     /**
-     * 调用存储过程生成新的序列值
+     * 条件查询
      *
-     * @param sequenceName
-     * @return java.lang.Long
+     * @param po
+     * @return java.util.List<com.aiqin.mgs.order.api.domain.SequenceGenerator>
      * @author: Tao.Chen
      * @version: v1.0.0
-     * @date 2020/1/9 11:43
+     * @date 2020/1/11 14:23
      */
-    Long getSequenceNextVal(@Param("sequenceName") String sequenceName);
+    List<SequenceGenerator> select(SequenceGenerator po);
+
+    /**
+     * 更新非空字段
+     *
+     * @param po
+     * @return java.lang.Integer
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2020/1/11 14:23
+     */
+    Integer updateByPrimaryKeySelective(SequenceGenerator po);
+
+    /**
+     * 新增
+     *
+     * @param po
+     * @return java.lang.Integer
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2020/1/11 14:24
+     */
+    Integer insert(SequenceGenerator po);
 
 }

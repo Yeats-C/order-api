@@ -68,13 +68,13 @@ public interface ErpOrderRequestService {
     /**
      * 把订单对应的物流券全部注销
      *
-     * @param orderId 订单id
+     * @param orderCode 订单编号
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2020/1/7 17:34
      */
-    void turnOffCouponsByOrderId(String orderId);
+    void turnOffCouponsByOrderId(String orderCode);
 
     /**
      * 修改优惠券状态
