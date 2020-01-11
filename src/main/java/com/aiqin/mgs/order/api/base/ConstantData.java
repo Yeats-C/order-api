@@ -62,4 +62,9 @@ public interface ConstantData {
      */
     String RETURN_ORDER_DETAIL = "修改商品详情";
 
+    /**
+     * 操作人--系统操作
+     */
+    String SYS_OPERTOR = "系统操作";
+
 }

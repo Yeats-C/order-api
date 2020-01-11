@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -34,6 +35,7 @@ public class ErpOrderInfo {
 
     @ApiModelProperty(value = "订单编号")
     @JsonProperty("order_store_code")
+    @NotBlank(message = "订单编号不能为空")
     private String orderStoreCode;
 
     @ApiModelProperty(value = "公司编码")
