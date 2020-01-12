@@ -48,6 +48,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.aiqin.ground.util.exception.GroundRuntimeException;
 import com.aiqin.mgs.order.api.domain.request.DevelRequest;
@@ -2321,6 +2322,9 @@ public class OrderServiceImpl implements OrderService {
         List<LatelyResponse> list = new ArrayList();
         try {
             list = orderDao.memberLately(memberId, distributorId);
+            if (list != null && list.size() > 0) {
+                list = list.stream().filter(l -> l.getPrice() != null && l.getPrice() > 0).collect(Collectors.toList());
+            }
             return HttpResponse.success(list);
         } catch (Exception e) {
             LOGGER.info("error 最近消费订单 (消费时间/消费金额)e:{}", e);
