@@ -16,7 +16,6 @@ import com.aiqin.mgs.order.api.domain.response.order.*;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
-import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,18 +122,18 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     }
 
     @Override
-    public LogisticsCouponDetail getLogisticsCouponByCode(String logisticsCode) {
+    public CouponDetail getCouponDetailByCode(String couponCode) {
         String url = urlProperties.getSlcsApi() + "/franchiseeVirtual/getLogistics";
-        url += "?couponCode=" + logisticsCode;
-        LogisticsCouponDetail logisticsDetail = null;
+        url += "?couponCode=" + couponCode;
+        CouponDetail logisticsDetail = null;
         try {
             HttpClient httpClient = HttpClient.get(url);
-            HttpResponse<LogisticsCouponDetail> response = httpClient.action().result(new TypeReference<HttpResponse<LogisticsCouponDetail>>() {
+            HttpResponse<CouponDetail> response = httpClient.action().result(new TypeReference<HttpResponse<CouponDetail>>() {
             });
             if (!RequestReturnUtil.validateHttpResponse(response)) {
                 throw new BusinessException("获取物流券信息失败");
             }
-            LogisticsCouponDetail data = response.getData();
+            CouponDetail data = response.getData();
             if (data == null) {
                 throw new BusinessException("无效的物流券编码");
             }

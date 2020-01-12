@@ -69,7 +69,7 @@ public class CartOrderServiceImpl implements CartOrderService {
         ShoppingCartProductRequest shoppingCartProductRequest=new ShoppingCartProductRequest();
         shoppingCartProductRequest.setCityCode(storeInfo.getData().getCityId());
         shoppingCartProductRequest.setProvinceCode(storeInfo.getData().getProvinceId());
-        shoppingCartProductRequest.setCompanyCode(storeInfo.getData().getCompanyCode());
+        shoppingCartProductRequest.setCompanyCode("14");
         shoppingCartProductRequest.setSkuCodes(skuCodeList);
         if(shoppingCartProductRequest.getCompanyCode()==null
                 || shoppingCartProductRequest.getCityCode()==null

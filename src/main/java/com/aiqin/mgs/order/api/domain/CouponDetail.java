@@ -14,7 +14,11 @@ import java.math.BigDecimal;
  * @date 2020/1/7 16:32
  */
 @Data
-public class LogisticsCouponDetail {
+public class CouponDetail {
+
+    @ApiModelProperty(value = "优惠券类型 0、物流券 1、服纺券 2、A品券")
+    @JsonProperty("coupon_type")
+    private Integer couponType;
 
     @ApiModelProperty(value = "优惠券编码")
     @JsonProperty("coupon_code")
@@ -24,7 +28,7 @@ public class LogisticsCouponDetail {
     @JsonProperty("nominal_Value")
     private BigDecimal nominalValue;
 
-    @ApiModelProperty(value = "使用状态 0未使用 1已使用 2过期")
+    @ApiModelProperty(value = "使用状态 0、未使用 1、已使用 2、过期")
     @JsonProperty("active_condition")
     private Integer activeCondition;
 

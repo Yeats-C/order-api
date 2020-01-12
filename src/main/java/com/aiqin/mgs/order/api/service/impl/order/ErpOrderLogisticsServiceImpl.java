@@ -9,7 +9,7 @@ import com.aiqin.mgs.order.api.component.enums.pay.ErpPayFeeTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderLogisticsDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
-import com.aiqin.mgs.order.api.domain.LogisticsCouponDetail;
+import com.aiqin.mgs.order.api.domain.CouponDetail;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
@@ -170,7 +170,7 @@ public class ErpOrderLogisticsServiceImpl implements ErpOrderLogisticsService {
             for (String couponIdItem :
                     couponIdList) {
                 //调用物流券接口获取物流券信息
-                LogisticsCouponDetail logisticsCoupon = erpOrderRequestService.getLogisticsCouponByCode(couponIdItem);
+                CouponDetail logisticsCoupon = erpOrderRequestService.getCouponDetailByCode(couponIdItem);
                 if (logisticsCoupon == null) {
                     throw new BusinessException("无效的物流券编码");
                 }

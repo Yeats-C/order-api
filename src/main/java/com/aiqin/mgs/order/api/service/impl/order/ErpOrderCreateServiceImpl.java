@@ -549,9 +549,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @date 2019/12/9 15:35
      */
     private void sharePrice(ErpOrderNodeProcessTypeEnum processTypeEnum, ErpOrderInfo erpOrderInfo) {
-        //TODO 计算均摊金额
-        for (ErpOrderItem item :
-                erpOrderInfo.getItemList()) {
+        //TODO 计算均摊金额   订单商品实收*单品价值/订单商品总价值，无法除尽的部分累加到优惠商品的最后一个商品中。
+        for (ErpOrderItem item : erpOrderInfo.getItemList()) {
             item.setTotalPreferentialAmount(item.getTotalProductAmount());
             item.setPreferentialAmount(item.getProductAmount());
         }

@@ -201,9 +201,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     @Override
     @Transactional(rollbackFor=Exception.class)
     public HttpResponse updateReturnStatus(ReturnOrderReviewReqVo reqVo) {
-        boolean flag = false;
-        boolean flag1 = false;
-        boolean flag2 = false;
+        boolean sysFlag = false;
+        boolean couponFlag = false;
+        boolean cancelFlag = false;
         //处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款 99--已取消
         String content="";
         String isPass="";
@@ -214,7 +214,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 reqVo.setTreatmentMethod(TreatmentMethodEnum.RETURN_AMOUNT_AND_GOODS_TYPE.getCode());
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg();
                 //同步数据到供应链
-                flag = true;
+                sysFlag = true;
                 break;
             case 2:
                 reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_APPLY.getKey());
@@ -222,7 +222,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 reqVo.setTreatmentMethod(TreatmentMethodEnum.BOOK_TYPE.getCode());
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_APPLY.getMsg();
                 //调用A品卷审批
-                flag1 = true;
+                couponFlag = true;
                 break;
             case 3:
                 reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getKey());
@@ -238,7 +238,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 if(returnOrderInfo.getReturnOrderStatus().equals(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_RETURN.getKey())){
                     return HttpResponse.failure(ResultCode.RETURN_ORDER_CANCEL_FALL);
                 }
-                flag2=true;
+                cancelFlag=true;
                 break;
             default:
                 return HttpResponse.failure(ResultCode.RETURN_ORDER_STATUS_NOT_FOUND);
@@ -248,7 +248,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         Integer review = returnOrderInfoDao.updateReturnStatus(reqVo);
         //添加日志
         insertLog(reqVo.getReturnOrderCode(),reqVo.getOperator(),reqVo.getOperator(),ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),reqVo.getOperateStatus(),content);
-        if (flag1) {
+        if (couponFlag) {
             log.info("驳回--进入A品券发放审批");
             //生成审批编码
             String approvalCode=createFormNo();
@@ -270,7 +270,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //A品券发放审批申请提交
             submitActBaseProcess(approvalCode,reqVo.getOperatorId(),reqVo.getDeptCode());
         }
-        if (flag) {
+        if (sysFlag) {
             // 同步到供应链，生成退供单
             log.info("erp同步供应链，生成退供单开始,returnOrderCode={}",reqVo.getReturnOrderCode());
             HttpResponse httpResponse=rejectRecordService.createRejectRecord(reqVo.getReturnOrderCode());
@@ -281,7 +281,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 throw new RuntimeException("erp同步供应链，生成退供单失败");
             }
         }
-        if(flag2){
+        if(cancelFlag){
             //通知退供单-撤销
             log.info("通知退供单-撤销开始，rejectRecordCode={}",reqVo.getReturnOrderCode());
             rejectRecordService.removeRejectRecordStatus(reqVo.getReturnOrderCode());
@@ -298,32 +298,32 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 
     @Override
     @Transactional
-    public Boolean updateOrderAfterSaleDetail(ReturnOrderDetailVO records) {
+    public HttpResponse updateReturnOrderDetail(ReturnOrderDetailVO records) {
+        log.info("退货单详情修改开始,入参records={}",records);
         List<ReturnOrderDetail> details=records.getDetails();
         String returnOrderCode = records.getReturnOrderCode();
         if(StringUtils.isNotBlank(returnOrderCode)&&CollectionUtils.isNotEmpty(details)){
             //根据退货单id，删除详情记录
-            int res=returnOrderDetailDao.deleteByReturnOrderCode(returnOrderCode);
-            if(res>0){
-                details = details.stream().map(detailVo -> {
-                    ReturnOrderDetail detail = new ReturnOrderDetail();
-                    BeanUtils.copyProperties(detailVo, detail);
-                    detail.setCreateTime(new Date());
-                    detail.setReturnOrderDetailId(IdUtil.uuid());
-                    detail.setReturnOrderCode(returnOrderCode);
-                    detail.setCreateById(records.getCreateId());
-                    detail.setCreateByName(records.getCreator());
-                    detail.setRemark("");
-                    detail.setEvidenceUrl("");
-                    return detail;
-                }).collect(Collectors.toList());
-                returnOrderDetailDao.insertBatch(details);
-                //添加日志
-                insertLog(returnOrderCode,records.getCreateId(),records.getCreator(),ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey(),ConstantData.RETURN_ORDER_DETAIL);
-                return true;
-            }
+            returnOrderDetailDao.deleteByReturnOrderCode(returnOrderCode);
+            details = details.stream().map(detailVo -> {
+                ReturnOrderDetail detail = new ReturnOrderDetail();
+                BeanUtils.copyProperties(detailVo, detail);
+                detail.setCreateTime(new Date());
+                detail.setReturnOrderDetailId(IdUtil.uuid());
+                detail.setReturnOrderCode(returnOrderCode);
+                detail.setCreateById(records.getCreateId());
+                detail.setCreateByName(records.getCreator());
+                detail.setRemark("");
+                detail.setEvidenceUrl("");
+                return detail;
+            }).collect(Collectors.toList());
+            log.info("退货单详情修改,details={}",details);
+            returnOrderDetailDao.insertBatch(details);
+            //添加日志
+            insertLog(returnOrderCode,records.getCreateId(),records.getCreator(),ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey(),ConstantData.RETURN_ORDER_DETAIL);
+            return HttpResponse.success();
         }
-        return false;
+        return HttpResponse.failure(ResultCode.RETURN_ORDER_PARAMETER_FALL);
     }
 
     @Override
@@ -461,11 +461,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         record.setStatus(ConstantData.REFUND_STATUS);
         refundInfoDao.updateByOrderCode(record);
         //添加日志
-        insertLog(reqVo.getOrderNo(),"","系统操作",ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getMsg());
+        insertLog(reqVo.getOrderNo(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getMsg());
         return returnOrderInfoDao.updateRefundStatus(reqVo.getOrderNo())>0;
 
         //todo 调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单（减库存）
-//        updateStoreStatus(reqVo.getOrderNo(),StoreStatusEnum.PAY_ORDER_TYPE_ZHI.toString(),returnOrderInfo.getStoreId(),"系统操作","系统操作",returnOrderInfo.getActualProductCount().toString());
+//        updateStoreStatus(reqVo.getOrderNo(),StoreStatusEnum.PAY_ORDER_TYPE_ZHI.toString(),returnOrderInfo.getStoreId(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,returnOrderInfo.getActualProductCount().toString());
     }
 
     /**
@@ -840,15 +840,15 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     detail.setCreateTime(new Date());
                     detail.setReturnOrderDetailId(IdUtil.uuid());
                     detail.setReturnOrderCode(returnOrderCode);
-                    detail.setCreateById("系统操作");
-                    detail.setCreateByName("系统操作");
+                    detail.setCreateById(ConstantData.SYS_OPERTOR);
+                    detail.setCreateByName(ConstantData.SYS_OPERTOR);
                     return detail;
                 }).collect(Collectors.toList());
                 //生成退货单详情
                 log.info("发起冲减单,生成退货单详情,details={}",details);
                 returnOrderDetailDao.insertWriteDownOrderBatch(details);
                 //添加日志
-                insertLog(returnOrderCode,"系统操作","系统操作",ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(), WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getCode(),WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getName());
+                insertLog(returnOrderCode,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(), WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getCode(),WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getName());
                 //发起退款
                 refund(returnOrderCode);
                 return HttpResponse.success();
@@ -932,14 +932,14 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             detail.setCreateTime(new Date());
             detail.setReturnOrderDetailId(IdUtil.uuid());
             detail.setReturnOrderCode(returnOrderCode);
-            detail.setCreateById("系统操作");
-            detail.setCreateByName("系统操作");
+            detail.setCreateById(ConstantData.SYS_OPERTOR);
+            detail.setCreateByName(ConstantData.SYS_OPERTOR);
             return detail;
         }).collect(Collectors.toList());
         //生成退货单详情
         returnOrderDetailDao.insertWriteDownOrderBatch(details);
         //添加日志
-        insertLog(returnOrderCode,"系统操作","系统操作",ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(), WriteDownOrderStatusEnum.CANCEL_ORDER.getCode(),WriteDownOrderStatusEnum.CANCEL_ORDER.getName());
+        insertLog(returnOrderCode,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(), WriteDownOrderStatusEnum.CANCEL_ORDER.getCode(),WriteDownOrderStatusEnum.CANCEL_ORDER.getName());
         return HttpResponse.success(returnOrderCode);
     }
 
@@ -1072,12 +1072,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 //                "  \"store_id\": \"AB957AE69917B34B35BEFFF8A23573F01E\"\n" +
                 "  \"store_id\": \"ABEC8D65036E5A45DBABCBA413FA56AEA2\"\n" +
                 "}";
-        JSONObject json= JSON.parseObject(str);
-        log.info("发起门店退货申请-完成(门店)（erp回调）--修改商品库存入参，url={},json={}",url,json);
-        HttpClient httpClient = HttpClient.post(url).json(json);
-        Map<String ,Object> result=null;
-        result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
-        log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存结果，request={}",result);
-
+//        JSONObject json= JSON.parseObject(str);
+//        log.info("发起门店退货申请-完成(门店)（erp回调）--修改商品库存入参，url={},json={}",url,json);
+//        HttpClient httpClient = HttpClient.post(url).json(json);
+//        Map<String ,Object> result=null;
+//        result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+//        log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存结果，request={}",result);
     }
 }
