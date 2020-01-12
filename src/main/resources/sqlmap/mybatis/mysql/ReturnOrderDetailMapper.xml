@@ -397,7 +397,7 @@
         insert into return_order_detail (return_order_detail_id, return_order_code,product_type,
         sku_code, sku_name,total_product_amount,return_product_count,model_code,product_status,
         product_spec,unit_name,color_code,color_name,create_by_id, create_by_name,picture_url,
-        create_time,remark,evidence_url,preferential_amount)
+        create_time,remark,evidence_url,preferential_amount,line_code,unit_code,tax_rate,product_amount)
         values
         <foreach collection="records" item="item" index="index" separator=",">
             (
@@ -410,7 +410,8 @@
             #{item.colorCode,jdbcType=VARCHAR}, #{item.colorName,jdbcType=VARCHAR}, #{item.createById,jdbcType=VARCHAR},
             #{item.createByName,jdbcType=VARCHAR},
             #{item.pictureUrl,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP},
-            #{item.remark,jdbcType=VARCHAR},#{item.evidenceUrl,jdbcType=VARCHAR},#{item.preferentialAmount,jdbcType=DECIMAL}
+            #{item.remark,jdbcType=VARCHAR},#{item.evidenceUrl,jdbcType=VARCHAR},#{item.preferentialAmount,jdbcType=DECIMAL},
+            #{item.lineCode},#{item.unitCode},#{item.taxRate},#{item.productAmount}
             )
         </foreach>
     </insert>
@@ -431,8 +432,8 @@
         <!-- collection可以是List对于list,数组对于array,Map对应ids -->
         <foreach collection="list" item="item" separator=";">
             update return_order_detail
-            actual_return_product_count = #{item.actualReturnProductCount}
-            where return_order_detail_id = #{item.returnOrderDetailId}
+            set actual_return_product_count = #{item.actualReturnProductCount}
+            where return_order_code = #{item.returnOrderCode} and line_code=#{item.lineCode}
         </foreach>
     </update>
 
@@ -440,9 +441,38 @@
         <!-- collection可以是List对于list,数组对于array,Map对应ids -->
         <foreach collection="list" item="item" separator=";">
             update return_order_detail
-            actual_total_product_amount = #{item.actualTotalProductAmount}
+            set actual_total_product_amount = #{item.actualTotalProductAmount}
             where return_order_detail_id = #{item.returnOrderDetailId}
         </foreach>
     </update>
+
+    <select id="selectUrlsByReturnOrderDetailId" resultType="java.lang.String" parameterType="java.lang.String">
+        select evidence_url
+        from return_order_detail
+        where return_order_detail_id = #{returnOrderDetailId}
+    </select>
+
+    <insert id="insertWriteDownOrderBatch" parameterType="list">
+        insert into return_order_detail (return_order_detail_id, return_order_code,product_type,
+        sku_code, sku_name,total_product_amount,return_product_count,model_code,product_status,
+        product_spec,unit_name,color_code,color_name,create_by_id, create_by_name,picture_url,
+        create_time,remark,evidence_url,preferential_amount,line_code,actual_return_product_count,actual_total_product_amount)
+        values
+        <foreach collection="records" item="item" index="index" separator=",">
+            (
+            #{item.returnOrderDetailId,jdbcType=VARCHAR},
+            #{item.returnOrderCode,jdbcType=VARCHAR},#{item.productType,jdbcType=BIT},
+            #{item.skuCode,jdbcType=VARCHAR}, #{item.skuName,jdbcType=VARCHAR},
+            #{item.totalProductAmount,jdbcType=DECIMAL},#{item.returnProductCount,jdbcType=BIGINT},
+            #{item.modelCode,jdbcType=VARCHAR},#{item.productStatus,jdbcType=BIT},#{item.productSpec,jdbcType=VARCHAR},
+            #{item.unitName,jdbcType=VARCHAR},
+            #{item.colorCode,jdbcType=VARCHAR}, #{item.colorName,jdbcType=VARCHAR}, #{item.createById,jdbcType=VARCHAR},
+            #{item.createByName,jdbcType=VARCHAR},
+            #{item.pictureUrl,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP},
+            #{item.remark,jdbcType=VARCHAR},#{item.evidenceUrl,jdbcType=VARCHAR},#{item.preferentialAmount,jdbcType=DECIMAL},
+            #{item.lineCode},#{item.actualReturnProductCount},#{item.actualTotalProductAmount}
+            )
+        </foreach>
+    </insert>
 
 </mapper>

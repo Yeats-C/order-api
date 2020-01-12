@@ -1,5 +1,7 @@
 package com.aiqin.mgs.order.api.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -15,6 +17,9 @@ import java.util.Date;
 @ApiModel("退供商品批次信息")
 @ToString(callSuper = true)
 public class RejectRecordDetailBatch {
+    @ApiModelProperty(value = "id")
+    @JsonProperty("id")
+    private String id;
     @ApiModelProperty(value = "业务id")
     private String rejectRecordDetailBatchId;
     @ApiModelProperty(value = "退供单号")
@@ -25,9 +30,9 @@ public class RejectRecordDetailBatch {
     private String skuName;
     @ApiModelProperty(value = "batch_code")
     private String batchCode;
-    @ApiModelProperty(value = "生产日期",example = "2001-01-01 01:01:01")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date productDate;
-    @ApiModelProperty(value = "batch_remark")
+    @ApiModelProperty(value = "批次备注")
     private String batchRemark;
     @ApiModelProperty(value = "单位编码")
     private String unitCode;
@@ -51,8 +56,8 @@ public class RejectRecordDetailBatch {
     private String updateById;
     @ApiModelProperty(value = "修改人名称")
     private String updateByName;
-    @ApiModelProperty(value = "创建时间",example = "2001-01-01 01:01:01")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
-    @ApiModelProperty(value = "修改时间",example = "2001-01-01 01:01:01")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 }

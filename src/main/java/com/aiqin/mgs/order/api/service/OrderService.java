@@ -6,6 +6,7 @@
 
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.service;
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -221,4 +222,12 @@ public interface OrderService {
 	 * @return
 	 */
     HttpResponse orderCount(String skuCode, String storeId, int day);
+
+	/**
+	 * 订单中心获取门店本月销售额
+	 * @param orderCountReq
+
+	 * @return
+	 */
+	HttpResponse<Integer> orderStoreCount(OrderCountReq orderCountReq);
 }

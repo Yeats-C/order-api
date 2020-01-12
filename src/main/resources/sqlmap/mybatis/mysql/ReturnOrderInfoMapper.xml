@@ -84,8 +84,12 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="source_type" property="sourceType" jdbcType="BIT" />
+    <result column="order_success" property="orderSuccess" jdbcType="BIT" />
     <result column="return_money_type" property="returnMoneyType" jdbcType="BIT" />
     <result column="order_category" property="orderCategory" jdbcType="BIT" />
+    <result column="review_operator_id" property="reviewOperatorId" jdbcType="VARCHAR" />
+    <result column="review_time" property="reviewTime" jdbcType="TIMESTAMP" />
+    <result column="order_success" property="orderSuccess" jdbcType="BIT" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, return_order_id, return_order_code, order_store_code, company_code, company_name,
@@ -103,7 +107,7 @@
     discount_amount_infos, store_id, store_code, store_name, nature_code, nature_name,
     review_remark, review_operator, refund_status, process_type, remark, use_status,
     create_by_id, create_by_name, update_by_id, update_by_name, create_time, update_time,
-    source_type, return_money_type, order_category
+    source_type, order_success, return_money_type, order_category, review_operator_id, review_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
@@ -365,11 +369,20 @@
       <if test="sourceType != null" >
         source_type,
       </if>
+      <if test="orderSuccess != null" >
+        order_success,
+      </if>
       <if test="returnMoneyType != null" >
         return_money_type,
       </if>
       <if test="orderCategory != null" >
         order_category,
+      </if>
+      <if test="reviewOperatorId != null" >
+        review_operator_id,
+      </if>
+      <if test="reviewTime != null" >
+        review_time,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -619,11 +632,20 @@
       <if test="sourceType != null" >
         #{sourceType,jdbcType=BIT},
       </if>
+      <if test="orderSuccess != null" >
+        #{orderSuccess,jdbcType=BIT},
+      </if>
       <if test="returnMoneyType != null" >
         #{returnMoneyType,jdbcType=BIT},
       </if>
       <if test="orderCategory != null" >
         #{orderCategory,jdbcType=BIT},
+      </if>
+      <if test="reviewOperatorId != null" >
+        #{reviewOperatorId},
+      </if>
+      <if test="reviewTime != null" >
+        #{reviewTime},
       </if>
     </trim>
   </insert>
@@ -873,11 +895,20 @@
       <if test="sourceType != null" >
         source_type = #{sourceType,jdbcType=BIT},
       </if>
+      <if test="orderSuccess != null" >
+        order_success = #{orderSuccess,jdbcType=BIT},
+      </if>
       <if test="returnMoneyType != null" >
         return_money_type = #{returnMoneyType,jdbcType=BIT},
       </if>
       <if test="orderCategory != null" >
         order_category=#{orderCategory,jdbcType=BIT},
+      </if>
+      <if test="reviewOperatorId != null" >
+        review_operator_id=#{reviewOperatorId},
+      </if>
+      <if test="reviewTime != null" >
+        review_time=#{reviewTime},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
@@ -903,6 +934,15 @@
             </if>
             <if test="reviewNote!=null">
                 review_remark=#{reviewNote,jdbcType=VARCHAR},
+            </if>
+            <if test="treatmentMethod!=null">
+                treatment_method=#{treatmentMethod},
+            </if>
+            <if test="operatorId != null" >
+              review_operator_id=#{operatorId},
+            </if>
+            <if test="reviewTime != null" >
+              review_time=#{reviewTime},
             </if>
         </set>
         where return_order_code=#{returnOrderCode,jdbcType=VARCHAR}
@@ -951,7 +991,7 @@
     set
     return_order_status=12,
     refund_status = 1
-    where return_order_code=#{orderStoreCode}
+    where return_order_code=#{returnOrderCode}
   </update>
 
   <!--后台销售退货单管理列表（搜索）-->
@@ -961,7 +1001,7 @@
     from return_order_info
     where
     1=1
-    <if test="returnOrderStatus!=null and returnOrderStatus!=''">
+    <if test="returnOrderStatus!=null">
      and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
     </if>
     <if test="returnOrderCode!=null and returnOrderCode!=''">
@@ -970,11 +1010,26 @@
     <if test="storeName!=null and storeName!=''">
      and store_name=#{storeName,jdbcType=VARCHAR}
     </if>
-    <if test="provinceName!=null and provinceName!=''">
-     and province_name=#{provinceName,jdbcType=VARCHAR}
+    <if test="storeId!=null and storeId!=''">
+      and store_id=#{storeId,jdbcType=VARCHAR}
     </if>
-    <if test="cityName!=null and cityName!=''">
-     and city_name=#{cityName,jdbcType=VARCHAR}
+    <if test="provinceId != null and provinceId!=''" >
+      and province_id = #{provinceId,jdbcType=VARCHAR}
+    </if>
+    <if test="provinceName != null and provinceName!=''" >
+      and province_name = #{provinceName,jdbcType=VARCHAR}
+    </if>
+    <if test="cityId != null and cityId!=''" >
+      and  city_id = #{cityId,jdbcType=VARCHAR}
+    </if>
+    <if test="cityName != null and cityName!=''" >
+      and  city_name = #{cityName,jdbcType=VARCHAR}
+    </if>
+    <if test="districtId != null and districtId!=''" >
+      and   district_id = #{districtId,jdbcType=VARCHAR}
+    </if>
+    <if test="districtName != null and districtName!=''" >
+      and  district_name = #{districtName,jdbcType=VARCHAR}
     </if>
     <if test="applyStartTime!=null and applyStartTime!=''">
       and create_time &gt;= #{applyStartTime}
@@ -982,13 +1037,16 @@
     <if test="applyEndTime!=null and applyEndTime!=''">
       and create_time &lt;= #{applyEndTime}
     </if>
-    <if test="orderCategory!=null and orderCategory!=''">
+    <if test="orderType!=null">
+      and order_type =#{orderType}
+    </if>
+    <if test="orderCategory!=null">
       and order_category=#{orderCategory,jdbcType=INTEGER}
     </if>
-    <if test="treatmentMethod!=null and treatmentMethod!=''">
+    <if test="treatmentMethod!=null">
       and treatment_method=#{treatmentMethod,jdbcType=INTEGER}
     </if>
-    <if test="returnOrderType!=null and returnOrderType!=''">
+    <if test="returnOrderType!=null">
       and return_order_type=#{returnOrderType,jdbcType=INTEGER}
     </if>
     order by create_time desc
@@ -1001,36 +1059,54 @@
     from return_order_info
     where
     1=1
-    <if test="returnOrderStatus!=null and returnOrderStatus!=''">
-      and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
-    </if>
-    <if test="returnOrderCode!=null and returnOrderCode!=''">
-      and return_order_code=#{returnOrderCode,jdbcType=VARCHAR}
-    </if>
-    <if test="storeName!=null and storeName!=''">
-      and store_name=#{storeName,jdbcType=VARCHAR}
-    </if>
-    <if test="provinceName!=null and provinceName!=''">
-      and province_name=#{provinceName,jdbcType=VARCHAR}
-    </if>
-    <if test="cityName!=null and cityName!=''">
-      and city_name=#{cityName,jdbcType=VARCHAR}
-    </if>
-    <if test="applyStartTime!=null and applyStartTime!=''">
-      and create_time &gt;= #{applyStartTime}
-    </if>
-    <if test="applyEndTime!=null and applyEndTime!=''">
-      and create_time &lt;= #{applyEndTime}
-    </if>
-    <if test="orderCategory!=null and orderCategory!=''">
-      and order_category=#{orderCategory,jdbcType=INTEGER}
-    </if>
-    <if test="treatmentMethod!=null and treatmentMethod!=''">
-      and treatment_method=#{treatmentMethod,jdbcType=INTEGER}
-    </if>
-    <if test="returnOrderType!=null and returnOrderType!=''">
-      and return_order_type=#{returnOrderType,jdbcType=INTEGER}
-    </if>
+      <if test="returnOrderStatus!=null">
+          and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
+      </if>
+      <if test="returnOrderCode!=null and returnOrderCode!=''">
+          and return_order_code=#{returnOrderCode,jdbcType=VARCHAR}
+      </if>
+      <if test="storeName!=null and storeName!=''">
+          and store_name=#{storeName,jdbcType=VARCHAR}
+      </if>
+      <if test="storeId!=null and storeId!=''">
+          and store_id=#{storeId,jdbcType=VARCHAR}
+      </if>
+      <if test="provinceId != null and provinceId!=''" >
+        and province_id = #{provinceId,jdbcType=VARCHAR}
+      </if>
+      <if test="provinceName != null and provinceName!=''" >
+        and province_name = #{provinceName,jdbcType=VARCHAR}
+      </if>
+      <if test="cityId != null and cityId!=''" >
+        and  city_id = #{cityId,jdbcType=VARCHAR}
+      </if>
+      <if test="cityName != null and cityName!=''" >
+        and  city_name = #{cityName,jdbcType=VARCHAR}
+      </if>
+      <if test="districtId != null and districtId!=''" >
+        and   district_id = #{districtId,jdbcType=VARCHAR}
+      </if>
+      <if test="districtName != null and districtName!=''" >
+        and  district_name = #{districtName,jdbcType=VARCHAR}
+      </if>
+      <if test="applyStartTime!=null and applyStartTime!=''">
+          and create_time &gt;= #{applyStartTime}
+      </if>
+      <if test="applyEndTime!=null and applyEndTime!=''">
+          and create_time &lt;= #{applyEndTime}
+      </if>
+      <if test="orderType!=null">
+          and order_type =#{orderType}
+      </if>
+      <if test="orderCategory!=null">
+          and order_category=#{orderCategory,jdbcType=INTEGER}
+      </if>
+      <if test="treatmentMethod!=null">
+          and treatment_method=#{treatmentMethod,jdbcType=INTEGER}
+      </if>
+      <if test="returnOrderType!=null">
+          and return_order_type=#{returnOrderType,jdbcType=INTEGER}
+      </if>
   </select>
 
   <!--通过条件查询退货单-->
@@ -1076,7 +1152,7 @@
   </select>
 
   <!--后台销售退货单管理列表（搜索）-->
-  <select id="selectAll" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.request.returnorder.AfterReturnOrderSearchVo" >
+  <select id="selectAll" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderQueryVo" >
     select
     <include refid="Base_Column_List" />
     from return_order_info
@@ -1108,6 +1184,12 @@
       <if test="orderType!=null">
         and order_type =#{orderType}
       </if>
+      <if test="transportCenterName!=null and transportCenterName!=''">
+        and transport_center_name =#{transportCenterName}
+      </if>
+      <if test="returnOrderType!=null">
+        and return_order_type =#{returnOrderType}
+      </if>
     </where>
     order by create_time desc
   </select>
@@ -1118,4 +1200,59 @@
     where return_order_code = #{returnOrderCode,jdbcType=VARCHAR}
   </select>
 
+  <select id="selectByParames" parameterType="com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo3" resultMap="BaseResultMap">
+    select * from return_order_info
+    <where>
+      <if test="returnOrderStatus!=null">
+        and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
+      </if>
+      <if test="returnOrderCode!=null and returnOrderCode!=''">
+        and return_order_code=#{returnOrderCode,jdbcType=VARCHAR}
+      </if>
+      <if test="orderStoreCode!=null and orderStoreCode!=''">
+        and order_store_code=#{orderStoreCode,jdbcType=VARCHAR}
+      </if>
+      <if test="beginTime!=null and beginTime!=''">
+        and create_time &gt;= #{beginTime}
+      </if>
+      <if test="finishTime!=null and finishTime!=''">
+        and create_time &lt;= #{finishTime}
+      </if>
+      <if test="customerName!=null and customerName!=''">
+        and customer_name =#{customerName}
+      </if>
+      <if test="transportCenterName!=null and transportCenterName!=''">
+        and transport_center_name =#{transportCenterName}
+      </if>
+      <if test="warehouseName!=null and warehouseName!=''">
+        and warehouse_name =#{warehouseName}
+      </if>
+      <if test="companyCode!=null and companyCode!=''">
+        and company_code =#{companyCode}
+      </if>
+    </where>
+  </select>
+  <update id="updateOrderSuccess">
+    update return_order_info
+    set
+    order_success = #{orderSuccess}
+    where return_order_code = #{returnOrderCode}
+  </update>
+
+  <!---->
+  <select id="selectByOrderCodeAndSuccess" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from return_order_info
+    where
+      return_order_code = #{returnOrderCode} and order_success = #{orderSuccess}
+  </select>
+
+  <select id="selectByOrderSuccess" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from return_order_info
+    where
+      order_success = #{orderSuccess}
+  </select>
 </mapper>

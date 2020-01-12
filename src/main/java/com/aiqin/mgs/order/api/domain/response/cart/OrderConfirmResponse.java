@@ -1,6 +1,8 @@
 package com.aiqin.mgs.order.api.domain.response.cart;
 
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -26,5 +28,15 @@ public class OrderConfirmResponse {
 
     /**应付金额总和*/
     private BigDecimal acountTotalprice;
+
+    /**是否有A类商品 0否  1是*/
+    @ApiModelProperty(value = "是否有A类商品 0否  1是")
+    @JsonProperty("have_product_A")
+    private Integer haveProductA;
+
+    /**A类商品金额总和*/
+    @ApiModelProperty(value = "商品id")
+    @JsonProperty("price_product_A")
+    private BigDecimal priceProductA;
 
 }

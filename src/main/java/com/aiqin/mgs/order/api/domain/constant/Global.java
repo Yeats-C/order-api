@@ -58,7 +58,7 @@ public interface Global {
     Integer ORDER_STATUS_4 = 4;  //已取消
     Integer ORDER_STATUS_5 = 5;  //已完成
     Integer ORDER_STATUS_6 = 6;  //已提货
-    
+    Integer ORDER_STATUS_7 = 7;  //退款完成
     
 //    /**
 //     * 退货状态
@@ -237,10 +237,11 @@ public interface Global {
     Integer DISTRIBUTION_TYPE_2 = 2;
     Integer DISTRIBUTION_TYPE_3 = 3;
 
-    //1:勾选 0:未勾选 2:全选
+    //1:勾选 0:未勾选 2:全选  3：全部取消
     Integer LINECHECKSTATUS_0 = 0;
     Integer LINECHECKSTATUS_1 = 1;
     Integer LINECHECKSTATUS_2 = 2;
+    Integer LINECHECKSTATUS_3 = 3;
 
     //1:门店 2:erp
     Integer CREATESOURCE_1 = 1;
@@ -295,4 +296,26 @@ public interface Global {
     Integer STORE_STATUS_1 = 1;
     Integer STORE_STATUS_2 = 2;
     Integer STORE_STATUS_3 = 3;
+
+    /**
+     * 支付业务类型
+     */
+    //正常销售订单
+    Integer PAY_ORDER_TYPE_0=0;
+    //预存订单
+    Integer PAY_ORDER_TYPE_1=1;
+    //客户储值
+    Integer PAY_ORDER_TYPE_2=2;
+    //服务订单购买
+    Integer PAY_ORDER_TYPE_3=3;
+    //服务订单划次
+    Integer PAY_ORDER_TYPE_4=4;
+    //正常销售单退款
+    Integer PAY_ORDER_TYPE_5=5;
+    //预存订单退款
+    Integer PAY_ORDER_TYPE_6=6;
+    //服务订单退款
+    Integer PAY_ORDER_TYPE_7=7;
+
+
 }

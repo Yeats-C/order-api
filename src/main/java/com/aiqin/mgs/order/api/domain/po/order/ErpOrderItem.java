@@ -29,7 +29,7 @@ public class ErpOrderItem {
     private String orderInfoDetailId;
 
     @ApiModelProperty(value = "订单id")
-    @JsonProperty("order_store_sd")
+    @JsonProperty("order_store_id")
     private String orderStoreId;
 
     @ApiModelProperty(value = "订单号")
@@ -183,6 +183,14 @@ public class ErpOrderItem {
     @ApiModelProperty(value = "签收数量差异原因")
     @JsonProperty("sign_difference_reason")
     private String signDifferenceReason;
+
+    @ApiModelProperty(value = "单个商品毛重(kg)")
+    @JsonProperty("box_gross_weight")
+    private BigDecimal boxGrossWeight;
+
+    @ApiModelProperty(value = "单个商品包装体积(mm³)")
+    @JsonProperty("box_volume")
+    private BigDecimal boxVolume;
 
     @ApiModelProperty(value = "0. 启用   1.禁用")
     @JsonProperty("use_status")

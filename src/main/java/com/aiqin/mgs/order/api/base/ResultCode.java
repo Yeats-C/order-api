@@ -27,6 +27,16 @@ public interface ResultCode {
     
     MessageId NET_EXCEPTION = MessageId.create(Project.ORDER_API, 15, "网络异常");
 
+    MessageId NOT_FOUND_ORDER_DATA = MessageId.create(Project.ORDER_API, 16, "此单号有误，未查到订单数据");
+    MessageId STORE_REQUEST_FALL = MessageId.create(Project.ORDER_API, 17, "发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存失败");
+    MessageId NOT_FOUND_RETURN_ORDER_DATA = MessageId.create(Project.ORDER_API, 17, "此单号有误，未查到退货单数据");
+    MessageId NO_FOUND_REJECT_ERROR = MessageId.create(Project.ORDER_API, 18, "未查询到对应退供单信息");
+    MessageId NOT_FOUND_REJECT_RECORD_DATA = MessageId.create(Project.ORDER_API, 19, "此单号有误，未查到退供单数据");
+    MessageId RETURN_ORDER_CANCEL_FALL = MessageId.create(Project.ORDER_API, 20, "此退货单撤销失败，撤销单已退货完成，正在发起退款");
+    MessageId RETURN_ORDER_STATUS_NOT_FOUND = MessageId.create(Project.ORDER_API, 21, "此退货单审核失败，传入的审核状态有误");
+    MessageId RETURN_ORDER_SYNCHRONIZATION_FALL = MessageId.create(Project.ORDER_API, 22, "此退货单审核失败，erp同步供应链，生成退供单失败");
+    MessageId RETURN_ORDER_PARAMETER_FALL = MessageId.create(Project.ORDER_API, 23, "退货单详情修改失败,请输入退货单号或详情");
+
     MessageId OVER_LIMIT = MessageId.create(Project.PRODUCT_API,20,"订购商品不能超过999");
     MessageId STORE_SHORT = MessageId.create(Project.PRODUCT_API,21,"库存不足");
     MessageId STOCK_SHORT1 = MessageId.create(Project.PRODUCT_API,22,"库存紧张");
@@ -83,8 +93,12 @@ public interface ResultCode {
 
     MessageId RETURN_PRE_AMOUNT_ERROR = MessageId.create(Project.PAYMENT_API, 5, "退货金额计算失败--订单中分摊后单价为null");
 
-    MessageId RETURN_TOTAL_AMOUNT_ERROR = MessageId.create(Project.PAYMENT_API, 5, "退货金额计算失败--优惠分摊总金额为null");
+    MessageId RETURN_TOTAL_AMOUNT_ERROR = MessageId.create(Project.PAYMENT_API, 6, "退货金额计算失败--优惠分摊总金额为null");
+
 
     
     /** 黄祉壹   2018-11-05 结束     */
+
+
+
 }

@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.response.order;
 
+import com.aiqin.mgs.order.api.domain.FranchiseeInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
@@ -13,4 +14,8 @@ public class StoreFranchiseeInfoResponse {
     @ApiModelProperty(value="门店信息")
     @JsonProperty("store_info")
     private StoreInfo storeInfo;
+
+    @ApiModelProperty(value="加盟商信息")
+    @JsonProperty("franchisee_info")
+    private FranchiseeInfo franchiseeInfo;
 }

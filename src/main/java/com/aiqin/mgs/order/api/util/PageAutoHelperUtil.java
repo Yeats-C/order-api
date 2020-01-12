@@ -31,7 +31,7 @@ public class PageAutoHelperUtil {
         if (page == null) {
             page = new PagesRequest();
         }
-        int pageNum = page.getBeginIndex();
+        int pageNum = page.getPageNo();
         int pageSize = page.getPageSize();
         PageHelper.startPage(pageNum, pageSize);
         List list = supplier.get();
@@ -52,7 +52,7 @@ public class PageAutoHelperUtil {
         if (page == null) {
             page = new PagesRequest();
         }
-        int pageNum = page.getBeginIndex();
+        int pageNum = page.getPageNo();
         int pageSize = page.getPageSize();
         PageHelper.startPage(pageNum, pageSize);
         List list = supplier.get();

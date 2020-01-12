@@ -7,20 +7,23 @@ import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
+import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.aiqin.mgs.order.api.domain.dto.ProductDistributorOrderDTO;
 import com.aiqin.mgs.order.api.domain.request.OperateStockVo;
+import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
 import com.aiqin.mgs.order.api.domain.response.NewFranchiseeResponse;
-import com.aiqin.mgs.order.api.domain.response.order.StoreFranchiseeInfoResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Createed by sunx on 2019/4/8.<br/>
@@ -58,27 +61,28 @@ public class BridgeProductService {
 
     /**
      * 获取商品信息
-     * @param shoppingCartRequest
+     * @param shoppingCartProductRequest
      * @return
      */
-    public HttpResponse<List<CartOrderInfo>> getProduct(ShoppingCartRequest shoppingCartRequest){
-        String path = "/product/productInfo";
-        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartRequest);
-        HttpResponse<List<CartOrderInfo>> response = httpClient.action().result(new TypeReference<HttpResponse<CartOrderInfo>>() {
+    public HttpResponse<List<CartOrderInfo>> getProduct(ShoppingCartProductRequest shoppingCartProductRequest){
+        shoppingCartProductRequest.setCompanyCode("14");
+        String path = "/search/spu/sku/detail2";
+        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest);
+        HttpResponse<List<CartOrderInfo>> response = httpClient.action().result(new TypeReference<HttpResponse<List<CartOrderInfo>>>() {
         });
-        //测试接口
-        HttpResponse<List<CartOrderInfo>> cartOrderInfoHttpResponse = new HttpResponse<>();
-        CartOrderInfo data = new CartOrderInfo();
-        data.setProductId("12345");
-        data.setStoreId("12345");
-        data.setSkuCode("12345");
-        data.setAmount(20);
-        data.setPrice(BigDecimal.valueOf(29.10));
-        data.setProductType(1);
-        ArrayList<CartOrderInfo> list = new ArrayList<>();
-        list.add(data);
-        cartOrderInfoHttpResponse.setData(list);
-        return cartOrderInfoHttpResponse;
+//        //测试接口
+//        HttpResponse<List<CartOrderInfo>> cartOrderInfoHttpResponse = new HttpResponse<>();
+//        CartOrderInfo data = new CartOrderInfo();
+//        data.setProductId("12345");
+//        data.setStoreId("12345");
+//        data.setSkuCode("12345");
+//        data.setAmount(20);
+//        data.setPrice(BigDecimal.valueOf(29.10));
+//        data.setProductType(1);
+//        ArrayList<CartOrderInfo> list = new ArrayList<>();
+//        list.add(data);
+//        cartOrderInfoHttpResponse.setData(list);
+        return response;
     }
 
 
@@ -87,23 +91,23 @@ public class BridgeProductService {
      * @param shoppingCartRequest
      * @return
      */
-    public HttpResponse<CartOrderInfo> getStoreInfo(ShoppingCartRequest shoppingCartRequest){
+    public HttpResponse<StoreInfo> getStoreInfo(ShoppingCartRequest shoppingCartRequest){
 
-//        String path = "/store/getStoreInfo";
-//        StringBuilder codeUrl = new StringBuilder();
-//        codeUrl.append(urlProperties.getSlcsApi()).append(path);
-//        HttpClient httpGet = HttpClient.get(codeUrl.toString() + "?store_id=" + shoppingCartRequest.getStoreId());
-//        httpGet.action().status();
-//        HttpResponse result = httpGet.action().result(new TypeReference<HttpResponse<CartOrderInfo>>() {
-//        });
+        String path = "/store/getStoreInfo";
+        StringBuilder codeUrl = new StringBuilder();
+        codeUrl.append(urlProperties.getSlcsApi()).append(path);
+        HttpClient httpGet = HttpClient.get(codeUrl.toString() + "?store_id=" + shoppingCartRequest.getStoreId());
+        httpGet.action().status();
+        HttpResponse result = httpGet.action().result(new TypeReference<HttpResponse<StoreInfo>>() {
+        });
 
-        HttpResponse<CartOrderInfo> cartOrderInfoHttpResponse = new HttpResponse<>();
-        CartOrderInfo data = new CartOrderInfo();
-        data.setAddress("北京市海淀区海淀南路35号");
-        data.setContacts("胡金英");
-        data.setContactsPhone("18513854421");
-        cartOrderInfoHttpResponse.setData(data);
-        return cartOrderInfoHttpResponse;
+//        HttpResponse<CartOrderInfo> cartOrderInfoHttpResponse = new HttpResponse<>();
+//        CartOrderInfo data = new CartOrderInfo();
+//        data.setAddress("北京市海淀区海淀南路35号");
+//        data.setContacts("胡金英");
+//        data.setContactsPhone("18513854421");
+//        cartOrderInfoHttpResponse.setData(data);
+        return result;
     }
 
     public NewFranchiseeResponse getStoreFranchiseeData(String distributorId) {

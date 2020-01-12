@@ -133,18 +133,18 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 			
 			//生成订单售后编号
 			String logo = "";
-			if(orderAfterSaleInfo.getOriginType() == Global.ORIGIN_TYPE_0) {
+			if(orderAfterSaleInfo.getOriginType().intValue()==Global.ORIGIN_TYPE_0.intValue()) {
 				logo = Global.ORIGIN_COME_3;
 			}
-			if(orderAfterSaleInfo.getOriginType() == Global.ORIGIN_TYPE_1) {
+			if(orderAfterSaleInfo.getOriginType().intValue() == Global.ORIGIN_TYPE_1.intValue()) {
 				logo = Global.ORIGIN_COME_4;
 			}
-			if(orderAfterSaleInfo.getOriginType() == Global.ORIGIN_TYPE_3) {
+			if(orderAfterSaleInfo.getOriginType().intValue() == Global.ORIGIN_TYPE_3.intValue()) {
 				logo = Global.ORIGIN_COME_5;
 			}
 			afterSaleCode = DateUtil.sysDate()+logo+String.valueOf(Global.ORDERID_CHANNEL_4)+OrderPublic.randomNumberF();
 			orderAfterSaleInfo.setAfterSaleCode(afterSaleCode);
-			
+
 			//保存订单售后
 			orderAfterDao.addAfterOrder(orderAfterSaleInfo);
 
@@ -207,7 +207,7 @@ public class OrderServiceAfterImpl implements OrderAfterService{
             //退款成功修改退款状态
             orderAfterSaleInfo.setRefundStatus(1);
             orderAfterDao.updateRefundStatus(orderAfterSaleInfo);
-			return HttpResponse.success(after_sale_code);
+			return HttpResponse.success(orderAfterSaleInfo);
 		
 
 	}
@@ -229,7 +229,28 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 		payReq.setPayOrderType(orderAfterSaleInfo.getOrderType());
 		payReq.setRefundType(orderAfterSaleInfo.getReturnMoneyType());
 		payReq.setUpdateBy(orderAfterSaleInfo.getCreateByName());
+        payReq.setFranchiseeId(orderAfterSaleInfo.getFranchiseeId());
+        payReq.setRefundType(orderAfterSaleInfo.getReturnMoneyType());
+		payReq.setBusinessType(choseAfterType(orderAfterSaleInfo.getOrderType()));
 		bridgePayService.toRefund(payReq);
+	}
+
+	/**
+	 * 获取售后业务类型
+	 * @param orderType
+	 * @return
+	 */
+	private Integer choseAfterType(Integer orderType) {
+		if (orderType==null){
+			return Global.PAY_ORDER_TYPE_5;
+		}
+		if (orderType==3){
+			return Global.PAY_ORDER_TYPE_7;
+		}
+		if (orderType==4){
+			return Global.PAY_ORDER_TYPE_6;
+		}
+		return Global.PAY_ORDER_TYPE_5;
 	}
 
 

@@ -4,11 +4,8 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 
-import java.math.BigDecimal;
-import java.util.List;
 
 /**
  * description: ReturnOrderInfoService
@@ -24,28 +21,21 @@ public interface ReturnOrderInfoService {
      * @param reqVo
      * @return
      */
-    Boolean save(ReturnOrderReqVo reqVo);
-
-    /**
-     * 退货单列表
-     * @param searchVo
-     * @return
-     */
-//    PageResData<ReturnOrderListVo> list(OrderAfterSaleSearchVo searchVo);
+    HttpResponse save(ReturnOrderReqVo reqVo);
 
     /**
      * 审核操作-erp使用
      * @param reqVo
      * @return
      */
-    Boolean updateReturnStatus(ReturnOrderReviewReqVo reqVo);
+    HttpResponse updateReturnStatus(ReturnOrderReviewReqVo reqVo);
 
     /**
      * 修改退货单详情
      * @param records
      * @return
      */
-    Boolean updateOrderAfterSaleDetail(ReturnOrderDetailVO records);
+    HttpResponse updateReturnOrderDetail(ReturnOrderDetailVO records);
 
     /**
      * 提供给供应链--退货单状态修改
@@ -53,6 +43,13 @@ public interface ReturnOrderInfoService {
      * @return
      */
     Boolean updateReturnStatusApi(ReturnOrderReviewApiReqVo reqVo);
+
+    /**
+     * 提供给供应链--同步是否成功（创建退供单）修改
+     * @param returnOrderCode
+     * @return
+     */
+    Boolean updateOrderSuccessApi(String returnOrderCode);
 
     /**
      * 退货单校验--查看此订单是否已经生成一条退货单，且流程未结束。如果已存在返回true
@@ -107,5 +104,40 @@ public interface ReturnOrderInfoService {
      * @return
      */
     HttpResponse getReturnStatus();
+
+    /**
+     * 退货单列表--查看附件
+     * @param returnOrderDetailId
+     * @return
+     */
+    HttpResponse getEvidenceUrl(String returnOrderDetailId);
+
+    /**
+     * 发起冲减单并发起退款---订单使用
+     * @param orderCode
+     * @return
+     */
+    HttpResponse saveWriteDownOrder(String orderCode);
+
+    /**
+     *售后管理--冲减单列表
+     * @param searchVo
+     * @return
+     */
+    PageResData<ReturnOrderInfo> getWriteDownOrderList(PageRequestVO<WriteDownOrderSearchVo> searchVo);
+
+    /**
+     * 根据退货单号查询支付状态 支付成功返回true
+     * @param orderCode
+     * @return
+     */
+    boolean searchPayOrder(String orderCode);
+
+    /**
+     * 客户取消订单---订单使用
+     * @param orderCode
+     * @return
+     */
+    HttpResponse saveCancelOrder(String orderCode);
 
 }

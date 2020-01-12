@@ -15,19 +15,19 @@
     <result column="color_code" jdbcType="VARCHAR" property="colorCode" />
     <result column="color_name" jdbcType="VARCHAR" property="colorName" />
     <result column="model_code" jdbcType="VARCHAR" property="modelCode" />
-    <result column="product_type" jdbcType="BIT" property="productType" />
+    <result column="product_type" jdbcType="INTEGER" property="productType" />
     <result column="product_count" jdbcType="BIGINT" property="productCount" />
     <result column="unit_code" jdbcType="VARCHAR" property="unitCode" />
     <result column="unit_name" jdbcType="VARCHAR" property="unitName" />
     <result column="tax_rate" jdbcType="DECIMAL" property="taxRate" />
-    <result column="line_code" jdbcType="VARCHAR" property="lineCode" />
+    <result column="line_code" jdbcType="BIGINT" property="lineCode" />
     <result column="factory_sku_code" jdbcType="VARCHAR" property="factorySkuCode" />
     <result column="tax_amount" jdbcType="DECIMAL" property="taxAmount" />
     <result column="total_tax_amount" jdbcType="DECIMAL" property="totalTaxAmount" />
     <result column="total_count" jdbcType="BIGINT" property="totalCount" />
     <result column="actual_total_count" jdbcType="BIGINT" property="actualTotalCount" />
     <result column="actual_total_tax_amount" jdbcType="DECIMAL" property="actualTotalTaxAmount" />
-    <result column="use_status" jdbcType="BIT" property="useStatus" />
+    <result column="use_status" jdbcType="INTEGER" property="useStatus" />
     <result column="create_by_id" jdbcType="VARCHAR" property="createById" />
     <result column="create_by_name" jdbcType="VARCHAR" property="createByName" />
     <result column="update_by_id" jdbcType="VARCHAR" property="updateById" />
@@ -70,11 +70,11 @@
       #{skuCode,jdbcType=VARCHAR}, #{skuName,jdbcType=VARCHAR}, #{brandCode,jdbcType=VARCHAR}, 
       #{brandName,jdbcType=VARCHAR}, #{categoryCode,jdbcType=VARCHAR}, #{categoryName,jdbcType=VARCHAR}, 
       #{productSpec,jdbcType=VARCHAR}, #{colorCode,jdbcType=VARCHAR}, #{colorName,jdbcType=VARCHAR}, 
-      #{modelCode,jdbcType=VARCHAR}, #{productType,jdbcType=BIT}, #{productCount,jdbcType=BIGINT}, 
+      #{modelCode,jdbcType=VARCHAR}, #{productType,jdbcType=INTEGER}, #{productCount,jdbcType=BIGINT},
       #{unitCode,jdbcType=VARCHAR}, #{unitName,jdbcType=VARCHAR}, #{taxRate,jdbcType=DECIMAL}, 
-      #{lineCode,jdbcType=VARCHAR}, #{factorySkuCode,jdbcType=VARCHAR}, #{taxAmount,jdbcType=DECIMAL}, 
+      #{lineCode,jdbcType=BIGINT}, #{factorySkuCode,jdbcType=VARCHAR}, #{taxAmount,jdbcType=DECIMAL},
       #{totalTaxAmount,jdbcType=DECIMAL}, #{totalCount,jdbcType=BIGINT}, #{actualTotalCount,jdbcType=BIGINT}, 
-      #{actualTotalTaxAmount,jdbcType=DECIMAL}, #{useStatus,jdbcType=BIT}, #{createById,jdbcType=VARCHAR}, 
+      #{actualTotalTaxAmount,jdbcType=DECIMAL}, #{useStatus,jdbcType=INTEGER}, #{createById,jdbcType=VARCHAR},
       #{createByName,jdbcType=VARCHAR}, #{updateById,jdbcType=VARCHAR}, #{updateByName,jdbcType=VARCHAR}, 
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
     </foreach>
@@ -214,7 +214,7 @@
         #{modelCode,jdbcType=VARCHAR},
       </if>
       <if test="productType != null">
-        #{productType,jdbcType=BIT},
+        #{productType,jdbcType=INTEGER},
       </if>
       <if test="productCount != null">
         #{productCount,jdbcType=BIGINT},
@@ -229,7 +229,7 @@
         #{taxRate,jdbcType=DECIMAL},
       </if>
       <if test="lineCode != null">
-        #{lineCode,jdbcType=VARCHAR},
+        #{lineCode,jdbcType=BIGINT},
       </if>
       <if test="factorySkuCode != null">
         #{factorySkuCode,jdbcType=VARCHAR},
@@ -250,7 +250,7 @@
         #{actualTotalTaxAmount,jdbcType=DECIMAL},
       </if>
       <if test="useStatus != null">
-        #{useStatus,jdbcType=BIT},
+        #{useStatus,jdbcType=INTEGER},
       </if>
       <if test="createById != null">
         #{createById,jdbcType=VARCHAR},
@@ -312,7 +312,7 @@
         model_code = #{modelCode,jdbcType=VARCHAR},
       </if>
       <if test="productType != null">
-        product_type = #{productType,jdbcType=BIT},
+        product_type = #{productType,jdbcType=INTEGER},
       </if>
       <if test="productCount != null">
         product_count = #{productCount,jdbcType=BIGINT},
@@ -327,7 +327,7 @@
         tax_rate = #{taxRate,jdbcType=DECIMAL},
       </if>
       <if test="lineCode != null">
-        line_code = #{lineCode,jdbcType=VARCHAR},
+        line_code = #{lineCode,jdbcType=BIGINT},
       </if>
       <if test="factorySkuCode != null">
         factory_sku_code = #{factorySkuCode,jdbcType=VARCHAR},
@@ -348,7 +348,7 @@
         actual_total_tax_amount = #{actualTotalTaxAmount,jdbcType=DECIMAL},
       </if>
       <if test="useStatus != null">
-        use_status = #{useStatus,jdbcType=BIT},
+        use_status = #{useStatus,jdbcType=INTEGER},
       </if>
       <if test="createById != null">
         create_by_id = #{createById,jdbcType=VARCHAR},
@@ -385,25 +385,34 @@
       color_code = #{colorCode,jdbcType=VARCHAR},
       color_name = #{colorName,jdbcType=VARCHAR},
       model_code = #{modelCode,jdbcType=VARCHAR},
-      product_type = #{productType,jdbcType=BIT},
+      product_type = #{productType,jdbcType=INTEGER},
       product_count = #{productCount,jdbcType=BIGINT},
       unit_code = #{unitCode,jdbcType=VARCHAR},
       unit_name = #{unitName,jdbcType=VARCHAR},
       tax_rate = #{taxRate,jdbcType=DECIMAL},
-      line_code = #{lineCode,jdbcType=VARCHAR},
+      line_code = #{lineCode,jdbcType=BIGINT},
       factory_sku_code = #{factorySkuCode,jdbcType=VARCHAR},
       tax_amount = #{taxAmount,jdbcType=DECIMAL},
       total_tax_amount = #{totalTaxAmount,jdbcType=DECIMAL},
       total_count = #{totalCount,jdbcType=BIGINT},
       actual_total_count = #{actualTotalCount,jdbcType=BIGINT},
       actual_total_tax_amount = #{actualTotalTaxAmount,jdbcType=DECIMAL},
-      use_status = #{useStatus,jdbcType=BIT},
+      use_status = #{useStatus,jdbcType=INTEGER},
       create_by_id = #{createById,jdbcType=VARCHAR},
       create_by_name = #{createByName,jdbcType=VARCHAR},
       update_by_id = #{updateById,jdbcType=VARCHAR},
       update_by_name = #{updateByName,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP}
-    where id = #{id,jdbcType=BIGINT}
+    where reject_record_code = #{rejectRecordCode,jdbcType=VARCHAR}
   </update>
+  <select id="selectByRejectRecordCode" resultMap="BaseResultMap">
+    select * from
+    reject_record_detail
+    <where>
+      <if test="rejectRecordCode!=null and rejectRecordCode!=''">
+        and reject_record_code=#{rejectRecordCode,jdbcType=VARCHAR}
+      </if>
+    </where>
+  </select>
 </mapper>

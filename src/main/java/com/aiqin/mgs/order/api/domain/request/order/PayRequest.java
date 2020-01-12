@@ -91,15 +91,23 @@ public class PayRequest implements Serializable {
     @NotEmpty(message = "门店id不能为空")
     private String storeId;
 
-    @ApiModelProperty("交易类型：STORE_WITHDRAWAL 门店提现 " +
-            "STORE_ORDER 门店订货 ACCOUNT_FREEZING 账户冻结 " +
-            "FINANCIAL_TRANSFER_OUT 财务转出 " +
-            "FINANCIAL_CREDIT_CANCELLATION 财务取消授信 " +
-            "STORE_RECHARGE 门店充值 RETURN_REFUND 退货退款 " +
-            "REFUND_ONLY 仅退款 STORE_CANCEL_ORDER 门店取消订单 " +
-            "DELIVER_GOODS_DEDUCT 发货冲减 OUT_OF_STOCK_CANCELLATION 缺货取消 " +
-            "ACCOUNT_UNFREEZING 账户解冻 FINANCIAL_TRANSFER_IN 财务转入 " +
-            "FINANCIAL_CREDIT 财务授信 LOGISTICS_PAYMENT 物流费支付")
+    @ApiModelProperty("业务类型：STORE_WITHDRAWAL 门店提现 " +
+            " DELIVERY_REPLENISHMENT 配送补货 " +
+            " DIRECT_DELIVERY_REPLENISHMENT 直送补货 " +
+            " ACCOUNT_FREEZING 账户冻结 " +
+            " FINANCIAL_TRANSFER_OUT 财务转出 " +
+            " FINANCIAL_CREDIT_CANCELLATION 财务取消授信 " +
+            " LOGISTICS_PAYMENT 物流费支付 " +
+            " FIRST_DELIVERY 首单配送 " +
+            " FIRST_DIRECT_DELIVERY 首单直送 " +
+            " ONLINE_RECHARGE 在线充值 " +
+            " AFTER_SALE_RETURNS 售后退货 " +
+            " STORE_CANCEL_ORDER 门店取消订单 " +
+            " DELIVER_GOODS_DEDUCT 发货冲减 " +
+            " OUT_OF_STOCK_CANCELLATION 缺货取消 " +
+            " ACCOUNT_UNFREEZING 账户解冻 " +
+            " FINANCIAL_TRANSFER_IN 财务转入 " +
+            " FINANCIAL_CREDIT 财务授信")
     private String transactionType;
 
     @ApiModelProperty("订单类型 14配送tob 2直送tob")
@@ -110,5 +118,28 @@ public class PayRequest implements Serializable {
     @ApiModelProperty("回调地址")
     @JsonProperty("back_url")
     private String backUrl;
+
+    /**************支付物流费用所需参数******************/
+    @ApiModelProperty("物流券支付金额--支付物流所需参数")
+    private Long couponPaymentAmount;
+
+    @ApiModelProperty("物流公司名称--支付物流所需参数")
+    private String logisticsCompany;
+
+    @ApiModelProperty("物流支付人--支付物流所需参数")
+    private String paymentFreightName;
+
+    @ApiModelProperty("订单号--支付物流所需参数")
+    private String relationOrderCode;
+
+    @ApiModelProperty("物流支付时间--支付物流所需参数")
+    private String paymentFreightTime;
+
+    @ApiModelProperty("门店编码--支付物流所需参数")
+    private String storeCode;
+
+    @ApiModelProperty("物流支付金额--支付物流所需参数")
+    private Long paymentFreightAmount;
+    /**************支付物流费用所需参数******************/
 
 }

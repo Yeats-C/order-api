@@ -23,4 +23,12 @@ public class OrderConstant {
     /***默认公司名称*/
     public static final String DEFAULT_COMPANY_NAME = "北京爱亲科技股份有限公司";
 
+    /***门店营业状态 待配架*/
+    public static final String OPEN_STATUS_CODE_17 = "010104";
+    /***门店营业状态 待首单*/
+    public static final String OPEN_STATUS_CODE_18 = "010105";
+
+    /***到供应链查询商品传的公司编码*/
+    public static final String SELECT_PRODUCT_COMPANY_CODE = "14";
+
 }

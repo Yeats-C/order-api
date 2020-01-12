@@ -122,6 +122,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderAfterService orderAfterService;
     @Resource
     private CashierShiftScheduleDao cashierShiftScheduleDao;
+
+
     //商品项目地址
     @Value("${slcsIp}")
     public String slcsIp;
@@ -154,6 +156,12 @@ public class OrderServiceImpl implements OrderService {
                     OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
                     orderDetailQuery.setOrderId(info.getOrderId());
                     List<OrderDetailInfo> detailList = orderDetailDao.selectDetailById(orderDetailQuery);
+                    //未付款的支付金额为空
+                    if (info.getOrderStatus()==0){
+                        info.setActualPrice(0);
+                        info.setPayType(null);
+
+                    }
                     info.setOrderdetailList(detailList);
 
                     //特殊处理   (前端控制退货按钮使用字段:1:订单已全数退完)
@@ -216,6 +224,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public HttpResponse prestorageOut(PrestorageOutInfo prestorageOutVo) {
+        boolean isUpdate=false;
         //查询
         PrestorageOrderSupplyDetail prestorageOrderSupplyDetail = prestorageOrderSupplyDetailDao.selectprestorageorderDetailsById(prestorageOutVo.getPrestorageOrderSupplyDetailId());
         //判断可取数量
@@ -236,12 +245,38 @@ public class OrderServiceImpl implements OrderService {
             prestorageOrderSupplyLogsDao.addLogs(prestorageOrderSupplyLogs);
 
         }
-        if (prestorageOrderSupplyDetail != null && prestorageOrderSupplyDetail.getAmount() - prestorageOrderSupplyDetail.getSupplyAmount() == prestorageOutVo.getAmount()) {
+        //购买数量<=已提货数量+未提货的退货数量
+        if (prestorageOrderSupplyDetail != null && prestorageOrderSupplyDetail.getAmount() <=prestorageOrderSupplyDetail.getSupplyAmount() + prestorageOrderSupplyDetail.getReturnPrestorageAmount()) {
             //修改状态
-            prestorageOrderSupplyDetail.setPrestorageOrderSupplyStatus(Global.ORDER_STATUS_5);
+            prestorageOrderSupplyDetail.setPrestorageOrderSupplyStatus(Global.ORDER_STATUS_6);
             prestorageOrderSupplyDetailDao.updateById(prestorageOrderSupplyDetail);
-            updateprestorageOrderSupplyStatus(prestorageOrderSupplyDetail.getPrestorageOrderSupplyId());
-
+           // updateprestorageOrderSupplyStatus(prestorageOrderSupplyDetail.getPrestorageOrderSupplyId());
+            isUpdate=true;
+        }
+        //修改订单状态
+        if(isUpdate){
+            boolean stateUpdate=true;
+            List<PrestorageOrderSupplyDetail> prestorageOrderSupplyDetails=prestorageOrderSupplyDetailDao.selectprestorageorderDetailsListByOrderId(prestorageOrderSupplyDetail.getOrderId());
+            for (PrestorageOrderSupplyDetail prestorageOrderSupplyDetail1:prestorageOrderSupplyDetails){
+                if (prestorageOrderSupplyDetail1.getPrestorageOrderSupplyStatus()==2){
+                    stateUpdate=false;
+                }
+            }
+            if (stateUpdate){
+                PrestorageOrderSupply prestorageOrderSupply=new PrestorageOrderSupply();
+                prestorageOrderSupply.setPrestorageOrderSupplyStatus(Global.ORDER_STATUS_6);
+                prestorageOrderSupply.setPrestorageOrderSupplyId(prestorageOrderSupplyDetail.getPrestorageOrderSupplyId());
+                prestorageOrderSupply.setUpdateBy(prestorageOrderSupplyDetail.getUpdateBy());
+                prestorageOrderSupplyDao.updateById(prestorageOrderSupply);
+                OrderInfo orderInfo=new OrderInfo();
+                orderInfo.setOrderStatus(Global.ORDER_STATUS_6);
+                orderInfo.setOrderId(prestorageOrderSupplyDetail.getOrderId());
+                try {
+                    orderDao.updateOrder(orderInfo);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
 
@@ -259,7 +294,17 @@ public class OrderServiceImpl implements OrderService {
                 orderInfo = (OrderodrInfo) response.getData();
             }
 
+
+
             if (Objects.nonNull(orderInfo)) {
+                log.info("------------------------------------------------------orderInfo："+ orderInfo.getDetailList());
+                log.info("------------------------------------------------------防止多次处理start" );
+                //防止多次处理
+                if (orderInfo.getOrderInfo().getPayStatus().equals(PayStatusEnum.HAS_PAY.getCode())){
+                    log.info("------------------------------------------------------防止多次处理ing" );
+                    return HttpResponse.success();
+                }
+                log.info("------------------------------------------------------防止多次处理end" );
                 //Toc 订单
                 if (orderInfo.getOrderInfo().getOrderType() == 1||orderInfo.getOrderInfo().getOrderType() == 4) {
                     orderInfo.getOrderInfo().setPayType(String.valueOf(vo.getPayType()));
@@ -295,8 +340,10 @@ public class OrderServiceImpl implements OrderService {
                 changeProductStock(orderInfo);
             } else {
                 //预存订单提出记录初始化
+                log.info("预存订单提出记录初始化{}", "===========" + orderInfo.getDetailList().toString());
                 createPrestorageOrder(orderInfo);
             }
+
 
             return HttpResponse.success();
         } catch (Exception e) {
@@ -320,7 +367,7 @@ public class OrderServiceImpl implements OrderService {
             //设置不可退货状态
             if (one.getOrderStatus().equals(Global.ORDER_STATUS_0)){
                 one.setTurnReturnView(1);
-            }else if(one.getOrderStatus().equals(Global.ORDER_STATUS_5)){
+            }else if(one.getOrderStatus().equals(Global.ORDER_STATUS_5)||one.getOrderStatus().equals(Global.ORDER_STATUS_6)){
                 //设置不可退货状态：
                 //可退货 ：已提货-已提货退货 >0
                 List<PrestorageOrderSupplyDetail> p=   prestorageOrderSupplyDetailDao.selectPrestorageOrderDetailByOrderId(one.getOrderId());
@@ -331,6 +378,11 @@ public class OrderServiceImpl implements OrderService {
                     }
                 }
 
+            }
+            //未付款的支付金额为0
+            if(one.getOrderStatus()==0){
+                one.setActualPrice(0L);
+                one.setPayType(null);
             }
 
         });
@@ -412,6 +464,14 @@ public class OrderServiceImpl implements OrderService {
         return HttpResponse.successGenerics(orderDao.querySaleSkuCount(skuCode,DateUtil.getBeforeDate(new Date(),day),storeId));
     }
 
+    @Override
+    public HttpResponse<Integer> orderStoreCount(OrderCountReq orderCountReq) {
+        //1）正常销售订单-已完成状态2）预存订单-未提货状态3）服务订单已完成
+       int count1= orderDao.orderPrestorageCount( orderCountReq.getStoreId(),  orderCountReq.getStartDay(),  orderCountReq.getEndDay());
+        int count2= orderDao.orderStoreCount( orderCountReq.getStoreId(),  orderCountReq.getStartDay(),  orderCountReq.getEndDay());
+        return HttpResponse.successGenerics(count1+count2);
+    }
+
     private OrderQuery trans(OrderQuery orderQuery) {
         if (orderQuery.getOrderStatus() != null) {
             if (orderQuery.getOrderStatus() == 2) {
@@ -480,7 +540,9 @@ public class OrderServiceImpl implements OrderService {
             stockVo.setStorageType(StorageTypeEnum.DOOR_STORE.getCode());
             /*stockVo.setStoragePosition(ReturnGoodsToStockEnum.DISPLAY_STOCK.getCode());*/
             stockVo.setProductSku(input.getSkuCode());
-            stockVo.setOperator("系统设置");
+            stockVo.setOperator(orderInfo.getOrderInfo().getCashierName());
+            stockVo.setCreateByName(orderInfo.getOrderInfo().getCashierName());
+            stockVo.setStoragePosition(1);
             stockVo.setReleaseStatus(ReleaseStatusEnum.RELEASE.getCode());
             stockVo.setRelateNumber(orderInfo.getOrderInfo().getOrderId());
             operateStockVos.add(stockVo);
@@ -1195,12 +1257,12 @@ public class OrderServiceImpl implements OrderService {
 
             if (reorerRequest != null) {
                 if (reorerRequest.getBeginTime() != null && !reorerRequest.getBeginTime().equals("")) {
-                    reorerRequest.setBeginTime(DateUtil.formatDateLong(DateUtil.getDayBegin(reorerRequest.getBeginTime())));
+                    String beginTimetime=reorerRequest.getBeginTime();
+                    reorerRequest.setBeginTime(DateUtil.formatDateLong(DateUtil.getDayBegin(beginTimetime)));
                     if (reorerRequest.getEndTime() == null || reorerRequest.getEndTime().equals("")) {
-                        reorerRequest.setEndTime(DateUtil.formatDateLong(DateUtil.getDayEnd(reorerRequest.getBeginTime())));
+                        reorerRequest.setEndTime(DateUtil.formatDateLong(DateUtil.getDayEnd(beginTimetime)));
                     }
-                }
-                if (reorerRequest.getEndTime() != null && !reorerRequest.getEndTime().equals("")) {
+                }else   if (reorerRequest.getEndTime() != null && !reorerRequest.getEndTime().equals("")) {
                     reorerRequest.setEndTime(DateUtil.formatDateLong(DateUtil.getDayEnd(reorerRequest.getEndTime())));
                 }
             }
@@ -1701,14 +1763,14 @@ public class OrderServiceImpl implements OrderService {
                     }
                     //删除订单明细数据
                     try {
-                        orderDetailDao.deleteOrderDetailInfo(orderInfo);
+                    //    orderDetailDao.deleteOrderDetailInfo(orderInfo);
                     } catch (Exception e) {
                         LOGGER.error("删除订单明细数据异常：{}", e);
                     }
                     //新增订单明细数据
                     if (detailList != null && detailList.size() > 0) {
                         try {
-                            detailList = orderDetailService.addDetailList(detailList, orderId, orderCode);
+                            detailList = orderDetailService.updateDetailList(detailList, orderId, orderCode);
                         } catch (Exception e) {
                             LOGGER.error("新增订单明细数据异常：{}", e);
                         }
@@ -1762,12 +1824,14 @@ public class OrderServiceImpl implements OrderService {
                     payReq.setCreateName(orderInfo.getCashierName());
                     payReq.setStoreName(orderInfo.getDistributorName());
                     payReq.setCreateBy(orderInfo.getCashierId());
-                    payReq.setFranchiseeId(orderInfo.getDistributorId());
+                    NewFranchiseeResponse newFranchiseeResponse=bridgeProductService.getStoreFranchiseeData(orderInfo.getDistributorId());
+                    payReq.setFranchiseeId(newFranchiseeResponse.getFranchiseeId());
                     payReq.setMemberPhone(orderInfo.getMemberPhone());
                     payReq.setMemberName(orderInfo.getMemberName());
                     payReq.setMemberId(orderInfo.getMemberId());
                     payReq.setStoreName(orderInfo.getDistributorName());
                     payReq.setBackUrl(urlProperties.getOrderApi() + "/order/back");
+                    payReq.setBusinessType(choseBusinessType(orderInfo.getOrderType()));
                     payService.doPay(payReq);
                 }
             }
@@ -1777,6 +1841,24 @@ public class OrderServiceImpl implements OrderService {
             LOGGER.error("添加新的订单主数据以及其他订单关联数据异常：{}", e);
             throw new RuntimeException("添加新的订单主数据以及其他订单关联数据异常");
         }
+    }
+
+    /**
+     * 根据订单类型选择支付业务
+     * @param orderType
+     * @return
+     */
+    private Integer choseBusinessType(Integer orderType) {
+        if (orderType==null){
+            return Global.PAY_ORDER_TYPE_0;
+        }
+        if (orderType.intValue()==3){
+            return Global.PAY_ORDER_TYPE_3;
+        }
+        if (orderType.intValue()==4){
+            return Global.PAY_ORDER_TYPE_1;
+        }
+        return Global.PAY_ORDER_TYPE_0;
     }
 
 
@@ -1988,6 +2070,7 @@ public class OrderServiceImpl implements OrderService {
                 payReq.setCreateName(order.getCashierName());
                 payReq.setStoreName(order.getDistributorName());
                 payReq.setCreateBy(order.getCashierId());
+                payReq.setBusinessType(choseBusinessType(order.getOrderType()));
                 payService.doPay(payReq);
             }
             return HttpResponse.success();
@@ -2200,7 +2283,6 @@ public class OrderServiceImpl implements OrderService {
             }
             Integer actualPrice = storeValueOrderPayRequest.getActualPrice();
             String updateBy = storeValueOrderPayRequest.getUpdateBy();
-            orderInfo.setPayStatus(1);
             //支付完成由回调修改
             //orderInfo.setOrderStatus(5);
             orderInfo.setPayType("7");

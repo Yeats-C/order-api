@@ -5,8 +5,6 @@ import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
 import com.aiqin.mgs.order.api.domain.request.order.PayCallbackRequest;
-import com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPayResultResponse;
-import com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPrintQueryResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayResultResponse;
 
 /**
@@ -53,11 +51,34 @@ public interface ErpOrderPayService {
      */
     void updateOrderPaySelective(ErpOrderPay po, AuthToken auth);
 
-    //发起支付或者创建订单自动发起支付时调用
+
+
+    /**
+     * 发起支付或者创建订单自动发起支付时调用
+     *
+     * @param erpOrderPayRequest 支付信息
+     * @param auth               操作人
+     * @param authCheck          自动支付校验
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2020/1/1 15:04
+     */
     void orderPayStartMethodGroup(ErpOrderPayRequest erpOrderPayRequest, AuthToken auth, boolean authCheck);
 
-    //轮询成功或者回调成功调用
+    /**
+     * 轮询成功或者回调成功调用
+     *
+     * @param orderCode 订单号
+     * @param auth      操作人
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2020/1/1 15:04
+     */
     void orderPaySuccessMethodGroup(String orderCode, AuthToken auth);
+
+
 
     /**
      * 订单支付
@@ -70,7 +91,6 @@ public interface ErpOrderPayService {
      * @date 2019/12/10 9:47
      */
     void orderPay(ErpOrderPayRequest erpOrderPayRequest, AuthToken auth, boolean autoCheck);
-
 
     /**
      * 查询订单支付结果
@@ -96,7 +116,7 @@ public interface ErpOrderPayService {
     void orderPayPolling(String orderCode, AuthToken auth);
 
     /**
-     * 完成支付状态
+     * 完成订单支付状态
      *
      * @param orderCode     订单号
      * @param payCode       支付流水号
@@ -134,28 +154,6 @@ public interface ErpOrderPayService {
     void orderPayCallback(PayCallbackRequest payCallbackRequest);
 
     /**
-     * 查询确认收款信息
-     *
-     * @param erpOrderPayRequest
-     * @return void
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/12/10 9:48
-     */
-    ErpOrderPay getOrderPayRepayInfo(ErpOrderPayRequest erpOrderPayRequest);
-
-    /**
-     * 校验并更正订单支付信息
-     *
-     * @param erpOrderPayRequest
-     * @return void
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/12/10 9:48
-     */
-    void orderPayRepay(ErpOrderPayRequest erpOrderPayRequest);
-
-    /**
      * 订单超时未支付取消订单
      *
      * @param orderCode 订单号
@@ -166,36 +164,5 @@ public interface ErpOrderPayService {
      */
     void orderTimeoutUnpaid(String orderCode);
 
-    /**
-     * 发起支付物流费用
-     *
-     * @param erpOrderPayRequest
-     * @return void
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/12/10 15:41
-     */
-    void orderLogisticsPay(ErpOrderPayRequest erpOrderPayRequest);
 
-    /**
-     * 查询订单物流费用支付结果
-     *
-     * @param erpOrderPayRequest
-     * @return com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPayResultResponse
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/12/10 15:31
-     */
-    ErpOrderLogisticsPayResultResponse orderLogisticsPayResult(ErpOrderPayRequest erpOrderPayRequest);
-
-    /**
-     * 物流费用支付凭证打印数据查询
-     *
-     * @param erpOrderPayRequest
-     * @return com.aiqin.mgs.order.api.domain.response.order.ErpOrderLogisticsPrintQueryResponse
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/12/10 16:41
-     */
-    ErpOrderLogisticsPrintQueryResponse orderLogisticsPrintQuery(ErpOrderPayRequest erpOrderPayRequest);
 }

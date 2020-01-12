@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.component.enums;
 
+import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayTransactionTypeEnum;
 import lombok.Getter;
 
 /**
@@ -13,26 +14,27 @@ import lombok.Getter;
 public enum ErpOrderNodeProcessTypeEnum {
 
     /***配送	- 普通首单*/
-    PROCESS_1(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_2, true, true, true, false, true, true, false, true, true, true, false, true),
+    PROCESS_1(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_2, ErpRequestPayTransactionTypeEnum.FIRST_DELIVERY, true, true, true, false, true, true, false, true, true, true, false, true),
     /***配送	- 首单赠送*/
-    PROCESS_2(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_4, true, true, false, false, true, true, false, true, true, true, false, true),
+    PROCESS_2(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_4, ErpRequestPayTransactionTypeEnum.FIRST_DELIVERY, true, true, false, false, true, true, false, true, true, true, false, true),
     /***配送	- 正常补货*/
-    PROCESS_3(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_1, true, true, true, true, true, true, true, true, false, true, true, true),
+    PROCESS_3(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_1, ErpRequestPayTransactionTypeEnum.DELIVERY_REPLENISHMENT, true, true, true, true, true, true, true, true, false, true, true, true),
     /***直送	- 普通首单*/
-    PROCESS_4(ErpOrderTypeEnum.DIRECT_SEND, ErpOrderCategoryEnum.ORDER_TYPE_1, true, false, true, false, false, false, false, false, true, false, false, false),
+    PROCESS_4(ErpOrderTypeEnum.DIRECT_SEND, ErpOrderCategoryEnum.ORDER_TYPE_1, ErpRequestPayTransactionTypeEnum.FIRST_DIRECT_DELIVERY, true, false, true, false, false, false, false, false, true, false, false, false),
     /***直送	- 正常补货*/
-    PROCESS_5(ErpOrderTypeEnum.DIRECT_SEND, ErpOrderCategoryEnum.ORDER_TYPE_2, true, false, true, false, false, false, false, false, false, false, false, false),
+    PROCESS_5(ErpOrderTypeEnum.DIRECT_SEND, ErpOrderCategoryEnum.ORDER_TYPE_2, ErpRequestPayTransactionTypeEnum.DIRECT_DELIVERY_REPLENISHMENT, true, false, true, false, false, false, false, false, false, false, false, false),
     /***辅采直送	- 新店货架*/
-    PROCESS_6(ErpOrderTypeEnum.ASSIST_PURCHASING, ErpOrderCategoryEnum.ORDER_TYPE_16, true, false, false, false, false, false, false, false, true, false, false, false),
+    PROCESS_6(ErpOrderTypeEnum.ASSIST_PURCHASING, ErpOrderCategoryEnum.ORDER_TYPE_16, ErpRequestPayTransactionTypeEnum.FIRST_DIRECT_DELIVERY, true, false, false, false, false, false, false, false, true, false, false, false),
     /***辅采直送	- 货架补货*/
-    PROCESS_7(ErpOrderTypeEnum.ASSIST_PURCHASING, ErpOrderCategoryEnum.ORDER_TYPE_17, true, false, false, false, false, false, false, false, true, false, false, false),
+    PROCESS_7(ErpOrderTypeEnum.ASSIST_PURCHASING, ErpOrderCategoryEnum.ORDER_TYPE_17, ErpRequestPayTransactionTypeEnum.DIRECT_DELIVERY_REPLENISHMENT, true, false, false, false, false, false, false, false, true, false, false, false),
     /***辅采直送	- 游泳游乐*/
-    PROCESS_8(ErpOrderTypeEnum.ASSIST_PURCHASING, ErpOrderCategoryEnum.ORDER_TYPE_172, true, false, false, false, false, false, false, false, true, false, false, false),
+    PROCESS_8(ErpOrderTypeEnum.ASSIST_PURCHASING, ErpOrderCategoryEnum.ORDER_TYPE_172, ErpRequestPayTransactionTypeEnum.DIRECT_DELIVERY_REPLENISHMENT, true, false, false, false, false, false, false, false, true, false, false, false),
     ;
 
-    ErpOrderNodeProcessTypeEnum(ErpOrderTypeEnum orderTypeEnum, ErpOrderCategoryEnum orderCategoryEnum, boolean areaCheck, boolean repertoryCheck, boolean priceCheck, boolean activityCheck, boolean hasActivity, boolean hasCoupon, boolean addProductGift, boolean hasLogisticsFee, boolean autoPay, boolean lockStock, boolean hasGoodsCoupon, boolean splitByRepertory) {
+    ErpOrderNodeProcessTypeEnum(ErpOrderTypeEnum orderTypeEnum, ErpOrderCategoryEnum orderCategoryEnum, ErpRequestPayTransactionTypeEnum payTransactionTypeEnum, boolean areaCheck, boolean repertoryCheck, boolean priceCheck, boolean activityCheck, boolean hasActivity, boolean hasCoupon, boolean addProductGift, boolean hasLogisticsFee, boolean autoPay, boolean lockStock, boolean hasGoodsCoupon, boolean splitByRepertory) {
         this.orderTypeEnum = orderTypeEnum;
         this.orderCategoryEnum = orderCategoryEnum;
+        this.payTransactionTypeEnum = payTransactionTypeEnum;
         this.areaCheck = areaCheck;
         this.repertoryCheck = repertoryCheck;
         this.priceCheck = priceCheck;
@@ -51,6 +53,8 @@ public enum ErpOrderNodeProcessTypeEnum {
     private ErpOrderTypeEnum orderTypeEnum;
     /***订单类别枚举*/
     private ErpOrderCategoryEnum orderCategoryEnum;
+    /***结算中心业务类型*/
+    private ErpRequestPayTransactionTypeEnum payTransactionTypeEnum;
     /***商品销售区域配置校验*/
     private boolean areaCheck;
     /***商品库存校验*/

@@ -52,5 +52,9 @@ public class ProductInfo {
     private String productPropertyCode;
     /***商品属性名称*/
     private String productPropertyName;
+    /***包装毛重*/
+    private BigDecimal boxGrossWeight;
+    /***箱子体积*/
+    private BigDecimal boxVolume;
 
 }

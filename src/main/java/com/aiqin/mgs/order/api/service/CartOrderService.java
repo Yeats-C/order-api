@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.service;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 
@@ -14,7 +15,7 @@ public interface CartOrderService {
      * @param shoppingCartRequest 请求参数
      * @return
      */
-    HttpResponse addCart(ShoppingCartRequest shoppingCartRequest);
+    HttpResponse addCart(ShoppingCartRequest shoppingCartRequest, AuthToken authToken);
 
     /**
      * 根据门店id查询购物车
@@ -39,9 +40,10 @@ public interface CartOrderService {
      * @param storeId 门店id
      * @param skuId skuID
      * @param lineCheckStatus 勾选标记
+     * @param productType 订单类型 1直送 2配送 3货架
      * @return
      */
-    HttpResponse deleteCartInfo(String storeId,String skuId,Integer lineCheckStatus);
+    HttpResponse deleteCartInfo(String storeId, String skuId, Integer lineCheckStatus, Integer productType);
 
     /**
      * 显示购物车中的勾选商品

@@ -1,60 +1,89 @@
 package com.aiqin.mgs.order.api.web.bill;
-import java.util.ArrayList;
-import java.util.Date;
 
+import com.aiqin.ground.util.protocol.MessageId;
+import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.dao.OperationLogDao;
-import com.aiqin.mgs.order.api.dao.PurchaseOrderDao;
-import com.aiqin.mgs.order.api.dao.PurchaseOrderDetailDao;
-import com.aiqin.mgs.order.api.domain.PurchaseOrder;
-import com.aiqin.mgs.order.api.domain.PurchaseOrderDetail;
+import com.aiqin.mgs.order.api.base.ResultCode;
+import com.aiqin.mgs.order.api.base.exception.BusinessException;
+import com.aiqin.mgs.order.api.domain.AuthToken;
+import com.aiqin.mgs.order.api.domain.DeliveryInfoVo;
+import com.aiqin.mgs.order.api.domain.OrderIogisticsVo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
-import freemarker.core.ReturnInstruction;
+import com.aiqin.mgs.order.api.service.order.ErpOrderPayService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.math.BigDecimal;
-import java.util.List;
 
+/**
+ * 爱亲采购单 控制器
+ */
 @RestController
 @RequestMapping("/purchase")
-@Api(tags = "同步采购单")
+@Api(tags = "爱亲采购单")
 public class PurchaseOrderController {
 
     @Resource
     private PurchaseOrderService purchaseOrderService;
-    @Autowired
-    PurchaseOrderDao purchaseOrderDao;
-    @Autowired
-    PurchaseOrderDetailDao purchaseOrderDetailDao;
-    @Autowired
-    OperationLogDao operationLogDao;
-
+    @Resource
+    private ErpOrderPayService erpOrderPayService;
     /**
      * 同步采购单
+     *
      * @param erpOrderInfo
      * @return
      */
     @PostMapping("/add")
     @ApiOperation(value = "根据销售单，生成爱亲采购单")
-    public HttpResponse synchronizationPurchaseOrder(@Valid @RequestBody ErpOrderInfo erpOrderInfo){
+    public HttpResponse synchronizationPurchaseOrder(@Valid @RequestBody ErpOrderInfo erpOrderInfo) {
         return purchaseOrderService.createPurchaseOrder(erpOrderInfo);
     }
 
     /**
-     * 栖耘销售单回传
+     * 耘链销售单回传
      */
-    @PostMapping("aiqin/purchase")
+    @PostMapping("/sale/info")
     @ApiOperation(value = "耘链销售单回传")
-    public HttpResponse select(){
-        return null;
+    public HttpResponse updatePurchaseInfo(@Valid @RequestBody OrderIogisticsVo orderIogisticsVo) {
+        return purchaseOrderService.updatePurchaseInfo(orderIogisticsVo);
+    }
+
+    /**
+     * 发运单回传
+     */
+    @PostMapping("/delivery/info")
+    @ApiOperation(value = "发运单回传")
+    public HttpResponse updateOrderStoreLogistics(@Valid @RequestBody DeliveryInfoVo deliveryInfoVo) {
+        return purchaseOrderService.updateOrderStoreLogistics(deliveryInfoVo);
+    }
+
+    /**
+     * 取消订单
+     */
+    @PostMapping("/cancel/info")
+    @ApiOperation(value = "取消订单")
+    public HttpResponse updateCancelOrderinfo(String orderStoreCode) {
+        return purchaseOrderService.updateCancelOrderinfo(orderStoreCode);
+    }
+
+    @GetMapping("/测试【触发订单 生成采购单】test1")
+    public HttpResponse test1(@RequestParam  String orderStoreCode) {
+        HttpResponse response = HttpResponse.success();
+        try {
+
+            AuthToken auth = new AuthToken();
+            auth.setPersonId("123456");
+            auth.setPersonName("1234567890");
+            erpOrderPayService.orderPaySuccessMethodGroup(orderStoreCode, auth);
+
+        } catch (BusinessException e) {
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
     }
 }

@@ -17,4 +17,6 @@ public interface CouponInfoDao {
 
     int insertBatch(@Param("records") List<CouponInfo> records);
 
+    int updateByOrderId(String orderId);
+
 }

@@ -410,6 +410,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			}else {
 				skuSum = getSkuSum(orderId);
 			}*/
+
 			Integer skuSum = getSkuSum(orderId);
 			orderInfo.setSkuSum(skuSum);
 			info.setOrderInfo(orderInfo);
@@ -455,7 +456,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 
 		try {
 		//收货信息
-		info.setReceivingInfo(orderReceivingDao.selecReceivingById(orderDetailQuery));
+		//info.setReceivingInfo(orderReceivingDao.selecReceivingById(orderDetailQuery));
 		     
 		} catch (Exception e) {
 			LOGGER.error("查询BYorderid-返回订单收货信息",e);
@@ -465,10 +466,21 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			//结算信息
 			OrderQuery orderQuery = new OrderQuery();
 			orderQuery.setOrderId(orderId);
-			info.setSettlementInfo(settlementDao.jkselectsettlement(orderQuery));
-			if (orderInfo!=null&&orderInfo.getOrderType()==4){
-				//预存订单 储值卡金额
+			SettlementInfo settlementInfo=settlementDao.jkselectsettlement(orderQuery);
+			if (settlementInfo!=null){
+				settlementInfo.setTotalCouponsDiscount(settlementInfo.getActivityDiscount());
+				if (orderInfo.getOrderStatus()==0){
+					settlementInfo.setOrderActual(0);
+					settlementInfo.setOrderReceivable(0);
+				}
+				info.setSettlementInfo(settlementInfo);
+				if (orderInfo!=null&&orderInfo.getOrderType()==4){
+					//预存订单 储值卡金额
+				}
+
 			}
+
+
 			return HttpResponse.success(info);
 			} catch (Exception e) {
 				LOGGER.error("查询BYorderid-返回订单结算信息",e);
@@ -512,7 +524,23 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		}
 		return list;
 	}
+	@Override
+	@Transactional
+	public List<OrderDetailInfo> updateDetailList(@Valid List<OrderDetailInfo> detailList, @Valid String orderId,@Valid String orderCode) throws Exception {
 
+		List<OrderDetailInfo> list = new ArrayList();
+		if(detailList !=null && detailList.size()>0) {
+			for(OrderDetailInfo info : detailList) {
+				info.setOrderCode(orderCode);
+
+				orderDetailDao.updateOrderDetail(info);
+				list.add(info);
+			}
+		}else {
+			LOGGER.warn("未获取订单明细数据.orderId: {}",orderId);
+		}
+		return list;
+	}
 
 //	//查询会员下的所有订单ID下的商品集合...
 //	@Override
@@ -733,6 +761,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			if(orderInfo !=null && orderInfo.getOrderId() !=null ) {
 				orderId = orderInfo.getOrderId();
 				orderDetailQuery.setOrderId(orderInfo.getOrderId());
+				orderDetailQuery.setOrderCode(orderInfo.getOrderCode());
 			}
 			
 			//获取SKU数量
@@ -759,9 +788,8 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 			LOGGER.error("查询BYorderid-返回订单明细数据 {}",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}
-		try {
+		/*try {
 		//收货信息
-			
 	    OrderReceivingInfo orderReceivingInfo = new OrderReceivingInfo();
 	    orderReceivingInfo=orderReceivingDao.selecReceivingById(orderDetailQuery);
 
@@ -772,7 +800,7 @@ public class OrderDetailServiceImpl implements OrderDetailService{
 		} catch (Exception e) {
 			LOGGER.error("查询BYorderid-返回订单收货信息异常 {}",e);
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
-		}
+		}*/
 		try {
 			//结算信息
 			OrderQuery orderQuery = new OrderQuery();

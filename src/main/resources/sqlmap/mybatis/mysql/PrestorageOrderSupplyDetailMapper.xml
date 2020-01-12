@@ -56,6 +56,9 @@
         <if test="memberPhone!=null and memberPhone!=''">
             and d.member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%')
         </if>
+        <if test="orderCode!=null and orderCode!=''">
+            and d.order_code =#{orderCode}
+        </if>
         <if test="distributorId!=null and distributorId!='' ">
             and d.distributor_id = #{distributorId}
         </if>
@@ -68,6 +71,7 @@
         <if test="endTime!=null ">
             and d.create_time &lt;= #{endTime}
         </if>
+        ORDER BY l.id desc
     </select>
     <select id="selectPrestorageOrderLogsCount" resultType="integer"
             parameterType="com.aiqin.mgs.order.api.domain.OrderQuery">

@@ -24,7 +24,7 @@ public class ErpOrderPayRequest {
     @JsonProperty("pay_way")
     private Integer payWay;
 
-    @ApiModelProperty(value = "物流券唯一标识，可能是物流券编码 支付物流费用时使用")
+    @ApiModelProperty(value = "物流券唯一标识，可能是物流券编码（多个） 支付物流费用时使用")
     @JsonProperty("coupon_ids")
     private List<String> couponIds;
 

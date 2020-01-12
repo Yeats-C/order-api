@@ -151,7 +151,7 @@
         <if test="totalPrice!=null">
             #{totalPrice},
         </if>
-        #{customNote},#{businessNote},#{cashierId},#{cashierName},#{guideId},#{guideName},#{orderType},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},#{receiveCode},CURRENT_TIMESTAMP)
+        #{customNote},#{businessNote},#{cashierId},#{cashierName},#{guideId},#{guideName},#{orderType},CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,#{createBy},#{updateBy},#{receiveCode},CURRENT_TIMESTAMP)
     </insert>
 
     <!-- 订单查询byorderid -->
@@ -1323,6 +1323,29 @@
         and d.create_time &gt;= #{startDate}
         and d.product_code = #{skuCode}
 
+    </select>
+
+    <select id="orderPrestorageCount" resultType="integer">
+        select sum(d.actual_price) from
+        order_consumer_detail d,order_consumer_info o
+        where
+        d.order_id=o.order_id
+       and  o.distributor_id = #{storeId}
+        and d.create_time &gt;= #{startDate}
+        and d.create_time &lt;= #{endDay}
+        and o.order_type = 4
+        and o.order_status in (2,5)
+    </select>
+    <select id="orderStoreCount" resultType="integer">
+         select sum(d.actual_price) from
+        order_consumer_detail d,order_consumer_info o
+        where
+        d.order_id=o.order_id
+       and  o.distributor_id = #{storeId}
+        and d.create_time &gt;= #{startDate}
+        and d.create_time &lt;= #{endDay}
+        and (o.order_type = 1  or o.order_type = 3 )
+        and o.order_status =5
     </select>
     <!--获取特定sku集合指定时间段内销量数据信息-->
     <select id="querySkuSale" parameterType="com.aiqin.mgs.order.api.domain.request.statistical.SkuSalesRequest"

@@ -38,6 +38,10 @@ public class ErpOrderQueryRequest {
     @JsonProperty("order_category_code")
     private Integer orderCategoryCode;
 
+    @ApiModelProperty(value = "门店id")
+    @JsonProperty("store_id")
+    private String storeId;
+
     @ApiModelProperty(value = "门店名称")
     @JsonProperty("store_name")
     private String storeName;

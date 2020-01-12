@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -17,9 +18,10 @@ import java.util.Date;
 @ToString(callSuper = true)
 @ApiModel("采购单")
 public class PurchaseOrder implements Serializable {
-    @ApiModelProperty(value = "采购单号")
+    private long id;
+    @ApiModelProperty(value = "业务id")
     private String purchaseOrderId;
-    @ApiModelProperty(value = "公司编码")
+    @ApiModelProperty(value = "采购单号")
     private String purchaseOrderCode;
     @ApiModelProperty(value = "公司编码")
     private String companyCode;
@@ -79,15 +81,15 @@ public class PurchaseOrder implements Serializable {
     private String contactPerson;
     @ApiModelProperty(value = "联系人电话")
     private String contactMobile;
-    @ApiModelProperty(value = "预计到货时间",example = "2001-01-01 01:01:01")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date preArrivalTime;
-    @ApiModelProperty(value = "有效期",example = "2001-01-01 01:01:01")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date validTime;
     @ApiModelProperty(value = "发货地址")
     private String deliveryAddress;
-    @ApiModelProperty(value = "发货时间",example = "2001-01-01 01:01:01")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date deliveryTime;
-    @ApiModelProperty(value = "入库时间",example = "2001-01-01 01:01:01")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date inStockTime;
     @ApiModelProperty(value = "入库地址")
     private String inStockAddress;
@@ -115,8 +117,8 @@ public class PurchaseOrder implements Serializable {
     private String updateById;
     @ApiModelProperty(value = "修改人名称")
     private String updateByName;
-    @ApiModelProperty(value = "创建时间",example = "2001-01-01 01:01:01")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
-    @ApiModelProperty(value = "修改时间",example = "2001-01-01 01:01:01")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 }

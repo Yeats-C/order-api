@@ -24,4 +24,10 @@ public class DeleteCartProductRequest {
     @JsonProperty("line_check_status")
     private Integer lineCheckStatus;
 
+    /***订单类型*/
+    @ApiModelProperty(value = "订单类型 1直送 2配送 3货架")
+    @JsonProperty("product_type")
+    private Integer productType;
+
+
 }

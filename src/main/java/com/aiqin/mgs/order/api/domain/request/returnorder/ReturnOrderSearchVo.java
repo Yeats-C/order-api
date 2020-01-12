@@ -18,6 +18,10 @@ public class ReturnOrderSearchVo extends PagesRequest {
     @JsonProperty("store_name")
     private String storeName;
 
+    @ApiModelProperty("门店名称")
+    @JsonProperty("store_id")
+    private String storeId;
+
     @ApiModelProperty("省名称")
     @JsonProperty("province_name")
     private String provinceName;
@@ -49,4 +53,25 @@ public class ReturnOrderSearchVo extends PagesRequest {
     @ApiModelProperty("退货类型  0客户退货、1缺货退货、2售后退货")
     @JsonProperty("return_order_type")
     private Integer returnOrderType;
+
+    @ApiModelProperty(value = "订单类型 0直送、1配送、2辅采")
+    @JsonProperty("order_type")
+    private Integer orderType;
+
+    @ApiModelProperty("收货区域 :区/县")
+    @JsonProperty("district_name")
+    private String districtName;
+
+    @ApiModelProperty("收货区域 :省编码")
+    @JsonProperty("province_id")
+    private String provinceId;
+
+    @ApiModelProperty("收货区域 :市编码")
+    @JsonProperty("city_id")
+    private String cityId;
+
+    @ApiModelProperty("收货区域 :区/县编码")
+    @JsonProperty("district_id")
+    private String districtId;
+
 }

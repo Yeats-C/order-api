@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.web;
 
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.cart.DeleteCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
@@ -38,9 +39,9 @@ public class CartOrderController {
      */
     @PostMapping("/add")
     @ApiOperation(value = "将商品添加到购物车")
-    public HttpResponse addCart(@Valid @RequestBody ShoppingCartRequest shoppingCartRequest) {
+    public HttpResponse addCart(@Valid @RequestBody ShoppingCartRequest shoppingCartRequest, AuthToken authToken) {
         //将商品添加到购物车
-        return cartOrderService.addCart(shoppingCartRequest);
+        return cartOrderService.addCart(shoppingCartRequest,authToken);
     }
 
     /**
@@ -65,7 +66,7 @@ public class CartOrderController {
     @ApiImplicitParams({@ApiImplicitParam(name = "store_id", value = "门店id", dataType = "String", paramType = "query", required = true),
             @ApiImplicitParam(name = "product_type", value = "商品类型 1:直送 2:配送 3:货架", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(name = "sku_code", value = "sku编码", dataType = "String", paramType = "query", required = false),
-            @ApiImplicitParam(name = "line_check_status", value = "勾选标记,0:未勾选,1:勾选单个商品,2:全部勾选", dataType = "Integer", paramType = "query", required = false),
+            @ApiImplicitParam(name = "line_check_status", value = "勾选标记,0:未勾选,1:勾选单个商品,2:全部勾选,3:全部取消", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(name = "number", value = "商品数量", dataType = "Integer", paramType = "query", required = false)})
     public HttpResponse<CartResponse> selectCartByStoreId(String store_id, Integer product_type, String sku_code, Integer line_check_status, Integer number) {
         LOGGER.info("购物车展示列表参数：{},{},{},{},{}", store_id,product_type,sku_code,line_check_status,number);
@@ -80,7 +81,7 @@ public class CartOrderController {
     @PostMapping("/deleteCart")
     @ApiOperation(value = "清空购物车、删除单个商品、删除勾选商品")
     public HttpResponse deleteCart(@Valid @RequestBody DeleteCartProductRequest deleteCartProductRequest){
-        return cartOrderService.deleteCartInfo(deleteCartProductRequest.getStoreId(),deleteCartProductRequest.getSkuId(),deleteCartProductRequest.getLineCheckStatus());
+        return cartOrderService.deleteCartInfo(deleteCartProductRequest.getStoreId(),deleteCartProductRequest.getSkuId(),deleteCartProductRequest.getLineCheckStatus(),deleteCartProductRequest.getProductType());
     }
 
     /**

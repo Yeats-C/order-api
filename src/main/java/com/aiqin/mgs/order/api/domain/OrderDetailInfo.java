@@ -61,7 +61,10 @@ public class OrderDetailInfo extends PagesRequest {
 	@ApiModelProperty(value="sku_code")
 	@JsonProperty("sku_code")
 	private String skuCode ;
-	
+
+	@ApiModelProperty(value="sku_name")
+	@JsonProperty("sku_name")
+	private String skuName ;
 	
 	@ApiModelProperty(value="spu_code")
 	@JsonProperty("spu_code")

@@ -175,7 +175,8 @@
     </select>
 
     <select id="selectPrestorageOrderListCount" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultType="integer">
-        select  count(1) from prestorage_order_supply a where 1=1
+        select  count(1) from prestorage_order_supply a  ,order_consumer_info o where a.order_id=o.order_id
+
         <if test="distributorId!=null and distributorId!='' ">
             and a.distributor_id = #{distributorId}
         </if>

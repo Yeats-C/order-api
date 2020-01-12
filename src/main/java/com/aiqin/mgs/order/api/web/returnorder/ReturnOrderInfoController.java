@@ -6,6 +6,7 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
+import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
@@ -26,10 +27,13 @@ public class ReturnOrderInfoController {
     @Resource
     private ReturnOrderInfoService returnOrderInfoService;
 
+    @Resource
+    private ErpOrderQueryService erpOrderQueryService;
+
     @ApiOperation("新增退货信息")
     @PostMapping("/add")
-    public HttpResponse<Boolean> save(@RequestBody ReturnOrderReqVo reqVo) {
-        return new HttpResponse<>(returnOrderInfoService.save(reqVo));
+    public HttpResponse save(@RequestBody ReturnOrderReqVo reqVo) {
+        return returnOrderInfoService.save(reqVo);
     }
 
     @ApiOperation("后台销售退货单管理列表（搜索）")
@@ -44,9 +48,8 @@ public class ReturnOrderInfoController {
 
     @ApiOperation("操作审核退货单")
     @PostMapping("/updateStatus")
-    public HttpResponse<Boolean> updateStatus(@RequestBody ReturnOrderReviewReqVo reqVo) {
-        Boolean review = returnOrderInfoService.updateReturnStatus(reqVo);
-        return new HttpResponse<>(review);
+    public HttpResponse updateStatus(@RequestBody ReturnOrderReviewReqVo reqVo) {
+        return returnOrderInfoService.updateReturnStatus(reqVo);
     }
 
     /**
@@ -56,9 +59,8 @@ public class ReturnOrderInfoController {
      */
     @ApiOperation("修改退货单详情")
     @PostMapping("/updateDetail")
-    public HttpResponse<Boolean> updateDetail(@RequestBody ReturnOrderDetailVO reqVo) {
-        Boolean review = returnOrderInfoService.updateOrderAfterSaleDetail(reqVo);
-        return new HttpResponse<>(review);
+    public HttpResponse updateDetail(@RequestBody ReturnOrderDetailVO reqVo) {
+        return returnOrderInfoService.updateReturnOrderDetail(reqVo);
     }
 
     @ApiOperation("提供给供应链--退货单状态修改")
@@ -68,8 +70,15 @@ public class ReturnOrderInfoController {
         return new HttpResponse<>(review);
     }
 
+    /*@ApiOperation("提供给供应链--同步是否成功（创建退供单）修改")
+    @GetMapping("/updateOrderSuccessApi")
+    public HttpResponse<Boolean> updateOrderSuccessApi(String returnOrderCode) {
+        Boolean review = returnOrderInfoService.updateOrderSuccessApi(returnOrderCode);
+        return new HttpResponse<>(review);
+    }*/
+
     @ApiOperation("退货单校验--查看此订单是否已经生成一条退货单，且流程未结束。如果已存在返回true")
-    @PostMapping("/check")
+    @GetMapping("/check")
     public HttpResponse<Boolean> check(String orderCode) {
         Boolean review = returnOrderInfoService.check(orderCode);
         return new HttpResponse<>(review);
@@ -118,5 +127,44 @@ public class ReturnOrderInfoController {
     public HttpResponse getReturnStatus() {
         return returnOrderInfoService.getReturnStatus();
     }
+
+    @ApiOperation("退货单列表--查看附件")
+    @GetMapping("/getEvidenceUrl")
+    public HttpResponse getEvidenceUrl(String returnOrderDetailId) {
+        return returnOrderInfoService.getEvidenceUrl(returnOrderDetailId);
+    }
+
+    @ApiOperation("根据订单编码查询主订单和详情")
+    @GetMapping("/getOrderAndItemByOrderCode")
+    public HttpResponse getOrderAndItemByOrderCode(String returnOrderCode) {
+        return HttpResponse.success(erpOrderQueryService.getOrderAndItemByOrderCode(returnOrderCode));
+    }
+
+    @ApiOperation("支付中心--发起冲减单")
+    @GetMapping("/saveWriteDownOrder")
+    public HttpResponse saveWriteDownOrder(String orderCode) {
+        return returnOrderInfoService.saveWriteDownOrder(orderCode);
+    }
+
+    @ApiOperation("支付中心--发起客户退货")
+    @GetMapping("/saveCancelOrder")
+    public HttpResponse saveCancelOrder(String orderCode) {
+        return returnOrderInfoService.saveCancelOrder(orderCode);
+    }
+
+
+
+    @ApiOperation("erp售后管理--冲减单列表")
+    @PostMapping("/getWriteDownOrderList")
+    public HttpResponse<PageResData<ReturnOrderInfo>> getWriteDownOrderList(@RequestBody PageRequestVO<WriteDownOrderSearchVo> searchVo) {
+        return new HttpResponse<>(returnOrderInfoService.getWriteDownOrderList(searchVo));
+    }
+
+    @ApiOperation("支付中心--查询订单状态,同时修改退货单和流水状态")
+    @GetMapping("/searchPayOrder")
+    public HttpResponse<Boolean> searchPayOrder(String orderCode) {
+        return new HttpResponse<>(returnOrderInfoService.searchPayOrder(orderCode));
+    }
+
 
 }

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.SequenceGeneratorDao">
+
+    <select id="select" parameterType="com.aiqin.mgs.order.api.domain.SequenceGenerator"
+            resultType="com.aiqin.mgs.order.api.domain.SequenceGenerator">
+        select
+        id as id, sequence_name as sequenceName, sequence_desc as sequenceDesc, sequence_val as sequenceVal, current_day
+        as currentDay, sequence_step as sequenceStep
+        from sequence_generator
+        where 1 = 1
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="sequenceName != null and sequenceName != ''">
+            and sequence_name = #{sequenceName}
+        </if>
+    </select>
+
+    <update id="updateByPrimaryKeySelective">
+        update sequence_generator
+        set
+        <if test="sequenceVal != null and sequenceVal != ''">
+            sequence_val = #{sequenceVal}
+        </if>
+        <if test="currentDay != null and currentDay != ''">
+            ,current_day = #{currentDay}
+        </if>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <insert id="insert">
+        insert into sequence_generator (id, sequence_name, sequence_desc, sequence_val, current_day,
+                                        sequence_step)
+        values (#{id}, #{sequenceName}, #{sequenceDesc}, #{sequenceVal}, #{currentDay},
+                #{sequenceStep})
+    </insert>
+
+</mapper>
+

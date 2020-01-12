@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.domain.pay;
 import com.aiqin.mgs.order.api.component.OperationTypeEnum;
 import com.aiqin.mgs.order.api.component.PayOriginTypeEnum;
 import com.aiqin.mgs.order.api.component.ServiceSceneEnum;
+import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
@@ -51,7 +52,7 @@ public class PayReq implements Serializable {
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonProperty("order_time")
     private Date orderTime;
-    @ApiModelProperty(value = "(支付类型1)")
+    @ApiModelProperty(value = "(支付类型1在线支付-支付宝 2在线支付-银联 3到店支付-现金支付 4到店支付-微信 5到店支付-支付宝 6到店支付-银联 7到店支付-储值卡支付")
     @JsonProperty("pay_type")
     private Integer payType;
     @ApiModelProperty(value = "微信公众号标识--不传", hidden = true)
@@ -92,7 +93,7 @@ public class PayReq implements Serializable {
     @JsonProperty("service_scene")
     private Integer serviceScene= ServiceSceneEnum.TO_C.getCode();
 
-    @ApiModelProperty(value = "支付来源")
+    @ApiModelProperty(value = "支付来源1toc-pos消费 3toc-web消费 18 toc-pos储值 19toc-web储值 20toc-web仅退款 21 toc-web退款退货 22toc-pos仅退款 23 toc-pos退货退款")
     @JsonProperty("pay_origin_type")
     private Integer payOriginType= PayOriginTypeEnum.TOC_POS.getCode();
 
@@ -148,4 +149,10 @@ public class PayReq implements Serializable {
     @JsonProperty("refund_type")
     @NotNull(message = "退款支付方式不能为空")
     private Integer refundType;
+
+    @ApiModelProperty("业务类型(0.正常销售订单 1.预存订单)")
+    @JsonProperty("business_type")
+    @NotNull(message = "业务类型不能为空")
+    private Integer businessType= Global.PAY_ORDER_TYPE_0;
+
 }

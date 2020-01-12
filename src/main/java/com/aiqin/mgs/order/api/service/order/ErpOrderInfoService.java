@@ -2,11 +2,12 @@ package com.aiqin.mgs.order.api.service.order;
 
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCarryOutNextStepRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderEditRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSignRequest;
 
 /**
- * 订单新增修改封装原子操作service
+ * 订单操作service
  *
  * @author: Tao.Chen
  * @version: v1.0.0
@@ -66,12 +67,13 @@ public interface ErpOrderInfoService {
      * 待支付订单新增赠品行
      *
      * @param erpOrderEditRequest
+     * @param auth
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/11 10:56
      */
-    void addProductGift(ErpOrderEditRequest erpOrderEditRequest);
+    void addProductGift(ErpOrderEditRequest erpOrderEditRequest, AuthToken auth);
 
     /**
      * 订单拆单逻辑
@@ -107,4 +109,28 @@ public interface ErpOrderInfoService {
      * @date 2019/12/10 9:39
      */
     void orderSign(ErpOrderSignRequest erpOrderSignRequest);
+
+    /**
+     * 订单流程校正
+     *
+     * @param erpOrderCarryOutNextStepRequest
+     * @param auth
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2020/1/4 14:10
+     */
+    void orderCarryOutNextStep(ErpOrderCarryOutNextStepRequest erpOrderCarryOutNextStepRequest, AuthToken auth);
+
+    /**
+     * 订单发起冲减单
+     *
+     * @param orderCode
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2020/1/11 10:02
+     */
+    void orderScourSheet(String orderCode);
+
 }
