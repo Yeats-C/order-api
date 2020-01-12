@@ -305,11 +305,9 @@ public class OrderServiceImpl implements OrderService {
                 }
                 log.info("------------------------------------------------------防止多次处理end" );
                 //Toc 订单
-                if (orderInfo.getOrderInfo().getOrderType() == 1||orderInfo.getOrderInfo().getOrderType() == 4) {
                     orderInfo.getOrderInfo().setPayType(String.valueOf(vo.getPayType()));
                     orderInfo.getOrderInfo().setActualPrice(vo.getOrderAmount());
                     return tocOrderCallback(orderInfo);
-                }
 
 
             }
