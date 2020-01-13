@@ -306,11 +306,9 @@ public class OrderServiceImpl implements OrderService {
                 }
                 log.info("------------------------------------------------------防止多次处理end" );
                 //Toc 订单
-                if (orderInfo.getOrderInfo().getOrderType() == 1||orderInfo.getOrderInfo().getOrderType() == 4) {
                     orderInfo.getOrderInfo().setPayType(String.valueOf(vo.getPayType()));
                     orderInfo.getOrderInfo().setActualPrice(vo.getOrderAmount());
                     return tocOrderCallback(orderInfo);
-                }
 
 
             }
@@ -335,10 +333,10 @@ public class OrderServiceImpl implements OrderService {
             if (i == 0) {
                 return HttpResponse.success();
             }
-            if (orderInfo.getOrderInfo().getOrderType() != 4) {
+            if (orderInfo.getOrderInfo().getOrderType() == 1) {
                 //修改库存
                 changeProductStock(orderInfo);
-            } else {
+            } else if (orderInfo.getOrderInfo().getOrderType() == 4){
                 //预存订单提出记录初始化
                 log.info("预存订单提出记录初始化{}", "===========" + orderInfo.getDetailList().toString());
                 createPrestorageOrder(orderInfo);
