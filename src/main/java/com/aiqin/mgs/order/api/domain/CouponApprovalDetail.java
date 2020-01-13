@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
@@ -20,7 +21,7 @@ public class CouponApprovalDetail {
     private Integer couponType;
 
     @ApiModelProperty("优惠券金额总额度")
-    private Double totalMoney;
+    private BigDecimal totalMoney;
 
     @ApiModelProperty("发放门店id")
     private String storeId;
