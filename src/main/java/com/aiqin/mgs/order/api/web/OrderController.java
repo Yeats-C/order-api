@@ -108,13 +108,7 @@ public class OrderController {
         	OrderInfo orderInfo = orderAndSoOnRequest.getOrderInfo();
           if(orderInfo !=null) {
               //预存订单
-              if (orderInfo.getOrderType()!=4){
-                  orderInfo.setOrderType(Global.ORDER_TYPE_1);
-              }
 
-              if (orderInfo.getOrderType()!=4){
-                  orderInfo.setOrderType(Global.ORDER_TYPE_1);
-              }
 
 
         	  orderAndSoOnRequest.setOrderInfo(orderInfo);
