@@ -37,6 +37,10 @@ public class OrderodrInfo {
 	@ApiModelProperty(value = "支付信息")
 	@JsonProperty("order_pay_detail")
 	private List<OrderPayInfo> payList;
+
+	@ApiModelProperty(value = "订单物流信息")
+	@JsonProperty("order_list_logistics")
+	private List<OrderListLogistics> orderListLogisticsList;
 	
 	
 
@@ -80,7 +84,13 @@ public class OrderodrInfo {
 		this.settlementInfo = settlementInfo;
 	}
 
-	
+    public List<OrderListLogistics> getOrderListLogisticsList() {
+        return orderListLogisticsList;
+    }
+
+    public void setOrderListLogisticsList(List<OrderListLogistics> orderListLogisticsList) {
+        this.orderListLogisticsList = orderListLogisticsList;
+    }
 }
 
 

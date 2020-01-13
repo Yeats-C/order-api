@@ -46,9 +46,8 @@ public class FrozenController {
      * @return
      */
     @PostMapping("")
-    @ApiOperation(value = "将商品列表挂起")
+    @ApiOperation(value = "将商品列表挂起1111")
     public HttpResponse addFrozenInfo(@Valid @RequestBody List<FrozenInfo> frozenInfolist) {
-    	
     	
         LOGGER.info("将商品列表挂起参数：{}",frozenInfolist);
         return frozenService.addFrozenInfo(frozenInfolist);
@@ -64,8 +63,7 @@ public class FrozenController {
     @DeleteMapping("/deletedetailbyfrozenId/{frozen_id}")
     @ApiOperation(value = "删除解卦信息")
     public HttpResponse deleteDetailByFrozenId(@Valid @PathVariable(name = "frozen_id",required = true) String frozenId) {
-        
-    	
+
     	LOGGER.info("删除挂单数据参数:{}",frozenId);
         return frozenService.deleteByFrozenId(frozenId);
     }

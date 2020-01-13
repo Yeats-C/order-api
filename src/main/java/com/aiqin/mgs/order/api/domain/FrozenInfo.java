@@ -58,12 +58,12 @@ public class FrozenInfo extends PagesRequest {
     
     @ApiModelProperty(value = "销售员id")
     @JsonProperty("sale_byid")
-    private String SaleById="";
+    private String saleById="";
     
     @ApiModelProperty(value = "销售员名称")
     @JsonProperty("sale_byname")
     @NotBlank
-    private String SaleByName="";
+    private String saleByName="";
     
     @ApiModelProperty(value = "商品id")
     @JsonProperty("product_id")
@@ -133,11 +133,19 @@ public class FrozenInfo extends PagesRequest {
     @ApiModelProperty(value = "备注")
     @JsonProperty("memo")
     private String memo;
-    
-    
 
-    
 
+	@ApiModelProperty("是否预存订单，1：是 ，2 否")
+	@JsonProperty("is_prestorage")
+	private Integer isPrestorage=2;
+
+	public Integer getIsPrestorage() {
+		return isPrestorage;
+	}
+
+	public void setIsPrestorage(Integer isPrestorage) {
+		this.isPrestorage = isPrestorage;
+	}
 
 	public String getMemo() {
 		return memo;
@@ -269,19 +277,19 @@ public class FrozenInfo extends PagesRequest {
 
 
 	public String getSaleById() {
-		return SaleById;
+		return saleById;
 	}
 
 	public void setSaleById(String saleById) {
-		SaleById = saleById;
+		this.saleById = saleById;
 	}
 
 	public String getSaleByName() {
-		return SaleByName;
+		return saleByName;
 	}
 
 	public void setSaleByName(String saleByName) {
-		SaleByName = saleByName;
+		this.saleByName = saleByName;
 	}
 
 	public Integer getSumSale() {

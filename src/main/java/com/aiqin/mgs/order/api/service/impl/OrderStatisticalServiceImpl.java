@@ -19,6 +19,8 @@ import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
@@ -36,6 +38,8 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class OrderStatisticalServiceImpl implements OrderStatisticalService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrderStatisticalServiceImpl.class);
 
     private final static String SALE_OUT_OF_STOCK_PREFIX = "sale:prefix:";
 
@@ -66,7 +70,7 @@ public class OrderStatisticalServiceImpl implements OrderStatisticalService {
                         return null;
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.info("context",e);
                 }
                 return null;
             });
@@ -84,15 +88,16 @@ public class OrderStatisticalServiceImpl implements OrderStatisticalService {
                         return null;
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.info("context",e);
                 }
                 return null;
             });
 
             //当前数据统计
             BusinessStatisticalRequest year = new BusinessStatisticalRequest();
+            DateUtil dateUtil = new DateUtil();
             year.setDistributorId(distributorId);
-            year.setStartDate(DateUtil.getCurrentYearBeginTime());
+            year.setStartDate(dateUtil.getCurrentYearBeginTime());
             year.setEndDate(DateUtil.getCurrentDate());
             year.setGroupByFlag(true);
             CompletableFuture<List<BusinessStatistical>> yearStatistical = CompletableFuture.supplyAsync(() -> {
@@ -104,7 +109,7 @@ public class OrderStatisticalServiceImpl implements OrderStatisticalService {
                         return Lists.newArrayList();
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.info("context",e);
                 }
                 return null;
             });
@@ -113,7 +118,6 @@ public class OrderStatisticalServiceImpl implements OrderStatisticalService {
             response = BusinessStatisticalBuilder.create(yesterdayStatistical.get(), todayStatistical.get(), yearStatistical.get()).builder();
             return response;
         } catch (Exception ex) {
-            ex.printStackTrace();
             log.error("error [{}]", ex);
         }
         return null;
@@ -296,7 +300,8 @@ public class OrderStatisticalServiceImpl implements OrderStatisticalService {
         for (String item : list) {
             String curKey = key + ":" + item;
             Map<String, Object> cur = redisTemplate.opsForHash().entries(curKey);
-            if (Objects.isNull(cur)) {
+            boolean isNull = Objects.isNull(cur);
+            if (isNull) {
                 continue;
             }
             SoldOutOfStockProduct curItem = new SoldOutOfStockProduct();

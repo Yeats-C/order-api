@@ -30,5 +30,11 @@ public interface OrderAfterDao {
 
     //个性化接口-通过ID更改售后表退货状态/修改员 
 	void returnStatus(OrderAfterSaleInfo orderAfterSaleInfo)throws Exception;
-    
+
+    /**
+     * 修改退款状态
+     * @param orderAfterSaleInfo
+     * @throws Exception
+     */
+    void updateRefundStatus(OrderAfterSaleInfo orderAfterSaleInfo)throws Exception;
 }

@@ -21,22 +21,39 @@
             <property name="forceBigDecimals" value="false"/>
         </javaTypeResolver>
 
-        <javaModelGenerator targetPackage="com.aiqin.bms.order.api" targetProject="src/main/java">
+        <!--控制生成的实体类-->
+        <javaModelGenerator targetPackage="com.aiqin.mgs.order.api.domain" targetProject="/Users/zhangchaoliang/IdeaProjects/order-api/src/main/java">
             <property name="enableSubPackages" value="true"/>
-            <property name="trimStrings" value="false"/>
+            <property name="trimStrings" value="true"/>
         </javaModelGenerator>
 
-        <sqlMapGenerator targetPackage="sqlmap.mybatis" targetProject="src/main/resources">
+        <!--生成xml的sql映射文件-->
+        <sqlMapGenerator targetPackage="sqlmap/mybatis/mysql" targetProject="/Users/zhangchaoliang/IdeaProjects/order-api/src/main/resources">
             <property name="trimStrings" value="true"/>
         </sqlMapGenerator>
 
-        <javaClientGenerator type="XMLMAPPER" targetPackage="com.aiqin.bms.order.api" targetProject="src/main/java">
+        <!--生成mapper接口-->
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.aiqin.mgs.order.api.dao" targetProject="/Users/zhangchaoliang/IdeaProjects/order-api/src/main/java">
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
 
         <!--对应数据库表 mysql可以加入主键自增 字段命名 忽略某字段等-->
+        <!--operation_log-->
 
-        <table tableName="order_list">
-        </table>
+        <!--
+        purchase_order
+        purchase_order_detail
+        purchase_order_detail_batch
+        -->
+
+
+
+        <!--reject_record
+        reject_record_detail
+        reject_record_detail_batch-->
+        <table schema="general" tableName="return_order_detail_batch" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
+               enableSelectByExample="false" selectByExampleQueryId="true" >
+            <property name="useActualColumnNames" value="false"/>
+    </table>
      </context>
 </generatorConfiguration>

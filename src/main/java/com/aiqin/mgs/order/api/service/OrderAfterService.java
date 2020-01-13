@@ -7,16 +7,11 @@
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.service;
 
-import java.util.List;
-
-import javax.validation.Valid;
-
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.domain.CartInfo;
-import com.aiqin.mgs.order.api.domain.OrderAfteIListInfo;
 import com.aiqin.mgs.order.api.domain.OrderAfterSaleInfo;
 import com.aiqin.mgs.order.api.domain.OrderAfterSaleQuery;
-import com.aiqin.mgs.order.api.domain.OrderInfo;
+
+import javax.validation.Valid;
 
 @SuppressWarnings("all")
 public interface OrderAfterService {
@@ -25,7 +20,7 @@ public interface OrderAfterService {
 	HttpResponse selectOrderAfter(@Valid OrderAfterSaleQuery orderAfterSaleQuery);
 
 	//TOC-添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表....
-	HttpResponse addAfterOrder(@Valid OrderAfterSaleInfo orderAfterSaleInfo);
+	HttpResponse addAfterOrder(@Valid OrderAfterSaleInfo orderAfterSaleInfo) throws Exception;
 	
 	//服务商品-添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表....
 	HttpResponse addAfterNoCodeOrder(@Valid OrderAfterSaleInfo orderAfterSaleInfo);

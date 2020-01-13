@@ -1,7 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>com.aiqin.ground</groupId>
         <artifactId>ground-spring-boot</artifactId>
@@ -28,7 +27,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
         </dependency>
 		<dependency>
             <groupId>com.thoughtworks.xstream</groupId>
@@ -40,9 +38,27 @@
             <artifactId>jedis</artifactId>
             <version>2.9.0</version>
         </dependency>
-        
+        <dependency>
+            <groupId>com.aiqin.mgs.control</groupId>
+            <artifactId>mgs-control-client</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>3.9</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aiqin.platform.flows</groupId>
+            <artifactId>flows-client</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+            <version>2.8.3</version>
+        </dependency>
     </dependencies>
-
     <build>
         <finalName>order-api</finalName>
         <resources>
@@ -63,7 +79,6 @@
                     <configFile>formatter.xml</configFile>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.mybatis.generator</groupId>
                 <artifactId>mybatis-generator-maven-plugin</artifactId>
@@ -92,13 +107,15 @@
             </plugin>
         </plugins>
     </build>
-
     <profiles>
         <profile>
             <id>dev</id>
             <properties>
                 <profile.name>dev</profile.name>
             </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
         </profile>
         <profile>
             <id>release</id>
@@ -111,9 +128,12 @@
             <properties>
                 <profile.name>test</profile.name>
             </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
+        </profile>
+        <profile>
+            <id>preheat</id>
+            <properties>
+                <profile.name>preheat</profile.name>
+            </properties>
         </profile>
     </profiles>
 </project>

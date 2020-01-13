@@ -14,7 +14,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
+@Data
 @ApiModel("订单明细实体类")
 public class OrderDetailInfo extends PagesRequest {
 	
@@ -59,7 +61,10 @@ public class OrderDetailInfo extends PagesRequest {
 	@ApiModelProperty(value="sku_code")
 	@JsonProperty("sku_code")
 	private String skuCode ;
-	
+
+	@ApiModelProperty(value="sku_name")
+	@JsonProperty("sku_name")
+	private String skuName ;
 	
 	@ApiModelProperty(value="spu_code")
 	@JsonProperty("spu_code")
@@ -89,8 +94,11 @@ public class OrderDetailInfo extends PagesRequest {
 	@ApiModelProperty(value="实际价格")
 	@JsonProperty("actual_price")
 	private Integer actualPrice ;
-	
-	
+
+	@ApiModelProperty(value="成本价格")
+	@JsonProperty("cost_price")
+	private Integer costPrice ;
+
 	@ApiModelProperty(value="购买数量")
 	@JsonProperty("amount")
 	private Integer amount;
@@ -200,389 +208,21 @@ public class OrderDetailInfo extends PagesRequest {
     @ApiModelProperty(value="优惠券实体类")
     @JsonProperty("coupon_info")
     private OrderRelationCouponInfo couponInfo;
-    
-    
-    
-	public String getOrderCode() {
-		return orderCode;
-	}
 
 
-	public void setOrderCode(String orderCode) {
-		this.orderCode = orderCode;
-	}
+	@ApiModelProperty(value="提货数量")
+	@JsonProperty("supply_amount")
+	private Integer supplyAmount=0;
 
+	@ApiModelProperty(value="剩余提货数量")
+	@JsonProperty("able_supply_amount")
+	private Integer ableSupplyAmount=0;
 
-	public String getRowno() {
-		return rowno;
-	}
 
 
-	public void setRowno(String rowno) {
-		this.rowno = rowno;
-	}
-
-
-	public OrderRelationCouponInfo getCouponInfo() {
-		return couponInfo;
-	}
-
-
-	public void setCouponInfo(OrderRelationCouponInfo couponInfo) {
-		this.couponInfo = couponInfo;
-	}
-
-
-	public String getReceiveType() {
-		return receiveType;
-	}
-
-
-	public void setReceiveType(String receiveType) {
-		this.receiveType = receiveType;
-	}
-
-
-	public Integer getConsumecycle() {
-		return consumecycle;
-	}
-
-
-	public void setConsumecycle(Integer consumecycle) {
-		this.consumecycle = consumecycle;
-	}
-
-
-	public Date getCycleenddate() {
-		return cycleenddate;
-	}
-
-
-	public void setCycleenddate(Date cycleenddate) {
-		this.cycleenddate = cycleenddate;
-	}
-
-	public String getMemberId() {
-		return memberId;
-	}
-
-
-	public void setMemberId(String memberId) {
-		this.memberId = memberId;
-	}
-
-
-	public String getMemberName() {
-		return memberName;
-	}
-
-
-	public void setMemberName(String memberName) {
-		this.memberName = memberName;
-	}
-
-
-	public String getMemberPhone() {
-		return memberPhone;
-	}
-
-
-	public void setMemberPhone(String memberPhone) {
-		this.memberPhone = memberPhone;
-	}
-
-
-	public String getOriginType() {
-		return originType;
-	}
-
-
-	public void setOriginType(String originType) {
-		this.originType = originType;
-	}
-
-
-	public String getOrderId() {
-		return orderId;
-	}
-
-
-	public void setOrderId(String orderId) {
-		this.orderId = orderId;
-	}
-
-
-	public String getOrderDetailId() {
-		return orderDetailId;
-	}
-
-
-	public void setOrderDetailId(String orderDetailId) {
-		this.orderDetailId = orderDetailId;
-	}
-
-
-	public String getProductId() {
-		return productId;
-	}
-
-
-	public void setProductId(String productId) {
-		this.productId = productId;
-	}
-
-
-	public String getProductCode() {
-		return productCode;
-	}
-
-
-	public void setProductCode(String productCode) {
-		this.productCode = productCode;
-	}
-
-
-	public String getProductName() {
-		return productName;
-	}
-
-
-	public void setProductName(String productName) {
-		this.productName = productName;
-	}
-
-
-	public String getListName() {
-		return listName;
-	}
-
-
-	public void setListName(String listName) {
-		this.listName = listName;
-	}
-
-
-	public String getSkuCode() {
-		return skuCode;
-	}
-
-
-	public void setSkuCode(String skuCode) {
-		this.skuCode = skuCode;
-	}
-
-
-	public String getSpuCode() {
-		return spuCode;
-	}
-
-
-	public void setSpuCode(String spuCode) {
-		this.spuCode = spuCode;
-	}
-
-
-	public String getBarCode() {
-		return barCode;
-	}
-
-
-	public void setBarCode(String barCode) {
-		this.barCode = barCode;
-	}
-
-
-	public String getSpec() {
-		return spec;
-	}
-
-
-	public void setSpec(String spec) {
-		this.spec = spec;
-	}
-
-
-	public String getUnit() {
-		return unit;
-	}
-
-
-	public void setUnit(String unit) {
-		this.unit = unit;
-	}
-
-
-	public Integer getRetailPrice() {
-		return retailPrice;
-	}
-
-
-	public void setRetailPrice(Integer retailPrice) {
-		this.retailPrice = retailPrice;
-	}
-
-
-	public Integer getActualPrice() {
-		return actualPrice;
-	}
-
-
-	public void setActualPrice(Integer actualPrice) {
-		this.actualPrice = actualPrice;
-	}
-
-
-	public Integer getAmount() {
-		return amount;
-	}
-
-
-	public void setAmount(Integer amount) {
-		this.amount = amount;
-	}
-
-
-	public Integer getProductStatus() {
-		return productStatus;
-	}
-
-
-	public void setProductStatus(Integer productStatus) {
-		this.productStatus = productStatus;
-	}
-
-
-	public String getLogo() {
-		return logo;
-	}
-
-
-	public void setLogo(String logo) {
-		this.logo = logo;
-	}
-
-
-	public String getTypeId() {
-		return typeId;
-	}
-
-
-	public void setTypeId(String typeId) {
-		this.typeId = typeId;
-	}
-
-
-	public String getTypeName() {
-		return typeName;
-	}
-
-
-	public void setTypeName(String typeName) {
-		this.typeName = typeName;
-	}
-
-
-	public Integer getGiftStatus() {
-		return giftStatus;
-	}
-
-
-	public void setGiftStatus(Integer giftStatus) {
-		this.giftStatus = giftStatus;
-	}
-
-
-	public Integer getReturnStatus() {
-		return returnStatus;
-	}
-
-
-	public void setReturnStatus(Integer returnStatus) {
-		this.returnStatus = returnStatus;
-	}
-
-
-	public Integer getReturnAmount() {
-		return returnAmount;
-	}
-
-
-	public void setReturnAmount(Integer returnAmount) {
-		this.returnAmount = returnAmount;
-	}
-
-
-	public String getActivityId() {
-		return activityId;
-	}
-
-
-	public void setActivityId(String activityId) {
-		this.activityId = activityId;
-	}
-
-
-	public String getActivityName() {
-		return activityName;
-	}
-
-
-	public void setActivityName(String activityName) {
-		this.activityName = activityName;
-	}
-
-
-	public Integer getCouponDiscount() {
-		return couponDiscount;
-	}
-
-
-	public void setCouponDiscount(Integer couponDiscount) {
-		this.couponDiscount = couponDiscount;
-	}
-
-
-	public Date getCreateTime() {
-		return createTime;
-	}
-
-
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
-
-
-	public Date getUpdateTime() {
-		return updateTime;
-	}
-
-
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
-	}
-
-
-	public String getCreateBy() {
-		return createBy;
-	}
-
-
-	public void setCreateBy(String createBy) {
-		this.createBy = createBy;
-	}
-
-
-	public String getUpdateBy() {
-		return updateBy;
-	}
-
-
-	public void setUpdateBy(String updateBy) {
-		this.updateBy = updateBy;
-	}
-	
-	
-    
+    @ApiModelProperty(value="未提货的退货数量")
+    @JsonProperty("return_prestorage_amount")
+    private Integer returnPrestorageAmount=0;
 }
 
 

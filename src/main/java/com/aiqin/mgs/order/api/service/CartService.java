@@ -18,7 +18,7 @@ import com.aiqin.mgs.order.api.domain.CartInfo;
 public interface CartService {
 	
 	//微商城-添加/修改购物车信息0:添加1:修改....
-	HttpResponse addCartInfo(CartInfo cartInfo);    
+	HttpResponse addCartInfo(CartInfo cartInfo);
     
 	//根据会员ID查询购物车
     HttpResponse selectCartByMemberId(String memberId,String distributorId,Integer pageNo,Integer pageSize);   

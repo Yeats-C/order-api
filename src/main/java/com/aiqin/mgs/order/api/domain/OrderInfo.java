@@ -141,7 +141,7 @@ public class OrderInfo extends PagesRequest {
 	private String guideName;
 	
 	//20190214
-	@ApiModelProperty(value="订单类型 1：TOC订单 2: TOB订单 3：服务商品")
+	@ApiModelProperty(value="订单类型 1：TOC订单 2: TOB订单 3：服务商品，4 预存订单")
 	@JsonProperty("order_type")
 	private Integer orderType;
 	
@@ -181,8 +181,7 @@ public class OrderInfo extends PagesRequest {
 	@ApiModelProperty(value="前端控制退货按钮使用字段:1:订单已全数退完")
 	@JsonProperty("turn_return_view")
 	private Integer turnReturnView;
-	
-	
+
 
 
 	public Integer getTurnReturnView() {

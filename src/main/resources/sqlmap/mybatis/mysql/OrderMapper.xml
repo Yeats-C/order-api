@@ -13,7 +13,7 @@
         <result column="origin_type" jdbcType="TINYINT" property="originType"/>
         <result column="receive_type" jdbcType="TINYINT" property="receiveType"/>
         <result column="receive_code" jdbcType="VARCHAR" property="receiveCode"/>
-        <result column="receiveTime" jdbcType="TIMESTAMP" property="receive_time"/>
+        <result column="receive_time" jdbcType="TIMESTAMP" property="receiveTime"/>
         <result column="order_status" jdbcType="TINYINT" property="orderStatus"/>
         <result column="return_status" jdbcType="TINYINT" property="returnStatus"/>
         <result column="pay_status" jdbcType="TINYINT" property="payStatus"/>
@@ -48,6 +48,20 @@
         <result column="return_order_amount" jdbcType="INTEGER" property="returnOrderAmount"/>
     </resultMap>
 
+    <resultMap id="LastPrestorageMapping" type="com.aiqin.mgs.order.api.domain.response.PrestorageResponse">
+        <result column="prestorage_order_supply_detail_id" jdbcType="VARCHAR" property="prestorageOrderSupplyDetailId"/>
+        <result column="product_name" jdbcType="VARCHAR" property="productName"/>
+        <result column="amount" jdbcType="INTEGER" property="amount"/>
+        <result column="return_amount" jdbcType="INTEGER" property="returnAmount"/>
+        <result column="return_prestorage_amount" jdbcType="INTEGER" property="returnPrestorageAmount"/>
+        <result column="supply_amount" jdbcType="INTEGER" property="supplyAmount"/>
+        <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
+        <result column="prestorage_order_supply_id" jdbcType="VARCHAR" property="prestorageOrderSupplyId"/>
+        <result column="distributor_code" jdbcType="VARCHAR" property="distributorCode"/>
+        <result column="distributor_id" jdbcType="VARCHAR" property="distributorId"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+
+    </resultMap>
     <resultMap id="LastBuyMapping" type="com.aiqin.mgs.order.api.domain.response.LastBuyResponse">
         <result column="new_consume_time" jdbcType="TIMESTAMP" property="newConsumeTime"/>
         <result column="product" jdbcType="VARCHAR" property="product"/>
@@ -70,7 +84,7 @@
         <result column="origin_type" jdbcType="TINYINT" property="originType"/>
         <result column="receive_type" jdbcType="TINYINT" property="receiveType"/>
         <result column="receive_code" jdbcType="VARCHAR" property="receiveCode"/>
-        <result column="receiveTime" jdbcType="TIMESTAMP" property="receive_time"/>
+        <result column="receive_time" jdbcType="TIMESTAMP" property="receiveTime"/>
         <result column="order_status" jdbcType="TINYINT" property="orderStatus"/>
         <result column="return_status" jdbcType="TINYINT" property="returnStatus"/>
         <result column="pay_status" jdbcType="TINYINT" property="payStatus"/>
@@ -103,11 +117,16 @@
         <result column="avg_paid_price" jdbcType="BIGINT" property="avgPaidPrice"/>
         <result column="date_tag" jdbcType="VARCHAR" property="dateTag"/>
     </resultMap>
-
+    
+    <resultMap id="LatelyResponse" type="com.aiqin.mgs.order.api.domain.response.LatelyResponse">
+        <result column="pay_time" property="pay_time"/>
+        <result column="price" property="price"/>
+    </resultMap>
+    
 
     <!-- 插入订单表 -->
     <insert id="addOrderInfo">
-        insert into order_info
+        insert into order_consumer_info
         (order_id,order_code,member_id,member_name,member_phone,distributor_id,distributor_code,distributor_name,origin_type,receive_type,order_status,
         <if test="returnStatus!=null">
             return_status,
@@ -132,20 +151,18 @@
         <if test="totalPrice!=null">
             #{totalPrice},
         </if>
-        #{customNote},#{businessNote},#{cashierId},#{cashierName},#{guideId},#{guideName},#{orderType},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},#{receiveCode},CURRENT_TIMESTAMP)
+        #{customNote},#{businessNote},#{cashierId},#{cashierName},#{guideId},#{guideName},#{orderType},CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,#{createBy},#{updateBy},#{receiveCode},CURRENT_TIMESTAMP)
     </insert>
 
     <!-- 订单查询byorderid -->
     <select id="selecOrderById" resultMap="OrderInfoMapping">
-        SELECT * FROM order_info
+        SELECT * FROM order_consumer_info
         where 1=1
         <choose>
             <when test="orderType != null ">
                 and order_type =#{orderType}
             </when>
-            <otherwise>
-                and order_type = 1
-            </otherwise>
+
         </choose>
         <if test="orderId!=null and orderId!=''">
             and order_id = #{orderId}
@@ -156,12 +173,52 @@
         LIMIT 1
     </select>
 
+    <!-- 预存订单查询 -->
+    <select id="selectPrestorageOrder" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="LastPrestorageMapping"
+            resultType="java.util.List">
+
+        select d.prestorage_order_supply_detail_id,d.product_name ,d.amount ,d.return_amount ,d.return_prestorage_amount,d.supply_amount ,s.create_time from prestorage_order_supply s,prestorage_order_supply_detail d
+        where  s.prestorage_order_supply_id=d.prestorage_order_supply_id and s.distributor_id = #{distributorId} and s.member_id =#{memberId}
+
+
+        ORDER BY s.create_time DESC
+
+    </select>
+    <!-- 总条数 -->
+    <select id="selectPrestorageOrderCount" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery"
+            resultType="java.lang.Integer">
+         SELECT count(1) FROM prestorage_order_supply s,prestorage_order_supply_detail d
+        WHERE  s.prestorage_order_supply_id=d.prestorage_order_supply_id and s.distributor_id = #{distributorId} and s.member_id =#{memberId}
+
+
+    </select>
+
+    <!-- 预存订单详情查询 -->
+    <select id="selectprestorageorderDetails" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="LastPrestorageMapping"
+            resultType="java.util.List">
+
+        select d.prestorage_order_supply_detail_id,d.product_name ,d.amount ,d.return_amount ,d.return_prestorage_amount,d.supply_amount,d.sku_code ,d.prestorage_order_supply_id,s.distributor_code ,s.distributor_id from prestorage_order_supply s,prestorage_order_supply_detail d
+        where  d.prestorage_order_supply_detail_id = #{prestorageOrderSupplyDetailId} and s.prestorage_order_supply_id=d.prestorage_order_supply_id
+
+
+        ORDER BY s.create_time DESC
+
+    </select>
+
 
     <!-- 模糊订单查询分页 -->
     <select id="selectOrder" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="OrderInfoMapping"
             resultType="java.util.List">
-        SELECT a.* FROM order_info a
-        WHERE 1=1 and order_type = 1
+        SELECT a.* FROM order_consumer_info a
+        WHERE 1=1
+        <choose>
+            <when test="orderType!=null and orderType!='' ">
+                and a.order_type = #{orderType}
+            </when>
+            <otherwise>
+                and (order_type = 1 or order_type = 4)
+            </otherwise>
+        </choose>
         <if test="distributorId!=null and distributorId!='' ">
             and a.distributor_id = #{distributorId}
         </if>
@@ -243,7 +300,7 @@
     <!-- 总条数 -->
     <select id="selectOrderCount" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery"
             resultType="java.lang.Integer">
-        SELECT count(1) FROM order_info a
+        SELECT count(1) FROM order_consumer_info a
         WHERE 1=1 and order_type = 1
         <if test="distributorId!=null and distributorId!='' ">
             and a.distributor_id = #{distributorId}
@@ -319,10 +376,64 @@
         </if>
     </select>
 
+
+
+    <select id="getUnPayNum" parameterType="com.aiqin.mgs.order.api.domain.request.UnPayVo" resultType="java.lang.Integer">
+        SELECT count(distinct a.member_id) FROM order_consumer_info a
+        WHERE 1=1
+        <if test="distributorId!=null and distributorId!='' ">
+            and a.distributor_id = #{distributorId}
+        </if>
+
+        <if test="orderStatus!=null ">
+            and a.order_status = #{orderStatus}
+        </if>
+        <if test="orderStatusList != null">
+            and a.order_status in (
+            <foreach collection="orderStatusList" item="order_status" separator=",">
+                '${order_status}'
+            </foreach>
+            )
+        </if>
+        <if test="beginTime!=null ">
+            and a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime!=null ">
+            and a.create_time &lt;= #{endTime}
+        </if>
+
+    </select>
+
+    <select id="getUnPayMemberIdList" parameterType="com.aiqin.mgs.order.api.domain.request.UnPayVo" resultType="java.lang.String">
+        SELECT distinct a.member_id FROM order_consumer_info a
+        WHERE 1=1
+        <if test="distributorId!=null and distributorId!='' ">
+            and a.distributor_id = #{distributorId}
+        </if>
+
+        <if test="orderStatus!=null ">
+            and a.order_status = #{orderStatus}
+        </if>
+        <if test="orderStatusList != null">
+            and a.order_status in (
+            <foreach collection="orderStatusList" item="order_status" separator=",">
+                '${order_status}'
+            </foreach>
+            )
+        </if>
+        <if test="beginTime!=null ">
+            and a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime!=null ">
+            and a.create_time &lt;= #{endTime}
+        </if>
+        ORDER BY a.distributor_id DESC
+        limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </select>
     <!-- 模糊查询订单列表+订单中商品sku数量分页 -->
     <select id="selectskuResponse" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="OradskuMapping"
             resultType="java.util.List">
-        SELECT a.*,a.create_time AS pay_time FROM order_info a
+        SELECT a.*,a.create_time AS pay_time FROM order_consumer_info a
         WHERE 1=1 and order_type = 1
         <if test="distributorId!=null and distributorId!='' ">
             and a.distributor_id = #{distributorId}
@@ -405,7 +516,7 @@
     <!-- 模糊查询订单列表+订单中商品sku数量 总数据量 -->
     <select id="skuResponseCount" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery"
             resultType="java.lang.Integer">
-        SELECT count(1) FROM order_info a
+        SELECT count(1) FROM order_consumer_info a
         WHERE 1=1 and order_type = 1
         <if test="distributorId!=null and distributorId!='' ">
             and a.distributor_id = #{distributorId}
@@ -483,7 +594,7 @@
 
     <!-- 接口-分销机构维度-总销售额 返回INT 总销售额：包含退货、不包含取消、未付款的订单-->
     <select id="selectOrderAmt" resultType="java.lang.Integer">
-        SELECT SUM(b.actual_price) AS total_price FROM order_info b
+        SELECT SUM(b.actual_price) AS total_price FROM order_consumer_info b
         WHERE 1=1 and order_type = 1
         and b.distributor_id =#{distributorId}
         AND b.order_status NOT IN ('0','4')
@@ -499,7 +610,7 @@
 
     <!-- 接口-分销机构+当月维度-当月销售额  当月销售额：包含退货、不包含取消、未付款的订单-->
     <select id="selectByMonthAllAmt" resultType="java.lang.Integer">
-        SELECT SUM(b.actual_price) AS total_price FROM order_info b
+        SELECT SUM(b.actual_price) AS total_price FROM order_consumer_info b
         WHERE 1=1 and order_type = 1
         and b.distributor_id = #{distributorId}
         AND b.order_status NOT IN ('0','4')
@@ -517,7 +628,7 @@
 
     <!-- 接口-分销机构+日维度- 昨日销售额：包含退货、不包含取消、未付款的订单  -->
     <select id="selectByYesdayAllAmt" resultType="java.lang.Integer">
-        SELECT SUM(b.actual_price) AS total_price FROM order_info b
+        SELECT SUM(b.actual_price) AS total_price FROM order_consumer_info b
         WHERE 1=1 and order_type = 1
         <if test="distributorId!=null and distributorId !='' ">
             and b.distributor_id = #{distributorId}
@@ -537,7 +648,7 @@
 
     <!-- 接口-分销机构+当月维度-当月支付订单数   当月支付订单数：包含退货、不包含取消、未付款的订单-->
     <select id="selectByMonthAcount" resultType="java.lang.Integer">
-        SELECT count(b.order_id) AS total_acount from order_info b
+        SELECT count(b.order_id) AS total_acount from order_consumer_info b
         WHERE
         1=1 and order_type = 1
         and b.distributor_id = #{distributorId}
@@ -556,7 +667,7 @@
 
     <!-- 接口-分销机构+日维度-昨日支付订单数  昨日支付订单数：包含退货、不包含取消、未付款的订单-->
     <select id="selectByYesdayAcount" resultType="java.lang.Integer">
-        SELECT count(b.order_id) AS total_acount from order_info b
+        SELECT count(b.order_id) AS total_acount from order_consumer_info b
         WHERE
         1=1 and order_type = 1
         and b.distributor_id = #{distributorId}
@@ -576,7 +687,7 @@
     <!-- 接口-分销机构+当月维度-当月实收    当月实收：不包含退货、未付款、取消的订单 -->
     <select id="selectbByMonthRetailAmt" resultType="java.lang.Integer">
         SELECT CASE WHEN b.return_price IS NULL THEN a.real_amt ELSE a.real_amt-b.return_price END AS real_amt FROM (
-        SELECT '1' AS create_time,SUM(actual_price) AS real_amt FROM order_info b
+        SELECT '1' AS create_time,SUM(actual_price) AS real_amt FROM order_consumer_info b
         WHERE 1=1 and order_type = 1
         AND b.distributor_id = #{distributorId}
         AND b.order_status NOT IN ('0','4')
@@ -615,7 +726,7 @@
     <select id="selectbByYesdayRetailAmt" resultType="java.lang.Integer">
 
         SELECT CASE WHEN b.return_price IS NULL THEN a.real_amt ELSE a.real_amt-b.return_price END AS real_amt FROM (
-        SELECT '1' AS create_time,COUNT(b.order_id) AS order_acount,SUM(actual_price) AS real_amt FROM order_info b
+        SELECT '1' AS create_time,COUNT(b.order_id) AS order_acount,SUM(actual_price) AS real_amt FROM order_consumer_info b
         WHERE 1=1 and order_type = 1
         AND b.distributor_id = #{distributorId}
         AND b.order_status NOT IN ('0','4')
@@ -655,7 +766,7 @@
         SELECT a.`create_time` as create_time ,a.order_acount as order_count,CASE WHEN b.return_price IS NULL THEN
         a.real_amt ELSE a.real_amt-b.return_price END AS actual_price FROM (
         SELECT DATE_FORMAT(b.create_time,"%Y-%m-%d") AS create_time,COUNT(b.order_id) AS order_acount,SUM(actual_price)
-        AS real_amt FROM order_info b
+        AS real_amt FROM order_consumer_info b
         WHERE 1=1 and order_type = 1
         AND b.distributor_id = #{distributorId}
         AND b.order_status NOT IN ('0','4')
@@ -697,7 +808,7 @@
         SELECT #{any} AS create_time ,a.order_acount AS order_count,CASE WHEN b.return_price IS NULL THEN a.real_amt
         ELSE a.real_amt-b.return_price END AS actual_price FROM (
         SELECT YEARWEEK(DATE_FORMAT(b.create_time,'%Y-%m-%d')) AS create_time,COUNT(b.order_id) AS
-        order_acount,SUM(actual_price) AS real_amt FROM order_info b
+        order_acount,SUM(actual_price) AS real_amt FROM order_consumer_info b
         WHERE 1=1 and order_type = 1
         AND b.distributor_id = #{distributorId}
         AND b.order_status NOT IN ('0','4')
@@ -737,7 +848,7 @@
         SELECT a.`create_time` AS create_time ,a.order_acount AS order_count,CASE WHEN b.return_price IS NULL THEN
         a.real_amt ELSE a.real_amt-b.return_price END AS actual_price FROM (
         SELECT DATE_FORMAT(b.create_time,"%Y-%m") AS create_time,COUNT(b.order_id) AS order_acount,SUM(actual_price) AS
-        real_amt FROM order_info b
+        real_amt FROM order_consumer_info b
         WHERE 1=1 and order_type = 1
         AND b.order_status NOT IN ('0','4')
         AND b.pay_status='1'
@@ -775,7 +886,7 @@
 
     <!-- 变更订单表 -->
     <update id="updateOrder">
-        update order_info set update_time=CURRENT_TIMESTAMP
+        update order_consumer_info set update_time=CURRENT_TIMESTAMP
         <if test="payType!=null and payType!='' ">
             ,pay_type=#{payType}
         </if>
@@ -812,7 +923,7 @@
         b.cashier_id,b.cashier_name,
         a.pay_type,SUM(pay_price) AS pay_price
         FROM
-        order_info b
+        order_consumer_info b
         LEFT JOIN order_pay a ON a.order_id = b.order_id
         WHERE
         1=1 and order_type = 1
@@ -835,8 +946,8 @@
         IFNULL(IFNULL(b.actual_price,0)*IFNULL(b.return_amount,0),0) AS return_price,COUNT(a.order_id) AS
         return_order_amount
         FROM
-        order_detail b
-        LEFT JOIN order_info a ON a.order_id = b.order_id
+        order_consumer_detail b
+        LEFT JOIN order_consumer_info a ON a.order_id = b.order_id
         LEFT JOIN order_pay c ON a.order_id = c.order_id
         WHERE 1=1 and order_type = 1
         AND a.cashier_id =#{cashierId}
@@ -855,7 +966,7 @@
         SELECT
         SUM(IFNULL(a.actual_price,0)) AS sales_amount, COUNT(a.order_id) AS sales_order_amount
         FROM
-        order_info a
+        order_consumer_info a
         LEFT JOIN order_pay c ON a.order_id = c.order_id
         WHERE 1=1 and order_type = 1
         AND a.cashier_id =#{cashierId}
@@ -872,34 +983,34 @@
 
     <!-- 接口-通过会员查询最后一次的消费记录. -->
     <select id="last" resultMap="LastBuyMapping" resultType="java.util.List">
-         SELECT distinct a.product_name as product,b.create_time as new_consume_time FROM order_detail a,
-         (SELECT order_id,create_time FROM  order_info 
-          WHERE 1=1 and order_type = 1 
+         SELECT distinct a.product_name as product,b.create_time as new_consume_time FROM order_consumer_detail a,
+         (SELECT order_id,create_time FROM  order_consumer_info
+          WHERE 1=1
          and member_id=#{memberId} 
          AND order_status NOT IN ('0','4')
          AND pay_status='1'
-         ORDER BY create_time DESC LIMIT 1) b 
+         ORDER BY create_time DESC LIMIT 3) b 
          WHERE a.order_id = b.order_id
-         LIMIT 2
+         LIMIT 3
     </select>
 
     <!-- 将提货码插入订单表中... -->
     <update id="rede">
-		update order_info set receive_code=#{receiveCode},receive_time=CURRENT_TIMESTAMP 
+		update order_consumer_info set receive_code=#{receiveCode},receive_time=CURRENT_TIMESTAMP
 		where order_id = #{orderId} and order_status =2
 	</update>
 
     <!-- 接口-注销提货码... -->
     <update id="reded">
-		update order_info set receive_code ='@zx',receive_time=CURRENT_TIMESTAMP where order_id = #{orderId}
+		update order_consumer_info set receive_code ='@zx',receive_time=CURRENT_TIMESTAMP where order_id = #{orderId}
 	</update>
 
 
     <!-- 接口-可退货的订单查询 分页 -->
     <select id="reorer" resultMap="OrderInfoMapping" resultType="java.util.List">
 
-        SELECT a.* FROM order_info a
-        LEFT JOIN (SELECT order_id,SUM(IFNULL(amount,0)) AS amount FROM order_detail GROUP BY order_id) b ON a.order_id
+        SELECT a.* FROM order_consumer_info a
+        LEFT JOIN (SELECT order_id,SUM(IFNULL(amount,0)) AS amount FROM order_consumer_detail GROUP BY order_id) b ON a.order_id
         = b.order_id
         LEFT JOIN (SELECT order_code,SUM(IFNULL(return_amount,0)) AS return_amount FROM `order_after_sale_detail` GROUP
         BY order_code) c ON a.order_code = c.order_code
@@ -934,8 +1045,8 @@
     <!-- 接口-可退货的订单查询 总数据量 -->
     <select id="reorerCount" resultMap="OrderInfoMapping" resultType="java.lang.Integer">
 
-        SELECT count(1) FROM order_info a
-        LEFT JOIN (SELECT order_id,SUM(IFNULL(amount,0)) AS amount FROM order_detail GROUP BY order_id) b ON a.order_id
+        SELECT count(1) FROM order_consumer_info a
+        LEFT JOIN (SELECT order_id,SUM(IFNULL(amount,0)) AS amount FROM order_consumer_detail GROUP BY order_id) b ON a.order_id
         = b.order_id
         LEFT JOIN (SELECT order_code,SUM(IFNULL(return_amount,0)) AS return_amount FROM `order_after_sale_detail` GROUP
         BY order_code) c ON a.order_code = c.order_code
@@ -967,7 +1078,7 @@
 
     <!-- 未付款订单30分钟后自动取消 -->
     <select id="nevder" resultType="java.lang.String">
-    SELECT order_id FROM order_info 
+    SELECT order_id FROM order_consumer_info
     WHERE 1=1 and order_type = 1 
     AND order_status=0
     AND DATE_ADD(create_time,INTERVAL 30 MINUTE) &lt;= NOW()
@@ -975,7 +1086,7 @@
 
     <!-- 提货码10分钟后失效. -->
     <select id="nevred" resultType="java.lang.String">
-        SELECT order_id FROM order_info 
+        SELECT order_id FROM order_consumer_info
         WHERE 1=1 and order_type = 1
         AND DATE_ADD(receive_time,INTERVAL 10 MINUTE) &lt;= NOW()
         AND order_status = 2
@@ -985,7 +1096,7 @@
     <!-- 接口-通过当前门店,等级会员list、 统计订单使用的会员数、返回7天内的统计. -->
     <select id="devel" resultMap="DevelMapping" resultType="java.util.List">
         SELECT DATE_FORMAT(create_time,'%Y-%m-%d') AS trante,COUNT(DISTINCT(member_id)) AS acount
-        FROM order_info
+        FROM order_consumer_info
         WHERE 1=1 and order_type = 1
         AND distributor_id = #{distributorId}
         <if test="memberList != null">
@@ -1001,14 +1112,14 @@
 
     <!-- 删除订单主数据 -->
     <delete id="deleteOrderInfo">
-		delete from order_info WHERE order_id =#{orderId}
+		delete from order_consumer_info WHERE order_id =#{orderId}
      </delete>
 
 
     <!-- 订单数 -->
     <select id="selectAcountByEcshop" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery"
             resultType="java.lang.Integer">
-        SELECT COUNT(1) FROM order_info
+        SELECT COUNT(1) FROM order_consumer_info
         WHERE 1=1 and order_type = 1
         <if test="distributorId!=null and distributorId!='' ">
             and distributor_id = #{distributorId}
@@ -1020,7 +1131,7 @@
     <!-- 订单金额 -->
     <select id="selectAmountByEcshop" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery"
             resultType="java.lang.Integer">
-        SELECT COUNT(actual_price) FROM order_info
+        SELECT COUNT(actual_price) FROM order_consumer_info
         WHERE 1=1 and order_type = 1
         <if test="distributorId!=null and distributorId!='' ">
             and distributor_id = #{distributorId}
@@ -1032,7 +1143,7 @@
     <!-- 成交客户 -->
     <select id="selectMembersByEcshop" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery"
             resultType="java.lang.Integer">
-        SELECT COUNT(DISTINCT member_id) FROM order_info
+        SELECT COUNT(DISTINCT member_id) FROM order_consumer_info
         WHERE 1=1 and order_type = 1
         <if test="distributorId!=null and distributorId!='' ">
             and distributor_id = #{distributorId}
@@ -1044,7 +1155,7 @@
     <!--根据状态查询订单 -->
     <select id="selectCountByStatus" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery"
             resultType="java.lang.Integer">
-        SELECT COUNT(order_id) FROM order_info
+        SELECT COUNT(order_id) FROM order_consumer_info
         WHERE 1=1 and order_type = 1
         <if test="distributorId!=null and distributorId!='' ">
             and distributor_id = #{distributorId}
@@ -1056,7 +1167,7 @@
 
     <!-- 销售目标管理-分销机构-月销售额-->
     <select id="selectDistributorMonth" resultType="java.lang.Integer">
-        SELECT SUM(IFNULL(b.actual_price,0)) AS total_price FROM order_info b
+        SELECT SUM(IFNULL(b.actual_price,0)) AS total_price FROM order_consumer_info b
         WHERE 1=1 and order_type = 1
         AND b.order_status NOT IN ('0','4')
         AND b.pay_status='1'
@@ -1073,19 +1184,19 @@
 
     <!-- 会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、7日内 -->
     <select id="selectByMemberPayCountDay" resultType="java.lang.Integer">
-         SELECT COUNT(DISTINCT member_id) AS count_member FROM order_info  
+         SELECT COUNT(DISTINCT member_id) AS count_member FROM order_consumer_info
          WHERE 1=1 and order_type = 1 
          AND DATE_FORMAT(create_time,"%Y-%m-%d") =#{countDate}
     </select>
     <!-- 会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、7周内 -->
     <select id="selectByMemberPayCountWeek" resultType="java.lang.Integer">
-         SELECT COUNT(DISTINCT member_id) AS count_member FROM order_info  
+         SELECT COUNT(DISTINCT member_id) AS count_member FROM order_consumer_info
          WHERE 1=1 and order_type = 1
          AND YEARWEEK(DATE_FORMAT(create_time,'%Y-%m-%d')) = YEARWEEK(NOW())-#{countDate}
     </select>
     <!-- 会员活跃情况-通过当前门店,等级会员list、 统计订单使用的会员数、7月内 -->
     <select id="selectByMemberPayCountMonth" resultType="java.lang.Integer">
-         SELECT COUNT(DISTINCT member_id) AS count_member FROM order_info  
+         SELECT COUNT(DISTINCT member_id) AS count_member FROM order_consumer_info
          WHERE 1=1 and order_type = 1
          AND DATE_FORMAT(create_time,"%Y-%m") = #{countDate}
     </select>
@@ -1093,7 +1204,7 @@
     <!-- 判断会员是否在当前门店时候有过消费记录 -->
     <select id="selectMemberByDistributor" resultType="java.lang.String">
         SELECT
-        DISTINCT member_id FROM order_info
+        DISTINCT member_id FROM order_consumer_info
         WHERE 1=1 and order_type = 1
         <if test="distributorId!=null and distributorId!='' ">
             AND Distributor_id =#{distributorId}
@@ -1108,7 +1219,7 @@
     </select>
     <!-- 查询未统计销量的已完成订单  -->
     <select id="selectsukReturn" resultType="java.lang.String">
-         SELECT order_id FROM order_info  
+         SELECT order_id FROM order_consumer_info
           WHERE 1=1 AND order_type = 1
             AND order_status IN ('0','4')
             AND suk_return IS NULL
@@ -1118,7 +1229,7 @@
 
     <!-- 修改统计销量状态 -->
     <update id="updateSukReturn" parameterType="java.lang.String">
-        update order_info set suk_return=1 where 1=1
+        update order_consumer_info set suk_return=1 where 1=1
         <if test="_parameter!=null and _parameter!=''">
             and order_id = #{_parameter,jdbcType=VARCHAR}
         </if>
@@ -1131,7 +1242,7 @@
         select sum(actual_price) as total_paid_price,
         count(*) as amount,
         date_format(create_time,'%Y-%m') as date_tag
-        from order_info where 1=1
+        from order_consumer_info where 1=1
         <if test="distributorId!=null">
             and distributor_id = #{distributorId}
         </if>
@@ -1150,7 +1261,7 @@
 
     <!--获取指定时间内有销售数据的门店id集合-->
     <select id="querySaleDistributor" resultType="string">
-        select distinct distributor_id from order_info
+        select distinct distributor_id from order_consumer_info
         where 1=1
         <if test="startDate!=null">
             and create_time &gt;= #{startDate}
@@ -1164,7 +1275,7 @@
     <!--获取指定门店指定时间段内销量前10的sku的集合-->
     <select id="queryTop10SaleSku" resultType="string">
         select b.sku_code from
-        (select order_id from order_info
+        (select order_id from order_consumer_info
         where 1=1
         <if test="distributorId!=null">
             and distributor_id = #{distributorId}
@@ -1177,7 +1288,7 @@
         </if>
         and order_status in(1,2,3,5,6)
         ) a
-        left join order_detail b on a.order_id=b.order_id
+        left join order_consumer_detail b on a.order_id=b.order_id
         group by b.sku_code
         order by count(b.sku_code) desc
         limit 0,10
@@ -1186,7 +1297,7 @@
     <!--获取指定门店指定时间段内销量大于等于num的sku的集合-->
     <select id="querySaleSkuGtNum" resultType="string">
         select b.sku_code from
-        (select order_id from order_info
+        (select order_id from order_consumer_info
         where 1=1
         <if test="distributorId!=null">
             and distributor_id = #{distributorId}
@@ -1199,16 +1310,48 @@
         </if>
         and order_status in(1,2,3,5,6)
         ) a
-        left join order_detail b on a.order_id=b.order_id
+        left join order_consumer_detail b on a.order_id=b.order_id
         group by b.sku_code
         having count(b.sku_code) &gt;= #{num}
     </select>
+    <select id="querySaleSkuCount" resultType="integer">
+        select count(d.id) from
+        order_consumer_detail d,order_consumer_info o
+        where
+        d.order_id=o.order_id
+       and  o.distributor_id = #{distributorId}
+        and d.create_time &gt;= #{startDate}
+        and d.product_code = #{skuCode}
 
+    </select>
+
+    <select id="orderPrestorageCount" resultType="integer">
+        select sum(d.actual_price) from
+        order_consumer_detail d,order_consumer_info o
+        where
+        d.order_id=o.order_id
+       and  o.distributor_id = #{storeId}
+        and d.create_time &gt;= #{startDate}
+        and d.create_time &lt;= #{endDay}
+        and o.order_type = 4
+        and o.order_status in (2,5)
+    </select>
+    <select id="orderStoreCount" resultType="integer">
+         select sum(d.actual_price) from
+        order_consumer_detail d,order_consumer_info o
+        where
+        d.order_id=o.order_id
+       and  o.distributor_id = #{storeId}
+        and d.create_time &gt;= #{startDate}
+        and d.create_time &lt;= #{endDay}
+        and (o.order_type = 1  or o.order_type = 3 )
+        and o.order_status =5
+    </select>
     <!--获取特定sku集合指定时间段内销量数据信息-->
     <select id="querySkuSale" parameterType="com.aiqin.mgs.order.api.domain.request.statistical.SkuSalesRequest"
             resultType="com.aiqin.mgs.order.api.domain.statistical.SkuSales">
         select b.sku_code as skuCode,count(b.sku_code) as sales from
-        (select order_id from order_info
+        (select order_id from order_consumer_info
         where 1=1
         <if test="distributorId!=null">
             and distributor_id = #{distributorId}
@@ -1221,7 +1364,7 @@
         </if>
         and order_status in(1,2,3,5,6)
         ) a
-        left join order_detail b on a.order_id=b.order_id
+        left join order_consumer_detail b on a.order_id=b.order_id
         where 1=1
         <if test="skuCodes != null">
             and b.sku_code in (
@@ -1234,7 +1377,7 @@
 
     <select id="queryLast10DaysOrderStatistical" resultType="com.aiqin.mgs.order.api.domain.response.statistical.Last10DaysOrderStatistical">
         select date_format(create_time,'%Y-%m-%d') as dateTag,count(*) as finishOrderNum
-        from order_info
+        from order_consumer_info
         where distributor_id = #{distributorId}
         and create_time &gt;= #{startDate}
         and create_time &lt;= #{endDate}
@@ -1242,5 +1385,57 @@
         group by date_format(create_time,'%Y-%m-%d')
         order by create_time desc
     </select>
+    <select id="isExistOrder" resultType="java.lang.String">
+        SELECT DATE_FORMAT(create_time,'%Y-%m-%d') AS create_time
+        FROM order_consumer_info
+        WHERE distributor_id = #{distributorId}
+        ORDER BY create_time LIMIT 1
+    </select>
+    
+    <select id="memberLately" resultMap="LatelyResponse"
+            resultType="java.util.List">
+        SELECT  create_time AS pay_time,actual_price as price FROM `order_consumer_info`
+        WHERE 1=1
+        <if test="distributorId!=null">
+            and distributor_id = #{distributorId}
+        </if>
+        <if test="memberId!=null and memberId!=''">
+            and member_id =#{memberId}
+        </if>
+        GROUP BY create_time
+        ORDER BY create_time DESC LIMIT 3
+    </select>
+
+    <!-- 根据条件查询订单列表 -->
+    <select id="findOrderInfoList" parameterType="com.aiqin.mgs.order.api.domain.OrderInfo"
+            resultMap="OrderInfoMapping"
+            resultType="java.util.List">
+        SELECT a.*
+        FROM order_info a
+        WHERE 1 = 1
+        <if test="orderType != null and orderType != '' or orderType == 0">
+            and a.order_type = #{orderType,jdbcType=VARCHAR}
+        </if>
+        <if test="orderStatus != null and orderStatus != '' or orderStatus == 0">
+            and a.order_status = #{orderStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="payStatus != null and payStatus != '' or payStatus == 0">
+            and a.pay_status = #{payStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="orderCode != null and orderCode != ''">
+            and a.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="distributorName != null and distributorName != ''">
+            and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="createTimeBegin != null and createTimeBegin != ''">
+            and date_format(a.create_time,'%Y-%m-%d') &gt;= #{createTimeBegin,jdbcType=VARCHAR}
+        </if>
+        <if test="createTimeEnd != null and createTimeEnd != ''">
+            and date_format(a.create_time,'%Y-%m-%d') &lt;= #{createTimeEnd,jdbcType=VARCHAR}
+        </if>
+        ORDER BY a.create_time DESC
+    </select>
+
 </mapper>
 

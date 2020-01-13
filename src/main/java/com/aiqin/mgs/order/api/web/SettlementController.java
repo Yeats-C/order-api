@@ -89,8 +89,7 @@ public class SettlementController {
     @GetMapping("/pay")
     @ApiOperation(value = "查询支付数据通过Order_id....")
     public HttpResponse pay(@Valid @RequestParam(name = "order_id", required = true) String orderId) {
-    	
-    	
+
         LOGGER.info("查询支付数据通过Order_id: {}",orderId);
         return settlementService.pay(orderId);
     

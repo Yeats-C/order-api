@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.aiqin.mgs.order.api.domain.request.ProductStoreRequest;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +41,12 @@ public interface OrderDetailService {
     //接口--商品概览产品销量、销售额-后5名
 	HttpResponse productOverviewByOrderLast(@Valid String distributor_id,String year, String month);
 
+	//接口--商品概览产品销量、销售额-前5名
+	HttpResponse productFrontTop10(@Valid String distributor_id,String beginTime, String endTime, String categoryId);
+
+    //接口--商品概览产品销量、销售额-后5名
+	HttpResponse productAfterTop10(@Valid String distributor_id,String beginTime, String endTime, String categoryId);
+
 	//接口--会员管理-会员消费记录
 	HttpResponse byMemberOrder(OrderDetailQuery orderDetailQuery); 
 
@@ -47,7 +54,9 @@ public interface OrderDetailService {
 	HttpResponse selectorderany(@Valid String orderId);
 
 	//添加新的订单明细数据
-	public List<OrderDetailInfo> addDetailList(@Valid List<OrderDetailInfo> detailList, @Valid String orderId,@Valid String orderCode) throws Exception; 
+	public List<OrderDetailInfo> addDetailList(@Valid List<OrderDetailInfo> detailList, @Valid String orderId,@Valid String orderCode) throws Exception;
+
+	public List<OrderDetailInfo> updateDetailList(@Valid List<OrderDetailInfo> detailList, @Valid String orderId,@Valid String orderCode) throws Exception;
 
 //	//查询会员下的所有订单ID下的商品集合...
 //	HttpResponse selectproductbyorders(@Valid List<String> orderidslList, @Valid String memberId); 
@@ -76,5 +85,11 @@ public interface OrderDetailService {
 	//查询SKU+销量
 	List<SkuSaleResponse> selectSkuSale(@Valid List<String> orderList);
 
+	//顾客可能还想购买
+	HttpResponse wantBuy(@Valid List<String> sukList);
 
+
+	HttpResponse findOrderDetailById(String orderDetailId);
+	// 查询门店商品订单数
+	HttpResponse productStore(@Valid ProductStoreRequest info);
 }

@@ -97,5 +97,28 @@ public class SequenceService {
         return new DecimalFormat(builder.toString()).format(source);
     }
 
+    /**
+     * 生成退货单编号
+     *
+     * @return
+     */
+    public String generateOrderAfterSaleCode(String companyCode, Integer afterSaleType) {
+        String dateStr = DateUtils.formatDate(new Date(), FMT_PATTERN_DAY);
+        Integer sequence = sequenceRedisDao.nextSequence(SequenceType.ORDER_AFTER_SALE, dateStr, EXPIRED_TIME_MONTH);
+        String type = "";
+        //0-售后退货 1-缺货取消(发货冲减) 2-客户取消
+        switch (afterSaleType) {
+            case 0:
+                type = "53";
+                break;
+            case 1:
+                type = "52";
+                break;
+            case 2:
+                type = "51";
+                break;
+        }
+        return String.format("%s%s%s%s", dateStr, companyCode, type, formatNumber(sequence, 5));
+    }
 
 }

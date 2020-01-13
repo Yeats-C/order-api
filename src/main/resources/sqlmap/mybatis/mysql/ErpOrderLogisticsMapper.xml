@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.order.ErpOrderLogisticsDao">
+
+    <select id="select" parameterType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics"
+            resultType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics">
+        select id as id,
+        logistics_id as logisticsId,
+        pay_id as payId,
+        pay_status as payStatus,
+        logistics_centre_code as logisticsCentreCode,
+        logistics_centre_name as logisticsCentreName,
+        logistics_code as logisticsCode,
+        send_repertory_code as sendRepertoryCode,
+        send_repertory_name as sendRepertoryName,
+        logistics_fee as logisticsFee,
+        coupon_pay_fee as couponPayFee,
+        balance_pay_fee as balancePayFee,
+        coupon_ids as couponIds,
+        create_time as createTime,
+        create_by_id as createById,
+        create_by_name as createByName,
+        update_time as updateTime,
+        update_by_id as updateById,
+        update_by_name as updateByName,
+        status as status
+        from order_store_logistics
+        where 1 = 1
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="logisticsId != null and logisticsId != ''">
+            and logistics_id = #{logisticsId}
+        </if>
+        <if test="payId != null and payId != ''">
+            and pay_id = #{payId}
+        </if>
+        <if test="logisticsCode != null and logisticsCode != ''">
+            and logistics_code = #{logisticsCode}
+        </if>
+        <if test="payStatus != null and payStatus != '' or payStatus == 0 ">
+            and pay_status = #{payStatus}
+        </if>
+        order by create_time desc
+    </select>
+
+    <update id="updateByPrimaryKeySelective">
+        update order_store_logistics
+        set
+        <if test="payId != null and payId != ''">
+            pay_id = #{payId},
+        </if>
+        <if test="payStatus != null and payStatus != '' or payStatus == 0 ">
+            pay_status = #{payStatus},
+        </if>
+        <if test="couponIds != null and couponIds != '' ">
+            coupon_ids = #{couponIds},
+        </if>
+        <if test="couponPayFee != null and couponPayFee != '' or couponPayFee == 0 ">
+            coupon_pay_fee = #{couponPayFee},
+        </if>
+        <if test="balancePayFee != null and balancePayFee != '' or balancePayFee == 0 ">
+            balance_pay_fee = #{balancePayFee},
+        </if>
+        coupon_pay_fee = #{couponPayFee},
+        balance_pay_fee = #{balancePayFee},
+        coupon_ids = #{couponIds},
+        update_by_id = #{updateById},
+        update_by_name = #{updateByName},
+        update_time = sysdate()
+        where id = #{id}
+    </update>
+
+    <update id="updateByPrimaryKey">
+        update order_store_logistics
+        set logistics_id          = #{logisticsId},
+            pay_id                = #{payId},
+            pay_status            = #{payStatus},
+            logistics_centre_code = #{logisticsCentreCode},
+            logistics_centre_name = #{logisticsCentreName},
+            logistics_code        = #{logisticsCode},
+            send_repertory_code   = #{sendRepertoryCode},
+            send_repertory_name   = #{sendRepertoryName},
+            logistics_fee         = #{logisticsFee},
+            coupon_pay_fee        = #{couponPayFee},
+            balance_pay_fee       = #{balancePayFee},
+            coupon_ids            = #{couponIds},
+            update_by_id          = #{updateById},
+            update_by_name        = #{updateByName},
+            status                = #{status},
+            update_time           = sysdate()
+        where id = #{id}
+    </update>
+
+    <insert id="insert">
+        insert into order_store_logistics (logistics_id, pay_id, pay_status, logistics_centre_code,
+                                           logistics_centre_name, logistics_code, send_repertory_code,
+                                           send_repertory_name, logistics_fee, coupon_pay_fee, balance_pay_fee,
+                                           coupon_ids, create_time, create_by_id, create_by_name, update_time,
+                                           update_by_id, update_by_name)
+        values (#{logisticsId}, #{payId}, #{payStatus}, #{logisticsCentreCode},
+                #{logisticsCentreName}, #{logisticsCode}, #{sendRepertoryCode},
+                #{sendRepertoryName}, #{logisticsFee}, #{couponPayFee}, #{balancePayFee},
+                #{couponIds}, sysdate(), #{createById}, #{createByName}, sysdate(),
+                #{updateById}, #{updateByName})
+    </insert>
+
+</mapper>
+

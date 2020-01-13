@@ -21,4 +21,23 @@ public class UrlProperties {
      */
     private String productApi;
 
+    /**
+     * 支付中心api
+     */
+    private String paymentApi;
+
+    /**
+     * 门店生命周期
+     */
+    private String slcsApi;
+
+    private String payApi;
+    /**
+     * 营运中心api
+     */
+    private String omsApi;
+    private String marketApi;
+    private String orderApi;
+    private String scmpApi;
+
 }

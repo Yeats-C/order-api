@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao">
+
+    <select id="select" parameterType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem"
+            resultType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem">
+        select
+        id as id,
+        order_info_detail_id as orderInfoDetailId,
+        order_store_id as orderStoreId,
+        order_store_code as orderStoreCode,
+        spu_code as spuCode,
+        spu_name as spuName,
+        sku_code as skuCode,
+        sku_name as skuName,
+        bar_code as barCode,
+        product_property_code as productPropertyCode,
+        product_property_name as productPropertyName,
+        supplier_code as supplierCode,
+        supplier_name as supplierName,
+        picture_url as pictureUrl,
+        product_spec as productSpec,
+        color_code as colorCode,
+        color_name as colorName,
+        model_code as modelCode,
+        unit_code as unitCode,
+        unit_name as unitName,
+        zero_disassembly_coefficient as zeroDisassemblyCoefficient,
+        product_type as productType,
+        product_count as productCount,
+        product_amount as productAmount,
+        purchase_amount as purchaseAmount,
+        total_product_amount as totalProductAmount,
+        actual_total_product_amount as actualTotalProductAmount,
+        total_preferential_amount as totalPreferentialAmount,
+        preferential_amount as preferentialAmount,
+        total_acivity_amount as totalAcivityAmount,
+        actual_inbound_count as actualInboundCount,
+        actual_product_count as actualProductCount,
+        return_product_count as returnProductCount,
+        tax_rate as taxRate,
+        activity_code as activityCode,
+        line_code as lineCode,
+        gift_line_code as giftLineCode,
+        company_code as companyCode,
+        company_name as companyName,
+        sign_difference_reason as signDifferenceReason,
+        use_status as useStatus,
+        box_gross_weight as boxGrossWeight,
+        box_volume as boxVolume,
+        create_by_id as createById,
+        create_by_name as createByName,
+        update_by_id as updateById,
+        update_by_name as updateByName,
+        create_time as createTime,
+        update_time as updateTime,
+        preferential_amount as preferentialAmount
+        from order_store_detail
+        where 1 = 1
+        <if test=" id != null and id != '' ">
+            and id = #{id}
+        </if>
+        <if test=" orderInfoDetailId != null and orderInfoDetailId != '' ">
+            and order_info_detail_id = #{orderInfoDetailId}
+        </if>
+        <if test=" orderStoreId != null and orderStoreId != '' ">
+            and order_store_id = #{orderStoreId}
+        </if>
+        <if test=" orderStoreCode != null and orderStoreCode != '' ">
+            and order_store_code = #{orderStoreCode}
+        </if>
+        <if test=" lineCode != null and lineCode != '' ">
+            and line_code = #{lineCode}
+        </if>
+        <if test=" useStatus != null and useStatus != '' or useStatus == 0 ">
+            and use_status = #{useStatus}
+        </if>
+        order by create_time asc
+    </select>
+
+    <update id="updateByPrimaryKeySelective">
+        update order_store_detail
+        set
+        <if test="productCount != null and productCount != '' or productCount == 0 ">
+            product_count = #{productCount},
+        </if>
+        <if test="actualProductCount != null and actualProductCount != '' or actualProductCount == 0 ">
+            actual_product_count = #{actualProductCount},
+        </if>
+        <if test="actualInboundCount != null and actualInboundCount != '' or actualInboundCount == 0 ">
+            actual_inbound_count = #{actualInboundCount},
+        </if>
+        <if test="totalProductAmount != null and totalProductAmount != '' or totalProductAmount == 0 ">
+            total_product_amount = #{totalProductAmount},
+        </if>
+        <if test="totalPreferentialAmount != null and totalPreferentialAmount != '' or totalPreferentialAmount == 0 ">
+            total_preferential_amount = #{totalPreferentialAmount},
+        </if>
+        <if test="preferentialAmount != null and preferentialAmount != '' or preferentialAmount == 0 ">
+            preferential_amount = #{preferentialAmount},
+        </if>
+        <if test="totalAcivityAmount != null and totalAcivityAmount != '' or totalAcivityAmount == 0 ">
+            total_acivity_amount = #{totalAcivityAmount},
+        </if>
+        <if test="actualTotalProductAmount != null and actualTotalProductAmount != '' or actualTotalProductAmount == 0 ">
+            actual_total_product_amount = #{actualTotalProductAmount},
+        </if>
+        <if test="useStatus != null and useStatus != '' or useStatus == 0">
+            use_status = #{useStatus},
+        </if>
+        <if test="signDifferenceReason != null and signDifferenceReason != '' ">
+            sign_difference_reason = #{signDifferenceReason},
+        </if>
+        update_by_id = #{updateById},
+        update_by_name = #{updateByName},
+        update_time = sysdate()
+        where id = #{id}
+    </update>
+
+    <insert id="insert">
+        insert into order_store_detail(order_info_detail_id, order_store_id, order_store_code, spu_code, spu_name,
+                                       sku_code,
+                                       sku_name, product_property_code, product_property_name, supplier_code,
+                                       supplier_name,
+                                       bar_code, picture_url, product_spec, color_code, color_name, model_code,
+                                       unit_code,
+                                       unit_name, zero_disassembly_coefficient, product_type, product_count,
+                                       product_amount,
+                                       purchase_amount, total_product_amount, actual_total_product_amount,
+                                       total_preferential_amount, preferential_amount, total_acivity_amount,
+                                       actual_inbound_count,
+                                       actual_product_count, return_product_count, tax_rate, activity_code, line_code,
+                                       gift_line_code, company_code, company_name, sign_difference_reason, box_gross_weight, box_volume,
+                                       use_status, create_by_id, create_by_name, update_by_id, update_by_name, create_time,
+                                       update_time)
+        values (#{orderInfoDetailId}, #{orderStoreId}, #{orderStoreCode}, #{spuCode}, #{spuName},
+                #{skuCode}, #{skuName}, #{productPropertyCode}, #{productPropertyName}, #{supplierCode},
+                #{supplierName},
+                #{barCode}, #{pictureUrl}, #{productSpec}, #{colorCode}, #{colorName},
+                #{modelCode}, #{unitCode}, #{unitName}, #{zeroDisassemblyCoefficient}, #{productType},
+                #{productCount}, #{productAmount}, #{purchaseAmount}, #{totalProductAmount},
+                #{actualTotalProductAmount}, #{totalPreferentialAmount}, #{preferentialAmount}, #{totalAcivityAmount},
+                #{actualInboundCount}, #{actualProductCount}, #{returnProductCount}, #{taxRate},
+                #{activityCode}, #{lineCode}, #{giftLineCode}, #{companyCode}, #{companyName},
+                #{signDifferenceReason}, #{boxGrossWeight}, #{boxVolume}, #{useStatus}, #{createById}, #{createByName}, #{updateById},
+                #{updateByName}, sysdate(), sysdate())
+    </insert>
+
+</mapper>
+

@@ -1,6 +1,5 @@
 package com.aiqin.mgs.order.api.domain.request;
 
-import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.aiqin.mgs.order.api.domain.ProductCycle;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.Api;

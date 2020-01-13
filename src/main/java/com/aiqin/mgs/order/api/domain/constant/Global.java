@@ -58,7 +58,7 @@ public interface Global {
     Integer ORDER_STATUS_4 = 4;  //已取消
     Integer ORDER_STATUS_5 = 5;  //已完成
     Integer ORDER_STATUS_6 = 6;  //已提货
-    
+    Integer ORDER_STATUS_7 = 7;  //退款完成
     
 //    /**
 //     * 退货状态
@@ -97,7 +97,8 @@ public interface Global {
     Integer P_TYPE_4 = 4;  //到店支付-微信
     Integer P_TYPE_5 = 5;  //到店支付-支付宝
     Integer P_TYPE_6 = 6;  //到店支付-银联
-    
+    Integer P_TYPE_7 = 7;  //到店支付-储值卡支付
+
     
     /**
      * 发货方状态
@@ -222,7 +223,7 @@ public interface Global {
     Integer ORDER_TYPE_1 = 1;  //TOC订单
     Integer ORDER_TYPE_2 = 2;  //TOB订单
     Integer ORDER_TYPE_3 = 3;  //服务商品
-    
+    Integer ORDER_TYPE_4 = 4;  //预存订单
     //销售流向:1:购买 2:退次
     Integer ORDER_FLOW_1=1;
     Integer ORDER_FLOW_2=2;
@@ -230,4 +231,91 @@ public interface Global {
     //会员类型:1:会员 2:非会员
     Integer MEMBER_TYPE_1=1;
     Integer MEMBER_TYPE_2=2;
+
+    //配送方式：1:配送 2:直送 3:货架
+    Integer DISTRIBUTION_TYPE_1 = 1;
+    Integer DISTRIBUTION_TYPE_2 = 2;
+    Integer DISTRIBUTION_TYPE_3 = 3;
+
+    //1:勾选 0:未勾选 2:全选  3：全部取消
+    Integer LINECHECKSTATUS_0 = 0;
+    Integer LINECHECKSTATUS_1 = 1;
+    Integer LINECHECKSTATUS_2 = 2;
+    Integer LINECHECKSTATUS_3 = 3;
+
+    //1:门店 2:erp
+    Integer CREATESOURCE_1 = 1;
+    Integer CREATESOURCE_2 = 2;
+    /**
+     * 判断插入和更新操作是否成功
+     */
+    Integer CHERC_INSERT_DELETE_UPDATE_SUCCESS = 0;
+
+
+    /**
+     * 服务项目的订单类型,扣减
+     */
+    Integer ORDER_TYPE_REDUCE = 0;
+    /**
+     * 服务项目的订单类型,购买
+     */
+    Integer ORDER_TYPE_BUY = 1;
+    /**
+     * 服务项目的订单类型,退次
+     */
+    Integer ORDER_TYPE_RETURN = 2;
+    /**
+     * 服务项目的订单类型,增次
+     */
+    Integer ORDER_TYPE_CONTINUE = 3;
+
+    /**
+     * 服务项目的订单类型,延期
+     */
+    Integer ORDER_TYPE_DELAY = 4;
+
+
+    /**
+     * 是否直接消费，0为是
+     */
+    Integer IS_DIRECT_CUSTOM = 0;
+    /**
+     * 是否限次，0为限次
+     */
+    Integer CONSUMPTION_PATTERN_LIMIT = 0;
+
+    /**
+     * 接口返回码
+     */
+    String RESULT_CODE = "code";
+
+    /**
+     *  爱掌柜首页概览状态编码（状态码：对应controller中有）
+     */
+    Integer STORE_STATUS_0 = 0;
+    Integer STORE_STATUS_1 = 1;
+    Integer STORE_STATUS_2 = 2;
+    Integer STORE_STATUS_3 = 3;
+
+    /**
+     * 支付业务类型
+     */
+    //正常销售订单
+    Integer PAY_ORDER_TYPE_0=0;
+    //预存订单
+    Integer PAY_ORDER_TYPE_1=1;
+    //客户储值
+    Integer PAY_ORDER_TYPE_2=2;
+    //服务订单购买
+    Integer PAY_ORDER_TYPE_3=3;
+    //服务订单划次
+    Integer PAY_ORDER_TYPE_4=4;
+    //正常销售单退款
+    Integer PAY_ORDER_TYPE_5=5;
+    //预存订单退款
+    Integer PAY_ORDER_TYPE_6=6;
+    //服务订单退款
+    Integer PAY_ORDER_TYPE_7=7;
+
+
 }

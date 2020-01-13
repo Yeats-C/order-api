@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao" >
+  <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.CouponApprovalInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="form_no" property="formNo" jdbcType="VARCHAR" />
+    <result column="process_title" property="processTitle" jdbcType="VARCHAR" />
+    <result column="process_type" property="processType" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="statu_str" property="statuStr" jdbcType="VARCHAR" />
+    <result column="applier_name" property="applierName" jdbcType="VARCHAR" />
+    <result column="applier_id" property="applierId" jdbcType="VARCHAR" />
+    <result column="create_time_str" property="createTimeStr" jdbcType="TIMESTAMP" />
+    <result column="pre_node_opt_user" property="preNodeOptUser" jdbcType="VARCHAR" />
+    <result column="pre_node_time" property="preNodeTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, form_no, process_title, process_type, status, statu_str, applier_name, applier_id, 
+    create_time_str, pre_node_opt_user, pre_node_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from coupon_approval_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from coupon_approval_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.CouponApprovalInfo" >
+    insert into coupon_approval_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="formNo != null" >
+        form_no,
+      </if>
+      <if test="processTitle != null" >
+        process_title,
+      </if>
+      <if test="processType != null" >
+        process_type,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="statuStr != null" >
+        statu_str,
+      </if>
+      <if test="applierName != null" >
+        applier_name,
+      </if>
+      <if test="applierId != null" >
+        applier_id,
+      </if>
+      <if test="createTimeStr != null" >
+        create_time_str,
+      </if>
+      <if test="preNodeOptUser != null" >
+        pre_node_opt_user,
+      </if>
+      <if test="preNodeTime != null" >
+        pre_node_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="formNo != null" >
+        #{formNo,jdbcType=VARCHAR},
+      </if>
+      <if test="processTitle != null" >
+        #{processTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="processType != null" >
+        #{processType,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="statuStr != null" >
+        #{statuStr,jdbcType=VARCHAR},
+      </if>
+      <if test="applierName != null" >
+        #{applierName,jdbcType=VARCHAR},
+      </if>
+      <if test="applierId != null" >
+        #{applierId,jdbcType=VARCHAR},
+      </if>
+      <if test="createTimeStr != null" >
+        #{createTimeStr,jdbcType=TIMESTAMP},
+      </if>
+      <if test="preNodeOptUser != null" >
+        #{preNodeOptUser,jdbcType=VARCHAR},
+      </if>
+      <if test="preNodeTime != null" >
+        #{preNodeTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.CouponApprovalInfo" >
+    update coupon_approval_info
+    <set >
+      <if test="formNo != null" >
+        form_no = #{formNo,jdbcType=VARCHAR},
+      </if>
+      <if test="processTitle != null" >
+        process_title = #{processTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="processType != null" >
+        process_type = #{processType,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="statuStr != null" >
+        statu_str = #{statuStr,jdbcType=VARCHAR},
+      </if>
+      <if test="applierName != null" >
+        applier_name = #{applierName,jdbcType=VARCHAR},
+      </if>
+      <if test="applierId != null" >
+        applier_id = #{applierId,jdbcType=VARCHAR},
+      </if>
+      <if test="createTimeStr != null" >
+        create_time_str = #{createTimeStr,jdbcType=TIMESTAMP},
+      </if>
+      <if test="preNodeOptUser != null" >
+        pre_node_opt_user = #{preNodeOptUser,jdbcType=VARCHAR},
+      </if>
+      <if test="preNodeTime != null" >
+        pre_node_time = #{preNodeTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <!--根据审批编号修改记录-->
+  <update id="updateByFormNoSelective" parameterType="com.aiqin.mgs.order.api.domain.CouponApprovalInfo" >
+    update coupon_approval_info
+    <set >
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="statuStr != null" >
+        statu_str = #{statuStr,jdbcType=VARCHAR},
+      </if>
+      <if test="preNodeOptUser != null" >
+        pre_node_opt_user = #{preNodeOptUser,jdbcType=VARCHAR},
+      </if>
+      <if test="preNodeTime != null" >
+        pre_node_time = #{preNodeTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where form_no = #{formNo,jdbcType=VARCHAR}
+  </update>
+
+  <select id="selectList" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.CouponApprovalInfo">
+    select
+    <include refid="Base_Column_List" />
+    from coupon_approval_info
+    <where>
+      <if test="processType != null" >
+        process_type = #{processType,jdbcType=VARCHAR}
+      </if>
+      <if test="status != null" >
+        and status = #{status,jdbcType=INTEGER}
+      </if>
+      <if test="applierId != null" >
+        and applier_id = #{applierId,jdbcType=VARCHAR}
+      </if>
+      <if test="applierName != null" >
+        and applier_name = #{applierName,jdbcType=VARCHAR}
+      </if>
+      <if test="startTime != null" >
+        and create_time_str &gt;= #{startTime,jdbcType=TIMESTAMP}
+      </if>
+      <if test="endTime != null" >
+        and create_time_str &lt;= #{endTime,jdbcType=TIMESTAMP}
+      </if>
+      <if test="formNo != null" >
+        and form_no = #{formNo,jdbcType=VARCHAR}
+      </if>
+    </where>
+    order by id desc
+  </select>
+
+  <select id="selectByFormNo" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from coupon_approval_info
+    where form_no = #{formNo,jdbcType=INTEGER}
+  </select>
+
+
+</mapper>

@@ -14,9 +14,13 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import com.aiqin.mgs.order.api.domain.pay.PayReq;
+import com.aiqin.mgs.order.api.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
@@ -43,13 +47,6 @@ import com.aiqin.mgs.order.api.domain.SettlementInfo;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.response.OrderJoinResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderNoCodeResponse.AddReturnOrderResonse;
-import com.aiqin.mgs.order.api.service.CartService;
-import com.aiqin.mgs.order.api.service.OrderAfterDetailService;
-import com.aiqin.mgs.order.api.service.OrderAfterService;
-import com.aiqin.mgs.order.api.service.OrderDetailService;
-import com.aiqin.mgs.order.api.service.OrderLogService;
-import com.aiqin.mgs.order.api.service.OrderService;
-import com.aiqin.mgs.order.api.service.SettlementService;
 import com.aiqin.mgs.order.api.util.DateUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 
@@ -90,8 +87,8 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 	@Resource
     private OrderCouponDao orderCouponDao;
 	
-	
-	
+	@Resource
+	private BridgePayService bridgePayService;
 	
 	
 	//支持-条件查询售后维权列表 /条件查询退货信息 分页
@@ -124,33 +121,33 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 	
 	//TOC订单-添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表
 	@Override
-	@Transactional
-	public HttpResponse addAfterOrder(@Valid OrderAfterSaleInfo orderAfterSaleInfo) {
+	@Transactional(isolation = Isolation.REPEATABLE_READ, propagation = Propagation.REQUIRED, readOnly = false, rollbackFor = Exception.class)
+	public HttpResponse addAfterOrder(@Valid OrderAfterSaleInfo orderAfterSaleInfo) throws Exception {
 		
 		String afterSaleId = "";
 		String afterSaleCode = "";
-		try {
+
 			//生成订单售后ID
 			afterSaleId = OrderPublic.getUUID();
 			orderAfterSaleInfo.setAfterSaleId(afterSaleId);
 			
 			//生成订单售后编号
 			String logo = "";
-			if(orderAfterSaleInfo.getOriginType() == Global.ORIGIN_TYPE_0) {
+			if(orderAfterSaleInfo.getOriginType().intValue()==Global.ORIGIN_TYPE_0.intValue()) {
 				logo = Global.ORIGIN_COME_3;
 			}
-			if(orderAfterSaleInfo.getOriginType() == Global.ORIGIN_TYPE_1) {
+			if(orderAfterSaleInfo.getOriginType().intValue() == Global.ORIGIN_TYPE_1.intValue()) {
 				logo = Global.ORIGIN_COME_4;
 			}
-			if(orderAfterSaleInfo.getOriginType() == Global.ORIGIN_TYPE_3) {
+			if(orderAfterSaleInfo.getOriginType().intValue() == Global.ORIGIN_TYPE_3.intValue()) {
 				logo = Global.ORIGIN_COME_5;
 			}
 			afterSaleCode = DateUtil.sysDate()+logo+String.valueOf(Global.ORDERID_CHANNEL_4)+OrderPublic.randomNumberF();
 			orderAfterSaleInfo.setAfterSaleCode(afterSaleCode);
-			
+
 			//保存订单售后
 			orderAfterDao.addAfterOrder(orderAfterSaleInfo);
-			
+
 			//保存订单售后明细
 			List<OrderAfterSaleDetailInfo> orderAfterDetailList = orderAfterSaleInfo.getDetailList();
 			orderAfterDetailService.addAfterOrderDetail(orderAfterDetailList,afterSaleId);   
@@ -163,7 +160,7 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 			orderId = orderAfterSaleInfo.getOrderId();
 			returnStatus = Global.IS_RETURN_1;
 			updateBy = orderAfterSaleInfo.getCreateBy();
-			
+			//仅更改退货状态-订单主表
 			orderService.retustus(orderId,returnStatus,updateBy);
 			
 			
@@ -204,15 +201,59 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 			
 			//返回售后编号
 			String after_sale_code = afterSaleId;
-			return HttpResponse.success(after_sale_code);
+
+			//调用支付中心退款
+			toRefund(orderAfterSaleInfo);
+            //退款成功修改退款状态
+            orderAfterSaleInfo.setRefundStatus(1);
+            orderAfterDao.updateRefundStatus(orderAfterSaleInfo);
+			return HttpResponse.success(orderAfterSaleInfo);
 		
-		} catch (Exception e) {
-			LOGGER.error("添加新的订单售后数据报错 {}", e);
-			return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
-		}
+
 	}
-	
-	
+
+	private void toRefund(OrderAfterSaleInfo orderAfterSaleInfo) {
+		PayReq payReq=new PayReq();
+		payReq.setStoreId(orderAfterSaleInfo.getDistributorId());
+		payReq.setStoreName(orderAfterSaleInfo.getDistributorName());
+		payReq.setOrderNo(orderAfterSaleInfo.getOrderCode());
+		payReq.setOrderSource(orderAfterSaleInfo.getOriginType());
+		payReq.setOrderTime(orderAfterSaleInfo.getOrderTime());
+		payReq.setPayType(orderAfterSaleInfo.getPayType());
+		payReq.setRefundAmount(Long.valueOf(orderAfterSaleInfo.getReturnPrice()));
+		payReq.setCreateBy(orderAfterSaleInfo.getCreateBy());
+		payReq.setMemberId(orderAfterSaleInfo.getMemberId());
+		payReq.setMemberName(orderAfterSaleInfo.getMemberName());
+		payReq.setMemberPhone(orderAfterSaleInfo.getMemberPhone());
+		payReq.setFranchiseeId(orderAfterSaleInfo.getFranchiseeId());
+		payReq.setPayOrderType(orderAfterSaleInfo.getOrderType());
+		payReq.setRefundType(orderAfterSaleInfo.getReturnMoneyType());
+		payReq.setUpdateBy(orderAfterSaleInfo.getCreateByName());
+        payReq.setFranchiseeId(orderAfterSaleInfo.getFranchiseeId());
+        payReq.setRefundType(orderAfterSaleInfo.getReturnMoneyType());
+		payReq.setBusinessType(choseAfterType(orderAfterSaleInfo.getOrderType()));
+		bridgePayService.toRefund(payReq);
+	}
+
+	/**
+	 * 获取售后业务类型
+	 * @param orderType
+	 * @return
+	 */
+	private Integer choseAfterType(Integer orderType) {
+		if (orderType==null){
+			return Global.PAY_ORDER_TYPE_5;
+		}
+		if (orderType==3){
+			return Global.PAY_ORDER_TYPE_7;
+		}
+		if (orderType==4){
+			return Global.PAY_ORDER_TYPE_6;
+		}
+		return Global.PAY_ORDER_TYPE_5;
+	}
+
+
 	//服务商品-添加新的订单售后数据+订单售后明细数据+修改订单表+修改订单明细表
 	@Override
 	@Transactional
@@ -300,7 +341,11 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 			
 			addReturnOrderResonse.setAfterSaleId(afterSaleId);
 			addReturnOrderResonse.setAfterSaleCode(afterSaleCode);
-			
+
+			//调用支付中心退款
+
+            //调用支付中心退款
+            toRefund(orderAfterSaleInfo);
 			return HttpResponse.success(addReturnOrderResonse);
 		
 		} catch (Exception e) {

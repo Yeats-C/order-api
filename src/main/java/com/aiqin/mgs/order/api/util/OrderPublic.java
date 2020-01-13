@@ -7,21 +7,15 @@
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.util;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-import javax.annotation.Resource;
-
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.OrderAfterSaleQuery;
 import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
 import com.aiqin.mgs.order.api.domain.OrderLog;
 import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.constant.Global;
-import com.aiqin.mgs.order.api.service.OrderService;
+
+import java.util.List;
+import java.util.UUID;
 
 public class OrderPublic {
 	
@@ -165,7 +159,6 @@ public class OrderPublic {
 	
 	return uuid; 
 	}
-
 	
 	/**
 	 * 订单日志参数

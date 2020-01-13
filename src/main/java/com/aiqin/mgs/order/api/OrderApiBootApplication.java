@@ -10,7 +10,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -37,7 +36,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * </pre>
  * <p>
  */
-@EnableScheduling //定时任务
+//@EnableScheduling //定时任务
 @SuppressWarnings("ALL")
 @Configuration
 @ComponentScan
@@ -47,11 +46,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @MapperScan(basePackages = {"com.aiqin.mgs.order.api.dao"})
 public class OrderApiBootApplication extends SpringBootServletInitializer {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(OrderApiBootApplication.class);
+    private static Logger log = LoggerFactory.getLogger(OrderApiBootApplication.class);
 
     public static void main(String[] args) {
         SpringApplication.run(OrderApiBootApplication.class, args);
-        LOGGER.info("============= SpringBoot Start Success =============");
+        log.info("============= SpringBoot Start Success =============");
     }
 
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
