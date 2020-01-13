@@ -5,7 +5,7 @@
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="form_no" property="formNo" jdbcType="VARCHAR" />
     <result column="coupon_type" property="couponType" jdbcType="INTEGER" />
-    <result column="total_money" property="totalMoney" jdbcType="DOUBLE" />
+    <result column="total_money" property="totalMoney" jdbcType="DECIMAL" />
     <result column="store_id" property="storeId" jdbcType="VARCHAR" />
     <result column="store_name" property="storeName" jdbcType="VARCHAR" />
     <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
@@ -85,7 +85,7 @@
         #{couponType,jdbcType=INTEGER},
       </if>
       <if test="totalMoney != null" >
-        #{totalMoney,jdbcType=DOUBLE},
+        #{totalMoney,jdbcType=DECIMAL},
       </if>
       <if test="storeId != null" >
         #{storeId,jdbcType=VARCHAR},
@@ -126,7 +126,7 @@
         coupon_type = #{couponType,jdbcType=INTEGER},
       </if>
       <if test="totalMoney != null" >
-        total_money = #{totalMoney,jdbcType=DOUBLE},
+        total_money = #{totalMoney,jdbcType=DECIMAL},
       </if>
       <if test="storeId != null" >
         store_id = #{storeId,jdbcType=VARCHAR},

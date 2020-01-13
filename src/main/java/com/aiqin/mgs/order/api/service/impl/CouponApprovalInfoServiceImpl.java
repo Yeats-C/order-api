@@ -111,7 +111,7 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                 //审核通过，修改本地主表状态
                 couponApprovalInfo.setStatus(StatusEnum.AUDIT_PASS.getValue());
                 couponApprovalInfo.setStatuStr(StatusEnum.AUDIT_PASS.getDesc());
-                Double totalMoney=couponApprovalDetail.getTotalMoney();
+                Double totalMoney=couponApprovalDetail.getTotalMoney().doubleValue();
                 //计算A品券数量，同步到虚拟资产
                 List<FranchiseeAssetVo> franchiseeAssets=new ArrayList<>();
                 if(couponApprovalDetail!=null&&totalMoney!=null){
