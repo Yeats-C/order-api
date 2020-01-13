@@ -142,11 +142,12 @@ public class CartOrderServiceImpl implements CartOrderService {
                                 cartOrderDao.insertCart(cartOrderInfo);
                             }
                         }
-                        return HttpResponse.success();
+
                     } else {
                         LOGGER.warn("购物车信息为空!");
                         return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
                     }
+
                 } catch (Exception e) {
                     LOGGER.error("添加购物车异常：{}", e);
                     return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
