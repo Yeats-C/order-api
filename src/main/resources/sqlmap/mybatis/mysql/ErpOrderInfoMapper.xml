@@ -495,14 +495,14 @@
         </if>
         <if test="orderStatus != null and orderStatus != '' or orderStatus == 0 ">
             and (
-            (a1.order_level = 0 and a1.order_status = #{orderStatus})
-            or exists(
+            (a1.split_status = 1 and a1.order_status = #{orderStatus})
+            or ( a1.split_status = 0 and exists(
             select b1.order_store_code
             from order_store_info b1
             where b1.order_level = 1
             and b1.main_order_code = a1.order_store_code
             and b1.order_status = #{orderStatus}
-            )
+            ))
             )
         </if>
         <if test="orderLevel != null and orderLevel != '' or orderLevel == 0 ">
@@ -652,6 +652,9 @@
         from order_store_info a1
         where 1 = 1
         and a1.order_level = #{orderLevel}
+        <if test="orderStatus != null and orderStatus != '' or orderStatus == 0 ">
+            and a1.order_status = #{orderStatus}
+        </if>
         and a1.main_order_code in (
         <foreach collection="primaryOrderCodeList" item="primaryCode" separator=",">
             '${primaryCode}'
