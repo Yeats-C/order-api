@@ -258,6 +258,8 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             secondOrderQueryRequest.setOrderLevel(ErpOrderLevelEnum.SECONDARY.getCode());
             secondOrderQueryRequest.setPrimaryOrderCodeList(primaryOrderCodeList);
             secondOrderQueryRequest.setOrderStatus(erpOrderQueryRequest.getOrderStatus());
+            secondOrderQueryRequest.setCreateTimeStart(erpOrderQueryRequest.getCreateTimeStart());
+            secondOrderQueryRequest.setCreateTimeEnd(erpOrderQueryRequest.getCreateTimeEnd());
             List<ErpOrderInfo> secondaryOrderList = erpOrderInfoDao.findSecondaryOrderList(secondOrderQueryRequest);
             if (secondaryOrderList != null && secondaryOrderList.size() > 0) {
                 for (ErpOrderInfo item :
