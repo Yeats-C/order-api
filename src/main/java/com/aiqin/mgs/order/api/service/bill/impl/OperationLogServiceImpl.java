@@ -29,7 +29,7 @@ public class OperationLogServiceImpl implements OperationLogService {
         operationLog.setUseStatus(String.valueOf(useStatus));//0. 启用 1.禁用
         //operationLog.setCreateById(auth.getPersonId());
         //operationLog.setCreateByName(auth.getPersonName());
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         operationLog.setCreateTime(formatter.format(new Date()));
         //添加日志
         operationLogDao.insert(operationLog);

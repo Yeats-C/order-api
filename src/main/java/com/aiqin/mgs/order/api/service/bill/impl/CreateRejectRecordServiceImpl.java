@@ -268,7 +268,6 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
                 returnOrderReq.setReturnOrderDetailReqList(orderDetails);
                 returnOrderReq.setReturnOrderInfo(orderInfo);
                 String url = rejectHost + "/returnGoods/record/return";
-                //String url = "http://192.168.10.183:80/returnGoods/record/return";
                 LOGGER.info("returnOrderReq" + returnOrderReq);
                 HttpClient httpGet = HttpClient.post(url).json(returnOrderReq).timeout(10000);
                 HttpResponse<Object> response = httpGet.action().result(new TypeReference<HttpResponse<Object>>() {
@@ -289,8 +288,8 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
      */
     private void addOperationLog(String returnOrderCode) {
         try {
-            Integer operationType = ErpLogSourceTypeEnum.RETURN_SUPPLY.getCode();
-            Integer sourceType = ErpLogOperationTypeEnum.ADD.getCode();
+            Integer sourceType = ErpLogSourceTypeEnum.RETURN_SUPPLY.getCode();
+            Integer operationType = ErpLogOperationTypeEnum.ADD.getCode();
             Integer useStatus = ErpLogStatusTypeEnum.USING.getCode();
             String operationContent = "根据爱亲退供单，生成耘链退货单";
             operationLogService.insert(returnOrderCode, operationType, sourceType, operationContent, null, useStatus, null);

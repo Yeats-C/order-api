@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sun.jvm.hotspot.utilities.Assert;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -74,6 +75,13 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     @Override
     @Transactional
     public HttpResponse updatePurchaseInfo(OrderIogisticsVo purchaseInfo) {
+        if(purchaseInfo != null
+                && purchaseInfo.getOrderStoreDetail() !=null
+                && purchaseInfo.getOrderStoreDetail().size()>0
+                && purchaseInfo.getOrderBatchStoreDetail() !=null
+                && purchaseInfo.getOrderBatchStoreDetail().size()>0){
+
+        }
         LOGGER.info("耘链销售单回传更新开始 参数purchaseInfo{}" + purchaseInfo);
         try {
             //更新订单&订单明细
@@ -98,6 +106,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             purchaseOrder.setDeliveryTime(purchaseInfo.getDeliveryTime());//
             purchaseOrder.setContactPerson(purchaseInfo.getDeliveryPersonId());//
             purchaseOrder.setPurchaseOrderCode(purchaseInfo.getOrderStoreCode());
+            purchaseOrder.setUpdateById(purchaseInfo.getPersonId());
+            purchaseOrder.setUpdateByName(purchaseInfo.getPersonName());
             purchaseOrder.setUpdateTime(new Date());
             purchaseOrderDao.updateByPrimaryKey(purchaseOrder);
 
@@ -109,6 +119,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 purchaseOrderDetail.setSkuName(orderStoreDetail.getSkuName());//SKU名称
                 purchaseOrderDetail.setTotalCount(orderStoreDetail.getActualProductCount());//实发数量
                 purchaseOrderDetail.setPurchaseOrderCode(purchaseInfo.getOrderStoreCode());
+                purchaseOrderDetail.setUpdateById(purchaseInfo.getPersonId());
+                purchaseOrderDetail.setUpdateByName(purchaseInfo.getPersonName());
                 purchaseOrderDetail.setUpdateTime(new Date());
                 purchaseOrderDetailDao.updateByPurchaseOrderCode(purchaseOrderDetail);
             }
@@ -119,12 +131,14 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 purchaseOrderDetailBatch.setPurchaseOrderDetailBatchId(IdUtil.purchaseId());
                 purchaseOrderDetailBatch.setPurchaseOrderCode(purchaseInfo.getOrderStoreCode());
                 purchaseOrderDetailBatch.setBatchCode(batchStoreDetail.getBatchCode());
-                purchaseOrderDetailBatch.setCreateTime(new Date());
                 purchaseOrderDetailBatch.setSkuCode(batchStoreDetail.getSkuCode());//SKU编码
                 purchaseOrderDetailBatch.setSkuCode(batchStoreDetail.getSkuName());//SKU名称
                 purchaseOrderDetailBatch.setActualTotalCount(purchaseInfo.getActualTotalCount());//实际销售数量
                 purchaseOrderDetailBatch.setBatchCode(batchStoreDetail.getSkuName());//SKU名称
                 purchaseOrderDetailBatch.setLineCode(batchStoreDetail.getLineCode());//行号
+                purchaseOrderDetailBatch.setCreateById(purchaseInfo.getPersonId());
+                purchaseOrderDetailBatch.setCreateByName(purchaseInfo.getPersonName());
+                purchaseOrderDetailBatch.setCreateTime(new Date());
                 purchaseOrderDetailBatchDao.insert(purchaseOrderDetailBatch);
             }
             return HttpResponse.success();
@@ -181,11 +195,6 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 try {
                     //根据ERP订单生成爱亲采购单&采购单明细&修改订单同步状态
                     createPurchaseOrderService.addOrderAndDetail(erpOrderInfo);
-
-
-
-
-
                 } catch (Exception e) {
                     LOGGER.error("同步ERP采购单失败" + e);
                     throw new RuntimeException();
@@ -193,10 +202,6 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             }
         });
     }
-
-
-
-
 
     //取消订单
     @Override
