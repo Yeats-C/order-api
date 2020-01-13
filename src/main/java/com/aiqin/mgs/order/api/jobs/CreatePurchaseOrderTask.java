@@ -27,10 +27,9 @@ public class CreatePurchaseOrderTask {
 
     /**
      * 定时扫描生成采购三失败的定单
-     * 每5秒执行一次 @Scheduled(fixedRate = 1000 * 5)
+     * 每2执行一次
      */
-    //在固定时间执行 @Scheduled(cron = "0 */1 *  * * * ")
-    @Scheduled(fixedRate = 1000 * 5)
+    @Scheduled(fixedRate = 100000 * 72)
     public void TimedFailedPurchaseOrder() {
         List<ErpOrderInfo> erpOrderInfos = null;
         List<ErpOrderInfo> orderInfos = Lists.newArrayList();

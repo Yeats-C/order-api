@@ -74,7 +74,7 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
             itemListToPurchaseOrderDetail(erpOrderInfo.getItemList());
 
             //根据爱亲采购单，生成耘链销售单开始
-            createSaleOrder(erpOrderInfo);
+            //createSaleOrder(erpOrderInfo);
 
             //修改ERP订单同步状态
             erpOrderInfoDao.updateOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_SUCCESS.getCode(), erpOrderInfo.getOrderStoreCode());
@@ -197,7 +197,7 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
                 //根据ERP订单生成爱亲采购单明细
                 purchaseOrderDetailDao.insertSelective(purchaseOrderDetail);
             } catch (Exception e) {
-                LOGGER.error("根据ERP订单生成爱亲采购单明细", e);
+                LOGGER.error("根据ERP订单生成爱亲采购单明细异常", e);
                 throw new RuntimeException();
             }
         }
@@ -232,7 +232,6 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
      */
     private void addOperationLog(ErpOrderInfo erpOrderInfo) {
         try {
-            LOGGER.info("根据ERP订单生成爱亲采购单，添加操作日志开始");
             String operationCode = erpOrderInfo.getOrderStoreCode();
             Integer sourceType = ErpLogSourceTypeEnum.PURCHASE.getCode();
             Integer operationType = ErpLogOperationTypeEnum.ADD.getCode();
