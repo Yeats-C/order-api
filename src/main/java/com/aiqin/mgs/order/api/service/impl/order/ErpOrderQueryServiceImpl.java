@@ -257,6 +257,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             ErpOrderQueryRequest secondOrderQueryRequest = new ErpOrderQueryRequest();
             secondOrderQueryRequest.setOrderLevel(ErpOrderLevelEnum.SECONDARY.getCode());
             secondOrderQueryRequest.setPrimaryOrderCodeList(primaryOrderCodeList);
+            secondOrderQueryRequest.setOrderStatus(erpOrderQueryRequest.getOrderStatus());
             List<ErpOrderInfo> secondaryOrderList = erpOrderInfoDao.findSecondaryOrderList(secondOrderQueryRequest);
             if (secondaryOrderList != null && secondaryOrderList.size() > 0) {
                 for (ErpOrderInfo item :
@@ -380,16 +381,12 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         //签收按钮
         boolean allowedSign = (processTypeEnum.isHasLogisticsFee() && orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_12) || (!processTypeEnum.isHasLogisticsFee() && orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_11);
         if (allowedSign) {
-            if (!orderCategoryEnum.isFirstOrder()) {
-                control.setSign(StatusEnum.YES.getCode());
-            }
+            control.setSign(StatusEnum.YES.getCode());
         }
 
         //支付物流费用
         if (processTypeEnum.isHasLogisticsFee() && orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_11) {
-            if (!orderCategoryEnum.isFirstOrder()) {
-                control.setPayLogistics(StatusEnum.YES.getCode());
-            }
+            control.setPayLogistics(StatusEnum.YES.getCode());
         }
 
         //取消
