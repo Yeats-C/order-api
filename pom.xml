@@ -129,5 +129,11 @@
                 <profile.name>test</profile.name>
             </properties>
         </profile>
+        <profile>
+            <id>preheat</id>
+            <properties>
+                <profile.name>preheat</profile.name>
+            </properties>
+        </profile>
     </profiles>
 </project>
