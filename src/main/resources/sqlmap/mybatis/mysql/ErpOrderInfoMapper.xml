@@ -473,7 +473,16 @@
         left join order_store_fee a2 on a1.fee_id = a2.fee_id
         where 1 = 1
         <if test="orderStoreCode != null and orderStoreCode != ''">
-            and a1.order_store_code like concat('%',#{orderStoreCode,jdbcType=VARCHAR},'%')
+            and (
+            (a1.order_level = 0 and a1.order_store_code like concat('%', #{orderStoreCode,jdbcType=VARCHAR}, '%'))
+            or exists(
+            select b1.order_store_code
+            from order_store_info b1
+            where b1.order_level = 1
+            and b1.main_order_code = a1.order_store_code
+            and b1.order_store_code like concat('%', #{orderStoreCode,jdbcType=VARCHAR}, '%')
+            )
+            )
         </if>
         <if test="storeId != null and storeId != ''">
             and a1.store_id = #{storeId,jdbcType=VARCHAR}
@@ -485,7 +494,16 @@
             and a1.create_by_name like concat('%',#{createByName,jdbcType=VARCHAR},'%')
         </if>
         <if test="orderStatus != null and orderStatus != '' or orderStatus == 0 ">
-            and a1.order_status = #{orderStatus}
+            and (
+            (a1.order_level = 0 and a1.order_status = #{orderStatus})
+            or exists(
+            select b1.order_store_code
+            from order_store_info b1
+            where b1.order_level = 1
+            and b1.main_order_code = a1.order_store_code
+            and b1.order_status = #{orderStatus}
+            )
+            )
         </if>
         <if test="orderLevel != null and orderLevel != '' or orderLevel == 0 ">
             and a1.order_level = #{orderLevel}
@@ -514,10 +532,29 @@
             )
         </if>
         <if test="createTimeStart != null and createTimeStart != ''">
-            and date_format(a1.create_time,'%Y-%m-%d') &gt;= #{createTimeStart,jdbcType=VARCHAR}
+            and (
+            (a1.order_level = 0 and date_format(a1.create_time,'%Y-%m-%d') &gt;= #{createTimeStart,jdbcType=VARCHAR})
+            or exists(
+            select b1.order_store_code
+            from order_store_info b1
+            where b1.order_level = 1
+            and b1.main_order_code = a1.order_store_code
+            and date_format(b1.create_time,'%Y-%m-%d') &gt;= #{createTimeStart,jdbcType=VARCHAR}
+            )
+            )
         </if>
         <if test="createTimeEnd != null and createTimeEnd != ''">
             and date_format(a1.create_time,'%Y-%m-%d') &lt;= #{createTimeEnd,jdbcType=VARCHAR}
+            and (
+            (a1.order_level = 0 and date_format(a1.create_time,'%Y-%m-%d') &lt;= #{createTimeEnd,jdbcType=VARCHAR})
+            or exists(
+            select b1.order_store_code
+            from order_store_info b1
+            where b1.order_level = 1
+            and b1.main_order_code = a1.order_store_code
+            and date_format(b1.create_time,'%Y-%m-%d') &lt;= #{createTimeEnd,jdbcType=VARCHAR}
+            )
+            )
         </if>
         order by a1.create_time desc
     </select>
