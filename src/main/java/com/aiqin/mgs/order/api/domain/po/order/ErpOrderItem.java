@@ -144,7 +144,7 @@ public class ErpOrderItem {
     @JsonProperty("preferential_amount")
     private BigDecimal preferentialAmount;
 
-    @ApiModelProperty(value = "活动优惠总金额")
+    @ApiModelProperty(value = "活动优惠总金额,包括活动优惠和优惠券优惠")
     @JsonProperty("total_acivity_amount")
     private BigDecimal totalAcivityAmount;
 

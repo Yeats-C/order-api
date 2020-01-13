@@ -16,6 +16,7 @@
         top_coupon_money as topCouponMoney,
         pay_money as payMoney,
         goods_coupon as goodsCoupon,
+        top_coupon_codes as topCouponCodes,
         create_time as createTime,
         create_by_id as createById,
         create_by_name as createByName,
@@ -71,6 +72,9 @@
         <if test="suitCouponMoney != null">
             suit_coupon_money = #{suitCouponMoney},
         </if>
+        <if test="topCouponCodes != null">
+            top_coupon_codes = #{topCouponCodes},
+        </if>
         update_by_id = #{updateById},
         update_by_name = #{updateByName},
         update_time = sysdate()
@@ -79,11 +83,11 @@
 
     <insert id="insert">
         insert into order_store_fee (fee_id, order_id, pay_id, pay_status, total_money, activity_money,
-                                     suit_coupon_money, top_coupon_money, pay_money, goods_coupon,
+                                     suit_coupon_money, top_coupon_money, pay_money, goods_coupon, top_coupon_codes,
                                      create_time, create_by_id, create_by_name, update_time, update_by_id,
                                      update_by_name)
         values (#{feeId}, #{orderId}, #{payId}, #{payStatus}, #{totalMoney}, #{activityMoney},
-                #{suitCouponMoney}, #{topCouponMoney}, #{payMoney}, #{goodsCoupon},
+                #{suitCouponMoney}, #{topCouponMoney}, #{payMoney}, #{goodsCoupon}, #{topCouponCodes},
                 sysdate(), #{createById}, #{createByName}, sysdate(), #{updateById},
                 #{updateByName})
     </insert>
