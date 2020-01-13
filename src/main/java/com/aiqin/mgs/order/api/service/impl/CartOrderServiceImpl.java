@@ -115,7 +115,8 @@ public class CartOrderServiceImpl implements CartOrderService {
                 cartOrderInfo.setZeroRemovalCoefficient(cartOrderInfo1.getZeroRemovalCoefficient());//交易倍数
                 cartOrderInfo.setSpec(cartOrderInfo1.getSpec());//规格
                 cartOrderInfo.setProductPropertyCode(cartOrderInfo1.getProductPropertyCode());//商品属性码
-                cartOrderInfo.setProductPropertyName(cartOrderInfo1.getProductPropertyName());//商品属性码
+                cartOrderInfo.setProductPropertyName(cartOrderInfo1.getProductPropertyName());//商品属性码、
+                cartOrderInfo.setLineCheckStatus(1);//选中状态
                 try {
                     if (cartOrderInfo != null) {
                         //判断sku是否在购物车里面存在
