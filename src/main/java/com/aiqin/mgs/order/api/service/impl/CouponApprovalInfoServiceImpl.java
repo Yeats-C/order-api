@@ -170,8 +170,8 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                         log.info("退款完成");
                     }
                 }
-                //TODO 调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单
-//                updateStoreStatus(couponApprovalDetail.getOrderId(),StoreStatusEnum.PAY_ORDER_TYPE_PEI.getKey().toString(),couponApprovalDetail.getStoreId(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
+                // 调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单
+                updateStoreStatus(couponApprovalDetail.getOrderId(),StoreStatusEnum.PAY_ORDER_TYPE_PEI.getKey().toString(),couponApprovalDetail.getStoreId(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
             } else if (TpmBpmUtils.isPass(formCallBackVo.getUpdateFormStatus(), formCallBackVo.getOptBtn())) {
                 couponApprovalInfo.setStatus(StatusEnum.AUDIT.getValue());
                 couponApprovalInfo.setStatuStr(StatusEnum.AUDIT.getDesc());
