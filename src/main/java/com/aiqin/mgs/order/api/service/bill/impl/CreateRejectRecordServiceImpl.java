@@ -27,7 +27,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tk.mybatis.mapper.util.Assert;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -119,6 +118,7 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
             return;
         }
     }
+
     private void instantRejectRecord(ReturnOrderDetailVO returnOrder) {
         if (returnOrder != null && returnOrder.getReturnOrderInfo() != null && returnOrder.getDetails() != null && returnOrder.getDetails().size() > 0) {
             //查询待ERP退货单，待生成爱亲退供单数据
@@ -127,7 +127,7 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
             returnOrderToRejectRecordDetail(returnOrder);
             try {
                 //修改退货单同步状态
-                returnOrderInfoDao.updateOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode(), returnOrder.getReturnOrderInfo().getReturnOrderCode());
+                returnOrderInfoDao.updateOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_SUCCESS.getCode(), returnOrder.getReturnOrderInfo().getReturnOrderCode());
             } catch (Exception e) {
                 LOGGER.error("修改退货单同步状态失败", e);
                 throw new RuntimeException();
