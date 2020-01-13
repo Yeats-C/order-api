@@ -10,6 +10,10 @@ import java.math.BigDecimal;
  */
 public class ConstantData {
 
+    private ConstantData() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * A品卷类型
      */
