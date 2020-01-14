@@ -13,11 +13,11 @@ import lombok.Getter;
 public enum ErpOrderReturnStatusEnum {
 
     /***未发起退货*/
-    NOT_NEED(1, "1", "未发起退货"),
-    /***正在退货中*/
-    WAIT(2, "2", "正在退货中"),
-    /***退货完成*/
-    SUCCESS(3, "3", "退货完成");
+    NONE(1, "1", "未发起退货"),
+    /***部分退货完成*/
+    WAIT(2, "2", "部分退货"),
+    /***全部退货完成*/
+    SUCCESS(3, "3", "全部退货完成");
 
     private Integer code;
     private String value;

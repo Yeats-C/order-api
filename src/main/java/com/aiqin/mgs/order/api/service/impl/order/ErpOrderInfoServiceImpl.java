@@ -892,7 +892,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateOrderReturnStatus(String orderCode, ErpOrderReturnStatusEnum orderReturnStatusEnum, List<ErpOrderItem> returnQuantityList, String personId, String personName) {
+    public void updateOrderReturnStatus(String orderCode, ErpOrderReturnRequestEnum orderReturnRequestEnum, List<ErpOrderItem> returnQuantityList, String personId, String personName) {
 
         if (StringUtils.isEmpty(orderCode)) {
             throw new BusinessException("缺失订单号");
@@ -906,9 +906,14 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         auth.setPersonId(personId);
         auth.setPersonName(personName);
 
-        order.setOrderReturn(orderReturnStatusEnum.getCode());
-        this.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
-        if (orderReturnStatusEnum == ErpOrderReturnStatusEnum.SUCCESS) {
+        if (orderReturnRequestEnum == ErpOrderReturnRequestEnum.CANCEL) {
+            order.setOrderReturnProcess(StatusEnum.NO.getCode());
+        } else if (orderReturnRequestEnum == ErpOrderReturnRequestEnum.WAIT) {
+            order.setOrderReturnProcess(StatusEnum.YES.getCode());
+        } else if (orderReturnRequestEnum==ErpOrderReturnRequestEnum.SUCCESS) {
+            order.setOrderReturnProcess(StatusEnum.NO.getCode());
+
+            //修改退货数量
             if (returnQuantityList == null || returnQuantityList.size() == 0) {
                 throw new BusinessException("缺失退货数量");
             }
@@ -929,15 +934,53 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             List<ErpOrderItem> returnUpdateList = new ArrayList<>();
             for (ErpOrderItem item :
                     itemList) {
+                if (ErpProductGiftEnum.GIFT.getCode().equals(item.getProductType())) {
+                    continue;
+                }
                 if (returnQuantityMap.containsKey(item.getLineCode())) {
-                    item.setReturnProductCount(returnQuantityMap.get(item.getLineCode()));
+                    item.setReturnProductCount((item.getReturnProductCount() == null ? 0L : item.getReturnProductCount()) + returnQuantityMap.get(item.getLineCode()));
+                    if (item.getReturnProductCount() > item.getProductCount()) {
+                        throw new BusinessException("行号为" + item.getLineCode() + "的商品退货数量超出最大可退数量");
+                    }
                     returnUpdateList.add(item);
                 }
             }
             if (returnUpdateList.size() > 0) {
                 erpOrderItemService.updateOrderItemList(returnUpdateList, auth);
             }
+
         }
+
+        //最新商品行数据
+        List<ErpOrderItem> newItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
+
+        //是否发起退货
+        boolean returnStartFlag = false;
+        //是否全部退货
+        boolean returnEndFlag = true;
+        for (ErpOrderItem item :
+                newItemList) {
+            if (ErpProductGiftEnum.GIFT.getCode().equals(item.getProductType())) {
+                continue;
+            }
+            if (item.getProductCount() > item.getReturnProductCount()) {
+                //如果有一行没有退完，则不算退货完成
+                returnEndFlag = false;
+            }
+            if (item.getReturnProductCount() > 0L) {
+                //如果有一行有退货数量，则算部分退货
+                returnStartFlag = true;
+            }
+        }
+
+        if (returnEndFlag) {
+            order.setOrderReturn(ErpOrderReturnStatusEnum.SUCCESS.getCode());
+        } else if (returnStartFlag) {
+            order.setOrderReturn(ErpOrderReturnStatusEnum.WAIT.getCode());
+        } else {
+            order.setOrderReturn(ErpOrderReturnStatusEnum.NONE.getCode());
+        }
+        this.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
     }
 
 }
