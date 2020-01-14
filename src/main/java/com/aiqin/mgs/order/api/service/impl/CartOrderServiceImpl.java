@@ -99,14 +99,13 @@ public class CartOrderServiceImpl implements CartOrderService {
                 cartOrderInfo.setSpuId(shoppingCartRequest.getProductId());//spuId
                 cartOrderInfo.setProductId(cartOrderInfo1.getSkuCode());//商品Code
                 cartOrderInfo.setStoreId(cartOrderInfo1.getStoreId());//门店id
-                cartOrderInfo.setPrice(cartOrderInfo1.getPrice());//商品价格
                 cartOrderInfo.setProductType(shoppingCartRequest.getProductType());//商品类型
                 cartOrderInfo.setProductName(cartOrderInfo1.getSkuName());//商品名称
                 cartOrderInfo.setColor(cartOrderInfo1.getColorName());//商品颜色
                 cartOrderInfo.setProductSize(cartOrderInfo1.getModelNumber());//商品型号
                 cartOrderInfo.setCreateSource(shoppingCartRequest.getCreateSource());//插入商品来源
                 cartOrderInfo.setAmount(product.getAmount());//获取商品数量
-                cartOrderInfo.setPrice(cartOrderInfo1.getPriceTax2());//商品价格
+                cartOrderInfo.setPrice(cartOrderInfo1.getPriceTax());//商品价格
                 cartOrderInfo.setProductType(shoppingCartRequest.getProductType());//商品类型 0直送、1配送、2辅采
                 cartOrderInfo.setStoreId(shoppingCartRequest.getStoreId());//门店ID
                 cartOrderInfo.setCreateById(authToken.getPersonId());//创建者id
