@@ -8,6 +8,7 @@ import com.aiqin.mgs.order.api.base.*;
 import com.aiqin.mgs.order.api.component.SequenceService;
 import com.aiqin.mgs.order.api.component.enums.ErpLogOperationTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderReturnStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOperationTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOrderSourceEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayTypeEnum;
@@ -26,6 +27,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderStatusVo;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
+import com.aiqin.mgs.order.api.service.order.ErpOrderInfoService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
@@ -98,6 +100,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     private ErpOrderQueryService erpOrderQueryService;
     @Resource
     private ErpOrderItemDao erpOrderItemDao;
+    @Resource
+    private ErpOrderInfoService erpOrderInfoService;
+
 
     @Override
     @Transactional
@@ -448,6 +453,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         log.info("退款回调开始，reqVo={}",reqVo);
         //查询退货单状态是否修改成功
         ReturnOrderInfo returnOrderInfo=returnOrderInfoDao.selectByReturnOrderCode(reqVo.getOrderNo());
+        log.info("退款回调--查询退货单,返回结果returnOrderInfo={}",returnOrderInfo);
         //退款状态，0-未退款、1-已退款
         if(returnOrderInfo!=null&&returnOrderInfo.getRefundStatus().equals(ConstantData.REFUND_STATUS)){//1-已退款
             return true;
@@ -457,17 +463,28 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         record.setPayNum(reqVo.getPayNum());
         record.setUpdateTime(new Date());
         record.setStatus(ConstantData.REFUND_STATUS);
+        log.info("退款回调--修改退款流水,record={}",record);
         refundInfoDao.updateByOrderCode(record);
+        log.info("退款回调--修改退款流水完成");
         //添加日志
         insertLog(reqVo.getOrderNo(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getMsg());
+        log.info("退款回调--修改退货单退款状态开始,入参returnOrderCode={}",reqVo.getOrderNo());
         returnOrderInfoDao.updateRefundStatus(reqVo.getOrderNo());
+        log.info("退款回调--修改退货单退款状态结束");
         // 调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单（减库存）
         updateStoreStatus(reqVo.getOrderNo(),StoreStatusEnum.PAY_ORDER_TYPE_ZHI.toString(),returnOrderInfo.getStoreId(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,returnOrderInfo.getActualProductCount().toString());
         //修改原始订单数据
         List<ReturnOrderDetail> details = returnOrderDetailDao.selectListByReturnOrderCode(reqVo.getOrderNo());
-
-
-
+        List<ErpOrderItem> returnQuantityList=new ArrayList<>();
+        for(ReturnOrderDetail rod:details){
+            ErpOrderItem eoi=new ErpOrderItem();
+            eoi.setLineCode(rod.getLineCode());
+            eoi.setReturnProductCount(rod.getActualReturnProductCount());
+            returnQuantityList.add(eoi);
+        }
+        log.info("退款回调--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}",returnOrderInfo.getOrderStoreCode(), ErpOrderReturnStatusEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
+        erpOrderInfoService.updateOrderReturnStatus(returnOrderInfo.getOrderStoreCode(), ErpOrderReturnStatusEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
+        log.info("退款回调结束");
         return true;
     }
 
