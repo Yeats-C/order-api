@@ -122,8 +122,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderAfterService orderAfterService;
     @Resource
     private CashierShiftScheduleDao cashierShiftScheduleDao;
-
-
+    @Resource
+    private BridgePayService bridgePayService;
     //商品项目地址
     @Value("${slcsIp}")
     public String slcsIp;
@@ -157,7 +157,7 @@ public class OrderServiceImpl implements OrderService {
                     orderDetailQuery.setOrderId(info.getOrderId());
                     List<OrderDetailInfo> detailList = orderDetailDao.selectDetailById(orderDetailQuery);
                     //未付款的支付金额为空
-                    if (info.getOrderStatus()==0){
+                    if (info.getOrderStatus() == 0) {
                         info.setActualPrice(0);
                         info.setPayType(null);
 
@@ -224,7 +224,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public HttpResponse prestorageOut(PrestorageOutInfo prestorageOutVo) {
-        boolean isUpdate=false;
+        boolean isUpdate = false;
         //查询
         PrestorageOrderSupplyDetail prestorageOrderSupplyDetail = prestorageOrderSupplyDetailDao.selectprestorageorderDetailsById(prestorageOutVo.getPrestorageOrderSupplyDetailId());
         //判断可取数量
@@ -246,29 +246,29 @@ public class OrderServiceImpl implements OrderService {
 
         }
         //购买数量<=已提货数量+未提货的退货数量
-        if (prestorageOrderSupplyDetail != null && prestorageOrderSupplyDetail.getAmount() <=prestorageOrderSupplyDetail.getSupplyAmount() + prestorageOrderSupplyDetail.getReturnPrestorageAmount()) {
+        if (prestorageOrderSupplyDetail != null && prestorageOrderSupplyDetail.getAmount() <= prestorageOrderSupplyDetail.getSupplyAmount() + prestorageOrderSupplyDetail.getReturnPrestorageAmount()) {
             //修改状态
             prestorageOrderSupplyDetail.setPrestorageOrderSupplyStatus(Global.ORDER_STATUS_6);
             prestorageOrderSupplyDetailDao.updateById(prestorageOrderSupplyDetail);
-           // updateprestorageOrderSupplyStatus(prestorageOrderSupplyDetail.getPrestorageOrderSupplyId());
-            isUpdate=true;
+            // updateprestorageOrderSupplyStatus(prestorageOrderSupplyDetail.getPrestorageOrderSupplyId());
+            isUpdate = true;
         }
         //修改订单状态
-        if(isUpdate){
-            boolean stateUpdate=true;
-            List<PrestorageOrderSupplyDetail> prestorageOrderSupplyDetails=prestorageOrderSupplyDetailDao.selectprestorageorderDetailsListByOrderId(prestorageOrderSupplyDetail.getOrderId());
-            for (PrestorageOrderSupplyDetail prestorageOrderSupplyDetail1:prestorageOrderSupplyDetails){
-                if (prestorageOrderSupplyDetail1.getPrestorageOrderSupplyStatus()==2){
-                    stateUpdate=false;
+        if (isUpdate) {
+            boolean stateUpdate = true;
+            List<PrestorageOrderSupplyDetail> prestorageOrderSupplyDetails = prestorageOrderSupplyDetailDao.selectprestorageorderDetailsListByOrderId(prestorageOrderSupplyDetail.getOrderId());
+            for (PrestorageOrderSupplyDetail prestorageOrderSupplyDetail1 : prestorageOrderSupplyDetails) {
+                if (prestorageOrderSupplyDetail1.getPrestorageOrderSupplyStatus() == 2) {
+                    stateUpdate = false;
                 }
             }
-            if (stateUpdate){
-                PrestorageOrderSupply prestorageOrderSupply=new PrestorageOrderSupply();
+            if (stateUpdate) {
+                PrestorageOrderSupply prestorageOrderSupply = new PrestorageOrderSupply();
                 prestorageOrderSupply.setPrestorageOrderSupplyStatus(Global.ORDER_STATUS_6);
                 prestorageOrderSupply.setPrestorageOrderSupplyId(prestorageOrderSupplyDetail.getPrestorageOrderSupplyId());
                 prestorageOrderSupply.setUpdateBy(prestorageOrderSupplyDetail.getUpdateBy());
                 prestorageOrderSupplyDao.updateById(prestorageOrderSupply);
-                OrderInfo orderInfo=new OrderInfo();
+                OrderInfo orderInfo = new OrderInfo();
                 orderInfo.setOrderStatus(Global.ORDER_STATUS_6);
                 orderInfo.setOrderId(prestorageOrderSupplyDetail.getOrderId());
                 try {
@@ -295,20 +295,21 @@ public class OrderServiceImpl implements OrderService {
             }
 
 
-
             if (Objects.nonNull(orderInfo)) {
-                log.info("------------------------------------------------------orderInfo："+ orderInfo.getDetailList());
-                log.info("------------------------------------------------------防止多次处理start" );
+                log.info("------------------------------------------------------orderInfo：" + orderInfo.getDetailList());
+                log.info("------------------------------------------------------防止多次处理start");
                 //防止多次处理
-                if (orderInfo.getOrderInfo().getPayStatus().equals(PayStatusEnum.HAS_PAY.getCode())){
-                    log.info("------------------------------------------------------防止多次处理ing" );
+                if (orderInfo.getOrderInfo().getPayStatus().equals(PayStatusEnum.HAS_PAY.getCode())) {
+                    log.info("------------------------------------------------------防止多次处理ing");
                     return HttpResponse.success();
                 }
-                log.info("------------------------------------------------------防止多次处理end" );
+                log.info("------------------------------------------------------防止多次处理end");
                 //Toc 订单
-                    orderInfo.getOrderInfo().setPayType(String.valueOf(vo.getPayType()));
-                    orderInfo.getOrderInfo().setActualPrice(vo.getOrderAmount());
-                    return tocOrderCallback(orderInfo);
+                orderInfo.getOrderInfo().setPayType(String.valueOf(vo.getPayType()));
+                orderInfo.getOrderInfo().setActualPrice(vo.getOrderAmount());
+                //会员消费更新会员消费时间记录
+                updateMemberSale(orderInfo);
+                return tocOrderCallback(orderInfo);
 
 
             }
@@ -318,16 +319,27 @@ public class OrderServiceImpl implements OrderService {
             return HttpResponse.failure(MessageId.create(Project.ORDER_API, -1, vo.getDealMsg()));
         }
     }
+    //会员消费更新会员消费时间记录
+    private void updateMemberSale(OrderodrInfo orderInfo) {
+        if (orderInfo==null||orderInfo.getOrderInfo()==null||orderInfo.getOrderInfo().getMemberId()==null){
+            return;
+        }
+        MemberSaleRequest memberSaleRequest=new MemberSaleRequest();
+        memberSaleRequest.setMemberId(orderInfo.getOrderInfo().getMemberId());
+        memberSaleRequest.setLastSaleAmount(orderInfo.getOrderInfo().getActualPrice());
+
+        bridgePayService.updateMemberSale(memberSaleRequest);
+    }
 
     private HttpResponse tocOrderCallback(OrderodrInfo orderInfo) {
         //修改状态 支付类型
         try {
-            int i=0;
-            if (orderInfo.getOrderInfo().getOrderType()==4){
-                 i = orderService.updateOrderStatuss(orderInfo.getOrderInfo().getOrderId(), Global.ORDER_STATUS_2, PayStatusEnum.HAS_PAY.getCode(), "系统设置",orderInfo.getOrderInfo().getPayType(),orderInfo.getOrderInfo().getActualPrice());
+            int i = 0;
+            if (orderInfo.getOrderInfo().getOrderType() == 4) {
+                i = orderService.updateOrderStatuss(orderInfo.getOrderInfo().getOrderId(), Global.ORDER_STATUS_2, PayStatusEnum.HAS_PAY.getCode(), "系统设置", orderInfo.getOrderInfo().getPayType(), orderInfo.getOrderInfo().getActualPrice());
 
-            }else {
-                 i = orderService.updateOrderStatuss(orderInfo.getOrderInfo().getOrderId(), Global.ORDER_STATUS_5, PayStatusEnum.HAS_PAY.getCode(), "系统设置",orderInfo.getOrderInfo().getPayType(), orderInfo.getOrderInfo().getActualPrice());
+            } else {
+                i = orderService.updateOrderStatuss(orderInfo.getOrderInfo().getOrderId(), Global.ORDER_STATUS_5, PayStatusEnum.HAS_PAY.getCode(), "系统设置", orderInfo.getOrderInfo().getPayType(), orderInfo.getOrderInfo().getActualPrice());
 
             }
             if (i == 0) {
@@ -336,7 +348,7 @@ public class OrderServiceImpl implements OrderService {
             if (orderInfo.getOrderInfo().getOrderType() == 1) {
                 //修改库存
                 changeProductStock(orderInfo);
-            } else if (orderInfo.getOrderInfo().getOrderType() == 4){
+            } else if (orderInfo.getOrderInfo().getOrderType() == 4) {
                 //预存订单提出记录初始化
                 log.info("预存订单提出记录初始化{}", "===========" + orderInfo.getDetailList().toString());
                 createPrestorageOrder(orderInfo);
@@ -361,24 +373,24 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void couldReturn(List<PrestorageOrderInfo> prestorageOrderSupplies) {
-        prestorageOrderSupplies.stream().forEach(one->{
+        prestorageOrderSupplies.stream().forEach(one -> {
             //设置不可退货状态
-            if (one.getOrderStatus().equals(Global.ORDER_STATUS_0)){
+            if (one.getOrderStatus().equals(Global.ORDER_STATUS_0)) {
                 one.setTurnReturnView(1);
-            }else if(one.getOrderStatus().equals(Global.ORDER_STATUS_5)||one.getOrderStatus().equals(Global.ORDER_STATUS_6)){
+            } else if (one.getOrderStatus().equals(Global.ORDER_STATUS_5) || one.getOrderStatus().equals(Global.ORDER_STATUS_6)) {
                 //设置不可退货状态：
                 //可退货 ：已提货-已提货退货 >0
-                List<PrestorageOrderSupplyDetail> p=   prestorageOrderSupplyDetailDao.selectPrestorageOrderDetailByOrderId(one.getOrderId());
+                List<PrestorageOrderSupplyDetail> p = prestorageOrderSupplyDetailDao.selectPrestorageOrderDetailByOrderId(one.getOrderId());
                 one.setTurnReturnView(1);
-                for (PrestorageOrderSupplyDetail prestorageOrderSupplyDetail :p){
-                    if (prestorageOrderSupplyDetail.getSupplyAmount()>prestorageOrderSupplyDetail.getReturnAmount()){
+                for (PrestorageOrderSupplyDetail prestorageOrderSupplyDetail : p) {
+                    if (prestorageOrderSupplyDetail.getSupplyAmount() > prestorageOrderSupplyDetail.getReturnAmount()) {
                         one.setTurnReturnView(0);
                     }
                 }
 
             }
             //未付款的支付金额为0
-            if(one.getOrderStatus()==0){
+            if (one.getOrderStatus() == 0) {
                 one.setActualPrice(0L);
                 one.setPayType(null);
             }
@@ -400,13 +412,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public HttpResponse updateRejectPrestoragProduct(PrestorageOrderSupplyDetailVo vo) {
-        int updateLine =prestorageOrderSupplyDetailDao.updateRejectPrestoragProduct(vo);
+        int updateLine = prestorageOrderSupplyDetailDao.updateRejectPrestoragProduct(vo);
         return HttpResponse.success();
     }
 
     @Override
     public HttpResponse updateRejectPrestoragState(RejectPrestoragStateVo vo) {
-        PrestorageOrderSupply prestorageOrderSupply=new PrestorageOrderSupply();
+        PrestorageOrderSupply prestorageOrderSupply = new PrestorageOrderSupply();
         prestorageOrderSupply.setPrestorageOrderSupplyId(vo.getPrestorageOrderSupplyId());
         prestorageOrderSupply.setPrestorageOrderSupplyStatus(vo.getProductStatus());
         prestorageOrderSupplyDao.updateById(prestorageOrderSupply);
@@ -426,48 +438,48 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public HttpResponse getUnPayNum(UnPayVo unPayVo) {
-        int num=orderDao.getUnPayNum(unPayVo);
+        int num = orderDao.getUnPayNum(unPayVo);
         return HttpResponse.success(num);
     }
 
     @Override
     public HttpResponse getUnPayMemberIdList(UnPayVo unPayVo) {
-        List<String> MemberIds=orderDao.getUnPayMemberIdList(unPayVo);
+        List<String> MemberIds = orderDao.getUnPayMemberIdList(unPayVo);
         return HttpResponse.success(MemberIds);
     }
 
     @Transactional
     @Override
     public HttpResponse batchUpdateRejectPrestoragProduct(PrestoragProductAfter vos) throws Exception {
-        for (PrestorageOrderSupplyDetailVo rejectPrestoragStateVo:vos.getPrestorageOrderSupplyDetailVos()){
+        for (PrestorageOrderSupplyDetailVo rejectPrestoragStateVo : vos.getPrestorageOrderSupplyDetailVos()) {
             updateRejectPrestoragProduct(rejectPrestoragStateVo);
         }
         vos.getAfterSaleSaveVo().setOrderType(Global.ORDER_TYPE_1);
-        return orderAfterService.addAfterOrder( vos.getAfterSaleSaveVo());
+        return orderAfterService.addAfterOrder(vos.getAfterSaleSaveVo());
     }
 
     @Override
     public HttpResponse cashierQuery(CashierReqVo cashierReqVo) {
         // 新增 交接班时间
         Integer type = cashierShiftScheduleDao.cashierQuery(cashierReqVo);
-        if(type == 1){
+        if (type == 1) {
             return HttpResponse.success(true);
-        }else {
+        } else {
             return HttpResponse.failure(ResultCode.CASHIER_SHIFT_SCHEDULE);
         }
     }
 
     @Override
     public HttpResponse orderCount(String skuCode, String storeId, int day) {
-        return HttpResponse.successGenerics(orderDao.querySaleSkuCount(skuCode,DateUtil.getBeforeDate(new Date(),day),storeId));
+        return HttpResponse.successGenerics(orderDao.querySaleSkuCount(skuCode, DateUtil.getBeforeDate(new Date(), day), storeId));
     }
 
     @Override
     public HttpResponse<Integer> orderStoreCount(OrderCountReq orderCountReq) {
         //1）正常销售订单-已完成状态2）预存订单-未提货状态3）服务订单已完成
-       int count1= orderDao.orderPrestorageCount( orderCountReq.getStoreId(),  orderCountReq.getStartDay(),  orderCountReq.getEndDay());
-        int count2= orderDao.orderStoreCount( orderCountReq.getStoreId(),  orderCountReq.getStartDay(),  orderCountReq.getEndDay());
-        return HttpResponse.successGenerics(count1+count2);
+        int count1 = orderDao.orderPrestorageCount(orderCountReq.getStoreId(), orderCountReq.getStartDay(), orderCountReq.getEndDay());
+        int count2 = orderDao.orderStoreCount(orderCountReq.getStoreId(), orderCountReq.getStartDay(), orderCountReq.getEndDay());
+        return HttpResponse.successGenerics(count1 + count2);
     }
 
     private OrderQuery trans(OrderQuery orderQuery) {
@@ -561,7 +573,7 @@ public class OrderServiceImpl implements OrderService {
         prestorageOrderSupply.setPrestorageOrderSupplyId(prestorageOrderSupplyId);
         prestorageOrderSupply.setPrestorageOrderSupplyStatus(Global.ORDER_STATUS_5);
         prestorageOrderSupplyDao.updateById(prestorageOrderSupply);
-        OrderInfo orderInfo=new OrderInfo();
+        OrderInfo orderInfo = new OrderInfo();
         orderInfo.setOrderId(prestorageOrderSupplyDetails.get(0).getOrderId());
         orderInfo.setOrderStatus(Global.ORDER_STATUS_5);
         try {
@@ -633,7 +645,7 @@ public class OrderServiceImpl implements OrderService {
         }
         //yyMMddHHmmss+订单来源+销售渠道标识+公司标识+4位数的随机数
         //orderCode = DateUtil.sysDate() + logo + String.valueOf(Global.ORDERID_CHANNEL_4) + companyCode + OrderPublic.randomNumberF();
-        orderCode = DateUtil.sysDate() + logo + String.valueOf(Global.ORDERID_CHANNEL_4) +  OrderPublic.randomNumberF();
+        orderCode = DateUtil.sysDate() + logo + String.valueOf(Global.ORDERID_CHANNEL_4) + OrderPublic.randomNumberF();
         orderInfo.setOrderCode(orderCode);
 
         //初始化提货码
@@ -1025,7 +1037,7 @@ public class OrderServiceImpl implements OrderService {
     public HttpResponse updateOrderStatus(@Valid String orderId, Integer orderStatus, Integer payStatus,
                                           String updateBy, String payType) {
         try {
-            updateOrderStatuss(orderId, orderStatus, payStatus, updateBy,payType, null);
+            updateOrderStatuss(orderId, orderStatus, payStatus, updateBy, payType, null);
 
             return HttpResponse.success();
         } catch (Exception e) {
@@ -1121,8 +1133,8 @@ public class OrderServiceImpl implements OrderService {
 
             // 获取改收银员最后一次交接时间
             String beginTime = cashierShiftScheduleDao.selectTimeByCashierId(cashierId);
-            if(StringUtils.isEmpty(beginTime)){
-               beginTime = DayUtil.getYearStr();
+            if (StringUtils.isEmpty(beginTime)) {
+                beginTime = DayUtil.getYearStr();
             }
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             OrderbyReceiptSumResponse receiptSumInfo = new OrderbyReceiptSumResponse();
@@ -1255,12 +1267,12 @@ public class OrderServiceImpl implements OrderService {
 
             if (reorerRequest != null) {
                 if (reorerRequest.getBeginTime() != null && !reorerRequest.getBeginTime().equals("")) {
-                    String beginTimetime=reorerRequest.getBeginTime();
+                    String beginTimetime = reorerRequest.getBeginTime();
                     reorerRequest.setBeginTime(DateUtil.formatDateLong(DateUtil.getDayBegin(beginTimetime)));
                     if (reorerRequest.getEndTime() == null || reorerRequest.getEndTime().equals("")) {
                         reorerRequest.setEndTime(DateUtil.formatDateLong(DateUtil.getDayEnd(beginTimetime)));
                     }
-                }else   if (reorerRequest.getEndTime() != null && !reorerRequest.getEndTime().equals("")) {
+                } else if (reorerRequest.getEndTime() != null && !reorerRequest.getEndTime().equals("")) {
                     reorerRequest.setEndTime(DateUtil.formatDateLong(DateUtil.getDayEnd(reorerRequest.getEndTime())));
                 }
             }
@@ -1761,7 +1773,7 @@ public class OrderServiceImpl implements OrderService {
                     }
                     //删除订单明细数据
                     try {
-                    //    orderDetailDao.deleteOrderDetailInfo(orderInfo);
+                        //    orderDetailDao.deleteOrderDetailInfo(orderInfo);
                     } catch (Exception e) {
                         LOGGER.error("删除订单明细数据异常：{}", e);
                     }
@@ -1811,8 +1823,8 @@ public class OrderServiceImpl implements OrderService {
                     }
                 }
                 //如果订单状态是已支付此处应该写调用支付中心现金支付
-                if (orderInfo.getOrderStatus().equals(Global.ORDER_STATUS_2)||orderInfo.getOrderStatus().equals(Global.ORDER_STATUS_5)){
-                    PayReq payReq=new PayReq();
+                if (orderInfo.getOrderStatus().equals(Global.ORDER_STATUS_2) || orderInfo.getOrderStatus().equals(Global.ORDER_STATUS_5)) {
+                    PayReq payReq = new PayReq();
                     payReq.setOrderAmount(Long.valueOf(orderInfo.getActualPrice()));
                     payReq.setAiqinMerchantId(orderInfo.getDistributorId());
                     payReq.setOrderNo(orderInfo.getOrderCode());
@@ -1822,7 +1834,7 @@ public class OrderServiceImpl implements OrderService {
                     payReq.setCreateName(orderInfo.getCashierName());
                     payReq.setStoreName(orderInfo.getDistributorName());
                     payReq.setCreateBy(orderInfo.getCashierId());
-                    NewFranchiseeResponse newFranchiseeResponse=bridgeProductService.getStoreFranchiseeData(orderInfo.getDistributorId());
+                    NewFranchiseeResponse newFranchiseeResponse = bridgeProductService.getStoreFranchiseeData(orderInfo.getDistributorId());
                     payReq.setFranchiseeId(newFranchiseeResponse.getFranchiseeId());
                     payReq.setMemberPhone(orderInfo.getMemberPhone());
                     payReq.setMemberName(orderInfo.getMemberName());
@@ -1843,17 +1855,18 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 根据订单类型选择支付业务
+     *
      * @param orderType
      * @return
      */
     private Integer choseBusinessType(Integer orderType) {
-        if (orderType==null){
+        if (orderType == null) {
             return Global.PAY_ORDER_TYPE_0;
         }
-        if (orderType.intValue()==3){
+        if (orderType.intValue() == 3) {
             return Global.PAY_ORDER_TYPE_3;
         }
-        if (orderType.intValue()==4){
+        if (orderType.intValue() == 4) {
             return Global.PAY_ORDER_TYPE_1;
         }
         return Global.PAY_ORDER_TYPE_0;
@@ -2050,9 +2063,9 @@ public class OrderServiceImpl implements OrderService {
             }
             orderDao.updateOrder(orderInfo);
             //如果订单状态是已支付此处增加支付中心现金支付
-            if (orderInfo.getOrderStatus().equals(Global.ORDER_STATUS_2)||orderInfo.getOrderStatus().equals(Global.ORDER_STATUS_5)){
-                NewFranchiseeResponse newFranchiseeResponse=bridgeProductService.getStoreFranchiseeData(order.getDistributorId());
-                PayReq payReq=new PayReq();
+            if (orderInfo.getOrderStatus().equals(Global.ORDER_STATUS_2) || orderInfo.getOrderStatus().equals(Global.ORDER_STATUS_5)) {
+                NewFranchiseeResponse newFranchiseeResponse = bridgeProductService.getStoreFranchiseeData(order.getDistributorId());
+                PayReq payReq = new PayReq();
                 payReq.setOrderAmount(Long.valueOf(order.getActualPrice()));
                 payReq.setAiqinMerchantId(order.getDistributorId());
                 payReq.setOrderNo(order.getOrderCode());
@@ -2062,7 +2075,7 @@ public class OrderServiceImpl implements OrderService {
                 payReq.setStoreId(order.getDistributorId());
                 payReq.setOrderSource(order.getOriginType());
                 payReq.setOrderNo(order.getOrderCode());
-                if (newFranchiseeResponse!=null){
+                if (newFranchiseeResponse != null) {
                     payReq.setFranchiseeId(newFranchiseeResponse.getFranchiseeId());
                 }
                 payReq.setCreateName(order.getCashierName());
@@ -2288,7 +2301,7 @@ public class OrderServiceImpl implements OrderService {
             orderInfo.setUpdateBy(updateBy);
             orderInfo.setDistributorCode(storeValueOrderPayRequest.getStoreCode());
             orderInfo.setDistributorName(storeValueOrderPayRequest.getStoreName());
-           // orderDao.updateOrder(orderInfo);
+            // orderDao.updateOrder(orderInfo);
             orderDetailQuery.setOrderId(orderInfo.getOrderId());
             List<OrderDetailInfo> orderDetailInfoList = orderDetailDao.selectDetailById(orderDetailQuery);
 
@@ -2297,14 +2310,13 @@ public class OrderServiceImpl implements OrderService {
                 productCount += orderDetailInfo.getAmount();
                 orderDetailInfo.setUpdateBy(updateBy);
 
-                orderDetailInfo.setActualPrice(orderDetailInfo.getActualPrice()*orderInfo.getActualPrice()/storeValueOrderPayRequest.getActualPrice());
+                orderDetailInfo.setActualPrice(orderDetailInfo.getActualPrice() * orderInfo.getActualPrice() / storeValueOrderPayRequest.getActualPrice());
 
 
-
-               // orderDetailDao.updateOrderDetail(orderDetailInfo);
+                // orderDetailDao.updateOrderDetail(orderDetailInfo);
             }
             //增加结算信息
-          //  addSettlementInfo(orderInfo.getOrderId(), productCount, updateBy, actualPrice);
+            //  addSettlementInfo(orderInfo.getOrderId(), productCount, updateBy, actualPrice);
             //支付信息
             addOrderPay(orderInfo, updateBy);
             orderInfo.setOrderdetailList(orderDetailInfoList);
