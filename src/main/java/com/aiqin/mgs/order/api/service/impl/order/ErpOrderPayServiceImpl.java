@@ -190,10 +190,13 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
     @Override
     public ErpOrderPayResultResponse orderPayResult(ErpOrderPayRequest erpOrderPayRequest) {
         ErpOrderPayResultResponse result = new ErpOrderPayResultResponse();
+        if (erpOrderPayRequest == null || StringUtils.isEmpty(erpOrderPayRequest.getOrderCode())) {
+            throw new BusinessException("缺失订单号");
+        }
         String orderCode = erpOrderPayRequest.getOrderCode();
         ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
         if (order == null) {
-            throw new BusinessException("无效的订单编码");
+            throw new BusinessException("无效的订单号");
         }
         ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByFeeId(order.getFeeId());
 
