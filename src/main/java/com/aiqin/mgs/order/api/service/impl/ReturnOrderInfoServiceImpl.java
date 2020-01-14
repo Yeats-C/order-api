@@ -463,6 +463,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         returnOrderInfoDao.updateRefundStatus(reqVo.getOrderNo());
         // 调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单（减库存）
         updateStoreStatus(reqVo.getOrderNo(),StoreStatusEnum.PAY_ORDER_TYPE_ZHI.toString(),returnOrderInfo.getStoreId(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,returnOrderInfo.getActualProductCount().toString());
+        //修改原始订单数据
+        List<ReturnOrderDetail> details = returnOrderDetailDao.selectListByReturnOrderCode(reqVo.getOrderNo());
+
+
+
         return true;
     }
 
