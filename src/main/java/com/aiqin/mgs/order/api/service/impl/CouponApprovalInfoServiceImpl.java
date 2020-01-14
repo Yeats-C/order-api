@@ -185,7 +185,7 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                 for(ReturnOrderDetail rod:details){
                     ErpOrderItem eoi=new ErpOrderItem();
                     eoi.setLineCode(rod.getLineCode());
-                    eoi.setReturnProductCount(rod.getActualReturnProductCount());
+                    eoi.setReturnProductCount(rod.getReturnProductCount());
                     returnQuantityList.add(eoi);
                 }
                 ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(couponApprovalDetail.getOrderId());
