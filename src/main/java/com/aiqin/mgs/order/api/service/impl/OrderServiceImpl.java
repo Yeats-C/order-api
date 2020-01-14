@@ -2288,7 +2288,7 @@ public class OrderServiceImpl implements OrderService {
             orderInfo.setUpdateBy(updateBy);
             orderInfo.setDistributorCode(storeValueOrderPayRequest.getStoreCode());
             orderInfo.setDistributorName(storeValueOrderPayRequest.getStoreName());
-            orderDao.updateOrder(orderInfo);
+           // orderDao.updateOrder(orderInfo);
             orderDetailQuery.setOrderId(orderInfo.getOrderId());
             List<OrderDetailInfo> orderDetailInfoList = orderDetailDao.selectDetailById(orderDetailQuery);
 
@@ -2301,10 +2301,10 @@ public class OrderServiceImpl implements OrderService {
 
 
 
-                orderDetailDao.updateOrderDetail(orderDetailInfo);
+               // orderDetailDao.updateOrderDetail(orderDetailInfo);
             }
             //增加结算信息
-            addSettlementInfo(orderInfo.getOrderId(), productCount, updateBy, actualPrice);
+          //  addSettlementInfo(orderInfo.getOrderId(), productCount, updateBy, actualPrice);
             //支付信息
             addOrderPay(orderInfo, updateBy);
             orderInfo.setOrderdetailList(orderDetailInfoList);
