@@ -1,14 +1,11 @@
 package com.aiqin.mgs.order.api.service.bill.impl;
 
-import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
-import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.returnenums.ReturnOrderStatusEnum;
 import com.aiqin.mgs.order.api.dao.*;
-import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.request.bill.ReturnBatchDetailDLReq;
@@ -26,15 +23,9 @@ import com.aiqin.mgs.order.api.util.BeanHelper;
 import com.github.pagehelper.PageHelper;
 import org.apache.commons.collections.CollectionUtils;
 import com.aiqin.mgs.order.api.service.bill.CreateRejectRecordService;
-import com.aiqin.mgs.order.api.service.bill.OperationLogService;
-import com.aiqin.mgs.order.api.util.BeanCopyUtils;
-import com.aiqin.mgs.order.api.util.RequestReturnUtil;
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,14 +41,9 @@ import java.util.concurrent.*;
 @Service
 public class RejectRecordServiceImpl implements RejectRecordService {
     private static final Logger LOGGER = LoggerFactory.getLogger(RejectRecordServiceImpl.class);
-    @Value("${reject.host}")
-    private String rejectHost;
+
     @Resource
     ReturnOrderInfoDao returnOrderInfoDao;
-    @Resource
-    ReturnOrderDetailDao returnOrderDetailDao;
-    @Resource
-    OperationLogService operationLogService;
     @Resource
     RejectRecordDao rejectRecordDao;
     @Resource
@@ -73,7 +59,7 @@ public class RejectRecordServiceImpl implements RejectRecordService {
     @Transactional(rollbackFor = Exception.class)
     public HttpResponse createRejectRecord(String returnOrderCode) {
         LOGGER.info("根据ERP退货单生成爱亲退供单，开始，returnOrderCode{}", returnOrderCode);
-        if (StringUtils.isNotEmpty(returnOrderCode)) {
+        if (StringUtils.isNotBlank(returnOrderCode)) {
             //异步执行
             rejectRecordExecutor(returnOrderCode);
             return HttpResponse.success();
@@ -239,19 +225,8 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                     //查询待ERP退货单，待生成爱亲退供单数据
                     ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndSuccess(orderSynchroSuccess, returnOrderCode);
                     if (returnOrderInfo != null) {
-                        LOGGER.info("根据ERP退货单生成爱亲退供单&爱亲退供单明细&修改ERP订单同步状态开始");
-                        createRejectRecordService.addRejectRecord(returnOrderInfo);
+                        createRejectRecordService.addRejectRecord(returnOrderCode);
                         LOGGER.info("根据ERP退货单生成爱亲退供单&爱亲退供单明细&修改ERP订单同步状态结束");
-
-                        //根据爱亲退供单，生成耘链退货单
-                        LOGGER.info("根据爱亲退供单，生成耘链退货单开始，returnOrderCode{}", returnOrderCode);
-                        createSaleOrder(returnOrderCode);
-                        LOGGER.info("根据爱亲退供单，生成耘链退货单结束");
-
-                        //添加操作日志
-                        LOGGER.info("添加根据爱亲退供单，生成耘链退货单，操作日志开始");
-                        addOperationLog(returnOrderInfo.getReturnOrderCode());
-                        LOGGER.info("根据爱亲退供单，生成耘链退货单，添加操作日志结束");
                     } else {
                         LOGGER.error("查询待ERP退货单为空");
                         throw new IllegalArgumentException();
@@ -262,51 +237,5 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                 }
             }
         });
-    }
-
-    /**
-     * 根据爱亲退供单，生成耘链退货单
-     *
-     * @param returnOrderCode
-     */
-    private void createSaleOrder(String returnOrderCode) {
-        try {
-            //查询退供单
-            ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(returnOrderCode);
-            //查询退供单明细
-            List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderCode);
-            if (returnOrderInfo != null && returnOrderDetails != null && returnOrderDetails.size() > 0) {
-                ReturnOrderInfo orderInfo = new ReturnOrderInfo();
-                BeanUtils.copyProperties(returnOrderInfo, orderInfo);
-                List<ReturnOrderDetail> orderDetails = BeanCopyUtils.copyList(returnOrderDetails, ReturnOrderDetail.class);
-                ReturnOrderReq returnOrderReq = new ReturnOrderReq();
-                returnOrderReq.setReturnOrderDetailReqList(orderDetails);
-                returnOrderReq.setReturnOrderInfo(orderInfo);
-                String url = rejectHost + "/returnGoods/record/return";
-                //String url = "http://192.168.10.183:80/returnGoods/record/return";
-                LOGGER.info("returnOrderReq" + returnOrderReq);
-                HttpClient httpGet = HttpClient.post(url).json(returnOrderReq).timeout(10000);
-                HttpResponse<Object> response = httpGet.action().result(new TypeReference<HttpResponse<Object>>() {
-                });
-                if (!RequestReturnUtil.validateHttpResponse(response)) {
-                    throw new BusinessException(response.getMessage());
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.error("根据爱亲退供单，生成耘链退货单失败returnOrderCode： " + returnOrderCode);
-        }
-    }
-
-    /**
-     * 根据爱亲退供单，生成耘链退货单，添加操作日志
-     *
-     * @param returnOrderCode
-     */
-    private void addOperationLog(String returnOrderCode) {
-        Integer operationType = ErpLogSourceTypeEnum.RETURN_SUPPLY.getCode();
-        Integer sourceType = ErpLogOperationTypeEnum.ADD.getCode();
-        Integer useStatus = ErpLogStatusTypeEnum.USING.getCode();
-        String operationContent = "根据爱亲退供单，生成耘链退货单";
-        operationLogService.insert(returnOrderCode, operationType, sourceType, operationContent, null, useStatus, null);
     }
 }
