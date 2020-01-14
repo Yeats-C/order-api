@@ -405,9 +405,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
 
         //重新加入购物车
         if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_99 || orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_98) {
-            if (!orderCategoryEnum.isFirstOrder()) {
-                control.setRejoinCart(StatusEnum.YES.getCode());
-            }
+            control.setRejoinCart(StatusEnum.YES.getCode());
         }
 
         //退货
