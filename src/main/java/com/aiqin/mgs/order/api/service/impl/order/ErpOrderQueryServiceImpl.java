@@ -410,8 +410,12 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
 
         //退货
         if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_13) {
-            if (!orderCategoryEnum.isFirstOrder()) {
-                control.setOrderReturn(StatusEnum.YES.getCode());
+            if (!ErpOrderReturnStatusEnum.SUCCESS.getCode().equals(order.getOrderReturn())) {
+                if (StatusEnum.NO.getCode().equals(order.getOrderReturnProcess())) {
+                    if (!orderCategoryEnum.isFirstOrder()) {
+                        control.setOrderReturn(StatusEnum.YES.getCode());
+                    }
+                }
             }
         }
 

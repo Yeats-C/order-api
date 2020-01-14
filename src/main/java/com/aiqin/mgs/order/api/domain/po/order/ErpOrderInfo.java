@@ -318,9 +318,13 @@ public class ErpOrderInfo {
     @JsonProperty("fee_id")
     private String feeId;
 
-    @ApiModelProperty(value = "退货流程状态 1未退货 2退货中 3退货完成")
+    @ApiModelProperty(value = "退货状态 1未退货 2部分退货 3退货完成")
     @JsonProperty("order_return")
     private Integer orderReturn;
+
+    @ApiModelProperty(value = "退货流程状态 1无进行中的退货 0正在退货")
+    @JsonProperty("order_return_process")
+    private Integer orderReturnProcess;
 
     @ApiModelProperty(value = "加盟商id")
     @JsonProperty("franchisee_id")
