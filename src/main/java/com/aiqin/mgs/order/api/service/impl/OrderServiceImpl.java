@@ -326,7 +326,7 @@ public class OrderServiceImpl implements OrderService {
         }
         MemberSaleRequest memberSaleRequest=new MemberSaleRequest();
         memberSaleRequest.setMemberId(orderInfo.getOrderInfo().getMemberId());
-        memberSaleRequest.setLastSaleAmount(orderInfo.getOrderInfo().getActualPrice());
+        memberSaleRequest.setLastSaleAmount(orderInfo.getSettlementInfo().getOrderReceivable());
 
         bridgePayService.updateMemberSale(memberSaleRequest);
     }
