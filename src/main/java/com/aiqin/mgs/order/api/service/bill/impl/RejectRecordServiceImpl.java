@@ -59,7 +59,7 @@ public class RejectRecordServiceImpl implements RejectRecordService {
     @Transactional(rollbackFor = Exception.class)
     public HttpResponse createRejectRecord(String returnOrderCode) {
         LOGGER.info("根据ERP退货单生成爱亲退供单，开始，returnOrderCode{}", returnOrderCode);
-        if (StringUtils.isNotEmpty(returnOrderCode)) {
+        if (StringUtils.isNotBlank(returnOrderCode)) {
             //异步执行
             rejectRecordExecutor(returnOrderCode);
             return HttpResponse.success();

@@ -74,7 +74,7 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
             itemListToPurchaseOrderDetail(erpOrderInfo.getItemList());
 
             //根据爱亲采购单，生成耘链销售单开始
-            //createSaleOrder(erpOrderInfo);
+            createSaleOrder(erpOrderInfo);
 
             //修改ERP订单同步状态
             erpOrderInfoDao.updateOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_SUCCESS.getCode(), erpOrderInfo.getOrderStoreCode());

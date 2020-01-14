@@ -83,9 +83,6 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             if (data == null) {
                 throw new BusinessException("无效的商品");
             }
-            if (data.getProductSkuBoxPackings() == null) {
-                throw new BusinessException("商品缺少包装信息");
-            }
 
             //商品编码
             product.setSpuCode(data.getProductCode());
@@ -106,11 +103,10 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             product.setTaxRate(data.getOutputTaxRate());
             product.setProductPropertyCode(data.getProductPropertyCode());
             product.setProductPropertyName(data.getProductPropertyName());
-            if (data.getProductSkuBoxPackings() == null || data.getProductSkuBoxPackings().size() == 0) {
-                throw new BusinessException("获取商品包装信息失败");
+            if (data.getProductSkuBoxPackings() != null && data.getProductSkuBoxPackings().size() > 0) {
+                product.setBoxGrossWeight(data.getProductSkuBoxPackings().get(0).getBoxGrossWeight());
+                product.setBoxVolume(data.getProductSkuBoxPackings().get(0).getBoxVolume());
             }
-            product.setBoxGrossWeight(data.getProductSkuBoxPackings().get(0).getBoxGrossWeight());
-            product.setBoxVolume(data.getProductSkuBoxPackings().get(0).getBoxVolume());
 
         } catch (BusinessException e) {
             logger.info("获取商品信息失败：{}", e.getMessage());

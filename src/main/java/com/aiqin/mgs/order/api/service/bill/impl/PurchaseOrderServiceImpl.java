@@ -1,23 +1,12 @@
 package com.aiqin.mgs.order.api.service.bill.impl;
 
 import com.aiqin.ground.util.id.IdUtil;
-import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.PurchaseOrderStatusEnum;
-import com.aiqin.mgs.order.api.domain.constant.BillConstant;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderDeliverItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderTransportLogisticsRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderTransportRequest;
 import com.aiqin.mgs.order.api.service.bill.CreatePurchaseOrderService;
-import com.aiqin.mgs.order.api.service.bill.OperationLogService;
-import com.aiqin.mgs.order.api.util.RequestReturnUtil;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
-
-import com.aiqin.mgs.order.api.component.enums.ErpLogOperationTypeEnum;
-import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
-import com.aiqin.mgs.order.api.component.enums.ErpLogStatusTypeEnum;
-
-import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.dao.*;
@@ -28,7 +17,6 @@ import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderDeliverService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,7 +49,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     @Override
     public HttpResponse createPurchaseOrder(@Valid ErpOrderInfo erpOrderInfo) {
         LOGGER.info("根据ERP订单生成爱亲采购单，采购单开始，erpOrderInfo{}", erpOrderInfo);
-        if (erpOrderInfo != null & erpOrderInfo.getItemList() !=null && erpOrderInfo.getItemList().size()>0) {
+        if (erpOrderInfo != null & erpOrderInfo.getItemList() != null && erpOrderInfo.getItemList().size() > 0) {
             //异步执行。
             purchaseOrderExecutor(erpOrderInfo);
             return HttpResponse.success();
@@ -74,6 +62,13 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     @Override
     @Transactional
     public HttpResponse updatePurchaseInfo(OrderIogisticsVo purchaseInfo) {
+        if (purchaseInfo != null
+                && purchaseInfo.getOrderStoreDetail() != null
+                && purchaseInfo.getOrderStoreDetail().size() > 0
+                && purchaseInfo.getOrderBatchStoreDetail() != null
+                && purchaseInfo.getOrderBatchStoreDetail().size() > 0) {
+
+        }
         LOGGER.info("耘链销售单回传更新开始 参数purchaseInfo{}" + purchaseInfo);
         try {
             //更新订单&订单明细
@@ -98,6 +93,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             purchaseOrder.setDeliveryTime(purchaseInfo.getDeliveryTime());//
             purchaseOrder.setContactPerson(purchaseInfo.getDeliveryPersonId());//
             purchaseOrder.setPurchaseOrderCode(purchaseInfo.getOrderStoreCode());
+            purchaseOrder.setUpdateById(purchaseInfo.getPersonId());
+            purchaseOrder.setUpdateByName(purchaseInfo.getPersonName());
             purchaseOrder.setUpdateTime(new Date());
             purchaseOrderDao.updateByPrimaryKey(purchaseOrder);
 
@@ -109,6 +106,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 purchaseOrderDetail.setSkuName(orderStoreDetail.getSkuName());//SKU名称
                 purchaseOrderDetail.setTotalCount(orderStoreDetail.getActualProductCount());//实发数量
                 purchaseOrderDetail.setPurchaseOrderCode(purchaseInfo.getOrderStoreCode());
+                purchaseOrderDetail.setUpdateById(purchaseInfo.getPersonId());
+                purchaseOrderDetail.setUpdateByName(purchaseInfo.getPersonName());
                 purchaseOrderDetail.setUpdateTime(new Date());
                 purchaseOrderDetailDao.updateByPurchaseOrderCode(purchaseOrderDetail);
             }
@@ -119,12 +118,14 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 purchaseOrderDetailBatch.setPurchaseOrderDetailBatchId(IdUtil.purchaseId());
                 purchaseOrderDetailBatch.setPurchaseOrderCode(purchaseInfo.getOrderStoreCode());
                 purchaseOrderDetailBatch.setBatchCode(batchStoreDetail.getBatchCode());
-                purchaseOrderDetailBatch.setCreateTime(new Date());
                 purchaseOrderDetailBatch.setSkuCode(batchStoreDetail.getSkuCode());//SKU编码
                 purchaseOrderDetailBatch.setSkuCode(batchStoreDetail.getSkuName());//SKU名称
                 purchaseOrderDetailBatch.setActualTotalCount(purchaseInfo.getActualTotalCount());//实际销售数量
                 purchaseOrderDetailBatch.setBatchCode(batchStoreDetail.getSkuName());//SKU名称
                 purchaseOrderDetailBatch.setLineCode(batchStoreDetail.getLineCode());//行号
+                purchaseOrderDetailBatch.setCreateById(purchaseInfo.getPersonId());
+                purchaseOrderDetailBatch.setCreateByName(purchaseInfo.getPersonName());
+                purchaseOrderDetailBatch.setCreateTime(new Date());
                 purchaseOrderDetailBatchDao.insert(purchaseOrderDetailBatch);
             }
             return HttpResponse.success();
@@ -155,7 +156,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             orderTransport.setTransportStatus(deliveryInfoVo.getTransportStatus());
             List<String> listDeliveryDetail = new ArrayList<>();
             deliveryInfoVo.getDeliveryDetail();
-            for(DeliveryDetailInfo deliveryDetails : deliveryInfoVo.getDeliveryDetail()){
+            for (DeliveryDetailInfo deliveryDetails : deliveryInfoVo.getDeliveryDetail()) {
                 listDeliveryDetail.add(deliveryDetails.getOrderCode());
             }
             orderTransport.setOrderCodeList(listDeliveryDetail);
@@ -181,11 +182,6 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 try {
                     //根据ERP订单生成爱亲采购单&采购单明细&修改订单同步状态
                     createPurchaseOrderService.addOrderAndDetail(erpOrderInfo);
-
-
-
-
-
                 } catch (Exception e) {
                     LOGGER.error("同步ERP采购单失败" + e);
                     throw new RuntimeException();
@@ -193,10 +189,6 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             }
         });
     }
-
-
-
-
 
     //取消订单
     @Override
