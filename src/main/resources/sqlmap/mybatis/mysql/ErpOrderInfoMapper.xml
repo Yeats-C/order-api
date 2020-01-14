@@ -76,6 +76,7 @@
         logistics_id as logisticsId,
         fee_id as feeId,
         order_return as orderReturn,
+        order_return_process as orderReturnProcess,
         franchisee_id as franchiseeId,
         franchisee_code as franchiseeCode,
         franchisee_name as franchiseeName,
@@ -122,6 +123,9 @@
         </if>
         <if test="orderReturn != null and orderReturn != '' or orderReturn == 0">
             and order_return = #{orderReturn}
+        </if>
+        <if test="orderReturnProcess != null and orderReturnProcess != '' or orderReturnProcess == 0">
+            and order_return_process = #{orderReturnProcess}
         </if>
         <if test="sourceType != null and sourceType != '' or sourceType == 0">
             and source_type = #{sourceType}
@@ -177,6 +181,9 @@
         </if>
         <if test="orderReturn != null and orderReturn != '' or orderReturn == 0">
             order_return = #{orderReturn},
+        </if>
+        <if test="orderReturnProcess != null and orderReturnProcess != '' or orderReturnProcess == 0">
+            order_return_process = #{orderReturnProcess},
         </if>
         <if test="splitStatus != null and splitStatus != '' or splitStatus == 0">
             split_status = #{splitStatus},
@@ -346,7 +353,7 @@
                                       main_order_code, order_level, split_status, before_cancel_status, remake,
                                       store_type, store_id,
                                       store_code, store_name, transport_company_code, transport_company_name,
-                                      transport_code, logistics_id, fee_id, order_return, franchisee_id,
+                                      transport_code, logistics_id, fee_id, order_return, order_return_process, franchisee_id,
                                       franchisee_code, franchisee_name, order_success, scour_sheet_status, use_status, source_code, source_name,
                                       source_type, create_by_id, create_by_name, update_by_id, update_by_name,
                                       create_time, update_time)
@@ -367,7 +374,7 @@
                 #{mainOrderCode}, #{orderLevel}, #{splitStatus}, #{beforeCancelStatus}, #{remake}, #{storeType},
                 #{storeId},
                 #{storeCode}, #{storeName}, #{transportCompanyCode}, #{transportCompanyName},
-                #{transportCode}, #{logisticsId}, #{feeId}, #{orderReturn}, #{franchiseeId},
+                #{transportCode}, #{logisticsId}, #{feeId}, #{orderReturn}, #{orderReturnProcess}, #{franchiseeId},
                 #{franchiseeCode}, #{franchiseeName}, #{orderSuccess}, #{scourSheetStatus}, #{useStatus}, #{sourceCode}, #{sourceName},
                 #{sourceType}, #{createById}, #{createByName}, #{updateById}, #{updateByName},
                 sysdate(), sysdate())
@@ -447,6 +454,7 @@
         a1.logistics_id as logisticsId,
         a1.fee_id as feeId,
         a1.order_return as orderReturn,
+        a1.order_return_process as orderReturnProcess,
         a1.franchisee_id as franchiseeId,
         a1.franchisee_code as franchiseeCode,
         a1.franchisee_name as franchiseeName,
@@ -615,6 +623,7 @@
         a1.logistics_id as logisticsId,
         a1.fee_id as feeId,
         a1.order_return as orderReturn,
+        a1.order_return_process as orderReturnProcess,
         a1.franchisee_id as franchiseeId,
         a1.franchisee_code as franchiseeCode,
         a1.franchisee_name as franchiseeName,
@@ -730,6 +739,7 @@
         a1.logistics_id as logisticsId,
         a1.fee_id as feeId,
         a1.order_return as orderReturn,
+        a1.order_return_process as orderReturnProcess,
         a1.franchisee_id as franchiseeId,
         a1.franchisee_code as franchiseeCode,
         a1.franchisee_name as franchiseeName,

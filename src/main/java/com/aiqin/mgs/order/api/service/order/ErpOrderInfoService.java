@@ -1,6 +1,6 @@
 package com.aiqin.mgs.order.api.service.order;
 
-import com.aiqin.mgs.order.api.component.enums.ErpOrderReturnStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderReturnRequestEnum;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
@@ -140,16 +140,16 @@ public interface ErpOrderInfoService {
     /**
      * 修改订单退货状态
      *
-     * @param orderCode             订单号
-     * @param orderReturnStatusEnum 订单退货状态
-     * @param returnQuantityList    退货数量（行号lineCode + 行退货数量returnProductCount） 只有状态是退货成功才传这个参数
-     * @param personId              操作人id
-     * @param personName            操作人名称
+     * @param orderCode              订单号
+     * @param orderReturnRequestEnum 订单退货请求类型
+     * @param returnQuantityList     退货数量（行号lineCode + 行退货数量returnProductCount） 只有状态是退货成功才传这个参数
+     * @param personId               操作人id
+     * @param personName             操作人名称
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2020/1/14 16:08
      */
-    void updateOrderReturnStatus(String orderCode, ErpOrderReturnStatusEnum orderReturnStatusEnum, List<ErpOrderItem> returnQuantityList, String personId, String personName);
+    void updateOrderReturnStatus(String orderCode, ErpOrderReturnRequestEnum orderReturnRequestEnum, List<ErpOrderItem> returnQuantityList, String personId, String personName);
 
 }
