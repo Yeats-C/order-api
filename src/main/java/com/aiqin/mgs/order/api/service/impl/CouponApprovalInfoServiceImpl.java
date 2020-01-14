@@ -4,6 +4,7 @@ import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.mgs.order.api.base.ConstantData;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderReturnRequestEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderReturnStatusEnum;
 import com.aiqin.mgs.order.api.component.returnenums.StoreStatusEnum;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
@@ -190,7 +191,7 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                 }
                 ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(couponApprovalDetail.getOrderId());
                 log.info("A品券发放审批回调--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}",returnOrderInfo.getOrderStoreCode(), ErpOrderReturnStatusEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
-                erpOrderInfoService.updateOrderReturnStatus(returnOrderInfo.getOrderStoreCode(), ErpOrderReturnStatusEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
+                erpOrderInfoService.updateOrderReturnStatus(returnOrderInfo.getOrderStoreCode(), ErpOrderReturnRequestEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
                 log.info("A品券发放审批回调结束");
             } else if (TpmBpmUtils.isPass(formCallBackVo.getUpdateFormStatus(), formCallBackVo.getOptBtn())) {
                 couponApprovalInfo.setStatus(StatusEnum.AUDIT.getValue());
