@@ -4,17 +4,19 @@ import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.mgs.order.api.base.ConstantData;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderReturnStatusEnum;
 import com.aiqin.mgs.order.api.component.returnenums.StoreStatusEnum;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
 import com.aiqin.mgs.order.api.dao.CouponInfoDao;
+import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
-import com.aiqin.mgs.order.api.domain.CouponApprovalDetail;
-import com.aiqin.mgs.order.api.domain.CouponApprovalInfo;
-import com.aiqin.mgs.order.api.domain.CouponInfo;
+import com.aiqin.mgs.order.api.domain.*;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.returnorder.FranchiseeAssetVo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
 import com.aiqin.mgs.order.api.service.CouponApprovalInfoService;
+import com.aiqin.mgs.order.api.service.order.ErpOrderInfoService;
 import com.aiqin.platform.flows.client.constant.Indicator;
 import com.aiqin.platform.flows.client.constant.IndicatorStr;
 import com.aiqin.platform.flows.client.constant.StatusEnum;
@@ -32,6 +34,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -60,6 +63,10 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
     private CouponInfoDao couponInfoDao;
     @Autowired
     private ReturnOrderInfoDao returnOrderInfoDao;
+    @Autowired
+    private ReturnOrderDetailDao returnOrderDetailDao;
+    @Resource
+    private ErpOrderInfoService erpOrderInfoService;
 
 
     @Override
@@ -172,6 +179,19 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                 }
                 // 调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单
                 updateStoreStatus(couponApprovalDetail.getOrderId(),StoreStatusEnum.PAY_ORDER_TYPE_PEI.getKey().toString(),couponApprovalDetail.getStoreId(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
+                //修改原始订单数据
+                List<ReturnOrderDetail> details = returnOrderDetailDao.selectListByReturnOrderCode(couponApprovalDetail.getOrderId());
+                List<ErpOrderItem> returnQuantityList=new ArrayList<>();
+                for(ReturnOrderDetail rod:details){
+                    ErpOrderItem eoi=new ErpOrderItem();
+                    eoi.setLineCode(rod.getLineCode());
+                    eoi.setReturnProductCount(rod.getActualReturnProductCount());
+                    returnQuantityList.add(eoi);
+                }
+                ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(couponApprovalDetail.getOrderId());
+                log.info("A品券发放审批回调--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}",returnOrderInfo.getOrderStoreCode(), ErpOrderReturnStatusEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
+                erpOrderInfoService.updateOrderReturnStatus(returnOrderInfo.getOrderStoreCode(), ErpOrderReturnStatusEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
+                log.info("A品券发放审批回调结束");
             } else if (TpmBpmUtils.isPass(formCallBackVo.getUpdateFormStatus(), formCallBackVo.getOptBtn())) {
                 couponApprovalInfo.setStatus(StatusEnum.AUDIT.getValue());
                 couponApprovalInfo.setStatuStr(StatusEnum.AUDIT.getDesc());
