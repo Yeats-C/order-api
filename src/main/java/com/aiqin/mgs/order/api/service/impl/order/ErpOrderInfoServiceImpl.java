@@ -155,6 +155,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         }
 
         List<ErpOrderItem> addGiftList = new ArrayList<>();
+        //增加的商品毛重(kg)
+        BigDecimal addBoxGrossWeightTotal = BigDecimal.ZERO;
+        //增加的商品包装体积(mm³)
+        BigDecimal addBoxVolumeTotal = BigDecimal.ZERO;
         int lineIndex = 0;
         for (ErpOrderProductItemRequest item :
                 erpOrderEditRequest.getProductGiftList()) {
@@ -228,7 +232,16 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             orderItem.setCompanyCode(order.getCompanyCode());
             //公司名称
             orderItem.setCompanyName(order.getCompanyName());
+            //单个商品毛重(kg)
+            orderItem.setBoxGrossWeight(product.getBoxGrossWeight());
+            //单个商品包装体积(mm³)
+            orderItem.setBoxVolume(product.getBoxVolume());
             addGiftList.add(orderItem);
+            //商品毛重汇总
+            addBoxGrossWeightTotal = addBoxGrossWeightTotal.add((orderItem.getBoxGrossWeight() == null ? BigDecimal.ZERO : orderItem.getBoxGrossWeight()).multiply(new BigDecimal(orderItem.getProductCount())));
+            //商品体积汇总
+            addBoxVolumeTotal = addBoxVolumeTotal.add((orderItem.getBoxVolume() == null ? BigDecimal.ZERO : orderItem.getBoxVolume()).multiply(new BigDecimal(orderItem.getProductCount())));
+
         }
 
         if (processTypeEnum.isLockStock()) {
@@ -237,6 +250,13 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         }
 
         erpOrderItemService.saveOrderItemList(addGiftList, auth);
+
+        //追加重量
+        order.setTotalWeight(order.getTotalWeight().add(addBoxGrossWeightTotal));
+        //追加体积
+        order.setTotalVolume(order.getTotalVolume().add(addBoxVolumeTotal));
+
+        this.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
 
     }
 
@@ -866,6 +886,56 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     order.setScourSheetStatus(ErpOrderScourSheetStatusEnum.SUCCESS.getCode());
                     this.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
                 }
+            }
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateOrderReturnStatus(String orderCode, ErpOrderReturnStatusEnum orderReturnStatusEnum, List<ErpOrderItem> returnQuantityList, String personId, String personName) {
+
+        if (StringUtils.isEmpty(orderCode)) {
+            throw new BusinessException("缺失订单号");
+        }
+        ErpOrderInfo order = erpOrderQueryService.getOrderAndItemByOrderCode(orderCode);
+        if (order == null) {
+            throw new BusinessException("无效的订单号");
+        }
+
+        AuthToken auth = new AuthToken();
+        auth.setPersonId(personId);
+        auth.setPersonName(personName);
+
+        order.setOrderReturn(orderReturnStatusEnum.getCode());
+        this.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
+        if (orderReturnStatusEnum == ErpOrderReturnStatusEnum.SUCCESS) {
+            if (returnQuantityList == null || returnQuantityList.size() == 0) {
+                throw new BusinessException("缺失退货数量");
+            }
+            Map<Long, Long> returnQuantityMap = new HashMap<>(16);
+            for (ErpOrderItem item :
+                    returnQuantityList) {
+                if (item.getLineCode() == null) {
+                    throw new BusinessException("退货参数缺失行号");
+                }
+                if (item.getReturnProductCount() == null) {
+                    throw new BusinessException("退货参数缺失数量");
+                }
+                returnQuantityMap.put(item.getLineCode(), item.getReturnProductCount());
+            }
+
+
+            List<ErpOrderItem> itemList = order.getItemList();
+            List<ErpOrderItem> returnUpdateList = new ArrayList<>();
+            for (ErpOrderItem item :
+                    itemList) {
+                if (returnQuantityMap.containsKey(item.getLineCode())) {
+                    item.setReturnProductCount(returnQuantityMap.get(item.getLineCode()));
+                    returnUpdateList.add(item);
+                }
+            }
+            if (returnUpdateList.size() > 0) {
+                erpOrderItemService.updateOrderItemList(returnUpdateList, auth);
             }
         }
     }
