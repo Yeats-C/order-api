@@ -48,6 +48,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.aiqin.ground.util.exception.GroundRuntimeException;
 import com.aiqin.mgs.order.api.domain.request.DevelRequest;
@@ -305,11 +306,9 @@ public class OrderServiceImpl implements OrderService {
                 }
                 log.info("------------------------------------------------------防止多次处理end" );
                 //Toc 订单
-                if (orderInfo.getOrderInfo().getOrderType() == 1||orderInfo.getOrderInfo().getOrderType() == 4) {
                     orderInfo.getOrderInfo().setPayType(String.valueOf(vo.getPayType()));
                     orderInfo.getOrderInfo().setActualPrice(vo.getOrderAmount());
                     return tocOrderCallback(orderInfo);
-                }
 
 
             }
@@ -334,10 +333,10 @@ public class OrderServiceImpl implements OrderService {
             if (i == 0) {
                 return HttpResponse.success();
             }
-            if (orderInfo.getOrderInfo().getOrderType() != 4) {
+            if (orderInfo.getOrderInfo().getOrderType() == 1) {
                 //修改库存
                 changeProductStock(orderInfo);
-            } else {
+            } else if (orderInfo.getOrderInfo().getOrderType() == 4){
                 //预存订单提出记录初始化
                 log.info("预存订单提出记录初始化{}", "===========" + orderInfo.getDetailList().toString());
                 createPrestorageOrder(orderInfo);
@@ -2403,6 +2402,9 @@ public class OrderServiceImpl implements OrderService {
         List<LatelyResponse> list = new ArrayList();
         try {
             list = orderDao.memberLately(memberId, distributorId);
+            if (list != null && list.size() > 0) {
+                list = list.stream().filter(l -> l.getPrice() != null && l.getPrice() > 0).collect(Collectors.toList());
+            }
             return HttpResponse.success(list);
         } catch (Exception e) {
             LOGGER.info("error 最近消费订单 (消费时间/消费金额)e:{}", e);

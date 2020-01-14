@@ -69,7 +69,7 @@ public class CartOrderServiceImpl implements CartOrderService {
         ShoppingCartProductRequest shoppingCartProductRequest=new ShoppingCartProductRequest();
         shoppingCartProductRequest.setCityCode(storeInfo.getData().getCityId());
         shoppingCartProductRequest.setProvinceCode(storeInfo.getData().getProvinceId());
-        shoppingCartProductRequest.setCompanyCode(storeInfo.getData().getCompanyCode());
+        shoppingCartProductRequest.setCompanyCode("14");
         shoppingCartProductRequest.setSkuCodes(skuCodeList);
         if(shoppingCartProductRequest.getCompanyCode()==null
                 || shoppingCartProductRequest.getCityCode()==null
@@ -99,14 +99,13 @@ public class CartOrderServiceImpl implements CartOrderService {
                 cartOrderInfo.setSpuId(shoppingCartRequest.getProductId());//spuId
                 cartOrderInfo.setProductId(cartOrderInfo1.getSkuCode());//商品Code
                 cartOrderInfo.setStoreId(cartOrderInfo1.getStoreId());//门店id
-                cartOrderInfo.setPrice(cartOrderInfo1.getPrice());//商品价格
                 cartOrderInfo.setProductType(shoppingCartRequest.getProductType());//商品类型
                 cartOrderInfo.setProductName(cartOrderInfo1.getSkuName());//商品名称
                 cartOrderInfo.setColor(cartOrderInfo1.getColorName());//商品颜色
                 cartOrderInfo.setProductSize(cartOrderInfo1.getModelNumber());//商品型号
                 cartOrderInfo.setCreateSource(shoppingCartRequest.getCreateSource());//插入商品来源
                 cartOrderInfo.setAmount(product.getAmount());//获取商品数量
-                cartOrderInfo.setPrice(cartOrderInfo1.getPriceTax2());//商品价格
+                cartOrderInfo.setPrice(cartOrderInfo1.getPriceTax());//商品价格
                 cartOrderInfo.setProductType(shoppingCartRequest.getProductType());//商品类型 0直送、1配送、2辅采
                 cartOrderInfo.setStoreId(shoppingCartRequest.getStoreId());//门店ID
                 cartOrderInfo.setCreateById(authToken.getPersonId());//创建者id
@@ -115,7 +114,8 @@ public class CartOrderServiceImpl implements CartOrderService {
                 cartOrderInfo.setZeroRemovalCoefficient(cartOrderInfo1.getZeroRemovalCoefficient());//交易倍数
                 cartOrderInfo.setSpec(cartOrderInfo1.getSpec());//规格
                 cartOrderInfo.setProductPropertyCode(cartOrderInfo1.getProductPropertyCode());//商品属性码
-                cartOrderInfo.setProductPropertyName(cartOrderInfo1.getProductPropertyName());//商品属性码
+                cartOrderInfo.setProductPropertyName(cartOrderInfo1.getProductPropertyName());//商品属性码、
+                cartOrderInfo.setLineCheckStatus(1);//选中状态
                 try {
                     if (cartOrderInfo != null) {
                         //判断sku是否在购物车里面存在
@@ -142,11 +142,12 @@ public class CartOrderServiceImpl implements CartOrderService {
                                 cartOrderDao.insertCart(cartOrderInfo);
                             }
                         }
-                        return HttpResponse.success();
+
                     } else {
                         LOGGER.warn("购物车信息为空!");
                         return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
                     }
+
                 } catch (Exception e) {
                     LOGGER.error("添加购物车异常：{}", e);
                     return HttpResponse.failure(ResultCode.ADD_EXCEPTION);

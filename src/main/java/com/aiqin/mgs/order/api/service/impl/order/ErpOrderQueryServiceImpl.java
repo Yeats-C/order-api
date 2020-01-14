@@ -257,6 +257,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             ErpOrderQueryRequest secondOrderQueryRequest = new ErpOrderQueryRequest();
             secondOrderQueryRequest.setOrderLevel(ErpOrderLevelEnum.SECONDARY.getCode());
             secondOrderQueryRequest.setPrimaryOrderCodeList(primaryOrderCodeList);
+            secondOrderQueryRequest.setOrderStatus(erpOrderQueryRequest.getOrderStatus());
             List<ErpOrderInfo> secondaryOrderList = erpOrderInfoDao.findSecondaryOrderList(secondOrderQueryRequest);
             if (secondaryOrderList != null && secondaryOrderList.size() > 0) {
                 for (ErpOrderInfo item :
@@ -350,7 +351,9 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
 
         //erp异常订单 确认订单按钮
         if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_2 || orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_3 || orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_4) {
-            control.setAbnormal(StatusEnum.YES.getCode());
+            if (!ErpOrderNodeStatusEnum.STATUS_4.getCode().equals(order.getOrderNodeStatus())) {
+                control.setAbnormal(StatusEnum.YES.getCode());
+            }
         } else if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_1) {
             if (orderNodeStatusEnum == ErpOrderNodeStatusEnum.STATUS_1 || orderNodeStatusEnum == ErpOrderNodeStatusEnum.STATUS_4) {
                 if (processTypeEnum.isAutoPay()) {
@@ -380,16 +383,12 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         //签收按钮
         boolean allowedSign = (processTypeEnum.isHasLogisticsFee() && orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_12) || (!processTypeEnum.isHasLogisticsFee() && orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_11);
         if (allowedSign) {
-            if (!orderCategoryEnum.isFirstOrder()) {
-                control.setSign(StatusEnum.YES.getCode());
-            }
+            control.setSign(StatusEnum.YES.getCode());
         }
 
         //支付物流费用
         if (processTypeEnum.isHasLogisticsFee() && orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_11) {
-            if (!orderCategoryEnum.isFirstOrder()) {
-                control.setPayLogistics(StatusEnum.YES.getCode());
-            }
+            control.setPayLogistics(StatusEnum.YES.getCode());
         }
 
         //取消
@@ -406,9 +405,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
 
         //重新加入购物车
         if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_99 || orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_98) {
-            if (!orderCategoryEnum.isFirstOrder()) {
-                control.setRejoinCart(StatusEnum.YES.getCode());
-            }
+            control.setRejoinCart(StatusEnum.YES.getCode());
         }
 
         //退货

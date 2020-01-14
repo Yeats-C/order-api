@@ -1,10 +1,14 @@
 package com.aiqin.mgs.order.api.service.order;
 
+import com.aiqin.mgs.order.api.component.enums.ErpOrderReturnStatusEnum;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCarryOutNextStepRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderEditRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSignRequest;
+
+import java.util.List;
 
 /**
  * 订单操作service
@@ -132,5 +136,20 @@ public interface ErpOrderInfoService {
      * @date 2020/1/11 10:02
      */
     void orderScourSheet(String orderCode);
+
+    /**
+     * 修改订单退货状态
+     *
+     * @param orderCode             订单号
+     * @param orderReturnStatusEnum 订单退货状态
+     * @param returnQuantityList    退货数量（行号lineCode + 行退货数量returnProductCount） 只有状态是退货成功才传这个参数
+     * @param personId              操作人id
+     * @param personName            操作人名称
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2020/1/14 16:08
+     */
+    void updateOrderReturnStatus(String orderCode, ErpOrderReturnStatusEnum orderReturnStatusEnum, List<ErpOrderItem> returnQuantityList, String personId, String personName);
 
 }

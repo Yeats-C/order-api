@@ -318,7 +318,7 @@ public class ErpOrderInfo {
     @JsonProperty("fee_id")
     private String feeId;
 
-    @ApiModelProperty(value = "是否发生退货 0是 1否")
+    @ApiModelProperty(value = "退货流程状态 1未退货 2退货中 3退货完成")
     @JsonProperty("order_return")
     private Integer orderReturn;
 

@@ -73,7 +73,6 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
         url += "&sku_code=" + skuCode;
         ProductInfo product = new ProductInfo();
         try {
-
             HttpClient httpClient = HttpClient.get(url);
             HttpResponse<ProductSkuDetailResponse> response = httpClient.action().result(new TypeReference<HttpResponse<ProductSkuDetailResponse>>() {
             });
@@ -83,9 +82,6 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             ProductSkuDetailResponse data = response.getData();
             if (data == null) {
                 throw new BusinessException("无效的商品");
-            }
-            if (data.getProductSkuBoxPackings() == null) {
-                throw new BusinessException("商品缺少包装信息");
             }
 
             //商品编码
@@ -107,8 +103,10 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             product.setTaxRate(data.getOutputTaxRate());
             product.setProductPropertyCode(data.getProductPropertyCode());
             product.setProductPropertyName(data.getProductPropertyName());
-            product.setBoxGrossWeight(data.getProductSkuBoxPackings().get(0).getBoxGrossWeight());
-            product.setBoxVolume(data.getProductSkuBoxPackings().get(0).getBoxVolume());
+            if (data.getProductSkuBoxPackings() != null && data.getProductSkuBoxPackings().size() > 0) {
+                product.setBoxGrossWeight(data.getProductSkuBoxPackings().get(0).getBoxGrossWeight());
+                product.setBoxVolume(data.getProductSkuBoxPackings().get(0).getBoxVolume());
+            }
 
         } catch (BusinessException e) {
             logger.info("获取商品信息失败：{}", e.getMessage());

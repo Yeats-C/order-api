@@ -19,7 +19,6 @@ import com.aiqin.mgs.order.api.domain.request.order.PayCallbackRequest;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayResultResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
 import com.aiqin.mgs.order.api.service.order.*;
-import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -315,6 +314,15 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
             }
             order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_2.getCode());
             erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
+
+            String topCouponCodes = orderFee.getTopCouponCodes();
+            if (StringUtils.isNotEmpty(topCouponCodes)) {
+                String[] topCouponCodeArray = topCouponCodes.split(",");
+                for (String topCouponCode :
+                        topCouponCodeArray) {
+                    erpOrderRequestService.updateCouponStatus(order.getFranchiseeId(), topCouponCode, order.getOrderStoreCode(), order.getStoreName());
+                }
+            }
 
         } else if (payStatusEnum == ErpPayStatusEnum.FAIL) {
             //支付失败
