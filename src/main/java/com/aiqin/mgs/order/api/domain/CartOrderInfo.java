@@ -220,6 +220,11 @@ public class CartOrderInfo {
     @JsonProperty("price_tax2")
     private BigDecimal priceTax2;
 
+    /***爱亲分销价*/
+    @ApiModelProperty(value = "爱亲分销价")
+    @JsonProperty("price_tax")
+    private BigDecimal priceTax;
+
     /***创建者id*/
     @ApiModelProperty(value = "创建者id")
     @JsonProperty("create_by_id")
