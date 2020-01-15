@@ -94,63 +94,65 @@ public class CartOrderServiceImpl implements CartOrderService {
                 if (stockProductAmount < 10) {
                     return HttpResponse.failure(ResultCode.STOCK_SHORT1);
                 }
-                CartOrderInfo cartOrderInfo = new CartOrderInfo();
-                cartOrderInfo.setSkuCode(cartOrderInfo1.getSkuCode());//skuId
-                cartOrderInfo.setSpuId(shoppingCartRequest.getProductId());//spuId
-                cartOrderInfo.setProductId(cartOrderInfo1.getSkuCode());//商品Code
-                cartOrderInfo.setStoreId(cartOrderInfo1.getStoreId());//门店id
-                cartOrderInfo.setProductType(shoppingCartRequest.getProductType());//商品类型
-                cartOrderInfo.setProductName(cartOrderInfo1.getSkuName());//商品名称
-                cartOrderInfo.setColor(cartOrderInfo1.getColorName());//商品颜色
-                cartOrderInfo.setProductSize(cartOrderInfo1.getModelNumber());//商品型号
-                cartOrderInfo.setCreateSource(shoppingCartRequest.getCreateSource());//插入商品来源
-                cartOrderInfo.setAmount(product.getAmount());//获取商品数量
-                cartOrderInfo.setPrice(cartOrderInfo1.getPriceTax());//商品价格
-                cartOrderInfo.setProductType(shoppingCartRequest.getProductType());//商品类型 0直送、1配送、2辅采
-                cartOrderInfo.setStoreId(shoppingCartRequest.getStoreId());//门店ID
-                cartOrderInfo.setCreateById(authToken.getPersonId());//创建者id
-                cartOrderInfo.setCreateByName(authToken.getPersonName());//创建者名称
-                cartOrderInfo.setStockNum(cartOrderInfo1.getStockNum());//库存数量
-                cartOrderInfo.setZeroRemovalCoefficient(cartOrderInfo1.getZeroRemovalCoefficient());//交易倍数
-                cartOrderInfo.setSpec(cartOrderInfo1.getSpec());//规格
-                cartOrderInfo.setProductPropertyCode(cartOrderInfo1.getProductPropertyCode());//商品属性码
-                cartOrderInfo.setProductPropertyName(cartOrderInfo1.getProductPropertyName());//商品属性码、
-                cartOrderInfo.setLineCheckStatus(1);//选中状态
-                try {
-                    if (cartOrderInfo != null) {
-                        //判断sku是否在购物车里面存在
-                        LOGGER.info("判断SKU商品是否已存在购物车中:{}", cartOrderInfo.getSkuCode());
-                        String oldAount = cartOrderDao.isYesCart(cartOrderInfo);
-                        if (oldAount != null && !oldAount.equals("")) {
-                            //已存在购物车的、新添加+已存在购物车的数量=真实数量
-                            LOGGER.info("更新购物车:{}", cartOrderInfo);
-                            int newAount = Integer.valueOf(oldAount) + cartOrderInfo.getAmount();
-                            cartOrderInfo.setAmount(newAount);
-                            //更新购物车
-                            cartOrderDao.updateCartById(cartOrderInfo);
-                        } else {
-                            if (cartOrderInfo.getCartId() != null) {
-                                cartOrderDao.insertCart(cartOrderInfo);
+                if(skuId.equals(product.getSkuId())) {
+                    CartOrderInfo cartOrderInfo = new CartOrderInfo();
+                    cartOrderInfo.setSkuCode(cartOrderInfo1.getSkuCode());//skuId
+                    cartOrderInfo.setSpuId(shoppingCartRequest.getProductId());//spuId
+                    cartOrderInfo.setProductId(cartOrderInfo1.getSkuCode());//商品Code
+                    cartOrderInfo.setStoreId(cartOrderInfo1.getStoreId());//门店id
+                    cartOrderInfo.setProductType(shoppingCartRequest.getProductType());//商品类型
+                    cartOrderInfo.setProductName(cartOrderInfo1.getSkuName());//商品名称
+                    cartOrderInfo.setColor(cartOrderInfo1.getColorName());//商品颜色
+                    cartOrderInfo.setProductSize(cartOrderInfo1.getModelNumber());//商品型号
+                    cartOrderInfo.setCreateSource(shoppingCartRequest.getCreateSource());//插入商品来源
+                    cartOrderInfo.setAmount(product.getAmount());//获取商品数量
+                    cartOrderInfo.setPrice(cartOrderInfo1.getPriceTax());//商品价格
+                    cartOrderInfo.setProductType(shoppingCartRequest.getProductType());//商品类型 0直送、1配送、2辅采
+                    cartOrderInfo.setStoreId(shoppingCartRequest.getStoreId());//门店ID
+                    cartOrderInfo.setCreateById(authToken.getPersonId());//创建者id
+                    cartOrderInfo.setCreateByName(authToken.getPersonName());//创建者名称
+                    cartOrderInfo.setStockNum(cartOrderInfo1.getStockNum());//库存数量
+                    cartOrderInfo.setZeroRemovalCoefficient(cartOrderInfo1.getZeroRemovalCoefficient());//交易倍数
+                    cartOrderInfo.setSpec(cartOrderInfo1.getSpec());//规格
+                    cartOrderInfo.setProductPropertyCode(cartOrderInfo1.getProductPropertyCode());//商品属性码
+                    cartOrderInfo.setProductPropertyName(cartOrderInfo1.getProductPropertyName());//商品属性码、
+                    cartOrderInfo.setLineCheckStatus(1);//选中状态
+                    try {
+                        if (cartOrderInfo != null) {
+                            //判断sku是否在购物车里面存在
+                            LOGGER.info("判断SKU商品是否已存在购物车中:{}", cartOrderInfo.getSkuCode());
+                            String oldAount = cartOrderDao.isYesCart(cartOrderInfo);
+                            if (oldAount != null && !oldAount.equals("")) {
+                                //已存在购物车的、新添加+已存在购物车的数量=真实数量
+                                LOGGER.info("更新购物车:{}", cartOrderInfo);
+                                int newAount = Integer.valueOf(oldAount) + cartOrderInfo.getAmount();
+                                cartOrderInfo.setAmount(newAount);
+                                //更新购物车
+                                cartOrderDao.updateCartById(cartOrderInfo);
                             } else {
-                                //生成购物车id
-                                String cartId = IdUtil.uuid();
-                                cartOrderInfo.setCartId(cartId);
-                                //生成商品加入购物车的时间
-                                cartOrderInfo.setCreateTime(new Date());
-                                //添加购物车
-                                LOGGER.info("添加购物车:{}", cartOrderInfo);
-                                cartOrderDao.insertCart(cartOrderInfo);
+                                if (cartOrderInfo.getCartId() != null) {
+                                    cartOrderDao.insertCart(cartOrderInfo);
+                                } else {
+                                    //生成购物车id
+                                    String cartId = IdUtil.uuid();
+                                    cartOrderInfo.setCartId(cartId);
+                                    //生成商品加入购物车的时间
+                                    cartOrderInfo.setCreateTime(new Date());
+                                    //添加购物车
+                                    LOGGER.info("添加购物车:{}", cartOrderInfo);
+                                    cartOrderDao.insertCart(cartOrderInfo);
+                                }
                             }
+
+                        } else {
+                            LOGGER.warn("购物车信息为空!");
+                            return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
                         }
 
-                    } else {
-                        LOGGER.warn("购物车信息为空!");
+                    } catch (Exception e) {
+                        LOGGER.error("添加购物车异常：{}", e);
                         return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
                     }
-
-                } catch (Exception e) {
-                    LOGGER.error("添加购物车异常：{}", e);
-                    return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
                 }
             }
 
