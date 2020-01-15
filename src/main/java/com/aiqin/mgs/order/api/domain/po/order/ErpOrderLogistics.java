@@ -49,13 +49,13 @@ public class ErpOrderLogistics {
     @ApiModelProperty(value = "发货仓库名称")
     @JsonProperty("send_repertory_name")
     private String sendRepertoryName;
-    @ApiModelProperty(value = "物流费用")
+    @ApiModelProperty(value = "物流费用（元）")
     @JsonProperty("logistics_fee")
     private BigDecimal logisticsFee;
-    @ApiModelProperty(value = "物流券抵扣物流费用金额")
+    @ApiModelProperty(value = "物流券抵扣物流费用金额（元）")
     @JsonProperty("coupon_pay_fee")
     private BigDecimal couponPayFee;
-    @ApiModelProperty(value = "余额支付物流费用金额")
+    @ApiModelProperty(value = "余额支付物流费用金额（元）")
     @JsonProperty("balance_pay_fee")
     private BigDecimal balancePayFee;
     @JsonProperty("coupon_ids")

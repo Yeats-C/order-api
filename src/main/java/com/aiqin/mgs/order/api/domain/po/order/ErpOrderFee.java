@@ -44,27 +44,27 @@ public class ErpOrderFee {
     @JsonProperty("pay_status_desc")
     private String payStatusDesc;
 
-    @ApiModelProperty(value = "订单总额")
+    @ApiModelProperty(value = "订单总额（元）")
     @JsonProperty("total_money")
     private BigDecimal totalMoney;
 
-    @ApiModelProperty(value = "活动优惠金额")
+    @ApiModelProperty(value = "活动优惠金额（元）")
     @JsonProperty("activity_money")
     private BigDecimal activityMoney;
 
-    @ApiModelProperty(value = "服纺券优惠金额")
+    @ApiModelProperty(value = "服纺券优惠金额（元）")
     @JsonProperty("suit_coupon_money")
     private BigDecimal suitCouponMoney;
 
-    @ApiModelProperty(value = "A品券优惠金额")
+    @ApiModelProperty(value = "A品券优惠金额（元）")
     @JsonProperty("top_coupon_money")
     private BigDecimal topCouponMoney;
 
-    @ApiModelProperty(value = "实付金额")
+    @ApiModelProperty(value = "实付金额（元）")
     @JsonProperty("pay_money")
     private BigDecimal payMoney;
 
-    @ApiModelProperty(value = "返还物流券金额")
+    @ApiModelProperty(value = "返还物流券金额（元）")
     @JsonProperty("goods_coupon")
     private BigDecimal goodsCoupon;
 
