@@ -910,7 +910,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             order.setOrderReturnProcess(StatusEnum.NO.getCode());
         } else if (orderReturnRequestEnum == ErpOrderReturnRequestEnum.WAIT) {
             order.setOrderReturnProcess(StatusEnum.YES.getCode());
-        } else if (orderReturnRequestEnum==ErpOrderReturnRequestEnum.SUCCESS) {
+        } else if (orderReturnRequestEnum == ErpOrderReturnRequestEnum.SUCCESS) {
             order.setOrderReturnProcess(StatusEnum.NO.getCode());
 
             //修改退货数量
@@ -963,11 +963,11 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             if (ErpProductGiftEnum.GIFT.getCode().equals(item.getProductType())) {
                 continue;
             }
-            if (item.getProductCount() > item.getReturnProductCount()) {
+            if (item.getProductCount() > (item.getReturnProductCount() == null ? 0L : item.getReturnProductCount())) {
                 //如果有一行没有退完，则不算退货完成
                 returnEndFlag = false;
             }
-            if (item.getReturnProductCount() > 0L) {
+            if ((item.getReturnProductCount() == null ? 0L : item.getReturnProductCount()) > 0L) {
                 //如果有一行有退货数量，则算部分退货
                 returnStartFlag = true;
             }
