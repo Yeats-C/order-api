@@ -380,6 +380,7 @@ public class ErpOrderLogisticsServiceImpl implements ErpOrderLogisticsService {
         //更新物流单关联支付单
         ErpOrderPay logisticsPay = erpOrderPayService.getOrderPayByPayId(orderLogistics.getPayId());
         logisticsPay.setPayEndTime(new Date());
+        logisticsPay.setPayCode(payCode);
         logisticsPay.setPayStatus(payStatusEnum.getCode());
         erpOrderPayService.updateOrderPaySelective(logisticsPay, auth);
 
