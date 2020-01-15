@@ -458,12 +458,14 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     }
 
     @Override
+    @Transactional(rollbackFor=Exception.class)
     public Boolean updateLogistics(LogisticsVo logisticsVo) {
         int res=returnOrderInfoDao.updateLogistics(logisticsVo);
         return res>0;
     }
 
     @Override
+    @Transactional(rollbackFor=Exception.class)
     public Boolean callback(RefundReq reqVo) {
         log.info("退款回调开始，reqVo={}",reqVo);
         //查询退货单状态是否修改成功
@@ -796,6 +798,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     }
 
     @Override
+    @Transactional(rollbackFor=Exception.class)
     public HttpResponse saveWriteDownOrder(String orderCode) {
         log.info("发起冲减单开始,原始订单编码,orderCode={}",orderCode);
         //根据订单编码查询原始订单数据及详情数据
