@@ -55,7 +55,7 @@ public class ErpOrderLogisticsPayResultResponse {
     @ApiModelProperty(value = "发货仓库名称")
     @JsonProperty("send_repertory_name")
     private String sendRepertoryName;
-    @ApiModelProperty(value = "物流费用")
+    @ApiModelProperty(value = "物流费用（元）")
     @JsonProperty("logistics_fee")
     private BigDecimal logisticsFee;
 

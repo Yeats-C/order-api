@@ -1,9 +1,6 @@
 package com.aiqin.mgs.order.api.domain.response;
 
-import com.aiqin.mgs.order.api.domain.RejectRecord;
-import com.aiqin.mgs.order.api.domain.RejectRecordDetail;
-import com.aiqin.mgs.order.api.domain.RejectRecordDetailBatch;
-import com.aiqin.mgs.order.api.domain.RejectRecordInfo;
+import com.aiqin.mgs.order.api.domain.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -20,7 +17,7 @@ public class RejectVoResponse {
 
     @ApiModelProperty(value = "退供单信息")
     @JsonProperty("rejectRecord")
-    private RejectRecord rejectRecord;
+    private RejectRecordVo rejectRecordVo;
 
     @ApiModelProperty(value = "商品批次列表")
     @JsonProperty("rejectRecordDetailBatches")

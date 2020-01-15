@@ -1,8 +1,6 @@
 package com.aiqin.mgs.order.api.domain.response;
 
-import com.aiqin.mgs.order.api.domain.ReturnOrderDetail;
-import com.aiqin.mgs.order.api.domain.ReturnOrderDetailBatch;
-import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
+import com.aiqin.mgs.order.api.domain.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -14,11 +12,11 @@ import java.util.List;
 public class ReturnOrderResponse {
     @ApiModelProperty(value = "退货单详情list（商品列表）")
     @JsonProperty("details")
-    private List<ReturnOrderDetail> details;
+    private List<ReturnOrderDetailExt> details;
 
     @ApiModelProperty(value = "退货单信息")
     @JsonProperty("returnOrderInfo")
-    private ReturnOrderInfo returnOrderInfo;
+    private ReturnOrderInfoExt returnOrderInfoExt;
 
     @ApiModelProperty(value = "商品批次列表")
     @JsonProperty("returnOrderDetailBatches")
