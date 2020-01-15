@@ -488,18 +488,21 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         log.info("退款回调--修改退货单退款状态结束");
         // 调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单（减库存）
         ReturnOrderInfo roi=returnOrderInfoDao.selectByReturnOrderCode(reqVo.getOrderNo());
-        updateStoreStatus(reqVo.getOrderNo(),StoreStatusEnum.PAY_ORDER_TYPE_ZHI.toString(),roi.getStoreId(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,roi.getActualProductCount().toString());
-        //修改原始订单数据
-        List<ReturnOrderDetail> details = returnOrderDetailDao.selectListByReturnOrderCode(reqVo.getOrderNo());
-        List<ErpOrderItem> returnQuantityList=new ArrayList<>();
-        for(ReturnOrderDetail rod:details){
-            ErpOrderItem eoi=new ErpOrderItem();
-            eoi.setLineCode(rod.getLineCode());
-            eoi.setReturnProductCount(rod.getActualReturnProductCount());
-            returnQuantityList.add(eoi);
+        //除了冲减单，都要回调门店和修改原始订单
+        if(!roi.getReturnOrderType().equals(ReturnOrderTypeEnum.WRITE_DOWN_ORDER_TYPE.getCode())){
+            updateStoreStatus(reqVo.getOrderNo(),StoreStatusEnum.PAY_ORDER_TYPE_ZHI.toString(),roi.getStoreId(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,roi.getActualProductCount().toString());
+            //修改原始订单数据
+            List<ReturnOrderDetail> details = returnOrderDetailDao.selectListByReturnOrderCode(reqVo.getOrderNo());
+            List<ErpOrderItem> returnQuantityList=new ArrayList<>();
+            for(ReturnOrderDetail rod:details){
+                ErpOrderItem eoi=new ErpOrderItem();
+                eoi.setLineCode(rod.getLineCode());
+                eoi.setReturnProductCount(rod.getActualReturnProductCount());
+                returnQuantityList.add(eoi);
+            }
+            log.info("退款回调--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}",roi.getOrderStoreCode(), ErpOrderReturnStatusEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
+            erpOrderInfoService.updateOrderReturnStatus(roi.getOrderStoreCode(), ErpOrderReturnRequestEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
         }
-        log.info("退款回调--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}",roi.getOrderStoreCode(), ErpOrderReturnStatusEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
-        erpOrderInfoService.updateOrderReturnStatus(roi.getOrderStoreCode(), ErpOrderReturnRequestEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
         log.info("退款回调结束");
         return true;
     }
