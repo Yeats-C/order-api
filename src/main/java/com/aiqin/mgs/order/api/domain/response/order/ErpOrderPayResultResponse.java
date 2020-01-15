@@ -33,7 +33,7 @@ public class ErpOrderPayResultResponse {
     @JsonProperty("order_code")
     private String orderCode;
 
-    @ApiModelProperty(value = "实付金额")
+    @ApiModelProperty(value = "实付金额（元）")
     @JsonProperty("pay_money")
     private BigDecimal payMoney;
 

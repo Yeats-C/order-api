@@ -190,15 +190,15 @@ public class ErpOrderInfo {
     @JsonProperty("payment_name")
     private String paymentName;
 
-    @ApiModelProperty(value = "运费")
+    @ApiModelProperty(value = "运费（元）")
     @JsonProperty("deliver_amount")
     private BigDecimal deliverAmount;
 
-    @ApiModelProperty(value = "商品总价")
+    @ApiModelProperty(value = "商品总价（元）")
     @JsonProperty("total_product_amount")
     private BigDecimal totalProductAmount;
 
-    @ApiModelProperty(value = "实际商品总价（发货商品总价）")
+    @ApiModelProperty(value = "实际商品总价（发货商品总价）（元）")
     @JsonProperty("actual_total_product_amount")
     private BigDecimal actualTotalProductAmount;
 
@@ -206,11 +206,11 @@ public class ErpOrderInfo {
     @JsonProperty("actual_product_count")
     private Long actualProductCount;
 
-    @ApiModelProperty(value = "优惠额度")
+    @ApiModelProperty(value = "优惠额度（元）")
     @JsonProperty("discount_amount")
     private BigDecimal discountAmount;
 
-    @ApiModelProperty(value = "实际支付金额")
+    @ApiModelProperty(value = "实际支付金额（元）")
     @JsonProperty("order_amount")
     private BigDecimal orderAmount;
 

@@ -47,7 +47,7 @@ public class ErpOrderPay {
     @JsonProperty("pay_way")
     private Integer payWay;
 
-    @ApiModelProperty(value = "支付费用")
+    @ApiModelProperty(value = "支付费用（元）")
     @JsonProperty("pay_fee")
     private BigDecimal payFee;
 
