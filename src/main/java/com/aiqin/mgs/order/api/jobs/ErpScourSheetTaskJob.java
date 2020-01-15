@@ -30,7 +30,7 @@ public class ErpScourSheetTaskJob {
     @Resource
     private ErpOrderInfoService erpOrderInfoService;
 
-    @Scheduled(cron = "0 0 0/2 * * ? ")
+    @Scheduled(cron = "0 0/5 * * * ? ")
     public void getTask() {
         //计时器
         StopWatch watch = new StopWatch();
