@@ -165,7 +165,9 @@ public class RejectRecordServiceImpl implements RejectRecordService {
             return HttpResponse.failure(ResultCode.NO_FOUND_REJECT_ERROR);
         }
 
-        List<RejectResponse> responses = BeanHelper.copyWithCollection(rejectRecords, RejectResponse.class);
+        List<RejectRecordVo> rejectRecordVos = BeanHelper.copyWithCollection(rejectRecords, RejectRecordVo.class);
+
+        List<RejectResponse> responses = BeanHelper.copyWithCollection(rejectRecordVos, RejectResponse.class);
 
         return HttpResponse.success(responses);
     }
@@ -190,12 +192,13 @@ public class RejectRecordServiceImpl implements RejectRecordService {
             //返回找不到该退供单
             return  HttpResponse.failure(ResultCode.NOT_FOUND_REJECT_RECORD_DATA);
         }
+        RejectRecordVo rejectRecordVo = BeanHelper.copyProperties(rejectRecord, RejectRecordVo.class);
         List<RejectRecordDetail> rejectRecordDetails = rejectRecordDetailDao.selectByRejectRecordCode(rejectRecordCode);
         List<RejectRecordDetailBatch> rejectRecordDetailBatches = rejectRecordDetailBatchDao.selectByRejectRecordCode(rejectRecordCode);
 
         RejectVoResponse resp = new RejectVoResponse();
         resp.setDetails(rejectRecordDetails);
-        resp.setRejectRecord(rejectRecord);
+        resp.setRejectRecordVo(rejectRecordVo);
         resp.setRejectRecordDetailBatches(rejectRecordDetailBatches);
         return HttpResponse.success(resp);
     }

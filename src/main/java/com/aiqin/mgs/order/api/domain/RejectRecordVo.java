@@ -16,7 +16,7 @@ import java.util.Date;
 @Data
 @ToString(callSuper = true)
 @ApiModel("退供单")
-public class RejectRecord {
+public class RejectRecordVo {
     @ApiModelProperty(value = "id")
     @JsonProperty("id")
     private String id;
