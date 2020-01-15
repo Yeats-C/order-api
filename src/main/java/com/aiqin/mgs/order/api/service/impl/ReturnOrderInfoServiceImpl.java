@@ -488,7 +488,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         log.info("退款回调--修改退货单退款状态结束");
         // 调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单（减库存）
         ReturnOrderInfo roi=returnOrderInfoDao.selectByReturnOrderCode(reqVo.getOrderNo());
-        updateStoreStatus(reqVo.getOrderNo(),StoreStatusEnum.PAY_ORDER_TYPE_ZHI.toString(),roi.getStoreId(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,returnOrderInfo.getActualProductCount().toString());
+        updateStoreStatus(reqVo.getOrderNo(),StoreStatusEnum.PAY_ORDER_TYPE_ZHI.toString(),roi.getStoreId(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,roi.getActualProductCount().toString());
         //修改原始订单数据
         List<ReturnOrderDetail> details = returnOrderDetailDao.selectListByReturnOrderCode(reqVo.getOrderNo());
         List<ErpOrderItem> returnQuantityList=new ArrayList<>();
