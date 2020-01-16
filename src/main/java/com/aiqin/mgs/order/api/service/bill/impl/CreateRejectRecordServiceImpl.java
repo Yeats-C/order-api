@@ -125,6 +125,8 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
             returnOrderToRejectRecord(returnOrder.getReturnOrderInfo());
             //根据退货单号查询退货单和退货明细
             returnOrderToRejectRecordDetail(returnOrder);
+            //根据爱亲退供单，生成耘链退货单
+            createSaleOrder(returnOrder.getReturnOrderInfo().getReturnOrderCode());
             try {
                 //修改退货单同步状态
                 returnOrderInfoDao.updateOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_SUCCESS.getCode(), returnOrder.getReturnOrderInfo().getReturnOrderCode());
@@ -132,9 +134,6 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
                 LOGGER.error("修改退货单同步状态失败", e);
                 throw new RuntimeException();
             }
-            //根据爱亲退供单，生成耘链退货单
-            createSaleOrder(returnOrder.getReturnOrderCode());
-
             //添加操作日志
             addOperationLog(returnOrder.getReturnOrderInfo().getOrderStoreCode());
         } else {
