@@ -129,14 +129,14 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                     double balance=totalMoney%100;
                     //存储A品卷信息
                     List<CouponInfo> couponInfoList=new ArrayList<>();
-                    CouponInfo couponInfo=new CouponInfo();
-                    couponInfo.setCouponName(ConstantData.COUPON_NAME_A);
-                    couponInfo.setCouponType(ConstantData.COUPON_TYPE);
-                    couponInfo.setFranchiseeId(couponApprovalDetail.getFranchiseeId());
-                    couponInfo.setOrderId(couponApprovalDetail.getOrderId());
-                    couponInfo.setValidityStartTime(couponApprovalDetail.getStartTime());
-                    couponInfo.setValidityEndTime(couponApprovalDetail.getEndTime());
                     for(int i=0;i<num;i++){
+                        CouponInfo couponInfo=new CouponInfo();
+                        couponInfo.setCouponName(ConstantData.COUPON_NAME_A);
+                        couponInfo.setCouponType(ConstantData.COUPON_TYPE);
+                        couponInfo.setFranchiseeId(couponApprovalDetail.getFranchiseeId());
+                        couponInfo.setOrderId(couponApprovalDetail.getOrderId());
+                        couponInfo.setValidityStartTime(couponApprovalDetail.getStartTime());
+                        couponInfo.setValidityEndTime(couponApprovalDetail.getEndTime());
                         couponInfo.setCouponCode(couponCode());
                         couponInfo.setNominalValue(ConstantData.NOMINAL_VALUE);
                         couponInfoList.add(couponInfo);
@@ -145,6 +145,13 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                         franchiseeAssets.add(franchiseeAsset);
                     }
                     if(balance>0){
+                        CouponInfo couponInfo=new CouponInfo();
+                        couponInfo.setCouponName(ConstantData.COUPON_NAME_A);
+                        couponInfo.setCouponType(ConstantData.COUPON_TYPE);
+                        couponInfo.setFranchiseeId(couponApprovalDetail.getFranchiseeId());
+                        couponInfo.setOrderId(couponApprovalDetail.getOrderId());
+                        couponInfo.setValidityStartTime(couponApprovalDetail.getStartTime());
+                        couponInfo.setValidityEndTime(couponApprovalDetail.getEndTime());
                         couponInfo.setCouponCode(couponCode());
                         couponInfo.setNominalValue(BigDecimal.valueOf(balance));
                         couponInfoList.add(couponInfo);
