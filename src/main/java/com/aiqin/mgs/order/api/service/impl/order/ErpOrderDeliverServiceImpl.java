@@ -271,7 +271,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 }
             }
 
-            order.setTransportStatus(StatusEnum.YES.getCode());
+            order.setTransportStatus(erpOrderTransportRequest.getTransportStatus());
             order.setTransportTime(erpOrderTransportRequest.getTransportTime());
             order.setDistributionModeCode(erpOrderTransportRequest.getDistributionModeCode());
             order.setDistributionModeName(erpOrderTransportRequest.getDistributionModeName());
