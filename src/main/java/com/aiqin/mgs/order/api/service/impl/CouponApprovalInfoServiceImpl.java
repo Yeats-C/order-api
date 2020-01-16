@@ -156,6 +156,21 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                     couponInfoDao.insertBatch(couponInfoList);
                     log.info("A品券明细本地同步完成");
                 }
+
+                ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(couponApprovalDetail.getOrderId());
+                // 调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单
+                updateStoreStatus(couponApprovalDetail.getOrderId(),StoreStatusEnum.PAY_ORDER_TYPE_PEI.getKey().toString(),couponApprovalDetail.getStoreId(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,returnOrderInfo.getProductCount().toString());
+                //修改原始订单数据
+                List<ReturnOrderDetail> details = returnOrderDetailDao.selectListByReturnOrderCode(couponApprovalDetail.getOrderId());
+                List<ErpOrderItem> returnQuantityList=new ArrayList<>();
+                for(ReturnOrderDetail rod:details){
+                    ErpOrderItem eoi=new ErpOrderItem();
+                    eoi.setLineCode(rod.getLineCode());
+                    eoi.setReturnProductCount(rod.getReturnProductCount());
+                    returnQuantityList.add(eoi);
+                }
+                log.info("A品券发放审批回调--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}",returnOrderInfo.getOrderStoreCode(), ErpOrderReturnStatusEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
+                erpOrderInfoService.updateOrderReturnStatus(returnOrderInfo.getOrderStoreCode(), ErpOrderReturnRequestEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
                 //产生的A品券不为空，同步到虚拟资产
                 if(CollectionUtils.isNotEmpty(franchiseeAssets)){
                     log.info("A品券同步到虚拟资产开始，franchiseeAssets={}",franchiseeAssets);
@@ -178,20 +193,6 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                         log.info("退款完成");
                     }
                 }
-                ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(couponApprovalDetail.getOrderId());
-                // 调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单
-                updateStoreStatus(couponApprovalDetail.getOrderId(),StoreStatusEnum.PAY_ORDER_TYPE_PEI.getKey().toString(),couponApprovalDetail.getStoreId(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,returnOrderInfo.getProductCount().toString());
-                //修改原始订单数据
-                List<ReturnOrderDetail> details = returnOrderDetailDao.selectListByReturnOrderCode(couponApprovalDetail.getOrderId());
-                List<ErpOrderItem> returnQuantityList=new ArrayList<>();
-                for(ReturnOrderDetail rod:details){
-                    ErpOrderItem eoi=new ErpOrderItem();
-                    eoi.setLineCode(rod.getLineCode());
-                    eoi.setReturnProductCount(rod.getReturnProductCount());
-                    returnQuantityList.add(eoi);
-                }
-                log.info("A品券发放审批回调--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}",returnOrderInfo.getOrderStoreCode(), ErpOrderReturnStatusEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
-                erpOrderInfoService.updateOrderReturnStatus(returnOrderInfo.getOrderStoreCode(), ErpOrderReturnRequestEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
                 log.info("A品券发放审批回调结束");
             } else if (TpmBpmUtils.isPass(formCallBackVo.getUpdateFormStatus(), formCallBackVo.getOptBtn())) {
                 couponApprovalInfo.setStatus(StatusEnum.AUDIT.getValue());
