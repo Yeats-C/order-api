@@ -178,8 +178,9 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                         log.info("退款完成");
                     }
                 }
+                ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(couponApprovalDetail.getOrderId());
                 // 调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单
-                updateStoreStatus(couponApprovalDetail.getOrderId(),StoreStatusEnum.PAY_ORDER_TYPE_PEI.getKey().toString(),couponApprovalDetail.getStoreId(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
+                updateStoreStatus(couponApprovalDetail.getOrderId(),StoreStatusEnum.PAY_ORDER_TYPE_PEI.getKey().toString(),couponApprovalDetail.getStoreId(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,returnOrderInfo.getProductCount().toString());
                 //修改原始订单数据
                 List<ReturnOrderDetail> details = returnOrderDetailDao.selectListByReturnOrderCode(couponApprovalDetail.getOrderId());
                 List<ErpOrderItem> returnQuantityList=new ArrayList<>();
@@ -189,7 +190,6 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                     eoi.setReturnProductCount(rod.getReturnProductCount());
                     returnQuantityList.add(eoi);
                 }
-                ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(couponApprovalDetail.getOrderId());
                 log.info("A品券发放审批回调--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}",returnOrderInfo.getOrderStoreCode(), ErpOrderReturnStatusEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
                 erpOrderInfoService.updateOrderReturnStatus(returnOrderInfo.getOrderStoreCode(), ErpOrderReturnRequestEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
                 log.info("A品券发放审批回调结束");
@@ -320,7 +320,7 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
      * @param updateById
      * @param updateByName
      */
-    public void updateStoreStatus(String orderReturnCode,String orderReturnStatus,String storeId,String updateById,String updateByName){
+    public void updateStoreStatus(String orderReturnCode,String orderReturnStatus,String storeId,String updateById,String updateByName,String actualAuantity){
         //修改商品库存
         String url=productHost+"/order/return/update/status";
         StringBuilder sb=new StringBuilder();
@@ -329,6 +329,7 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
         sb.append("&store_id="+storeId);
         sb.append("&update_by_id="+updateById);
         sb.append("&update_by_name="+updateByName);
+        sb.append("&actual_quantity="+actualAuantity);
         log.info("发起订货管理-修改退货申请单入参，url={},json={}",url+sb);
         HttpClient httpClient = HttpClient.get(url+sb);
         Map<String ,Object> result=null;
@@ -336,6 +337,8 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
         log.info("发起订货管理-修改退货申请单结果，request={}",result);
         if(result!=null&&"0".equals(result.get("code").toString())){
             log.info("发起订货管理-修改退货申请单结果--成功");
+        }else {
+            throw new RuntimeException("发起订货管理-修改退货申请单结果--失败");
         }
     }
 
