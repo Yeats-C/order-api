@@ -38,8 +38,7 @@ import java.util.List;
 @Service
 public class CreateRejectRecordServiceImpl implements CreateRejectRecordService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CreateRejectRecordServiceImpl.class);
-
-    @Value("${reject.host}")
+    @Value("${purchase.host}")
     private String rejectHost;
     @Resource
     RejectRecordDao rejectRecordDao;
@@ -125,6 +124,8 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
             returnOrderToRejectRecord(returnOrder.getReturnOrderInfo());
             //根据退货单号查询退货单和退货明细
             returnOrderToRejectRecordDetail(returnOrder);
+            //根据爱亲退供单，生成耘链退货单
+            createSaleOrder(returnOrder.getReturnOrderInfo().getReturnOrderCode());
             try {
                 //修改退货单同步状态
                 returnOrderInfoDao.updateOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_SUCCESS.getCode(), returnOrder.getReturnOrderInfo().getReturnOrderCode());
@@ -132,9 +133,6 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
                 LOGGER.error("修改退货单同步状态失败", e);
                 throw new RuntimeException();
             }
-            //根据爱亲退供单，生成耘链退货单
-            createSaleOrder(returnOrder.getReturnOrderCode());
-
             //添加操作日志
             addOperationLog(returnOrder.getReturnOrderInfo().getOrderStoreCode());
         } else {
@@ -268,8 +266,9 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
                 returnOrderReq.setReturnOrderDetailReqList(orderDetails);
                 returnOrderReq.setReturnOrderInfo(orderInfo);
                 String url = rejectHost + "/returnGoods/record/return";
-                LOGGER.info("returnOrderReq" + returnOrderReq);
-                HttpClient httpGet = HttpClient.post(url).json(returnOrderReq).timeout(10000);
+                //String url = "http://192.168.11.119:80/returnGoods/record/return";
+                LOGGER.info("根据爱亲退供单，生成耘链退货亲求地址url:"+ url +"，请求参数returnOrderReq:"+returnOrderReq);
+                HttpClient httpGet = HttpClient.post(url).json(returnOrderReq);
                 HttpResponse<Object> response = httpGet.action().result(new TypeReference<HttpResponse<Object>>() {
                 });
                 if (!RequestReturnUtil.validateHttpResponse(response)) {
@@ -277,7 +276,8 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
                 }
             }
         } catch (Exception e) {
-            LOGGER.error("根据爱亲退供单，生成耘链退货单失败returnOrderCode： " + returnOrderCode);
+            LOGGER.error("根据爱亲退供单，生成耘链退货单失败",e);
+            throw new RuntimeException();
         }
     }
 

@@ -702,11 +702,11 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                         item.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_12.getCode());
                         item.setActualProductCount(actualProductCount);
                         item.setActualTotalProductAmount(item.getOrderAmount());
-                        item.setDeliveryTime(now);
+//                        item.setDeliveryTime(now);
                         item.setActualTotalVolume(item.getTotalVolume());
                         item.setActualTotalWeight(item.getTotalWeight());
-                        item.setTransportStatus(StatusEnum.YES.getCode());
-                        item.setTransportTime(now);
+//                        item.setTransportStatus(StatusEnum.YES.getCode());
+//                        item.setTransportTime(now);
                         item.setReceiveTime(now);
                         this.updateOrderByPrimaryKeySelective(item, auth);
                     } else {
