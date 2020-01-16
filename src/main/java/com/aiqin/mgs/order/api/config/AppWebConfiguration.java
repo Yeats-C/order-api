@@ -28,7 +28,9 @@ public class AppWebConfiguration implements WebMvcConfigurer {
                         "/webjars/**",
                         "/init/**",
                         "/order/**",
-                        "/orderdetail/**"
+                        "/orderdetail/**",
+                        "/orderafter/**",
+                        "/frozen/**"
                         );
     }
 
