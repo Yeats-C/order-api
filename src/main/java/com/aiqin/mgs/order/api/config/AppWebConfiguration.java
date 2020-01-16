@@ -35,7 +35,8 @@ public class AppWebConfiguration implements WebMvcConfigurer {
                         "/orderNoCode/**",
                         "/settlement/**",
                         "/erpOrderSignController/**",
-                        "/store-value/**"
+                        "/store-value/**",
+                        "/payment/**"
                         );
     }
 
