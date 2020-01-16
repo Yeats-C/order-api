@@ -23,7 +23,7 @@ import java.util.List;
 @Component
 public class ErpScourSheetTaskJob {
 
-    private static final Logger logger = LoggerFactory.getLogger(ErpOrderPayTimeOutTaskJob.class);
+    private static final Logger logger = LoggerFactory.getLogger(ErpScourSheetTaskJob.class);
 
     @Resource
     private ErpOrderQueryService erpOrderQueryService;
