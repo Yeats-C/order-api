@@ -874,6 +874,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 returnOrderInfo.setTreatmentMethod(TreatmentMethodEnum.RETURN_AMOUNT_TYPE.getCode());
                 //生成退货单
                 returnOrderInfo.setId(null);
+                returnOrderInfo.setOrderType(Integer.valueOf(erpOrderInfo.getOrderTypeCode()));
                 log.info("发起冲减单,生成退货单,returnOrderInfo={}",returnOrderInfo);
                 returnOrderInfoDao.insertSelective(returnOrderInfo);
                 List<ReturnOrderDetail> details = detailsList.stream().map(detailVo -> {
