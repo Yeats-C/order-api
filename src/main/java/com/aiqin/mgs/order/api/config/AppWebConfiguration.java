@@ -27,7 +27,8 @@ public class AppWebConfiguration implements WebMvcConfigurer {
                         "/swagger-resources",
                         "/webjars/**",
                         "/init/**",
-                        "/order/lately");
+                        "/order/lately",
+                        "/order/addordta");
     }
 
     @Override
