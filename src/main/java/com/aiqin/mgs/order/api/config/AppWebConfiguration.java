@@ -30,7 +30,8 @@ public class AppWebConfiguration implements WebMvcConfigurer {
                         "/order/**",
                         "/orderdetail/**",
                         "/orderafter/**",
-                        "/frozen/**"
+                        "/frozen/**",
+                        "/service/**"
                         );
     }
 
