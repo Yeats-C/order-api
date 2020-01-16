@@ -190,15 +190,15 @@ public class ErpOrderInfo {
     @JsonProperty("payment_name")
     private String paymentName;
 
-    @ApiModelProperty(value = "运费")
+    @ApiModelProperty(value = "运费（元）")
     @JsonProperty("deliver_amount")
     private BigDecimal deliverAmount;
 
-    @ApiModelProperty(value = "商品总价")
+    @ApiModelProperty(value = "商品总价（元）")
     @JsonProperty("total_product_amount")
     private BigDecimal totalProductAmount;
 
-    @ApiModelProperty(value = "实际商品总价（发货商品总价）")
+    @ApiModelProperty(value = "实际商品总价（发货商品总价）（元）")
     @JsonProperty("actual_total_product_amount")
     private BigDecimal actualTotalProductAmount;
 
@@ -206,11 +206,11 @@ public class ErpOrderInfo {
     @JsonProperty("actual_product_count")
     private Long actualProductCount;
 
-    @ApiModelProperty(value = "优惠额度")
+    @ApiModelProperty(value = "优惠额度（元）")
     @JsonProperty("discount_amount")
     private BigDecimal discountAmount;
 
-    @ApiModelProperty(value = "实际支付金额")
+    @ApiModelProperty(value = "实际支付金额（元）")
     @JsonProperty("order_amount")
     private BigDecimal orderAmount;
 
@@ -318,9 +318,13 @@ public class ErpOrderInfo {
     @JsonProperty("fee_id")
     private String feeId;
 
-    @ApiModelProperty(value = "是否发生退货 0是 1否")
+    @ApiModelProperty(value = "退货状态 1未退货 2部分退货 3退货完成")
     @JsonProperty("order_return")
     private Integer orderReturn;
+
+    @ApiModelProperty(value = "退货流程状态 1无进行中的退货 0正在退货")
+    @JsonProperty("order_return_process")
+    private Integer orderReturnProcess;
 
     @ApiModelProperty(value = "加盟商id")
     @JsonProperty("franchisee_id")

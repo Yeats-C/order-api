@@ -120,31 +120,31 @@ public class ErpOrderItem {
     @JsonProperty("product_count")
     private Long productCount;
 
-    @ApiModelProperty(value = "单价")
+    @ApiModelProperty(value = "单价（元）")
     @JsonProperty("product_amount")
     private BigDecimal productAmount;
 
-    @ApiModelProperty(value = "含税采购价")
+    @ApiModelProperty(value = "含税采购价（元）")
     @JsonProperty("purchase_amount")
     private BigDecimal purchaseAmount;
 
-    @ApiModelProperty(value = "行总价")
+    @ApiModelProperty(value = "行总价（元）")
     @JsonProperty("total_product_amount")
     private BigDecimal totalProductAmount;
 
-    @ApiModelProperty(value = "实际商品总价（发货商品总价）")
+    @ApiModelProperty(value = "实际商品总价（发货商品总价）（元）")
     @JsonProperty("actual_total_product_amount")
     private BigDecimal actualTotalProductAmount;
 
-    @ApiModelProperty(value = "优惠分摊总金额（分摊后金额）")
+    @ApiModelProperty(value = "优惠分摊总金额（分摊后金额）（元）")
     @JsonProperty("total_preferential_amount")
     private BigDecimal totalPreferentialAmount;
 
-    @ApiModelProperty(value = "分摊后单价")
+    @ApiModelProperty(value = "分摊后单价（元）")
     @JsonProperty("preferential_amount")
     private BigDecimal preferentialAmount;
 
-    @ApiModelProperty(value = "活动优惠总金额,包括活动优惠和优惠券优惠")
+    @ApiModelProperty(value = "活动优惠总金额,包括活动优惠和优惠券优惠（元）")
     @JsonProperty("total_acivity_amount")
     private BigDecimal totalAcivityAmount;
 

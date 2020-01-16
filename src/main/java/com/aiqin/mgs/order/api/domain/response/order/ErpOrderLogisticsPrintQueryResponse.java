@@ -39,15 +39,15 @@ public class ErpOrderLogisticsPrintQueryResponse {
     @JsonProperty("logistic_code")
     private String logisticCode;
 
-    @ApiModelProperty(value = "物流费用")
+    @ApiModelProperty(value = "物流费用（元）")
     @JsonProperty("logistic_fee")
     private BigDecimal logisticFee;
 
-    @ApiModelProperty(value = "物流券支付金额")
+    @ApiModelProperty(value = "物流券支付金额（元）")
     @JsonProperty("coupon_pay_fee")
     private BigDecimal couponPayFee;
 
-    @ApiModelProperty(value = "余额支付金额")
+    @ApiModelProperty(value = "余额支付金额（元）")
     @JsonProperty("balance_pay_fee")
     private BigDecimal balancePayFee;
 

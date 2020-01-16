@@ -23,14 +23,14 @@ import java.util.List;
 @Component
 public class ErpScourSheetTaskJob {
 
-    private static final Logger logger = LoggerFactory.getLogger(ErpOrderPayTimeOutTaskJob.class);
+    private static final Logger logger = LoggerFactory.getLogger(ErpScourSheetTaskJob.class);
 
     @Resource
     private ErpOrderQueryService erpOrderQueryService;
     @Resource
     private ErpOrderInfoService erpOrderInfoService;
 
-    @Scheduled(cron = "0 0 0/2 * * ? ")
+    @Scheduled(cron = "0 0/5 * * * ? ")
     public void getTask() {
         //计时器
         StopWatch watch = new StopWatch();

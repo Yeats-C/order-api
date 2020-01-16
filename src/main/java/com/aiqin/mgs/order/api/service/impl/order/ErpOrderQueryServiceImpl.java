@@ -351,7 +351,9 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
 
         //erp异常订单 确认订单按钮
         if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_2 || orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_3 || orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_4) {
-            control.setAbnormal(StatusEnum.YES.getCode());
+            if (!ErpOrderNodeStatusEnum.STATUS_4.getCode().equals(order.getOrderNodeStatus())) {
+                control.setAbnormal(StatusEnum.YES.getCode());
+            }
         } else if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_1) {
             if (orderNodeStatusEnum == ErpOrderNodeStatusEnum.STATUS_1 || orderNodeStatusEnum == ErpOrderNodeStatusEnum.STATUS_4) {
                 if (processTypeEnum.isAutoPay()) {
@@ -403,15 +405,17 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
 
         //重新加入购物车
         if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_99 || orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_98) {
-            if (!orderCategoryEnum.isFirstOrder()) {
-                control.setRejoinCart(StatusEnum.YES.getCode());
-            }
+            control.setRejoinCart(StatusEnum.YES.getCode());
         }
 
         //退货
         if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_13) {
-            if (!orderCategoryEnum.isFirstOrder()) {
-                control.setOrderReturn(StatusEnum.YES.getCode());
+            if (!ErpOrderReturnStatusEnum.SUCCESS.getCode().equals(order.getOrderReturn())) {
+                if (StatusEnum.NO.getCode().equals(order.getOrderReturnProcess())) {
+                    if (!orderCategoryEnum.isFirstOrder()) {
+                        control.setOrderReturn(StatusEnum.YES.getCode());
+                    }
+                }
             }
         }
 

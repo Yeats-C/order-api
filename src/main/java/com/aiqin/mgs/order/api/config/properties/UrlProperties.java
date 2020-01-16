@@ -39,5 +39,8 @@ public class UrlProperties {
     private String marketApi;
     private String orderApi;
     private String scmpApi;
-
+    /**
+     * 会员中心
+     */
+    private String memberApi;
 }

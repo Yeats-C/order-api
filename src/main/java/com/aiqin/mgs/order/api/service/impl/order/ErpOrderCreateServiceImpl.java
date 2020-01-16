@@ -514,8 +514,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setStoreCode(storeInfo.getStoreCode());
         //门店名称
         order.setStoreName(storeInfo.getStoreName());
-        //是否发生退货  0 是  1.否
-        order.setOrderReturn(StatusEnum.NO.getCode());
+        //退货状态
+        order.setOrderReturn(ErpOrderReturnStatusEnum.NONE.getCode());
+        //退货流程状态
+        order.setOrderReturnProcess(StatusEnum.NO.getCode());
         //加盟商id
         order.setFranchiseeId(storeInfo.getFranchiseeId());
         //加盟商编码
@@ -985,8 +987,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setStoreName(storeInfo.getStoreName());
         //费用id
         order.setFeeId(feeId);
-        //是否发生退货  0 是  1.否
-        order.setOrderReturn(StatusEnum.NO.getCode());
+        //退货状态
+        order.setOrderReturn(ErpOrderReturnStatusEnum.NONE.getCode());
+        //退货流程状态
+        order.setOrderReturnProcess(StatusEnum.NO.getCode());
         //加盟商id
         order.setFranchiseeId(storeInfo.getFranchiseeId());
         //加盟商编码

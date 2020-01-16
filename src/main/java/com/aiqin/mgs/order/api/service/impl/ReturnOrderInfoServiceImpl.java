@@ -8,6 +8,8 @@ import com.aiqin.mgs.order.api.base.*;
 import com.aiqin.mgs.order.api.component.SequenceService;
 import com.aiqin.mgs.order.api.component.enums.ErpLogOperationTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderReturnRequestEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderReturnStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOperationTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOrderSourceEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayTypeEnum;
@@ -26,6 +28,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderStatusVo;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
+import com.aiqin.mgs.order.api.service.order.ErpOrderInfoService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
@@ -98,6 +101,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     private ErpOrderQueryService erpOrderQueryService;
     @Resource
     private ErpOrderItemDao erpOrderItemDao;
+    @Resource
+    private ErpOrderInfoService erpOrderInfoService;
+
 
     @Override
     @Transactional
@@ -148,6 +154,10 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //添加日志
         log.info("发起退货--插入日志，details={}",details);
         insertLog(afterSaleCode,reqVo.getCreateById(),reqVo.getCreateByName(),ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getMsg());
+        //修改原始订单数据
+        log.info("发起退货--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}",record.getOrderStoreCode(), ErpOrderReturnStatusEnum.WAIT,null,record.getCreateById(),record.getCreateByName());
+        erpOrderInfoService.updateOrderReturnStatus(record.getOrderStoreCode(), ErpOrderReturnRequestEnum.WAIT,null,record.getCreateById(),record.getCreateByName());
+        log.info("发起退货--修改原始订单数据结束");
         //门店退货申请-完成(门店)（erp回调）--修改商品库存
         String url=productHost+"/order/return/insert";
         JSONObject body=new JSONObject();
@@ -200,12 +210,15 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     @Override
     @Transactional(rollbackFor=Exception.class)
     public HttpResponse updateReturnStatus(ReturnOrderReviewReqVo reqVo) {
+        log.info("退货单审核--入参,reqVo={}",reqVo);
         boolean sysFlag = false;
         boolean couponFlag = false;
         boolean cancelFlag = false;
+        boolean erplFlag = false;
         //处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款 99--已取消
         String content="";
         String isPass="";
+        ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(reqVo.getReturnOrderCode());
         switch (reqVo.getOperateStatus()) {
             case 1:
                 reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey());
@@ -228,16 +241,18 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 reqVo.setTreatmentMethod(TreatmentMethodEnum.FALL_TYPE.getCode());
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getMsg();
                 isPass=StoreStatusEnum.PAY_ORDER_TYPE_PEI.getKey().toString();
+                erplFlag=true;
                 break;
             case 99://撤销
                 reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REMOVE.getKey());
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getMsg();
                 //如果退货状态为11，则不进行撤销，继续向下走流程
-                ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(reqVo.getReturnOrderCode());
                 if(returnOrderInfo.getReturnOrderStatus().equals(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_RETURN.getKey())){
+                    log.info("退货单审核--取消撤销操作");
                     return HttpResponse.failure(ResultCode.RETURN_ORDER_CANCEL_FALL);
                 }
                 cancelFlag=true;
+                erplFlag=true;
                 break;
             default:
                 return HttpResponse.failure(ResultCode.RETURN_ORDER_STATUS_NOT_FOUND);
@@ -288,8 +303,13 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         }
         //调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单
         if(StringUtils.isNotBlank(isPass)){
-            ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(reqVo.getReturnOrderCode());
             updateStoreStatus(reqVo.getReturnOrderCode(),isPass,returnOrderInfo.getStoreId(),reqVo.getOperatorId(),reqVo.getOperator(),null);
+        }
+        //修改原始订单数据
+        if(erplFlag){
+            log.info("退货单审核--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}",returnOrderInfo.getOrderStoreCode(), ErpOrderReturnStatusEnum.SUCCESS,null,reqVo.getOperatorId(),reqVo.getOperator());
+            erpOrderInfoService.updateOrderReturnStatus(returnOrderInfo.getOrderStoreCode(), ErpOrderReturnRequestEnum.CANCEL,null,reqVo.getOperatorId(),reqVo.getOperator());
+
         }
         return HttpResponse.success();
     }
@@ -438,16 +458,19 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     }
 
     @Override
+    @Transactional(rollbackFor=Exception.class)
     public Boolean updateLogistics(LogisticsVo logisticsVo) {
         int res=returnOrderInfoDao.updateLogistics(logisticsVo);
         return res>0;
     }
 
     @Override
+    @Transactional(rollbackFor=Exception.class)
     public Boolean callback(RefundReq reqVo) {
         log.info("退款回调开始，reqVo={}",reqVo);
         //查询退货单状态是否修改成功
         ReturnOrderInfo returnOrderInfo=returnOrderInfoDao.selectByReturnOrderCode(reqVo.getOrderNo());
+        log.info("退款回调--查询退货单,返回结果returnOrderInfo={}",returnOrderInfo);
         //退款状态，0-未退款、1-已退款
         if(returnOrderInfo!=null&&returnOrderInfo.getRefundStatus().equals(ConstantData.REFUND_STATUS)){//1-已退款
             return true;
@@ -457,12 +480,32 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         record.setPayNum(reqVo.getPayNum());
         record.setUpdateTime(new Date());
         record.setStatus(ConstantData.REFUND_STATUS);
+        log.info("退款回调--修改退款流水,record={}",record);
         refundInfoDao.updateByOrderCode(record);
+        log.info("退款回调--修改退款流水完成");
         //添加日志
         insertLog(reqVo.getOrderNo(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getMsg());
+        log.info("退款回调--修改退货单退款状态开始,入参returnOrderCode={}",reqVo.getOrderNo());
         returnOrderInfoDao.updateRefundStatus(reqVo.getOrderNo());
+        log.info("退款回调--修改退货单退款状态结束");
         // 调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单（减库存）
-        updateStoreStatus(reqVo.getOrderNo(),StoreStatusEnum.PAY_ORDER_TYPE_ZHI.toString(),returnOrderInfo.getStoreId(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,returnOrderInfo.getActualProductCount().toString());
+        ReturnOrderInfo roi=returnOrderInfoDao.selectByReturnOrderCode(reqVo.getOrderNo());
+        //除了冲减单，都要回调门店和修改原始订单
+        if(!roi.getReturnOrderType().equals(ReturnOrderTypeEnum.WRITE_DOWN_ORDER_TYPE.getCode())){
+            updateStoreStatus(reqVo.getOrderNo(),StoreStatusEnum.PAY_ORDER_TYPE_ZHI.toString(),roi.getStoreId(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,roi.getActualProductCount().toString());
+            //修改原始订单数据
+            List<ReturnOrderDetail> details = returnOrderDetailDao.selectListByReturnOrderCode(reqVo.getOrderNo());
+            List<ErpOrderItem> returnQuantityList=new ArrayList<>();
+            for(ReturnOrderDetail rod:details){
+                ErpOrderItem eoi=new ErpOrderItem();
+                eoi.setLineCode(rod.getLineCode());
+                eoi.setReturnProductCount(rod.getActualReturnProductCount());
+                returnQuantityList.add(eoi);
+            }
+            log.info("退款回调--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}",roi.getOrderStoreCode(), ErpOrderReturnStatusEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
+            erpOrderInfoService.updateOrderReturnStatus(roi.getOrderStoreCode(), ErpOrderReturnRequestEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
+        }
+        log.info("退款回调结束");
         return true;
     }
 
@@ -755,6 +798,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     }
 
     @Override
+    @Transactional(rollbackFor=Exception.class)
     public HttpResponse saveWriteDownOrder(String orderCode) {
         log.info("发起冲减单开始,原始订单编码,orderCode={}",orderCode);
         //根据订单编码查询原始订单数据及详情数据
@@ -830,6 +874,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 returnOrderInfo.setTreatmentMethod(TreatmentMethodEnum.RETURN_AMOUNT_TYPE.getCode());
                 //生成退货单
                 returnOrderInfo.setId(null);
+                returnOrderInfo.setOrderType(Integer.valueOf(erpOrderInfo.getOrderTypeCode()));
                 log.info("发起冲减单,生成退货单,returnOrderInfo={}",returnOrderInfo);
                 returnOrderInfoDao.insertSelective(returnOrderInfo);
                 List<ReturnOrderDetail> details = detailsList.stream().map(detailVo -> {

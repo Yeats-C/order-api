@@ -34,7 +34,7 @@ public class ErpOrderOperationControlResponse {
     @JsonProperty("pay_logistics")
     private int payLogistics = 1;
 
-    @ApiModelProperty(value = "取消 0有 1无")
+    @ApiModelProperty(value = "爱掌柜取消订单按钮 0有 1无")
     @JsonProperty("cancel")
     private int cancel = 1;
 
@@ -50,15 +50,15 @@ public class ErpOrderOperationControlResponse {
     @JsonProperty("logistics_area")
     private int logisticsArea = 1;
 
-    @ApiModelProperty(value = "重新加入购物车 0有 1无")
+    @ApiModelProperty(value = "爱掌柜重新加入购物车按钮 0有 1无")
     @JsonProperty("rejoin_cart")
     private int rejoinCart = 1;
 
-    @ApiModelProperty(value = "退货 0有 1无")
+    @ApiModelProperty(value = "爱掌柜退货按钮 0有 1无")
     @JsonProperty("order_return")
     private int orderReturn = 1;
 
-    @ApiModelProperty(value = "退款 0有 1无")
+    @ApiModelProperty(value = "是否有退款信息 0有 1无")
     @JsonProperty("refund")
     private int refund = 1;
 
