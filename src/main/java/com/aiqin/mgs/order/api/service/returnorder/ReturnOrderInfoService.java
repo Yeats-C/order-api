@@ -140,4 +140,11 @@ public interface ReturnOrderInfoService {
      */
     HttpResponse saveCancelOrder(String orderCode);
 
+    /**
+     * A品券发起审批测试
+     * @param
+     * @return
+     */
+    HttpResponse apply(String approvalCode,String operatorId,String deptCode);
+
 }

@@ -567,7 +567,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         paramVO.setFormUpdateUrl("http://order.api.aiqin.com/approval/callback");//回调地址
         paramVO.setFormUpdateUrlType(FormUpdateUrlType.HTTP);
         paramVO.setSignTicket(IdUtil.uuid());
-        //paramVO.setReceiptType("1");
+        paramVO.setReceiptType("1");
         paramVO.setPositionCode(positionCode);
         log.info("调用审批流发起申请,request={}", paramVO);
         String url = activitiHost + "/activiti/common/submit";
@@ -984,6 +984,12 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //添加日志
         insertLog(returnOrderCode,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(), WriteDownOrderStatusEnum.CANCEL_ORDER.getCode(),WriteDownOrderStatusEnum.CANCEL_ORDER.getName());
         return HttpResponse.success(returnOrderCode);
+    }
+
+    @Override
+    public HttpResponse apply(String approvalCode, String operatorId, String deptCode) {
+        submitActBaseProcess(approvalCode,operatorId,deptCode);
+        return HttpResponse.success();
     }
 
     /**
