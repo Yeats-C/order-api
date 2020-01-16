@@ -8,6 +8,7 @@ import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
+import com.aiqin.platform.flows.client.domain.vo.FormCallBackVo;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -166,5 +167,10 @@ public class ReturnOrderInfoController {
         return new HttpResponse<>(returnOrderInfoService.searchPayOrder(orderCode));
     }
 
+    @GetMapping("/apply")
+    @ApiOperation("A品券测试审批")
+    public HttpResponse apply(String approvalCode,String operatorId,String deptCode) {
+        return returnOrderInfoService.apply(approvalCode,operatorId,deptCode);
+    }
 
 }
