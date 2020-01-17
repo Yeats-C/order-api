@@ -141,9 +141,9 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         try {
             ErpOrderTransportRequest orderTransport = new ErpOrderTransportRequest();
             ErpOrderTransportLogisticsRequest logistics = new ErpOrderTransportLogisticsRequest();
-            logistics.setLogisticsCode(deliveryInfoVo.getTransportCompanyCode());//物流单号
-            logistics.setLogisticsCentreCode(deliveryInfoVo.getCustomerCode());//物流公司编码
-            logistics.setLogisticsCentreName(deliveryInfoVo.getCustomerName());//物流公司名称
+            logistics.setLogisticsCode(deliveryInfoVo.getTransportCode());//物流单号
+            logistics.setLogisticsCentreCode(deliveryInfoVo.getTransportCompanyCode());//物流公司编码
+            logistics.setLogisticsCentreName(deliveryInfoVo.getTransportCompanyName());//物流公司名称
             logistics.setSendRepertoryCode(deliveryInfoVo.getTransportCenterCode());//发货仓库编码
             logistics.setSendRepertoryName(deliveryInfoVo.getTransportCenterName());//发货仓库名称
             logistics.setLogisticsFee(deliveryInfoVo.getTransportAmount());//物流费用
