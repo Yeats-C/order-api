@@ -108,11 +108,11 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                 //ERP 退货单状态修改
                 ReturnOrderInfo returnOrderInfo1 = returnOrderInfoDao.selectByReturnOrderCode(returnOrderReviewApi.getReturnOrderCode());
                 LOGGER.info("service 层退货单状态修改********************,returnOrderInfo1={}",returnOrderInfo1);
-                if(returnOrderInfo1.getRefundStatus().equals(1)){
-                    LOGGER.info("供应链入库完成--回调退货单，此退货单已退款");
-                    return true;
+                if(!returnOrderInfo1.getRefundStatus().equals(1)){
+                    LOGGER.info("供应链入库完成--回调退货单*********");
+                    returnOrderInfoService.updateReturnStatusApi(returnOrderReviewApi);
                 }
-                returnOrderInfoService.updateReturnStatusApi(returnOrderReviewApi);
+
             }
 
             if (returnDLReq.getReturnBatchDetailDLReqList() != null) {
