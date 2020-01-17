@@ -251,6 +251,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     log.info("退货单审核--取消撤销操作");
                     return HttpResponse.failure(ResultCode.RETURN_ORDER_CANCEL_FALL);
                 }
+                isPass=StoreStatusEnum.PAY_ORDER_TYPE_PEI.getKey().toString();
                 cancelFlag=true;
                 erplFlag=true;
                 break;
@@ -303,7 +304,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         }
         //调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单
         if(StringUtils.isNotBlank(isPass)){
-            updateStoreStatus(reqVo.getReturnOrderCode(),isPass,returnOrderInfo.getStoreId(),reqVo.getOperatorId(),reqVo.getOperator(),null);
+            updateStoreStatus(reqVo.getReturnOrderCode(),isPass,returnOrderInfo.getStoreId(),reqVo.getOperatorId(),reqVo.getOperator(),"0");
         }
         //修改原始订单数据
         if(erplFlag){
