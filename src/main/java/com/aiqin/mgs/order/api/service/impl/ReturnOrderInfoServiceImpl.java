@@ -375,7 +375,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             log.info("供应链入库完成--回调退货单，查询原始订单详情,入参，query={}",query);
             List<ErpOrderItem> erpOrderItems = erpOrderItemDao.select(query);
             log.info("供应链入库完成--回调退货单，查询原始订单详情,结果，erpOrderItems={}",erpOrderItems);
-            if(CollectionUtils.isNotEmpty(erpOrderItems)){
+            if(CollectionUtils.isEmpty(erpOrderItems)){
                 throw new NullPointerException("查询原始订单详情为空");
             }
             Map<String,BigDecimal> map=new HashMap<>();
