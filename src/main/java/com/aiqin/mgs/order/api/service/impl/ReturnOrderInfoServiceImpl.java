@@ -847,6 +847,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     BeanUtils.copyProperties(eoi,returnOrderDetail);
                     returnOrderDetail.setActualReturnProductCount(differenceCount);
                     returnOrderDetail.setActualTotalProductAmount(amount);
+                    returnOrderDetail.setProductAmount(eoi.getProductAmount());
+                    returnOrderDetail.setReturnProductCount(eoi.getProductCount());
                     detailsList.add(returnOrderDetail);
                 }else if(differenceCount.equals(productCount)){//全退
                     //计算公式：优惠分摊总金额（分摊后金额）
@@ -855,6 +857,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     BeanUtils.copyProperties(eoi,returnOrderDetail);
                     returnOrderDetail.setActualReturnProductCount(differenceCount);
                     returnOrderDetail.setActualTotalProductAmount(totalPreferentialAmount);
+                    returnOrderDetail.setProductAmount(eoi.getProductAmount());
+                    returnOrderDetail.setReturnProductCount(eoi.getProductCount());
                     detailsList.add(returnOrderDetail);
                 }
             }
