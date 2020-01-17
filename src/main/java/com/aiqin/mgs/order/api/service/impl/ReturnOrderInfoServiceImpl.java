@@ -349,7 +349,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     public Boolean updateReturnStatusApi(ReturnOrderReviewApiReqVo reqVo) {
         log.info("供应链入库完成--回调退货单，修改退货单状态及详情数量开始，reqVo={}",reqVo);
         ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(reqVo.getReturnOrderCode());
-        if(returnOrderInfo.getRefundStatus().equals(1)){
+        RefundInfo refundInfo = refundInfoDao.selectByOrderCode(reqVo.getReturnOrderCode());
+        if(returnOrderInfo.getRefundStatus().equals(1)||refundInfo!=null){
             log.info("供应链入库完成--回调退货单，此退货单已退款");
             return true;
         }

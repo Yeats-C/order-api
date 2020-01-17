@@ -8,7 +8,7 @@ public interface RefundInfoDao {
 
     int insertSelective(RefundInfo record);
 
-    RefundInfo selectByPrimaryKey(Integer id);
+    RefundInfo selectByOrderCode(String orderCode);
 
     int updateByPrimaryKeySelective(RefundInfo record);
 
