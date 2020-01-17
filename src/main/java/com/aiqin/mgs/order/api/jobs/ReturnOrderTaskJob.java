@@ -31,7 +31,7 @@ public class ReturnOrderTaskJob {
     @Resource
     private ReturnOrderInfoDao returnOrderInfoDao;
 
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0 0/25 * * * ? ")
     public void getTask() {
         //计时器
         StopWatch watch = new StopWatch();

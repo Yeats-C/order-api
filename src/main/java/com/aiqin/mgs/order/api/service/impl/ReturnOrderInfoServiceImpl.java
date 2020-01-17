@@ -370,7 +370,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             log.info("供应链入库完成--回调退货单，查询原始订单详情,入参，query={}",query);
             List<ErpOrderItem> erpOrderItems = erpOrderItemDao.select(query);
             log.info("供应链入库完成--回调退货单，查询原始订单详情,结果，erpOrderItems={}",erpOrderItems);
-            if(CollectionUtils.isNotEmpty(erpOrderItems)){
+            if(CollectionUtils.isEmpty(erpOrderItems)){
                 throw new NullPointerException("查询原始订单详情为空");
             }
             Map<String,BigDecimal> map=new HashMap<>();
@@ -492,7 +492,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         ReturnOrderInfo roi=returnOrderInfoDao.selectByReturnOrderCode(reqVo.getOrderNo());
         //除了冲减单，都要回调门店和修改原始订单
         if(!roi.getReturnOrderType().equals(ReturnOrderTypeEnum.WRITE_DOWN_ORDER_TYPE.getCode())){
-            updateStoreStatus(reqVo.getOrderNo(),StoreStatusEnum.PAY_ORDER_TYPE_ZHI.toString(),roi.getStoreId(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,roi.getActualProductCount().toString());
+            updateStoreStatus(reqVo.getOrderNo(),StoreStatusEnum.PAY_ORDER_TYPE_ZHI.getKey().toString(),roi.getStoreId(),ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,roi.getActualProductCount().toString());
             //修改原始订单数据
             List<ReturnOrderDetail> details = returnOrderDetailDao.selectListByReturnOrderCode(reqVo.getOrderNo());
             List<ErpOrderItem> returnQuantityList=new ArrayList<>();
@@ -567,7 +567,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         paramVO.setFormUpdateUrl("http://order.api.aiqin.com/approval/callback");//回调地址
         paramVO.setFormUpdateUrlType(FormUpdateUrlType.HTTP);
         paramVO.setSignTicket(IdUtil.uuid());
-        //paramVO.setReceiptType("1");
+        paramVO.setReceiptType("1");
         paramVO.setPositionCode(positionCode);
         log.info("调用审批流发起申请,request={}", paramVO);
         String url = activitiHost + "/activiti/common/submit";
@@ -874,6 +874,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 returnOrderInfo.setTreatmentMethod(TreatmentMethodEnum.RETURN_AMOUNT_TYPE.getCode());
                 //生成退货单
                 returnOrderInfo.setId(null);
+                returnOrderInfo.setOrderType(Integer.valueOf(erpOrderInfo.getOrderTypeCode()));
                 log.info("发起冲减单,生成退货单,returnOrderInfo={}",returnOrderInfo);
                 returnOrderInfoDao.insertSelective(returnOrderInfo);
                 List<ReturnOrderDetail> details = detailsList.stream().map(detailVo -> {
@@ -983,6 +984,12 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //添加日志
         insertLog(returnOrderCode,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(), WriteDownOrderStatusEnum.CANCEL_ORDER.getCode(),WriteDownOrderStatusEnum.CANCEL_ORDER.getName());
         return HttpResponse.success(returnOrderCode);
+    }
+
+    @Override
+    public HttpResponse apply(String approvalCode, String operatorId, String deptCode) {
+        submitActBaseProcess(approvalCode,operatorId,deptCode);
+        return HttpResponse.success();
     }
 
     /**
