@@ -445,6 +445,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 info.setTurnReturnView(checkTurn(detailList));
             }else {
                 info.setTurnReturnView(1);
+                info.getOrderInfo().setTurnReturnView(1);
             }
 
             info.setDetailList(detailList);
