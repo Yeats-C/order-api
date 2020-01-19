@@ -502,6 +502,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     splitOrderList.add(newOrder);
 
                 }
+
+                order.setSplitStatus(StatusEnum.YES.getCode());
             }
 
             if (splitOrderList.size() > 0) {
