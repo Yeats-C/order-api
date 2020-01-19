@@ -278,4 +278,15 @@ public interface ErpOrderRequestService {
      * @param s
      */
     void updateStoreStatus(String storeId, String s);
+
+    /**
+     * 首单修改加盟商角色-权限
+     *
+     * @param accountId
+     * @return void
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2020/1/17 14:41
+     */
+    void accountRole(String accountId);
 }

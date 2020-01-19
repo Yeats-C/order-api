@@ -748,4 +748,16 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             throw new BusinessException("首单，修改门店状态");
         }
     }
+
+    @Override
+    public void accountRole(String accountId) {
+        try {
+            HttpClient httpClient = HttpClient.post(urlProperties.getSlcsApi() + "/conten/update/accountRole")
+                    .addParameter("account_id", accountId);
+            HttpResponse response = httpClient.action().result(new TypeReference<HttpResponse>() {
+            });
+        } catch (Exception e) {
+            logger.error("首单修改加盟商角色-权限失败：{}", e);
+        }
+    }
 }
