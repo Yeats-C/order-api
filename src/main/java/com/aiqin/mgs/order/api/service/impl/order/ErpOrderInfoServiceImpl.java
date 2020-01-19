@@ -967,7 +967,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             if (ErpProductGiftEnum.GIFT.getCode().equals(item.getProductType())) {
                 continue;
             }
-            if (item.getProductCount() > (item.getReturnProductCount() == null ? 0L : item.getReturnProductCount())) {
+            if (item.getActualInboundCount() > (item.getReturnProductCount() == null ? 0L : item.getReturnProductCount())) {
                 //如果有一行没有退完，则不算退货完成
                 returnEndFlag = false;
             }
