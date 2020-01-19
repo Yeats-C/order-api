@@ -5,6 +5,7 @@ import com.aiqin.mgs.order.api.domain.request.bill.ReturnDLReq;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/reject")
 @Api(tags = "爱亲退供单")
+@Slf4j
 public class RejectRecordController {
     @Resource
     private RejectRecordService rejectRecordService;
@@ -40,6 +42,7 @@ public class RejectRecordController {
     @PostMapping("info")
     @ApiOperation(value = "耘链退货单回传")
     public HttpResponse selectPurchaseInfo(@RequestBody ReturnDLReq returnDLReq) {
+        log.info("耘链退货单回传******************************************");
         Boolean result = rejectRecordService.selectPurchaseInfo(returnDLReq);
         if (result == true) {
             return HttpResponse.success(true);

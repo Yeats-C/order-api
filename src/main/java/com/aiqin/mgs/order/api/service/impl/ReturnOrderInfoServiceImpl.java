@@ -251,6 +251,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     log.info("退货单审核--取消撤销操作");
                     return HttpResponse.failure(ResultCode.RETURN_ORDER_CANCEL_FALL);
                 }
+                isPass=StoreStatusEnum.PAY_ORDER_TYPE_PEI.getKey().toString();
                 cancelFlag=true;
                 erplFlag=true;
                 break;
@@ -303,7 +304,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         }
         //调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单
         if(StringUtils.isNotBlank(isPass)){
-            updateStoreStatus(reqVo.getReturnOrderCode(),isPass,returnOrderInfo.getStoreId(),reqVo.getOperatorId(),reqVo.getOperator(),null);
+            updateStoreStatus(reqVo.getReturnOrderCode(),isPass,returnOrderInfo.getStoreId(),reqVo.getOperatorId(),reqVo.getOperator(),"0");
         }
         //修改原始订单数据
         if(erplFlag){
@@ -348,6 +349,12 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     @Transactional(rollbackFor = Exception.class)
     public Boolean updateReturnStatusApi(ReturnOrderReviewApiReqVo reqVo) {
         log.info("供应链入库完成--回调退货单，修改退货单状态及详情数量开始，reqVo={}",reqVo);
+        ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(reqVo.getReturnOrderCode());
+        RefundInfo refundInfo = refundInfoDao.selectByOrderCode(reqVo.getReturnOrderCode());
+        if(returnOrderInfo.getRefundStatus().equals(1)||refundInfo!=null){
+            log.info("供应链入库完成--回调退货单，此退货单已退款");
+            return true;
+        }
         Boolean flag=false;
         ReturnOrderReviewReqVo re=new ReturnOrderReviewReqVo();
         //状态为11-退货完成
@@ -841,6 +848,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     BeanUtils.copyProperties(eoi,returnOrderDetail);
                     returnOrderDetail.setActualReturnProductCount(differenceCount);
                     returnOrderDetail.setActualTotalProductAmount(amount);
+                    returnOrderDetail.setProductAmount(eoi.getProductAmount());
+                    returnOrderDetail.setReturnProductCount(eoi.getProductCount());
                     detailsList.add(returnOrderDetail);
                 }else if(differenceCount.equals(productCount)){//全退
                     //计算公式：优惠分摊总金额（分摊后金额）
@@ -849,6 +858,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     BeanUtils.copyProperties(eoi,returnOrderDetail);
                     returnOrderDetail.setActualReturnProductCount(differenceCount);
                     returnOrderDetail.setActualTotalProductAmount(totalPreferentialAmount);
+                    returnOrderDetail.setProductAmount(eoi.getProductAmount());
+                    returnOrderDetail.setReturnProductCount(eoi.getProductCount());
                     detailsList.add(returnOrderDetail);
                 }
             }
