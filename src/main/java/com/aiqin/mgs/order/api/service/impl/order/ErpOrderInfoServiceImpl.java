@@ -497,7 +497,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     newOrder.setItemList(orderItemList);
 
                     erpOrderItemService.saveOrderItemList(splitItemList, auth);
-                    erpOrderOperationLogService.copySplitOrderLog(orderCode, orderOperationLogList);
+                    erpOrderOperationLogService.copySplitOrderLog(newOrderCode, orderOperationLogList);
                     this.saveOrderNoLog(newOrder, auth);
                     splitOrderList.add(newOrder);
 
