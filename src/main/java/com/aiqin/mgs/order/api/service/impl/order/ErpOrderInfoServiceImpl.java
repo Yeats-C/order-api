@@ -400,6 +400,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
                     //拆出来的行订货金额
                     newSplitItem.setTotalProductAmount(item.getProductAmount().multiply(new BigDecimal(lockCount)));
+                    //拆出来的行订货数量
+                    newSplitItem.setProductCount(lockCount);
                     if (i < lineParamList.size() - 1) {
 
                         //拆出来的行均摊总金额
