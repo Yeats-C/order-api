@@ -13,7 +13,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
+@Data
 @ApiModel("根据orderID返回订单明细数据、订单主数据、收货信息、结算信息")
 public class OrderodrInfo {
     
@@ -41,56 +43,11 @@ public class OrderodrInfo {
 	@ApiModelProperty(value = "订单物流信息")
 	@JsonProperty("order_list_logistics")
 	private List<OrderListLogistics> orderListLogisticsList;
-	
-	
 
-	public List<OrderPayInfo> getPayList() {
-		return payList;
-	}
 
-	public void setPayList(List<OrderPayInfo> payList) {
-		this.payList = payList;
-	}
-
-	public OrderReceivingInfo getReceivingInfo() {
-		return receivingInfo;
-	}
-
-	public void setReceivingInfo(OrderReceivingInfo receivingInfo) {
-		this.receivingInfo = receivingInfo;
-	}
-
-	public OrderInfo getOrderInfo() {
-		return orderInfo;
-	}
-
-	public void setOrderInfo(OrderInfo orderInfo) {
-		this.orderInfo = orderInfo;
-	}
-
-	public List<OrderDetailInfo> getDetailList() {
-		return detailList;
-	}
-
-	public void setDetailList(List<OrderDetailInfo> detailList) {
-		this.detailList = detailList;
-	}
-
-	public SettlementInfo getSettlementInfo() {
-		return settlementInfo;
-	}
-
-	public void setSettlementInfo(SettlementInfo settlementInfo) {
-		this.settlementInfo = settlementInfo;
-	}
-
-    public List<OrderListLogistics> getOrderListLogisticsList() {
-        return orderListLogisticsList;
-    }
-
-    public void setOrderListLogisticsList(List<OrderListLogistics> orderListLogisticsList) {
-        this.orderListLogisticsList = orderListLogisticsList;
-    }
+	@ApiModelProperty(value="前端控制退货按钮使用字段:1:订单已全数退完")
+	@JsonProperty("turn_return_view")
+	private Integer turnReturnView;
 }
 
 

@@ -400,6 +400,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
                     //拆出来的行订货金额
                     newSplitItem.setTotalProductAmount(item.getProductAmount().multiply(new BigDecimal(lockCount)));
+                    //拆出来的行订货数量
+                    newSplitItem.setProductCount(lockCount);
                     if (i < lineParamList.size() - 1) {
 
                         //拆出来的行均摊总金额
@@ -480,7 +482,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                         splitItemList.add(newOrderItem);
 
                         //商品总价
-                        totalProductAmount = totalProductAmount.add(item.getProductAmount());
+                        totalProductAmount = totalProductAmount.add(item.getTotalProductAmount());
                         //实际支付金额 取分摊后金额汇总
                         orderAmount = orderAmount.add(item.getTotalPreferentialAmount());
                         //商品毛重汇总
@@ -491,17 +493,19 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     }
                     newOrder.setTotalProductAmount(totalProductAmount);
                     newOrder.setOrderAmount(orderAmount);
-                    newOrder.setDiscountAmount(totalProductAmount.multiply(orderAmount));
+                    newOrder.setDiscountAmount(totalProductAmount.subtract(orderAmount));
                     newOrder.setTotalWeight(boxGrossWeightTotal);
                     newOrder.setTotalVolume(boxVolumeTotal);
                     newOrder.setItemList(orderItemList);
 
                     erpOrderItemService.saveOrderItemList(splitItemList, auth);
-                    erpOrderOperationLogService.copySplitOrderLog(orderCode, orderOperationLogList);
+                    erpOrderOperationLogService.copySplitOrderLog(newOrderCode, orderOperationLogList);
                     this.saveOrderNoLog(newOrder, auth);
                     splitOrderList.add(newOrder);
 
                 }
+
+                order.setSplitStatus(StatusEnum.YES.getCode());
             }
 
             if (splitOrderList.size() > 0) {
@@ -604,7 +608,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                         //TODO 如果后续增加了活动和优惠券，就需要考虑这样计算精不精确
 
                         //商品总价
-                        totalProductAmount = totalProductAmount.add(item.getProductAmount());
+                        totalProductAmount = totalProductAmount.add(item.getTotalProductAmount());
 
                         //实际支付金额 取分摊后金额汇总
                         orderAmount = orderAmount.add(item.getTotalPreferentialAmount());
@@ -617,7 +621,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     }
                     newOrder.setTotalProductAmount(totalProductAmount);
                     newOrder.setOrderAmount(orderAmount);
-                    newOrder.setDiscountAmount(totalProductAmount.multiply(orderAmount));
+                    newOrder.setDiscountAmount(totalProductAmount.subtract(orderAmount));
                     newOrder.setTotalWeight(boxGrossWeightTotal);
                     newOrder.setTotalVolume(boxVolumeTotal);
                     newOrder.setItemList(orderItemList);

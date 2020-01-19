@@ -14,11 +14,11 @@
   <sql id="Base_Column_List" >
     id, order_code, pay_num, order_amount, pay_type, status, create_time, update_time
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <select id="selectByOrderCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
     from refund_info
-    where id = #{id,jdbcType=INTEGER}
+    where order_code = #{orderCode,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from refund_info

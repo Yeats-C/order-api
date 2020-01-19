@@ -31,27 +31,6 @@ public class AuthUtil {
     public static AuthToken getCurrentAuth() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         AuthToken authToken = new AuthToken();
-        //从head中获取参数
-///        Enumeration<?> enum1 = request.getHeaderNames();
-///        while (enum1.hasMoreElements()) {
-///            String key = (String) enum1.nextElement();
-///            String value = request.getHeader(key);
-///            if ("person_id".equals(key)) {
-///                authToken.setPersonId(value);
-///            }
-///            if ("account_id".equals(key)) {
-///                authToken.setAccountId(value);
-///            }
-///            if ("ticket".equals(key)) {
-///                authToken.setTicket(value);
-///            }
-///            if ("ticket_person_id".equals(key)) {
-///                authToken.setTicketPersonId(value);
-///            }
-///            if ("person_name".equals(key)) {
-///                authToken.setPersonName(value);
-///            }
-///        }
 
         //从url中获取参数
         authToken.setPersonId(request.getParameter("person_id"));
@@ -78,6 +57,9 @@ public class AuthUtil {
         }
         if (StringUtils.isEmpty(auth.getPersonName())) {
             throw new BusinessException("缺失公共参数person_name");
+        }
+        if (StringUtils.isEmpty(auth.getAccountId())) {
+            throw new BusinessException("缺失公共参数account_id");
         }
     }
 
