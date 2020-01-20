@@ -620,7 +620,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             String franchiseeId=getFranchiseeId(returnOrderInfo.getStoreId());
             json.put("franchisee_id",franchiseeId);
             json.put("store_name",returnOrderInfo.getStoreName());
-            json.put("store_id",returnOrderInfo.getStoreCode());
+            json.put("store_id",returnOrderInfo.getStoreId());
             Integer method=returnOrderInfo.getTreatmentMethod();
             //处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款
             if(null!=method&&method.equals(TreatmentMethodEnum.RETURN_AMOUNT_AND_GOODS_TYPE.getCode())){//RETURN_REFUND 退货退款
