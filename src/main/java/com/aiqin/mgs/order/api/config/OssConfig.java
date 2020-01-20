@@ -23,7 +23,7 @@ public class OssConfig {
 
     public OssConfig() {
     }
-
+    @Override
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -102,7 +102,7 @@ public class OssConfig {
     protected boolean canEqual(Object other) {
         return other instanceof OssConfig;
     }
-
+    @Override
     public int hashCode() {
         int result = 1;
         Object $bucketName = this.ossProperties.getBucketName();
@@ -117,7 +117,7 @@ public class OssConfig {
         result = result * 59 + ($remoteEndpoint == null ? 43 : $remoteEndpoint.hashCode());
         return result;
     }
-
+    @Override
     public String toString() {
         return "OssConfig(" + this.ossProperties.toString() + ")";
     }

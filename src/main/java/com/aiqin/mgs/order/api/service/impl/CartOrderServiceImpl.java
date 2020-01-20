@@ -126,7 +126,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                             //判断sku是否在购物车里面存在
                             LOGGER.info("判断SKU商品是否已存在购物车中:{}", cartOrderInfo.getSkuCode());
                             String oldAount = cartOrderDao.isYesCart(cartOrderInfo);
-                            if (oldAount != null && !oldAount.equals("")) {
+                            if (oldAount != null && ! "".equals(oldAount)) {
                                 //已存在购物车的、新添加+已存在购物车的数量=真实数量
                                 LOGGER.info("更新购物车:{}", cartOrderInfo);
                                 int newAount = Integer.valueOf(oldAount) + cartOrderInfo.getAmount();

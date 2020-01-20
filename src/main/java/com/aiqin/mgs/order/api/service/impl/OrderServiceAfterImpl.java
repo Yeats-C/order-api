@@ -8,14 +8,18 @@
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.validation.Valid;
-
+import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.ResultCode;
+import com.aiqin.mgs.order.api.dao.*;
+import com.aiqin.mgs.order.api.domain.*;
+import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.pay.PayReq;
+import com.aiqin.mgs.order.api.domain.response.OrderJoinResponse;
+import com.aiqin.mgs.order.api.domain.response.OrderNoCodeResponse.AddReturnOrderResonse;
 import com.aiqin.mgs.order.api.service.*;
+import com.aiqin.mgs.order.api.util.DateUtil;
+import com.aiqin.mgs.order.api.util.OrderPublic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,32 +27,10 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.base.PageResData;
-import com.aiqin.mgs.order.api.base.ResultCode;
-import com.aiqin.mgs.order.api.dao.CartDao;
-import com.aiqin.mgs.order.api.dao.OrderAfterDao;
-import com.aiqin.mgs.order.api.dao.OrderAfterDetailDao;
-import com.aiqin.mgs.order.api.dao.OrderCouponDao;
-import com.aiqin.mgs.order.api.dao.OrderDao;
-import com.aiqin.mgs.order.api.dao.OrderDetailDao;
-import com.aiqin.mgs.order.api.domain.CartInfo;
-import com.aiqin.mgs.order.api.domain.OrderAfteIListInfo;
-import com.aiqin.mgs.order.api.domain.OrderAfterSaleDetailInfo;
-import com.aiqin.mgs.order.api.domain.OrderAfterSaleInfo;
-import com.aiqin.mgs.order.api.domain.OrderAfterSaleQuery;
-import com.aiqin.mgs.order.api.domain.OrderDetailInfo;
-import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
-import com.aiqin.mgs.order.api.domain.OrderInfo;
-import com.aiqin.mgs.order.api.domain.OrderLog;
-import com.aiqin.mgs.order.api.domain.OrderQuery;
-import com.aiqin.mgs.order.api.domain.OrderRelationCouponInfo;
-import com.aiqin.mgs.order.api.domain.SettlementInfo;
-import com.aiqin.mgs.order.api.domain.constant.Global;
-import com.aiqin.mgs.order.api.domain.response.OrderJoinResponse;
-import com.aiqin.mgs.order.api.domain.response.OrderNoCodeResponse.AddReturnOrderResonse;
-import com.aiqin.mgs.order.api.util.DateUtil;
-import com.aiqin.mgs.order.api.util.OrderPublic;
+import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings("all")
 @Service
@@ -272,13 +254,13 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 			
 			//生成订单售后编号
 			String logo = "";
-			if(orderAfterSaleInfo.getOriginType() == Global.ORIGIN_TYPE_0) {
+			if(orderAfterSaleInfo.getOriginType() .equals(Global.ORIGIN_TYPE_0)) {
 				logo = Global.ORIGIN_COME_3;
 			}
-			if(orderAfterSaleInfo.getOriginType() == Global.ORIGIN_TYPE_1) {
+			if(orderAfterSaleInfo.getOriginType() .equals(Global.ORIGIN_TYPE_1)) {
 				logo = Global.ORIGIN_COME_4;
 			}
-			if(orderAfterSaleInfo.getOriginType() == Global.ORIGIN_TYPE_3) {
+			if(orderAfterSaleInfo.getOriginType() .equals(Global.ORIGIN_TYPE_3)) {
 				logo = Global.ORIGIN_COME_5;
 			}
 			afterSaleCode = DateUtil.sysDate()+logo+String.valueOf(Global.ORDERID_CHANNEL_4)+OrderPublic.randomNumberF();

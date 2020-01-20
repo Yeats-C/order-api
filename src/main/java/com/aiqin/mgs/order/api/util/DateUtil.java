@@ -166,7 +166,7 @@ public class DateUtil {
     public static Date getFristOfMonthDay(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        cal.set(cal.DAY_OF_MONTH, 1);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
         Date firstDay = cal.getTime();
 
         //考虑到使用判断获取数据时存在部分数据不显示问题，逐将日期格式化处理
@@ -189,7 +189,7 @@ public class DateUtil {
     public static Date getLashOfMonthDay(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        cal.set(cal.DAY_OF_MONTH, 1);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
         cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
         Date lastDay = cal.getTime();
 

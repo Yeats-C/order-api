@@ -47,7 +47,7 @@ public class OssUtil {
         String fileName = dir + "/" + UUID.randomUUID() + type;
         ossClient.putObject(bucketName, fileName, new ByteArrayInputStream(file.getBytes()));
         ossClient.shutdown();
-        Date expiration = new Date(new Date().getTime() + 3600l * 1000 * 24 * 365 * 10);
+        Date expiration = new Date(System.currentTimeMillis() + 3600L * 1000 * 24 * 365 * 10);
         String url = ossClient.generatePresignedUrl(bucketName, fileName, expiration).toString();
         log.info("oss文件链接,{}", url);
         map.put("name", fileName);
@@ -62,7 +62,7 @@ public class OssUtil {
         String fileName = dir + UUID.randomUUID() + type;
         ossClient.putObject(bucketName, fileName, new ByteArrayInputStream(bytes));
         ossClient.shutdown();
-        Date expiration = new Date(new Date().getTime() + 3600l * 1000 * 24 * 365 * 10);
+        Date expiration = new Date(System.currentTimeMillis() + 3600L * 1000 * 24 * 365 * 10);
         String url = ossClient.generatePresignedUrl(bucketName, fileName, expiration).toString();
         log.info("oss文件链接,{}", url);
         return url;
@@ -83,7 +83,7 @@ public class OssUtil {
         }
         ossClient.putObject(bucketName, fileName, new ByteArrayInputStream(Base64.getDecoder().decode(base64)));
         ossClient.shutdown();
-        Date expiration = new Date(new Date().getTime() + 3600l * 1000 * 24 * 365 * 10);
+        Date expiration = new Date(System.currentTimeMillis() + 3600L * 1000 * 24 * 365 * 10);
         String url = ossClient.generatePresignedUrl(bucketName, fileName, expiration).toString();
         log.info("oss文件链接,{}", url);
         return url;
