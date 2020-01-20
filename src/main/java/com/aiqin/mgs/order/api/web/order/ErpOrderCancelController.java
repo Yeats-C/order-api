@@ -7,7 +7,7 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCancelRequest;
-import com.aiqin.mgs.order.api.service.order.ErpOrderCancelService;
+import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -35,7 +35,7 @@ public class ErpOrderCancelController {
     private static final Logger logger = LoggerFactory.getLogger(ErpOrderCancelController.class);
 
     @Resource
-    private ErpOrderCancelService erpOrderCancelService;
+    private ErpOrderCancelNoTransactionalService erpOrderCancelNoTransactionalService;
 
     @PostMapping("/cancelOrderWithoutStock")
     @ApiOperation(value = "缺货终止交易")
@@ -44,7 +44,7 @@ public class ErpOrderCancelController {
         try {
             AuthUtil.loginCheck();
             AuthToken auth = AuthUtil.getCurrentAuth();
-            erpOrderCancelService.cancelOrderWithoutStock(erpOrderCancelRequest, auth);
+            erpOrderCancelNoTransactionalService.cancelOrderWithoutStock(erpOrderCancelRequest, auth);
         } catch (BusinessException e) {
             logger.error("异常信息：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
@@ -62,7 +62,7 @@ public class ErpOrderCancelController {
         try {
             AuthUtil.loginCheck();
             AuthToken auth = AuthUtil.getCurrentAuth();
-            erpOrderCancelService.applyCancelOrder(erpOrderCancelRequest, auth);
+            erpOrderCancelNoTransactionalService.applyCancelOrder(erpOrderCancelRequest, auth);
         } catch (BusinessException e) {
             logger.error("异常信息：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));

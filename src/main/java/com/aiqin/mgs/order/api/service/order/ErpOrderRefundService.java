@@ -5,7 +5,6 @@ import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayTransactionTypeEnum;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderRefund;
-import com.aiqin.mgs.order.api.domain.request.order.PayCallbackRequest;
 
 /**
  * 订单退款信息service
@@ -73,21 +72,6 @@ public interface ErpOrderRefundService {
      * @param auth                   操作人
      */
     void orderRefundPay(String orderCode, ErpRequestPayTransactionTypeEnum payTransactionTypeEnum, AuthToken auth);
-
-    /**
-     * 退款回调
-     *
-     * @param payCallbackRequest
-     */
-    void orderRefundCallback(PayCallbackRequest payCallbackRequest);
-
-    /**
-     * 退款单轮询退款结果
-     *
-     * @param orderCode 订单号
-     * @param auth      操作人
-     */
-    void orderRefundPolling(String orderCode, AuthToken auth);
 
     /**
      * 结束退款单退款状态
