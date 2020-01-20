@@ -52,15 +52,15 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     @Resource
     private ErpOrderRequestService erpOrderRequestService;
     @Resource
-    private ErpOrderPayService erpOrderPayService;
-    @Resource
     private PurchaseOrderService purchaseOrderService;
     @Resource
     private SequenceGeneratorService sequenceGeneratorService;
     @Resource
-    private ErpOrderCancelService erpOrderCancelService;
-    @Resource
     private ReturnOrderInfoService returnOrderInfoService;
+    @Resource
+    private ErpOrderPayNoTransactionalService erpOrderPayNoTransactionalService;
+    @Resource
+    private ErpOrderCancelNoTransactionalService erpOrderCancelNoTransactionalService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -862,17 +862,17 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             ErpOrderPayRequest erpOrderPayRequest = new ErpOrderPayRequest();
             erpOrderPayRequest.setOrderCode(order.getOrderStoreCode());
             erpOrderPayRequest.setPayWay(ErpPayWayEnum.PAY_1.getCode());
-            erpOrderPayService.orderPayStartMethodGroup(erpOrderPayRequest, auth, true);
+            erpOrderPayNoTransactionalService.orderPayStartMethodGroup(erpOrderPayRequest, auth, true);
         }
         if (payAfterFlag) {
             //重新执行支付成功后续操作
 
-            erpOrderPayService.orderPaySuccessMethodGroup(order.getOrderStoreCode(), auth);
+            erpOrderPayNoTransactionalService.orderPaySuccessMethodGroup(order.getOrderStoreCode(), auth);
         }
 
         if (ErpOrderNodeStatusEnum.STATUS_31.getCode() <= order.getOrderNodeStatus() && order.getOrderNodeStatus() < ErpOrderNodeStatusEnum.STATUS_37.getCode()) {
             //取消订单后续操作
-            erpOrderCancelService.cancelOrderRequestGroup(order.getOrderStoreCode(), auth);
+            erpOrderCancelNoTransactionalService.cancelOrderRequestGroup(order.getOrderStoreCode(), auth);
         }
 
     }

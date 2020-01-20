@@ -11,8 +11,7 @@ import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
-import com.aiqin.mgs.order.api.service.order.ErpOrderCreateService;
-import com.aiqin.mgs.order.api.service.order.ErpOrderPayService;
+import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,9 +40,16 @@ public class ErpOrderCreateController {
 
     @Resource
     private ErpOrderCreateService erpOrderCreateService;
-
     @Resource
     private ErpOrderPayService erpOrderPayService;
+    @Resource
+    private ErpOrderPayNoTransactionalService erpOrderPayNoTransactionalService;
+    @Resource
+    private ErpOrderLogisticsNoTransactionalService erpOrderLogisticsNoTransactionalService;
+    @Resource
+    private ErpOrderCancelNoTransactionalService erpOrderCancelNoTransactionalService;
+    @Resource
+    private ErpOrderRefundNoTransactionalService erpOrderRefundNoTransactionalService;
 
     @PostMapping("/erpSaveOrder")
     @ApiOperation(value = "erp从购物车创建订单")
@@ -58,7 +64,7 @@ public class ErpOrderCreateController {
             ErpOrderPayRequest payRequest = new ErpOrderPayRequest();
             payRequest.setOrderCode(erpOrderInfo.getOrderStoreCode());
             payRequest.setPayWay(ErpPayWayEnum.PAY_1.getCode());
-            erpOrderPayService.orderPayStartMethodGroup(payRequest, auth, true);
+            erpOrderPayNoTransactionalService.orderPayStartMethodGroup(payRequest, auth, true);
 
         } catch (BusinessException e) {
             logger.info("创建订单失败：{}", e);
@@ -83,7 +89,7 @@ public class ErpOrderCreateController {
             ErpOrderPayRequest payRequest = new ErpOrderPayRequest();
             payRequest.setOrderCode(erpOrderInfo.getOrderStoreCode());
             payRequest.setPayWay(ErpPayWayEnum.PAY_1.getCode());
-            erpOrderPayService.orderPayStartMethodGroup(payRequest, auth, true);
+            erpOrderPayNoTransactionalService.orderPayStartMethodGroup(payRequest, auth, true);
 
         } catch (BusinessException e) {
             logger.info("创建订单失败：{}", e);
@@ -108,7 +114,7 @@ public class ErpOrderCreateController {
             ErpOrderPayRequest payRequest = new ErpOrderPayRequest();
             payRequest.setOrderCode(erpOrderInfo.getOrderStoreCode());
             payRequest.setPayWay(ErpPayWayEnum.PAY_1.getCode());
-            erpOrderPayService.orderPayStartMethodGroup(payRequest, auth, true);
+            erpOrderPayNoTransactionalService.orderPayStartMethodGroup(payRequest, auth, true);
 
         } catch (BusinessException e) {
             logger.info("创建货架订单失败：{}", e);

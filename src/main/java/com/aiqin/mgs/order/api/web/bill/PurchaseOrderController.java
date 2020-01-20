@@ -10,7 +10,7 @@ import com.aiqin.mgs.order.api.domain.DeliveryInfoVo;
 import com.aiqin.mgs.order.api.domain.OrderIogisticsVo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
-import com.aiqin.mgs.order.api.service.order.ErpOrderPayService;
+import com.aiqin.mgs.order.api.service.order.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +30,8 @@ public class PurchaseOrderController {
     private PurchaseOrderService purchaseOrderService;
     @Resource
     private ErpOrderPayService erpOrderPayService;
+    @Resource
+    private ErpOrderPayNoTransactionalService erpOrderPayNoTransactionalService;
     /**
      * 同步采购单
      *
@@ -77,7 +79,7 @@ public class PurchaseOrderController {
             AuthToken auth = new AuthToken();
             auth.setPersonId("123456");
             auth.setPersonName("1234567890");
-            erpOrderPayService.orderPaySuccessMethodGroup(orderStoreCode, auth);
+            erpOrderPayNoTransactionalService.orderPaySuccessMethodGroup(orderStoreCode, auth);
 
         } catch (BusinessException e) {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
