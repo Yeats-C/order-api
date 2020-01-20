@@ -48,7 +48,7 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
     OperationLogService operationLogService;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    //@Transactional(rollbackFor = Exception.class)
     public void addOrderAndDetail(ErpOrderInfo erpOrderInfo) {
         LOGGER.info("根据ERP订单生成爱亲采购单&采购单明细&修改订单同步状态，参数为：erpOrderInfo{}", erpOrderInfo);
         PurchaseOrder purchaseOrder = null;
