@@ -24,6 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -111,7 +112,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public void orderPay(ErpOrderPayRequest erpOrderPayRequest, AuthToken auth, boolean autoCheck) {
 
         if (erpOrderPayRequest == null) {
@@ -287,7 +288,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public void endOrderPay(String orderCode, String payCode, ErpPayStatusEnum payStatusEnum, AuthToken auth, boolean manual) {
 
         ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
@@ -350,7 +351,7 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public void getGoodsCoupon(String orderCode, AuthToken auth) {
 
         ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
