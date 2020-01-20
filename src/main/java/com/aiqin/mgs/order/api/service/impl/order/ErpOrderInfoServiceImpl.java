@@ -26,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -261,7 +262,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public void orderSplit(String orderCode, AuthToken auth) {
 
         //原订单
@@ -667,7 +668,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public void orderSendToSupply(String orderCode, AuthToken auth) {
 
         List<ErpOrderInfo> list = new ArrayList<>();
