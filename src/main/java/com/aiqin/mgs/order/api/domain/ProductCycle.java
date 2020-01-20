@@ -1,12 +1,10 @@
 package com.aiqin.mgs.order.api.domain;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
-
-import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 
 /**
  * Created by 爱亲 on 2018/11/20.
@@ -52,7 +50,7 @@ public class ProductCycle{
     /**
      *  实体类自动重写toString()方法
      */
-    
+    @Override
 	public String toString() {
 
 		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);

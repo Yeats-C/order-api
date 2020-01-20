@@ -40,7 +40,7 @@ public class SelectByMemberPayCountResponse{
 	public void setCountDate(String countDate) {
 		this.countDate = countDate;
 	}
-    
+    @Override
 	public String toString() {
 
 		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
