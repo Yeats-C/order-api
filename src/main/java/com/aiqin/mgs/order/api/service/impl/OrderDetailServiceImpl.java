@@ -442,7 +442,9 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
             //为pos端判断是否可退货
             if (orderInfo.getOrderStatus().intValue()==2||orderInfo.getOrderStatus().intValue()==5){
-                info.setTurnReturnView(checkTurn(detailList));
+                int state=checkTurn(detailList);
+                info.setTurnReturnView(state);
+                info.getOrderInfo().setTurnReturnView(state);
             }else {
                 info.setTurnReturnView(1);
                 info.getOrderInfo().setTurnReturnView(1);
