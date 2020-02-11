@@ -1,7 +1,6 @@
 package com.aiqin.mgs.order.api.config;
 
 import com.aiqin.mgs.order.api.intercepter.UrlInterceptor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -19,24 +18,26 @@ public class AppWebConfiguration implements WebMvcConfigurer {
     @Resource
     private UrlInterceptor urlInterceptor;
 
-    @Value("${spring.profiles.active}")
-    private String profile;
-
-    private static final String RELEASE = "release";
-
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        if (RELEASE.equals(profile)) {
-            registry.addInterceptor(urlInterceptor)
-                    .addPathPatterns("/**").excludePathPatterns(
-                    "/doc.html",
-                    "/swagger-resources",
-                    "/webjars/**",
-                    "/init/**");
-        }
-//        registry.addInterceptor(new IPInterceptor())
-//                .addPathPatterns("/swagger-ui.html")
-//                .addPathPatterns("/doc.html");
+        registry.addInterceptor(urlInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns(
+                        "/doc.html",
+                        "/swagger-resources",
+                        "/webjars/**",
+                        "/init/**",
+                        "/order/**",
+                        "/orderdetail/**",
+                        "/orderafter/**",
+                        "/frozen/**",
+                        "/service/**",
+                        "/orderNoCode/**",
+                        "/settlement/**",
+                        "/erpOrderSignController/**",
+                        "/store-value/**",
+                        "/payment/**"
+                        );
     }
 
     @Override
