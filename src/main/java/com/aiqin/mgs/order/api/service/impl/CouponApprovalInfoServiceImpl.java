@@ -113,7 +113,7 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
         log.info("A品券发放审批进入回调,request={}", formCallBackVo);
         CouponApprovalInfo couponApprovalInfo = couponApprovalInfoDao.selectByFormNo(formCallBackVo.getFormNo());
         CouponApprovalDetail couponApprovalDetail = couponApprovalDetailDao.selectByFormNo(formCallBackVo.getFormNo());
-        log.info("A品券发放审批回调,couponApprovalInfo={},couponAp`provalDetail={}", couponApprovalInfo,couponApprovalDetail);
+        log.info("A品券发放审批回调,couponApprovalInfo={},couponApprovalDetail={}", couponApprovalInfo,couponApprovalDetail);
         if (couponApprovalInfo != null) {
             if (formCallBackVo.getUpdateFormStatus().equals(Indicator.COST_FORM_STATUS_APPROVED.getCode())) {
                 //审核通过，修改本地主表状态
