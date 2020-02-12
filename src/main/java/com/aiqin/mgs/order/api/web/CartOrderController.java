@@ -25,7 +25,7 @@ import java.util.List;
 @Api(tags = "购物车相关接口")
 public class CartOrderController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CartController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CartOrderController.class);
     @Resource
     private CartOrderService cartOrderService;
 

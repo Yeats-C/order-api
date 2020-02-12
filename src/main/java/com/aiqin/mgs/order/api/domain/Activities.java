@@ -9,7 +9,7 @@ import java.util.Date;
 
 @ApiModel("促销活动bean")
 @Data
-public class activities {
+public class Activities {
 
     /**活动id*/
     @ApiModelProperty(value = "活动id")
