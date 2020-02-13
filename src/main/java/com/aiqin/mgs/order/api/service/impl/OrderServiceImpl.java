@@ -477,9 +477,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public HttpResponse<Integer> orderStoreCount(OrderCountReq orderCountReq) {
         //1）正常销售订单-已完成状态2）预存订单-未提货状态3）服务订单已完成
-        int count1 = orderDao.orderPrestorageCount(orderCountReq.getStoreId(), orderCountReq.getStartDay(), orderCountReq.getEndDay());
-        int count2 = orderDao.orderStoreCount(orderCountReq.getStoreId(), orderCountReq.getStartDay(), orderCountReq.getEndDay());
-        return HttpResponse.successGenerics(count1 + count2);
+        Integer count1 = orderDao.orderPrestorageCount(orderCountReq.getStoreId(), orderCountReq.getStartDay(), orderCountReq.getEndDay());
+        Integer count2 = orderDao.orderStoreCount(orderCountReq.getStoreId(), orderCountReq.getStartDay(), orderCountReq.getEndDay());
+        return HttpResponse.successGenerics((count1==null?0:count1) + (count2==null?0:count2));
     }
 
     private OrderQuery trans(OrderQuery orderQuery) {

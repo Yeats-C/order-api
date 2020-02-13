@@ -242,7 +242,12 @@ public class OrderPublic {
 			}else {
 				query.setMemberidList(null);
 			}
-			
+			//门店集合
+			if(query.getListDistributorId() !=null && query.getListDistributorId().size()>0) {
+
+			}else {
+				query.setListDistributorId(null);
+			}
 			//订单集合
 			if(query.getOrderIdList() !=null && query.getOrderIdList().size()>0) {
 				

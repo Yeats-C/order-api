@@ -826,7 +826,7 @@ public class OrderController {
      */
     @PostMapping("/orderStoreCount")
     @ApiOperation(value = "接口-订单中心获取门店本月销售额")
-    public HttpResponse<Integer> orderStoreCount(@Valid OrderCountReq orderCountReq) {
+    public HttpResponse<Integer> orderStoreCount(@Valid @RequestBody OrderCountReq orderCountReq) {
 
         LOGGER.info("订单中心获取门店本月销售额：{}",orderCountReq);
         return orderService.orderStoreCount(orderCountReq);

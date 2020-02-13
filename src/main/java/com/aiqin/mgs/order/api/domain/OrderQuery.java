@@ -50,12 +50,16 @@ public class OrderQuery extends PagesRequest {
     @ApiModelProperty(value="分销机构id")
 	@JsonProperty("distributor_id")
 	private String distributorId="";
-	
+
+	@JsonProperty("list_distributor_id")
+	@ApiModelProperty(value = "erp专用，门店列表，查全部传空")
+	private List<String> listDistributorId;
 	
 	@ApiModelProperty(value="分销机构编码")
 	@JsonProperty("distributor_code")
 	private String distributorCode="";
-	
+
+
 	
 	@ApiModelProperty(value="分销机构名称")
 	@JsonProperty("distributor_name")
