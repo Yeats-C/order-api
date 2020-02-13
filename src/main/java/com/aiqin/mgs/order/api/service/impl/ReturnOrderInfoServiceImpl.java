@@ -1003,6 +1003,12 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         return HttpResponse.success();
     }
 
+    @Override
+    public HttpResponse directDelivery(ReturnOrderReviewReqVo reqVo) {
+
+        return null;
+    }
+
     /**
      * 插入日志表
      * @param orderCode
