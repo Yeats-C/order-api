@@ -12,6 +12,13 @@ public interface ActivitiesDao {
      * @return
      */
     List<Activities> activityList(Activities activities);
+
+    /**
+     * 通过活动id获取单个活动信息
+     * @param activities
+     * @return
+     */
+    Activities getActivityInformation(Activities activities);
 }
 
 

@@ -62,6 +62,17 @@
             </if>
         </where>
     </select>
+    <select id="getActivityInformation" resultType="com.aiqin.mgs.order.api.domain.Activities" parameterType="com.aiqin.mgs.order.api.domain.Activities">
+        select activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization
+        ,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time
+        from activities
+        <where>
+            1=1
+            <if test="activityId != '' and activityId != null">
+                and activity_id = #{activityId}
+            </if>
+        </where>
+    </select>
 
 
 </mapper>

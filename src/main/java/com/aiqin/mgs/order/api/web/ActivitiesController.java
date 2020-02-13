@@ -35,4 +35,15 @@ public class ActivitiesController {
         return activitesService.activityList(activities);
     }
 
+    /**
+     * 通过活动id获取单个活动信息
+     * @param activityId
+     * @return
+     */
+    @PostMapping("/getActivityInformation")
+    @ApiOperation(value = "通过活动id获取单个活动信息")
+    public HttpResponse<Activities> getActivityInformation(String activityId){
+        return activitesService.getActivityInformation(activityId);
+    }
+
 }
