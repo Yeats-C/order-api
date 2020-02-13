@@ -1007,6 +1007,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     public HttpResponse directDelivery(ReturnOrderReviewReqVo reqVo) {
         log.info("直送退货处理--入参,reqVo={}",reqVo);
         String content="";
+        int synFlag = 0;
+        String isPass="";
         ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(reqVo.getReturnOrderCode());
         switch (reqVo.getOperateStatus()) {//处理办法 1--退款并退货 2--驳回
             case 1:
@@ -1015,9 +1017,15 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 reqVo.setTreatmentMethod(TreatmentMethodEnum.RETURN_AMOUNT_AND_GOODS_TYPE.getCode());
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg();
                 //同步数据到供应链
+                synFlag = 1;
                 break;
             case 2:
-
+                reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getKey());
+                reqVo.setTreatmentMethod(TreatmentMethodEnum.FALL_TYPE.getCode());
+                content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getMsg();
+                //调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单
+                isPass=StoreStatusEnum.PAY_ORDER_TYPE_PEI.getKey().toString();
+                break;
             default:
                 return HttpResponse.failure(ResultCode.RETURN_ORDER_STATUS_NOT_FOUND);
         }
@@ -1026,6 +1034,18 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         returnOrderInfoDao.updateReturnStatus(reqVo);
         //添加日志
         insertLog(reqVo.getReturnOrderCode(),reqVo.getOperator(),reqVo.getOperator(),ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),reqVo.getOperateStatus(),content);
+        if (synFlag==1) {
+            // 同步到供应链，生成退供单
+            log.info("erp同步供应链，生成退供单开始,returnOrderCode={}",reqVo.getReturnOrderCode());
+            HttpResponse httpResponse=rejectRecordService.createRejectRecord(reqVo.getReturnOrderCode());
+            log.info("erp同步供应链，生成退供单结束,httpResponse={}",httpResponse);
+            if(!"0".equals(httpResponse.getCode())){
+                throw new RuntimeException("erp同步供应链，生成退供单失败");
+            }
+        }
+        if(StringUtils.isNotBlank(isPass)){
+            updateStoreStatus(reqVo.getReturnOrderCode(),isPass,returnOrderInfo.getStoreId(),reqVo.getOperatorId(),reqVo.getOperator(),"0");
+        }
         return HttpResponse.success();
     }
 
