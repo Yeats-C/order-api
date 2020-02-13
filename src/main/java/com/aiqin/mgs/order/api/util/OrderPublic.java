@@ -13,6 +13,7 @@ import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
 import com.aiqin.mgs.order.api.domain.OrderLog;
 import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.constant.Global;
+import com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest;
 
 import java.util.List;
 import java.util.UUID;
@@ -177,7 +178,34 @@ public class OrderPublic {
 		
 		return orderLog;
 	}
-	
+
+	public static void getServiceOrderQuery(ReduceDetailRequest reduceDetailRequest) {
+		if (reduceDetailRequest==null){
+			return;
+		}
+		if (reduceDetailRequest.getStoreId()!=null && reduceDetailRequest.getStoreId().equals("")){
+			reduceDetailRequest.setStoreId(null);
+		}
+		if (reduceDetailRequest.getCustomerPhone()!=null &&reduceDetailRequest.getCustomerPhone().equals("")){
+			reduceDetailRequest.setCustomerPhone(null);
+		}
+		if (reduceDetailRequest.getListDistributorId()!=null&&reduceDetailRequest.getListDistributorId().size()==0){
+			reduceDetailRequest.setListDistributorId(null);
+		}
+		if (reduceDetailRequest.getOrderCode()!=null && reduceDetailRequest.getOrderCode().equals("")){
+			reduceDetailRequest.setOrderCode(null);
+		}
+		if (reduceDetailRequest.getOrderId()!=null&&reduceDetailRequest.getOrderId().equals("")){
+			reduceDetailRequest.setOrderId(null);
+		}
+		if (reduceDetailRequest.getProjectId()!=null&&reduceDetailRequest.getProjectId().equals("")){
+			reduceDetailRequest.setProjectId(null);
+		}
+		if (reduceDetailRequest.getTypeId()!=null&&reduceDetailRequest.getTypeId().equals("")){
+			reduceDetailRequest.setTypeId(null);
+		}
+	}
+
 
 	/**
 	 * 封装订单日志信息
@@ -242,7 +270,12 @@ public class OrderPublic {
 			}else {
 				query.setMemberidList(null);
 			}
-			
+			//门店集合
+			if(query.getListDistributorId() !=null && query.getListDistributorId().size()>0) {
+
+			}else {
+				query.setListDistributorId(null);
+			}
 			//订单集合
 			if(query.getOrderIdList() !=null && query.getOrderIdList().size()>0) {
 				

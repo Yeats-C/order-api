@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.ActivitiesDao">
+    <resultMap id="ActivitiesMapping" type="com.aiqin.mgs.order.api.domain.Activities">
+        <result column="activity_id" jdbcType="VARCHAR" property="activityId"/>
+        <result column="activity_name" jdbcType="VARCHAR" property="activityName"/>
+        <result column="activity_type" jdbcType="INTEGER" property="activityType"/>
+        <result column="activity_status" jdbcType="INTEGER" property="activityStatus"/>
+        <result column="begin_time" jdbcType="TIMESTAMP" property="beginTime"/>
+        <result column="finish_time" jdbcType="TIMESTAMP" property="finishTime"/>
+        <result column="publishing_organization" jdbcType="VARCHAR" property="publishingOrganization"/>
+        <result column="activity_brief" jdbcType="VARCHAR" property="activityBrief"/>
+        <result column="activity_pic_pc" jdbcType="VARCHAR" property="activityPicPc"/>
+        <result column="activity_pic_app" jdbcType="VARCHAR" property="activityPicApp"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+
+    </resultMap>
+
+    <sql id="Base_Column_List">
+       activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization,activity_brief
+       ,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time
+    </sql>
+
+    <select id="activityList" resultType="java.util.List" resultMap="ActivitiesMapping" parameterType="com.aiqin.mgs.order.api.domain.Activities">
+        select activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization
+        ,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time
+        from activities
+        <where>
+            1=1
+            <if test="activityId != '' and activityId != null">
+                and activity_id = #{activityId}
+            </if>
+            <if test="activityName != '' and activityName!= null">
+                and activity_name = #{activityName}
+            </if>
+            <if test="activityType!= null">
+                and activity_type = #{activityType}
+            </if>
+            <if test="activityStatus!= null">
+                and activity_status = #{activityStatus}
+            </if>
+            <if test="beginTime!= null">
+                and begin_time &gt;= #{beginTime}
+            </if>
+            <if test="finishTime!= null">
+                and finish_time  &lt;= #{finishTime}
+            </if>
+            <if test="createBy != '' and createBy!= null">
+                and create_by = #{createBy}
+            </if>
+            <if test="updateBy != '' and updateBy!= null">
+                and update_by = #{updateBy}
+            </if>
+            <if test="createTime!= null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateTime!= null">
+                and update_time = #{updateTime}
+            </if>
+        </where>
+    </select>
+
+
+</mapper>
