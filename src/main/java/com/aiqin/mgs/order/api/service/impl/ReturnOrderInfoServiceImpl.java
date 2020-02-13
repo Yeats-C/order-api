@@ -1005,8 +1005,28 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 
     @Override
     public HttpResponse directDelivery(ReturnOrderReviewReqVo reqVo) {
+        log.info("直送退货处理--入参,reqVo={}",reqVo);
+        String content="";
+        ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(reqVo.getReturnOrderCode());
+        switch (reqVo.getOperateStatus()) {//处理办法 1--退款并退货 2--驳回
+            case 1:
+                reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey());
+                //处理办法 1--退货退款(通过)
+                reqVo.setTreatmentMethod(TreatmentMethodEnum.RETURN_AMOUNT_AND_GOODS_TYPE.getCode());
+                content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg();
+                //同步数据到供应链
+                break;
+            case 2:
 
-        return null;
+            default:
+                return HttpResponse.failure(ResultCode.RETURN_ORDER_STATUS_NOT_FOUND);
+        }
+        reqVo.setReviewTime(new Date());
+        //修改退货单状态
+        returnOrderInfoDao.updateReturnStatus(reqVo);
+        //添加日志
+        insertLog(reqVo.getReturnOrderCode(),reqVo.getOperator(),reqVo.getOperator(),ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),reqVo.getOperateStatus(),content);
+        return HttpResponse.success();
     }
 
     /**
