@@ -401,6 +401,9 @@ public class OrderPublic {
 			if(query.getEndTime() !=null) {
 				query.setEndTime(DateUtil.getDayEnd(query.getEndTime()));
 			}
+			if (query.getListDistributorId()!=null&&query.getListDistributorId().size()==0){
+				query.setListDistributorId(null);
+			}
 			
 		}
 		return query;		

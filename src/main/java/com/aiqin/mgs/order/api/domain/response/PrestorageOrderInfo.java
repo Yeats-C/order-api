@@ -129,11 +129,17 @@ public class PrestorageOrderInfo {
 
 
     @ApiModelProperty(value="操作员名称")
-    @JsonProperty("`create_by_name`")
+    @JsonProperty("create_by_name")
     private String createByName="";
 
 
     @ApiModelProperty(value="修改员名称")
-    @JsonProperty("`update_by_name`")
+    @JsonProperty("update_by_name")
     private String updateByName="";
+
+
+
+    @ApiModelProperty(value="门店ID")
+    @JsonProperty("distributor_id")
+    private String distributorId;
 }
