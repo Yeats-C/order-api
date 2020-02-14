@@ -21,4 +21,6 @@ public interface RelatedSalesService {
 
     PageResData<RelatedSales> getList(PageRequestVO<RelatedSalesVo> searchVo);
 
+    RelatedSales selectBySalseCategoryId(String salseCategoryId);
+
 }

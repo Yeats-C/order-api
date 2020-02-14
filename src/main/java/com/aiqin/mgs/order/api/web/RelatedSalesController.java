@@ -53,4 +53,11 @@ public class RelatedSalesController {
         return new HttpResponse<>(relatedSalesService.updateStatus(id,status));
     }
 
+    @ApiOperation("根据品类编码，查询sku信息")
+    @GetMapping("/getBySalseCategoryId")
+    @ApiImplicitParams({@ApiImplicitParam(name = "salse_category_id", value = "销售品类ID", dataType = "String", paramType = "query", required = true)})
+    public HttpResponse<RelatedSales> selectBySalseCategoryId(String salse_category_id) {
+        return new HttpResponse<>(relatedSalesService.selectBySalseCategoryId(salse_category_id));
+    }
+
 }

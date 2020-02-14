@@ -53,4 +53,9 @@ public class RelatedSalesServiceImpl implements RelatedSalesService {
         List<RelatedSales> relatedSales = relatedSalesDao.selectList(searchVo.getSearchVO());
         return new PageResData(Integer.valueOf((int)((Page) relatedSales).getTotal()) , relatedSales);
     }
+
+    @Override
+    public RelatedSales selectBySalseCategoryId(String salseCategoryId) {
+        return relatedSalesDao.selectBySalseCategoryId(salseCategoryId);
+    }
 }

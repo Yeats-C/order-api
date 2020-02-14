@@ -11,7 +11,7 @@ public interface RelatedSalesDao {
 
     int insertSelective(RelatedSales record);
 
-    RelatedSales selectByPrimaryKey(Long id);
+    RelatedSales selectBySalseCategoryId(String salseCategoryId);
 
     int updateByPrimaryKeySelective(RelatedSales record);
 

@@ -16,11 +16,11 @@
     id, salse_category_name, salse_category_id, first_sku, secondly_sku, last_sku, status, 
     create_time, update_time
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+  <select id="selectBySalseCategoryId" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
     from related_sales
-    where id = #{id,jdbcType=BIGINT}
+    where salse_category_id = #{salseCategoryId,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     delete from related_sales
