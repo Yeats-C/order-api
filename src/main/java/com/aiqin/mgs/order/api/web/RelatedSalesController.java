@@ -47,8 +47,8 @@ public class RelatedSalesController {
 
     @ApiOperation("关联销售修改--生效/失效")
     @GetMapping("/updateStatus")
-    @ApiImplicitParams({@ApiImplicitParam(name = "id", value = "关联销售id", dataType = "Long", paramType = "query", required = true),
-            @ApiImplicitParam(name = "status", value = "生效状态 0:生效 1:失效", dataType = "Integer", paramType = "query", required = true)})
+    @ApiImplicitParams({@ApiImplicitParam(name = "id", value = "关联销售id", dataType = "long", paramType = "query", required = true),
+            @ApiImplicitParam(name = "status", value = "生效状态 0:生效 1:失效", dataType = "int", paramType = "query", required = true)})
     public HttpResponse<Boolean> updateStatus(Long id,Integer status) {
         return new HttpResponse<>(relatedSalesService.updateStatus(id,status));
     }
