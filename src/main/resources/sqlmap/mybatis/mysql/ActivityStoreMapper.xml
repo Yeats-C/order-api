@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.ActivityStoreDao">
+    <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.ActivityStore">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="activity_id" jdbcType="VARCHAR" property="activityId"/>
+        <result column="province_id" jdbcType="VARCHAR" property="provinceId"/>
+        <result column="province_name" jdbcType="VARCHAR" property="provinceName"/>
+        <result column="city_id" jdbcType="VARCHAR" property="cityId"/>
+        <result column="city_name" jdbcType="VARCHAR" property="cityName"/>
+        <result column="district_id" jdbcType="VARCHAR" property="districtId"/>
+        <result column="district_name" jdbcType="VARCHAR" property="districtName"/>
+        <result column="store_id" jdbcType="VARCHAR" property="storeId"/>
+        <result column="store_name" jdbcType="VARCHAR" property="storeName"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="is_delete" jdbcType="BIGINT" property="isDelete"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id,activity_id, province_id,province_name, city_id, city_name,district_id, district_name,store_id, store_name,
+    create_time, update_time,is_delete
+  </sql>
+    <!--<select id="selectByActivityId" parameterType="java.lang.String" resultMap="BaseResultMap"
+            resultType="java.util.List">
+        select
+        <include refid="Base_Column_List"/>
+        from activity_store
+        where activity_id = #{activityId,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteStatusByActivityId" parameterType="java.lang.String">
+     update activity_store set
+        is_delete = 1,
+        update_time = now()
+    where activity_id = #{activityId,jdbcType=VARCHAR}
+  </delete>
+    <delete id="deleteByActivityId" parameterType="java.lang.String">
+    delete from activity_store
+    where activity_id = #{activityId,jdbcType=VARCHAR}
+  </delete>
+    <insert id="insertList" parameterType="java.util.List">
+        insert into activity_store (activity_id, province_id,province_name,
+        city_id,city_name, district_id,district_name, store_id,store_name, create_time, update_time )
+        values
+        <foreach collection="list" item="activityStore" separator=",">
+            (#{activityStore.activityId,jdbcType=VARCHAR},
+            #{activityStore.provinceId,jdbcType=VARCHAR},
+            #{activityStore.provinceName,jdbcType=VARCHAR},
+            #{activityStore.cityId,jdbcType=VARCHAR},
+            #{activityStore.cityName,jdbcType=VARCHAR},
+            #{activityStore.districtId,jdbcType=VARCHAR},
+            #{activityStore.districtName,jdbcType=VARCHAR},
+            #{activityStore.storeId,jdbcType=VARCHAR},
+            #{activityStore.storeName,jdbcType=VARCHAR}, now(), now() )
+        </foreach>
+    </insert>
+    <select id="selectAllActivityStoreByActivityLive" parameterType="java.util.Date" resultMap="BaseResultMap"
+            resultType="java.util.List">
+        select distinct ast.activity_id,ast.store_id,ast.store_name,ast.province_name,ast.province_id,ast.city_name,ast.city_id,ast.district_name,ast.district_id
+        from activity_store ast JOIN activities a
+        on a.activity_id = ast.activity_id  and TO_DAYS(#{task_time,jdbcType=TIMESTAMP})&gt;= TO_DAYS(a.begin_time) and TO_DAYS(#{task_time,jdbcType=TIMESTAMP})&lt;= TO_DAYS(a.finish_time) and a.is_delete=0 and ast.is_delete=0
+    </select>-->
+    <!--批量保存活动对应门店信息List-->
+    <insert id="insertList" parameterType="java.util.List">
+        insert into activity_store (activity_id, province_id,province_name,
+        city_id,city_name, district_id,district_name, store_id,store_name, create_time, update_time )
+        values
+        <foreach collection="list" item="activityStore" separator=",">
+            (#{activityStore.activityId,jdbcType=VARCHAR},
+            #{activityStore.provinceId,jdbcType=VARCHAR},
+            #{activityStore.provinceName,jdbcType=VARCHAR},
+            #{activityStore.cityId,jdbcType=VARCHAR},
+            #{activityStore.cityName,jdbcType=VARCHAR},
+            #{activityStore.districtId,jdbcType=VARCHAR},
+            #{activityStore.districtName,jdbcType=VARCHAR},
+            #{activityStore.storeId,jdbcType=VARCHAR},
+            #{activityStore.storeName,jdbcType=VARCHAR}, now(), now() )
+        </foreach>
+    </insert>
+</mapper>

@@ -8,9 +8,15 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@ApiModel("促销活动bean")
+/**
+ * @author csf
+ */
+@ApiModel("促销活动商品范围bean")
 @Data
-public class ActivityProductDetail {
+public class ActivityProduct {
+    @ApiModelProperty(value = "自增主键")
+    @JsonProperty("id")
+    private Long id;
 
     /**活动id*/
     @ApiModelProperty(value = "活动id")
@@ -78,6 +84,11 @@ public class ActivityProductDetail {
     @ApiModelProperty(value = "是否删除0否1是")
     @JsonProperty("is_delete")
     private Integer isDelete;
+
+   /***活动范围：1.按单品设置2.按品类设置3.按品牌设置4.按单品排除*/
+    @ApiModelProperty(value = "活动范围：1.按单品设置2.按品类设置3.按品牌设置4.按单品排除")
+    @JsonProperty("activity_scope")
+    private Integer activityScope;
 
     /***创建人*/
     @ApiModelProperty(value = "创建人")

@@ -8,7 +8,10 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@ApiModel("优惠方式（规则）bean")
+/**
+ * @author csf
+ */
+@ApiModel("促销活动优惠方式（规则）bean")
 @Data
 public class ActivityRule {
 
