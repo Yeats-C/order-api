@@ -39,8 +39,13 @@ public class ActivitiesServiceImpl implements ActivitesService {
         }
         Activities activity=new Activities();
         activity.setActivityId(activityId);
-        Activities activityData=activitiesDao.getActivityInformation(activity);
-        response.setData(activityData);
+        List<Activities> list=activitiesDao.activityList(activity);
+        if(list!=null && list.get(0)!=null){
+            Activities activityData=list.get(0);
+            response.setData(activityData);
+        }else{
+            return HttpResponse.failure(ResultCode.NOT_HAVE_PARAM);
+        }
         return response;
     }
 }
