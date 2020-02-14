@@ -38,6 +38,8 @@
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
         <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="distributor_id" jdbcType="VARCHAR" property="distributorId"/>
+
     </resultMap>
 
     <update id="updateById" parameterType="com.aiqin.mgs.order.api.domain.PrestorageOrderSupply">
@@ -129,9 +131,17 @@
     </insert>
 
     <select id="selectPrestorageOrderList" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="OrderSupplyInfoMapping">
-        select  o.* from prestorage_order_supply a ,order_consumer_info o where a.order_id=o.order_id
+        select  o.*, a.distributor_id from prestorage_order_supply a ,order_consumer_info o where a.order_id=o.order_id
         <if test="distributorId!=null and distributorId!='' ">
             and a.distributor_id = #{distributorId}
+        </if>
+
+        <if test="listDistributorId != null">
+            and a.distributor_id in (
+            <foreach collection="listDistributorId" item="distributorId" separator=",">
+                '${distributorId}'
+            </foreach>
+            )
         </if>
         <if test="distributorName!=null and distributorName!=''">
             and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
@@ -179,6 +189,13 @@
 
         <if test="distributorId!=null and distributorId!='' ">
             and a.distributor_id = #{distributorId}
+        </if>
+        <if test="listDistributorId != null">
+            and a.distributor_id in (
+            <foreach collection="listDistributorId" item="distributorId" separator=",">
+                '${distributorId}'
+            </foreach>
+            )
         </if>
         <if test="distributorName!=null and distributorName!=''">
             and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
