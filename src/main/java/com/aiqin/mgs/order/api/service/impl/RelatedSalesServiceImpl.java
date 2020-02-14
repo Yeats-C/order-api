@@ -1,6 +1,5 @@
 package com.aiqin.mgs.order.api.service.impl;
 
-import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.dao.RelatedSalesDao;
@@ -28,11 +27,24 @@ public class RelatedSalesServiceImpl implements RelatedSalesService {
     private RelatedSalesDao relatedSalesDao;
 
     @Override
-    public HttpResponse insert(RelatedSales entity) {
+    public Boolean insert(RelatedSales entity) {
         entity.setCreateTime(new Date());
         entity.setUpdateTime(new Date());
-        relatedSalesDao.insertSelective(entity);
-        return HttpResponse.success();
+        return relatedSalesDao.insertSelective(entity)>0;
+    }
+
+    @Override
+    public Boolean update(RelatedSales entity) {
+        entity.setUpdateTime(new Date());
+        return relatedSalesDao.updateByPrimaryKeySelective(entity)>0;
+    }
+
+    @Override
+    public Boolean updateStatus(Long id, Integer status) {
+        RelatedSales entity=new RelatedSales();
+        entity.setId(id);
+        entity.setStatus(status);
+        return relatedSalesDao.updateStatus(entity)>0;
     }
 
     @Override

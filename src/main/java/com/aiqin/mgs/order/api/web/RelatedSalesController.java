@@ -7,12 +7,11 @@ import com.aiqin.mgs.order.api.domain.RelatedSales;
 import com.aiqin.mgs.order.api.domain.request.RelatedSalesVo;
 import com.aiqin.mgs.order.api.service.RelatedSalesService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * description: RelatedSalesController
@@ -36,8 +35,22 @@ public class RelatedSalesController {
 
     @ApiOperation("关联销售新增")
     @PostMapping("/insert")
-    public HttpResponse addRelatedSales(@RequestBody RelatedSales relatedSales) {
-        return relatedSalesService.insert(relatedSales);
+    public HttpResponse<Boolean> addRelatedSales(@RequestBody RelatedSales relatedSales) {
+        return new HttpResponse<>(relatedSalesService.insert(relatedSales));
+    }
+
+    @ApiOperation("关联销售修改")
+    @PostMapping("/update")
+    public HttpResponse<Boolean> update(@RequestBody RelatedSales relatedSales) {
+        return new HttpResponse<>(relatedSalesService.update(relatedSales));
+    }
+
+    @ApiOperation("关联销售修改--生效/失效")
+    @GetMapping("/updateStatus")
+    @ApiImplicitParams({@ApiImplicitParam(name = "id", value = "关联销售id", dataType = "Long", paramType = "query", required = true),
+            @ApiImplicitParam(name = "status", value = "生效状态 0:生效 1:失效", dataType = "Integer", paramType = "query", required = true)})
+    public HttpResponse<Boolean> updateStatus(Long id,Integer status) {
+        return new HttpResponse<>(relatedSalesService.updateStatus(id,status));
     }
 
 }

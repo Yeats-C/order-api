@@ -26,16 +26,6 @@
     delete from related_sales
     where id = #{id,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.RelatedSales" >
-    insert into related_sales (id, salse_category_name, salse_category_id, 
-      first_sku, secondly_sku, last_sku, 
-      status, create_time, update_time
-      )
-    values (#{id,jdbcType=BIGINT}, #{salseCategoryName,jdbcType=VARCHAR}, #{salseCategoryId,jdbcType=VARCHAR}, 
-      #{firstSku,jdbcType=VARCHAR}, #{secondlySku,jdbcType=VARCHAR}, #{lastSku,jdbcType=VARCHAR}, 
-      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
-      )
-  </insert>
   <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.RelatedSales" >
     insert into related_sales
     <trim prefix="(" suffix=")" suffixOverrides="," >
@@ -127,18 +117,6 @@
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.aiqin.mgs.order.api.domain.RelatedSales" >
-    update related_sales
-    set salse_category_name = #{salseCategoryName,jdbcType=VARCHAR},
-      salse_category_id = #{salseCategoryId,jdbcType=VARCHAR},
-      first_sku = #{firstSku,jdbcType=VARCHAR},
-      secondly_sku = #{secondlySku,jdbcType=VARCHAR},
-      last_sku = #{lastSku,jdbcType=VARCHAR},
-      status = #{status,jdbcType=INTEGER},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
-    where id = #{id,jdbcType=BIGINT}
-  </update>
 
   <select id="selectList" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.request.RelatedSalesVo" >
     select
@@ -154,5 +132,10 @@
     </where>
   </select>
 
+  <update id="updateStatus" parameterType="com.aiqin.mgs.order.api.domain.RelatedSales" >
+    update related_sales
+    set status = #{status,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
 
 </mapper>

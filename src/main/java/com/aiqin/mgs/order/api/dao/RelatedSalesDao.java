@@ -9,15 +9,13 @@ public interface RelatedSalesDao {
 
     int deleteByPrimaryKey(Long id);
 
-    int insert(RelatedSales record);
-
     int insertSelective(RelatedSales record);
 
     RelatedSales selectByPrimaryKey(Long id);
 
     int updateByPrimaryKeySelective(RelatedSales record);
 
-    int updateByPrimaryKey(RelatedSales record);
+    int updateStatus(RelatedSales record);
 
     List<RelatedSales> selectList(RelatedSalesVo record);
 

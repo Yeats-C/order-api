@@ -1,6 +1,5 @@
 package com.aiqin.mgs.order.api.service;
 
-import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.RelatedSales;
@@ -14,7 +13,11 @@ import com.aiqin.mgs.order.api.domain.request.RelatedSalesVo;
  */
 public interface RelatedSalesService {
 
-    HttpResponse insert(RelatedSales entity);
+    Boolean insert(RelatedSales entity);
+
+    Boolean update(RelatedSales entity);
+
+    Boolean updateStatus(Long id,Integer status);
 
     PageResData<RelatedSales> getList(PageRequestVO<RelatedSalesVo> searchVo);
 
