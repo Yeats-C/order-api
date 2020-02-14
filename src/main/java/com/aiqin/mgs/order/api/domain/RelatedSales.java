@@ -21,7 +21,7 @@ public class RelatedSales {
 
     private String lastSku;
 
-    private Byte status;
+    private Integer status;
 
     private Date createTime;
 

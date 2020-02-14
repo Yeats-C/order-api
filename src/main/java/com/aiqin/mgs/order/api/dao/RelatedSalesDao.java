@@ -1,6 +1,9 @@
 package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.RelatedSales;
+import com.aiqin.mgs.order.api.domain.request.RelatedSalesVo;
+
+import java.util.List;
 
 public interface RelatedSalesDao {
 
@@ -15,4 +18,7 @@ public interface RelatedSalesDao {
     int updateByPrimaryKeySelective(RelatedSales record);
 
     int updateByPrimaryKey(RelatedSales record);
+
+    List<RelatedSales> selectList(RelatedSalesVo record);
+
 }
