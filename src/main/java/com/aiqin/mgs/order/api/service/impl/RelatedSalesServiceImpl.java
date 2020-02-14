@@ -28,6 +28,12 @@ public class RelatedSalesServiceImpl implements RelatedSalesService {
 
     @Override
     public Boolean insert(RelatedSales entity) {
+        //判断此销售分类是否已存在记录，如果存在做修改，不存在做新增操作
+        RelatedSales relatedSales = relatedSalesDao.selectBySalseCategoryId(entity.getSalseCategoryId());
+        if(relatedSales!=null){
+            entity.setId(relatedSales.getId());
+            return relatedSalesDao.updateByPrimaryKeySelective(entity)>0;
+        }
         entity.setCreateTime(new Date());
         entity.setUpdateTime(new Date());
         return relatedSalesDao.insertSelective(entity)>0;
