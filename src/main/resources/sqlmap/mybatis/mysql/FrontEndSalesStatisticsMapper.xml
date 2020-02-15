@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.FrontEndSalesStatisticsDao">
+    <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.statistical.FrontEndSalesStatistics">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="sale_statistics_id" jdbcType="VARCHAR" property="saleStatisticsId"/>
+        <result column="store_id" jdbcType="VARCHAR" property="storeId"/>
+        <result column="order_detail_id" jdbcType="VARCHAR" property="orderDetailId"/>
+        <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
+        <result column="sku_name" jdbcType="VARCHAR" property="skuName"/>
+        <result column="month" jdbcType="INTEGER" property="month"/>
+        <result column="category_id" jdbcType="VARCHAR" property="categoryId"/>
+        <result column="category_name" jdbcType="VARCHAR" property="categoryName"/>
+        <result column="sale_total_count" jdbcType="BIGINT" property="saleTotalCount"/>
+        <result column="sale_total_amount" jdbcType="BIGINT" property="saleTotalAmount"/>
+        <result column="price_unit" jdbcType="INTEGER" property="priceUnit"/>
+        <result column="sku_unit" jdbcType="VARCHAR" property="skuUnit"/>
+        <result column="create_time" jdbcType="TIMESTAMP"
+                property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP"
+                property="updateTime"/>
+        <result column="create_by" jdbcType="VARCHAR"
+                property="createBy"/>
+        <result column="update_by" jdbcType="VARCHAR"
+                property="updateBy"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        t0.id as id,
+        t0.sale_statistics_id as saleStatisticsId,
+        t0.store_id as storeId,
+        t0.order_detail_id as orderDetailId,
+        t0.sku_code as skuCode,
+        t0.sku_name as skuName,
+        t0.month as month,
+        t0.category_id as categoryId,
+        t0.category_name as categoryName,
+        t0.sale_total_count as saleTotalCount,
+        t0.sale_total_amount as saleTotalAmount,
+        t0.price_unit as priceUnit,
+        t0.sku_unit as skuUnit,
+        t0.create_time as createTime,
+        t0.update_time as updateTime,
+        t0.create_by as createBy,
+        t0.update_by as updateBy
+    </sql>
+    <sql id="where_Column_List">
+        <if test="storeId != null">
+            and store_id = #{storeId,jdbcType=VARCHAR}
+        </if>
+        <if test="storeIdList != null">
+            store_id in
+            <foreach collection="storeIdList" item="storeId"
+                     index="index" separator="," open="(" close=")">
+                #{storeId,jdbcType=VARCHAR}
+            </foreach>
+        </if>
+        <if test="month != null">
+            and month =
+            #{month,jdbcType=VARCHAR}
+        </if>
+    </sql>
+
+
+    <!-- 查询前台销售统计情况 -->
+    <select id="selectByCondition" resultMap="BaseResultMap">
+
+        select
+            <include refid="Base_Column_List"/>
+        from front_end_sales_statistics t0
+        <where>
+            <include refid="where_Column_List"/>
+            order by create_time desc
+            LIMIT #{beginIndex,jdbcType=BIGINT},
+            #{pageSize,jdbcType=BIGINT}
+        </where>
+    </select>
+
+    <select id="selectCurrentMonthSalesStatistics"
+            resultType="com.aiqin.mgs.order.api.domain.statistical.FrontEndSalesStatistics">
+        select DISTINCT
+            t1.distributor_id as storeId,
+            t0.order_detail_id as orderDetailId,
+            t0.unit as skuUnit,
+            ifnull(sum(t0.retail_price * ifnull(t0.amount,0)),0)  as saleTotalAmount,
+            ifnull(sum(amount),0) as saleTotalCount,
+            t0.type_id as categoryId,
+            t0.type_name as categoryName,
+            t0.sku_code as skuCode,
+            t0.sku_name as skuName
+        from order_consumer_detail t0
+            LEFT JOIN order_consumer_info t1
+            on t0.order_id = t1.order_id
+        WHERE
+            DATE_FORMAT( t0.create_time, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )
+        group by
+            t1.distributor_id ,
+            t0.sku_code,
+            t0.type_id
+    </select>
+
+    <delete id="deleteSalesStatisticsByMonth"
+            parameterType="Integer">
+        delete from front_end_sales_statistics
+        <where>
+            month=#{month}
+        </where>
+    </delete>
+
+    <insert id="insertSalesStatisticsList" parameterType="java.util.List">
+        insert into front_end_sales_statistics
+        (
+        sale_statistics_id,
+        store_id,
+        order_detail_id,
+        sku_code,
+        sku_name,
+        month,
+        category_id,
+        category_name,
+        sale_total_count,
+        sale_total_amount,
+        price_unit,
+        sku_unit,
+        create_time,
+        update_time,
+        create_by,
+        update_by
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.saleStatisticsId},
+            #{item.storeId},
+            #{item.orderDetailId},
+            #{item.skuCode},
+            #{item.skuName},
+            #{item.month},
+            #{item.categoryId},
+            #{item.categoryName},
+            #{item.saleTotalCount},
+            #{item.saleTotalAmount},
+            #{item.priceUnit},
+            #{item.skuUnit},
+            now(),
+            now(),
+            #{item.createBy},
+            #{item.updateBy}
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateBatchByMonthAndStoreId"  parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update front_end_sales_statistics
+            <set>
+                sku_code=${item.skuCode},
+                sku_name=${item.skuName}
+            </set>
+            where store_id = ${item.store_id,VARCHAR} and month = ${item.month,INTEGER}
+        </foreach>
+    </update>
+
+</mapper>
+

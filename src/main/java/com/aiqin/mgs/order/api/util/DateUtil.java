@@ -147,6 +147,7 @@ public class DateUtil {
 
     /**
      * 获取月末日期
+     * 1:当月  2:下月
      */
     public static String getLastMonth(int i) {
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
@@ -156,6 +157,15 @@ public class DateUtil {
         String firstday = sdf1.format(cale.getTime());
         return firstday;
     }
+    public static Integer getCurrentMonth() {
+        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyyMM");
+        Calendar cale = Calendar.getInstance();
+        cale.add(Calendar.MONTH, 1);
+        cale.set(Calendar.DAY_OF_MONTH, 0);  //月末
+        String firstday = sdf1.format(cale.getTime());
+        return Integer.parseInt(firstday);
+    }
+
 
 
     /**
@@ -453,8 +463,7 @@ public class DateUtil {
 
     public static void main(String[] args) {
 
-        System.out.println(getBeforeDate(dateAfterMonth("2019-03-02",3),-1));
-        System.out.println(DateUtil.getNowDate());
+        System.out.println(getCurrentMonth());
     }
 
 }
