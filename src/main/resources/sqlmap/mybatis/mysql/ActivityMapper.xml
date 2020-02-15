@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.aiqin.mgs.order.api.dao.ActivitiesDao">
-    <resultMap id="ActivitiesMapping" type="com.aiqin.mgs.order.api.domain.Activities">
+<mapper namespace="com.aiqin.mgs.order.api.dao.ActivityDao">
+    <resultMap id="ActivityMapping" type="com.aiqin.mgs.order.api.domain.Activity">
         <result column="activity_id" jdbcType="VARCHAR" property="activityId"/>
         <result column="activity_name" jdbcType="VARCHAR" property="activityName"/>
         <result column="activity_type" jdbcType="INTEGER" property="activityType"/>
@@ -16,7 +16,6 @@
         <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
-
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -24,10 +23,11 @@
        ,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time
     </sql>
 
-    <select id="activityList" resultType="java.util.List" resultMap="ActivitiesMapping" parameterType="com.aiqin.mgs.order.api.domain.Activities">
+
+    <select id="activityList" resultType="java.util.List" resultMap="ActivityMapping" parameterType="com.aiqin.mgs.order.api.domain.Activity">
         select activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization
         ,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time
-        from activities
+        from activity
         <where>
             1=1
             <if test="activityId != '' and activityId != null">
@@ -63,5 +63,26 @@
         </where>
     </select>
 
+    <select id="getActivityInformation" resultType="com.aiqin.mgs.order.api.domain.Activity" parameterType="com.aiqin.mgs.order.api.domain.Activity">
+        select activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization
+        ,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time
+        from activity
+        <where>
+            1=1
+            <if test="activityId != '' and activityId != null">
+                and activity_id = #{activityId}
+            </if>
+        </where>
+    </select>
+
+    <!--插入活动主表信息-->
+    <insert id="insertActivity" parameterType="com.aiqin.mgs.order.api.domain.Activity">
+        insert into activity
+			(activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization
+			,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time)
+		values
+		    (#{activityId},#{activityName},#{activityType},#{activityStatus},#{beginTime},#{finishTime},#{publishingOrganization}
+		    ,#{activityBrief},#{activityPicPc},#{activityPicApp},#{createBy},#{updateBy},#{createTime},#{updateTime})
+	</insert>
 
 </mapper>
