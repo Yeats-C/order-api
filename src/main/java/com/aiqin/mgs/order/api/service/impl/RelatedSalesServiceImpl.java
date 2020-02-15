@@ -64,4 +64,18 @@ public class RelatedSalesServiceImpl implements RelatedSalesService {
     public RelatedSales selectBySalseCategoryId(String salseCategoryId) {
         return relatedSalesDao.selectBySalseCategoryId(salseCategoryId);
     }
+
+    @Override
+    public RelatedSales getByCategoryLevel(String categoryLevel) {
+        String[] str=categoryLevel.split(",");
+        RelatedSales relatedSales =new RelatedSales();
+        for(int i=3;i>=0;i--){
+            relatedSales = relatedSalesDao.selectBySalseCategoryId(str[i]);
+            if(relatedSales!=null){
+                return relatedSales;
+            }
+        }
+        return relatedSales;
+    }
+
 }

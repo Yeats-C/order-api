@@ -60,4 +60,11 @@ public class RelatedSalesController {
         return new HttpResponse<>(relatedSalesService.selectBySalseCategoryId(salse_category_id));
     }
 
+    @ApiOperation("根据一二三四类品类编码，查询sku信息--提供给pos")
+    @GetMapping("/getByCategoryLevel")
+    @ApiImplicitParams({@ApiImplicitParam(name = "categoryLevel", value = "多级销售品类--以逗号形式拼接给我", dataType = "String", paramType = "query", required = true)})
+    public HttpResponse<RelatedSales> getByCategoryLevel(String categoryLevel) {
+        return new HttpResponse<>(relatedSalesService.getByCategoryLevel(categoryLevel));
+    }
+
 }

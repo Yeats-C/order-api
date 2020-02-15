@@ -23,4 +23,6 @@ public interface RelatedSalesService {
 
     RelatedSales selectBySalseCategoryId(String salseCategoryId);
 
+    RelatedSales getByCategoryLevel(String categoryLevel);
+
 }
