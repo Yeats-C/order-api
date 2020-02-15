@@ -37,6 +37,7 @@ public class FrontEndSaleStatisticsJob {
     @Scheduled(cron = "0 0 0,23 * * ?") // 每晚11点和凌晨各执行一次
 //     @Scheduled(cron = "*/5 * * * * ?") 每隔5s执行一次
     public void getTask() {
+        logger.info("定时任务 处理前台销售统计数据");
         //计时器
         StopWatch watch = new StopWatch();
          //计时器开始
