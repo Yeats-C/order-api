@@ -4,6 +4,7 @@ import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.dao.ActivityDao;
+import com.aiqin.mgs.order.api.dao.ActivityRuleDao;
 import com.aiqin.mgs.order.api.dao.ActivityStoreDao;
 import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityProduct;
@@ -37,6 +38,10 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Resource
     private ActivityStoreDao activityStoreDao;
+
+
+    @Resource
+    private ActivityRuleDao activityRuleDao;
 
     @Override
     public HttpResponse<List<Activity>> activityList(Activity activity) {
@@ -137,14 +142,14 @@ public class ActivityServiceImpl implements ActivityService {
             activityRule.setCreateTime(new Date());
             activityRule.setUpdateTime(new Date());
         }
-        int activityRuleRecord = activityStoreDao.insertList(activityStoreList);
-        if (activityProductRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+        int activityRuleRecord = activityRuleDao.insertList(activityRuleList);
+        if (activityRuleRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
             return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
         }
-        LOGGER.info("保存活动对应商品信息成功");
+        LOGGER.info("保存活动对应规则信息成功");
         //保存活动对应规则信息end
-
-        return null;
+        LOGGER.info("活动添加成功，活动id为{}，活动名称为{}", activityId, activity.getActivityName());
+        return HttpResponse.success();
         } catch (Exception e) {
             LOGGER.error("添加活动失败", e);
             throw new RuntimeException(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION.getMessage());
