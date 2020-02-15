@@ -69,9 +69,9 @@ public class RelatedSalesServiceImpl implements RelatedSalesService {
     public RelatedSales getByCategoryLevel(String categoryLevel) {
         String[] str=categoryLevel.split(",");
         RelatedSales relatedSales =new RelatedSales();
-        for(int i=3;i>=0;i--){
+        for(int i=str.length-1;i>=0;i--){
             relatedSales = relatedSalesDao.selectBySalseCategoryId(str[i]);
-            if(relatedSales!=null){
+            if(relatedSales!=null&&relatedSales.getStatus().equals(0)){
                 return relatedSales;
             }
         }
