@@ -75,7 +75,13 @@
         <if test=" useStatus != null and useStatus != '' or useStatus == 0 ">
             and use_status = #{useStatus}
         </if>
+        <if test=" isActivity != null">
+            and is_activity = #{isActivity}
+        </if>
         order by create_time asc
+        <if test="pageSize!=null ">
+            limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+        </if>
     </select>
 
     <update id="updateByPrimaryKeySelective">

@@ -4,6 +4,7 @@ package com.aiqin.mgs.order.api.web;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityProduct;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import io.swagger.annotations.Api;
@@ -68,6 +69,17 @@ public class ActivityController {
     @ApiOperation(value = "活动详情-促销规则-活动商品列表查询（分页），只传activityId与分页参数")
     public HttpResponse<List<ActivityProduct>> activityProductList(Activity activity){
         return activitesService.activityProductList(activity);
+    }
+
+    /**
+     * 活动详情-销售数据-活动销售列表（分页）-只传分页参数
+     * @param erpOrderItem
+     * @return
+     */
+    @GetMapping("/getActivityItem")
+    @ApiOperation(value = "活动详情-销售数据-活动销售列表（分页）-只传分页参数")
+    public HttpResponse<List<Activity>> getActivityItem(ErpOrderItem erpOrderItem){
+        return activitesService.getActivityItem(erpOrderItem);
     }
 
 }

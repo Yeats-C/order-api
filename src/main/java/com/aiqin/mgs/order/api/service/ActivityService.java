@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.service;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityProduct;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
 
 import java.util.List;
@@ -36,4 +37,11 @@ public interface ActivityService {
      * @return
      */
     HttpResponse<List<ActivityProduct>> activityProductList(Activity activity);
+
+    /**
+     * 活动详情-销售数据-活动销售列表（分页）-只传分页参数
+     * @param erpOrderItem
+     * @return
+     */
+    HttpResponse<List<Activity>> getActivityItem(ErpOrderItem erpOrderItem);
 }

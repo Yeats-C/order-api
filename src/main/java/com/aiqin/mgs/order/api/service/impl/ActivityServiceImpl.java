@@ -7,11 +7,13 @@ import com.aiqin.mgs.order.api.dao.ActivityDao;
 import com.aiqin.mgs.order.api.dao.ActivityProductDao;
 import com.aiqin.mgs.order.api.dao.ActivityRuleDao;
 import com.aiqin.mgs.order.api.dao.ActivityStoreDao;
+import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityProduct;
 import com.aiqin.mgs.order.api.domain.ActivityRule;
 import com.aiqin.mgs.order.api.domain.ActivityStore;
 import com.aiqin.mgs.order.api.domain.constant.Global;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import org.slf4j.Logger;
@@ -45,6 +47,9 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Resource
     private ActivityProductDao activityProductDao;
+
+    @Resource
+    private ErpOrderItemDao erpOrderItemDao;
 
     @Override
     public HttpResponse<List<Activity>> activityList(Activity activity) {
@@ -172,6 +177,21 @@ public class ActivityServiceImpl implements ActivityService {
         List<ActivityProduct> list=activityProductDao.activityProductList(activity);
         if(null!=list){
             response.setData(list);
+        }else{
+            return HttpResponse.failure(ResultCode.NOT_HAVE_PARAM);
+        }
+        return response;
+    }
+
+    @Override
+    public HttpResponse<List<Activity>> getActivityItem(ErpOrderItem erpOrderItem) {
+        LOGGER.info("查询活动详情-销售数据-活动销售列表（分页）getActivityItem参数erpOrderItem为：{}", erpOrderItem);
+        //只查询活动商品
+        erpOrderItem.setIsActivity(1);
+        List<ErpOrderItem> select = erpOrderItemDao.select(erpOrderItem);
+        HttpResponse response = HttpResponse.success();
+        if(null!=select){
+            response.setData(select);
         }else{
             return HttpResponse.failure(ResultCode.NOT_HAVE_PARAM);
         }
