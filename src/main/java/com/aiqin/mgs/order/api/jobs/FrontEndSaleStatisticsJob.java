@@ -32,23 +32,26 @@ public class FrontEndSaleStatisticsJob {
     @Resource
     private FrontEndSalesStatisticsService service;
 
-//    @Scheduled(cron = "0 0/25 * * * ? ")
-     @Scheduled(cron = "*/5 * * * * ?")
+//    @Scheduled(cron = "0 0 0 * * ?") // 每天凌晨执行一次
+//    @Scheduled(cron = "0 0 23 * * ? ") // 每晚11点执行一次
+    @Scheduled(cron = "0 0 0,23 * * ?") // 每晚11点和凌晨各执行一次
+//     @Scheduled(cron = "*/5 * * * * ?") 每隔5s执行一次
     public void getTask() {
         //计时器
         StopWatch watch = new StopWatch();
-        //计时器开始
-        watch.start();
-        List<FrontEndSalesStatistics> frontEndSalesStatistics = service.selectCurrentMonthSalesStatistics();
-         List<String> storeIdList = frontEndSalesStatistics.stream()
+         //计时器开始
+         watch.start();
+         service.deleteSalesStatisticsByMonth(DateUtil.getCurrentMonth());
+         List<FrontEndSalesStatistics> frontEndSalesStatistics = service.selectCurrentMonthSalesStatistics();
+        /* List<String> storeIdList = frontEndSalesStatistics.stream()
                                      .filter(f -> StringUtils.isNotBlank(f.getStoreId()))
                                      .map(f->f.getStoreId())
-                                     .collect(Collectors.toList());
+                                     .collect(Collectors.toList());*/
+        if (frontEndSalesStatistics != null && frontEndSalesStatistics.size() > 0) {
+            service.insertSalesStatisticsList(frontEndSalesStatistics);
+        }
 
-         FrontEndSalesStatistics statistics = new FrontEndSalesStatistics();
-         statistics.setStoreIdList(storeIdList);
-         statistics.setMonth(DateUtil.getCurrentMonth());
-         List<FrontEndSalesStatistics> frontEndSalesStatistics1 = service.selectByCondition(statistics);
+
          //计时器结束
         watch.stop();
         logger.info("查询退货单退款定时任务=====>结束，本次用时：{}毫秒", watch.getTime());
