@@ -4,6 +4,7 @@ import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.dao.ActivityDao;
+import com.aiqin.mgs.order.api.dao.ActivityProductDao;
 import com.aiqin.mgs.order.api.dao.ActivityRuleDao;
 import com.aiqin.mgs.order.api.dao.ActivityStoreDao;
 import com.aiqin.mgs.order.api.domain.Activity;
@@ -39,9 +40,11 @@ public class ActivityServiceImpl implements ActivityService {
     @Resource
     private ActivityStoreDao activityStoreDao;
 
-
     @Resource
     private ActivityRuleDao activityRuleDao;
+
+    @Resource
+    private ActivityProductDao activityProductDao;
 
     @Override
     public HttpResponse<List<Activity>> activityList(Activity activity) {
@@ -54,6 +57,7 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     @Transactional
     public HttpResponse<Activity> getActivityInformation(String activityId) {
+        LOGGER.info("查询单个促销活动getActivityInformation参数activityId为：{}", activityId);
         HttpResponse response = HttpResponse.success();
         if(null==activityId){
             return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
@@ -125,7 +129,7 @@ public class ActivityServiceImpl implements ActivityService {
             activityProduct.setCreateTime(new Date());
             activityProduct.setUpdateTime(new Date());
         }
-        int activityProductRecord = activityStoreDao.insertList(activityStoreList);
+        int activityProductRecord = activityProductDao.insertList(activityProductList);
         if (activityProductRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
             return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
         }
@@ -155,5 +159,22 @@ public class ActivityServiceImpl implements ActivityService {
             LOGGER.error("添加活动失败", e);
             throw new RuntimeException(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION.getMessage());
         }
+    }
+
+    @Override
+    public HttpResponse<List<ActivityProduct>> activityProductList(Activity activity) {
+        LOGGER.info("查询单个促销活动的商品列表（分页）activityProductList参数activity为：{}", activity);
+        HttpResponse response = HttpResponse.success();
+
+        if(null==activity.getActivityId()){
+            return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
+        }
+        List<ActivityProduct> list=activityProductDao.activityProductList(activity);
+        if(null!=list){
+            response.setData(list);
+        }else{
+            return HttpResponse.failure(ResultCode.NOT_HAVE_PARAM);
+        }
+        return response;
     }
 }

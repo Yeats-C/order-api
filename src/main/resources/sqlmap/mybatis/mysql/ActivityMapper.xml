@@ -60,6 +60,9 @@
             <if test="updateTime!= null">
                 and update_time = #{updateTime}
             </if>
+            <if test="pageSize!=null ">
+                limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+            </if>
         </where>
     </select>
 

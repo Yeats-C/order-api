@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain;
 
+import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -10,7 +11,7 @@ import java.util.Date;
 
 @Data
 @ApiModel("促销活动bean")
-public class Activity implements Serializable {
+public class Activity extends PagesRequest implements Serializable {
 
     /**活动id*/
     @ApiModelProperty(value = "活动id")
