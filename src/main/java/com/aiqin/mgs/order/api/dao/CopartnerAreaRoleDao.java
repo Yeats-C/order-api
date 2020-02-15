@@ -43,4 +43,6 @@ public interface CopartnerAreaRoleDao {
 	CopartnerAreaRoleList getRoleByUnion(CopartnerAreaRoleList copartnerAreaRole);
 
 	CopartnerAreaRoleVo getRoleByPky(CopartnerAreaRoleVo param);
+
+	void saveCopartnerAreaRole(CopartnerAreaRoleVo vo);
 }

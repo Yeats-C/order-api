@@ -19,7 +19,7 @@ import java.util.List;
 @Data
 public class CopartnerAreaStoreList{
 	
-	@ApiModelProperty(value = "经营区域ID")
+	@ApiModelProperty(value = "自动生成-经营区域ID")
     @JsonProperty("copartner_area_id")
     private String copartnerAreaId;
     

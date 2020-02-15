@@ -15,11 +15,11 @@ import java.util.List;
  * @author huangzy
  * @create 2020-02-13
  */
-@ApiModel("经营区域详情")
+@ApiModel("经营区域详情基本信息")
 @Data
 public class CopartnerAreaDetail{
 	
-	@ApiModelProperty(value = "经营区域ID")
+	@ApiModelProperty(value = "自动生成-经营区域ID")
     @JsonProperty("copartner_area_id")
     private String copartnerAreaId;
     

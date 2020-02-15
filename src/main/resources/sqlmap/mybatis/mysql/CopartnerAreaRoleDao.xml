@@ -37,5 +37,24 @@
     </if>
     limit 1
     </select>
+    <insert id ="saveCopartnerAreaRole">
+       insert into copartner_area_role(
+          copartner_area_id,
+          person_id,
+          person_name,
+          role_code,
+          role_name,
+          role_type,
+          memo
+       )values(
+          #{copartnerAreaId},
+          #{personId},
+          #{personName},
+          #{roleCode},
+          #{roleName},
+          #{roleType},
+          #{memo}
+       )
+    </insert>
 </mapper>
 

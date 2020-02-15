@@ -17,6 +17,7 @@ import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaList;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaListReq;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleList;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleVo;
+import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaSave;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
 import com.aiqin.mgs.order.api.domain.request.*;
@@ -70,44 +71,43 @@ public class CopartnerAreaController {
     
     
     @GetMapping("/list/up")
-    @ApiOperation(value = "查询上级合伙人")
+    @ApiOperation(value = "新建页面-查询上级合伙人接口")
     public HttpResponse<CopartnerAreaUp> copartnerAreaUp(){    
     	return copartnerAreaService.copartnerAreaUp();
     }
     
     
     @GetMapping("/store/tree")
-    @ApiOperation(value = "所辖门店树")
+    @ApiOperation(value = "新建页面-所辖门店树弹框")
     public HttpResponse storeTree(){    
     	//TODO
     	return null;
     }
     
     @GetMapping("/person/list")
-    @ApiOperation(value = "选择公司人员")
+    @ApiOperation(value = "新建页面-公司人员弹框")
     public HttpResponse<CopartnerAreaRoleList> getPersonList(@Valid @RequestParam(name = "person_team", required = true) String personTeam){
     	return copartnerAreaService.getPersonList(personTeam);
     }
     
     @PostMapping("/role/list")
-    @ApiOperation(value = "公司人员查询权限列表")
+    @ApiOperation(value = "新建页面-公司人员弹框提交按钮调用")
     public HttpResponse getRoleList(@Valid @RequestBody List<CopartnerAreaRoleList> param){
     	return copartnerAreaService.getRoleList(param);
     }
     
     @GetMapping("/role/detail")
-    @ApiOperation(value = "权限详情")
+    @ApiOperation(value = "权限详情") //HUANGZYTODO 需求变更.
     public HttpResponse roledetail(@Valid @RequestParam(name = "copartner_area_id", required = false) String copartnerAreaId,
     		@Valid @RequestParam(name = "person_id", required = false) String personId){
     	return copartnerAreaService.roledetail(copartnerAreaId,personId);
     }
     
-    
-    
-    
-    
-    
-    
+    @PostMapping("/save")
+    @ApiOperation(value = "新建区域-保存")
+    public HttpResponse saveCopartnerArea(@Valid @RequestBody CopartnerAreaSave param){
+    	return copartnerAreaService.saveCopartnerArea(param);
+    }
     
     
     @GetMapping("/detail/info")
@@ -151,6 +151,4 @@ public class CopartnerAreaController {
     	vo.setPageSize(pageSize);
     	return copartnerAreaService.getCopartnerAreaRole(vo);
     }
-    
-    
 }

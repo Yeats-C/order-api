@@ -8,5 +8,20 @@
     where 1=1
     and copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
     </select>
+    <insert id="saveCopartnerAreaStore">
+        insert into copartner_area_store(
+            copartner_area_id,
+            store_id,
+            store_code,
+            store_name,
+            memo
+        )
+        values(
+            #{copartnerAreaId},
+            #{storeId},
+            #{storeCode},
+            #{storeName}
+        )
+    </insert>
 </mapper>
 

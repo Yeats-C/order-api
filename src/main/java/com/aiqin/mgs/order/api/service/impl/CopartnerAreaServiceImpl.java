@@ -31,8 +31,11 @@ import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleDetail;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleDict;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleList;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleVo;
+import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaSave;
+import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreList;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
+import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.SystemResource;
 import com.aiqin.mgs.order.api.domain.pay.PayReq;
 import com.aiqin.mgs.order.api.domain.request.*;
@@ -53,6 +56,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.http.client.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -289,6 +293,49 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
     	}
     	
     	return dictList;
+	}
+	
+	
+	/**
+	 * 保存区域
+	 */
+	@Override
+	public HttpResponse saveCopartnerArea(@Valid CopartnerAreaSave param) {
+		
+		LOGGER.info("保存区域请求参数{}",param);
+		
+		String copartnerAreaId = IdUtil.uuid();
+		//基本信息
+		if(param.getCopartnerAreaDetail() !=null ) {
+			CopartnerAreaVo vo = new CopartnerAreaVo();
+			BeanUtils.copyProperties(param.getCopartnerAreaDetail(), vo);
+			vo.setCopartnerAreaId(copartnerAreaId);
+			AuthToken auth = AuthUtil.getCurrentAuth();
+			vo.setCreateBy(auth.getTicketPersonId());
+			copartnerAreaDao.saveCopartnerArea(vo);
+		}
+		
+		//门店信息
+		if(CollectionUtils.isNotEmpty(param.getStoreList())) {
+			for(CopartnerAreaStoreList copartnerAreaStore : param.getStoreList()) {
+				CopartnerAreaStoreVo vo = new CopartnerAreaStoreVo();
+				BeanUtils.copyProperties(copartnerAreaStore, vo);
+				vo.setCopartnerAreaId(copartnerAreaId);
+				copartnerAreaStoreDao.saveCopartnerAreaStore(vo);
+			}
+		}
+		
+		//权限信息
+		if(CollectionUtils.isNotEmpty(param.getRoleList())) {
+			for(CopartnerAreaRoleList copartnerAreaRole : param.getRoleList()) {
+				CopartnerAreaRoleVo vo = new CopartnerAreaRoleVo();
+				BeanUtils.copyProperties(copartnerAreaRole, vo);
+				vo.setCopartnerAreaId(copartnerAreaId);
+				copartnerAreaRoleDao.saveCopartnerAreaRole(vo);
+			}
+		}
+		
+		return HttpResponse.success(true);
 	}
 
 

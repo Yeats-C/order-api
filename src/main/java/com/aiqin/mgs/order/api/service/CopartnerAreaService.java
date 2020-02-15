@@ -15,6 +15,7 @@ import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaListReq;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleList;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleVo;
+import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaSave;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
 import com.aiqin.mgs.order.api.domain.request.*;
@@ -40,5 +41,7 @@ public interface CopartnerAreaService {
 	HttpResponse getRoleList(@Valid List<CopartnerAreaRoleList> param);
 
 	HttpResponse roledetail(@Valid String copartnerAreaId, @Valid String personId);
+
+	HttpResponse saveCopartnerArea(@Valid CopartnerAreaSave param);
 	
 }

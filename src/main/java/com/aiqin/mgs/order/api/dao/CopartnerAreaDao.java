@@ -25,6 +25,7 @@ import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaList;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaListReq;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
+import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo;
 import com.aiqin.mgs.order.api.domain.request.DevelRequest;
 import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
@@ -46,5 +47,7 @@ public interface CopartnerAreaDao {
 	int countCopartnerAreaList(@Valid CopartnerAreaListReq param);
 
 	List<CopartnerAreaUp> copartnerAreaUp();
+
+	void saveCopartnerArea(CopartnerAreaVo vo);
 
 }
