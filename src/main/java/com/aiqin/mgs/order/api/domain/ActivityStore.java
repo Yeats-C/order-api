@@ -6,9 +6,13 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
+/**
+ * @author csf
+ */
 @Data
 @ApiModel("活动适于门店情况")
 public class ActivityStore {
+
     @ApiModelProperty(value = "自增主键")
     @JsonProperty("id")
     private Long id;

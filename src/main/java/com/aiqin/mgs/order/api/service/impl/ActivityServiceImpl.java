@@ -7,6 +7,7 @@ import com.aiqin.mgs.order.api.dao.ActivityDao;
 import com.aiqin.mgs.order.api.dao.ActivityStoreDao;
 import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityProduct;
+import com.aiqin.mgs.order.api.domain.ActivityRule;
 import com.aiqin.mgs.order.api.domain.ActivityStore;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
@@ -77,7 +78,7 @@ public class ActivityServiceImpl implements ActivityService {
         }
         //生成活动id
         String activityId = IdUtil.activityId();
-
+        //保存活动主表信息start
         Activity activity=activityRequest.getActivity();
         activity.setCreateTime(new Date());
         activity.setUpdateTime(new Date());
@@ -87,7 +88,9 @@ public class ActivityServiceImpl implements ActivityService {
             return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
         }
         LOGGER.info("保存活动主表信息成功");
+        //保存活动主表信息end
 
+        //保存活动对应门店信息start
         List<ActivityStore> activityStoreList = activityRequest.getActivityStores();
         // 去重
         Set<ActivityStore> activityStoreSet = new HashSet<>(activityStoreList);
@@ -103,7 +106,9 @@ public class ActivityServiceImpl implements ActivityService {
             return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
         }
         LOGGER.info("保存活动对应门店信息成功");
+        //保存活动对应门店信息end
 
+        //保存活动对应商品信息start
         List<ActivityProduct> activityProductList = activityRequest.getActivityProducts();
         // 去重
         Set<ActivityProduct> activityProductSet = new HashSet<>(activityProductList);
@@ -119,6 +124,26 @@ public class ActivityServiceImpl implements ActivityService {
             return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
         }
         LOGGER.info("保存活动对应商品信息成功");
+        //保存活动对应商品信息end
+
+        //保存活动对应规则信息start
+        List<ActivityRule> activityRuleList = activityRequest.getActivityRules();
+        // 去重
+        Set<ActivityRule> activityRuleSet = new HashSet<>(activityRuleList);
+        activityRuleList.clear();
+        activityRuleList.addAll(activityRuleSet);
+        for (ActivityRule activityRule : activityRuleList) {
+            activityRule.setActivityId(activityId);
+            activityRule.setCreateTime(new Date());
+            activityRule.setUpdateTime(new Date());
+        }
+        int activityRuleRecord = activityStoreDao.insertList(activityStoreList);
+        if (activityProductRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+            return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+        }
+        LOGGER.info("保存活动对应商品信息成功");
+        //保存活动对应规则信息end
+
         return null;
         } catch (Exception e) {
             LOGGER.error("添加活动失败", e);

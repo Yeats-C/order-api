@@ -15,6 +15,10 @@ import java.util.Date;
 @Data
 public class ActivityRule {
 
+    @ApiModelProperty(value = "自增主键")
+    @JsonProperty("id")
+    private Long id;
+
     /**活动id*/
     @ApiModelProperty(value = "活动id")
     @JsonProperty("activity_id")
@@ -28,7 +32,7 @@ public class ActivityRule {
     /**优惠单位：1.按数量（件）2.按金额（元）*/
     @ApiModelProperty(value = "优惠单位：1.按数量（件）2.按金额（元")
     @JsonProperty("rule_unit")
-    private Integer rule_unit;
+    private Integer ruleUnit;
 
     /**满足条件*/
     @ApiModelProperty(value = "满足条件(满多少参加活动)")

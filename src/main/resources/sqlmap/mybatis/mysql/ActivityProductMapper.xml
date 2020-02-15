@@ -30,7 +30,7 @@
 
     <!--批量保存活动对应商品信息List-->
     <insert id="insertList" parameterType="java.util.List">
-        insert into activity_store (activity_id, sku_code,product_name, product_code, product_brand_code,product_brand_name
+        insert into activity_product (activity_id, sku_code,product_name, product_code, product_brand_code,product_brand_name
         , product_category_code,product_category_name, price_tax,discount,reduce,actual_price,status,create_time
         , update_time,is_delete,create_by,update_by,activity_scope )
         values

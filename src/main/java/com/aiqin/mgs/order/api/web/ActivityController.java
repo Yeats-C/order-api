@@ -9,10 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -32,7 +29,7 @@ public class ActivityController {
      * @param activity
      * @return
      */
-    @PostMapping("/activityList")
+    @GetMapping("/activityList")
     @ApiOperation(value = "促销活动管理--活动列表")
     public HttpResponse<List<Activity>> activityList(Activity activity){
         return activitesService.activityList(activity);
@@ -43,7 +40,7 @@ public class ActivityController {
      * @param activityId
      * @return
      */
-    @PostMapping("/getActivityInformation")
+    @GetMapping("/getActivityInformation")
     @ApiOperation(value = "通过活动id获取单个活动信息")
     public HttpResponse<Activity> getActivityInformation(String activityId){
         return activitesService.getActivityInformation(activityId);
@@ -57,7 +54,7 @@ public class ActivityController {
      */
     @PostMapping("/add")
     @ApiOperation(value = "将商品添加到购物车")
-    public HttpResponse addCart(@Valid @RequestBody ActivityRequest activityRequest) {
+    public HttpResponse add(@Valid @RequestBody ActivityRequest activityRequest) {
         //将商品添加到购物车
         return activitesService.addActivity(activityRequest);
     }
