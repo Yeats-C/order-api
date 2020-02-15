@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/activity")
@@ -80,6 +81,17 @@ public class ActivityController {
     @ApiOperation(value = "活动详情-销售数据-活动销售列表（分页）-只传分页参数")
     public HttpResponse<List<Activity>> getActivityItem(ErpOrderItem erpOrderItem){
         return activitesService.getActivityItem(erpOrderItem);
+    }
+
+    /**
+     * 活动详情-销售数据-活动销售统计
+     * @param
+     * @return
+     */
+    @GetMapping("/getActivitySalesStatistics")
+    @ApiOperation(value = "活动详情-销售数据-活动销售统计")
+    public HttpResponse<Map> getActivitySalesStatistics(){
+        return activitesService.getActivitySalesStatistics();
     }
 
 }

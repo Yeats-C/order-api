@@ -7,6 +7,7 @@ import com.aiqin.mgs.order.api.dao.ActivityDao;
 import com.aiqin.mgs.order.api.dao.ActivityProductDao;
 import com.aiqin.mgs.order.api.dao.ActivityRuleDao;
 import com.aiqin.mgs.order.api.dao.ActivityStoreDao;
+import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityProduct;
@@ -22,10 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author csf
@@ -50,6 +48,9 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Resource
     private ErpOrderItemDao erpOrderItemDao;
+
+    @Resource
+    private ErpOrderInfoDao erpOrderInfoDao;
 
     @Override
     public HttpResponse<List<Activity>> activityList(Activity activity) {
@@ -195,6 +196,19 @@ public class ActivityServiceImpl implements ActivityService {
         }else{
             return HttpResponse.failure(ResultCode.NOT_HAVE_PARAM);
         }
+        return response;
+    }
+
+    @Override
+    public HttpResponse<Map> getActivitySalesStatistics() {
+        LOGGER.info("查询活动详情-销售数据-活动销售统计");
+        HttpResponse response = HttpResponse.success();
+        //活动相关订单销售额及活动订单数(当订单中的商品命中了这个促销活动时，这个订单纳入统计，统计主订单。)
+        Map activitySalesData=erpOrderInfoDao.getActivitySales();
+        //
+        //
+        //
+        //
         return response;
     }
 }

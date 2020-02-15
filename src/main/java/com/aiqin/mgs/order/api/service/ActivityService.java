@@ -7,6 +7,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ActivityService {
 
@@ -44,4 +45,10 @@ public interface ActivityService {
      * @return
      */
     HttpResponse<List<Activity>> getActivityItem(ErpOrderItem erpOrderItem);
+
+    /**
+     * 活动详情-销售数据-活动销售统计
+     * @return
+     */
+    HttpResponse<Map> getActivitySalesStatistics();
 }
