@@ -30,7 +30,7 @@ public class RelatedSalesController {
     @ApiOperation("关联销售列表")
     @PostMapping("/getlist")
     public HttpResponse<PageResData<RelatedSales>> getlist(@RequestBody PageRequestVO<RelatedSalesVo> searchVo) {
-        return new HttpResponse<>(relatedSalesService.getList(searchVo));
+        return new HttpResponse(relatedSalesService.getList(searchVo));
     }
 
     @ApiOperation("关联销售新增")
@@ -57,14 +57,14 @@ public class RelatedSalesController {
     @GetMapping("/getBySalseCategoryId")
     @ApiImplicitParams({@ApiImplicitParam(name = "salse_category_id", value = "销售品类ID", dataType = "String", paramType = "query", required = true)})
     public HttpResponse<RelatedSales> selectBySalseCategoryId(String salse_category_id) {
-        return new HttpResponse<>(relatedSalesService.selectBySalseCategoryId(salse_category_id));
+        return new HttpResponse(relatedSalesService.selectBySalseCategoryId(salse_category_id));
     }
 
     @ApiOperation("根据一二三四类品类编码，查询sku信息--提供给pos")
     @GetMapping("/getByCategoryLevel")
     @ApiImplicitParams({@ApiImplicitParam(name = "categoryLevel", value = "多级销售品类--以逗号形式拼接给我", dataType = "String", paramType = "query", required = true)})
     public HttpResponse<RelatedSales> getByCategoryLevel(String categoryLevel) {
-        return new HttpResponse<>(relatedSalesService.getByCategoryLevel(categoryLevel));
+        return new HttpResponse(relatedSalesService.getByCategoryLevel(categoryLevel));
     }
 
 }
