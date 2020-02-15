@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author dell
+ * @author csf
  */
 @Service
 public class ActivityServiceImpl implements ActivityService {
@@ -71,6 +71,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
+    @Transactional
     public HttpResponse addActivity(ActivityRequest activityRequest) {
         try {
         LOGGER.info("新增活动addActivity参数为：{}", activityRequest);

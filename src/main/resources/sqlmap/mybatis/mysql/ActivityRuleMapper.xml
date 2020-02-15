@@ -30,7 +30,7 @@
         values
         <foreach collection="list" item="activityRule" separator=",">
             (#{activityRule.activityId,jdbcType=VARCHAR},
-            #{activityRule.activity_type,jdbcType=INTEGER},
+            #{activityRule.activityType,jdbcType=INTEGER},
             #{activityRule.ruleUnit,jdbcType=INTEGER},
             #{activityRule.meetingConditions,jdbcType=INTEGER},
             #{activityRule.preferentialAmount,jdbcType=INTEGER},
