@@ -880,6 +880,29 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     }
 
     @Override
+    public HttpResponse batchAddOrder(List<OrderodrInfo> cartInfo) {
+        if (cartInfo==null){
+            return new HttpResponse();
+        }
+        for (OrderodrInfo orderodrInfo:cartInfo){
+
+            try {
+                orderDao.addOrderInfo(orderodrInfo.getOrderInfo());
+                for (OrderDetailInfo orderDetailInfo:orderodrInfo.getDetailList()){
+                    orderDetailDao.addDetailList(orderDetailInfo);
+
+                }
+                settlementDao.addSettlement(orderodrInfo.getSettlementInfo());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        return new HttpResponse();
+    }
+
+    @Override
     public HttpResponse findOrderDetailById(String orderDetailId) {
         return HttpResponse.success(orderDetailDao.findOrderDetailById(orderDetailId));
     }
