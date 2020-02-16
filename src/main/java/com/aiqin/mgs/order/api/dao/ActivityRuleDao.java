@@ -22,6 +22,13 @@ public interface ActivityRuleDao {
      * @return
      */
     List<ActivityRule> selectByActivityId(String activityId);
+
+    /**
+     * 通过activityId删除活动-规则信息（逻辑删除）
+     * @param activityId
+     * @return
+     */
+    Integer deleteRuleByActivityId(String activityId);
 }
 
 

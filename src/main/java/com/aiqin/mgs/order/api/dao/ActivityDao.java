@@ -20,7 +20,19 @@ public interface ActivityDao {
      */
     Activity getActivityInformation(Activity activity);
 
+    /**
+     * 保存活动主体
+     * @param activity
+     * @return
+     */
     int insertActivity(Activity activity);
+
+    /**
+     * 编辑活动主体
+     * @param activity
+     * @return
+     */
+    int updateActivity(Activity activity);
 }
 
 
