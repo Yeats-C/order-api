@@ -106,13 +106,13 @@ public class ActivityController {
     }
 
     /**
-     * 添加活动
+     * 编辑活动
      *
      * @param
      * @return
      */
     @PostMapping("/update")
-    @ApiOperation(value = "添加活动")
+    @ApiOperation(value = "编辑活动")
     public HttpResponse update(@RequestBody ActivityRequest activityRequest) {
         //将商品添加到购物车
         return activitesService.updateActivity(activityRequest);

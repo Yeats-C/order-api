@@ -99,7 +99,7 @@ public class ActivityServiceImpl implements ActivityService {
         activity.setActivityId(activityId);
         int activityRecord = activityDao.insertActivity(activity);
         if (activityRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
-            return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+            return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
         }
         LOGGER.info("保存活动主表信息成功");
         //保存活动主表信息end
@@ -117,7 +117,7 @@ public class ActivityServiceImpl implements ActivityService {
         }
         int activityStoreRecord = activityStoreDao.insertList(activityStoreList);
         if (activityStoreRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
-            return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+            return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
         }
         LOGGER.info("保存活动对应门店信息成功");
         //保存活动对应门店信息end
@@ -135,7 +135,7 @@ public class ActivityServiceImpl implements ActivityService {
         }
         int activityProductRecord = activityProductDao.insertList(activityProductList);
         if (activityProductRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
-            return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+            return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
         }
         LOGGER.info("保存活动对应商品信息成功");
         //保存活动对应商品信息end
@@ -153,7 +153,7 @@ public class ActivityServiceImpl implements ActivityService {
         }
         int activityRuleRecord = activityRuleDao.insertList(activityRuleList);
         if (activityRuleRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
-            return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+            return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
         }
         LOGGER.info("保存活动对应规则信息成功");
         //保存活动对应规则信息end
@@ -257,8 +257,8 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     @Transactional
     public HttpResponse updateActivity(ActivityRequest activityRequest) {
+        LOGGER.info("编辑活动updateActivity参数为：{}", activityRequest);
         try {
-            LOGGER.info("编辑活动updateActivity参数为：{}", activityRequest);
             if(null==activityRequest
                     ||null==activityRequest.getActivity()
                     ||null==activityRequest.getActivityStores()
@@ -269,14 +269,16 @@ public class ActivityServiceImpl implements ActivityService {
             //保存活动主表信息start
             Activity activity=activityRequest.getActivity();
             activity.setUpdateTime(new Date());
-            int activityRecord = activityDao.insertActivity(activity);
+            int activityRecord = activityDao.updateActivity(activity);
             if (activityRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
-                return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+                LOGGER.error("更新活动主表信息失败");
+                return HttpResponse.failure(ResultCode.UPDATE_ACTIVITY_INFO_EXCEPTION);
             }
-            LOGGER.info("保存活动主表信息成功");
+            LOGGER.info("更新活动主表信息成功");
             //保存活动主表信息end
 
             //保存活动对应门店信息start
+            activityStoreDao.deleteStoreByActivityId(activity.getActivityId());
             List<ActivityStore> activityStoreList = activityRequest.getActivityStores();
             // 去重
             Set<ActivityStore> activityStoreSet = new HashSet<>(activityStoreList);
@@ -289,12 +291,14 @@ public class ActivityServiceImpl implements ActivityService {
             }
             int activityStoreRecord = activityStoreDao.insertList(activityStoreList);
             if (activityStoreRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
-                return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+                LOGGER.error("更新活动-门店信息失败");
+                return HttpResponse.failure(ResultCode.UPDATE_ACTIVITY_INFO_EXCEPTION);
             }
             LOGGER.info("保存活动对应门店信息成功");
             //保存活动对应门店信息end
 
             //保存活动对应商品信息start
+            activityProductDao.deleteProductByActivityId(activity.getActivityId());
             List<ActivityProduct> activityProductList = activityRequest.getActivityProducts();
             // 去重
             Set<ActivityProduct> activityProductSet = new HashSet<>(activityProductList);
@@ -307,12 +311,14 @@ public class ActivityServiceImpl implements ActivityService {
             }
             int activityProductRecord = activityProductDao.insertList(activityProductList);
             if (activityProductRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
-                return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+                LOGGER.error("更新活动-商品信息失败");
+                return HttpResponse.failure(ResultCode.UPDATE_ACTIVITY_INFO_EXCEPTION);
             }
             LOGGER.info("保存活动对应商品信息成功");
             //保存活动对应商品信息end
 
             //保存活动对应规则信息start
+            activityRuleDao.deleteRuleByActivityId(activity.getActivityId());
             List<ActivityRule> activityRuleList = activityRequest.getActivityRules();
             // 去重
             Set<ActivityRule> activityRuleSet = new HashSet<>(activityRuleList);
@@ -325,15 +331,16 @@ public class ActivityServiceImpl implements ActivityService {
             }
             int activityRuleRecord = activityRuleDao.insertList(activityRuleList);
             if (activityRuleRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
-                return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+                LOGGER.error("更新活动-规则信息失败");
+                return HttpResponse.failure(ResultCode.UPDATE_ACTIVITY_INFO_EXCEPTION);
             }
             LOGGER.info("保存活动对应规则信息成功");
             //保存活动对应规则信息end
-            LOGGER.info("活动添加成功，活动id为{}，活动名称为{}", activity.getActivityId(), activity.getActivityName());
+            LOGGER.info("活动更新成功，活动id为{}，活动名称为{}", activity.getActivityId(), activity.getActivityName());
             return HttpResponse.success();
         } catch (Exception e) {
-            LOGGER.error("添加活动失败", e);
-            throw new RuntimeException(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION.getMessage());
+            LOGGER.error("更新活动失败", e);
+            throw new RuntimeException(ResultCode.UPDATE_ACTIVITY_INFO_EXCEPTION.getMessage());
         }
     }
 }

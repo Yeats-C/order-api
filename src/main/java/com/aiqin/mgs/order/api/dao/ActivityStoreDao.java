@@ -22,6 +22,13 @@ public interface ActivityStoreDao {
      * @return
      */
     List<ActivityStore> selectByActivityId(String activityId);
+
+    /**
+     * 删除活动-门店信息
+     * @param activityId
+     * @return
+     */
+    Integer deleteStoreByActivityId(String activityId);
 }
 
 
