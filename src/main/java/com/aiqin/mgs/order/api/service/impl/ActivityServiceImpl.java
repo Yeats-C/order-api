@@ -96,7 +96,7 @@ public class ActivityServiceImpl implements ActivityService {
         Activity activity=activityRequest.getActivity();
         activity.setCreateTime(new Date());
         activity.setUpdateTime(new Date());
-
+        activity.setActivityId(activityId);
         int activityRecord = activityDao.insertActivity(activity);
         if (activityRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
             return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
@@ -217,6 +217,39 @@ public class ActivityServiceImpl implements ActivityService {
         return response;
         } catch (Exception e) {
             LOGGER.error("查询活动详情-销售数据-活动销售统计失败", e);
+            throw new RuntimeException(ResultCode.SELECT_ACTIVITY_INFO_EXCEPTION.getMessage());
+        }
+    }
+
+    @Override
+    public HttpResponse<Activity> getActivityDetail(String activityId) {
+        LOGGER.info("查询单个促销活动详情getActivityDetail参数activityId为：{}", activityId);
+        try {
+            HttpResponse response = HttpResponse.success();
+            if(null==activityId){
+                return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
+            }
+            ActivityRequest activityRequest=new ActivityRequest();
+            Activity activity=new Activity();
+            activity.setActivityId(activityId);
+            List<Activity> list=activityDao.activityList(activity);
+            if(list!=null && list.get(0)!=null){
+                Activity activityData=list.get(0);
+            }else{
+                return HttpResponse.failure(ResultCode.NOT_HAVE_PARAM);
+            }
+
+            List<ActivityStore> activityStoreList=activityStoreDao.selectByActivityId(activityId);
+            List<ActivityProduct> activityProductList=activityProductDao.activityProductList(activity);
+            List<ActivityRule> activityRuleList=activityRuleDao.selectByActivityId(activityId);
+            activityRequest.setActivity(activity);
+            activityRequest.setActivityStores(activityStoreList);
+            activityRequest.setActivityProducts(activityProductList);
+            activityRequest.setActivityRules(activityRuleList);
+            response.setData(activityRequest);
+            return response;
+        } catch (Exception e) {
+            LOGGER.error("查询单个促销活动详情失败", e);
             throw new RuntimeException(ResultCode.SELECT_ACTIVITY_INFO_EXCEPTION.getMessage());
         }
     }

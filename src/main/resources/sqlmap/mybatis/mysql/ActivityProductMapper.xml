@@ -62,7 +62,7 @@
         ,product_category_name, price_tax,discount,reduce,actual_price,status,create_time, update_time,is_delete,create_by
         ,update_by,activity_scope
         FROM activity_product
-        where 1=1
+        where 1=1 and is_delete=0
         <if test="activityId != '' and activityId != null">
             and activity_id = #{activityId}
         </if>

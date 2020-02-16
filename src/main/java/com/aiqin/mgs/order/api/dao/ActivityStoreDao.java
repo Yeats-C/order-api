@@ -15,6 +15,13 @@ public interface ActivityStoreDao {
      * @return
      */
     Integer insertList(List<ActivityStore> activityStoreList);
+
+    /**
+     * 通过activityId查询活动-门店列表
+     * @param activityId
+     * @return
+     */
+    List<ActivityStore> selectByActivityId(String activityId);
 }
 
 

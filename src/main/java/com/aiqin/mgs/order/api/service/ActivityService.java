@@ -51,4 +51,11 @@ public interface ActivityService {
      * @return
      */
     HttpResponse<Map> getActivitySalesStatistics();
+
+    /**
+     * 通过活动id获取单个活动详情（活动+门店+商品+规则）
+     * @param activityId
+     * @return
+     */
+    HttpResponse<Activity> getActivityDetail(String activityId);
 }

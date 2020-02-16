@@ -20,14 +20,17 @@
     id,activity_id, province_id,province_name, city_id, city_name,district_id, district_name,store_id, store_name,
     create_time, update_time,is_delete
   </sql>
-    <!--<select id="selectByActivityId" parameterType="java.lang.String" resultMap="BaseResultMap"
+
+    <!--通过activityId查询活动-门店列表-->
+    <select id="selectByActivityId" parameterType="java.lang.String" resultMap="BaseResultMap"
             resultType="java.util.List">
         select
         <include refid="Base_Column_List"/>
         from activity_store
         where activity_id = #{activityId,jdbcType=VARCHAR}
+        and is_delete=0
     </select>
-    <delete id="deleteStatusByActivityId" parameterType="java.lang.String">
+    <!--<delete id="deleteStatusByActivityId" parameterType="java.lang.String">
      update activity_store set
         is_delete = 1,
         update_time = now()

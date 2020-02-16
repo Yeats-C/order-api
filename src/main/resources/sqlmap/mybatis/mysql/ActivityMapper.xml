@@ -72,9 +72,7 @@
         from activity
         <where>
             1=1
-            <if test="activityId != '' and activityId != null">
-                and activity_id = #{activityId}
-            </if>
+            and activity_id = #{activityId}
         </where>
     </select>
 
