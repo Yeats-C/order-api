@@ -51,10 +51,14 @@ public class ActivityServiceImpl implements ActivityService {
     private ErpOrderInfoDao erpOrderInfoDao;
 
     @Override
-    public HttpResponse<List<Activity>> activityList(Activity activity) {
+    public HttpResponse<Map> activityList(Activity activity) {
         LOGGER.info("查询促销活动列表activityList参数为：{}", activity);
         HttpResponse response = HttpResponse.success();
-        response.setData(activityDao.activityList(activity));
+        Integer totalCount=activityDao.totalCount(activity);
+        Map data=new HashMap();
+        data.put("activityList",activityDao.activityList(activity));
+        data.put("totalCount",totalCount);
+        response.setData(data);
         return response;
     }
 
@@ -183,14 +187,19 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public HttpResponse<List<Activity>> getActivityItem(ErpOrderItem erpOrderItem) {
+    public HttpResponse<Map> getActivityItem(ErpOrderItem erpOrderItem) {
         LOGGER.info("查询活动详情-销售数据-活动销售列表（分页）getActivityItem参数erpOrderItem为：{}", erpOrderItem);
+        HttpResponse response = HttpResponse.success();
         //只查询活动商品
         erpOrderItem.setIsActivity(1);
         List<ErpOrderItem> select = erpOrderItemDao.select(erpOrderItem);
-        HttpResponse response = HttpResponse.success();
+        Integer totalCount = erpOrderItemDao.totalCount(erpOrderItem);
+        Map data=new HashMap();
+
         if(null!=select){
-            response.setData(select);
+            data.put("erpOrderItemList",select);
+            data.put("totalCount",totalCount);
+            response.setData(data);
         }else{
             return HttpResponse.failure(ResultCode.NOT_HAVE_PARAM);
         }

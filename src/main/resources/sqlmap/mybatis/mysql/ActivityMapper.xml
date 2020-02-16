@@ -78,6 +78,7 @@
         </where>
     </select>
 
+
     <!--插入活动主表信息-->
     <insert id="insertActivity" parameterType="com.aiqin.mgs.order.api.domain.Activity">
         insert into activity
@@ -128,4 +129,42 @@
             update_time = now()
         </set>
     </update>
+
+    <select id="totalCount" resultType="java.lang.Integer" parameterType="com.aiqin.mgs.order.api.domain.Activity">
+        select count(1)
+        from activity
+        <where>
+            1=1
+            <if test="activityId != '' and activityId != null">
+                and activity_id = #{activityId}
+            </if>
+            <if test="activityName != '' and activityName!= null">
+                and activity_name = #{activityName}
+            </if>
+            <if test="activityType!= null">
+                and activity_type = #{activityType}
+            </if>
+            <if test="activityStatus!= null">
+                and activity_status = #{activityStatus}
+            </if>
+            <if test="beginTime!= null">
+                and begin_time &gt;= #{beginTime}
+            </if>
+            <if test="finishTime!= null">
+                and finish_time &lt;= #{finishTime}
+            </if>
+            <if test="createBy != '' and createBy!= null">
+                and create_by = #{createBy}
+            </if>
+            <if test="updateBy != '' and updateBy!= null">
+                and update_by = #{updateBy}
+            </if>
+            <if test="createTime!= null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateTime!= null">
+                and update_time = #{updateTime}
+            </if>
+        </where>
+    </select>
 </mapper>
