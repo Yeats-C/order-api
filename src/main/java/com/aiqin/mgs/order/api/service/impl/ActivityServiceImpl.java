@@ -253,4 +253,87 @@ public class ActivityServiceImpl implements ActivityService {
             throw new RuntimeException(ResultCode.SELECT_ACTIVITY_INFO_EXCEPTION.getMessage());
         }
     }
+
+    @Override
+    @Transactional
+    public HttpResponse updateActivity(ActivityRequest activityRequest) {
+        try {
+            LOGGER.info("编辑活动updateActivity参数为：{}", activityRequest);
+            if(null==activityRequest
+                    ||null==activityRequest.getActivity()
+                    ||null==activityRequest.getActivityStores()
+                    ||null==activityRequest.getActivityProducts()
+                    ||null==activityRequest.getActivityRules()){
+                return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
+            }
+            //保存活动主表信息start
+            Activity activity=activityRequest.getActivity();
+            activity.setUpdateTime(new Date());
+            int activityRecord = activityDao.insertActivity(activity);
+            if (activityRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+                return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+            }
+            LOGGER.info("保存活动主表信息成功");
+            //保存活动主表信息end
+
+            //保存活动对应门店信息start
+            List<ActivityStore> activityStoreList = activityRequest.getActivityStores();
+            // 去重
+            Set<ActivityStore> activityStoreSet = new HashSet<>(activityStoreList);
+            activityStoreList.clear();
+            activityStoreList.addAll(activityStoreSet);
+            for (ActivityStore activityStore : activityStoreList) {
+                activityStore.setActivityId(activity.getActivityId());
+                activityStore.setCreateTime(new Date());
+                activityStore.setUpdateTime(new Date());
+            }
+            int activityStoreRecord = activityStoreDao.insertList(activityStoreList);
+            if (activityStoreRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+                return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+            }
+            LOGGER.info("保存活动对应门店信息成功");
+            //保存活动对应门店信息end
+
+            //保存活动对应商品信息start
+            List<ActivityProduct> activityProductList = activityRequest.getActivityProducts();
+            // 去重
+            Set<ActivityProduct> activityProductSet = new HashSet<>(activityProductList);
+            activityProductList.clear();
+            activityProductList.addAll(activityProductSet);
+            for (ActivityProduct activityProduct : activityProductList) {
+                activityProduct.setActivityId(activity.getActivityId());
+                activityProduct.setCreateTime(new Date());
+                activityProduct.setUpdateTime(new Date());
+            }
+            int activityProductRecord = activityProductDao.insertList(activityProductList);
+            if (activityProductRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+                return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+            }
+            LOGGER.info("保存活动对应商品信息成功");
+            //保存活动对应商品信息end
+
+            //保存活动对应规则信息start
+            List<ActivityRule> activityRuleList = activityRequest.getActivityRules();
+            // 去重
+            Set<ActivityRule> activityRuleSet = new HashSet<>(activityRuleList);
+            activityRuleList.clear();
+            activityRuleList.addAll(activityRuleSet);
+            for (ActivityRule activityRule : activityRuleList) {
+                activityRule.setActivityId(activity.getActivityId());
+                activityRule.setCreateTime(new Date());
+                activityRule.setUpdateTime(new Date());
+            }
+            int activityRuleRecord = activityRuleDao.insertList(activityRuleList);
+            if (activityRuleRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+                return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+            }
+            LOGGER.info("保存活动对应规则信息成功");
+            //保存活动对应规则信息end
+            LOGGER.info("活动添加成功，活动id为{}，活动名称为{}", activity.getActivityId(), activity.getActivityName());
+            return HttpResponse.success();
+        } catch (Exception e) {
+            LOGGER.error("添加活动失败", e);
+            throw new RuntimeException(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION.getMessage());
+        }
+    }
 }

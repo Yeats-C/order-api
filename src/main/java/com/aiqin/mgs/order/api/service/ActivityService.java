@@ -58,4 +58,11 @@ public interface ActivityService {
      * @return
      */
     HttpResponse<Activity> getActivityDetail(String activityId);
+
+    /**
+     * 编辑活动
+     * @param activityRequest
+     * @return
+     */
+    HttpResponse updateActivity(ActivityRequest activityRequest);
 }
