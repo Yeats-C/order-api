@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -68,17 +69,20 @@ public class RelatedSalesServiceImpl implements RelatedSalesService {
     }
 
     @Override
-    public RelatedSales getByCategoryLevel(String categoryLevel) {
+    public List<String> getByCategoryLevel(String categoryLevel) {
         log.info("根据一二三四类品类编码，查询sku信息,入参categoryLevel={}",categoryLevel);
-        RelatedSales relatedSales =new RelatedSales();
+        List<String> list=new ArrayList<>();
         for(int k=0;k<4;k++){
             String s=categoryLevel.substring(0,categoryLevel.length()-2*k);
-            relatedSales = relatedSalesDao.selectBySalseCategoryId(s);
+            RelatedSales relatedSales = relatedSalesDao.selectBySalseCategoryId(s);
             if(relatedSales!=null&&relatedSales.getStatus().equals(0)){
-                return relatedSales;
+                list.add(relatedSales.getFirstSku());
+                list.add(relatedSales.getSecondlySku());
+                list.add(relatedSales.getLastSku());
+                return list;
             }
         }
-        return relatedSales;
+        return list;
     }
 
 }

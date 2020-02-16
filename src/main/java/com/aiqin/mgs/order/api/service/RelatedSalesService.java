@@ -5,6 +5,8 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.RelatedSales;
 import com.aiqin.mgs.order.api.domain.request.RelatedSalesVo;
 
+import java.util.List;
+
 /**
  * description: RelatedSalesService
  * date: 2020/2/14 11:29
@@ -23,6 +25,6 @@ public interface RelatedSalesService {
 
     RelatedSales selectBySalseCategoryId(String salseCategoryId);
 
-    RelatedSales getByCategoryLevel(String categoryLevel);
+    List<String> getByCategoryLevel(String categoryLevel);
 
 }
