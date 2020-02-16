@@ -16,7 +16,7 @@ public interface ActivityService {
      * @param activity
      * @return
      */
-    HttpResponse<List<Activity>> activityList(Activity activity);
+    HttpResponse<Map> activityList(Activity activity);
 
     /**
      * 通过活动id获取单个活动信息
@@ -44,7 +44,7 @@ public interface ActivityService {
      * @param erpOrderItem
      * @return
      */
-    HttpResponse<List<Activity>> getActivityItem(ErpOrderItem erpOrderItem);
+    HttpResponse<Map> getActivityItem(ErpOrderItem erpOrderItem);
 
     /**
      * 活动详情-销售数据-活动销售统计

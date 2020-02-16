@@ -33,7 +33,7 @@ public class ActivityController {
      */
     @GetMapping("/activityList")
     @ApiOperation(value = "促销活动管理--活动列表")
-    public HttpResponse<List<Activity>> activityList(Activity activity){
+    public HttpResponse<Map> activityList(Activity activity){
         return activitesService.activityList(activity);
     }
 
@@ -79,7 +79,7 @@ public class ActivityController {
      */
     @GetMapping("/getActivityItem")
     @ApiOperation(value = "活动详情-销售数据-活动销售列表（分页）-只传分页参数")
-    public HttpResponse<List<Activity>> getActivityItem(ErpOrderItem erpOrderItem){
+    public HttpResponse<Map> getActivityItem(ErpOrderItem erpOrderItem){
         return activitesService.getActivityItem(erpOrderItem);
     }
 
@@ -106,13 +106,13 @@ public class ActivityController {
     }
 
     /**
-     * 添加活动
+     * 编辑活动
      *
      * @param
      * @return
      */
     @PostMapping("/update")
-    @ApiOperation(value = "添加活动")
+    @ApiOperation(value = "编辑活动")
     public HttpResponse update(@RequestBody ActivityRequest activityRequest) {
         //将商品添加到购物车
         return activitesService.updateActivity(activityRequest);
