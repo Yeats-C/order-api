@@ -9,6 +9,7 @@ import com.aiqin.mgs.order.api.service.RelatedSalesService;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -72,6 +73,9 @@ public class RelatedSalesServiceImpl implements RelatedSalesService {
     public List<String> getByCategoryLevel(String categoryLevel) {
         log.info("根据一二三四类品类编码，查询sku信息,入参categoryLevel={}",categoryLevel);
         List<String> list=new ArrayList<>();
+        if(StringUtils.isBlank(categoryLevel)){
+            return list;
+        }
         for(int k=0;k<4;k++){
             String s=categoryLevel.substring(0,categoryLevel.length()-2*k);
             RelatedSales relatedSales = relatedSalesDao.selectBySalseCategoryId(s);
