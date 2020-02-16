@@ -87,6 +87,26 @@
             #{memo}
          )
     </insert>
+    <select id="selectCopartnerAreaInfo" resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo">
+        select 
+            id as id,
+            copartner_area_id as copartnerAreaId,
+            copartner_area_name as copartnerAreaName,
+            copartner_area_level as copartnerAreaLevel,
+            copartner_area_company as copartnerAreaCompany,
+            company_person_id as companyPersonId,
+            company_person_name as companyPersonName,
+            copartner_area_id_up as copartnerAreaIdUp,
+            copartner_area_name_up as copartnerAreaNameUp,
+            create_by as createBy,
+            update_by as updateBy,
+            create_time as createTime,
+            update_time as updateTime,
+            memo as memo 
+        from  copartner_area_info
+        where copartner_area_id = #{copartnerAreaId}
+    limit 1
+    </select>
     
 </mapper>
 

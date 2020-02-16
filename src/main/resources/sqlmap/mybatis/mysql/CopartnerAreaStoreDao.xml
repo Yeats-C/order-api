@@ -23,5 +23,27 @@
             #{storeName}
         )
     </insert>
+    <select id="selectStoreMainPageList" resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreList">
+        select
+         copartner_area_id as copartnerAreaId,
+         store_id as storeId,
+         store_code as storeCode,
+         store_name as storeName
+        from copartner_area_store
+        where 1=1
+        <if test=" copartnerAreaId !=null and copartnerAreaId !='' ">
+         and copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
+        </if>
+        LIMIT #{beginIndex,jdbcType=BIGINT}, #{pageSize,jdbcType=BIGINT}
+    </select>
+    <select id="countStoreMainPage" resultType="java.lang.Integer">
+        select
+         count(1)
+        from copartner_area_store
+        where 1=1
+        <if test=" copartnerAreaId !=null and copartnerAreaId !='' ">
+         and copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
+        </if>
+    </select>
 </mapper>
 

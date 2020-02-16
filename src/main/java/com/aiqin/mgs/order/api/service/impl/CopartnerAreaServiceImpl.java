@@ -25,6 +25,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.constant.Global;
+import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaDetail;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaList;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaListReq;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleDetail;
@@ -304,57 +305,103 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 		
 		LOGGER.info("保存区域请求参数{}",param);
 		
-		String copartnerAreaId = IdUtil.uuid();
-		//基本信息
-		if(param.getCopartnerAreaDetail() !=null ) {
-			CopartnerAreaVo vo = new CopartnerAreaVo();
-			BeanUtils.copyProperties(param.getCopartnerAreaDetail(), vo);
-			vo.setCopartnerAreaId(copartnerAreaId);
-			AuthToken auth = AuthUtil.getCurrentAuth();
-			vo.setCreateBy(auth.getTicketPersonId());
-			copartnerAreaDao.saveCopartnerArea(vo);
-		}
-		
-		//门店信息
-		if(CollectionUtils.isNotEmpty(param.getStoreList())) {
-			for(CopartnerAreaStoreList copartnerAreaStore : param.getStoreList()) {
-				CopartnerAreaStoreVo vo = new CopartnerAreaStoreVo();
-				BeanUtils.copyProperties(copartnerAreaStore, vo);
+		try {
+
+			String copartnerAreaId = IdUtil.uuid();
+			//基本信息
+			if(param.getCopartnerAreaDetail() !=null ) {
+				CopartnerAreaVo vo = new CopartnerAreaVo();
+				BeanUtils.copyProperties(param.getCopartnerAreaDetail(), vo);
 				vo.setCopartnerAreaId(copartnerAreaId);
-				copartnerAreaStoreDao.saveCopartnerAreaStore(vo);
+				AuthToken auth = AuthUtil.getCurrentAuth();
+				vo.setCreateBy(auth.getTicketPersonId());
+				copartnerAreaDao.saveCopartnerArea(vo);
 			}
-		}
-		
-		//权限信息
-		if(CollectionUtils.isNotEmpty(param.getRoleList())) {
-			for(CopartnerAreaRoleList copartnerAreaRole : param.getRoleList()) {
-				CopartnerAreaRoleVo vo = new CopartnerAreaRoleVo();
-				BeanUtils.copyProperties(copartnerAreaRole, vo);
-				vo.setCopartnerAreaId(copartnerAreaId);
-				copartnerAreaRoleDao.saveCopartnerAreaRole(vo);
+			
+			//门店信息
+			if(CollectionUtils.isNotEmpty(param.getStoreList())) {
+				for(CopartnerAreaStoreList copartnerAreaStore : param.getStoreList()) {
+					CopartnerAreaStoreVo vo = new CopartnerAreaStoreVo();
+					BeanUtils.copyProperties(copartnerAreaStore, vo);
+					vo.setCopartnerAreaId(copartnerAreaId);
+					copartnerAreaStoreDao.saveCopartnerAreaStore(vo);
+				}
 			}
+			
+			//权限信息
+			if(CollectionUtils.isNotEmpty(param.getRoleList())) {
+				for(CopartnerAreaRoleList copartnerAreaRole : param.getRoleList()) {
+					CopartnerAreaRoleVo vo = new CopartnerAreaRoleVo();
+					BeanUtils.copyProperties(copartnerAreaRole, vo);
+					vo.setCopartnerAreaId(copartnerAreaId);
+					copartnerAreaRoleDao.saveCopartnerAreaRole(vo);
+				}
+			}
+			
+			return HttpResponse.success(true);
+		}catch(Exception e) {
+		    log.error("保存异常:保存区域-请求参数{},{}",param,e);
+		    return HttpResponse.failure(MessageId.create(Project.ZERO, 01,"保存出现未知异常,请联系系统管理员."));
 		}
-		
-		return HttpResponse.success(true);
 	}
 
 
+	/**
+	 * 查询详情基本信息
+	 */
 	@Override
 	public HttpResponse getCopartnerAreaDetail(@Valid String copartnerAreaId) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+
+			//返回实体
+			CopartnerAreaDetail info = new CopartnerAreaDetail();
+			//数据实体
+			CopartnerAreaVo vo = copartnerAreaDao.selectCopartnerAreaInfo(copartnerAreaId);
+		    if(vo !=null ) {
+		    	//->
+		    	BeanUtils.copyProperties(info, vo);
+		    }
+
+		    return HttpResponse.success(info);
+		}catch(Exception e) {
+		    log.error("查询异常:查询详情基本信息-请求参数{},{}",copartnerAreaId,e);
+		    return HttpResponse.failure(MessageId.create(Project.ZERO, 01,"查询出现未知异常,请联系系统管理员."));
+		}
 	}
 
+	
+	/**
+	 * 查询门店列表分页
+	 */
 	@Override
 	public HttpResponse getCopartnerAreaStore(CopartnerAreaStoreVo vo) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		try {
+		    List<CopartnerAreaStoreList> dataList = copartnerAreaStoreDao.selectStoreMainPageList(vo);
+		    int totalCount = copartnerAreaStoreDao.countStoreMainPage(vo);
+
+		    return HttpResponse.success(new PageResData(totalCount,dataList));
+		}catch(Exception e) {
+		    log.error("查询异常:查询门店列表分页-请求参数{},{}",vo,e);
+		    return HttpResponse.failure(MessageId.create(Project.ZERO, 01,"查询出现未知异常,请联系系统管理员."));
+		}
 	}
 
+	
+	/**
+	 * 查询权限列表分页
+	 */
 	@Override
 	public HttpResponse getCopartnerAreaRole(CopartnerAreaRoleVo vo) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+		    List<CopartnerAreaRoleList> dataList = copartnerAreaRoleDao.selectRoleMainPageList(vo);
+		    int totalCount = copartnerAreaRoleDao.countRoleMainPage(vo);
+
+		    return HttpResponse.success(new PageResData(totalCount,dataList));
+		}catch(Exception e) {
+		    log.error("查询异常:查询权限列表分页-请求参数{},{}",vo,e);
+		    return HttpResponse.failure(MessageId.create(Project.ZERO, 01,"查询出现未知异常,请联系系统管理员."));
+		}
 	}
 }
 

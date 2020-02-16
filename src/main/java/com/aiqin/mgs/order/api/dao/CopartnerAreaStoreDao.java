@@ -22,6 +22,7 @@ import com.aiqin.mgs.order.api.domain.statistical.SkuSales;
 import org.apache.ibatis.annotations.Param;
 
 import com.aiqin.mgs.order.api.domain.*;
+import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreList;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreVo;
 import com.aiqin.mgs.order.api.domain.request.DevelRequest;
 import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
@@ -42,5 +43,9 @@ public interface CopartnerAreaStoreDao {
 	int countStoreByArea(String copartnerAreaId);
 
 	void saveCopartnerAreaStore(CopartnerAreaStoreVo vo);
+
+	List<CopartnerAreaStoreList> selectStoreMainPageList(CopartnerAreaStoreVo vo);
+
+	int countStoreMainPage(CopartnerAreaStoreVo vo);
 
 }

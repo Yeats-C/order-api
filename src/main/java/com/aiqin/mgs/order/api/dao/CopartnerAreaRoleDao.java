@@ -24,6 +24,7 @@ import org.apache.ibatis.annotations.Param;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleList;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleVo;
+import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreList;
 import com.aiqin.mgs.order.api.domain.request.DevelRequest;
 import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
@@ -45,4 +46,8 @@ public interface CopartnerAreaRoleDao {
 	CopartnerAreaRoleVo getRoleByPky(CopartnerAreaRoleVo param);
 
 	void saveCopartnerAreaRole(CopartnerAreaRoleVo vo);
+
+	List<CopartnerAreaRoleList> selectRoleMainPageList(CopartnerAreaRoleVo vo);
+
+	int countRoleMainPage(CopartnerAreaRoleVo vo);
 }

@@ -50,4 +50,6 @@ public interface CopartnerAreaDao {
 
 	void saveCopartnerArea(CopartnerAreaVo vo);
 
+	CopartnerAreaVo selectCopartnerAreaInfo(@Valid String copartnerAreaId);
+
 }
