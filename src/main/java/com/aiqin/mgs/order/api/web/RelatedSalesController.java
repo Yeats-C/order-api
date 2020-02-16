@@ -64,6 +64,7 @@ public class RelatedSalesController {
 
     @ApiOperation("根据一二三四类品类编码，查询sku信息--提供给pos")
     @GetMapping("/getByCategoryLevel")
+    @ApiImplicitParams({@ApiImplicitParam(name = "category_level", value = "销售品类id", dataType = "String", paramType = "query", required = false)})
     public HttpResponse<List<String>> getByCategoryLevel(@RequestParam("category_level") String category_level) {
         return new HttpResponse(relatedSalesService.getByCategoryLevel(category_level));
     }
