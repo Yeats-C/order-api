@@ -757,5 +757,24 @@
         from order_store_info a1
          where a1.order_success = #{orderSuccess}
     </select>
+
+    <!--活动相关订单销售额及活动订单数(当订单中的商品命中了这个促销活动时，这个订单纳入统计，统计主订单。-->
+    <select id="getActivitySales" resultType="com.aiqin.mgs.order.api.domain.ActivitySales">
+        SELECT
+            SUM( total_product_amount ) AS activitySales,
+            COUNT( 1 ) AS activitySalesNum
+        FROM
+            order_store_info
+        WHERE
+            is_activity =1
+    </select>
+
+    <!--活动补货门店数-->
+    <select id="getStoreNum" resultType="java.lang.Integer">
+        SELECT
+            COUNT( a.storeCode )
+        FROM
+            ( SELECT store_code AS storeCode FROM order_store_info WHERE is_activity = 1 GROUP BY store_code ) a
+    </select>
 </mapper>
 

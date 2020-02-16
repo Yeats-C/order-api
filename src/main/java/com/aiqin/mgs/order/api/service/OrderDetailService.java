@@ -11,16 +11,12 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.request.ProductStoreRequest;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.domain.CartInfo;
-import com.aiqin.mgs.order.api.domain.OrderDetailInfo;
-import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
-import com.aiqin.mgs.order.api.domain.OrderInfo;
-import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.request.ProdisorRequest;
 import com.aiqin.mgs.order.api.domain.response.SkuSaleResponse;
 
@@ -92,4 +88,6 @@ public interface OrderDetailService {
 	HttpResponse findOrderDetailById(String orderDetailId);
 	// 查询门店商品订单数
 	HttpResponse productStore(@Valid ProductStoreRequest info);
+
+	HttpResponse batchAddOrder(List<OrderodrInfo> cartInfo);
 }

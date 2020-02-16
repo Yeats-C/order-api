@@ -47,12 +47,37 @@
             #{activityProduct.discount,jdbcType=INTEGER},
             #{activityProduct.reduce,jdbcType=INTEGER},
             #{activityProduct.actualPrice,jdbcType=INTEGER},
-            #{activityProduct.createBy,jdbcType=VARCHAR},
-            #{activityProduct.update_by,jdbcType=VARCHAR},
+            #{activityProduct.status,jdbcType=INTEGER},
             now(), now(),
             #{activityProduct.isDelete,jdbcType=INTEGER},
+            #{activityProduct.createBy,jdbcType=VARCHAR},
+            #{activityProduct.updateBy,jdbcType=VARCHAR},
             #{activityProduct.activityScope,jdbcType=INTEGER}
             )
         </foreach>
     </insert>
+
+
+    <select id="activityProductList" resultType="java.util.List" resultMap="BaseResultMap"
+            parameterType="com.aiqin.mgs.order.api.domain.ActivityProduct">
+        select id,activity_id, sku_code,product_name, product_code, product_brand_code,product_brand_name, product_category_code
+        ,product_category_name, price_tax,discount,reduce,actual_price,status,create_time, update_time,is_delete,create_by
+        ,update_by,activity_scope
+        FROM activity_product
+        where 1=1 and is_delete=0
+        <if test="activityId != '' and activityId != null">
+            and activity_id = #{activityId}
+        </if>
+        <if test="pageSize!=null ">
+            limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+        </if>
+    </select>
+
+    <!--通过activityId删除活动-商品信息（逻辑删除）-->
+    <delete id="deleteProductByActivityId" parameterType="java.lang.String">
+    update activity_product set
+        is_delete = 1,
+        update_time = now()
+    where activity_id = #{activityId,jdbcType=VARCHAR}
+  </delete>
 </mapper>

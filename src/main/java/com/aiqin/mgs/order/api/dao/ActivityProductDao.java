@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.dao;
 
+import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityProduct;
 
 import java.util.List;
@@ -15,6 +16,20 @@ public interface ActivityProductDao {
      * @return
      */
     Integer insertList(List<ActivityProduct> activityProductList);
+
+    /**
+     * 查询活动-商品列表
+     * @param activity
+     * @return
+     */
+    List<ActivityProduct> activityProductList(Activity activity);
+
+    /**
+     * 通过activityId删除活动-商品信息（逻辑删除）
+     * @param activityId
+     * @return
+     */
+    Integer deleteProductByActivityId(String activityId);
 }
 
 
