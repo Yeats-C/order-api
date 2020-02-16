@@ -15,6 +15,13 @@ public interface ActivityRuleDao {
      * @return
      */
     Integer insertList(List<ActivityRule> activityRuleList);
+
+    /**
+     * 通过活动id查询活动规则
+     * @param activityId
+     * @return
+     */
+    List<ActivityRule> selectByActivityId(String activityId);
 }
 
 

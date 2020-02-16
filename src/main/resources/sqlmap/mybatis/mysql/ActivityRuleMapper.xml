@@ -30,7 +30,7 @@
         values
         <foreach collection="list" item="activityRule" separator=",">
             (#{activityRule.activityId,jdbcType=VARCHAR},
-            #{activityRule.activity_type,jdbcType=INTEGER},
+            #{activityRule.activityType,jdbcType=INTEGER},
             #{activityRule.ruleUnit,jdbcType=INTEGER},
             #{activityRule.meetingConditions,jdbcType=INTEGER},
             #{activityRule.preferentialAmount,jdbcType=INTEGER},
@@ -44,4 +44,14 @@
             now(), now() )
         </foreach>
     </insert>
+
+    <!--通过activityId查询活动-规则列表-->
+    <select id="selectByActivityId" parameterType="java.lang.String" resultMap="BaseResultMap"
+            resultType="java.util.List">
+        select
+        <include refid="Base_Column_List"/>
+        from activity_rule
+        where activity_id = #{activityId,jdbcType=VARCHAR}
+        and is_delete=0
+    </select>
 </mapper>

@@ -75,8 +75,15 @@
         <if test=" useStatus != null and useStatus != '' or useStatus == 0 ">
             and use_status = #{useStatus}
         </if>
+        <if test=" isActivity != null">
+            and is_activity = #{isActivity}
+        </if>
         order by create_time asc
+        <if test="pageSize!=null ">
+            limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+        </if>
     </select>
+
 
     <update id="updateByPrimaryKeySelective">
         update order_store_detail
@@ -145,6 +152,15 @@
                 #{signDifferenceReason}, #{boxGrossWeight}, #{boxVolume}, #{useStatus}, #{createById}, #{createByName}, #{updateById},
                 #{updateByName}, sysdate(), sysdate())
     </insert>
+
+    <select id="getProductSales" resultType="java.math.BigDecimal">
+        SELECT
+            SUM( total_product_amount ) AS productSales
+        FROM
+            order_store_detail
+        WHERE
+            is_activity =1
+    </select>
 
 </mapper>
 
