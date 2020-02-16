@@ -18,9 +18,17 @@ import java.util.Date;
 @ApiModel("前台销售统计数据")
 public class FrontEndSalesStatisticsDetail {
 
+    @JsonProperty("id")
+    @ApiModelProperty("id")
+    private Long id;
+
     @JsonProperty("sale_statistics_id")
     @ApiModelProperty("前台销售统计id")
     private String saleStatisticsId;
+
+    @JsonProperty("sale_statistics_detail_id")
+    @ApiModelProperty("前台销售统计明细id")
+    private String saleStatisticsDetailId;
 
     @JsonProperty("store_id")
     @ApiModelProperty("门店id")

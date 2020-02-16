@@ -25,6 +25,7 @@ public interface FrontEndSalesStatisticsDao {
      */
     List<FrontEndSalesStatistics> selectCurrentMonthSalesStatistics();
 
+
     /**
      * 根据月份批量删除数据
      * @return

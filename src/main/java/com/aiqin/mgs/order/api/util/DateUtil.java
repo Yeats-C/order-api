@@ -5,6 +5,7 @@
  * ****************************************************************************/
 package com.aiqin.mgs.order.api.util;
 
+import io.swagger.models.auth.In;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,6 +134,8 @@ public class DateUtil {
         return formatDate(sysDate);
     }
 
+
+
     /**
      * 获取月初日期
      */
@@ -165,7 +168,18 @@ public class DateUtil {
         String firstday = sdf1.format(cale.getTime());
         return Integer.parseInt(firstday);
     }
-
+    /**
+     *  获取当前日期的前一天
+     * @param
+     * @return
+     */
+    public static String getYesterdayDate(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -1); //得到前一天
+        Date date = calendar.getTime();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        return df.format(date);
+    }
 
 
     /**
