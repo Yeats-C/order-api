@@ -84,6 +84,7 @@
         </if>
     </select>
 
+
     <update id="updateByPrimaryKeySelective">
         update order_store_detail
         set
@@ -151,6 +152,15 @@
                 #{signDifferenceReason}, #{boxGrossWeight}, #{boxVolume}, #{useStatus}, #{createById}, #{createByName}, #{updateById},
                 #{updateByName}, sysdate(), sysdate())
     </insert>
+
+    <select id="getProductSales" resultType="java.math.BigDecimal">
+        SELECT
+            SUM( total_product_amount ) AS productSales
+        FROM
+            order_store_detail
+        WHERE
+            is_activity =1
+    </select>
 
 </mapper>
 

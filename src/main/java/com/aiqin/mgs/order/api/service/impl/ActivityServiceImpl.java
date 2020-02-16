@@ -9,10 +9,7 @@ import com.aiqin.mgs.order.api.dao.ActivityRuleDao;
 import com.aiqin.mgs.order.api.dao.ActivityStoreDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
-import com.aiqin.mgs.order.api.domain.Activity;
-import com.aiqin.mgs.order.api.domain.ActivityProduct;
-import com.aiqin.mgs.order.api.domain.ActivityRule;
-import com.aiqin.mgs.order.api.domain.ActivityStore;
+import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
@@ -23,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -202,13 +200,24 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public HttpResponse<Map> getActivitySalesStatistics() {
         LOGGER.info("查询活动详情-销售数据-活动销售统计");
-        HttpResponse response = HttpResponse.success();
-        //活动相关订单销售额及活动订单数(当订单中的商品命中了这个促销活动时，这个订单纳入统计，统计主订单。)
-        Map activitySalesData=erpOrderInfoDao.getActivitySales();
-        //
-        //
-        //
-        //
+        try {
+            HttpResponse response = HttpResponse.success();
+            //活动相关订单销售额及活动订单数(当订单中的商品命中了这个促销活动时，这个订单纳入统计，统计主订单。)
+            ActivitySales activitySales=erpOrderInfoDao.getActivitySales();
+            //活动商品销售额
+            BigDecimal  productSales=erpOrderItemDao.getProductSales();
+            //活动补货门店数
+            Integer storeNum=erpOrderInfoDao.getStoreNum();
+            //平均单价
+            BigDecimal averageUnitPrice=activitySales.getActivitySales().divide(new BigDecimal(activitySales.getActivitySalesNum()));
+            activitySales.setProductSales(productSales);
+            activitySales.setStoreNum(storeNum);
+            activitySales.setAverageUnitPrice(averageUnitPrice);
+            response.setData(activitySales);
         return response;
+        } catch (Exception e) {
+            LOGGER.error("查询活动详情-销售数据-活动销售统计失败", e);
+            throw new RuntimeException(ResultCode.SELECT_ACTIVITY_INFO_EXCEPTION.getMessage());
+        }
     }
 }
