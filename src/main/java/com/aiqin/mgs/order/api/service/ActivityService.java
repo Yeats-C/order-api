@@ -65,4 +65,11 @@ public interface ActivityService {
      * @return
      */
     HttpResponse updateActivity(ActivityRequest activityRequest);
+
+    /**
+     * 编辑活动生效状态
+     * @param activity
+     * @return
+     */
+    HttpResponse updateStatus(Activity activity);
 }
