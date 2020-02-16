@@ -60,6 +60,9 @@
             <if test="updateTime!= null">
                 and update_time = #{updateTime}
             </if>
+            <if test="pageSize!=null ">
+                limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+            </if>
         </where>
     </select>
 
@@ -69,9 +72,7 @@
         from activity
         <where>
             1=1
-            <if test="activityId != '' and activityId != null">
-                and activity_id = #{activityId}
-            </if>
+            and activity_id = #{activityId}
         </where>
     </select>
 

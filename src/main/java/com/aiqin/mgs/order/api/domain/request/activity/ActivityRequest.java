@@ -9,14 +9,15 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author csf
  */
 @Data
-@ApiModel("活动新建/修改请求参数")
-public class ActivityRequest {
+@ApiModel("活动新建、修改请求参数")
+public class ActivityRequest implements Serializable {
 
     /**活动信息*/
     @ApiModelProperty(value = "活动信息")
