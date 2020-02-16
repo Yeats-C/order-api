@@ -52,4 +52,11 @@ public interface ErpOrderItemDao {
      * @return
      */
     BigDecimal getProductSales();
+
+    /**
+     * 根据字段精确查询符合的数据列表总数
+     * @param erpOrderItem
+     * @return
+     */
+    Integer totalCount(ErpOrderItem erpOrderItem);
 }

@@ -33,6 +33,13 @@ public interface ActivityDao {
      * @return
      */
     int updateActivity(Activity activity);
+
+    /**
+     * 查询总条数
+     * @param activity
+     * @return
+     */
+    Integer totalCount(Activity activity);
 }
 
 
