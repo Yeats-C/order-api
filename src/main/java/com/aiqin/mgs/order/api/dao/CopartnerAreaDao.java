@@ -42,14 +42,18 @@ import org.apache.ibatis.annotations.Select;
 
 public interface CopartnerAreaDao {
 
-	List<CopartnerAreaList> copartnerAreaList(@Valid CopartnerAreaListReq param);
+	List<CopartnerAreaList> copartnerAreaList(@Valid CopartnerAreaVo param);
 
-	int countCopartnerAreaList(@Valid CopartnerAreaListReq param);
+	int countCopartnerAreaList(@Valid CopartnerAreaVo param);
 
 	List<CopartnerAreaUp> copartnerAreaUp();
 
 	void saveCopartnerArea(CopartnerAreaVo vo);
 
 	CopartnerAreaVo selectCopartnerAreaInfo(@Valid String copartnerAreaId);
+
+	void deleteById(String copartnerAreaId);
+	
+	List<CopartnerAreaVo> copartnerAreaVoList(@Valid CopartnerAreaVo param);
 
 }

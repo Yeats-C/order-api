@@ -20,6 +20,8 @@ import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaSave;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
+import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo;
+import com.aiqin.mgs.order.api.domain.copartnerArea.PublicAreaStore;
 import com.aiqin.mgs.order.api.domain.request.*;
 import com.aiqin.mgs.order.api.domain.response.LatelyResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
@@ -31,6 +33,8 @@ import com.aiqin.mgs.order.api.service.OrderService;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
@@ -60,13 +64,31 @@ public class CopartnerAreaController {
     private CopartnerAreaService copartnerAreaService;
     
     
-    @PostMapping("/list")
+    @GetMapping("/list")
     @ApiOperation(value = "经营区域列表-分页")
-    public HttpResponse<CopartnerAreaList> copartnerAreaList(@Valid @RequestBody CopartnerAreaListReq param){
-        
-    	LOGGER.info("经营区域列表请求参数：{}",param);
-        
-    	return copartnerAreaService.copartnerAreaList(param);
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "copartner_area_name", value = "经营区域名称", dataType = "String", paramType = "query", required = false),
+        @ApiImplicitParam(name = "copartner_area_company", value = "管理归属", dataType = "String", paramType = "query", required = false),
+        @ApiImplicitParam(name = "copartner_area_level", value = "管理层级 1:一级 2：二级", dataType = "Integer", paramType = "query", required = false),
+        @ApiImplicitParam(name = "page_no", value = "当前页", dataType = "Integer", paramType = "query", required = false),
+        @ApiImplicitParam(name = "page_size", value = "每页条数", dataType = "Integer", paramType = "query", required = false)
+    })
+    public HttpResponse<CopartnerAreaList> copartnerAreaList(
+            @RequestParam(value = "copartner_area_name", required = false) String copartnerAreaName,
+            @RequestParam(value = "copartner_area_company", required = false) String copartnerAreaCompany,
+            @RequestParam(value = "copartner_area_level", required = false) Integer copartnerAreaLevel,
+            @RequestParam(value = "page_no", required = false) Integer pageNo,
+            @RequestParam(value = "page_size", required = false) Integer pageSize) {
+
+        LOGGER.info("经营区域列表-分页请求参数[[copartnerAreaName={},copartnerAreaCompany={},copartnerAreaLevel={},pageNo={},pageSize={}",copartnerAreaName,copartnerAreaCompany,copartnerAreaLevel,pageNo,pageSize);
+
+        CopartnerAreaVo vo = new CopartnerAreaVo();
+        vo.setCopartnerAreaName(copartnerAreaName);
+        vo.setCopartnerAreaCompany(copartnerAreaCompany);
+        vo.setCopartnerAreaLevel(copartnerAreaLevel);
+        vo.setPageNo(pageNo);
+        vo.setPageSize(pageSize);
+        return copartnerAreaService.copartnerAreaList(vo);
     }
     
     
@@ -104,7 +126,7 @@ public class CopartnerAreaController {
     }
     
     @PostMapping("/save")
-    @ApiOperation(value = "新建区域-保存")
+    @ApiOperation(value = "新建/修改区域-保存")
     public HttpResponse saveCopartnerArea(@Valid @RequestBody CopartnerAreaSave param){
     	return copartnerAreaService.saveCopartnerArea(param);
     }
@@ -122,33 +144,52 @@ public class CopartnerAreaController {
     
     
     @GetMapping("/detail/store")
-    @ApiOperation(value = "经营区域详情-门店列表分页")
+    @ApiOperation(value = "经营区域详情-门店列表")
     public HttpResponse getCopartnerAreaStore(
-    		@Valid @RequestParam(name = "copartner_area_id", required = true) String copartnerAreaId,
-    		@RequestParam(value = "page_no", required = false) Integer pageNo,
-            @RequestParam(value = "page_size", required = false) Integer pageSize){
+    		@Valid @RequestParam(name = "copartner_area_id", required = true) String copartnerAreaId){
         
-    	LOGGER.info("经营区域详情基本信息请求参数：copartnerAreaId={},pageNo={},pageSize={}",copartnerAreaId,pageNo,pageSize);
-    	CopartnerAreaStoreVo vo = new CopartnerAreaStoreVo();
-    	vo.setCopartnerAreaId(copartnerAreaId);
-    	vo.setPageNo(pageNo);
-    	vo.setPageSize(pageSize);
-    	return copartnerAreaService.getCopartnerAreaStore(vo);
+    	LOGGER.info("经营区域详情基本信息请求参数：copartnerAreaId={}",copartnerAreaId);
+    	return copartnerAreaService.getCopartnerAreaStore(copartnerAreaId);
     }
     
     
     @GetMapping("/detail/role")
-    @ApiOperation(value = "经营区域详情-权限列表分页")
+    @ApiOperation(value = "经营区域详情-权限列表")
     public HttpResponse getCopartnerAreaRole(
-    		@Valid @RequestParam(name = "copartner_area_id", required = true) String copartnerAreaId,
-    		@RequestParam(value = "page_no", required = false) Integer pageNo,
-            @RequestParam(value = "page_size", required = false) Integer pageSize){
+    		@Valid @RequestParam(name = "copartner_area_id", required = true) String copartnerAreaId){
         
-    	LOGGER.info("经营区域详情基本信息请求参数：copartnerAreaId={},pageNo={},pageSize={}",copartnerAreaId,pageNo,pageSize);
-    	CopartnerAreaRoleVo vo = new CopartnerAreaRoleVo();
-    	vo.setCopartnerAreaId(copartnerAreaId);
-    	vo.setPageNo(pageNo);
-    	vo.setPageSize(pageSize);
-    	return copartnerAreaService.getCopartnerAreaRole(vo);
+    	LOGGER.info("经营区域详情基本信息请求参数：copartnerAreaId={}",copartnerAreaId);
+    	return copartnerAreaService.getCopartnerAreaRole(copartnerAreaId);
+    }
+    
+    @GetMapping("/delete")
+    @ApiOperation(value = "删除区域设置")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "copartner_area_id", value = "经营区域ID", dataType = "String", required = true),
+    })
+    public HttpResponse deleteMainById(
+            @RequestParam(value = "copartner_area_id", required = true) String copartnerAreaId
+            ) {
+
+    	LOGGER.info("删除区域设置请求参数[[copartnerAreaId={}",copartnerAreaId);
+
+        return copartnerAreaService.deleteMainById(copartnerAreaId);
+    }
+    
+    
+    @GetMapping("/store/by/person")
+    @ApiOperation(value = "合伙人数据权限控制公共接口")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "person_id", value = "人员编码", dataType = "String", required = true),
+        @ApiImplicitParam(name = "resource_code", value = "菜单编码", dataType = "String", required = true)
+    })
+    public HttpResponse<PublicAreaStore> selectStoreByPerson(
+            @RequestParam(value = "person_id", required = true) String personId,
+            @RequestParam(value = "resource_code", required = true) String resourceCode
+            ) {
+
+    	LOGGER.info("合伙人数据权限控制公共接口请求参数[[personId={},resourceCode={}",personId,resourceCode);
+
+        return copartnerAreaService.selectStoreByPerson(personId,resourceCode);
     }
 }

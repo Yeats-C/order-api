@@ -68,7 +68,6 @@
         <if test=" copartnerAreaId !=null and copartnerAreaId !='' ">
          and copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
         </if>
-        LIMIT #{beginIndex,jdbcType=BIGINT}, #{pageSize,jdbcType=BIGINT}
     </select>
     <select id="countRoleMainPage" resultType="java.lang.Integer">
         select
@@ -79,5 +78,29 @@
          and copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
         </if>
     </select>
+    
+    <select id="selectRoleMainList"  resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleVo">
+        select
+        copartner_area_id as copartnerAreaId,
+        person_id as personId,
+        person_name as personName,
+        role_code as roleCode,
+        role_name as roleName
+        from copartner_area_role
+        where 1=1
+        <if test=" copartnerAreaId !=null and copartnerAreaId !='' ">
+         and copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
+        </if>
+        <if test=" personId !=null and personId !='' ">
+         and person_id = #{personId,jdbcType=VARCHAR}
+        </if>
+        <if test=" roleCode !=null and roleCode !='' ">
+         and role_code = #{roleCode,jdbcType=VARCHAR}
+        </if>
+    </select>
+    
+    <delete id="deleteById">
+        delete from copartner_area_role where copartner_area_id = #{copartnerAreaId}
+    </delete>
 </mapper>
 

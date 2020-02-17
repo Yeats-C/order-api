@@ -48,6 +48,10 @@ public interface CopartnerAreaRoleDao {
 	void saveCopartnerAreaRole(CopartnerAreaRoleVo vo);
 
 	List<CopartnerAreaRoleList> selectRoleMainPageList(CopartnerAreaRoleVo vo);
-
+	
 	int countRoleMainPage(CopartnerAreaRoleVo vo);
+
+	void deleteById(String copartnerAreaId);
+	
+	List<CopartnerAreaRoleVo> selectRoleMainList(CopartnerAreaRoleVo vo);
 }

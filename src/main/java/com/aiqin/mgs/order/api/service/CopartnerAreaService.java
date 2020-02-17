@@ -18,6 +18,7 @@ import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaSave;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
+import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo;
 import com.aiqin.mgs.order.api.domain.request.*;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
@@ -26,13 +27,13 @@ import com.aiqin.mgs.order.api.domain.response.PartnerPayGateRep;
 @SuppressWarnings("all")
 public interface CopartnerAreaService {
 
-	HttpResponse copartnerAreaList(@Valid CopartnerAreaListReq param);
+	HttpResponse copartnerAreaList(@Valid CopartnerAreaVo param);
 
 	HttpResponse getCopartnerAreaDetail(@Valid String copartnerAreaId);
 
-	HttpResponse getCopartnerAreaStore(CopartnerAreaStoreVo vo);
+	HttpResponse getCopartnerAreaStore(String copartnerAreaId);
 
-	HttpResponse getCopartnerAreaRole(CopartnerAreaRoleVo vo);
+	HttpResponse getCopartnerAreaRole(String copartnerAreaId);
 
 	HttpResponse<CopartnerAreaUp> copartnerAreaUp();
 
@@ -43,5 +44,9 @@ public interface CopartnerAreaService {
 	HttpResponse roledetail(@Valid String copartnerAreaId, @Valid String personId);
 
 	HttpResponse saveCopartnerArea(@Valid CopartnerAreaSave param);
+
+	HttpResponse deleteMainById(String copartnerAreaId);
+
+	HttpResponse selectStoreByPerson(String personId,String resourceCode);
 	
 }

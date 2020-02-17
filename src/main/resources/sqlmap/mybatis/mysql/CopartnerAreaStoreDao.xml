@@ -34,7 +34,6 @@
         <if test=" copartnerAreaId !=null and copartnerAreaId !='' ">
          and copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
         </if>
-        LIMIT #{beginIndex,jdbcType=BIGINT}, #{pageSize,jdbcType=BIGINT}
     </select>
     <select id="countStoreMainPage" resultType="java.lang.Integer">
         select
@@ -45,5 +44,21 @@
          and copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
         </if>
     </select>
+    
+    <select id="selectPublicAreaStoreList" resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreVo">
+        select
+         store_id as storeId,
+         store_code as storeCode,
+         store_name as storeName
+        from copartner_area_store
+        where 1=1
+        <if test=" copartnerAreaId !=null and copartnerAreaId !='' ">
+         and copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
+        </if>
+    </select>
+    
+    <delete id="deleteById">
+        delete from copartner_area_store where copartner_area_id = #{copartnerAreaId}
+    </delete>
 </mapper>
 

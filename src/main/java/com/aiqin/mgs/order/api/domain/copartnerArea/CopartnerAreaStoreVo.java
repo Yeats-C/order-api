@@ -20,6 +20,7 @@ import java.util.List;
 @Data
 public class CopartnerAreaStoreVo extends PagesRequest{
 	
+
 	@ApiModelProperty(value = "自动生成-经营区域ID")
     @JsonProperty("copartner_area_id")
     private String copartnerAreaId;
@@ -57,5 +58,13 @@ public class CopartnerAreaStoreVo extends PagesRequest{
 	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonProperty("update_time")
 	private Date updateTime;
+	
+	
+	public CopartnerAreaStoreVo(String copartnerAreaId) {
+		this.copartnerAreaId = copartnerAreaId;
+	}
+	
+	public CopartnerAreaStoreVo() {
+	}
 	
 }
