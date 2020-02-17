@@ -16,7 +16,7 @@ import lombok.Data;
 public class RelatedSalesVo {
 
     @ApiModelProperty(value = "销售品类ID")
-    @JsonProperty("salse_category_id")
+    @JsonProperty("category_code")
     private String salseCategoryId;
 
     @ApiModelProperty(value = "生效状态 0:生效 1：失效")
