@@ -118,5 +118,16 @@ public class ActivityController {
         return activitesService.updateActivity(activityRequest);
     }
 
+    /**
+     * 通过门店id爱掌柜的促销活动列表（所有生效活动）
+     * @param storeId
+     * @return
+     */
+    @GetMapping("/effectiveActivityList")
+    @ApiOperation(value = "通过门店id爱掌柜的促销活动列表（所有生效活动）")
+    public HttpResponse<List<ActivityRequest>> effectiveActivityList(String storeId){
+        return activitesService.effectiveActivityList(storeId);
+    }
+
 
 }

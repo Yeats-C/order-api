@@ -352,4 +352,12 @@ public class ActivityServiceImpl implements ActivityService {
             throw new RuntimeException(ResultCode.UPDATE_ACTIVITY_INFO_EXCEPTION.getMessage());
         }
     }
+
+    @Override
+    public HttpResponse<List<ActivityRequest>> effectiveActivityList(String storeId) {
+        LOGGER.info("通过门店id爱掌柜的促销活动列表（所有生效活动）effectiveActivityList参数为：{}", storeId);
+        HttpResponse response = HttpResponse.success();
+        List<Activity> activityList=activityDao.effectiveActivityList(storeId);
+        return response;
+    }
 }
