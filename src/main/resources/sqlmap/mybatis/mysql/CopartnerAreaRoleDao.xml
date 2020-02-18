@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.CopartnerAreaRoleDao">
+    <select id = "getRoleByUnion" resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleList">
+    select 
+      copartner_area_id as copartnerAreaId,
+      person_id as personId,
+      person_name as personName,
+      REPLACE(GROUP_CONCAT(role_name),',','、') as roleName
+    from copartner_area_role
+    where 1=1
+    <if test=" copartnerAreaId !=null and copartnerAreaId !='' ">
+         and copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
+    </if>
+    <if test=" personId !=null and personId !='' ">
+         and person_id = #{personId,jdbcType=VARCHAR}
+    </if>
+    limit 1
+    </select>
+    
+    <select id = "getRoleByPky" resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleVo">
+    select 
+      copartner_area_id as copartnerAreaId,
+      person_id as personId,
+      person_name as personName,
+      REPLACE(GROUP_CONCAT(role_code),',','、') as roleCode
+    from copartner_area_role
+    where 1=1
+    <if test=" copartnerAreaId !=null and copartnerAreaId !='' ">
+         and copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
+    </if>
+    <if test=" personId !=null and personId !='' ">
+         and person_id = #{personId,jdbcType=VARCHAR}
+    </if>
+    <if test=" roleType !=null ">
+         and role_type = #{roleType,jdbcType=TINYINT}
+    </if>
+    limit 1
+    </select>
+    <insert id ="saveCopartnerAreaRole">
+       insert into copartner_area_role(
+          copartner_area_id,
+          person_id,
+          person_name,
+          role_code,
+          role_name,
+          role_type,
+          memo
+       )values(
+          #{copartnerAreaId},
+          #{personId},
+          #{personName},
+          #{roleCode},
+          #{roleName},
+          #{roleType},
+          #{memo}
+       )
+    </insert>
+    <select id="selectRoleMainPageList"  resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleList">
+        select
+        copartner_area_id as copartnerAreaId,
+        person_id as personId,
+        person_name as personName,
+        role_code as roleCode,
+        role_name as roleName
+        from copartner_area_role
+        where 1=1
+        <if test=" copartnerAreaId !=null and copartnerAreaId !='' ">
+         and copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
+        </if>
+    </select>
+    <select id="countRoleMainPage" resultType="java.lang.Integer">
+        select
+        count(1)
+        from copartner_area_role
+        where 1=1
+        <if test=" copartnerAreaId !=null and copartnerAreaId !='' ">
+         and copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
+        </if>
+    </select>
+    
+    <select id="selectRoleMainList"  resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleVo">
+        select
+        copartner_area_id as copartnerAreaId,
+        person_id as personId,
+        person_name as personName,
+        role_code as roleCode,
+        role_name as roleName
+        from copartner_area_role
+        where 1=1
+        <if test=" copartnerAreaId !=null and copartnerAreaId !='' ">
+         and copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
+        </if>
+        <if test=" personId !=null and personId !='' ">
+         and person_id = #{personId,jdbcType=VARCHAR}
+        </if>
+        <if test=" roleCode !=null and roleCode !='' ">
+         and role_code = #{roleCode,jdbcType=VARCHAR}
+        </if>
+    </select>
+    
+    <delete id="deleteById">
+        delete from copartner_area_role where copartner_area_id = #{copartnerAreaId}
+    </delete>
+</mapper>
+
