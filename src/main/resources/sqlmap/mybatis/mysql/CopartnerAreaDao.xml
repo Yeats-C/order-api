@@ -134,7 +134,7 @@
         </if>
     </select>
     
-    <delete id="deleteById">
+    <delete id="deleteById" parameterType="java.lang.String">
         delete from copartner_area_info where copartner_area_id = #{copartnerAreaId}
     </delete>
     

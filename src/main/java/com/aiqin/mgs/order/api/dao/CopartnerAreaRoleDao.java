@@ -51,7 +51,7 @@ public interface CopartnerAreaRoleDao {
 	
 	int countRoleMainPage(CopartnerAreaRoleVo vo);
 
-	void deleteById(String copartnerAreaId);
+	void deleteById(@Valid @Param("copartnerAreaId") String copartnerAreaId);
 	
 	List<CopartnerAreaRoleVo> selectRoleMainList(CopartnerAreaRoleVo vo);
 }

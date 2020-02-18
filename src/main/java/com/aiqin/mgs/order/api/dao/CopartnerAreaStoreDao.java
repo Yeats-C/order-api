@@ -41,7 +41,7 @@ import org.apache.ibatis.annotations.Select;
 
 public interface CopartnerAreaStoreDao {
 
-	int countStoreByArea(String copartnerAreaId);
+	int countStoreByArea(@Valid @Param("copartnerAreaId") String copartnerAreaId);
 
 	void saveCopartnerAreaStore(CopartnerAreaStoreVo vo);
 
@@ -49,7 +49,7 @@ public interface CopartnerAreaStoreDao {
 
 	int countStoreMainPage(CopartnerAreaStoreVo vo);
 
-	void deleteById(String copartnerAreaId);
+	void deleteById(@Valid @Param("copartnerAreaId") String copartnerAreaId);
 	
 	List<PublicAreaStore> selectPublicAreaStoreList(String copartnerAreaId);
 

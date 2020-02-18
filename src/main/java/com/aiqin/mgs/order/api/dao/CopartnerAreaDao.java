@@ -50,9 +50,9 @@ public interface CopartnerAreaDao {
 
 	void saveCopartnerArea(CopartnerAreaVo vo);
 
-	CopartnerAreaVo selectCopartnerAreaInfo(@Valid String copartnerAreaId);
+	CopartnerAreaVo selectCopartnerAreaInfo(@Valid @Param("copartnerAreaId") String copartnerAreaId);
 
-	void deleteById(String copartnerAreaId);
+	void deleteById(@Valid @Param("copartnerAreaId") String copartnerAreaId);
 	
 	List<CopartnerAreaVo> copartnerAreaVoList(@Valid CopartnerAreaVo param);
 
