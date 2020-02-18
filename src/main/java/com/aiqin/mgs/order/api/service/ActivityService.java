@@ -95,5 +95,11 @@ public interface ActivityService {
      * @param productBrandName
      * @return
      */
-    HttpResponse<ActivityProduct> productBrandList(String productBrandName);
+    HttpResponse<List<ActivityProduct>> productBrandList(String productBrandName);
+
+    /**
+     * 活动商品品类接口
+     * @return
+     */
+    HttpResponse<List<ActivityProduct>> productCategoryList();
 }

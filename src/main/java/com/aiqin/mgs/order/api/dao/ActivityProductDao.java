@@ -37,6 +37,12 @@ public interface ActivityProductDao {
      * @return
      */
     List<ActivityProduct> productBrandList(ActivityProduct productBrandName);
+
+    /**
+     * 活动商品品类接口
+     * @return
+     */
+    List<ActivityProduct> productCategoryList();
 }
 
 

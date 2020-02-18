@@ -404,12 +404,37 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public HttpResponse<ActivityProduct> productBrandList(String productBrandName) {
+    public HttpResponse<List<ActivityProduct>> productBrandList(String productBrandName) {
         LOGGER.info("活动商品品牌列表接口参数productBrandName为:{}", productBrandName);
         HttpResponse response = HttpResponse.success();
         ActivityProduct activityProduct=new ActivityProduct();
         activityProduct.setProductBrandName(productBrandName);
         List<ActivityProduct> activityProducts=activityProductDao.productBrandList(activityProduct);
+        response.setData(activityProducts);
+        return response;
+    }
+
+    @Override
+    public HttpResponse<List<ActivityProduct>> productCategoryList() {
+        LOGGER.info("活动商品品牌列表接口开始");
+        HttpResponse response = HttpResponse.success();
+        List<ActivityProduct> activityProducts=activityProductDao.productCategoryList();
+        //所有根节点
+        List<ActivityProduct> parentList = new ArrayList<>();
+        //所有子节点
+        List<ActivityProduct> childList = new ArrayList<>();
+//        activityProducts.forEach(item->{
+//            if (item.getParentId().equals("0")){
+//                parentList.add(item);
+//            } else {
+//                childList.add(item);
+//            }
+//        });
+//
+//        parentList.forEach(item->{
+//            List<ActivityProduct> resultList = getChildren(String.valueOf(item.getProductCategoryCode()),childList);
+//            item.setActivityProducts(resultList);
+//        });
         response.setData(activityProducts);
         return response;
     }

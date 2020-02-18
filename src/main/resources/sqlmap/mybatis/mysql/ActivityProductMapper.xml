@@ -98,4 +98,17 @@
         GROUP BY
             p.product_brand_code
     </select>
+
+    <!--活动商品品牌列表接口-->
+    <select id="productCategoryList" resultType="java.util.List" resultMap="BaseResultMap">
+        SELECT
+        p.product_category_code,
+        p.product_category_name
+        FROM
+        activity_product p
+        LEFT JOIN activity a ON a.activity_id = p.activity_id
+        where 1=1
+        GROUP BY
+        p.product_category_code
+    </select>
 </mapper>

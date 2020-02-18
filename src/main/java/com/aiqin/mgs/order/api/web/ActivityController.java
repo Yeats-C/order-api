@@ -173,7 +173,18 @@ public class ActivityController {
      */
     @GetMapping("/product/brand/list")
     @ApiOperation(value = "活动商品品牌列表接口")
-    public HttpResponse<ActivityProduct> productBrandList(String productBrandName) {
+    public HttpResponse<List<ActivityProduct>> productBrandList(String productBrandName) {
         return activitesService.productBrandList(productBrandName);
+    }
+
+    /**
+     * 活动商品品类接口
+     * @param
+     * @return
+     */
+    @GetMapping("/product/category/list")
+    @ApiOperation(value = "活动商品品类接口")
+    public HttpResponse<List<ActivityProduct>> productCategoryList() {
+        return activitesService.productCategoryList();
     }
 }
