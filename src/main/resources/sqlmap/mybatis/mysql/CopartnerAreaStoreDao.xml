@@ -46,7 +46,7 @@
         </if>
     </select>
     
-    <select id="selectPublicAreaStoreList" resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreVo">
+    <select id="selectPublicAreaStoreList" resultType="com.aiqin.mgs.order.api.domain.copartnerArea.PublicAreaStore">
         select
          store_id as storeId,
          store_code as storeCode,
@@ -61,5 +61,13 @@
     <delete id="deleteById">
         delete from copartner_area_store where copartner_area_id = #{copartnerAreaId}
     </delete>
+    
+    <select id = "countStoreByStoreCode" resultType="java.lang.Integer">
+    select 
+      count(1)
+    from copartner_area_store
+    where 1=1
+    and store_code = #{storeCode,jdbcType=VARCHAR}
+    </select>
 </mapper>
 
