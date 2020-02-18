@@ -178,5 +178,8 @@
         JOIN activity_store s ON a.activity_id = s.activity_id
         where   1=1
         and s.store_id = #{storeId}
+        AND a.begin_time &lt; now()
+        and a.finish_time &gt; NOW()
+        and a.activity_status=0
     </select>
 </mapper>

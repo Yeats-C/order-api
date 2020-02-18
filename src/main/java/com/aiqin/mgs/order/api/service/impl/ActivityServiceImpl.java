@@ -3,17 +3,17 @@ package com.aiqin.mgs.order.api.service.impl;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
-import com.aiqin.mgs.order.api.dao.ActivityDao;
-import com.aiqin.mgs.order.api.dao.ActivityProductDao;
-import com.aiqin.mgs.order.api.dao.ActivityRuleDao;
-import com.aiqin.mgs.order.api.dao.ActivityStoreDao;
+import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
+import com.aiqin.mgs.order.api.util.DateUtil;
+import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -50,13 +50,32 @@ public class ActivityServiceImpl implements ActivityService {
     @Resource
     private ErpOrderInfoDao erpOrderInfoDao;
 
+    @Resource
+    private CartOrderDao cartOrderDao;
+
     @Override
     public HttpResponse<Map> activityList(Activity activity) {
         LOGGER.info("查询促销活动列表activityList参数为：{}", activity);
         HttpResponse response = HttpResponse.success();
         Integer totalCount=activityDao.totalCount(activity);
         Map data=new HashMap();
-        data.put("activityList",activityDao.activityList(activity));
+        List<Activity> activities=new ArrayList<>();
+        for (Activity act:activityDao.activityList(activity)){
+            int finishNum=DateUtils.truncatedCompareTo(DateUtil.getNowDate(), act.getFinishTime(), Calendar.SECOND);
+            int startNum=DateUtils.truncatedCompareTo(DateUtil.getNowDate(), act.getBeginTime(), Calendar.SECOND);
+            if(act.getActivityStatus()==1 || finishNum>0){
+                act.setActivityStatus(3);//已关闭
+            }else if(act.getActivityStatus()==0
+                    && startNum>=0
+                    && finishNum<0){
+                act.setActivityStatus(2);//进行中
+            }else if(act.getActivityStatus()==0
+                    && startNum<0){
+                act.setActivityStatus(1);//未开始
+            }
+            activities.add(act);
+        }
+        data.put("activityList",activities);
         data.put("totalCount",totalCount);
         response.setData(data);
         return response;
@@ -358,6 +377,15 @@ public class ActivityServiceImpl implements ActivityService {
         LOGGER.info("通过门店id爱掌柜的促销活动列表（所有生效活动）effectiveActivityList参数为：{}", storeId);
         HttpResponse response = HttpResponse.success();
         List<Activity> activityList=activityDao.effectiveActivityList(storeId);
+        return response;
+    }
+
+    @Override
+    public HttpResponse<Integer> getSkuNum(ShoppingCartRequest shoppingCartRequest) {
+        LOGGER.info("返回购物车中的sku商品的数量getSkuNum参数为：{}", shoppingCartRequest);
+        HttpResponse response = HttpResponse.success();
+        Integer skuNum=cartOrderDao.getSkuNum(shoppingCartRequest);
+        response.setData(skuNum);
         return response;
     }
 }

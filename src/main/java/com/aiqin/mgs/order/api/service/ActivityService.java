@@ -5,6 +5,7 @@ import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityProduct;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -72,4 +73,11 @@ public interface ActivityService {
      * @return
      */
     HttpResponse<List<ActivityRequest>> effectiveActivityList(String storeId);
+
+    /**
+     * 返回购物车中的sku商品的数量
+     * @param shoppingCartRequest
+     * @return
+     */
+    HttpResponse<Integer> getSkuNum(ShoppingCartRequest shoppingCartRequest);
 }

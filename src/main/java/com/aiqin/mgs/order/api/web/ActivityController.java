@@ -6,6 +6,7 @@ import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityProduct;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
@@ -129,5 +131,25 @@ public class ActivityController {
         return activitesService.effectiveActivityList(storeId);
     }
 
+    /**
+     * 爱掌柜-活动商品列表查询（分页），只传activityId与分页参数（未完，商品需处理。每个商品得确定有什么活动，这个最好是在service层写成公用方法）
+     * @param activity
+     * @return
+     */
+    @GetMapping("/productList")
+    @ApiOperation(value = "活动详情-促销规则-活动商品列表查询（分页），只传activityId与分页参数")
+    public HttpResponse<List<ActivityProduct>> productList(Activity activity){
+        return activitesService.activityProductList(activity);
+    }
 
+    /**
+     * 返回购物车中的sku商品的数量
+     * @param shoppingCartRequest
+     * @return
+     */
+    @GetMapping("/getSkuNum")
+    @ApiOperation(value = "返回购物车中的sku商品的数量")
+    public HttpResponse<Integer> getSkuNum(@Valid ShoppingCartRequest shoppingCartRequest) {
+        return activitesService.getSkuNum(shoppingCartRequest);
+    }
 }
