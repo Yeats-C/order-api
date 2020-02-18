@@ -13,12 +13,14 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
+import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaDetail;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaList;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaListReq;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleDetail;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleList;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaSave;
+import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreList;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo;
@@ -151,7 +153,7 @@ public class CopartnerAreaController {
     
     @GetMapping("/detail/info")
     @ApiOperation(value = "经营区域详情基本信息")
-    public HttpResponse getCopartnerAreaDetail(
+    public HttpResponse<CopartnerAreaDetail> getCopartnerAreaDetail(
     		@Valid @RequestParam(name = "copartner_area_id", required = true) String copartnerAreaId){
         
     	LOGGER.info("经营区域详情基本信息请求参数：{}",copartnerAreaId);
@@ -162,7 +164,7 @@ public class CopartnerAreaController {
     
     @GetMapping("/detail/store")
     @ApiOperation(value = "经营区域详情-门店列表")
-    public HttpResponse getCopartnerAreaStore(
+    public HttpResponse<CopartnerAreaStoreList> getCopartnerAreaStore(
     		@Valid @RequestParam(name = "copartner_area_id", required = true) String copartnerAreaId){
         
     	LOGGER.info("经营区域详情基本信息请求参数：copartnerAreaId={}",copartnerAreaId);
@@ -172,7 +174,7 @@ public class CopartnerAreaController {
     
     @GetMapping("/detail/role")
     @ApiOperation(value = "经营区域详情-权限列表")
-    public HttpResponse getCopartnerAreaRole(
+    public HttpResponse<CopartnerAreaRoleList> getCopartnerAreaRole(
     		@Valid @RequestParam(name = "copartner_area_id", required = true) String copartnerAreaId){
         
     	LOGGER.info("经营区域详情基本信息请求参数：copartnerAreaId={}",copartnerAreaId);
