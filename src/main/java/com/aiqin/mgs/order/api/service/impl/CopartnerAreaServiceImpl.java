@@ -185,7 +185,7 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 				for(int i=0;i<param.size();i++) {
 					CopartnerAreaRoleList copartnerAreaRole = new CopartnerAreaRoleList();
 					copartnerAreaRole = param.get(i);
-					//查询权限名称
+					//查询权限编码、权限名称
 					CopartnerAreaRoleList roleName = copartnerAreaRoleDao.getRoleByUnion(copartnerAreaRole);
 					if(roleName != null ) {
 						param.set(i, roleName);

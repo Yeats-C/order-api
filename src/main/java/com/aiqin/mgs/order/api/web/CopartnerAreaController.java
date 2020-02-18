@@ -103,12 +103,12 @@ public class CopartnerAreaController {
     }
     
     
-    @GetMapping("/store/tree")
-    @ApiOperation(value = "新建页面-所辖门店树弹框")
-    public HttpResponse storeTree(){    
-    	//TODO
-    	return null;
-    }
+//    @GetMapping("/store/tree")
+//    @ApiOperation(value = "新建页面-所辖门店树弹框")
+//    public HttpResponse storeTree(){    
+//    	//TODO
+//    	return null;
+//    }
     
     @GetMapping("/person/list")
     @ApiOperation(value = "新建页面-选择公司负责人、选择公司人员")
@@ -120,20 +120,21 @@ public class CopartnerAreaController {
     }
     
     @PostMapping("/role/list")
-    @ApiOperation(value = "新建页面-公司人员弹框提交按钮调用")
-    public HttpResponse getRoleList(@Valid @RequestBody List<CopartnerAreaRoleList> param){
+    @ApiOperation(value = "新建页面-根据公司人员列表查询已有权限列表")
+    public HttpResponse<CopartnerAreaRoleList> getRoleList(@Valid @RequestBody List<CopartnerAreaRoleList> param){
     	return copartnerAreaService.getRoleList(param);
     }
     
     @GetMapping("/role/detail")
-    @ApiOperation(value = "新增页面-编辑公司人员权限")
+    @ApiOperation(value = "公司人员权限树")
     @ApiImplicitParams({
-    	@ApiImplicitParam(name = "copartner_area_id", value = "经营区域ID", dataType = "String", required = false),
+//    	@ApiImplicitParam(name = "copartner_area_id", value = "经营区域ID", dataType = "String", required = false),
         @ApiImplicitParam(name = "company_person_id", value = "公司人员编码", dataType = "String", required = true)
     })
-    public HttpResponse<CopartnerAreaRoleDetail> roledetail(@Valid @RequestParam(name = "copartner_area_id", required = false) String copartnerAreaId,
+    public HttpResponse<CopartnerAreaRoleDetail> roledetail(
+//    		@Valid @RequestParam(name = "copartner_area_id", required = false) String copartnerAreaId,
     		@Valid @RequestParam(name = "company_person_id", required = true) String personId){
-    	return copartnerAreaService.roledetail(copartnerAreaId,personId);
+    	return copartnerAreaService.roledetail(null,personId);
     }
     
     @PostMapping("/save")

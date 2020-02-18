@@ -6,6 +6,7 @@
       copartner_area_id as copartnerAreaId,
       person_id as personId,
       person_name as personName,
+      REPLACE(GROUP_CONCAT(role_code),',','、') as roleCode,
       REPLACE(GROUP_CONCAT(role_name),',','、') as roleName
     from copartner_area_role
     where 1=1
