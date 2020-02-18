@@ -164,5 +164,16 @@ public class ActivityController {
     @ApiOperation(value = "校验商品活动是否过期")
     Boolean checkProcuct(String activityId,String storeId,String productId){
         return activitesService.checkProcuct(activityId,storeId,productId);
-    };
+    }
+
+    /**
+     * 活动商品品牌列表接口
+     * @param productBrandName
+     * @return
+     */
+    @GetMapping("/product/brand/list")
+    @ApiOperation(value = "活动商品品牌列表接口")
+    public HttpResponse<ActivityProduct> productBrandList(String productBrandName) {
+        return activitesService.productBrandList(productBrandName);
+    }
 }

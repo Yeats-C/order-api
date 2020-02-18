@@ -89,4 +89,11 @@ public interface ActivityService {
      * @return
      */
     Boolean checkProcuct(String activityId,String storeId,String productId);
+
+    /**
+     * 活动商品品牌列表接口
+     * @param productBrandName
+     * @return
+     */
+    HttpResponse<ActivityProduct> productBrandList(String productBrandName);
 }

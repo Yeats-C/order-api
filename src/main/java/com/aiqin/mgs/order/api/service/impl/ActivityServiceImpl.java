@@ -391,7 +391,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public Boolean checkProcuct(String activityId, String storeId, String productId) {
-        LOGGER.info("校验商品活动是否过期checkProcuct参数activityId为：{}，storeId：{}，productId：{}", activityId,storeId,productId);
+        LOGGER.info("校验商品活动是否过期checkProcuct参数activityId为:{},storeId:{},productId:{}", activityId,storeId,productId);
         if(null==activityId ||null==storeId ||null==productId){
             return false;
         }
@@ -401,6 +401,17 @@ public class ActivityServiceImpl implements ActivityService {
         }else{
             return false;
         }
+    }
+
+    @Override
+    public HttpResponse<ActivityProduct> productBrandList(String productBrandName) {
+        LOGGER.info("活动商品品牌列表接口参数productBrandName为:{}", productBrandName);
+        HttpResponse response = HttpResponse.success();
+        ActivityProduct activityProduct=new ActivityProduct();
+        activityProduct.setProductBrandName(productBrandName);
+        List<ActivityProduct> activityProducts=activityProductDao.productBrandList(activityProduct);
+        response.setData(activityProducts);
+        return response;
     }
 
 

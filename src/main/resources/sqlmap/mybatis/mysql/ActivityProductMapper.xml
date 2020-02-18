@@ -73,6 +73,7 @@
         </if>
     </select>
 
+
     <!--通过activityId删除活动-商品信息（逻辑删除）-->
     <delete id="deleteProductByActivityId" parameterType="java.lang.String">
     update activity_product set
@@ -80,4 +81,21 @@
         update_time = now()
     where activity_id = #{activityId,jdbcType=VARCHAR}
   </delete>
+
+    <!--活动商品品牌列表接口-->
+    <select id="productBrandList" resultType="java.util.List" resultMap="BaseResultMap"
+            parameterType="com.aiqin.mgs.order.api.domain.ActivityProduct">
+        SELECT
+            p.product_brand_code,
+            p.product_brand_name
+        FROM
+            activity_product p
+        LEFT JOIN activity a ON a.activity_id = p.activity_id
+        where 1=1
+        <if test="productBrandName!=null ">
+            AND p.product_brand_name LIKE CONCAT('%',#{productBrandName,jdbcType=VARCHAR}, '%')
+        </if>
+        GROUP BY
+            p.product_brand_code
+    </select>
 </mapper>
