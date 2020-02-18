@@ -9,8 +9,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import org.assertj.core.internal.bytebuddy.implementation.StubMethod;
-
 /**
  * <p>
  * 菜单表
