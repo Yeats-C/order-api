@@ -15,14 +15,18 @@ import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaList;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaListReq;
+import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleDetail;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleList;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaSave;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo;
+import com.aiqin.mgs.order.api.domain.copartnerArea.NewStoreTreeResponse;
 import com.aiqin.mgs.order.api.domain.copartnerArea.PublicAreaStore;
+import com.aiqin.mgs.order.api.domain.copartnerArea.SystemResource;
 import com.aiqin.mgs.order.api.domain.request.*;
+import com.aiqin.mgs.order.api.domain.request.returnorder.AreaReq;
 import com.aiqin.mgs.order.api.domain.response.LatelyResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
 import com.aiqin.mgs.order.api.domain.response.PartnerPayGateRep;
@@ -107,7 +111,10 @@ public class CopartnerAreaController {
     }
     
     @GetMapping("/person/list")
-    @ApiOperation(value = "新建页面-公司人员弹框")
+    @ApiOperation(value = "新建页面-选择公司负责人、选择公司人员")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "person_team", value = "人员编码名称组合查询", dataType = "String", required = true)
+    })
     public HttpResponse<CopartnerAreaRoleList> getPersonList(@Valid @RequestParam(name = "person_team", required = true) String personTeam){
     	return copartnerAreaService.getPersonList(personTeam);
     }
@@ -119,9 +126,13 @@ public class CopartnerAreaController {
     }
     
     @GetMapping("/role/detail")
-    @ApiOperation(value = "权限详情") //HUANGZYTODO 需求变更.
-    public HttpResponse roledetail(@Valid @RequestParam(name = "copartner_area_id", required = false) String copartnerAreaId,
-    		@Valid @RequestParam(name = "person_id", required = false) String personId){
+    @ApiOperation(value = "新增页面-编辑公司人员权限")
+    @ApiImplicitParams({
+    	@ApiImplicitParam(name = "copartner_area_id", value = "经营区域ID", dataType = "String", required = false),
+        @ApiImplicitParam(name = "company_person_id", value = "公司人员编码", dataType = "String", required = true)
+    })
+    public HttpResponse<CopartnerAreaRoleDetail> roledetail(@Valid @RequestParam(name = "copartner_area_id", required = false) String copartnerAreaId,
+    		@Valid @RequestParam(name = "company_person_id", required = true) String personId){
     	return copartnerAreaService.roledetail(copartnerAreaId,personId);
     }
     
@@ -192,4 +203,37 @@ public class CopartnerAreaController {
 
         return copartnerAreaService.selectStoreByPerson(personId,resourceCode);
     }
+    
+    
+    @GetMapping("/no-authority/type/{area_type}")
+    @ApiOperation(value = "根据类型查询区域", notes = "根据类型查询区域")
+    public HttpResponse areaTypeInfo(@PathVariable(name = "area_type") Integer areaType) {
+        return copartnerAreaService.areaTypeInfo(areaType);
+    }
+    
+    @GetMapping("/no-authority/{parent_id}")
+    @ApiOperation(value = "根据上级编码查询所有的子集", notes = "根据上级编码查询所有的子集")
+    public HttpResponse childrenInfo(@PathVariable(name = "parent_id") String parentId) {
+        return copartnerAreaService.childrenInfo(parentId);
+    }
+    
+    /**
+     * 促销活动--根据省市区编码查询所有门店
+     */
+    @PostMapping("/getStoresByAreaCode")
+    @ApiOperation("根据省市区编码查询所有门店")
+    public HttpResponse<List<NewStoreTreeResponse>> getStoresByAreaCode(@RequestBody AreaReq areaReq) {
+        return copartnerAreaService.getStoresByAreaCode(areaReq);
+    }
+
+    /**
+     * 促销活动--根据门店名称或编码模糊查询门店
+     */
+    @GetMapping("/getStoresByCodeOrName")
+    @ApiOperation("根据门店名称或编码模糊查询门店")
+    public HttpResponse<List<NewStoreTreeResponse>> getStoresByCodeOrName(
+    		@RequestParam(value = "parm", required = true) String parm) {
+        return copartnerAreaService.getStoresByCodeOrName(parm);
+    }
+    
 }

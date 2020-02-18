@@ -25,22 +25,8 @@ public class SystemResource implements Serializable {
     /**
      * 
      */
-    private Long id;
-    /**
-     * 
-     */
     @ApiModelProperty(value = "菜单编码")
     private String resourceCode;
-    /**
-     * 菜单链接
-     */
-    @ApiModelProperty(value = "菜单链接")
-    private String resourceLink;
-    /**
-     * 菜单名称
-     */
-    @ApiModelProperty(value = "菜单名称")
-    private String resourceName;
     /**
      * 显示名称
      */
@@ -56,42 +42,16 @@ public class SystemResource implements Serializable {
      */
     @ApiModelProperty(value = "排序")
     private Integer resourceOrder;
-    /**
-     * 
-     */
-    @ApiModelProperty(value = "菜单图标")
-    private String resourceIcon;
-    /**
-     * 0禁用1启用
-     */
-    @ApiModelProperty(value = "项目编码")
-    private Integer resourceStatus;
+    
+    @ApiModelProperty(value = "勾选标识: 1:已勾选")
+    @JsonProperty("check_flag")
+    private Integer checkFlag;
+    
     /**
      * 
      */
     @ApiModelProperty(value = "父级菜单编码")
     private String parentCode;
-    /**
-     * 所属系统
-     */
-    @ApiModelProperty(value = "所属系统")
-    private String systemCode;
-    /**
-     * 同步批次标识
-     */
-    @ApiModelProperty(value = "同步批次标识")
-    private String planMark;
-    /**
-     * 创建时间
-     */
-    @ApiModelProperty(value = "创建时间")
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime;
-    /**
-     * 更新时间
-     */
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date updateTime;
 
     private List<SystemResource> resources;
     
@@ -126,13 +86,6 @@ public class SystemResource implements Serializable {
         this.resources = resources;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getResourceCode() {
         return resourceCode;
@@ -142,21 +95,6 @@ public class SystemResource implements Serializable {
         this.resourceCode = resourceCode;
     }
 
-    public String getResourceLink() {
-        return resourceLink;
-    }
-
-    public void setResourceLink(String resourceLink) {
-        this.resourceLink = resourceLink;
-    }
-
-    public String getResourceName() {
-        return resourceName;
-    }
-
-    public void setResourceName(String resourceName) {
-        this.resourceName = resourceName;
-    }
 
     public Integer getResourceLevel() {
         return resourceLevel;
@@ -174,22 +112,6 @@ public class SystemResource implements Serializable {
         this.resourceOrder = resourceOrder;
     }
 
-    public String getResourceIcon() {
-        return resourceIcon;
-    }
-
-    public void setResourceIcon(String resourceIcon) {
-        this.resourceIcon = resourceIcon;
-    }
-
-    public Integer getResourceStatus() {
-        return resourceStatus;
-    }
-
-    public void setResourceStatus(Integer resourceStatus) {
-        this.resourceStatus = resourceStatus;
-    }
-
     public String getParentCode() {
         return parentCode;
     }
@@ -198,36 +120,15 @@ public class SystemResource implements Serializable {
         this.parentCode = parentCode;
     }
 
-    public String getSystemCode() {
-        return systemCode;
-    }
+	public Integer getCheckFlag() {
+		return checkFlag;
+	}
 
-    public void setSystemCode(String systemCode) {
-        this.systemCode = systemCode;
-    }
+	public void setCheckFlag(Integer checkFlag) {
+		this.checkFlag = checkFlag;
+	}
+    
+    
 
-    public String getPlanMark() {
-        return planMark;
-    }
-
-    public void setPlanMark(String planMark) {
-        this.planMark = planMark;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
 
 }

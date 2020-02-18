@@ -21,9 +21,9 @@ public class CopartnerAreaRoleDetail{
 	
 	@ApiModelProperty(value = "本公司管理权限")
     @JsonProperty("role_salf_list")
-    private List<CopartnerAreaRoleDict> roleSalfList;
+    private List<SystemResource> roleSalfList;
 	
 	@ApiModelProperty(value = "下级公司管理权限")
     @JsonProperty("role_down_list")
-    private List<CopartnerAreaRoleDict> roleDownList;
+    private List<SystemResource> roleDownList;
 }
