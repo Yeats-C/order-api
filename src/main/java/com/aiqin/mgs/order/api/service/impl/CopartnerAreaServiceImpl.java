@@ -29,7 +29,6 @@ import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaDetail;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaList;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaListReq;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleDetail;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleDict;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleList;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaSave;
@@ -37,6 +36,7 @@ import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreList;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo;
+import com.aiqin.mgs.order.api.domain.copartnerArea.NewStoreTreeResponse;
 import com.aiqin.mgs.order.api.domain.copartnerArea.PublicAreaStore;
 import com.aiqin.mgs.order.api.domain.copartnerArea.SystemResource;
 import com.aiqin.mgs.order.api.domain.pay.PayReq;
@@ -74,6 +74,7 @@ import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
 import com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
+import com.aiqin.mgs.order.api.domain.request.returnorder.AreaReq;
 import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
@@ -101,6 +102,10 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
     
     @Value("${center.main.url}")
     private String centerMainUrl;
+    
+    @Value("${bridge.url.slcs_api}")
+    private String slcsMainUrl;
+    
     
     /**
      * 列表分页
@@ -196,7 +201,7 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 	
 	
 	/**
-	 * 查询权限详情
+	 * 编辑公司人员权限
 	 */
 	@Override
 	public HttpResponse roledetail(@Valid String copartnerAreaId, @Valid String personId) {
@@ -206,23 +211,24 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 
 		
 		//菜单字典项
-		List<CopartnerAreaRoleDict> dictList = new ArrayList();
+		List<SystemResource> dictList = new ArrayList();
 		try {
-			dictList = getMenu(dictList);
+			dictList = getMenu();
 		}catch(Exception e) {
 			LOGGER.error("查询主控菜单异常{}",e);
 			return HttpResponse.failure(MessageId.create(Project.ZERO, 01,"连接主控查询出现未知异常,请联系系统管理员."));
 		}
 		
 		
-		//本公司已授权的菜单
-		List<CopartnerAreaRoleDict> roleSalfList = getCheckFlag(copartnerAreaId,personId,1,dictList); //HUANGZYTODO
-		detail.setRoleSalfList(roleSalfList);
-		
-		
-		//下级公司已授权的菜单
-		List<CopartnerAreaRoleDict> roleDownList = getCheckFlag(copartnerAreaId,personId,2,dictList); //HUANGZYTODO
-		detail.setRoleDownList(roleDownList);
+		//HUANGZYTODO
+//		//本公司已授权的菜单
+//		List<CopartnerAreaRoleDict> roleSalfList = getCheckFlag(copartnerAreaId,personId,1,dictList); //HUANGZYTODO
+		detail.setRoleSalfList(dictList);
+//		
+//		
+//		//下级公司已授权的菜单
+//		List<CopartnerAreaRoleDict> roleDownList = getCheckFlag(copartnerAreaId,personId,2,dictList); //HUANGZYTODO
+		detail.setRoleDownList(dictList);
 		
 		
 		return HttpResponse.success(detail);
@@ -230,41 +236,42 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 	}
 
 	
-	private List<CopartnerAreaRoleDict> getCheckFlag(String copartnerAreaId,String personId,Integer checkFlag,List<CopartnerAreaRoleDict> dictList) {
-		
-		List<CopartnerAreaRoleDict> list = new ArrayList();
-		list = dictList;
-		
-		//单个权限查询
-		CopartnerAreaRoleVo copartnerAreaRoleVo = new CopartnerAreaRoleVo();
-		copartnerAreaRoleVo.setCopartnerAreaId(copartnerAreaId);
-		copartnerAreaRoleVo.setPersonId(personId);
-		copartnerAreaRoleVo.setRoleType(checkFlag);
-		copartnerAreaRoleVo = copartnerAreaRoleDao.getRoleByPky(copartnerAreaRoleVo);
-		if(copartnerAreaRoleVo !=null ) {
-			String[] roleCodes = copartnerAreaRoleVo.getRoleCode().split("、");
-			for(String roleCode : roleCodes) {
-				for(int i=0;i<list.size();i++) {
-					CopartnerAreaRoleDict dict = new CopartnerAreaRoleDict();
-					dict = list.get(i);
-					if(roleCode.equals(dict.getRoleCode())) {
-						dict.setCheckFlag(1); //HUANGZYTODO
-						list.set(i, dict);
-						continue;
-					}
-				}
-			}
-		}
-		
-		return list;
-	}
+	//HUANGZYTODO
+//	private List<CopartnerAreaRoleDetail> getCheckFlag(String copartnerAreaId,String personId,Integer checkFlag,List<CopartnerAreaRoleDict> dictList) {
+//		
+//		List<CopartnerAreaRoleDict> list = new ArrayList();
+//		list = dictList;
+//		
+//		//单个权限查询
+//		CopartnerAreaRoleVo copartnerAreaRoleVo = new CopartnerAreaRoleVo();
+//		copartnerAreaRoleVo.setCopartnerAreaId(copartnerAreaId);
+//		copartnerAreaRoleVo.setPersonId(personId);
+//		copartnerAreaRoleVo.setRoleType(checkFlag);
+//		copartnerAreaRoleVo = copartnerAreaRoleDao.getRoleByPky(copartnerAreaRoleVo);
+//		if(copartnerAreaRoleVo !=null ) {
+//			String[] roleCodes = copartnerAreaRoleVo.getRoleCode().split("、");
+//			for(String roleCode : roleCodes) {
+//				for(int i=0;i<list.size();i++) {
+//					CopartnerAreaRoleDict dict = new CopartnerAreaRoleDict();
+//					dict = list.get(i);
+//					if(roleCode.equals(dict.getRoleCode())) {
+//						dict.setCheckFlag(1); //HUANGZYTODO
+//						list.set(i, dict);
+//						continue;
+//					}
+//				}
+//			}
+//		}
+//		
+//		return list;
+//	}
 
 
 	/**
 	 * 菜单字典项
 	 * @return
 	 */
-	private List<CopartnerAreaRoleDict> getMenu(List<CopartnerAreaRoleDict> dictList) throws Exception{
+	private List<SystemResource> getMenu() throws Exception{
 		
 		//查询所有菜单
 		AuthToken auth = AuthUtil.getCurrentAuth();
@@ -275,26 +282,26 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
     	HttpResponse response = httpClient.action().result(HttpResponse.class);
     	List<SystemResource> systemResources = JsonUtil.fromJson(JsonUtil.toJson(response.getData()),new TypeReference<List<SystemResource>>() {
         });  
-    	//一级菜单
-    	if(CollectionUtils.isNotEmpty(systemResources)) {
-    		for(SystemResource systemResource : systemResources) {
-    			CopartnerAreaRoleDict dict = new CopartnerAreaRoleDict();
-    			dict.setRoleCode(systemResource.getResourceCode());
-    			dict.setRoleName(systemResource.getResourceShowName());
-    			dictList.add(dict);
-    			//+二级菜单
-    			if(CollectionUtils.isNotEmpty(systemResource.getResources())) {
-    				for(SystemResource downResource : systemResource.getResources()) {
-    					CopartnerAreaRoleDict downDict = new CopartnerAreaRoleDict();
-    					downDict.setRoleCode(downResource.getResourceCode());
-    					downDict.setRoleName(downResource.getResourceShowName());
-    	    			dictList.add(downDict);
-    				}
-    			}
-    		}
-    	}
+//    	//一级菜单
+//    	if(CollectionUtils.isNotEmpty(systemResources)) {
+//    		for(SystemResource systemResource : systemResources) {
+//    			CopartnerAreaRoleDict dict = new CopartnerAreaRoleDict();
+//    			dict.setRoleCode(systemResource.getResourceCode());
+//    			dict.setRoleName(systemResource.getResourceShowName());
+//    			dictList.add(dict);
+//    			//+二级菜单
+//    			if(CollectionUtils.isNotEmpty(systemResource.getResources())) {
+//    				for(SystemResource downResource : systemResource.getResources()) {
+//    					CopartnerAreaRoleDict downDict = new CopartnerAreaRoleDict();
+//    					downDict.setRoleCode(downResource.getResourceCode());
+//    					downDict.setRoleName(downResource.getResourceShowName());
+//    	    			dictList.add(downDict);
+//    				}
+//    			}
+//    		}
+//    	}
     	
-    	return dictList;
+    	return systemResources;
 	}
 	
 	
@@ -482,6 +489,49 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 		    log.error("查询异常:查询门店列表-请求参数{},{}",dataList,e);
 		    return HttpResponse.failure(MessageId.create(Project.ZERO, 01,"查询出现未知异常,请联系系统管理员."));
 		}
+	}
+
+
+	/**
+	 * 根据类型查询区域
+	 */
+	@Override
+	public HttpResponse areaTypeInfo(Integer areaType) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(centerMainUrl+"/area/info/no-authority/type/"+areaType+"");
+		HttpClient httpClient = HttpClient.get(sb.toString());
+	    return httpClient.action().result(HttpResponse.class);
+	}
+
+
+	/**
+	 * 根据上级编码查询所有的子集
+	 */
+	@Override
+	public HttpResponse childrenInfo(String parentId) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(centerMainUrl+"/area/info/no-authority/"+parentId+"");
+		HttpClient httpClient = HttpClient.get(sb.toString());
+	    return httpClient.action().result(HttpResponse.class);
+	}
+
+
+	@Override
+	public HttpResponse<List<NewStoreTreeResponse>> getStoresByAreaCode(AreaReq areaReq) {
+		HttpClient httpClient = HttpClient.post(slcsMainUrl + "/store/getStoresByAreaCode").json(areaReq);
+		return httpClient.action().result(HttpResponse.class);
+	}
+
+
+	@Override
+	public HttpResponse<List<NewStoreTreeResponse>> getStoresByCodeOrName(String parm) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(slcsMainUrl+"/store/getStoresByCodeOrName?");
+		if(StringUtils.isNotBlank(parm)) {
+		    sb.append("parm="+parm+"");
+		}
+		HttpClient httpClient = HttpClient.get(sb.toString());
+	    return httpClient.action().result(HttpResponse.class);
 	}
 }
 

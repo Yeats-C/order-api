@@ -19,8 +19,9 @@ import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaSave;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo;
+import com.aiqin.mgs.order.api.domain.copartnerArea.NewStoreTreeResponse;
 import com.aiqin.mgs.order.api.domain.request.*;
-
+import com.aiqin.mgs.order.api.domain.request.returnorder.AreaReq;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.response.PartnerPayGateRep;
 
@@ -48,5 +49,13 @@ public interface CopartnerAreaService {
 	HttpResponse deleteMainById(String copartnerAreaId);
 
 	HttpResponse selectStoreByPerson(String personId,String resourceCode);
+
+	HttpResponse areaTypeInfo(Integer areaType);
+
+	HttpResponse childrenInfo(String parentId);
+
+	HttpResponse<List<NewStoreTreeResponse>> getStoresByAreaCode(AreaReq areaReq);
+
+	HttpResponse<List<NewStoreTreeResponse>> getStoresByCodeOrName(String parm);
 	
 }

@@ -20,7 +20,8 @@
             #{copartnerAreaId},
             #{storeId},
             #{storeCode},
-            #{storeName}
+            #{storeName},
+            #{memo}
         )
     </insert>
     <select id="selectStoreMainPageList" resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreList">
