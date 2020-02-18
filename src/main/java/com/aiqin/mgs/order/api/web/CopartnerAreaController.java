@@ -103,12 +103,12 @@ public class CopartnerAreaController {
     }
     
     
-    @GetMapping("/store/tree")
-    @ApiOperation(value = "新建页面-所辖门店树弹框")
-    public HttpResponse storeTree(){    
-    	//TODO
-    	return null;
-    }
+//    @GetMapping("/store/tree")
+//    @ApiOperation(value = "新建页面-所辖门店树弹框")
+//    public HttpResponse storeTree(){    
+//    	//TODO
+//    	return null;
+//    }
     
     @GetMapping("/person/list")
     @ApiOperation(value = "新建页面-选择公司负责人、选择公司人员")
@@ -119,22 +119,28 @@ public class CopartnerAreaController {
     	return copartnerAreaService.getPersonList(personTeam);
     }
     
-    @PostMapping("/role/list")
-    @ApiOperation(value = "新建页面-公司人员弹框提交按钮调用")
-    public HttpResponse getRoleList(@Valid @RequestBody List<CopartnerAreaRoleList> param){
-    	return copartnerAreaService.getRoleList(param);
-    }
     
     @GetMapping("/role/detail")
-    @ApiOperation(value = "新增页面-编辑公司人员权限")
+    @ApiOperation(value = "权限树")
     @ApiImplicitParams({
-    	@ApiImplicitParam(name = "copartner_area_id", value = "经营区域ID", dataType = "String", required = false),
+    })
+    public HttpResponse<CopartnerAreaRoleDetail> roledetail(){
+    	return copartnerAreaService.roledetail(null,null);
+    }
+    
+    @GetMapping("/role/detail/exist")
+    @ApiOperation(value = "根据区域公司人员查询权限树")
+    @ApiImplicitParams({
+    	@ApiImplicitParam(name = "copartner_area_id", value = "经营区域ID", dataType = "String", required = true),
         @ApiImplicitParam(name = "company_person_id", value = "公司人员编码", dataType = "String", required = true)
     })
-    public HttpResponse<CopartnerAreaRoleDetail> roledetail(@Valid @RequestParam(name = "copartner_area_id", required = false) String copartnerAreaId,
+    public HttpResponse<CopartnerAreaRoleDetail> roledetail(
+    		@Valid @RequestParam(name = "copartner_area_id", required = true) String copartnerAreaId,
     		@Valid @RequestParam(name = "company_person_id", required = true) String personId){
     	return copartnerAreaService.roledetail(copartnerAreaId,personId);
     }
+    
+    
     
     @PostMapping("/save")
     @ApiOperation(value = "新建/修改区域-保存")
