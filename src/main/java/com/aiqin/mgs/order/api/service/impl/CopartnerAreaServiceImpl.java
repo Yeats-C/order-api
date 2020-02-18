@@ -201,7 +201,7 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 	
 	
 	/**
-	 * 编辑公司人员权限
+	 * 权限树
 	 */
 	@Override
 	public HttpResponse roledetail(@Valid String copartnerAreaId, @Valid String personId) {
@@ -217,6 +217,13 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 		}catch(Exception e) {
 			LOGGER.error("查询主控菜单异常{}",e);
 			return HttpResponse.failure(MessageId.create(Project.ZERO, 01,"连接主控查询出现未知异常,请联系系统管理员."));
+		}
+		
+		
+		if(StringUtils.isBlank(copartnerAreaId)) {
+			detail.setRoleSalfList(dictList);
+			detail.setRoleDownList(dictList);
+			return HttpResponse.success(detail);
 		}
 		
 		
@@ -375,7 +382,7 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 			CopartnerAreaVo vo = copartnerAreaDao.selectCopartnerAreaInfo(copartnerAreaId);
 		    if(vo !=null ) {
 		    	//->
-		    	BeanUtils.copyProperties(info, vo);
+		    	BeanUtils.copyProperties(vo, info);
 		    }
 
 		    return HttpResponse.success(info);

@@ -119,23 +119,28 @@ public class CopartnerAreaController {
     	return copartnerAreaService.getPersonList(personTeam);
     }
     
-    @PostMapping("/role/list")
-    @ApiOperation(value = "新建页面-根据公司人员列表查询已有权限列表")
-    public HttpResponse<CopartnerAreaRoleList> getRoleList(@Valid @RequestBody List<CopartnerAreaRoleList> param){
-    	return copartnerAreaService.getRoleList(param);
-    }
     
     @GetMapping("/role/detail")
-    @ApiOperation(value = "公司人员权限树")
+    @ApiOperation(value = "权限树")
     @ApiImplicitParams({
-//    	@ApiImplicitParam(name = "copartner_area_id", value = "经营区域ID", dataType = "String", required = false),
+    })
+    public HttpResponse<CopartnerAreaRoleDetail> roledetail(){
+    	return copartnerAreaService.roledetail(null,null);
+    }
+    
+    @GetMapping("/role/detail/exist")
+    @ApiOperation(value = "根据区域公司人员查询权限树")
+    @ApiImplicitParams({
+    	@ApiImplicitParam(name = "copartner_area_id", value = "经营区域ID", dataType = "String", required = true),
         @ApiImplicitParam(name = "company_person_id", value = "公司人员编码", dataType = "String", required = true)
     })
     public HttpResponse<CopartnerAreaRoleDetail> roledetail(
-//    		@Valid @RequestParam(name = "copartner_area_id", required = false) String copartnerAreaId,
+    		@Valid @RequestParam(name = "copartner_area_id", required = true) String copartnerAreaId,
     		@Valid @RequestParam(name = "company_person_id", required = true) String personId){
-    	return copartnerAreaService.roledetail(null,personId);
+    	return copartnerAreaService.roledetail(copartnerAreaId,personId);
     }
+    
+    
     
     @PostMapping("/save")
     @ApiOperation(value = "新建/修改区域-保存")
