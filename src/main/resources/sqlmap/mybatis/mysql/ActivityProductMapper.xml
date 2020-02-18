@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.ActivityProductDao">
+    <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.ActivityProduct">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="activity_id" jdbcType="VARCHAR" property="activityId"/>
+        <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
+        <result column="product_name" jdbcType="VARCHAR" property="productName"/>
+        <result column="product_code" jdbcType="VARCHAR" property="productCode"/>
+        <result column="product_brand_code" jdbcType="VARCHAR" property="productBrandCode"/>
+        <result column="product_brand_name" jdbcType="VARCHAR" property="productBrandName"/>
+        <result column="product_category_code" jdbcType="VARCHAR" property="productCategoryCode"/>
+        <result column="product_category_name" jdbcType="VARCHAR" property="productCategoryName"/>
+        <result column="price" jdbcType="INTEGER" property="priceTax"/>
+        <result column="discount" jdbcType="INTEGER" property="discount"/>
+        <result column="reduce" jdbcType="INTEGER" property="reduce"/>
+        <result column="actual_price" jdbcType="INTEGER" property="actualPrice"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="is_delete" jdbcType="BIGINT" property="isDelete"/>
+        <result column="activity_scope" jdbcType="BIGINT" property="activityScope"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id,activity_id, sku_code,product_name, product_code, product_brand_code,product_brand_name, product_category_code
+    ,product_category_name, price_tax,discount,reduce,actual_price,status,create_time, update_time,is_delete,create_by
+    ,update_by,activity_scope
+  </sql>
+
+    <!--批量保存活动对应商品信息List-->
+    <insert id="insertList" parameterType="java.util.List">
+        insert into activity_product (activity_id, sku_code,product_name, product_code, product_brand_code,product_brand_name
+        , product_category_code,product_category_name, price_tax,discount,reduce,actual_price,status,create_time
+        , update_time,is_delete,create_by,update_by,activity_scope )
+        values
+        <foreach collection="list" item="activityProduct" separator=",">
+            (#{activityProduct.activityId,jdbcType=VARCHAR},
+            #{activityProduct.skuCode,jdbcType=VARCHAR},
+            #{activityProduct.productName,jdbcType=VARCHAR},
+            #{activityProduct.productCode,jdbcType=VARCHAR},
+            #{activityProduct.productBrandCode,jdbcType=VARCHAR},
+            #{activityProduct.productBrandName,jdbcType=VARCHAR},
+            #{activityProduct.productCategoryCode,jdbcType=VARCHAR},
+            #{activityProduct.productCategoryName,jdbcType=VARCHAR},
+            #{activityProduct.priceTax,jdbcType=INTEGER},
+            #{activityProduct.discount,jdbcType=INTEGER},
+            #{activityProduct.reduce,jdbcType=INTEGER},
+            #{activityProduct.actualPrice,jdbcType=INTEGER},
+            #{activityProduct.status,jdbcType=INTEGER},
+            now(), now(),
+            #{activityProduct.isDelete,jdbcType=INTEGER},
+            #{activityProduct.createBy,jdbcType=VARCHAR},
+            #{activityProduct.updateBy,jdbcType=VARCHAR},
+            #{activityProduct.activityScope,jdbcType=INTEGER}
+            )
+        </foreach>
+    </insert>
+
+
+    <select id="activityProductList" resultType="java.util.List" resultMap="BaseResultMap"
+            parameterType="com.aiqin.mgs.order.api.domain.ActivityProduct">
+        select id,activity_id, sku_code,product_name, product_code, product_brand_code,product_brand_name, product_category_code
+        ,product_category_name, price_tax,discount,reduce,actual_price,status,create_time, update_time,is_delete,create_by
+        ,update_by,activity_scope
+        FROM activity_product
+        where 1=1 and is_delete=0
+        <if test="activityId != '' and activityId != null">
+            and activity_id = #{activityId}
+        </if>
+        <if test="pageSize!=null ">
+            limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+        </if>
+    </select>
+
+    <!--通过activityId删除活动-商品信息（逻辑删除）-->
+    <delete id="deleteProductByActivityId" parameterType="java.lang.String">
+    update activity_product set
+        is_delete = 1,
+        update_time = now()
+    where activity_id = #{activityId,jdbcType=VARCHAR}
+  </delete>
+</mapper>

@@ -22,16 +22,7 @@ public class OrderAfterSaleQuery extends PagesRequest {
 	@ApiModelProperty(value="不传参不返回 0:全部")
 	@JsonProperty("icount")
 	private Integer icount = 0;
-	
 
-	public Integer getIcount() {
-		return icount;
-	}
-
-
-	public void setIcount(Integer icount) {
-		this.icount = icount;
-	}
 	
 	@ApiModelProperty(value="售后编号")
 	@JsonProperty("after_sale_code")
@@ -52,7 +43,12 @@ public class OrderAfterSaleQuery extends PagesRequest {
 	@ApiModelProperty(value="分销机构id")
 	@JsonProperty("distributor_id")
 	private String distributorId;
-	
+
+
+	@JsonProperty("list_distributor_id")
+	@ApiModelProperty(value = "erp专用，门店列表，查全部传空")
+	private List<String> listDistributorId;
+
 	@ApiModelProperty(value="分销机构name")
 	@JsonProperty("distributor_name")
 	private String distributorName;

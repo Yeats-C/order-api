@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.dao.order;
 
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -46,4 +47,16 @@ public interface ErpOrderItemDao {
      */
     Integer insert(ErpOrderItem po);
 
+    /**
+     * 获取活动商品销售额（订单中的商品命中了这个活动的促销规则，那么把这些命中促销规则的商品的实收纳入统计）
+     * @return
+     */
+    BigDecimal getProductSales();
+
+    /**
+     * 根据字段精确查询符合的数据列表总数
+     * @param erpOrderItem
+     * @return
+     */
+    Integer totalCount(ErpOrderItem erpOrderItem);
 }

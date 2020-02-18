@@ -318,4 +318,9 @@ public interface Global {
     Integer PAY_ORDER_TYPE_7=7;
 
 
+    /**
+     * 判断插入、更新和删除是否成功
+     */
+    int CHECK_INSERT_UPDATE_DELETE_SUCCESS = 0;
+
 }
