@@ -23,6 +23,13 @@ public interface ActivityProductDao {
      * @return
      */
     List<ActivityProduct> activityProductList(Activity activity);
+
+    /**
+     * 通过activityId删除活动-商品信息（逻辑删除）
+     * @param activityId
+     * @return
+     */
+    Integer deleteProductByActivityId(String activityId);
 }
 
 

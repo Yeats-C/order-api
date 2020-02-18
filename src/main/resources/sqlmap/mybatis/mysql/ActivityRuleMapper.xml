@@ -44,4 +44,22 @@
             now(), now() )
         </foreach>
     </insert>
+
+    <!--通过activityId查询活动-规则列表-->
+    <select id="selectByActivityId" parameterType="java.lang.String" resultMap="BaseResultMap"
+            resultType="java.util.List">
+        select
+        <include refid="Base_Column_List"/>
+        from activity_rule
+        where activity_id = #{activityId,jdbcType=VARCHAR}
+        and is_delete=0
+    </select>
+
+    <!--通过activityId删除活动-规则信息（逻辑删除）-->
+    <delete id="deleteRuleByActivityId" parameterType="java.lang.String">
+    update activity_rule set
+        is_delete = 1,
+        update_time = now()
+    where activity_id = #{activityId,jdbcType=VARCHAR}
+  </delete>
 </mapper>

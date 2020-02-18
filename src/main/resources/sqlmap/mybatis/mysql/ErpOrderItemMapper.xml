@@ -84,6 +84,7 @@
         </if>
     </select>
 
+
     <update id="updateByPrimaryKeySelective">
         update order_store_detail
         set
@@ -151,6 +152,43 @@
                 #{signDifferenceReason}, #{boxGrossWeight}, #{boxVolume}, #{useStatus}, #{createById}, #{createByName}, #{updateById},
                 #{updateByName}, sysdate(), sysdate())
     </insert>
+
+    <select id="getProductSales" resultType="java.math.BigDecimal">
+        SELECT
+            SUM( total_product_amount ) AS productSales
+        FROM
+            order_store_detail
+        WHERE
+            is_activity =1
+    </select>
+    <select id="totalCount" resultType="java.lang.Integer">
+
+        select
+        count(1)
+        from order_store_detail
+        where 1 = 1
+        <if test=" id != null and id != '' ">
+            and id = #{id}
+        </if>
+        <if test=" orderInfoDetailId != null and orderInfoDetailId != '' ">
+            and order_info_detail_id = #{orderInfoDetailId}
+        </if>
+        <if test=" orderStoreId != null and orderStoreId != '' ">
+            and order_store_id = #{orderStoreId}
+        </if>
+        <if test=" orderStoreCode != null and orderStoreCode != '' ">
+            and order_store_code = #{orderStoreCode}
+        </if>
+        <if test=" lineCode != null and lineCode != '' ">
+            and line_code = #{lineCode}
+        </if>
+        <if test=" useStatus != null and useStatus != '' or useStatus == 0 ">
+            and use_status = #{useStatus}
+        </if>
+        <if test=" isActivity != null">
+            and is_activity = #{isActivity}
+        </if>
+    </select>
 
 </mapper>
 

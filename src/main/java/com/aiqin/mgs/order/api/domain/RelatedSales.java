@@ -16,11 +16,11 @@ public class RelatedSales {
     private Long id;
 
     @ApiModelProperty(value = "销售品类名称")
-    @JsonProperty("salse_category_name")
+    @JsonProperty("category_name")
     private String salseCategoryName;
 
     @ApiModelProperty(value = "销售品类ID")
-    @JsonProperty("salse_category_id")
+    @JsonProperty("category_code")
     private String salseCategoryId;
 
     @ApiModelProperty(value = "优先推荐sku")

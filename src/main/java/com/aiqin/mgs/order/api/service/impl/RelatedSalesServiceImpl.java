@@ -8,9 +8,12 @@ import com.aiqin.mgs.order.api.domain.request.RelatedSalesVo;
 import com.aiqin.mgs.order.api.service.RelatedSalesService;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -20,6 +23,7 @@ import java.util.List;
  * author: hantao
  * version: 1.0
  */
+@Slf4j
 @Service
 public class RelatedSalesServiceImpl implements RelatedSalesService {
 
@@ -66,16 +70,23 @@ public class RelatedSalesServiceImpl implements RelatedSalesService {
     }
 
     @Override
-    public RelatedSales getByCategoryLevel(String categoryLevel) {
-        String[] str=categoryLevel.split(",");
-        RelatedSales relatedSales =new RelatedSales();
-        for(int i=str.length-1;i>=0;i--){
-            relatedSales = relatedSalesDao.selectBySalseCategoryId(str[i]);
+    public List<String> getByCategoryLevel(String categoryLevel) {
+        log.info("根据一二三四类品类编码，查询sku信息,入参categoryLevel={}",categoryLevel);
+        List<String> list=new ArrayList<>();
+        if(StringUtils.isBlank(categoryLevel)){
+            return list;
+        }
+        for(int k=0;k<4;k++){
+            String s=categoryLevel.substring(0,categoryLevel.length()-2*k);
+            RelatedSales relatedSales = relatedSalesDao.selectBySalseCategoryId(s);
             if(relatedSales!=null&&relatedSales.getStatus().equals(0)){
-                return relatedSales;
+                list.add(relatedSales.getFirstSku());
+                list.add(relatedSales.getSecondlySku());
+                list.add(relatedSales.getLastSku());
+                return list;
             }
         }
-        return relatedSales;
+        return list;
     }
 
 }

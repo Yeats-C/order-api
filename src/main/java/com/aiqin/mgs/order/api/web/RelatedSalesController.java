@@ -13,6 +13,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * description: RelatedSalesController
  * date: 2020/2/14 14:03
@@ -55,16 +57,16 @@ public class RelatedSalesController {
 
     @ApiOperation("根据品类编码，查询sku信息")
     @GetMapping("/getBySalseCategoryId")
-    @ApiImplicitParams({@ApiImplicitParam(name = "salse_category_id", value = "销售品类ID", dataType = "String", paramType = "query", required = true)})
-    public HttpResponse<RelatedSales> selectBySalseCategoryId(String salse_category_id) {
-        return new HttpResponse(relatedSalesService.selectBySalseCategoryId(salse_category_id));
+    @ApiImplicitParams({@ApiImplicitParam(name = "category_code", value = "销售品类ID", dataType = "String", paramType = "query", required = true)})
+    public HttpResponse<RelatedSales> selectBySalseCategoryId(String category_code) {
+        return new HttpResponse(relatedSalesService.selectBySalseCategoryId(category_code));
     }
 
     @ApiOperation("根据一二三四类品类编码，查询sku信息--提供给pos")
     @GetMapping("/getByCategoryLevel")
-    @ApiImplicitParams({@ApiImplicitParam(name = "categoryLevel", value = "多级销售品类--以逗号形式拼接给我", dataType = "String", paramType = "query", required = true)})
-    public HttpResponse<RelatedSales> getByCategoryLevel(String categoryLevel) {
-        return new HttpResponse(relatedSalesService.getByCategoryLevel(categoryLevel));
+    @ApiImplicitParams({@ApiImplicitParam(name = "category_level", value = "销售品类id", dataType = "String", paramType = "query", required = false)})
+    public HttpResponse<List<String>> getByCategoryLevel(@RequestParam("category_level") String category_level) {
+        return new HttpResponse(relatedSalesService.getByCategoryLevel(category_level));
     }
 
 }
