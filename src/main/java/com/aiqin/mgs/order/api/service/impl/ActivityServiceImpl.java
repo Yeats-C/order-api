@@ -250,7 +250,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public HttpResponse<Activity> getActivityDetail(String activityId) {
+    public HttpResponse<ActivityRequest> getActivityDetail(String activityId) {
         LOGGER.info("查询单个促销活动详情getActivityDetail参数activityId为：{}", activityId);
         try {
             HttpResponse response = HttpResponse.success();

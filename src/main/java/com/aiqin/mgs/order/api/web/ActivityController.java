@@ -103,7 +103,7 @@ public class ActivityController {
      */
     @GetMapping("/getActivityDetail")
     @ApiOperation(value = "通过活动id获取单个活动详情（活动+门店+商品+规则）")
-    public HttpResponse<Activity> getActivityDetail(String activityId){
+    public HttpResponse<ActivityRequest> getActivityDetail(String activityId){
         return activitesService.getActivityDetail(activityId);
     }
 

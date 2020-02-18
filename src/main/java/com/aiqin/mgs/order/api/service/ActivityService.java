@@ -58,7 +58,7 @@ public interface ActivityService {
      * @param activityId
      * @return
      */
-    HttpResponse<Activity> getActivityDetail(String activityId);
+    HttpResponse<ActivityRequest> getActivityDetail(String activityId);
 
     /**
      * 编辑活动
