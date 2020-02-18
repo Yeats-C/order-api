@@ -5,6 +5,7 @@ import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityProduct;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -57,7 +58,7 @@ public interface ActivityService {
      * @param activityId
      * @return
      */
-    HttpResponse<Activity> getActivityDetail(String activityId);
+    HttpResponse<ActivityRequest> getActivityDetail(String activityId);
 
     /**
      * 编辑活动
@@ -65,6 +66,29 @@ public interface ActivityService {
      * @return
      */
     HttpResponse updateActivity(ActivityRequest activityRequest);
+
+    /**
+     * 通过门店id爱掌柜的促销活动列表（所有生效活动）
+     * @param storeId
+     * @return
+     */
+    HttpResponse<List<ActivityRequest>> effectiveActivityList(String storeId);
+
+    /**
+     * 返回购物车中的sku商品的数量
+     * @param shoppingCartRequest
+     * @return
+     */
+    HttpResponse<Integer> getSkuNum(ShoppingCartRequest shoppingCartRequest);
+
+    /**
+     * 校验商品活动是否过期
+     * @param activityId
+     * @param storeId
+     * @param productId
+     * @return
+     */
+    Boolean checkProcuct(String activityId,String storeId,String productId);
 
     /**
      * 编辑活动生效状态
