@@ -152,4 +152,17 @@ public class ActivityController {
     public HttpResponse<Integer> getSkuNum(@Valid ShoppingCartRequest shoppingCartRequest) {
         return activitesService.getSkuNum(shoppingCartRequest);
     }
+
+    /**
+     * 校验商品活动是否过期
+     * @param activityId
+     * @param storeId
+     * @param productId
+     * @return
+     */
+    @GetMapping("/checkProcuct")
+    @ApiOperation(value = "校验商品活动是否过期")
+    Boolean checkProcuct(String activityId,String storeId,String productId){
+        return activitesService.checkProcuct(activityId,storeId,productId);
+    };
 }

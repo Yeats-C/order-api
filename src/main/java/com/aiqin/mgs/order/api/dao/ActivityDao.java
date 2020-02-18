@@ -47,6 +47,15 @@ public interface ActivityDao {
      * @return
      */
     List<Activity> effectiveActivityList(String storeId);
+
+    /**
+     * 校验商品活动是否过期
+     * @param activityId
+     * @param storeId
+     * @param productId
+     * @return
+     */
+    List<Activity> checkProcuct(String activityId, String storeId, String productId);
 }
 
 

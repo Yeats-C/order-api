@@ -34,8 +34,8 @@ public class ActivityRequest implements Serializable {
     @JsonProperty("activityProducts")
     private List<ActivityProduct> activityProducts;
 
-    /**参与活动商品范围列表集合*/
-    @ApiModelProperty(value = "参与活动商品范围列表集合")
+    /**参与活动梯度规则列表集合*/
+    @ApiModelProperty(value = "参与活动梯度规则列表集合")
     @JsonProperty("activityRules")
     private List<ActivityRule> activityRules;
 

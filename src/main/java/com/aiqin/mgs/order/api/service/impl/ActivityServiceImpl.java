@@ -388,4 +388,20 @@ public class ActivityServiceImpl implements ActivityService {
         response.setData(skuNum);
         return response;
     }
+
+    @Override
+    public Boolean checkProcuct(String activityId, String storeId, String productId) {
+        LOGGER.info("校验商品活动是否过期checkProcuct参数activityId为：{}，storeId：{}，productId：{}", activityId,storeId,productId);
+        if(null==activityId ||null==storeId ||null==productId){
+            return false;
+        }
+        List<Activity> activityList=activityDao.checkProcuct(activityId,storeId,productId);
+        if(activityList!=null){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+
 }

@@ -80,4 +80,13 @@ public interface ActivityService {
      * @return
      */
     HttpResponse<Integer> getSkuNum(ShoppingCartRequest shoppingCartRequest);
+
+    /**
+     * 校验商品活动是否过期
+     * @param activityId
+     * @param storeId
+     * @param productId
+     * @return
+     */
+    Boolean checkProcuct(String activityId,String storeId,String productId);
 }
