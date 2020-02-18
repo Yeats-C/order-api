@@ -33,6 +33,23 @@ public interface CartOrderDao {
     //显示购物车中勾选的商品
     List<CartOrderInfo> selectCartByLineCheckStatus(@Valid CartOrderInfo cartOrderInfo) throws Exception;
 
+    /**
+     * 根据购物车唯一标识获取购物车商品行
+     *
+     * @param cartId 购物车商品行唯一标识
+     * @return
+     * @throws Exception
+     */
+    CartOrderInfo getCartByCartId(@Param("cartId") String cartId);
+
+    /**
+     * 根据购物车唯一标识获取这一行附带的赠品行
+     *
+     * @param giftParentCartId 购物车商品行唯一标识
+     * @return
+     */
+    List<CartOrderInfo> findByGiftParentCartId(@Param("giftParentCartId") String giftParentCartId);
+
 }
 
 

@@ -180,5 +180,31 @@
         </where>
     </select>
 
+    <select id="getCartByCartId" resultType="com.aiqin.mgs.order.api.domain.CartOrderInfo"
+            parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from order_store_cart
+        <where>
+        1=1
+            <if test="lineCheckStatus != null">
+                and cart_id = #{cartId}
+            </if>
+        </where>
+    </select>
+
+    <select id="findByGiftParentCartId" resultType="com.aiqin.mgs.order.api.domain.CartOrderInfo"
+            parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from order_store_cart
+        <where>
+        1=1
+            <if test="lineCheckStatus != null">
+                and gift_parent_cart_id = #{giftParentCartId}
+            </if>
+        </where>
+    </select>
+
 
 </mapper>
