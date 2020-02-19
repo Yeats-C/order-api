@@ -303,6 +303,11 @@ public class OrderPublic {
 			if(query.getEndTime() !=null) {
 				query.setEndTime(DateUtil.getDayEnd(query.getEndTime()));
 			}
+			if(query.getOrderBy() !=null) {
+				query.setOrderBy("a."+query.getOrderBy());
+			}else {
+				query.setOrderBy("a.create_time");
+			}
 		}
 			return query;
 		}

@@ -9,6 +9,7 @@ import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.aiqin.mgs.order.api.domain.dto.ProductDistributorOrderDTO;
+import com.aiqin.mgs.order.api.domain.request.InventoryDetailRequest;
 import com.aiqin.mgs.order.api.domain.request.OperateStockVo;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
@@ -52,9 +53,9 @@ public class BridgeProductService {
         return Lists.newArrayList();
     }
 
-    public HttpResponse changeStock(List<OperateStockVo> stockReqVos) {
+    public HttpResponse changeStock(List<InventoryDetailRequest> stockReqVos) {
         StringBuilder sb = new StringBuilder();
-        sb.append(urlProperties.getProductApi()).append("/inventory/update/record");
+        sb.append(urlProperties.getProductApi()).append("/inventory/update/detail");
         HttpClient orderClient =HttpClient.post(sb.toString()).json(stockReqVos);
         return orderClient.action().result(HttpResponse.class);
     }

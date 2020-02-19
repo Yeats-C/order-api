@@ -29,6 +29,7 @@ import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.pay.PayReq;
 import com.aiqin.mgs.order.api.domain.request.*;
 import com.aiqin.mgs.order.api.domain.response.*;
+import com.aiqin.mgs.order.api.intercepter.UrlInterceptor;
 import com.aiqin.mgs.order.api.service.*;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.util.DayUtil;
@@ -545,6 +546,16 @@ public class OrderServiceImpl implements OrderService {
 
     private HttpResponse changeProductStock(OrderodrInfo orderInfo) {
         List<OperateStockVo> operateStockVos = Lists.newArrayList();
+        List<InventoryDetailRequest> inventoryDetailRequests=new ArrayList<>();
+
+        InventoryDetailRequest inventoryDetailRequest=new InventoryDetailRequest();
+        inventoryDetailRequest.setBillType(BillTypeEnum.ONLINE_SALE.getCode());
+        inventoryDetailRequest.setCreateByName(orderInfo.getOrderInfo().getCashierName());
+        inventoryDetailRequest.setOperator(orderInfo.getOrderInfo().getCashierName());
+        inventoryDetailRequest.setRecordType(StockChangeTypeEnum.OUT_STORAGE.getCode());
+        inventoryDetailRequest.setRelateNumber(orderInfo.getOrderInfo().getOrderId());
+        inventoryDetailRequest.setStoragePosition(1);
+        inventoryDetailRequest.setStorageType(1);
         orderInfo.getDetailList().stream().forEach(input -> {
             OperateStockVo stockVo = new OperateStockVo();
             stockVo.setStoreCode(orderInfo.getOrderInfo().getDistributorCode());
@@ -563,7 +574,9 @@ public class OrderServiceImpl implements OrderService {
             stockVo.setRelateNumber(orderInfo.getOrderInfo().getOrderId());
             operateStockVos.add(stockVo);
         });
-        return bridgeProductService.changeStock(operateStockVos);
+        inventoryDetailRequest.setInventoryRecordRequests(operateStockVos);
+        inventoryDetailRequests.add(inventoryDetailRequest);
+        return bridgeProductService.changeStock(inventoryDetailRequests);
     }
 
 
