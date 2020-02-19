@@ -225,6 +225,13 @@ public class ErpOrderItem extends PagesRequest {
     @JsonProperty("is_activity")
     private Integer isActivity;
 
+    @ApiModelProperty(value = "订单状态")
+    @JsonProperty("order_status")
+    private Integer orderStatus;
+
+
+
+
     public String getProductTypeDesc() {
         return ErpProductGiftEnum.getEnumDesc(productType);
     }
