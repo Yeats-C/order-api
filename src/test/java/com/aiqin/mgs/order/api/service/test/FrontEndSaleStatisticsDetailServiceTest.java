@@ -62,7 +62,8 @@ public class FrontEndSaleStatisticsDetailServiceTest {
 
     @Test
     public void selectStoreMonthSaleStatisticsByMonthAndStoreIdTest() {
-        HttpResponse response = service.selectStoreMonthSaleStatisticsByMonthAndStoreId("2020-02", "ABEC8D65036E5A45DBABCBA413FA56AEA2");
+        // AB03E20A0A731E4A14870E623C3D6944C7
+        HttpResponse response = service.selectStoreMonthSaleStatisticsByMonthAndStoreId("2020-02", "AB03E20A0A731E4A14870E623C3D6944C7");
         System.out.println();
         System.out.println();
         System.out.println();

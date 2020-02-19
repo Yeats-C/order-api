@@ -1,12 +1,9 @@
 package com.aiqin.mgs.order.api.domain.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
-import java.util.Date;
 
 /**
  * @author by wpp25
@@ -15,8 +12,8 @@ import java.util.Date;
  * @Date 2020/2/15 14:07
  */
 @Data
-@ApiModel("前台销售统计响应数据")
-public class FrontEndSalesStatisticsResponse {
+@ApiModel("前台销售根据sku信息统计响应数据dto")
+public class FrontEndSalesStatisticsBySkuDTO {
 
     @JsonProperty("store_id")
     @ApiModelProperty("门店id")
@@ -29,14 +26,6 @@ public class FrontEndSalesStatisticsResponse {
     @JsonProperty("sku_name")
     @ApiModelProperty("sku名")
     private String skuName;
-
-    @JsonProperty("category_id")
-    @ApiModelProperty("分类id")
-    private String categoryId;
-
-    @JsonProperty("category_name")
-    @ApiModelProperty("分类名称")
-    private String categoryName;
 
     @JsonProperty("sale_total_count")
     @ApiModelProperty("销售总数")
