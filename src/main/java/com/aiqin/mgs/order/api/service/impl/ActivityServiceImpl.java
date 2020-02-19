@@ -456,41 +456,6 @@ public class ActivityServiceImpl implements ActivityService {
         return list;
     }
 
-
-
-    @Override
-    public HttpResponse<List<ActivityRequest>> effectiveActivityList(String storeId) {
-        LOGGER.info("通过门店id爱掌柜的促销活动列表（所有生效活动）effectiveActivityList参数为：{}", storeId);
-        HttpResponse response = HttpResponse.success();
-        List<Activity> activityList=activityDao.effectiveActivityList(storeId);
-        return response;
-    }
-
-    @Override
-    public HttpResponse<Integer> getSkuNum(ShoppingCartRequest shoppingCartRequest) {
-        LOGGER.info("返回购物车中的sku商品的数量getSkuNum参数为：{}", shoppingCartRequest);
-        HttpResponse response = HttpResponse.success();
-        Integer skuNum=cartOrderDao.getSkuNum(shoppingCartRequest);
-        response.setData(skuNum);
-        return response;
-    }
-
-    @Override
-    public Boolean checkProcuct(String activityId, String storeId, String productId) {
-        LOGGER.info("校验商品活动是否过期checkProcuct参数activityId为：{}，storeId：{}，productId：{}", activityId,storeId,productId);
-        if(null==activityId ||null==storeId ||null==productId){
-            return false;
-        }
-        List<Activity> activityList=activityDao.checkProcuct(activityId,storeId,productId);
-        if(activityList!=null){
-            return true;
-        }else{
-            return false;
-        }
-    }
-
-
-
     @Override
     public HttpResponse updateStatus(Activity activity) {
         LOGGER.info("编辑活动生效状态updateStatus参数为：{}", activity);

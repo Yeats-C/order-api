@@ -68,29 +68,6 @@ public interface ActivityService {
     HttpResponse updateActivity(ActivityRequest activityRequest);
 
     /**
-     * 通过门店id爱掌柜的促销活动列表（所有生效活动）
-     * @param storeId
-     * @return
-     */
-    HttpResponse<List<ActivityRequest>> effectiveActivityList(String storeId);
-
-    /**
-     * 返回购物车中的sku商品的数量
-     * @param shoppingCartRequest
-     * @return
-     */
-    HttpResponse<Integer> getSkuNum(ShoppingCartRequest shoppingCartRequest);
-
-    /**
-     * 校验商品活动是否过期
-     * @param activityId
-     * @param storeId
-     * @param productId
-     * @return
-     */
-    Boolean checkProcuct(String activityId,String storeId,String productId);
-
-    /**
      * 编辑活动生效状态
      * @param activity
      * @return
