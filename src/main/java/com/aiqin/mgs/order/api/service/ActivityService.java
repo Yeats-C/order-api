@@ -68,6 +68,13 @@ public interface ActivityService {
     HttpResponse updateActivity(ActivityRequest activityRequest);
 
     /**
+     * 编辑活动生效状态
+     * @param activity
+     * @return
+     */
+    HttpResponse updateStatus(Activity activity);
+
+    /**
      * 通过门店id爱掌柜的促销活动列表（所有生效活动）
      * @param storeId
      * @return
@@ -91,9 +98,15 @@ public interface ActivityService {
     Boolean checkProcuct(String activityId,String storeId,String productId);
 
     /**
-     * 编辑活动生效状态
-     * @param activity
+     * 活动商品品牌列表接口
+     * @param productBrandName
      * @return
      */
-    HttpResponse updateStatus(Activity activity);
+    HttpResponse<List<ActivityProduct>> productBrandList(String productBrandName);
+
+    /**
+     * 活动商品品类接口
+     * @return
+     */
+    HttpResponse<List<ActivityProduct>> productCategoryList();
 }

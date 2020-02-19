@@ -391,7 +391,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public Boolean checkProcuct(String activityId, String storeId, String productId) {
-        LOGGER.info("校验商品活动是否过期checkProcuct参数activityId为：{}，storeId：{}，productId：{}", activityId,storeId,productId);
+        LOGGER.info("校验商品活动是否过期checkProcuct参数activityId为:{},storeId:{},productId:{}", activityId,storeId,productId);
         if(null==activityId ||null==storeId ||null==productId){
             return false;
         }
@@ -403,7 +403,58 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
+    @Override
+    public HttpResponse<List<ActivityProduct>> productBrandList(String productBrandName) {
+        LOGGER.info("活动商品品牌列表接口参数productBrandName为:{}", productBrandName);
+        HttpResponse response = HttpResponse.success();
+        ActivityProduct activityProduct=new ActivityProduct();
+        activityProduct.setProductBrandName(productBrandName);
+        List<ActivityProduct> activityProducts=activityProductDao.productBrandList(activityProduct);
+        response.setData(activityProducts);
+        return response;
+    }
 
+    @Override
+    public HttpResponse<List<ActivityProduct>> productCategoryList() {
+        LOGGER.info("活动商品品牌列表接口开始");
+        HttpResponse response = HttpResponse.success();
+        List<ActivityProduct> activityProducts=activityProductDao.productCategoryList();
+        //所有根节点
+        List<ActivityProduct> parentList = new ArrayList<>();
+        //所有子节点
+        List<ActivityProduct> childList = new ArrayList<>();
+        activityProducts.forEach(item->{
+            if (item.getProductCategoryCode().equals("0")){
+                parentList.add(item);
+            } else {
+                childList.add(item);
+            }
+        });
+
+        parentList.forEach(item->{
+            List<ActivityProduct> resultList = getChildren(String.valueOf(item.getProductCategoryCode()),childList);
+            item.setActivityProductList(resultList);
+        });
+        response.setData(activityProducts);
+        return response;
+    }
+
+    /**
+     * 根据父节点和所有子节点集合获取父节点下得子节点集合
+     * @param parentId
+     * @param children
+     * @return
+     */
+    public List<ActivityProduct> getChildren(String parentId,List<ActivityProduct> children){
+        List<ActivityProduct> list = new ArrayList<>();
+        children.forEach(item->{
+            if (parentId.equals(item.getProductCategoryCode())){
+                item.setActivityProductList(getChildren(String.valueOf(item.getProductCategoryCode()),children));
+                list.add(item);
+            }
+        });
+        return list;
+    }
 
     @Override
     public HttpResponse updateStatus(Activity activity) {

@@ -6,14 +6,17 @@
     <result column="salse_category_name" property="salseCategoryName" jdbcType="VARCHAR" />
     <result column="salse_category_id" property="salseCategoryId" jdbcType="VARCHAR" />
     <result column="first_sku" property="firstSku" jdbcType="VARCHAR" />
+    <result column="first_sku_name" property="firstSkuName" jdbcType="VARCHAR" />
     <result column="secondly_sku" property="secondlySku" jdbcType="VARCHAR" />
+    <result column="secondly_sku_name" property="secondlySkuName" jdbcType="VARCHAR" />
     <result column="last_sku" property="lastSku" jdbcType="VARCHAR" />
+    <result column="last_sku_name" property="lastSkuName" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, salse_category_name, salse_category_id, first_sku, secondly_sku, last_sku, status, 
+    id, salse_category_name, salse_category_id, first_sku,first_sku_name, secondly_sku,secondly_sku_name, last_sku,last_sku_name, status,
     create_time, update_time
   </sql>
   <select id="selectBySalseCategoryId" resultMap="BaseResultMap" parameterType="java.lang.String" >
@@ -41,11 +44,20 @@
       <if test="firstSku != null" >
         first_sku,
       </if>
+      <if test="firstSkuName != null" >
+        first_sku_name,
+      </if>
       <if test="secondlySku != null" >
         secondly_sku,
       </if>
+      <if test="secondlySkuName != null" >
+        secondly_sku_name,
+      </if>
       <if test="lastSku != null" >
         last_sku,
+      </if>
+      <if test="lastSkuName != null" >
+        last_sku_name,
       </if>
       <if test="status != null" >
         status,
@@ -70,11 +82,20 @@
       <if test="firstSku != null" >
         #{firstSku,jdbcType=VARCHAR},
       </if>
+      <if test="firstSkuName != null" >
+        #{firstSkuName,jdbcType=VARCHAR},
+      </if>
       <if test="secondlySku != null" >
         #{secondlySku,jdbcType=VARCHAR},
       </if>
+      <if test="secondlySkuName != null" >
+        #{secondlySkuName,jdbcType=VARCHAR},
+      </if>
       <if test="lastSku != null" >
         #{lastSku,jdbcType=VARCHAR},
+      </if>
+      <if test="lastSkuName != null" >
+        #{lastSkuName,jdbcType=VARCHAR},
       </if>
       <if test="status != null" >
         #{status,jdbcType=INTEGER},
@@ -99,11 +120,20 @@
       <if test="firstSku != null" >
         first_sku = #{firstSku,jdbcType=VARCHAR},
       </if>
+      <if test="firstSkuName != null" >
+        first_sku_name = #{firstSkuName,jdbcType=VARCHAR},
+      </if>
       <if test="secondlySku != null" >
         secondly_sku = #{secondlySku,jdbcType=VARCHAR},
       </if>
+      <if test="secondlySkuName != null" >
+        secondly_sku_name = #{secondlySkuName,jdbcType=VARCHAR},
+      </if>
       <if test="lastSku != null" >
         last_sku = #{lastSku,jdbcType=VARCHAR},
+      </if>
+      <if test="lastSkuName != null" >
+        last_sku_name = #{lastSkuName,jdbcType=VARCHAR},
       </if>
       <if test="status != null" >
         status = #{status,jdbcType=INTEGER},
