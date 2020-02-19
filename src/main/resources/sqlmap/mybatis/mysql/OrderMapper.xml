@@ -303,9 +303,11 @@
             and a.pay_type =#{payType}
         </if>
         <if test="orderBy!=null and orderBy!='' ">
-            ORDER BY #{orderBy} DESC
+            ORDER BY a.update_time DESC
         </if>
-
+        <if test="orderBy==null || orderBy=='' ">
+            ORDER BY a.create_time DESC
+        </if>
         <if test="icount!=null ">
             limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
         </if>
