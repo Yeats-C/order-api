@@ -229,7 +229,13 @@ public class ErpOrderItem extends PagesRequest {
     @JsonProperty("order_status")
     private Integer orderStatus;
 
+    @ApiModelProperty(value = "门店编码")
+    @JsonProperty("store_code")
+    private String storeCode;
 
+    @ApiModelProperty(value = "门店名称")
+    @JsonProperty("store_name")
+    private String storeName;
 
 
     public String getProductTypeDesc() {
