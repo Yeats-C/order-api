@@ -553,7 +553,7 @@ public class OrderServiceImpl implements OrderService {
         inventoryDetailRequest.setCreateByName(orderInfo.getOrderInfo().getCashierName());
         inventoryDetailRequest.setOperator(orderInfo.getOrderInfo().getCashierName());
         inventoryDetailRequest.setRecordType(StockChangeTypeEnum.OUT_STORAGE.getCode());
-        inventoryDetailRequest.setRelateNumber(orderInfo.getOrderInfo().getOrderCode());
+        inventoryDetailRequest.setRelateNumber(orderInfo.getOrderInfo().getOrderId());
         inventoryDetailRequest.setStoragePosition(1);
         inventoryDetailRequest.setStorageType(1);
         orderInfo.getDetailList().stream().forEach(input -> {
