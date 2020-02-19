@@ -303,6 +303,7 @@ public class OrderPublic {
 			if(query.getEndTime() !=null) {
 				query.setEndTime(DateUtil.getDayEnd(query.getEndTime()));
 			}
+
 		}
 			return query;
 		}

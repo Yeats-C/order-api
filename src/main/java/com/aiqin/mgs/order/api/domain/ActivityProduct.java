@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author csf
@@ -109,4 +110,9 @@ public class ActivityProduct {
     @ApiModelProperty(value = "更新时间")
     @JsonProperty("update_time")
     private Date updateTime;
+
+    /***子节点集合*/
+    @ApiModelProperty(value = "子节点集合")
+    @JsonProperty("activity_product_list")
+    private List<ActivityProduct> activityProductList;
 }

@@ -3,17 +3,17 @@ package com.aiqin.mgs.order.api.service.impl;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
-import com.aiqin.mgs.order.api.dao.ActivityDao;
-import com.aiqin.mgs.order.api.dao.ActivityProductDao;
-import com.aiqin.mgs.order.api.dao.ActivityRuleDao;
-import com.aiqin.mgs.order.api.dao.ActivityStoreDao;
+import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
+import com.aiqin.mgs.order.api.util.DateUtil;
+import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -50,13 +50,32 @@ public class ActivityServiceImpl implements ActivityService {
     @Resource
     private ErpOrderInfoDao erpOrderInfoDao;
 
+    @Resource
+    private CartOrderDao cartOrderDao;
+
     @Override
     public HttpResponse<Map> activityList(Activity activity) {
         LOGGER.info("查询促销活动列表activityList参数为：{}", activity);
         HttpResponse response = HttpResponse.success();
         Integer totalCount=activityDao.totalCount(activity);
         Map data=new HashMap();
-        data.put("activityList",activityDao.activityList(activity));
+        List<Activity> activities=new ArrayList<>();
+        for (Activity act:activityDao.activityList(activity)){
+            int finishNum=DateUtils.truncatedCompareTo(DateUtil.getNowDate(), act.getFinishTime(), Calendar.SECOND);
+            int startNum=DateUtils.truncatedCompareTo(DateUtil.getNowDate(), act.getBeginTime(), Calendar.SECOND);
+            if(act.getActivityStatus()==1 || finishNum>0){
+                act.setActivityStatus(3);//已关闭
+            }else if(act.getActivityStatus()==0
+                    && startNum>=0
+                    && finishNum<0){
+                act.setActivityStatus(2);//进行中
+            }else if(act.getActivityStatus()==0
+                    && startNum<0){
+                act.setActivityStatus(1);//未开始
+            }
+            activities.add(act);
+        }
+        data.put("activityList",activities);
         data.put("totalCount",totalCount);
         response.setData(data);
         return response;
@@ -231,7 +250,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public HttpResponse<Activity> getActivityDetail(String activityId) {
+    public HttpResponse<ActivityRequest> getActivityDetail(String activityId) {
         LOGGER.info("查询单个促销活动详情getActivityDetail参数activityId为：{}", activityId);
         try {
             HttpResponse response = HttpResponse.success();
@@ -351,6 +370,90 @@ public class ActivityServiceImpl implements ActivityService {
             LOGGER.error("更新活动失败", e);
             throw new RuntimeException(ResultCode.UPDATE_ACTIVITY_INFO_EXCEPTION.getMessage());
         }
+    }
+
+    @Override
+    public HttpResponse<List<ActivityRequest>> effectiveActivityList(String storeId) {
+        LOGGER.info("通过门店id爱掌柜的促销活动列表（所有生效活动）effectiveActivityList参数为：{}", storeId);
+        HttpResponse response = HttpResponse.success();
+        List<Activity> activityList=activityDao.effectiveActivityList(storeId);
+        return response;
+    }
+
+    @Override
+    public HttpResponse<Integer> getSkuNum(ShoppingCartRequest shoppingCartRequest) {
+        LOGGER.info("返回购物车中的sku商品的数量getSkuNum参数为：{}", shoppingCartRequest);
+        HttpResponse response = HttpResponse.success();
+        Integer skuNum=cartOrderDao.getSkuNum(shoppingCartRequest);
+        response.setData(skuNum);
+        return response;
+    }
+
+    @Override
+    public Boolean checkProcuct(String activityId, String storeId, String productId) {
+        LOGGER.info("校验商品活动是否过期checkProcuct参数activityId为:{},storeId:{},productId:{}", activityId,storeId,productId);
+        if(null==activityId ||null==storeId ||null==productId){
+            return false;
+        }
+        List<Activity> activityList=activityDao.checkProcuct(activityId,storeId,productId);
+        if(activityList!=null){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    @Override
+    public HttpResponse<List<ActivityProduct>> productBrandList(String productBrandName) {
+        LOGGER.info("活动商品品牌列表接口参数productBrandName为:{}", productBrandName);
+        HttpResponse response = HttpResponse.success();
+        ActivityProduct activityProduct=new ActivityProduct();
+        activityProduct.setProductBrandName(productBrandName);
+        List<ActivityProduct> activityProducts=activityProductDao.productBrandList(activityProduct);
+        response.setData(activityProducts);
+        return response;
+    }
+
+    @Override
+    public HttpResponse<List<ActivityProduct>> productCategoryList() {
+        LOGGER.info("活动商品品牌列表接口开始");
+        HttpResponse response = HttpResponse.success();
+        List<ActivityProduct> activityProducts=activityProductDao.productCategoryList();
+        //所有根节点
+        List<ActivityProduct> parentList = new ArrayList<>();
+        //所有子节点
+        List<ActivityProduct> childList = new ArrayList<>();
+        activityProducts.forEach(item->{
+            if (item.getProductCategoryCode().equals("0")){
+                parentList.add(item);
+            } else {
+                childList.add(item);
+            }
+        });
+
+        parentList.forEach(item->{
+            List<ActivityProduct> resultList = getChildren(String.valueOf(item.getProductCategoryCode()),childList);
+            item.setActivityProductList(resultList);
+        });
+        response.setData(activityProducts);
+        return response;
+    }
+
+    /**
+     * 根据父节点和所有子节点集合获取父节点下得子节点集合
+     * @param parentId
+     * @param children
+     * @return
+     */
+    public List<ActivityProduct> getChildren(String parentId,List<ActivityProduct> children){
+        List<ActivityProduct> list = new ArrayList<>();
+        children.forEach(item->{
+            if (parentId.equals(item.getProductCategoryCode())){
+                item.setActivityProductList(getChildren(String.valueOf(item.getProductCategoryCode()),children));
+                list.add(item);
+            }
+        });
+        return list;
     }
 
     @Override

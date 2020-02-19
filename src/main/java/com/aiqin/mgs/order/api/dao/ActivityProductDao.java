@@ -30,6 +30,19 @@ public interface ActivityProductDao {
      * @return
      */
     Integer deleteProductByActivityId(String activityId);
+
+    /**
+     * 活动商品品牌列表接口
+     * @param productBrandName
+     * @return
+     */
+    List<ActivityProduct> productBrandList(ActivityProduct productBrandName);
+
+    /**
+     * 活动商品品类接口
+     * @return
+     */
+    List<ActivityProduct> productCategoryList();
 }
 
 
