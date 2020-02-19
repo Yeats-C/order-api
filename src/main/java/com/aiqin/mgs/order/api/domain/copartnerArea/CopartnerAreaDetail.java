@@ -27,7 +27,7 @@ public class CopartnerAreaDetail{
     @JsonProperty("copartner_area_name")
     private String copartnerAreaName;
 	
-	@ApiModelProperty(value = "管理层级 1:一级 2：二级")
+	@ApiModelProperty(value = "管理层级 0:总部 1:一级 2：二级")
     @JsonProperty("copartner_area_level")
     private Integer copartnerAreaLevel;
 	

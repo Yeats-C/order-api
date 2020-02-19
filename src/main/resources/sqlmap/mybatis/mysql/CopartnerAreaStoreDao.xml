@@ -62,11 +62,19 @@
         delete from copartner_area_store where copartner_area_id = #{copartnerAreaId}
     </delete>
     
-    <select id = "countStoreByStoreCode" resultType="java.lang.Integer">
+    <select id = "selectStoreByStoreCode" resultType="java.lang.Integer">
     select 
       count(1)
     from copartner_area_store
     where 1=1
+    and store_code = #{storeCode,jdbcType=VARCHAR}
+    </select>
+    <select id = "qryInfo" resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp">
+    SELECT 
+      b.copartner_area_id as copartnerAreaId,b.copartner_area_name as copartnerAreaName
+    FROM copartner_area_store a
+    LEFT JOIN `copartner_area_info` b ON a.copartner_area_id = b.copartner_area_id
+    WHERE 1=1
     and store_code = #{storeCode,jdbcType=VARCHAR}
     </select>
 </mapper>
