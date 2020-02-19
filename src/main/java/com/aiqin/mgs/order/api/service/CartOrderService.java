@@ -52,4 +52,9 @@ public interface CartOrderService {
      */
     HttpResponse<List<CartOrderInfo>> displayCartLineCheckProduct(CartOrderInfo cartOrderInfo);
 
+    /**
+     * 解析购物车商品上的活动，并且计算数量或者生成赠品行
+     * @param cartId
+     */
+    void analysisActivityInCart(String cartId);
 }

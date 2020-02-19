@@ -180,13 +180,30 @@
         </where>
     </select>
 
+    <!--返回购物车中的sku商品的数量-->
+    <select id="getSkuNum" resultType="java.lang.Integer" parameterType="com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest">
+        select SUM(amount) as amount from order_store_cart
+        <where>
+            1=1
+            <if test="storeId != null and storeId != '' ">
+                and store_id =#{storeId}
+            </if>
+            <if test="productId != null and productId != '' ">
+                and sku_code =#{productId}
+            </if>
+            <if test="productType != null and productType != '' ">
+                and product_type =#{productType}
+            </if>
+        </where>
+    </select>
+
     <select id="getCartByCartId" resultType="com.aiqin.mgs.order.api.domain.CartOrderInfo"
             parameterType="java.lang.String">
         select
         <include refid="Base_Column_List"/>
         from order_store_cart
         <where>
-        1=1
+            1=1
             <if test="lineCheckStatus != null">
                 and cart_id = #{cartId}
             </if>
@@ -199,12 +216,17 @@
         <include refid="Base_Column_List"/>
         from order_store_cart
         <where>
-        1=1
+            1=1
             <if test="lineCheckStatus != null">
                 and gift_parent_cart_id = #{giftParentCartId}
             </if>
         </where>
     </select>
 
+    <delete id="deleteByCartId" parameterType="java.lang.String">
+        delete
+        from order_store_cart
+        where cart_id = #{cartId}
+    </delete>
 
 </mapper>

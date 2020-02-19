@@ -40,6 +40,13 @@ public interface ActivityDao {
      * @return
      */
     Integer totalCount(Activity activity);
+
+    /**
+     * 通过门店id爱掌柜的促销活动列表（所有生效活动）
+     * @param storeId
+     * @return
+     */
+    List<Activity> effectiveActivityList(String storeId);
 }
 
 

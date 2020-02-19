@@ -99,20 +99,20 @@ public class CartOrderInfo {
     @JsonProperty("price")
     private BigDecimal price;
 
-    /***商品特价*/
-    @ApiModelProperty(value = "商品特价")
-    @JsonProperty("special_price")
-    private BigDecimal specialPrice;
+//    /***商品特价*/
+//    @ApiModelProperty(value = "商品特价")
+//    @JsonProperty("special_price")
+//    private BigDecimal specialPrice;
 
     /**实付金额总和*/
     @ApiModelProperty(value = "实付金额总和")
     @JsonProperty("account_actual_price")
     private BigDecimal accountActualPrice;
-
-    /**应付金额总和*/
-    @ApiModelProperty(value = "应付金额总和")
-    @JsonProperty("account_total_price")
-    private BigDecimal accountTotalPrice;
+//
+//    /**应付金额总和*/
+//    @ApiModelProperty(value = "应付金额总和")
+//    @JsonProperty("account_total_price")
+//    private BigDecimal accountTotalPrice;
 
     /***商品颜色*/
     @ApiModelProperty(value = "商品颜色")

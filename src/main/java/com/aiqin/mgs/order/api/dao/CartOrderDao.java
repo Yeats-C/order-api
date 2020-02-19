@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
+import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import org.apache.ibatis.annotations.Param;
 
 import javax.validation.Valid;
@@ -34,6 +35,13 @@ public interface CartOrderDao {
     List<CartOrderInfo> selectCartByLineCheckStatus(@Valid CartOrderInfo cartOrderInfo) throws Exception;
 
     /**
+     *返回购物车中的sku商品的数量
+     * @param shoppingCartRequest
+     * @return
+     */
+    Integer getSkuNum(ShoppingCartRequest shoppingCartRequest);
+
+    /**
      * 根据购物车唯一标识获取购物车商品行
      *
      * @param cartId 购物车商品行唯一标识
@@ -49,6 +57,13 @@ public interface CartOrderDao {
      * @return
      */
     List<CartOrderInfo> findByGiftParentCartId(@Param("giftParentCartId") String giftParentCartId);
+
+    /**
+     * 根据行唯一标识删除购物车商品行
+     * @param cartId
+     * @return
+     */
+    Integer deleteByCartId(@Param("cartId") String cartId);
 
 }
 

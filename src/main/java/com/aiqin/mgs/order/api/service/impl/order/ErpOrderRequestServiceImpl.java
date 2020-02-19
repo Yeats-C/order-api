@@ -103,6 +103,10 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             product.setTaxRate(data.getOutputTaxRate());
             product.setProductPropertyCode(data.getProductPropertyCode());
             product.setProductPropertyName(data.getProductPropertyName());
+            product.setProductBrandCode(data.getProductBrandCode());
+            product.setProductBrandName(data.getProductBrandName());
+            product.setProductCategoryCode(data.getProductCategoryCode());
+            product.setProductCategoryName(data.getProductCategoryName());
             if (data.getProductSkuBoxPackings() != null && data.getProductSkuBoxPackings().size() > 0) {
                 product.setBoxGrossWeight(data.getProductSkuBoxPackings().get(0).getBoxGrossWeight());
                 product.setBoxVolume(data.getProductSkuBoxPackings().get(0).getBoxVolume());

@@ -167,4 +167,19 @@
             </if>
         </where>
     </select>
+
+    <!--通过门店id爱掌柜的促销活动列表（所有生效活动）-->
+    <select id="effectiveActivityList" resultType="com.aiqin.mgs.order.api.domain.Activity" parameterType="java.lang.String">
+        SELECT
+        a.activity_id,a.activity_name,a.activity_type,a.activity_status,a.begin_time,a.finish_time,a.publishing_organization,a.activity_brief
+        ,a.activity_pic_pc,a.activity_pic_app,a.create_by,a.update_by,a.create_time,a.update_time
+        FROM
+        activity a
+        JOIN activity_store s ON a.activity_id = s.activity_id
+        where   1=1
+        and s.store_id = #{storeId}
+        AND a.begin_time &lt; now()
+        and a.finish_time &gt; NOW()
+        and a.activity_status=0
+    </select>
 </mapper>
