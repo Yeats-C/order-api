@@ -423,20 +423,37 @@ public class ActivityServiceImpl implements ActivityService {
         List<ActivityProduct> parentList = new ArrayList<>();
         //所有子节点
         List<ActivityProduct> childList = new ArrayList<>();
-//        activityProducts.forEach(item->{
-//            if (item.getParentId().equals("0")){
-//                parentList.add(item);
-//            } else {
-//                childList.add(item);
-//            }
-//        });
-//
-//        parentList.forEach(item->{
-//            List<ActivityProduct> resultList = getChildren(String.valueOf(item.getProductCategoryCode()),childList);
-//            item.setActivityProducts(resultList);
-//        });
+        activityProducts.forEach(item->{
+            if (item.getProductCategoryCode().equals("0")){
+                parentList.add(item);
+            } else {
+                childList.add(item);
+            }
+        });
+
+        parentList.forEach(item->{
+            List<ActivityProduct> resultList = getChildren(String.valueOf(item.getProductCategoryCode()),childList);
+            item.setActivityProductList(resultList);
+        });
         response.setData(activityProducts);
         return response;
+    }
+
+    /**
+     * 根据父节点和所有子节点集合获取父节点下得子节点集合
+     * @param parentId
+     * @param children
+     * @return
+     */
+    public List<ActivityProduct> getChildren(String parentId,List<ActivityProduct> children){
+        List<ActivityProduct> list = new ArrayList<>();
+        children.forEach(item->{
+            if (parentId.equals(item.getProductCategoryCode())){
+                item.setActivityProductList(getChildren(String.valueOf(item.getProductCategoryCode()),children));
+                list.add(item);
+            }
+        });
+        return list;
     }
 
 
