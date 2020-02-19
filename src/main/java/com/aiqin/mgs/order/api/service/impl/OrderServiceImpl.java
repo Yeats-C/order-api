@@ -322,7 +322,7 @@ public class OrderServiceImpl implements OrderService {
     }
     //会员消费更新会员消费时间记录
     private void updateMemberSale(OrderodrInfo orderInfo) {
-        if (orderInfo==null||orderInfo.getOrderInfo()==null||orderInfo.getOrderInfo().getMemberId()==null){
+        if (orderInfo==null||orderInfo.getOrderInfo()==null||orderInfo.getOrderInfo().getMemberId()==null||orderInfo.getOrderInfo().getMemberId().equals("")){
             return;
         }
         MemberSaleRequest memberSaleRequest=new MemberSaleRequest();
