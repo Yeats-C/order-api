@@ -61,8 +61,8 @@ public class ActivityServiceImpl implements ActivityService {
         Map data=new HashMap();
         List<Activity> activities=new ArrayList<>();
         for (Activity act:activityDao.activityList(activity)){
-            int finishNum=DateUtils.truncatedCompareTo(DateUtil.getNowDate(), act.getFinishTime(), Calendar.SECOND);
-            int startNum=DateUtils.truncatedCompareTo(DateUtil.getNowDate(), act.getBeginTime(), Calendar.SECOND);
+            int finishNum=DateUtils.truncatedCompareTo(DateUtil.getNowDate(),DateUtil.StrToDate(act.getFinishTime()), Calendar.SECOND);
+            int startNum=DateUtils.truncatedCompareTo(DateUtil.getNowDate(), DateUtil.StrToDate(act.getBeginTime()), Calendar.SECOND);
             if(act.getActivityStatus()==1 || finishNum>0){
                 act.setActivityStatus(3);//已关闭
             }else if(act.getActivityStatus()==0
