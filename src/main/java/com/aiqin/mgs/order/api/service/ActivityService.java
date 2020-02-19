@@ -68,6 +68,13 @@ public interface ActivityService {
     HttpResponse updateActivity(ActivityRequest activityRequest);
 
     /**
+     * 编辑活动生效状态
+     * @param activity
+     * @return
+     */
+    HttpResponse updateStatus(Activity activity);
+
+    /**
      * 通过门店id爱掌柜的促销活动列表（所有生效活动）
      * @param storeId
      * @return

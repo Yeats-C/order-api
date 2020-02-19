@@ -116,7 +116,7 @@ public class ActivityController {
     @PostMapping("/update")
     @ApiOperation(value = "编辑活动")
     public HttpResponse update(@RequestBody ActivityRequest activityRequest) {
-        //将商品添加到购物车
+        //编辑活动
         return activitesService.updateActivity(activityRequest);
     }
 
@@ -141,6 +141,21 @@ public class ActivityController {
     public HttpResponse<List<ActivityProduct>> productList(Activity activity){
         return activitesService.activityProductList(activity);
     }
+    /**
+     * 编辑活动生效状态
+     *
+     * @param
+     * @return
+     */
+    @PostMapping("/updateStatus")
+    @ApiOperation(value = "编辑活动生效状态")
+    public HttpResponse updateStatus(@RequestBody Activity activity) {
+        //编辑活动生效状态
+        return activitesService.updateStatus(activity);
+    }
+
+
+
 
     /**
      * 返回购物车中的sku商品的数量
@@ -187,4 +202,6 @@ public class ActivityController {
     public HttpResponse<List<ActivityProduct>> productCategoryList() {
         return activitesService.productCategoryList();
     }
+
+
 }

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.CopartnerAreaStoreDao">
+    <select id = "countStoreByArea" resultType="java.lang.Integer">
+    select 
+      count(1)
+    from copartner_area_store
+    where 1=1
+    and copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
+    </select>
+    <insert id="saveCopartnerAreaStore">
+        insert into copartner_area_store(
+            copartner_area_id,
+            store_id,
+            store_code,
+            store_name,
+            memo
+        )
+        values(
+            #{copartnerAreaId},
+            #{storeId},
+            #{storeCode},
+            #{storeName},
+            #{memo}
+        )
+    </insert>
+    <select id="selectStoreMainPageList" resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreList">
+        select
+         copartner_area_id as copartnerAreaId,
+         store_id as storeId,
+         store_code as storeCode,
+         store_name as storeName
+        from copartner_area_store
+        where 1=1
+        <if test=" copartnerAreaId !=null and copartnerAreaId !='' ">
+         and copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
+        </if>
+    </select>
+    <select id="countStoreMainPage" resultType="java.lang.Integer">
+        select
+         count(1)
+        from copartner_area_store
+        where 1=1
+        <if test=" copartnerAreaId !=null and copartnerAreaId !='' ">
+         and copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
+        </if>
+    </select>
+    
+    <select id="selectPublicAreaStoreList" resultType="com.aiqin.mgs.order.api.domain.copartnerArea.PublicAreaStore">
+        select
+         store_id as storeId,
+         store_code as storeCode,
+         store_name as storeName
+        from copartner_area_store
+        where 1=1
+        <if test=" copartnerAreaId !=null and copartnerAreaId !='' ">
+         and copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
+        </if>
+    </select>
+    
+    <delete id="deleteById">
+        delete from copartner_area_store where copartner_area_id = #{copartnerAreaId}
+    </delete>
+    
+    <select id = "countStoreByStoreCode" resultType="java.lang.Integer">
+    select 
+      count(1)
+    from copartner_area_store
+    where 1=1
+    and store_code = #{storeCode,jdbcType=VARCHAR}
+    </select>
+</mapper>
+

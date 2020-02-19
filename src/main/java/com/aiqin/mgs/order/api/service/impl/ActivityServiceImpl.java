@@ -456,5 +456,28 @@ public class ActivityServiceImpl implements ActivityService {
         return list;
     }
 
-
+    @Override
+    public HttpResponse updateStatus(Activity activity) {
+        LOGGER.info("编辑活动生效状态updateStatus参数为：{}", activity);
+        try {
+            if(null==activity.getActivityId()
+                    ||null==activity.getActivityStatus()){
+                return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
+            }
+            //保存活动主表信息start
+            activity.setUpdateTime(new Date());
+            int activityRecord = activityDao.updateActivity(activity);
+            if (activityRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+                LOGGER.error("更新活动主表信息失败");
+                return HttpResponse.failure(ResultCode.UPDATE_ACTIVITY_INFO_EXCEPTION);
+            }
+            LOGGER.info("更新活动主表信息成功");
+            //保存活动主表信息end
+            LOGGER.info("活动更新成功，活动id为{}，活动名称为{}", activity.getActivityId(), activity.getActivityName());
+            return HttpResponse.success();
+        } catch (Exception e) {
+            LOGGER.error("更新活动失败", e);
+            throw new RuntimeException(ResultCode.UPDATE_ACTIVITY_INFO_EXCEPTION.getMessage());
+        }
+    }
 }
