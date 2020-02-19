@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -203,5 +204,15 @@ public class ActivityController {
         return activitesService.productCategoryList();
     }
 
-
+    /**
+     * 导出--活动详情-销售数据-活动销售列表
+     * @param erpOrderItem
+     * @param response
+     * @return
+     */
+    @PostMapping("/excelActivityItem")
+    @ApiOperation("导出--活动详情-销售数据-活动销售列表")
+    public HttpResponse excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response){
+        return activitesService.excelActivityItem(erpOrderItem,response);
+    }
 }

@@ -1,8 +1,10 @@
 package com.aiqin.mgs.order.api.service.impl;
 
+import com.aiqin.ground.util.exception.GroundRuntimeException;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
@@ -13,13 +15,18 @@ import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import com.aiqin.mgs.order.api.util.DateUtil;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -439,6 +446,8 @@ public class ActivityServiceImpl implements ActivityService {
         return response;
     }
 
+
+
     /**
      * 根据父节点和所有子节点集合获取父节点下得子节点集合
      * @param parentId
@@ -479,5 +488,123 @@ public class ActivityServiceImpl implements ActivityService {
             LOGGER.error("更新活动失败", e);
             throw new RuntimeException(ResultCode.UPDATE_ACTIVITY_INFO_EXCEPTION.getMessage());
         }
+    }
+
+    @Override
+    public HttpResponse excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response) {
+        LOGGER.info("导出--活动详情-销售数据-活动销售列表excelActivityItem参数为：{}", erpOrderItem);
+        HttpResponse res = HttpResponse.success();
+        try {
+            //只查询活动商品
+            erpOrderItem.setIsActivity(1);
+            List<ErpOrderItem> select = erpOrderItemDao.getActivityItem(erpOrderItem);
+            HSSFWorkbook wb = exportData(select);
+            String excelName = "数据列表";
+            response.reset();
+            response.setContentType("application/vnd.ms-excel;charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+            response.addHeader("Content-Disposition", "attachment;fileName=" + new String(excelName.getBytes("UTF-8"), "iso-8859-1"));
+            OutputStream os = response.getOutputStream();
+            wb.write(os);
+            os.flush();
+            os.close();
+            return res;
+        } catch (Exception ex) {
+            throw new GroundRuntimeException(ex.getMessage());
+        }
+    }
+
+    public static HSSFWorkbook exportData(List<ErpOrderItem> list) {
+        // 创建工作空间
+        HSSFWorkbook wb = new HSSFWorkbook();
+        // 创建表
+        HSSFSheet sheet = wb.createSheet("数据空间");
+        sheet.setDefaultColumnWidth(20);
+        sheet.setDefaultRowHeightInPoints(20);
+
+        // 创建行
+        HSSFRow row = sheet.createRow(0);
+
+        // 生成一个样式
+        HSSFCellStyle style = wb.createCellStyle();
+        style.setAlignment(HSSFCellStyle.ALIGN_CENTER);// 水平居中
+        style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);// 垂直居中
+
+        // 背景色
+        style.setFillForegroundColor(HSSFColor.TAN.index);
+        style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        style.setFillBackgroundColor(HSSFColor.DARK_RED.index);
+
+        // 设置边框
+        style.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+        style.setBorderLeft(HSSFCellStyle.BORDER_THIN);
+        style.setBorderRight(HSSFCellStyle.BORDER_THIN);
+        style.setBorderTop(HSSFCellStyle.BORDER_THIN);
+
+        // 生成一个字体
+        HSSFFont font = wb.createFont();
+        font.setFontHeightInPoints((short) 20);
+        font.setColor(HSSFColor.VIOLET.index);
+        font.setFontName("宋体");
+
+
+        // 把字体 应用到当前样式
+        style.setFont(font);
+        // 添加表头数据
+        String[] excelHeader = { "门店编码", "门店名称", "订单号", "商品名称", "是否活动商品","订货数量","订货金额","订单状态","订单时间"};
+        for (int i = 0; i < excelHeader.length; i++) {
+            HSSFCell cell = row.createCell(i);
+            cell.setCellValue(excelHeader[i]);
+            cell.setCellStyle(style);
+        }
+        // 添加单元格数据
+        for (int i = 0; i < list.size(); i++) {
+            row = sheet.createRow(i + 1);
+            ErpOrderItem item = list.get(i);
+            if(StringUtils.isNotBlank(item.getStoreCode())) {
+                row.createCell(0).setCellValue(item.getStoreCode());
+            }else {
+                row.createCell(0).setCellValue("");
+            }
+            if(StringUtils.isNotBlank(item.getStoreName())) {
+                row.createCell(1).setCellValue(item.getStoreName());
+            }else {
+                row.createCell(1).setCellValue("");
+            }
+            if(StringUtils.isNotBlank(item.getOrderStoreCode())) {
+                row.createCell(2).setCellValue(item.getOrderStoreCode());
+            }else {
+                row.createCell(2).setCellValue("");
+            }
+            if(StringUtils.isNotBlank(item.getSkuName())) {
+                row.createCell(3).setCellValue(item.getSkuName());
+            }else {
+                row.createCell(3).setCellValue("");
+            }
+
+            row.createCell(4).setCellValue("是");
+
+            if(item.getProductCount()!=null) {
+                row.createCell(5).setCellValue(item.getProductCount());
+            }else {
+                row.createCell(5).setCellValue(0);
+            }
+            if(item.getActualTotalProductAmount()!=null) {
+                row.createCell(6).setCellValue(item.getActualTotalProductAmount().intValue());
+            }else {
+                row.createCell(6).setCellValue(0);
+            }
+            if(item.getOrderStatus()!=null) {
+                row.createCell(7).setCellValue(ErpOrderStatusEnum.getEnumDesc(item.getOrderStatus()));
+            }else {
+                row.createCell(7).setCellValue("");
+            }
+            if(item.getCreateTime()!=null) {
+                row.createCell(8).setCellValue(DateUtil.formatDate(item.getCreateTime()));
+            }else {
+                row.createCell(8).setCellValue("");
+            }
+        }
+        return wb;
     }
 }
