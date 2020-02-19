@@ -244,7 +244,9 @@
         o.create_time AS createTime,
         d.update_time AS updateTime,
         d.preferential_amount AS preferentialAmount,
-        o.order_status as orderStatus
+        o.order_status as orderStatus,
+        o.store_code as storeCode,
+        o.store_name as storeName
         FROM
         order_store_detail d
         LEFT JOIN order_store_info o ON d.order_store_code = o.order_store_code
