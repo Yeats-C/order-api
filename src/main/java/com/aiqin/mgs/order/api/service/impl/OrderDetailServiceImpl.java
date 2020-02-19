@@ -893,6 +893,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
                 }
                 //新增订单结算数据
+                orderodrInfo.getSettlementInfo().setSettlementId(OrderPublic.getUUID());
 
                 settlementDao.addSettlement(orderodrInfo.getSettlementInfo());
 
@@ -912,7 +913,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
         }
 
-        return new HttpResponse();
+        return HttpResponse.success();
     }
 
     @Override
