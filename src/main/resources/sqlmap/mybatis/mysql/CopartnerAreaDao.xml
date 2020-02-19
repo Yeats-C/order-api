@@ -104,7 +104,7 @@
             update_time as updateTime,
             memo as memo 
         from  copartner_area_info
-        where copartner_area_id = #{copartnerAreaId}
+        where copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
     limit 1
     </select>
     
@@ -127,10 +127,10 @@
         from  copartner_area_info
         where 1=1
         <if test=" copartnerAreaId !=null and copartnerAreaId !='' ">
-        and copartner_area_id = #{copartnerAreaId}
+        and copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
         </if>
         <if test=" copartnerAreaIdUp !=null and copartnerAreaIdUp !='' ">
-        and copartner_area_id_up = #{copartnerAreaIdUp}
+        and copartner_area_id_up = #{copartnerAreaIdUp,jdbcType=VARCHAR}
         </if>
     </select>
     

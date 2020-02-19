@@ -61,6 +61,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
@@ -185,7 +187,7 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 				for(int i=0;i<param.size();i++) {
 					CopartnerAreaRoleList copartnerAreaRole = new CopartnerAreaRoleList();
 					copartnerAreaRole = param.get(i);
-					//查询权限名称
+					//查询权限编码、权限名称
 					CopartnerAreaRoleList roleName = copartnerAreaRoleDao.getRoleByUnion(copartnerAreaRole);
 					if(roleName != null ) {
 						param.set(i, roleName);
@@ -201,7 +203,7 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 	
 	
 	/**
-	 * 编辑公司人员权限
+	 * 权限树
 	 */
 	@Override
 	public HttpResponse roledetail(@Valid String copartnerAreaId, @Valid String personId) {
@@ -220,15 +222,22 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 		}
 		
 		
-		//HUANGZYTODO
-//		//本公司已授权的菜单
-//		List<CopartnerAreaRoleDict> roleSalfList = getCheckFlag(copartnerAreaId,personId,1,dictList); //HUANGZYTODO
-		detail.setRoleSalfList(dictList);
-//		
-//		
-//		//下级公司已授权的菜单
-//		List<CopartnerAreaRoleDict> roleDownList = getCheckFlag(copartnerAreaId,personId,2,dictList); //HUANGZYTODO
-		detail.setRoleDownList(dictList);
+		if(StringUtils.isBlank(copartnerAreaId)) {
+			detail.setRoleSalfList(dictList);
+			detail.setRoleDownList(dictList);
+			return HttpResponse.success(detail);
+		}
+		
+		//本公司已授权的菜单	
+		List<SystemResource> roleSalfList = dictList;
+		roleSalfList = getCheckFlag(copartnerAreaId,personId,1,roleSalfList); //HUANGZYTODO
+		detail.setRoleSalfList(roleSalfList);
+		
+		
+		//下级公司已授权的菜单
+		List<SystemResource> roleDownList = dictList;
+		roleDownList = getCheckFlag(copartnerAreaId,personId,2,roleDownList); //HUANGZYTODO
+		detail.setRoleDownList(roleDownList);
 		
 		
 		return HttpResponse.success(detail);
@@ -236,35 +245,41 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 	}
 
 	
-	//HUANGZYTODO
-//	private List<CopartnerAreaRoleDetail> getCheckFlag(String copartnerAreaId,String personId,Integer checkFlag,List<CopartnerAreaRoleDict> dictList) {
-//		
-//		List<CopartnerAreaRoleDict> list = new ArrayList();
-//		list = dictList;
-//		
-//		//单个权限查询
-//		CopartnerAreaRoleVo copartnerAreaRoleVo = new CopartnerAreaRoleVo();
-//		copartnerAreaRoleVo.setCopartnerAreaId(copartnerAreaId);
-//		copartnerAreaRoleVo.setPersonId(personId);
-//		copartnerAreaRoleVo.setRoleType(checkFlag);
-//		copartnerAreaRoleVo = copartnerAreaRoleDao.getRoleByPky(copartnerAreaRoleVo);
-//		if(copartnerAreaRoleVo !=null ) {
-//			String[] roleCodes = copartnerAreaRoleVo.getRoleCode().split("、");
-//			for(String roleCode : roleCodes) {
-//				for(int i=0;i<list.size();i++) {
-//					CopartnerAreaRoleDict dict = new CopartnerAreaRoleDict();
-//					dict = list.get(i);
-//					if(roleCode.equals(dict.getRoleCode())) {
-//						dict.setCheckFlag(1); //HUANGZYTODO
-//						list.set(i, dict);
-//						continue;
-//					}
-//				}
-//			}
-//		}
-//		
-//		return list;
-//	}
+	/**
+	 * 添加勾选标识
+	 * @param copartnerAreaId
+	 * @param personId
+	 * @param roleType
+	 * @param dictList
+	 * @return
+	 */
+	private List<SystemResource> getCheckFlag(String copartnerAreaId,String personId,Integer roleType,List<SystemResource> dictList) {
+		
+		CopartnerAreaRoleVo param = new CopartnerAreaRoleVo();
+		param.setCopartnerAreaId(copartnerAreaId);
+		param.setPersonId(personId);
+		param.setRoleType(roleType);
+		CopartnerAreaRoleVo vo = copartnerAreaRoleDao.getRoleByPky(param);
+		if(vo !=null) {
+			for(int i=0;i< dictList.size(); i++) {
+				SystemResource systemResource = new SystemResource();
+				systemResource = dictList.get(i);
+				//每一个菜单对应的权限
+				String[] roleCodes = vo.getRoleCode().split("、");
+				for(String roleCode : roleCodes) {
+					String[] elements= roleCode.split("-");
+					if(elements[1].equals(String.valueOf(roleType))) {
+						if(systemResource.getResourceCode().equals(elements[0])) {
+							systemResource.setCheckFlag(1); //HUANGZYTODO 1:已勾选
+							dictList.set(i, systemResource);
+						}
+					}
+				}
+			}
+		}
+		
+		return dictList;
+	}
 
 
 	/**
@@ -309,6 +324,7 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 	 * 保存区域
 	 */
 	@Override
+	@Transactional(isolation = Isolation.REPEATABLE_READ, propagation = Propagation.REQUIRED, readOnly = false, rollbackFor = Exception.class)
 	public HttpResponse saveCopartnerArea(@Valid CopartnerAreaSave param) {
 		
 		LOGGER.info("保存区域请求参数{}",param);
@@ -375,7 +391,7 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 			CopartnerAreaVo vo = copartnerAreaDao.selectCopartnerAreaInfo(copartnerAreaId);
 		    if(vo !=null ) {
 		    	//->
-		    	BeanUtils.copyProperties(info, vo);
+		    	BeanUtils.copyProperties(vo, info);
 		    }
 
 		    return HttpResponse.success(info);
@@ -431,6 +447,7 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 	 * 删除区域设置
 	 */
 	@Override
+	@Transactional(isolation = Isolation.REPEATABLE_READ, propagation = Propagation.REQUIRED, readOnly = false, rollbackFor = Exception.class)
 	public HttpResponse deleteMainById(String copartnerAreaId) {
 		try {
 
@@ -453,30 +470,36 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 	public HttpResponse selectStoreByPerson(String personId,String resourceCode) {
 		List<PublicAreaStore> dataList = new ArrayList();
 		try {
-			//查询人员+菜单编码查询权限
+			//查询人员+菜单编码查询本公司权限
 			CopartnerAreaRoleVo roleVo = new CopartnerAreaRoleVo();
 			roleVo.setPersonId(personId);
-			roleVo.setRoleCode(resourceCode);
+			roleVo.setRoleCode(resourceCode+"-1"); //本级公司
 			List<CopartnerAreaRoleVo> roleList = copartnerAreaRoleDao.selectRoleMainList(roleVo);
-			
 			//根据区域查询所辖门店
 			if(CollectionUtils.isNotEmpty(roleList)) {
 				for(CopartnerAreaRoleVo vo : roleList) {
-					if(vo.getRoleType() !=null && vo.getRoleType().equals("1")) {   //HUANGZYTODO 组织权限 1：本公司管理权限,2：下级公司管理权限
-						List<PublicAreaStore> storeList = copartnerAreaStoreDao.selectPublicAreaStoreList(vo.getCopartnerAreaId());
-					    if(CollectionUtils.isNotEmpty(storeList)) {
-					    	dataList.addAll(storeList);
-					    }
-					}else {
-						//查询二级区域
+					List<PublicAreaStore> storeList = copartnerAreaStoreDao.selectPublicAreaStoreList(vo.getCopartnerAreaId());
+				    if(CollectionUtils.isNotEmpty(storeList)) {
+				    	dataList.addAll(storeList);
+				    }
+				    
+				  //根据区域查询是否存在子公司权限
+					CopartnerAreaRoleVo downRoleVo = new CopartnerAreaRoleVo();
+					downRoleVo.setPersonId(personId);
+					downRoleVo.setRoleCode(resourceCode+"-2"); //下级公司
+					downRoleVo.setCopartnerAreaId(vo.getCopartnerAreaId());
+					List<CopartnerAreaRoleVo> downRoleList = copartnerAreaRoleDao.selectRoleMainList(downRoleVo);
+					if(CollectionUtils.isNotEmpty(downRoleList)) {
+						//获取所有的下级公司
 						CopartnerAreaVo copartnerAreaVo = new CopartnerAreaVo();
 						copartnerAreaVo.setCopartnerAreaIdUp(vo.getCopartnerAreaId());
 						List<CopartnerAreaVo> areaList = copartnerAreaDao.copartnerAreaVoList(copartnerAreaVo);
 						if(CollectionUtils.isNotEmpty(areaList)) {
-							for(CopartnerAreaVo downVo : areaList) {
-								List<PublicAreaStore> storeList = copartnerAreaStoreDao.selectPublicAreaStoreList(downVo.getCopartnerAreaId());
-							    if(CollectionUtils.isNotEmpty(storeList)) {
-							    	dataList.addAll(storeList);
+							//获取所有下级公司的权限
+							for(CopartnerAreaVo downAreaVo : areaList) {
+								List<PublicAreaStore> downStoreList = copartnerAreaStoreDao.selectPublicAreaStoreList(downAreaVo.getCopartnerAreaId());
+							    if(CollectionUtils.isNotEmpty(downStoreList)) {
+							    	dataList.addAll(downStoreList);
 							    }
 							}
 						}
@@ -518,20 +541,45 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 
 	@Override
 	public HttpResponse<List<NewStoreTreeResponse>> getStoresByAreaCode(AreaReq areaReq) {
+		
+		List<NewStoreTreeResponse> dataList = new ArrayList();
 		HttpClient httpClient = HttpClient.post(slcsMainUrl + "/store/getStoresByAreaCode").json(areaReq);
-		return httpClient.action().result(HttpResponse.class);
+		HttpResponse response = httpClient.action().result(HttpResponse.class);
+		List<NewStoreTreeResponse> list = JsonUtil.fromJson(JsonUtil.toJson(response.getData()),new TypeReference<List<NewStoreTreeResponse>>() {}); 
+		if(CollectionUtils.isNotEmpty(list)) {
+			for(NewStoreTreeResponse newStoreTreeResponse : list) {
+				int amount = copartnerAreaStoreDao.countStoreByStoreCode(newStoreTreeResponse.getStoreCode());
+				if(amount <=0) {
+					dataList.add(newStoreTreeResponse);
+				}
+			}
+		}
+		return HttpResponse.success(dataList);
 	}
 
 
 	@Override
 	public HttpResponse<List<NewStoreTreeResponse>> getStoresByCodeOrName(String parm) {
+		
+		List<NewStoreTreeResponse> dataList = new ArrayList();
+		
 		StringBuffer sb = new StringBuffer();
 		sb.append(slcsMainUrl+"/store/getStoresByCodeOrName?");
 		if(StringUtils.isNotBlank(parm)) {
 		    sb.append("parm="+parm+"");
 		}
 		HttpClient httpClient = HttpClient.get(sb.toString());
-	    return httpClient.action().result(HttpResponse.class);
+	    HttpResponse response = httpClient.action().result(HttpResponse.class);
+		List<NewStoreTreeResponse> list = JsonUtil.fromJson(JsonUtil.toJson(response.getData()),new TypeReference<List<NewStoreTreeResponse>>() {}); 
+		if(CollectionUtils.isNotEmpty(list)) {
+			for(NewStoreTreeResponse newStoreTreeResponse : list) {
+				int amount = copartnerAreaStoreDao.countStoreByStoreCode(newStoreTreeResponse.getStoreCode());
+				if(amount <=0) {
+					dataList.add(newStoreTreeResponse);
+				}
+			}
+		}
+		return HttpResponse.success(dataList);
 	}
 }
 

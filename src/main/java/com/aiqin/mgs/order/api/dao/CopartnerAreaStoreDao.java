@@ -51,6 +51,7 @@ public interface CopartnerAreaStoreDao {
 
 	void deleteById(@Valid @Param("copartnerAreaId") String copartnerAreaId);
 	
-	List<PublicAreaStore> selectPublicAreaStoreList(String copartnerAreaId);
+	List<PublicAreaStore> selectPublicAreaStoreList(@Valid @Param("copartnerAreaId") String copartnerAreaId);
 
+	int countStoreByStoreCode(@Valid @Param("storeCode") String storeCode);
 }
