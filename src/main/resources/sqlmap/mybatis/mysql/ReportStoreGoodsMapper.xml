@@ -156,7 +156,7 @@
     from report_store_goods
     <where>
       <if test="countTime != null and countTime !=''" >
-        count_time = #{countTime,jdbcType=VARCHAR},
+        count_time = #{countTime,jdbcType=VARCHAR}
       </if>
     </where>
   </select>
