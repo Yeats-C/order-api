@@ -553,7 +553,7 @@ public class OrderServiceImpl implements OrderService {
         inventoryDetailRequest.setCreateByName(orderInfo.getOrderInfo().getCashierName());
         inventoryDetailRequest.setOperator(orderInfo.getOrderInfo().getCashierName());
         inventoryDetailRequest.setRecordType(StockChangeTypeEnum.OUT_STORAGE.getCode());
-        inventoryDetailRequest.setRelateNumber(orderInfo.getOrderInfo().getOrderId());
+        inventoryDetailRequest.setRelateNumber(orderInfo.getOrderInfo().getOrderCode());
         inventoryDetailRequest.setStoragePosition(1);
         inventoryDetailRequest.setStorageType(1);
         orderInfo.getDetailList().stream().forEach(input -> {
@@ -571,7 +571,7 @@ public class OrderServiceImpl implements OrderService {
             stockVo.setCreateByName(orderInfo.getOrderInfo().getCashierName());
             stockVo.setStoragePosition(1);
             stockVo.setReleaseStatus(ReleaseStatusEnum.RELEASE.getCode());
-            stockVo.setRelateNumber(orderInfo.getOrderInfo().getOrderId());
+            stockVo.setRelateNumber(orderInfo.getOrderInfo().getOrderCode());
             operateStockVos.add(stockVo);
         });
         inventoryDetailRequest.setInventoryRecordRequests(operateStockVos);
