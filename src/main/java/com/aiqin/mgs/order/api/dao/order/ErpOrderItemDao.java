@@ -59,4 +59,11 @@ public interface ErpOrderItemDao {
      * @return
      */
     Integer totalCount(ErpOrderItem erpOrderItem);
+
+    /**
+     * 根据字段精确查询符合的数据列表(关联主表)
+     * @param erpOrderItem
+     * @return
+     */
+    List<ErpOrderItem> getActivityItem(ErpOrderItem erpOrderItem);
 }

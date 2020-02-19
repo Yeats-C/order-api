@@ -36,12 +36,12 @@ public class Activity extends PagesRequest implements Serializable {
     /***活动开始时间*/
     @ApiModelProperty(value = "活动开始时间")
     @JsonProperty("begin_time")
-    private Date beginTime;
+    private String beginTime;
 
     /***活动终止时间*/
     @ApiModelProperty(value = "活动终止时间")
     @JsonProperty("finish_time")
-    private Date finishTime;
+    private String finishTime;
 
     /**发布组织*/
     @ApiModelProperty(value = "发布组织")

@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.dao;
 
+import com.aiqin.mgs.order.api.domain.dto.FrontEndSalesStatisticsResponse;
 import com.aiqin.mgs.order.api.domain.statistical.FrontEndSalesStatistics;
 import com.aiqin.mgs.order.api.domain.statistical.FrontEndSalesStatisticsDetail;
 import org.apache.ibatis.annotations.Param;
@@ -23,7 +24,7 @@ public interface FrontEndSalesStatisticsDetailDao {
      * @param storeId
      * @return
      */
-    List<FrontEndSalesStatistics> selectStoreMonthSaleStatisticsByMonthAndStoreId(
+    List<FrontEndSalesStatisticsResponse> selectStoreMonthSaleStatisticsByMonthAndStoreId(
             @Param("beginDay") Integer beginDay,
             @Param("currentDay") Integer currentDay,
             @Param("storeId") String storeId);

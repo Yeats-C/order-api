@@ -7,6 +7,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -109,4 +110,12 @@ public interface ActivityService {
      * @return
      */
     HttpResponse<List<ActivityProduct>> productCategoryList();
+
+    /**
+     *导出--活动详情-销售数据-活动销售列表
+     * @param  erpOrderItem
+     * @param response
+     * @return
+     */
+    HttpResponse excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response);
 }

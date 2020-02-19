@@ -20,7 +20,7 @@
     <if test=" copartnerAreaLevel !=null ">
          and copartner_area_level = #{copartnerAreaLevel,jdbcType=INTEGER}
     </if>
-    order by copartner_area_name
+    ORDER BY copartner_area_level,copartner_area_name 
     LIMIT #{beginIndex,jdbcType=BIGINT}, #{pageSize,jdbcType=BIGINT}
     </select>
     <select id = "countCopartnerAreaList" resultType="java.lang.Integer">
