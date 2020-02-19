@@ -211,7 +211,7 @@ public class ActivityServiceImpl implements ActivityService {
         HttpResponse response = HttpResponse.success();
         //只查询活动商品
         erpOrderItem.setIsActivity(1);
-        List<ErpOrderItem> select = erpOrderItemDao.select(erpOrderItem);
+        List<ErpOrderItem> select = erpOrderItemDao.getActivityItem(erpOrderItem);
         Integer totalCount = erpOrderItemDao.totalCount(erpOrderItem);
         Map data=new HashMap();
 
@@ -416,7 +416,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public HttpResponse<List<ActivityProduct>> productCategoryList() {
-        LOGGER.info("活动商品品牌列表接口开始");
+        LOGGER.info("活动商品品类列表接口开始");
         HttpResponse response = HttpResponse.success();
         List<ActivityProduct> activityProducts=activityProductDao.productCategoryList();
         //所有根节点
