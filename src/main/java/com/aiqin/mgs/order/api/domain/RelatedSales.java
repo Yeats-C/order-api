@@ -27,13 +27,27 @@ public class RelatedSales {
     @JsonProperty("first_sku")
     private String firstSku;
 
+    @ApiModelProperty(value = "优先推荐sku名称")
+    @JsonProperty("first_sku_name")
+    private String firstSkuName;
+
+
     @ApiModelProperty(value = "其次推荐sku")
     @JsonProperty("secondly_sku")
     private String secondlySku;
 
+
+    @ApiModelProperty(value = "其次推荐sku名称")
+    @JsonProperty("secondly_sku_name")
+    private String secondlySkuName;
+
     @ApiModelProperty(value = "最次推荐sku")
     @JsonProperty("last_sku")
     private String lastSku;
+
+    @ApiModelProperty(value = "最次推荐sku名称")
+    @JsonProperty("last_sku_name")
+    private String lastSkuName;
 
     @ApiModelProperty(value = "生效状态 0:生效 1：失效")
     @JsonProperty("status")
