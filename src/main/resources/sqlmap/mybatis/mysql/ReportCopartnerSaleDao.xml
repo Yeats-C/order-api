@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.ReportCopartnerSaleDao">
+    <select id = "selectMainPageList" resultType="com.aiqin.mgs.order.api.domain.response.ReportCopartnerSaleInfo">
+    SELECT 
+          report_month AS reportMonth,
+          copartner_area_id AS copartnerAreaId,
+          copartner_area_name AS copartnerAreaName,
+          store_id AS storeId,
+          store_code AS storeCode,
+          store_name AS storeName,
+          total_target AS totalTarget,
+          total_finish AS totalFinish,
+          eighteen_target AS eighteenTarget,
+          eighteen_finish AS eighteenFinish,
+          key_target AS keyTarget,
+          key_finish AS keyFinish,
+          textile_target AS textileTarget,
+          textile_finish AS textileFinish
+     FROM report_copartner_sale 
+     where 1=1
+     <if test=" reportYear !=null and reportYear !='' ">
+     and report_year = #{reportYear}
+     </if>
+     <choose>
+                <when test=" reportMonth !=null and reportMonth !='' ">
+                    and report_month = #{reportMonth}
+                    and report_subtotal_type IN ('1','2')
+                    ORDER BY copartner_area_id DESC ,report_subtotal_type,store_name
+                </when>
+                <otherwise>
+                    and report_subtotal_type IN ('1','3')
+                    ORDER BY report_month ,copartner_area_id DESC, report_subtotal_type,store_name
+                </otherwise>
+     </choose>
+    LIMIT #{beginIndex,jdbcType=BIGINT}, #{pageSize,jdbcType=BIGINT}
+    </select>
+    <select id = "countMainPage" resultType="java.lang.Integer">
+    SELECT 
+          count(1)
+     FROM report_copartner_sale 
+     where 1=1
+     <if test=" reportYear !=null and reportYear !='' ">
+     and report_year = #{reportYear}
+     </if>
+     <choose>
+                <when test=" reportMonth !=null and reportMonth !='' ">
+                    and report_month = #{reportMonth}
+                    and report_subtotal_type IN ('1','2')
+                    ORDER BY copartner_area_name ,report_subtotal_type,store_name
+                </when>
+                <otherwise>
+                    and report_subtotal_type IN ('1','3')
+                    ORDER BY report_month ,report_subtotal_type,copartner_area_name,store_name
+                </otherwise>
+     </choose>
+    </select>
+    <insert id="save">
+        insert into report_copartner_sale(
+        report_year,
+        report_month,
+        copartner_area_id,
+        copartner_area_name,
+        store_id,
+        store_code,
+        store_name,
+    <if test="totalTarget !=null ">
+        total_target,
+    </if>
+    <if test="totalFinish !=null ">
+        total_finish,
+    </if>
+    <if test="eighteenTarget !=null ">
+        eighteen_target,
+    </if>
+    <if test="eighteenFinish !=null ">
+        eighteen_finish,
+    </if>
+    <if test="keyTarget !=null ">
+        key_target,
+    </if>
+    <if test="keyFinish !=null ">
+        key_finish,
+    </if>
+    <if test="textileTarget !=null ">
+        textile_target,
+    </if>
+    <if test="textileFinish !=null ">
+        textile_finish,
+    </if>
+        report_subtotal_type
+    )values(
+        #{reportYear},
+        #{reportMonth},
+        #{copartnerAreaId},
+        #{copartnerAreaName},
+        #{storeId},
+        #{storeCode},
+        #{storeName},
+    <if test="totalTarget !=null ">
+        #{totalTarget},
+    </if>
+    <if test="totalFinish !=null ">
+        #{totalFinish},
+    </if>
+    <if test="eighteenTarget !=null ">
+        #{eighteenTarget},
+    </if>
+    <if test="eighteenFinish !=null ">
+        #{eighteenFinish},
+    </if>
+    <if test="keyTarget !=null ">
+        #{keyTarget},
+    </if>
+    <if test="keyFinish !=null ">
+        #{keyFinish},
+    </if>
+    <if test="textileTarget !=null ">
+        #{textileTarget},
+    </if>
+    <if test="textileFinish !=null ">
+        #{textileFinish},
+    </if>
+        #{reportSubtotalType}
+    )
+    </insert>
+    <delete id="delete">
+    delete from report_copartner_sale where report_year = #{reportYear} and report_month =#{reportMonth}
+    </delete>
+    <delete id="deleteByArea">
+    delete from report_copartner_sale where report_year = #{reportYear} and report_month =#{reportMonth} and copartner_area_id = #{copartnerAreaId}
+    </delete>
+    <delete id="deleteByMonth">
+    delete from report_copartner_sale where report_year = #{reportYear} and report_month =#{reportMonth} and report_subtotal_type = 3
+    </delete>
+    <select id="qryAreaTotal" resultType="com.aiqin.mgs.order.api.domain.ReportCopartnerSaleVo">
+    SELECT 
+          report_year AS reportYear,
+          report_month AS reportMonth,
+          IFNULL(copartner_area_id,'0000') AS copartnerAreaId,
+          IFNULL(copartner_area_name,'其他') AS copartnerAreaName,
+          IFNULL(SUM(IFNULL(total_target,0)),0) AS totalTarget,
+          IFNULL(SUM(IFNULL(total_finish,0)),0) AS totalFinish,
+          IFNULL(SUM(IFNULL(eighteen_target,0)),0) AS eighteenTarget,
+          IFNULL(SUM(IFNULL(eighteen_finish,0)),0) AS eighteenFinish,
+          IFNULL(SUM(IFNULL(key_target,0)),0) AS keyTarget,
+          IFNULL(SUM(IFNULL(key_finish,0)),0) AS keyFinish,
+          IFNULL(SUM(IFNULL(textile_target,0)),0) AS textileTarget,
+          IFNULL(SUM(IFNULL(textile_finish,0)),0) AS textileFinish,
+          '2' as reportSubtotalType
+    FROM  report_copartner_sale
+    WHERE 1=1
+    AND report_year = #{reportYear}
+    AND report_month = #{reportMonth}
+    AND report_subtotal_type =1
+    GROUP BY copartner_area_id
+    </select>
+    <select id="qryMonthTotal" resultType="com.aiqin.mgs.order.api.domain.ReportCopartnerSaleVo">
+    SELECT
+          report_year AS reportYear,
+          report_month AS reportMonth,
+          IFNULL(SUM(IFNULL(total_target,0)),0) AS totalTarget,
+          IFNULL(SUM(IFNULL(total_finish,0)),0) AS totalFinish,
+          IFNULL(SUM(IFNULL(eighteen_target,0)),0) AS eighteenTarget,
+          IFNULL(SUM(IFNULL(eighteen_finish,0)),0) AS eighteenFinish,
+          IFNULL(SUM(IFNULL(key_target,0)),0) AS keyTarget,
+          IFNULL(SUM(IFNULL(key_finish,0)),0) AS keyFinish,
+          IFNULL(SUM(IFNULL(textile_target,0)),0) AS textileTarget,
+          IFNULL(SUM(IFNULL(textile_finish,0)),0) AS textileFinish,
+          '3' as reportSubtotalType
+    FROM  report_copartner_sale
+    WHERE 1=1
+    AND report_year = #{reportYear}
+    AND report_month = #{reportMonth}
+    AND report_subtotal_type =1
+    </select>
+</mapper>
+

@@ -1,8 +1,8 @@
 /*****************************************************************
  * 
- * 模块名称：经营区域设置-实现层
+ * 模块名称：合伙人销售报表-实现层
  * 开发人员: huangzy
- * 开发时间: 2020-02-13
+ * 开发时间: 2020-02-19
  * 
  * ****************************************************************************/
 package com.aiqin.mgs.order.api.service.impl;
@@ -470,7 +470,7 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 	public HttpResponse selectStoreByPerson(String personId,String resourceCode) {
 		List<PublicAreaStore> dataList = new ArrayList();
 		try {
-			//查询人员+菜单编码查询本公司权限
+			//查询人员+菜单编码查询总部本公司权限
 			CopartnerAreaRoleVo roleVo = new CopartnerAreaRoleVo();
 			roleVo.setPersonId(personId);
 			roleVo.setRoleCode(resourceCode+"-1"); //本级公司
@@ -482,26 +482,40 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 				    if(CollectionUtils.isNotEmpty(storeList)) {
 				    	dataList.addAll(storeList);
 				    }
-				    
-				  //根据区域查询是否存在子公司权限
-					CopartnerAreaRoleVo downRoleVo = new CopartnerAreaRoleVo();
-					downRoleVo.setPersonId(personId);
-					downRoleVo.setRoleCode(resourceCode+"-2"); //下级公司
-					downRoleVo.setCopartnerAreaId(vo.getCopartnerAreaId());
-					List<CopartnerAreaRoleVo> downRoleList = copartnerAreaRoleDao.selectRoleMainList(downRoleVo);
-					if(CollectionUtils.isNotEmpty(downRoleList)) {
-						//获取所有的下级公司
-						CopartnerAreaVo copartnerAreaVo = new CopartnerAreaVo();
-						copartnerAreaVo.setCopartnerAreaIdUp(vo.getCopartnerAreaId());
-						List<CopartnerAreaVo> areaList = copartnerAreaDao.copartnerAreaVoList(copartnerAreaVo);
-						if(CollectionUtils.isNotEmpty(areaList)) {
-							//获取所有下级公司的权限
-							for(CopartnerAreaVo downAreaVo : areaList) {
-								List<PublicAreaStore> downStoreList = copartnerAreaStoreDao.selectPublicAreaStoreList(downAreaVo.getCopartnerAreaId());
-							    if(CollectionUtils.isNotEmpty(downStoreList)) {
-							    	dataList.addAll(downStoreList);
-							    }
-							}
+				}
+			}
+			
+			//查询人员+菜单编码查询下级公司的权限
+			CopartnerAreaRoleVo downRoleVo = new CopartnerAreaRoleVo();
+			downRoleVo.setPersonId(personId);
+			downRoleVo.setRoleCode(resourceCode+"-2"); //下级公司
+			List<CopartnerAreaRoleVo> downRoleList = copartnerAreaRoleDao.selectRoleMainList(downRoleVo);
+			if(CollectionUtils.isNotEmpty(downRoleList)) {
+				for(CopartnerAreaRoleVo vo : downRoleList) {
+					//获取第一层下级列表
+					CopartnerAreaVo copartnerAreaVo = new CopartnerAreaVo();
+					copartnerAreaVo.setCopartnerAreaIdUp(vo.getCopartnerAreaId());
+					List<CopartnerAreaVo> areaList = copartnerAreaDao.copartnerAreaVoList(copartnerAreaVo);
+					if(CollectionUtils.isNotEmpty(areaList)) {
+						//获取所有下级公司的权限
+						for(CopartnerAreaVo downAreaVo : areaList) {
+							List<PublicAreaStore> downStoreList = copartnerAreaStoreDao.selectPublicAreaStoreList(downAreaVo.getCopartnerAreaId());
+						    if(CollectionUtils.isNotEmpty(downStoreList)) {
+						    	dataList.addAll(downStoreList);
+						    }
+						    
+						  //获取第二层下级列表
+						    CopartnerAreaVo scodCopartnerAreaVo = new CopartnerAreaVo();
+						    scodCopartnerAreaVo.setCopartnerAreaIdUp(vo.getCopartnerAreaId());
+							List<CopartnerAreaVo> scodAreaList = copartnerAreaDao.copartnerAreaVoList(scodCopartnerAreaVo);
+						    if(CollectionUtils.isNotEmpty(scodAreaList)) {
+						    	for(CopartnerAreaVo scodAreaVo : areaList) {
+									List<PublicAreaStore> scodStoreList = copartnerAreaStoreDao.selectPublicAreaStoreList(scodAreaVo.getCopartnerAreaId());
+								    if(CollectionUtils.isNotEmpty(scodStoreList)) {
+								    	dataList.addAll(scodStoreList);
+								    }
+						    	}
+						    }
 						}
 					}
 				}
@@ -580,6 +594,12 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 			}
 		}
 		return HttpResponse.success(dataList);
+	}
+
+
+	@Override
+	public CopartnerAreaUp qryInfo(String storeCode) {
+		return copartnerAreaStoreDao.qryInfo(storeCode);
 	}
 }
 

@@ -57,5 +57,7 @@ public interface CopartnerAreaService {
 	HttpResponse<List<NewStoreTreeResponse>> getStoresByAreaCode(AreaReq areaReq);
 
 	HttpResponse<List<NewStoreTreeResponse>> getStoresByCodeOrName(String parm);
+
+	CopartnerAreaUp qryInfo(String storeCode);
 	
 }
