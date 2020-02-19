@@ -892,7 +892,20 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                     orderDetailDao.addDetailList(orderDetailInfo);
 
                 }
+                //新增订单结算数据
+
                 settlementDao.addSettlement(orderodrInfo.getSettlementInfo());
+
+
+
+                //新增订单支付数据
+             /*   if (orderPayList != null && orderPayList.size() > 0) {
+                    try {
+                        settlementService.addOrderPayList(orderPayList, orderId, orderCode);
+                    } catch (Exception e) {
+                        LOGGER.error("新增订单支付数据异常：{}", e);
+                    }
+                }*/
             } catch (Exception e) {
                 e.printStackTrace();
             }

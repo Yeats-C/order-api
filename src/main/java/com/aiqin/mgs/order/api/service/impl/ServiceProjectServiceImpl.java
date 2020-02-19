@@ -388,8 +388,15 @@ public class ServiceProjectServiceImpl  implements ServiceProjectService {
                     LOGGER.info("未查询到对应的订单信息");
                     return HttpResponse.failure(ResultCode.SELECT_ASSET_BY_ORDER_Id_FAIL);
                 }
+                ReduceDetailRequest reduceDetailRequest = new ReduceDetailRequest();
+                reduceDetailRequest.setStoreId(storeId);
+                reduceDetailRequest.setOrderId(orderId);
+                reduceDetailRequest.setOrderType(orderType);
+                serviceProjectReduceDetail = serviceProjectReduceDetailDao.selectReduceDetailByReduceId(reduceDetailRequest);
+
+
                 ServiceProjectAsset serviceProjectAsset = serviceProjectAssetList.get(0);
-                serviceProjectReduceDetail.setOrderCode(serviceProjectAsset.getOrderCode());
+               // serviceProjectReduceDetail.setOrderCode(serviceProjectAsset.getOrderCode());
                 serviceProjectReduceDetail.setOrderId(serviceProjectAsset.getOrderId());
                 serviceProjectReduceDetail.setOrderType(Global.ORDER_TYPE_BUY);
                 serviceProjectReduceDetail.setCashierId(serviceProjectAsset.getCashierId());

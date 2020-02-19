@@ -103,7 +103,7 @@ public class ActivityController {
      */
     @GetMapping("/getActivityDetail")
     @ApiOperation(value = "通过活动id获取单个活动详情（活动+门店+商品+规则）")
-    public HttpResponse<Activity> getActivityDetail(String activityId){
+    public HttpResponse<ActivityRequest> getActivityDetail(String activityId){
         return activitesService.getActivityDetail(activityId);
     }
 
@@ -151,5 +151,40 @@ public class ActivityController {
     @ApiOperation(value = "返回购物车中的sku商品的数量")
     public HttpResponse<Integer> getSkuNum(@Valid ShoppingCartRequest shoppingCartRequest) {
         return activitesService.getSkuNum(shoppingCartRequest);
+    }
+
+    /**
+     * 校验商品活动是否过期
+     * @param activityId
+     * @param storeId
+     * @param productId
+     * @return
+     */
+    @GetMapping("/checkProcuct")
+    @ApiOperation(value = "校验商品活动是否过期")
+    Boolean checkProcuct(String activityId,String storeId,String productId){
+        return activitesService.checkProcuct(activityId,storeId,productId);
+    }
+
+    /**
+     * 活动商品品牌列表接口
+     * @param productBrandName
+     * @return
+     */
+    @GetMapping("/product/brand/list")
+    @ApiOperation(value = "活动商品品牌列表接口")
+    public HttpResponse<List<ActivityProduct>> productBrandList(String productBrandName) {
+        return activitesService.productBrandList(productBrandName);
+    }
+
+    /**
+     * 活动商品品类接口
+     * @param
+     * @return
+     */
+    @GetMapping("/product/category/list")
+    @ApiOperation(value = "活动商品品类接口")
+    public HttpResponse<List<ActivityProduct>> productCategoryList() {
+        return activitesService.productCategoryList();
     }
 }

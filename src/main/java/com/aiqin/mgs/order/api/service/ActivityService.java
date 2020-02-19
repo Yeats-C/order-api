@@ -58,7 +58,7 @@ public interface ActivityService {
      * @param activityId
      * @return
      */
-    HttpResponse<Activity> getActivityDetail(String activityId);
+    HttpResponse<ActivityRequest> getActivityDetail(String activityId);
 
     /**
      * 编辑活动
@@ -80,4 +80,26 @@ public interface ActivityService {
      * @return
      */
     HttpResponse<Integer> getSkuNum(ShoppingCartRequest shoppingCartRequest);
+
+    /**
+     * 校验商品活动是否过期
+     * @param activityId
+     * @param storeId
+     * @param productId
+     * @return
+     */
+    Boolean checkProcuct(String activityId,String storeId,String productId);
+
+    /**
+     * 活动商品品牌列表接口
+     * @param productBrandName
+     * @return
+     */
+    HttpResponse<List<ActivityProduct>> productBrandList(String productBrandName);
+
+    /**
+     * 活动商品品类接口
+     * @return
+     */
+    HttpResponse<List<ActivityProduct>> productCategoryList();
 }
