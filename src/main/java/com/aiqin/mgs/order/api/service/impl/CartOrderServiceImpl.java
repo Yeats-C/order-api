@@ -132,6 +132,10 @@ public class CartOrderServiceImpl implements CartOrderService {
                     cartOrderInfo.setProductBrandName(cartOrderInfo1.getProductBrandName());//品牌名称
                     cartOrderInfo.setProductCategoryCode(cartOrderInfo1.getProductCategoryCode());//品类编码
                     cartOrderInfo.setProductCategoryName(cartOrderInfo1.getProductCategoryName());//品类编码
+                    cartOrderInfo.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
+                    cartOrderInfo.setAccountTotalPrice(cartOrderInfo.getPrice().multiply(new BigDecimal(cartOrderInfo.getAmount())));
+                    cartOrderInfo.setActivityPrice(cartOrderInfo.getPrice());
+                    cartOrderInfo.setActivityId(shoppingCartRequest.getActivityId());
                     try {
                         if (cartOrderInfo != null) {
                             //判断sku是否在购物车里面存在
@@ -163,6 +167,9 @@ public class CartOrderServiceImpl implements CartOrderService {
                             LOGGER.warn("购物车信息为空!");
                             return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
                         }
+
+                        //解析活动
+                        analysisActivityInCart(cartOrderInfo.getCartId());
 
                     } catch (Exception e) {
                         LOGGER.error("添加购物车异常：{}", e);
@@ -343,17 +350,32 @@ public class CartOrderServiceImpl implements CartOrderService {
     @Override
     public HttpResponse deleteCartInfo(String storeId, String skuId, Integer lineCheckStatus, Integer productType) {
         try {
-            //清空购物车
-            if (storeId != null) {
-                LOGGER.info("删除购物车中的商品：{}", storeId);
-                //可以清空，可以删除单条，删除勾选数据。
-                cartOrderDao.deleteCart(storeId, skuId, lineCheckStatus,productType);
-            } else {
+            if (StringUtils.isEmpty(storeId)) {
                 LOGGER.error("删除购物车中的商品失败：{}", storeId);
                 return HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
             }
-            return HttpResponse.success();
+            CartOrderInfo query = new CartOrderInfo();
+            query.setStoreId(storeId);
+            query.setSkuCode(skuId);
+            query.setLineCheckStatus(lineCheckStatus);
+            query.setProductType(productType);
+            query.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
 
+            List<CartOrderInfo> queryList = cartOrderDao.selectByProperty(query);
+            if (queryList != null && queryList.size() > 0) {
+                for (CartOrderInfo item :
+                        queryList) {
+                    List<CartOrderInfo> giftList = cartOrderDao.findByGiftParentCartId(item.getCartId());
+                    if (giftList != null && giftList.size() > 0) {
+                        for (CartOrderInfo giftItem :
+                                giftList) {
+                            cartOrderDao.deleteByCartId(giftItem.getCartId());
+                        }
+                    }
+                    cartOrderDao.deleteByCartId(item.getCartId());
+                }
+            }
+            return HttpResponse.success();
         } catch (Exception e) {
             LOGGER.error("清空购物车失败", e);
             return HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
@@ -432,7 +454,7 @@ public class CartOrderServiceImpl implements CartOrderService {
             }
         }
         //把实际支付金额置为原价
-        cart.setAccountActualPrice(cart.getPrice().multiply(new BigDecimal(cart.getAmount())));
+        cart.setAccountTotalPrice(cart.getPrice().multiply(new BigDecimal(cart.getAmount())));
         //活动价等于原价
         cart.setActivityPrice(cart.getPrice());
 
@@ -505,7 +527,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                         }
 
                         if (curRule != null) {
-                            cart.setAccountActualPrice(cart.getAccountActualPrice().compareTo(curRule.getPreferentialAmount()) > 0 ? cart.getAccountActualPrice().subtract(curRule.getPreferentialAmount()) : BigDecimal.ZERO);
+                            cart.setAccountTotalPrice(cart.getAccountTotalPrice().compareTo(curRule.getPreferentialAmount()) > 0 ? cart.getAccountTotalPrice().subtract(curRule.getPreferentialAmount()) : BigDecimal.ZERO);
                         }
                         ;
                         break;
@@ -643,7 +665,7 @@ public class CartOrderServiceImpl implements CartOrderService {
         cartOrderInfo.setProductGift(ErpProductGiftEnum.GIFT.getCode());
         cartOrderInfo.setGiftParentCartId(cart.getCartId());
         cartOrderInfo.setActivityPrice(BigDecimal.ZERO);
-        cartOrderInfo.setAccountActualPrice(BigDecimal.ZERO);
+        cartOrderInfo.setAccountTotalPrice(BigDecimal.ZERO);
         cartOrderInfo.setCreateTime(new Date());
 
         return cartOrderInfo;
