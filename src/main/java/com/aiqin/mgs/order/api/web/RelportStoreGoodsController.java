@@ -75,4 +75,20 @@ public class RelportStoreGoodsController {
         return HttpResponse.success();
     }
 
+    @ApiOperation("测试")
+    @PostMapping("/test2")
+    public HttpResponse test2() {
+        reportStoreGoodsService.test();
+//        List<ReportStoreGoods> records=new ArrayList<>();
+//        ReportStoreGoods ss=new ReportStoreGoods();
+//        ss.setStoreCode("60000028");
+//        ss.setChainRatio(new BigDecimal(100));
+//        ss.setTongRatio(new BigDecimal(100));
+//        ss.setCountTime("2020-02");
+//        ss.setCreateTime(new Date());
+//        records.add(ss);
+//        reportStoreGoodsDao.insertBatch(records);
+        return HttpResponse.success();
+    }
+
 }

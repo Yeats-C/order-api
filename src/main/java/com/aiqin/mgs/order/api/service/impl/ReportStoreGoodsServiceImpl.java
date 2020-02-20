@@ -9,6 +9,7 @@ import com.aiqin.mgs.order.api.domain.ReportStoreGoods;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsVo;
+import com.aiqin.mgs.order.api.domain.response.report.ReportOrderAndStoreResponse;
 import com.aiqin.mgs.order.api.domain.response.report.ReportStoreGoodsCountResponse;
 import com.aiqin.mgs.order.api.service.ReportStoreGoodsService;
 import com.alibaba.fastjson.JSON;
@@ -23,6 +24,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.Map.Entry;
 
 /**
  * description: ReportStoreGoodsServiceImpl
@@ -41,6 +44,8 @@ import java.util.stream.Collectors;
 @Service
 public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
 
+    @Value("${bridge.url.slcs_api}")
+    private String slcsiHost;
     @Autowired
     private ReportStoreGoodsDao reportStoreGoodsDao;
     @Autowired
@@ -83,39 +88,63 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
     public void dealWith() {
         long start=System.currentTimeMillis();
         log.info("开始执行门店补货定时任务");
-//        String url="http://slcs.api.aiqin.com/store/getAllStoreCode";
-//        log.info("查询所有门店编码,请求url={}", url);
-//        HttpClient httpClient = HttpClient.get(url);
-//        Map<String, Object> result = httpClient.action().result(new TypeReference<Map<String, Object>>() {});
-//        log.info("调用slcs系统返回结果，result={}", JSON.toJSON(result));
-//        if(result==null){
-//            log.info("调用门店系统--查询所有门店编码失败");
-//            return;
-//        }
+        String url=slcsiHost+"/store/getAllStoreCode";
+        log.info("查询所有门店编码,请求url={}", url);
+        HttpClient httpClient = HttpClient.get(url);
+        Map<String, Object> result = httpClient.action().result(new TypeReference<Map<String, Object>>() {});
+        log.info("调用slcs系统返回结果，result={}", JSON.toJSON(result));
+        if(result==null){
+            log.info("调用门店系统--查询所有门店编码失败");
+            return;
+        }
         List<String> jsonMap=new ArrayList<>();
-//        if (StringUtils.isNotBlank(result.get("code").toString()) && "0".equals(String.valueOf(result.get("code")))) {
-//            jsonMap = JSONArray.parseArray(JSON.toJSONString(result.get("data")), String.class);
-//            log.info("jsonMap:"+jsonMap);
-//        } else {
-//            log.info("查询所有门店编码为空");
-//            return;
-//        }
-        jsonMap.add("60000028");
+        if (StringUtils.isNotBlank(result.get("code").toString()) && "0".equals(String.valueOf(result.get("code")))) {
+            jsonMap = JSONArray.parseArray(JSON.toJSONString(result.get("data")), String.class);
+            log.info("jsonMap:"+jsonMap);
+        } else {
+            log.info("查询所有门店编码为空");
+            return;
+        }
+//        jsonMap.add("60000028");
+        //根据门店编码批量查询是否在本月下过订单
+        List<ReportOrderAndStoreResponse> reportOrderAndStoreResponses = reportStoreGoodsDao.selectOrderByStoreCodes(jsonMap);
+        if(CollectionUtils.isEmpty(reportOrderAndStoreResponses)){
+            log.info("所有门店在本月均未补过货");
+            return;
+        }
+        log.info("根据门店编码批量查询是否在本月下过订单，一共下单:"+reportOrderAndStoreResponses.size()+"次，消耗时间:"+(System.currentTimeMillis()-start));
+        log.info("根据门店编码批量查询是否在本月下过订单，返回结果:"+reportOrderAndStoreResponses);
+        Map<String,String> map=new HashMap<>();
+        for(ReportOrderAndStoreResponse re:reportOrderAndStoreResponses){
+            if(re!=null&&null!=re.getStoreCode()&&null!=re.getOrderStoreCode()){
+                map.put(re.getStoreCode(),re.getOrderStoreCode());
+            }
+        }
+        log.info("查询所有下过单的门店编码集合:"+map);
         //判断门店编码集合是否为空，不为空，遍历查询信息
-        if(CollectionUtils.isNotEmpty(jsonMap)){
-            for(String storeCode:jsonMap){
+        if(map!=null && map.size()>0){
+//        if(CollectionUtils.isNotEmpty(strings)){
+//            for(String storeCode:jsonMap){
+//            for(String orderStoreCode:strings){
+            for(Entry<String, String> entry:map.entrySet()){
+                String storeCode3=entry.getKey();
                 //查询门店下补货品牌、数量（主表）
-                List<ReportStoreGoods> reportStoreGoodsCountResponses = reportStoreGoodsDao.selectProductCount(storeCode);
+                List<ReportStoreGoods> reportStoreGoodsCountResponses = reportStoreGoodsDao.selectProductCount(storeCode3);
+//                List<ReportStoreGoods> reportStoreGoodsCountResponses = reportStoreGoodsDao.selectProductCount1(orderStoreCode);
                 if(CollectionUtils.isEmpty(reportStoreGoodsCountResponses)){//未查询到订单数据
-                    log.info("查询"+storeCode+"该门店下补货品牌、数量为空");
+//                    log.info("查询"+storeCode+"该门店下补货品牌、数量为空");
                     continue;
                 }
                 //查询门店下补货，各个品牌下商品信息
-                List<ReportStoreGoodsDetail> reportStoreGoodsDetails = reportStoreGoodsDao.selectReportStoreGoodsDetail(storeCode);
+                List<ReportStoreGoodsDetail> reportStoreGoodsDetails = reportStoreGoodsDao.selectReportStoreGoodsDetail(storeCode3);
+//                List<ReportStoreGoodsDetail> reportStoreGoodsDetails = reportStoreGoodsDao.selectReportStoreGoodsDetail1(orderStoreCode);
                 if(CollectionUtils.isEmpty(reportStoreGoodsDetails)){
-                    log.info("查询"+storeCode+"该门店下补货，各个品牌下商品信息为空");
+//                    log.info("查询"+storeCode+"该门店下补货，各个品牌下商品信息为空");
                     continue;
                 }
+                //根据订单编码反向查找门店编码
+//                String storeCode2=reportStoreGoodsDao.selectStoreCodeByOrderCode(orderStoreCode);
+
                 SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM");
                 Date time=new Date();
                 Calendar rightNow = Calendar.getInstance();
@@ -123,14 +152,17 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 rightNow.add(Calendar.DAY_OF_MONTH,-1);//因为统计的是前一天的数据，所以日期减1
                 Date d=rightNow.getTime();
                 String countTime = sdf.format(d);
-                reportStoreGoodsDetails.forEach(p -> p.setStoreCode(storeCode));
+                reportStoreGoodsDetails.forEach(p -> p.setStoreCode(storeCode3));
                 reportStoreGoodsDetails.forEach(p -> p.setCreateTime(new Date()));
                 reportStoreGoodsDetails.forEach(p -> p.setCountTime(countTime));
                 //根据门店编码、统计时间清空数据
                 ReportStoreGoodsDetailVo vo=new ReportStoreGoodsDetailVo();
-                vo.setStoreCode(storeCode);
+                vo.setStoreCode(storeCode3);
                 vo.setCountTime(countTime);
-                reportStoreGoodsDetailDao.deleteByStoreCodeAndCountTime(vo);
+                List<ReportStoreGoodsDetail> reportStoreGoodsDetails1 = reportStoreGoodsDetailDao.selectList(vo);
+                if(CollectionUtils.isNotEmpty(reportStoreGoodsDetails1)){
+                    reportStoreGoodsDetailDao.deleteByStoreCodeAndCountTime(vo);
+                }
                 //插入门店补货列表统计detail报表
                 reportStoreGoodsDetailDao.insertBatch(reportStoreGoodsDetails);
                 reportStoreGoodsCountResponses=reportStoreGoodsCountResponses.stream().map(detailVo -> {
@@ -138,7 +170,7 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                     BeanUtils.copyProperties(detailVo,detail);
                     String productBrandCode = detail.getBrandId();
                     ReportStoreGoodsDetailVo reportStoreGoodsDetailVo=new ReportStoreGoodsDetailVo();
-                    reportStoreGoodsDetailVo.setStoreCode(storeCode);
+                    reportStoreGoodsDetailVo.setStoreCode(storeCode3);
                     reportStoreGoodsDetailVo.setBrandId(productBrandCode);
                     reportStoreGoodsDetailVo.setCountTime(countTime);
                     //各个品牌总金额
@@ -151,7 +183,7 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                     Date dt1=rightNow.getTime();
                     String reStr = sdf.format(dt1);
                     ReportStoreGoods r=new ReportStoreGoods();
-                    r.setStoreCode(storeCode);
+                    r.setStoreCode(storeCode3);
                     r.setCountTime(reStr);
                     r.setBrandId(productBrandCode);
                     //计算同比
@@ -181,11 +213,16 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                     detail.setChainRatio(b);
                     detail.setTongRatio(a);
                     detail.setCountTime(countTime);
-                    detail.setStoreCode(storeCode);
+                    detail.setStoreCode(storeCode3);
                     return detail;
                 }).collect(Collectors.toList());
                 //根据门店编码、统计时间清空数据
-                reportStoreGoodsDao.deleteByStoreCodeAndCountTime(vo);
+                ReportStoreGoodsVo vo1=new ReportStoreGoodsVo();
+                BeanUtils.copyProperties(vo,vo1);
+                List<ReportStoreGoods> reportStoreGoods = reportStoreGoodsDao.selectList(vo1);
+                if(CollectionUtils.isNotEmpty(reportStoreGoods)){
+                    reportStoreGoodsDao.deleteByStoreCodeAndCountTime(vo);
+                }
                 //插入数据
                 reportStoreGoodsDao.insertBatch(reportStoreGoodsCountResponses);
                 //查询各个sku对应的总金额
@@ -199,6 +236,32 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
             log.info("校验查询所有门店编码为空");
         }
         log.info("执行门店补货定时任务结束，消耗时间:"+(System.currentTimeMillis()-start));
+    }
+
+    @Override
+    public void test() {
+        long start=System.currentTimeMillis();
+        log.info("开始执行门店补货定时任务");
+        String url="http://slcs.api.aiqin.com/store/getAllStoreCode";
+        log.info("查询所有门店编码,请求url={}", url);
+        HttpClient httpClient = HttpClient.get(url);
+        Map<String, Object> result = httpClient.action().result(new TypeReference<Map<String, Object>>() {});
+        log.info("调用slcs系统返回结果，result={}", JSON.toJSON(result));
+        if(result==null){
+            log.info("调用门店系统--查询所有门店编码失败");
+            return;
+        }
+        List<String> jsonMap=new ArrayList<>();
+        if (StringUtils.isNotBlank(result.get("code").toString()) && "0".equals(String.valueOf(result.get("code")))) {
+            jsonMap = JSONArray.parseArray(JSON.toJSONString(result.get("data")), String.class);
+            log.info("jsonMap:"+jsonMap);
+        } else {
+            log.info("查询所有门店编码为空");
+            return;
+        }
+        List<ReportOrderAndStoreResponse> strings = reportStoreGoodsDao.selectOrderByStoreCodes(jsonMap);
+        log.info("测试结束，一共:"+strings.size()+"条，消耗时间:"+(System.currentTimeMillis()-start));
+
     }
 
     public static void main(String[] args) {
