@@ -233,16 +233,18 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public HttpResponse<Map> getActivitySalesStatistics() {
+    public HttpResponse<ActivitySales> getActivitySalesStatistics(String activityId) {
         LOGGER.info("查询活动详情-销售数据-活动销售统计");
         try {
             HttpResponse response = HttpResponse.success();
+            Activity activity=new Activity();
+            activity.setActivityId(activityId);
             //活动相关订单销售额及活动订单数(当订单中的商品命中了这个促销活动时，这个订单纳入统计，统计主订单。)
-            ActivitySales activitySales=erpOrderInfoDao.getActivitySales();
+            ActivitySales activitySales=erpOrderInfoDao.getActivitySales(activity);
             //活动商品销售额
-            BigDecimal  productSales=erpOrderItemDao.getProductSales();
+            BigDecimal  productSales=erpOrderItemDao.getProductSales(activity);
             //活动补货门店数
-            Integer storeNum=erpOrderInfoDao.getStoreNum();
+            Integer storeNum=erpOrderInfoDao.getStoreNum(activity);
             //平均单价
             BigDecimal averageUnitPrice=activitySales.getActivitySales().divide(new BigDecimal(activitySales.getActivitySalesNum()));
             activitySales.setProductSales(productSales);
@@ -269,7 +271,7 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setActivityId(activityId);
             List<Activity> list=activityDao.activityList(activity);
             if(list!=null && list.get(0)!=null){
-                Activity activityData=list.get(0);
+                activityRequest.setActivity(list.get(0));
             }else{
                 return HttpResponse.failure(ResultCode.NOT_HAVE_PARAM);
             }
@@ -277,7 +279,7 @@ public class ActivityServiceImpl implements ActivityService {
             List<ActivityStore> activityStoreList=activityStoreDao.selectByActivityId(activityId);
             List<ActivityProduct> activityProductList=activityProductDao.activityProductList(activity);
             List<ActivityRule> activityRuleList=activityRuleDao.selectByActivityId(activityId);
-            activityRequest.setActivity(activity);
+
             activityRequest.setActivityStores(activityStoreList);
             activityRequest.setActivityProducts(activityProductList);
             activityRequest.setActivityRules(activityRuleList);
@@ -431,7 +433,7 @@ public class ActivityServiceImpl implements ActivityService {
         //所有子节点
         List<ActivityProduct> childList = new ArrayList<>();
         activityProducts.forEach(item->{
-            if (item.getProductCategoryCode().equals("0")){
+            if ("0".equals(item.getProductCategoryCode())){
                 parentList.add(item);
             } else {
                 childList.add(item);
@@ -448,22 +450,6 @@ public class ActivityServiceImpl implements ActivityService {
 
 
 
-    /**
-     * 根据父节点和所有子节点集合获取父节点下得子节点集合
-     * @param parentId
-     * @param children
-     * @return
-     */
-    public List<ActivityProduct> getChildren(String parentId,List<ActivityProduct> children){
-        List<ActivityProduct> list = new ArrayList<>();
-        children.forEach(item->{
-            if (parentId.equals(item.getProductCategoryCode())){
-                item.setActivityProductList(getChildren(String.valueOf(item.getProductCategoryCode()),children));
-                list.add(item);
-            }
-        });
-        return list;
-    }
 
     @Override
     public HttpResponse updateStatus(Activity activity) {
@@ -514,6 +500,46 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
+    @Override
+    public HttpResponse<List<ActivitySales>> comparisonActivitySalesStatistics(List<String> activityIdList) {
+        LOGGER.info("活动列表-对比分析柱状图comparisonActivitySalesStatistics参数为：{}", activityIdList);
+        HttpResponse res = HttpResponse.success();
+        List<ActivitySales> activitySalesList=new ArrayList<>();
+        for (String activityId: activityIdList){
+            ActivitySales sales=getActivitySalesStatistics(activityId).getData();
+            activitySalesList.add(sales);
+        }
+        res.setData(activityIdList);
+        return res;
+    }
+
+    @Override
+    public HttpResponse excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response) {
+        LOGGER.info("导出--活动列表-对比分析柱状图excelActivitySalesStatistics参数为：{}", activityIdList);
+        HttpResponse res = HttpResponse.success();
+        try {
+            List<ActivitySales> activitySalesList=new ArrayList<>();
+            for (String activityId: activityIdList){
+                ActivitySales sales=getActivitySalesStatistics(activityId).getData();
+                activitySalesList.add(sales);
+            }
+            HSSFWorkbook wb = exportActivitySalesData(activitySalesList);
+            String excelName = "数据列表";
+            response.reset();
+            response.setContentType("application/vnd.ms-excel;charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+            response.addHeader("Content-Disposition", "attachment;fileName=" + new String(excelName.getBytes("UTF-8"), "iso-8859-1"));
+            OutputStream os = response.getOutputStream();
+            wb.write(os);
+            os.flush();
+            os.close();
+            return res;
+        } catch (Exception ex) {
+            throw new GroundRuntimeException(ex.getMessage());
+        }
+    }
+
+    /***********************************************工具方法**************************************************/
     public static HSSFWorkbook exportData(List<ErpOrderItem> list) {
         // 创建工作空间
         HSSFWorkbook wb = new HSSFWorkbook();
@@ -607,4 +633,95 @@ public class ActivityServiceImpl implements ActivityService {
         }
         return wb;
     }
+
+    /**
+     * 根据父节点和所有子节点集合获取父节点下得子节点集合
+     * @param parentId
+     * @param children
+     * @return
+     */
+    public List<ActivityProduct> getChildren(String parentId,List<ActivityProduct> children){
+        List<ActivityProduct> list = new ArrayList<>();
+        children.forEach(item->{
+            if (parentId.equals(item.getProductCategoryCode())){
+                item.setActivityProductList(getChildren(String.valueOf(item.getProductCategoryCode()),children));
+                list.add(item);
+            }
+        });
+        return list;
+    }
+
+
+    public static HSSFWorkbook exportActivitySalesData(List<ActivitySales> list) {
+        // 创建工作空间
+        HSSFWorkbook wb = new HSSFWorkbook();
+        // 创建表
+        HSSFSheet sheet = wb.createSheet("数据空间");
+        sheet.setDefaultColumnWidth(20);
+        sheet.setDefaultRowHeightInPoints(20);
+
+        // 创建行
+        HSSFRow row = sheet.createRow(0);
+
+        // 生成一个样式
+        HSSFCellStyle style = wb.createCellStyle();
+        style.setAlignment(HSSFCellStyle.ALIGN_CENTER);// 水平居中
+        style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);// 垂直居中
+
+        // 背景色
+        style.setFillForegroundColor(HSSFColor.TAN.index);
+        style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        style.setFillBackgroundColor(HSSFColor.DARK_RED.index);
+
+        // 设置边框
+        style.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+        style.setBorderLeft(HSSFCellStyle.BORDER_THIN);
+        style.setBorderRight(HSSFCellStyle.BORDER_THIN);
+        style.setBorderTop(HSSFCellStyle.BORDER_THIN);
+
+        // 生成一个字体
+        HSSFFont font = wb.createFont();
+        font.setFontHeightInPoints((short) 20);
+        font.setColor(HSSFColor.VIOLET.index);
+        font.setFontName("宋体");
+
+
+        // 把字体 应用到当前样式
+        style.setFont(font);
+        // 添加表头数据
+        String[] excelHeader = { "活动相关订单销售额", "活动商品销售额", "补货门店数", "平均客单价"};
+        for (int i = 0; i < excelHeader.length; i++) {
+            HSSFCell cell = row.createCell(i);
+            cell.setCellValue(excelHeader[i]);
+            cell.setCellStyle(style);
+        }
+        // 添加单元格数据
+        for (int i = 0; i < list.size(); i++) {
+            row = sheet.createRow(i + 1);
+            ActivitySales item = list.get(i);
+            if(null!=item.getActivitySales()) {
+                row.createCell(0).setCellValue(item.getActivitySales().doubleValue());
+            }else {
+                row.createCell(0).setCellValue(0);
+            }
+            if(null!=item.getProductSales()) {
+                row.createCell(1).setCellValue(item.getProductSales().doubleValue());
+            }else {
+                row.createCell(1).setCellValue(0);
+            }
+            if(null!=item.getStoreNum()) {
+                row.createCell(2).setCellValue(item.getStoreNum());
+            }else {
+                row.createCell(2).setCellValue(0);
+            }
+            if(null!=item.getAverageUnitPrice()) {
+                row.createCell(3).setCellValue(item.getAverageUnitPrice().doubleValue());
+            }else {
+                row.createCell(3).setCellValue(0);
+            }
+
+        }
+        return wb;
+    }
+
 }

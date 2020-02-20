@@ -4,6 +4,7 @@ package com.aiqin.mgs.order.api.web;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityProduct;
+import com.aiqin.mgs.order.api.domain.ActivitySales;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
@@ -88,13 +89,13 @@ public class ActivityController {
 
     /**
      * 活动详情-销售数据-活动销售统计
-     * @param
+     * @param activityId
      * @return
      */
     @GetMapping("/getActivitySalesStatistics")
     @ApiOperation(value = "活动详情-销售数据-活动销售统计")
-    public HttpResponse<Map> getActivitySalesStatistics(){
-        return activitesService.getActivitySalesStatistics();
+    public HttpResponse<ActivitySales> getActivitySalesStatistics(@RequestParam(name = "activity_id", required = false) String activityId){
+        return activitesService.getActivitySalesStatistics(activityId);
     }
 
     /**
@@ -214,5 +215,28 @@ public class ActivityController {
     @ApiOperation("导出--活动详情-销售数据-活动销售列表")
     public HttpResponse excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response){
         return activitesService.excelActivityItem(erpOrderItem,response);
+    }
+
+    /**
+     * 活动列表-对比分析柱状图
+     * @param activityIdList
+     * @return
+     */
+    @GetMapping("/comparisonActivitySalesStatistics")
+    @ApiOperation(value = "活动列表-对比分析柱状图")
+    public HttpResponse<List<ActivitySales>> comparisonActivitySalesStatistics(List<String> activityIdList){
+        return activitesService.comparisonActivitySalesStatistics(activityIdList);
+    }
+
+    /**
+     * 导出--活动列表-对比分析柱状图
+     * @param activityIdList
+     * @param response
+     * @return
+     */
+    @PostMapping("/excelActivitySalesStatistics")
+    @ApiOperation("导出--活动列表-对比分析柱状图")
+    public HttpResponse excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response){
+        return activitesService.excelActivitySalesStatistics(activityIdList,response);
     }
 }

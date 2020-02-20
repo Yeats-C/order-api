@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.dao.order;
 
+import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 
 import java.math.BigDecimal;
@@ -50,8 +51,9 @@ public interface ErpOrderItemDao {
     /**
      * 获取活动商品销售额（订单中的商品命中了这个活动的促销规则，那么把这些命中促销规则的商品的实收纳入统计）
      * @return
+     * @param activity
      */
-    BigDecimal getProductSales();
+    BigDecimal getProductSales(Activity activity);
 
     /**
      * 根据字段精确查询符合的数据列表总数
