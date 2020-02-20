@@ -271,7 +271,7 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setActivityId(activityId);
             List<Activity> list=activityDao.activityList(activity);
             if(list!=null && list.get(0)!=null){
-                Activity activityData=list.get(0);
+                activityRequest.setActivity(list.get(0));
             }else{
                 return HttpResponse.failure(ResultCode.NOT_HAVE_PARAM);
             }
@@ -279,7 +279,7 @@ public class ActivityServiceImpl implements ActivityService {
             List<ActivityStore> activityStoreList=activityStoreDao.selectByActivityId(activityId);
             List<ActivityProduct> activityProductList=activityProductDao.activityProductList(activity);
             List<ActivityRule> activityRuleList=activityRuleDao.selectByActivityId(activityId);
-            activityRequest.setActivity(activity);
+
             activityRequest.setActivityStores(activityStoreList);
             activityRequest.setActivityProducts(activityProductList);
             activityRequest.setActivityRules(activityRuleList);
