@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -58,9 +59,10 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
 
     @Override
     public List<ReportStoreGoodsDetail> getCountDetailList(ReportStoreGoodsDetailVo searchVo) {
+        List<ReportStoreGoodsDetail> list=new ArrayList<>();
         if(StringUtils.isNotBlank(searchVo.getStoreCode())&&StringUtils.isNotBlank(searchVo.getBrandId())&&StringUtils.isNotBlank(searchVo.getCountTime())){
-            return reportStoreGoodsDetailDao.selectList(searchVo);
+            list =reportStoreGoodsDetailDao.selectList(searchVo);
         }
-        return null;
+        return list;
     }
 }
