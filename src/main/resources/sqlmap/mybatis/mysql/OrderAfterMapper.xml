@@ -71,6 +71,13 @@
 		 <if test="distributorId!=null and distributorId!='' ">
          and distributor_id = #{distributorId}
          </if>
+        <if test="listDistributorId != null">
+            and distributor_id in (
+            <foreach collection="listDistributorId" item="distributorId" separator=",">
+                '${distributorId}'
+            </foreach>
+            )
+        </if>
          <if test="distributorName!=null and distributorName!='' ">
 		 and distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%') 
 		 </if>

@@ -225,6 +225,8 @@
 
     <!-- 查询订单明细部分汇总-（支持活动ID汇总、）-->
     <select id="selectorderdetailsum" resultMap="OrderInfoDetailMapping">
+        select sum(actual_price),count(amount) from
+        (
         SELECT IFNULL(SUM(IFNULL(a.actual_price,0)*IFNULL(a.amount,0)),0) AS actual_price,COUNT(a.order_id) AS amount
         FROM order_consumer_detail a,order_consumer_info b
         WHERE 1=1
@@ -233,6 +235,8 @@
         <if test="activityId!=null and activityId!=''">
             AND a.activity_id =#{activityId}
         </if>
+        group by a.order_code
+        ) c
     </select>
 
 

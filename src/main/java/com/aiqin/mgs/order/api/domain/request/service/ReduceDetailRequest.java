@@ -9,6 +9,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @ApiModel("查询订单明细")
@@ -24,6 +25,11 @@ public class ReduceDetailRequest extends PagesRequest {
     @ApiModelProperty(value = "门店id")
     @JsonProperty("store_id")
     private String storeId;
+
+
+    @JsonProperty("list_distributor_id")
+    @ApiModelProperty(value = "erp专用，门店列表，查全部传空")
+    private List<String> listDistributorId;
 
     @ApiModelProperty(value = "服务项目类别id")
     @JsonProperty("type_id")

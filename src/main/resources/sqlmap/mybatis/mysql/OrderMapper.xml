@@ -222,6 +222,14 @@
         <if test="distributorId!=null and distributorId!='' ">
             and a.distributor_id = #{distributorId}
         </if>
+
+        <if test="listDistributorId != null">
+            and a.distributor_id in (
+            <foreach collection="listDistributorId" item="distributorId" separator=",">
+                '${distributorId}'
+            </foreach>
+            )
+        </if>
         <if test="distributorName!=null and distributorName!=''">
             and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
         </if>
@@ -294,7 +302,12 @@
         <if test="payType!=null and payType!='' ">
             and a.pay_type =#{payType}
         </if>
-        ORDER BY a.create_time DESC
+        <if test="orderBy!=null and orderBy!='' ">
+            ORDER BY a.update_time DESC
+        </if>
+        <if test="orderBy==null || orderBy=='' ">
+            ORDER BY a.create_time DESC
+        </if>
         <if test="icount!=null ">
             limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
         </if>
@@ -307,6 +320,13 @@
         WHERE 1=1 and order_type = 1
         <if test="distributorId!=null and distributorId!='' ">
             and a.distributor_id = #{distributorId}
+        </if>
+        <if test="listDistributorId != null">
+            and a.distributor_id in (
+            <foreach collection="listDistributorId" item="distributorId" separator=",">
+                '${distributorId}'
+            </foreach>
+            )
         </if>
         <if test="distributorName!=null and distributorName!=''">
             and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')

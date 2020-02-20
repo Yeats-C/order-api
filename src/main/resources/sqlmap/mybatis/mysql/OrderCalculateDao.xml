@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.OrderCalculateDao">
+    <select id="qryFinish" resultType="com.aiqin.mgs.order.api.domain.OrderMonthCalculateInfo">
+    SELECT 
+     DISTINCT store_id as storeId,store_code as storeCode,store_name as storeName
+    FROM order_store_info info
+    WHERE info.order_status = 13
+    AND info.create_time  &gt;= #{beginTime}
+    AND info.create_time  &lt;= #{endTime}
+    AND store_id IS NOT NULL
+    GROUP BY store_id
+    </select>
+    <select id="qryTotalFinish" resultType="java.lang.Integer">
+    SELECT 
+         SUM(IFNULL(info.order_amount,0)*100)
+    FROM order_store_info info
+    WHERE info.order_status = 13
+    AND info.create_time  &gt;= #{beginTime}
+    AND info.create_time  &lt;= #{endTime}
+    AND info.store_id = #{storeId}
+    </select>
+    <select id="qryEighteenFinish" resultType="java.lang.Integer">
+    SELECT 
+     IFNULL(SUM(IFNULL(detail.activity_price,0)*100*IFNULL(product_count,0)),0)
+    FROM order_store_info info
+    LEFT JOIN order_store_detail detail  ON info.order_store_id = info.order_store_id
+    WHERE info.order_status = 13
+    AND info.create_time  &gt;= #{beginTime}
+    AND info.create_time  &lt;= #{endTime}
+    AND detail.product_property_name = #{dictionaryContent}
+    AND info.store_id = #{storeId}
+    </select>
+    <select id="qryTextileFinish"  resultType="java.lang.Integer">
+    SELECT 
+     IFNULL(SUM(IFNULL(detail.activity_price,0)*100*IFNULL(product_count,0)),0)
+    FROM order_store_info info
+    LEFT JOIN order_store_detail detail  ON info.order_store_id = info.order_store_id
+    WHERE info.order_status = 13
+    AND info.create_time  &gt;= #{beginTime}
+    AND info.create_time  &lt;= #{endTime}
+    AND detail.product_category_code = #{categoryCode}
+    AND info.store_id = #{storeId}
+    </select>
+</mapper>
+

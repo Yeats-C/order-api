@@ -29,6 +29,7 @@ import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.pay.PayReq;
 import com.aiqin.mgs.order.api.domain.request.*;
 import com.aiqin.mgs.order.api.domain.response.*;
+import com.aiqin.mgs.order.api.intercepter.UrlInterceptor;
 import com.aiqin.mgs.order.api.service.*;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.util.DayUtil;
@@ -321,7 +322,7 @@ public class OrderServiceImpl implements OrderService {
     }
     //会员消费更新会员消费时间记录
     private void updateMemberSale(OrderodrInfo orderInfo) {
-        if (orderInfo==null||orderInfo.getOrderInfo()==null||orderInfo.getOrderInfo().getMemberId()==null){
+        if (orderInfo==null||orderInfo.getOrderInfo()==null||orderInfo.getOrderInfo().getMemberId()==null||orderInfo.getOrderInfo().getMemberId().equals("")){
             return;
         }
         MemberSaleRequest memberSaleRequest=new MemberSaleRequest();
@@ -364,6 +365,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public HttpResponse selectPrestorageOrderList(OrderQuery orderQuery) {
+        if (orderQuery!=null &&orderQuery.getListDistributorId()!=null&&orderQuery.getListDistributorId().size()==0){
+            orderQuery.setListDistributorId(null);
+        }
         List<PrestorageOrderInfo> prestorageOrderSupplies = prestorageOrderSupplyDao.selectPrestorageOrderList(trans(orderQuery));
         //是否可退货
         couldReturn(prestorageOrderSupplies);
@@ -400,6 +404,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public HttpResponse selectPrestorageOrderLogs(OrderQuery orderQuery) {
+        if (orderQuery!=null&&orderQuery.getListDistributorId()!=null&&orderQuery.getListDistributorId().size()==0){
+            orderQuery.setListDistributorId(null);
+        }
         List<PrestorageOrderLogsInfo> prestorageOrderLogsInfos = prestorageOrderSupplyDetailDao.selectPrestorageOrderLogs(orderQuery);
         int totalCount = prestorageOrderSupplyDetailDao.selectPrestorageOrderLogsCount(orderQuery);
         return HttpResponse.success(new PageResData(totalCount, prestorageOrderLogsInfos));
@@ -477,9 +484,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public HttpResponse<Integer> orderStoreCount(OrderCountReq orderCountReq) {
         //1）正常销售订单-已完成状态2）预存订单-未提货状态3）服务订单已完成
-        int count1 = orderDao.orderPrestorageCount(orderCountReq.getStoreId(), orderCountReq.getStartDay(), orderCountReq.getEndDay());
-        int count2 = orderDao.orderStoreCount(orderCountReq.getStoreId(), orderCountReq.getStartDay(), orderCountReq.getEndDay());
-        return HttpResponse.successGenerics(count1 + count2);
+        Integer count1 = orderDao.orderPrestorageCount(orderCountReq.getStoreId(), orderCountReq.getStartDay(), orderCountReq.getEndDay());
+        Integer count2 = orderDao.orderStoreCount(orderCountReq.getStoreId(), orderCountReq.getStartDay(), orderCountReq.getEndDay());
+        return HttpResponse.successGenerics((count1==null?0:count1) + (count2==null?0:count2));
     }
 
     private OrderQuery trans(OrderQuery orderQuery) {
@@ -539,6 +546,16 @@ public class OrderServiceImpl implements OrderService {
 
     private HttpResponse changeProductStock(OrderodrInfo orderInfo) {
         List<OperateStockVo> operateStockVos = Lists.newArrayList();
+        List<InventoryDetailRequest> inventoryDetailRequests=new ArrayList<>();
+
+        InventoryDetailRequest inventoryDetailRequest=new InventoryDetailRequest();
+        inventoryDetailRequest.setBillType(BillTypeEnum.ONLINE_SALE.getCode());
+        inventoryDetailRequest.setCreateByName(orderInfo.getOrderInfo().getCashierName());
+        inventoryDetailRequest.setOperator(orderInfo.getOrderInfo().getCashierName());
+        inventoryDetailRequest.setRecordType(StockChangeTypeEnum.OUT_STORAGE.getCode());
+        inventoryDetailRequest.setRelateNumber(orderInfo.getOrderInfo().getOrderCode());
+        inventoryDetailRequest.setStoragePosition(1);
+        inventoryDetailRequest.setStorageType(1);
         orderInfo.getDetailList().stream().forEach(input -> {
             OperateStockVo stockVo = new OperateStockVo();
             stockVo.setStoreCode(orderInfo.getOrderInfo().getDistributorCode());
@@ -554,10 +571,12 @@ public class OrderServiceImpl implements OrderService {
             stockVo.setCreateByName(orderInfo.getOrderInfo().getCashierName());
             stockVo.setStoragePosition(1);
             stockVo.setReleaseStatus(ReleaseStatusEnum.RELEASE.getCode());
-            stockVo.setRelateNumber(orderInfo.getOrderInfo().getOrderId());
+            stockVo.setRelateNumber(orderInfo.getOrderInfo().getOrderCode());
             operateStockVos.add(stockVo);
         });
-        return bridgeProductService.changeStock(operateStockVos);
+        inventoryDetailRequest.setInventoryRecordRequests(operateStockVos);
+        inventoryDetailRequests.add(inventoryDetailRequest);
+        return bridgeProductService.changeStock(inventoryDetailRequests);
     }
 
 

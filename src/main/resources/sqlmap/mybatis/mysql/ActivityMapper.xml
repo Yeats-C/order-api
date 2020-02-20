@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.ActivityDao">
+    <resultMap id="ActivityMapping" type="com.aiqin.mgs.order.api.domain.Activity">
+        <result column="activity_id" jdbcType="VARCHAR" property="activityId"/>
+        <result column="activity_name" jdbcType="VARCHAR" property="activityName"/>
+        <result column="activity_type" jdbcType="INTEGER" property="activityType"/>
+        <result column="activity_status" jdbcType="INTEGER" property="activityStatus"/>
+        <result column="begin_time" jdbcType="TIMESTAMP" property="beginTime"/>
+        <result column="finish_time" jdbcType="TIMESTAMP" property="finishTime"/>
+        <result column="publishing_organization" jdbcType="VARCHAR" property="publishingOrganization"/>
+        <result column="activity_brief" jdbcType="VARCHAR" property="activityBrief"/>
+        <result column="activity_pic_pc" jdbcType="VARCHAR" property="activityPicPc"/>
+        <result column="activity_pic_app" jdbcType="VARCHAR" property="activityPicApp"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+       activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization,activity_brief
+       ,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time
+    </sql>
+
+
+    <select id="activityList" resultType="java.util.List" resultMap="ActivityMapping"
+            parameterType="com.aiqin.mgs.order.api.domain.Activity">
+        select activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization
+        ,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time
+        from activity
+        <where>
+            1=1
+            <if test="activityId != '' and activityId != null">
+                and activity_id = #{activityId}
+            </if>
+            <if test="activityName != '' and activityName!= null">
+                and activity_name = #{activityName}
+            </if>
+            <if test="activityType!= null">
+                and activity_type = #{activityType}
+            </if>
+            <if test="activityStatus!= null">
+                and activity_status = #{activityStatus}
+            </if>
+            <if test="beginTime!= null">
+                and begin_time &gt;= #{beginTime}
+            </if>
+            <if test="finishTime!= null">
+                and finish_time &lt;= #{finishTime}
+            </if>
+            <if test="createBy != '' and createBy!= null">
+                and create_by = #{createBy}
+            </if>
+            <if test="updateBy != '' and updateBy!= null">
+                and update_by = #{updateBy}
+            </if>
+            <if test="createTime!= null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateTime!= null">
+                and update_time = #{updateTime}
+            </if>
+            <if test="pageSize!=null ">
+                limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+            </if>
+        </where>
+    </select>
+
+    <select id="getActivityInformation" resultType="com.aiqin.mgs.order.api.domain.Activity"
+            parameterType="com.aiqin.mgs.order.api.domain.Activity">
+        select activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization
+        ,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time
+        from activity
+        <where>
+            1=1
+            and activity_id = #{activityId}
+        </where>
+    </select>
+
+
+    <!--插入活动主表信息-->
+    <insert id="insertActivity" parameterType="com.aiqin.mgs.order.api.domain.Activity">
+        insert into activity
+			(activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization
+			,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time)
+		values
+		    (#{activityId},#{activityName},#{activityType},#{activityStatus},#{beginTime},#{finishTime},#{publishingOrganization}
+		    ,#{activityBrief},#{activityPicPc},#{activityPicApp},#{createBy},#{updateBy},#{createTime},#{updateTime})
+	</insert>
+
+    <!--编辑活动主表-->
+    <update id="updateActivity">
+        update activity
+        <set>
+            <if test="activityId != null">
+                activity_id = #{activityId,jdbcType=VARCHAR},
+            </if>
+            <if test="activityName != null">
+                activity_name = #{activityName,jdbcType=VARCHAR},
+            </if>
+            <if test="activityType != null">
+                activity_type = #{activityType,jdbcType=BIT},
+            </if>
+            <if test="activityStatus != null">
+                activity_status = #{activityStatus,jdbcType=BIT},
+            </if>
+            <if test="beginTime != null">
+                begin_time = #{beginTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="finishTime != null">
+                finish_time = #{finishTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="publishingOrganization != null">
+                publishing_organization = #{publishingOrganization,jdbcType=VARCHAR},
+            </if>
+            <if test="activityBrief != null">
+                activity_brief = #{activityBrief,jdbcType=VARCHAR},
+            </if>
+            <if test="activityPicPc != null">
+                activity_pic_pc = #{activityPicPc,jdbcType=VARCHAR},
+            </if>
+            <if test="activityPicApp != null">
+                activity_pic_app = #{activityPicApp,jdbcType=VARCHAR},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=VARCHAR},
+            </if>
+            update_time = now()
+        </set>
+    </update>
+
+    <select id="totalCount" resultType="java.lang.Integer" parameterType="com.aiqin.mgs.order.api.domain.Activity">
+        select count(1)
+        from activity
+        <where>
+            1=1
+            <if test="activityId != '' and activityId != null">
+                and activity_id = #{activityId}
+            </if>
+            <if test="activityName != '' and activityName!= null">
+                and activity_name = #{activityName}
+            </if>
+            <if test="activityType!= null">
+                and activity_type = #{activityType}
+            </if>
+            <if test="activityStatus!= null">
+                and activity_status = #{activityStatus}
+            </if>
+            <if test="beginTime!= null">
+                and begin_time &gt;= #{beginTime}
+            </if>
+            <if test="finishTime!= null">
+                and finish_time &lt;= #{finishTime}
+            </if>
+            <if test="createBy != '' and createBy!= null">
+                and create_by = #{createBy}
+            </if>
+            <if test="updateBy != '' and updateBy!= null">
+                and update_by = #{updateBy}
+            </if>
+            <if test="createTime!= null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateTime!= null">
+                and update_time = #{updateTime}
+            </if>
+        </where>
+    </select>
+
+    <!--通过门店id爱掌柜的促销活动列表（所有生效活动）-->
+    <select id="effectiveActivityList" resultType="com.aiqin.mgs.order.api.domain.Activity" parameterType="java.lang.String">
+        SELECT
+        a.activity_id,a.activity_name,a.activity_type,a.activity_status,a.begin_time,a.finish_time,a.publishing_organization,a.activity_brief
+        ,a.activity_pic_pc,a.activity_pic_app,a.create_by,a.update_by,a.create_time,a.update_time
+        FROM
+        activity a
+        JOIN activity_store s ON a.activity_id = s.activity_id
+        where   1=1
+        and s.store_id = #{storeId}
+        AND a.begin_time &lt; now()
+        and a.finish_time &gt; NOW()
+        and a.activity_status=0
+    </select>
+
+    <select id="checkProcuct" resultType="com.aiqin.mgs.order.api.domain.Activity" parameterType="java.lang.String">
+        SELECT
+        a.activity_id,
+        a.activity_name,
+        a.activity_type,
+        a.activity_status,
+        a.begin_time,
+        a.finish_time,
+        a.publishing_organization,
+        a.activity_brief,
+        a.activity_pic_pc,
+        a.activity_pic_app,
+        a.create_by,
+        a.update_by,
+        a.create_time,
+        a.update_time
+        FROM
+        activity a
+        left JOIN activity_store s ON a.activity_id = s.activity_id
+        LEFT JOIN activity_product p ON a.activity_id = p.activity_id
+        WHERE
+        1 = 1
+        AND s.store_id = 6
+        and p.sku_code = 6
+        AND a.begin_time &lt; now()
+        and a.finish_time &gt; NOW()
+        and a.activity_status=0
+    </select>
+
+
+</mapper>

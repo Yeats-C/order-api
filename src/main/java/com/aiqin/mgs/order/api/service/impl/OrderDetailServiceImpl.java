@@ -441,8 +441,10 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             }
 
             //为pos端判断是否可退货
-            if (orderInfo.getOrderStatus()==2||orderInfo.getOrderStatus()==5){
-                info.setTurnReturnView(checkTurn(detailList));
+            if (orderInfo.getOrderStatus().intValue()==2||orderInfo.getOrderStatus().intValue()==5){
+                int state=checkTurn(detailList);
+                info.setTurnReturnView(state);
+                info.getOrderInfo().setTurnReturnView(state);
             }else {
                 info.setTurnReturnView(1);
                 info.getOrderInfo().setTurnReturnView(1);
@@ -875,6 +877,43 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             LOGGER.error("接口-统计商品在各个渠道的订单数失败 {}", e);
             return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
         }
+    }
+
+    @Override
+    public HttpResponse batchAddOrder(List<OrderodrInfo> cartInfo) {
+        if (cartInfo==null){
+            return new HttpResponse();
+        }
+        for (OrderodrInfo orderodrInfo:cartInfo){
+
+            try {
+                orderDao.addOrderInfo(orderodrInfo.getOrderInfo());
+                for (OrderDetailInfo orderDetailInfo:orderodrInfo.getDetailList()){
+                    orderDetailDao.addDetailList(orderDetailInfo);
+
+                }
+                //新增订单结算数据
+                orderodrInfo.getSettlementInfo().setSettlementId(OrderPublic.getUUID());
+
+                settlementDao.addSettlement(orderodrInfo.getSettlementInfo());
+
+
+
+                //新增订单支付数据
+             /*   if (orderPayList != null && orderPayList.size() > 0) {
+                    try {
+                        settlementService.addOrderPayList(orderPayList, orderId, orderCode);
+                    } catch (Exception e) {
+                        LOGGER.error("新增订单支付数据异常：{}", e);
+                    }
+                }*/
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        return HttpResponse.success();
     }
 
     @Override

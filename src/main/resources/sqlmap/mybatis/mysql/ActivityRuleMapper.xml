@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.ActivityRuleDao">
+    <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.ActivityRule">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="activity_id" jdbcType="VARCHAR" property="activityId"/>
+        <result column="activity_type" jdbcType="BIGINT" property="activityType"/>
+        <result column="rule_unit" jdbcType="BIGINT" property="ruleUnit"/>
+        <result column="meeting_conditions" jdbcType="INTEGER" property="meetingConditions"/>
+        <result column="preferential_amount" jdbcType="INTEGER" property="preferentialAmount"/>
+        <result column="rule_num" jdbcType="INTEGER" property="ruleNum"/>
+        <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
+        <result column="product_name" jdbcType="VARCHAR" property="productName"/>
+        <result column="product_code" jdbcType="VARCHAR" property="productCode"/>
+        <result column="numbers" jdbcType="INTEGER" property="numbers"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id,activity_id, activity_type,rule_unit, meeting_conditions, preferential_amount,rule_num, sku_code,product_name
+    , product_code,numbers,create_by,update_by,create_time, update_time
+  </sql>
+
+    <!--批量保存活动对应规则信息List-->
+    <insert id="insertList" parameterType="java.util.List">
+        insert into activity_rule (activity_id, activity_type,rule_unit, meeting_conditions, preferential_amount,rule_num
+        , sku_code,product_name, product_code,numbers,create_by,update_by,create_time, update_time)
+        values
+        <foreach collection="list" item="activityRule" separator=",">
+            (#{activityRule.activityId,jdbcType=VARCHAR},
+            #{activityRule.activityType,jdbcType=INTEGER},
+            #{activityRule.ruleUnit,jdbcType=INTEGER},
+            #{activityRule.meetingConditions,jdbcType=INTEGER},
+            #{activityRule.preferentialAmount,jdbcType=INTEGER},
+            #{activityRule.ruleNum,jdbcType=INTEGER},
+            #{activityRule.skuCode,jdbcType=VARCHAR},
+            #{activityRule.productName,jdbcType=VARCHAR},
+            #{activityRule.productCode,jdbcType=VARCHAR},
+            #{activityRule.numbers,jdbcType=INTEGER},
+            #{activityRule.createBy,jdbcType=VARCHAR},
+            #{activityRule.updateBy,jdbcType=VARCHAR},
+            now(), now() )
+        </foreach>
+    </insert>
+
+    <!--通过activityId查询活动-规则列表-->
+    <select id="selectByActivityId" parameterType="java.lang.String" resultMap="BaseResultMap"
+            resultType="java.util.List">
+        select
+        <include refid="Base_Column_List"/>
+        from activity_rule
+        where activity_id = #{activityId,jdbcType=VARCHAR}
+        and is_delete=0
+    </select>
+
+    <!--通过activityId删除活动-规则信息（逻辑删除）-->
+    <delete id="deleteRuleByActivityId" parameterType="java.lang.String">
+    update activity_rule set
+        is_delete = 1,
+        update_time = now()
+    where activity_id = #{activityId,jdbcType=VARCHAR}
+  </delete>
+</mapper>

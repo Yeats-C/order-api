@@ -62,6 +62,13 @@
         <if test="distributorId!=null and distributorId!='' ">
             and d.distributor_id = #{distributorId}
         </if>
+        <if test="listDistributorId != null">
+            and d.distributor_id in (
+            <foreach collection="listDistributorId" item="distributorId" separator=",">
+                '${distributorId}'
+            </foreach>
+            )
+        </if>
         <if test="barCodeAndSku!=null and barCodeAndSku!=''">
             and (l.bar_code= #{barCodeAndSku,jdbcType=VARCHAR} or l.sku_code = #{barCodeAndSku,jdbcType=VARCHAR})
         </if>
@@ -84,6 +91,13 @@
         </if>
         <if test="distributorId!=null and distributorId!='' ">
             and d.distributor_id = #{distributorId}
+        </if>
+        <if test="listDistributorId != null">
+            and d.distributor_id in (
+            <foreach collection="listDistributorId" item="distributorId" separator=",">
+                '${distributorId}'
+            </foreach>
+            )
         </if>
         <if test="barCodeAndSku!=null and barCodeAndSku!=''">
             and (l.bar_code= #{barCodeAndSku,jdbcType=VARCHAR} or l.sku_code = #{barCodeAndSku,jdbcType=VARCHAR})

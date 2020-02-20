@@ -173,4 +173,10 @@ public class ReturnOrderInfoController {
         return returnOrderInfoService.apply(approvalCode,operatorId,deptCode);
     }
 
+    @GetMapping("/directDelivery")
+    @ApiOperation("直送退货处理")
+    public HttpResponse directDelivery(@RequestBody ReturnOrderReviewReqVo reqVo) {
+        return returnOrderInfoService.directDelivery(reqVo);
+    }
+
 }

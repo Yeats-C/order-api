@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.po.order;
 
+import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.aiqin.mgs.order.api.component.enums.ErpProductGiftEnum;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,7 +19,7 @@ import java.util.Date;
  */
 @Data
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class ErpOrderItem {
+public class ErpOrderItem extends PagesRequest {
 
     @ApiModelProperty(value = "主键")
     @JsonProperty("id")
@@ -219,6 +220,23 @@ public class ErpOrderItem {
     @ApiModelProperty(value = "更新时间")
     @JsonProperty("update_time")
     private Date updateTime;
+
+    @ApiModelProperty(value = "是否活动商品0否1是")
+    @JsonProperty("is_activity")
+    private Integer isActivity;
+
+    @ApiModelProperty(value = "订单状态")
+    @JsonProperty("order_status")
+    private Integer orderStatus;
+
+    @ApiModelProperty(value = "门店编码")
+    @JsonProperty("store_code")
+    private String storeCode;
+
+    @ApiModelProperty(value = "门店名称")
+    @JsonProperty("store_name")
+    private String storeName;
+
 
     public String getProductTypeDesc() {
         return ErpProductGiftEnum.getEnumDesc(productType);
