@@ -4,12 +4,16 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoods;
+import com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail;
+import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsVo;
 import com.aiqin.mgs.order.api.service.ReportStoreGoodsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * description: RelportStoreGoodsController
@@ -41,6 +45,12 @@ public class RelportStoreGoodsController {
     @PostMapping("/update")
     public HttpResponse<Boolean> update(@RequestBody ReportStoreGoods relatedSales) {
         return new HttpResponse<>(reportStoreGoodsService.update(relatedSales));
+    }
+
+    @ApiOperation("门店补货列表商品详情")
+    @PostMapping("/getCountDetailList")
+    public HttpResponse<List<ReportStoreGoodsDetail>> getCountDetailList(@RequestBody ReportStoreGoodsDetailVo searchVo) {
+        return new HttpResponse(reportStoreGoodsService.getCountDetailList(searchVo));
     }
 
 }
