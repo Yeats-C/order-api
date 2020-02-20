@@ -549,7 +549,7 @@ public class OrderServiceImpl implements OrderService {
         List<InventoryDetailRequest> inventoryDetailRequests=new ArrayList<>();
 
         InventoryDetailRequest inventoryDetailRequest=new InventoryDetailRequest();
-        inventoryDetailRequest.setBillType(BillTypeEnum.ONLINE_SALE.getCode());
+        inventoryDetailRequest.setBillType(BillTypeEnum.DOOR_SALE.getCode());
         inventoryDetailRequest.setCreateByName(orderInfo.getOrderInfo().getCashierName());
         inventoryDetailRequest.setOperator(orderInfo.getOrderInfo().getCashierName());
         inventoryDetailRequest.setRecordType(StockChangeTypeEnum.OUT_STORAGE.getCode());
