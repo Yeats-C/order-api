@@ -24,20 +24,20 @@ public class AppWebConfiguration implements WebMvcConfigurer {
 
     private static final String RELEASE = "release";
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        if (RELEASE.equals(profile)) {
-            registry.addInterceptor(urlInterceptor)
-                    .addPathPatterns("/**").excludePathPatterns(
-                    "/doc.html",
-                    "/swagger-resources",
-                    "/webjars/**",
-                    "/init/**");
-        }
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        if (RELEASE.equals(profile)) {
+//            registry.addInterceptor(urlInterceptor)
+//                    .addPathPatterns("/**").excludePathPatterns(
+//                    "/doc.html",
+//                    "/swagger-resources",
+//                    "/webjars/**",
+//                    "/init/**");
+//        }
 //        registry.addInterceptor(new IPInterceptor())
 //                .addPathPatterns("/swagger-ui.html")
 //                .addPathPatterns("/doc.html");
-    }
+//    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
