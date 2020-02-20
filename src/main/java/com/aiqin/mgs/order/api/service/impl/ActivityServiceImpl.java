@@ -60,6 +60,9 @@ public class ActivityServiceImpl implements ActivityService {
     @Resource
     private CartOrderDao cartOrderDao;
 
+    @Resource
+    private ActivityGiftDao activityGiftDao;
+
     @Override
     public HttpResponse<Map> activityList(Activity activity) {
         LOGGER.info("查询促销活动列表activityList参数为：{}", activity);
@@ -180,6 +183,20 @@ public class ActivityServiceImpl implements ActivityService {
             activityRule.setActivityId(activityId);
             activityRule.setCreateTime(new Date());
             activityRule.setUpdateTime(new Date());
+            String ruleId=IdUtil.activityId();
+            activityRule.setRuleId(ruleId);
+            //如果规则为满赠，插入赠品信息
+            if(activityRule.getActivityType()==2 && null!=activityRule.getGiftList()){
+                List<ActivityGift> activityGiftList=new ArrayList<>();
+                for(ActivityGift gift:activityRule.getGiftList()){
+                    gift.setRuleId(ruleId);
+                    activityGiftList.add(gift);
+                }
+                int activityGiftRecord = activityGiftDao.insertList(activityGiftList);
+                if (activityGiftRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+                    return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
+                }
+            }
         }
         int activityRuleRecord = activityRuleDao.insertList(activityRuleList);
         if (activityRuleRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
@@ -279,6 +296,14 @@ public class ActivityServiceImpl implements ActivityService {
             List<ActivityStore> activityStoreList=activityStoreDao.selectByActivityId(activityId);
             List<ActivityProduct> activityProductList=activityProductDao.activityProductList(activity);
             List<ActivityRule> activityRuleList=activityRuleDao.selectByActivityId(activityId);
+            if(null!=activityRuleList){
+                for (ActivityRule rule:activityRuleList){
+                    if(2==rule.getActivityType()){
+                        List<ActivityGift> giftList=activityGiftDao.selectByRuleId(rule.getRuleId());
+                        rule.setGiftList(giftList);
+                    }
+                }
+            }
 
             activityRequest.setActivityStores(activityStoreList);
             activityRequest.setActivityProducts(activityProductList);
@@ -365,6 +390,20 @@ public class ActivityServiceImpl implements ActivityService {
                 activityRule.setActivityId(activity.getActivityId());
                 activityRule.setCreateTime(new Date());
                 activityRule.setUpdateTime(new Date());
+                String ruleId=IdUtil.activityId();
+                activityRule.setRuleId(ruleId);
+                //如果规则为满赠，插入赠品信息
+                if(activityRule.getActivityType()==2 && null!=activityRule.getGiftList()){
+                    List<ActivityGift> activityGiftList=new ArrayList<>();
+                    for(ActivityGift gift:activityRule.getGiftList()){
+                        gift.setRuleId(ruleId);
+                        activityGiftList.add(gift);
+                    }
+                    int activityGiftRecord = activityGiftDao.insertList(activityGiftList);
+                    if (activityGiftRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+                        return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
+                    }
+                }
             }
             int activityRuleRecord = activityRuleDao.insertList(activityRuleList);
             if (activityRuleRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
