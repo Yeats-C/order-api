@@ -534,21 +534,11 @@ public class CartOrderServiceImpl implements CartOrderService {
                     case TYPE_2:
                         //满赠
 
-                        Map<Integer, List<ActivityRule>> ruleNumGroupMap = new HashMap<>(16);
-                        Integer curRuleNum = null;
-                        BigDecimal curMeetingConditions = null;
-
+                        //当前命中梯度
+                        ActivityRule curRuleTemp = null;
 
                         for (ActivityRule ruleItem :
                                 activityRules) {
-
-                            //记录分组情况
-                            List<ActivityRule> ruleNumGroupList = new ArrayList<>();
-                            if (ruleNumGroupMap.containsKey(ruleItem.getRuleNum())) {
-                                ruleNumGroupList = ruleNumGroupMap.get(ruleItem.getRuleNum());
-                            }
-                            ruleNumGroupList.add(ruleItem);
-                            ruleNumGroupMap.put(ruleItem.getRuleNum(), ruleNumGroupList);
 
                             //是否把当前梯度作为命中梯度
                             boolean flag = false;
@@ -558,10 +548,10 @@ public class CartOrderServiceImpl implements CartOrderService {
                                 //按照数量
 
                                 if (ruleItem.getMeetingConditions().compareTo(new BigDecimal(cart.getAmount())) <= 0) {
-                                    if (curRuleNum == null) {
+                                    if (curRuleTemp == null) {
                                         flag = true;
                                     } else {
-                                        if (ruleItem.getMeetingConditions().compareTo(curMeetingConditions) > 0) {
+                                        if (ruleItem.getMeetingConditions().compareTo(curRuleTemp.getMeetingConditions()) > 0) {
                                             flag = true;
                                         }
                                     }
@@ -571,10 +561,10 @@ public class CartOrderServiceImpl implements CartOrderService {
                                 //按照金额
 
                                 if (ruleItem.getMeetingConditions().compareTo(cartMoney) <= 0) {
-                                    if (curRuleNum == null) {
+                                    if (curRuleTemp == null) {
                                         flag = true;
                                     } else {
-                                        if (ruleItem.getMeetingConditions().compareTo(curMeetingConditions) > 0) {
+                                        if (ruleItem.getMeetingConditions().compareTo(curRuleTemp.getMeetingConditions()) > 0) {
                                             flag = true;
                                         }
                                     }
@@ -585,19 +575,18 @@ public class CartOrderServiceImpl implements CartOrderService {
                             }
 
                             if (flag) {
-                                curRuleNum = ruleItem.getRuleNum();
-                                curMeetingConditions = ruleItem.getMeetingConditions();
+                                curRuleTemp = ruleItem;
                             }
                         }
 
-                        if (curRuleNum != null) {
+                        if (curRuleTemp != null) {
                             //满赠规则组
-                            List<ActivityRule> activityRuleList = ruleNumGroupMap.get(curRuleNum);
+                            List<ActivityGift> giftList = curRuleTemp.getGiftList();
 
                             //生成赠品行
-                            for (ActivityRule ruleItem :
-                                    activityRuleList) {
-                                CartOrderInfo giftProductLine = createGiftProductLine(cart, ruleItem);
+                            for (ActivityGift giftItem :
+                                    giftList) {
+                                CartOrderInfo giftProductLine = createGiftProductLine(cart, giftItem);
                                 try {
                                     cartOrderDao.insertCart(giftProductLine);
                                 } catch (Exception e) {
@@ -633,7 +622,7 @@ public class CartOrderServiceImpl implements CartOrderService {
      * @param rule 满赠梯度规则中的一个赠品规则
      * @return
      */
-    private CartOrderInfo createGiftProductLine(CartOrderInfo cart, ActivityRule rule) {
+    private CartOrderInfo createGiftProductLine(CartOrderInfo cart, ActivityGift rule) {
 
         ProductInfo skuDetail = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, "rule.getSkuCode()");
 
