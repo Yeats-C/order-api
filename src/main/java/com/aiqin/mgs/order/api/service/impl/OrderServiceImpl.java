@@ -368,10 +368,10 @@ public class OrderServiceImpl implements OrderService {
         if (orderQuery!=null &&orderQuery.getListDistributorId()!=null&&orderQuery.getListDistributorId().size()==0){
             orderQuery.setListDistributorId(null);
         }
-        List<PrestorageOrderInfo> prestorageOrderSupplies = prestorageOrderSupplyDao.selectPrestorageOrderList(trans(orderQuery));
+        List<PrestorageOrderInfo> prestorageOrderSupplies = prestorageOrderSupplyDao.selectPrestorageOrderList(orderQuery);
         //是否可退货
         couldReturn(prestorageOrderSupplies);
-        int totalCount = prestorageOrderSupplyDao.selectPrestorageOrderListCount(trans(orderQuery));
+        int totalCount = prestorageOrderSupplyDao.selectPrestorageOrderListCount(orderQuery);
 
         return HttpResponse.success(new PageResData(totalCount, prestorageOrderSupplies));
     }
