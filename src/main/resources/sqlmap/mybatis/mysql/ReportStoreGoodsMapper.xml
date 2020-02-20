@@ -161,4 +161,20 @@
     </where>
   </select>
 
+  <select id="selectProductCount" parameterType="java.lang.String" resultType="com.aiqin.mgs.order.api.domain.response.report.ReportStoreGoodsCountResponse">
+    select SUM(actual_inbound_count) as proCount,product_brand_code as productBrandCode,product_brand_name as productBrandName
+    FROM order_store_detail
+    where order_store_code in (SELECT order_store_code FROM `order_store_info`
+        WHERE  DATE_FORMAT(create_time,'%Y-%m')=DATE_FORMAT(now(),'%Y-%m') and store_code=#{storeCode} AND order_status=12)
+    GROUP BY product_brand_code
+  </select>
+
+<!--  select SUM(actual_inbound_count) as proCount,product_brand_code as productBrandCode,-->
+<!--  product_brand_name as productBrandName ,sku_name as skuName,sku_code as skuCode,-->
+<!--  activity_price as money-->
+<!--  FROM order_store_detail-->
+<!--  where order_store_code in (SELECT order_store_code FROM `order_store_info`-->
+<!--  WHERE DATE_FORMAT(create_time,'%Y-%m')=DATE_FORMAT(now(),'%Y-%m') and store_code='60000028' AND order_status=12)-->
+<!--  GROUP BY productBrandCode,sku_code-->
+
 </mapper>
