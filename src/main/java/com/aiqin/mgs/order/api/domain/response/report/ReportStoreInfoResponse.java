@@ -1,4 +1,4 @@
-package com.aiqin.mgs.order.api.domain.response;
+package com.aiqin.mgs.order.api.domain.response.report;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
