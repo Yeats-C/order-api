@@ -1,8 +1,10 @@
 package com.aiqin.mgs.order.api.service.impl;
 
+import com.aiqin.ground.util.exception.GroundRuntimeException;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
@@ -13,13 +15,18 @@ import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import com.aiqin.mgs.order.api.util.DateUtil;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -52,6 +59,9 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Resource
     private CartOrderDao cartOrderDao;
+
+    @Resource
+    private ActivityGiftDao activityGiftDao;
 
     @Override
     public HttpResponse<Map> activityList(Activity activity) {
@@ -173,6 +183,20 @@ public class ActivityServiceImpl implements ActivityService {
             activityRule.setActivityId(activityId);
             activityRule.setCreateTime(new Date());
             activityRule.setUpdateTime(new Date());
+            String ruleId=IdUtil.activityId();
+            activityRule.setRuleId(ruleId);
+            //如果规则为满赠，插入赠品信息
+            if(activityRule.getActivityType()==2 && null!=activityRule.getGiftList()){
+                List<ActivityGift> activityGiftList=new ArrayList<>();
+                for(ActivityGift gift:activityRule.getGiftList()){
+                    gift.setRuleId(ruleId);
+                    activityGiftList.add(gift);
+                }
+                int activityGiftRecord = activityGiftDao.insertList(activityGiftList);
+                if (activityGiftRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+                    return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
+                }
+            }
         }
         int activityRuleRecord = activityRuleDao.insertList(activityRuleList);
         if (activityRuleRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
@@ -226,16 +250,18 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public HttpResponse<Map> getActivitySalesStatistics() {
+    public HttpResponse<ActivitySales> getActivitySalesStatistics(String activityId) {
         LOGGER.info("查询活动详情-销售数据-活动销售统计");
         try {
             HttpResponse response = HttpResponse.success();
+            Activity activity=new Activity();
+            activity.setActivityId(activityId);
             //活动相关订单销售额及活动订单数(当订单中的商品命中了这个促销活动时，这个订单纳入统计，统计主订单。)
-            ActivitySales activitySales=erpOrderInfoDao.getActivitySales();
+            ActivitySales activitySales=erpOrderInfoDao.getActivitySales(activity);
             //活动商品销售额
-            BigDecimal  productSales=erpOrderItemDao.getProductSales();
+            BigDecimal  productSales=erpOrderItemDao.getProductSales(activity);
             //活动补货门店数
-            Integer storeNum=erpOrderInfoDao.getStoreNum();
+            Integer storeNum=erpOrderInfoDao.getStoreNum(activity);
             //平均单价
             BigDecimal averageUnitPrice=activitySales.getActivitySales().divide(new BigDecimal(activitySales.getActivitySalesNum()));
             activitySales.setProductSales(productSales);
@@ -262,7 +288,7 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setActivityId(activityId);
             List<Activity> list=activityDao.activityList(activity);
             if(list!=null && list.get(0)!=null){
-                Activity activityData=list.get(0);
+                activityRequest.setActivity(list.get(0));
             }else{
                 return HttpResponse.failure(ResultCode.NOT_HAVE_PARAM);
             }
@@ -270,7 +296,15 @@ public class ActivityServiceImpl implements ActivityService {
             List<ActivityStore> activityStoreList=activityStoreDao.selectByActivityId(activityId);
             List<ActivityProduct> activityProductList=activityProductDao.activityProductList(activity);
             List<ActivityRule> activityRuleList=activityRuleDao.selectByActivityId(activityId);
-            activityRequest.setActivity(activity);
+            if(null!=activityRuleList){
+                for (ActivityRule rule:activityRuleList){
+                    if(2==rule.getActivityType()){
+                        List<ActivityGift> giftList=activityGiftDao.selectByRuleId(rule.getRuleId());
+                        rule.setGiftList(giftList);
+                    }
+                }
+            }
+
             activityRequest.setActivityStores(activityStoreList);
             activityRequest.setActivityProducts(activityProductList);
             activityRequest.setActivityRules(activityRuleList);
@@ -356,6 +390,20 @@ public class ActivityServiceImpl implements ActivityService {
                 activityRule.setActivityId(activity.getActivityId());
                 activityRule.setCreateTime(new Date());
                 activityRule.setUpdateTime(new Date());
+                String ruleId=IdUtil.activityId();
+                activityRule.setRuleId(ruleId);
+                //如果规则为满赠，插入赠品信息
+                if(activityRule.getActivityType()==2 && null!=activityRule.getGiftList()){
+                    List<ActivityGift> activityGiftList=new ArrayList<>();
+                    for(ActivityGift gift:activityRule.getGiftList()){
+                        gift.setRuleId(ruleId);
+                        activityGiftList.add(gift);
+                    }
+                    int activityGiftRecord = activityGiftDao.insertList(activityGiftList);
+                    if (activityGiftRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+                        return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
+                    }
+                }
             }
             int activityRuleRecord = activityRuleDao.insertList(activityRuleList);
             if (activityRuleRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
@@ -424,7 +472,7 @@ public class ActivityServiceImpl implements ActivityService {
         //所有子节点
         List<ActivityProduct> childList = new ArrayList<>();
         activityProducts.forEach(item->{
-            if (item.getProductCategoryCode().equals("0")){
+            if ("0".equals(item.getProductCategoryCode())){
                 parentList.add(item);
             } else {
                 childList.add(item);
@@ -437,6 +485,192 @@ public class ActivityServiceImpl implements ActivityService {
         });
         response.setData(activityProducts);
         return response;
+    }
+
+
+
+
+    @Override
+    public HttpResponse updateStatus(Activity activity) {
+        LOGGER.info("编辑活动生效状态updateStatus参数为：{}", activity);
+        try {
+            if(null==activity.getActivityId()
+                    ||null==activity.getActivityStatus()){
+                return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
+            }
+            //保存活动主表信息start
+            activity.setUpdateTime(new Date());
+            int activityRecord = activityDao.updateActivity(activity);
+            if (activityRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+                LOGGER.error("更新活动主表信息失败");
+                return HttpResponse.failure(ResultCode.UPDATE_ACTIVITY_INFO_EXCEPTION);
+            }
+            LOGGER.info("更新活动主表信息成功");
+            //保存活动主表信息end
+            LOGGER.info("活动更新成功，活动id为{}，活动名称为{}", activity.getActivityId(), activity.getActivityName());
+            return HttpResponse.success();
+        } catch (Exception e) {
+            LOGGER.error("更新活动失败", e);
+            throw new RuntimeException(ResultCode.UPDATE_ACTIVITY_INFO_EXCEPTION.getMessage());
+        }
+    }
+
+    @Override
+    public HttpResponse excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response) {
+        LOGGER.info("导出--活动详情-销售数据-活动销售列表excelActivityItem参数为：{}", erpOrderItem);
+        HttpResponse res = HttpResponse.success();
+        try {
+            //只查询活动商品
+            erpOrderItem.setIsActivity(1);
+            List<ErpOrderItem> select = erpOrderItemDao.getActivityItem(erpOrderItem);
+            HSSFWorkbook wb = exportData(select);
+            String excelName = "数据列表";
+            response.reset();
+            response.setContentType("application/vnd.ms-excel;charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+            response.addHeader("Content-Disposition", "attachment;fileName=" + new String(excelName.getBytes("UTF-8"), "iso-8859-1"));
+            OutputStream os = response.getOutputStream();
+            wb.write(os);
+            os.flush();
+            os.close();
+            return res;
+        } catch (Exception ex) {
+            throw new GroundRuntimeException(ex.getMessage());
+        }
+    }
+
+    @Override
+    public HttpResponse<List<ActivitySales>> comparisonActivitySalesStatistics(List<String> activityIdList) {
+        LOGGER.info("活动列表-对比分析柱状图comparisonActivitySalesStatistics参数为：{}", activityIdList);
+        HttpResponse res = HttpResponse.success();
+        List<ActivitySales> activitySalesList=new ArrayList<>();
+        for (String activityId: activityIdList){
+            ActivitySales sales=getActivitySalesStatistics(activityId).getData();
+            activitySalesList.add(sales);
+        }
+        res.setData(activityIdList);
+        return res;
+    }
+
+    @Override
+    public HttpResponse excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response) {
+        LOGGER.info("导出--活动列表-对比分析柱状图excelActivitySalesStatistics参数为：{}", activityIdList);
+        HttpResponse res = HttpResponse.success();
+        try {
+            List<ActivitySales> activitySalesList=new ArrayList<>();
+            for (String activityId: activityIdList){
+                ActivitySales sales=getActivitySalesStatistics(activityId).getData();
+                activitySalesList.add(sales);
+            }
+            HSSFWorkbook wb = exportActivitySalesData(activitySalesList);
+            String excelName = "数据列表";
+            response.reset();
+            response.setContentType("application/vnd.ms-excel;charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+            response.addHeader("Content-Disposition", "attachment;fileName=" + new String(excelName.getBytes("UTF-8"), "iso-8859-1"));
+            OutputStream os = response.getOutputStream();
+            wb.write(os);
+            os.flush();
+            os.close();
+            return res;
+        } catch (Exception ex) {
+            throw new GroundRuntimeException(ex.getMessage());
+        }
+    }
+
+    /***********************************************工具方法**************************************************/
+    public static HSSFWorkbook exportData(List<ErpOrderItem> list) {
+        // 创建工作空间
+        HSSFWorkbook wb = new HSSFWorkbook();
+        // 创建表
+        HSSFSheet sheet = wb.createSheet("数据空间");
+        sheet.setDefaultColumnWidth(20);
+        sheet.setDefaultRowHeightInPoints(20);
+
+        // 创建行
+        HSSFRow row = sheet.createRow(0);
+
+        // 生成一个样式
+        HSSFCellStyle style = wb.createCellStyle();
+        style.setAlignment(HSSFCellStyle.ALIGN_CENTER);// 水平居中
+        style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);// 垂直居中
+
+        // 背景色
+        style.setFillForegroundColor(HSSFColor.TAN.index);
+        style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        style.setFillBackgroundColor(HSSFColor.DARK_RED.index);
+
+        // 设置边框
+        style.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+        style.setBorderLeft(HSSFCellStyle.BORDER_THIN);
+        style.setBorderRight(HSSFCellStyle.BORDER_THIN);
+        style.setBorderTop(HSSFCellStyle.BORDER_THIN);
+
+        // 生成一个字体
+        HSSFFont font = wb.createFont();
+        font.setFontHeightInPoints((short) 20);
+        font.setColor(HSSFColor.VIOLET.index);
+        font.setFontName("宋体");
+
+
+        // 把字体 应用到当前样式
+        style.setFont(font);
+        // 添加表头数据
+        String[] excelHeader = { "门店编码", "门店名称", "订单号", "商品名称", "是否活动商品","订货数量","订货金额","订单状态","订单时间"};
+        for (int i = 0; i < excelHeader.length; i++) {
+            HSSFCell cell = row.createCell(i);
+            cell.setCellValue(excelHeader[i]);
+            cell.setCellStyle(style);
+        }
+        // 添加单元格数据
+        for (int i = 0; i < list.size(); i++) {
+            row = sheet.createRow(i + 1);
+            ErpOrderItem item = list.get(i);
+            if(StringUtils.isNotBlank(item.getStoreCode())) {
+                row.createCell(0).setCellValue(item.getStoreCode());
+            }else {
+                row.createCell(0).setCellValue("");
+            }
+            if(StringUtils.isNotBlank(item.getStoreName())) {
+                row.createCell(1).setCellValue(item.getStoreName());
+            }else {
+                row.createCell(1).setCellValue("");
+            }
+            if(StringUtils.isNotBlank(item.getOrderStoreCode())) {
+                row.createCell(2).setCellValue(item.getOrderStoreCode());
+            }else {
+                row.createCell(2).setCellValue("");
+            }
+            if(StringUtils.isNotBlank(item.getSkuName())) {
+                row.createCell(3).setCellValue(item.getSkuName());
+            }else {
+                row.createCell(3).setCellValue("");
+            }
+
+            row.createCell(4).setCellValue("是");
+
+            if(item.getProductCount()!=null) {
+                row.createCell(5).setCellValue(item.getProductCount());
+            }else {
+                row.createCell(5).setCellValue(0);
+            }
+            if(item.getActualTotalProductAmount()!=null) {
+                row.createCell(6).setCellValue(item.getActualTotalProductAmount().intValue());
+            }else {
+                row.createCell(6).setCellValue(0);
+            }
+            if(item.getOrderStatus()!=null) {
+                row.createCell(7).setCellValue(ErpOrderStatusEnum.getEnumDesc(item.getOrderStatus()));
+            }else {
+                row.createCell(7).setCellValue("");
+            }
+            if(item.getCreateTime()!=null) {
+                row.createCell(8).setCellValue(DateUtil.formatDate(item.getCreateTime()));
+            }else {
+                row.createCell(8).setCellValue("");
+            }
+        }
+        return wb;
     }
 
     /**
@@ -456,5 +690,77 @@ public class ActivityServiceImpl implements ActivityService {
         return list;
     }
 
+
+    public static HSSFWorkbook exportActivitySalesData(List<ActivitySales> list) {
+        // 创建工作空间
+        HSSFWorkbook wb = new HSSFWorkbook();
+        // 创建表
+        HSSFSheet sheet = wb.createSheet("数据空间");
+        sheet.setDefaultColumnWidth(20);
+        sheet.setDefaultRowHeightInPoints(20);
+
+        // 创建行
+        HSSFRow row = sheet.createRow(0);
+
+        // 生成一个样式
+        HSSFCellStyle style = wb.createCellStyle();
+        style.setAlignment(HSSFCellStyle.ALIGN_CENTER);// 水平居中
+        style.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);// 垂直居中
+
+        // 背景色
+        style.setFillForegroundColor(HSSFColor.TAN.index);
+        style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+        style.setFillBackgroundColor(HSSFColor.DARK_RED.index);
+
+        // 设置边框
+        style.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+        style.setBorderLeft(HSSFCellStyle.BORDER_THIN);
+        style.setBorderRight(HSSFCellStyle.BORDER_THIN);
+        style.setBorderTop(HSSFCellStyle.BORDER_THIN);
+
+        // 生成一个字体
+        HSSFFont font = wb.createFont();
+        font.setFontHeightInPoints((short) 20);
+        font.setColor(HSSFColor.VIOLET.index);
+        font.setFontName("宋体");
+
+
+        // 把字体 应用到当前样式
+        style.setFont(font);
+        // 添加表头数据
+        String[] excelHeader = { "活动相关订单销售额", "活动商品销售额", "补货门店数", "平均客单价"};
+        for (int i = 0; i < excelHeader.length; i++) {
+            HSSFCell cell = row.createCell(i);
+            cell.setCellValue(excelHeader[i]);
+            cell.setCellStyle(style);
+        }
+        // 添加单元格数据
+        for (int i = 0; i < list.size(); i++) {
+            row = sheet.createRow(i + 1);
+            ActivitySales item = list.get(i);
+            if(null!=item.getActivitySales()) {
+                row.createCell(0).setCellValue(item.getActivitySales().doubleValue());
+            }else {
+                row.createCell(0).setCellValue(0);
+            }
+            if(null!=item.getProductSales()) {
+                row.createCell(1).setCellValue(item.getProductSales().doubleValue());
+            }else {
+                row.createCell(1).setCellValue(0);
+            }
+            if(null!=item.getStoreNum()) {
+                row.createCell(2).setCellValue(item.getStoreNum());
+            }else {
+                row.createCell(2).setCellValue(0);
+            }
+            if(null!=item.getAverageUnitPrice()) {
+                row.createCell(3).setCellValue(item.getAverageUnitPrice().doubleValue());
+            }else {
+                row.createCell(3).setCellValue(0);
+            }
+
+        }
+        return wb;
+    }
 
 }

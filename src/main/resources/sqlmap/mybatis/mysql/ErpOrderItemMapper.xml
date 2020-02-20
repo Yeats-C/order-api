@@ -153,13 +153,16 @@
                 #{updateByName}, sysdate(), sysdate())
     </insert>
 
-    <select id="getProductSales" resultType="java.math.BigDecimal">
+    <select id="getProductSales" resultType="java.math.BigDecimal" parameterType="com.aiqin.mgs.order.api.domain.Activity">
         SELECT
             SUM( total_product_amount ) AS productSales
         FROM
             order_store_detail
         WHERE
             is_activity =1
+        <if test="activityId != '' and activityId != null">
+            and activity_id = #{activityId}
+        </if>
     </select>
     <select id="totalCount" resultType="java.lang.Integer">
 

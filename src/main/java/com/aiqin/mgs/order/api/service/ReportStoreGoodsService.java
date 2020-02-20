@@ -3,7 +3,12 @@ package com.aiqin.mgs.order.api.service;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoods;
+import com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail;
+import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsVo;
+import com.aiqin.mgs.order.api.domain.response.report.ReportStoreGoodsCountDetailResponse;
+
+import java.util.List;
 
 /**
  * description: ReportStoreGoodsService
@@ -18,5 +23,9 @@ public interface ReportStoreGoodsService {
     Boolean update(ReportStoreGoods entity);
 
     PageResData<ReportStoreGoods> getList(PageRequestVO<ReportStoreGoodsVo> searchVo);
+
+    List<ReportStoreGoodsDetail> getCountDetailList(ReportStoreGoodsDetailVo searchVo);
+
+//    Boolean dealWith(ReportStoreGoods entity);
 
 }

@@ -4,6 +4,7 @@ package com.aiqin.mgs.order.api.web;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityProduct;
+import com.aiqin.mgs.order.api.domain.ActivitySales;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -87,13 +89,13 @@ public class ActivityController {
 
     /**
      * 活动详情-销售数据-活动销售统计
-     * @param
+     * @param activityId
      * @return
      */
     @GetMapping("/getActivitySalesStatistics")
     @ApiOperation(value = "活动详情-销售数据-活动销售统计")
-    public HttpResponse<Map> getActivitySalesStatistics(){
-        return activitesService.getActivitySalesStatistics();
+    public HttpResponse<ActivitySales> getActivitySalesStatistics(@RequestParam(name = "activity_id", required = false) String activityId){
+        return activitesService.getActivitySalesStatistics(activityId);
     }
 
     /**
@@ -116,7 +118,7 @@ public class ActivityController {
     @PostMapping("/update")
     @ApiOperation(value = "编辑活动")
     public HttpResponse update(@RequestBody ActivityRequest activityRequest) {
-        //将商品添加到购物车
+        //编辑活动
         return activitesService.updateActivity(activityRequest);
     }
 
@@ -141,6 +143,21 @@ public class ActivityController {
     public HttpResponse<List<ActivityProduct>> productList(Activity activity){
         return activitesService.activityProductList(activity);
     }
+    /**
+     * 编辑活动生效状态
+     *
+     * @param
+     * @return
+     */
+    @PostMapping("/updateStatus")
+    @ApiOperation(value = "编辑活动生效状态")
+    public HttpResponse updateStatus(@RequestBody Activity activity) {
+        //编辑活动生效状态
+        return activitesService.updateStatus(activity);
+    }
+
+
+
 
     /**
      * 返回购物车中的sku商品的数量
@@ -186,5 +203,40 @@ public class ActivityController {
     @ApiOperation(value = "活动商品品类接口")
     public HttpResponse<List<ActivityProduct>> productCategoryList() {
         return activitesService.productCategoryList();
+    }
+
+    /**
+     * 导出--活动详情-销售数据-活动销售列表
+     * @param erpOrderItem
+     * @param response
+     * @return
+     */
+    @PostMapping("/excelActivityItem")
+    @ApiOperation("导出--活动详情-销售数据-活动销售列表")
+    public HttpResponse excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response){
+        return activitesService.excelActivityItem(erpOrderItem,response);
+    }
+
+    /**
+     * 活动列表-对比分析柱状图
+     * @param activityIdList
+     * @return
+     */
+    @GetMapping("/comparisonActivitySalesStatistics")
+    @ApiOperation(value = "活动列表-对比分析柱状图")
+    public HttpResponse<List<ActivitySales>> comparisonActivitySalesStatistics(List<String> activityIdList){
+        return activitesService.comparisonActivitySalesStatistics(activityIdList);
+    }
+
+    /**
+     * 导出--活动列表-对比分析柱状图
+     * @param activityIdList
+     * @param response
+     * @return
+     */
+    @PostMapping("/excelActivitySalesStatistics")
+    @ApiOperation("导出--活动列表-对比分析柱状图")
+    public HttpResponse excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response){
+        return activitesService.excelActivitySalesStatistics(activityIdList,response);
     }
 }

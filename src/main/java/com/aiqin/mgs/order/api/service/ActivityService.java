@@ -3,10 +3,12 @@ package com.aiqin.mgs.order.api.service;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityProduct;
+import com.aiqin.mgs.order.api.domain.ActivitySales;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +53,7 @@ public interface ActivityService {
      * 活动详情-销售数据-活动销售统计
      * @return
      */
-    HttpResponse<Map> getActivitySalesStatistics();
+    HttpResponse<ActivitySales> getActivitySalesStatistics(String activityId);
 
     /**
      * 通过活动id获取单个活动详情（活动+门店+商品+规则）
@@ -66,6 +68,13 @@ public interface ActivityService {
      * @return
      */
     HttpResponse updateActivity(ActivityRequest activityRequest);
+
+    /**
+     * 编辑活动生效状态
+     * @param activity
+     * @return
+     */
+    HttpResponse updateStatus(Activity activity);
 
     /**
      * 通过门店id爱掌柜的促销活动列表（所有生效活动）
@@ -102,4 +111,27 @@ public interface ActivityService {
      * @return
      */
     HttpResponse<List<ActivityProduct>> productCategoryList();
+
+    /**
+     *导出--活动详情-销售数据-活动销售列表
+     * @param  erpOrderItem
+     * @param response
+     * @return
+     */
+    HttpResponse excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response);
+
+    /**
+     *活动列表-对比分析柱状图
+     * @param activityIdList
+     * @return
+     */
+    HttpResponse<List<ActivitySales>> comparisonActivitySalesStatistics(List<String> activityIdList);
+
+    /**
+     * 导出-活动列表-对比分析柱状图
+     * @param activityIdList
+     * @param response
+     * @return
+     */
+    HttpResponse excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response);
 }

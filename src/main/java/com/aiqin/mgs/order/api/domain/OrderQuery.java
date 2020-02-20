@@ -166,7 +166,9 @@ public class OrderQuery extends PagesRequest {
 	@JsonProperty("order_type")
 	private String orderType;
 
-
+	@ApiModelProperty(value="排序方式 默认按创建时间排序，更新时间:update_time")
+	@JsonProperty("order_by")
+	private String orderBy;
 
 }
 

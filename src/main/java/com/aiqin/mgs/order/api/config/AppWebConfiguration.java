@@ -18,8 +18,8 @@ public class AppWebConfiguration implements WebMvcConfigurer {
     @Resource
     private UrlInterceptor urlInterceptor;
 
-//    @Override
-//    public void addInterceptors(InterceptorRegistry registry) {
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
 //        registry.addInterceptor(urlInterceptor)
 //                .addPathPatterns("/**")
 //                .excludePathPatterns(
@@ -37,9 +37,10 @@ public class AppWebConfiguration implements WebMvcConfigurer {
 //                        "/erpOrderSignController/**",
 //                        "/store-value/**",
 //                        "/payment/**",
-//                        "/purchase/**"
+//                        "/purchase/**",
+//                        "/relatedSales/**"
 //                        );
-//    }
+    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {

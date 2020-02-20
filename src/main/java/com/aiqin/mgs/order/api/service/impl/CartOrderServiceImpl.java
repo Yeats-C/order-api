@@ -635,7 +635,7 @@ public class CartOrderServiceImpl implements CartOrderService {
      */
     private CartOrderInfo createGiftProductLine(CartOrderInfo cart, ActivityRule rule) {
 
-        ProductInfo skuDetail = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, rule.getSkuCode());
+        ProductInfo skuDetail = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, "rule.getSkuCode()");
 
         CartOrderInfo cartOrderInfo = new CartOrderInfo();
         cartOrderInfo.setCartId(IdUtil.uuid());
@@ -647,7 +647,7 @@ public class CartOrderServiceImpl implements CartOrderService {
         cartOrderInfo.setColor(skuDetail.getColorName());//商品颜色
         cartOrderInfo.setProductSize(skuDetail.getModelCode());//商品型号
         cartOrderInfo.setCreateSource(cart.getCreateSource());//插入商品来源
-        cartOrderInfo.setAmount(rule.getNumbers());//获取商品数量
+//        cartOrderInfo.setAmount(rule.getNumbers());//获取商品数量
         cartOrderInfo.setPrice(BigDecimal.ZERO);//商品价格
         cartOrderInfo.setProductType(cart.getProductType());//商品类型 0直送、1配送、2辅采
         cartOrderInfo.setCreateById(cart.getCreateById());//创建者id
