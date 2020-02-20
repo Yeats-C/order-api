@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.web;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.dao.ReportStoreGoodsDao;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoods;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo;
@@ -13,6 +14,9 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,6 +32,8 @@ public class RelportStoreGoodsController {
 
     @Autowired
     private ReportStoreGoodsService reportStoreGoodsService;
+    @Autowired
+    private ReportStoreGoodsDao reportStoreGoodsDao;
 
     @ApiOperation("门店补货报表列表")
     @PostMapping("/getlist")
@@ -51,6 +57,22 @@ public class RelportStoreGoodsController {
     @PostMapping("/getCountDetailList")
     public HttpResponse<List<ReportStoreGoodsDetail>> getCountDetailList(@RequestBody ReportStoreGoodsDetailVo searchVo) {
         return new HttpResponse(reportStoreGoodsService.getCountDetailList(searchVo));
+    }
+
+    @ApiOperation("门店补货报表定时任务测试")
+    @PostMapping("/test")
+    public HttpResponse test() {
+        reportStoreGoodsService.dealWith();
+//        List<ReportStoreGoods> records=new ArrayList<>();
+//        ReportStoreGoods ss=new ReportStoreGoods();
+//        ss.setStoreCode("60000028");
+//        ss.setChainRatio(new BigDecimal(100));
+//        ss.setTongRatio(new BigDecimal(100));
+//        ss.setCountTime("2020-02");
+//        ss.setCreateTime(new Date());
+//        records.add(ss);
+//        reportStoreGoodsDao.insertBatch(records);
+        return HttpResponse.success();
     }
 
 }

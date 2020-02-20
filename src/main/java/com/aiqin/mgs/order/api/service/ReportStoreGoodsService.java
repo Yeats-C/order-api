@@ -6,7 +6,6 @@ import com.aiqin.mgs.order.api.domain.ReportStoreGoods;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsVo;
-import com.aiqin.mgs.order.api.domain.response.report.ReportStoreGoodsCountDetailResponse;
 
 import java.util.List;
 

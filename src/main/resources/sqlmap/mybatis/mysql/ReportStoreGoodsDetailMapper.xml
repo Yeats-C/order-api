@@ -179,4 +179,23 @@
     </where>
   </select>
 
+  <insert id="insertBatch" parameterType="list">
+    insert into report_store_goods_detail (sku_code, sku_name,
+    store_code, brand_id,brand_name, num, amount,count_time, create_time)
+    values
+    <foreach collection="records" item="item" index="index" separator=",">
+      (
+       #{item.skuCode,jdbcType=VARCHAR}, #{item.skuName,jdbcType=VARCHAR},
+       #{item.storeCode,jdbcType=VARCHAR}, #{item.brandId,jdbcType=VARCHAR},
+       #{item.brandName,jdbcType=VARCHAR}, #{item.num,jdbcType=BIGINT}, #{item.amount,jdbcType=DECIMAL},
+       #{item.countTime,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}
+      )
+    </foreach>
+  </insert>
+
+  <select id="sumAmountByBrandId" resultType="java.math.BigDecimal" parameterType="com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo" >
+    select sum(amount) from report_store_goods_detail
+	WHERE store_code=#{storeCode,jdbcType=VARCHAR} and brand_id=#{brandId,jdbcType=VARCHAR} and count_time= #{countTime,jdbcType=VARCHAR}
+  </select>
+
 </mapper>
