@@ -16,6 +16,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -117,7 +118,11 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 }
                 SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM");
                 Date time=new Date();
-                String countTime=sdf.format(time);
+                Calendar rightNow = Calendar.getInstance();
+                rightNow.setTime(time);
+                rightNow.add(Calendar.DAY_OF_MONTH,-1);//因为统计的是前一天的数据，所以日期减1
+                Date d=rightNow.getTime();
+                String countTime = sdf.format(d);
                 reportStoreGoodsDetails.forEach(p -> p.setStoreCode(storeCode));
                 reportStoreGoodsDetails.forEach(p -> p.setCreateTime(new Date()));
                 reportStoreGoodsDetails.forEach(p -> p.setCountTime(countTime));
@@ -140,8 +145,8 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                     BigDecimal amount = reportStoreGoodsDetailDao.sumAmountByBrandId(reportStoreGoodsDetailVo);
                     detail.setAmount(amount);
                     detail.setCreateTime(new Date());
-                    Calendar rightNow = Calendar.getInstance();
                     rightNow.setTime(time);
+                    rightNow.add(Calendar.DAY_OF_MONTH,-1);//因为统计的是前一天的数据，所以日期减1
                     rightNow.add(Calendar.YEAR,-1);//日期减1年
                     Date dt1=rightNow.getTime();
                     String reStr = sdf.format(dt1);
@@ -160,6 +165,7 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                         }
                     }
                     rightNow.setTime(time);
+                    rightNow.add(Calendar.DAY_OF_MONTH,-1);//因为统计的是前一天的数据，所以日期减1
                     rightNow.add(Calendar.MONTH,-1);//日期减1个月
                     Date dt2=rightNow.getTime();
                     String reStr1 = sdf.format(dt2);
@@ -196,19 +202,27 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
     }
 
     public static void main(String[] args) {
-        StringBuilder sb = new StringBuilder("http://slcs.api.aiqin.com/store/getAllStoreCode");
-        log.info("查询dl闭店审批信息,请求url为{}", sb);
-        HttpClient httpClient = HttpClient.get(sb.toString());
-        Map<String, Object> result;
-        result = httpClient.action().result(new TypeReference<Map<String, Object>>() {
-        });
-        log.info("调用主控反参result{}", JSON.toJSON(result));
-        if (StringUtils.isNotBlank(String.valueOf(result.get("code"))) && "0".equals(String.valueOf(result.get("code")))) {
-            List<String> jsonMap = JSONArray.parseArray(JSON.toJSONString(result.get("data")), String.class);
-            log.info("jsonMap:"+jsonMap);
-        } else {
-            log.info("33333333333333333333333");
-    }
-
+//        StringBuilder sb = new StringBuilder("http://slcs.api.aiqin.com/store/getAllStoreCode");
+//        log.info("查询dl闭店审批信息,请求url为{}", sb);
+//        HttpClient httpClient = HttpClient.get(sb.toString());
+//        Map<String, Object> result;
+//        result = httpClient.action().result(new TypeReference<Map<String, Object>>() {
+//        });
+//        log.info("调用主控反参result{}", JSON.toJSON(result));
+//        if (StringUtils.isNotBlank(String.valueOf(result.get("code"))) && "0".equals(String.valueOf(result.get("code")))) {
+//            List<String> jsonMap = JSONArray.parseArray(JSON.toJSONString(result.get("data")), String.class);
+//            log.info("jsonMap:"+jsonMap);
+//        } else {
+//            log.info("33333333333333333333333");
+//    }
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM");
+        Date time=new Date();
+        Calendar rightNow = Calendar.getInstance();
+        rightNow.setTime(time);
+        rightNow.add(Calendar.DAY_OF_MONTH,-19);//日期减1年
+        rightNow.add(Calendar.YEAR,-1);//日期减1年
+        Date dt1=rightNow.getTime();
+        String reStr = sdf.format(dt1);
+        System.out.println(reStr);
     }
 }
