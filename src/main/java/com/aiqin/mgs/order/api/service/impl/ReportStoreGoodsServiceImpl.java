@@ -58,11 +58,13 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
 
     @Override
     public PageResData<ReportStoreGoods> getList(PageRequestVO<ReportStoreGoodsVo> searchVo) {
-        PageHelper.startPage(searchVo.getPageNo(),searchVo.getPageSize());
-        List<ReportStoreGoods> reportStoreGoods = reportStoreGoodsDao.selectList(searchVo.getSearchVO());
         PageResData result=new PageResData();
-        result.setTotalCount((int)((Page)reportStoreGoods).getTotal());
-        result.setDataList(reportStoreGoods);
+        if(searchVo.getSearchVO()!=null&&StringUtils.isNotBlank(searchVo.getSearchVO().getStoreCode())&&StringUtils.isNotBlank(searchVo.getSearchVO().getCountTime())){
+            PageHelper.startPage(searchVo.getPageNo(),searchVo.getPageSize());
+            List<ReportStoreGoods> reportStoreGoods = reportStoreGoodsDao.selectList(searchVo.getSearchVO());
+            result.setTotalCount((int)((Page)reportStoreGoods).getTotal());
+            result.setDataList(reportStoreGoods);
+        }
         return result;
     }
 
