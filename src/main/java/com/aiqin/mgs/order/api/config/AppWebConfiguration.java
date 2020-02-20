@@ -18,28 +18,28 @@ public class AppWebConfiguration implements WebMvcConfigurer {
     @Resource
     private UrlInterceptor urlInterceptor;
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(urlInterceptor)
-                .addPathPatterns("/**")
-                .excludePathPatterns(
-                        "/doc.html",
-                        "/swagger-resources",
-                        "/webjars/**",
-                        "/init/**",
-                        "/order/**",
-                        "/orderdetail/**",
-                        "/orderafter/**",
-                        "/frozen/**",
-                        "/service/**",
-                        "/orderNoCode/**",
-                        "/settlement/**",
-                        "/erpOrderSignController/**",
-                        "/store-value/**",
-                        "/payment/**",
-                        "/purchase/**"
-                        );
-    }
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        registry.addInterceptor(urlInterceptor)
+//                .addPathPatterns("/**")
+//                .excludePathPatterns(
+//                        "/doc.html",
+//                        "/swagger-resources",
+//                        "/webjars/**",
+//                        "/init/**",
+//                        "/order/**",
+//                        "/orderdetail/**",
+//                        "/orderafter/**",
+//                        "/frozen/**",
+//                        "/service/**",
+//                        "/orderNoCode/**",
+//                        "/settlement/**",
+//                        "/erpOrderSignController/**",
+//                        "/store-value/**",
+//                        "/payment/**",
+//                        "/purchase/**"
+//                        );
+//    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
