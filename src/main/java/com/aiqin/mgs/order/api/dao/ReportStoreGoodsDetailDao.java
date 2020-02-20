@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ReportStoreGoodsDetailDao {
 
-    int deleteByPrimaryKey(Long id);
+    int deleteByStoreCodeAndCountTime(ReportStoreGoodsDetailVo vo);
 
     int insert(ReportStoreGoodsDetail record);
 

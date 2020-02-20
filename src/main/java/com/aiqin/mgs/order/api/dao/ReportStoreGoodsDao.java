@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.ReportStoreGoods;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail;
+import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsVo;
 import com.aiqin.mgs.order.api.domain.response.report.ReportStoreGoodsCountResponse;
 import org.apache.ibatis.annotations.Param;
@@ -10,7 +11,7 @@ import java.util.List;
 
 public interface ReportStoreGoodsDao {
 
-    int deleteByPrimaryKey(Long id);
+    int deleteByStoreCodeAndCountTime(ReportStoreGoodsDetailVo vo);
 
     int insertSelective(ReportStoreGoods record);
 

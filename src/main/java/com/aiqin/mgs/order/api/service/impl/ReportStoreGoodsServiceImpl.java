@@ -121,6 +121,11 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 reportStoreGoodsDetails.forEach(p -> p.setStoreCode(storeCode));
                 reportStoreGoodsDetails.forEach(p -> p.setCreateTime(new Date()));
                 reportStoreGoodsDetails.forEach(p -> p.setCountTime(countTime));
+                //根据门店编码、统计时间清空数据
+                ReportStoreGoodsDetailVo vo=new ReportStoreGoodsDetailVo();
+                vo.setStoreCode(storeCode);
+                vo.setCountTime(countTime);
+                reportStoreGoodsDetailDao.deleteByStoreCodeAndCountTime(vo);
                 //插入门店补货列表统计detail报表
                 reportStoreGoodsDetailDao.insertBatch(reportStoreGoodsDetails);
                 reportStoreGoodsCountResponses=reportStoreGoodsCountResponses.stream().map(detailVo -> {
@@ -173,6 +178,9 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                     detail.setStoreCode(storeCode);
                     return detail;
                 }).collect(Collectors.toList());
+                //根据门店编码、统计时间清空数据
+                reportStoreGoodsDao.deleteByStoreCodeAndCountTime(vo);
+                //插入数据
                 reportStoreGoodsDao.insertBatch(reportStoreGoodsCountResponses);
                 //查询各个sku对应的总金额
 //                List<BigDecimal> amounts=reportStoreGoodsDetails.stream().map(ReportStoreGoodsDetail::getAmount).collect(Collectors.toList());

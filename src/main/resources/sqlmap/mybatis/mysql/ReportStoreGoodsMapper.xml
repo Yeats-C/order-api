@@ -25,9 +25,9 @@
     from report_store_goods
     where id = #{id,jdbcType=BIGINT}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+  <delete id="deleteByStoreCodeAndCountTime" parameterType="com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo" >
     delete from report_store_goods
-    where id = #{id,jdbcType=BIGINT}
+    where store_code = #{storeCode,jdbcType=VARCHAR} and count_time=#{countTime,jdbcType=VARCHAR}
   </delete>
 
   <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.ReportStoreGoods" >
