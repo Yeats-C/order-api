@@ -234,7 +234,7 @@ public class ActivityController {
      * @param response
      * @return
      */
-    @PostMapping("/excelActivityItem")
+    @PostMapping("/excelActivitySalesStatistics")
     @ApiOperation("导出--活动列表-对比分析柱状图")
     public HttpResponse excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response){
         return activitesService.excelActivitySalesStatistics(activityIdList,response);
