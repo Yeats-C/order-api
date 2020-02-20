@@ -99,6 +99,11 @@ public class CartOrderInfo {
     @JsonProperty("price")
     private BigDecimal price;
 
+    /***活动价*/
+    @ApiModelProperty(value = "活动价")
+    @JsonProperty("activity_price")
+    private BigDecimal activityPrice;
+
 //    /***商品特价*/
 //    @ApiModelProperty(value = "商品特价")
 //    @JsonProperty("special_price")

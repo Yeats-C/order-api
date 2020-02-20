@@ -60,10 +60,19 @@ public interface CartOrderDao {
 
     /**
      * 根据行唯一标识删除购物车商品行
+     *
      * @param cartId
      * @return
      */
     Integer deleteByCartId(@Param("cartId") String cartId);
+
+    /**
+     * 根据购物车商品行唯一标识更新字段
+     *
+     * @param cart
+     * @return
+     */
+    Integer updateCartByCartId(CartOrderInfo cart);
 
 }
 

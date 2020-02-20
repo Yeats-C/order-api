@@ -229,4 +229,12 @@
         where cart_id = #{cartId}
     </delete>
 
+    <update id="updateCartByCartId" parameterType="java.lang.String">
+        update order_store_cart
+        set activity_id          = #{activityId},
+            activity_price       = #{activityPrice},
+            account_actual_price = #{accountActualPrice}
+            where cart_id = #{cartId}
+    </update>
+
 </mapper>
