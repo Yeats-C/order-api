@@ -14,11 +14,11 @@ public enum ErpProductPropertyTypeEnum {
 
     /***商品属性*/
     TYPE_1(1, "1", "18A", true),
-    TYPE_2(2, "2", "18B", false),
+    TYPE_2(2, "2", "18B", true),
     TYPE_3(3, "3", "C品", false),
     TYPE_4(4, "4", "D品", false),
     TYPE_5(5, "5", "其他", false),
-    TYPE_6(6, "6", "18A", true),
+    TYPE_6(6, "6", "18A", false),
     ;
 
     private Integer code;
