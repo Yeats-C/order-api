@@ -1,5 +1,7 @@
 package com.aiqin.mgs.order.api.service.impl;
 
+import com.aiqin.ground.util.http.HttpClient;
+import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.dao.ReportStoreGoodsDao;
@@ -10,9 +12,13 @@ import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsVo;
 import com.aiqin.mgs.order.api.domain.response.report.ReportStoreGoodsCountDetailResponse;
 import com.aiqin.mgs.order.api.service.ReportStoreGoodsService;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * description: ReportStoreGoodsServiceImpl
@@ -64,5 +71,47 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
             list =reportStoreGoodsDetailDao.selectList(searchVo);
         }
         return list;
+    }
+
+    @Override
+    public void dealWith() {
+        String url="http://slcs.api.aiqin.com/store/getAllStoreCode";
+        log.info("查询所有门店编码,请求url={}", url);
+        HttpClient httpClient = HttpClient.get(url);
+        Map<String, Object> result = httpClient.action().result(new TypeReference<Map<String, Object>>() {});
+        log.info("调用slcs系统返回结果，result={}", JSON.toJSON(result));
+        if(result==null){
+            return;
+        }
+        List<String> jsonMap=new ArrayList<>();
+        if (StringUtils.isNotBlank(result.get("code").toString()) && "0".equals(String.valueOf(result.get("code")))) {
+            jsonMap = JSONArray.parseArray(JSON.toJSONString(result.get("data")), String.class);
+            log.info("jsonMap:"+jsonMap);
+        } else {
+            log.info("查询所有门店编码为空");
+            return;
+        }
+        //判断门店编码集合是否为空，不为空，遍历查询信息
+        if(CollectionUtils.isNotEmpty(jsonMap)){
+
+        }
+
+    }
+
+    public static void main(String[] args) {
+        StringBuilder sb = new StringBuilder("http://slcs.api.aiqin.com/store/getAllStoreCode");
+        log.info("查询dl闭店审批信息,请求url为{}", sb);
+        HttpClient httpClient = HttpClient.get(sb.toString());
+        Map<String, Object> result;
+        result = httpClient.action().result(new TypeReference<Map<String, Object>>() {
+        });
+        log.info("调用主控反参result{}", JSON.toJSON(result));
+        if (StringUtils.isNotBlank(String.valueOf(result.get("code"))) && "0".equals(String.valueOf(result.get("code")))) {
+            List<String> jsonMap = JSONArray.parseArray(JSON.toJSONString(result.get("data")), String.class);
+            log.info("jsonMap:"+jsonMap);
+        } else {
+            log.info("33333333333333333333333");
+    }
+
     }
 }

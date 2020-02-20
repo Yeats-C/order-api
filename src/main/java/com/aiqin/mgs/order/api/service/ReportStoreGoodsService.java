@@ -26,6 +26,6 @@ public interface ReportStoreGoodsService {
 
     List<ReportStoreGoodsDetail> getCountDetailList(ReportStoreGoodsDetailVo searchVo);
 
-//    Boolean dealWith(ReportStoreGoods entity);
+    void dealWith();
 
 }
