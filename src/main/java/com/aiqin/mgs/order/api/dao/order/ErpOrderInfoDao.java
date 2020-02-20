@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.dao.order;
 
+import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivitySales;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest;
@@ -100,12 +101,14 @@ public interface ErpOrderInfoDao {
     /**
      * 活动相关订单销售额及活动订单数(当订单中的商品命中了这个促销活动时，这个订单纳入统计，统计主订单。
      * @return
+     * @param activity
      */
-    ActivitySales getActivitySales();
+    ActivitySales getActivitySales(Activity activity);
 
     /**
      * 活动补货门店数
      * @return
+     * @param activity
      */
-    Integer getStoreNum();
+    Integer getStoreNum(Activity activity);
 }
