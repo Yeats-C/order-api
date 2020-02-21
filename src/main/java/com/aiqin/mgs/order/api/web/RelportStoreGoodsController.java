@@ -14,9 +14,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -60,8 +57,8 @@ public class RelportStoreGoodsController {
     }
 
     @ApiOperation("门店补货报表定时任务测试")
-    @PostMapping("/test")
-    public HttpResponse test() {
+    @PostMapping("/reportTimingTask")
+    public HttpResponse reportTimingTask() {
         reportStoreGoodsService.reportTimingTask();
         return HttpResponse.success();
     }
