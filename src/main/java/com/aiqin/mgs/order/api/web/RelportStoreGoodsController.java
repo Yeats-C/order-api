@@ -56,7 +56,7 @@ public class RelportStoreGoodsController {
         return new HttpResponse(reportStoreGoodsService.getCountDetailList(searchVo));
     }
 
-    @ApiOperation("门店补货报表定时任务测试")
+    @ApiOperation("门店补货报表定时任务手动执行")
     @PostMapping("/reportTimingTask")
     public HttpResponse reportTimingTask() {
         reportStoreGoodsService.reportTimingTask();
