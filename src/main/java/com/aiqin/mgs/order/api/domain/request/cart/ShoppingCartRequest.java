@@ -36,10 +36,4 @@ public class ShoppingCartRequest {
     @JsonProperty("product_type")
     private Integer productType;
 
-    /***活动id*/
-    @ApiModelProperty(value = "活动id")
-    @JsonProperty("activity_id")
-    private String activityId;
-
-
 }

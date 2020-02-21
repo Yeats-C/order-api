@@ -88,9 +88,9 @@ public class CartOrderController {
             @ApiImplicitParam(name = "number", value = "商品数量", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(name = "activity_id", value = "活动id", dataType = "String", paramType = "query", required = false)
     })
-    public HttpResponse<CartResponse> queryCartByStoreId(String store_id, Integer product_type, String sku_code, Integer line_check_status, Integer number,String activityId) {
-        LOGGER.info("购物车展示列表参数：{},{},{},{},{}", store_id,product_type,sku_code,line_check_status,number,activityId);
-        return cartOrderService.queryCartByStoreId(store_id,product_type,sku_code,line_check_status,number,activityId);
+    public HttpResponse<CartResponse> queryCartByStoreId(String store_id, Integer product_type, String sku_code, Integer line_check_status, Integer number,String activity_id) {
+        LOGGER.info("购物车展示列表参数：{},{},{},{},{}", store_id,product_type,sku_code,line_check_status,number,activity_id);
+        return cartOrderService.queryCartByStoreId(store_id,product_type,sku_code,line_check_status,number,activity_id);
     }
 
     /**

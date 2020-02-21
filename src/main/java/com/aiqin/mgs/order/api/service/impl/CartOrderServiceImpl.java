@@ -66,6 +66,9 @@ public class CartOrderServiceImpl implements CartOrderService {
         //入参校验
         checkParam(shoppingCartRequest);
 
+        //记录各个sku附带的活动
+        Map<String, String> skuActivityMap = new HashMap<>(16);
+
         //商品数量不能大于999
         List<Product> products = shoppingCartRequest.getProducts();
         for (Product product : products) {
@@ -73,6 +76,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                 return HttpResponse.failure(ResultCode.OVER_LIMIT);
             }
             skuCodeList.add(product.getSkuId());
+            skuActivityMap.put(product.getSkuId(), product.getActivityId());
         }
         //通过门店id返回门店省市公司信息
         HttpResponse<StoreInfo> storeInfo = bridgeProductService.getStoreInfo(shoppingCartRequest);
@@ -137,7 +141,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                     cartOrderInfo.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
                     cartOrderInfo.setAccountTotalPrice(cartOrderInfo.getPrice().multiply(new BigDecimal(cartOrderInfo.getAmount())));
                     cartOrderInfo.setActivityPrice(cartOrderInfo.getPrice());
-                    cartOrderInfo.setActivityId(shoppingCartRequest.getActivityId());
+                    cartOrderInfo.setActivityId(skuActivityMap.containsKey(cartOrderInfo1.getSkuCode()) ? skuActivityMap.get(cartOrderInfo1.getSkuCode()) : null);
                     try {
                         if (cartOrderInfo != null) {
                             //判断sku是否在购物车里面存在
@@ -292,6 +296,7 @@ public class CartOrderServiceImpl implements CartOrderService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public HttpResponse queryCartByStoreId(String storeId, Integer productType, String skuId, Integer lineCheckStatus, Integer number, String activityId) {
         HttpResponse<CartResponse> response = HttpResponse.success();
         try {
@@ -311,7 +316,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                         if (StringUtils.isEmpty(skuId)) {
                             throw new BusinessException("参数缺失");
                         }
-                        item.setLineCheckStatus(Global.LINECHECKSTATUS_0);
+                        item.setLineCheckStatus(lineCheckStatus);
                         if (number != null) {
                             item.setAmount(number);
                         }
@@ -335,8 +340,6 @@ public class CartOrderServiceImpl implements CartOrderService {
                     analysisActivityInCart(item.getCartId());
                 }
             }
-
-
 
             //返回商品列表并结算价格
             CartResponse cartResponse = getStoreProductList(storeId, productType);
@@ -566,6 +569,9 @@ public class CartOrderServiceImpl implements CartOrderService {
 
     @Override
     public void analysisActivityInCart(String cartId) {
+        if (StringUtils.isEmpty(cartId)) {
+            return;
+        }
         CartOrderInfo cart = cartOrderDao.getCartByCartId(cartId);
         if (cart == null) {
             //异常
