@@ -119,6 +119,10 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
         //判断门店编码集合是否为空，不为空，遍历查询信息
         if(map!=null && map.size()>0){
             for(Entry<String, String> entry:map.entrySet()){
+                //统计总的销售金额
+                BigDecimal totalAmount=new BigDecimal(0);
+                //统计总的销售数量
+                Long totalNum=0L;
                 String storeCode=entry.getKey();
                 //查询门店下补货品牌、数量（主表）
                 List<ReportStoreGoods> reportStoreGoodsCountResponses = reportStoreGoodsDao.selectProductCount(storeCode);
@@ -152,14 +156,12 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 }
                 //插入门店补货列表统计detail报表
                 reportStoreGoodsDetailDao.insertBatch(reportStoreGoodsDetails);
-                //统计总的销售金额
-                BigDecimal totalAmount=new BigDecimal(0);
-                //统计总的销售数量
-                Long totalNum=0L;
                 for(ReportStoreGoods rsg:reportStoreGoodsCountResponses){
                     String productBrandCode = rsg.getBrandId();
                     Long num = rsg.getNum();
-                    totalNum=totalNum+num;
+                    if(null!=rsg.getNum()){
+                        totalNum=totalNum+num;
+                    }
                     ReportStoreGoodsDetailVo reportStoreGoodsDetailVo=new ReportStoreGoodsDetailVo();
                     reportStoreGoodsDetailVo.setStoreCode(storeCode);
                     reportStoreGoodsDetailVo.setBrandId(productBrandCode);
@@ -219,6 +221,51 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 }
                 //插入数据
                 reportStoreGoodsDao.insertBatch(reportStoreGoodsCountResponses);
+                //更新总的同比环比
+                ReportStoreGoodsVo vo2=new ReportStoreGoodsVo();
+                rightNow.setTime(time);
+                rightNow.add(Calendar.DAY_OF_MONTH,-1);//因为统计的是前一天的数据，所以日期减1
+                rightNow.add(Calendar.YEAR,-1);//日期减1年
+                Date dt1=rightNow.getTime();
+                String reStr = sdf.format(dt1);
+                vo2.setStoreCode(storeCode);
+                vo2.setCountTime(reStr);
+                //计算总同比
+                List<ReportStoreGoods> reportStoreGoods1 = reportStoreGoodsDao.selectList(vo2);
+                BigDecimal a=new BigDecimal(100.0000);
+                BigDecimal b=new BigDecimal(100.0000);
+                if(CollectionUtils.isNotEmpty(reportStoreGoods1)){
+                    ReportStoreGoods rsg2=reportStoreGoods1.get(0);
+                    if(null!=rsg2.getTotalAmount()){
+                        BigDecimal cha=totalAmount.subtract(rsg2.getTotalAmount());
+                        a=cha.divide(rsg2.getAmount());
+                    }
+                }
+                rightNow.setTime(time);
+                rightNow.add(Calendar.DAY_OF_MONTH,-1);//因为统计的是前一天的数据，所以日期减1
+                rightNow.add(Calendar.MONTH,-1);//日期减1个月
+                Date dt2=rightNow.getTime();
+                String reStr1 = sdf.format(dt2);
+                vo2.setStoreCode(storeCode);
+                vo2.setCountTime(reStr1);
+                //计算总环比
+                List<ReportStoreGoods> reportStoreGoods2 = reportStoreGoodsDao.selectList(vo2);
+                if(CollectionUtils.isNotEmpty(reportStoreGoods2)){
+                    ReportStoreGoods rsg2=reportStoreGoods2.get(0);
+                    if(null!=rsg2.getTotalAmount()){
+                        BigDecimal cha=totalAmount.subtract(rsg2.getTotalAmount());
+                        b=cha.divide(rsg2.getAmount());
+                    }
+                }
+                ReportStoreGoods reportStoreGood=new ReportStoreGoods();
+                reportStoreGood.setStoreCode(storeCode);
+                reportStoreGood.setCountTime(countTime);
+                reportStoreGood.setTotalAmount(totalAmount);
+                reportStoreGood.setTotalNum(totalNum);
+                reportStoreGood.setTotalChainRatio(b);
+                reportStoreGood.setTotalTongRatio(a);
+                //更新总的销售数量、总金额、总的环比和同比
+                reportStoreGoodsDao.updateByStoreCodeAndTime(reportStoreGood);
             }
         }else{
             log.info("校验查询所有门店编码为空");

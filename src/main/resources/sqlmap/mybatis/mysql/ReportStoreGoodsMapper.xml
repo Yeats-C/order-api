@@ -263,4 +263,13 @@
     WHERE order_store_code=#{orderStoreCode}
   </select>
 
+  <update id="updateByStoreCodeAndTime" parameterType="com.aiqin.mgs.order.api.domain.ReportStoreGoods" >
+    update report_store_goods
+    set total_num = #{totalNum,jdbcType=BIGINT},
+      total_amount = #{totalAmount,jdbcType=DECIMAL},
+      total_tong_ratio = #{totalTongRatio,jdbcType=DECIMAL},
+      total_chain_ratio = #{totalChainRatio,jdbcType=DECIMAL}
+    where store_code = #{storeCode,jdbcType=VARCHAR} and count_time = #{countTime,jdbcType=VARCHAR}
+  </update>
+
 </mapper>
