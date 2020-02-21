@@ -29,8 +29,6 @@ public class RelportStoreGoodsController {
 
     @Autowired
     private ReportStoreGoodsService reportStoreGoodsService;
-    @Autowired
-    private ReportStoreGoodsDao reportStoreGoodsDao;
 
     @ApiOperation("门店补货报表列表")
     @PostMapping("/getlist")
