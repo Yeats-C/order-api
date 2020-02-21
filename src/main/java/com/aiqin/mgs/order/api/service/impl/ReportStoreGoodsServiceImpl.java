@@ -152,18 +152,26 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 }
                 //插入门店补货列表统计detail报表
                 reportStoreGoodsDetailDao.insertBatch(reportStoreGoodsDetails);
-                reportStoreGoodsCountResponses=reportStoreGoodsCountResponses.stream().map(detailVo -> {
-                    ReportStoreGoods detail = new ReportStoreGoods();
-                    BeanUtils.copyProperties(detailVo,detail);
-                    String productBrandCode = detail.getBrandId();
+                //统计总的销售金额
+                BigDecimal totalAmount=new BigDecimal(0);
+                //统计总的销售数量
+                Long totalNum=0L;
+                for(ReportStoreGoods rsg:reportStoreGoodsCountResponses){
+                    String productBrandCode = rsg.getBrandId();
+                    Long num = rsg.getNum();
+                    totalNum=totalNum+num;
                     ReportStoreGoodsDetailVo reportStoreGoodsDetailVo=new ReportStoreGoodsDetailVo();
                     reportStoreGoodsDetailVo.setStoreCode(storeCode);
                     reportStoreGoodsDetailVo.setBrandId(productBrandCode);
                     reportStoreGoodsDetailVo.setCountTime(countTime);
                     //各个品牌总金额
                     BigDecimal amount = reportStoreGoodsDetailDao.sumAmountByBrandId(reportStoreGoodsDetailVo);
-                    detail.setAmount(amount);
-                    detail.setCreateTime(new Date());
+                    if(amount==null){
+                        amount=new BigDecimal(0);
+                    }
+                    totalAmount=totalAmount.add(amount);
+                    rsg.setAmount(amount);
+                    rsg.setCreateTime(new Date());
                     rightNow.setTime(time);
                     rightNow.add(Calendar.DAY_OF_MONTH,-1);//因为统计的是前一天的数据，所以日期减1
                     rightNow.add(Calendar.YEAR,-1);//日期减1年
@@ -178,8 +186,8 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                     BigDecimal a=new BigDecimal(100.0000);
                     BigDecimal b=new BigDecimal(100.0000);
                     if(reportStoreGoods!=null&&reportStoreGoods.getNum()>0){
-                        if(null!=detail.getAmount()){
-                            BigDecimal cha=detail.getAmount().subtract(reportStoreGoods.getAmount());
+                        if(null!=rsg.getAmount()){
+                            BigDecimal cha=rsg.getAmount().subtract(reportStoreGoods.getAmount());
                             a=cha.divide(reportStoreGoods.getAmount());
                         }
                     }
@@ -192,17 +200,16 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                     //计算环比
                     reportStoreGoods = reportStoreGoodsDao.selectReportStoreGoods(r);
                     if(reportStoreGoods!=null&&reportStoreGoods.getNum()>0){
-                        if(null!=detail.getNum()){
-                            BigDecimal cha=detail.getAmount().subtract(reportStoreGoods.getAmount());
+                        if(null!=rsg.getNum()){
+                            BigDecimal cha=rsg.getAmount().subtract(reportStoreGoods.getAmount());
                             b=cha.divide(reportStoreGoods.getAmount());
                         }
                     }
-                    detail.setChainRatio(b);
-                    detail.setTongRatio(a);
-                    detail.setCountTime(countTime);
-                    detail.setStoreCode(storeCode);
-                    return detail;
-                }).collect(Collectors.toList());
+                    rsg.setChainRatio(b);
+                    rsg.setTongRatio(a);
+                    rsg.setCountTime(countTime);
+                    rsg.setStoreCode(storeCode);
+                }
                 //根据门店编码、统计时间清空数据
                 ReportStoreGoodsVo vo1=new ReportStoreGoodsVo();
                 BeanUtils.copyProperties(vo,vo1);
