@@ -69,23 +69,23 @@ public class FirstReportServiceImpl implements FirstReportService {
         firstReportStoreAndOrderRerequest.setCountTime(countTime);
         //首单直送销售金额
         BigDecimal bigDecimal = firstReportDao.selectOrder(firstReportStoreAndOrderRerequest);
-//        if(bigDecimal == null){
-//            bigDecimal = new BigDecimal(0);
-//        }
+        if(bigDecimal == null){
+            bigDecimal = new BigDecimal(0);
+        }
         firstReportStoreAndOrderRerequest.setOrder_category_code("2");
         firstReportStoreAndOrderRerequest.setOrder_type_code("2");
         //首单配送销售金额
         BigDecimal bigDecimal1 = firstReportDao.selectOrder(firstReportStoreAndOrderRerequest);
-//        if(bigDecimal1 == null){
-//            bigDecimal1 = new BigDecimal(0);
-//        }
+        if(bigDecimal1 == null){
+            bigDecimal1 = new BigDecimal(0);
+        }
         firstReportStoreAndOrderRerequest.setOrder_category_code("16");
         firstReportStoreAndOrderRerequest.setOrder_type_code("3");
         //首单货架销售金额
         BigDecimal bigDecimal2 = firstReportDao.selectOrder(firstReportStoreAndOrderRerequest);
-//        if(bigDecimal2 == null){
-//            bigDecimal2 = new BigDecimal(0);
-//        }
+        if(bigDecimal2 == null){
+            bigDecimal2 = new BigDecimal(0);
+        }
         log.info("首单货架金额：" + bigDecimal2);
         log.info("首单直送金额：" + bigDecimal);
         log.info("首单配送金额：" + bigDecimal1);
