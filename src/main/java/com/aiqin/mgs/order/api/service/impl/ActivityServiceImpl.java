@@ -833,8 +833,12 @@ public class ActivityServiceImpl implements ActivityService {
         return wb;
     }
 
-    public List<Activity> activityList(String storeId,String activityId,String productCategoryCode){
-
+    /**
+     * 通过条件查询一个商品有多少个进行中的活动
+     * @return
+     */
+    public List<Activity> activityList(ActivityParameterRequest activityParameterRequest){
+        LOGGER.info("通过条件查询一个商品有多少个进行中的活动activityList参数activityParameterRequest为：{}", activityParameterRequest);
         return null;
     }
 
