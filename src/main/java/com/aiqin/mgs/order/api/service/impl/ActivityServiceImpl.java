@@ -862,6 +862,7 @@ public class ActivityServiceImpl implements ActivityService {
      * 通过条件查询一个商品有多少个进行中的活动
      * @return
      */
+    @Override
     public List<Activity> activityList(ActivityParameterRequest activityParameterRequest){
         LOGGER.info("通过条件查询一个商品有多少个进行中的活动activityList参数activityParameterRequest为：{}", activityParameterRequest);
         List<Activity> activityList=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode(),null,null);

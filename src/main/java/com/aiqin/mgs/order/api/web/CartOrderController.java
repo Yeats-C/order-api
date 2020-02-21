@@ -62,7 +62,7 @@ public class CartOrderController {
      * @return
      */
     @GetMapping("/cartDisplay")
-    @ApiOperation(value = "购物车展示列表,附带勾选功能")
+    @ApiOperation(value = "购物车展示列表,附带勾选功能，仅erp使用")
     @ApiImplicitParams({@ApiImplicitParam(name = "store_id", value = "门店id", dataType = "String", paramType = "query", required = true),
             @ApiImplicitParam(name = "product_type", value = "商品类型 1:直送 2:配送 3:货架", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(name = "sku_code", value = "sku编码", dataType = "String", paramType = "query", required = false),
@@ -80,7 +80,7 @@ public class CartOrderController {
      * @return
      */
     @GetMapping("/queryCartByStoreId")
-    @ApiOperation(value = "购物车展示列表,附带勾选功能")
+    @ApiOperation(value = "购物车展示列表,附带勾选功能，仅爱掌柜调用")
     @ApiImplicitParams({@ApiImplicitParam(name = "store_id", value = "门店id", dataType = "String", paramType = "query", required = true),
             @ApiImplicitParam(name = "product_type", value = "商品类型 1:直送 2:配送 3:货架", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(name = "sku_code", value = "sku编码", dataType = "String", paramType = "query", required = false),

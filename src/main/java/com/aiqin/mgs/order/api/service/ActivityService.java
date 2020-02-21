@@ -142,4 +142,11 @@ public interface ActivityService {
      * @return
      */
     HttpResponse skuPage(SpuProductReqVO spuProductReqVO);
+
+    /**
+     * 通过条件查询一个商品有多少个进行中的活动
+     *
+     * @return
+     */
+    List<Activity> activityList(ActivityParameterRequest activityParameterRequest);
 }

@@ -434,8 +434,13 @@ public class CartOrderServiceImpl implements CartOrderService {
             List<CartOrderInfo> giftList = cartOrderDao.findByGiftParentCartId(item.getCartId());
             item.setGiftList(giftList);
 
-            //TODO 调用接口查询商品可选活动列表
-            List<Activity> activityList = new ArrayList<>();
+            //调用接口查询商品可选活动列表
+            ActivityParameterRequest activityParameterRequest = new ActivityParameterRequest();
+            activityParameterRequest.setStoreId(storeId);
+            activityParameterRequest.setSkuCode(item.getSkuCode());
+            activityParameterRequest.setProductBrandCode(item.getProductBrandCode());
+            activityParameterRequest.setProductCategoryCode(item.getProductCategoryCode());
+            List<Activity> activityList = activityService.activityList(activityParameterRequest);
             item.setActivityList(activityList);
 
         }
