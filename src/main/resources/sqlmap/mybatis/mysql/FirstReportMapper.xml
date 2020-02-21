@@ -19,7 +19,7 @@
   </select>
   <select id="selectOrder" resultType="java.math.BigDecimal" parameterType="com.aiqin.mgs.order.api.domain.request.FirstReportStoreAndOrderRerequest">
     select sum(order_amount) from order_store_info
-    where order_type_code=#{order_type_code} and order_category_code=#{order_category_code} and DATE_FORMAT(create_time,'%Y-%m')=DATE_FORMAT(#{countTime},'%Y-%m')
+    where order_type_code=#{order_type_code} and order_category_code=#{order_category_code} and DATE_FORMAT(create_time,'%Y-%m')=#{countTime}
     and store_id in
     <foreach collection="records"  item="item" open="(" separator="," close=")"  >
       #{item}
