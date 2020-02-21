@@ -49,7 +49,7 @@
             #{activityProduct.actualPrice,jdbcType=INTEGER},
             #{activityProduct.status,jdbcType=INTEGER},
             now(), now(),
-            #{activityProduct.isDelete,jdbcType=INTEGER},
+            0,
             #{activityProduct.createBy,jdbcType=VARCHAR},
             #{activityProduct.updateBy,jdbcType=VARCHAR},
             #{activityProduct.activityScope,jdbcType=INTEGER}

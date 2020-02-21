@@ -55,7 +55,7 @@ public interface ActivityDao {
      * @param productId
      * @return
      */
-    List<Activity> checkProcuct(String activityId, String storeId, String productId);
+    List<Activity> checkProcuct(String activityId, String storeId, String productId,String productBrandCode,String productCategoryCode);
 }
 
 

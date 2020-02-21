@@ -48,12 +48,12 @@ public class ActivityProduct {
 
     /***商品品类名称*/
     @ApiModelProperty(value = "商品品类名称")
-    @JsonProperty("`product_category_name")
+    @JsonProperty("product_category_name")
     private String productCategoryName;
 
     /***商品品类编码*/
     @ApiModelProperty(value = "商品品类编码")
-    @JsonProperty("`product_category_code")
+    @JsonProperty("product_category_code")
     private String productCategoryCode;
 
     /***原价(爱亲分销价)*/

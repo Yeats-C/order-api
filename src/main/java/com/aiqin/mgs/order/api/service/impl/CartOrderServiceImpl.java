@@ -11,6 +11,7 @@ import com.aiqin.mgs.order.api.dao.CartOrderDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
+import com.aiqin.mgs.order.api.domain.request.activity.ActivityParameterRequest;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.Product;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
@@ -438,7 +439,11 @@ public class CartOrderServiceImpl implements CartOrderService {
 
         if (StringUtils.isNotEmpty(cart.getActivityId())) {
             //校验活动，如果过期，删除活动
-            Boolean aBoolean = activityService.checkProcuct(cart.getActivityId(), cart.getStoreId(), cart.getProductId());
+            ActivityParameterRequest parameterRequest=new ActivityParameterRequest();
+            parameterRequest.setActivityId(cart.getActivityId());
+            parameterRequest.setStoreId(cart.getStoreId());
+            parameterRequest.setSkuCode(cart.getProductId());
+            Boolean aBoolean = activityService.checkProcuct(parameterRequest);
             if (aBoolean) {
                 //解析活动
 
@@ -613,7 +618,7 @@ public class CartOrderServiceImpl implements CartOrderService {
      */
     private CartOrderInfo createGiftProductLine(CartOrderInfo cart, ActivityRule rule) {
 
-        ProductInfo skuDetail = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, rule.getSkuCode());
+        ProductInfo skuDetail = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, "rule.getSkuCode()");
 
         CartOrderInfo cartOrderInfo = new CartOrderInfo();
         cartOrderInfo.setCartId(IdUtil.uuid());
@@ -625,7 +630,7 @@ public class CartOrderServiceImpl implements CartOrderService {
         cartOrderInfo.setColor(skuDetail.getColorName());//商品颜色
         cartOrderInfo.setProductSize(skuDetail.getModelCode());//商品型号
         cartOrderInfo.setCreateSource(cart.getCreateSource());//插入商品来源
-        cartOrderInfo.setAmount(rule.getNumbers());//获取商品数量
+//        cartOrderInfo.setAmount(rule.getNumbers());//获取商品数量
         cartOrderInfo.setPrice(BigDecimal.ZERO);//商品价格
         cartOrderInfo.setProductType(cart.getProductType());//商品类型 0直送、1配送、2辅采
         cartOrderInfo.setCreateById(cart.getCreateById());//创建者id

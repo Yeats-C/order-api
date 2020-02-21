@@ -5,7 +5,9 @@ import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityProduct;
 import com.aiqin.mgs.order.api.domain.ActivitySales;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
+import com.aiqin.mgs.order.api.domain.request.activity.ActivityParameterRequest;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
+import com.aiqin.mgs.order.api.domain.request.activity.SpuProductReqVO;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 
 import javax.servlet.http.HttpServletResponse;
@@ -92,12 +94,11 @@ public interface ActivityService {
 
     /**
      * 校验商品活动是否过期
-     * @param activityId
-     * @param storeId
-     * @param productId
+     * @param  activityParameterRequest
+
      * @return
      */
-    Boolean checkProcuct(String activityId,String storeId,String productId);
+    Boolean checkProcuct(ActivityParameterRequest activityParameterRequest);
 
     /**
      * 活动商品品牌列表接口
@@ -134,4 +135,11 @@ public interface ActivityService {
      * @return
      */
     HttpResponse excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response);
+
+    /**
+     * 活动商品筛选分页
+     * @param spuProductReqVO
+     * @return
+     */
+    HttpResponse skuPage(SpuProductReqVO spuProductReqVO);
 }

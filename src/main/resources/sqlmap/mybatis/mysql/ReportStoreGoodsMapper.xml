@@ -25,9 +25,9 @@
     from report_store_goods
     where id = #{id,jdbcType=BIGINT}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+  <delete id="deleteByStoreCodeAndCountTime" parameterType="com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo" >
     delete from report_store_goods
-    where id = #{id,jdbcType=BIGINT}
+    where store_code = #{storeCode,jdbcType=VARCHAR} and count_time=#{countTime,jdbcType=VARCHAR}
   </delete>
 
   <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.ReportStoreGoods" >
@@ -156,25 +156,66 @@
     from report_store_goods
     <where>
       <if test="countTime != null and countTime !=''" >
-        count_time = #{countTime,jdbcType=VARCHAR}
+        and count_time = #{countTime,jdbcType=VARCHAR}
+      </if>
+      <if test="storeCode != null and storeCode !=''" >
+        and store_code = #{storeCode,jdbcType=VARCHAR}
       </if>
     </where>
   </select>
 
-  <select id="selectProductCount" parameterType="java.lang.String" resultType="com.aiqin.mgs.order.api.domain.response.report.ReportStoreGoodsCountResponse">
-    select SUM(actual_inbound_count) as proCount,product_brand_code as productBrandCode,product_brand_name as productBrandName
+  <select id="selectProductCount" parameterType="java.lang.String" resultType="com.aiqin.mgs.order.api.domain.ReportStoreGoods">
+    select SUM(actual_inbound_count) as num,product_brand_code as brandId,product_brand_name as brandName
     FROM order_store_detail
     where order_store_code in (SELECT order_store_code FROM `order_store_info`
         WHERE  DATE_FORMAT(create_time,'%Y-%m')=DATE_FORMAT(now(),'%Y-%m') and store_code=#{storeCode} AND order_status=12)
     GROUP BY product_brand_code
   </select>
 
-<!--  select SUM(actual_inbound_count) as proCount,product_brand_code as productBrandCode,-->
-<!--  product_brand_name as productBrandName ,sku_name as skuName,sku_code as skuCode,-->
-<!--  activity_price as money-->
-<!--  FROM order_store_detail-->
-<!--  where order_store_code in (SELECT order_store_code FROM `order_store_info`-->
-<!--  WHERE DATE_FORMAT(create_time,'%Y-%m')=DATE_FORMAT(now(),'%Y-%m') and store_code='60000028' AND order_status=12)-->
-<!--  GROUP BY productBrandCode,sku_code-->
+  <select id="selectReportStoreGoodsDetail" parameterType="java.lang.String" resultType="com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail">
+    select t.num,t.brandId,t.brandName,t.skuName,t.skuCode,t.amount*t.num as amount from
+		(select SUM(actual_inbound_count) as num,product_brand_code as brandId,
+            product_brand_name as brandName ,sku_name as skuName,sku_code as skuCode,
+            activity_price as amount,DATE_FORMAT(create_time,'%Y-%m') as countTime
+        FROM order_store_detail
+        where order_store_code in (SELECT order_store_code FROM `order_store_info`
+            WHERE DATE_FORMAT(create_time,'%Y-%m')=DATE_FORMAT(now(),'%Y-%m') and store_code=#{storeCode} AND order_status=12)
+        GROUP BY brandId,sku_code) t
+  </select>
+
+  <select id="selectReportStoreGoods" resultType="com.aiqin.mgs.order.api.domain.ReportStoreGoods" parameterType="com.aiqin.mgs.order.api.domain.ReportStoreGoods" >
+    select
+    <include refid="Base_Column_List" />
+    from report_store_goods where count_time = #{countTime,jdbcType=VARCHAR} and brand_id = #{brandId,jdbcType=VARCHAR} and store_code = #{storeCode,jdbcType=VARCHAR}
+  </select>
+
+  <insert id="insertBatch" parameterType="list">
+    insert into report_store_goods (
+      store_code, brand_id, brand_name,
+      num, amount, tong_ratio,
+      chain_ratio, count_time, create_time
+      )
+    values
+    <foreach collection="records" item="item" index="index" separator=",">
+     (
+      #{item.storeCode,jdbcType=VARCHAR}, #{item.brandId,jdbcType=VARCHAR}, #{item.brandName,jdbcType=VARCHAR},
+      #{item.num,jdbcType=BIGINT}, #{item.amount,jdbcType=DECIMAL}, #{item.tongRatio,jdbcType=DECIMAL},
+      #{item.chainRatio,jdbcType=DECIMAL}, #{item.countTime,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}
+      )
+    </foreach>
+  </insert>
+
+  <select id="selectOrderByStoreCodes" resultType="com.aiqin.mgs.order.api.domain.response.report.ReportOrderAndStoreResponse" parameterType="java.util.List" >
+    SELECT order_store_code as orderStoreCode,store_code as storeCode FROM `order_store_info`
+    WHERE DATE_FORMAT(create_time,'%Y-%m')=DATE_FORMAT(now(),'%Y-%m') AND order_status=12 and store_code in
+    <foreach collection="records"  item="item" open="(" separator="," close=")"  >
+      #{item}
+    </foreach>
+  </select>
+
+  <select id="selectStoreCodeByOrderCode" resultType="java.lang.String" parameterType="java.lang.String" >
+    SELECT store_code FROM `order_store_info`
+    WHERE order_store_code=#{orderStoreCode}
+  </select>
 
 </mapper>
