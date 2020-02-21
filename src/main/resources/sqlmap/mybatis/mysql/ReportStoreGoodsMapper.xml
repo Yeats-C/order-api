@@ -14,10 +14,15 @@
     <result column="chain_ratio" property="chainRatio" jdbcType="DECIMAL" />
     <result column="count_time" property="countTime" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="total_num" property="totalNum" jdbcType="BIGINT" />
+    <result column="total_amount" property="totalAmount" jdbcType="DECIMAL" />
+    <result column="total_tong_ratio" property="totalTongRatio" jdbcType="DECIMAL" />
+    <result column="total_chain_ratio" property="totalChainRatio" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, store_name, store_id, store_code, brand_id, brand_name, num, amount, tong_ratio, 
-    chain_ratio, count_time, create_time
+    chain_ratio, count_time, create_time, total_num, total_amount, total_tong_ratio,
+    total_chain_ratio
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -69,6 +74,18 @@
       <if test="createTime != null" >
         create_time,
       </if>
+      <if test="totalNum != null" >
+        total_num,
+      </if>
+      <if test="totalAmount != null" >
+        total_amount,
+      </if>
+      <if test="totalTongRatio != null" >
+        total_tong_ratio,
+      </if>
+      <if test="totalChainRatio != null" >
+        total_chain_ratio,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -106,6 +123,18 @@
       </if>
       <if test="createTime != null" >
         #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="totalNum != null" >
+        #{totalNum,jdbcType=BIGINT},
+      </if>
+      <if test="totalAmount != null" >
+        #{totalAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="totalTongRatio != null" >
+        #{totalTongRatio,jdbcType=DECIMAL},
+      </if>
+      <if test="totalChainRatio != null" >
+        #{totalChainRatio,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -145,6 +174,18 @@
       </if>
       <if test="createTime != null" >
         create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="totalNum != null" >
+        total_num = #{totalNum,jdbcType=BIGINT},
+      </if>
+      <if test="totalAmount != null" >
+        total_amount = #{totalAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="totalTongRatio != null" >
+        total_tong_ratio = #{totalTongRatio,jdbcType=DECIMAL},
+      </if>
+      <if test="totalChainRatio != null" >
+        total_chain_ratio = #{totalChainRatio,jdbcType=DECIMAL},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
@@ -193,14 +234,18 @@
     insert into report_store_goods (
       store_code, brand_id, brand_name,
       num, amount, tong_ratio,
-      chain_ratio, count_time, create_time
+      chain_ratio, count_time, create_time,
+      total_num, total_amount, total_tong_ratio,
+      total_chain_ratio
       )
     values
     <foreach collection="records" item="item" index="index" separator=",">
      (
       #{item.storeCode,jdbcType=VARCHAR}, #{item.brandId,jdbcType=VARCHAR}, #{item.brandName,jdbcType=VARCHAR},
       #{item.num,jdbcType=BIGINT}, #{item.amount,jdbcType=DECIMAL}, #{item.tongRatio,jdbcType=DECIMAL},
-      #{item.chainRatio,jdbcType=DECIMAL}, #{item.countTime,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}
+      #{item.chainRatio,jdbcType=DECIMAL}, #{item.countTime,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP},
+      #{item.totalNum,jdbcType=BIGINT}, #{item.totalAmount,jdbcType=DECIMAL}, #{item.totalTongRatio,jdbcType=DECIMAL},
+      #{item.totalChainRatio,jdbcType=DECIMAL}
       )
     </foreach>
   </insert>
