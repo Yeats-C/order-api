@@ -110,6 +110,9 @@
             <if test="productType != null">
                 and product_type = #{productType}
             </if>
+            <if test="productGift != null">
+                and product_gift = #{productGift}
+            </if>
         </where>
     </update>
 
@@ -127,6 +130,12 @@
             </if>
             <if test="productType != null">
                 and product_type = #{productType}
+            </if>
+            <if test="productGift != null">
+                and product_gift = #{productGift}
+            </if>
+            <if test="lineCheckStatus != null">
+                and line_check_status = #{lineCheckStatus}
             </if>
         </where>
         order by create_time
@@ -235,9 +244,12 @@
     <update id="updateCartByCartId" parameterType="java.lang.String">
         update order_store_cart
         set activity_id         = #{activityId},
+            activity_name       = #{activityName},
+            line_check_status   = #{lineCheckStatus},
+            amount              = #{amount},
             activity_price      = #{activityPrice},
             account_total_price = #{accountTotalPrice}
-            where cart_id = #{cartId}
+        where cart_id = #{cartId}
     </update>
 
     <select id="selectByProperty" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo"

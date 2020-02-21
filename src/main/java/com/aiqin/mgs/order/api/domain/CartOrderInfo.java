@@ -270,6 +270,13 @@ public class CartOrderInfo {
     @JsonProperty("spec")
     private String spec;
 
+    @ApiModelProperty(value = "本商品待选择活动列表")
+    @JsonProperty("activity_list")
+    private List<Activity> activityList;
+
+    @ApiModelProperty(value = "本商品行附带的赠品行")
+    @JsonProperty("gift_list")
+    private List<CartOrderInfo> giftList;
 
 
 

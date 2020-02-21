@@ -28,6 +28,8 @@ public interface CartOrderService {
      */
     HttpResponse selectCartByStoreId(String storeId,Integer productType,String skuId,Integer lineCheckStatus,Integer number);
 
+    HttpResponse queryCartByStoreId(String storeId,Integer productType,String skuId,Integer lineCheckStatus,Integer number,String activityId);
+
     /**
      * 返回购物车中的所有商品数量
      * @param storeId 门店ID
