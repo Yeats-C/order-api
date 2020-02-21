@@ -11,7 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -38,34 +41,51 @@ public class FirstReportServiceImpl implements FirstReportService {
                   AraeId.add(copartnerAreaId);
           }
         //根据经营区域id去查询门店
-        log.info("集合：" + AraeId);
+        log.info("区域id集合：" + AraeId);
         List<String> StoreIdList = firstReportDao.QueryStore(AraeId);
         log.info("获取门店id集合，返回结果：" + StoreIdList);
           if(CollectionUtils.isEmpty(StoreIdList)){
               log.info("获取门店id集合为空");
               return;
           }
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM");
+        Date time=new Date();
+        //获取Calendar对象
+        Calendar rightNow = Calendar.getInstance();
+        //使用给定的time设置此日历的时间
+        rightNow.setTime(time);
+        //日历的规则，给指定字段添加或减少时间量
+        rightNow.add(Calendar.DAY_OF_MONTH,-1);//因为统计的是前一天的数据，所以日期减1
+        //返回一个dete为日历时间
+        Date d=rightNow.getTime();
+        String countTime = sdf.format(d);
+        log.info("时间：" + countTime);
+        //销售金额参数对象
         FirstReportStoreAndOrderRerequest firstReportStoreAndOrderRerequest = new FirstReportStoreAndOrderRerequest();
         firstReportStoreAndOrderRerequest.setRecords(StoreIdList);
 
         firstReportStoreAndOrderRerequest.setOrder_category_code("2");
         firstReportStoreAndOrderRerequest.setOrder_type_code("1");
-        //销售金额
+        firstReportStoreAndOrderRerequest.setCountTime(countTime);
+        //首单直送销售金额
         BigDecimal bigDecimal = firstReportDao.selectOrder(firstReportStoreAndOrderRerequest);
-        log.info("首单直送金额：" + bigDecimal);
-
-
+//        if(bigDecimal == null){
+//            bigDecimal = new BigDecimal(0);
+//        }
         firstReportStoreAndOrderRerequest.setOrder_category_code("2");
         firstReportStoreAndOrderRerequest.setOrder_type_code("2");
-        //销售金额
+        //首单配送销售金额
         BigDecimal bigDecimal1 = firstReportDao.selectOrder(firstReportStoreAndOrderRerequest);
-        log.info("首单配送金额：" + bigDecimal1);
-
-
+//        if(bigDecimal1 == null){
+//            bigDecimal1 = new BigDecimal(0);
+//        }
         firstReportStoreAndOrderRerequest.setOrder_category_code("16");
         firstReportStoreAndOrderRerequest.setOrder_type_code("3");
-        //销售金额
+        //首单货架销售金额
         BigDecimal bigDecimal2 = firstReportDao.selectOrder(firstReportStoreAndOrderRerequest);
+//        if(bigDecimal2 == null){
+//            bigDecimal2 = new BigDecimal(0);
+//        }
         log.info("首单货架金额：" + bigDecimal2);
         log.info("首单直送金额：" + bigDecimal);
         log.info("首单配送金额：" + bigDecimal1);

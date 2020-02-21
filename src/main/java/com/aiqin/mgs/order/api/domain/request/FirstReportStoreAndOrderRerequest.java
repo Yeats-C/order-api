@@ -18,4 +18,7 @@ public class FirstReportStoreAndOrderRerequest {
     @ApiModelProperty(value = "门店id集合")
     private List<String> records;
 
+    @ApiModelProperty(value = "统计时间")
+    private String countTime;
+
 }
