@@ -839,7 +839,31 @@ public class ActivityServiceImpl implements ActivityService {
      */
     public List<Activity> activityList(ActivityParameterRequest activityParameterRequest){
         LOGGER.info("通过条件查询一个商品有多少个进行中的活动activityList参数activityParameterRequest为：{}", activityParameterRequest);
-        return null;
+        List<Activity> activityList=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode(),null,null);
+        List<Activity> activityListByBrand=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),null,activityParameterRequest.getProductBrandCode(),null);
+        List<Activity> activityListByCategory=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),null,null,activityParameterRequest.getProductCategoryCode());
+        if(null==activityList&&null==activityListByBrand&&null==activityListByCategory){
+            return new ArrayList<Activity>();
+        }
+        if(null==activityList){
+            activityList=new ArrayList<>();
+        }
+        if(null!=activityListByBrand){
+            for (Activity act:activityListByBrand){
+                activityList.add(act);
+            }
+        }
+        if(null!=activityListByCategory){
+            for (Activity act:activityListByCategory){
+                activityList.add(act);
+            }
+        }
+
+        // 去重
+        Set<Activity> activitySet = new HashSet<>(activityList);
+        activityList.clear();
+        activityList.addAll(activitySet);
+        return activityList;
     }
 
 }
