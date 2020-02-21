@@ -21,7 +21,7 @@ public class ReportStoreOrderTaskJob {
     @Resource
     private ReportStoreGoodsService reportStoreGoodsService;
 
-    @Scheduled(cron = "0 0/2 * * * ? ")
+    @Scheduled(cron = "0 10 2 * * ? ")//每天凌晨两点十分执行
     public void getTask() {
         //计时器
         StopWatch watch = new StopWatch();
