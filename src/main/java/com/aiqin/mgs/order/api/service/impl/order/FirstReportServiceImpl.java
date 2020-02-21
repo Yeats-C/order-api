@@ -66,7 +66,7 @@ public class FirstReportServiceImpl implements FirstReportService {
         firstReportStoreAndOrderRerequest.setOrder_type_code("3");
         //销售金额
         BigDecimal bigDecimal2 = firstReportDao.selectOrder(firstReportStoreAndOrderRerequest);
-        log.info("首单货架金额：" + bigDecimal2 );
+        log.info("首单货架金额：" + bigDecimal2);
         log.info("首单直送金额：" + bigDecimal);
         log.info("首单配送金额：" + bigDecimal1);
     }
