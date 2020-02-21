@@ -9,6 +9,7 @@ import com.aiqin.mgs.order.api.domain.ReportStoreGoods;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsVo;
+import com.aiqin.mgs.order.api.domain.response.report.ReportOrderAndStoreListResponse;
 import com.aiqin.mgs.order.api.domain.response.report.ReportOrderAndStoreResponse;
 import com.aiqin.mgs.order.api.service.ReportStoreGoodsService;
 import com.alibaba.fastjson.JSON;
@@ -60,15 +61,24 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
     }
 
     @Override
-    public PageResData<ReportStoreGoods> getList(PageRequestVO<ReportStoreGoodsVo> searchVo) {
+    public ReportOrderAndStoreListResponse getList(PageRequestVO<ReportStoreGoodsVo> searchVo) {
+        ReportOrderAndStoreListResponse res=new ReportOrderAndStoreListResponse();
         PageResData result=new PageResData();
         if(searchVo.getSearchVO()!=null&&StringUtils.isNotBlank(searchVo.getSearchVO().getStoreCode())&&StringUtils.isNotBlank(searchVo.getSearchVO().getCountTime())){
             PageHelper.startPage(searchVo.getPageNo(),searchVo.getPageSize());
             List<ReportStoreGoods> reportStoreGoods = reportStoreGoodsDao.selectList(searchVo.getSearchVO());
+            if(CollectionUtils.isNotEmpty(reportStoreGoods)){
+                ReportStoreGoods reportStoreGoods1= reportStoreGoods.get(0);
+                res.setTotalAmount(reportStoreGoods1.getTotalAmount());
+                res.setTotalChainRatio(reportStoreGoods1.getTotalChainRatio());
+                res.setTotalNum(reportStoreGoods1.getTotalNum());
+                res.setTotalTongRatio(reportStoreGoods1.getTotalTongRatio());
+            }
             result.setTotalCount((int)((Page)reportStoreGoods).getTotal());
             result.setDataList(reportStoreGoods);
+            res.setPageResData(result);
         }
-        return result;
+        return res;
     }
 
     @Override

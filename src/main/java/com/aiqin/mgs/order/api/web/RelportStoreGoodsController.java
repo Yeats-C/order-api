@@ -8,6 +8,7 @@ import com.aiqin.mgs.order.api.domain.ReportStoreGoods;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsVo;
+import com.aiqin.mgs.order.api.domain.response.report.ReportOrderAndStoreListResponse;
 import com.aiqin.mgs.order.api.service.ReportStoreGoodsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,7 +33,7 @@ public class RelportStoreGoodsController {
 
     @ApiOperation("门店补货报表列表")
     @PostMapping("/getlist")
-    public HttpResponse<PageResData<ReportStoreGoods>> getlist(@RequestBody PageRequestVO<ReportStoreGoodsVo> searchVo) {
+    public HttpResponse<ReportOrderAndStoreListResponse> getlist(@RequestBody PageRequestVO<ReportStoreGoodsVo> searchVo) {
         return new HttpResponse(reportStoreGoodsService.getList(searchVo));
     }
 
