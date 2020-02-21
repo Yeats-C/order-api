@@ -205,8 +205,8 @@
         LEFT JOIN activity_product p ON a.activity_id = p.activity_id
         WHERE
         1 = 1
-        AND s.store_id = 6
-        and p.sku_code = 6
+        AND s.store_id =  #{storeId}
+        and p.sku_code =  #{productId}
         AND a.begin_time &lt; now()
         and a.finish_time &gt; NOW()
         and a.activity_status=0

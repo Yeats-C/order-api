@@ -443,6 +443,12 @@ public class ActivityServiceImpl implements ActivityService {
         if(null==activityId ||null==storeId ||null==productId){
             return false;
         }
+        Activity act=new Activity();
+        act.setActivityId(activityId);
+        List<ActivityProduct> activityProductList=activityProductDao.activityProductList(act);
+        if(null!=activityProductList){
+
+        }
         List<Activity> activityList=activityDao.checkProcuct(activityId,storeId,productId);
         if(activityList!=null){
             return true;
@@ -761,6 +767,11 @@ public class ActivityServiceImpl implements ActivityService {
 
         }
         return wb;
+    }
+
+    public List<Activity> activityList(String storeId,String activityId,String productCategoryCode){
+
+        return null;
     }
 
 }
