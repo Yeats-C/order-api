@@ -24,9 +24,7 @@ public interface ReportStoreGoodsService {
     PageResData<ReportStoreGoods> getList(PageRequestVO<ReportStoreGoodsVo> searchVo);
 
     List<ReportStoreGoodsDetail> getCountDetailList(ReportStoreGoodsDetailVo searchVo);
-
-    void dealWith();
-
-    void test();
+    //门店补货报表统计---定时任务使用
+    void reportTimingTask();
 
 }

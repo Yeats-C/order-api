@@ -172,13 +172,6 @@
     GROUP BY product_brand_code
   </select>
 
-  <select id="selectProductCount1" parameterType="java.lang.String" resultType="com.aiqin.mgs.order.api.domain.ReportStoreGoods">
-    select SUM(actual_inbound_count) as num,product_brand_code as brandId,product_brand_name as brandName
-    FROM order_store_detail
-    where order_store_code =#{orderStoreCode}
-    GROUP BY product_brand_code
-  </select>
-
   <select id="selectReportStoreGoodsDetail" parameterType="java.lang.String" resultType="com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail">
     select t.num,t.brandId,t.brandName,t.skuName,t.skuCode,t.amount*t.num as amount from
 		(select SUM(actual_inbound_count) as num,product_brand_code as brandId,
@@ -187,15 +180,6 @@
         FROM order_store_detail
         where order_store_code in (SELECT order_store_code FROM `order_store_info`
             WHERE DATE_FORMAT(create_time,'%Y-%m')=DATE_FORMAT(now(),'%Y-%m') and store_code=#{storeCode} AND order_status=12)
-        GROUP BY brandId,sku_code) t
-  </select>
-
-  <select id="selectReportStoreGoodsDetail1" parameterType="java.lang.String" resultType="com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail">
-    select t.num,t.brandId,t.brandName,t.skuName,t.skuCode,t.amount*t.num as amount from
-		(select SUM(actual_inbound_count) as num,product_brand_code as brandId,
-            product_brand_name as brandName ,sku_name as skuName,sku_code as skuCode,
-            activity_price as amount,DATE_FORMAT(create_time,'%Y-%m') as countTime
-        FROM order_store_detail where order_store_code =#{orderStoreCode}
         GROUP BY brandId,sku_code) t
   </select>
 

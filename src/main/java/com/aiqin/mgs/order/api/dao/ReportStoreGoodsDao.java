@@ -5,7 +5,6 @@ import com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsVo;
 import com.aiqin.mgs.order.api.domain.response.report.ReportOrderAndStoreResponse;
-import com.aiqin.mgs.order.api.domain.response.report.ReportStoreGoodsCountResponse;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -22,12 +21,9 @@ public interface ReportStoreGoodsDao {
 
     List<ReportStoreGoods> selectList(ReportStoreGoodsVo vo);
 
-//    List<ReportStoreGoodsCountResponse> selectProductCount(String storeCode);
     List<ReportStoreGoods> selectProductCount(String storeCode);
-    List<ReportStoreGoods> selectProductCount1(String orderStoreCode);
 
     List<ReportStoreGoodsDetail> selectReportStoreGoodsDetail(String storeCode);
-    List<ReportStoreGoodsDetail> selectReportStoreGoodsDetail1(String orderStoreCode);
 
     ReportStoreGoods selectReportStoreGoods(ReportStoreGoods record);
 
