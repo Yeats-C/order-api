@@ -206,7 +206,15 @@
         WHERE
         1 = 1
         AND s.store_id =  #{storeId}
-        and p.sku_code =  #{productId}
+        <if test="productId!= null">
+            and p.sku_code =  #{productId}
+        </if>
+        <if test="productBrandCode!= null">
+            and p.product_brand_code =  #{productBrandCode}
+        </if>
+        <if test="productCategoryCode!= null">
+            and p.product_category_code =  #{productCategoryCode}
+        </if>
         AND a.begin_time &lt; now()
         and a.finish_time &gt; NOW()
         and a.activity_status=0
