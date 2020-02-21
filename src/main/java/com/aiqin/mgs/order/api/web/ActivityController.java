@@ -6,7 +6,9 @@ import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityProduct;
 import com.aiqin.mgs.order.api.domain.ActivitySales;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
+import com.aiqin.mgs.order.api.domain.request.activity.ActivityParameterRequest;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
+import com.aiqin.mgs.order.api.domain.request.activity.SpuProductReqVO;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import io.swagger.annotations.Api;
@@ -172,15 +174,13 @@ public class ActivityController {
 
     /**
      * 校验商品活动是否过期
-     * @param activityId
-     * @param storeId
-     * @param productId
+     * @param activityParameterRequest
      * @return
      */
     @GetMapping("/checkProcuct")
     @ApiOperation(value = "校验商品活动是否过期")
-    Boolean checkProcuct(String activityId,String storeId,String productId){
-        return activitesService.checkProcuct(activityId,storeId,productId);
+    Boolean checkProcuct(ActivityParameterRequest activityParameterRequest){
+        return activitesService.checkProcuct(activityParameterRequest);
     }
 
     /**
@@ -238,5 +238,16 @@ public class ActivityController {
     @ApiOperation("导出--活动列表-对比分析柱状图")
     public HttpResponse excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response){
         return activitesService.excelActivitySalesStatistics(activityIdList,response);
+    }
+
+
+    /**
+     * 活动商品查询（筛选+分页）
+     * @param spuProductReqVO
+     */
+    @PostMapping("/skuPage")
+    @ApiOperation("活动商品查询（筛选+分页）")
+    public HttpResponse skuPage(SpuProductReqVO spuProductReqVO){
+        return activitesService.skuPage(spuProductReqVO);
     }
 }

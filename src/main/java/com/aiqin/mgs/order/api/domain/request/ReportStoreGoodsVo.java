@@ -20,5 +20,8 @@ public class ReportStoreGoodsVo implements Serializable {
     @ApiModelProperty(value = "查询时间")
     @JsonProperty("count_time")
     private String countTime;
+    @ApiModelProperty(value = "查询时间")
+    @JsonProperty("store_code")
+    private String storeCode;
 
 }

@@ -12,6 +12,7 @@ import com.aiqin.mgs.order.api.dao.CartOrderDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
+import com.aiqin.mgs.order.api.domain.request.activity.ActivityParameterRequest;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.Product;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
@@ -591,7 +592,11 @@ public class CartOrderServiceImpl implements CartOrderService {
 
         if (StringUtils.isNotEmpty(cart.getActivityId())) {
             //校验活动，如果过期，删除活动
-            Boolean aBoolean = activityService.checkProcuct(cart.getActivityId(), cart.getStoreId(), cart.getProductId());
+            ActivityParameterRequest parameterRequest=new ActivityParameterRequest();
+            parameterRequest.setActivityId(cart.getActivityId());
+            parameterRequest.setStoreId(cart.getStoreId());
+            parameterRequest.setSkuCode(cart.getProductId());
+            Boolean aBoolean = activityService.checkProcuct(parameterRequest);
             if (aBoolean) {
                 //解析活动
 

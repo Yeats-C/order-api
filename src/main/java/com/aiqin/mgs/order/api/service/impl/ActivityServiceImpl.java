@@ -11,9 +11,12 @@ import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
+import com.aiqin.mgs.order.api.domain.request.activity.ActivityParameterRequest;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
+import com.aiqin.mgs.order.api.domain.request.activity.SpuProductReqVO;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
+import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.util.DateUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
@@ -62,6 +65,9 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Resource
     private ActivityGiftDao activityGiftDao;
+
+    @Resource
+    private BridgeProductService bridgeProductService;
 
     @Override
     public HttpResponse<Map> activityList(Activity activity) {
@@ -438,17 +444,40 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public Boolean checkProcuct(String activityId, String storeId, String productId) {
-        LOGGER.info("校验商品活动是否过期checkProcuct参数activityId为:{},storeId:{},productId:{}", activityId,storeId,productId);
-        if(null==activityId ||null==storeId ||null==productId){
+    public Boolean checkProcuct(ActivityParameterRequest activityParameterRequest) {
+        LOGGER.info("校验商品活动是否过期checkProcuct参数为:{}", activityParameterRequest);
+        if(null==activityParameterRequest.getActivityId() ||null==activityParameterRequest.getStoreId()){
             return false;
         }
-        List<Activity> activityList=activityDao.checkProcuct(activityId,storeId,productId);
-        if(activityList!=null){
-            return true;
-        }else{
-            return false;
-        }
+        Activity act=new Activity();
+        act.setActivityId(activityParameterRequest.getActivityId());
+        List<ActivityProduct> activityProductList=activityProductDao.activityProductList(act);
+        if(null!=activityProductList){
+            List<Activity> activityList=new ArrayList<>();
+            Integer activityScope=activityProductList.get(0).getActivityScope();
+            if(activityScope==1){//按单品设置
+                activityList=activityDao.checkProcuct(activityParameterRequest.getActivityId(),activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode(),null,null);
+            }else if(activityScope==2){//按品类设置
+                activityList=activityDao.checkProcuct(activityParameterRequest.getActivityId(),activityParameterRequest.getStoreId(),null,activityParameterRequest.getProductBrandCode(),null);
+            }else if(activityScope==3){//按品牌设置
+                activityList=activityDao.checkProcuct(activityParameterRequest.getActivityId(),activityParameterRequest.getStoreId(),null,null,activityParameterRequest.getProductCategoryCode());
+            }else if(activityScope==4){//按单品排除
+                activityList=activityDao.checkProcuct(activityParameterRequest.getActivityId(),activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode(),null,null);
+                if(activityList==null){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+
+            if(activityList!=null){
+                return true;
+            }else{
+                return false;
+            }
+        }else{return false;}
+
+
     }
 
     @Override
@@ -576,6 +605,47 @@ public class ActivityServiceImpl implements ActivityService {
         } catch (Exception ex) {
             throw new GroundRuntimeException(ex.getMessage());
         }
+    }
+
+    @Override
+    public HttpResponse skuPage(SpuProductReqVO spuProductReqVO) {
+        LOGGER.info("活动商品查询（筛选+分页）skuPage参数为：{}", spuProductReqVO);
+        HttpResponse res = HttpResponse.success();
+        if(null==spuProductReqVO.getActivityId()){
+            return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
+        }
+        Activity activity=new Activity();
+        activity.setActivityId(spuProductReqVO.getActivityId());
+        List<ActivityProduct> activityProducts=activityProductDao.activityProductList(activity);
+        if(null!=activityProducts){
+            Integer activityScope=activityProducts.get(0).getActivityScope();
+            List<String> parameterList=new ArrayList<>();
+            for(ActivityProduct product:activityProducts){
+                if(activityScope==1){//按单品设置
+                    parameterList.add(product.getSkuCode());
+                }else if(activityScope==2){//按品类设置
+                    parameterList.add(product.getProductCategoryCode());
+                }else if(activityScope==3){//按品牌设置
+                    parameterList.add(product.getProductBrandCode());
+                }else if(activityScope==4){//按单品排除
+                    parameterList.add(product.getSkuCode());
+                }
+            }
+            if(activityScope==1){//按单品设置
+                spuProductReqVO.setIncludeSkuCodes(parameterList);
+            }else if(activityScope==2){//按品类设置
+//                spuProductReqVO.setIncludeSkuCodes(parameterList);
+            }else if(activityScope==3){//按品牌设置
+//                spuProductReqVO.setIncludeSkuCodes(parameterList);
+            }else if(activityScope==4){//按单品排除
+                spuProductReqVO.setExcludeSkuCodes(parameterList);
+            }
+            res = bridgeProductService.getSkuPage(spuProductReqVO);
+
+        }else{
+            return HttpResponse.failure(ResultCode.SELECT_ACTIVITY_INFO_EXCEPTION);
+        }
+        return res;
     }
 
     /***********************************************工具方法**************************************************/
@@ -761,6 +831,39 @@ public class ActivityServiceImpl implements ActivityService {
 
         }
         return wb;
+    }
+
+    /**
+     * 通过条件查询一个商品有多少个进行中的活动
+     * @return
+     */
+    public List<Activity> activityList(ActivityParameterRequest activityParameterRequest){
+        LOGGER.info("通过条件查询一个商品有多少个进行中的活动activityList参数activityParameterRequest为：{}", activityParameterRequest);
+        List<Activity> activityList=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode(),null,null);
+        List<Activity> activityListByBrand=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),null,activityParameterRequest.getProductBrandCode(),null);
+        List<Activity> activityListByCategory=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),null,null,activityParameterRequest.getProductCategoryCode());
+        if(null==activityList&&null==activityListByBrand&&null==activityListByCategory){
+            return new ArrayList<Activity>();
+        }
+        if(null==activityList){
+            activityList=new ArrayList<>();
+        }
+        if(null!=activityListByBrand){
+            for (Activity act:activityListByBrand){
+                activityList.add(act);
+            }
+        }
+        if(null!=activityListByCategory){
+            for (Activity act:activityListByCategory){
+                activityList.add(act);
+            }
+        }
+
+        // 去重
+        Set<Activity> activitySet = new HashSet<>(activityList);
+        activityList.clear();
+        activityList.addAll(activitySet);
+        return activityList;
     }
 
 }

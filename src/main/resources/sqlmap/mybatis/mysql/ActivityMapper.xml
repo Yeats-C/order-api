@@ -85,7 +85,7 @@
 			(activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization
 			,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time)
 		values
-		    (#{activityId},#{activityName},#{activityType},#{activityStatus},#{beginTime},#{finishTime},#{publishingOrganization}
+		    (#{activityId},#{activityName},#{activityType},0,#{beginTime},#{finishTime},#{publishingOrganization}
 		    ,#{activityBrief},#{activityPicPc},#{activityPicApp},#{createBy},#{updateBy},#{createTime},#{updateTime})
 	</insert>
 
@@ -205,8 +205,19 @@
         LEFT JOIN activity_product p ON a.activity_id = p.activity_id
         WHERE
         1 = 1
-        AND s.store_id = 6
-        and p.sku_code = 6
+        AND s.store_id =  #{storeId}
+        <if test="productId!= null">
+            and p.sku_code =  #{productId}
+        </if>
+        <if test="productBrandCode!= null">
+            and p.product_brand_code =  #{productBrandCode}
+        </if>
+        <if test="productCategoryCode!= null">
+            and p.product_category_code =  #{productCategoryCode}
+        </if>
+        <if test="activityId!= null">
+            and a.activity_id =  #{activityId}
+        </if>
         AND a.begin_time &lt; now()
         and a.finish_time &gt; NOW()
         and a.activity_status=0
