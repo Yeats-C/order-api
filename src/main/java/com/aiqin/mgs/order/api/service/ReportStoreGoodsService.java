@@ -6,7 +6,6 @@ import com.aiqin.mgs.order.api.domain.ReportStoreGoods;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsVo;
-import com.aiqin.mgs.order.api.domain.response.report.ReportStoreGoodsCountDetailResponse;
 
 import java.util.List;
 
@@ -25,7 +24,7 @@ public interface ReportStoreGoodsService {
     PageResData<ReportStoreGoods> getList(PageRequestVO<ReportStoreGoodsVo> searchVo);
 
     List<ReportStoreGoodsDetail> getCountDetailList(ReportStoreGoodsDetailVo searchVo);
-
-//    Boolean dealWith(ReportStoreGoods entity);
+    //门店补货报表统计---定时任务使用
+    void reportTimingTask();
 
 }

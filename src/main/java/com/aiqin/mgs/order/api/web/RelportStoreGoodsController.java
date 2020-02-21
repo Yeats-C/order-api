@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.web;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.dao.ReportStoreGoodsDao;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoods;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo;
@@ -28,6 +29,8 @@ public class RelportStoreGoodsController {
 
     @Autowired
     private ReportStoreGoodsService reportStoreGoodsService;
+    @Autowired
+    private ReportStoreGoodsDao reportStoreGoodsDao;
 
     @ApiOperation("门店补货报表列表")
     @PostMapping("/getlist")
@@ -51,6 +54,13 @@ public class RelportStoreGoodsController {
     @PostMapping("/getCountDetailList")
     public HttpResponse<List<ReportStoreGoodsDetail>> getCountDetailList(@RequestBody ReportStoreGoodsDetailVo searchVo) {
         return new HttpResponse(reportStoreGoodsService.getCountDetailList(searchVo));
+    }
+
+    @ApiOperation("门店补货报表定时任务测试")
+    @PostMapping("/reportTimingTask")
+    public HttpResponse reportTimingTask() {
+        reportStoreGoodsService.reportTimingTask();
+        return HttpResponse.success();
     }
 
 }
