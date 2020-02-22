@@ -11,6 +11,7 @@ import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.aiqin.mgs.order.api.domain.dto.ProductDistributorOrderDTO;
 import com.aiqin.mgs.order.api.domain.request.InventoryDetailRequest;
+import com.aiqin.mgs.order.api.domain.request.activity.ProductSkuRespVo5;
 import com.aiqin.mgs.order.api.domain.request.activity.SpuProductReqVO;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
@@ -130,10 +131,10 @@ public class BridgeProductService {
      * @param spuProductReqVO
      * @return
      */
-    public HttpResponse getSkuPage(SpuProductReqVO spuProductReqVO){
+    public HttpResponse<PageResData<ProductSkuRespVo5>> getSkuPage(SpuProductReqVO spuProductReqVO){
         String path = "/search/spu/skuPage";
         HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(spuProductReqVO);
-        HttpResponse<List<CartOrderInfo>> response = httpClient.action().result(new TypeReference<HttpResponse<PageResData>>() {
+        HttpResponse<PageResData<ProductSkuRespVo5>> response = httpClient.action().result(new TypeReference<HttpResponse<PageResData>>() {
         });
 
         return response;

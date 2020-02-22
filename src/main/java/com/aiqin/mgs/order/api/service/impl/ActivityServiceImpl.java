@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.service.impl;
 import com.aiqin.ground.util.exception.GroundRuntimeException;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.dao.*;
@@ -609,7 +610,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public HttpResponse skuPage(SpuProductReqVO spuProductReqVO) {
+    public HttpResponse<PageResData<ProductSkuRespVo5>> skuPage(SpuProductReqVO spuProductReqVO) {
         LOGGER.info("活动商品查询（筛选+分页）skuPage参数为：{}", spuProductReqVO);
         HttpResponse res = HttpResponse.success();
         if(null==spuProductReqVO.getActivityId()){
@@ -653,7 +654,8 @@ public class ActivityServiceImpl implements ActivityService {
             ShoppingCartRequest shoppingCartRequest=new ShoppingCartRequest();
             shoppingCartRequest.setStoreId(spuProductReqVO.getStoreId());
 
-            List<ProductSkuRespVo5> productSkuRespVo=(List<ProductSkuRespVo5>)res.getData();
+            PageResData<ProductSkuRespVo5> pageResData= (PageResData<ProductSkuRespVo5>) res.getData();
+            List<ProductSkuRespVo5> productSkuRespVo=pageResData.getDataList();
             for (ProductSkuRespVo5 vo:productSkuRespVo){
                 activityParameterRequest.setSkuCode(vo.getSkuCode());
                 activityParameterRequest.setProductBrandCode(vo.getProductBrandCode());
@@ -666,6 +668,14 @@ public class ActivityServiceImpl implements ActivityService {
 
                 Integer storeStockSkuNum=(Integer) bridgeProductService.getStoreStockSkuNum(shoppingCartRequest).getData();
                 vo.setStoreStockSkuNum(storeStockSkuNum);
+
+                if(vo.getSkuStock()>10){
+                    vo.setStoreStockExplain("有货");
+                }else if(vo.getSkuStock()<=0){
+                    vo.setStoreStockExplain("缺货");
+                }else if(vo.getSkuStock()>0 && vo.getSkuStock()<=10){
+                    vo.setStoreStockExplain("库存紧张");
+                }
             }
         }else{
             return HttpResponse.failure(ResultCode.SELECT_ACTIVITY_INFO_EXCEPTION);
