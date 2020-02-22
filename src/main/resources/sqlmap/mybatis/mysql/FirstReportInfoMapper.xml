@@ -37,12 +37,12 @@
       ps_sales_amount,ps_same_period,ps_on_period,ps_same_ratio,ps_ring_ratio,hj_sales_amount,hj_same_period,hj_on_period,
       hj_same_ratio,hj_ring_ratio,create_time,report_time)
       values
-      (#{copartnerAreaId,jdbcType=VARCHAR},#{copartnerAreaName,jdbcType=VARCHAR},#{zsSalesAmount,jdbcType=DECIMAL},#{zsSamePeriod,jdbcType=INTEGER},
-      #{zsOnPeriod,jdbcType=INTEGER},#{zsSameRatio,jdbcType=INTEGER},#{zsRingRatio,jdbcType=INTEGER},
-      #{psSalesAmount,jdbcType=DECIMAL},#{psSamePeriod,dbcType=INTEGER},#{psOnPeriod,jdbcType=INTEGER},#{psSameRatio,jdbcType=INTEGER},
-      #{psRingRatio,jdbcType=INTEGER},
-      #{hjSalesAmount,jdbcType=DECIMAL},#{hjSamePeriod,jdbcType=INTEGER},#{hjOnPeriod,jdbcType=INTEGER},#{hjSameRatio,jdbcType=INTEGER},
-      #{hjRingRatio,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP},#{reportTime,jdbcType=VARCHAR})
+      (#{copartnerAreaId,jdbcType=VARCHAR},#{copartnerAreaName,jdbcType=VARCHAR},#{zsSalesAmount,jdbcType=DECIMAL},#{zsSamePeriod,jdbcType=DECIMAL},
+      #{zsOnPeriod,jdbcType=DECIMAL},#{zsSameRatio,jdbcType=DECIMAL},#{zsRingRatio,jdbcType=DECIMAL},
+      #{psSalesAmount,jdbcType=DECIMAL},#{psSamePeriod,jdbcType=DECIMAL},#{psOnPeriod,jdbcType=DECIMAL},#{psSameRatio,jdbcType=DECIMAL},
+      #{psRingRatio,jdbcType=DECIMAL},
+      #{hjSalesAmount,jdbcType=DECIMAL},#{hjSamePeriod,jdbcType=DECIMAL},#{hjOnPeriod,jdbcType=DECIMAL},#{hjSameRatio,jdbcType=DECIMAL},
+      #{hjRingRatio,jdbcType=DECIMAL},#{createTime,jdbcType=TIMESTAMP},#{reportTime,jdbcType=VARCHAR})
     </insert>
     <delete id="delete" parameterType="com.aiqin.mgs.order.api.domain.FirstReportInfo">
         delete from first_report
