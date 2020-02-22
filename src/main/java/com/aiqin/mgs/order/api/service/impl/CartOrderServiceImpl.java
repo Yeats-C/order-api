@@ -24,6 +24,7 @@ import com.aiqin.mgs.order.api.service.CartOrderService;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
+import com.aiqin.mgs.order.api.util.TestUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -320,9 +321,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                         if (number != null) {
                             item.setAmount(number);
                         }
-                        if (StringUtils.isNotEmpty(activityId)) {
-                            item.setActivityId(activityId);
-                        }
+                        item.setActivityId(activityId);
 
                     } else if (Global.LINECHECKSTATUS_2.equals(lineCheckStatus)) {
                         //全选
@@ -331,7 +330,6 @@ public class CartOrderServiceImpl implements CartOrderService {
                         //取消全选
                         item.setLineCheckStatus(Global.LINECHECKSTATUS_0);
                     } else {
-                        throw new BusinessException("参数缺失");
                     }
                     //更新这一行
                     cartOrderDao.updateCartByCartId(item);
@@ -435,12 +433,15 @@ public class CartOrderServiceImpl implements CartOrderService {
             item.setGiftList(giftList);
 
             //调用接口查询商品可选活动列表
-            ActivityParameterRequest activityParameterRequest = new ActivityParameterRequest();
-            activityParameterRequest.setStoreId(storeId);
-            activityParameterRequest.setSkuCode(item.getSkuCode());
-            activityParameterRequest.setProductBrandCode(item.getProductBrandCode());
-            activityParameterRequest.setProductCategoryCode(item.getProductCategoryCode());
-            List<Activity> activityList = activityService.activityList(activityParameterRequest);
+//            ActivityParameterRequest activityParameterRequest = new ActivityParameterRequest();
+//            activityParameterRequest.setStoreId(storeId);
+//            activityParameterRequest.setSkuCode(item.getSkuCode());
+//            activityParameterRequest.setProductBrandCode(item.getProductBrandCode());
+//            activityParameterRequest.setProductCategoryCode(item.getProductCategoryCode());
+//            List<Activity> activityList = activityService.activityList(activityParameterRequest);
+
+            //TODO 临时调试使用，用完删除
+            List<Activity> activityList = TestUtil.getTestActivityList();
             item.setActivityList(activityList);
 
         }
@@ -543,26 +544,42 @@ public class CartOrderServiceImpl implements CartOrderService {
         orderConfirmResponse.setStoreContactsPhone(storeInfo.getData().getContactsPhone());
         try {
             if (cartOrderInfo != null) {
+                cartOrderInfo.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
                 List<CartOrderInfo> cartOrderInfos = cartOrderDao.selectCartByLineCheckStatus(cartOrderInfo);
                 //封装返回的勾选的商品信息
                 orderConfirmResponse.setCartOrderInfos(cartOrderInfos);
                 orderConfirmResponse.setHaveProductA(0);
 
                 //计算订货金额合计
-                BigDecimal orderTotalPrice = new BigDecimal(0);
+                BigDecimal orderTotalPrice = BigDecimal.ZERO;
+
+                //除去活动优惠之后的金额汇总
+                BigDecimal afterActivityPrice = BigDecimal.ZERO;
+
                 for (CartOrderInfo cartOrderInfo1 : cartOrderInfos) {
                     BigDecimal total = cartOrderInfo1.getPrice().multiply(new BigDecimal(cartOrderInfo1.getAmount()));
                     orderTotalPrice = orderTotalPrice.add(total);
-                    //TODO 判断商品为A类以上商品 此处最好是按照字典表接口比对，防止供应链更改类型code
-                    if(cartOrderInfo1.getProductPropertyCode().equals("1") ||cartOrderInfo1.getProductPropertyCode().equals("6")){//A品与A+品
+
+                    afterActivityPrice = afterActivityPrice.add(cartOrderInfo1.getAccountTotalPrice());
+
+                    //判断商品是否使用可以A品券，汇总活动后总价
+                    ErpProductPropertyTypeEnum productPropertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(cartOrderInfo1.getProductPropertyCode());
+                    if (productPropertyTypeEnum != null && productPropertyTypeEnum.isUseTopCoupon()) {
                         orderConfirmResponse.setHaveProductA(1);
-                        priceProductA=priceProductA.add(cartOrderInfo1.getPrice());
+                        priceProductA = priceProductA.add(cartOrderInfo1.getAccountTotalPrice());
                     }
 
+                    //查询赠品行
+                    List<CartOrderInfo> giftList = cartOrderDao.findByGiftParentCartId(cartOrderInfo1.getCartId());
+                    cartOrderInfo1.setGiftList(giftList);
                 }
                 orderConfirmResponse.setPriceProductA(priceProductA);
                 //封装订货金额合计
                 orderConfirmResponse.setAcountActualprice(orderTotalPrice);
+                //活动之后的金额汇总
+                orderConfirmResponse.setAccountActualActivityPrice(afterActivityPrice);
+
+
                 response.setData(orderConfirmResponse);
             }
         } catch (Exception e) {
@@ -607,16 +624,25 @@ public class CartOrderServiceImpl implements CartOrderService {
             parameterRequest.setActivityId(cart.getActivityId());
             parameterRequest.setStoreId(cart.getStoreId());
             parameterRequest.setSkuCode(cart.getProductId());
-            Boolean aBoolean = activityService.checkProcuct(parameterRequest);
+//            Boolean aBoolean = activityService.checkProcuct(parameterRequest);
+            //TODO 临时调试使用，用完删除
+            Boolean aBoolean = true;
+
             if (aBoolean) {
                 //解析活动
 
                 //获取活动详情
-                HttpResponse<ActivityRequest> activityDetail = activityService.getActivityDetail(cart.getActivityId());
-                if (!RequestReturnUtil.validateHttpResponse(activityDetail)) {
-                    throw new BusinessException("活动异常");
+                ActivityRequest activityRequest = new ActivityRequest();
+                if ("999999".equals(cart.getActivityId()) || "888888".equals(cart.getActivityId())) {
+                    //TODO 临时调试使用，用完删除
+                    activityRequest = TestUtil.getTestActivity(cart.getActivityId());
+                } else {
+                    HttpResponse<ActivityRequest> activityDetail = activityService.getActivityDetail(cart.getActivityId());
+                    if (!RequestReturnUtil.validateHttpResponse(activityDetail)) {
+                        throw new BusinessException("活动异常");
+                    }
+                    activityRequest = activityDetail.getData();
                 }
-                ActivityRequest activityRequest = activityDetail.getData();
                 Activity activity = activityRequest.getActivity();
                 cart.setActivityName(activity.getActivityName());
                 List<ActivityRule> activityRules = activityRequest.getActivityRules();
@@ -771,7 +797,7 @@ public class CartOrderServiceImpl implements CartOrderService {
      */
     private CartOrderInfo createGiftProductLine(CartOrderInfo cart, ActivityGift rule) {
 
-        ProductInfo skuDetail = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, "rule.getSkuCode()");
+        ProductInfo skuDetail = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, rule.getSkuCode());
 
         CartOrderInfo cartOrderInfo = new CartOrderInfo();
         cartOrderInfo.setCartId(IdUtil.uuid());
@@ -783,7 +809,7 @@ public class CartOrderServiceImpl implements CartOrderService {
         cartOrderInfo.setColor(skuDetail.getColorName());//商品颜色
         cartOrderInfo.setProductSize(skuDetail.getModelCode());//商品型号
         cartOrderInfo.setCreateSource(cart.getCreateSource());//插入商品来源
-//        cartOrderInfo.setAmount(rule.getNumbers());//获取商品数量
+        cartOrderInfo.setAmount(rule.getNumbers());//获取商品数量
         cartOrderInfo.setPrice(BigDecimal.ZERO);//商品价格
         cartOrderInfo.setProductType(cart.getProductType());//商品类型 0直送、1配送、2辅采
         cartOrderInfo.setCreateById(cart.getCreateById());//创建者id
@@ -803,6 +829,9 @@ public class CartOrderServiceImpl implements CartOrderService {
         cartOrderInfo.setActivityPrice(BigDecimal.ZERO);
         cartOrderInfo.setAccountTotalPrice(BigDecimal.ZERO);
         cartOrderInfo.setCreateTime(new Date());
+        cartOrderInfo.setActivityId(cart.getActivityId());
+        cartOrderInfo.setActivityName(cart.getActivityName());
+
 
         return cartOrderInfo;
     }
