@@ -155,12 +155,12 @@ public class FirstReportServiceImpl implements FirstReportService {
             firstReportInfo.setZsSalesAmount(aa);
             firstReportInfo.setPsSalesAmount(bb);
             firstReportInfo.setHjSalesAmount(cc);
-            BigDecimal aaa=new BigDecimal(1);
-            BigDecimal bbb=new BigDecimal(1);
-            BigDecimal ccc=new BigDecimal(1);
-            BigDecimal ddd=new BigDecimal(1);
-            BigDecimal eee=new BigDecimal(1);
-            BigDecimal fff=new BigDecimal(1);
+            BigDecimal aaa=new BigDecimal(1.0000);
+            BigDecimal bbb=new BigDecimal(1.0000);
+            BigDecimal ccc=new BigDecimal(1.0000);
+            BigDecimal ddd=new BigDecimal(1.0000);
+            BigDecimal eee=new BigDecimal(1.0000);
+            BigDecimal fff=new BigDecimal(1.0000);
             if(firstReportInfo2!=null&&null!=firstReportInfo2.getPsSamePeriod()){
                 aaa=bb.subtract(firstReportInfo2.getPsSamePeriod()).divide(firstReportInfo2.getPsSamePeriod());
             }
