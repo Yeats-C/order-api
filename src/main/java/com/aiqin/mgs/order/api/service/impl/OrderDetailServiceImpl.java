@@ -886,9 +886,16 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         }
         for (OrderodrInfo orderodrInfo:cartInfo){
 
+            String orderCode = DateUtil.sysDate() + Global.ORIGIN_COME_3 + String.valueOf(Global.ORDERID_CHANNEL_4) + OrderPublic.randomNumberF();
+
+
+            orderodrInfo.getOrderInfo().setOrderCode( orderCode);
             try {
                 orderDao.addOrderInfo(orderodrInfo.getOrderInfo());
                 for (OrderDetailInfo orderDetailInfo:orderodrInfo.getDetailList()){
+                    orderDetailInfo.setOrderCode(orderCode);
+                    orderDetailInfo.setOrderDetailId(OrderPublic.getUUID());
+                    orderDetailInfo.setOrderId(orderodrInfo.getOrderInfo().getOrderId());
                     orderDetailDao.addDetailList(orderDetailInfo);
 
                 }
