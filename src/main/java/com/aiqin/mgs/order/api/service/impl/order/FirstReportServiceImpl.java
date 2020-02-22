@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -101,7 +100,7 @@ public class FirstReportServiceImpl implements FirstReportService {
             //首单货架销售初始金额
             BigDecimal cc=new BigDecimal(0);
             //首单直送销售金额
-            if(!a){
+            if(!a){ //如果是真的
                 firstReportStoreAndOrderRerequest.setOrder_category_code("2");
                 firstReportStoreAndOrderRerequest.setOrder_type_code("1");
                 BigDecimal bigDecimal = firstReportDao.selectOrder(firstReportStoreAndOrderRerequest);
