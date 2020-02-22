@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aiqin.mgs.order.api.dao.FirstReportInfoDao">
+    <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.FirstReportInfo">
+        <result column="copartner_area_name" property="copartnerAreaName" jdbcType="VARCHAR"/>
+        <result column="zs_sales_amount" property="zsSalesAmount" jdbcType="DECIMAL"/>
+        <result column="zs_same_period" property="zsSamePeriod" jdbcType="INTEGER"/>
+        <result column="zs_on_period" property="zsOnPeriod" jdbcType="INTEGER"/>
+        <result column="zs_same_ratio" property="zsSameRatio" jdbcType="INTEGER"/>
+        <result column="zs_ring_ratio" property="zsRingRatio" jdbcType="INTEGER"/>
+        <result column="ps_sales_amount" property="psSalesAmount" jdbcType="DECIMAL"/>
+        <result column="ps_same_period" property="psSamePeriod" jdbcType="INTEGER"/>
+        <result column="ps_on_period" property="psOnPeriod" jdbcType="INTEGER"/>
+        <result column="ps_same_ratio" property="psSameRatio" jdbcType="INTEGER"/>
+        <result column="ps_ring_ratio" property="psRingRatio" jdbcType="INTEGER"/>
+        <result column="hj_sales_amount" property="hjSalesAmount" jdbcType="DECIMAL"/>
+        <result column="hj_same_period" property="hjSamePeriod" jdbcType="INTEGER"/>
+        <result column="hj_on_period" property="hjOnPeriod" jdbcType="INTEGER"/>
+        <result column="hj_same_ratio" property="hjSameRatio" jdbcType="INTEGER"/>
+        <result column="hj_ring_ratio" property="hjRingRatio" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="report_time" property="reportTime" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+         copartner_area_name as copartnerAreaName,zs_sales_amount as zsSalesAmount,zs_same_period as zsSamePeriod,
+         zs_on_period as zsOnPeriod,zs_same_ratio as zsSameRatio,zs_ring_ratio as zsRingRatio,ps_sales_amount as psSalesAmount,
+         ps_same_period as psSamePeriod,ps_on_period as psOnPeriod,ps_same_ratio as psSameRatio,ps_ring_ratio as psRingRatio,
+         hj_sales_amount as hjSalesAmount,hj_same_period as hjSamePeriod,hj_on_period as hjOnPeriod,hj_same_ratio as hjSameRatio,
+         hj_ring_ratio as hjRingRatio,create_time as createTime,report_time as reportTime
+    </sql>
+    <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.FirstReportInfo">
+      insert into first_report
+      (copartner_area_name,zs_sales_amount,zs_same_period,zs_on_period,zs_same_ratio,zs_ring_ratio,
+      ps_sales_amount,ps_same_period,ps_on_period,ps_same_ratio,ps_ring_ratio,hj_sales_amount,hj_same_period,hj_on_period,
+      hj_same_ratio,hj_ring_ratio,create_time,report_time)
+      values
+      (#{copartnerAreaName,jdbcType=VARCHAR},#{zsSalesAmount,jdbcType=DECIMAL},#{zsSamePeriod,jdbcType=INTEGER},
+      #{zsOnPeriod,jdbcType=INTEGER},#{zsSameRatio,jdbcType=INTEGER},#{zsRingRatio,jdbcType=INTEGER},
+      #{psSalesAmount,jdbcType=DECIMAL},#{psSamePeriod,dbcType=INTEGER},#{psOnPeriod,jdbcType=INTEGER},#{psSameRatio,jdbcType=INTEGER},
+      #{psRingRatio,jdbcType=INTEGER},
+      #{hjSalesAmount,jdbcType=DECIMAL},#{hjSamePeriod,jdbcType=INTEGER},#{hjOnPeriod,jdbcType=INTEGER},#{hjSameRatio,jdbcType=INTEGER},
+      #{hjRingRatio,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP},#{reportTime,jdbcType=VARCHAR})
+    </insert>
+    <delete id="delete">
+        delete from first_report
+        where report_time = #{reportTime,jdbcType=VARCHAR}
+    </delete>
+    <select id="reportLis" resultType="com.aiqin.mgs.order.api.domain.FirstReportInfo">
+        select
+        <include refid="Base_Column_List"/>
+        from first_report
+        where report_time = #{reportTime,jdbcType=VARCHAR}
+    </select>
+</mapper>

@@ -1,7 +1,7 @@
 package com.aiqin.mgs.order.api.dao;
 
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.FirstReportStoreAndOrderRerequest;
-import com.aiqin.mgs.order.api.domain.response.FirstReportOrderResponse;
 import com.aiqin.mgs.order.api.domain.response.FirstReportResponse;
 import org.apache.ibatis.annotations.Param;
 
@@ -16,4 +16,7 @@ public interface FirstReportDao {
     List<String> QueryStore(@Param("araeId") List<String> araeId);
     //通过门店id集合去查询订单集合
     BigDecimal selectOrder(FirstReportStoreAndOrderRerequest firstReportStoreAndOrderRerequest);
+
+    List<String> QueryStoreByAreaId(@Param("araeId") String araeId);
+    List<ErpOrderInfo> selectOrders(FirstReportStoreAndOrderRerequest firstReportStoreAndOrderRerequest);
 }
