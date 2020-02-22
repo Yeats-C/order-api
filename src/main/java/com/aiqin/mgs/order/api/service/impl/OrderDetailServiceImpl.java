@@ -895,6 +895,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 for (OrderDetailInfo orderDetailInfo:orderodrInfo.getDetailList()){
                     orderDetailInfo.setOrderCode(orderCode);
                     orderDetailInfo.setOrderDetailId(OrderPublic.getUUID());
+                    orderDetailInfo.setOrderId(orderodrInfo.getOrderInfo().getOrderId());
                     orderDetailDao.addDetailList(orderDetailInfo);
 
                 }
