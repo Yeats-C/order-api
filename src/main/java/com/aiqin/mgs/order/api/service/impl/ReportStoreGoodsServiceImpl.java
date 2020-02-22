@@ -9,6 +9,7 @@ import com.aiqin.mgs.order.api.domain.ReportStoreGoods;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsVo;
+import com.aiqin.mgs.order.api.domain.response.report.ReportOrderAndStoreListResponse;
 import com.aiqin.mgs.order.api.domain.response.report.ReportOrderAndStoreResponse;
 import com.aiqin.mgs.order.api.service.ReportStoreGoodsService;
 import com.alibaba.fastjson.JSON;
@@ -60,15 +61,24 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
     }
 
     @Override
-    public PageResData<ReportStoreGoods> getList(PageRequestVO<ReportStoreGoodsVo> searchVo) {
+    public ReportOrderAndStoreListResponse<PageResData<ReportStoreGoods>> getList(PageRequestVO<ReportStoreGoodsVo> searchVo) {
+        ReportOrderAndStoreListResponse res=new ReportOrderAndStoreListResponse();
         PageResData result=new PageResData();
         if(searchVo.getSearchVO()!=null&&StringUtils.isNotBlank(searchVo.getSearchVO().getStoreCode())&&StringUtils.isNotBlank(searchVo.getSearchVO().getCountTime())){
             PageHelper.startPage(searchVo.getPageNo(),searchVo.getPageSize());
             List<ReportStoreGoods> reportStoreGoods = reportStoreGoodsDao.selectList(searchVo.getSearchVO());
+            if(CollectionUtils.isNotEmpty(reportStoreGoods)){
+                ReportStoreGoods reportStoreGoods1= reportStoreGoods.get(0);
+                res.setTotalAmount(reportStoreGoods1.getTotalAmount());
+                res.setTotalChainRatio(reportStoreGoods1.getTotalChainRatio());
+                res.setTotalNum(reportStoreGoods1.getTotalNum());
+                res.setTotalTongRatio(reportStoreGoods1.getTotalTongRatio());
+            }
             result.setTotalCount((int)((Page)reportStoreGoods).getTotal());
             result.setDataList(reportStoreGoods);
+            res.setPageResData(result);
         }
-        return result;
+        return res;
     }
 
     @Override
@@ -119,6 +129,10 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
         //判断门店编码集合是否为空，不为空，遍历查询信息
         if(map!=null && map.size()>0){
             for(Entry<String, String> entry:map.entrySet()){
+                //统计总的销售金额
+                BigDecimal totalAmount=new BigDecimal(0);
+                //统计总的销售数量
+                Long totalNum=0L;
                 String storeCode=entry.getKey();
                 //查询门店下补货品牌、数量（主表）
                 List<ReportStoreGoods> reportStoreGoodsCountResponses = reportStoreGoodsDao.selectProductCount(storeCode);
@@ -152,18 +166,24 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 }
                 //插入门店补货列表统计detail报表
                 reportStoreGoodsDetailDao.insertBatch(reportStoreGoodsDetails);
-                reportStoreGoodsCountResponses=reportStoreGoodsCountResponses.stream().map(detailVo -> {
-                    ReportStoreGoods detail = new ReportStoreGoods();
-                    BeanUtils.copyProperties(detailVo,detail);
-                    String productBrandCode = detail.getBrandId();
+                for(ReportStoreGoods rsg:reportStoreGoodsCountResponses){
+                    String productBrandCode = rsg.getBrandId();
+                    Long num = rsg.getNum();
+                    if(null!=rsg.getNum()){
+                        totalNum=totalNum+num;
+                    }
                     ReportStoreGoodsDetailVo reportStoreGoodsDetailVo=new ReportStoreGoodsDetailVo();
                     reportStoreGoodsDetailVo.setStoreCode(storeCode);
                     reportStoreGoodsDetailVo.setBrandId(productBrandCode);
                     reportStoreGoodsDetailVo.setCountTime(countTime);
                     //各个品牌总金额
                     BigDecimal amount = reportStoreGoodsDetailDao.sumAmountByBrandId(reportStoreGoodsDetailVo);
-                    detail.setAmount(amount);
-                    detail.setCreateTime(new Date());
+                    if(amount==null){
+                        amount=new BigDecimal(0);
+                    }
+                    totalAmount=totalAmount.add(amount);
+                    rsg.setAmount(amount);
+                    rsg.setCreateTime(new Date());
                     rightNow.setTime(time);
                     rightNow.add(Calendar.DAY_OF_MONTH,-1);//因为统计的是前一天的数据，所以日期减1
                     rightNow.add(Calendar.YEAR,-1);//日期减1年
@@ -178,8 +198,8 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                     BigDecimal a=new BigDecimal(100.0000);
                     BigDecimal b=new BigDecimal(100.0000);
                     if(reportStoreGoods!=null&&reportStoreGoods.getNum()>0){
-                        if(null!=detail.getAmount()){
-                            BigDecimal cha=detail.getAmount().subtract(reportStoreGoods.getAmount());
+                        if(null!=rsg.getAmount()){
+                            BigDecimal cha=rsg.getAmount().subtract(reportStoreGoods.getAmount());
                             a=cha.divide(reportStoreGoods.getAmount());
                         }
                     }
@@ -192,17 +212,16 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                     //计算环比
                     reportStoreGoods = reportStoreGoodsDao.selectReportStoreGoods(r);
                     if(reportStoreGoods!=null&&reportStoreGoods.getNum()>0){
-                        if(null!=detail.getNum()){
-                            BigDecimal cha=detail.getAmount().subtract(reportStoreGoods.getAmount());
+                        if(null!=rsg.getNum()){
+                            BigDecimal cha=rsg.getAmount().subtract(reportStoreGoods.getAmount());
                             b=cha.divide(reportStoreGoods.getAmount());
                         }
                     }
-                    detail.setChainRatio(b);
-                    detail.setTongRatio(a);
-                    detail.setCountTime(countTime);
-                    detail.setStoreCode(storeCode);
-                    return detail;
-                }).collect(Collectors.toList());
+                    rsg.setChainRatio(b);
+                    rsg.setTongRatio(a);
+                    rsg.setCountTime(countTime);
+                    rsg.setStoreCode(storeCode);
+                }
                 //根据门店编码、统计时间清空数据
                 ReportStoreGoodsVo vo1=new ReportStoreGoodsVo();
                 BeanUtils.copyProperties(vo,vo1);
@@ -212,6 +231,51 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 }
                 //插入数据
                 reportStoreGoodsDao.insertBatch(reportStoreGoodsCountResponses);
+                //更新总的同比环比
+                ReportStoreGoodsVo vo2=new ReportStoreGoodsVo();
+                rightNow.setTime(time);
+                rightNow.add(Calendar.DAY_OF_MONTH,-1);//因为统计的是前一天的数据，所以日期减1
+                rightNow.add(Calendar.YEAR,-1);//日期减1年
+                Date dt1=rightNow.getTime();
+                String reStr = sdf.format(dt1);
+                vo2.setStoreCode(storeCode);
+                vo2.setCountTime(reStr);
+                //计算总同比
+                List<ReportStoreGoods> reportStoreGoods1 = reportStoreGoodsDao.selectList(vo2);
+                BigDecimal a=new BigDecimal(100.0000);
+                BigDecimal b=new BigDecimal(100.0000);
+                if(CollectionUtils.isNotEmpty(reportStoreGoods1)){
+                    ReportStoreGoods rsg2=reportStoreGoods1.get(0);
+                    if(null!=rsg2.getTotalAmount()){
+                        BigDecimal cha=totalAmount.subtract(rsg2.getTotalAmount());
+                        a=cha.divide(rsg2.getAmount());
+                    }
+                }
+                rightNow.setTime(time);
+                rightNow.add(Calendar.DAY_OF_MONTH,-1);//因为统计的是前一天的数据，所以日期减1
+                rightNow.add(Calendar.MONTH,-1);//日期减1个月
+                Date dt2=rightNow.getTime();
+                String reStr1 = sdf.format(dt2);
+                vo2.setStoreCode(storeCode);
+                vo2.setCountTime(reStr1);
+                //计算总环比
+                List<ReportStoreGoods> reportStoreGoods2 = reportStoreGoodsDao.selectList(vo2);
+                if(CollectionUtils.isNotEmpty(reportStoreGoods2)){
+                    ReportStoreGoods rsg2=reportStoreGoods2.get(0);
+                    if(null!=rsg2.getTotalAmount()){
+                        BigDecimal cha=totalAmount.subtract(rsg2.getTotalAmount());
+                        b=cha.divide(rsg2.getAmount());
+                    }
+                }
+                ReportStoreGoods reportStoreGood=new ReportStoreGoods();
+                reportStoreGood.setStoreCode(storeCode);
+                reportStoreGood.setCountTime(countTime);
+                reportStoreGood.setTotalAmount(totalAmount);
+                reportStoreGood.setTotalNum(totalNum);
+                reportStoreGood.setTotalChainRatio(b);
+                reportStoreGood.setTotalTongRatio(a);
+                //更新总的销售数量、总金额、总的环比和同比
+                reportStoreGoodsDao.updateByStoreCodeAndTime(reportStoreGood);
             }
         }else{
             log.info("校验查询所有门店编码为空");

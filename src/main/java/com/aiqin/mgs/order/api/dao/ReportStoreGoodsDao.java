@@ -33,4 +33,6 @@ public interface ReportStoreGoodsDao {
 
     String selectStoreCodeByOrderCode(@Param("orderStoreCode") String orderStoreCode);
 
+    int updateByStoreCodeAndTime(ReportStoreGoods record);
+
 }

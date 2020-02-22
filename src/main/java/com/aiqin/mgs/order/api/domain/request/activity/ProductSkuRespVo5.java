@@ -69,4 +69,7 @@ public class ProductSkuRespVo5 {
     @ApiModelProperty("门店库存数量")
     private Integer storeStockSkuNum;
 
+    @ApiModelProperty("门店库存数量描述1 有货—— 总部库存大于10 ，2缺货——总库库存为0 ，3 库存紧张 ——总库库存小于等于10")
+    private String storeStockExplain;
+
 }

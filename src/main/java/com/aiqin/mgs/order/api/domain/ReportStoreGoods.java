@@ -61,4 +61,20 @@ public class ReportStoreGoods implements Serializable {
     @JsonProperty("create_time")
     private Date createTime;
 
+    @ApiModelProperty(value = "总销量")
+    @JsonProperty("total_num")
+    private Long totalNum;
+
+    @ApiModelProperty(value = "总额")
+    @JsonProperty("total_amount")
+    private BigDecimal totalAmount;
+
+    @ApiModelProperty(value = "总的同比")
+    @JsonProperty("total_tong_ratio")
+    private BigDecimal totalTongRatio;
+
+    @ApiModelProperty(value = "总的环比")
+    @JsonProperty("total_chain_ratio")
+    private BigDecimal totalChainRatio;
+
 }
