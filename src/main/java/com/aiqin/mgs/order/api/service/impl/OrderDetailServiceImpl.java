@@ -920,7 +920,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
         }
 
-        return HttpResponse.success();
+        return HttpResponse.successGenerics(cartInfo);
     }
 
     @Override
