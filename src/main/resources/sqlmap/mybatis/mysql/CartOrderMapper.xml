@@ -28,15 +28,15 @@
         <result column="spec" jdbcType="VARCHAR" property="spec"/>
         <result column="product_property_code" jdbcType="VARCHAR" property="productPropertyCode"/>
         <result column="product_property_name" jdbcType="VARCHAR" property="productPropertyName"/>
-        <result column="Activity_id" jdbcType="VARCHAR" property="activityId"/>
-        <result column="Activity_price" jdbcType="DECIMAL" property="activityPrice"/>
+        <result column="activity_id" jdbcType="VARCHAR" property="activityId"/>
+        <result column="activity_price" jdbcType="DECIMAL" property="activityPrice"/>
         <result column="account_total_price" jdbcType="DECIMAL" property="accountTotalPrice"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         product_id,cart_id,franchisee_id,store_id,sku_code,spu_id,product_name,amount,logo,price,color,create_time,update_time,product_size,activity_id,
         activity_name,product_type,create_source,product_gift,gift_parent_cart_id,line_check_status,stock_num,zero_removalCoefficient,spec,product_property_code
-        ,product_property_name,Activity_id,Activity_price,account_total_price
+        ,product_property_name,activity_id,activity_price,account_total_price
     </sql>
 
     <!-- 将商品添加添加购物车 -->
@@ -210,7 +210,7 @@
     </select>
 
     <select id="getCartByCartId" resultType="com.aiqin.mgs.order.api.domain.CartOrderInfo"
-            parameterType="java.lang.String">
+            parameterType="java.lang.String" resultMap="CartOrderInfoMapping">
         select
         <include refid="Base_Column_List"/>
         from order_store_cart
@@ -222,8 +222,9 @@
         </where>
     </select>
 
-    <select id="findByGiftParentCartId" resultType="com.aiqin.mgs.order.api.domain.CartOrderInfo"
-            parameterType="java.lang.String">
+    <select id="findByGiftParentCartId" resultType="java.util.List"
+            parameterType="java.lang.String"
+            resultMap="CartOrderInfoMapping">
         select
         <include refid="Base_Column_List"/>
         from order_store_cart

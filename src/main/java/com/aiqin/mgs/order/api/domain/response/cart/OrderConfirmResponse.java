@@ -29,6 +29,10 @@ public class OrderConfirmResponse {
     /**应付金额总和*/
     private BigDecimal acountTotalprice;
 
+    @ApiModelProperty(value = "勾选商品活动价汇总")
+    @JsonProperty("account_actual_activity_price")
+    private BigDecimal accountActualActivityPrice;
+
     /**是否有A类商品 0否  1是*/
     @ApiModelProperty(value = "是否有A类商品 0否  1是")
     @JsonProperty("have_product_A")

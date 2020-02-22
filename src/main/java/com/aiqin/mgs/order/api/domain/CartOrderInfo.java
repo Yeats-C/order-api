@@ -115,7 +115,7 @@ public class CartOrderInfo {
 //    private BigDecimal accountActualPrice;
 //
     /**应付金额总和*/
-    @ApiModelProperty(value = "应付金额总和")
+    @ApiModelProperty(value = "行去掉活动优惠之后的总价")
     @JsonProperty("account_total_price")
     private BigDecimal accountTotalPrice;
 
