@@ -161,7 +161,7 @@
         </if>
 
         <if test="orderStatus!=null ">
-            and a.order_status = #{orderStatus}
+            and o.order_status = #{orderStatus}
         </if>
 
         <if test="beginTime!=null ">
@@ -215,7 +215,7 @@
         </if>
 
         <if test="orderStatus!=null ">
-            and a.order_status = #{orderStatus}
+            and o.order_status = #{orderStatus}
         </if>
 
         <if test="beginTime!=null ">

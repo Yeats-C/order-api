@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aiqin.mgs.order.api.dao.FirstReportDao" >
+
+  <select id="QueryArea" resultType="com.aiqin.mgs.order.api.domain.response.FirstReportResponse">
+        SELECT copartner_area_id,copartner_area_name FROM copartner_area_info
+  </select>
+
+  <select id="QueryStore" resultType="java.lang.String">
+       SELECT store_id FROM copartner_area_store
+        <where>
+           <if test="araeId != null and araeId.size > 0">
+             copartner_area_id in
+             <foreach collection="araeId" item="item" open="(" separator="," close=")">
+                 #{item}
+             </foreach>
+           </if>
+        </where>
+  </select>
+  <select id="selectOrder" resultType="java.math.BigDecimal" parameterType="com.aiqin.mgs.order.api.domain.request.FirstReportStoreAndOrderRerequest">
+    select sum(order_amount) from order_store_info
+    where order_type_code=#{order_type_code} and order_category_code=#{order_category_code} and DATE_FORMAT(create_time,'%Y-%m')=#{countTime}
+    and store_id in
+    <foreach collection="records"  item="item" open="(" separator="," close=")"  >
+      #{item}
+    </foreach>
+  </select>
+</mapper>

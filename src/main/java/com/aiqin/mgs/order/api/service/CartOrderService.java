@@ -29,6 +29,19 @@ public interface CartOrderService {
     HttpResponse selectCartByStoreId(String storeId,Integer productType,String skuId,Integer lineCheckStatus,Integer number);
 
     /**
+     * 更新和查询购物车
+     *
+     * @param storeId         门店id
+     * @param productType     商品类型
+     * @param skuId           sku编码
+     * @param lineCheckStatus 勾选标记
+     * @param number          数量
+     * @param activityId      活动id
+     * @return com.aiqin.ground.util.protocol.http.HttpResponse
+     */
+    HttpResponse queryCartByStoreId(String storeId, Integer productType, String skuId, Integer lineCheckStatus, Integer number, String activityId);
+
+    /**
      * 返回购物车中的所有商品数量
      * @param storeId 门店ID
      * @return
@@ -52,4 +65,9 @@ public interface CartOrderService {
      */
     HttpResponse<List<CartOrderInfo>> displayCartLineCheckProduct(CartOrderInfo cartOrderInfo);
 
+    /**
+     * 解析购物车商品上的活动，并且计算数量或者生成赠品行
+     * @param cartId
+     */
+    void analysisActivityInCart(String cartId);
 }

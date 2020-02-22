@@ -99,18 +99,23 @@ public class CartOrderInfo {
     @JsonProperty("price")
     private BigDecimal price;
 
-    /***商品特价*/
-    @ApiModelProperty(value = "商品特价")
-    @JsonProperty("special_price")
-    private BigDecimal specialPrice;
+    /***活动价*/
+    @ApiModelProperty(value = "活动价")
+    @JsonProperty("activity_price")
+    private BigDecimal activityPrice;
 
-    /**实付金额总和*/
-    @ApiModelProperty(value = "实付金额总和")
-    @JsonProperty("account_actual_price")
-    private BigDecimal accountActualPrice;
+//    /***商品特价*/
+//    @ApiModelProperty(value = "商品特价")
+//    @JsonProperty("special_price")
+//    private BigDecimal specialPrice;
 
+//    /**实付金额总和*/
+//    @ApiModelProperty(value = "实付金额总和")
+//    @JsonProperty("account_actual_price")
+//    private BigDecimal accountActualPrice;
+//
     /**应付金额总和*/
-    @ApiModelProperty(value = "应付金额总和")
+    @ApiModelProperty(value = "行去掉活动优惠之后的总价")
     @JsonProperty("account_total_price")
     private BigDecimal accountTotalPrice;
 
@@ -265,6 +270,13 @@ public class CartOrderInfo {
     @JsonProperty("spec")
     private String spec;
 
+    @ApiModelProperty(value = "本商品待选择活动列表")
+    @JsonProperty("activity_list")
+    private List<Activity> activityList;
+
+    @ApiModelProperty(value = "本商品行附带的赠品行")
+    @JsonProperty("gift_list")
+    private List<CartOrderInfo> giftList;
 
 
 

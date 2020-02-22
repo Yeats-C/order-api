@@ -5,11 +5,14 @@ import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.aiqin.mgs.order.api.domain.dto.ProductDistributorOrderDTO;
-import com.aiqin.mgs.order.api.domain.request.OperateStockVo;
+import com.aiqin.mgs.order.api.domain.request.InventoryDetailRequest;
+import com.aiqin.mgs.order.api.domain.request.activity.ProductSkuRespVo5;
+import com.aiqin.mgs.order.api.domain.request.activity.SpuProductReqVO;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
@@ -52,9 +55,9 @@ public class BridgeProductService {
         return Lists.newArrayList();
     }
 
-    public HttpResponse changeStock(List<OperateStockVo> stockReqVos) {
+    public HttpResponse changeStock(List<InventoryDetailRequest> stockReqVos) {
         StringBuilder sb = new StringBuilder();
-        sb.append(urlProperties.getProductApi()).append("/inventory/update/record");
+        sb.append(urlProperties.getProductApi()).append("/inventory/update/detail");
         HttpClient orderClient =HttpClient.post(sb.toString()).json(stockReqVos);
         return orderClient.action().result(HttpResponse.class);
     }
@@ -121,5 +124,33 @@ public class BridgeProductService {
             return franchiseeResponse;
         }
         throw new GroundRuntimeException("查询门店对应的加盟商信息异常,无法下单");
+    }
+
+    /**
+     * 活动商品信息分页
+     * @param spuProductReqVO
+     * @return
+     */
+    public HttpResponse<PageResData<ProductSkuRespVo5>> getSkuPage(SpuProductReqVO spuProductReqVO){
+        String path = "/search/spu/skuPage";
+        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(spuProductReqVO);
+        HttpResponse<PageResData<ProductSkuRespVo5>> response = httpClient.action().result(new TypeReference<HttpResponse<PageResData>>() {
+        });
+
+        return response;
+    }
+
+    /**
+     * 商品门店可用库存
+     * @param req
+     * @return
+     */
+    public HttpResponse getStoreStockSkuNum(ShoppingCartRequest req){
+        String path = "/store/stock/sku/info";
+        HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path+"?store_id=" + req.getStoreId()+"&sku_code="+req.getProductId());
+        HttpResponse<Integer> response = httpClient.action().result(new TypeReference<HttpResponse<Integer>>() {
+        });
+
+        return response;
     }
 }

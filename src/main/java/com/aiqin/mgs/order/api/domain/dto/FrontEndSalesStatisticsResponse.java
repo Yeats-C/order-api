@@ -40,11 +40,11 @@ public class FrontEndSalesStatisticsResponse {
 
     @JsonProperty("sale_total_count")
     @ApiModelProperty("销售总数")
-    private String saleTotalCount;
+    private Long saleTotalCount;
 
     @JsonProperty("sale_total_amount")
     @ApiModelProperty("销售总额")
-    private String saleTotalAmount;
+    private Long saleTotalAmount;
 
     @JsonProperty("price_unit")
     @ApiModelProperty("价格单位 0：分 1： 元 默认为分")

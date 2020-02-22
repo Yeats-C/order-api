@@ -81,4 +81,7 @@ public class PrestorageOrderLogsInfo {
     @ApiModelProperty(value = "提货时间")
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
+
+    @JsonProperty("store_name")
+    private String storeName;
 }

@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aiqin.mgs.order.api.dao.ReportStoreGoodsDetailDao" >
+  <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="sku_code" property="skuCode" jdbcType="VARCHAR" />
+    <result column="sku_name" property="skuName" jdbcType="VARCHAR" />
+    <result column="store_code" property="storeCode" jdbcType="VARCHAR" />
+    <result column="store_name" property="storeName" jdbcType="VARCHAR" />
+    <result column="brand_id" property="brandId" jdbcType="VARCHAR" />
+    <result column="brand_name" property="brandName" jdbcType="VARCHAR" />
+    <result column="num" property="num" jdbcType="BIGINT" />
+    <result column="amount" property="amount" jdbcType="DECIMAL" />
+    <result column="count_time" property="countTime" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, sku_code, sku_name, store_code, store_name, brand_id, brand_name, num, amount, 
+    count_time, create_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from report_store_goods_detail
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByStoreCodeAndCountTime" parameterType="com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo" >
+    delete from report_store_goods_detail
+    where store_code = #{storeCode,jdbcType=VARCHAR} and count_time=#{countTime,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail" >
+    insert into report_store_goods_detail (id, sku_code, sku_name, 
+      store_code, store_name, brand_id, 
+      brand_name, num, amount, 
+      count_time, create_time)
+    values (#{id,jdbcType=BIGINT}, #{skuCode,jdbcType=VARCHAR}, #{skuName,jdbcType=VARCHAR}, 
+      #{storeCode,jdbcType=VARCHAR}, #{storeName,jdbcType=VARCHAR}, #{brandId,jdbcType=VARCHAR}, 
+      #{brandName,jdbcType=VARCHAR}, #{num,jdbcType=BIGINT}, #{amount,jdbcType=DECIMAL}, 
+      #{countTime,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail" >
+    insert into report_store_goods_detail
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="skuCode != null" >
+        sku_code,
+      </if>
+      <if test="skuName != null" >
+        sku_name,
+      </if>
+      <if test="storeCode != null" >
+        store_code,
+      </if>
+      <if test="storeName != null" >
+        store_name,
+      </if>
+      <if test="brandId != null" >
+        brand_id,
+      </if>
+      <if test="brandName != null" >
+        brand_name,
+      </if>
+      <if test="num != null" >
+        num,
+      </if>
+      <if test="amount != null" >
+        amount,
+      </if>
+      <if test="countTime != null" >
+        count_time,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="skuCode != null" >
+        #{skuCode,jdbcType=VARCHAR},
+      </if>
+      <if test="skuName != null" >
+        #{skuName,jdbcType=VARCHAR},
+      </if>
+      <if test="storeCode != null" >
+        #{storeCode,jdbcType=VARCHAR},
+      </if>
+      <if test="storeName != null" >
+        #{storeName,jdbcType=VARCHAR},
+      </if>
+      <if test="brandId != null" >
+        #{brandId,jdbcType=VARCHAR},
+      </if>
+      <if test="brandName != null" >
+        #{brandName,jdbcType=VARCHAR},
+      </if>
+      <if test="num != null" >
+        #{num,jdbcType=BIGINT},
+      </if>
+      <if test="amount != null" >
+        #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="countTime != null" >
+        #{countTime,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail" >
+    update report_store_goods_detail
+    <set >
+      <if test="skuCode != null" >
+        sku_code = #{skuCode,jdbcType=VARCHAR},
+      </if>
+      <if test="skuName != null" >
+        sku_name = #{skuName,jdbcType=VARCHAR},
+      </if>
+      <if test="storeCode != null" >
+        store_code = #{storeCode,jdbcType=VARCHAR},
+      </if>
+      <if test="storeName != null" >
+        store_name = #{storeName,jdbcType=VARCHAR},
+      </if>
+      <if test="brandId != null" >
+        brand_id = #{brandId,jdbcType=VARCHAR},
+      </if>
+      <if test="brandName != null" >
+        brand_name = #{brandName,jdbcType=VARCHAR},
+      </if>
+      <if test="num != null" >
+        num = #{num,jdbcType=BIGINT},
+      </if>
+      <if test="amount != null" >
+        amount = #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="countTime != null" >
+        count_time = #{countTime,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail" >
+    update report_store_goods_detail
+    set sku_code = #{skuCode,jdbcType=VARCHAR},
+      sku_name = #{skuName,jdbcType=VARCHAR},
+      store_code = #{storeCode,jdbcType=VARCHAR},
+      store_name = #{storeName,jdbcType=VARCHAR},
+      brand_id = #{brandId,jdbcType=VARCHAR},
+      brand_name = #{brandName,jdbcType=VARCHAR},
+      num = #{num,jdbcType=BIGINT},
+      amount = #{amount,jdbcType=DECIMAL},
+      count_time = #{countTime,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="selectList" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo" >
+    select
+    <include refid="Base_Column_List" />
+    from report_store_goods_detail
+    <where>
+      <if test="storeCode != null and storeCode != ''" >
+        and store_code = #{storeCode,jdbcType=VARCHAR}
+      </if>
+      <if test="brandId != null and brandId != ''" >
+        and brand_id = #{brandId,jdbcType=VARCHAR}
+      </if>
+      <if test="countTime != null and countTime != ''" >
+        and count_time = #{countTime,jdbcType=VARCHAR}
+      </if>
+    </where>
+  </select>
+
+  <insert id="insertBatch" parameterType="list">
+    insert into report_store_goods_detail (sku_code, sku_name,
+    store_code, brand_id,brand_name, num, amount,count_time, create_time)
+    values
+    <foreach collection="records" item="item" index="index" separator=",">
+      (
+       #{item.skuCode,jdbcType=VARCHAR}, #{item.skuName,jdbcType=VARCHAR},
+       #{item.storeCode,jdbcType=VARCHAR}, #{item.brandId,jdbcType=VARCHAR},
+       #{item.brandName,jdbcType=VARCHAR}, #{item.num,jdbcType=BIGINT}, #{item.amount,jdbcType=DECIMAL},
+       #{item.countTime,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}
+      )
+    </foreach>
+  </insert>
+
+  <select id="sumAmountByBrandId" resultType="java.math.BigDecimal" parameterType="com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo" >
+    select sum(amount) from report_store_goods_detail
+	WHERE store_code=#{storeCode,jdbcType=VARCHAR} and brand_id=#{brandId,jdbcType=VARCHAR} and count_time= #{countTime,jdbcType=VARCHAR}
+  </select>
+
+</mapper>

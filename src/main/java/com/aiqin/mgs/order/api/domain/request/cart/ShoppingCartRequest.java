@@ -36,5 +36,4 @@ public class ShoppingCartRequest {
     @JsonProperty("product_type")
     private Integer productType;
 
-
 }

@@ -153,40 +153,132 @@
                 #{updateByName}, sysdate(), sysdate())
     </insert>
 
-    <select id="getProductSales" resultType="java.math.BigDecimal">
+    <select id="getProductSales" resultType="java.math.BigDecimal" parameterType="com.aiqin.mgs.order.api.domain.Activity">
         SELECT
             SUM( total_product_amount ) AS productSales
         FROM
             order_store_detail
         WHERE
             is_activity =1
+        <if test="activityId != '' and activityId != null">
+            and activity_id = #{activityId}
+        </if>
     </select>
     <select id="totalCount" resultType="java.lang.Integer">
 
         select
         count(1)
-        from order_store_detail
-        where 1 = 1
+        FROM
+        order_store_detail d
+        LEFT JOIN order_store_info o ON d.order_store_code = o.order_store_code
+        WHERE
+        1 = 1
         <if test=" id != null and id != '' ">
-            and id = #{id}
+            and d.id = #{id}
         </if>
         <if test=" orderInfoDetailId != null and orderInfoDetailId != '' ">
-            and order_info_detail_id = #{orderInfoDetailId}
+            and d.order_info_detail_id = #{orderInfoDetailId}
         </if>
         <if test=" orderStoreId != null and orderStoreId != '' ">
-            and order_store_id = #{orderStoreId}
+            and d.order_store_id = #{orderStoreId}
         </if>
         <if test=" orderStoreCode != null and orderStoreCode != '' ">
-            and order_store_code = #{orderStoreCode}
+            and d.order_store_code = #{orderStoreCode}
         </if>
         <if test=" lineCode != null and lineCode != '' ">
-            and line_code = #{lineCode}
+            and d.line_code = #{lineCode}
         </if>
         <if test=" useStatus != null and useStatus != '' or useStatus == 0 ">
-            and use_status = #{useStatus}
+            and d.use_status = #{useStatus}
         </if>
         <if test=" isActivity != null">
-            and is_activity = #{isActivity}
+            and d.is_activity = #{isActivity}
+        </if>
+    </select>
+    <select id="getActivityItem" resultType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem">
+        SELECT
+        d.id AS id,
+        d.order_info_detail_id AS orderInfoDetailId,
+        d.order_store_id AS orderStoreId,
+        d.order_store_code AS orderStoreCode,
+        d.spu_code AS spuCode,
+        d.spu_name AS spuName,
+        d.sku_code AS skuCode,
+        d.sku_name AS skuName,
+        d.bar_code AS barCode,
+        d.product_property_code AS productPropertyCode,
+        d.product_property_name AS productPropertyName,
+        d.supplier_code AS supplierCode,
+        d.supplier_name AS supplierName,
+        d.picture_url AS pictureUrl,
+        d.product_spec AS productSpec,
+        d.color_code AS colorCode,
+        d.color_name AS colorName,
+        d.model_code AS modelCode,
+        d.unit_code AS unitCode,
+        d.unit_name AS unitName,
+        d.zero_disassembly_coefficient AS zeroDisassemblyCoefficient,
+        d.product_type AS productType,
+        d.product_count AS productCount,
+        d.product_amount AS productAmount,
+        d.purchase_amount AS purchaseAmount,
+        d.total_product_amount AS totalProductAmount,
+        d.actual_total_product_amount AS actualTotalProductAmount,
+        d.total_preferential_amount AS totalPreferentialAmount,
+        d.preferential_amount AS preferentialAmount,
+        d.total_acivity_amount AS totalAcivityAmount,
+        d.actual_inbound_count AS actualInboundCount,
+        d.actual_product_count AS actualProductCount,
+        d.return_product_count AS returnProductCount,
+        d.tax_rate AS taxRate,
+        d.activity_code AS activityCode,
+        d.line_code AS lineCode,
+        d.gift_line_code AS giftLineCode,
+        d.company_code AS companyCode,
+        d.company_name AS companyName,
+        d.sign_difference_reason AS signDifferenceReason,
+        d.use_status AS useStatus,
+        d.box_gross_weight AS boxGrossWeight,
+        d.box_volume AS boxVolume,
+        d.create_by_id AS createById,
+        d.create_by_name AS createByName,
+        d.update_by_id AS updateById,
+        d.update_by_name AS updateByName,
+        o.create_time AS createTime,
+        d.update_time AS updateTime,
+        d.preferential_amount AS preferentialAmount,
+        o.order_status as orderStatus,
+        o.store_code as storeCode,
+        o.store_name as storeName
+        FROM
+        order_store_detail d
+        LEFT JOIN order_store_info o ON d.order_store_code = o.order_store_code
+        WHERE
+        1 = 1
+        <if test=" id != null and id != '' ">
+            and d.id = #{id}
+        </if>
+        <if test=" orderInfoDetailId != null and orderInfoDetailId != '' ">
+            and d.order_info_detail_id = #{orderInfoDetailId}
+        </if>
+        <if test=" orderStoreId != null and orderStoreId != '' ">
+            and d.order_store_id = #{orderStoreId}
+        </if>
+        <if test=" orderStoreCode != null and orderStoreCode != '' ">
+            and d.order_store_code = #{orderStoreCode}
+        </if>
+        <if test=" lineCode != null and lineCode != '' ">
+            and d.line_code = #{lineCode}
+        </if>
+        <if test=" useStatus != null and useStatus != '' or useStatus == 0 ">
+            and d.use_status = #{useStatus}
+        </if>
+        <if test=" isActivity != null">
+            and d.is_activity = #{isActivity}
+        </if>
+        order by d.create_time asc
+        <if test="pageSize!=null ">
+            limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
         </if>
     </select>
 
