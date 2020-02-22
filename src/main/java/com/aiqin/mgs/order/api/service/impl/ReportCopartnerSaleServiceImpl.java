@@ -59,6 +59,7 @@ import org.apache.http.client.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -97,23 +98,86 @@ public class ReportCopartnerSaleServiceImpl implements ReportCopartnerSaleServic
 
     @Resource
     private ReportCopartnerSaleDao reportCopartnerSaleDao;
+    
+    @Autowired
+    private CopartnerAreaService copartnerAreaService;
 
 	@Override
 	public HttpResponse qryReportPageList(String reportYear, String reportMonth, Integer pageNo, Integer pageSize) {
 		
 		ReportCopartnerSaleVo vo = new ReportCopartnerSaleVo();
 		try {
+			
+			List<ReportCopartnerSaleInfo> dataList = new ArrayList();
+					
+			//区域权限控制
+			String resourceCode = "ERP012006";
+			List<String> storeIds = getStoreIds(resourceCode);
+			if(CollectionUtils.isEmpty(storeIds)) {
+				return HttpResponse.success(new PageResData(0,dataList));
+			}
+			//门店所属区域
+			List<String> areaIds = copartnerAreaService.qryAreaByStores(storeIds);
+			if(CollectionUtils.isNotEmpty(areaIds)) {
+				vo.setAreaIds(areaIds);
+			}
 			vo.setReportYear(reportYear);
 			vo.setReportMonth(reportMonth);
 			vo.setPageNo(pageNo);
 			vo.setPageSize(pageSize);
-		    List<ReportCopartnerSaleInfo> dataList = reportCopartnerSaleDao.selectMainPageList(vo);
+			vo.setStoreIds(storeIds);
+			dataList = reportCopartnerSaleDao.selectMainPageList(vo);
+			
+			if(CollectionUtils.isNotEmpty(dataList)) {
+				for(int i=0;i<dataList.size();i++) {
+					ReportCopartnerSaleInfo reportCopartnerSaleInfo = new ReportCopartnerSaleInfo();
+					reportCopartnerSaleInfo = dataList.get(i);
+					    //月报区域小计
+					if(reportCopartnerSaleInfo.getReportSubtotalType().equals(2)) {//HUANGZYTODO
+						ReportCopartnerSaleVo reportCopartnerSaleVo = reportCopartnerSaleDao.qryAreaTotal(reportCopartnerSaleInfo.getCopartnerAreaId(),storeIds,reportYear, reportMonth);
+					    BeanUtils.copyProperties(reportCopartnerSaleVo, reportCopartnerSaleInfo);
+					    dataList.set(i, reportCopartnerSaleInfo);
+					}
+					if(reportCopartnerSaleInfo.getReportSubtotalType().equals(3)){
+						//年报月份区域小计
+						ReportCopartnerSaleVo reportCopartnerSaleVo = reportCopartnerSaleDao.qryMonthTotal(storeIds,reportYear,reportCopartnerSaleInfo.getReportMonth());
+					    BeanUtils.copyProperties(reportCopartnerSaleVo, reportCopartnerSaleInfo);
+					    dataList.set(i, reportCopartnerSaleInfo);
+					}
+				}
+			}
+			
 		    int totalCount = reportCopartnerSaleDao.countMainPage(vo);
 
 		    return HttpResponse.success(new PageResData(totalCount,dataList));
 		}catch(Exception e) {
-		    log.error("查询异常:?-请求参数{},{}",vo,e);
+		    log.error("查询异常:区域销售列表-请求参数{},{}",vo,e);
 		    return HttpResponse.failure(MessageId.create(Project.ZERO, 01,"查询出现未知异常,请联系系统管理员."));
+		}
+	}
+
+	
+	/**
+	 * 获取权限
+	 * @param resourceCode
+	 * @return
+	 */
+	private List<String> getStoreIds(String resourceCode) {
+
+		List<String> storeIds = new ArrayList();
+		
+		//获取登陆人信息
+		AuthToken authToken = AuthUtil.getCurrentAuth();
+//		HttpResponse response = copartnerAreaService.selectStoreByPerson(authToken.getTicketPersonId(),resourceCode); HUANGZYTODO
+		HttpResponse response = copartnerAreaService.selectStoreByPerson("10088",resourceCode);
+		List<PublicAreaStore> list = JsonUtil.fromJson(JsonUtil.toJson(response.getData()),new TypeReference<List<PublicAreaStore>>() {});  
+		if(CollectionUtils.isNotEmpty(list)) {
+			for(PublicAreaStore publicAreaStore : list) {
+				storeIds.add(publicAreaStore.getStoreId());
+			}
+			return storeIds;
+		}else {
+			return null;
 		}
 	}
 
@@ -128,10 +192,10 @@ public class ReportCopartnerSaleServiceImpl implements ReportCopartnerSaleServic
 		
 	}
 
-	@Override
-	public List<ReportCopartnerSaleVo> qryAreaTotal(String year, String month) {
-		return reportCopartnerSaleDao.qryAreaTotal(year,month);
-	}
+//	@Override
+//	public List<ReportCopartnerSaleVo> qryAreaTotal(String year, String month) {
+//		return reportCopartnerSaleDao.qryAreaTotal(year,month);
+//	}
 
 	@Override
 	public void deleteByArea(String copartnerAreaId, String year, String month) {
@@ -139,14 +203,20 @@ public class ReportCopartnerSaleServiceImpl implements ReportCopartnerSaleServic
 		
 	}
 
-	@Override
-	public ReportCopartnerSaleVo qryMonthTotal(String year, String month) {
-		return reportCopartnerSaleDao.qryMonthTotal(year,month);
-	}
+//	@Override
+//	public ReportCopartnerSaleVo qryMonthTotal(String year, String month) {
+//		return reportCopartnerSaleDao.qryMonthTotal(year,month);
+//	}
 
 	@Override
 	public void deleteByMonth(String year, String month) {
 		reportCopartnerSaleDao.deleteByMonth(year,month);
+	}
+
+
+	@Override
+	public List<ReportCopartnerSaleVo> qryAreaInit(String year, String month) {
+		return reportCopartnerSaleDao.qryAreaInit(year,month);
 	}
     
 }

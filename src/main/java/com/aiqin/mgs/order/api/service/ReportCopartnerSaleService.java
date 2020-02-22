@@ -12,12 +12,14 @@ public interface ReportCopartnerSaleService {
 	public void save(ReportCopartnerSaleVo vo);
 
 	void delete(String year, String month);
-
-	List<ReportCopartnerSaleVo> qryAreaTotal(String year, String month);
+	
+	List<ReportCopartnerSaleVo> qryAreaInit(String year, String month);
+	
+//	List<ReportCopartnerSaleVo> qryAreaTotal(String year, String month);
 
 	void deleteByArea(String copartnerAreaId, String year, String month);
 
-	ReportCopartnerSaleVo qryMonthTotal(String year, String month);
+//	ReportCopartnerSaleVo qryMonthTotal(String year, String month);
 
 	void deleteByMonth(String year, String month);
 }

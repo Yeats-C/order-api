@@ -78,4 +78,7 @@ public class ReportCopartnerSaleInfo{
 	@ApiModelProperty(value="服纺销售实际值")
 	@JsonProperty("textile_finish")
 	private Integer textileFinish;
+	
+	@ApiModelProperty(value="小计类型 1:门店 2:经营区域 3:月份")
+	private Integer reportSubtotalType;
 }
