@@ -87,5 +87,18 @@
     WHERE 1=1
     and store_code = #{storeCode,jdbcType=VARCHAR}
     </select>
+    <select id = "qryAreaByStores" resultType="java.lang.String">
+    SELECT 
+      distinct copartner_area_id
+    FROM copartner_area_store a
+    WHERE 1=1
+    <if test="storeIds != null">
+            and store_id in (
+            <foreach collection="storeIds" item="storeId" separator=",">
+                '${storeId}'
+            </foreach>
+            )
+    </if>
+    </select>
 </mapper>
 

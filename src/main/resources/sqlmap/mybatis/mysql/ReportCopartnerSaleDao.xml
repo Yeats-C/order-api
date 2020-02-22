@@ -16,7 +16,8 @@
           key_target AS keyTarget,
           key_finish AS keyFinish,
           textile_target AS textileTarget,
-          textile_finish AS textileFinish
+          textile_finish AS textileFinish,
+          report_subtotal_type as reportSubtotalType
      FROM report_copartner_sale 
      where 1=1
      <if test=" reportYear !=null and reportYear !='' ">
@@ -26,10 +27,40 @@
                 <when test=" reportMonth !=null and reportMonth !='' ">
                     and report_month = #{reportMonth}
                     and report_subtotal_type IN ('1','2')
+                    and (
+                         <if test="storeIds != null">
+                         store_id in (
+                         <foreach collection="storeIds" item="storeId" separator=",">
+                         '${storeId}'
+                         </foreach>
+                         )
+                         </if>
+                         or
+                         <if test="areaIds != null">
+                         copartner_area_id in (
+                         <foreach collection="areaIds" item="copartnerAreaId" separator=",">
+                         '${copartnerAreaId}'
+                         </foreach>
+                         )
+                         </if>
+                    )
                     ORDER BY copartner_area_id DESC ,report_subtotal_type,store_name
                 </when>
                 <otherwise>
                     and report_subtotal_type IN ('1','3')
+                    and (
+                         <if test="storeIds != null">
+                         store_id in (
+                         <foreach collection="storeIds" item="storeId" separator=",">
+                         '${storeId}'
+                         </foreach>
+                         )
+                         </if>
+                         or
+                         (
+                         copartner_area_id is null and store_id is null
+                         )
+                    )
                     ORDER BY report_month ,copartner_area_id DESC, report_subtotal_type,store_name
                 </otherwise>
      </choose>
@@ -42,6 +73,13 @@
      where 1=1
      <if test=" reportYear !=null and reportYear !='' ">
      and report_year = #{reportYear}
+     </if>
+     <if test="storeIds != null">
+            and store_id in (
+            <foreach collection="storeIds" item="storeId" separator=",">
+                '${storeId}'
+            </foreach>
+            )
      </if>
      <choose>
                 <when test=" reportMonth !=null and reportMonth !='' ">
@@ -153,7 +191,14 @@
     AND report_year = #{reportYear}
     AND report_month = #{reportMonth}
     AND report_subtotal_type =1
-    GROUP BY copartner_area_id
+    and copartner_area_id = #{copartnerAreaId}
+    <if test="storeIds != null">
+            and store_id in (
+            <foreach collection="storeIds" item="storeId" separator=",">
+                '${storeId}'
+            </foreach>
+            )
+    </if> 
     </select>
     <select id="qryMonthTotal" resultType="com.aiqin.mgs.order.api.domain.ReportCopartnerSaleVo">
     SELECT
@@ -173,6 +218,28 @@
     AND report_year = #{reportYear}
     AND report_month = #{reportMonth}
     AND report_subtotal_type =1
+    <if test="storeIds != null">
+            and store_id in (
+            <foreach collection="storeIds" item="storeId" separator=",">
+                '${storeId}'
+            </foreach>
+            )
+    </if>
+    </select>
+    
+    <select id="qryAreaInit" resultType="com.aiqin.mgs.order.api.domain.ReportCopartnerSaleVo">
+    SELECT 
+          report_year AS reportYear,
+          report_month AS reportMonth,
+          IFNULL(copartner_area_id,'0000') AS copartnerAreaId,
+          IFNULL(copartner_area_name,'其他') AS copartnerAreaName,
+          '2' as reportSubtotalType
+    FROM  report_copartner_sale
+    WHERE 1=1
+    AND report_year = #{reportYear}
+    AND report_month = #{reportMonth}
+    AND report_subtotal_type =1
+    GROUP BY copartner_area_id
     </select>
 </mapper>
 

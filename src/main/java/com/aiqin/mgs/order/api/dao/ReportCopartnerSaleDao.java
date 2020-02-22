@@ -27,12 +27,14 @@ public interface ReportCopartnerSaleDao {
 
 	void delete(@Valid @Param("reportYear") String reportYear,@Valid @Param("reportMonth") String reportMonth);
 
-	List<ReportCopartnerSaleVo> qryAreaTotal(@Valid @Param("reportYear") String reportYear,@Valid @Param("reportMonth") String reportMonth);
+	ReportCopartnerSaleVo qryAreaTotal(@Valid @Param("copartnerAreaId") String copartnerAreaId,@Valid @Param("storeIds")List<String> storeIds,@Valid @Param("reportYear") String reportYear,@Valid @Param("reportMonth") String reportMonth);
 
 	void deleteByArea(@Valid @Param("copartnerAreaId")String copartnerAreaId,@Valid @Param("reportYear") String reportYear,@Valid @Param("reportMonth") String reportMonth);
 
-	ReportCopartnerSaleVo qryMonthTotal(@Valid @Param("reportYear") String reportYear,@Valid @Param("reportMonth") String reportMonth);
+	ReportCopartnerSaleVo qryMonthTotal(@Valid @Param("storeIds")List<String> storeIds,@Valid @Param("reportYear") String reportYear,@Valid @Param("reportMonth") String reportMonth);
 
 	void deleteByMonth(@Valid @Param("reportYear") String reportYear,@Valid @Param("reportMonth") String reportMonth);
+
+	List<ReportCopartnerSaleVo> qryAreaInit(@Valid @Param("reportYear") String reportYear,@Valid @Param("reportMonth") String reportMonth);
 
 }

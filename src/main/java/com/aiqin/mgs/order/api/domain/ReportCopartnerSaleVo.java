@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @ApiModel("合伙人销售报表")
@@ -89,5 +90,12 @@ public class ReportCopartnerSaleVo extends PagesRequest{
 	@ApiModelProperty(value="小计类型 1:门店 2:经营区域 3:月份")
 	@JsonProperty("report_subtotal_type")
 	private Integer reportSubtotalType;
+	
+	
+	@ApiModelProperty(value="可见门店列表")
+	private List<String> storeIds;
+	
+	@ApiModelProperty(value="可见区域列表")
+	private List<String> areaIds;
 	
 }
