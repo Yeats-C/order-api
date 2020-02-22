@@ -195,8 +195,8 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                     r.setBrandId(productBrandCode);
                     //计算同比
                     ReportStoreGoods reportStoreGoods = reportStoreGoodsDao.selectReportStoreGoods(r);
-                    BigDecimal a=new BigDecimal(100.0000);
-                    BigDecimal b=new BigDecimal(100.0000);
+                    BigDecimal a=new BigDecimal(1.0000);
+                    BigDecimal b=new BigDecimal(1.0000);
                     if(reportStoreGoods!=null&&reportStoreGoods.getNum()>0){
                         if(null!=rsg.getAmount()){
                             BigDecimal cha=rsg.getAmount().subtract(reportStoreGoods.getAmount());
@@ -217,8 +217,8 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                             b=cha.divide(reportStoreGoods.getAmount());
                         }
                     }
-                    rsg.setChainRatio(b);
-                    rsg.setTongRatio(a);
+                    rsg.setChainRatio(b.multiply(new BigDecimal(100)));
+                    rsg.setTongRatio(a.multiply(new BigDecimal(100)));
                     rsg.setCountTime(countTime);
                     rsg.setStoreCode(storeCode);
                 }
@@ -242,8 +242,8 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 vo2.setCountTime(reStr);
                 //计算总同比
                 List<ReportStoreGoods> reportStoreGoods1 = reportStoreGoodsDao.selectList(vo2);
-                BigDecimal a=new BigDecimal(100.0000);
-                BigDecimal b=new BigDecimal(100.0000);
+                BigDecimal a=new BigDecimal(1.0000);
+                BigDecimal b=new BigDecimal(1.0000);
                 if(CollectionUtils.isNotEmpty(reportStoreGoods1)){
                     ReportStoreGoods rsg2=reportStoreGoods1.get(0);
                     if(null!=rsg2.getTotalAmount()){
@@ -272,8 +272,8 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 reportStoreGood.setCountTime(countTime);
                 reportStoreGood.setTotalAmount(totalAmount);
                 reportStoreGood.setTotalNum(totalNum);
-                reportStoreGood.setTotalChainRatio(b);
-                reportStoreGood.setTotalTongRatio(a);
+                reportStoreGood.setTotalChainRatio(b.multiply(new BigDecimal(100)));
+                reportStoreGood.setTotalTongRatio(a.multiply(new BigDecimal(100)));
                 //更新总的销售数量、总金额、总的环比和同比
                 reportStoreGoodsDao.updateByStoreCodeAndTime(reportStoreGood);
             }
