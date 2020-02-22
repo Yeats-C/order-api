@@ -27,19 +27,19 @@ public class FirstReportInfo {
 
     @ApiModelProperty(value = "首单直送同期")
     @JsonProperty("zs_same_period")
-    private int zsSamePeriod;
+    private BigDecimal zsSamePeriod;
 
     @ApiModelProperty(value = "首单直送上期")
     @JsonProperty("zs_on_period")
-    private int zsOnPeriod;
+    private BigDecimal zsOnPeriod;
 
     @ApiModelProperty(value = "首单直送同比")
     @JsonProperty("zs_same_ratio")
-    private int zsSameRatio;
+    private BigDecimal zsSameRatio;
 
     @ApiModelProperty(value = "首单直送环比")
     @JsonProperty("zs_ring_ratio")
-    private int zsRingRatio;
+    private BigDecimal zsRingRatio;
 
     @ApiModelProperty(value = "首单配送销售金额")
     @JsonProperty("ps_sales_amount")
@@ -47,19 +47,19 @@ public class FirstReportInfo {
 
     @ApiModelProperty(value = "首单配送同期")
     @JsonProperty("ps_same_period")
-    private int psSamePeriod;
+    private BigDecimal psSamePeriod;
 
     @ApiModelProperty(value = "首单配送上期")
     @JsonProperty("ps_on_period")
-    private int psOnPeriod;
+    private BigDecimal psOnPeriod;
 
     @ApiModelProperty(value = "首单配送同比")
     @JsonProperty("ps_same_ratio")
-    private int psSameRatio;
+    private BigDecimal psSameRatio;
 
     @ApiModelProperty(value = "首单配送环比")
     @JsonProperty("ps_ring_ratio")
-    private int psRingRatio;
+    private BigDecimal psRingRatio;
 
     @ApiModelProperty(value = "首单货架销售金额")
     @JsonProperty("hj_sales_amount")
@@ -67,19 +67,19 @@ public class FirstReportInfo {
 
     @ApiModelProperty(value = "首单货架同期")
     @JsonProperty("hj_same_period")
-    private int hjSamePeriod;
+    private BigDecimal hjSamePeriod;
 
     @ApiModelProperty(value = "首单货架上期")
     @JsonProperty("hj_on_period")
-    private int hjOnPeriod;
+    private BigDecimal hjOnPeriod;
 
     @ApiModelProperty(value = "首单货架同比")
     @JsonProperty("hj_same_ratio")
-    private int hjSameRatio;
+    private BigDecimal hjSameRatio;
 
     @ApiModelProperty(value = "首单货架环比")
     @JsonProperty("hj_ring_ratio")
-    private int hjRingRatio;
+    private BigDecimal hjRingRatio;
 
     @ApiModelProperty(value = "创建时间")
     @JsonProperty("create_time")

@@ -42,14 +42,22 @@
       #{hjSalesAmount,jdbcType=DECIMAL},#{hjSamePeriod,jdbcType=INTEGER},#{hjOnPeriod,jdbcType=INTEGER},#{hjSameRatio,jdbcType=INTEGER},
       #{hjRingRatio,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP},#{reportTime,jdbcType=VARCHAR})
     </insert>
-    <delete id="delete">
+    <delete id="delete" parameterType="com.aiqin.mgs.order.api.domain.FirstReportInfo">
         delete from first_report
-        where report_time = #{reportTime,jdbcType=VARCHAR}
+        where report_time = #{reportTime,jdbcType=VARCHAR} and copartner_area_id=#{copartnerAreaId}
     </delete>
     <select id="reportLis" resultType="com.aiqin.mgs.order.api.domain.FirstReportInfo">
         select
         <include refid="Base_Column_List"/>
         from first_report
-        where report_time = #{reportTime,jdbcType=VARCHAR}
+        where report_time = #{reportTime,jdbcType=VARCHAR} and copartner_area_id=#{copartnerAreaId}
     </select>
+
+    <select id="selectReportInfo" resultType="com.aiqin.mgs.order.api.domain.FirstReportInfo" parameterType="com.aiqin.mgs.order.api.domain.FirstReportInfo">
+        select
+        <include refid="Base_Column_List"/>
+        from first_report
+        where report_time = #{reportTime} and copartner_area_id=#{copartnerAreaId}
+    </select>
+
 </mapper>
