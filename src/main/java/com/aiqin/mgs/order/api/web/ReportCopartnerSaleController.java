@@ -78,13 +78,13 @@ public class ReportCopartnerSaleController {
     @GetMapping("/qry/list")
     @ApiOperation(value = "合伙人销售报表-分页")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "report_year", value = "年份", dataType = "String", paramType = "query", required = false),
+        @ApiImplicitParam(name = "report_year", value = "年份", dataType = "String", paramType = "query", required = true),
         @ApiImplicitParam(name = "report_month", value = "月份", dataType = "String", paramType = "query", required = false),
         @ApiImplicitParam(name = "page_no", value = "当前页", dataType = "Integer", paramType = "query", required = false),
         @ApiImplicitParam(name = "page_size", value = "每页条数", dataType = "Integer", paramType = "query", required = false)
     })
     public HttpResponse<ReportCopartnerSaleInfo> qryReportPageList(
-            @RequestParam(value = "report_year", required = false) String reportYear,
+            @RequestParam(value = "report_year", required = true) String reportYear,
             @RequestParam(value = "report_month", required = false) String reportMonth,
             @RequestParam(value = "page_no", required = false) Integer pageNo,
             @RequestParam(value = "page_size", required = false) Integer pageSize) {
@@ -98,11 +98,11 @@ public class ReportCopartnerSaleController {
     @GetMapping("/export")
     @ApiOperation(value = "合伙人销售报表-导出")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "report_year", value = "年份", dataType = "String", paramType = "query", required = false),
+        @ApiImplicitParam(name = "report_year", value = "年份", dataType = "String", paramType = "query", required = true),
         @ApiImplicitParam(name = "report_month", value = "月份", dataType = "String", paramType = "query", required = false)
     })
     public HttpResponse qryReportPageList(
-            @RequestParam(value = "report_year", required = false) String reportYear,
+            @RequestParam(value = "report_year", required = true) String reportYear,
             @RequestParam(value = "report_month", required = false) String reportMonth) {
 
     	LOGGER.info("合伙人销售报表-导出请求参数[[reportYear={},reportMonth={}",reportYear,reportMonth);

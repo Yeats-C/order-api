@@ -339,7 +339,12 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 				copartnerAreaStoreDao.deleteById(copartnerAreaId);
 				copartnerAreaRoleDao.deleteById(copartnerAreaId);
 			}
-			copartnerAreaId = IdUtil.uuid();
+			if(StringUtils.isNotBlank(param.getCopartnerAreaDetail().getCopartnerAreaId()) && param.getCopartnerAreaDetail().getCopartnerAreaId().equals("0")) {
+				copartnerAreaId = "0";
+			}else {
+				copartnerAreaId = IdUtil.uuid();
+			}
+			
 			//基本信息
 			if(param.getCopartnerAreaDetail() !=null ) {
 				CopartnerAreaVo vo = new CopartnerAreaVo();
