@@ -133,17 +133,14 @@ public class ActivityServiceImpl implements ActivityService {
         }
         //生成活动id
         String activityId = IdUtil.activityId();
-        //保存活动主表信息start
+
         Activity activity=activityRequest.getActivity();
         activity.setCreateTime(new Date());
         activity.setUpdateTime(new Date());
         activity.setActivityId(activityId);
-        int activityRecord = activityDao.insertActivity(activity);
-        if (activityRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
-            return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
-        }
-        LOGGER.info("保存活动主表信息成功");
-        //保存活动主表信息end
+        activity.setActiveStoreRange(2);
+
+
 
         //保存活动对应门店信息start
         List<ActivityStore> activityStoreList = activityRequest.getActivityStores();
@@ -152,6 +149,9 @@ public class ActivityServiceImpl implements ActivityService {
         activityStoreList.clear();
         activityStoreList.addAll(activityStoreSet);
         for (ActivityStore activityStore : activityStoreList) {
+            if("all".equals(activityStore.getStoreId())){
+                activity.setActiveStoreRange(1);
+            }
             activityStore.setActivityId(activityId);
             activityStore.setCreateTime(new Date());
             activityStore.setUpdateTime(new Date());
@@ -162,6 +162,14 @@ public class ActivityServiceImpl implements ActivityService {
         }
         LOGGER.info("保存活动对应门店信息成功");
         //保存活动对应门店信息end
+
+        //保存活动主表信息start
+        int activityRecord = activityDao.insertActivity(activity);
+        if (activityRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+            return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
+        }
+        LOGGER.info("保存活动主表信息成功");
+        //保存活动主表信息end
 
         //保存活动对应商品信息start
         List<ActivityProduct> activityProductList = activityRequest.getActivityProducts();
@@ -336,16 +344,11 @@ public class ActivityServiceImpl implements ActivityService {
                     ||null==activityRequest.getActivityRules()){
                 return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
             }
-            //保存活动主表信息start
+
             Activity activity=activityRequest.getActivity();
             activity.setUpdateTime(new Date());
-            int activityRecord = activityDao.updateActivity(activity);
-            if (activityRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
-                LOGGER.error("更新活动主表信息失败");
-                return HttpResponse.failure(ResultCode.UPDATE_ACTIVITY_INFO_EXCEPTION);
-            }
-            LOGGER.info("更新活动主表信息成功");
-            //保存活动主表信息end
+            activity.setActiveStoreRange(2);
+
 
             //保存活动对应门店信息start
             activityStoreDao.deleteStoreByActivityId(activity.getActivityId());
@@ -355,6 +358,9 @@ public class ActivityServiceImpl implements ActivityService {
             activityStoreList.clear();
             activityStoreList.addAll(activityStoreSet);
             for (ActivityStore activityStore : activityStoreList) {
+                if("all".equals(activityStore.getStoreId())){
+                    activity.setActiveStoreRange(1);
+                }
                 activityStore.setActivityId(activity.getActivityId());
                 activityStore.setCreateTime(new Date());
                 activityStore.setUpdateTime(new Date());
@@ -366,6 +372,15 @@ public class ActivityServiceImpl implements ActivityService {
             }
             LOGGER.info("保存活动对应门店信息成功");
             //保存活动对应门店信息end
+
+            //保存活动主表信息start
+            int activityRecord = activityDao.updateActivity(activity);
+            if (activityRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+                LOGGER.error("更新活动主表信息失败");
+                return HttpResponse.failure(ResultCode.UPDATE_ACTIVITY_INFO_EXCEPTION);
+            }
+            LOGGER.info("更新活动主表信息成功");
+            //保存活动主表信息end
 
             //保存活动对应商品信息start
             activityProductDao.deleteProductByActivityId(activity.getActivityId());

@@ -83,4 +83,9 @@ public class Activity extends PagesRequest implements Serializable {
     @ApiModelProperty(value = "更新时间")
     @JsonProperty("update_time")
     private Date updateTime;
+
+    /***1全部 2部分*/
+    @ApiModelProperty(value = "活动门店范围 1全部 2部分")
+    @JsonProperty("active_store_range")
+    private Integer activeStoreRange;
 }

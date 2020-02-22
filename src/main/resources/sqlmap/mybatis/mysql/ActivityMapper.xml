@@ -16,18 +16,19 @@
         <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="active_store_range" jdbcType="INTEGER" property="activeStoreRange"/>
     </resultMap>
 
     <sql id="Base_Column_List">
        activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization,activity_brief
-       ,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time
+       ,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time,active_store_range
     </sql>
 
 
     <select id="activityList" resultType="java.util.List" resultMap="ActivityMapping"
             parameterType="com.aiqin.mgs.order.api.domain.Activity">
         select activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization
-        ,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time
+        ,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time,active_store_range
         from activity
         <where>
             1=1
@@ -67,6 +68,9 @@
             <if test="updateTime!= null">
                 and update_time = #{updateTime}
             </if>
+            <if test="activeStoreRange!= null">
+                and active_store_range = #{activeStoreRange}
+            </if>
             <if test="pageSize!=null ">
                 limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
             </if>
@@ -76,7 +80,7 @@
     <select id="getActivityInformation" resultType="com.aiqin.mgs.order.api.domain.Activity"
             parameterType="com.aiqin.mgs.order.api.domain.Activity">
         select activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization
-        ,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time
+        ,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time,active_store_range
         from activity
         <where>
             1=1
@@ -89,10 +93,10 @@
     <insert id="insertActivity" parameterType="com.aiqin.mgs.order.api.domain.Activity">
         insert into activity
 			(activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization
-			,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time)
+			,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time,active_store_range)
 		values
 		    (#{activityId},#{activityName},#{activityType},0,#{beginTime},#{finishTime},#{publishingOrganization}
-		    ,#{activityBrief},#{activityPicPc},#{activityPicApp},#{createBy},#{updateBy},#{createTime},#{updateTime})
+		    ,#{activityBrief},#{activityPicPc},#{activityPicApp},#{createBy},#{updateBy},#{createTime},#{updateTime},#{activeStoreRange})
 	</insert>
 
     <!--编辑活动主表-->
@@ -131,6 +135,9 @@
             </if>
             <if test="updateBy != null">
                 update_by = #{updateBy,jdbcType=VARCHAR},
+            </if>
+            <if test="activeStoreRange != null">
+                active_store_range = #{activeStoreRange,jdbcType=BIT},
             </if>
             update_time = now()
         </set>
@@ -171,6 +178,9 @@
             <if test="updateTime!= null">
                 and update_time = #{updateTime}
             </if>
+            <if test="activeStoreRange!= null">
+                and active_store_range = #{activeStoreRange}
+            </if>
         </where>
     </select>
 
@@ -183,7 +193,7 @@
         activity a
         JOIN activity_store s ON a.activity_id = s.activity_id
         where   1=1
-        and s.store_id = #{storeId}
+        and s.store_id = #{storeId} or s.storeId = 'all'
         AND a.begin_time &lt; now()
         and a.finish_time &gt; NOW()
         and a.activity_status=0
@@ -204,14 +214,15 @@
         a.create_by,
         a.update_by,
         a.create_time,
-        a.update_time
+        a.update_time,
+        a.active_store_range
         FROM
         activity a
         left JOIN activity_store s ON a.activity_id = s.activity_id
         LEFT JOIN activity_product p ON a.activity_id = p.activity_id
         WHERE
         1 = 1
-        AND s.store_id =  #{storeId}
+        AND s.store_id =  #{storeId} or s.storeId = 'all'
         <if test="productId!= null">
             and p.sku_code =  #{productId}
         </if>
