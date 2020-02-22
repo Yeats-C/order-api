@@ -40,8 +40,14 @@
             <if test="activityType!= null">
                 and activity_type = #{activityType}
             </if>
-            <if test="activityStatus!= null">
-                and activity_status = #{activityStatus}
+            <if test="activityStatus!= null and activityStatus==3">
+                and finish_time &lt; now() or activity_status=1
+            </if>
+            <if test="activityStatus!= null and activityStatus==2">
+                and begin_time &lt;= now() and finish_time &gt;= now() and activity_status=0
+            </if>
+            <if test="activityStatus!= null and activityStatus==3">
+                and begin_time &gt; now() and activity_status=0
             </if>
             <if test="beginTime!= null">
                 and begin_time &gt;= #{beginTime}
