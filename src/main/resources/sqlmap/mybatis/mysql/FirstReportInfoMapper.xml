@@ -52,7 +52,7 @@
         select
         <include refid="Base_Column_List"/>
         from first_report
-        where report_time = #{reportTime,jdbcType=VARCHAR} and copartner_area_id=#{copartnerAreaId}
+        where report_time = #{reportTime,jdbcType=VARCHAR}
     </select>
 
     <select id="selectReportInfo" resultType="com.aiqin.mgs.order.api.domain.FirstReportInfo" parameterType="com.aiqin.mgs.order.api.domain.FirstReportInfo">

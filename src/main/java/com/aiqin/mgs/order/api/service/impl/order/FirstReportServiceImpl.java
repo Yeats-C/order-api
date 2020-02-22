@@ -11,6 +11,7 @@ import com.aiqin.mgs.order.api.domain.response.FirstReportResponse;
 import com.aiqin.mgs.order.api.service.FirstReportService;
 import com.aiqin.mgs.order.api.util.ResultModel;
 import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -228,6 +229,7 @@ public class FirstReportServiceImpl implements FirstReportService {
         if (reportTime == null) {
             return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
         }
+        PageHelper.startPage(1,10);
         List<FirstReportInfo> firstReportInfos = firstReportInfoDao.reportLis(reportTime);
         log.info("查询首单报表表格数据，返回结果 : " + firstReportInfos);
         if (firstReportInfos == null) {
