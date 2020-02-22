@@ -339,7 +339,12 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 				copartnerAreaStoreDao.deleteById(copartnerAreaId);
 				copartnerAreaRoleDao.deleteById(copartnerAreaId);
 			}
-			copartnerAreaId = IdUtil.uuid();
+			if(StringUtils.isNotBlank(param.getCopartnerAreaDetail().getCopartnerAreaId()) && param.getCopartnerAreaDetail().getCopartnerAreaId().equals("0")) {
+				copartnerAreaId = "0";
+			}else {
+				copartnerAreaId = IdUtil.uuid();
+			}
+			
 			//基本信息
 			if(param.getCopartnerAreaDetail() !=null ) {
 				CopartnerAreaVo vo = new CopartnerAreaVo();
@@ -469,6 +474,10 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 	@Override
 	public HttpResponse selectStoreByPerson(String personId,String resourceCode) {
 		List<PublicAreaStore> dataList = new ArrayList();
+		
+		if(StringUtils.isBlank(personId) || StringUtils.isBlank(resourceCode)) {
+			return HttpResponse.success(dataList);
+		}
 		try {
 			//查询人员+菜单编码查询总部本公司权限
 			CopartnerAreaRoleVo roleVo = new CopartnerAreaRoleVo();
@@ -600,6 +609,12 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 	@Override
 	public CopartnerAreaUp qryInfo(String storeCode) {
 		return copartnerAreaStoreDao.qryInfo(storeCode);
+	}
+
+
+	@Override
+	public List<String> qryAreaByStores(List<String> storeIds) {
+		return copartnerAreaStoreDao.qryAreaByStores(storeIds);
 	}
 }
 

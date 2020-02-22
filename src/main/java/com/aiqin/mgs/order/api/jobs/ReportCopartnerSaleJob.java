@@ -62,7 +62,6 @@ public class ReportCopartnerSaleJob {
 					ReportCopartnerSaleVo vo = new ReportCopartnerSaleVo();
 					try {
 						BeanUtils.copyProperties(vo, orderMonthCalculateInfo);
-//						String[] yearMonth =  orderMonthCalculateInfo.getCalculateMonth().split("-"); //YYYY-MM
 						vo.setReportYear(year);
 						vo.setReportMonth(month);
 						vo.setReportSubtotalType(1); //门店
@@ -82,8 +81,8 @@ public class ReportCopartnerSaleJob {
 					}
 				}
 				
-				//区域汇总
-				List<ReportCopartnerSaleVo> areaList = reportCopartnerSaleService.qryAreaTotal(year,month);
+				//添加区域数据,汇总入库调整为实时查询
+				List<ReportCopartnerSaleVo> areaList = reportCopartnerSaleService.qryAreaInit(year,month);
 				if(CollectionUtils.isNotEmpty(areaList)) {
 					for(ReportCopartnerSaleVo vo : areaList) {
 						//先删后增
@@ -94,9 +93,10 @@ public class ReportCopartnerSaleJob {
 					}
 				}
 				
-				//月份汇总
+				//添加月份数据,汇总入库调整为实时查询
 				//先删后增
-				ReportCopartnerSaleVo monthVo = reportCopartnerSaleService.qryMonthTotal(year,month);
+				ReportCopartnerSaleVo monthVo = new ReportCopartnerSaleVo();
+//				reportCopartnerSaleService.qryMonthTotal(year,month);
 //				reportCopartnerSaleService.deleteByMonth(year,month);
 				monthVo.setReportSubtotalType(3); //HUANGZYTODO
 				reportCopartnerSaleService.save(monthVo);

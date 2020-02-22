@@ -57,4 +57,6 @@ public interface CopartnerAreaStoreDao {
 	int countStoreByStoreCode(@Valid @Param("storeCode") String storeCode);
 	
 	CopartnerAreaUp qryInfo(@Valid @Param("storeCode") String storeCode);
+
+	List<String> qryAreaByStores(@Valid @Param("storeIds")List<String> storeIds);
 }
