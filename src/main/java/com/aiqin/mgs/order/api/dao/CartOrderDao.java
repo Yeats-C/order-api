@@ -74,6 +74,17 @@ public interface CartOrderDao {
      */
     Integer updateCartByCartId(CartOrderInfo cart);
 
+    /**
+     * 根据属性精确查询
+     *
+     * @param cartOrderInfo
+     * @return java.util.List<com.aiqin.mgs.order.api.domain.CartOrderInfo>
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2020/2/20 15:33
+     */
+    List<CartOrderInfo> selectByProperty(CartOrderInfo cartOrderInfo);
+
 }
 
 

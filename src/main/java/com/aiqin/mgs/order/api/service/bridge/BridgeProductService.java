@@ -138,4 +138,18 @@ public class BridgeProductService {
 
         return response;
     }
+
+    /**
+     * 商品门店可用库存
+     * @param req
+     * @return
+     */
+    public HttpResponse getStoreStockSkuNum(ShoppingCartRequest req){
+        String path = "/store/stock/sku/info";
+        HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path+"?store_id=" + req.getStoreId()+"&sku_code="+req.getProductId());
+        HttpResponse<Integer> response = httpClient.action().result(new TypeReference<HttpResponse<Integer>>() {
+        });
+
+        return response;
+    }
 }
