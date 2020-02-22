@@ -160,37 +160,47 @@ public class FirstReportServiceImpl implements FirstReportService {
             BigDecimal ddd=new BigDecimal(1.0000);
             BigDecimal eee=new BigDecimal(1.0000);
             BigDecimal fff=new BigDecimal(1.0000);
+            BigDecimal PsSamePeriod=new BigDecimal(0);
+            BigDecimal PsOnPeriod=new BigDecimal(0);
             if(firstReportInfo2!=null&&null!=firstReportInfo2.getPsSamePeriod()){
                 aaa=bb.subtract(firstReportInfo2.getPsSamePeriod()).divide(firstReportInfo2.getPsSamePeriod());
+                PsSamePeriod=firstReportInfo2.getPsSamePeriod();
             }
             if(firstReportInfo3!=null&&null!=firstReportInfo3.getPsOnPeriod()){
                 ddd=bb.subtract(firstReportInfo3.getPsOnPeriod()).divide(firstReportInfo3.getPsOnPeriod());
+                PsOnPeriod=firstReportInfo3.getPsOnPeriod();
             }
             firstReportInfo.setPsRingRatio(ddd.multiply(new BigDecimal(100)));
             firstReportInfo.setPsSameRatio(aaa.multiply(new BigDecimal(100)));
-            firstReportInfo.setPsOnPeriod(firstReportInfo3.getPsOnPeriod());
-            firstReportInfo.setPsSamePeriod(firstReportInfo2.getPsSamePeriod());
-
+            firstReportInfo.setPsOnPeriod(PsOnPeriod);
+            firstReportInfo.setPsSamePeriod(PsSamePeriod);
+            BigDecimal HjSamePeriod=new BigDecimal(0);
+            BigDecimal HjOnPeriod=new BigDecimal(0);
             if(firstReportInfo2!=null&&null!=firstReportInfo2.getHjSamePeriod()){
                 bbb=cc.subtract(firstReportInfo2.getHjSamePeriod()).divide(firstReportInfo2.getHjSamePeriod());
+                HjSamePeriod=firstReportInfo2.getHjSamePeriod();
             }
             if(firstReportInfo3!=null&&null!=firstReportInfo3.getHjOnPeriod()){
                 eee=bb.subtract(firstReportInfo3.getHjOnPeriod()).divide(firstReportInfo3.getHjOnPeriod());
+                HjOnPeriod=firstReportInfo3.getHjOnPeriod();
             }
             firstReportInfo.setHjSameRatio(bbb.multiply(new BigDecimal(100)));
-            firstReportInfo.setHjOnPeriod(firstReportInfo3.getHjOnPeriod());
-            firstReportInfo.setHjSamePeriod(firstReportInfo2.getHjSamePeriod());
+            firstReportInfo.setHjOnPeriod(HjOnPeriod);
+            firstReportInfo.setHjSamePeriod(HjSamePeriod);
             firstReportInfo.setHjRingRatio(eee.multiply(new BigDecimal(100)));
-
+            BigDecimal ZsSamePeriod=new BigDecimal(0);
+            BigDecimal ZsOnPeriod=new BigDecimal(0);
             if(firstReportInfo2!=null&&null!=firstReportInfo2.getZsSamePeriod()){
                 ccc=aa.subtract(firstReportInfo2.getZsSamePeriod()).divide(firstReportInfo2.getZsSamePeriod());
+                ZsSamePeriod=firstReportInfo2.getZsSamePeriod();
             }
             if(firstReportInfo3!=null&&null!=firstReportInfo3.getZsOnPeriod()){
                 fff=bb.subtract(firstReportInfo3.getZsOnPeriod()).divide(firstReportInfo3.getZsOnPeriod());
+                ZsOnPeriod=firstReportInfo3.getZsOnPeriod();
             }
-            firstReportInfo.setZsOnPeriod(firstReportInfo3.getZsOnPeriod());
+            firstReportInfo.setZsOnPeriod(ZsOnPeriod);
             firstReportInfo.setZsRingRatio(fff.multiply(new BigDecimal(100)));
-            firstReportInfo.setZsSamePeriod(firstReportInfo2.getZsSamePeriod());
+            firstReportInfo.setZsSamePeriod(ZsSamePeriod);
             firstReportInfo.setZsSameRatio(ccc.multiply(new BigDecimal(100)));
             firstReportInfo.setCreateTime(new Date());
             rightNow.setTime(time);
