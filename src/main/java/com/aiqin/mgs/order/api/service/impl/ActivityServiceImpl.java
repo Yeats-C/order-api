@@ -652,9 +652,9 @@ public class ActivityServiceImpl implements ActivityService {
             if(activityScope==1){
                 spuProductReqVO.setIncludeSkuCodes(parameterList);
             }else if(activityScope==2){
-//                spuProductReqVO.setIncludeSkuCodes(parameterList);
+                spuProductReqVO.setCategoryCodeList(parameterList);
             }else if(activityScope==3){
-//                spuProductReqVO.setIncludeSkuCodes(parameterList);
+                spuProductReqVO.setBrandCodeList(parameterList);
             }else if(activityScope==4){
                 spuProductReqVO.setExcludeSkuCodes(parameterList);
             }
