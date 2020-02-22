@@ -2,12 +2,14 @@ package com.aiqin.mgs.order.api.web;
 
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityProduct;
 import com.aiqin.mgs.order.api.domain.ActivitySales;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityParameterRequest;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
+import com.aiqin.mgs.order.api.domain.request.activity.ProductSkuRespVo5;
 import com.aiqin.mgs.order.api.domain.request.activity.SpuProductReqVO;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
@@ -247,7 +249,7 @@ public class ActivityController {
      */
     @PostMapping("/skuPage")
     @ApiOperation("活动商品查询（筛选+分页）")
-    public HttpResponse skuPage(SpuProductReqVO spuProductReqVO){
+    public HttpResponse<PageResData<ProductSkuRespVo5>> skuPage(SpuProductReqVO spuProductReqVO){
         return activitesService.skuPage(spuProductReqVO);
     }
 }
