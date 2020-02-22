@@ -613,9 +613,21 @@ public class ActivityServiceImpl implements ActivityService {
     public HttpResponse<PageResData<ProductSkuRespVo5>> skuPage(SpuProductReqVO spuProductReqVO) {
         LOGGER.info("活动商品查询（筛选+分页）skuPage参数为：{}", spuProductReqVO);
         HttpResponse res = HttpResponse.success();
-        if(null==spuProductReqVO.getActivityId()){
+        if(null==spuProductReqVO.getActivityId() ||null==spuProductReqVO.getStoreId()){
             return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
         }
+        ShoppingCartRequest shoppingCartRequest=new ShoppingCartRequest();
+        shoppingCartRequest.setStoreId(spuProductReqVO.getStoreId());
+        //通过门店id返回门店省市公司信息
+        HttpResponse<StoreInfo> storeInfo = bridgeProductService.getStoreInfo(shoppingCartRequest);
+        if(storeInfo==null||storeInfo.getData()==null){
+            return HttpResponse.failure(ResultCode.NO_HAVE_STORE_ERROR);
+        }
+        spuProductReqVO.setCompanyCode("14");
+        spuProductReqVO.setProvinceCode(storeInfo.getData().getProvinceId());
+        spuProductReqVO.setCityCode(storeInfo.getData().getCityId());
+        //设置查询库房 1销售库  2特卖库
+        spuProductReqVO.setWarehouseTypeCode("1");
         Activity activity=new Activity();
         activity.setActivityId(spuProductReqVO.getActivityId());
         List<ActivityProduct> activityProducts=activityProductDao.activityProductList(activity);
@@ -640,9 +652,9 @@ public class ActivityServiceImpl implements ActivityService {
             if(activityScope==1){
                 spuProductReqVO.setIncludeSkuCodes(parameterList);
             }else if(activityScope==2){
-//                spuProductReqVO.setIncludeSkuCodes(parameterList);
+                spuProductReqVO.setCategoryCodeList(parameterList);
             }else if(activityScope==3){
-//                spuProductReqVO.setIncludeSkuCodes(parameterList);
+                spuProductReqVO.setBrandCodeList(parameterList);
             }else if(activityScope==4){
                 spuProductReqVO.setExcludeSkuCodes(parameterList);
             }
@@ -650,9 +662,6 @@ public class ActivityServiceImpl implements ActivityService {
             ActivityParameterRequest activityParameterRequest=new ActivityParameterRequest();
             activityParameterRequest.setActivityId(spuProductReqVO.getActivityId());
             activityParameterRequest.setStoreId(spuProductReqVO.getStoreId());
-
-            ShoppingCartRequest shoppingCartRequest=new ShoppingCartRequest();
-            shoppingCartRequest.setStoreId(spuProductReqVO.getStoreId());
 
             PageResData<ProductSkuRespVo5> pageResData= (PageResData<ProductSkuRespVo5>) res.getData();
             List<ProductSkuRespVo5> productSkuRespVo=pageResData.getDataList();
