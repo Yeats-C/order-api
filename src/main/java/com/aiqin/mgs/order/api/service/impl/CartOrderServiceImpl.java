@@ -544,6 +544,7 @@ public class CartOrderServiceImpl implements CartOrderService {
         orderConfirmResponse.setStoreContactsPhone(storeInfo.getData().getContactsPhone());
         try {
             if (cartOrderInfo != null) {
+                cartOrderInfo.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
                 List<CartOrderInfo> cartOrderInfos = cartOrderDao.selectCartByLineCheckStatus(cartOrderInfo);
                 //封装返回的勾选的商品信息
                 orderConfirmResponse.setCartOrderInfos(cartOrderInfos);

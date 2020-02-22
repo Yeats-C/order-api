@@ -183,6 +183,9 @@
             <if test="lineCheckStatus != null">
                 and line_check_status = #{lineCheckStatus}
             </if>
+            <if test="productGift != null">
+                and product_gift = #{productGift}
+            </if>
             <if test="productType != null">
                 and product_type = #{productType}
             </if>
