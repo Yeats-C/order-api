@@ -135,6 +135,7 @@ public class FirstReportServiceImpl implements FirstReportService {
             firstReportInfo.setHjSalesAmount(cc);
             firstReportInfo.setCopartnerAreaId(copartnerAreaId);
             firstReportInfo.setCopartnerAreaName(copartnerAreaName);
+
             FirstReportInfo firstReportInfo1=new FirstReportInfo();
             firstReportInfo1.setCopartnerAreaId(copartnerAreaId);
             rightNow.setTime(time);
@@ -143,14 +144,14 @@ public class FirstReportServiceImpl implements FirstReportService {
             Date dt1=rightNow.getTime();
             String reStr = sdf.format(dt1);
             firstReportInfo1.setReportTime(reStr);
-            //查询同比数据
+            //查询同期数据
             FirstReportInfo firstReportInfo2 = firstReportInfoDao.selectReportInfo(firstReportInfo1);
             rightNow.setTime(time);
             rightNow.add(Calendar.MONTH,-1);//日期减1个月
             Date dt2=rightNow.getTime();
             String reStr2 = sdf.format(dt2);
             firstReportInfo1.setReportTime(reStr2);
-            //查询环比数据
+            //查询上期数据
             FirstReportInfo firstReportInfo3 = firstReportInfoDao.selectReportInfo(firstReportInfo1);
             firstReportInfo.setZsSalesAmount(aa);
             firstReportInfo.setPsSalesAmount(bb);
@@ -161,7 +162,9 @@ public class FirstReportServiceImpl implements FirstReportService {
             BigDecimal ddd=new BigDecimal(1.0000);
             BigDecimal eee=new BigDecimal(1.0000);
             BigDecimal fff=new BigDecimal(1.0000);
+            //"首单配送同期
             BigDecimal PsSamePeriod=new BigDecimal(0);
+            //首单配送上期
             BigDecimal PsOnPeriod=new BigDecimal(0);
             if(firstReportInfo2!=null&&null!=firstReportInfo2.getPsSamePeriod()){
                 aaa=bb.subtract(firstReportInfo2.getPsSamePeriod()).divide(firstReportInfo2.getPsSamePeriod());
@@ -171,11 +174,17 @@ public class FirstReportServiceImpl implements FirstReportService {
                 ddd=bb.subtract(firstReportInfo3.getPsOnPeriod()).divide(firstReportInfo3.getPsOnPeriod());
                 PsOnPeriod=firstReportInfo3.getPsOnPeriod();
             }
+            //首单配送环比
             firstReportInfo.setPsRingRatio(ddd.multiply(new BigDecimal(100)));
+            //首单配送同比
             firstReportInfo.setPsSameRatio(aaa.multiply(new BigDecimal(100)));
+            //首单配送上期
             firstReportInfo.setPsOnPeriod(PsOnPeriod);
+            //首单配送同期
             firstReportInfo.setPsSamePeriod(PsSamePeriod);
+            //首单货架同期
             BigDecimal HjSamePeriod=new BigDecimal(0);
+            //首单货架上期
             BigDecimal HjOnPeriod=new BigDecimal(0);
             if(firstReportInfo2!=null&&null!=firstReportInfo2.getHjSamePeriod()){
                 bbb=cc.subtract(firstReportInfo2.getHjSamePeriod()).divide(firstReportInfo2.getHjSamePeriod());
@@ -185,11 +194,17 @@ public class FirstReportServiceImpl implements FirstReportService {
                 eee=bb.subtract(firstReportInfo3.getHjOnPeriod()).divide(firstReportInfo3.getHjOnPeriod());
                 HjOnPeriod=firstReportInfo3.getHjOnPeriod();
             }
+            //首单货架同比
             firstReportInfo.setHjSameRatio(bbb.multiply(new BigDecimal(100)));
+            //首单货架上期
             firstReportInfo.setHjOnPeriod(HjOnPeriod);
+            //首单货架同期
             firstReportInfo.setHjSamePeriod(HjSamePeriod);
+            //首单货架环比
             firstReportInfo.setHjRingRatio(eee.multiply(new BigDecimal(100)));
+            //首单直送同期
             BigDecimal ZsSamePeriod=new BigDecimal(0);
+            //首单直送上期
             BigDecimal ZsOnPeriod=new BigDecimal(0);
             if(firstReportInfo2!=null&&null!=firstReportInfo2.getZsSamePeriod()){
                 ccc=aa.subtract(firstReportInfo2.getZsSamePeriod()).divide(firstReportInfo2.getZsSamePeriod());
@@ -199,11 +214,16 @@ public class FirstReportServiceImpl implements FirstReportService {
                 fff=bb.subtract(firstReportInfo3.getZsOnPeriod()).divide(firstReportInfo3.getZsOnPeriod());
                 ZsOnPeriod=firstReportInfo3.getZsOnPeriod();
             }
+            //首单直送上期
             firstReportInfo.setZsOnPeriod(ZsOnPeriod);
+            //首单直送环比
             firstReportInfo.setZsRingRatio(fff.multiply(new BigDecimal(100)));
+            //首单直送同期
             firstReportInfo.setZsSamePeriod(ZsSamePeriod);
+            //首单直送同比
             firstReportInfo.setZsSameRatio(ccc.multiply(new BigDecimal(100)));
             firstReportInfo.setCreateTime(new Date());
+
             rightNow.setTime(time);
             rightNow.add(Calendar.DAY_OF_MONTH, -1);//因为统计的是前一天的数据，所以日期减1
             Date dt3=rightNow.getTime();
@@ -224,8 +244,11 @@ public class FirstReportServiceImpl implements FirstReportService {
      * @return
      */
     @Override
-    public HttpResponse getLists(String reportTime) {
+    public HttpResponse getLists(String reportTime,Integer pageNo,Integer pageSize) {
         log.info("获取首单报表表格数据入参：{}", reportTime);
+        pageNo = pageNo == null ? 1 : pageNo;
+        pageSize = pageSize == null ? 10 : pageSize;
+        PageHelper.startPage(pageNo, pageSize);
         if (reportTime == null) {
             return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
         }

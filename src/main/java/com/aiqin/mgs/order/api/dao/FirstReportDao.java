@@ -16,7 +16,8 @@ public interface FirstReportDao {
     List<String> QueryStore(@Param("araeId") List<String> araeId);
     //通过门店id集合去查询订单集合
     BigDecimal selectOrder(FirstReportStoreAndOrderRerequest firstReportStoreAndOrderRerequest);
-
+    //区域id获取对应下的门店id
     List<String> QueryStoreByAreaId(@Param("araeId") String araeId);
+    //此方法是为了看门店有没有订单
     List<ErpOrderInfo> selectOrders(FirstReportStoreAndOrderRerequest firstReportStoreAndOrderRerequest);
 }
