@@ -22,7 +22,7 @@ public interface ReportStoreGoodsService {
 
     Boolean update(ReportStoreGoods entity);
 
-    ReportOrderAndStoreListResponse getList(PageRequestVO<ReportStoreGoodsVo> searchVo);
+    ReportOrderAndStoreListResponse<PageResData<ReportStoreGoods>> getList(PageRequestVO<ReportStoreGoodsVo> searchVo);
 
     List<ReportStoreGoodsDetail> getCountDetailList(ReportStoreGoodsDetailVo searchVo);
     //门店补货报表统计---定时任务使用

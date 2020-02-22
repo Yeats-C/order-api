@@ -17,7 +17,7 @@ import java.math.BigDecimal;
  */
 @Data
 @ApiModel("订单门店报表列表返回实体类")
-public class ReportOrderAndStoreListResponse implements Serializable {
+public class ReportOrderAndStoreListResponse<T> implements Serializable {
 
     @ApiModelProperty(value = "总销量")
     @JsonProperty("total_num")
@@ -37,6 +37,6 @@ public class ReportOrderAndStoreListResponse implements Serializable {
 
     @ApiModelProperty(value = "列表数据")
     @JsonProperty("page_res_data")
-    private PageResData pageResData;
+    private T pageResData;
 
 }

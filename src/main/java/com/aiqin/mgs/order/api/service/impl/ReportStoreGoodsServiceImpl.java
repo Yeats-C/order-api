@@ -61,7 +61,7 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
     }
 
     @Override
-    public ReportOrderAndStoreListResponse getList(PageRequestVO<ReportStoreGoodsVo> searchVo) {
+    public ReportOrderAndStoreListResponse<PageResData<ReportStoreGoods>> getList(PageRequestVO<ReportStoreGoodsVo> searchVo) {
         ReportOrderAndStoreListResponse res=new ReportOrderAndStoreListResponse();
         PageResData result=new PageResData();
         if(searchVo.getSearchVO()!=null&&StringUtils.isNotBlank(searchVo.getSearchVO().getStoreCode())&&StringUtils.isNotBlank(searchVo.getSearchVO().getCountTime())){

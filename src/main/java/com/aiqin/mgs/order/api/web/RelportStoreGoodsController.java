@@ -33,7 +33,7 @@ public class RelportStoreGoodsController {
 
     @ApiOperation("门店补货报表列表")
     @PostMapping("/getlist")
-    public HttpResponse<ReportOrderAndStoreListResponse> getlist(@RequestBody PageRequestVO<ReportStoreGoodsVo> searchVo) {
+    public HttpResponse<ReportOrderAndStoreListResponse<PageResData<ReportStoreGoods>>> getlist(@RequestBody PageRequestVO<ReportStoreGoodsVo> searchVo) {
         return new HttpResponse(reportStoreGoodsService.getList(searchVo));
     }
 
