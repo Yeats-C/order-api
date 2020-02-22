@@ -32,6 +32,7 @@ import com.aiqin.mgs.order.api.domain.request.returnorder.AreaReq;
 import com.aiqin.mgs.order.api.domain.response.LatelyResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
 import com.aiqin.mgs.order.api.domain.response.PartnerPayGateRep;
+import com.aiqin.mgs.order.api.domain.response.ReportCopartnerSaleInfo;
 import com.aiqin.mgs.order.api.jobs.ReportCopartnerSaleJob;
 import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.CopartnerAreaService;
@@ -82,7 +83,7 @@ public class ReportCopartnerSaleController {
         @ApiImplicitParam(name = "page_no", value = "当前页", dataType = "Integer", paramType = "query", required = false),
         @ApiImplicitParam(name = "page_size", value = "每页条数", dataType = "Integer", paramType = "query", required = false)
     })
-    public HttpResponse qryReportPageList(
+    public HttpResponse<ReportCopartnerSaleInfo> qryReportPageList(
             @RequestParam(value = "report_year", required = false) String reportYear,
             @RequestParam(value = "report_month", required = false) String reportMonth,
             @RequestParam(value = "page_no", required = false) Integer pageNo,
