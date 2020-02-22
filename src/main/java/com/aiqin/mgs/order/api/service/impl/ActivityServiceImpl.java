@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.service.impl;
 import com.aiqin.ground.util.exception.GroundRuntimeException;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.dao.*;
@@ -13,6 +14,7 @@ import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityParameterRequest;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
+import com.aiqin.mgs.order.api.domain.request.activity.ProductSkuRespVo5;
 import com.aiqin.mgs.order.api.domain.request.activity.SpuProductReqVO;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
@@ -608,7 +610,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public HttpResponse skuPage(SpuProductReqVO spuProductReqVO) {
+    public HttpResponse<PageResData<ProductSkuRespVo5>> skuPage(SpuProductReqVO spuProductReqVO) {
         LOGGER.info("活动商品查询（筛选+分页）skuPage参数为：{}", spuProductReqVO);
         HttpResponse res = HttpResponse.success();
         if(null==spuProductReqVO.getActivityId()){
@@ -621,27 +623,60 @@ public class ActivityServiceImpl implements ActivityService {
             Integer activityScope=activityProducts.get(0).getActivityScope();
             List<String> parameterList=new ArrayList<>();
             for(ActivityProduct product:activityProducts){
-                if(activityScope==1){//按单品设置
+                if(activityScope==1){
+                    //按单品设置
                     parameterList.add(product.getSkuCode());
-                }else if(activityScope==2){//按品类设置
+                }else if(activityScope==2){
+                    //按品类设置
                     parameterList.add(product.getProductCategoryCode());
-                }else if(activityScope==3){//按品牌设置
+                }else if(activityScope==3){
+                    //按品牌设置
                     parameterList.add(product.getProductBrandCode());
-                }else if(activityScope==4){//按单品排除
+                }else if(activityScope==4){
+                    //按单品排除
                     parameterList.add(product.getSkuCode());
                 }
             }
-            if(activityScope==1){//按单品设置
+            if(activityScope==1){
                 spuProductReqVO.setIncludeSkuCodes(parameterList);
-            }else if(activityScope==2){//按品类设置
+            }else if(activityScope==2){
 //                spuProductReqVO.setIncludeSkuCodes(parameterList);
-            }else if(activityScope==3){//按品牌设置
+            }else if(activityScope==3){
 //                spuProductReqVO.setIncludeSkuCodes(parameterList);
-            }else if(activityScope==4){//按单品排除
+            }else if(activityScope==4){
                 spuProductReqVO.setExcludeSkuCodes(parameterList);
             }
             res = bridgeProductService.getSkuPage(spuProductReqVO);
+            ActivityParameterRequest activityParameterRequest=new ActivityParameterRequest();
+            activityParameterRequest.setActivityId(spuProductReqVO.getActivityId());
+            activityParameterRequest.setStoreId(spuProductReqVO.getStoreId());
 
+            ShoppingCartRequest shoppingCartRequest=new ShoppingCartRequest();
+            shoppingCartRequest.setStoreId(spuProductReqVO.getStoreId());
+
+            PageResData<ProductSkuRespVo5> pageResData= (PageResData<ProductSkuRespVo5>) res.getData();
+            List<ProductSkuRespVo5> productSkuRespVo=pageResData.getDataList();
+            for (ProductSkuRespVo5 vo:productSkuRespVo){
+                activityParameterRequest.setSkuCode(vo.getSkuCode());
+                activityParameterRequest.setProductBrandCode(vo.getProductBrandCode());
+                activityParameterRequest.setProductCategoryCode(vo.getProductCategoryCode());
+                vo.setActivityList(activityList(activityParameterRequest));
+
+                shoppingCartRequest.setProductId(vo.getSkuCode());
+                Integer cartNum=getSkuNum(shoppingCartRequest).getData();
+                vo.setCartNum(cartNum);
+
+                Integer storeStockSkuNum=(Integer) bridgeProductService.getStoreStockSkuNum(shoppingCartRequest).getData();
+                vo.setStoreStockSkuNum(storeStockSkuNum);
+
+                if(vo.getSkuStock()>10){
+                    vo.setStoreStockExplain("有货");
+                }else if(vo.getSkuStock()<=0){
+                    vo.setStoreStockExplain("缺货");
+                }else if(vo.getSkuStock()>0 && vo.getSkuStock()<=10){
+                    vo.setStoreStockExplain("库存紧张");
+                }
+            }
         }else{
             return HttpResponse.failure(ResultCode.SELECT_ACTIVITY_INFO_EXCEPTION);
         }
@@ -837,6 +872,7 @@ public class ActivityServiceImpl implements ActivityService {
      * 通过条件查询一个商品有多少个进行中的活动
      * @return
      */
+    @Override
     public List<Activity> activityList(ActivityParameterRequest activityParameterRequest){
         LOGGER.info("通过条件查询一个商品有多少个进行中的活动activityList参数activityParameterRequest为：{}", activityParameterRequest);
         List<Activity> activityList=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode(),null,null);

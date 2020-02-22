@@ -135,4 +135,8 @@ public class SpuProductReqVO extends PagesRequest {
     @ApiModelProperty(value = "活动id")
     @JsonProperty("activity_id")
     private String activityId="";
+
+    @ApiModelProperty(value = "门店id")
+    @JsonProperty("store_id")
+    private String storeId;
 }

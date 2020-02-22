@@ -11,6 +11,7 @@ import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.aiqin.mgs.order.api.domain.dto.ProductDistributorOrderDTO;
 import com.aiqin.mgs.order.api.domain.request.InventoryDetailRequest;
+import com.aiqin.mgs.order.api.domain.request.activity.ProductSkuRespVo5;
 import com.aiqin.mgs.order.api.domain.request.activity.SpuProductReqVO;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
@@ -130,10 +131,24 @@ public class BridgeProductService {
      * @param spuProductReqVO
      * @return
      */
-    public HttpResponse getSkuPage(SpuProductReqVO spuProductReqVO){
+    public HttpResponse<PageResData<ProductSkuRespVo5>> getSkuPage(SpuProductReqVO spuProductReqVO){
         String path = "/search/spu/skuPage";
         HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(spuProductReqVO);
-        HttpResponse<List<CartOrderInfo>> response = httpClient.action().result(new TypeReference<HttpResponse<PageResData>>() {
+        HttpResponse<PageResData<ProductSkuRespVo5>> response = httpClient.action().result(new TypeReference<HttpResponse<PageResData>>() {
+        });
+
+        return response;
+    }
+
+    /**
+     * 商品门店可用库存
+     * @param req
+     * @return
+     */
+    public HttpResponse getStoreStockSkuNum(ShoppingCartRequest req){
+        String path = "/store/stock/sku/info";
+        HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path+"?store_id=" + req.getStoreId()+"&sku_code="+req.getProductId());
+        HttpResponse<Integer> response = httpClient.action().result(new TypeReference<HttpResponse<Integer>>() {
         });
 
         return response;

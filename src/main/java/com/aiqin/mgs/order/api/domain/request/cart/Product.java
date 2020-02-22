@@ -16,4 +16,9 @@ public class Product {
     @ApiModelProperty(value = "sku码")
     @JsonProperty("sku_id")
     private String skuId;
+
+    /***活动id*/
+    @ApiModelProperty(value = "活动id")
+    @JsonProperty("activity_id")
+    private String activityId;
 }

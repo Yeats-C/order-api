@@ -1,10 +1,12 @@
 package com.aiqin.mgs.order.api.domain.request.activity;
 
+import com.aiqin.mgs.order.api.domain.Activity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author knight.xie
@@ -57,5 +59,17 @@ public class ProductSkuRespVo5 {
 
     @ApiModelProperty("封面图")
     private String itroImages;
+
+    @ApiModelProperty("活动List")
+    private List<Activity> activityList;
+
+    @ApiModelProperty("加入购物车数量")
+    private Integer cartNum;
+
+    @ApiModelProperty("门店库存数量")
+    private Integer storeStockSkuNum;
+
+    @ApiModelProperty("门店库存数量描述1 有货—— 总部库存大于10 ，2缺货——总库库存为0 ，3 库存紧张 ——总库库存小于等于10")
+    private String storeStockExplain;
 
 }
