@@ -352,6 +352,18 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 				vo.setCopartnerAreaId(copartnerAreaId);
 				AuthToken auth = AuthUtil.getCurrentAuth();
 				vo.setCreateBy(auth.getTicketPersonId());
+				
+				//原型不足,兼容处理
+				if(copartnerAreaId.equals("0")) {
+					vo.setCopartnerAreaIdUp("");
+					vo.setCopartnerAreaNameUp("");
+					vo.setCopartnerAreaLevel(0);
+				}
+				if(vo.getCopartnerAreaLevel() !=null && vo.getCopartnerAreaLevel().equals(1)) {
+					vo.setCopartnerAreaIdUp("0");
+					vo.setCopartnerAreaNameUp("总部");
+				}
+				
 				copartnerAreaDao.saveCopartnerArea(vo);
 			}
 			
