@@ -269,8 +269,11 @@
         <if test="beginTime!=null ">
             and a.create_time &gt;= #{beginTime}
         </if>
-        <if test="endTime!=null ">
-            and a.create_time &lt;= #{endTime}
+        <if test="beginTime!=null ">
+            and a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="updateTime!=null ">
+            and a.update_time &gt;= #{updateTime}
         </if>
         <if test="originTypeList != null">
             and a.origin_type in (
@@ -302,12 +305,7 @@
         <if test="payType!=null and payType!='' ">
             and a.pay_type =#{payType}
         </if>
-        <if test="orderBy!=null and orderBy!='' ">
-            ORDER BY a.update_time DESC
-        </if>
-        <if test="orderBy==null || orderBy=='' ">
-            ORDER BY a.create_time DESC
-        </if>
+        ORDER BY a.create_time DESC
         <if test="icount!=null ">
             limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
         </if>
