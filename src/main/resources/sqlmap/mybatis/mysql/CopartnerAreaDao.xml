@@ -59,12 +59,8 @@
             copartner_area_company,
             company_person_id,
             company_person_name,
-            <if test=" copartnerAreaIdUp !=null and copartnerAreaIdUp !='' ">
             copartner_area_id_up,
-            </if>
-            <if test=" copartnerAreaNameUp !=null and copartnerAreaNameUp !='' ">
             copartner_area_name_up,
-            </if>
             create_by,
             memo
          )
@@ -77,12 +73,8 @@
             #{copartnerAreaCompany},
             #{companyPersonId},
             #{companyPersonName},
-            <if test=" copartnerAreaIdUp !=null and copartnerAreaIdUp !='' ">
             #{copartnerAreaIdUp},
-            </if>
-            <if test=" copartnerAreaNameUp !=null and copartnerAreaNameUp !='' ">
             #{copartnerAreaNameUp},
-            </if>
             #{createBy},
             #{memo}
          )
