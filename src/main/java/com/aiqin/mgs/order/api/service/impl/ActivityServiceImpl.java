@@ -12,10 +12,7 @@ import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
-import com.aiqin.mgs.order.api.domain.request.activity.ActivityParameterRequest;
-import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
-import com.aiqin.mgs.order.api.domain.request.activity.ProductSkuRespVo5;
-import com.aiqin.mgs.order.api.domain.request.activity.SpuProductReqVO;
+import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
@@ -498,13 +495,26 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public HttpResponse<List<ActivityProduct>> productBrandList(String productBrandName) {
+    public HttpResponse<List<QueryProductBrandRespVO>> productBrandList(String productBrandName, String activityId) {
         LOGGER.info("活动商品品牌列表接口参数productBrandName为:{}", productBrandName);
         HttpResponse response = HttpResponse.success();
         ActivityProduct activityProduct=new ActivityProduct();
-        activityProduct.setProductBrandName(productBrandName);
+        if(StringUtils.isNotEmpty(productBrandName)){
+            activityProduct.setProductBrandName(productBrandName);
+        }
+        if(StringUtils.isNotEmpty(activityId)){
+            activityProduct.setActivityId(activityId);
+        }
         List<ActivityProduct> activityProducts=activityProductDao.productBrandList(activityProduct);
-        response.setData(activityProducts);
+        List<String> brandIds=new ArrayList<>();
+        ActivityBrandCategoryRequest categoryRequest=new ActivityBrandCategoryRequest();
+        if(null!=activityProducts){
+            for (ActivityProduct product:activityProducts){
+                brandIds.add(product.getProductBrandCode());
+            }
+        }
+        categoryRequest.setBrandIds(brandIds);
+        response=bridgeProductService.productBrandList(categoryRequest);
         return response;
     }
 

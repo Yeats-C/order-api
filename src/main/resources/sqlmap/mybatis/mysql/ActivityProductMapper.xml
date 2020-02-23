@@ -95,6 +95,9 @@
         <if test="productBrandName!=null ">
             AND p.product_brand_name LIKE CONCAT('%',#{productBrandName,jdbcType=VARCHAR}, '%')
         </if>
+        <if test="activityId!=null ">
+            AND a.activity_id = #{activityId,jdbcType=VARCHAR}
+        </if>
         GROUP BY
             p.product_brand_code
     </select>
@@ -108,6 +111,9 @@
         activity_product p
         LEFT JOIN activity a ON a.activity_id = p.activity_id
         where 1=1
+        <if test="activityId!=null ">
+            AND a.activity_id = #{activityId,jdbcType=VARCHAR}
+        </if>
         GROUP BY
         p.product_category_code
     </select>

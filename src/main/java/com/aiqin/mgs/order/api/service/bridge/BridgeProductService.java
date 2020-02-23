@@ -159,22 +159,22 @@ public class BridgeProductService {
      * @return
      */
     public HttpResponse productCategoryList(ActivityBrandCategoryRequest req){
-        String path = "/product/category/list";
-        HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path+"?category_status=" + req.getCategoryStatus());
-        HttpResponse<ProductCategoryRespVO> response = httpClient.action().result(new TypeReference<HttpResponse<ProductCategoryRespVO>>() {
+        String path = "/product/category/list/categoryCodes";
+        HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path+"?category_codes=" + req.getCategoryCodes());
+        HttpResponse<List<ProductCategoryRespVO>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ProductCategoryRespVO>>>() {
         });
         return response;
     }
 
     /**
-     * 供应链提供查询品类树接口
+     * 供应链提供查询品牌树接口
      * @param req
      * @return
      */
     public HttpResponse productBrandList(ActivityBrandCategoryRequest req){
         String path = "/product/brand/list";
-        HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path+"?name=" + req.getName());
-        HttpResponse<QueryProductBrandRespVO> response = httpClient.action().result(new TypeReference<HttpResponse<QueryProductBrandRespVO>>() {
+        HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path+"?name=" + req.getName()+"&brand_ids="+req.getBrandIds());
+        HttpResponse<List<QueryProductBrandRespVO>> response = httpClient.action().result(new TypeReference<HttpResponse<List<QueryProductBrandRespVO>>>() {
         });
         return response;
     }

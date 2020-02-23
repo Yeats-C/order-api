@@ -6,10 +6,7 @@ import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityProduct;
 import com.aiqin.mgs.order.api.domain.ActivitySales;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
-import com.aiqin.mgs.order.api.domain.request.activity.ActivityParameterRequest;
-import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
-import com.aiqin.mgs.order.api.domain.request.activity.ProductSkuRespVo5;
-import com.aiqin.mgs.order.api.domain.request.activity.SpuProductReqVO;
+import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 
 import javax.servlet.http.HttpServletResponse;
@@ -104,10 +101,12 @@ public interface ActivityService {
 
     /**
      * 活动商品品牌列表接口
+     *
      * @param productBrandName
+     * @param activityId
      * @return
      */
-    HttpResponse<List<ActivityProduct>> productBrandList(String productBrandName);
+    HttpResponse<List<QueryProductBrandRespVO>> productBrandList(String productBrandName, String activityId);
 
     /**
      * 活动商品品类接口
