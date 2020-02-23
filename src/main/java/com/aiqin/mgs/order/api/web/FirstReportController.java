@@ -4,6 +4,7 @@ package com.aiqin.mgs.order.api.web;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.dao.FirstReportInfoDao;
 import com.aiqin.mgs.order.api.domain.FirstReportInfo;
+import com.aiqin.mgs.order.api.service.CopartnerAreaService;
 import com.aiqin.mgs.order.api.service.FirstReportService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,6 +37,11 @@ public class FirstReportController {
     @Autowired
     private FirstReportInfoDao firstReportInfoDao;
 
+    @Autowired
+    private CopartnerAreaService copartnerAreaService;
+
+
+
     /**
      * 首单报表定时任务
      * @return
@@ -57,9 +63,11 @@ public class FirstReportController {
     @ApiOperation("获取首单报表表格数据")
     @GetMapping("/gitList")
     public HttpResponse<List<FirstReportInfo>> getList(@RequestParam(value = "report_time") String reportTime,
+                                                       @RequestParam(value = "person_id") String personId,
+                                                       @RequestParam(value = "resource_code") String resourceCode,
                                                        @RequestParam(value = "page_no", required = false) Integer pageNo,
                                                        @RequestParam(value = "page_size", required = false) Integer pageSize){
-        return firstReportService.getLists(reportTime,pageNo,pageSize);
+        return firstReportService.getLists(reportTime,pageNo,pageSize, personId,resourceCode);
     }
 
     /**

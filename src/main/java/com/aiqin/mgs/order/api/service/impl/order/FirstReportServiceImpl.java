@@ -8,6 +8,7 @@ import com.aiqin.mgs.order.api.domain.FirstReportInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.FirstReportStoreAndOrderRerequest;
 import com.aiqin.mgs.order.api.domain.response.FirstReportResponse;
+import com.aiqin.mgs.order.api.service.CopartnerAreaService;
 import com.aiqin.mgs.order.api.service.FirstReportService;
 import com.aiqin.mgs.order.api.util.ResultModel;
 import com.github.pagehelper.Page;
@@ -33,6 +34,9 @@ public class FirstReportServiceImpl implements FirstReportService {
 
     @Autowired
     private FirstReportInfoDao firstReportInfoDao;
+
+    @Autowired
+    private CopartnerAreaService copartnerAreaService;
 
     @Override
     @Transactional
@@ -244,8 +248,10 @@ public class FirstReportServiceImpl implements FirstReportService {
      * @return
      */
     @Override
-    public HttpResponse getLists(String reportTime,Integer pageNo,Integer pageSize) {
-        log.info("获取首单报表表格数据入参：{}", reportTime);
+    public HttpResponse getLists(String reportTime,Integer pageNo,Integer pageSize,String personId,String resourceCode) {
+        log.info("获取首单报表表格数据入参：{}{}{}", reportTime,personId,resourceCode);
+        //引用合伙人区域公共接口
+        HttpResponse httpResponse = copartnerAreaService.selectStoreByPerson(personId, resourceCode);
         pageNo = pageNo == null ? 1 : pageNo;
         pageSize = pageSize == null ? 10 : pageSize;
         PageHelper.startPage(pageNo, pageSize);
