@@ -111,6 +111,8 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
             log.info("调用slcs系统,查询所有门店编码为空");
             return;
         }
+//        jsonMap.add("60000681");
+//        jsonMap.add("1147621");
         //根据门店编码批量查询是否在本月下过订单
         List<ReportOrderAndStoreResponse> reportOrderAndStoreResponses = reportStoreGoodsDao.selectOrderByStoreCodes(jsonMap);
         if(CollectionUtils.isEmpty(reportOrderAndStoreResponses)){
@@ -136,7 +138,7 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 String storeCode=entry.getKey();
                 //查询门店下补货品牌、数量（主表）
                 List<ReportStoreGoods> reportStoreGoodsCountResponses = reportStoreGoodsDao.selectProductCount(storeCode);
-                if(CollectionUtils.isEmpty(reportStoreGoodsCountResponses)){//未查询到订单数据
+                if(CollectionUtils.isEmpty(reportStoreGoodsCountResponses)&&null!=reportStoreGoodsCountResponses&&reportStoreGoodsCountResponses.size()>0){//未查询到订单数据
                     log.info("查询"+storeCode+"该门店下补货品牌、数量为空");
                     continue;
                 }
@@ -166,8 +168,12 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 }
                 //插入门店补货列表统计detail报表
                 reportStoreGoodsDetailDao.insertBatch(reportStoreGoodsDetails);
+                log.info("查询"+storeCode+"该门店下补货品牌、数量结果为reportStoreGoodsCountResponses={}",reportStoreGoodsCountResponses);
                 for(ReportStoreGoods rsg:reportStoreGoodsCountResponses){
-                    String productBrandCode = rsg.getBrandId();
+                    String productBrandCode ="";
+                    if(StringUtils.isNotBlank(rsg.getBrandId())){
+                        productBrandCode = rsg.getBrandId();
+                    }
                     Long num = rsg.getNum();
                     if(null!=rsg.getNum()){
                         totalNum=totalNum+num;
@@ -195,8 +201,8 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                     r.setBrandId(productBrandCode);
                     //计算同比
                     ReportStoreGoods reportStoreGoods = reportStoreGoodsDao.selectReportStoreGoods(r);
-                    BigDecimal a=new BigDecimal(100.0000);
-                    BigDecimal b=new BigDecimal(100.0000);
+                    BigDecimal a=new BigDecimal(1.0000);
+                    BigDecimal b=new BigDecimal(1.0000);
                     if(reportStoreGoods!=null&&reportStoreGoods.getNum()>0){
                         if(null!=rsg.getAmount()){
                             BigDecimal cha=rsg.getAmount().subtract(reportStoreGoods.getAmount());
@@ -217,8 +223,8 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                             b=cha.divide(reportStoreGoods.getAmount());
                         }
                     }
-                    rsg.setChainRatio(b);
-                    rsg.setTongRatio(a);
+                    rsg.setChainRatio(b.multiply(new BigDecimal(100)));
+                    rsg.setTongRatio(a.multiply(new BigDecimal(100)));
                     rsg.setCountTime(countTime);
                     rsg.setStoreCode(storeCode);
                 }
@@ -242,8 +248,8 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 vo2.setCountTime(reStr);
                 //计算总同比
                 List<ReportStoreGoods> reportStoreGoods1 = reportStoreGoodsDao.selectList(vo2);
-                BigDecimal a=new BigDecimal(100.0000);
-                BigDecimal b=new BigDecimal(100.0000);
+                BigDecimal a=new BigDecimal(1.0000);
+                BigDecimal b=new BigDecimal(1.0000);
                 if(CollectionUtils.isNotEmpty(reportStoreGoods1)){
                     ReportStoreGoods rsg2=reportStoreGoods1.get(0);
                     if(null!=rsg2.getTotalAmount()){
@@ -272,8 +278,8 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 reportStoreGood.setCountTime(countTime);
                 reportStoreGood.setTotalAmount(totalAmount);
                 reportStoreGood.setTotalNum(totalNum);
-                reportStoreGood.setTotalChainRatio(b);
-                reportStoreGood.setTotalTongRatio(a);
+                reportStoreGood.setTotalChainRatio(b.multiply(new BigDecimal(100)));
+                reportStoreGood.setTotalTongRatio(a.multiply(new BigDecimal(100)));
                 //更新总的销售数量、总金额、总的环比和同比
                 reportStoreGoodsDao.updateByStoreCodeAndTime(reportStoreGood);
             }

@@ -12,10 +12,7 @@ import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
-import com.aiqin.mgs.order.api.domain.request.activity.ActivityParameterRequest;
-import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
-import com.aiqin.mgs.order.api.domain.request.activity.ProductSkuRespVo5;
-import com.aiqin.mgs.order.api.domain.request.activity.SpuProductReqVO;
+import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
@@ -133,17 +130,14 @@ public class ActivityServiceImpl implements ActivityService {
         }
         //生成活动id
         String activityId = IdUtil.activityId();
-        //保存活动主表信息start
+
         Activity activity=activityRequest.getActivity();
         activity.setCreateTime(new Date());
         activity.setUpdateTime(new Date());
         activity.setActivityId(activityId);
-        int activityRecord = activityDao.insertActivity(activity);
-        if (activityRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
-            return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
-        }
-        LOGGER.info("保存活动主表信息成功");
-        //保存活动主表信息end
+        activity.setActiveStoreRange(2);
+
+
 
         //保存活动对应门店信息start
         List<ActivityStore> activityStoreList = activityRequest.getActivityStores();
@@ -152,6 +146,9 @@ public class ActivityServiceImpl implements ActivityService {
         activityStoreList.clear();
         activityStoreList.addAll(activityStoreSet);
         for (ActivityStore activityStore : activityStoreList) {
+            if("all".equals(activityStore.getStoreId())){
+                activity.setActiveStoreRange(1);
+            }
             activityStore.setActivityId(activityId);
             activityStore.setCreateTime(new Date());
             activityStore.setUpdateTime(new Date());
@@ -162,6 +159,14 @@ public class ActivityServiceImpl implements ActivityService {
         }
         LOGGER.info("保存活动对应门店信息成功");
         //保存活动对应门店信息end
+
+        //保存活动主表信息start
+        int activityRecord = activityDao.insertActivity(activity);
+        if (activityRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+            return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
+        }
+        LOGGER.info("保存活动主表信息成功");
+        //保存活动主表信息end
 
         //保存活动对应商品信息start
         List<ActivityProduct> activityProductList = activityRequest.getActivityProducts();
@@ -336,16 +341,11 @@ public class ActivityServiceImpl implements ActivityService {
                     ||null==activityRequest.getActivityRules()){
                 return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
             }
-            //保存活动主表信息start
+
             Activity activity=activityRequest.getActivity();
             activity.setUpdateTime(new Date());
-            int activityRecord = activityDao.updateActivity(activity);
-            if (activityRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
-                LOGGER.error("更新活动主表信息失败");
-                return HttpResponse.failure(ResultCode.UPDATE_ACTIVITY_INFO_EXCEPTION);
-            }
-            LOGGER.info("更新活动主表信息成功");
-            //保存活动主表信息end
+            activity.setActiveStoreRange(2);
+
 
             //保存活动对应门店信息start
             activityStoreDao.deleteStoreByActivityId(activity.getActivityId());
@@ -355,6 +355,9 @@ public class ActivityServiceImpl implements ActivityService {
             activityStoreList.clear();
             activityStoreList.addAll(activityStoreSet);
             for (ActivityStore activityStore : activityStoreList) {
+                if("all".equals(activityStore.getStoreId())){
+                    activity.setActiveStoreRange(1);
+                }
                 activityStore.setActivityId(activity.getActivityId());
                 activityStore.setCreateTime(new Date());
                 activityStore.setUpdateTime(new Date());
@@ -366,6 +369,15 @@ public class ActivityServiceImpl implements ActivityService {
             }
             LOGGER.info("保存活动对应门店信息成功");
             //保存活动对应门店信息end
+
+            //保存活动主表信息start
+            int activityRecord = activityDao.updateActivity(activity);
+            if (activityRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+                LOGGER.error("更新活动主表信息失败");
+                return HttpResponse.failure(ResultCode.UPDATE_ACTIVITY_INFO_EXCEPTION);
+            }
+            LOGGER.info("更新活动主表信息成功");
+            //保存活动主表信息end
 
             //保存活动对应商品信息start
             activityProductDao.deleteProductByActivityId(activity.getActivityId());
@@ -429,10 +441,11 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public HttpResponse<List<ActivityRequest>> effectiveActivityList(String storeId) {
+    public HttpResponse<List<Activity>> effectiveActivityList(String storeId) {
         LOGGER.info("通过门店id爱掌柜的促销活动列表（所有生效活动）effectiveActivityList参数为：{}", storeId);
         HttpResponse response = HttpResponse.success();
         List<Activity> activityList=activityDao.effectiveActivityList(storeId);
+        response.setData(activityList);
         return response;
     }
 
@@ -483,38 +496,47 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public HttpResponse<List<ActivityProduct>> productBrandList(String productBrandName) {
+    public HttpResponse<List<QueryProductBrandRespVO>> productBrandList(String productBrandName, String activityId) {
         LOGGER.info("活动商品品牌列表接口参数productBrandName为:{}", productBrandName);
         HttpResponse response = HttpResponse.success();
         ActivityProduct activityProduct=new ActivityProduct();
-        activityProduct.setProductBrandName(productBrandName);
+        if(StringUtils.isNotEmpty(productBrandName)){
+            activityProduct.setProductBrandName(productBrandName);
+        }
+        if(StringUtils.isNotEmpty(activityId)){
+            activityProduct.setActivityId(activityId);
+        }
         List<ActivityProduct> activityProducts=activityProductDao.productBrandList(activityProduct);
-        response.setData(activityProducts);
+        List<String> brandIds=new ArrayList<>();
+        ActivityBrandCategoryRequest categoryRequest=new ActivityBrandCategoryRequest();
+        if(null!=activityProducts && 0!=activityProducts.size()){
+            for (ActivityProduct product:activityProducts){
+                brandIds.add(product.getProductBrandCode());
+            }
+        }
+        categoryRequest.setBrandIds(brandIds);
+        response=bridgeProductService.productBrandList(categoryRequest);
         return response;
     }
 
     @Override
-    public HttpResponse<List<ActivityProduct>> productCategoryList() {
+    public HttpResponse<List<ProductCategoryRespVO>> productCategoryList(String activityId) {
         LOGGER.info("活动商品品类列表接口开始");
         HttpResponse response = HttpResponse.success();
-        List<ActivityProduct> activityProducts=activityProductDao.productCategoryList();
-        //所有根节点
-        List<ActivityProduct> parentList = new ArrayList<>();
-        //所有子节点
-        List<ActivityProduct> childList = new ArrayList<>();
-        activityProducts.forEach(item->{
-            if ("0".equals(item.getProductCategoryCode())){
-                parentList.add(item);
-            } else {
-                childList.add(item);
-            }
-        });
+        Activity activity=new Activity();
+        activity.setActivityId(activityId);
+        List<ActivityProduct> activityProducts=activityProductDao.productCategoryList(activity);
 
-        parentList.forEach(item->{
-            List<ActivityProduct> resultList = getChildren(String.valueOf(item.getProductCategoryCode()),childList);
-            item.setActivityProductList(resultList);
-        });
-        response.setData(activityProducts);
+        List<String> categoryCodes=new ArrayList<>();
+        ActivityBrandCategoryRequest categoryRequest=new ActivityBrandCategoryRequest();
+        if(null!=activityProducts && 0!=activityProducts.size()){
+            for (ActivityProduct product:activityProducts){
+                categoryCodes.add(product.getProductCategoryCode());
+            }
+            categoryRequest.setCategoryCodes(categoryCodes);
+        }
+
+        response=bridgeProductService.productCategoryList(categoryRequest);
         return response;
     }
 
@@ -613,9 +635,21 @@ public class ActivityServiceImpl implements ActivityService {
     public HttpResponse<PageResData<ProductSkuRespVo5>> skuPage(SpuProductReqVO spuProductReqVO) {
         LOGGER.info("活动商品查询（筛选+分页）skuPage参数为：{}", spuProductReqVO);
         HttpResponse res = HttpResponse.success();
-        if(null==spuProductReqVO.getActivityId()){
+        if(null==spuProductReqVO.getActivityId() ||null==spuProductReqVO.getStoreId()){
             return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
         }
+        ShoppingCartRequest shoppingCartRequest=new ShoppingCartRequest();
+        shoppingCartRequest.setStoreId(spuProductReqVO.getStoreId());
+        //通过门店id返回门店省市公司信息
+        HttpResponse<StoreInfo> storeInfo = bridgeProductService.getStoreInfo(shoppingCartRequest);
+        if(storeInfo==null||storeInfo.getData()==null){
+            return HttpResponse.failure(ResultCode.NO_HAVE_STORE_ERROR);
+        }
+        spuProductReqVO.setCompanyCode("14");
+        spuProductReqVO.setProvinceCode(storeInfo.getData().getProvinceId());
+        spuProductReqVO.setCityCode(storeInfo.getData().getCityId());
+        //设置查询库房 1销售库  2特卖库
+        spuProductReqVO.setWarehouseTypeCode("1");
         Activity activity=new Activity();
         activity.setActivityId(spuProductReqVO.getActivityId());
         List<ActivityProduct> activityProducts=activityProductDao.activityProductList(activity);
@@ -640,9 +674,9 @@ public class ActivityServiceImpl implements ActivityService {
             if(activityScope==1){
                 spuProductReqVO.setIncludeSkuCodes(parameterList);
             }else if(activityScope==2){
-//                spuProductReqVO.setIncludeSkuCodes(parameterList);
+                spuProductReqVO.setCategoryCodeList(parameterList);
             }else if(activityScope==3){
-//                spuProductReqVO.setIncludeSkuCodes(parameterList);
+                spuProductReqVO.setBrandCodeList(parameterList);
             }else if(activityScope==4){
                 spuProductReqVO.setExcludeSkuCodes(parameterList);
             }
@@ -650,9 +684,6 @@ public class ActivityServiceImpl implements ActivityService {
             ActivityParameterRequest activityParameterRequest=new ActivityParameterRequest();
             activityParameterRequest.setActivityId(spuProductReqVO.getActivityId());
             activityParameterRequest.setStoreId(spuProductReqVO.getStoreId());
-
-            ShoppingCartRequest shoppingCartRequest=new ShoppingCartRequest();
-            shoppingCartRequest.setStoreId(spuProductReqVO.getStoreId());
 
             PageResData<ProductSkuRespVo5> pageResData= (PageResData<ProductSkuRespVo5>) res.getData();
             List<ProductSkuRespVo5> productSkuRespVo=pageResData.getDataList();
