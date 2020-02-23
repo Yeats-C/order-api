@@ -1,6 +1,8 @@
 package com.aiqin.mgs.order.api.domain;
 
+import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.PagesRequest;
+import com.aiqin.mgs.order.api.domain.request.activity.ProductSkuRespVo5;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -88,4 +90,9 @@ public class Activity extends PagesRequest implements Serializable {
     @ApiModelProperty(value = "活动门店范围 1全部 2部分")
     @JsonProperty("active_store_range")
     private Integer activeStoreRange;
+
+    /***爱掌柜活动列表中的商品列表*/
+    @ApiModelProperty(value = "爱掌柜活动列表中的商品列表")
+    @JsonProperty("page_res_data")
+    private PageResData<ProductSkuRespVo5> pageResData;
 }

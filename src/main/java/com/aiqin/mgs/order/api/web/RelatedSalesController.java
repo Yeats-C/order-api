@@ -37,7 +37,7 @@ public class RelatedSalesController {
 
     @ApiOperation("关联销售新增")
     @PostMapping("/insert")
-    public HttpResponse<Boolean> addRelatedSales(@RequestBody RelatedSales relatedSales) {
+    public HttpResponse<Integer> addRelatedSales(@RequestBody RelatedSales relatedSales) {
         return new HttpResponse<>(relatedSalesService.insert(relatedSales));
     }
 

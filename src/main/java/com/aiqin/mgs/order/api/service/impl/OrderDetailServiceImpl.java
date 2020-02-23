@@ -367,10 +367,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             Integer totalCount = 0;
             Integer icount = null;
             orderDetailQuery.setIcount(icount);
-            List<OrderDetailByMemberResponse> icountList = orderDetailDao.byMemberOrder(OrderPublic.getOrderDetailQuery(orderDetailQuery));
-            if (icountList != null && icountList.size() > 0) {
-                totalCount = icountList.size();
-            }
+            totalCount = orderDetailDao.byMemberOrderCount(OrderPublic.getOrderDetailQuery(orderDetailQuery));
+
 
 //              return HttpResponse.success(OrderPublic.getData(list)); 
             return HttpResponse.success(new PageResData(totalCount, list));
