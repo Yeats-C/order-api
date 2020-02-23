@@ -445,6 +445,17 @@ public class ActivityServiceImpl implements ActivityService {
         LOGGER.info("通过门店id爱掌柜的促销活动列表（所有生效活动）effectiveActivityList参数为：{}", storeId);
         HttpResponse response = HttpResponse.success();
         List<Activity> activityList=activityDao.effectiveActivityList(storeId);
+        SpuProductReqVO spuProductReqVO=new SpuProductReqVO();
+        if(null!=activityList){
+            for (Activity activity:activityList){
+                spuProductReqVO.setActivityId(activity.getActivityId());
+                spuProductReqVO.setStoreId(storeId);
+                spuProductReqVO.setPageSize(5);
+                HttpResponse<PageResData<ProductSkuRespVo5>> resDataHttpResponse=skuPage(spuProductReqVO);
+                activity.setPageResData(resDataHttpResponse.getData());
+            }
+
+        }
         response.setData(activityList);
         return response;
     }
@@ -653,7 +664,7 @@ public class ActivityServiceImpl implements ActivityService {
         Activity activity=new Activity();
         activity.setActivityId(spuProductReqVO.getActivityId());
         List<ActivityProduct> activityProducts=activityProductDao.activityProductList(activity);
-        if(null!=activityProducts){
+        if(null!=activityProducts && 0!=activityProducts.size()){
             Integer activityScope=activityProducts.get(0).getActivityScope();
             List<String> parameterList=new ArrayList<>();
             for(ActivityProduct product:activityProducts){
