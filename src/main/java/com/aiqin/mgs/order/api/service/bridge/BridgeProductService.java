@@ -16,6 +16,7 @@ import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
 import com.aiqin.mgs.order.api.domain.response.NewFranchiseeResponse;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -172,8 +173,11 @@ public class BridgeProductService {
      * @return
      */
     public HttpResponse productBrandList(ActivityBrandCategoryRequest req){
-        String path = "/product/brand/list";
-        HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path+"?name=" + req.getName()+"&brand_ids="+req.getBrandIds());
+        String path = urlProperties.getProductApi()+"/product/brand/list";
+        JSONObject json=new JSONObject();
+        json.put("name",req.getName());
+        json.put("brand_ids",req.getBrandIds());
+        HttpClient httpClient = HttpClient.post(path).json(json);
         HttpResponse<List<QueryProductBrandRespVO>> response = httpClient.action().result(new TypeReference<HttpResponse<List<QueryProductBrandRespVO>>>() {
         });
         return response;
