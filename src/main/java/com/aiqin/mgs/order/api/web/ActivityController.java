@@ -200,8 +200,8 @@ public class ActivityController {
      */
     @GetMapping("/product/category/list")
     @ApiOperation(value = "活动商品品类接口")
-    public HttpResponse<List<ActivityProduct>> productCategoryList(@RequestParam(name = "activity_id", required = false) String activityId) {
-        return activitesService.productCategoryList();
+    public HttpResponse<List<ProductCategoryRespVO>> productCategoryList(@RequestParam(name = "activity_id", required = false) String activityId) {
+        return activitesService.productCategoryList(activityId);
     }
 
     /**

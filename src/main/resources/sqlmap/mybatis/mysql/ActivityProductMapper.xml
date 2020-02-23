@@ -59,7 +59,7 @@
 
 
     <select id="activityProductList" resultType="java.util.List" resultMap="BaseResultMap"
-            parameterType="com.aiqin.mgs.order.api.domain.ActivityProduct">
+            parameterType="com.aiqin.mgs.order.api.domain.Activity">
         select id,activity_id, sku_code,product_name, product_code, product_brand_code,product_brand_name, product_category_code
         ,product_category_name, price_tax,discount,reduce,actual_price,status,create_time, update_time,is_delete,create_by
         ,update_by,activity_scope
@@ -103,7 +103,8 @@
     </select>
 
     <!--活动商品品牌列表接口-->
-    <select id="productCategoryList" resultType="java.util.List" resultMap="BaseResultMap">
+    <select id="productCategoryList" resultType="java.util.List" resultMap="BaseResultMap"
+            parameterType="com.aiqin.mgs.order.api.domain.Activity">
         SELECT
         p.product_category_code,
         p.product_category_name

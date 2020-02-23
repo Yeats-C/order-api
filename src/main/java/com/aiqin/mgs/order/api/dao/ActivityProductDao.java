@@ -42,7 +42,7 @@ public interface ActivityProductDao {
      * 活动商品品类接口
      * @return
      */
-    List<ActivityProduct> productCategoryList();
+    List<ActivityProduct> productCategoryList(Activity activity);
 }
 
 

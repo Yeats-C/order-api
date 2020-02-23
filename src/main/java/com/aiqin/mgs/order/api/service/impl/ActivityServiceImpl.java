@@ -508,7 +508,7 @@ public class ActivityServiceImpl implements ActivityService {
         List<ActivityProduct> activityProducts=activityProductDao.productBrandList(activityProduct);
         List<String> brandIds=new ArrayList<>();
         ActivityBrandCategoryRequest categoryRequest=new ActivityBrandCategoryRequest();
-        if(null!=activityProducts){
+        if(null!=activityProducts && 0!=activityProducts.size()){
             for (ActivityProduct product:activityProducts){
                 brandIds.add(product.getProductBrandCode());
             }
@@ -519,27 +519,23 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public HttpResponse<List<ActivityProduct>> productCategoryList() {
+    public HttpResponse<List<ProductCategoryRespVO>> productCategoryList(String activityId) {
         LOGGER.info("活动商品品类列表接口开始");
         HttpResponse response = HttpResponse.success();
-        List<ActivityProduct> activityProducts=activityProductDao.productCategoryList();
-        //所有根节点
-        List<ActivityProduct> parentList = new ArrayList<>();
-        //所有子节点
-        List<ActivityProduct> childList = new ArrayList<>();
-        activityProducts.forEach(item->{
-            if ("0".equals(item.getProductCategoryCode())){
-                parentList.add(item);
-            } else {
-                childList.add(item);
-            }
-        });
+        Activity activity=new Activity();
+        activity.setActivityId(activityId);
+        List<ActivityProduct> activityProducts=activityProductDao.productCategoryList(activity);
 
-        parentList.forEach(item->{
-            List<ActivityProduct> resultList = getChildren(String.valueOf(item.getProductCategoryCode()),childList);
-            item.setActivityProductList(resultList);
-        });
-        response.setData(activityProducts);
+        List<String> categoryCodes=new ArrayList<>();
+        ActivityBrandCategoryRequest categoryRequest=new ActivityBrandCategoryRequest();
+        if(null!=activityProducts && 0!=activityProducts.size()){
+            for (ActivityProduct product:activityProducts){
+                categoryCodes.add(product.getProductCategoryCode());
+            }
+            categoryRequest.setCategoryCodes(categoryCodes);
+        }
+
+        response=bridgeProductService.productCategoryList(categoryRequest);
         return response;
     }
 
