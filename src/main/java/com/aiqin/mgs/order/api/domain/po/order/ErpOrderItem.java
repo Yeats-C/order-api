@@ -125,6 +125,10 @@ public class ErpOrderItem extends PagesRequest {
     @JsonProperty("product_amount")
     private BigDecimal productAmount;
 
+    @ApiModelProperty(value = "活动价（元）")
+    @JsonProperty("activity_price")
+    private BigDecimal activityPrice;
+
     @ApiModelProperty(value = "含税采购价（元）")
     @JsonProperty("purchase_amount")
     private BigDecimal purchaseAmount;
@@ -192,6 +196,10 @@ public class ErpOrderItem extends PagesRequest {
     @ApiModelProperty(value = "单个商品包装体积(mm³)")
     @JsonProperty("box_volume")
     private BigDecimal boxVolume;
+
+    @ApiModelProperty(value = "单品活动id")
+    @JsonProperty("activity_id")
+    private String activityId;
 
     @ApiModelProperty(value = "0. 启用   1.禁用")
     @JsonProperty("use_status")

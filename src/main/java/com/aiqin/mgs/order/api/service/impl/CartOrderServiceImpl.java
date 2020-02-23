@@ -6,6 +6,8 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpProductGiftEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpProductPropertyTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.StatusEnum;
+import com.aiqin.mgs.order.api.component.enums.YesOrNoEnum;
 import com.aiqin.mgs.order.api.component.enums.activity.ActivityRuleUnitEnum;
 import com.aiqin.mgs.order.api.component.enums.activity.ActivityTypeEnum;
 import com.aiqin.mgs.order.api.dao.CartOrderDao;
@@ -19,6 +21,7 @@ import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.CartResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.OrderConfirmResponse;
+import com.aiqin.mgs.order.api.domain.response.cart.StoreCartProductResponse;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import com.aiqin.mgs.order.api.service.CartOrderService;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
@@ -453,6 +456,98 @@ public class CartOrderServiceImpl implements CartOrderService {
         cartResponse.setTotalNumber(totalNumber);
         cartResponse.setTopTotalPrice(topTotalAmount);
         return cartResponse;
+    }
+
+    private StoreCartProductResponse getStoreCartProductGroup(String storeId, Integer productType) throws Exception {
+        CartOrderInfo query = new CartOrderInfo();
+        query.setStoreId(storeId);
+        query.setProductType(productType);
+        query.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
+        query.setLineCheckStatus(Global.LINECHECKSTATUS_1);
+
+        //购物车数据-本品行
+        List<CartOrderInfo> cartInfoList = cartOrderDao.selectCartByStoreId(query);
+
+        //商品活动价汇总
+        BigDecimal activityPriceTotal = BigDecimal.ZERO;
+
+        //实际支付价格汇总
+        BigDecimal actualPriceTotal = BigDecimal.ZERO;
+
+        //计算商品总数量
+        int totalNumber = 0;
+
+
+        //活动id 购物车商品行
+        Map<String, List<CartOrderInfo>> activityCartMap = new HashMap<>(16);
+
+        List<CartGroupInfo> cartGroupList = new ArrayList<>();
+
+        for (CartOrderInfo item :
+                cartInfoList) {
+
+            if (StringUtils.isEmpty(item.getActivityId())) {
+                //非活动楼层
+
+                CartGroupInfo cartGroupInfo = new CartGroupInfo();
+                cartGroupInfo.setHasActivity(YesOrNoEnum.NO.getCode());
+//                cartGroupInfo.set
+                List<CartOrderInfo> cartOrderList = new ArrayList<>();
+                item.setActivityPrice(item.getPrice());
+                cartOrderList.add(item);
+
+            }
+
+        }
+        
+        
+        
+//        //计算商品总价格
+//        BigDecimal accountActualPrice = BigDecimal.ZERO;
+//        //计算商品活动优惠后价格汇总
+//        BigDecimal accountActualActivityPrice = BigDecimal.ZERO;
+//
+//        BigDecimal topTotalAmount = BigDecimal.ZERO;
+//
+//        for (CartOrderInfo item : cartInfoList) {
+//            if (Global.LINECHECKSTATUS_1.equals(item.getLineCheckStatus())) {
+//
+//                BigDecimal total = new BigDecimal(item.getAmount()).multiply(item.getPrice());
+//                accountActualPrice = accountActualPrice.add(total);
+//                totalNumber += item.getAmount();
+//                accountActualActivityPrice = accountActualActivityPrice.add(item.getAccountTotalPrice());
+//                ErpProductPropertyTypeEnum productPropertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(item.getProductPropertyCode());
+//                if (productPropertyTypeEnum.isUseTopCoupon()) {
+//                    topTotalAmount = topTotalAmount.add(item.getAccountTotalPrice());
+//                }
+//            }
+//
+//            //查询赠品行
+//            List<CartOrderInfo> giftList = cartOrderDao.findByGiftParentCartId(item.getCartId());
+//            item.setGiftList(giftList);
+//
+//            //调用接口查询商品可选活动列表
+////            ActivityParameterRequest activityParameterRequest = new ActivityParameterRequest();
+////            activityParameterRequest.setStoreId(storeId);
+////            activityParameterRequest.setSkuCode(item.getSkuCode());
+////            activityParameterRequest.setProductBrandCode(item.getProductBrandCode());
+////            activityParameterRequest.setProductCategoryCode(item.getProductCategoryCode());
+////            List<Activity> activityList = activityService.activityList(activityParameterRequest);
+//
+//            //TODO 临时调试使用，用完删除
+//            List<Activity> activityList = TestUtil.getTestActivityList();
+//            item.setActivityList(activityList);
+//
+//        }
+//
+//        CartResponse cartResponse = new CartResponse();
+//        cartResponse.setCartInfoList(cartInfoList);
+//        cartResponse.setAccountActualPrice(accountActualPrice);
+//        cartResponse.setAccountActualActivityPrice(accountActualActivityPrice);
+//        cartResponse.setTotalNumber(totalNumber);
+//        cartResponse.setTopTotalPrice(topTotalAmount);
+//        return cartResponse;
+        return null;
     }
 
 

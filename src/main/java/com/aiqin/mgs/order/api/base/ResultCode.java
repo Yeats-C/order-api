@@ -16,6 +16,7 @@ public interface ResultCode {
     MessageId NO_HAVE_STORE_ERROR = MessageId.create(Project.STORE_API, 9, "未查询到对应门店信息");
     MessageId CHANGE_STORE_ERROR=MessageId.create(Project.ORDER_API, -1, "修改库存失败");
     MessageId STATUS_CHANGE_ERROR=MessageId.create(Project.ORDER_API, -1, "订单状态修改失败");
+    MessageId FIRST_REPORT_ERROP =MessageId.create(Project.ORDER_API,-2,"查询首单报表数据为空");
 
     /** 黄祉壹   2018-11-05 开始     */
     

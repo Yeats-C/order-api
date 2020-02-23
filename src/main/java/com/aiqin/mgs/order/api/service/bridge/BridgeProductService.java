@@ -11,8 +11,7 @@ import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.aiqin.mgs.order.api.domain.dto.ProductDistributorOrderDTO;
 import com.aiqin.mgs.order.api.domain.request.InventoryDetailRequest;
-import com.aiqin.mgs.order.api.domain.request.activity.ProductSkuRespVo5;
-import com.aiqin.mgs.order.api.domain.request.activity.SpuProductReqVO;
+import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
@@ -151,6 +150,32 @@ public class BridgeProductService {
         HttpResponse<Integer> response = httpClient.action().result(new TypeReference<HttpResponse<Integer>>() {
         });
 
+        return response;
+    }
+
+    /**
+     * 供应链提供查询品类树接口
+     * @param req
+     * @return
+     */
+    public HttpResponse productCategoryList(ActivityBrandCategoryRequest req){
+        String path = "/product/category/list";
+        HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path+"?category_status=" + req.getCategoryStatus());
+        HttpResponse<ProductCategoryRespVO> response = httpClient.action().result(new TypeReference<HttpResponse<ProductCategoryRespVO>>() {
+        });
+        return response;
+    }
+
+    /**
+     * 供应链提供查询品类树接口
+     * @param req
+     * @return
+     */
+    public HttpResponse productBrandList(ActivityBrandCategoryRequest req){
+        String path = "/product/brand/list";
+        HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path+"?name=" + req.getName());
+        HttpResponse<QueryProductBrandRespVO> response = httpClient.action().result(new TypeReference<HttpResponse<QueryProductBrandRespVO>>() {
+        });
         return response;
     }
 }
