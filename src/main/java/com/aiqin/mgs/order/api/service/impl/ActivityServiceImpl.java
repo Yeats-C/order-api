@@ -531,7 +531,9 @@ public class ActivityServiceImpl implements ActivityService {
         ActivityBrandCategoryRequest categoryRequest=new ActivityBrandCategoryRequest();
         if(null!=activityProducts && 0!=activityProducts.size()){
             for (ActivityProduct product:activityProducts){
-                categoryCodes.add(product.getProductCategoryCode());
+                if(StringUtils.isNotBlank(product.getProductCategoryCode())){
+                    categoryCodes.add(product.getProductCategoryCode());
+                }
             }
             categoryRequest.setCategoryCodes(categoryCodes);
         }
