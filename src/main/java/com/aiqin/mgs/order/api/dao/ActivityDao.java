@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.Activity;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -55,7 +56,7 @@ public interface ActivityDao {
      * @param productId
      * @return
      */
-    List<Activity> checkProcuct(String activityId, String storeId, String productId,String productBrandCode,String productCategoryCode);
+    List<Activity> checkProcuct(@Param("activityId") String activityId,@Param("storeId") String storeId,@Param("productId") String productId,@Param("productBrandCode") String productBrandCode,@Param("productCategoryCode") String productCategoryCode);
 }
 
 
