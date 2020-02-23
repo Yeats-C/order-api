@@ -185,7 +185,7 @@
         activity a
         JOIN activity_store s ON a.activity_id = s.activity_id
         where   1=1
-        and s.store_id = #{storeId} or s.storeId = 'all'
+        and s.store_id = #{storeId} or s.store_id = 'all'
         AND a.begin_time &lt; now()
         and a.finish_time &gt; NOW()
         and a.activity_status=0
@@ -214,7 +214,7 @@
         LEFT JOIN activity_product p ON a.activity_id = p.activity_id
         WHERE
         1 = 1
-        AND s.store_id =  #{storeId} or s.storeId = 'all'
+        AND s.store_id =  #{storeId} or s.store_id = 'all'
         <if test="productId!= null">
             and p.sku_code =  #{productId}
         </if>

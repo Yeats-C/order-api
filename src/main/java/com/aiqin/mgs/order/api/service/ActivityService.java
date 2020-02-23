@@ -111,8 +111,9 @@ public interface ActivityService {
     /**
      * 活动商品品类接口
      * @return
+     * @param activityId
      */
-    HttpResponse<List<ActivityProduct>> productCategoryList();
+    HttpResponse<List<ProductCategoryRespVO>> productCategoryList(String activityId);
 
     /**
      *导出--活动详情-销售数据-活动销售列表
