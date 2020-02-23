@@ -12,10 +12,7 @@ import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
-import com.aiqin.mgs.order.api.domain.request.activity.ActivityParameterRequest;
-import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
-import com.aiqin.mgs.order.api.domain.request.activity.ProductSkuRespVo5;
-import com.aiqin.mgs.order.api.domain.request.activity.SpuProductReqVO;
+import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
@@ -444,10 +441,22 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public HttpResponse<List<ActivityRequest>> effectiveActivityList(String storeId) {
+    public HttpResponse<List<Activity>> effectiveActivityList(String storeId) {
         LOGGER.info("通过门店id爱掌柜的促销活动列表（所有生效活动）effectiveActivityList参数为：{}", storeId);
         HttpResponse response = HttpResponse.success();
         List<Activity> activityList=activityDao.effectiveActivityList(storeId);
+        SpuProductReqVO spuProductReqVO=new SpuProductReqVO();
+        if(null!=activityList){
+            for (Activity activity:activityList){
+                spuProductReqVO.setActivityId(activity.getActivityId());
+                spuProductReqVO.setStoreId(storeId);
+                spuProductReqVO.setPageSize(5);
+                HttpResponse<PageResData<ProductSkuRespVo5>> resDataHttpResponse=skuPage(spuProductReqVO);
+                activity.setPageResData(resDataHttpResponse.getData());
+            }
+
+        }
+        response.setData(activityList);
         return response;
     }
 
@@ -498,38 +507,49 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public HttpResponse<List<ActivityProduct>> productBrandList(String productBrandName) {
+    public HttpResponse<List<QueryProductBrandRespVO>> productBrandList(String productBrandName, String activityId) {
         LOGGER.info("活动商品品牌列表接口参数productBrandName为:{}", productBrandName);
         HttpResponse response = HttpResponse.success();
         ActivityProduct activityProduct=new ActivityProduct();
-        activityProduct.setProductBrandName(productBrandName);
+        if(StringUtils.isNotEmpty(productBrandName)){
+            activityProduct.setProductBrandName(productBrandName);
+        }
+        if(StringUtils.isNotEmpty(activityId)){
+            activityProduct.setActivityId(activityId);
+        }
         List<ActivityProduct> activityProducts=activityProductDao.productBrandList(activityProduct);
-        response.setData(activityProducts);
+        List<String> brandIds=new ArrayList<>();
+        ActivityBrandCategoryRequest categoryRequest=new ActivityBrandCategoryRequest();
+        if(null!=activityProducts && 0!=activityProducts.size()){
+            for (ActivityProduct product:activityProducts){
+                brandIds.add(product.getProductBrandCode());
+            }
+        }
+        categoryRequest.setBrandIds(brandIds);
+        response=bridgeProductService.productBrandList(categoryRequest);
         return response;
     }
 
     @Override
-    public HttpResponse<List<ActivityProduct>> productCategoryList() {
+    public HttpResponse<List<ProductCategoryRespVO>> productCategoryList(String activityId) {
         LOGGER.info("活动商品品类列表接口开始");
         HttpResponse response = HttpResponse.success();
-        List<ActivityProduct> activityProducts=activityProductDao.productCategoryList();
-        //所有根节点
-        List<ActivityProduct> parentList = new ArrayList<>();
-        //所有子节点
-        List<ActivityProduct> childList = new ArrayList<>();
-        activityProducts.forEach(item->{
-            if ("0".equals(item.getProductCategoryCode())){
-                parentList.add(item);
-            } else {
-                childList.add(item);
-            }
-        });
+        Activity activity=new Activity();
+        activity.setActivityId(activityId);
+        List<ActivityProduct> activityProducts=activityProductDao.productCategoryList(activity);
 
-        parentList.forEach(item->{
-            List<ActivityProduct> resultList = getChildren(String.valueOf(item.getProductCategoryCode()),childList);
-            item.setActivityProductList(resultList);
-        });
-        response.setData(activityProducts);
+        List<String> categoryCodes=new ArrayList<>();
+        ActivityBrandCategoryRequest categoryRequest=new ActivityBrandCategoryRequest();
+        if(null!=activityProducts && 0!=activityProducts.size()){
+            for (ActivityProduct product:activityProducts){
+                if(StringUtils.isNotBlank(product.getProductCategoryCode())){
+                    categoryCodes.add(product.getProductCategoryCode());
+                }
+            }
+            categoryRequest.setCategoryCodes(categoryCodes);
+        }
+
+        response=bridgeProductService.productCategoryList(categoryRequest);
         return response;
     }
 
@@ -646,7 +666,7 @@ public class ActivityServiceImpl implements ActivityService {
         Activity activity=new Activity();
         activity.setActivityId(spuProductReqVO.getActivityId());
         List<ActivityProduct> activityProducts=activityProductDao.activityProductList(activity);
-        if(null!=activityProducts){
+        if(null!=activityProducts && 0!=activityProducts.size()){
             Integer activityScope=activityProducts.get(0).getActivityScope();
             List<String> parameterList=new ArrayList<>();
             for(ActivityProduct product:activityProducts){

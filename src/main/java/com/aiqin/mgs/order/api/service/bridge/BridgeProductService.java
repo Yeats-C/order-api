@@ -16,6 +16,7 @@ import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
 import com.aiqin.mgs.order.api.domain.response.NewFranchiseeResponse;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -159,22 +160,36 @@ public class BridgeProductService {
      * @return
      */
     public HttpResponse productCategoryList(ActivityBrandCategoryRequest req){
-        String path = "/product/category/list";
-        HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path+"?category_status=" + req.getCategoryStatus());
-        HttpResponse<ProductCategoryRespVO> response = httpClient.action().result(new TypeReference<HttpResponse<ProductCategoryRespVO>>() {
+        String path = urlProperties.getProductApi() +"/product/category/list/categoryCodes";
+        StringBuilder sb=new StringBuilder();
+        String a="";
+        if(req.getCategoryCodes()!=null){
+            a=req.getCategoryCodes().get(0);
+        }
+        sb.append("?category_codes="+a);
+        if(req.getCategoryCodes()!=null&&req.getCategoryCodes().size()>=1){
+            for(int i=1;i<req.getCategoryCodes().size();i++){
+                sb.append("&category_codes="+req.getCategoryCodes().get(i));
+            }
+        }
+        HttpClient httpClient = HttpClient.get( path+sb.toString());
+        HttpResponse<List<ProductCategoryRespVO>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ProductCategoryRespVO>>>() {
         });
         return response;
     }
 
     /**
-     * 供应链提供查询品类树接口
+     * 供应链提供查询品牌树接口
      * @param req
      * @return
      */
     public HttpResponse productBrandList(ActivityBrandCategoryRequest req){
-        String path = "/product/brand/list";
-        HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path+"?name=" + req.getName());
-        HttpResponse<QueryProductBrandRespVO> response = httpClient.action().result(new TypeReference<HttpResponse<QueryProductBrandRespVO>>() {
+        String path = urlProperties.getProductApi()+"/product/brand/list";
+        JSONObject json=new JSONObject();
+        json.put("name",req.getName());
+        json.put("brand_ids",req.getBrandIds());
+        HttpClient httpClient = HttpClient.post(path).json(json);
+        HttpResponse<List<QueryProductBrandRespVO>> response = httpClient.action().result(new TypeReference<HttpResponse<List<QueryProductBrandRespVO>>>() {
         });
         return response;
     }

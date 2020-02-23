@@ -7,10 +7,7 @@ import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityProduct;
 import com.aiqin.mgs.order.api.domain.ActivitySales;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
-import com.aiqin.mgs.order.api.domain.request.activity.ActivityParameterRequest;
-import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
-import com.aiqin.mgs.order.api.domain.request.activity.ProductSkuRespVo5;
-import com.aiqin.mgs.order.api.domain.request.activity.SpuProductReqVO;
+import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import io.swagger.annotations.Api;
@@ -133,7 +130,7 @@ public class ActivityController {
      */
     @GetMapping("/effectiveActivityList")
     @ApiOperation(value = "通过门店id爱掌柜的促销活动列表（所有生效活动）")
-    public HttpResponse<List<ActivityRequest>> effectiveActivityList(String storeId){
+    public HttpResponse<List<Activity>> effectiveActivityList(String storeId){
         return activitesService.effectiveActivityList(storeId);
     }
 
@@ -192,8 +189,8 @@ public class ActivityController {
      */
     @GetMapping("/product/brand/list")
     @ApiOperation(value = "活动商品品牌列表接口")
-    public HttpResponse<List<ActivityProduct>> productBrandList(String productBrandName) {
-        return activitesService.productBrandList(productBrandName);
+    public HttpResponse<List<QueryProductBrandRespVO>> productBrandList(@RequestParam(name = "product_brand_name", required = false) String productBrandName, @RequestParam(name = "activity_id", required = false) String activityId) {
+        return activitesService.productBrandList(productBrandName,activityId);
     }
 
     /**
@@ -203,8 +200,8 @@ public class ActivityController {
      */
     @GetMapping("/product/category/list")
     @ApiOperation(value = "活动商品品类接口")
-    public HttpResponse<List<ActivityProduct>> productCategoryList() {
-        return activitesService.productCategoryList();
+    public HttpResponse<List<ProductCategoryRespVO>> productCategoryList(@RequestParam(name = "activity_id", required = false) String activityId) {
+        return activitesService.productCategoryList(activityId);
     }
 
     /**
@@ -251,5 +248,17 @@ public class ActivityController {
     @ApiOperation("活动商品查询（筛选+分页）")
     public HttpResponse<PageResData<ProductSkuRespVo5>> skuPage(SpuProductReqVO spuProductReqVO){
         return activitesService.skuPage(spuProductReqVO);
+    }
+
+    /**
+     * 通过条件查询一个商品有多少个进行中的活动
+     * @param parameterRequest
+     */
+    @PostMapping("/productActivityList")
+    @ApiOperation("通过条件查询一个商品有多少个进行中的活动")
+    public HttpResponse<List<Activity>> productActivityList(ActivityParameterRequest parameterRequest){
+        HttpResponse response = HttpResponse.success();
+        response.setData(activitesService.activityList(parameterRequest));
+        return response;
     }
 }
