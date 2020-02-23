@@ -8,18 +8,20 @@ package com.aiqin.mgs.order.api.service;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.ReportMemberSaleCateVo;
 import com.aiqin.mgs.order.api.domain.ReportMemberSaleVo;
+import com.aiqin.mgs.order.api.domain.ReportMemberVo;
 
 import java.util.List;
 
 @SuppressWarnings("all")
 public interface ReportMemberService {
 
-	HttpResponse qryReportPageList(String reportYear, String reportMonth, Integer pageNo, Integer pageSize);
+	HttpResponse<ReportMemberVo> qryReportMonthPageList(Integer statYear, Integer statMonth, Integer pageNo,
+			Integer pageSize);
 
-	HttpResponse qryReportSalePageList(String reportYear, String reportMonth, Integer pageNo,Integer pageSize);
+	HttpResponse<ReportMemberVo> qryReportYearList(Integer statYear, Integer pageNo, Integer pageSize);
 
-	HttpResponse qryReportSaleCatepPageList(String reportYear, String reportMonth,Integer pageNo, Integer pageSize);
+	HttpResponse<ReportMemberSaleVo> qrySaleMonthList(String statYearMonth, Integer pageNo, Integer pageSize);
 
-	HttpResponse qryReportSaleCatemPageList(String reportYear, String reportMonth, Integer pageNo,Integer pageSize);
+	HttpResponse<ReportMemberSaleVo> qrySaleYearList(String statYear, Integer pageNo, Integer pageSize);
 
 }
