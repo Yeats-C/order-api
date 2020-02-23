@@ -82,7 +82,7 @@ public interface ActivityService {
      * @param storeId
      * @return
      */
-    HttpResponse<List<ActivityRequest>> effectiveActivityList(String storeId);
+    HttpResponse<List<Activity>> effectiveActivityList(String storeId);
 
     /**
      * 返回购物车中的sku商品的数量

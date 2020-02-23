@@ -130,7 +130,7 @@ public class ActivityController {
      */
     @GetMapping("/effectiveActivityList")
     @ApiOperation(value = "通过门店id爱掌柜的促销活动列表（所有生效活动）")
-    public HttpResponse<List<ActivityRequest>> effectiveActivityList(String storeId){
+    public HttpResponse<List<Activity>> effectiveActivityList(String storeId){
         return activitesService.effectiveActivityList(storeId);
     }
 

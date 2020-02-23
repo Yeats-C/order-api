@@ -195,6 +195,7 @@
         AND a.begin_time &lt; now()
         and a.finish_time &gt; NOW()
         and a.activity_status=0
+        GROUP BY a.activity_id
     </select>
 
     <select id="checkProcuct" resultType="com.aiqin.mgs.order.api.domain.Activity" parameterType="java.lang.String">
