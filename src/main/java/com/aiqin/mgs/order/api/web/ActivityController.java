@@ -7,10 +7,7 @@ import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityProduct;
 import com.aiqin.mgs.order.api.domain.ActivitySales;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
-import com.aiqin.mgs.order.api.domain.request.activity.ActivityParameterRequest;
-import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
-import com.aiqin.mgs.order.api.domain.request.activity.ProductSkuRespVo5;
-import com.aiqin.mgs.order.api.domain.request.activity.SpuProductReqVO;
+import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import io.swagger.annotations.Api;
@@ -192,8 +189,8 @@ public class ActivityController {
      */
     @GetMapping("/product/brand/list")
     @ApiOperation(value = "活动商品品牌列表接口")
-    public HttpResponse<List<ActivityProduct>> productBrandList(String productBrandName) {
-        return activitesService.productBrandList(productBrandName);
+    public HttpResponse<List<QueryProductBrandRespVO>> productBrandList(@RequestParam(name = "product_brand_name", required = false) String productBrandName, @RequestParam(name = "activity_id", required = false) String activityId) {
+        return activitesService.productBrandList(productBrandName,activityId);
     }
 
     /**
@@ -203,7 +200,7 @@ public class ActivityController {
      */
     @GetMapping("/product/category/list")
     @ApiOperation(value = "活动商品品类接口")
-    public HttpResponse<List<ActivityProduct>> productCategoryList() {
+    public HttpResponse<List<ActivityProduct>> productCategoryList(@RequestParam(name = "activity_id", required = false) String activityId) {
         return activitesService.productCategoryList();
     }
 

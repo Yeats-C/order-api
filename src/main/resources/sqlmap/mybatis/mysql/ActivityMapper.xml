@@ -97,9 +97,6 @@
     <update id="updateActivity">
         update activity
         <set>
-            <if test="activityId != null">
-                activity_id = #{activityId,jdbcType=VARCHAR},
-            </if>
             <if test="activityName != null">
                 activity_name = #{activityName,jdbcType=VARCHAR},
             </if>
@@ -134,6 +131,7 @@
                 active_store_range = #{activeStoreRange,jdbcType=BIT},
             </if>
             update_time = now()
+            where  activity_id = #{activityId,jdbcType=VARCHAR}
         </set>
     </update>
 

@@ -16,12 +16,12 @@ import java.util.List;
 public class ActivityBrandCategoryRequest implements Serializable {
 
     @ApiModelProperty("品牌编码集合")
-    @JsonProperty("brand_code_list")
-    private List<String> brandCodeList;
+    @JsonProperty("brand_ids")
+    private List<String> brandIds;
 
     @ApiModelProperty("品类编码集合")
-    @JsonProperty("category_code_list")
-    private List<String> categoryCodeList;
+    @JsonProperty("category_codes")
+    private List<String> categoryCodes;
 
     @ApiModelProperty("品类查询全部还是启用,0为启用,4为全部")
     @JsonProperty("category_status")
