@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface RelatedSalesService {
 
-    Boolean insert(RelatedSales entity);
+    Integer insert(RelatedSales entity);
 
     Boolean update(RelatedSales entity);
 
