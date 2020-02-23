@@ -249,4 +249,16 @@ public class ActivityController {
     public HttpResponse<PageResData<ProductSkuRespVo5>> skuPage(SpuProductReqVO spuProductReqVO){
         return activitesService.skuPage(spuProductReqVO);
     }
+
+    /**
+     * 通过条件查询一个商品有多少个进行中的活动
+     * @param parameterRequest
+     */
+    @PostMapping("/productActivityList")
+    @ApiOperation("通过条件查询一个商品有多少个进行中的活动")
+    public HttpResponse<List<Activity>> productActivityList(ActivityParameterRequest parameterRequest){
+        HttpResponse response = HttpResponse.success();
+        response.setData(activitesService.activityList(parameterRequest));
+        return response;
+    }
 }

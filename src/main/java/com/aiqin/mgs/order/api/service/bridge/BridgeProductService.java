@@ -160,8 +160,19 @@ public class BridgeProductService {
      * @return
      */
     public HttpResponse productCategoryList(ActivityBrandCategoryRequest req){
-        String path = "/product/category/list/categoryCodes";
-        HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path+"?category_codes=" + req.getCategoryCodes());
+        String path = urlProperties.getProductApi() +"/product/category/list/categoryCodes";
+        StringBuilder sb=new StringBuilder();
+        String a="";
+        if(req.getCategoryCodes()!=null){
+            a=req.getCategoryCodes().get(0);
+        }
+        sb.append("?category_codes="+a);
+        if(req.getCategoryCodes()!=null&&req.getCategoryCodes().size()>=1){
+            for(int i=1;i<req.getCategoryCodes().size();i++){
+                sb.append("&category_codes="+req.getCategoryCodes().get(i));
+            }
+        }
+        HttpClient httpClient = HttpClient.get( path+sb.toString());
         HttpResponse<List<ProductCategoryRespVO>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ProductCategoryRespVO>>>() {
         });
         return response;

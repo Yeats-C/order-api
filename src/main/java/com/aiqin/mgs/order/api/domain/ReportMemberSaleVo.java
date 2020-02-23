@@ -12,17 +12,84 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
-@ApiModel("门店会员销售报表-实体类")
+@ApiModel("门店会员消费报表-实体类")
 public class ReportMemberSaleVo extends PagesRequest {
 	
-	@ApiModelProperty(value="报表年份")
-	@JsonProperty("report_year")
-	private String reportYear;
+	@ApiModelProperty(value="id")
+	@JsonProperty("id")
+	private Integer id;
+
+
+	@ApiModelProperty(value="年月")
+	@JsonProperty("stat_year_month")
+	private String statYearMonth;
+
+
+	@ApiModelProperty(value="门店id")
+	@JsonProperty("store_id")
+	private String storeId;
+
+
+	@ApiModelProperty(value="门店编码")
+	@JsonProperty("store_code")
+	private String storeCode;
+
+
+	@ApiModelProperty(value="门店名称")
+	@JsonProperty("store_name")
+	private String storeName;
+
+
+	@ApiModelProperty(value="会员消费人数")
+	@JsonProperty("order_member_num")
+	private Integer orderMemberNum;
+
+
+	@ApiModelProperty(value="会员消费总额")
+	@JsonProperty("mem_total_amount")
+	private Integer memTotalAmount;
+
+
+	@ApiModelProperty(value="总消费额")
+	@JsonProperty("total_amount")
+	private Integer totalAmount;
+
+
+	@ApiModelProperty(value="会员消费金额占比")
+	@JsonProperty("pct_member_consume")
+	private Integer pctMemberConsume;
+
+
+	@ApiModelProperty(value="会员平均消费")
+	@JsonProperty("avg_member_consume")
+	private Integer avgMemberConsume;
+
+
+	@ApiModelProperty(value="会员平均订单数")
+	@JsonProperty("avg_member_order_num")
+	private Integer avgMemberOrderNum;
+
+
+	@ApiModelProperty(value="会员平均订单值")
+	@JsonProperty("avg_order_price")
+	private Integer avgOrderPrice;
 	
-	@ApiModelProperty(value="报表月份")
-	@JsonProperty("report_month")
-	private String reportMonth;
+	@ApiModelProperty(value="门店列表")
+	@JsonProperty("store_ids")
+	private List<String> storeIds;
+	
+	public ReportMemberSaleVo(List<String> storeIds, String statYearMonth, Integer pageNo, Integer pageSize) {
+		this.storeIds = storeIds;
+		this.statYearMonth = statYearMonth;
+	    super.setPageNo(pageNo);
+	    super.setPageSize(pageSize);
+	}
+
+	public ReportMemberSaleVo() {
+		
+	}
 
 }
