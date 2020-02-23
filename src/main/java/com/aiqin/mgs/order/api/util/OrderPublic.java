@@ -365,9 +365,7 @@ public class OrderPublic {
 		  if(query.getEndDate() !=null) {
 			query.setEndDate(DateUtil.getDayEnd(query.getEndDate()));
 		  }
-			if(query.getUpdateTime() !=null) {
-				query.setUpdateTime(DateUtil.getDayEnd(query.getUpdateTime()));
-			}
+
 		}
 		return query;		
 	}	

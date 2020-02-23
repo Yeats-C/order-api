@@ -81,7 +81,7 @@ public class OrderDetailByMemberResponse extends PagesRequest{
 	
 	@ApiModelProperty(value="消费金额")
 	@JsonProperty("price")
-	private Integer price;
+	private Long price;
     
     @ApiModelProperty(value="消耗周期")
     @JsonProperty("consumecycle")
@@ -204,11 +204,11 @@ public class OrderDetailByMemberResponse extends PagesRequest{
 		this.amount = amount;
 	}
 
-	public Integer getPrice() {
+	public Long getPrice() {
 		return price;
 	}
 
-	public void setPrice(Integer price) {
+	public void setPrice(Long price) {
 		this.price = price;
 	}
 
