@@ -2,15 +2,19 @@ package com.aiqin.mgs.order.api.service.impl.order;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
+import com.aiqin.mgs.order.api.dao.CopartnerAreaStoreDao;
 import com.aiqin.mgs.order.api.dao.FirstReportDao;
 import com.aiqin.mgs.order.api.dao.FirstReportInfoDao;
 import com.aiqin.mgs.order.api.domain.FirstReportInfo;
+import com.aiqin.mgs.order.api.domain.copartnerArea.PublicAreaStore;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.FirstReportStoreAndOrderRerequest;
 import com.aiqin.mgs.order.api.domain.response.FirstReportResponse;
 import com.aiqin.mgs.order.api.service.CopartnerAreaService;
 import com.aiqin.mgs.order.api.service.FirstReportService;
 import com.aiqin.mgs.order.api.util.ResultModel;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +25,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -34,6 +40,8 @@ public class FirstReportServiceImpl implements FirstReportService {
 
     @Autowired
     private FirstReportInfoDao firstReportInfoDao;
+    @Autowired
+    private CopartnerAreaStoreDao copartnerAreaStoreDao;
 
     @Autowired
     private CopartnerAreaService copartnerAreaService;
@@ -249,24 +257,36 @@ public class FirstReportServiceImpl implements FirstReportService {
      */
     @Override
     public HttpResponse getLists(String reportTime,Integer pageNo,Integer pageSize,String personId,String resourceCode) {
-        log.info("获取首单报表表格数据入参：{}{}{}", reportTime,personId,resourceCode);
+        log.info("获取首单报表表格数据入参：reportTime={},personId={},resourceCode={}", reportTime,personId,resourceCode);
         //引用合伙人区域公共接口
         HttpResponse httpResponse = copartnerAreaService.selectStoreByPerson(personId, resourceCode);
-        pageNo = pageNo == null ? 1 : pageNo;
-        pageSize = pageSize == null ? 10 : pageSize;
-        PageHelper.startPage(pageNo, pageSize);
-        if (reportTime == null) {
-            return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
-        }
-        PageHelper.startPage(1,10);
-        List<FirstReportInfo> firstReportInfos = firstReportInfoDao.reportLis(reportTime);
-        log.info("查询首单报表表格数据，返回结果 : " + firstReportInfos);
-        if (firstReportInfos == null) {
-            return HttpResponse.failure(ResultCode.FIRST_REPORT_ERROP);
-        }
+        Object obj=httpResponse.getData();
         ResultModel resultModel = new ResultModel();
-        resultModel.setResult(firstReportInfos);
-        resultModel.setTotal(((Page) firstReportInfos).getTotal());
+        if (obj!=null) {
+            List<PublicAreaStore> dataList = JSONArray.parseArray(JSON.toJSONString(obj), PublicAreaStore.class);
+            List<String> storeIds=dataList.stream().map(PublicAreaStore::getStoreId).collect(Collectors.toList());
+            log.info("门店id集合:"+storeIds);
+            List<String> areaIds = copartnerAreaStoreDao.qryAreaByStores(storeIds);
+            if(CollectionUtils.isEmpty(areaIds)){
+                return HttpResponse.success(resultModel);
+            }
+            if (reportTime == null) {
+                return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
+            }
+            FirstReportInfo firstReportInfo=new FirstReportInfo();
+            firstReportInfo.setReportTime(reportTime);
+            firstReportInfo.setAreaIds(areaIds);
+            pageNo = pageNo == null ? 1 : pageNo;
+            pageSize = pageSize == null ? 10 : pageSize;
+            PageHelper.startPage(pageNo, pageSize);
+            List<FirstReportInfo> firstReportInfos = firstReportInfoDao.reportLis(firstReportInfo);
+            log.info("查询首单报表表格数据，返回结果 : " + firstReportInfos);
+            if (firstReportInfos == null) {
+                return HttpResponse.failure(ResultCode.FIRST_REPORT_ERROP);
+            }
+            resultModel.setResult(firstReportInfos);
+            resultModel.setTotal(((Page) firstReportInfos).getTotal());
+        }
         return HttpResponse.success(resultModel);
     }
 }
