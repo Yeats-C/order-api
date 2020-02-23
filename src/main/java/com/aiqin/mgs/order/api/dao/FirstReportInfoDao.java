@@ -13,4 +13,6 @@ public interface FirstReportInfoDao {
     int insert(FirstReportInfo firstReportInfo);
     //删除首单报表数据
     int delete(FirstReportInfo firstReportInfo);
+    //获取首单报表集合
+    List<FirstReportInfo> selcetReportInfoAll();
 }

@@ -496,7 +496,7 @@ public class ActivityServiceImpl implements ActivityService {
                 }
             }
 
-            if(activityList!=null){
+            if(activityList!=null && 0!=activityList.size()){
                 return true;
             }else{
                 return false;

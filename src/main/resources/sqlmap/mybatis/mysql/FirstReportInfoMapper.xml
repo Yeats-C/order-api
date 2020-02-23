@@ -61,5 +61,10 @@
         from first_report
         where report_time = #{reportTime} and copartner_area_id=#{copartnerAreaId}
     </select>
+    <select id="selcetReportInfoAll" resultType="com.aiqin.mgs.order.api.domain.FirstReportInfo">
+        select
+        <include refid="Base_Column_List"/>
+        from first_report
+    </select>
 
 </mapper>

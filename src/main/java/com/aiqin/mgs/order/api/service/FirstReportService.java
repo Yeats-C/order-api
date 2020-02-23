@@ -10,4 +10,5 @@ public interface FirstReportService {
     void reportTimedTask();
     //根据报表时间查询报表表格数据
     HttpResponse getLists(String reportTime,Integer pageNo,Integer pageSize);
+
 }
