@@ -427,7 +427,7 @@
     </select>
 
     <select id="byMemberOrderCount"   resultType="java.lang.Integer">
-        SELECT count(b.id)
+        SELECT count(a.id)
 
         FROM
         order_consumer_detail a
