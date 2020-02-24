@@ -709,17 +709,20 @@ public class ActivityServiceImpl implements ActivityService {
                 shoppingCartRequest.setProductId(vo.getSkuCode());
                 Integer cartNum=getSkuNum(shoppingCartRequest).getData();
                 vo.setCartNum(cartNum);
+                vo.setStoreStockSkuNum(bridgeProductService.getStoreStockSkuNum(shoppingCartRequest));
 
-                Integer storeStockSkuNum=(Integer) bridgeProductService.getStoreStockSkuNum(shoppingCartRequest).getData();
-                vo.setStoreStockSkuNum(storeStockSkuNum);
-
-                if(vo.getSkuStock()>10){
-                    vo.setStoreStockExplain("有货");
-                }else if(vo.getSkuStock()<=0){
+                if(null!=vo.getSkuStock()){
+                    if(vo.getSkuStock()>10){
+                        vo.setStoreStockExplain("有货");
+                    }else if(vo.getSkuStock()<=0){
+                        vo.setStoreStockExplain("缺货");
+                    }else if(vo.getSkuStock()>0 && vo.getSkuStock()<=10){
+                        vo.setStoreStockExplain("库存紧张");
+                    }
+                }else{
                     vo.setStoreStockExplain("缺货");
-                }else if(vo.getSkuStock()>0 && vo.getSkuStock()<=10){
-                    vo.setStoreStockExplain("库存紧张");
                 }
+
             }
         }else{
             return HttpResponse.failure(ResultCode.SELECT_ACTIVITY_INFO_EXCEPTION);
