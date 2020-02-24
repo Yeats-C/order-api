@@ -1,0 +1,52 @@
+package com.aiqin.mgs.order.api.domain.request;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import java.math.BigDecimal;
+
+/**
+ * description: CouponShareRequest
+ * date: 2020/2/24 15:47
+ * author: hantao
+ * version: 1.0
+ */
+@Data
+@ApiModel("A品卷分摊")
+public class CouponShareRequest {
+
+    @ApiModelProperty(value = "行号")
+    @JsonProperty("line_code")
+    private Long lineCode;
+
+    @ApiModelProperty(value = "sku编码")
+    @JsonProperty("sku_code")
+    private String skuCode;
+
+    @ApiModelProperty(value = "数量")
+    @JsonProperty("product_count")
+    private Long productCount;
+
+    @ApiModelProperty(value = "活动价（元）")
+    @JsonProperty("activity_price")
+    private BigDecimal activityPrice;
+
+    @ApiModelProperty(value = "行总价（元）")
+    @JsonProperty("total_product_amount")
+    private BigDecimal totalProductAmount;
+
+    @ApiModelProperty(value = "优惠分摊总金额（分摊后金额）（元）")
+    @JsonProperty("total_preferential_amount")
+    private BigDecimal totalPreferentialAmount;
+
+    @ApiModelProperty(value = "分摊后单价（元）")
+    @JsonProperty("preferential_amount")
+    private BigDecimal preferentialAmount;
+
+    @ApiModelProperty(value = "活动优惠总金额,包括活动优惠和优惠券优惠（元）")
+    @JsonProperty("total_acivity_amount")
+    private BigDecimal totalAcivityAmount;
+
+}
