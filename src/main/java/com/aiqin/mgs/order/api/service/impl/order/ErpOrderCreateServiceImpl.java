@@ -640,16 +640,15 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     /**
      * A品券计算均摊金额
      *
-     * @param processTypeEnum
      * @param details
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2019/12/9 15:35
      */
-    private void couponSharePrice(ErpOrderNodeProcessTypeEnum processTypeEnum, List<CouponShareRequest> details, List<String> topCouponCodeList) {
-
-        ErpOrderFee orderFee = order.getOrderFee();
+    private void couponSharePrice(List<CouponShareRequest> details, List<String> topCouponCodeList) {
+//        ErpOrderNodeProcessTypeEnum processTypeEnum
+//        ErpOrderFee orderFee = order.getOrderFee();
         //A品券编码，逗号隔开
         String topCouponCodes = null;
         //A品券优惠金额
@@ -674,13 +673,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             topCouponCodes = String.join(",", topCouponCodeList);
         }
 
-
         //计算A品券金额
-        List<ErpOrderItem> topProductList = new ArrayList<>();
-        for (ErpOrderItem item :
-                order.getItemList()) {
+        List<CouponShareRequest> topProductList = new ArrayList<>();
+        for (CouponShareRequest item : details) {
             ErpProductPropertyTypeEnum propertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(item.getProductPropertyCode());
-            if (processTypeEnum != null && propertyTypeEnum.isUseTopCoupon()) {
+            if (propertyTypeEnum.isUseTopCoupon()) {
                 topProductList.add(item);
             }
         }

@@ -49,4 +49,7 @@ public class CouponShareRequest {
     @JsonProperty("total_acivity_amount")
     private BigDecimal totalAcivityAmount;
 
+    @ApiModelProperty(value = "商品属性编码")
+    @JsonProperty("product_property_code")
+    private String productPropertyCode;
 }
