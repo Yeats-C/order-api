@@ -42,5 +42,19 @@
     AND detail.product_category_code = #{categoryCode}
     AND info.store_id = #{storeId}
     </select>
+    
+    <select id="qryCategoryFinish" resultType="com.aiqin.mgs.order.api.domain.ReportCategoryVo">
+    SELECT 
+     DISTINCT info.store_id AS storeId,info.store_code AS storeCode,info.store_name AS storeName,
+     detail.product_category_code AS categoryCode,detail.product_category_name AS categoryName
+    FROM order_store_info info
+    LEFT JOIN order_store_detail detail  ON info.order_store_id = info.order_store_id
+    WHERE info.order_status = 13
+    AND info.create_time  &gt;= #{beginTime}
+    AND info.create_time  &lt;= #{endTime}
+    AND info.store_id IS NOT NULL
+    AND detail.product_category_code IS NOT NULL
+    GROUP BY info.store_id,detail.product_category_code
+    </select>
 </mapper>
 
