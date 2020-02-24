@@ -675,6 +675,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //计算A品券金额
         List<CouponShareRequest> topProductList = new ArrayList<>();
+        //存储符合A品卷均摊的商品的总分销价
+
         for (CouponShareRequest item : details) {
             ErpProductPropertyTypeEnum propertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(item.getProductPropertyCode());
             if (propertyTypeEnum.isUseTopCoupon()) {
