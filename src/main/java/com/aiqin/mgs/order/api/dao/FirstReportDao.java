@@ -20,4 +20,6 @@ public interface FirstReportDao {
     List<String> QueryStoreByAreaId(@Param("araeId") String araeId);
     //此方法是为了看门店有没有订单
     List<ErpOrderInfo> selectOrders(FirstReportStoreAndOrderRerequest firstReportStoreAndOrderRerequest);
+    //此方法是为了测试年包有没有订单
+    List<ErpOrderInfo> selectOrderss(FirstReportStoreAndOrderRerequest firstReportStoreAndOrderRerequest);
 }

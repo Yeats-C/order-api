@@ -8,6 +8,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @ApiModel("首单报表对象")
@@ -88,5 +89,9 @@ public class FirstReportInfo {
     @ApiModelProperty(value = "统计月份")
     @JsonProperty("report_time")
     private String reportTime;
+
+    @ApiModelProperty(value = "区域id集合")
+    @JsonProperty("area_ids")
+    private List<String> areaIds;
 
  }
