@@ -246,7 +246,7 @@ public class ActivityController {
      */
     @PostMapping("/skuPage")
     @ApiOperation("活动商品查询（筛选+分页）")
-    public HttpResponse<PageResData<ProductSkuRespVo5>> skuPage(SpuProductReqVO spuProductReqVO){
+    public HttpResponse<PageResData<ProductSkuRespVo5>> skuPage(@Valid @RequestBody SpuProductReqVO spuProductReqVO){
         return activitesService.skuPage(spuProductReqVO);
     }
 
