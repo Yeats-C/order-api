@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.ReportCategoryDao">
+
+   <delete id="delete">
+    delete from report_category_copartner_sale where report_year = #{reportYear} and report_month =#{reportMonth}
+    </delete>
+    
+    <select id="qryAreaInit" resultType="com.aiqin.mgs.order.api.domain.ReportCategoryVo">
+    SELECT 
+          report_year AS reportYear,
+          report_month AS reportMonth,
+          IFNULL(copartner_area_id,'0000') AS copartnerAreaId,
+          IFNULL(copartner_area_name,'其他') AS copartnerAreaName,
+          '2' as reportSubtotalType
+    FROM  report_category_copartner_sale
+    WHERE 1=1
+    AND report_year = #{reportYear}
+    AND report_month = #{reportMonth}
+    AND report_subtotal_type =1
+    GROUP BY copartner_area_id
+    </select>
+    
+    <insert id="save">
+        insert into report_category_copartner_sale(
+        id,                                    
+        copartner_area_id,                     
+        copartner_area_name,                   
+        store_id,                              
+        store_code,                            
+        store_name,                            
+        category_code,                         
+        category_name,                         
+    <if test="totalTarget !=null ">            
+        total_target,                          
+    </if>                                      
+    <if test="totalRate !=null ">              
+        total_rate,                            
+    </if>                                      
+    <if test="totalAmount !=null ">            
+        total_amount,                          
+    </if>                                      
+    <if test="totalPrice !=null ">             
+        total_price,                           
+    </if>                                      
+    <if test="priceRate !=null ">              
+        price_rate,                            
+    </if>                                      
+    <if test="lastRate !=null ">               
+        last_rate,                             
+    </if>                                      
+    <if test="sameRate !=null ">               
+        same_rate,                             
+    </if>                                      
+    <if test="qoqRate !=null ">                
+        qoq_rate,                              
+    </if>                                      
+        report_year,                           
+        report_month,                          
+        report_subtotal_type                   
+    )values(                                   
+        #{id},                                 
+        #{copartnerAreaId},                    
+        #{copartnerAreaName},                  
+        #{storeId},                            
+        #{storeCode},                          
+        #{storeName},                          
+        #{categoryCode},                       
+        #{categoryName},                       
+    <if test="totalTarget !=null ">            
+        #{totalTarget},                        
+    </if>                                      
+    <if test="totalRate !=null ">              
+        #{totalRate},                          
+    </if>                                      
+    <if test="totalAmount !=null ">            
+        #{totalAmount},                        
+    </if>                                      
+    <if test="totalPrice !=null ">             
+        #{totalPrice},                         
+    </if>                                      
+    <if test="priceRate !=null ">              
+        #{priceRate},                          
+    </if>                                      
+    <if test="lastRate !=null ">               
+        #{lastRate},                           
+    </if>                                      
+    <if test="sameRate !=null ">               
+        #{sameRate},                           
+    </if>                                      
+    <if test="qoqRate !=null ">                
+        #{qoqRate},                            
+    </if>                                      
+        #{reportYear},                         
+        #{reportMonth},                        
+        #{reportSubtotalType}                  
+    )                                                                     
+    </insert>
+    
+</mapper>
+
+
