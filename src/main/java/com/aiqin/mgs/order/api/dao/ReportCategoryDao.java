@@ -12,4 +12,10 @@ import java.util.List;
 
 public interface ReportCategoryDao {
 
+	void save(ReportCategoryVo vo);
+
+	void delete(@Valid @Param("reportYear") String reportYear,@Valid @Param("reportMonth") String reportMonth);
+
+	List<ReportCategoryVo> qryAreaInit(@Valid @Param("reportYear") String reportYear,@Valid @Param("reportMonth") String reportMonth);
+
 }

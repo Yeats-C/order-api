@@ -6,9 +6,17 @@
 package com.aiqin.mgs.order.api.service;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.domain.ReportCategoryVo;
+
 import java.util.List;
 
 @SuppressWarnings("all")
 public interface ReportCategoryService {
+
+	void delete(String year, String month);
+
+	void save(ReportCategoryVo vo);
+
+	List<ReportCategoryVo> qryAreaInit(String year, String month);
 
 }

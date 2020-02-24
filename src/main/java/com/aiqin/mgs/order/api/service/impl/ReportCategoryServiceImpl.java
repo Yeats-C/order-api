@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.aiqin.mgs.order.api.dao.ReportCategoryDao;
+import com.aiqin.mgs.order.api.domain.ReportCategoryVo;
+import com.aiqin.mgs.order.api.domain.ReportCopartnerSaleVo;
+
 import java.util.List;
 
 @SuppressWarnings("all")
@@ -26,6 +29,24 @@ public class ReportCategoryServiceImpl implements ReportCategoryService {
 
     @Resource
     private ReportCategoryDao dao;
+    
+    
+    @Override
+	public void save(ReportCategoryVo vo) {
+    	dao.save(vo);
+	}
+
+	@Override
+	public void delete(String reportYear, String reportMonth) {
+		dao.delete(reportYear,reportMonth);
+		
+	}
+
+
+	@Override
+	public List<ReportCategoryVo> qryAreaInit(String year, String month) {
+		return dao.qryAreaInit(year,month);
+	}
 
 
 
