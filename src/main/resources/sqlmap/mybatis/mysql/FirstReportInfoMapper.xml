@@ -74,6 +74,6 @@
         select
         <include refid="Base_Column_List"/>
         from first_report
+        where report_time = #{reportTime}
     </select>
-
 </mapper>
