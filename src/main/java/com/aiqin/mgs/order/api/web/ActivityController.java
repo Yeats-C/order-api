@@ -256,7 +256,7 @@ public class ActivityController {
      */
     @PostMapping("/productActivityList")
     @ApiOperation("通过条件查询一个商品有多少个进行中的活动")
-    public HttpResponse<List<Activity>> productActivityList(@Valid @RequestBody     ActivityParameterRequest parameterRequest){
+    public HttpResponse<List<Activity>> productActivityList(@Valid @RequestBody ActivityParameterRequest parameterRequest){
         HttpResponse response = HttpResponse.success();
         response.setData(activitesService.activityList(parameterRequest));
         return response;
