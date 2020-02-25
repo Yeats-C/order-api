@@ -29,13 +29,13 @@ public class CouponShareRequest {
     @JsonProperty("product_count")
     private Long productCount;
 
-    @ApiModelProperty(value = "活动价（元）")
-    @JsonProperty("activity_price")
-    private BigDecimal activityPrice;
-
     @ApiModelProperty(value = "行总价（元）")
     @JsonProperty("total_product_amount")
     private BigDecimal totalProductAmount;
+
+    @ApiModelProperty(value = "商品属性编码")
+    @JsonProperty("product_property_code")
+    private String productPropertyCode;
 
     @ApiModelProperty(value = "优惠分摊总金额（分摊后金额）（元）")
     @JsonProperty("total_preferential_amount")
@@ -49,7 +49,8 @@ public class CouponShareRequest {
     @JsonProperty("total_acivity_amount")
     private BigDecimal totalAcivityAmount;
 
-    @ApiModelProperty(value = "商品属性编码")
-    @JsonProperty("product_property_code")
-    private String productPropertyCode;
+    @ApiModelProperty(value = "关联A品券编码")
+    @JsonProperty("top_coupon_codes")
+    private String topCouponCodes;
+
 }

@@ -639,16 +639,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
     /**
      * A品券计算均摊金额
-     *
      * @param details
-     * @return void
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/12/9 15:35
+     * @param topCouponCodeList
      */
     private void couponSharePrice(List<CouponShareRequest> details, List<String> topCouponCodeList) {
-//        ErpOrderNodeProcessTypeEnum processTypeEnum
-//        ErpOrderFee orderFee = order.getOrderFee();
         //A品券编码，逗号隔开
         String topCouponCodes = null;
         //A品券优惠金额
@@ -672,66 +666,55 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             }
             topCouponCodes = String.join(",", topCouponCodeList);
         }
-
+        //如果A品卷总金额为0，直接返回
+        if (topCouponMoney.compareTo(BigDecimal.ZERO) == 0) {
+            return;
+        }
         //计算A品券金额
         List<CouponShareRequest> topProductList = new ArrayList<>();
-        //存储符合A品卷均摊的商品的总分销价
-
+        //存储符合A品卷均摊的商品的总分销价(商品组价值)
+        BigDecimal totalAmount=BigDecimal.ZERO;
         for (CouponShareRequest item : details) {
             ErpProductPropertyTypeEnum propertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(item.getProductPropertyCode());
             if (propertyTypeEnum.isUseTopCoupon()) {
                 topProductList.add(item);
+                //分销总价=从活动的分摊总价取
+                totalAmount=totalAmount.add(item.getTotalPreferentialAmount());
             }
         }
-
-        //订单总金额
-        BigDecimal totalMoney = orderFee.getTotalMoney();
-        //已经分摊的金额临时缓存
-        BigDecimal usedTopCouponAmount = BigDecimal.ZERO;
-        if (topProductList.size() > 0) {
-            for (int i = 0; i < topProductList.size(); i++) {
-                ErpOrderItem item = topProductList.get(i);
-                //行均摊后金额
-                BigDecimal totalPreferentialAmount = item.getTotalPreferentialAmount();
-                //行均摊后单价
-                BigDecimal preferentialAmount = item.getPreferentialAmount();
-                //行A品券金额
-                BigDecimal lineTopCouponMoney = BigDecimal.ZERO;
-
-                if (topCouponMoney.compareTo(BigDecimal.ZERO) > 0) {
-                    if (i < topProductList.size() - 1) {
-                        //非最后一行，根据比例计算
-                        lineTopCouponMoney = topCouponMoney.multiply(item.getTotalProductAmount()).divide(totalMoney, 4, RoundingMode.HALF_UP);
-                    } else {
-                        //最后一行，用减法防止误差
-                        lineTopCouponMoney = topCouponMoney.subtract(usedTopCouponAmount);
-                    }
-                    if (lineTopCouponMoney.compareTo(item.getTotalProductAmount()) > 0) {
-                        //防止金额减成负数
-                        lineTopCouponMoney = item.getTotalProductAmount();
-                    }
-                    //已使用A品优惠金额
-                    usedTopCouponAmount = usedTopCouponAmount.add(lineTopCouponMoney);
-                    //行均摊金额
-                    totalPreferentialAmount = totalPreferentialAmount.subtract(lineTopCouponMoney);
-                    //行均摊单价
-                    preferentialAmount = totalPreferentialAmount.divide(new BigDecimal(item.getProductCount()), 4, RoundingMode.HALF_DOWN);
+        //判断优惠券总金额和从活动的分摊总价取，如果A品卷总金额大于活动分摊总价，则A品券总金额=活动分摊总价
+        if(topCouponMoney.subtract(totalAmount).compareTo(BigDecimal.ZERO)==1){
+            topCouponMoney=totalAmount;
+        }
+        //商品组实收(商品组价值-A品卷)
+        BigDecimal auGroupAmount=totalAmount.subtract(topCouponMoney);
+        //计算累加分摊总金额（最后一行做减法使用）
+        BigDecimal totalFenAmount=BigDecimal.ZERO;
+        if(topProductList!=null&&topProductList.size()>0){
+            for(int i=0;i<topCouponCodeList.size();i++){
+                CouponShareRequest csr=topProductList.get(i);
+                //行总价(分销价)（元）
+                BigDecimal totalProductAmount=csr.getTotalProductAmount();
+                //A品卷分摊后总价值
+                BigDecimal totalPreferentialAmount =csr.getTotalPreferentialAmount();
+                if (i < topProductList.size() - 1) {
+                    //非最后一行，根据比例计算
+                    totalPreferentialAmount = totalProductAmount.multiply(auGroupAmount).divide(totalAmount,4, RoundingMode.HALF_UP);
+                    totalFenAmount=totalFenAmount.add(totalPreferentialAmount);
+                }else {
+                    //最后一行，用减法防止误差
+                    totalPreferentialAmount = auGroupAmount.subtract(totalFenAmount);
                 }
-
-                //优惠分摊总金额（分摊后金额）
-                item.setTotalPreferentialAmount(totalPreferentialAmount);
-                //分摊后单价
-                item.setPreferentialAmount(preferentialAmount);
-                //活动优惠总金额
-                item.setTotalAcivityAmount(item.getTotalAcivityAmount().add(lineTopCouponMoney));
+                //分摊单价
+                BigDecimal preferentialAmount = totalPreferentialAmount.divide(new BigDecimal(csr.getProductCount()), 4, RoundingMode.HALF_DOWN);
+                //活动优惠总金额=分销总价-分摊价
+                BigDecimal activityTotalAmount=totalProductAmount.subtract(totalPreferentialAmount);
+                csr.setTotalPreferentialAmount(totalPreferentialAmount);
+                csr.setPreferentialAmount(preferentialAmount);
+                csr.setTotalAcivityAmount(activityTotalAmount);
+                csr.setTopCouponCodes(topCouponCodes);
             }
         }
-
-        orderFee.setSuitCouponMoney(BigDecimal.ZERO);
-        orderFee.setActivityMoney(BigDecimal.ZERO);
-        orderFee.setTopCouponMoney(usedTopCouponAmount);
-        orderFee.setTopCouponCodes(topCouponCodes);
-        orderFee.setPayMoney(orderFee.getTotalMoney().subtract(orderFee.getActivityMoney()).subtract(orderFee.getSuitCouponMoney()).subtract(orderFee.getTopCouponMoney()));
     }
 
 
