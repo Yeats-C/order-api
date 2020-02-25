@@ -103,7 +103,7 @@
     <update id="updateActivity">
         update activity
         <set>
-            <if test="activityName != null">
+            <if test="activityName != null and activityName !=''">
                 activity_name = #{activityName,jdbcType=VARCHAR},
             </if>
             <if test="activityType != null">
@@ -118,19 +118,19 @@
             <if test="finishTime != null">
                 finish_time = #{finishTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="publishingOrganization != null">
+            <if test="publishingOrganization != null and publishingOrganization!=''">
                 publishing_organization = #{publishingOrganization,jdbcType=VARCHAR},
             </if>
-            <if test="activityBrief != null">
+            <if test="activityBrief != null and activityBrief!=''">
                 activity_brief = #{activityBrief,jdbcType=VARCHAR},
             </if>
-            <if test="activityPicPc != null">
+            <if test="activityPicPc != null and activityPicPc!=''">
                 activity_pic_pc = #{activityPicPc,jdbcType=VARCHAR},
             </if>
-            <if test="activityPicApp != null">
+            <if test="activityPicApp != null and activityPicApp!=''">
                 activity_pic_app = #{activityPicApp,jdbcType=VARCHAR},
             </if>
-            <if test="updateBy != null">
+            <if test="updateBy != null and updateBy!=''">
                 update_by = #{updateBy,jdbcType=VARCHAR},
             </if>
             <if test="activeStoreRange != null">
