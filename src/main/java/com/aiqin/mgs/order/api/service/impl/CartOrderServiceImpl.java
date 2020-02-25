@@ -343,7 +343,7 @@ public class CartOrderServiceImpl implements CartOrderService {
         query.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
 
         //购物车数据
-        List<CartOrderInfo> cartInfoList = cartOrderDao.selectCartByStoreId(cartOrderInfo);
+        List<CartOrderInfo> cartInfoList = cartOrderDao.selectCartByStoreId(query);
 
         //计算商品总价格
         BigDecimal acountActualprice = BigDecimal.ZERO;
@@ -612,6 +612,42 @@ public class CartOrderServiceImpl implements CartOrderService {
             httpResponse = HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
         }
         return httpResponse;
+    }
+
+    @Override
+    public List<CartOrderInfo> getErpProductList(String storeId, Integer productType) {
+        CartOrderInfo query = new CartOrderInfo();
+        query.setStoreId(storeId);
+        query.setProductType(productType);
+        query.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
+        query.setLineCheckStatus(Global.LINECHECKSTATUS_1);
+
+        //购物车数据
+        List<CartOrderInfo> cartInfoList = null;
+        try {
+            cartInfoList = cartOrderDao.selectCartByStoreId(query);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (cartInfoList != null && cartInfoList.size() > 0) {
+            for (CartOrderInfo item :
+                    cartInfoList) {
+                BigDecimal totalMoney = item.getPrice().multiply(new BigDecimal(item.getAmount()));
+                item.setActivityPrice(item.getPrice());
+                item.setLineAmountTotal(totalMoney);
+                item.setLineActivityAmountTotal(totalMoney);
+                item.setLineActivityDiscountTotal(BigDecimal.ZERO);
+                item.setLineAmountAfterActivity(totalMoney);
+            }
+        }
+
+        return cartInfoList;
+    }
+
+    @Override
+    public void deleteByCartId(String cartId) {
+        cartOrderDao.deleteByCartId(cartId);
     }
 
     /**

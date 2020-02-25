@@ -66,4 +66,20 @@ public interface CartOrderService {
      */
     HttpResponse<StoreCartProductResponse> displayCartLineCheckProduct(CartOrderInfo cartOrderInfo);
 
+    /**
+     * 获取erp端购物车信息
+     *
+     * @param storeId     门店id
+     * @param productType 商品类型
+     * @return
+     */
+    List<CartOrderInfo> getErpProductList(String storeId, Integer productType);
+
+    /**
+     * 根据cartId删除一行
+     *
+     * @param cartId
+     */
+    void deleteByCartId(String cartId);
+
 }
