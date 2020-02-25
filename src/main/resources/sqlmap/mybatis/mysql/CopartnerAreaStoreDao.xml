@@ -100,5 +100,9 @@
             )
     </if>
     </select>
+    
+    <delete id="deleteByAreaStore">
+        delete from copartner_area_store where store_id = #{storeId}
+    </delete>
 </mapper>
 
