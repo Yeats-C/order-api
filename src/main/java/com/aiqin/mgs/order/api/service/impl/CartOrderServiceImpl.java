@@ -528,52 +528,11 @@ public class CartOrderServiceImpl implements CartOrderService {
         response.setTopTotalPrice(topTotalPrice);
         response.setCartGroupList(cartGroupList);
         response.setActivityDiscountAmount(activityDiscountAmount);
+        StoreInfo store = erpOrderRequestService.getStoreInfoByStoreId(storeId);
+        response.setStoreAddress(store.getAddress());
+        response.setStoreContacts(store.getContacts());
+        response.setStoreContactsPhone(store.getContactsPhone());
 
-//        //计算商品总价格
-//        BigDecimal accountActualPrice = BigDecimal.ZERO;
-//        //计算商品活动优惠后价格汇总
-//        BigDecimal accountActualActivityPrice = BigDecimal.ZERO;
-//
-//        BigDecimal topTotalAmount = BigDecimal.ZERO;
-//
-//        for (CartOrderInfo item : cartInfoList) {
-//            if (Global.LINECHECKSTATUS_1.equals(item.getLineCheckStatus())) {
-//
-//                BigDecimal total = new BigDecimal(item.getAmount()).multiply(item.getPrice());
-//                accountActualPrice = accountActualPrice.add(total);
-//                totalNumber += item.getAmount();
-//                accountActualActivityPrice = accountActualActivityPrice.add(item.getAccountTotalPrice());
-//                ErpProductPropertyTypeEnum productPropertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(item.getProductPropertyCode());
-//                if (productPropertyTypeEnum.isUseTopCoupon()) {
-//                    topTotalAmount = topTotalAmount.add(item.getAccountTotalPrice());
-//                }
-//            }
-//
-//            //查询赠品行
-//            List<CartOrderInfo> giftList = cartOrderDao.findByGiftParentCartId(item.getCartId());
-//            item.setGiftList(giftList);
-//
-//            //调用接口查询商品可选活动列表
-////            ActivityParameterRequest activityParameterRequest = new ActivityParameterRequest();
-////            activityParameterRequest.setStoreId(storeId);
-////            activityParameterRequest.setSkuCode(item.getSkuCode());
-////            activityParameterRequest.setProductBrandCode(item.getProductBrandCode());
-////            activityParameterRequest.setProductCategoryCode(item.getProductCategoryCode());
-////            List<Activity> activityList = activityService.activityList(activityParameterRequest);
-//
-//            //TODO 临时调试使用，用完删除
-//            List<Activity> activityList = TestUtil.getTestActivityList();
-//            item.setActivityList(activityList);
-//
-//        }
-//
-//        CartResponse cartResponse = new CartResponse();
-//        cartResponse.setCartInfoList(cartInfoList);
-//        cartResponse.setAccountActualPrice(accountActualPrice);
-//        cartResponse.setAccountActualActivityPrice(accountActualActivityPrice);
-//        cartResponse.setTotalNumber(totalNumber);
-//        cartResponse.setTopTotalPrice(topTotalAmount);
-//        return cartResponse;
         return response;
     }
 

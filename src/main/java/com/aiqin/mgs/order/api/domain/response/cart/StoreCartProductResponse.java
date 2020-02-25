@@ -33,4 +33,16 @@ public class StoreCartProductResponse {
     @JsonProperty("top_total_price")
     private BigDecimal topTotalPrice;
 
+    @ApiModelProperty(value = "门店地址")
+    @JsonProperty("store_address")
+    private String storeAddress;
+
+    @ApiModelProperty(value = "门店联系人")
+    @JsonProperty("store_contacts")
+    private String storeContacts;
+
+    @ApiModelProperty(value = "门店联系人电话")
+    @JsonProperty("store_contacts_phone")
+    private String storeContactsPhone;
+
 }
