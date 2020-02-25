@@ -360,7 +360,7 @@ public class ErpOrderInfo {
 
     @ApiModelProperty(value = "是否活动商品0否1是")
     @JsonProperty("is_activity")
-    private String isActivity;
+    private Integer isActivity;
 
     @ApiModelProperty(value = "整单活动id")
     @JsonProperty("activity_id")
