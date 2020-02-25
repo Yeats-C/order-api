@@ -20,6 +20,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -134,7 +135,7 @@ public class BridgeProductService {
     public HttpResponse<PageResData<ProductSkuRespVo5>> getSkuPage(SpuProductReqVO spuProductReqVO){
         String path = "/search/spu/skuPage";
         HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(spuProductReqVO);
-        HttpResponse<PageResData<ProductSkuRespVo5>> response = httpClient.action().result(new TypeReference<HttpResponse<PageResData>>() {
+        HttpResponse<PageResData<ProductSkuRespVo5>> response = httpClient.action().result(new TypeReference<HttpResponse<PageResData<ProductSkuRespVo5>>>() {
         });
 
         return response;
@@ -145,13 +146,19 @@ public class BridgeProductService {
      * @param req
      * @return
      */
-    public HttpResponse getStoreStockSkuNum(ShoppingCartRequest req){
+    public Integer getStoreStockSkuNum(ShoppingCartRequest req){
+        Integer num=0;
         String path = "/store/stock/sku/info";
         HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path+"?store_id=" + req.getStoreId()+"&sku_code="+req.getProductId());
-        HttpResponse<Integer> response = httpClient.action().result(new TypeReference<HttpResponse<Integer>>() {
-        });
+        Map<String, Object> result = httpClient.action().result(new TypeReference<Map<String, Object>>() {});
+        if (StringUtils.isNotBlank(String.valueOf(result.get("code"))) && "0".equals(String.valueOf(result.get("code")))) {
+            Map data = (Map)result.get("data");
+            if(data!=null&&data.get("data")!=null){
+                num= Integer.valueOf(data.get("data").toString());
+            }
+        }
 
-        return response;
+        return num;
     }
 
     /**

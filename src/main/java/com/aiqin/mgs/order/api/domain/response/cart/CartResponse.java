@@ -21,15 +21,7 @@ public class CartResponse {
     @JsonProperty("account_actual_price")
     private BigDecimal accountActualPrice;
 
-    @ApiModelProperty(value = "勾选商品活动价汇总")
-    @JsonProperty("account_actual_activity_price")
-    private BigDecimal accountActualActivityPrice;
-
     @ApiModelProperty(value = "商品总数量")
     @JsonProperty("total_number")
     private int totalNumber;
-
-    @ApiModelProperty(value = "所有勾选的商品中可使用A品券的商品活动后金额汇总")
-    @JsonProperty("top_total_price")
-    private BigDecimal topTotalPrice;
 }
