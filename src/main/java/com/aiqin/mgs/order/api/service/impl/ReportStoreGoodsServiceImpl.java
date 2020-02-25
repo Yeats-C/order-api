@@ -138,7 +138,7 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 String storeCode=entry.getKey();
                 //查询门店下补货品牌、数量（主表）
                 List<ReportStoreGoods> reportStoreGoodsCountResponses = reportStoreGoodsDao.selectProductCount(storeCode);
-                if(CollectionUtils.isEmpty(reportStoreGoodsCountResponses)&&null!=reportStoreGoodsCountResponses&&reportStoreGoodsCountResponses.size()>0){//未查询到订单数据
+                if(CollectionUtils.isEmpty(reportStoreGoodsCountResponses)||null==reportStoreGoodsCountResponses||reportStoreGoodsCountResponses.size()==0){//未查询到订单数据
                     log.info("查询"+storeCode+"该门店下补货品牌、数量为空");
                     continue;
                 }
@@ -163,7 +163,7 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 vo.setStoreCode(storeCode);
                 vo.setCountTime(countTime);
                 List<ReportStoreGoodsDetail> reportStoreGoodsDetails1 = reportStoreGoodsDetailDao.selectList(vo);
-                if(CollectionUtils.isNotEmpty(reportStoreGoodsDetails1)){
+                if(CollectionUtils.isNotEmpty(reportStoreGoodsDetails1)||reportStoreGoodsDetails1.size()>0){
                     reportStoreGoodsDetailDao.deleteByStoreCodeAndCountTime(vo);
                 }
                 //插入门店补货列表统计detail报表
