@@ -630,6 +630,41 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 	public List<String> qryAreaByStores(List<String> storeIds) {
 		return copartnerAreaStoreDao.qryAreaByStores(storeIds);
 	}
+
+	
+	/**
+	 * 对外接口-查询区域列表
+	 */
+	@Override
+	public HttpResponse<CopartnerAreaUp> qryCopartnerAreaList() {
+		try {
+			List<CopartnerAreaUp> list = new ArrayList();
+			list = copartnerAreaDao.qryCopartnerAreaList();
+			return HttpResponse.success(list);
+		}catch(Exception e) {
+			LOGGER.error("对外接口-查询区域列表异常{}",e);
+			return HttpResponse.failure(MessageId.create(Project.ZERO, 01,"查询出现未知异常,请联系系统管理员."));
+		}
+	}
+
+
+	/**
+	 * 保存门店与区域的对应关系
+	 */
+	@Override
+	public HttpResponse saveAreaStore(CopartnerAreaStoreVo param) {
+		try {
+			//删除对应关系
+			copartnerAreaStoreDao.deleteByAreaStore(param.getStoreId());
+			copartnerAreaStoreDao.saveCopartnerAreaStore(param);
+			return HttpResponse.success(true);
+		}catch(Exception e) {
+			LOGGER.error("保存门店与区域的对应关系异常{}",e);
+			return HttpResponse.failure(MessageId.create(Project.ZERO, 01,"查询出现未知异常,请联系系统管理员."));
+		}
+		
+		
+	}
 }
 
 

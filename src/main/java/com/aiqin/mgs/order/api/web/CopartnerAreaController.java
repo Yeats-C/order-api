@@ -42,9 +42,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.web.bind.WebDataBinder;
@@ -244,4 +247,24 @@ public class CopartnerAreaController {
         return copartnerAreaService.getStoresByCodeOrName(parm);
     }
     
+    /**
+     * 对外接口
+     * @return
+     */
+    @GetMapping("/out/list")
+    @ApiOperation(value = "对外接口-查询区域列表")
+    public HttpResponse<CopartnerAreaUp> qryCopartnerAreaList(){    
+    	return copartnerAreaService.qryCopartnerAreaList();
+    }
+    
+    
+    
+    /**
+     * 保存门店与区域的对应关系
+     */
+    @PostMapping("/out/save/store")
+    @ApiOperation("对外接口-保存门店与区域的对应关系")
+    public HttpResponse saveAreaStore(@RequestBody CopartnerAreaStoreVo param) {
+        return copartnerAreaService.saveAreaStore(param);
+    }
 }
