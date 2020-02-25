@@ -477,7 +477,7 @@ public class DateUtil {
 
     public static void main(String[] args) {
 
-        System.out.println(afterMonth(0));
+        System.out.println(dateAfterMonth("2020-01-15",-12));
     }
 
 }

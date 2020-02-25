@@ -108,14 +108,14 @@ public class OrderCalculateServiceImpl implements OrderCalculateService{
 				ReportCategoryVo info = new ReportCategoryVo();
 				info = storeList.get(i);
 				String storeId = info.getStoreId();
-				String categoryCode = info.getCategoryCode();
+				String childCategoryCode = info.getChildCategoryCode();
 				
 				//子级别销售数量
-				int totalAmount= orderCalculateDao.qryCategoryFinish(storeId,categoryCode,DateUtil.getFristOfMonthDay(new Date()),DateUtil.getLashOfMonthDay(new Date()));
+				int totalAmount= orderCalculateDao.qryCategoryAmountFinish(storeId,childCategoryCode,DateUtil.getFristOfMonthDay(new Date()),DateUtil.getLashOfMonthDay(new Date()));
 				info.setTotalAmount(totalAmount);
 				
 				//子级别含税销售金额
-				int totalPrice= orderCalculateDao.qryTextileFinish(storeId,categoryCode,DateUtil.getFristOfMonthDay(new Date()),DateUtil.getLashOfMonthDay(new Date()));
+				int totalPrice= orderCalculateDao.qryTextileFinish(storeId,childCategoryCode,DateUtil.getFristOfMonthDay(new Date()),DateUtil.getLashOfMonthDay(new Date()));
 				info.setTotalPrice(totalPrice);
 				
 				//汇总日期
@@ -126,6 +126,5 @@ public class OrderCalculateServiceImpl implements OrderCalculateService{
 		}
 		
 		return storeList;
-	}
-	
+	}	
 }
