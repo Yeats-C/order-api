@@ -137,7 +137,7 @@ public class SpuProductReqVO extends PagesRequest {
 
     @ApiModelProperty("品类编码集合")
     @JsonProperty("category_code_list")
-    private List<String> categoryCodeList;
+    private List<ActivityCategoryRequest> categoryCodeList;
 
     /**活动id*/
     @ApiModelProperty(value = "活动id")

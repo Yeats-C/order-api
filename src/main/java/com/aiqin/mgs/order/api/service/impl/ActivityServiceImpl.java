@@ -678,13 +678,17 @@ public class ActivityServiceImpl implements ActivityService {
         if(null!=activityProducts && 0!=activityProducts.size()){
             Integer activityScope=activityProducts.get(0).getActivityScope();
             List<String> parameterList=new ArrayList<>();
+            List<ActivityCategoryRequest> categoryRequestList=new ArrayList<>();
             for(ActivityProduct product:activityProducts){
                 if(activityScope==1){
                     //按单品设置
                     parameterList.add(product.getSkuCode());
                 }else if(activityScope==2){
                     //按品类设置
-                    parameterList.add(product.getProductCategoryCode());
+                    ActivityCategoryRequest categoryRequest=new ActivityCategoryRequest();
+                    categoryRequest.setProductCategoryCode(product.getProductCategoryCode());
+                    categoryRequest.setLevel(product.getLevel());
+                    categoryRequestList.add(categoryRequest);
                 }else if(activityScope==3){
                     //按品牌设置
                     parameterList.add(product.getProductBrandCode());
@@ -696,7 +700,7 @@ public class ActivityServiceImpl implements ActivityService {
             if(activityScope==1){
                 spuProductReqVO.setIncludeSkuCodes(parameterList);
             }else if(activityScope==2){
-                spuProductReqVO.setCategoryCodeList(parameterList);
+                spuProductReqVO.setCategoryCodeList(categoryRequestList);
             }else if(activityScope==3){
                 spuProductReqVO.setBrandCodeList(parameterList);
             }else if(activityScope==4){
