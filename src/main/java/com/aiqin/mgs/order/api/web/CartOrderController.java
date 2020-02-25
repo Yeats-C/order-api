@@ -112,7 +112,7 @@ public class CartOrderController {
      */
     @PostMapping("/displayCartLineCheckProduct")
     @ApiOperation(value = "显示勾选商品列表")
-    public HttpResponse<List<CartOrderInfo>> displayCartLineCheckProduct(CartOrderInfo cartOrderInfo){
+    public HttpResponse<StoreCartProductResponse> displayCartLineCheckProduct(CartOrderInfo cartOrderInfo){
         return cartOrderService.displayCartLineCheckProduct(cartOrderInfo);
     }
 
