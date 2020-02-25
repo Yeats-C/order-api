@@ -7,6 +7,7 @@ package com.aiqin.mgs.order.api.service;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.ReportCategoryVo;
+import com.aiqin.mgs.order.api.domain.response.ReportCopartnerSaleInfo;
 
 import java.util.List;
 
@@ -18,5 +19,8 @@ public interface ReportCategoryService {
 	void save(ReportCategoryVo vo);
 
 	List<ReportCategoryVo> qryAreaInit(String year, String month);
+
+	HttpResponse<ReportCategoryVo> qryReportPageList(String reportYear, String reportMonth, Integer pageNo,
+			Integer pageSize);
 
 }

@@ -30,6 +30,6 @@ public interface OrderCalculateDao {
 
 	List<ReportCategoryVo> qryCategoryFinish(@Valid @Param("beginTime")Date beginTime,@Valid @Param("endTime")Date endTime);
 
-	int qryCategoryFinish(@Valid @Param("storeId")String storeId,@Valid @Param("categoryCode") String categoryCode,@Valid @Param("beginTime")Date beginTime,@Valid @Param("endTime")Date endTime);
+	int qryCategoryAmountFinish(@Valid @Param("storeId")String storeId,@Valid @Param("categoryCode") String categoryCode,@Valid @Param("beginTime")Date beginTime,@Valid @Param("endTime")Date endTime);
 
 }
