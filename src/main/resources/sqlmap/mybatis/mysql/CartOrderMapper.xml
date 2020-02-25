@@ -29,22 +29,20 @@
         <result column="product_property_code" jdbcType="VARCHAR" property="productPropertyCode"/>
         <result column="product_property_name" jdbcType="VARCHAR" property="productPropertyName"/>
         <result column="activity_id" jdbcType="VARCHAR" property="activityId"/>
-        <result column="activity_price" jdbcType="DECIMAL" property="activityPrice"/>
-        <result column="account_total_price" jdbcType="DECIMAL" property="accountTotalPrice"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         product_id,cart_id,franchisee_id,store_id,sku_code,spu_id,product_name,amount,logo,price,color,create_time,update_time,product_size,activity_id,
         activity_name,product_type,create_source,product_gift,gift_parent_cart_id,line_check_status,stock_num,zero_removalCoefficient,spec,product_property_code
-        ,product_property_name,activity_id,activity_price,account_total_price
+        ,product_property_name,activity_id
     </sql>
 
     <!-- 将商品添加添加购物车 -->
     <insert id="insertCart" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo">
         insert into order_store_cart
-			(product_id,cart_id,product_name,amount,logo,create_time,update_time,price,color,product_size,activity_id,activity_name,product_type,sku_code,spu_id,store_id,create_source,stock_num,zero_removalCoefficient,spec,product_property_code,product_property_name,line_check_status,product_brand_code,product_brand_name,product_category_code,product_category_name,activity_price,account_total_price,product_gift,gift_parent_cart_id)
+			(product_id,cart_id,product_name,amount,logo,create_time,update_time,price,color,product_size,activity_id,activity_name,product_type,sku_code,spu_id,store_id,create_source,stock_num,zero_removalCoefficient,spec,product_property_code,product_property_name,line_check_status,product_brand_code,product_brand_name,product_category_code,product_category_name,product_gift,gift_parent_cart_id)
 		values
-		    (#{productId},#{cartId},#{productName},#{amount},#{logo},#{createTime},#{updateTime},#{price},#{color},#{productSize},#{activityId},#{activityName},#{productType},#{skuCode},#{spuId},#{storeId},#{createSource},#{stockNum},#{zeroRemovalCoefficient},#{spec},#{productPropertyCode},#{productPropertyName},#{lineCheckStatus},#{productBrandCode},#{productBrandName},#{productCategoryCode},#{productCategoryName},#{activityPrice},#{accountTotalPrice},#{productGift},#{giftParentCartId})
+		    (#{productId},#{cartId},#{productName},#{amount},#{logo},#{createTime},#{updateTime},#{price},#{color},#{productSize},#{activityId},#{activityName},#{productType},#{skuCode},#{spuId},#{storeId},#{createSource},#{stockNum},#{zeroRemovalCoefficient},#{spec},#{productPropertyCode},#{productPropertyName},#{lineCheckStatus},#{productBrandCode},#{productBrandName},#{productCategoryCode},#{productCategoryName},#{productGift},#{giftParentCartId})
     </insert>
 
     <!-- 判断SKU商品是否已存在购物车中 -->
@@ -225,20 +223,6 @@
         </where>
     </select>
 
-    <select id="findByGiftParentCartId" resultType="java.util.List"
-            parameterType="java.lang.String"
-            resultMap="CartOrderInfoMapping">
-        select
-        <include refid="Base_Column_List"/>
-        from order_store_cart
-        <where>
-            1=1
-            <if test="giftParentCartId != null">
-                and gift_parent_cart_id = #{giftParentCartId}
-            </if>
-        </where>
-    </select>
-
     <delete id="deleteByCartId" parameterType="java.lang.String">
         delete
         from order_store_cart
@@ -250,9 +234,7 @@
         set activity_id         = #{activityId},
             activity_name       = #{activityName},
             line_check_status   = #{lineCheckStatus},
-            amount              = #{amount},
-            activity_price      = #{activityPrice},
-            account_total_price = #{accountTotalPrice}
+            amount              = #{amount}
         where cart_id = #{cartId}
     </update>
 

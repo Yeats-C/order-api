@@ -6,7 +6,6 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpProductGiftEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpProductPropertyTypeEnum;
-import com.aiqin.mgs.order.api.component.enums.StatusEnum;
 import com.aiqin.mgs.order.api.component.enums.YesOrNoEnum;
 import com.aiqin.mgs.order.api.component.enums.activity.ActivityRuleUnitEnum;
 import com.aiqin.mgs.order.api.component.enums.activity.ActivityTypeEnum;
@@ -36,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 @Service
@@ -56,7 +56,6 @@ public class CartOrderServiceImpl implements CartOrderService {
     @Resource
     private ActivityService activityService;
 
-
     /**
      * 将商品加入购物车
      *
@@ -65,8 +64,8 @@ public class CartOrderServiceImpl implements CartOrderService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public HttpResponse addCart(ShoppingCartRequest shoppingCartRequest , AuthToken authToken) {
-        List<String> skuCodeList=new ArrayList();
+    public HttpResponse addCart(ShoppingCartRequest shoppingCartRequest, AuthToken authToken) {
+        List<String> skuCodeList = new ArrayList();
         //入参校验
         checkParam(shoppingCartRequest);
 
@@ -84,18 +83,18 @@ public class CartOrderServiceImpl implements CartOrderService {
         }
         //通过门店id返回门店省市公司信息
         HttpResponse<StoreInfo> storeInfo = bridgeProductService.getStoreInfo(shoppingCartRequest);
-        if(storeInfo==null||storeInfo.getData()==null){
+        if (storeInfo == null || storeInfo.getData() == null) {
             return HttpResponse.failure(ResultCode.NO_HAVE_STORE_ERROR);
         }
-        ShoppingCartProductRequest shoppingCartProductRequest=new ShoppingCartProductRequest();
+        ShoppingCartProductRequest shoppingCartProductRequest = new ShoppingCartProductRequest();
         shoppingCartProductRequest.setCityCode(storeInfo.getData().getCityId());
         shoppingCartProductRequest.setProvinceCode(storeInfo.getData().getProvinceId());
         shoppingCartProductRequest.setCompanyCode("14");
         shoppingCartProductRequest.setSkuCodes(skuCodeList);
-        if(shoppingCartProductRequest.getCompanyCode()==null
-                || shoppingCartProductRequest.getCityCode()==null
-                || shoppingCartProductRequest.getProvinceCode()==null
-                || shoppingCartProductRequest.getSkuCodes()==null){
+        if (shoppingCartProductRequest.getCompanyCode() == null
+                || shoppingCartProductRequest.getCityCode() == null
+                || shoppingCartProductRequest.getProvinceCode() == null
+                || shoppingCartProductRequest.getSkuCodes() == null) {
             return HttpResponse.failure(ResultCode.PARAMETER_EXCEPTION);
         }
         //通过省市公司ID、skuid调用商品模块，返回商品信息
@@ -115,7 +114,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                 if (stockProductAmount < 10) {
                     return HttpResponse.failure(ResultCode.STOCK_SHORT1);
                 }
-                if(skuId.equals(product.getSkuId())) {
+                if (skuId.equals(product.getSkuId())) {
                     CartOrderInfo cartOrderInfo = new CartOrderInfo();
                     cartOrderInfo.setSkuCode(cartOrderInfo1.getSkuCode());//skuId
                     cartOrderInfo.setSpuId(shoppingCartRequest.getProductId());//spuId
@@ -143,15 +142,13 @@ public class CartOrderServiceImpl implements CartOrderService {
                     cartOrderInfo.setProductCategoryCode(cartOrderInfo1.getProductCategoryCode());//品类编码
                     cartOrderInfo.setProductCategoryName(cartOrderInfo1.getProductCategoryName());//品类编码
                     cartOrderInfo.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
-                    cartOrderInfo.setAccountTotalPrice(cartOrderInfo.getPrice().multiply(new BigDecimal(cartOrderInfo.getAmount())));
-                    cartOrderInfo.setActivityPrice(cartOrderInfo.getPrice());
                     cartOrderInfo.setActivityId(skuActivityMap.containsKey(cartOrderInfo1.getSkuCode()) ? skuActivityMap.get(cartOrderInfo1.getSkuCode()) : null);
                     try {
                         if (cartOrderInfo != null) {
                             //判断sku是否在购物车里面存在
                             LOGGER.info("判断SKU商品是否已存在购物车中:{}", cartOrderInfo.getSkuCode());
                             String oldAount = cartOrderDao.isYesCart(cartOrderInfo);
-                            if (oldAount != null && ! "".equals(oldAount)) {
+                            if (oldAount != null && !"".equals(oldAount)) {
                                 //已存在购物车的、新添加+已存在购物车的数量=真实数量
                                 LOGGER.info("更新购物车:{}", cartOrderInfo);
                                 int newAount = Integer.valueOf(oldAount) + cartOrderInfo.getAmount();
@@ -177,9 +174,6 @@ public class CartOrderServiceImpl implements CartOrderService {
                             LOGGER.warn("购物车信息为空!");
                             return HttpResponse.failure(ResultCode.ADD_EXCEPTION);
                         }
-
-                        //解析活动
-                        analysisActivityInCart(cartOrderInfo.getCartId());
 
                     } catch (Exception e) {
                         LOGGER.error("添加购物车异常：{}", e);
@@ -272,22 +266,6 @@ public class CartOrderServiceImpl implements CartOrderService {
             } else {
             }
 
-            if (StringUtils.isNotEmpty(skuId)) {
-                //说明本次请求可能是修改一行的数量，要重新解析该行活动规则
-                CartOrderInfo cartQuery = new CartOrderInfo();
-                cartQuery.setStoreId(storeId);
-                cartQuery.setProductType(productType);
-                cartQuery.setSkuCode(skuId);
-                cartQuery.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
-                List<CartOrderInfo> queryList = cartOrderDao.selectByProperty(cartQuery);
-                if (queryList != null && queryList.size() > 0) {
-                    for (CartOrderInfo item :
-                            queryList) {
-                        analysisActivityInCart(item.getCartId());
-                    }
-                }
-            }
-
             //返回商品列表并结算价格
             CartResponse cartResponse = getProductList(cartOrderInfo);
             LOGGER.info("返回购物车中的数据给前端：{}", cartResponse);
@@ -302,7 +280,7 @@ public class CartOrderServiceImpl implements CartOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public HttpResponse queryCartByStoreId(String storeId, Integer productType, String skuId, Integer lineCheckStatus, Integer number, String activityId) {
-        HttpResponse<CartResponse> response = HttpResponse.success();
+        HttpResponse<StoreCartProductResponse> response = HttpResponse.success();
         try {
             CartOrderInfo query = new CartOrderInfo();
             query.setStoreId(storeId);
@@ -337,13 +315,11 @@ public class CartOrderServiceImpl implements CartOrderService {
                     //更新这一行
                     cartOrderDao.updateCartByCartId(item);
 
-                    //解析活动
-                    analysisActivityInCart(item.getCartId());
                 }
             }
 
             //返回商品列表并结算价格
-            CartResponse cartResponse = getStoreProductList(storeId, productType);
+            StoreCartProductResponse cartResponse = getStoreCartProductGroup(storeId, productType, true);
             LOGGER.info("返回购物车中的数据给前端：{}", cartResponse);
             response.setData(cartResponse);
             return response;
@@ -355,6 +331,7 @@ public class CartOrderServiceImpl implements CartOrderService {
 
     /**
      * 返回购物车中的商品列表，并计算出商品总价和总数量
+     *
      * @param cartOrderInfo
      * @return
      * @throws Exception
@@ -375,7 +352,7 @@ public class CartOrderServiceImpl implements CartOrderService {
         int totalNumber = 0;
 
         for (CartOrderInfo item : cartInfoList) {
-            if(Global.LINECHECKSTATUS_1.equals(item.getLineCheckStatus())){
+            if (Global.LINECHECKSTATUS_1.equals(item.getLineCheckStatus())) {
                 BigDecimal total = item.getPrice().multiply(new BigDecimal(item.getAmount()));
                 acountActualprice = acountActualprice.add(total);
                 totalNumber += item.getAmount();
@@ -390,97 +367,29 @@ public class CartOrderServiceImpl implements CartOrderService {
     }
 
     /**
-     * 获取爱掌柜购物车显示信息
-     *
-     * @param storeId     门店id
+     * 获取购物车商品楼层信息
+     * @param storeId 门店id
      * @param productType 商品类型
-     * @return com.aiqin.mgs.order.api.domain.response.cart.CartResponse
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2020/2/21 15:48
+     * @param cartRequest 是否是购物车请求，购物车请求的返回值包含未勾选的行
+     * @return
+     * @throws Exception
      */
-    private CartResponse getStoreProductList(String storeId, Integer productType) throws Exception {
+    private StoreCartProductResponse getStoreCartProductGroup(String storeId, Integer productType, boolean cartRequest) throws Exception {
         CartOrderInfo query = new CartOrderInfo();
         query.setStoreId(storeId);
         query.setProductType(productType);
         query.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
-
-        //购物车数据
-        List<CartOrderInfo> cartInfoList = cartOrderDao.selectCartByStoreId(query);
-
-        //计算商品总价格
-        BigDecimal accountActualPrice = BigDecimal.ZERO;
-        //计算商品活动优惠后价格汇总
-        BigDecimal accountActualActivityPrice = BigDecimal.ZERO;
-
-        //计算商品总数量
-        int totalNumber = 0;
-
-        BigDecimal topTotalAmount = BigDecimal.ZERO;
-
-        for (CartOrderInfo item : cartInfoList) {
-            if (Global.LINECHECKSTATUS_1.equals(item.getLineCheckStatus())) {
-
-                BigDecimal total = new BigDecimal(item.getAmount()).multiply(item.getPrice());
-                accountActualPrice = accountActualPrice.add(total);
-                totalNumber += item.getAmount();
-                accountActualActivityPrice = accountActualActivityPrice.add(item.getAccountTotalPrice());
-                ErpProductPropertyTypeEnum productPropertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(item.getProductPropertyCode());
-                if (productPropertyTypeEnum.isUseTopCoupon()) {
-                    topTotalAmount = topTotalAmount.add(item.getAccountTotalPrice());
-                }
-            }
-
-            //查询赠品行
-            List<CartOrderInfo> giftList = cartOrderDao.findByGiftParentCartId(item.getCartId());
-            item.setGiftList(giftList);
-
-            //调用接口查询商品可选活动列表
-//            ActivityParameterRequest activityParameterRequest = new ActivityParameterRequest();
-//            activityParameterRequest.setStoreId(storeId);
-//            activityParameterRequest.setSkuCode(item.getSkuCode());
-//            activityParameterRequest.setProductBrandCode(item.getProductBrandCode());
-//            activityParameterRequest.setProductCategoryCode(item.getProductCategoryCode());
-//            List<Activity> activityList = activityService.activityList(activityParameterRequest);
-
-            //TODO 临时调试使用，用完删除
-            List<Activity> activityList = TestUtil.getTestActivityList();
-            item.setActivityList(activityList);
-
+        if (!cartRequest) {
+            query.setLineCheckStatus(Global.LINECHECKSTATUS_1);
         }
-
-        CartResponse cartResponse = new CartResponse();
-        cartResponse.setCartInfoList(cartInfoList);
-        cartResponse.setAccountActualPrice(accountActualPrice);
-        cartResponse.setAccountActualActivityPrice(accountActualActivityPrice);
-        cartResponse.setTotalNumber(totalNumber);
-        cartResponse.setTopTotalPrice(topTotalAmount);
-        return cartResponse;
-    }
-
-    private StoreCartProductResponse getStoreCartProductGroup(String storeId, Integer productType) throws Exception {
-        CartOrderInfo query = new CartOrderInfo();
-        query.setStoreId(storeId);
-        query.setProductType(productType);
-        query.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
-        query.setLineCheckStatus(Global.LINECHECKSTATUS_1);
 
         //购物车数据-本品行
         List<CartOrderInfo> cartInfoList = cartOrderDao.selectCartByStoreId(query);
 
-        //商品活动价汇总
-        BigDecimal activityPriceTotal = BigDecimal.ZERO;
-
-        //实际支付价格汇总
-        BigDecimal actualPriceTotal = BigDecimal.ZERO;
-
-        //计算商品总数量
-        int totalNumber = 0;
-
-
         //活动id 购物车商品行
         Map<String, List<CartOrderInfo>> activityCartMap = new HashMap<>(16);
 
+        //楼层列表
         List<CartGroupInfo> cartGroupList = new ArrayList<>();
 
         for (CartOrderInfo item :
@@ -488,20 +397,138 @@ public class CartOrderServiceImpl implements CartOrderService {
 
             if (StringUtils.isEmpty(item.getActivityId())) {
                 //非活动楼层
-
                 CartGroupInfo cartGroupInfo = new CartGroupInfo();
                 cartGroupInfo.setHasActivity(YesOrNoEnum.NO.getCode());
-//                cartGroupInfo.set
                 List<CartOrderInfo> cartOrderList = new ArrayList<>();
                 item.setActivityPrice(item.getPrice());
+                BigDecimal totalAmount = item.getPrice().multiply(new BigDecimal(item.getAmount()));
+                item.setLineAmountTotal(totalAmount);
+                item.setLineAmountAfterActivity(totalAmount);
+                item.setLineActivityAmountTotal(totalAmount);
+                item.setLineActivityDiscountTotal(BigDecimal.ZERO);
                 cartOrderList.add(item);
-
+                cartGroupInfo.setCartProductList(cartOrderList);
+                cartGroupList.add(cartGroupInfo);
+            } else {
+                //参加活动的数据
+                List<CartOrderInfo> list = new ArrayList<>();
+                if (activityCartMap.containsKey(item.getActivityId())) {
+                    list = activityCartMap.get(item.getActivityId());
+                }
+                list.add(item);
+                activityCartMap.put(item.getActivityId(), list);
             }
 
         }
-        
-        
-        
+
+        //有活动id的商品行
+        for (Map.Entry<String, List<CartOrderInfo>> entry :
+                activityCartMap.entrySet()) {
+            CartGroupInfo cartGroupInfo = generateCartGroupAndShareActivityPrice(entry.getKey(), entry.getValue());
+            cartGroupList.add(cartGroupInfo);
+        }
+
+        //勾选商品活动价汇总
+        BigDecimal activityAmountTotal = BigDecimal.ZERO;
+        //勾选商品活动优惠金额
+        BigDecimal activityDiscountAmount = BigDecimal.ZERO;
+        //商品总数量
+        int totalNumber = 0;
+        //所有勾选的商品中可使用A品券的商品活动均摊后金额汇总
+        BigDecimal topTotalPrice = BigDecimal.ZERO;
+
+        //遍历楼层，汇总数据
+        for (CartGroupInfo item :
+                cartGroupList) {
+            //楼层总的分销金额汇总
+            BigDecimal groupAmount = BigDecimal.ZERO;
+            //楼层总的活动价金额汇总
+            BigDecimal groupActivityAmount = BigDecimal.ZERO;
+            //楼层总的活动优惠减少的金额汇总
+            BigDecimal groupActivityDiscountAmount = BigDecimal.ZERO;
+            //楼层本品数量汇总
+            int groupProductQuantity = 0;
+            //楼层赠品数量汇总
+            int groupGiftQuantity = 0;
+            //楼层本品分销价汇总
+            BigDecimal groupProductAmount = BigDecimal.ZERO;
+            //楼层A品本品均摊后金额汇总
+            BigDecimal groupTopCouponMaxTotal = BigDecimal.ZERO;
+
+            //遍历本品列表
+            if (item.getCartProductList() != null && item.getCartProductList().size() > 0) {
+                for (CartOrderInfo productItem :
+                        item.getCartProductList()) {
+                    if (Global.LINECHECKSTATUS_1.equals(productItem.getLineCheckStatus())) {
+                        groupAmount = groupAmount.add(productItem.getLineAmountTotal());
+                        groupProductAmount = groupProductAmount.add(productItem.getLineAmountTotal());
+                        groupActivityAmount = groupActivityAmount.add(productItem.getLineActivityAmountTotal());
+                        groupActivityDiscountAmount = groupActivityDiscountAmount.add(productItem.getLineActivityDiscountTotal());
+                        groupProductQuantity += productItem.getAmount();
+
+                        ErpProductPropertyTypeEnum productPropertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(productItem.getProductPropertyCode());
+                        if (productPropertyTypeEnum != null && productPropertyTypeEnum.isUseTopCoupon()) {
+                            groupTopCouponMaxTotal = groupTopCouponMaxTotal.add(productItem.getLineAmountAfterActivity());
+                        }
+                    }
+
+                    if (cartRequest) {
+                        //调用接口查询商品可选活动列表
+//                        ActivityParameterRequest activityParameterRequest = new ActivityParameterRequest();
+//                        activityParameterRequest.setStoreId(storeId);
+//                        activityParameterRequest.setSkuCode(productItem.getSkuCode());
+//                        activityParameterRequest.setProductBrandCode(productItem.getProductBrandCode());
+//                        activityParameterRequest.setProductCategoryCode(productItem.getProductCategoryCode());
+//                        List<Activity> activityList = activityService.activityList(activityParameterRequest);
+
+                        //TODO 临时调试使用，用完删除
+                        List<Activity> activityList = TestUtil.getTestActivityList();
+                        productItem.setActivityList(activityList);
+                    }
+                }
+            }
+
+            //遍历赠品列表
+            if (item.getCartGiftList() != null && item.getCartGiftList().size() > 0) {
+                for (CartOrderInfo giftItem :
+                        item.getCartGiftList()) {
+                    groupAmount = groupAmount.add(giftItem.getLineAmountTotal());
+                    groupActivityAmount = groupActivityAmount.add(giftItem.getLineActivityAmountTotal());
+                    groupActivityDiscountAmount = groupActivityDiscountAmount.add(giftItem.getLineActivityDiscountTotal());
+                    groupGiftQuantity += giftItem.getAmount();
+                }
+            }
+
+
+            //楼层总的分销金额汇总
+            item.setGroupAmount(groupAmount);
+            //楼层总的活动价金额汇总
+            item.setGroupActivityAmount(groupActivityAmount);
+            //楼层总的活动优惠减少的金额汇总
+            item.setGroupActivityDiscountAmount(groupActivityDiscountAmount);
+            //楼层本品数量汇总
+            item.setGroupProductQuantity(groupProductQuantity);
+            //楼层赠品数量汇总
+            item.setGroupGiftQuantity(groupGiftQuantity);
+            //楼层本品分销价汇总
+            item.setGroupProductAmount(groupProductAmount);
+            //楼层A品本品均摊后金额汇总
+            item.setGroupTopCouponMaxTotal(groupTopCouponMaxTotal);
+
+            activityAmountTotal = activityAmountTotal.add(groupActivityAmount);
+            totalNumber += groupProductQuantity;
+            totalNumber += groupGiftQuantity;
+            topTotalPrice = topTotalPrice.add(groupTopCouponMaxTotal);
+            activityDiscountAmount = activityDiscountAmount.add(groupActivityDiscountAmount);
+        }
+
+        StoreCartProductResponse response = new StoreCartProductResponse();
+        response.setActivityAmountTotal(activityAmountTotal);
+        response.setTotalNumber(totalNumber);
+        response.setTopTotalPrice(topTotalPrice);
+        response.setCartGroupList(cartGroupList);
+        response.setActivityDiscountAmount(activityDiscountAmount);
+
 //        //计算商品总价格
 //        BigDecimal accountActualPrice = BigDecimal.ZERO;
 //        //计算商品活动优惠后价格汇总
@@ -547,9 +574,8 @@ public class CartOrderServiceImpl implements CartOrderService {
 //        cartResponse.setTotalNumber(totalNumber);
 //        cartResponse.setTopTotalPrice(topTotalAmount);
 //        return cartResponse;
-        return null;
+        return response;
     }
-
 
     /**
      * 根据门店id返回商品的总数量
@@ -572,7 +598,6 @@ public class CartOrderServiceImpl implements CartOrderService {
         }
         return response;
     }
-
 
     /**
      * 删除单条商品，清空整个购物车，删除勾选商品
@@ -601,13 +626,6 @@ public class CartOrderServiceImpl implements CartOrderService {
             if (queryList != null && queryList.size() > 0) {
                 for (CartOrderInfo item :
                         queryList) {
-                    List<CartOrderInfo> giftList = cartOrderDao.findByGiftParentCartId(item.getCartId());
-                    if (giftList != null && giftList.size() > 0) {
-                        for (CartOrderInfo giftItem :
-                                giftList) {
-                            cartOrderDao.deleteByCartId(giftItem.getCartId());
-                        }
-                    }
                     cartOrderDao.deleteByCartId(item.getCartId());
                 }
             }
@@ -626,262 +644,16 @@ public class CartOrderServiceImpl implements CartOrderService {
      */
     @Override
     public HttpResponse displayCartLineCheckProduct(CartOrderInfo cartOrderInfo) {
-        BigDecimal priceProductA=BigDecimal.ZERO;
-        HttpResponse response = HttpResponse.success();
-        //调用门店接口，返回门店的基本信息
-        ShoppingCartRequest shoppingCartRequest = new ShoppingCartRequest();
-        shoppingCartRequest.setStoreId(cartOrderInfo.getStoreId());
-        HttpResponse<StoreInfo> storeInfo = bridgeProductService.getStoreInfo(shoppingCartRequest);
-        OrderConfirmResponse orderConfirmResponse = new OrderConfirmResponse();
-        //封装门店信息
-        orderConfirmResponse.setStoreAddress(storeInfo.getData().getAddress());
-        orderConfirmResponse.setStoreContacts(storeInfo.getData().getContacts());
-        orderConfirmResponse.setStoreContactsPhone(storeInfo.getData().getContactsPhone());
+        HttpResponse httpResponse = HttpResponse.success();
         try {
-            if (cartOrderInfo != null) {
-                cartOrderInfo.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
-                List<CartOrderInfo> cartOrderInfos = cartOrderDao.selectCartByLineCheckStatus(cartOrderInfo);
-                //封装返回的勾选的商品信息
-                orderConfirmResponse.setCartOrderInfos(cartOrderInfos);
-                orderConfirmResponse.setHaveProductA(0);
-
-                //计算订货金额合计
-                BigDecimal orderTotalPrice = BigDecimal.ZERO;
-
-                //除去活动优惠之后的金额汇总
-                BigDecimal afterActivityPrice = BigDecimal.ZERO;
-
-                for (CartOrderInfo cartOrderInfo1 : cartOrderInfos) {
-                    BigDecimal total = cartOrderInfo1.getPrice().multiply(new BigDecimal(cartOrderInfo1.getAmount()));
-                    orderTotalPrice = orderTotalPrice.add(total);
-
-                    afterActivityPrice = afterActivityPrice.add(cartOrderInfo1.getAccountTotalPrice());
-
-                    //判断商品是否使用可以A品券，汇总活动后总价
-                    ErpProductPropertyTypeEnum productPropertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(cartOrderInfo1.getProductPropertyCode());
-                    if (productPropertyTypeEnum != null && productPropertyTypeEnum.isUseTopCoupon()) {
-                        orderConfirmResponse.setHaveProductA(1);
-                        priceProductA = priceProductA.add(cartOrderInfo1.getAccountTotalPrice());
-                    }
-
-                    //查询赠品行
-                    List<CartOrderInfo> giftList = cartOrderDao.findByGiftParentCartId(cartOrderInfo1.getCartId());
-                    cartOrderInfo1.setGiftList(giftList);
-                }
-                orderConfirmResponse.setPriceProductA(priceProductA);
-                //封装订货金额合计
-                orderConfirmResponse.setAcountActualprice(orderTotalPrice);
-                //活动之后的金额汇总
-                orderConfirmResponse.setAccountActualActivityPrice(afterActivityPrice);
-
-
-                response.setData(orderConfirmResponse);
-            }
+            StoreCartProductResponse storeCartProductGroup = getStoreCartProductGroup(cartOrderInfo.getStoreId(), cartOrderInfo.getProductType(), false);
+            httpResponse.setData(storeCartProductGroup);
         } catch (Exception e) {
-            LOGGER.error("返回订单确认数据失败", e);
-            return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+            LOGGER.error("查询订单确认信息异常", e);
+            httpResponse = HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
         }
-        return response;
+        return httpResponse;
     }
-
-    @Override
-    public void analysisActivityInCart(String cartId) {
-        if (StringUtils.isEmpty(cartId)) {
-            return;
-        }
-        CartOrderInfo cart = cartOrderDao.getCartByCartId(cartId);
-        if (cart == null) {
-            //异常
-            return;
-        }
-
-        //如果不是本品行，跳过
-        if (ErpProductGiftEnum.GIFT.getCode().equals(cart.getProductGift())) {
-            return;
-        }
-
-        //复位，把活动减去的数量和金额、赠品都归位
-        List<CartOrderInfo> list = cartOrderDao.findByGiftParentCartId(cartId);
-        if (list != null && list.size() > 0) {
-            for (CartOrderInfo item :
-                    list) {
-                cartOrderDao.deleteByCartId(item.getCartId());
-            }
-        }
-        //把实际支付金额置为原价
-        cart.setAccountTotalPrice(cart.getPrice().multiply(new BigDecimal(cart.getAmount())));
-        //活动价等于原价
-        cart.setActivityPrice(cart.getPrice());
-
-        if (StringUtils.isNotEmpty(cart.getActivityId())) {
-            //校验活动，如果过期，删除活动
-            ActivityParameterRequest parameterRequest=new ActivityParameterRequest();
-            parameterRequest.setActivityId(cart.getActivityId());
-            parameterRequest.setStoreId(cart.getStoreId());
-            parameterRequest.setSkuCode(cart.getProductId());
-//            Boolean aBoolean = activityService.checkProcuct(parameterRequest);
-            //TODO 临时调试使用，用完删除
-            Boolean aBoolean = true;
-
-            if (aBoolean) {
-                //解析活动
-
-                //获取活动详情
-                ActivityRequest activityRequest = new ActivityRequest();
-                if ("999999".equals(cart.getActivityId()) || "888888".equals(cart.getActivityId())) {
-                    //TODO 临时调试使用，用完删除
-                    activityRequest = TestUtil.getTestActivity(cart.getActivityId());
-                } else {
-                    HttpResponse<ActivityRequest> activityDetail = activityService.getActivityDetail(cart.getActivityId());
-                    if (!RequestReturnUtil.validateHttpResponse(activityDetail)) {
-                        throw new BusinessException("活动异常");
-                    }
-                    activityRequest = activityDetail.getData();
-                }
-                Activity activity = activityRequest.getActivity();
-                cart.setActivityName(activity.getActivityName());
-                List<ActivityRule> activityRules = activityRequest.getActivityRules();
-
-                //活动类型
-                ActivityTypeEnum activityTypeEnum = ActivityTypeEnum.getEnum(activity.getActivityType());
-                //行原始金额
-                BigDecimal cartMoney = cart.getPrice().multiply(new BigDecimal(cart.getAmount()));
-                switch (activityTypeEnum) {
-                    case TYPE_1:
-                        //满减
-
-                        //缓存当前命中的规则
-                        ActivityRule curRule = null;
-
-                        for (ActivityRule ruleItem :
-                                activityRules) {
-
-                            //是否把当前梯度作为命中梯度
-                            boolean flag = false;
-
-                            if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(ruleItem.getRuleUnit())) {
-                                //按照数量
-
-                                if (ruleItem.getMeetingConditions().compareTo(new BigDecimal(cart.getAmount())) <= 0) {
-                                    if (curRule == null) {
-                                        flag = true;
-                                    } else {
-                                        if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
-                                            flag = true;
-                                        }
-                                    }
-                                }
-
-                            } else if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(ruleItem.getRuleUnit())) {
-                                //按照金额
-
-                                if (ruleItem.getMeetingConditions().compareTo(cartMoney) <= 0) {
-                                    if (curRule == null) {
-                                        flag = true;
-                                    } else {
-                                        if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
-                                            flag = true;
-                                        }
-                                    }
-                                }
-
-                            } else {
-
-                            }
-
-                            if (flag) {
-                                curRule = ruleItem;
-                            }
-                        }
-
-                        if (curRule != null) {
-                            cart.setAccountTotalPrice(cart.getAccountTotalPrice().compareTo(curRule.getPreferentialAmount()) > 0 ? cart.getAccountTotalPrice().subtract(curRule.getPreferentialAmount()) : BigDecimal.ZERO);
-                        }
-                        ;
-                        break;
-                    case TYPE_2:
-                        //满赠
-
-                        //当前命中梯度
-                        ActivityRule curRuleTemp = null;
-
-                        for (ActivityRule ruleItem :
-                                activityRules) {
-
-                            //是否把当前梯度作为命中梯度
-                            boolean flag = false;
-
-
-                            if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(ruleItem.getRuleUnit())) {
-                                //按照数量
-
-                                if (ruleItem.getMeetingConditions().compareTo(new BigDecimal(cart.getAmount())) <= 0) {
-                                    if (curRuleTemp == null) {
-                                        flag = true;
-                                    } else {
-                                        if (ruleItem.getMeetingConditions().compareTo(curRuleTemp.getMeetingConditions()) > 0) {
-                                            flag = true;
-                                        }
-                                    }
-                                }
-
-                            } else if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(ruleItem.getRuleUnit())) {
-                                //按照金额
-
-                                if (ruleItem.getMeetingConditions().compareTo(cartMoney) <= 0) {
-                                    if (curRuleTemp == null) {
-                                        flag = true;
-                                    } else {
-                                        if (ruleItem.getMeetingConditions().compareTo(curRuleTemp.getMeetingConditions()) > 0) {
-                                            flag = true;
-                                        }
-                                    }
-                                }
-
-                            } else {
-
-                            }
-
-                            if (flag) {
-                                curRuleTemp = ruleItem;
-                            }
-                        }
-
-                        if (curRuleTemp != null) {
-                            //满赠规则组
-                            List<ActivityGift> giftList = curRuleTemp.getGiftList();
-
-                            //生成赠品行
-                            for (ActivityGift giftItem :
-                                    giftList) {
-                                CartOrderInfo giftProductLine = createGiftProductLine(cart, giftItem);
-                                try {
-                                    cartOrderDao.insertCart(giftProductLine);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-
-                        ;
-                        break;
-                    default:
-                        ;
-                }
-            } else {
-                cart.setActivityId(null);
-            }
-
-        }
-
-        try {
-            cartOrderDao.updateCartByCartId(cart);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
 
     /**
      * 根据满赠活动生成赠品行
@@ -905,7 +677,7 @@ public class CartOrderServiceImpl implements CartOrderService {
         cartOrderInfo.setProductSize(skuDetail.getModelCode());//商品型号
         cartOrderInfo.setCreateSource(cart.getCreateSource());//插入商品来源
         cartOrderInfo.setAmount(rule.getNumbers());//获取商品数量
-        cartOrderInfo.setPrice(BigDecimal.ZERO);//商品价格
+        cartOrderInfo.setPrice(skuDetail.getPrice());//商品价格
         cartOrderInfo.setProductType(cart.getProductType());//商品类型 0直送、1配送、2辅采
         cartOrderInfo.setCreateById(cart.getCreateById());//创建者id
         cartOrderInfo.setCreateByName(cart.getCreateByName());//创建者名称
@@ -922,12 +694,254 @@ public class CartOrderServiceImpl implements CartOrderService {
         cartOrderInfo.setProductGift(ErpProductGiftEnum.GIFT.getCode());
         cartOrderInfo.setGiftParentCartId(cart.getCartId());
         cartOrderInfo.setActivityPrice(BigDecimal.ZERO);
-        cartOrderInfo.setAccountTotalPrice(BigDecimal.ZERO);
         cartOrderInfo.setCreateTime(new Date());
         cartOrderInfo.setActivityId(cart.getActivityId());
         cartOrderInfo.setActivityName(cart.getActivityName());
+        BigDecimal multiplyAmountTotal = cartOrderInfo.getPrice().multiply(new BigDecimal(cartOrderInfo.getAmount()));
+        cartOrderInfo.setLineAmountTotal(multiplyAmountTotal);
+        cartOrderInfo.setLineActivityAmountTotal(BigDecimal.ZERO);
+        cartOrderInfo.setLineActivityDiscountTotal(BigDecimal.ZERO);
+        cartOrderInfo.setLineAmountAfterActivity(BigDecimal.ZERO);
 
 
         return cartOrderInfo;
     }
+
+    /**
+     * 根据活动id和本品列表解析活动并且返回一个楼层
+     *
+     * @param activityId 活动id
+     * @param list       本品列表
+     * @return
+     */
+    private CartGroupInfo generateCartGroupAndShareActivityPrice(String activityId, List<CartOrderInfo> list) {
+
+        CartGroupInfo cartGroupInfo = new CartGroupInfo();
+
+        //获取活动详情
+        ActivityRequest activityRequest = new ActivityRequest();
+        if ("999999".equals(activityId) || "888888".equals(activityId)) {
+            //TODO 临时调试使用，用完删除
+            activityRequest = TestUtil.getTestActivity(activityId);
+        } else {
+            HttpResponse<ActivityRequest> activityDetail = activityService.getActivityDetail(activityId);
+            if (!RequestReturnUtil.validateHttpResponse(activityDetail)) {
+                throw new BusinessException("活动异常");
+            }
+            activityRequest = activityDetail.getData();
+        }
+        Activity activity = activityRequest.getActivity();
+        cartGroupInfo.setHasActivity(YesOrNoEnum.YES.getCode());
+        cartGroupInfo.setActivity(activity);
+        cartGroupInfo.setCartProductList(list);
+        List<ActivityRule> activityRules = activityRequest.getActivityRules();
+
+        //活动类型
+        ActivityTypeEnum activityTypeEnum = ActivityTypeEnum.getEnum(activity.getActivityType());
+
+        //勾选的商品组商品数量
+        Integer quantity = 0;
+        //勾选的商品组分销价汇总
+        BigDecimal amountTotal = BigDecimal.ZERO;
+        //勾选的商品组活动价汇总，初始等于商品组分销价汇总
+        BigDecimal activityAmountTotal = BigDecimal.ZERO;
+
+        //用来缓存勾选状态的行
+        List<CartOrderInfo> tempList = new ArrayList<>();
+        //商品组金额数量汇总
+        for (CartOrderInfo item :
+                list) {
+            //行分销金额
+            BigDecimal lineAmountTotal = item.getPrice().multiply(new BigDecimal(item.getAmount()));
+
+            if (Global.LINECHECKSTATUS_1.equals(item.getLineCheckStatus())) {
+                //勾选的行
+
+                quantity += item.getAmount();
+                amountTotal = amountTotal.add(lineAmountTotal);
+                activityAmountTotal = activityAmountTotal.add(lineAmountTotal);
+                tempList.add(item);
+            }
+
+            item.setActivityPrice(item.getPrice());
+            //行分销金额
+            item.setLineAmountTotal(lineAmountTotal);
+            //行活动金额暂且赋值为分销价汇总
+            item.setLineActivityAmountTotal(lineAmountTotal);
+            //行活动优惠金额暂且赋值为0
+            item.setLineActivityDiscountTotal(BigDecimal.ZERO);
+            //行减去活动优惠之后分摊的金额
+            item.setLineAmountAfterActivity(lineAmountTotal);
+        }
+
+        //根据活动类型解析活动
+        switch (activityTypeEnum) {
+            case TYPE_1:
+                //满减
+
+                //缓存当前命中的规则
+                ActivityRule curRule = null;
+
+                for (ActivityRule ruleItem :
+                        activityRules) {
+
+                    //是否把当前梯度作为命中梯度
+                    boolean flag = false;
+
+                    if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(ruleItem.getRuleUnit())) {
+                        //按照数量
+
+                        if (ruleItem.getMeetingConditions().compareTo(new BigDecimal(quantity)) <= 0) {
+                            if (curRule == null) {
+                                flag = true;
+                            } else {
+                                if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                    flag = true;
+                                }
+                            }
+                        }
+
+                    } else if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(ruleItem.getRuleUnit())) {
+                        //按照金额
+
+                        if (ruleItem.getMeetingConditions().compareTo(amountTotal) <= 0) {
+                            if (curRule == null) {
+                                flag = true;
+                            } else {
+                                if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                    flag = true;
+                                }
+                            }
+                        }
+
+                    } else {
+
+                    }
+
+                    if (flag) {
+                        curRule = ruleItem;
+                    }
+                }
+
+                if (curRule != null) {
+
+                    cartGroupInfo.setActivityRule(curRule);
+
+                    //当前剩余满减的金额
+                    BigDecimal restPreferentialAmount = curRule.getPreferentialAmount();
+
+
+                    for (int i = 0; i < tempList.size(); i++) {
+                        CartOrderInfo item = tempList.get(i);
+                        if (i == tempList.size() - 1) {
+                            //最后一行，用减法避免误差
+                            item.setLineActivityDiscountTotal(restPreferentialAmount);
+                        } else {
+                            BigDecimal lineActivityDiscountTotal = item.getLineActivityAmountTotal().divide(amountTotal, 4, RoundingMode.HALF_UP).multiply(curRule.getPreferentialAmount());
+                            item.setLineActivityDiscountTotal(lineActivityDiscountTotal);
+                            restPreferentialAmount = restPreferentialAmount.subtract(lineActivityDiscountTotal);
+                        }
+                        item.setLineAmountAfterActivity(item.getLineActivityAmountTotal().subtract(item.getLineActivityDiscountTotal()));
+                    }
+
+                }
+                ;
+                break;
+            case TYPE_2:
+                //满赠
+
+                //当前命中梯度
+                ActivityRule curRuleTemp = null;
+
+                for (ActivityRule ruleItem :
+                        activityRules) {
+
+                    //是否把当前梯度作为命中梯度
+                    boolean flag = false;
+
+
+                    if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(ruleItem.getRuleUnit())) {
+                        //按照数量
+
+                        if (ruleItem.getMeetingConditions().compareTo(new BigDecimal(quantity)) <= 0) {
+                            if (curRuleTemp == null) {
+                                flag = true;
+                            } else {
+                                if (ruleItem.getMeetingConditions().compareTo(curRuleTemp.getMeetingConditions()) > 0) {
+                                    flag = true;
+                                }
+                            }
+                        }
+
+                    } else if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(ruleItem.getRuleUnit())) {
+                        //按照金额
+
+                        if (ruleItem.getMeetingConditions().compareTo(amountTotal) <= 0) {
+                            if (curRuleTemp == null) {
+                                flag = true;
+                            } else {
+                                if (ruleItem.getMeetingConditions().compareTo(curRuleTemp.getMeetingConditions()) > 0) {
+                                    flag = true;
+                                }
+                            }
+                        }
+
+                    } else {
+
+                    }
+
+                    if (flag) {
+                        curRuleTemp = ruleItem;
+                    }
+                }
+
+                if (curRuleTemp != null) {
+
+                    cartGroupInfo.setActivityRule(curRuleTemp);
+
+                    //满赠规则组
+                    List<ActivityGift> giftList = curRuleTemp.getGiftList();
+
+                    //存放生成的赠品行
+                    List<CartOrderInfo> cartGiftList = new ArrayList<>();
+
+                    //生成赠品行
+                    for (ActivityGift giftItem :
+                            giftList) {
+                        //生成赠品行
+                        CartOrderInfo giftProductLine = createGiftProductLine(list.get(0), giftItem);
+                        cartGiftList.add(giftProductLine);
+                        amountTotal = amountTotal.add(giftProductLine.getPrice().multiply(new BigDecimal(giftProductLine.getAmount())));
+                    }
+
+                    //本品+赠品的list，用来计算活动价格均摊
+                    List<CartOrderInfo> productShareList = new ArrayList<>();
+                    productShareList.addAll(tempList);
+                    productShareList.addAll(cartGiftList);
+
+                    BigDecimal restActivityAmountTotal = activityAmountTotal;
+
+                    for (int i = 0; i < productShareList.size(); i++) {
+                        CartOrderInfo item = productShareList.get(i);
+                        if (i == productShareList.size() - 1) {
+                            //最后一行
+                            item.setLineAmountAfterActivity(restActivityAmountTotal);
+                        } else {
+                            BigDecimal lineAmountAfterActivity = item.getLineActivityAmountTotal().divide(amountTotal, 4, RoundingMode.HALF_UP).multiply(activityAmountTotal);
+                            item.setLineAmountAfterActivity(lineAmountAfterActivity);
+                            restActivityAmountTotal = restActivityAmountTotal.subtract(lineAmountAfterActivity);
+                        }
+                    }
+                    cartGroupInfo.setCartGiftList(cartGiftList);
+                }
+
+                ;
+                break;
+            default:
+                ;
+        }
+
+        return cartGroupInfo;
+    }
+
 }
