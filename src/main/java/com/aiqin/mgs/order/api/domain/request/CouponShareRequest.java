@@ -45,12 +45,8 @@ public class CouponShareRequest {
     @JsonProperty("preferential_amount")
     private BigDecimal preferentialAmount;
 
-    @ApiModelProperty(value = "活动优惠总金额,包括活动优惠和优惠券优惠（元）")
-    @JsonProperty("total_acivity_amount")
-    private BigDecimal totalAcivityAmount;
-
-    @ApiModelProperty(value = "关联A品券编码")
-    @JsonProperty("top_coupon_codes")
-    private String topCouponCodes;
+    @ApiModelProperty(value = "本行A品卷优惠金额")
+    @JsonProperty("apin_coupon_amount")
+    private BigDecimal apinCouponAmount;
 
 }
