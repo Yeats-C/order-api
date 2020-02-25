@@ -640,20 +640,20 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     /**
      * A品券计算均摊金额
      * @param details
-     * @param topCouponCodeList
+     * @param couponCodeList
      */
-    private void couponSharePrice(List<CouponShareRequest> details, List<String> topCouponCodeList) {
+    private void couponSharePrice(List<CouponShareRequest> details, List<String> couponCodeList) {
         //A品券总金额
         BigDecimal topCouponMoney = BigDecimal.ZERO;
         List<String> topCouponCodeUniqueCheckList = new ArrayList<>();
-        if (topCouponCodeList != null && topCouponCodeList.size() > 0) {
-            for (String item : topCouponCodeList) {
-                if (topCouponCodeUniqueCheckList.contains(item)) {
+        if (couponCodeList != null && couponCodeList.size() > 0) {
+            for (String couponCode : couponCodeList) {
+                if (topCouponCodeUniqueCheckList.contains(couponCode)) {
                     throw new BusinessException("A品券重复提交");
                 } else {
-                    topCouponCodeUniqueCheckList.add(item);
+                    topCouponCodeUniqueCheckList.add(couponCode);
                 }
-                CouponDetail couponDetail = erpOrderRequestService.getCouponDetailByCode(item);
+                CouponDetail couponDetail = erpOrderRequestService.getCouponDetailByCode(couponCode);
                 if (couponDetail.getActiveCondition() == 1) {
                     throw new BusinessException("优惠券已经被使用");
                 }
@@ -663,34 +663,33 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 topCouponMoney = topCouponMoney.add(couponDetail.getNominalValue());
             }
         }
-        //如果A品卷总金额为0，直接返回
-//        if (topCouponMoney.compareTo(BigDecimal.ZERO) == 0) {
-//            return;
-//        }
         //计算A品券金额
         List<CouponShareRequest> topProductList = new ArrayList<>();
         //存储符合A品卷均摊的商品的总分销价(商品组价值)
-        BigDecimal totalAmount=BigDecimal.ZERO;
+        BigDecimal totalFirstFenAmount=BigDecimal.ZERO;
+        //存储符合A品卷均摊的商品的总分销价(商品组价值)
+        BigDecimal totalProAmount=BigDecimal.ZERO;
         for (CouponShareRequest item : details) {
             ErpProductPropertyTypeEnum propertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(item.getProductPropertyCode());
-            if (propertyTypeEnum.isUseTopCoupon()) {
+            if (propertyTypeEnum.isUseTopCoupon()&&ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductGift())) {
                 topProductList.add(item);
                 //分销总价=从活动的分摊总价取
-                totalAmount=totalAmount.add(item.getTotalPreferentialAmount());
+                totalFirstFenAmount=totalFirstFenAmount.add(item.getTotalPreferentialAmount());
+                totalProAmount=totalProAmount.add(item.getTotalProductAmount());
             }
         }
         //判断优惠券总金额和从活动的分摊总价取，如果A品卷总金额大于活动分摊总价，则A品券总金额=活动分摊总价
-        if(topCouponMoney.subtract(totalAmount).compareTo(BigDecimal.ZERO)==1){
-            topCouponMoney=totalAmount;
+        if(topCouponMoney.subtract(totalFirstFenAmount).compareTo(BigDecimal.ZERO)==1){
+            topCouponMoney=totalFirstFenAmount;
         }
         //商品组实收(商品组价值-A品卷)
-        BigDecimal auGroupAmount=totalAmount.subtract(topCouponMoney);
+        BigDecimal auGroupAmount=totalFirstFenAmount.subtract(topCouponMoney);
         //计算累加分摊总金额（最后一行做减法使用）
         BigDecimal totalFenAmount=BigDecimal.ZERO;
         //计算累加各行A品券优惠金额（最后一行使用）
         BigDecimal totalApinAmount=BigDecimal.ZERO;
         if(topProductList!=null&&topProductList.size()>0){
-            for(int i=0;i<topCouponCodeList.size();i++){
+            for(int i=0;i<topProductList.size();i++){
                 CouponShareRequest csr=topProductList.get(i);
                 //行总价(分销价)（元）
                 BigDecimal totalProductAmount=csr.getTotalProductAmount();
@@ -700,7 +699,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 BigDecimal apinCouponAmount=BigDecimal.ZERO;
                 if (i < topProductList.size() - 1) {
                     //非最后一行，根据比例计算
-                    totalPreferentialAmount = totalProductAmount.multiply(auGroupAmount).divide(totalAmount,4, RoundingMode.HALF_UP);
+                    totalPreferentialAmount = totalProductAmount.multiply(auGroupAmount).divide(totalProAmount,4, RoundingMode.HALF_UP);
                     totalFenAmount=totalFenAmount.add(totalPreferentialAmount);
                     apinCouponAmount=totalProductAmount.multiply(topCouponMoney).divide(auGroupAmount,4, RoundingMode.HALF_UP);
                     totalApinAmount=totalApinAmount.add(apinCouponAmount);

@@ -49,4 +49,8 @@ public class CouponShareRequest {
     @JsonProperty("apin_coupon_amount")
     private BigDecimal apinCouponAmount;
 
+    @ApiModelProperty(value = "是否是增品 0:商品 1:赠品")
+    @JsonProperty("product_gift")
+    private Integer productGift;
+
 }
