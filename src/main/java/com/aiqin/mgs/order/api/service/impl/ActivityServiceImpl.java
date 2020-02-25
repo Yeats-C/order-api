@@ -566,6 +566,11 @@ public class ActivityServiceImpl implements ActivityService {
             }
             //保存活动主表信息start
             activity.setUpdateTime(new Date());
+            if(null!=activity.getActivityStatus() && activity.getActivityStatus()==1){
+                activity.setActivityStatus(0);
+            }else if(null!=activity.getActivityStatus() && activity.getActivityStatus()==2){
+                activity.setActivityStatus(1);
+            }
             int activityRecord = activityDao.updateActivity(activity);
             if (activityRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
                 LOGGER.error("更新活动主表信息失败");
