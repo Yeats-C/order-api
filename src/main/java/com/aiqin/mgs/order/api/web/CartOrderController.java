@@ -7,6 +7,7 @@ import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.cart.DeleteCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.CartResponse;
+import com.aiqin.mgs.order.api.domain.response.cart.StoreCartProductResponse;
 import com.aiqin.mgs.order.api.service.CartOrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -88,7 +89,7 @@ public class CartOrderController {
             @ApiImplicitParam(name = "number", value = "商品数量", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(name = "activity_id", value = "活动id", dataType = "String", paramType = "query", required = false)
     })
-    public HttpResponse<CartResponse> queryCartByStoreId(String store_id, Integer product_type, String sku_code, Integer line_check_status, Integer number,String activity_id) {
+    public HttpResponse<StoreCartProductResponse> queryCartByStoreId(String store_id, Integer product_type, String sku_code, Integer line_check_status, Integer number, String activity_id) {
         LOGGER.info("购物车展示列表参数：{},{},{},{},{}", store_id,product_type,sku_code,line_check_status,number,activity_id);
         return cartOrderService.queryCartByStoreId(store_id,product_type,sku_code,line_check_status,number,activity_id);
     }
@@ -111,7 +112,7 @@ public class CartOrderController {
      */
     @PostMapping("/displayCartLineCheckProduct")
     @ApiOperation(value = "显示勾选商品列表")
-    public HttpResponse<List<CartOrderInfo>> displayCartLineCheckProduct(CartOrderInfo cartOrderInfo){
+    public HttpResponse<StoreCartProductResponse> displayCartLineCheckProduct(CartOrderInfo cartOrderInfo){
         return cartOrderService.displayCartLineCheckProduct(cartOrderInfo);
     }
 

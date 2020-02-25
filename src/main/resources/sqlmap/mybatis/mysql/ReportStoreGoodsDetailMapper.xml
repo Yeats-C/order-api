@@ -21,15 +21,15 @@
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
     <include refid="Base_Column_List" />
-    from report_store_goods_detail
+    from report_order_store_detail
     where id = #{id,jdbcType=BIGINT}
   </select>
   <delete id="deleteByStoreCodeAndCountTime" parameterType="com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo" >
-    delete from report_store_goods_detail
+    delete from report_order_store_detail
     where store_code = #{storeCode,jdbcType=VARCHAR} and count_time=#{countTime,jdbcType=VARCHAR}
   </delete>
   <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail" >
-    insert into report_store_goods_detail (id, sku_code, sku_name, 
+    insert into report_order_store_detail (id, sku_code, sku_name, 
       store_code, store_name, brand_id, 
       brand_name, num, amount, 
       count_time, create_time)
@@ -39,7 +39,7 @@
       #{countTime,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail" >
-    insert into report_store_goods_detail
+    insert into report_order_store_detail
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,
@@ -112,7 +112,7 @@
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail" >
-    update report_store_goods_detail
+    update report_order_store_detail
     <set >
       <if test="skuCode != null" >
         sku_code = #{skuCode,jdbcType=VARCHAR},
@@ -148,7 +148,7 @@
     where id = #{id,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail" >
-    update report_store_goods_detail
+    update report_order_store_detail
     set sku_code = #{skuCode,jdbcType=VARCHAR},
       sku_name = #{skuName,jdbcType=VARCHAR},
       store_code = #{storeCode,jdbcType=VARCHAR},
@@ -165,7 +165,7 @@
   <select id="selectList" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo" >
     select
     <include refid="Base_Column_List" />
-    from report_store_goods_detail
+    from report_order_store_detail
     <where>
       <if test="storeCode != null and storeCode != ''" >
         and store_code = #{storeCode,jdbcType=VARCHAR}
@@ -180,7 +180,7 @@
   </select>
 
   <insert id="insertBatch" parameterType="list">
-    insert into report_store_goods_detail (sku_code, sku_name,
+    insert into report_order_store_detail (sku_code, sku_name,
     store_code, brand_id,brand_name, num, amount,count_time, create_time)
     values
     <foreach collection="records" item="item" index="index" separator=",">
@@ -194,7 +194,7 @@
   </insert>
 
   <select id="sumAmountByBrandId" resultType="java.math.BigDecimal" parameterType="com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo" >
-    select sum(amount) from report_store_goods_detail
+    select sum(amount) from report_order_store_detail
 	WHERE store_code=#{storeCode,jdbcType=VARCHAR} and brand_id=#{brandId,jdbcType=VARCHAR} and count_time= #{countTime,jdbcType=VARCHAR}
   </select>
 

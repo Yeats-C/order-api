@@ -51,14 +51,6 @@ public interface CartOrderDao {
     CartOrderInfo getCartByCartId(@Param("cartId") String cartId);
 
     /**
-     * 根据购物车唯一标识获取这一行附带的赠品行
-     *
-     * @param giftParentCartId 购物车商品行唯一标识
-     * @return
-     */
-    List<CartOrderInfo> findByGiftParentCartId(@Param("giftParentCartId") String giftParentCartId);
-
-    /**
      * 根据行唯一标识删除购物车商品行
      *
      * @param cartId
@@ -86,11 +78,3 @@ public interface CartOrderDao {
     List<CartOrderInfo> selectByProperty(CartOrderInfo cartOrderInfo);
 
 }
-
-
-
-
-
-
-
-
