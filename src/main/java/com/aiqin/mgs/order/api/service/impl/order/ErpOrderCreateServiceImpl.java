@@ -9,6 +9,7 @@ import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
+import com.aiqin.mgs.order.api.domain.request.CouponShareRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.OrderConfirmResponse;
@@ -635,6 +636,87 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         orderFee.setTopCouponCodes(topCouponCodes);
         orderFee.setPayMoney(orderFee.getTotalMoney().subtract(orderFee.getActivityMoney()).subtract(orderFee.getSuitCouponMoney()).subtract(orderFee.getTopCouponMoney()));
     }
+
+    /**
+     * A品券计算均摊金额
+     * @param details
+     * @param couponCodeList
+     */
+    private void couponSharePrice(List<CouponShareRequest> details, List<String> couponCodeList) {
+        //A品券总金额
+        BigDecimal topCouponMoney = BigDecimal.ZERO;
+        List<String> topCouponCodeUniqueCheckList = new ArrayList<>();
+        if (couponCodeList != null && couponCodeList.size() > 0) {
+            for (String couponCode : couponCodeList) {
+                if (topCouponCodeUniqueCheckList.contains(couponCode)) {
+                    throw new BusinessException("A品券重复提交");
+                } else {
+                    topCouponCodeUniqueCheckList.add(couponCode);
+                }
+                CouponDetail couponDetail = erpOrderRequestService.getCouponDetailByCode(couponCode);
+                if (couponDetail.getActiveCondition() == 1) {
+                    throw new BusinessException("优惠券已经被使用");
+                }
+                if (couponDetail.getActiveCondition() == 2) {
+                    throw new BusinessException("优惠券已经过期");
+                }
+                topCouponMoney = topCouponMoney.add(couponDetail.getNominalValue());
+            }
+        }
+        //计算A品券金额
+        List<CouponShareRequest> topProductList = new ArrayList<>();
+        //存储符合A品卷均摊的商品的总分销价(商品组价值)
+        BigDecimal totalFirstFenAmount=BigDecimal.ZERO;
+        //存储符合A品卷均摊的商品的总分销价(商品组价值)
+        BigDecimal totalProAmount=BigDecimal.ZERO;
+        for (CouponShareRequest item : details) {
+            ErpProductPropertyTypeEnum propertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(item.getProductPropertyCode());
+            if (propertyTypeEnum.isUseTopCoupon()&&ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductGift())) {
+                topProductList.add(item);
+                //分销总价=从活动的分摊总价取
+                totalFirstFenAmount=totalFirstFenAmount.add(item.getTotalPreferentialAmount());
+                totalProAmount=totalProAmount.add(item.getTotalProductAmount());
+            }
+        }
+        //判断优惠券总金额和从活动的分摊总价取，如果A品卷总金额大于活动分摊总价，则A品券总金额=活动分摊总价
+        if(topCouponMoney.subtract(totalFirstFenAmount).compareTo(BigDecimal.ZERO)==1){
+            topCouponMoney=totalFirstFenAmount;
+        }
+        //商品组实收(商品组价值-A品卷)
+        BigDecimal auGroupAmount=totalFirstFenAmount.subtract(topCouponMoney);
+        //计算累加分摊总金额（最后一行做减法使用）
+        BigDecimal totalFenAmount=BigDecimal.ZERO;
+        //计算累加各行A品券优惠金额（最后一行使用）
+        BigDecimal totalApinAmount=BigDecimal.ZERO;
+        if(topProductList!=null&&topProductList.size()>0){
+            for(int i=0;i<topProductList.size();i++){
+                CouponShareRequest csr=topProductList.get(i);
+                //行总价(分销价)（元）
+                BigDecimal totalProductAmount=csr.getTotalProductAmount();
+                //A品卷分摊后总价值
+                BigDecimal totalPreferentialAmount =csr.getTotalPreferentialAmount();
+                //本行A品卷优惠金额
+                BigDecimal apinCouponAmount=BigDecimal.ZERO;
+                if (i < topProductList.size() - 1) {
+                    //非最后一行，根据比例计算
+                    totalPreferentialAmount = totalProductAmount.multiply(auGroupAmount).divide(totalProAmount,4, RoundingMode.HALF_UP);
+                    totalFenAmount=totalFenAmount.add(totalPreferentialAmount);
+                    apinCouponAmount=totalProductAmount.multiply(topCouponMoney).divide(auGroupAmount,4, RoundingMode.HALF_UP);
+                    totalApinAmount=totalApinAmount.add(apinCouponAmount);
+                }else {
+                    //最后一行，用减法防止误差
+                    totalPreferentialAmount = auGroupAmount.subtract(totalFenAmount);
+                    apinCouponAmount=topCouponMoney.subtract(totalApinAmount);
+                }
+                //分摊单价
+                BigDecimal preferentialAmount = totalPreferentialAmount.divide(new BigDecimal(csr.getProductCount()), 4, RoundingMode.HALF_DOWN);
+                csr.setTotalPreferentialAmount(totalPreferentialAmount);
+                csr.setPreferentialAmount(preferentialAmount);
+                csr.setApinCouponAmount(apinCouponAmount);
+            }
+        }
+    }
+
 
     /**
      * //保存订单、订单明细、订单支付、订单收货人信息、订单日志
