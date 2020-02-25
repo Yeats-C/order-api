@@ -564,14 +564,18 @@ public class ActivityServiceImpl implements ActivityService {
                     ||null==activity.getActivityStatus()){
                 return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
             }
+            Activity act=new Activity();
             //保存活动主表信息start
-            activity.setUpdateTime(new Date());
+            act.setUpdateTime(new Date());
+            act.setActivityId(activity.getActivityId());
             if(null!=activity.getActivityStatus() && activity.getActivityStatus()==1){
-                activity.setActivityStatus(0);
+                act.setActivityStatus(0);
             }else if(null!=activity.getActivityStatus() && activity.getActivityStatus()==2){
-                activity.setActivityStatus(1);
+                act.setActivityStatus(1);
+            }else if(null!=activity.getActivityStatus() && activity.getActivityStatus()==0){
+                act.setActivityStatus(0);
             }
-            int activityRecord = activityDao.updateActivity(activity);
+            int activityRecord = activityDao.updateActivity(act);
             if (activityRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
                 LOGGER.error("更新活动主表信息失败");
                 return HttpResponse.failure(ResultCode.UPDATE_ACTIVITY_INFO_EXCEPTION);
