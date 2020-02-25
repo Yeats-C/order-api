@@ -30,7 +30,9 @@
         store_code,                            
         store_name,                            
         category_code,                         
-        category_name,                         
+        category_name, 
+        child_category_code,                         
+        child_category_name,                          
     <if test="totalTarget !=null ">            
         total_target,                          
     </if>                                      
@@ -66,7 +68,9 @@
         #{storeCode},                          
         #{storeName},                          
         #{categoryCode},                       
-        #{categoryName},                       
+        #{categoryName},
+        #{childCategoryCode},                       
+        #{childCategoryName},                      
     <if test="totalTarget !=null ">            
         #{totalTarget},                        
     </if>                                      
@@ -97,6 +101,180 @@
     )                                                                     
     </insert>
     
+    
+    <select id = "selectMainPageList" resultType="com.aiqin.mgs.order.api.domain.ReportCategoryVo">
+    SELECT 
+          id as id,
+          copartner_area_id as copartnerAreaId,
+          copartner_area_name as copartnerAreaName,
+          store_id as storeId,
+          store_code as storeCode,
+          store_name as storeName,
+          category_code as categoryCode,
+          category_name as categoryName,
+          SUM(IFNULL(total_target,0)) AS totalTarget,
+          SUM(IFNULL(total_rate,0)) AS totalRate,
+          SUM(IFNULL(total_amount,0)) AS totalAmount,
+          SUM(IFNULL(total_price,0)) AS totalPrice,
+          SUM(IFNULL(price_rate,0)) AS priceRate,
+          SUM(IFNULL(last_rate,0)) AS lastRate,
+          SUM(IFNULL(same_rate,0)) AS sameRate,
+          SUM(IFNULL(qoq_rate,0)) AS qoqRate,
+          report_year as reportYear,
+          report_month as reportMonth,
+          report_subtotal_type as reportSubtotalType
+     FROM report_category_copartner_sale 
+     where 1=1
+     <if test=" reportYear !=null and reportYear !='' ">
+     and report_year = #{reportYear}
+     </if>
+     <choose>
+                <when test=" reportMonth !=null and reportMonth !='' ">
+                    and report_month = #{reportMonth}
+                    and report_subtotal_type IN ('1','2')
+                    and (
+                         <if test="storeIds != null">
+                         store_id in (
+                         <foreach collection="storeIds" item="storeId" separator=",">
+                         '${storeId}'
+                         </foreach>
+                         )
+                         </if>
+                         or
+                         <if test="areaIds != null">
+                         copartner_area_id in (
+                         <foreach collection="areaIds" item="copartnerAreaId" separator=",">
+                         '${copartnerAreaId}'
+                         </foreach>
+                         )
+                         </if>
+                    )
+                    GROUP BY copartnerAreaId,category_code
+                    ORDER BY copartner_area_id DESC ,report_subtotal_type,category_code
+                </when>
+                <otherwise>
+                    and report_subtotal_type IN ('1','3')
+                    and (
+                         <if test="storeIds != null">
+                         store_id in (
+                         <foreach collection="storeIds" item="storeId" separator=",">
+                         '${storeId}'
+                         </foreach>
+                         )
+                         </if>
+                         or
+                         (
+                         copartner_area_id is null and store_id is null
+                         )
+                    )
+                    GROUP BY copartnerAreaId,category_code
+                    ORDER BY report_month ,copartner_area_id DESC, report_subtotal_type,category_code
+                </otherwise>
+     </choose>
+    LIMIT #{beginIndex,jdbcType=BIGINT}, #{pageSize,jdbcType=BIGINT}
+    </select>
+    <select id = "countMainPage" resultType="java.lang.Integer">
+    SELECT 
+          count(1)
+     FROM report_category_copartner_sale 
+     where 1=1
+     <if test=" reportYear !=null and reportYear !='' ">
+     and report_year = #{reportYear}
+     </if>
+     <if test="storeIds != null">
+            and store_id in (
+            <foreach collection="storeIds" item="storeId" separator=",">
+                '${storeId}'
+            </foreach>
+            )
+     </if>
+     <choose>
+                <when test=" reportMonth !=null and reportMonth !='' ">
+                    and report_month = #{reportMonth}
+                    and report_subtotal_type IN ('1','2')
+                    ORDER BY copartner_area_name ,report_subtotal_type,store_name
+                </when>
+                <otherwise>
+                    and report_subtotal_type IN ('1','3')
+                    ORDER BY report_month ,report_subtotal_type,copartner_area_name,store_name
+                </otherwise>
+     </choose>
+    </select>
+    
+    <select id="qryCategoryTotal" resultType="com.aiqin.mgs.order.api.domain.ReportCategoryVo">
+    SELECT 
+          report_year AS reportYear,
+          report_month AS reportMonth,
+          IFNULL(copartner_area_id,'0000') AS copartnerAreaId,
+          IFNULL(copartner_area_name,'其他') AS copartnerAreaName,
+          SUM(IFNULL(total_target,0)) AS totalTarget,
+          SUM(IFNULL(total_rate,0)) AS totalRate,
+          SUM(IFNULL(total_amount,0)) AS totalAmount,
+          SUM(IFNULL(total_price,0)) AS totalPrice,
+          '1' as reportSubtotalType
+    FROM  report_category_copartner_sale
+    WHERE 1=1
+    AND report_year = #{reportYear}
+    AND report_month = #{reportMonth}
+    AND report_subtotal_type =1
+    and copartner_area_id = #{copartnerAreaId}
+    and category_code = #{categoryCode}
+    <if test="storeIds != null">
+            and store_id in (
+            <foreach collection="storeIds" item="storeId" separator=",">
+                '${storeId}'
+            </foreach>
+            )
+    </if>
+    </select>
+    
+    <select id="qryAreaTotal" resultType="com.aiqin.mgs.order.api.domain.ReportCategoryVo">
+    SELECT 
+          report_year AS reportYear,
+          report_month AS reportMonth,
+          IFNULL(copartner_area_id,'0000') AS copartnerAreaId,
+          IFNULL(copartner_area_name,'其他') AS copartnerAreaName,
+          SUM(IFNULL(total_target,0)) AS totalTarget,
+          SUM(IFNULL(total_rate,0)) AS totalRate,
+          SUM(IFNULL(total_amount,0)) AS totalAmount,
+          SUM(IFNULL(total_price,0)) AS totalPrice,
+          '2' as reportSubtotalType
+    FROM  report_category_copartner_sale
+    WHERE 1=1
+    AND report_year = #{reportYear}
+    AND report_month = #{reportMonth}
+    AND report_subtotal_type =1
+    and copartner_area_id = #{copartnerAreaId}
+    <if test="storeIds != null">
+            and store_id in (
+            <foreach collection="storeIds" item="storeId" separator=",">
+                '${storeId}'
+            </foreach>
+            )
+    </if> 
+    </select>
+    <select id="qryMonthTotal" resultType="com.aiqin.mgs.order.api.domain.ReportCategoryVo">
+    SELECT
+          report_year AS reportYear,
+          report_month AS reportMonth,
+          SUM(IFNULL(total_target,0)) AS totalTarget,
+          SUM(IFNULL(total_rate,0)) AS totalRate,
+          SUM(IFNULL(total_amount,0)) AS totalAmount,
+          SUM(IFNULL(total_price,0)) AS totalPrice,
+          '3' as reportSubtotalType
+    FROM  report_category_copartner_sale
+    WHERE 1=1
+    AND report_year = #{reportYear}
+    AND report_month = #{reportMonth}
+    AND report_subtotal_type =1
+    <if test="storeIds != null">
+            and store_id in (
+            <foreach collection="storeIds" item="storeId" separator=",">
+                '${storeId}'
+            </foreach>
+            )
+    </if>
+    </select>
 </mapper>
 
 

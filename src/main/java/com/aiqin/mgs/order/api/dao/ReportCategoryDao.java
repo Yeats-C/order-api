@@ -18,4 +18,16 @@ public interface ReportCategoryDao {
 
 	List<ReportCategoryVo> qryAreaInit(@Valid @Param("reportYear") String reportYear,@Valid @Param("reportMonth") String reportMonth);
 
+	List<ReportCategoryVo> selectMainPageList(ReportCategoryVo vo);
+	
+	int countMainPage(ReportCategoryVo vo);
+
+	//品类汇总
+	ReportCategoryVo qryCategoryTotal(@Valid @Param("copartnerAreaId")String copartnerAreaId,@Valid @Param("categoryCode")String categoryCode,@Valid @Param("storeIds")List<String> storeIds, @Valid @Param("reportYear") String reportYear,@Valid @Param("reportMonth") String reportMonth);
+	
+	//区域汇总
+	ReportCategoryVo qryAreaTotal(@Valid @Param("copartnerAreaId")String copartnerAreaId,@Valid @Param("storeIds")List<String> storeIds, @Valid @Param("reportYear") String reportYear,@Valid @Param("reportMonth") String reportMonth);
+
+	//月份汇总
+	ReportCategoryVo qryMonthTotal(@Valid @Param("storeIds")List<String> storeIds,@Valid @Param("reportYear") String reportYear,@Valid @Param("reportMonth") String reportMonth);
 }

@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @ApiModel("品类报表-实体类")
@@ -47,14 +48,23 @@ public class ReportCategoryVo extends PagesRequest {
 	private String storeName;
 
 
-	@ApiModelProperty(value="品类编码")
+	@ApiModelProperty(value="一级品类编码")
 	@JsonProperty("category_code")
 	private String categoryCode;
 
 
-	@ApiModelProperty(value="品类名称")
+	@ApiModelProperty(value="一级品类名称")
 	@JsonProperty("category_name")
 	private String categoryName;
+	
+	@ApiModelProperty(value="子类编码")
+	@JsonProperty("child_category_code")
+	private String childCategoryCode;
+
+
+	@ApiModelProperty(value="子类名称")
+	@JsonProperty("child_category_name")
+	private String childCategoryName;
 
 
 	@ApiModelProperty(value="销售目标")
@@ -82,7 +92,7 @@ public class ReportCategoryVo extends PagesRequest {
 	private Integer priceRate;
 
 
-	@ApiModelProperty(value="上期")
+	@ApiModelProperty(value="上期-销售额")
 	@JsonProperty("last_rate")
 	private Integer lastRate;
 
@@ -114,6 +124,15 @@ public class ReportCategoryVo extends PagesRequest {
 	@ApiModelProperty(value="报表月份")
 	@JsonProperty("calculate_month")
 	private String calculateMonth;
+	
+	@ApiModelProperty(value="可见门店列表")
+	private List<String> storeIds;
+	
+	@ApiModelProperty(value="可见区域列表")
+	private List<String> areaIds;
+	
+	@ApiModelProperty(value="订单id")
+	private String orderStoreId;
 	
 
 }

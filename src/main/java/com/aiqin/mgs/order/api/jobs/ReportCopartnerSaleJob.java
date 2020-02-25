@@ -99,6 +99,8 @@ public class ReportCopartnerSaleJob {
 				ReportCopartnerSaleVo monthVo = new ReportCopartnerSaleVo();
 //				reportCopartnerSaleService.qryMonthTotal(year,month);
 //				reportCopartnerSaleService.deleteByMonth(year,month);
+				monthVo.setReportYear(year);
+				monthVo.setReportMonth(month);
 				monthVo.setReportSubtotalType(3); //HUANGZYTODO
 				reportCopartnerSaleService.save(monthVo);
 				
