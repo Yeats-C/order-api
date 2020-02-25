@@ -4,6 +4,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
+import com.aiqin.mgs.order.api.domain.response.cart.StoreCartProductResponse;
 
 import java.util.List;
 
@@ -63,6 +64,6 @@ public interface CartOrderService {
      * @param cartOrderInfo 购物车中的商品信息
      * @return
      */
-    HttpResponse<List<CartOrderInfo>> displayCartLineCheckProduct(CartOrderInfo cartOrderInfo);
+    HttpResponse<StoreCartProductResponse> displayCartLineCheckProduct(CartOrderInfo cartOrderInfo);
 
 }
