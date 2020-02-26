@@ -929,6 +929,26 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     /**
+     * 作用:遍历树形菜单得到所有的id
+     * @param root
+     * @param result
+     * @return
+     */
+    //前序遍历得到所有的id List
+    private static List<Long> ergodicList(List<ProductCategoryRespVO> root, List<Long> result){
+        for (int i = 0; i < root.size(); i++) {
+            // 查询某节点的子节点（获取的是list）
+            result.add(root.get(i).getId());//前序遍历
+            if (null != root.get(i).getProductCategoryRespVOS()) {
+                List<ProductCategoryRespVO> children = root.get(i).getProductCategoryRespVOS();
+                ergodicList(children,result);
+            }
+            //result.add(root.get(i).getId());//后序遍历
+        }
+        return result;
+    }
+
+    /**
      * 通过条件查询一个商品有多少个进行中的活动
      * @return
      */
@@ -940,7 +960,11 @@ public class ActivityServiceImpl implements ActivityService {
             list.add(activityParameterRequest.getProductCategoryCode());
             ActivityBrandCategoryRequest activityBrandCategoryRequest=new ActivityBrandCategoryRequest();
             activityBrandCategoryRequest.setCategoryCodes(list);
-            ProductCategoryRespVO productCategoryRespVO=bridgeProductService.categoryCodes(activityBrandCategoryRequest);
+            HttpResponse response=bridgeProductService.categoryCodes(activityBrandCategoryRequest);
+            List<ProductCategoryRespVO> productCategoryRespVO=(List<ProductCategoryRespVO>)response.getData();
+            List<Long> categoryCodes = new ArrayList<>();
+            ergodicList(productCategoryRespVO,categoryCodes);
+            LOGGER.info("一二三级品类编码,"+categoryCodes);
         }
 
 

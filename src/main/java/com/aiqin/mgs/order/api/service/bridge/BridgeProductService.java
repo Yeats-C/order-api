@@ -16,6 +16,8 @@ import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
 import com.aiqin.mgs.order.api.domain.response.NewFranchiseeResponse;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
@@ -24,10 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Createed by sunx on 2019/4/8.<br/>
@@ -207,11 +206,18 @@ public class BridgeProductService {
      * @param req
      * @return
      */
-    public ProductCategoryRespVO categoryCodes(ActivityBrandCategoryRequest req){
-        String path = "/product/category/list/categoryCodes";
-        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(req);
-        HttpResponse<ProductCategoryRespVO> response = httpClient.action().result(new TypeReference<HttpResponse<ProductCategoryRespVO>>() {
+    public HttpResponse categoryCodes(ActivityBrandCategoryRequest req){
+        String str=req.getCategoryCodes().get(0);
+        String path = "/product/category/list/categoryCodes?category_codes="+str;
+        HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path);
+//        Map<String,Object> result=new HashMap<>();
+//        result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+//        List<ProductCategoryRespVO> jsonMap=new ArrayList<>();
+//        if (StringUtils.isNotBlank(String.valueOf(result.get("code"))) && "0".equals(String.valueOf(result.get("code")))) {
+//            jsonMap = JSONArray.parseArray(JSON.toJSONString(result.get("data")), ProductCategoryRespVO.class);
+//        }
+        HttpResponse<List<ProductCategoryRespVO>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ProductCategoryRespVO>>>() {
         });
-        return response.getData();
+        return response;
     }
 }
