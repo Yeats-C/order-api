@@ -750,7 +750,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         orderFee.setActivityMoney(activityMoneyTotal);
         orderFee.setSuitCouponMoney(suitCouponMoneyTotal);
         orderFee.setTopCouponMoney(topCouponMoneyTotal);
-        orderFee.setPayMoney(topCouponMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal));
+        orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal));
         orderFee.setTopCouponCodes(String.join(",", topCouponCodeList));
 
         return orderFee;
