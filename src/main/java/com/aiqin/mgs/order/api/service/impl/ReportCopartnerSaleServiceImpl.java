@@ -168,8 +168,8 @@ public class ReportCopartnerSaleServiceImpl implements ReportCopartnerSaleServic
 		
 		//获取登陆人信息
 		AuthToken authToken = AuthUtil.getCurrentAuth();
-//		HttpResponse response = copartnerAreaService.selectStoreByPerson(authToken.getTicketPersonId(),resourceCode); HUANGZYTODO
-		HttpResponse response = copartnerAreaService.selectStoreByPerson("12213",resourceCode);
+		HttpResponse response = copartnerAreaService.selectStoreByPerson(authToken.getTicketPersonId(),resourceCode);
+//		HttpResponse response = copartnerAreaService.selectStoreByPerson("12213",resourceCode);
 		List<PublicAreaStore> list = JsonUtil.fromJson(JsonUtil.toJson(response.getData()),new TypeReference<List<PublicAreaStore>>() {});  
 		if(CollectionUtils.isNotEmpty(list)) {
 			for(PublicAreaStore publicAreaStore : list) {
