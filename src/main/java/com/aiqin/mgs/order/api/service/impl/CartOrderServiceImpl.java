@@ -19,14 +19,12 @@ import com.aiqin.mgs.order.api.domain.request.cart.Product;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.CartResponse;
-import com.aiqin.mgs.order.api.domain.response.cart.OrderConfirmResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.StoreCartProductResponse;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import com.aiqin.mgs.order.api.service.CartOrderService;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
-import com.aiqin.mgs.order.api.util.TestUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -368,7 +366,8 @@ public class CartOrderServiceImpl implements CartOrderService {
 
     /**
      * 获取购物车商品楼层信息
-     * @param storeId 门店id
+     *
+     * @param storeId     门店id
      * @param productType 商品类型
      * @param cartRequest 是否是购物车请求，购物车请求的返回值包含未勾选的行
      * @return
@@ -474,15 +473,12 @@ public class CartOrderServiceImpl implements CartOrderService {
 
                     if (cartRequest) {
                         //调用接口查询商品可选活动列表
-//                        ActivityParameterRequest activityParameterRequest = new ActivityParameterRequest();
-//                        activityParameterRequest.setStoreId(storeId);
-//                        activityParameterRequest.setSkuCode(productItem.getSkuCode());
-//                        activityParameterRequest.setProductBrandCode(productItem.getProductBrandCode());
-//                        activityParameterRequest.setProductCategoryCode(productItem.getProductCategoryCode());
-//                        List<Activity> activityList = activityService.activityList(activityParameterRequest);
-
-                        //TODO 临时调试使用，用完删除
-                        List<Activity> activityList = TestUtil.getTestActivityList();
+                        ActivityParameterRequest activityParameterRequest = new ActivityParameterRequest();
+                        activityParameterRequest.setStoreId(storeId);
+                        activityParameterRequest.setSkuCode(productItem.getSkuCode());
+                        activityParameterRequest.setProductBrandCode(productItem.getProductBrandCode());
+                        activityParameterRequest.setProductCategoryCode(productItem.getProductCategoryCode());
+                        List<Activity> activityList = activityService.activityList(activityParameterRequest);
                         productItem.setActivityList(activityList);
                     }
                 }
@@ -715,16 +711,12 @@ public class CartOrderServiceImpl implements CartOrderService {
 
         //获取活动详情
         ActivityRequest activityRequest = new ActivityRequest();
-        if ("999999".equals(activityId) || "888888".equals(activityId)) {
-            //TODO 临时调试使用，用完删除
-            activityRequest = TestUtil.getTestActivity(activityId);
-        } else {
-            HttpResponse<ActivityRequest> activityDetail = activityService.getActivityDetail(activityId);
-            if (!RequestReturnUtil.validateHttpResponse(activityDetail)) {
-                throw new BusinessException("活动异常");
-            }
-            activityRequest = activityDetail.getData();
+        HttpResponse<ActivityRequest> activityDetail = activityService.getActivityDetail(activityId);
+        if (!RequestReturnUtil.validateHttpResponse(activityDetail)) {
+            throw new BusinessException("活动异常");
         }
+        activityRequest = activityDetail.getData();
+
         Activity activity = activityRequest.getActivity();
         cartGroupInfo.setHasActivity(YesOrNoEnum.YES.getCode());
         cartGroupInfo.setActivity(activity);
