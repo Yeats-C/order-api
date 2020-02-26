@@ -135,13 +135,31 @@ public class ReportCopartnerSaleServiceImpl implements ReportCopartnerSaleServic
 					    //月报区域小计
 					if(reportCopartnerSaleInfo.getReportSubtotalType().equals(2)) {//HUANGZYTODO
 						ReportCopartnerSaleVo reportCopartnerSaleVo = reportCopartnerSaleDao.qryAreaTotal(reportCopartnerSaleInfo.getCopartnerAreaId(),storeIds,reportYear, reportMonth);
-					    BeanUtils.copyProperties(reportCopartnerSaleVo, reportCopartnerSaleInfo);
+						if(reportCopartnerSaleVo !=null) {
+							reportCopartnerSaleInfo.setEighteenFinish(reportCopartnerSaleVo.getEighteenFinish());
+							reportCopartnerSaleInfo.setEighteenTarget(reportCopartnerSaleVo.getEighteenTarget());
+							reportCopartnerSaleInfo.setKeyFinish(reportCopartnerSaleVo.getKeyFinish());
+							reportCopartnerSaleInfo.setKeyTarget(reportCopartnerSaleVo.getKeyTarget());
+							reportCopartnerSaleInfo.setTextileFinish(reportCopartnerSaleVo.getTextileFinish());
+							reportCopartnerSaleInfo.setTextileTarget(reportCopartnerSaleVo.getTextileTarget());
+							reportCopartnerSaleInfo.setTotalFinish(reportCopartnerSaleVo.getTotalFinish());
+							reportCopartnerSaleInfo.setTotalTarget(reportCopartnerSaleVo.getTotalTarget());
+						}
 					    dataList.set(i, reportCopartnerSaleInfo);
 					}
 					if(reportCopartnerSaleInfo.getReportSubtotalType().equals(3)){
 						//年报月份区域小计
 						ReportCopartnerSaleVo reportCopartnerSaleVo = reportCopartnerSaleDao.qryMonthTotal(storeIds,reportYear,reportCopartnerSaleInfo.getReportMonth());
-					    BeanUtils.copyProperties(reportCopartnerSaleVo, reportCopartnerSaleInfo);
+						if(reportCopartnerSaleVo !=null) {
+							reportCopartnerSaleInfo.setEighteenFinish(reportCopartnerSaleVo.getEighteenFinish());
+							reportCopartnerSaleInfo.setEighteenTarget(reportCopartnerSaleVo.getEighteenTarget());
+							reportCopartnerSaleInfo.setKeyFinish(reportCopartnerSaleVo.getKeyFinish());
+							reportCopartnerSaleInfo.setKeyTarget(reportCopartnerSaleVo.getKeyTarget());
+							reportCopartnerSaleInfo.setTextileFinish(reportCopartnerSaleVo.getTextileFinish());
+							reportCopartnerSaleInfo.setTextileTarget(reportCopartnerSaleVo.getTextileTarget());
+							reportCopartnerSaleInfo.setTotalFinish(reportCopartnerSaleVo.getTotalFinish());
+							reportCopartnerSaleInfo.setTotalTarget(reportCopartnerSaleVo.getTotalTarget());
+						}
 					    dataList.set(i, reportCopartnerSaleInfo);
 					}
 				}
@@ -168,8 +186,8 @@ public class ReportCopartnerSaleServiceImpl implements ReportCopartnerSaleServic
 		
 		//获取登陆人信息
 		AuthToken authToken = AuthUtil.getCurrentAuth();
-		HttpResponse response = copartnerAreaService.selectStoreByPerson(authToken.getTicketPersonId(),resourceCode);
-//		HttpResponse response = copartnerAreaService.selectStoreByPerson("12213",resourceCode);
+//		HttpResponse response = copartnerAreaService.selectStoreByPerson(authToken.getTicketPersonId(),resourceCode);
+		HttpResponse response = copartnerAreaService.selectStoreByPerson("12213",resourceCode);
 		List<PublicAreaStore> list = JsonUtil.fromJson(JsonUtil.toJson(response.getData()),new TypeReference<List<PublicAreaStore>>() {});  
 		if(CollectionUtils.isNotEmpty(list)) {
 			for(PublicAreaStore publicAreaStore : list) {
