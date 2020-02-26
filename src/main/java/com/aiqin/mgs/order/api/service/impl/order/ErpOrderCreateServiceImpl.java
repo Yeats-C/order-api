@@ -284,7 +284,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                     list.add(productItem);
                 }
                 if (ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(orderType)) {
-                    list.addAll(item.getCartGiftList());
+                    if (item.getCartGiftList() != null && item.getCartGiftList().size() > 0) {
+                        list.addAll(item.getCartGiftList());
+                    }
                 }
             }
         } else {
@@ -703,7 +705,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             itemRequest.setProductPropertyCode(item.getProductPropertyCode());
             itemRequest.setTotalPreferentialAmount(item.getTotalPreferentialAmount());
             itemRequest.setPreferentialAmount(item.getTotalPreferentialAmount().divide(new BigDecimal(item.getProductCount()),4,RoundingMode.DOWN));
+            itemRequest.setApinCouponAmount(BigDecimal.ZERO);
             itemRequest.setProductGift(item.getProductType());
+            detailList.add(itemRequest);
         }
 
         couponSharePrice(detailList, topCouponCodeList);
