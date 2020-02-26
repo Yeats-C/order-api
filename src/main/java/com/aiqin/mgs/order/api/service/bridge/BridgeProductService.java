@@ -210,12 +210,6 @@ public class BridgeProductService {
         String str=req.getCategoryCodes().get(0);
         String path = "/product/category/list/categoryCodes?category_codes="+str;
         HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path);
-//        Map<String,Object> result=new HashMap<>();
-//        result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
-//        List<ProductCategoryRespVO> jsonMap=new ArrayList<>();
-//        if (StringUtils.isNotBlank(String.valueOf(result.get("code"))) && "0".equals(String.valueOf(result.get("code")))) {
-//            jsonMap = JSONArray.parseArray(JSON.toJSONString(result.get("data")), ProductCategoryRespVO.class);
-//        }
         HttpResponse<List<ProductCategoryRespVO>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ProductCategoryRespVO>>>() {
         });
         return response;

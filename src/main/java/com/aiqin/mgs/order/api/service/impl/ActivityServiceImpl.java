@@ -935,15 +935,14 @@ public class ActivityServiceImpl implements ActivityService {
      * @return
      */
     //前序遍历得到所有的id List
-    private static List<Long> ergodicList(List<ProductCategoryRespVO> root, List<Long> result){
+    private static List<String> ergodicList(List<ProductCategoryRespVO> root, List<String> result){
         for (int i = 0; i < root.size(); i++) {
             // 查询某节点的子节点（获取的是list）
-            result.add(root.get(i).getId());//前序遍历
+            result.add(root.get(i).getCategoryId());//前序遍历
             if (null != root.get(i).getProductCategoryRespVOS()) {
                 List<ProductCategoryRespVO> children = root.get(i).getProductCategoryRespVOS();
                 ergodicList(children,result);
             }
-            //result.add(root.get(i).getId());//后序遍历
         }
         return result;
     }
@@ -962,7 +961,7 @@ public class ActivityServiceImpl implements ActivityService {
             activityBrandCategoryRequest.setCategoryCodes(list);
             HttpResponse response=bridgeProductService.categoryCodes(activityBrandCategoryRequest);
             List<ProductCategoryRespVO> productCategoryRespVO=(List<ProductCategoryRespVO>)response.getData();
-            List<Long> categoryCodes = new ArrayList<>();
+            List<String> categoryCodes = new ArrayList<>();
             ergodicList(productCategoryRespVO,categoryCodes);
             LOGGER.info("一二三级品类编码,"+categoryCodes);
         }
