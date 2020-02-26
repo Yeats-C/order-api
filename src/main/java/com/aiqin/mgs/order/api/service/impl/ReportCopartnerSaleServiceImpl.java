@@ -159,6 +159,7 @@ public class ReportCopartnerSaleServiceImpl implements ReportCopartnerSaleServic
 							reportCopartnerSaleInfo.setTextileTarget(reportCopartnerSaleVo.getTextileTarget());
 							reportCopartnerSaleInfo.setTotalFinish(reportCopartnerSaleVo.getTotalFinish());
 							reportCopartnerSaleInfo.setTotalTarget(reportCopartnerSaleVo.getTotalTarget());
+							reportCopartnerSaleInfo.setReportMonth(reportCopartnerSaleInfo.getReportMonth()+"-小计");
 						}
 					    dataList.set(i, reportCopartnerSaleInfo);
 					}
