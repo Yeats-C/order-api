@@ -949,14 +949,35 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 
     @Override
     public PageResData<ReturnOrderInfo> getWriteDownOrderList(PageRequestVO<WriteDownOrderSearchVo> searchVo) {
+        log.info("erp售后管理--冲减单列表入参searchVo={}",searchVo);
+        PageResData pageResData=new PageResData();
+        if(StringUtils.isBlank(searchVo.getSearchVO().getPersonId())||StringUtils.isBlank(searchVo.getSearchVO().getResourceCode())){
+            return pageResData;
+        }
+        log.info("调用合伙人数据权限控制公共接口入参,personId={},resourceCode={}",searchVo.getSearchVO().getPersonId(),searchVo.getSearchVO().getResourceCode());
+        HttpResponse httpResponse = copartnerAreaService.selectStoreByPerson(searchVo.getSearchVO().getPersonId(), searchVo.getSearchVO().getResourceCode());
+        List<PublicAreaStore> dataList = JSONArray.parseArray(JSON.toJSONString(httpResponse.getData()), PublicAreaStore.class);
+        log.info("调用合伙人数据权限控制公共接口返回结果,dataList={}",dataList);
+        if (dataList == null || dataList.size() == 0) {
+            return pageResData;
+        }
+        //遍历门店id
+        List<String> storesIds = dataList.stream().map(PublicAreaStore::getStoreId).collect(Collectors.toList());
+        log.info("门店ids={}",storesIds);
+        if (storesIds == null || storesIds.size() == 0) {
+            return pageResData;
+        }
         PageHelper.startPage(searchVo.getPageNo(),searchVo.getPageSize());
         ReturnOrderQueryVo afterReturnOrderSearchVo=new ReturnOrderQueryVo();
         BeanUtils.copyProperties(searchVo.getSearchVO(),afterReturnOrderSearchVo);
         //退货类型 3冲减单
         afterReturnOrderSearchVo.setReturnOrderType(ReturnOrderTypeEnum.WRITE_DOWN_ORDER_TYPE.getCode());
+        afterReturnOrderSearchVo.setStoreIds(storesIds);
         log.info("erp售后管理--冲减单列表，searchVo={}",searchVo);
         List<ReturnOrderInfo> content = returnOrderInfoDao.selectAll(afterReturnOrderSearchVo);
-        return new PageResData(Integer.valueOf((int)((Page) content).getTotal()) , content);
+        pageResData.setTotalCount(Integer.valueOf((int)((Page) content).getTotal()));
+        pageResData.setDataList(content);
+        return pageResData;
     }
 
     //@Override

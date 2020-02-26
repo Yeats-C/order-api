@@ -43,4 +43,12 @@ public class WriteDownOrderSearchVo implements Serializable {
     @JsonProperty("transport_center_name")
     private String transportCenterName;
 
+    @ApiModelProperty(value = "用户id--数据权限使用")
+    @JsonProperty("person_id")
+    private String personId;
+
+    @ApiModelProperty(value = "菜单编码--数据权限使用")
+    @JsonProperty("resource_code")
+    private String resourceCode;
+
 }
