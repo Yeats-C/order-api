@@ -4,6 +4,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
+import com.aiqin.mgs.order.api.domain.response.cart.StoreCartProductResponse;
 
 import java.util.List;
 
@@ -63,11 +64,22 @@ public interface CartOrderService {
      * @param cartOrderInfo 购物车中的商品信息
      * @return
      */
-    HttpResponse<List<CartOrderInfo>> displayCartLineCheckProduct(CartOrderInfo cartOrderInfo);
+    HttpResponse<StoreCartProductResponse> displayCartLineCheckProduct(CartOrderInfo cartOrderInfo);
 
     /**
-     * 解析购物车商品上的活动，并且计算数量或者生成赠品行
+     * 获取erp端购物车信息
+     *
+     * @param storeId     门店id
+     * @param productType 商品类型
+     * @return
+     */
+    List<CartOrderInfo> getErpProductList(String storeId, Integer productType);
+
+    /**
+     * 根据cartId删除一行
+     *
      * @param cartId
      */
-    void analysisActivityInCart(String cartId);
+    void deleteByCartId(String cartId);
+
 }

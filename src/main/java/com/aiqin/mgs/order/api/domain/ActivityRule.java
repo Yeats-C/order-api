@@ -80,5 +80,19 @@ public class ActivityRule {
     @JsonProperty("gift_list")
     private List<ActivityGift> giftList;
 
+    /***附加字段 赠品数量*/
+    @ApiModelProperty(value = "赠品数量")
+    @JsonProperty("gift_number")
+    private Integer giftNumber;
 
+    public Integer getGiftNumber() {
+        int number = 0;
+        if (giftList != null && giftList.size() > 0) {
+            for (ActivityGift item :
+                    giftList) {
+                number += item.getNumbers() != null ? item.getNumbers() : 0;
+            }
+        }
+        return number;
+    }
 }

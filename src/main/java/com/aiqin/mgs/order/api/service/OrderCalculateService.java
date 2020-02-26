@@ -26,4 +26,6 @@ public interface OrderCalculateService {
 
 	List<OrderMonthCalculateInfo> copartnerMonth();
 
+	List<ReportCategoryVo> storeCategoryCopartnerMonth();
+
 }

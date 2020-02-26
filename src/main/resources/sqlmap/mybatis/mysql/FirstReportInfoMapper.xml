@@ -48,11 +48,20 @@
         delete from first_report
         where report_time = #{reportTime,jdbcType=VARCHAR} and copartner_area_id=#{copartnerAreaId}
     </delete>
-    <select id="reportLis" resultType="com.aiqin.mgs.order.api.domain.FirstReportInfo">
+    <select id="reportLis" resultType="com.aiqin.mgs.order.api.domain.FirstReportInfo" parameterType="com.aiqin.mgs.order.api.domain.FirstReportInfo">
         select
         <include refid="Base_Column_List"/>
         from first_report
         where report_time = #{reportTime,jdbcType=VARCHAR}
+        and copartner_area_id in
+        <foreach collection="areaIds" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+<!--        and copartner_area_id in (-->
+<!--        <foreach collection="areaIds" item="storeId" separator=",">-->
+<!--            #{storeId}-->
+<!--        </foreach>-->
+<!--        )-->
     </select>
 
     <select id="selectReportInfo" resultType="com.aiqin.mgs.order.api.domain.FirstReportInfo" parameterType="com.aiqin.mgs.order.api.domain.FirstReportInfo">
@@ -65,6 +74,6 @@
         select
         <include refid="Base_Column_List"/>
         from first_report
+        where report_time = #{reportTime}
     </select>
-
 </mapper>

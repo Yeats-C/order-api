@@ -59,4 +59,6 @@ public interface CopartnerAreaStoreDao {
 	CopartnerAreaUp qryInfo(@Valid @Param("storeCode") String storeCode);
 
 	List<String> qryAreaByStores(@Valid @Param("storeIds")List<String> storeIds);
+
+	void deleteByAreaStore(@Valid @Param("storeId") String storeId);
 }

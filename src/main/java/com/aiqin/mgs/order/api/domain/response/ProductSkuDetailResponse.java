@@ -79,10 +79,10 @@ public class ProductSkuDetailResponse {
     @JsonProperty("product_brand_code")
     private String productBrandCode;
     /***商品品类名称*/
-    @JsonProperty("`product_category_name")
+    @JsonProperty("product_category_name")
     private String productCategoryName;
     /***商品品类编码*/
-    @JsonProperty("`product_category_code")
+    @JsonProperty("product_category_code")
     private String productCategoryCode;
     /***SKU整包装信息返回*/
     @JsonProperty("productSkuBoxPackings")

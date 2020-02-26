@@ -48,6 +48,13 @@
         use_status as useStatus,
         box_gross_weight as boxGrossWeight,
         box_volume as boxVolume,
+        activity_price as activityPrice,
+        product_brand_code as productBrandCode,
+        product_brand_name as productBrandName,
+        product_category_code as productCategoryCode,
+        product_category_name as productCategoryName,
+        activity_id as activityId,
+        is_activity as isActivity,
         create_by_id as createById,
         create_by_name as createByName,
         update_by_id as updateById,
@@ -138,6 +145,7 @@
                                        actual_inbound_count,
                                        actual_product_count, return_product_count, tax_rate, activity_code, line_code,
                                        gift_line_code, company_code, company_name, sign_difference_reason, box_gross_weight, box_volume,
+                                       product_brand_code,product_brand_name,product_category_code,product_category_name,activity_id,is_activity,activity_price,
                                        use_status, create_by_id, create_by_name, update_by_id, update_by_name, create_time,
                                        update_time)
         values (#{orderInfoDetailId}, #{orderStoreId}, #{orderStoreCode}, #{spuCode}, #{spuName},
@@ -149,7 +157,9 @@
                 #{actualTotalProductAmount}, #{totalPreferentialAmount}, #{preferentialAmount}, #{totalAcivityAmount},
                 #{actualInboundCount}, #{actualProductCount}, #{returnProductCount}, #{taxRate},
                 #{activityCode}, #{lineCode}, #{giftLineCode}, #{companyCode}, #{companyName},
-                #{signDifferenceReason}, #{boxGrossWeight}, #{boxVolume}, #{useStatus}, #{createById}, #{createByName}, #{updateById},
+                #{signDifferenceReason}, #{boxGrossWeight}, #{boxVolume},
+                #{productBrandCode},#{productBrandName},#{productCategoryCode},#{productCategoryName},#{activityId},#{isActivity},#{activityPrice},
+                #{useStatus}, #{createById}, #{createByName}, #{updateById},
                 #{updateByName}, sysdate(), sysdate())
     </insert>
 

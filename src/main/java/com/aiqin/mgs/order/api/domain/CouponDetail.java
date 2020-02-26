@@ -25,7 +25,7 @@ public class CouponDetail {
     private String couponCode;
 
     @ApiModelProperty(value = "面值")
-    @JsonProperty("nominal_Value")
+    @JsonProperty("nominal_value")
     private BigDecimal nominalValue;
 
     @ApiModelProperty(value = "使用状态 0、未使用 1、已使用 2、过期")

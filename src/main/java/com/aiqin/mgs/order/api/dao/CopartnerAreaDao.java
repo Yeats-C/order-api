@@ -63,4 +63,6 @@ public interface CopartnerAreaDao {
 	@Select("select resource_code as resourceCode, resource_link as resourceLink, resource_name as resourceName ,resource_show_name as resourceShowName, resource_level AS resourceLevel, resource_order AS resourceOrder, resource_icon as resourceIcon, resource_status as resourceStatus, parent_code as parentCode, system_code as systemCode, plan_mark as planMark from system_resource where parent_code = #{parentCode} ")
     public List<SystemResource> selectByParent(String parentCode);
 
+	List<CopartnerAreaUp> qryCopartnerAreaList();
+
 }

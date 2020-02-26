@@ -483,10 +483,18 @@ public class ActivityServiceImpl implements ActivityService {
             Integer activityScope=activityProductList.get(0).getActivityScope();
             if(activityScope==1){//按单品设置
                 activityList=activityDao.checkProcuct(activityParameterRequest.getActivityId(),activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode(),null,null);
-            }else if(activityScope==2){//按品类设置
+            }else if(activityScope==2){//按品牌设置
                 activityList=activityDao.checkProcuct(activityParameterRequest.getActivityId(),activityParameterRequest.getStoreId(),null,activityParameterRequest.getProductBrandCode(),null);
-            }else if(activityScope==3){//按品牌设置
-                activityList=activityDao.checkProcuct(activityParameterRequest.getActivityId(),activityParameterRequest.getStoreId(),null,null,activityParameterRequest.getProductCategoryCode());
+            }else if(activityScope==3){//按品类设置
+                List<String> categoryCodes=new ArrayList<>();
+                if(StringUtils.isNotEmpty(activityParameterRequest.getProductCategoryCode())){
+                    for(int k=0;k<4;k++) {
+                        String str = activityParameterRequest.getProductCategoryCode().substring(0, activityParameterRequest.getProductCategoryCode().length() - 2 * k);
+                        categoryCodes.add(str);
+                    }
+                    LOGGER.info("一二三级品类编码,"+categoryCodes);
+                }
+                activityList=activityDao.checkProcuct(activityParameterRequest.getActivityId(),activityParameterRequest.getStoreId(),null,null,categoryCodes);
             }else if(activityScope==4){//按单品排除
                 activityList=activityDao.checkProcuct(activityParameterRequest.getActivityId(),activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode(),null,null);
                 if(activityList==null){
@@ -564,9 +572,18 @@ public class ActivityServiceImpl implements ActivityService {
                     ||null==activity.getActivityStatus()){
                 return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
             }
+            Activity act=new Activity();
             //保存活动主表信息start
-            activity.setUpdateTime(new Date());
-            int activityRecord = activityDao.updateActivity(activity);
+            act.setUpdateTime(new Date());
+            act.setActivityId(activity.getActivityId());
+            if(null!=activity.getActivityStatus() && activity.getActivityStatus()==1){
+                act.setActivityStatus(0);
+            }else if(null!=activity.getActivityStatus() && activity.getActivityStatus()==2){
+                act.setActivityStatus(1);
+            }else if(null!=activity.getActivityStatus() && activity.getActivityStatus()==0){
+                act.setActivityStatus(0);
+            }
+            int activityRecord = activityDao.updateActivity(act);
             if (activityRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
                 LOGGER.error("更新活动主表信息失败");
                 return HttpResponse.failure(ResultCode.UPDATE_ACTIVITY_INFO_EXCEPTION);
@@ -669,13 +686,17 @@ public class ActivityServiceImpl implements ActivityService {
         if(null!=activityProducts && 0!=activityProducts.size()){
             Integer activityScope=activityProducts.get(0).getActivityScope();
             List<String> parameterList=new ArrayList<>();
+            List<ActivityCategoryRequest> categoryRequestList=new ArrayList<>();
             for(ActivityProduct product:activityProducts){
                 if(activityScope==1){
                     //按单品设置
                     parameterList.add(product.getSkuCode());
                 }else if(activityScope==2){
                     //按品类设置
-                    parameterList.add(product.getProductCategoryCode());
+                    ActivityCategoryRequest categoryRequest=new ActivityCategoryRequest();
+                    categoryRequest.setProductCategoryCode(product.getProductCategoryCode());
+                    categoryRequest.setLevel(product.getLevel());
+                    categoryRequestList.add(categoryRequest);
                 }else if(activityScope==3){
                     //按品牌设置
                     parameterList.add(product.getProductBrandCode());
@@ -687,7 +708,7 @@ public class ActivityServiceImpl implements ActivityService {
             if(activityScope==1){
                 spuProductReqVO.setIncludeSkuCodes(parameterList);
             }else if(activityScope==2){
-                spuProductReqVO.setCategoryCodeList(parameterList);
+                spuProductReqVO.setCategoryCodeList(categoryRequestList);
             }else if(activityScope==3){
                 spuProductReqVO.setBrandCodeList(parameterList);
             }else if(activityScope==4){
@@ -708,17 +729,25 @@ public class ActivityServiceImpl implements ActivityService {
 
                 shoppingCartRequest.setProductId(vo.getSkuCode());
                 Integer cartNum=getSkuNum(shoppingCartRequest).getData();
+                if (null == cartNum) {
+                    cartNum=0;
+                }
                 vo.setCartNum(cartNum);
+                vo.setStoreStockSkuNum(bridgeProductService.getStoreStockSkuNum(shoppingCartRequest));
 
-                Integer storeStockSkuNum=(Integer) bridgeProductService.getStoreStockSkuNum(shoppingCartRequest).getData();
-                vo.setStoreStockSkuNum(storeStockSkuNum);
-
-                if(vo.getSkuStock()>10){
-                    vo.setStoreStockExplain("有货");
-                }else if(vo.getSkuStock()<=0){
+                if(null!=vo.getSkuStock()){
+                    if(vo.getSkuStock()>10){
+                        vo.setStoreStockExplain("有货");
+                    }else if(vo.getSkuStock()<=0){
+                        vo.setStoreStockExplain("缺货");
+                    }else if(vo.getSkuStock()>0 && vo.getSkuStock()<=10){
+                        vo.setStoreStockExplain("库存紧张");
+                    }
+                }else{
                     vo.setStoreStockExplain("缺货");
-                }else if(vo.getSkuStock()>0 && vo.getSkuStock()<=10){
-                    vo.setStoreStockExplain("库存紧张");
+                }
+                if(StringUtils.isEmpty(vo.getItroImages())){
+                    vo.setItroImages("无");
                 }
             }
         }else{
@@ -913,15 +942,45 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     /**
+     * 作用:遍历树形菜单得到所有的id
+     * @param root
+     * @param result
+     * @return
+     */
+    //前序遍历得到所有的id List
+    private static List<String> ergodicList(List<ProductCategoryRespVO> root, List<String> result){
+        for (int i = 0; i < root.size(); i++) {
+            // 查询某节点的子节点（获取的是list）
+            result.add(root.get(i).getCategoryId());//前序遍历
+            if (null != root.get(i).getProductCategoryRespVOS()) {
+                List<ProductCategoryRespVO> children = root.get(i).getProductCategoryRespVOS();
+                ergodicList(children,result);
+            }
+        }
+        return result;
+    }
+
+    /**
      * 通过条件查询一个商品有多少个进行中的活动
      * @return
      */
     @Override
     public List<Activity> activityList(ActivityParameterRequest activityParameterRequest){
         LOGGER.info("通过条件查询一个商品有多少个进行中的活动activityList参数activityParameterRequest为：{}", activityParameterRequest);
+        List<String> categoryCodes=new ArrayList<>();
+        if(StringUtils.isNotEmpty(activityParameterRequest.getProductCategoryCode())){
+
+            for(int k=0;k<4;k++) {
+                String str = activityParameterRequest.getProductCategoryCode().substring(0, activityParameterRequest.getProductCategoryCode().length() - 2 * k);
+                categoryCodes.add(str);
+            }
+            LOGGER.info("一二三级品类编码,"+categoryCodes);
+        }
+
+
         List<Activity> activityList=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode(),null,null);
         List<Activity> activityListByBrand=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),null,activityParameterRequest.getProductBrandCode(),null);
-        List<Activity> activityListByCategory=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),null,null,activityParameterRequest.getProductCategoryCode());
+        List<Activity> activityListByCategory=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),null,null,categoryCodes);
         if(null==activityList&&null==activityListByBrand&&null==activityListByCategory){
             return new ArrayList<Activity>();
         }

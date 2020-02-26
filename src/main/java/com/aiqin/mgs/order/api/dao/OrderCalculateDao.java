@@ -27,4 +27,9 @@ public interface OrderCalculateDao {
 	int qryEighteenFinish(@Valid @Param("storeId")String storeId,@Valid @Param("dictionaryContent") String dictionaryContent,@Valid @Param("beginTime")Date beginTime,@Valid @Param("endTime")Date endTime);
 
 	int qryTextileFinish(@Valid @Param("storeId")String storeId,@Valid @Param("categoryCode") String categoryCode,@Valid @Param("beginTime")Date beginTime,@Valid @Param("endTime")Date endTime);
+
+	List<ReportCategoryVo> qryCategoryFinish(@Valid @Param("beginTime")Date beginTime,@Valid @Param("endTime")Date endTime);
+
+	int qryCategoryAmountFinish(@Valid @Param("storeId")String storeId,@Valid @Param("categoryCode") String categoryCode,@Valid @Param("beginTime")Date beginTime,@Valid @Param("endTime")Date endTime);
+
 }

@@ -75,4 +75,10 @@ public class OrderCalculateController {
     public HttpResponse<OrderMonthCalculateInfo> copartnerMonth(){    
     	return HttpResponse.success(orderCalculateService.copartnerMonth());
     }
+    
+    @GetMapping("/store/category/month")
+    @ApiOperation(value = "/TOB-门店品类统计")
+    public HttpResponse<ReportCategoryVo> storeCategoryCopartnerMonth(){    
+    	return HttpResponse.success(orderCalculateService.storeCategoryCopartnerMonth());
+    }
 }

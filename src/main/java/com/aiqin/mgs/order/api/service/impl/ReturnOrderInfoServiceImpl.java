@@ -876,7 +876,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 //退货状态 改为：11-退货完成
                 returnOrderInfo.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_RETURN.getKey());
                 returnOrderInfo.setActualProductCount(totalCount);
+                returnOrderInfo.setProductCount(totalCount);
                 returnOrderInfo.setActualReturnOrderAmount(totalAmount);
+                returnOrderInfo.setReturnOrderAmount(totalAmount);
                 //退款方式 5:退到加盟商账户
                 returnOrderInfo.setReturnMoneyType(ConstantData.RETURN_MONEY_TYPE);
                 //退货类型 3冲减单
