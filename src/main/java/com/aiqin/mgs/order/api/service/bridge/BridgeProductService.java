@@ -200,4 +200,18 @@ public class BridgeProductService {
         });
         return response;
     }
+
+
+    /**
+     * 供应链提供查询品牌树接口
+     * @param req
+     * @return
+     */
+    public ProductCategoryRespVO categoryCodes(ActivityBrandCategoryRequest req){
+        String path = "/product/category/list/categoryCodes";
+        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(req);
+        HttpResponse<ProductCategoryRespVO> response = httpClient.action().result(new TypeReference<HttpResponse<ProductCategoryRespVO>>() {
+        });
+        return response.getData();
+    }
 }

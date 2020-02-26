@@ -935,6 +935,15 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public List<Activity> activityList(ActivityParameterRequest activityParameterRequest){
         LOGGER.info("通过条件查询一个商品有多少个进行中的活动activityList参数activityParameterRequest为：{}", activityParameterRequest);
+        if(StringUtils.isNotEmpty(activityParameterRequest.getProductCategoryCode())){
+            List<String> list=new ArrayList<>();
+            list.add(activityParameterRequest.getProductCategoryCode());
+            ActivityBrandCategoryRequest activityBrandCategoryRequest=new ActivityBrandCategoryRequest();
+            activityBrandCategoryRequest.setCategoryCodes(list);
+            ProductCategoryRespVO productCategoryRespVO=bridgeProductService.categoryCodes(activityBrandCategoryRequest);
+        }
+
+
         List<Activity> activityList=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode(),null,null);
         List<Activity> activityListByBrand=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),null,activityParameterRequest.getProductBrandCode(),null);
         List<Activity> activityListByCategory=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),null,null,activityParameterRequest.getProductCategoryCode());
