@@ -73,7 +73,7 @@ public class ProductSkuRespVo5 {
 
     @ApiModelProperty("封面图")
     @JsonProperty("itro_images")
-    private String itroImages;
+    private String itroImages="";
 
     @ApiModelProperty("交易倍数")
     @JsonProperty("zero_removal_coefficient")

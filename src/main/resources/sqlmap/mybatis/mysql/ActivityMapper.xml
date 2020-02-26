@@ -229,7 +229,10 @@
         and p.product_brand_code =  #{productBrandCode}
     </if>
     <if test="productCategoryCode!= null">
-        and p.product_category_code =  #{productCategoryCode}
+        and p.product_category_code in
+        <foreach collection="productCategoryCode" item="item" open="(" separator="," close=")">
+        #{item}
+        </foreach>
     </if>
     <if test="activityId!= null">
         and a.activity_id =  #{activityId}
