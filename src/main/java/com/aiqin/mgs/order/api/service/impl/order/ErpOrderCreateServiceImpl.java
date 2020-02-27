@@ -689,7 +689,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         }
         //商品组实收(商品组价值-A品卷)
         BigDecimal auGroupAmount=totalFirstFenAmount.subtract(topCouponMoney);
-        log.info("A品券计算均摊金额--总分销价:totalProAmount={},上一次分摊总价:totalFirstFenAmount={},总分销价:totalProAmount={},商品组实收:auGroupAmount={}",totalProAmount,totalFirstFenAmount,auGroupAmount);
+        log.info("A品券计算均摊金额--总分销价:totalProAmount={},上一次分摊总价:totalFirstFenAmount={},商品组实收:auGroupAmount={}",totalProAmount,totalFirstFenAmount,auGroupAmount);
         //计算累加分摊总金额（最后一行做减法使用）
         BigDecimal totalFenAmount=BigDecimal.ZERO;
         //计算累加各行A品券优惠金额（最后一行使用）
