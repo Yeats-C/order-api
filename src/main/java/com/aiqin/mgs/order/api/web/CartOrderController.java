@@ -1,12 +1,18 @@
 package com.aiqin.mgs.order.api.web;
 
 
+import com.aiqin.ground.util.protocol.MessageId;
+import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.ResultCode;
+import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.cart.DeleteCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.StoreActivityAchieveRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.CartResponse;
+import com.aiqin.mgs.order.api.domain.response.cart.StoreActivityAchieveResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.StoreCartProductResponse;
 import com.aiqin.mgs.order.api.service.CartOrderService;
 import io.swagger.annotations.Api;
@@ -116,4 +122,20 @@ public class CartOrderController {
         return cartOrderService.displayCartLineCheckProduct(cartOrderInfo);
     }
 
+    @PostMapping("/getStoreActivityAchieveDetail")
+    @ApiOperation(value = "查询当前购物车活动条件满足情况")
+    public HttpResponse<StoreActivityAchieveResponse> getStoreActivityAchieveDetail(@RequestBody StoreActivityAchieveRequest storeActivityAchieveRequest) {
+        HttpResponse<StoreActivityAchieveResponse> httpResponse = HttpResponse.success();
+        try {
+            StoreActivityAchieveResponse storeActivityAchieveDetail = cartOrderService.getStoreActivityAchieveDetail(storeActivityAchieveRequest);
+            httpResponse.setData(storeActivityAchieveDetail);
+        } catch (BusinessException e) {
+            LOGGER.info("创建订单失败：{}", e);
+            httpResponse = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            LOGGER.error("查询订单确认信息异常", e);
+            httpResponse = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return httpResponse;
+    }
 }

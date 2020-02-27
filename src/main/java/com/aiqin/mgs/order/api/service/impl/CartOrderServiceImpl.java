@@ -4,6 +4,7 @@ import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpProductGiftEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpProductPropertyTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.YesOrNoEnum;
@@ -18,7 +19,9 @@ import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.Product;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.StoreActivityAchieveRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.CartResponse;
+import com.aiqin.mgs.order.api.domain.response.cart.StoreActivityAchieveResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.StoreCartProductResponse;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import com.aiqin.mgs.order.api.service.CartOrderService;
@@ -644,6 +647,81 @@ public class CartOrderServiceImpl implements CartOrderService {
     @Override
     public void deleteByCartId(String cartId) {
         cartOrderDao.deleteByCartId(cartId);
+    }
+
+    @Override
+    public StoreActivityAchieveResponse getStoreActivityAchieveDetail(StoreActivityAchieveRequest storeActivityAchieveRequest) {
+        StoreActivityAchieveResponse storeActivityAchieveResponse = new StoreActivityAchieveResponse();
+
+        CartOrderInfo query = new CartOrderInfo();
+        query.setStoreId(storeActivityAchieveRequest.getStoreId());
+        query.setActivityId(storeActivityAchieveRequest.getActivityId());
+        query.setLineCheckStatus(Global.LINECHECKSTATUS_1);
+        query.setProductType(ErpOrderTypeEnum.DISTRIBUTION.getCode());
+
+        BigDecimal totalMoney = BigDecimal.ZERO;
+        int totalCount = 0;
+        List<CartOrderInfo> list = cartOrderDao.selectByProperty(query);
+        if (list != null && list.size() > 0) {
+            for (CartOrderInfo item :
+                    list) {
+                totalMoney = totalMoney.add(item.getPrice().multiply(new BigDecimal(item.getAmount())));
+                totalCount += item.getAmount();
+            }
+        }
+
+
+        HttpResponse<ActivityRequest> activityDetail = activityService.getActivityDetail(storeActivityAchieveRequest.getActivityId());
+        if (!RequestReturnUtil.validateHttpResponse(activityDetail)) {
+            throw new BusinessException("获取活动详情失败");
+        }
+        ActivityRequest activityRequest = activityDetail.getData();
+        Activity activity = activityRequest.getActivity();
+        List<ActivityRule> activityRules = activityRequest.getActivityRules();
+
+        //最低梯度
+        ActivityRule firstRule = null;
+        //当前满足梯度
+        ActivityRule curRule = null;
+
+        for (ActivityRule item :
+                activityRules) {
+
+            //筛选出最低梯度
+            if (firstRule == null) {
+                firstRule = item;
+            }
+            if (item.getMeetingConditions().compareTo(firstRule.getMeetingConditions()) < 0) {
+                firstRule = item;
+            }
+
+            //筛选出当前满足的最大梯度
+            if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(item.getRuleUnit())) {
+                //按照金额
+                if (item.getMeetingConditions().compareTo(totalMoney) >= 0) {
+                    if (curRule == null || item.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                        curRule = item;
+                    }
+                }
+            }
+
+            if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(item.getRuleUnit())) {
+                //按照金额
+                if (item.getMeetingConditions().compareTo(new BigDecimal(totalCount)) >= 0) {
+                    if (curRule == null || item.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                        curRule = item;
+                    }
+                }
+            }
+
+        }
+
+        storeActivityAchieveResponse.setActivity(activity);
+        storeActivityAchieveResponse.setCurActivityRule(curRule);
+        storeActivityAchieveResponse.setFirstActivityRule(firstRule);
+        storeActivityAchieveResponse.setTotalCount(totalCount);
+        storeActivityAchieveResponse.setTotalMoney(totalMoney);
+        return storeActivityAchieveResponse;
     }
 
     /**
