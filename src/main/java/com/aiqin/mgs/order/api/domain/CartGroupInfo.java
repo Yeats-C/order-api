@@ -24,6 +24,10 @@ public class CartGroupInfo {
     @JsonProperty("activity_rule")
     private ActivityRule activityRule;
 
+    @ApiModelProperty(value = "活动的最小梯度")
+    @JsonProperty("first_activity_rule")
+    private ActivityRule firstActivityRule;
+
     @ApiModelProperty(value = "楼层总的分销金额汇总")
     @JsonProperty("group_amount")
     private BigDecimal groupAmount;
