@@ -703,7 +703,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             itemRequest.setLineCode(item.getLineCode());
             itemRequest.setSkuCode(item.getSkuCode());
             itemRequest.setProductCount(item.getProductCount());
-            itemRequest.setTotalProductAmount(item.getProductAmount());
+            itemRequest.setTotalProductAmount(item.getTotalProductAmount());
             itemRequest.setProductPropertyCode(item.getProductPropertyCode());
             itemRequest.setTotalPreferentialAmount(item.getTotalPreferentialAmount());
             itemRequest.setPreferentialAmount(item.getTotalPreferentialAmount().divide(new BigDecimal(item.getProductCount()),4,RoundingMode.DOWN));
