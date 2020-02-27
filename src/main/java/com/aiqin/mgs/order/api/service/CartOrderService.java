@@ -4,6 +4,8 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.StoreActivityAchieveRequest;
+import com.aiqin.mgs.order.api.domain.response.cart.StoreActivityAchieveResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.StoreCartProductResponse;
 
 import java.util.List;
@@ -81,5 +83,13 @@ public interface CartOrderService {
      * @param cartId
      */
     void deleteByCartId(String cartId);
+
+    /**
+     * 查询当前购物车活动条件满足情况
+     *
+     * @param storeActivityAchieveRequest
+     * @return
+     */
+    StoreActivityAchieveResponse getStoreActivityAchieveDetail(StoreActivityAchieveRequest storeActivityAchieveRequest);
 
 }
