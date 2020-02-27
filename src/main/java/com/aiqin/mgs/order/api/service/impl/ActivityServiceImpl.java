@@ -78,14 +78,17 @@ public class ActivityServiceImpl implements ActivityService {
         for (Activity act:activityDao.activityList(activity)){
             int finishNum=DateUtils.truncatedCompareTo(DateUtil.getNowDate(),DateUtil.StrToDate(act.getFinishTime()), Calendar.SECOND);
             int startNum=DateUtils.truncatedCompareTo(DateUtil.getNowDate(), DateUtil.StrToDate(act.getBeginTime()), Calendar.SECOND);
-            if(act.getActivityStatus()==1 || finishNum>0){
+            if(finishNum>0){
                 act.setActivityStatus(3);//已关闭
             }else if(act.getActivityStatus()==0
                     && startNum>=0
                     && finishNum<0){
                 act.setActivityStatus(2);//进行中
-            }else if(act.getActivityStatus()==0
-                    && startNum<0){
+            }else if(act.getActivityStatus()==1
+                    && startNum>=0
+                    && finishNum<0){
+                act.setActivityStatus(1);//未开始
+            }else if(startNum<0){
                 act.setActivityStatus(1);//未开始
             }
             activities.add(act);
@@ -577,10 +580,8 @@ public class ActivityServiceImpl implements ActivityService {
             act.setUpdateTime(new Date());
             act.setActivityId(activity.getActivityId());
             if(null!=activity.getActivityStatus() && activity.getActivityStatus()==1){
-                act.setActivityStatus(0);
-            }else if(null!=activity.getActivityStatus() && activity.getActivityStatus()==2){
                 act.setActivityStatus(1);
-            }else if(null!=activity.getActivityStatus() && activity.getActivityStatus()==0){
+            }else if(null!=activity.getActivityStatus() && activity.getActivityStatus()==2){
                 act.setActivityStatus(0);
             }
             int activityRecord = activityDao.updateActivity(act);
