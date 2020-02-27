@@ -38,6 +38,7 @@ import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.NewStoreTreeResponse;
 import com.aiqin.mgs.order.api.domain.copartnerArea.PublicAreaStore;
+import com.aiqin.mgs.order.api.domain.copartnerArea.StoreAndAreaPartnerRequest;
 import com.aiqin.mgs.order.api.domain.copartnerArea.SystemMethod;
 import com.aiqin.mgs.order.api.domain.copartnerArea.SystemResource;
 import com.aiqin.mgs.order.api.domain.pay.PayReq;
@@ -376,6 +377,18 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 					BeanUtils.copyProperties(copartnerAreaStore, vo);
 					vo.setCopartnerAreaId(copartnerAreaId);
 					copartnerAreaStoreDao.saveCopartnerAreaStore(vo);
+					
+					//同步门店查询.
+					StoreAndAreaPartnerRequest storeAndAreaPartnerRequest = new StoreAndAreaPartnerRequest();
+					storeAndAreaPartnerRequest.setPartner(param.getCopartnerAreaDetail().getCopartnerAreaName());
+					storeAndAreaPartnerRequest.setPartnerCode(copartnerAreaId);
+					storeAndAreaPartnerRequest.setStoreId(vo.getStoreId());
+					HttpClient httpClient = HttpClient.post(slcsMainUrl + "/store/post/store/are").json(storeAndAreaPartnerRequest);
+					HttpResponse response = httpClient.action().result(HttpResponse.class);
+					if(!response.getCode().equals("0")) {
+						log.error("保存异常:保存区域-请求参数{}",param);
+					    return HttpResponse.failure(MessageId.create(Project.ZERO, 01,response.getMessage()));
+					}
 				}
 			}
 			
@@ -652,6 +665,7 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 	 * 保存门店与区域的对应关系
 	 */
 	@Override
+	@Transactional(isolation = Isolation.REPEATABLE_READ, propagation = Propagation.REQUIRED, readOnly = false, rollbackFor = Exception.class)
 	public HttpResponse saveAreaStore(CopartnerAreaStoreVo param) {
 		try {
 			//删除对应关系
