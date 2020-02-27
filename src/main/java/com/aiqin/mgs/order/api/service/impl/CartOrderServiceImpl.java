@@ -902,7 +902,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                             //最后一行，用减法避免误差
                             item.setLineActivityDiscountTotal(restPreferentialAmount);
                         } else {
-                            BigDecimal lineActivityDiscountTotal = item.getLineActivityAmountTotal().divide(amountTotal, 4, RoundingMode.HALF_UP).multiply(curRule.getPreferentialAmount());
+                            BigDecimal lineActivityDiscountTotal = item.getLineActivityAmountTotal().divide(amountTotal, 2, RoundingMode.HALF_UP).multiply(curRule.getPreferentialAmount());
                             item.setLineActivityDiscountTotal(lineActivityDiscountTotal);
                             restPreferentialAmount = restPreferentialAmount.subtract(lineActivityDiscountTotal);
                         }
@@ -992,7 +992,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                             //最后一行
                             item.setLineAmountAfterActivity(restActivityAmountTotal);
                         } else {
-                            BigDecimal lineAmountAfterActivity = item.getLineActivityAmountTotal().divide(amountTotal, 4, RoundingMode.HALF_UP).multiply(activityAmountTotal);
+                            BigDecimal lineAmountAfterActivity = item.getLineActivityAmountTotal().divide(amountTotal, 2, RoundingMode.HALF_UP).multiply(activityAmountTotal);
                             item.setLineAmountAfterActivity(lineAmountAfterActivity);
                             restActivityAmountTotal = restActivityAmountTotal.subtract(lineAmountAfterActivity);
                         }
