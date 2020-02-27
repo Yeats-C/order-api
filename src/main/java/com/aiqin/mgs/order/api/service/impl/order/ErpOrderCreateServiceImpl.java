@@ -18,6 +18,7 @@ import com.aiqin.mgs.order.api.service.SequenceGeneratorService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +38,7 @@ import java.util.Map;
  * @version: v1.0.0
  * @date 2019/12/9 13:57
  */
+@Slf4j
 @Service
 public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
@@ -643,6 +645,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @param couponCodeList
      */
     private void couponSharePrice(List<CouponShareRequest> details, List<String> couponCodeList) {
+        log.info("A品券计算均摊金额入参,details={},couponCodeList={}",details,couponCodeList);
         //A品券总金额
         BigDecimal topCouponMoney = BigDecimal.ZERO;
         List<String> topCouponCodeUniqueCheckList = new ArrayList<>();
@@ -663,11 +666,12 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 topCouponMoney = topCouponMoney.add(couponDetail.getNominalValue());
             }
         }
+        log.info("A品券计算均摊金额--A品券总金额,topCouponMoney={}",topCouponMoney);
         //计算A品券金额
         List<CouponShareRequest> topProductList = new ArrayList<>();
-        //存储符合A品卷均摊的商品的总分销价(商品组价值)
+        //存储符合A品卷均摊的商品的总分销价(上一次分摊总价)
         BigDecimal totalFirstFenAmount=BigDecimal.ZERO;
-        //存储符合A品卷均摊的商品的总分销价(商品组价值)
+        //总分销价(商品组价值)
         BigDecimal totalProAmount=BigDecimal.ZERO;
         for (CouponShareRequest item : details) {
             ErpProductPropertyTypeEnum propertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(item.getProductPropertyCode());
@@ -678,12 +682,14 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 totalProAmount=totalProAmount.add(item.getTotalProductAmount());
             }
         }
+        log.info("A品券计算均摊金额,符合A品卷均摊的商品topProductList={}",topProductList);
         //判断优惠券总金额和从活动的分摊总价取，如果A品卷总金额大于活动分摊总价，则A品券总金额=活动分摊总价
         if(topCouponMoney.subtract(totalFirstFenAmount).compareTo(BigDecimal.ZERO)==1){
             topCouponMoney=totalFirstFenAmount;
         }
         //商品组实收(商品组价值-A品卷)
         BigDecimal auGroupAmount=totalFirstFenAmount.subtract(topCouponMoney);
+        log.info("A品券计算均摊金额--总分销价:totalProAmount={},上一次分摊总价:totalFirstFenAmount={},总分销价:totalProAmount={},商品组实收:auGroupAmount={}",totalProAmount,totalFirstFenAmount,auGroupAmount);
         //计算累加分摊总金额（最后一行做减法使用）
         BigDecimal totalFenAmount=BigDecimal.ZERO;
         //计算累加各行A品券优惠金额（最后一行使用）
@@ -715,6 +721,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 csr.setApinCouponAmount(apinCouponAmount);
             }
         }
+        log.info("A品券计算均摊金额处理结果,details={}",details);
     }
 
 
