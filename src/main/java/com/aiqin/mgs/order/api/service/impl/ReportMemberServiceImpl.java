@@ -58,7 +58,12 @@ public class ReportMemberServiceImpl implements ReportMemberService {
 				return HttpResponse.success(new PageResData(0,null));
 			}
 			StringBuffer sb = new StringBuffer();
-			sb.append(memberUrl+"/member/alculate/qry/month/list?stat_year="+statYear+"&stat_month="+statMonth+"&page_no="+pageNo+"&page_size="+pageSize+"");
+			sb.append(memberUrl+"/member/alculate/qry/month/list?stat_year="+statYear+"&stat_month="+statMonth);
+			if(pageNo ==null && pageSize ==null) {
+				sb.append("&page_no=0&page_size=50");
+			}else {
+				sb.append("&page_no="+pageNo+"&page_size="+pageSize);
+			}
 			HttpClient httpClient = HttpClient.post(sb.toString()).json(storeIds);
 			log.info("请求地址="+sb.toString());
 		    return HttpResponse.success(httpClient.action().result(HttpResponse.class));
@@ -78,7 +83,12 @@ public class ReportMemberServiceImpl implements ReportMemberService {
 				return HttpResponse.success(new PageResData(0,null));
 			}
 			StringBuffer sb = new StringBuffer();
-			sb.append(memberUrl+"/member/alculate/qry/year/list?stat_year="+statYear+"&page_no="+pageNo+"&page_size="+pageSize+"");
+			sb.append(memberUrl+"/member/alculate/qry/year/list?stat_year="+statYear);
+			if(pageNo ==null && pageSize ==null) {
+				sb.append("&page_no=0&page_size=50");
+			}else {
+				sb.append("&page_no="+pageNo+"&page_size="+pageSize);
+			}
 			HttpClient httpClient = HttpClient.post(sb.toString()).json(storeIds);
 		    return HttpResponse.success(httpClient.action().result(HttpResponse.class));
 		}catch(Exception e) {
@@ -123,7 +133,12 @@ public class ReportMemberServiceImpl implements ReportMemberService {
 				return HttpResponse.success(new PageResData(0,null));
 			}
 			StringBuffer sb = new StringBuffer();
-			sb.append(memberUrl+"/member/alculate/qry/sale/month/list?stat_year_month="+statYearMonth+"&page_no="+pageNo+"&page_size="+pageSize+"");
+			sb.append(memberUrl+"/member/alculate/qry/sale/month/list?stat_year_month="+statYearMonth);
+			if(pageNo ==null && pageSize ==null) {
+				sb.append("&page_no=0&page_size=50");
+			}else {
+				sb.append("&page_no="+pageNo+"&page_size="+pageSize);
+			}
 			HttpClient httpClient = HttpClient.post(sb.toString()).json(storeIds);
 		    return HttpResponse.success(httpClient.action().result(HttpResponse.class));
 		}catch(Exception e) {
@@ -144,7 +159,12 @@ public class ReportMemberServiceImpl implements ReportMemberService {
 				return HttpResponse.success(new PageResData(0,null));
 			}
 			StringBuffer sb = new StringBuffer();
-			sb.append(memberUrl+"/member/alculate/qry/sale/year/list?stat_year="+statYear+"&page_no="+pageNo+"&page_size="+pageSize+"");
+			sb.append(memberUrl+"/member/alculate/qry/sale/year/list?stat_year="+statYear);
+			if(pageNo ==null && pageSize ==null) {
+				sb.append("&page_no=0&page_size=50");
+			}else {
+				sb.append("&page_no="+pageNo+"&page_size="+pageSize);
+			}
 			HttpClient httpClient = HttpClient.post(sb.toString()).json(storeIds);
 		    return HttpResponse.success(httpClient.action().result(HttpResponse.class));
 		}catch(Exception e) {
