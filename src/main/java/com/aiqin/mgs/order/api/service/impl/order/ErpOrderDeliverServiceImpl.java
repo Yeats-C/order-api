@@ -338,7 +338,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             BigDecimal thisFee = BigDecimal.ZERO;
             if (i < orderList.size() - 1) {
                 //该订单占用运费
-                thisFee = new BigDecimal(order.getActualProductCount()).divide(new BigDecimal(totalCount), 4, RoundingMode.HALF_UP);
+                thisFee = new BigDecimal(order.getActualProductCount()).divide(new BigDecimal(totalCount), 2, RoundingMode.HALF_UP);
                 useFee = useFee.add(thisFee);
             } else {
                 thisFee = fee.subtract(useFee);

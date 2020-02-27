@@ -4,6 +4,7 @@ import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpProductGiftEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpProductPropertyTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.YesOrNoEnum;
@@ -18,7 +19,9 @@ import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.Product;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.StoreActivityAchieveRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.CartResponse;
+import com.aiqin.mgs.order.api.domain.response.cart.StoreActivityAchieveResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.StoreCartProductResponse;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import com.aiqin.mgs.order.api.service.CartOrderService;
@@ -646,6 +649,81 @@ public class CartOrderServiceImpl implements CartOrderService {
         cartOrderDao.deleteByCartId(cartId);
     }
 
+    @Override
+    public StoreActivityAchieveResponse getStoreActivityAchieveDetail(StoreActivityAchieveRequest storeActivityAchieveRequest) {
+        StoreActivityAchieveResponse storeActivityAchieveResponse = new StoreActivityAchieveResponse();
+
+        CartOrderInfo query = new CartOrderInfo();
+        query.setStoreId(storeActivityAchieveRequest.getStoreId());
+        query.setActivityId(storeActivityAchieveRequest.getActivityId());
+        query.setLineCheckStatus(Global.LINECHECKSTATUS_1);
+        query.setProductType(ErpOrderTypeEnum.DISTRIBUTION.getCode());
+
+        BigDecimal totalMoney = BigDecimal.ZERO;
+        int totalCount = 0;
+        List<CartOrderInfo> list = cartOrderDao.selectByProperty(query);
+        if (list != null && list.size() > 0) {
+            for (CartOrderInfo item :
+                    list) {
+                totalMoney = totalMoney.add(item.getPrice().multiply(new BigDecimal(item.getAmount())));
+                totalCount += item.getAmount();
+            }
+        }
+
+
+        HttpResponse<ActivityRequest> activityDetail = activityService.getActivityDetail(storeActivityAchieveRequest.getActivityId());
+        if (!RequestReturnUtil.validateHttpResponse(activityDetail)) {
+            throw new BusinessException("获取活动详情失败");
+        }
+        ActivityRequest activityRequest = activityDetail.getData();
+        Activity activity = activityRequest.getActivity();
+        List<ActivityRule> activityRules = activityRequest.getActivityRules();
+
+        //最低梯度
+        ActivityRule firstRule = null;
+        //当前满足梯度
+        ActivityRule curRule = null;
+
+        for (ActivityRule item :
+                activityRules) {
+
+            //筛选出最低梯度
+            if (firstRule == null) {
+                firstRule = item;
+            }
+            if (item.getMeetingConditions().compareTo(firstRule.getMeetingConditions()) < 0) {
+                firstRule = item;
+            }
+
+            //筛选出当前满足的最大梯度
+            if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(item.getRuleUnit())) {
+                //按照金额
+                if (item.getMeetingConditions().compareTo(totalMoney) >= 0) {
+                    if (curRule == null || item.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                        curRule = item;
+                    }
+                }
+            }
+
+            if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(item.getRuleUnit())) {
+                //按照金额
+                if (item.getMeetingConditions().compareTo(new BigDecimal(totalCount)) >= 0) {
+                    if (curRule == null || item.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                        curRule = item;
+                    }
+                }
+            }
+
+        }
+
+        storeActivityAchieveResponse.setActivity(activity);
+        storeActivityAchieveResponse.setCurActivityRule(curRule);
+        storeActivityAchieveResponse.setFirstActivityRule(firstRule);
+        storeActivityAchieveResponse.setTotalCount(totalCount);
+        storeActivityAchieveResponse.setTotalMoney(totalMoney);
+        return storeActivityAchieveResponse;
+    }
+
     /**
      * 根据满赠活动生成赠品行
      *
@@ -708,23 +786,7 @@ public class CartOrderServiceImpl implements CartOrderService {
     private CartGroupInfo generateCartGroupAndShareActivityPrice(String activityId, List<CartOrderInfo> list) {
 
         CartGroupInfo cartGroupInfo = new CartGroupInfo();
-
-        //获取活动详情
-        ActivityRequest activityRequest = new ActivityRequest();
-        HttpResponse<ActivityRequest> activityDetail = activityService.getActivityDetail(activityId);
-        if (!RequestReturnUtil.validateHttpResponse(activityDetail)) {
-            throw new BusinessException("活动异常");
-        }
-        activityRequest = activityDetail.getData();
-
-        Activity activity = activityRequest.getActivity();
-        cartGroupInfo.setHasActivity(YesOrNoEnum.YES.getCode());
-        cartGroupInfo.setActivity(activity);
         cartGroupInfo.setCartProductList(list);
-        List<ActivityRule> activityRules = activityRequest.getActivityRules();
-
-        //活动类型
-        ActivityTypeEnum activityTypeEnum = ActivityTypeEnum.getEnum(activity.getActivityType());
 
         //勾选的商品组商品数量
         Integer quantity = 0;
@@ -761,171 +823,195 @@ public class CartOrderServiceImpl implements CartOrderService {
             item.setLineAmountAfterActivity(lineAmountTotal);
         }
 
-        //根据活动类型解析活动
-        switch (activityTypeEnum) {
-            case TYPE_1:
-                //满减
+        //获取活动详情
+        HttpResponse<ActivityRequest> activityDetail = activityService.getActivityDetail(activityId);
+        if (RequestReturnUtil.validateHttpResponse(activityDetail) && activityDetail.getData() != null) {
+            ActivityRequest activityRequest = activityDetail.getData();
 
-                //缓存当前命中的规则
-                ActivityRule curRule = null;
+            Activity activity = activityRequest.getActivity();
+            cartGroupInfo.setHasActivity(YesOrNoEnum.YES.getCode());
+            cartGroupInfo.setActivity(activity);
+            List<ActivityRule> activityRules = activityRequest.getActivityRules();
 
-                for (ActivityRule ruleItem :
-                        activityRules) {
+            //活动类型
+            ActivityTypeEnum activityTypeEnum = ActivityTypeEnum.getEnum(activity.getActivityType());
 
-                    //是否把当前梯度作为命中梯度
-                    boolean flag = false;
+            //缓存当前命中的规则
+            ActivityRule curRule = null;
+            //最小梯度
+            ActivityRule firstRule = null;
 
-                    if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(ruleItem.getRuleUnit())) {
-                        //按照数量
+            //根据活动类型解析活动
+            switch (activityTypeEnum) {
+                case TYPE_1:
+                    //满减
 
-                        if (ruleItem.getMeetingConditions().compareTo(new BigDecimal(quantity)) <= 0) {
-                            if (curRule == null) {
-                                flag = true;
-                            } else {
-                                if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
-                                    flag = true;
-                                }
-                            }
+                    for (ActivityRule ruleItem :
+                            activityRules) {
+
+                        //筛选最小梯度
+                        if (firstRule == null || ruleItem.getMeetingConditions().compareTo(firstRule.getMeetingConditions()) < 0) {
+                            firstRule = ruleItem;
                         }
 
-                    } else if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(ruleItem.getRuleUnit())) {
-                        //按照金额
+                        //是否把当前梯度作为命中梯度
+                        boolean flag = false;
 
-                        if (ruleItem.getMeetingConditions().compareTo(amountTotal) <= 0) {
-                            if (curRule == null) {
-                                flag = true;
-                            } else {
-                                if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                        if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(ruleItem.getRuleUnit())) {
+                            //按照数量
+
+                            if (ruleItem.getMeetingConditions().compareTo(new BigDecimal(quantity)) <= 0) {
+                                if (curRule == null) {
                                     flag = true;
+                                } else {
+                                    if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                        flag = true;
+                                    }
                                 }
                             }
-                        }
 
-                    } else {
+                        } else if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(ruleItem.getRuleUnit())) {
+                            //按照金额
 
-                    }
+                            if (ruleItem.getMeetingConditions().compareTo(amountTotal) <= 0) {
+                                if (curRule == null) {
+                                    flag = true;
+                                } else {
+                                    if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                        flag = true;
+                                    }
+                                }
+                            }
 
-                    if (flag) {
-                        curRule = ruleItem;
-                    }
-                }
-
-                if (curRule != null) {
-
-                    cartGroupInfo.setActivityRule(curRule);
-
-                    //当前剩余满减的金额
-                    BigDecimal restPreferentialAmount = curRule.getPreferentialAmount();
-
-
-                    for (int i = 0; i < tempList.size(); i++) {
-                        CartOrderInfo item = tempList.get(i);
-                        if (i == tempList.size() - 1) {
-                            //最后一行，用减法避免误差
-                            item.setLineActivityDiscountTotal(restPreferentialAmount);
                         } else {
-                            BigDecimal lineActivityDiscountTotal = item.getLineActivityAmountTotal().divide(amountTotal, 4, RoundingMode.HALF_UP).multiply(curRule.getPreferentialAmount());
-                            item.setLineActivityDiscountTotal(lineActivityDiscountTotal);
-                            restPreferentialAmount = restPreferentialAmount.subtract(lineActivityDiscountTotal);
+
                         }
-                        item.setLineAmountAfterActivity(item.getLineActivityAmountTotal().subtract(item.getLineActivityDiscountTotal()));
+
+                        if (flag) {
+                            curRule = ruleItem;
+                        }
                     }
 
-                }
-                ;
-                break;
-            case TYPE_2:
-                //满赠
+                    if (curRule != null) {
 
-                //当前命中梯度
-                ActivityRule curRuleTemp = null;
+                        cartGroupInfo.setActivityRule(curRule);
 
-                for (ActivityRule ruleItem :
-                        activityRules) {
-
-                    //是否把当前梯度作为命中梯度
-                    boolean flag = false;
+                        //当前剩余满减的金额
+                        BigDecimal restPreferentialAmount = curRule.getPreferentialAmount();
 
 
-                    if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(ruleItem.getRuleUnit())) {
-                        //按照数量
-
-                        if (ruleItem.getMeetingConditions().compareTo(new BigDecimal(quantity)) <= 0) {
-                            if (curRuleTemp == null) {
-                                flag = true;
+                        for (int i = 0; i < tempList.size(); i++) {
+                            CartOrderInfo item = tempList.get(i);
+                            if (i == tempList.size() - 1) {
+                                //最后一行，用减法避免误差
+                                item.setLineActivityDiscountTotal(restPreferentialAmount);
                             } else {
-                                if (ruleItem.getMeetingConditions().compareTo(curRuleTemp.getMeetingConditions()) > 0) {
+                                BigDecimal lineActivityDiscountTotal = item.getLineActivityAmountTotal().divide(amountTotal, 2, RoundingMode.HALF_UP).multiply(curRule.getPreferentialAmount());
+                                item.setLineActivityDiscountTotal(lineActivityDiscountTotal);
+                                restPreferentialAmount = restPreferentialAmount.subtract(lineActivityDiscountTotal);
+                            }
+                            item.setLineAmountAfterActivity(item.getLineActivityAmountTotal().subtract(item.getLineActivityDiscountTotal()));
+                        }
+
+                    }
+                    ;
+                    break;
+                case TYPE_2:
+                    //满赠
+
+                    for (ActivityRule ruleItem :
+                            activityRules) {
+
+                        //筛选最小梯度
+                        if (firstRule == null || ruleItem.getMeetingConditions().compareTo(firstRule.getMeetingConditions()) < 0) {
+                            firstRule = ruleItem;
+                        }
+
+                        //是否把当前梯度作为命中梯度
+                        boolean flag = false;
+
+
+                        if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(ruleItem.getRuleUnit())) {
+                            //按照数量
+
+                            if (ruleItem.getMeetingConditions().compareTo(new BigDecimal(quantity)) <= 0) {
+                                if (curRule == null) {
                                     flag = true;
+                                } else {
+                                    if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                        flag = true;
+                                    }
                                 }
                             }
-                        }
 
-                    } else if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(ruleItem.getRuleUnit())) {
-                        //按照金额
+                        } else if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(ruleItem.getRuleUnit())) {
+                            //按照金额
 
-                        if (ruleItem.getMeetingConditions().compareTo(amountTotal) <= 0) {
-                            if (curRuleTemp == null) {
-                                flag = true;
-                            } else {
-                                if (ruleItem.getMeetingConditions().compareTo(curRuleTemp.getMeetingConditions()) > 0) {
+                            if (ruleItem.getMeetingConditions().compareTo(amountTotal) <= 0) {
+                                if (curRule == null) {
                                     flag = true;
+                                } else {
+                                    if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                        flag = true;
+                                    }
                                 }
                             }
+
+                        } else {
+
                         }
 
-                    } else {
-
+                        if (flag) {
+                            curRule = ruleItem;
+                        }
                     }
 
-                    if (flag) {
-                        curRuleTemp = ruleItem;
-                    }
-                }
+                    if (curRule != null) {
 
-                if (curRuleTemp != null) {
+                        cartGroupInfo.setActivityRule(curRule);
 
-                    cartGroupInfo.setActivityRule(curRuleTemp);
+                        //满赠规则组
+                        List<ActivityGift> giftList = curRule.getGiftList();
 
-                    //满赠规则组
-                    List<ActivityGift> giftList = curRuleTemp.getGiftList();
+                        //存放生成的赠品行
+                        List<CartOrderInfo> cartGiftList = new ArrayList<>();
 
-                    //存放生成的赠品行
-                    List<CartOrderInfo> cartGiftList = new ArrayList<>();
-
-                    //生成赠品行
-                    for (ActivityGift giftItem :
-                            giftList) {
                         //生成赠品行
-                        CartOrderInfo giftProductLine = createGiftProductLine(list.get(0), giftItem);
-                        cartGiftList.add(giftProductLine);
-                        amountTotal = amountTotal.add(giftProductLine.getPrice().multiply(new BigDecimal(giftProductLine.getAmount())));
-                    }
-
-                    //本品+赠品的list，用来计算活动价格均摊
-                    List<CartOrderInfo> productShareList = new ArrayList<>();
-                    productShareList.addAll(tempList);
-                    productShareList.addAll(cartGiftList);
-
-                    BigDecimal restActivityAmountTotal = activityAmountTotal;
-
-                    for (int i = 0; i < productShareList.size(); i++) {
-                        CartOrderInfo item = productShareList.get(i);
-                        if (i == productShareList.size() - 1) {
-                            //最后一行
-                            item.setLineAmountAfterActivity(restActivityAmountTotal);
-                        } else {
-                            BigDecimal lineAmountAfterActivity = item.getLineActivityAmountTotal().divide(amountTotal, 4, RoundingMode.HALF_UP).multiply(activityAmountTotal);
-                            item.setLineAmountAfterActivity(lineAmountAfterActivity);
-                            restActivityAmountTotal = restActivityAmountTotal.subtract(lineAmountAfterActivity);
+                        for (ActivityGift giftItem :
+                                giftList) {
+                            //生成赠品行
+                            CartOrderInfo giftProductLine = createGiftProductLine(list.get(0), giftItem);
+                            cartGiftList.add(giftProductLine);
+                            amountTotal = amountTotal.add(giftProductLine.getPrice().multiply(new BigDecimal(giftProductLine.getAmount())));
                         }
-                    }
-                    cartGroupInfo.setCartGiftList(cartGiftList);
-                }
 
-                ;
-                break;
-            default:
-                ;
+                        //本品+赠品的list，用来计算活动价格均摊
+                        List<CartOrderInfo> productShareList = new ArrayList<>();
+                        productShareList.addAll(tempList);
+                        productShareList.addAll(cartGiftList);
+
+                        BigDecimal restActivityAmountTotal = activityAmountTotal;
+
+                        for (int i = 0; i < productShareList.size(); i++) {
+                            CartOrderInfo item = productShareList.get(i);
+                            if (i == productShareList.size() - 1) {
+                                //最后一行
+                                item.setLineAmountAfterActivity(restActivityAmountTotal);
+                            } else {
+                                BigDecimal lineAmountAfterActivity = item.getLineActivityAmountTotal().divide(amountTotal, 2, RoundingMode.HALF_UP).multiply(activityAmountTotal);
+                                item.setLineAmountAfterActivity(lineAmountAfterActivity);
+                                restActivityAmountTotal = restActivityAmountTotal.subtract(lineAmountAfterActivity);
+                            }
+                        }
+                        cartGroupInfo.setCartGiftList(cartGiftList);
+                    }
+
+                    ;
+                    break;
+                default:
+                    ;
+            }
+            cartGroupInfo.setFirstActivityRule(firstRule);
         }
 
         return cartGroupInfo;
