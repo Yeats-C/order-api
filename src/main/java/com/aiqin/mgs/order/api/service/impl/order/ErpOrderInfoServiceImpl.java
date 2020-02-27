@@ -406,12 +406,12 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     if (i < lineParamList.size() - 1) {
 
                         //拆出来的行均摊总金额
-                        BigDecimal totalPreferentialAmount = item.getTotalProductAmount().multiply(new BigDecimal(lockCount)).divide(new BigDecimal(item.getProductCount()), 4, RoundingMode.HALF_UP);
+                        BigDecimal totalPreferentialAmount = item.getTotalProductAmount().multiply(new BigDecimal(lockCount)).divide(new BigDecimal(item.getProductCount()), 2, RoundingMode.HALF_UP);
                         lineTotalPreferentialAmount = lineTotalPreferentialAmount.add(totalPreferentialAmount);
                         newSplitItem.setTotalPreferentialAmount(totalPreferentialAmount);
 
                         //拆出来的行活动优惠金额
-                        BigDecimal totalAcivityAmount = item.getTotalAcivityAmount().multiply(new BigDecimal(lockCount)).divide(new BigDecimal(item.getProductCount()), 4, RoundingMode.HALF_UP);
+                        BigDecimal totalAcivityAmount = item.getTotalAcivityAmount().multiply(new BigDecimal(lockCount)).divide(new BigDecimal(item.getProductCount()), 2, RoundingMode.HALF_UP);
                         lineTotalAcivityAmount = lineTotalAcivityAmount.add(totalAcivityAmount);
                         newSplitItem.setTotalAcivityAmount(totalAcivityAmount);
 
