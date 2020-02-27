@@ -705,9 +705,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 BigDecimal apinCouponAmount=BigDecimal.ZERO;
                 if (i < topProductList.size() - 1) {
                     //非最后一行，根据比例计算
-                    totalPreferentialAmount = totalProductAmount.multiply(auGroupAmount).divide(totalProAmount,4, RoundingMode.HALF_UP);
+                    totalPreferentialAmount = totalProductAmount.multiply(auGroupAmount).divide(totalProAmount,2, RoundingMode.HALF_UP);
                     totalFenAmount=totalFenAmount.add(totalPreferentialAmount);
-                    apinCouponAmount=totalProductAmount.multiply(topCouponMoney).divide(auGroupAmount,4, RoundingMode.HALF_UP);
+                    apinCouponAmount=totalProductAmount.multiply(topCouponMoney).divide(auGroupAmount,2, RoundingMode.HALF_UP);
                     totalApinAmount=totalApinAmount.add(apinCouponAmount);
                 }else {
                     //最后一行，用减法防止误差
@@ -715,7 +715,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                     apinCouponAmount=topCouponMoney.subtract(totalApinAmount);
                 }
                 //分摊单价
-                BigDecimal preferentialAmount = totalPreferentialAmount.divide(new BigDecimal(csr.getProductCount()), 4, RoundingMode.HALF_DOWN);
+                BigDecimal preferentialAmount = totalPreferentialAmount.divide(new BigDecimal(csr.getProductCount()), 2, RoundingMode.HALF_UP);
                 csr.setTotalPreferentialAmount(totalPreferentialAmount);
                 csr.setPreferentialAmount(preferentialAmount);
                 csr.setApinCouponAmount(apinCouponAmount);
