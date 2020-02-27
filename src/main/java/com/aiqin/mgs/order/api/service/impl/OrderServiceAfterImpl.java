@@ -111,8 +111,12 @@ public class OrderServiceAfterImpl implements OrderAfterService{
 
 			//生成订单售后ID
 			afterSaleId = OrderPublic.getUUID();
-			orderAfterSaleInfo.setAfterSaleId(afterSaleId);
-			
+			//pos离线退货的pos端生成ID
+			if (orderAfterSaleInfo.getAfterSaleId()==null||orderAfterSaleInfo.getAfterSaleId().equals("")){
+				orderAfterSaleInfo.setAfterSaleId(afterSaleId);
+
+			}
+
 			//生成订单售后编号
 			String logo = "";
 			if(orderAfterSaleInfo.getOriginType().intValue()==Global.ORIGIN_TYPE_0.intValue()) {
