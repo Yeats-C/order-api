@@ -679,6 +679,15 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 		
 		
 	}
+
+
+	@Override
+	public HttpResponse<CopartnerAreaUp> qryCopartnerAreaListBypersonId(String personId) {
+		List<CopartnerAreaUp> list = new ArrayList();
+		//查询人员的所有的区域列表
+		List<CopartnerAreaUp> roleList = copartnerAreaRoleDao.qryCopartnerAreaListBypersonId(personId);
+		return HttpResponse.success(roleList);
+	}
 }
 
 
