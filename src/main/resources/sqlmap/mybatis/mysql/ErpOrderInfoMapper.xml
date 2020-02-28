@@ -82,6 +82,8 @@
         franchisee_name as franchiseeName,
         order_success as orderSuccess,
         scour_sheet_status as scourSheetStatus,
+        activity_id as activityId,
+        is_activity as isActivity,
         use_status as useStatus,
         source_code as sourceCode,
         source_name as sourceName,
@@ -329,6 +331,12 @@
         <if test="scourSheetStatus != null and scourSheetStatus != '' or scourSheetStatus == 0 ">
             scour_sheet_status = #{scourSheetStatus},
         </if>
+        <if test="activityId != null and activityId != '' ">
+            activity_id = #{activityId},
+        </if>
+        <if test="isActivity != null and isActivity != '' or isActivity == 0 ">
+            is_activity = #{isActivity},
+        </if>
         update_by_id = #{updateById},
         update_by_name = #{updateByName},
         update_time = sysdate()
@@ -355,7 +363,7 @@
                                       store_code, store_name, transport_company_code, transport_company_name,
                                       transport_code, logistics_id, fee_id, order_return, order_return_process, franchisee_id,
                                       franchisee_code, franchisee_name, order_success, scour_sheet_status, use_status, source_code, source_name,
-                                      source_type, create_by_id, create_by_name, update_by_id, update_by_name,
+                                      source_type, activity_id, is_activity, create_by_id, create_by_name, update_by_id, update_by_name,
                                       create_time, update_time)
         values (#{orderStoreId}, #{orderStoreCode}, #{companyCode}, #{companyName},
                 #{orderTypeCode}, #{orderTypeName}, #{orderCategoryCode},
@@ -376,7 +384,7 @@
                 #{storeCode}, #{storeName}, #{transportCompanyCode}, #{transportCompanyName},
                 #{transportCode}, #{logisticsId}, #{feeId}, #{orderReturn}, #{orderReturnProcess}, #{franchiseeId},
                 #{franchiseeCode}, #{franchiseeName}, #{orderSuccess}, #{scourSheetStatus}, #{useStatus}, #{sourceCode}, #{sourceName},
-                #{sourceType}, #{createById}, #{createByName}, #{updateById}, #{updateByName},
+                #{sourceType}, #{activityId}, #{isActivity}, #{createById}, #{createByName}, #{updateById}, #{updateByName},
                 sysdate(), sysdate())
     </insert>
 
@@ -470,6 +478,8 @@
         a1.update_by_name as updateByName,
         a1.create_time as createTime,
         a1.update_time as updateTime,
+        a1.activity_id as activityId,
+        a1.is_activity as isActivity,
         a2.total_money as totalMoney,
         a2.activity_money as activityMoney,
         a2.pay_money as payMoney,
@@ -633,6 +643,8 @@
         a1.source_code as sourceCode,
         a1.source_name as sourceName,
         a1.source_type as sourceType,
+        a1.activity_id as activityId,
+        a1.is_activity as isActivity,
         a1.create_by_id as createById,
         a1.create_by_name as createByName,
         a1.update_by_id as updateById,
@@ -756,6 +768,32 @@
         a1.update_time as updateTime
         from order_store_info a1
          where a1.order_success = #{orderSuccess}
+    </select>
+
+    <!--活动相关订单销售额及活动订单数(当订单中的商品命中了这个促销活动时，这个订单纳入统计，统计主订单。-->
+    <select id="getActivitySales" resultType="com.aiqin.mgs.order.api.domain.ActivitySales" parameterType="com.aiqin.mgs.order.api.domain.Activity">
+        SELECT
+            SUM( total_product_amount ) AS activitySales,
+            COUNT( 1 ) AS activitySalesNum
+        FROM
+            order_store_info
+        WHERE
+            is_activity =1
+        <if test="activityId != '' and activityId != null">
+            and activity_id = #{activityId}
+        </if>
+    </select>
+
+    <!--活动补货门店数-->
+    <select id="getStoreNum" resultType="java.lang.Integer" parameterType="com.aiqin.mgs.order.api.domain.Activity">
+        SELECT
+            COUNT( a.storeCode )
+        FROM
+            ( SELECT store_code AS storeCode FROM order_store_info WHERE is_activity = 1
+        <if test="activityId != '' and activityId != null">
+            and activity_id = #{activityId}
+        </if>
+            GROUP BY store_code ) a
     </select>
 </mapper>
 

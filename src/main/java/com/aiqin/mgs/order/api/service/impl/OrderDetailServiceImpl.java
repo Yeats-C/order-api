@@ -367,10 +367,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             Integer totalCount = 0;
             Integer icount = null;
             orderDetailQuery.setIcount(icount);
-            List<OrderDetailByMemberResponse> icountList = orderDetailDao.byMemberOrder(OrderPublic.getOrderDetailQuery(orderDetailQuery));
-            if (icountList != null && icountList.size() > 0) {
-                totalCount = icountList.size();
-            }
+            totalCount = orderDetailDao.byMemberOrderCount(OrderPublic.getOrderDetailQuery(orderDetailQuery));
+
 
 //              return HttpResponse.success(OrderPublic.getData(list)); 
             return HttpResponse.success(new PageResData(totalCount, list));
@@ -441,10 +439,13 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             }
 
             //为pos端判断是否可退货
-            if (orderInfo.getOrderStatus()==2){
-                info.setTurnReturnView(checkTurn(detailList));
+            if (orderInfo.getOrderStatus().intValue()==2||orderInfo.getOrderStatus().intValue()==5){
+                int state=checkTurn(detailList);
+                info.setTurnReturnView(state);
+                info.getOrderInfo().setTurnReturnView(state);
             }else {
                 info.setTurnReturnView(1);
+                info.getOrderInfo().setTurnReturnView(1);
             }
 
             info.setDetailList(detailList);
@@ -874,6 +875,50 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             LOGGER.error("接口-统计商品在各个渠道的订单数失败 {}", e);
             return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
         }
+    }
+
+    @Override
+    public HttpResponse batchAddOrder(List<OrderodrInfo> cartInfo) {
+        if (cartInfo==null){
+            return new HttpResponse();
+        }
+        for (OrderodrInfo orderodrInfo:cartInfo){
+
+            String orderCode = DateUtil.sysDate() + Global.ORIGIN_COME_3 + String.valueOf(Global.ORDERID_CHANNEL_4) + OrderPublic.randomNumberF();
+
+
+            orderodrInfo.getOrderInfo().setOrderCode( orderCode);
+            try {
+                orderDao.addOrderInfo(orderodrInfo.getOrderInfo());
+                for (OrderDetailInfo orderDetailInfo:orderodrInfo.getDetailList()){
+                    orderDetailInfo.setOrderCode(orderCode);
+                    orderDetailInfo.setOrderDetailId(OrderPublic.getUUID());
+                    orderDetailInfo.setOrderId(orderodrInfo.getOrderInfo().getOrderId());
+                    orderDetailDao.addDetailList(orderDetailInfo);
+
+                }
+                //新增订单结算数据
+                orderodrInfo.getSettlementInfo().setSettlementId(OrderPublic.getUUID());
+
+                settlementDao.addSettlement(orderodrInfo.getSettlementInfo());
+
+
+
+                //新增订单支付数据
+             /*   if (orderPayList != null && orderPayList.size() > 0) {
+                    try {
+                        settlementService.addOrderPayList(orderPayList, orderId, orderCode);
+                    } catch (Exception e) {
+                        LOGGER.error("新增订单支付数据异常：{}", e);
+                    }
+                }*/
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        return HttpResponse.successGenerics(cartInfo);
     }
 
     @Override

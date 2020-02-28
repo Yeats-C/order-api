@@ -4,18 +4,14 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderNodeStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderRefundTypeEnum;
-import com.aiqin.mgs.order.api.component.enums.StatusEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayFeeTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayTransactionTypeEnum;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderRefundDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
-import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderRefund;
-import com.aiqin.mgs.order.api.domain.request.order.PayCallbackRequest;
-import com.aiqin.mgs.order.api.domain.response.order.ErpOrderPayStatusResponse;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import com.aiqin.mgs.order.api.util.OrderPublic;
@@ -28,11 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class ErpOrderRefundServiceImpl implements ErpOrderRefundService {
 
     private static final Logger logger = LoggerFactory.getLogger(ErpOrderRefundServiceImpl.class);
@@ -110,7 +104,6 @@ public class ErpOrderRefundServiceImpl implements ErpOrderRefundService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void generateOrderRefund(String orderCode, AuthToken auth) {
         ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
         if (ErpOrderNodeStatusEnum.STATUS_34.getCode().equals(order.getOrderNodeStatus())) {
@@ -138,7 +131,6 @@ public class ErpOrderRefundServiceImpl implements ErpOrderRefundService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void orderRefundPay(String orderCode, ErpRequestPayTransactionTypeEnum payTransactionTypeEnum, AuthToken auth) {
 
         ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
@@ -180,80 +172,6 @@ public class ErpOrderRefundServiceImpl implements ErpOrderRefundService {
     }
 
     @Override
-    public void orderRefundCallback(PayCallbackRequest payCallbackRequest) {
-        ErpOrderRefund orderRefund = this.getOrderRefundByRefundCode(payCallbackRequest.getOrderNo());
-        if (orderRefund == null) {
-            throw new BusinessException("无效的退款单号");
-        }
-        if (ErpPayStatusEnum.PAYING.getCode().equals(orderRefund.getRefundStatus())) {
-            ErpOrderPay orderPay = erpOrderPayService.getOrderPayByPayId(orderRefund.getPayId());
-
-            AuthToken auth = new AuthToken();
-            auth.setPersonId(orderPay.getCreateById());
-            auth.setPersonName(orderPay.getCreateByName());
-
-            if (StatusEnum.YES.getValue().equals(payCallbackRequest.getReturnCode())) {
-                if (StringUtils.isEmpty(payCallbackRequest.getPayNum())) {
-                    throw new BusinessException("缺失支付流水号");
-                }
-                this.endOrderRefund(orderRefund.getRefundCode(), payCallbackRequest.getPayNum(), ErpPayStatusEnum.SUCCESS, auth);
-            } else {
-                this.endOrderRefund(orderRefund.getRefundCode(), null, ErpPayStatusEnum.FAIL, auth);
-            }
-        }
-    }
-
-    @Override
-    public void orderRefundPolling(String orderCode, AuthToken auth) {
-
-        ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
-        if (ErpOrderNodeStatusEnum.STATUS_36.getCode().equals(order.getOrderNodeStatus())) {
-            ErpOrderRefund refund = this.getOrderRefundByOrderIdAndRefundType(order.getOrderStoreId(), ErpOrderRefundTypeEnum.ORDER_CANCEL);
-            String refundCode = refund.getRefundCode();
-
-            //轮询请求查询支付信息
-            logger.info("开始订单退款结果轮询：{}", refundCode);
-            ScheduledExecutorService service = new ScheduledThreadPoolExecutor(1);
-            service.scheduleAtFixedRate(new Runnable() {
-
-                int pollingTimes = 0;
-
-                @Override
-                public void run() {
-                    pollingTimes++;
-                    logger.info("第{}次订单退款结果轮询：{}", pollingTimes, refundCode);
-
-                    ErpOrderRefund orderRefund = getOrderRefundByRefundCode(refundCode);
-
-                    if (!ErpPayStatusEnum.PAYING.getCode().equals(orderRefund.getRefundStatus())) {
-                        logger.info("第{}次订单退款结果轮询：{}", pollingTimes, refundCode);
-                        service.shutdown();
-                    } else if (pollingTimes > OrderConstant.MAX_PAY_POLLING_TIMES) {
-                        //轮询次数超时
-                        logger.info("第{}次订单退款结果轮询：{}", pollingTimes, refundCode);
-                        service.shutdown();
-                    } else {
-                        //调用支付中心，查看结果
-                        ErpOrderPayStatusResponse payStatusResponse = erpOrderRequestService.getOrderRefundStatus(refundCode);
-                        if (payStatusResponse.isRequestSuccess()) {
-                            ErpPayStatusEnum payStatusEnum = payStatusResponse.getPayStatusEnum();
-                            if (payStatusEnum == ErpPayStatusEnum.SUCCESS || payStatusEnum == ErpPayStatusEnum.FAIL) {
-                                endOrderRefund(refundCode, payStatusResponse.getPayCode(), payStatusEnum, auth);
-                                logger.info("结束订单退款结果轮询：{}", refundCode);
-                                service.shutdown();
-                            }
-                        }
-                    }
-                }
-                //轮询时间控制
-            }, OrderConstant.MAX_PAY_POLLING_INITIALDELAY, OrderConstant.MAX_PAY_POLLING_PERIOD, TimeUnit.MILLISECONDS);
-        }
-
-
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
     public void endOrderRefund(String refundCode, String payCode, ErpPayStatusEnum payStatusEnum, AuthToken auth) {
 
         //查询退款信息

@@ -17,7 +17,7 @@ public class CartResponse {
     @JsonProperty("cartInfoList")
     private List<CartOrderInfo> cartInfoList;
 
-    @ApiModelProperty(value = "实付总价")
+    @ApiModelProperty(value = "勾选商品原价汇总")
     @JsonProperty("account_actual_price")
     private BigDecimal accountActualPrice;
 

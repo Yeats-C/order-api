@@ -56,6 +56,7 @@ public class BridgePayServiceImpl implements BridgePayService {
             logger.info("updateMemberSale:"+response);
 
         }catch (Exception e){
+            logger.info("updateMemberSaleErr:"+memberSaleRequest);
             logger.error(e.toString());
         }
 

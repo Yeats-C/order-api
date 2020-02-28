@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.po.order;
 
+import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.aiqin.mgs.order.api.component.enums.ErpProductGiftEnum;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,7 +19,7 @@ import java.util.Date;
  */
 @Data
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class ErpOrderItem {
+public class ErpOrderItem extends PagesRequest {
 
     @ApiModelProperty(value = "主键")
     @JsonProperty("id")
@@ -124,6 +125,10 @@ public class ErpOrderItem {
     @JsonProperty("product_amount")
     private BigDecimal productAmount;
 
+    @ApiModelProperty(value = "活动价（元）")
+    @JsonProperty("activity_price")
+    private BigDecimal activityPrice;
+
     @ApiModelProperty(value = "含税采购价（元）")
     @JsonProperty("purchase_amount")
     private BigDecimal purchaseAmount;
@@ -192,6 +197,10 @@ public class ErpOrderItem {
     @JsonProperty("box_volume")
     private BigDecimal boxVolume;
 
+    @ApiModelProperty(value = "单品活动id")
+    @JsonProperty("activity_id")
+    private String activityId;
+
     @ApiModelProperty(value = "0. 启用   1.禁用")
     @JsonProperty("use_status")
     private String useStatus;
@@ -219,6 +228,47 @@ public class ErpOrderItem {
     @ApiModelProperty(value = "更新时间")
     @JsonProperty("update_time")
     private Date updateTime;
+
+    @ApiModelProperty(value = "是否活动商品0否1是")
+    @JsonProperty("is_activity")
+    private Integer isActivity;
+
+    @ApiModelProperty(value = "订单状态")
+    @JsonProperty("order_status")
+    private Integer orderStatus;
+
+    @ApiModelProperty(value = "门店编码")
+    @JsonProperty("store_code")
+    private String storeCode;
+
+    @ApiModelProperty(value = "门店名称")
+    @JsonProperty("store_name")
+    private String storeName;
+
+    @ApiModelProperty(value = "商品品牌编码")
+    @JsonProperty("product_brand_code")
+    private String productBrandCode;
+
+    @ApiModelProperty(value = "商品品牌名称")
+    @JsonProperty("product_brand_name")
+    private String productBrandName;
+
+    @ApiModelProperty(value = "商品品类编码")
+    @JsonProperty("product_category_code")
+    private String productCategoryCode;
+
+    @ApiModelProperty(value = "商品品类名称")
+    @JsonProperty("product_category_name")
+    private String productCategoryName;
+
+    /***仅活动优惠金额,用于统计*/
+    @JsonProperty("activity_discount_amount")
+    private BigDecimal activityDiscountAmount;
+
+    /***仅A品优惠金额，用于统计*/
+    @JsonProperty("top_coupon_discount_amount")
+    private BigDecimal topCouponDiscountAmount;
+
 
     public String getProductTypeDesc() {
         return ErpProductGiftEnum.getEnumDesc(productType);

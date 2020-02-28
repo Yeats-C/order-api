@@ -225,7 +225,7 @@ public interface OrderDao {
      * @param endDay
      * @return
      */
-    int orderPrestorageCount(@Param("storeId")String storeId,@Param("startDate") Date startDay,@Param("endDay") Date endDay);
+    Integer orderPrestorageCount(@Param("storeId")String storeId,@Param("startDate") Date startDay,@Param("endDay") Date endDay);
 
     /**
      * 正常销售订单的销售量-已完成状态2）
@@ -234,5 +234,5 @@ public interface OrderDao {
      * @param endDay
      * @return
      */
-    int orderStoreCount(@Param("storeId")String storeId,@Param("startDate") Date startDay,@Param("endDay") Date endDay);
+    Integer orderStoreCount(@Param("storeId")String storeId,@Param("startDate") Date startDay,@Param("endDay") Date endDay);
 }

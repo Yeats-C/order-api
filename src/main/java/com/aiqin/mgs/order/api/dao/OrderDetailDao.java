@@ -88,4 +88,6 @@ public interface OrderDetailDao {
     List<String> wantBuy(@Valid @Param("sukList") List<String> sukList) throws Exception;
 
     OrderDetailInfo findOrderDetailById(@Param("orderDetailId") String orderDetailId);
+   //统计数量
+    Integer byMemberOrderCount(OrderDetailQuery orderDetailQuery);
 }

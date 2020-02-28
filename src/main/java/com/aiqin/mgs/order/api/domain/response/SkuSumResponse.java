@@ -65,7 +65,7 @@ public class SkuSumResponse{
 	public void setPrice(Integer price) {
 		this.price = price;
 	}
-	
+	@Override
 	public String toString() {
 
 		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);

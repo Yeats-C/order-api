@@ -25,6 +25,7 @@
         <result column="member_name" jdbcType="VARCHAR" property="memberName"/>
         <result column="member_phone" jdbcType="VARCHAR" property="memberPhone"/>
         <result column="product_name" jdbcType="VARCHAR" property="productName"/>
+        <result column="store_name" jdbcType="VARCHAR" property="storeName"/>
         <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
         <result column="spu_code" jdbcType="VARCHAR" property="spuCode"/>
         <result column="bar_code" jdbcType="VARCHAR" property="barCode"/>
@@ -48,7 +49,7 @@
     <select id="selectPrestorageOrderLogs" resultMap="OrderLogs"
             parameterType="com.aiqin.mgs.order.api.domain.OrderQuery">
         select
-        d.member_name,d.member_phone,l.product_name,l.bar_code,l.sku_code,l.supply_amount,l.surplus_amount,d.order_id,d.order_code,l.create_time
+        d.member_name,d.member_phone,d.distributor_name as store_name,l.product_name,l.bar_code,l.sku_code,l.supply_amount,l.surplus_amount,d.order_id,d.order_code,l.create_time
         from prestorage_order_supply_logs l ,prestorage_order_supply d
 
         where d.prestorage_order_supply_id=l.prestorage_order_supply_id
@@ -61,6 +62,13 @@
         </if>
         <if test="distributorId!=null and distributorId!='' ">
             and d.distributor_id = #{distributorId}
+        </if>
+        <if test="listDistributorId != null">
+            and d.distributor_id in (
+            <foreach collection="listDistributorId" item="distributorId" separator=",">
+                '${distributorId}'
+            </foreach>
+            )
         </if>
         <if test="barCodeAndSku!=null and barCodeAndSku!=''">
             and (l.bar_code= #{barCodeAndSku,jdbcType=VARCHAR} or l.sku_code = #{barCodeAndSku,jdbcType=VARCHAR})
@@ -84,6 +92,13 @@
         </if>
         <if test="distributorId!=null and distributorId!='' ">
             and d.distributor_id = #{distributorId}
+        </if>
+        <if test="listDistributorId != null">
+            and d.distributor_id in (
+            <foreach collection="listDistributorId" item="distributorId" separator=",">
+                '${distributorId}'
+            </foreach>
+            )
         </if>
         <if test="barCodeAndSku!=null and barCodeAndSku!=''">
             and (l.bar_code= #{barCodeAndSku,jdbcType=VARCHAR} or l.sku_code = #{barCodeAndSku,jdbcType=VARCHAR})

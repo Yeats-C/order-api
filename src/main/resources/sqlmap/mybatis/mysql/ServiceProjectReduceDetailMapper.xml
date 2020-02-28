@@ -222,6 +222,14 @@
             <if test="storeId!=null">
                 and d.store_id  = #{storeId,jdbcType=VARCHAR}
             </if>
+
+            <if test="listDistributorId != null">
+                and a.store_id in (
+                <foreach collection="listDistributorId" item="distributorId" separator=",">
+                    '${distributorId}'
+                </foreach>
+                )
+            </if>
             <if test="typeId!=null">
                 and d.type_id  = #{typeId,jdbcType=VARCHAR}
             </if>
@@ -262,6 +270,13 @@
             </if>
             <if test="storeId!=null">
                 and d.store_id  = #{storeId,jdbcType=VARCHAR}
+            </if>
+            <if test="listDistributorId != null">
+                and a.store_id in (
+                <foreach collection="listDistributorId" item="distributorId" separator=",">
+                    '${distributorId}'
+                </foreach>
+                )
             </if>
             <if test="typeId!=null">
                 and d.type_id  = #{typeId,jdbcType=VARCHAR}

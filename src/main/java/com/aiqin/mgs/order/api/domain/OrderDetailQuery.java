@@ -12,11 +12,15 @@ import java.util.List;
 import javax.validation.constraints.NotBlank;
 
 import com.aiqin.mgs.order.api.base.PagesRequest;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
+@Data
 @ApiModel("订单明细查询条件")
 public class OrderDetailQuery extends PagesRequest {
 
@@ -83,11 +87,7 @@ public class OrderDetailQuery extends PagesRequest {
 	@ApiModelProperty(value="sku集合")
 	@JsonProperty("suk_list")
 	private List<String>  sukList;
-	
-//	@ApiModelProperty(value="来源类型")
-//	@JsonProperty("origin_type")
-//	private Integer orderOriginType;
-	
+
 	@ApiModelProperty(value="来源类型:2||null-全部;0&&3-门店;1-微商城;0-pos;3:web")
 	@JsonProperty("origin_type_list")
 	private List<Integer> originTypeList;
@@ -95,155 +95,12 @@ public class OrderDetailQuery extends PagesRequest {
 	@ApiModelProperty(value="订单类型 1：TOC订单 2: TOB订单 3：服务商品")
 	@JsonProperty("order_type")
 	private Integer orderType;
-	
-//	//接口--商品概览 月销量/产品销量
-//	@ApiModelProperty(value="年份")
-//	@JsonProperty("year")
-//	private String year ;
-//	
-//	@ApiModelProperty(value="月份")
-//	@JsonProperty("month")
-//	private String month ;
 
-
-	public String getStoreId() {
-		return storeId;
-	}
-
-	public void setStoreId(String storeId) {
-		this.storeId = storeId;
-	}
-
-	public Integer getOrderType() {
-		return orderType;
-	}
-
-	public List<String> getOrderIdList() {
-		return orderIdList;
-	}
-
-	public void setOrderIdList(List<String> orderIdList) {
-		this.orderIdList = orderIdList;
-	}
-
-	public void setOrderType(Integer orderType) {
-		this.orderType = orderType;
-	}
-
-	public Integer getIcount() {
-		return icount;
-	}
-
-	public List<Integer> getOriginTypeList() {
-		return originTypeList;
-	}
-
-	public void setOriginTypeList(List<Integer> originTypeList) {
-		this.originTypeList = originTypeList;
-	}
-
-	public void setIcount(Integer icount) {
-		this.icount = icount;
-	}
-
-	public String getOrderCode() {
-		return orderCode;
-	}
-
-	public void setOrderCode(String orderCode) {
-		this.orderCode = orderCode;
-	}
-
-	public List<String> getSukList() {
-		return sukList;
-	}
-
-	public void setSukList(List<String> sukList) {
-		this.sukList = sukList;
-	}
-
-	public List<String> getMemberidList() {
-		return memberidList;
-	}
-
-	public String getActivityId() {
-		return activityId;
-	}
-
-	public void setActivityId(String activityId) {
-		this.activityId = activityId;
-	}
-
-	public Integer getOrderStatus() {
-		return orderStatus;
-	}
-
-	public void setOrderStatus(Integer orderStatus) {
-		this.orderStatus = orderStatus;
-	}
-
-	public void setMemberidList(List<String> memberidList) {
-		this.memberidList = memberidList;
-	}
-
-	public String getDistributorId() {
-		return distributorId;
-	}
-
-	public void setDistributorId(String distributorId) {
-		this.distributorId = distributorId;
-	}
-
-	public Date getBeginDate() {
-		return beginDate;
-	}
-
-	public void setBeginDate(Date beginDate) {
-		this.beginDate = beginDate;
-	}
-
-	public Date getEndDate() {
-		return endDate;
-	}
-
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
-
-	public String getOrderId() {
-		return orderId;
-	}
-
-	public void setOrderId(String orderId) {
-		this.orderId = orderId;
-	}
-
-	public String getMemberName() {
-		return memberName;
-	}
-
-	public void setMemberName(String memberName) {
-		this.memberName = memberName;
-	}
-
-	public String getMemberPhone() {
-		return memberPhone;
-	}
-
-	public void setMemberPhone(String memberPhone) {
-		this.memberPhone = memberPhone;
-	}
-
-	public List<String> getActivityIdList() {
-		return activityIdList;
-	}
-
-	public void setActivityIdList(List<String> activityIdList) {
-		this.activityIdList = activityIdList;
-	}
-
-
-	
+	@ApiModelProperty(value = "更新时间")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@JsonProperty("update_time")
+	private Date updateTime;
 }
 
 

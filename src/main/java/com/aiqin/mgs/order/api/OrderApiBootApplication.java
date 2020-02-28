@@ -10,7 +10,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -37,7 +36,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * </pre>
  * <p>
  */
-@EnableScheduling //定时任务
+//@EnableScheduling //定时任务
 @SuppressWarnings("ALL")
 @Configuration
 @ComponentScan
@@ -53,7 +52,7 @@ public class OrderApiBootApplication extends SpringBootServletInitializer {
         SpringApplication.run(OrderApiBootApplication.class, args);
         log.info("============= SpringBoot Start Success =============");
     }
-
+    @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(OrderApiBootApplication.class);
     }

@@ -358,6 +358,14 @@ public class ErpOrderInfo {
     @JsonProperty("scour_sheet_status")
     private Integer scourSheetStatus;
 
+    @ApiModelProperty(value = "是否活动商品0否1是")
+    @JsonProperty("is_activity")
+    private Integer isActivity;
+
+    @ApiModelProperty(value = "整单活动id")
+    @JsonProperty("activity_id")
+    private String activityId;
+
     @ApiModelProperty(value = "启用停用 0启用 1启用")
     @JsonProperty("use_status")
     private Integer useStatus;

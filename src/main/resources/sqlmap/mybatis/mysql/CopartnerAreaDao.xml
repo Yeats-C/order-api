@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.CopartnerAreaDao">
+    <select id = "copartnerAreaList" resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaList">
+    select 
+      id AS id,
+      copartner_area_id as copartnerAreaId,
+      copartner_area_name as copartnerAreaName,
+      copartner_area_company as copartnerAreaCompany,
+      copartner_area_level as copartnerAreaLevel,
+      copartner_area_name_up as copartnerAreaNameUp
+    from copartner_area_info
+    where 1=1
+    <if test=" copartnerAreaName !=null and copartnerAreaName !='' ">
+         and copartner_area_name like concat('%',#{copartnerAreaName,jdbcType=VARCHAR},'%')
+    </if>
+    <if test=" copartnerAreaCompany !=null and copartnerAreaCompany !='' ">
+         and copartner_area_company like concat('%',#{copartnerAreaCompany,jdbcType=VARCHAR},'%')
+    </if>
+    <if test=" copartnerAreaLevel !=null ">
+         and copartner_area_level = #{copartnerAreaLevel,jdbcType=INTEGER}
+    </if>
+    ORDER BY copartner_area_level,copartner_area_name 
+    LIMIT #{beginIndex,jdbcType=BIGINT}, #{pageSize,jdbcType=BIGINT}
+    </select>
+    <select id = "countCopartnerAreaList" resultType="java.lang.Integer">
+    select 
+      count(1)
+    from copartner_area_info
+    where 1=1
+    <if test=" copartnerAreaName !=null and copartnerAreaName !='' ">
+         and copartner_area_name like concat('%',#{copartnerAreaName,jdbcType=VARCHAR},'%')
+    </if>
+    <if test=" copartnerAreaCompany !=null and copartnerAreaCompany !='' ">
+         and copartner_area_company like concat('%',#{copartnerAreaCompany,jdbcType=VARCHAR},'%')
+    </if>
+    <if test=" copartnerAreaLevel !=null ">
+         and copartner_area_level = #{copartnerAreaLevel,jdbcType=INTEGER}
+    </if>
+    </select>
+    
+    <select id = "copartnerAreaUp" resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp">
+    select 
+      copartner_area_id as copartnerAreaId,
+      copartner_area_name as copartnerAreaName
+    from copartner_area_info
+    where 1=1
+    and copartner_area_level = 1
+    order by copartner_area_name
+    </select>
+    
+    <insert id="saveCopartnerArea">
+        insert into copartner_area_info(
+            copartner_area_id,
+            copartner_area_name,
+            <if test=" copartnerAreaLevel !=null ">
+            copartner_area_level,
+            </if>
+            copartner_area_company,
+            company_person_id,
+            company_person_name,
+            copartner_area_id_up,
+            copartner_area_name_up,
+            create_by,
+            memo
+         )
+         values(
+            #{copartnerAreaId},
+            #{copartnerAreaName},
+            <if test=" copartnerAreaLevel !=null ">
+            #{copartnerAreaLevel},
+            </if>
+            #{copartnerAreaCompany},
+            #{companyPersonId},
+            #{companyPersonName},
+            #{copartnerAreaIdUp},
+            #{copartnerAreaNameUp},
+            #{createBy},
+            #{memo}
+         )
+    </insert>
+    <select id="selectCopartnerAreaInfo" resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo">
+        select 
+            id as id,
+            copartner_area_id as copartnerAreaId,
+            copartner_area_name as copartnerAreaName,
+            copartner_area_level as copartnerAreaLevel,
+            copartner_area_company as copartnerAreaCompany,
+            company_person_id as companyPersonId,
+            company_person_name as companyPersonName,
+            copartner_area_id_up as copartnerAreaIdUp,
+            copartner_area_name_up as copartnerAreaNameUp,
+            create_by as createBy,
+            update_by as updateBy,
+            create_time as createTime,
+            update_time as updateTime,
+            memo as memo 
+        from  copartner_area_info
+        where copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
+    limit 1
+    </select>
+    
+    <select id="copartnerAreaVoList" resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo">
+        select 
+            id as id,
+            copartner_area_id as copartnerAreaId,
+            copartner_area_name as copartnerAreaName,
+            copartner_area_level as copartnerAreaLevel,
+            copartner_area_company as copartnerAreaCompany,
+            company_person_id as companyPersonId,
+            company_person_name as companyPersonName,
+            copartner_area_id_up as copartnerAreaIdUp,
+            copartner_area_name_up as copartnerAreaNameUp,
+            create_by as createBy,
+            update_by as updateBy,
+            create_time as createTime,
+            update_time as updateTime,
+            memo as memo 
+        from  copartner_area_info
+        where 1=1
+        <if test=" copartnerAreaId !=null and copartnerAreaId !='' ">
+        and copartner_area_id = #{copartnerAreaId,jdbcType=VARCHAR}
+        </if>
+        <if test=" copartnerAreaIdUp !=null and copartnerAreaIdUp !='' ">
+        and copartner_area_id_up = #{copartnerAreaIdUp,jdbcType=VARCHAR}
+        </if>
+    </select>
+    
+    <delete id="deleteById" parameterType="java.lang.String">
+        delete from copartner_area_info where copartner_area_id = #{copartnerAreaId}
+    </delete>
+    
+    <select id = "qryCopartnerAreaList" resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp">
+    SELECT 
+      copartner_area_id AS copartnerAreaId,
+      copartner_area_name AS copartnerAreaName
+    FROM copartner_area_info
+    WHERE 1=1
+    ORDER BY copartner_area_id,copartner_area_name
+    </select>
+    
+</mapper>
+

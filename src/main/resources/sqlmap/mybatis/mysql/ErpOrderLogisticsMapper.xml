@@ -62,9 +62,6 @@
         <if test="balancePayFee != null and balancePayFee != '' or balancePayFee == 0 ">
             balance_pay_fee = #{balancePayFee},
         </if>
-        coupon_pay_fee = #{couponPayFee},
-        balance_pay_fee = #{balancePayFee},
-        coupon_ids = #{couponIds},
         update_by_id = #{updateById},
         update_by_name = #{updateByName},
         update_time = sysdate()
@@ -87,7 +84,6 @@
             coupon_ids            = #{couponIds},
             update_by_id          = #{updateById},
             update_by_name        = #{updateByName},
-            status                = #{status},
             update_time           = sysdate()
         where id = #{id}
     </update>

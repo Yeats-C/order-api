@@ -67,8 +67,9 @@ public class IPInterceptor implements HandlerInterceptor {
         //过滤ip,若用户在白名单内，则放行
         String ipAddress = IPUtil.getRealIP(request);
         LOGGER.info("USER IP ADDRESS IS =>" + ipAddress);
-        if (!StringUtils.isNotBlank(ipAddress))
+        if (!StringUtils.isNotBlank(ipAddress)){
             return false;
+        }
         if (!ipList.contains(ipAddress) && !isInRange(ipAddress, "118.112.72.0/100")) {
             response.getWriter().append("<h1 style=\"text-align:center;\">Not allowed!</h1>");
             return false;

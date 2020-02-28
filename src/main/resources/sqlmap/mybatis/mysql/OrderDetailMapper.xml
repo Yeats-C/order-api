@@ -225,6 +225,8 @@
 
     <!-- 查询订单明细部分汇总-（支持活动ID汇总、）-->
     <select id="selectorderdetailsum" resultMap="OrderInfoDetailMapping">
+        select sum(actual_price),count(amount) from
+        (
         SELECT IFNULL(SUM(IFNULL(a.actual_price,0)*IFNULL(a.amount,0)),0) AS actual_price,COUNT(a.order_id) AS amount
         FROM order_consumer_detail a,order_consumer_info b
         WHERE 1=1
@@ -233,6 +235,8 @@
         <if test="activityId!=null and activityId!=''">
             AND a.activity_id =#{activityId}
         </if>
+        group by a.order_code
+        ) c
     </select>
 
 
@@ -408,15 +412,53 @@
             and b.distributor_id = #{distributorId}
         </if>
         <if test="beginDate!=null ">
-            and create_time &gt;= #{beginDate}
+            and b.create_time &gt;= #{beginDate}
         </if>
         <if test="endDate!=null ">
-            and create_time &lt;= #{endDate}
+            and b.create_time &lt;= #{endDate}
+        </if>
+        <if test="updateTime!=null ">
+            and b.update_time &gt;= #{updateTime}
         </if>
         ORDER BY a.create_time DESC
         <if test="icount!=null ">
             limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
         </if>
+    </select>
+
+    <select id="byMemberOrderCount"   resultType="java.lang.Integer">
+        SELECT count(a.id)
+
+        FROM
+        order_consumer_detail a
+        LEFT JOIN order_consumer_info b ON a.order_id=b.order_id
+        where 1=1
+        <if test="memberidList != null">
+            and b.member_id in (
+            <foreach collection="memberidList" item="member_id" separator=",">
+                '${member_id}'
+            </foreach>
+            )
+        </if>
+        <if test="memberName!=null and memberName!='' ">
+            AND b.member_name like CONCAT(CONCAT('%',#{memberName}),'%')
+        </if>
+        <if test="memberPhone!=null and memberPhone!='' ">
+            and b.member_phone like CONCAT(CONCAT('%',#{memberPhone}),'%')
+        </if>
+        <if test="distributorId!=null and distributorId!=''">
+            and b.distributor_id = #{distributorId}
+        </if>
+        <if test="beginDate!=null ">
+            and b.create_time &gt;= #{beginDate}
+        </if>
+        <if test="endDate!=null ">
+            and b.create_time &lt;= #{endDate}
+        </if>
+        <if test="updateTime!=null ">
+            and b.update_time &gt;= #{updateTime}
+        </if>
+
     </select>
 
     <!--接口-统计商品在各个渠道的订单数.-->

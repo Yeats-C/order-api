@@ -20,24 +20,26 @@ public class AppWebConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(urlInterceptor)
-                .addPathPatterns("/**")
-                .excludePathPatterns(
-                        "/doc.html",
-                        "/swagger-resources",
-                        "/webjars/**",
-                        "/init/**",
-                        "/order/**",
-                        "/orderdetail/**",
-                        "/orderafter/**",
-                        "/frozen/**",
-                        "/service/**",
-                        "/orderNoCode/**",
-                        "/settlement/**",
-                        "/erpOrderSignController/**",
-                        "/store-value/**",
-                        "/payment/**"
-                        );
+//        registry.addInterceptor(urlInterceptor)
+//                .addPathPatterns("/**")
+//                .excludePathPatterns(
+//                        "/doc.html",
+//                        "/swagger-resources",
+//                        "/webjars/**",
+//                        "/init/**",
+//                        "/order/**",
+//                        "/orderdetail/**",
+//                        "/orderafter/**",
+//                        "/frozen/**",
+//                        "/service/**",
+//                        "/orderNoCode/**",
+//                        "/settlement/**",
+//                        "/erpOrderSignController/**",
+//                        "/store-value/**",
+//                        "/payment/**",
+//                        "/purchase/**",
+//                        "/relatedSales/**"
+//                        );
     }
 
     @Override

@@ -48,7 +48,7 @@ public class CartServiceImpl implements CartService {
                     LOGGER.info("判断SKU商品是否已存在购物车中:{}", cartInfo);
                     String OldAount = cartDao.isYesCart(cartInfo);
 
-                    if (OldAount != null && !OldAount.equals("")) {
+                    if (OldAount != null && !"".equals(OldAount)) {
 
                         //已存在购物车的、新添加+已存在购物车的数量=真实数量
                         LOGGER.info("更新购物车:{}", cartInfo);
@@ -140,7 +140,7 @@ public class CartServiceImpl implements CartService {
 
         try {
 
-            if (memberId != null && !memberId.equals("")) {
+            if (memberId != null && !"".equals(memberId)) {
                 cartDao.deleteCartInfo(memberId);
                 return HttpResponse.success();
             } else {

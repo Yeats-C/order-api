@@ -620,7 +620,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             String franchiseeId=getFranchiseeId(returnOrderInfo.getStoreId());
             json.put("franchisee_id",franchiseeId);
             json.put("store_name",returnOrderInfo.getStoreName());
-            json.put("store_id",returnOrderInfo.getStoreCode());
+            json.put("store_id",returnOrderInfo.getStoreId());
             Integer method=returnOrderInfo.getTreatmentMethod();
             //处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款
             if(null!=method&&method.equals(TreatmentMethodEnum.RETURN_AMOUNT_AND_GOODS_TYPE.getCode())){//RETURN_REFUND 退货退款
@@ -876,7 +876,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 //退货状态 改为：11-退货完成
                 returnOrderInfo.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_RETURN.getKey());
                 returnOrderInfo.setActualProductCount(totalCount);
+                returnOrderInfo.setProductCount(totalCount);
                 returnOrderInfo.setActualReturnOrderAmount(totalAmount);
+                returnOrderInfo.setReturnOrderAmount(totalAmount);
                 //退款方式 5:退到加盟商账户
                 returnOrderInfo.setReturnMoneyType(ConstantData.RETURN_MONEY_TYPE);
                 //退货类型 3冲减单
@@ -1000,6 +1002,58 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     @Override
     public HttpResponse apply(String approvalCode, String operatorId, String deptCode) {
         submitActBaseProcess(approvalCode,operatorId,deptCode);
+        return HttpResponse.success();
+    }
+
+    @Override
+    public HttpResponse directDelivery(ReturnOrderReviewReqVo reqVo) {
+        log.info("直送退货处理--入参,reqVo={}",reqVo);
+        String content="";
+        int synFlag = 0;
+        String isPass="";
+        int erpFlag = 0;
+        ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByReturnOrderCode(reqVo.getReturnOrderCode());
+        switch (reqVo.getOperateStatus()) {//处理办法 1--退款并退货 2--驳回
+            case 1:
+                reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey());
+                //处理办法 1--退货退款(通过)
+                reqVo.setTreatmentMethod(TreatmentMethodEnum.RETURN_AMOUNT_AND_GOODS_TYPE.getCode());
+                content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg();
+                //同步数据到供应链
+                synFlag = 1;
+                break;
+            case 2:
+                reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getKey());
+                reqVo.setTreatmentMethod(TreatmentMethodEnum.FALL_TYPE.getCode());
+                content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_FALL.getMsg();
+                //调用门店退货申请-完成(门店)（erp回调）---订货管理-修改退货申请单
+                isPass=StoreStatusEnum.PAY_ORDER_TYPE_PEI.getKey().toString();
+                erpFlag=1;
+                break;
+            default:
+                return HttpResponse.failure(ResultCode.RETURN_ORDER_STATUS_NOT_FOUND);
+        }
+        reqVo.setReviewTime(new Date());
+        //修改退货单状态
+        returnOrderInfoDao.updateReturnStatus(reqVo);
+        //添加日志
+        insertLog(reqVo.getReturnOrderCode(),reqVo.getOperator(),reqVo.getOperator(),ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),reqVo.getOperateStatus(),content);
+        if (synFlag==1) {
+            // 同步到供应链，生成退供单
+            log.info("erp同步供应链，生成退供单开始,returnOrderCode={}",reqVo.getReturnOrderCode());
+            HttpResponse httpResponse=rejectRecordService.createRejectRecord(reqVo.getReturnOrderCode());
+            log.info("erp同步供应链，生成退供单结束,httpResponse={}",httpResponse);
+            if(!"0".equals(httpResponse.getCode())){
+                throw new RuntimeException("erp同步供应链，生成退供单失败");
+            }
+        }
+        if(StringUtils.isNotBlank(isPass)){
+            updateStoreStatus(reqVo.getReturnOrderCode(),isPass,returnOrderInfo.getStoreId(),reqVo.getOperatorId(),reqVo.getOperator(),"0");
+        }
+        if(erpFlag==1){//修改原始订单数据
+            log.info("退货单审核--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}",returnOrderInfo.getOrderStoreCode(), ErpOrderReturnStatusEnum.SUCCESS,null,reqVo.getOperatorId(),reqVo.getOperator());
+            erpOrderInfoService.updateOrderReturnStatus(returnOrderInfo.getOrderStoreCode(), ErpOrderReturnRequestEnum.CANCEL,null,reqVo.getOperatorId(),reqVo.getOperator());
+        }
         return HttpResponse.success();
     }
 

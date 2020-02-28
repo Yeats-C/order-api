@@ -4,6 +4,9 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.StoreActivityAchieveRequest;
+import com.aiqin.mgs.order.api.domain.response.cart.StoreActivityAchieveResponse;
+import com.aiqin.mgs.order.api.domain.response.cart.StoreCartProductResponse;
 
 import java.util.List;
 
@@ -29,6 +32,19 @@ public interface CartOrderService {
     HttpResponse selectCartByStoreId(String storeId,Integer productType,String skuId,Integer lineCheckStatus,Integer number);
 
     /**
+     * 更新和查询购物车
+     *
+     * @param storeId         门店id
+     * @param productType     商品类型
+     * @param skuId           sku编码
+     * @param lineCheckStatus 勾选标记
+     * @param number          数量
+     * @param activityId      活动id
+     * @return com.aiqin.ground.util.protocol.http.HttpResponse
+     */
+    HttpResponse queryCartByStoreId(String storeId, Integer productType, String skuId, Integer lineCheckStatus, Integer number, String activityId);
+
+    /**
      * 返回购物车中的所有商品数量
      * @param storeId 门店ID
      * @return
@@ -50,6 +66,30 @@ public interface CartOrderService {
      * @param cartOrderInfo 购物车中的商品信息
      * @return
      */
-    HttpResponse<List<CartOrderInfo>> displayCartLineCheckProduct(CartOrderInfo cartOrderInfo);
+    HttpResponse<StoreCartProductResponse> displayCartLineCheckProduct(CartOrderInfo cartOrderInfo);
+
+    /**
+     * 获取erp端购物车信息
+     *
+     * @param storeId     门店id
+     * @param productType 商品类型
+     * @return
+     */
+    List<CartOrderInfo> getErpProductList(String storeId, Integer productType);
+
+    /**
+     * 根据cartId删除一行
+     *
+     * @param cartId
+     */
+    void deleteByCartId(String cartId);
+
+    /**
+     * 查询当前购物车活动条件满足情况
+     *
+     * @param storeActivityAchieveRequest
+     * @return
+     */
+    StoreActivityAchieveResponse getStoreActivityAchieveDetail(StoreActivityAchieveRequest storeActivityAchieveRequest);
 
 }

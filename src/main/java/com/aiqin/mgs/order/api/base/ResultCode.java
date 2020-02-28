@@ -16,6 +16,7 @@ public interface ResultCode {
     MessageId NO_HAVE_STORE_ERROR = MessageId.create(Project.STORE_API, 9, "未查询到对应门店信息");
     MessageId CHANGE_STORE_ERROR=MessageId.create(Project.ORDER_API, -1, "修改库存失败");
     MessageId STATUS_CHANGE_ERROR=MessageId.create(Project.ORDER_API, -1, "订单状态修改失败");
+    MessageId FIRST_REPORT_ERROP =MessageId.create(Project.ORDER_API,-2,"查询首单报表数据为空");
 
     /** 黄祉壹   2018-11-05 开始     */
     
@@ -98,6 +99,15 @@ public interface ResultCode {
 
     
     /** 黄祉壹   2018-11-05 结束     */
+
+    /**促销活动相关 start */
+    MessageId ADD_ACTIVITY_INFO_EXCEPTION = MessageId.create(Project.MARKET_API, 6, "新增活动时失败");
+    MessageId UPDATE_ACTIVITY_INFO_EXCEPTION = MessageId.create(Project.MARKET_API, 7, "更新活动信息时失败");
+    MessageId DELETE_ACTIVITY_INFO_EXCEPTION = MessageId.create(Project.MARKET_API, 8, "删除活动信息时失败");
+    MessageId SELECT_ACTIVITY_INFO_EXCEPTION = MessageId.create(Project.MARKET_API, 9, "查询活动信息时失败");
+    MessageId SELECT_ACTIVITY_BY_CONDITION_EXCEPTION = MessageId.create(Project.MARKET_API, 10, "分页模糊查询活动时失败");
+    MessageId UPDATE_ACTIVITY_EXCEPTION = MessageId.create(Project.MARKET_API, 11, "更新活动时失败");
+    /**促销活动相关 end */
 
 
 

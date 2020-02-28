@@ -147,4 +147,12 @@ public interface ReturnOrderInfoService {
      */
     HttpResponse apply(String approvalCode,String operatorId,String deptCode);
 
+    /**
+     * 直送退货处理
+     * @param reqVo
+     * @return
+     */
+    HttpResponse directDelivery(ReturnOrderReviewReqVo reqVo);
+
+
 }
