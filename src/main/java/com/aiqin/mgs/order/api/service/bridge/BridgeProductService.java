@@ -6,9 +6,11 @@ import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
+import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.dto.ProductDistributorOrderDTO;
 import com.aiqin.mgs.order.api.domain.request.InventoryDetailRequest;
 import com.aiqin.mgs.order.api.domain.request.activity.*;
@@ -16,6 +18,7 @@ import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
 import com.aiqin.mgs.order.api.domain.response.NewFranchiseeResponse;
+import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
@@ -24,10 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Createed by sunx on 2019/4/8.<br/>
@@ -87,6 +87,31 @@ public class BridgeProductService {
 //        list.add(data);
 //        cartOrderInfoHttpResponse.setData(list);
         return response;
+    }
+
+    public CartOrderInfo getCartProductDetail(String provinceId, String cityId, String skuCode) {
+        ShoppingCartProductRequest shoppingCartProductRequest = new ShoppingCartProductRequest();
+        shoppingCartProductRequest.setCityCode(cityId);
+        shoppingCartProductRequest.setProvinceCode(provinceId);
+        shoppingCartProductRequest.setCompanyCode(OrderConstant.SELECT_PRODUCT_COMPANY_CODE);
+        List<String> skuCodeList = new ArrayList<>();
+        skuCodeList.add(skuCode);
+        shoppingCartProductRequest.setSkuCodes(skuCodeList);
+        String path = "/search/spu/sku/detail2";
+        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest);
+        HttpResponse<List<CartOrderInfo>> response = httpClient.action().result(new TypeReference<HttpResponse<List<CartOrderInfo>>>() {
+        });
+
+        CartOrderInfo cartOrderInfo = new CartOrderInfo();
+        if (!RequestReturnUtil.validateHttpResponse(response)) {
+
+        } else {
+            List<CartOrderInfo> data = response.getData();
+            if (data != null && data.size() > 0) {
+                cartOrderInfo = data.get(0);
+            }
+        }
+        return cartOrderInfo;
     }
 
 

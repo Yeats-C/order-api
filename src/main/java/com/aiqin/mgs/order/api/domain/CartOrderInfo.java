@@ -275,6 +275,10 @@ public class CartOrderInfo {
     @JsonProperty("spec")
     private String spec;
 
+    @ApiModelProperty(value = "标签列表")
+    @JsonProperty("tag_info_list")
+    private List<TagInfo> tagInfoList;
+
     @ApiModelProperty(value = "本商品待选择活动列表")
     @JsonProperty("activity_list")
     private List<Activity> activityList;

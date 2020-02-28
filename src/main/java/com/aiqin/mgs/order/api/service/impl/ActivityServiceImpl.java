@@ -11,11 +11,13 @@ import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
+import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
+import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.DateUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
@@ -68,6 +70,9 @@ public class ActivityServiceImpl implements ActivityService {
     @Resource
     private BridgeProductService bridgeProductService;
 
+    @Resource
+    private CopartnerAreaRoleDao copartnerAreaRoleDao;
+
     @Override
     public HttpResponse<Map> activityList(Activity activity) {
         LOGGER.info("查询促销活动列表activityList参数为：{}", activity);
@@ -78,14 +83,17 @@ public class ActivityServiceImpl implements ActivityService {
         for (Activity act:activityDao.activityList(activity)){
             int finishNum=DateUtils.truncatedCompareTo(DateUtil.getNowDate(),DateUtil.StrToDate(act.getFinishTime()), Calendar.SECOND);
             int startNum=DateUtils.truncatedCompareTo(DateUtil.getNowDate(), DateUtil.StrToDate(act.getBeginTime()), Calendar.SECOND);
-            if(act.getActivityStatus()==1 || finishNum>0){
+            if(finishNum>0){
                 act.setActivityStatus(3);//已关闭
             }else if(act.getActivityStatus()==0
                     && startNum>=0
                     && finishNum<0){
                 act.setActivityStatus(2);//进行中
-            }else if(act.getActivityStatus()==0
-                    && startNum<0){
+            }else if(act.getActivityStatus()==1
+                    && startNum>=0
+                    && finishNum<0){
+                act.setActivityStatus(1);//未开始
+            }else if(startNum<0){
                 act.setActivityStatus(1);//未开始
             }
             activities.add(act);
@@ -128,6 +136,8 @@ public class ActivityServiceImpl implements ActivityService {
             ||null==activityRequest.getActivityRules()){
             return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
         }
+        AuthToken authToken= AuthUtil.getCurrentAuth();
+
         //生成活动id
         String activityId = IdUtil.activityId();
 
@@ -137,7 +147,11 @@ public class ActivityServiceImpl implements ActivityService {
         activity.setActivityId(activityId);
         activity.setActiveStoreRange(2);
 
-
+        //查询人员的所有的区域列表
+        List<CopartnerAreaUp> roleList = copartnerAreaRoleDao.qryCopartnerAreaListBypersonId(authToken.getPersonId());
+        if(null!=roleList&& 0!=roleList.size()){
+            activity.setPublishingOrganization(roleList.get(0).getCopartnerAreaName());
+        }
 
         //保存活动对应门店信息start
         List<ActivityStore> activityStoreList = activityRequest.getActivityStores();
@@ -341,11 +355,16 @@ public class ActivityServiceImpl implements ActivityService {
                     ||null==activityRequest.getActivityRules()){
                 return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
             }
+            AuthToken authToken=AuthUtil.getCurrentAuth();
 
             Activity activity=activityRequest.getActivity();
             activity.setUpdateTime(new Date());
             activity.setActiveStoreRange(2);
-
+            //查询人员的所有的区域列表
+            List<CopartnerAreaUp> roleList = copartnerAreaRoleDao.qryCopartnerAreaListBypersonId(authToken.getPersonId());
+            if(null!=roleList&& 0!=roleList.size()){
+                activity.setPublishingOrganization(roleList.get(0).getCopartnerAreaName());
+            }
 
             //保存活动对应门店信息start
             activityStoreDao.deleteStoreByActivityId(activity.getActivityId());
@@ -577,10 +596,8 @@ public class ActivityServiceImpl implements ActivityService {
             act.setUpdateTime(new Date());
             act.setActivityId(activity.getActivityId());
             if(null!=activity.getActivityStatus() && activity.getActivityStatus()==1){
-                act.setActivityStatus(0);
-            }else if(null!=activity.getActivityStatus() && activity.getActivityStatus()==2){
                 act.setActivityStatus(1);
-            }else if(null!=activity.getActivityStatus() && activity.getActivityStatus()==0){
+            }else if(null!=activity.getActivityStatus() && activity.getActivityStatus()==2){
                 act.setActivityStatus(0);
             }
             int activityRecord = activityDao.updateActivity(act);
