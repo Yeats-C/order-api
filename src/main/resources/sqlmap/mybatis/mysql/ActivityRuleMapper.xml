@@ -46,6 +46,7 @@
         from activity_rule
         where activity_id = #{activityId,jdbcType=VARCHAR}
         and is_delete=0
+        order by rule_num asc
     </select>
 
     <!--通过activityId删除活动-规则信息（逻辑删除）-->
