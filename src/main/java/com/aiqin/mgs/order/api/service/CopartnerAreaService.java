@@ -65,5 +65,7 @@ public interface CopartnerAreaService {
 	HttpResponse<CopartnerAreaUp> qryCopartnerAreaList();
 
 	HttpResponse saveAreaStore(CopartnerAreaStoreVo param);
+
+	HttpResponse<CopartnerAreaUp> qryCopartnerAreaListBypersonId(String personId);
 	
 }

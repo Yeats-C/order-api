@@ -25,6 +25,7 @@ import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleList;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreList;
+import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
 import com.aiqin.mgs.order.api.domain.request.DevelRequest;
 import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
@@ -54,4 +55,6 @@ public interface CopartnerAreaRoleDao {
 	void deleteById(@Valid @Param("copartnerAreaId") String copartnerAreaId);
 	
 	List<CopartnerAreaRoleVo> selectRoleMainList(CopartnerAreaRoleVo vo);
+
+	List<CopartnerAreaUp> qryCopartnerAreaListBypersonId(String personId);
 }
