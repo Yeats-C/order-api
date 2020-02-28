@@ -183,6 +183,7 @@ public class ErpOrderLogisticsServiceImpl implements ErpOrderLogisticsService {
 
         orderLogistics.setCouponPayFee(couponPayFee);
         orderLogistics.setBalancePayFee(balancePayFee);
+        orderLogistics.setCouponIds(couponIds);
         //物流单关联的订单
         List<ErpOrderInfo> logisticsOrderList = erpOrderQueryService.getOrderByLogisticsId(orderLogistics.getLogisticsId());
 
@@ -204,7 +205,6 @@ public class ErpOrderLogisticsServiceImpl implements ErpOrderLogisticsService {
             erpOrderPayService.saveOrderPay(logisticsPay, auth);
 
             orderLogistics.setPayStatus(ErpPayStatusEnum.PAYING.getCode());
-            orderLogistics.setCouponIds(couponIds);
             orderLogistics.setPayId(payId);
             this.updateOrderLogisticsSelective(orderLogistics, auth);
 
@@ -272,7 +272,7 @@ public class ErpOrderLogisticsServiceImpl implements ErpOrderLogisticsService {
             orderLogistics.setCouponPayFee(null);
             orderLogistics.setBalancePayFee(null);
             orderLogistics.setCouponIds(null);
-            this.updateOrderLogisticsSelective(orderLogistics, auth);
+            this.updateOrderLogistics(orderLogistics, auth);
         } else {
 
         }
