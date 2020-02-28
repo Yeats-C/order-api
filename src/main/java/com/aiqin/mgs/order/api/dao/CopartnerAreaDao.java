@@ -26,6 +26,7 @@ import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaList;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaListReq;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo;
+import com.aiqin.mgs.order.api.domain.copartnerArea.SystemResource;
 import com.aiqin.mgs.order.api.domain.request.DevelRequest;
 import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
@@ -55,5 +56,13 @@ public interface CopartnerAreaDao {
 	void deleteById(@Valid @Param("copartnerAreaId") String copartnerAreaId);
 	
 	List<CopartnerAreaVo> copartnerAreaVoList(@Valid CopartnerAreaVo param);
+
+	@Select("select resource_code as resourceCode, resource_link as resourceLink, resource_name as resourceName,resource_show_name as resourceShowName, resource_level AS resourceLevel, resource_order AS resourceOrder, resource_icon as resourceIcon, resource_status as resourceStatus, parent_code as parentCode, system_code as systemCode, plan_mark as planMark from system_resource where system_code = #{systemCode} and parent_code = '0'")
+    public List<SystemResource> selectSystemResource(@Param("systemCode") String systemCode);
+
+	@Select("select resource_code as resourceCode, resource_link as resourceLink, resource_name as resourceName ,resource_show_name as resourceShowName, resource_level AS resourceLevel, resource_order AS resourceOrder, resource_icon as resourceIcon, resource_status as resourceStatus, parent_code as parentCode, system_code as systemCode, plan_mark as planMark from system_resource where parent_code = #{parentCode} ")
+    public List<SystemResource> selectByParent(String parentCode);
+
+	List<CopartnerAreaUp> qryCopartnerAreaList();
 
 }

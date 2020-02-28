@@ -61,5 +61,9 @@ public interface CopartnerAreaService {
 	CopartnerAreaUp qryInfo(String storeCode);
 	
 	List<String> qryAreaByStores(List<String> storeIds);
+
+	HttpResponse<CopartnerAreaUp> qryCopartnerAreaList();
+
+	HttpResponse saveAreaStore(CopartnerAreaStoreVo param);
 	
 }

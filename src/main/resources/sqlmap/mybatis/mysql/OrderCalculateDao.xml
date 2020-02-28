@@ -42,5 +42,31 @@
     AND detail.product_category_code = #{categoryCode}
     AND info.store_id = #{storeId}
     </select>
+
+    <select id="qryCategoryFinish" resultType="com.aiqin.mgs.order.api.domain.ReportCategoryVo">
+    SELECT DISTINCT info.store_id AS storeId,info.store_code AS storeCode,info.store_name AS storeName,
+     detail.product_category_code AS childCategoryCode,detail.product_category_name AS childCategoryName
+    FROM  `order_store_detail`  detail,
+    (
+    SELECT info.store_id,info.store_code,info.store_name,order_store_id FROM  order_store_info  info
+    WHERE order_status = 13
+    AND info.create_time  &gt;= #{beginTime}
+    AND info.create_time  &lt;= #{endTime}
+    )info
+    WHERE detail.order_store_id = info.order_store_id
+    AND detail.product_category_code IS NOT NULL
+    </select>
+    
+    <select id="qryCategoryAmountFinish" resultType="java.lang.Integer">
+    SELECT 
+     IFNULL(SUM(IFNULL(product_count,0)),0)
+    FROM order_store_info info
+    LEFT JOIN order_store_detail detail  ON info.order_store_id = info.order_store_id
+    WHERE info.order_status = 13
+    AND info.create_time  &gt;= #{beginTime}
+    AND info.create_time  &lt;= #{endTime}
+    AND detail.product_category_code = #{categoryCode}
+    AND info.store_id = #{storeId}
+    </select>
 </mapper>
 

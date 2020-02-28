@@ -12,11 +12,13 @@ import java.util.List;
 import javax.validation.constraints.NotBlank;
 
 import com.aiqin.mgs.order.api.base.PagesRequest;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Data
 @ApiModel("订单明细查询条件")
@@ -95,6 +97,8 @@ public class OrderDetailQuery extends PagesRequest {
 	private Integer orderType;
 
 	@ApiModelProperty(value = "更新时间")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@JsonProperty("update_time")
 	private Date updateTime;
 }

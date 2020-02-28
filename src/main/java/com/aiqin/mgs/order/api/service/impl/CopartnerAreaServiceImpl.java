@@ -38,6 +38,7 @@ import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.NewStoreTreeResponse;
 import com.aiqin.mgs.order.api.domain.copartnerArea.PublicAreaStore;
+import com.aiqin.mgs.order.api.domain.copartnerArea.SystemMethod;
 import com.aiqin.mgs.order.api.domain.copartnerArea.SystemResource;
 import com.aiqin.mgs.order.api.domain.pay.PayReq;
 import com.aiqin.mgs.order.api.domain.request.*;
@@ -289,35 +290,36 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 	private List<SystemResource> getMenu() throws Exception{
 		
 		//查询所有菜单
-		AuthToken auth = AuthUtil.getCurrentAuth();
-		StringBuffer sb = new StringBuffer();
-		sb.append(centerMainUrl);
-		sb.append("/resource/system/erp-system?ticket_person_id="+auth.getTicketPersonId()+"&ticket="+auth.getTicket()+"");
-    	HttpClient httpClient = HttpClient.get(sb.toString());
-    	HttpResponse response = httpClient.action().result(HttpResponse.class);
-    	List<SystemResource> systemResources = JsonUtil.fromJson(JsonUtil.toJson(response.getData()),new TypeReference<List<SystemResource>>() {
-        });  
-//    	//一级菜单
-//    	if(CollectionUtils.isNotEmpty(systemResources)) {
-//    		for(SystemResource systemResource : systemResources) {
-//    			CopartnerAreaRoleDict dict = new CopartnerAreaRoleDict();
-//    			dict.setRoleCode(systemResource.getResourceCode());
-//    			dict.setRoleName(systemResource.getResourceShowName());
-//    			dictList.add(dict);
-//    			//+二级菜单
-//    			if(CollectionUtils.isNotEmpty(systemResource.getResources())) {
-//    				for(SystemResource downResource : systemResource.getResources()) {
-//    					CopartnerAreaRoleDict downDict = new CopartnerAreaRoleDict();
-//    					downDict.setRoleCode(downResource.getResourceCode());
-//    					downDict.setRoleName(downResource.getResourceShowName());
-//    	    			dictList.add(downDict);
-//    				}
-//    			}
-//    		}
-//    	}
-    	
+		String systemCode = "erp-system";
+//		AuthToken auth = AuthUtil.getCurrentAuth();
+//		StringBuffer sb = new StringBuffer();
+//		sb.append(centerMainUrl);
+//		sb.append("/resource/system/erp-system?ticket_person_id="+auth.getTicketPersonId()+"&ticket="+auth.getTicket()+"");
+//    	HttpClient httpClient = HttpClient.get(sb.toString());
+//    	HttpResponse response = httpClient.action().result(HttpResponse.class);
+    	List<SystemResource> systemResources = copartnerAreaDao.selectSystemResource(systemCode);
+    	this.getList(systemResources);
     	return systemResources;
 	}
+	
+	
+    private void getList(List<SystemResource> list){
+        List<SystemMethod> systemMethods;
+        for (SystemResource systemResource:list) {
+//            systemMethods = systemMethodManager.selectListResourceCode(systemResource.getResourceCode());//systemMethodDao.selectList(new EntityWrapper<SystemMethod>().eq("resource_code", systemResource.getResourceCode()));
+//            if(CollectionUtils.isNotEmpty(systemMethods)){
+//                systemResource.setSystemMethods(systemMethods);
+//            }
+//            systemResource.setResourceMark(new ArrayList<>());
+            systemResource.setResources(getSystemChild(systemResource.getResourceCode()));
+        }
+    }
+    
+    private List<SystemResource> getSystemChild(String parentCode){
+        List<SystemResource> list = copartnerAreaDao.selectByParent(parentCode);
+        this.getList(list);
+        return list;
+    }
 	
 	
 	/**
@@ -627,6 +629,41 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 	@Override
 	public List<String> qryAreaByStores(List<String> storeIds) {
 		return copartnerAreaStoreDao.qryAreaByStores(storeIds);
+	}
+
+	
+	/**
+	 * 对外接口-查询区域列表
+	 */
+	@Override
+	public HttpResponse<CopartnerAreaUp> qryCopartnerAreaList() {
+		try {
+			List<CopartnerAreaUp> list = new ArrayList();
+			list = copartnerAreaDao.qryCopartnerAreaList();
+			return HttpResponse.success(list);
+		}catch(Exception e) {
+			LOGGER.error("对外接口-查询区域列表异常{}",e);
+			return HttpResponse.failure(MessageId.create(Project.ZERO, 01,"查询出现未知异常,请联系系统管理员."));
+		}
+	}
+
+
+	/**
+	 * 保存门店与区域的对应关系
+	 */
+	@Override
+	public HttpResponse saveAreaStore(CopartnerAreaStoreVo param) {
+		try {
+			//删除对应关系
+			copartnerAreaStoreDao.deleteByAreaStore(param.getStoreId());
+			copartnerAreaStoreDao.saveCopartnerAreaStore(param);
+			return HttpResponse.success(true);
+		}catch(Exception e) {
+			LOGGER.error("保存门店与区域的对应关系异常{}",e);
+			return HttpResponse.failure(MessageId.create(Project.ZERO, 01,"查询出现未知异常,请联系系统管理员."));
+		}
+		
+		
 	}
 }
 
