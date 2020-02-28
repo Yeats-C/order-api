@@ -257,6 +257,17 @@ public class CopartnerAreaController {
     	return copartnerAreaService.qryCopartnerAreaList();
     }
     
+    /**
+     * 对外接口
+     * @return
+     */
+    @GetMapping("/out/list/by/person")
+    @ApiOperation(value = "对外接口-根据人员编码查询区域列表")
+    public HttpResponse<CopartnerAreaUp> qryCopartnerAreaListById(
+    		@RequestParam(value = "person_id", required = true) String personId){    
+    	return copartnerAreaService.qryCopartnerAreaListBypersonId(personId);
+    }
+    
     
     
     /**

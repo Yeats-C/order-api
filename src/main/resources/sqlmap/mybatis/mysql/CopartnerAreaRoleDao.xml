@@ -103,5 +103,16 @@
     <delete id="deleteById">
         delete from copartner_area_role where copartner_area_id = #{copartnerAreaId}
     </delete>
+    
+    <select id="qryCopartnerAreaListBypersonId"  resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp">
+        SELECT
+        info.copartner_area_id AS copartnerAreaId,
+        info.copartner_area_name AS copartnerAreaName
+        FROM copartner_area_role role
+        LEFT JOIN `copartner_area_info` info ON role.copartner_area_id = info.copartner_area_id
+        WHERE 1=1
+        and person_id = #{personId,jdbcType=VARCHAR}
+        ORDER BY info.copartner_area_id
+    </select>
 </mapper>
 

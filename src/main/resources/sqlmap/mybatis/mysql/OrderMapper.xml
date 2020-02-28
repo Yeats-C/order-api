@@ -1051,6 +1051,9 @@
         <if test="endTime!=null and endTime!='' ">
             and a.create_time &lt;= #{endTime}
         </if>
+        <if test="updateTime!=null and updateTime!='' ">
+            and a.update_time &gt;= #{updateTime}
+        </if>
         <if test="statusList != null">
             and a.order_status in (
             <foreach collection="statusList" item="order_status" separator=",">
@@ -1064,9 +1067,9 @@
     </select>
 
     <!-- 接口-可退货的订单查询 总数据量 -->
-    <select id="reorerCount" resultMap="OrderInfoMapping" resultType="java.lang.Integer">
+    <select id="reorerCount"  resultType="java.lang.Integer">
 
-        SELECT count(1) FROM order_consumer_info a
+        SELECT count(a.id) FROM order_consumer_info a
         LEFT JOIN (SELECT order_id,SUM(IFNULL(amount,0)) AS amount FROM order_consumer_detail GROUP BY order_id) b ON a.order_id
         = b.order_id
         LEFT JOIN (SELECT order_code,SUM(IFNULL(return_amount,0)) AS return_amount FROM `order_after_sale_detail` GROUP
@@ -1086,6 +1089,9 @@
         </if>
         <if test="endTime!=null and endTime!='' ">
             and a.create_time &lt;= #{endTime}
+        </if>
+        <if test="updateTime!=null and updateTime!='' ">
+            and a.update_time &gt;= #{updateTime}
         </if>
         <if test="statusList != null">
             and a.order_status in (
@@ -1347,7 +1353,7 @@
     </select>
 
     <select id="orderPrestorageCount" resultType="integer">
-        select sum(d.actual_price) from
+        select sum(o.actual_price) from
         order_consumer_detail d,order_consumer_info o
         where
         d.order_id=o.order_id
@@ -1358,7 +1364,7 @@
         and o.order_status in (2,5)
     </select>
     <select id="orderStoreCount" resultType="integer">
-         select sum(d.actual_price) from
+         select sum(o.actual_price) from
         order_consumer_detail d,order_consumer_info o
         where
         d.order_id=o.order_id

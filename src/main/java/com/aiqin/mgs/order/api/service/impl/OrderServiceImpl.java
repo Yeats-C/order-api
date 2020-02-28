@@ -1385,8 +1385,7 @@ public class OrderServiceImpl implements OrderService {
 //            list = orderDao.selectOrder(orderQuery);
 
             //计算总数据量
-            Integer totalCount = null;
-            totalCount = orderDao.reorerCount(reorerRequest);
+            Integer  totalCount = orderDao.reorerCount(reorerRequest);
 
             return HttpResponse.success(new PageResData(totalCount, list));
 
