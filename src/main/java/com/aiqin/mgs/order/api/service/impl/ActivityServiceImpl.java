@@ -998,23 +998,24 @@ public class ActivityServiceImpl implements ActivityService {
 
 
         List<Activity> activityList=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode(),null,null);
-        if(null==activityList&&0==activityList.size()){
-            List<Activity> activityListByBrand=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),null,activityParameterRequest.getProductBrandCode(),null);
-            List<Activity> activityListByCategory=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),null,null,categoryCodes);
-
+        List<Activity> activityListByBrand=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),null,activityParameterRequest.getProductBrandCode(),null);
+        List<Activity> activityListByCategory=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),null,null,categoryCodes);
+        if(null==activityList&&null==activityListByBrand&&null==activityListByCategory){
+            return new ArrayList<Activity>();
+        }
+        if(null==activityList){
             activityList=new ArrayList<>();
-            if(null!=activityListByBrand){
-                for (Activity act:activityListByBrand){
-                    activityList.add(act);
-                }
-            }
-            if(null!=activityListByCategory){
-                for (Activity act:activityListByCategory){
-                    activityList.add(act);
-                }
+        }
+        if(null!=activityListByBrand){
+            for (Activity act:activityListByBrand){
+                activityList.add(act);
             }
         }
-
+        if(null!=activityListByCategory){
+            for (Activity act:activityListByCategory){
+                activityList.add(act);
+            }
+        }
         // 去重
         Set<Activity> activitySet = new HashSet<>(activityList);
         activityList.clear();
