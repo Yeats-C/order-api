@@ -129,11 +129,6 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             }
         }
 
-        //首单修改加盟商角色-权限
-        if (processTypeEnum.getOrderCategoryEnum().isFirstOrder()) {
-//            erpOrderRequestService.accountRole(auth.getAccountId());
-        }
-
         //返回订单信息
         return erpOrderQueryService.getOrderByOrderId(orderId);
     }

@@ -1,10 +1,7 @@
 package com.aiqin.mgs.order.api.service.impl.order;
 
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
-import com.aiqin.mgs.order.api.component.enums.ErpOrderNodeProcessTypeEnum;
-import com.aiqin.mgs.order.api.component.enums.ErpOrderNodeStatusEnum;
-import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
-import com.aiqin.mgs.order.api.component.enums.StatusEnum;
+import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayFeeTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayWayEnum;
@@ -194,6 +191,13 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
                         topCouponCodeArray) {
                     erpOrderRequestService.updateCouponStatus(order.getFranchiseeId(), topCouponCode, order.getOrderStoreCode(), order.getStoreName());
                 }
+            }
+
+            ErpOrderCategoryEnum orderCategoryEnum = ErpOrderCategoryEnum.getEnum(order.getOrderCategoryCode());
+
+            //首单修改加盟商角色-权限
+            if (orderCategoryEnum != null && orderCategoryEnum.isFirstOrder()) {
+                erpOrderRequestService.accountRole(order.getFranchiseeCode());
             }
 
         } else if (payStatusEnum == ErpPayStatusEnum.FAIL) {
