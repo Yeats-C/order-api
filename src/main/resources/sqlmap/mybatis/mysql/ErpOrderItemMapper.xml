@@ -119,6 +119,9 @@
         <if test="actualTotalProductAmount != null and actualTotalProductAmount != '' or actualTotalProductAmount == 0 ">
             actual_total_product_amount = #{actualTotalProductAmount},
         </if>
+        <if test="returnProductCount != null and returnProductCount != '' or returnProductCount == 0 ">
+            return_product_count = #{returnProductCount},
+        </if>
         <if test="useStatus != null and useStatus != '' or useStatus == 0">
             use_status = #{useStatus},
         </if>
