@@ -146,6 +146,7 @@ public class ActivityServiceImpl implements ActivityService {
         activity.setUpdateTime(new Date());
         activity.setActivityId(activityId);
         activity.setActiveStoreRange(2);
+        activity.setActivityScope(activityRequest.getActivityProducts().get(0).getActivityScope());
 
         //查询人员的所有的区域列表
         List<CopartnerAreaUp> roleList = copartnerAreaRoleDao.qryCopartnerAreaListBypersonId(authToken.getPersonId());
@@ -360,6 +361,7 @@ public class ActivityServiceImpl implements ActivityService {
             Activity activity=activityRequest.getActivity();
             activity.setUpdateTime(new Date());
             activity.setActiveStoreRange(2);
+            activity.setActivityScope(activityRequest.getActivityProducts().get(0).getActivityScope());
             //查询人员的所有的区域列表
             List<CopartnerAreaUp> roleList = copartnerAreaRoleDao.qryCopartnerAreaListBypersonId(authToken.getPersonId());
             if(null!=roleList&& 0!=roleList.size()){
@@ -996,22 +998,20 @@ public class ActivityServiceImpl implements ActivityService {
 
 
         List<Activity> activityList=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode(),null,null);
-        List<Activity> activityListByBrand=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),null,activityParameterRequest.getProductBrandCode(),null);
-        List<Activity> activityListByCategory=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),null,null,categoryCodes);
-        if(null==activityList&&null==activityListByBrand&&null==activityListByCategory){
-            return new ArrayList<Activity>();
-        }
-        if(null==activityList){
+        if(null==activityList&&0==activityList.size()){
+            List<Activity> activityListByBrand=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),null,activityParameterRequest.getProductBrandCode(),null);
+            List<Activity> activityListByCategory=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),null,null,categoryCodes);
+
             activityList=new ArrayList<>();
-        }
-        if(null!=activityListByBrand){
-            for (Activity act:activityListByBrand){
-                activityList.add(act);
+            if(null!=activityListByBrand){
+                for (Activity act:activityListByBrand){
+                    activityList.add(act);
+                }
             }
-        }
-        if(null!=activityListByCategory){
-            for (Activity act:activityListByCategory){
-                activityList.add(act);
+            if(null!=activityListByCategory){
+                for (Activity act:activityListByCategory){
+                    activityList.add(act);
+                }
             }
         }
 

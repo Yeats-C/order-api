@@ -95,4 +95,10 @@ public class Activity extends PagesRequest implements Serializable {
     @ApiModelProperty(value = "爱掌柜活动列表中的商品列表")
     @JsonProperty("page_res_data")
     private PageResData<ProductSkuRespVo5> pageResData;
+
+
+    /***活动范围：1.按单品设置2.按品类设置3.按品牌设置4.按单品排除*/
+    @ApiModelProperty(value = "活动范围：1.按单品设置2.按品类设置3.按品牌设置4.按单品排除")
+    @JsonProperty("activity_scope")
+    private Integer activityScope;
 }
