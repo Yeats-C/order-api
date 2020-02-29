@@ -504,9 +504,9 @@ public class ActivityServiceImpl implements ActivityService {
             Integer activityScope=activityProductList.get(0).getActivityScope();
             if(activityScope==1){//按单品设置
                 activityList=activityDao.checkProcuct(activityParameterRequest.getActivityId(),activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode(),null,null);
-            }else if(activityScope==2){//按品牌设置
+            }else if(activityScope==3){//按品牌设置
                 activityList=activityDao.checkProcuct(activityParameterRequest.getActivityId(),activityParameterRequest.getStoreId(),null,activityParameterRequest.getProductBrandCode(),null);
-            }else if(activityScope==3){//按品类设置
+            }else if(activityScope==2){//按品类设置
                 List<String> categoryCodes=new ArrayList<>();
                 if(StringUtils.isNotEmpty(activityParameterRequest.getProductCategoryCode())){
                     for(int k=0;k<4;k++) {
