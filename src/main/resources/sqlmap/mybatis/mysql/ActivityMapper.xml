@@ -137,7 +137,7 @@
                 active_store_range = #{activeStoreRange,jdbcType=BIT},
             </if>
             update_time = now()
-            where  activity_id = #{activityId,jdbcType=VARCHAR}
+            where activity_id = #{activityId,jdbcType=VARCHAR}
         </set>
     </update>
 
@@ -183,7 +183,8 @@
     </select>
 
     <!--通过门店id爱掌柜的促销活动列表（所有生效活动）-->
-    <select id="effectiveActivityList" resultType="com.aiqin.mgs.order.api.domain.Activity" resultMap="ActivityMapping" parameterType="java.lang.String">
+    <select id="effectiveActivityList" resultType="com.aiqin.mgs.order.api.domain.Activity" resultMap="ActivityMapping"
+            parameterType="java.lang.String">
         SELECT
         a.activity_id,a.activity_name,a.activity_type,a.activity_status,a.begin_time,a.finish_time,a.publishing_organization,a.activity_brief
         ,a.activity_pic_pc,a.activity_pic_app,a.create_by,a.update_by,a.create_time,a.update_time
@@ -198,50 +199,53 @@
         GROUP BY a.activity_id
     </select>
 
-    <select id="checkProcuct" resultType="com.aiqin.mgs.order.api.domain.Activity"  resultMap="ActivityMapping" parameterType="java.lang.String">
-    SELECT
-    a.activity_id,
-    a.activity_name,
-    a.activity_type,
-    a.activity_status,
-    a.begin_time,
-    a.finish_time,
-    a.publishing_organization,
-    a.activity_brief,
-    a.activity_pic_pc,
-    a.activity_pic_app,
-    a.create_by,
-    a.update_by,
-    a.create_time,
-    a.update_time,
-    a.active_store_range
-    FROM
-    activity a
-    left JOIN activity_store s ON a.activity_id = s.activity_id
-    LEFT JOIN activity_product p ON a.activity_id = p.activity_id
-    WHERE
-    1 = 1
-    AND s.store_id =  #{storeId} or s.store_id = 'all'
-    <if test="productId!= null">
-        and p.sku_code =  #{productId}
-    </if>
-    <if test="productBrandCode!= null">
-        and p.product_brand_code =  #{productBrandCode}
-    </if>
-    <if test="productCategoryCode!= null">
-        and p.product_category_code in
-        <foreach collection="productCategoryCode" item="item" open="(" separator="," close=")">
-        #{item}
-        </foreach>
-    </if>
-    <if test="activityId!= null">
-        and a.activity_id =  #{activityId}
-    </if>
-    AND a.begin_time &lt; now()
-    and a.finish_time &gt; NOW()
-    and a.activity_status=0
-    GROUP BY a.activity_id
-</select>
+    <select id="checkProcuct" resultType="com.aiqin.mgs.order.api.domain.Activity" resultMap="ActivityMapping"
+            parameterType="java.lang.String">
+        SELECT
+        a.activity_id,
+        a.activity_name,
+        a.activity_type,
+        a.activity_status,
+        a.begin_time,
+        a.finish_time,
+        a.publishing_organization,
+        a.activity_brief,
+        a.activity_pic_pc,
+        a.activity_pic_app,
+        a.create_by,
+        a.update_by,
+        a.create_time,
+        a.update_time,
+        a.active_store_range
+        FROM
+        activity a
+        left JOIN activity_store s ON a.activity_id = s.activity_id
+        LEFT JOIN activity_product p ON a.activity_id = p.activity_id
+        WHERE
+        1 = 1
+
+        AND s.store_id in
+        (#{storeId}, 'all' )
+        <if test="productId!= null">
+            and p.sku_code = #{productId}
+        </if>
+        <if test="productBrandCode!= null">
+            and p.product_brand_code = #{productBrandCode}
+        </if>
+        <if test="productCategoryCode!= null">
+            and p.product_category_code in
+            <foreach collection="productCategoryCode" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="activityId!= null">
+            and a.activity_id = #{activityId}
+        </if>
+        AND a.begin_time &lt; now()
+        and a.finish_time &gt; NOW()
+        and a.activity_status=0
+        GROUP BY a.activity_id
+    </select>
 
 
 </mapper>
