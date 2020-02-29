@@ -946,14 +946,14 @@ public class CartOrderServiceImpl implements CartOrderService {
                     BigDecimal restPreferentialAmount = curRule.getPreferentialAmount();
 
 
-                    if (amountTotal.compareTo(BigDecimal.ZERO) > 0) {
+                    if (activityAmountTotal.compareTo(BigDecimal.ZERO) > 0) {
                         for (int i = 0; i < tempList.size(); i++) {
                             CartOrderInfo item = tempList.get(i);
                             if (i == tempList.size() - 1) {
                                 //最后一行，用减法避免误差
                                 item.setLineActivityDiscountTotal(restPreferentialAmount);
                             } else {
-                                BigDecimal lineActivityDiscountTotal = item.getLineActivityAmountTotal().divide(amountTotal, 2, RoundingMode.HALF_UP).multiply(curRule.getPreferentialAmount());
+                                BigDecimal lineActivityDiscountTotal = item.getLineActivityAmountTotal().divide(activityAmountTotal, 6, RoundingMode.HALF_UP).multiply(curRule.getPreferentialAmount()).setScale(2,RoundingMode.HALF_UP);
                                 item.setLineActivityDiscountTotal(lineActivityDiscountTotal);
                                 restPreferentialAmount = restPreferentialAmount.subtract(lineActivityDiscountTotal);
                             }
@@ -1046,7 +1046,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                                 //最后一行
                                 item.setLineAmountAfterActivity(restActivityAmountTotal);
                             } else {
-                                BigDecimal lineAmountAfterActivity = item.getLineActivityAmountTotal().divide(amountTotal, 2, RoundingMode.HALF_UP).multiply(activityAmountTotal);
+                                BigDecimal lineAmountAfterActivity = item.getLineActivityAmountTotal().divide(amountTotal, 6, RoundingMode.HALF_UP).multiply(activityAmountTotal).setScale(2, RoundingMode.HALF_UP);
                                 item.setLineAmountAfterActivity(lineAmountAfterActivity);
                                 restActivityAmountTotal = restActivityAmountTotal.subtract(lineAmountAfterActivity);
                             }
