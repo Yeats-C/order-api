@@ -557,6 +557,12 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 				}
 			}
 			
+			if(CollectionUtils.isNotEmpty(dataList)) {
+				LinkedHashSet<PublicAreaStore> hashSet = new LinkedHashSet<>(dataList);         
+				dataList = new ArrayList<>(hashSet);
+			}
+			
+			
 		    return HttpResponse.success(dataList);
 		}catch(Exception e) {
 		    log.error("查询异常:查询门店列表-请求参数{},{}",dataList,e);
