@@ -17,11 +17,12 @@
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="active_store_range" jdbcType="INTEGER" property="activeStoreRange"/>
+        <result column="activity_scope" jdbcType="INTEGER" property="activityScope"/>
     </resultMap>
 
     <sql id="Base_Column_List">
        activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization,activity_brief
-       ,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time,active_store_range
+       ,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time,active_store_range,activity_scope
     </sql>
 
 
@@ -29,6 +30,7 @@
             parameterType="com.aiqin.mgs.order.api.domain.Activity">
         select activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization
         ,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time,active_store_range
+        ,activity_scope
         from activity
         <where>
             1=1
@@ -81,6 +83,7 @@
             parameterType="com.aiqin.mgs.order.api.domain.Activity">
         select activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization
         ,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time,active_store_range
+        ,activity_scope
         from activity
         <where>
             1=1
@@ -93,10 +96,10 @@
     <insert id="insertActivity" parameterType="com.aiqin.mgs.order.api.domain.Activity">
         insert into activity
 			(activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization
-			,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time,active_store_range)
+			,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time,active_store_range,activity_scope)
 		values
 		    (#{activityId},#{activityName},#{activityType},0,#{beginTime},#{finishTime},#{publishingOrganization}
-		    ,#{activityBrief},#{activityPicPc},#{activityPicApp},#{createBy},#{updateBy},#{createTime},#{updateTime},#{activeStoreRange})
+		    ,#{activityBrief},#{activityPicPc},#{activityPicApp},#{createBy},#{updateBy},#{createTime},#{updateTime},#{activeStoreRange},#{activityScope})
 	</insert>
 
     <!--编辑活动主表-->
@@ -136,8 +139,11 @@
             <if test="activeStoreRange != null">
                 active_store_range = #{activeStoreRange,jdbcType=BIT},
             </if>
+            <if test="activityScope != null">
+                activity_scope = #{activityScope,jdbcType=BIT},
+            </if>
             update_time = now()
-            where  activity_id = #{activityId,jdbcType=VARCHAR}
+            where activity_id = #{activityId,jdbcType=VARCHAR}
         </set>
     </update>
 
@@ -183,65 +189,72 @@
     </select>
 
     <!--通过门店id爱掌柜的促销活动列表（所有生效活动）-->
-    <select id="effectiveActivityList" resultType="com.aiqin.mgs.order.api.domain.Activity" resultMap="ActivityMapping" parameterType="java.lang.String">
+    <select id="effectiveActivityList" resultType="com.aiqin.mgs.order.api.domain.Activity" resultMap="ActivityMapping"
+            parameterType="java.lang.String">
         SELECT
         a.activity_id,a.activity_name,a.activity_type,a.activity_status,a.begin_time,a.finish_time,a.publishing_organization,a.activity_brief
-        ,a.activity_pic_pc,a.activity_pic_app,a.create_by,a.update_by,a.create_time,a.update_time
+        ,a.activity_pic_pc,a.activity_pic_app,a.create_by,a.update_by,a.create_time,a.update_time,activity_scope
         FROM
         activity a
         JOIN activity_store s ON a.activity_id = s.activity_id
         where   1=1
-        and s.store_id = #{storeId} or s.store_id = 'all'
+        AND s.store_id in
+        (#{storeId}, 'all' )
         AND a.begin_time &lt; now()
         and a.finish_time &gt; NOW()
         and a.activity_status=0
         GROUP BY a.activity_id
     </select>
 
-    <select id="checkProcuct" resultType="com.aiqin.mgs.order.api.domain.Activity"  resultMap="ActivityMapping" parameterType="java.lang.String">
-    SELECT
-    a.activity_id,
-    a.activity_name,
-    a.activity_type,
-    a.activity_status,
-    a.begin_time,
-    a.finish_time,
-    a.publishing_organization,
-    a.activity_brief,
-    a.activity_pic_pc,
-    a.activity_pic_app,
-    a.create_by,
-    a.update_by,
-    a.create_time,
-    a.update_time,
-    a.active_store_range
-    FROM
-    activity a
-    left JOIN activity_store s ON a.activity_id = s.activity_id
-    LEFT JOIN activity_product p ON a.activity_id = p.activity_id
-    WHERE
-    1 = 1
-    AND s.store_id =  #{storeId} or s.store_id = 'all'
-    <if test="productId!= null">
-        and p.sku_code =  #{productId}
-    </if>
-    <if test="productBrandCode!= null">
-        and p.product_brand_code =  #{productBrandCode}
-    </if>
-    <if test="productCategoryCode!= null">
-        and p.product_category_code in
-        <foreach collection="productCategoryCode" item="item" open="(" separator="," close=")">
-        #{item}
-        </foreach>
-    </if>
-    <if test="activityId!= null">
-        and a.activity_id =  #{activityId}
-    </if>
-    AND a.begin_time &lt; now()
-    and a.finish_time &gt; NOW()
-    and a.activity_status=0
-    GROUP BY a.activity_id
-</select>
+    <select id="checkProcuct" resultType="com.aiqin.mgs.order.api.domain.Activity" resultMap="ActivityMapping"
+            parameterType="java.lang.String">
+        SELECT
+        a.activity_id,
+        a.activity_name,
+        a.activity_type,
+        a.activity_status,
+        a.begin_time,
+        a.finish_time,
+        a.publishing_organization,
+        a.activity_brief,
+        a.activity_pic_pc,
+        a.activity_pic_app,
+        a.create_by,
+        a.update_by,
+        a.create_time,
+        a.update_time,
+        a.active_store_range,
+        a.activity_scope
+        FROM
+        activity a
+        left JOIN activity_store s ON a.activity_id = s.activity_id
+        LEFT JOIN activity_product p ON a.activity_id = p.activity_id
+        WHERE
+        1 = 1
+
+        AND s.store_id in
+        (#{storeId}, 'all' )
+        <if test="productId!= null">
+            and p.sku_code = #{productId} and a.activity_scope=1
+        </if>
+        <if test="productBrandCode!= null">
+            and p.product_brand_code = #{productBrandCode} and a.activity_scope=3
+        </if>
+        <if test="productCategoryCode!= null">
+            and p.product_category_code in
+            <foreach collection="productCategoryCode" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            and a.activity_scope=2
+        </if>
+        <if test="activityId!= null">
+            and a.activity_id = #{activityId}
+        </if>
+        AND a.begin_time &lt; now()
+        and a.finish_time &gt; NOW()
+        and a.activity_status=0
+        GROUP BY a.activity_id
+    </select>
 
 
 </mapper>
