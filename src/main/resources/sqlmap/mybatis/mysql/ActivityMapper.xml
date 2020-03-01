@@ -205,6 +205,7 @@
         and a.activity_status=0
         AND s.is_delete = 0
         GROUP BY a.activity_id
+        order by a.begin_time desc
     </select>
 
     <select id="checkProcuct" resultType="com.aiqin.mgs.order.api.domain.Activity" resultMap="ActivityMapping"
@@ -257,6 +258,7 @@
         AND p.is_delete = 0
         AND s.is_delete = 0
         GROUP BY a.activity_id
+        order by a.begin_time desc
     </select>
 
 
