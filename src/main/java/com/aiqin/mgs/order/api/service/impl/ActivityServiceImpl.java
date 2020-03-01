@@ -539,6 +539,7 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public HttpResponse<List<QueryProductBrandRespVO>> productBrandList(String productBrandName, String activityId) {
         LOGGER.info("活动商品品牌列表接口参数productBrandName为:{}", productBrandName);
+        List<QueryProductBrandRespVO> queryProductBrandRespVO=new ArrayList<>();
         HttpResponse response = HttpResponse.success();
         ActivityProduct activityProduct=new ActivityProduct();
         if(StringUtils.isNotEmpty(productBrandName)){
@@ -548,16 +549,29 @@ public class ActivityServiceImpl implements ActivityService {
             activityProduct.setActivityId(activityId);
         }
         List<ActivityProduct> activityProducts=activityProductDao.productBrandList(activityProduct);
-        List<String> brandIds=new ArrayList<>();
-        ActivityBrandCategoryRequest categoryRequest=new ActivityBrandCategoryRequest();
-        if(null!=activityProducts && 0!=activityProducts.size()){
+        if(null!=activityProducts&& activityProducts.get(0).getActivityScope()==2){
             for (ActivityProduct product:activityProducts){
-                brandIds.add(product.getProductBrandCode());
+                ProductCategoryAndBrandResponse2 response2= (ProductCategoryAndBrandResponse2) bridgeProductService.selectCategoryByBrandCode(product.getProductCategoryCode(),"1").getData();
+                queryProductBrandRespVO.addAll(response2.getQueryProductBrandRespVO());
             }
+
+            Set<QueryProductBrandRespVO> activitySet = new HashSet<>(queryProductBrandRespVO);
+            queryProductBrandRespVO.clear();
+            queryProductBrandRespVO.addAll(activitySet);
+            response.setData(queryProductBrandRespVO);
+            return  response;
+        }else{
+            List<String> brandIds=new ArrayList<>();
+            ActivityBrandCategoryRequest categoryRequest=new ActivityBrandCategoryRequest();
+            if(null!=activityProducts && 0!=activityProducts.size()){
+                for (ActivityProduct product:activityProducts){
+                    brandIds.add(product.getProductBrandCode());
+                }
+            }
+            categoryRequest.setBrandIds(brandIds);
+            response=bridgeProductService.productBrandList(categoryRequest);
+            return response;
         }
-        categoryRequest.setBrandIds(brandIds);
-        response=bridgeProductService.productBrandList(categoryRequest);
-        return response;
     }
 
     @Override

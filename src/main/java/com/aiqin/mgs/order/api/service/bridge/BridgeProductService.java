@@ -6,7 +6,6 @@ import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
-import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
@@ -237,6 +236,20 @@ public class BridgeProductService {
         String path = "/product/category/list/categoryCodes?category_codes="+str;
         HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path);
         HttpResponse<List<ProductCategoryRespVO>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ProductCategoryRespVO>>>() {
+        });
+        return response;
+    }
+
+    /**
+     * 品牌和品类关系,condition_code为查询条件，type=2 通过品牌查品类,type=1 通过品类查品牌
+     * @param condition_code
+     * @param type
+     * @return
+     */
+    public HttpResponse selectCategoryByBrandCode(String condition_code,String type){
+        String path = "/product/brand/selectCategoryByBrandCode?condition_code="+condition_code+"&type="+type;
+        HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path);
+        HttpResponse<ProductCategoryAndBrandResponse2> response = httpClient.action().result(new TypeReference<HttpResponse<ProductCategoryAndBrandResponse2>>() {
         });
         return response;
     }
