@@ -518,12 +518,7 @@ public class ActivityServiceImpl implements ActivityService {
                 }
                 activityList=activityDao.checkProcuct(activityParameterRequest.getActivityId(),activityParameterRequest.getStoreId(),null,null,categoryCodes);
             }else if(activityScope==4){//按单品排除
-                activityList=activityDao.checkProcuct(activityParameterRequest.getActivityId(),activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode(),null,null);
-                if(activityList==null){
-                    return true;
-                }else{
-                    return false;
-                }
+                activityList=activityDao.singleProductElimination(activityParameterRequest.getActivityId(),activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode());
             }
 
             if(activityList!=null && 0!=activityList.size()){
@@ -1015,7 +1010,8 @@ public class ActivityServiceImpl implements ActivityService {
         List<Activity> activityList=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode(),null,null);
         List<Activity> activityListByBrand=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),null,activityParameterRequest.getProductBrandCode(),null);
         List<Activity> activityListByCategory=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),null,null,categoryCodes);
-        if(null==activityList&&null==activityListByBrand&&null==activityListByCategory){
+        List<Activity> singleProductElimination=activityDao.singleProductElimination(null,activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode());
+        if(null==activityList&&null==activityListByBrand&&null==activityListByCategory &&null==singleProductElimination){
             return new ArrayList<Activity>();
         }
         if(null==activityList){
@@ -1028,6 +1024,11 @@ public class ActivityServiceImpl implements ActivityService {
         }
         if(null!=activityListByCategory){
             for (Activity act:activityListByCategory){
+                activityList.add(act);
+            }
+        }
+        if(null!=singleProductElimination){
+            for (Activity act:singleProductElimination){
                 activityList.add(act);
             }
         }
