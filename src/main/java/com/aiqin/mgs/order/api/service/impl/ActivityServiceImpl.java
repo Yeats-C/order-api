@@ -32,6 +32,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -291,14 +292,14 @@ public class ActivityServiceImpl implements ActivityService {
             //活动补货门店数
             Integer storeNum=erpOrderInfoDao.getStoreNum(activity);
             //平均单价
-            BigDecimal averageUnitPrice=activitySales.getActivitySales().divide(new BigDecimal(activitySales.getActivitySalesNum()));
+            BigDecimal averageUnitPrice=activitySales.getActivitySales().divide(activitySales.getActivitySalesNum(),0, RoundingMode.HALF_UP);
             activitySales.setProductSales(productSales);
             activitySales.setStoreNum(storeNum);
             activitySales.setAverageUnitPrice(averageUnitPrice);
             response.setData(activitySales);
         return response;
         } catch (Exception e) {
-            LOGGER.error("查询活动详情-销售数据-活动销售统计失败", e);
+            LOGGER.error("查询活动详情-销售数据-活动销售统计失败", e.getStackTrace());
             throw new RuntimeException(ResultCode.SELECT_ACTIVITY_INFO_EXCEPTION.getMessage());
         }
     }
