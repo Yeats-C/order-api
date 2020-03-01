@@ -24,7 +24,7 @@ public class ActivitySales implements Serializable {
     /**活动订单数(当订单中的商品命中了这个促销活动时，这个订单纳入统计，统计主订单。)*/
     @ApiModelProperty(value = "活动订单数(当订单中的商品命中了这个促销活动时，这个订单纳入统计，统计主订单。")
     @JsonProperty("activitySalesNum")
-    private Integer activitySalesNum;
+    private BigDecimal activitySalesNum;
 
     /**活动商品销售额 */
     @ApiModelProperty(value = "活动商品销售额")
