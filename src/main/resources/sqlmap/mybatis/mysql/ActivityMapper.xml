@@ -203,6 +203,7 @@
         AND a.begin_time &lt; now()
         and a.finish_time &gt; NOW()
         and a.activity_status=0
+        AND s.is_delete = 0
         GROUP BY a.activity_id
     </select>
 
@@ -253,6 +254,8 @@
         AND a.begin_time &lt; now()
         and a.finish_time &gt; NOW()
         and a.activity_status=0
+        AND p.is_delete = 0
+        AND s.is_delete = 0
         GROUP BY a.activity_id
     </select>
 
