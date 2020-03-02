@@ -478,7 +478,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public HttpResponse orderCount(String skuCode, String storeId, int day) {
-        return HttpResponse.successGenerics(orderDao.querySaleSkuCount(skuCode, DateUtil.getBeforeDate(new Date(), day), storeId));
+        return HttpResponse.successGenerics(orderDao.querySaleSkuCount(storeId, DateUtil.getBeforeDate(new Date(), day), skuCode));
     }
 
     @Override

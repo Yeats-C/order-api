@@ -1348,7 +1348,7 @@
         d.order_id=o.order_id
        and  o.distributor_id = #{distributorId}
         and d.create_time &gt;= #{startDate}
-        and d.product_code = #{skuCode}
+        and d.sku_code = #{skuCode}
 
     </select>
 
