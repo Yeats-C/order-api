@@ -143,7 +143,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                     cartOrderInfo.setProductCategoryCode(cartOrderInfo1.getProductCategoryCode());//品类编码
                     cartOrderInfo.setProductCategoryName(cartOrderInfo1.getProductCategoryName());//品类编码
                     cartOrderInfo.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
-                    cartOrderInfo.setActivityId(skuActivityMap.containsKey(cartOrderInfo1.getSkuCode()) ? skuActivityMap.get(cartOrderInfo1.getSkuCode()) : null);
+                    cartOrderInfo.setActivityId(skuActivityMap.get(cartOrderInfo1.getSkuCode()));
                     try {
                         if (cartOrderInfo != null) {
                             //判断sku是否在购物车里面存在
@@ -1093,6 +1093,8 @@ public class CartOrderServiceImpl implements CartOrderService {
                         for (CartOrderInfo dataItem :
                                 data) {
                             if (item.getSkuCode().equals(dataItem.getSkuCode())) {
+                                item.setProductPicturePath(dataItem.getProductPicturePath());
+                                item.setLogo(dataItem.getProductPicturePath());
                                 item.setPrice(dataItem.getPriceTax());
                                 item.setTagInfoList(dataItem.getTagInfoList());
                                 item.setStockNum(dataItem.getStockNum());
