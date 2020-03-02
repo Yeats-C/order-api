@@ -811,6 +811,8 @@ public class CartOrderServiceImpl implements CartOrderService {
         cartOrderInfo.setGiftParentCartId(cart.getCartId());
         cartOrderInfo.setActivityPrice(BigDecimal.ZERO);
         cartOrderInfo.setCreateTime(new Date());
+        cartOrderInfo.setProductPicturePath(skuDetail.getProductPicturePath());
+        cartOrderInfo.setLogo(skuDetail.getProductPicturePath());
         cartOrderInfo.setActivityId(cart.getActivityId());
         cartOrderInfo.setActivityName(cart.getActivityName());
         cartOrderInfo.setTagInfoList(skuDetail.getTagInfoList());
