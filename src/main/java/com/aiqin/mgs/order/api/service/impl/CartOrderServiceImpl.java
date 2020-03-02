@@ -1046,7 +1046,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                                 //最后一行
                                 item.setLineAmountAfterActivity(restActivityAmountTotal);
                             } else {
-                                BigDecimal lineAmountAfterActivity = item.getLineActivityAmountTotal().divide(amountTotal, 6, RoundingMode.HALF_UP).multiply(activityAmountTotal).setScale(2, RoundingMode.HALF_UP);
+                                BigDecimal lineAmountAfterActivity = item.getLineAmountTotal().divide(amountTotal, 6, RoundingMode.HALF_UP).multiply(activityAmountTotal).setScale(2, RoundingMode.HALF_UP);
                                 item.setLineAmountAfterActivity(lineAmountAfterActivity);
                                 restActivityAmountTotal = restActivityAmountTotal.subtract(lineAmountAfterActivity);
                             }
