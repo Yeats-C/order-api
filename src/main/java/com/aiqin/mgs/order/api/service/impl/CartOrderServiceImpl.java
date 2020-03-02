@@ -744,7 +744,7 @@ public class CartOrderServiceImpl implements CartOrderService {
             //筛选出当前满足的最大梯度
             if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(item.getRuleUnit())) {
                 //按照金额
-                if (item.getMeetingConditions().compareTo(totalMoney) >= 0) {
+                if (item.getMeetingConditions().compareTo(totalMoney) <= 0) {
                     if (curRule == null || item.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
                         curRule = item;
                     }
@@ -753,7 +753,7 @@ public class CartOrderServiceImpl implements CartOrderService {
 
             if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(item.getRuleUnit())) {
                 //按照金额
-                if (item.getMeetingConditions().compareTo(new BigDecimal(totalCount)) >= 0) {
+                if (item.getMeetingConditions().compareTo(new BigDecimal(totalCount)) <= 0) {
                     if (curRule == null || item.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
                         curRule = item;
                     }
