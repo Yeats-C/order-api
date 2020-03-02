@@ -789,6 +789,9 @@ public class CartOrderServiceImpl implements CartOrderService {
         cartOrderInfo.setProductId(skuDetail.getSkuCode());//商品Code
         cartOrderInfo.setStoreId(cart.getStoreId());//门店id
         cartOrderInfo.setProductName(skuDetail.getSkuName());//商品名称
+        cartOrderInfo.setSkuName(skuDetail.getSkuName());
+        cartOrderInfo.setSpuCode(skuDetail.getSpuCode());
+        cartOrderInfo.setSpuName(skuDetail.getSpuName());
         cartOrderInfo.setColor(skuDetail.getColorName());//商品颜色
         cartOrderInfo.setProductSize(skuDetail.getProductSize());//商品型号
         cartOrderInfo.setCreateSource(cart.getCreateSource());//插入商品来源
@@ -1100,6 +1103,9 @@ public class CartOrderServiceImpl implements CartOrderService {
                                 item.setPrice(dataItem.getPriceTax());
                                 item.setTagInfoList(dataItem.getTagInfoList());
                                 item.setStockNum(dataItem.getStockNum());
+                                item.setSkuName(dataItem.getSkuName());
+                                item.setSpuCode(dataItem.getSpuCode());
+                                item.setSpuName(dataItem.getSpuName());
                                 break;
                             }
                         }
