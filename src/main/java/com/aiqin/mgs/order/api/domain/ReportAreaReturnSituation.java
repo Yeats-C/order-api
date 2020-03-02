@@ -41,4 +41,8 @@ public class ReportAreaReturnSituation implements Serializable {
     @JsonProperty("create_time")
     private Date createTime;
 
+    @ApiModelProperty("退货理由")
+    @JsonProperty("reason_code")
+    private String reasonCode;
+
 }

@@ -9,9 +9,10 @@
     <result column="return_amount" property="returnAmount" jdbcType="DECIMAL" />
     <result column="type" property="type" jdbcType="TINYINT" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="reason_code" property="reasonCode" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, province_id, province_name, return_count, return_amount, type, create_time
+    id, province_id, province_name, return_count, return_amount, type, create_time,reason_code
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -26,10 +27,10 @@
   <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation" >
     insert into report_area_return_situation (id, province_id, province_name, 
       return_count, return_amount, type, 
-      create_time)
+      create_time,reason_code)
     values (#{id,jdbcType=BIGINT}, #{provinceId,jdbcType=VARCHAR}, #{provinceName,jdbcType=VARCHAR}, 
       #{returnCount,jdbcType=BIGINT}, #{returnAmount,jdbcType=DECIMAL}, #{type,jdbcType=TINYINT}, 
-      #{createTime,jdbcType=TIMESTAMP})
+      #{createTime,jdbcType=TIMESTAMP},#{reasonCode})
   </insert>
   <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation" >
     insert into report_area_return_situation
