@@ -168,6 +168,19 @@ public class CartOrderInfo {
     @JsonProperty("sku_code")
     private String skuCode;
 
+    /**sku名称--爱亲供应链字段*/
+    @ApiModelProperty(value = "sku名称")
+    @JsonProperty("sku_name")
+    private String skuName;
+
+    @ApiModelProperty(value = "spu码")
+    @JsonProperty("spu_code")
+    private String spuCode;
+
+    @ApiModelProperty(value = "spu名称")
+    @JsonProperty("spu_name")
+    private String spuName;
+
     /***spu码*/
     @ApiModelProperty(value = "spu码")
     @JsonProperty("spu_id")
@@ -268,11 +281,6 @@ public class CartOrderInfo {
     @ApiModelProperty(value = "交易倍数")
     @JsonProperty("zero_removalCoefficient")
     private Integer zeroRemovalCoefficient;
-
-    /**sku名称--爱亲供应链字段*/
-    @ApiModelProperty(value = "sku名称")
-    @JsonProperty("sku_name")
-    private String skuName;
 
     /**规格--爱亲供应链字段*/
     @ApiModelProperty(value = "规格")
