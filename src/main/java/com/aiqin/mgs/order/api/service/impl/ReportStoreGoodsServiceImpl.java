@@ -302,21 +302,18 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
         result= httpClient.action().result(new TypeReference<Map<String,Object>>() {});
         log.info("调用slcs系统,根据省查询所有门店编码返回结果，result={}", JSON.toJSON(result));
         if(result==null){
-            log.info("调用slcs系统,--查询所有门店编码失败");
+            log.info("调用slcs系统,根据省查询所有门店编码失败");
             return;
         }
         if (StringUtils.isNotBlank(result.get("code").toString()) && "0".equals(String.valueOf(result.get("code")))) {
-//            if(){
-//
-//            }
-            List<NewStoreTreeResponse> jsonMap = JSONArray.parseArray(JSON.toJSONString(result.get("data")), NewStoreTreeResponse.class);
-            log.info("调用slcs系统,查询所有门店编码数组为:"+jsonMap);
+            List<NewStoreTreeResponse> list = JSONArray.parseArray(JSON.toJSONString(result.get("data")), NewStoreTreeResponse.class);
+            log.info("调用slcs系统,根据省查询所有门店为list={}",list);
+            List<String> storeCodes = list.stream().map(NewStoreTreeResponse::getStoreCode).collect(Collectors.toList());
+            log.info("调用slcs系统,根据省查询所有门店编码数组为storeCodes={}",storeCodes);
         } else {
-            log.info("调用slcs系统,查询所有门店编码为空");
+            log.info("调用slcs系统,根据省查询所有门店编码异常");
             return;
         }
-
-
 
 
     }
