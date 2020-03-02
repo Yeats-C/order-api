@@ -1,12 +1,14 @@
 package com.aiqin.mgs.order.api.service.impl;
 
 import com.aiqin.ground.util.http.HttpClient;
+import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.dao.ReportStoreGoodsDao;
 import com.aiqin.mgs.order.api.dao.ReportStoreGoodsDetailDao;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoods;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail;
+import com.aiqin.mgs.order.api.domain.copartnerArea.NewStoreTreeResponse;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsVo;
 import com.aiqin.mgs.order.api.domain.response.report.ReportOrderAndStoreListResponse;
@@ -14,6 +16,7 @@ import com.aiqin.mgs.order.api.domain.response.report.ReportOrderAndStoreRespons
 import com.aiqin.mgs.order.api.service.ReportStoreGoodsService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -286,6 +289,36 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
         }else{
             log.info("校验查询所有门店编码为空");
         }
+    }
+
+    @Override
+    public void areaReturnSituation() {
+        String url=slcsiHost+"/store/getStoresByAreaCode";
+        JSONObject body=new JSONObject();
+        body.put("province_id","610000");
+        log.info("调用slcs系统,根据省查询所有门店编码,请求url={},body={}", url,body);
+        HttpClient httpClient = HttpClient.post(url).json(body);
+        Map<String,Object> result=null;
+        result= httpClient.action().result(new TypeReference<Map<String,Object>>() {});
+        log.info("调用slcs系统,根据省查询所有门店编码返回结果，result={}", JSON.toJSON(result));
+        if(result==null){
+            log.info("调用slcs系统,--查询所有门店编码失败");
+            return;
+        }
+        if (StringUtils.isNotBlank(result.get("code").toString()) && "0".equals(String.valueOf(result.get("code")))) {
+//            if(){
+//
+//            }
+            List<NewStoreTreeResponse> jsonMap = JSONArray.parseArray(JSON.toJSONString(result.get("data")), NewStoreTreeResponse.class);
+            log.info("调用slcs系统,查询所有门店编码数组为:"+jsonMap);
+        } else {
+            log.info("调用slcs系统,查询所有门店编码为空");
+            return;
+        }
+
+
+
+
     }
 
 }

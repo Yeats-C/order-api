@@ -27,5 +27,7 @@ public interface ReportStoreGoodsService {
     List<ReportStoreGoodsDetail> getCountDetailList(ReportStoreGoodsDetailVo searchVo);
     //门店补货报表统计---定时任务使用
     void reportTimingTask();
+    //售后管理---各地区退货情况
+    void areaReturnSituation();
 
 }
