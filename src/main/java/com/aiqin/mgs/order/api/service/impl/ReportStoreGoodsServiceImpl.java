@@ -330,6 +330,8 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                     log.info("调用slcs系统,根据省查询所有门店为list={}",list);
                     List<String> storeCodes = list.stream().map(NewStoreTreeResponse::getStoreCode).collect(Collectors.toList());
                     log.info("调用slcs系统,根据省查询所有门店编码数组为storeCodes={}",storeCodes);
+
+
                 } else {
                     log.info("调用slcs系统,根据省查询所有门店编码异常");
                     return;

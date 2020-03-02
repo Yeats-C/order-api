@@ -4,6 +4,7 @@ import com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation;
 import com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ReportAreaReturnSituationDao {
@@ -23,5 +24,7 @@ public interface ReportAreaReturnSituationDao {
     List<ReportAreaReturnSituation> selectList(ReportAreaReturnSituationVo vo);
 
     int insertBatch(@Param("records") List<ReportAreaReturnSituation> records);
+
+    BigDecimal selectOrderAmountByStoreCodes(ReportAreaReturnSituationVo vo);
 
 }

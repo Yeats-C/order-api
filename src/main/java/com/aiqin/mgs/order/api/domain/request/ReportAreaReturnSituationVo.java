@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * description: ReportAreaReturnSituationVo
@@ -17,12 +18,16 @@ import java.io.Serializable;
 @ApiModel("各地区退货情况统计表请求类")
 public class ReportAreaReturnSituationVo implements Serializable {
 
-    @ApiModelProperty("类型")
+    @ApiModelProperty("订单类型 1直送 2配送 3货架 ")
     @JsonProperty("type")
     private Integer type;
 
     @ApiModelProperty("退货理由")
     @JsonProperty("reason_code")
     private String reasonCode;
+
+    @ApiModelProperty("门店编码集合（后端填充）")
+    @JsonProperty("store_codes")
+    private List<String> storeCodes;
 
 }
