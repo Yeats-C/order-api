@@ -11,6 +11,7 @@ import com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail;
 import com.aiqin.mgs.order.api.domain.copartnerArea.NewStoreTreeResponse;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsVo;
+import com.aiqin.mgs.order.api.domain.response.report.ProvinceAreaResponse;
 import com.aiqin.mgs.order.api.domain.response.report.ReportOrderAndStoreListResponse;
 import com.aiqin.mgs.order.api.domain.response.report.ReportOrderAndStoreResponse;
 import com.aiqin.mgs.order.api.service.ReportStoreGoodsService;
@@ -47,6 +48,8 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
 
     @Value("${bridge.url.slcs_api}")
     private String slcsiHost;
+    @Value("${bridge.url.product-api}")
+    private String productHost;
     @Autowired
     private ReportStoreGoodsDao reportStoreGoodsDao;
     @Autowired
@@ -293,27 +296,47 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
 
     @Override
     public void areaReturnSituation() {
-        String url=slcsiHost+"/store/getStoresByAreaCode";
-        JSONObject body=new JSONObject();
-        body.put("province_id","610000");
-        log.info("调用slcs系统,根据省查询所有门店编码,请求url={},body={}", url,body);
-        HttpClient httpClient = HttpClient.post(url).json(body);
-        Map<String,Object> result=null;
-        result= httpClient.action().result(new TypeReference<Map<String,Object>>() {});
-        log.info("调用slcs系统,根据省查询所有门店编码返回结果，result={}", JSON.toJSON(result));
-        if(result==null){
-            log.info("调用slcs系统,根据省查询所有门店编码失败");
-            return;
-        }
-        if (StringUtils.isNotBlank(result.get("code").toString()) && "0".equals(String.valueOf(result.get("code")))) {
-            List<NewStoreTreeResponse> list = JSONArray.parseArray(JSON.toJSONString(result.get("data")), NewStoreTreeResponse.class);
-            log.info("调用slcs系统,根据省查询所有门店为list={}",list);
-            List<String> storeCodes = list.stream().map(NewStoreTreeResponse::getStoreCode).collect(Collectors.toList());
-            log.info("调用slcs系统,根据省查询所有门店编码数组为storeCodes={}",storeCodes);
+        String productUrl=productHost+"/area/province";
+        log.info("调用product系统,查询所有省,请求url={}",productUrl);
+        HttpClient httpClient1 = HttpClient.get(productUrl);
+        Map<String,Object> res=null;
+        res= httpClient1.action().result(new TypeReference<Map<String,Object>>() {});
+        log.info("调用product系统,查询所有省返回结果，result={}", JSON.toJSON(res));
+        List<ProvinceAreaResponse> proList =new ArrayList<>();
+        if (StringUtils.isNotBlank(res.get("code").toString()) && "0".equals(String.valueOf(res.get("code")))) {
+            proList = JSONArray.parseArray(JSON.toJSONString(res.get("data")), ProvinceAreaResponse.class);
+            log.info("调用product系统,查询所有省集合为list={}",proList);
         } else {
-            log.info("调用slcs系统,根据省查询所有门店编码异常");
+            log.info("调用product系统,查询所有省异常");
             return;
         }
+        if(proList!=null&&proList.size()>0){
+            for(ProvinceAreaResponse par:proList){
+                String provinceId=par.getAreaId();
+                String url=slcsiHost+"/store/getStoresByAreaCode";
+                JSONObject body=new JSONObject();
+                body.put("province_id",provinceId);
+                log.info("调用slcs系统,根据省查询所有门店编码,请求url={},body={}", url,body);
+                HttpClient httpClient = HttpClient.post(url).json(body);
+                Map<String,Object> result=null;
+                result= httpClient.action().result(new TypeReference<Map<String,Object>>() {});
+                log.info("调用slcs系统,根据省查询所有门店编码返回结果，result={}", JSON.toJSON(result));
+                if(result==null){
+                    log.info("调用slcs系统,根据省查询所有门店编码失败");
+                    return;
+                }
+                if (StringUtils.isNotBlank(result.get("code").toString()) && "0".equals(String.valueOf(result.get("code")))) {
+                    List<NewStoreTreeResponse> list = JSONArray.parseArray(JSON.toJSONString(result.get("data")), NewStoreTreeResponse.class);
+                    log.info("调用slcs系统,根据省查询所有门店为list={}",list);
+                    List<String> storeCodes = list.stream().map(NewStoreTreeResponse::getStoreCode).collect(Collectors.toList());
+                    log.info("调用slcs系统,根据省查询所有门店编码数组为storeCodes={}",storeCodes);
+                } else {
+                    log.info("调用slcs系统,根据省查询所有门店编码异常");
+                    return;
+                }
+            }
+        }
+
 
 
     }
