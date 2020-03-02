@@ -94,6 +94,10 @@ public class CartOrderInfo {
     @JsonProperty("logo")
     private String logo="";
 
+    @ApiModelProperty(value = "主图片路径")
+    @JsonProperty("product_picture_path")
+    private String productPicturePath;
+
     /***商品原价*/
     @ApiModelProperty(value = "商品原价（分销价）")
     @JsonProperty("price")

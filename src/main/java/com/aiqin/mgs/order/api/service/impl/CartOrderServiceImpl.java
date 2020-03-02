@@ -1093,6 +1093,8 @@ public class CartOrderServiceImpl implements CartOrderService {
                         for (CartOrderInfo dataItem :
                                 data) {
                             if (item.getSkuCode().equals(dataItem.getSkuCode())) {
+                                item.setProductPicturePath(dataItem.getProductPicturePath());
+                                item.setLogo(dataItem.getProductPicturePath());
                                 item.setPrice(dataItem.getPriceTax());
                                 item.setTagInfoList(dataItem.getTagInfoList());
                                 item.setStockNum(dataItem.getStockNum());
