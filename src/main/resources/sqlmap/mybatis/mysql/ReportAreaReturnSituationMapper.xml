@@ -114,4 +114,19 @@
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="selectList" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo" >
+    select
+    <include refid="Base_Column_List" />
+    from report_area_return_situation
+    <where>
+      <if test="type != null" >
+        and type = #{type}
+      </if>
+      <if test="reasonCode != null and reasonCode !=''" >
+        and reason_code = #{reasonCode,jdbcType=VARCHAR}
+      </if>
+    </where>
+  </select>
+
 </mapper>

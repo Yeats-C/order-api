@@ -6,9 +6,11 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.dao.ReportStoreGoodsDao;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoods;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail;
+import com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsVo;
 import com.aiqin.mgs.order.api.domain.response.report.ReportOrderAndStoreListResponse;
+import com.aiqin.mgs.order.api.service.ReportAreaReturnSituationService;
 import com.aiqin.mgs.order.api.service.ReportStoreGoodsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -30,6 +32,8 @@ public class RelportStoreGoodsController {
 
     @Autowired
     private ReportStoreGoodsService reportStoreGoodsService;
+    @Autowired
+    private ReportAreaReturnSituationService reportAreaReturnSituationService;
 
     @ApiOperation("门店补货报表列表")
     @PostMapping("/getlist")
@@ -64,10 +68,10 @@ public class RelportStoreGoodsController {
 
     @ApiOperation("售后管理---各地区退货情况")
     @PostMapping("/areaReturnSituation")
-    public HttpResponse areaReturnSituation() {
-        reportStoreGoodsService.areaReturnSituation();
-        return HttpResponse.success();
+    public HttpResponse areaReturnSituation(@RequestBody ReportAreaReturnSituationVo vo) {
+        return HttpResponse.success(reportAreaReturnSituationService.getList(vo));
     }
+
 
 
 }
