@@ -18,7 +18,6 @@ import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
 import com.aiqin.mgs.order.api.domain.response.NewFranchiseeResponse;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -216,11 +215,16 @@ public class BridgeProductService {
      */
     public HttpResponse productBrandList(ActivityBrandCategoryRequest req){
         String path = urlProperties.getProductApi()+"/product/brand/list";
-        path=path+"?name="+req.getName();
+        if(StringUtils.isNotEmpty(req.getName())){
+            path=path+"?name="+req.getName();
+        }else{
+            path=path+"?name=";
+        }
+
         StringBuilder sb=new StringBuilder();
         if(req.getBrandIds()!=null&&req.getBrandIds().size()>0){
             for(int i=0;i<req.getBrandIds().size();i++){
-                sb.append("&brand_ids="+req.getCategoryCodes().get(i));
+                sb.append("&brand_ids="+req.getBrandIds().get(i));
             }
         }
         HttpClient httpClient = HttpClient.post(path+sb);
