@@ -143,7 +143,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                     cartOrderInfo.setProductCategoryCode(cartOrderInfo1.getProductCategoryCode());//品类编码
                     cartOrderInfo.setProductCategoryName(cartOrderInfo1.getProductCategoryName());//品类编码
                     cartOrderInfo.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
-                    cartOrderInfo.setActivityId(skuActivityMap.containsKey(cartOrderInfo1.getSkuCode()) ? skuActivityMap.get(cartOrderInfo1.getSkuCode()) : null);
+                    cartOrderInfo.setActivityId(skuActivityMap.get(cartOrderInfo1.getSkuCode()));
                     try {
                         if (cartOrderInfo != null) {
                             //判断sku是否在购物车里面存在

@@ -73,6 +73,12 @@
     <!-- 更新购物车 -->
     <update id="updateCartById" parameterType="com.aiqin.mgs.order.api.domain.CartOrderInfo">
         update order_store_cart set amount=#{amount}
+        <if test=" activityId != null and activityId != '' ">
+            ,activity_id = #{activityId}
+        </if>
+        <if test="lineCheckStatus != null and lineCheckStatus != '' or lineCheckStatus == 0 ">
+            ,line_check_status = #{lineCheckStatus}
+        </if>
         <where>
             1=1
             <if test="storeId != null">
