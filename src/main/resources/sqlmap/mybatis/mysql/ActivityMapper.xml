@@ -73,6 +73,7 @@
             <if test="activeStoreRange!= null">
                 and active_store_range = #{activeStoreRange}
             </if>
+            order by begin_time desc
             <if test="pageSize!=null ">
                 limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
             </if>

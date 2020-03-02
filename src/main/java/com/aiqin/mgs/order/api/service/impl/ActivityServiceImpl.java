@@ -573,23 +573,36 @@ public class ActivityServiceImpl implements ActivityService {
     public HttpResponse<List<ProductCategoryRespVO>> productCategoryList(String activityId) {
         LOGGER.info("活动商品品类列表接口开始");
         HttpResponse response = HttpResponse.success();
+        List<ProductCategoryRespVO> queryProductBrandRespVO=new ArrayList<>();
         Activity activity=new Activity();
         activity.setActivityId(activityId);
         List<ActivityProduct> activityProducts=activityProductDao.productCategoryList(activity);
-
-        List<String> categoryCodes=new ArrayList<>();
-        ActivityBrandCategoryRequest categoryRequest=new ActivityBrandCategoryRequest();
-        if(null!=activityProducts && 0!=activityProducts.size()){
+        if(null!=activityProducts&& activityProducts.get(0).getActivityScope()==3){
             for (ActivityProduct product:activityProducts){
-                if(StringUtils.isNotBlank(product.getProductCategoryCode())){
-                    categoryCodes.add(product.getProductCategoryCode());
-                }
+                ProductCategoryAndBrandResponse2 response2= (ProductCategoryAndBrandResponse2) bridgeProductService.selectCategoryByBrandCode(product.getProductBrandCode(),"2").getData();
+                queryProductBrandRespVO.addAll(response2.getProductCategoryRespVOList());
             }
-            categoryRequest.setCategoryCodes(categoryCodes);
-        }
 
-        response=bridgeProductService.productCategoryList(categoryRequest);
-        return response;
+            Set<ProductCategoryRespVO> activitySet = new HashSet<>(queryProductBrandRespVO);
+            queryProductBrandRespVO.clear();
+            queryProductBrandRespVO.addAll(activitySet);
+            response.setData(queryProductBrandRespVO);
+            return  response;
+        }else{
+            List<String> categoryCodes=new ArrayList<>();
+            ActivityBrandCategoryRequest categoryRequest=new ActivityBrandCategoryRequest();
+            if(null!=activityProducts && 0!=activityProducts.size()){
+                for (ActivityProduct product:activityProducts){
+                    if(StringUtils.isNotBlank(product.getProductCategoryCode())){
+                        categoryCodes.add(product.getProductCategoryCode());
+                    }
+                }
+                categoryRequest.setCategoryCodes(categoryCodes);
+            }
+
+            response=bridgeProductService.productCategoryList(categoryRequest);
+            return response;
+        }
     }
 
 

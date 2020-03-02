@@ -193,10 +193,11 @@ public class BridgeProductService {
         String path = urlProperties.getProductApi() +"/product/category/list/categoryCodes";
         StringBuilder sb=new StringBuilder();
         String a="";
-        if(req.getCategoryCodes()!=null){
+        if(req.getCategoryCodes()!=null&&0!=req.getCategoryCodes().size()){
             a=req.getCategoryCodes().get(0);
+            sb.append("?category_codes="+a);
         }
-        sb.append("?category_codes="+a);
+
         if(req.getCategoryCodes()!=null&&req.getCategoryCodes().size()>=1){
             for(int i=1;i<req.getCategoryCodes().size();i++){
                 sb.append("&category_codes="+req.getCategoryCodes().get(i));
