@@ -30,7 +30,7 @@ public class ReportAreaReturnSituationServiceImpl implements ReportAreaReturnSit
 
     @Override
     public Boolean insertBatch(List<ReportAreaReturnSituation> entity) {
-        return null;
+        return reportAreaReturnSituationDao.insertBatch(entity)>0;
     }
 
 }

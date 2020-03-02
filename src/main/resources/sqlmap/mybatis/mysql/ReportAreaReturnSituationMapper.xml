@@ -130,4 +130,17 @@
     </where>
   </select>
 
+  <insert id="insertBatch" parameterType="list">
+    insert into report_area_return_situation (id, province_id, province_name,
+    return_count, return_amount, type,
+    create_time,reason_code)
+    values
+    <foreach collection="records" item="item" index="index" separator=",">
+      (
+        #{item.provinceId,jdbcType=VARCHAR}, #{item.provinceName,jdbcType=VARCHAR},
+        #{item.returnCount,jdbcType=BIGINT}, #{item.returnAmount,jdbcType=DECIMAL}, #{item.type,jdbcType=TINYINT},
+        #{item.createTime,jdbcType=TIMESTAMP},#{item.reasonCode}
+      )
+    </foreach>
+  </insert>
 </mapper>

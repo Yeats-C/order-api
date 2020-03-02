@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation;
 import com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -20,5 +21,7 @@ public interface ReportAreaReturnSituationDao {
     int updateByPrimaryKey(ReportAreaReturnSituation record);
 
     List<ReportAreaReturnSituation> selectList(ReportAreaReturnSituationVo vo);
+
+    int insertBatch(@Param("records") List<ReportAreaReturnSituation> records);
 
 }
