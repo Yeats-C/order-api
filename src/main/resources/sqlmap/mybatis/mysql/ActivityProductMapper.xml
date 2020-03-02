@@ -88,9 +88,12 @@
     <select id="productBrandList" resultType="java.util.List" resultMap="BaseResultMap"
             parameterType="com.aiqin.mgs.order.api.domain.ActivityProduct">
         SELECT
+            p.product_category_code,
+            p.product_category_name,
             p.product_brand_code,
             p.product_brand_name,
-            p.activity_id
+            p.activity_id,
+            p.activity_scope
         FROM
             activity_product p
         LEFT JOIN activity a ON a.activity_id = p.activity_id
@@ -111,8 +114,11 @@
         SELECT
         p.product_category_code,
         p.product_category_name,
+        p.product_brand_code,
+        p.product_brand_name,
         p.level,
-        p.activity_id
+        p.activity_id,
+        p.activity_scope
         FROM
         activity_product p
         LEFT JOIN activity a ON a.activity_id = p.activity_id

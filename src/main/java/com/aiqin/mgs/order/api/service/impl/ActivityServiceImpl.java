@@ -32,6 +32,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -146,6 +147,7 @@ public class ActivityServiceImpl implements ActivityService {
         activity.setUpdateTime(new Date());
         activity.setActivityId(activityId);
         activity.setActiveStoreRange(2);
+        activity.setActivityScope(activityRequest.getActivityProducts().get(0).getActivityScope());
 
         //查询人员的所有的区域列表
         List<CopartnerAreaUp> roleList = copartnerAreaRoleDao.qryCopartnerAreaListBypersonId(authToken.getPersonId());
@@ -290,14 +292,14 @@ public class ActivityServiceImpl implements ActivityService {
             //活动补货门店数
             Integer storeNum=erpOrderInfoDao.getStoreNum(activity);
             //平均单价
-            BigDecimal averageUnitPrice=activitySales.getActivitySales().divide(new BigDecimal(activitySales.getActivitySalesNum()));
+            BigDecimal averageUnitPrice=activitySales.getActivitySales().divide(activitySales.getActivitySalesNum(),0, RoundingMode.HALF_UP);
             activitySales.setProductSales(productSales);
             activitySales.setStoreNum(storeNum);
             activitySales.setAverageUnitPrice(averageUnitPrice);
             response.setData(activitySales);
         return response;
         } catch (Exception e) {
-            LOGGER.error("查询活动详情-销售数据-活动销售统计失败", e);
+            LOGGER.error("查询活动详情-销售数据-活动销售统计失败", e.getStackTrace());
             throw new RuntimeException(ResultCode.SELECT_ACTIVITY_INFO_EXCEPTION.getMessage());
         }
     }
@@ -360,6 +362,7 @@ public class ActivityServiceImpl implements ActivityService {
             Activity activity=activityRequest.getActivity();
             activity.setUpdateTime(new Date());
             activity.setActiveStoreRange(2);
+            activity.setActivityScope(activityRequest.getActivityProducts().get(0).getActivityScope());
             //查询人员的所有的区域列表
             List<CopartnerAreaUp> roleList = copartnerAreaRoleDao.qryCopartnerAreaListBypersonId(authToken.getPersonId());
             if(null!=roleList&& 0!=roleList.size()){
@@ -502,9 +505,9 @@ public class ActivityServiceImpl implements ActivityService {
             Integer activityScope=activityProductList.get(0).getActivityScope();
             if(activityScope==1){//按单品设置
                 activityList=activityDao.checkProcuct(activityParameterRequest.getActivityId(),activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode(),null,null);
-            }else if(activityScope==2){//按品牌设置
+            }else if(activityScope==3){//按品牌设置
                 activityList=activityDao.checkProcuct(activityParameterRequest.getActivityId(),activityParameterRequest.getStoreId(),null,activityParameterRequest.getProductBrandCode(),null);
-            }else if(activityScope==3){//按品类设置
+            }else if(activityScope==2){//按品类设置
                 List<String> categoryCodes=new ArrayList<>();
                 if(StringUtils.isNotEmpty(activityParameterRequest.getProductCategoryCode())){
                     for(int k=0;k<4;k++) {
@@ -515,12 +518,7 @@ public class ActivityServiceImpl implements ActivityService {
                 }
                 activityList=activityDao.checkProcuct(activityParameterRequest.getActivityId(),activityParameterRequest.getStoreId(),null,null,categoryCodes);
             }else if(activityScope==4){//按单品排除
-                activityList=activityDao.checkProcuct(activityParameterRequest.getActivityId(),activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode(),null,null);
-                if(activityList==null){
-                    return true;
-                }else{
-                    return false;
-                }
+                activityList=activityDao.singleProductElimination(activityParameterRequest.getActivityId(),activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode());
             }
 
             if(activityList!=null && 0!=activityList.size()){
@@ -536,6 +534,7 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public HttpResponse<List<QueryProductBrandRespVO>> productBrandList(String productBrandName, String activityId) {
         LOGGER.info("活动商品品牌列表接口参数productBrandName为:{}", productBrandName);
+        List<QueryProductBrandRespVO> queryProductBrandRespVO=new ArrayList<>();
         HttpResponse response = HttpResponse.success();
         ActivityProduct activityProduct=new ActivityProduct();
         if(StringUtils.isNotEmpty(productBrandName)){
@@ -545,39 +544,65 @@ public class ActivityServiceImpl implements ActivityService {
             activityProduct.setActivityId(activityId);
         }
         List<ActivityProduct> activityProducts=activityProductDao.productBrandList(activityProduct);
-        List<String> brandIds=new ArrayList<>();
-        ActivityBrandCategoryRequest categoryRequest=new ActivityBrandCategoryRequest();
-        if(null!=activityProducts && 0!=activityProducts.size()){
+        if(null!=activityProducts&& activityProducts.get(0).getActivityScope()==2){
             for (ActivityProduct product:activityProducts){
-                brandIds.add(product.getProductBrandCode());
+                ProductCategoryAndBrandResponse2 response2= (ProductCategoryAndBrandResponse2) bridgeProductService.selectCategoryByBrandCode(product.getProductCategoryCode(),"1").getData();
+                queryProductBrandRespVO.addAll(response2.getQueryProductBrandRespVO());
             }
+
+            Set<QueryProductBrandRespVO> activitySet = new HashSet<>(queryProductBrandRespVO);
+            queryProductBrandRespVO.clear();
+            queryProductBrandRespVO.addAll(activitySet);
+            response.setData(queryProductBrandRespVO);
+            return  response;
+        }else{
+            List<String> brandIds=new ArrayList<>();
+            ActivityBrandCategoryRequest categoryRequest=new ActivityBrandCategoryRequest();
+            if(null!=activityProducts && 0!=activityProducts.size()){
+                for (ActivityProduct product:activityProducts){
+                    brandIds.add(product.getProductBrandCode());
+                }
+            }
+            categoryRequest.setBrandIds(brandIds);
+            response=bridgeProductService.productBrandList(categoryRequest);
+            return response;
         }
-        categoryRequest.setBrandIds(brandIds);
-        response=bridgeProductService.productBrandList(categoryRequest);
-        return response;
     }
 
     @Override
     public HttpResponse<List<ProductCategoryRespVO>> productCategoryList(String activityId) {
         LOGGER.info("活动商品品类列表接口开始");
         HttpResponse response = HttpResponse.success();
+        List<ProductCategoryRespVO> queryProductBrandRespVO=new ArrayList<>();
         Activity activity=new Activity();
         activity.setActivityId(activityId);
         List<ActivityProduct> activityProducts=activityProductDao.productCategoryList(activity);
-
-        List<String> categoryCodes=new ArrayList<>();
-        ActivityBrandCategoryRequest categoryRequest=new ActivityBrandCategoryRequest();
-        if(null!=activityProducts && 0!=activityProducts.size()){
+        if(null!=activityProducts&& activityProducts.get(0).getActivityScope()==3){
             for (ActivityProduct product:activityProducts){
-                if(StringUtils.isNotBlank(product.getProductCategoryCode())){
-                    categoryCodes.add(product.getProductCategoryCode());
-                }
+                ProductCategoryAndBrandResponse2 response2= (ProductCategoryAndBrandResponse2) bridgeProductService.selectCategoryByBrandCode(product.getProductBrandCode(),"2").getData();
+                queryProductBrandRespVO.addAll(response2.getProductCategoryRespVOList());
             }
-            categoryRequest.setCategoryCodes(categoryCodes);
-        }
 
-        response=bridgeProductService.productCategoryList(categoryRequest);
-        return response;
+            Set<ProductCategoryRespVO> activitySet = new HashSet<>(queryProductBrandRespVO);
+            queryProductBrandRespVO.clear();
+            queryProductBrandRespVO.addAll(activitySet);
+            response.setData(queryProductBrandRespVO);
+            return  response;
+        }else{
+            List<String> categoryCodes=new ArrayList<>();
+            ActivityBrandCategoryRequest categoryRequest=new ActivityBrandCategoryRequest();
+            if(null!=activityProducts && 0!=activityProducts.size()){
+                for (ActivityProduct product:activityProducts){
+                    if(StringUtils.isNotBlank(product.getProductCategoryCode())){
+                        categoryCodes.add(product.getProductCategoryCode());
+                    }
+                }
+                categoryRequest.setCategoryCodes(categoryCodes);
+            }
+
+            response=bridgeProductService.productCategoryList(categoryRequest);
+            return response;
+        }
     }
 
 
@@ -998,7 +1023,8 @@ public class ActivityServiceImpl implements ActivityService {
         List<Activity> activityList=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode(),null,null);
         List<Activity> activityListByBrand=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),null,activityParameterRequest.getProductBrandCode(),null);
         List<Activity> activityListByCategory=activityDao.checkProcuct(null,activityParameterRequest.getStoreId(),null,null,categoryCodes);
-        if(null==activityList&&null==activityListByBrand&&null==activityListByCategory){
+        List<Activity> singleProductElimination=activityDao.singleProductElimination(null,activityParameterRequest.getStoreId(),activityParameterRequest.getSkuCode());
+        if(null==activityList&&null==activityListByBrand&&null==activityListByCategory &&null==singleProductElimination){
             return new ArrayList<Activity>();
         }
         if(null==activityList){
@@ -1014,7 +1040,11 @@ public class ActivityServiceImpl implements ActivityService {
                 activityList.add(act);
             }
         }
-
+        if(null!=singleProductElimination){
+            for (Activity act:singleProductElimination){
+                activityList.add(act);
+            }
+        }
         // 去重
         Set<Activity> activitySet = new HashSet<>(activityList);
         activityList.clear();

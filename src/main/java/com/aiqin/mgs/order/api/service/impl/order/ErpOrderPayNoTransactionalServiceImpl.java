@@ -83,7 +83,7 @@ public class ErpOrderPayNoTransactionalServiceImpl implements ErpOrderPayNoTrans
         result.setOrderCode(order.getOrderStoreCode());
         result.setOrderId(order.getOrderStoreId());
         result.setReceivePerson(order.getReceivePerson());
-        result.setReceiveAddress(order.getReceiveMobile());
+        result.setReceiveMobile(order.getReceiveMobile());
         result.setReceiveAddress(order.getReceiveAddress());
         result.setGoodsCoupon(orderFee.getGoodsCoupon());
         result.setPayStatus(orderFee.getPayStatus());

@@ -6,7 +6,6 @@ import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
-import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
@@ -19,7 +18,6 @@ import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
 import com.aiqin.mgs.order.api.domain.response.NewFranchiseeResponse;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -195,10 +193,11 @@ public class BridgeProductService {
         String path = urlProperties.getProductApi() +"/product/category/list/categoryCodes";
         StringBuilder sb=new StringBuilder();
         String a="";
-        if(req.getCategoryCodes()!=null){
+        if(req.getCategoryCodes()!=null&&0!=req.getCategoryCodes().size()){
             a=req.getCategoryCodes().get(0);
+            sb.append("?category_codes="+a);
         }
-        sb.append("?category_codes="+a);
+
         if(req.getCategoryCodes()!=null&&req.getCategoryCodes().size()>=1){
             for(int i=1;i<req.getCategoryCodes().size();i++){
                 sb.append("&category_codes="+req.getCategoryCodes().get(i));
@@ -217,11 +216,20 @@ public class BridgeProductService {
      */
     public HttpResponse productBrandList(ActivityBrandCategoryRequest req){
         String path = urlProperties.getProductApi()+"/product/brand/list";
-        JSONObject json=new JSONObject();
-        json.put("name",req.getName());
-        json.put("brand_ids",req.getBrandIds());
-        HttpClient httpClient = HttpClient.post(path).json(json);
-        HttpResponse<List<QueryProductBrandRespVO>> response = httpClient.action().result(new TypeReference<HttpResponse<List<QueryProductBrandRespVO>>>() {
+        if(StringUtils.isNotEmpty(req.getName())){
+            path=path+"?name="+req.getName();
+        }else{
+            path=path+"?name=";
+        }
+
+        StringBuilder sb=new StringBuilder();
+        if(req.getBrandIds()!=null&&req.getBrandIds().size()>0){
+            for(int i=0;i<req.getBrandIds().size();i++){
+                sb.append("&brand_ids="+req.getBrandIds().get(i));
+            }
+        }
+        HttpClient httpClient = HttpClient.post(path+sb);
+        HttpResponse<List<QueryProductBrandRespVO>>  response = httpClient.action().result(new TypeReference<HttpResponse<List<QueryProductBrandRespVO>>>() {
         });
         return response;
     }
@@ -237,6 +245,20 @@ public class BridgeProductService {
         String path = "/product/category/list/categoryCodes?category_codes="+str;
         HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path);
         HttpResponse<List<ProductCategoryRespVO>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ProductCategoryRespVO>>>() {
+        });
+        return response;
+    }
+
+    /**
+     * 品牌和品类关系,condition_code为查询条件，type=2 通过品牌查品类,type=1 通过品类查品牌
+     * @param condition_code
+     * @param type
+     * @return
+     */
+    public HttpResponse selectCategoryByBrandCode(String condition_code,String type){
+        String path = "/product/brand/selectCategoryByBrandCode?condition_code="+condition_code+"&type="+type;
+        HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path);
+        HttpResponse<ProductCategoryAndBrandResponse2> response = httpClient.action().result(new TypeReference<HttpResponse<ProductCategoryAndBrandResponse2>>() {
         });
         return response;
     }
