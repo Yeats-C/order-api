@@ -470,7 +470,7 @@ public class CartOrderServiceImpl implements CartOrderService {
         BigDecimal activityAmountTotal = BigDecimal.ZERO;
         //勾选商品活动优惠金额
         BigDecimal activityDiscountAmount = BigDecimal.ZERO;
-        //商品总数量
+        //勾选商品本品总数量
         int totalNumber = 0;
         //所有勾选的商品中可使用A品券的商品活动均摊后金额汇总
         BigDecimal topTotalPrice = BigDecimal.ZERO;
@@ -552,7 +552,6 @@ public class CartOrderServiceImpl implements CartOrderService {
 
             activityAmountTotal = activityAmountTotal.add(groupActivityAmount);
             totalNumber += groupProductQuantity;
-            totalNumber += groupGiftQuantity;
             topTotalPrice = topTotalPrice.add(groupTopCouponMaxTotal);
             activityDiscountAmount = activityDiscountAmount.add(groupActivityDiscountAmount);
         }
