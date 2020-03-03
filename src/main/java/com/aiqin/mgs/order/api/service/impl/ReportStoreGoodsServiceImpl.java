@@ -346,7 +346,7 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 }
                 BigDecimal amount=BigDecimal.ZERO;
                 Long count=0L;
-                if(storeCodes!=null||storeCodes.size()>0){
+                if(storeCodes!=null&&storeCodes.size()>0){
                     vo.setStoreCodes(storeCodes);
 //                    vo.setType();
 //                    vo.setReasonCode();

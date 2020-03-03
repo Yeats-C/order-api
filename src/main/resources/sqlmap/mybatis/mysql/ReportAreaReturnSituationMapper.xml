@@ -134,7 +134,7 @@
   </select>
 
   <insert id="insertBatch" parameterType="list">
-    insert into report_area_return_situation (id, province_id, province_name,
+    insert into report_area_return_situation (province_id, province_name,
     return_count, return_amount, type,
     create_time,reason_code)
     values

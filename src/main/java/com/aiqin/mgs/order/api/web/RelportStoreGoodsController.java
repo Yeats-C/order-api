@@ -67,11 +67,16 @@ public class RelportStoreGoodsController {
     }
 
     @ApiOperation("售后管理---各地区退货情况")
-    @PostMapping("/areaReturnSituation")
-    public HttpResponse areaReturnSituation(@RequestBody ReportAreaReturnSituationVo vo) {
+    @PostMapping("/areaReturnSituationList")
+    public HttpResponse getList(@RequestBody ReportAreaReturnSituationVo vo) {
         return HttpResponse.success(reportAreaReturnSituationService.getList(vo));
     }
 
-
+    @ApiOperation("售后管理---各地区退货情况定时任务手动执行")
+    @PostMapping("/areaReturnSituation")
+    public HttpResponse areaReturnSituation(@RequestBody ReportAreaReturnSituationVo vo) {
+        reportStoreGoodsService.areaReturnSituation(vo);
+        return HttpResponse.success();
+    }
 
 }
