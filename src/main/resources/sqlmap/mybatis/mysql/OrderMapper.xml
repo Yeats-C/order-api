@@ -1051,7 +1051,7 @@
         <if test="endTime!=null and endTime!='' ">
             and a.create_time &lt;= #{endTime}
         </if>
-        <if test="updateTime!=null and updateTime!='' ">
+        <if test="updateTime!=null  ">
             and a.update_time &gt;= #{updateTime}
         </if>
         <if test="statusList != null">
@@ -1090,7 +1090,7 @@
         <if test="endTime!=null and endTime!='' ">
             and a.create_time &lt;= #{endTime}
         </if>
-        <if test="updateTime!=null and updateTime!='' ">
+        <if test="updateTime!=null ">
             and a.update_time &gt;= #{updateTime}
         </if>
         <if test="statusList != null">
@@ -1348,7 +1348,7 @@
         d.order_id=o.order_id
        and  o.distributor_id = #{distributorId}
         and d.create_time &gt;= #{startDate}
-        and d.product_code = #{skuCode}
+        and d.sku_code = #{skuCode}
 
     </select>
 
