@@ -348,8 +348,6 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 Long count=0L;
                 if(storeCodes!=null&&storeCodes.size()>0){
                     vo.setStoreCodes(storeCodes);
-//                    vo.setType();
-//                    vo.setReasonCode();
                     ReportAreaReturnSituation rars = reportAreaReturnSituationDao.selectOrderAmountByStoreCodes(vo);
                     ReportAreaReturnSituation rars2 =reportAreaReturnSituationDao.selectOrderCountByStoreCodes(vo);
                     if(rars!=null&&rars.getReturnAmount()!=null){
