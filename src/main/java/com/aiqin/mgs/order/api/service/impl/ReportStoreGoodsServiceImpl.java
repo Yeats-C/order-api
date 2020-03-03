@@ -316,9 +316,11 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
             return;
         }
         List<ReportAreaReturnSituation> records=new ArrayList<>();
+        List<String> provinceIds=new ArrayList<>();
         if(proList!=null&&proList.size()>0){
             for(ProvinceAreaResponse par:proList){
                 String provinceId=par.getAreaId();
+                provinceIds.add(provinceId);
                 String provinceName=par.getAreaName();
                 String url=slcsiHost+"/store/getStoresByAreaCode";
                 JSONObject body=new JSONObject();
@@ -368,6 +370,13 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 records.add(rars3);
             }
             if(records!=null&&records.size()>0){
+                ReportAreaReturnSituationVo vo1=new ReportAreaReturnSituationVo();
+                vo1.setType(vo.getType());
+                vo1.setReasonCode(vo.getReasonCode());
+                vo1.setStoreCodes(provinceIds);
+                //清空数据
+                reportAreaReturnSituationDao.deleteByProvinceAndType(vo1);
+                //插入数据
                 reportAreaReturnSituationDao.insertBatch(records);
             }
         } else {

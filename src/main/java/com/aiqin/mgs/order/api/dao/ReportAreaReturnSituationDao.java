@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ReportAreaReturnSituationDao {
 
-    int deleteByPrimaryKey(Long id);
+    int deleteByProvinceAndType(ReportAreaReturnSituationVo vo);
 
     int insert(ReportAreaReturnSituation record);
 
