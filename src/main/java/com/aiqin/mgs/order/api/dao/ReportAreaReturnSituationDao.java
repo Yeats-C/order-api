@@ -10,6 +10,8 @@ public interface ReportAreaReturnSituationDao {
 
     int deleteByProvinceAndType(ReportAreaReturnSituationVo vo);
 
+    int deleteByType(ReportAreaReturnSituationVo vo);
+
     int insert(ReportAreaReturnSituation record);
 
     int insertSelective(ReportAreaReturnSituation record);

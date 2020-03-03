@@ -4,6 +4,8 @@ import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.component.returnenums.OrderTypeEnum;
+import com.aiqin.mgs.order.api.component.returnenums.ReturnReasonEnum;
 import com.aiqin.mgs.order.api.dao.ReportAreaReturnSituationDao;
 import com.aiqin.mgs.order.api.dao.ReportStoreGoodsDao;
 import com.aiqin.mgs.order.api.dao.ReportStoreGoodsDetailDao;
@@ -301,6 +303,12 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
 
     @Override
     public void areaReturnSituation(ReportAreaReturnSituationVo vo) {
+        Integer category=1;
+        if(vo.getType().equals(OrderTypeEnum.ORDER_TYPE_PS.getCode())&&vo.getReasonCode().equals(ReturnReasonEnum.ORDER_TYPE_ZS.getCode())){//配送质量
+            category=2;
+        }else if(vo.getType().equals(OrderTypeEnum.ORDER_TYPE_PS.getCode())&&vo.getReasonCode().equals(ReturnReasonEnum.ORDER_TYPE_PS.getCode())){//配送一般
+            category=3;
+        }
         String productUrl=productHost+"/area/province";
         log.info("调用product系统,查询所有省,请求url={}",productUrl);
         HttpClient httpClient1 = HttpClient.get(productUrl);
@@ -364,16 +372,14 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 rars3.setReasonCode(vo.getReasonCode());
                 rars3.setReturnAmount(amount);
                 rars3.setReturnCount(count);
-                rars3.setType(vo.getType());
+                rars3.setType(category);
                 records.add(rars3);
             }
             if(records!=null&&records.size()>0){
                 ReportAreaReturnSituationVo vo1=new ReportAreaReturnSituationVo();
-                vo1.setType(vo.getType());
-                vo1.setReasonCode(vo.getReasonCode());
-                vo1.setStoreCodes(provinceIds);
+                vo1.setType(category);
                 //清空数据
-                reportAreaReturnSituationDao.deleteByProvinceAndType(vo1);
+                reportAreaReturnSituationDao.deleteByType(vo1);
                 //插入数据
                 reportAreaReturnSituationDao.insertBatch(records);
             }

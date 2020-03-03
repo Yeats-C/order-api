@@ -27,6 +27,10 @@
           #{item}
       </foreach>
   </delete>
+  <delete id="deleteByType" parameterType="com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo" >
+    delete from report_area_return_situation
+    where type = #{type}
+  </delete>
   <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation" >
     insert into report_area_return_situation (id, province_id, province_name, 
       return_count, return_amount, type, 
