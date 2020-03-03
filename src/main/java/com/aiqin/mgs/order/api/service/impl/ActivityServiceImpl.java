@@ -12,19 +12,24 @@ import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
+import com.aiqin.mgs.order.api.domain.copartnerArea.PublicAreaStore;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
+import com.aiqin.mgs.order.api.service.CopartnerAreaService;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.DateUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +39,7 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author csf
@@ -74,10 +80,26 @@ public class ActivityServiceImpl implements ActivityService {
     @Resource
     private CopartnerAreaRoleDao copartnerAreaRoleDao;
 
+    @Autowired
+    private CopartnerAreaService copartnerAreaService;
+
     @Override
     public HttpResponse<Map> activityList(Activity activity) {
-        LOGGER.info("查询促销活动列表activityList参数为：{}", activity);
         HttpResponse response = HttpResponse.success();
+        AuthToken authToken= AuthUtil.getCurrentAuth();
+        LOGGER.info("调用合伙人数据权限控制公共接口入参,personId={},resourceCode={}",authToken.getPersonId(),"ERP007003");
+        HttpResponse httpResponse = copartnerAreaService.selectStoreByPerson(authToken.getPersonId(), "ERP007003");
+        List<PublicAreaStore> dataList = JSONArray.parseArray(JSON.toJSONString(httpResponse.getData()), PublicAreaStore.class);
+        LOGGER.info("调用合伙人数据权限控制公共接口返回结果,dataList={}",dataList);
+        if (dataList == null || dataList.size() == 0) {
+            return HttpResponse.failure(ResultCode.SELECT_ACTIVITY_INFO_EXCEPTION);
+        }
+        //遍历门店id
+        List<String> storesIds = dataList.stream().map(PublicAreaStore::getStoreId).collect(Collectors.toList());
+        LOGGER.info("门店ids={}",storesIds);
+        activity.setStoresIds(storesIds);
+        LOGGER.info("查询促销活动列表activityList参数为：{}", activity);
+
         Integer totalCount=activityDao.totalCount(activity);
         Map data=new HashMap();
         List<Activity> activities=new ArrayList<>();
