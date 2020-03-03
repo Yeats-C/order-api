@@ -259,6 +259,9 @@
             <if test="cartId != null and cartId != ''">
                 and cart_id = #{cartId}
             </if>
+            <if test="activityId != null and activityId != ''">
+                and activity_id = #{activityId}
+            </if>
             <if test="storeId != null and storeId != ''">
                 and store_id = #{storeId}
             </if>
