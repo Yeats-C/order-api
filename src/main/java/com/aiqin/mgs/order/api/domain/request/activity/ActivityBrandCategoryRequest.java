@@ -19,9 +19,17 @@ public class ActivityBrandCategoryRequest implements Serializable {
     @JsonProperty("brand_ids")
     private List<String> brandIds;
 
+    @ApiModelProperty("排除品牌编码集合")
+    @JsonProperty("exclude_brand_ids")
+    private List<String> excludeBrandIds;
+
     @ApiModelProperty("品类编码集合")
     @JsonProperty("category_codes")
     private List<String> categoryCodes;
+
+    @ApiModelProperty("排除品类编码集合")
+    @JsonProperty("exclude_category_codes")
+    private List<String> excludeCategoryCodes;
 
     @ApiModelProperty("品类查询全部还是启用,0为启用,4为全部")
     @JsonProperty("category_status")
