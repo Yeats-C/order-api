@@ -4,11 +4,14 @@ import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.dao.ReportAreaReturnSituationDao;
 import com.aiqin.mgs.order.api.dao.ReportStoreGoodsDao;
 import com.aiqin.mgs.order.api.dao.ReportStoreGoodsDetailDao;
+import com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoods;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail;
 import com.aiqin.mgs.order.api.domain.copartnerArea.NewStoreTreeResponse;
+import com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsVo;
 import com.aiqin.mgs.order.api.domain.response.report.ProvinceAreaResponse;
@@ -54,6 +57,8 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
     private ReportStoreGoodsDao reportStoreGoodsDao;
     @Autowired
     private ReportStoreGoodsDetailDao reportStoreGoodsDetailDao;
+    @Autowired
+    private ReportAreaReturnSituationDao reportAreaReturnSituationDao;
 
     @Override
     public Boolean insert(ReportStoreGoods entity) {
@@ -295,7 +300,7 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
     }
 
     @Override
-    public void areaReturnSituation() {
+    public void areaReturnSituation(ReportAreaReturnSituationVo vo) {
         String productUrl=productHost+"/area/province";
         log.info("调用product系统,查询所有省,请求url={}",productUrl);
         HttpClient httpClient1 = HttpClient.get(productUrl);
@@ -310,9 +315,11 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
             log.info("调用product系统,查询所有省异常");
             return;
         }
+        List<ReportAreaReturnSituation> records=new ArrayList<>();
         if(proList!=null&&proList.size()>0){
             for(ProvinceAreaResponse par:proList){
                 String provinceId=par.getAreaId();
+                String provinceName=par.getAreaName();
                 String url=slcsiHost+"/store/getStoresByAreaCode";
                 JSONObject body=new JSONObject();
                 body.put("province_id",provinceId);
@@ -325,22 +332,48 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                     log.info("调用slcs系统,根据省查询所有门店编码失败");
                     return;
                 }
+                List<String> storeCodes=new ArrayList<>();
                 if (StringUtils.isNotBlank(result.get("code").toString()) && "0".equals(String.valueOf(result.get("code")))) {
                     List<NewStoreTreeResponse> list = JSONArray.parseArray(JSON.toJSONString(result.get("data")), NewStoreTreeResponse.class);
                     log.info("调用slcs系统,根据省查询所有门店为list={}",list);
-                    List<String> storeCodes = list.stream().map(NewStoreTreeResponse::getStoreCode).collect(Collectors.toList());
+                    storeCodes = list.stream().map(NewStoreTreeResponse::getStoreCode).collect(Collectors.toList());
                     log.info("调用slcs系统,根据省查询所有门店编码数组为storeCodes={}",storeCodes);
-
-
                 } else {
                     log.info("调用slcs系统,根据省查询所有门店编码异常");
                     return;
                 }
+                BigDecimal amount=BigDecimal.ZERO;
+                Long count=0L;
+                if(storeCodes!=null||storeCodes.size()>0){
+                    vo.setStoreCodes(storeCodes);
+//                    vo.setType();
+//                    vo.setReasonCode();
+                    ReportAreaReturnSituation rars = reportAreaReturnSituationDao.selectOrderAmountByStoreCodes(vo);
+                    ReportAreaReturnSituation rars2 =reportAreaReturnSituationDao.selectOrderCountByStoreCodes(vo);
+                    if(rars!=null&&rars.getReturnAmount()!=null){
+                        amount=rars.getReturnAmount();
+                    }
+                    if(rars2!=null&&rars2.getReturnCount()!=null){
+                        count=rars2.getReturnCount();
+                    }
+                }
+                ReportAreaReturnSituation rars3=new ReportAreaReturnSituation();
+                rars3.setCreateTime(new Date());
+                rars3.setProvinceId(provinceId);
+                rars3.setProvinceName(provinceName);
+                rars3.setReasonCode(vo.getReasonCode());
+                rars3.setReturnAmount(amount);
+                rars3.setReturnCount(count);
+                rars3.setType(vo.getType());
+                records.add(rars3);
             }
+            if(records!=null&&records.size()>0){
+                reportAreaReturnSituationDao.insertBatch(records);
+            }
+        } else {
+            log.info("调用product系统,查询所有省数据为空");
+            return;
         }
-
-
-
     }
 
 }

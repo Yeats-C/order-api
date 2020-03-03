@@ -4,6 +4,7 @@ import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoods;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail;
+import com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsVo;
 import com.aiqin.mgs.order.api.domain.response.report.ReportOrderAndStoreListResponse;
@@ -28,6 +29,6 @@ public interface ReportStoreGoodsService {
     //门店补货报表统计---定时任务使用
     void reportTimingTask();
     //售后管理---各地区退货情况
-    void areaReturnSituation();
+    void areaReturnSituation(ReportAreaReturnSituationVo vo);
 
 }
