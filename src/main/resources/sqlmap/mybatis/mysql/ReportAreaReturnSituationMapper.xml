@@ -144,10 +144,10 @@
     </foreach>
   </insert>
 
-  <select id="selectOrderAmountByStoreCodes" resultType="java.math.BigDecimal" parameterType="com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo" >
-    SELECT sum(actual_return_order_amount) FROM `return_order_info`
+  <select id="selectOrderAmountByStoreCodes" resultType="com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation" parameterType="com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo" >
+    SELECT sum(actual_return_order_amount) AS returnAmount, sum(actual_product_count) AS returnCount FROM `return_order_info`
     <where>
-      return_order_status=12 and and return_order_type=2 and store_code in
+      return_order_status=12 and return_order_type=2 and store_code in
       <foreach collection="storeCodes"  item="item" open="(" separator="," close=")"  >
         #{item}
       </foreach>
