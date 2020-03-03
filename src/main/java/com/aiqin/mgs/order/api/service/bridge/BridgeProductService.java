@@ -196,11 +196,40 @@ public class BridgeProductService {
         if(req.getCategoryCodes()!=null&&0!=req.getCategoryCodes().size()){
             a=req.getCategoryCodes().get(0);
             sb.append("?category_codes="+a);
+        }else{
+            sb.append("?category_codes=");
         }
 
         if(req.getCategoryCodes()!=null&&req.getCategoryCodes().size()>=1){
             for(int i=1;i<req.getCategoryCodes().size();i++){
                 sb.append("&category_codes="+req.getCategoryCodes().get(i));
+            }
+        }
+        HttpClient httpClient = HttpClient.get( path+sb.toString());
+        HttpResponse<List<ProductCategoryRespVO>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ProductCategoryRespVO>>>() {
+        });
+        return response;
+    }
+
+    /**
+     * 供应链提供查询品类树接口
+     * @param req
+     * @return
+     */
+    public HttpResponse excludeCategoryCodes(ActivityBrandCategoryRequest req){
+        String path = urlProperties.getProductApi() +"/product/category/list/excludeCategoryCodes";
+        StringBuilder sb=new StringBuilder();
+        String a="";
+        if(req.getExcludeCategoryCodes()!=null&&0!=req.getExcludeCategoryCodes().size()){
+            a=req.getExcludeCategoryCodes().get(0);
+            sb.append("?exclude_category_codes="+a);
+        }else{
+            sb.append("?exclude_category_codes=");
+        }
+
+        if(req.getExcludeCategoryCodes()!=null&&req.getExcludeCategoryCodes().size()>=1){
+            for(int i=1;i<req.getExcludeCategoryCodes().size();i++){
+                sb.append("&exclude_category_codes="+req.getExcludeCategoryCodes().get(i));
             }
         }
         HttpClient httpClient = HttpClient.get( path+sb.toString());
@@ -226,6 +255,13 @@ public class BridgeProductService {
         if(req.getBrandIds()!=null&&req.getBrandIds().size()>0){
             for(int i=0;i<req.getBrandIds().size();i++){
                 sb.append("&brand_ids="+req.getBrandIds().get(i));
+            }
+        }
+
+        StringBuilder exsb=new StringBuilder();
+        if(req.getExcludeBrandIds()!=null&&req.getExcludeBrandIds().size()>0){
+            for(int i=0;i<req.getExcludeBrandIds().size();i++){
+                exsb.append("&no_brand_ids="+req.getExcludeBrandIds().get(i));
             }
         }
         HttpClient httpClient = HttpClient.post(path+sb);

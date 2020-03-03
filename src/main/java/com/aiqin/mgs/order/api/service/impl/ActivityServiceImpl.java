@@ -217,13 +217,15 @@ public class ActivityServiceImpl implements ActivityService {
             //如果规则为满赠，插入赠品信息
             if(activityRule.getActivityType()==2 && null!=activityRule.getGiftList()){
                 List<ActivityGift> activityGiftList=new ArrayList<>();
-                for(ActivityGift gift:activityRule.getGiftList()){
-                    gift.setRuleId(ruleId);
-                    activityGiftList.add(gift);
-                }
-                int activityGiftRecord = activityGiftDao.insertList(activityGiftList);
-                if (activityGiftRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
-                    return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
+                if(null!=activityRule.getGiftList() && 0!=activityRule.getGiftList().size()){
+                    for(ActivityGift gift:activityRule.getGiftList()){
+                        gift.setRuleId(ruleId);
+                        activityGiftList.add(gift);
+                    }
+                    int activityGiftRecord = activityGiftDao.insertList(activityGiftList);
+                    if (activityGiftRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+                        return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
+                    }
                 }
             }
         }
@@ -535,6 +537,7 @@ public class ActivityServiceImpl implements ActivityService {
     public HttpResponse<List<QueryProductBrandRespVO>> productBrandList(String productBrandName, String activityId) {
         LOGGER.info("活动商品品牌列表接口参数productBrandName为:{}", productBrandName);
         List<QueryProductBrandRespVO> queryProductBrandRespVO=new ArrayList<>();
+        ActivityBrandCategoryRequest categoryRequest=new ActivityBrandCategoryRequest();
         HttpResponse response = HttpResponse.success();
         ActivityProduct activityProduct=new ActivityProduct();
         if(StringUtils.isNotEmpty(productBrandName)){
@@ -549,18 +552,29 @@ public class ActivityServiceImpl implements ActivityService {
                 ProductCategoryAndBrandResponse2 response2= (ProductCategoryAndBrandResponse2) bridgeProductService.selectCategoryByBrandCode(product.getProductCategoryCode(),"1").getData();
                 queryProductBrandRespVO.addAll(response2.getQueryProductBrandRespVO());
             }
-
             Set<QueryProductBrandRespVO> activitySet = new HashSet<>(queryProductBrandRespVO);
             queryProductBrandRespVO.clear();
             queryProductBrandRespVO.addAll(activitySet);
             response.setData(queryProductBrandRespVO);
             return  response;
+        }if(null!=activityProducts&& activityProducts.get(0).getActivityScope()==4){
+            List<String> excludeBrandIds=new ArrayList<>();
+            for (ActivityProduct product:activityProducts){
+                if(StringUtils.isNotBlank(product.getProductBrandCode())){
+                    excludeBrandIds.add(product.getProductBrandCode());
+                }
+            }
+            categoryRequest.setExcludeBrandIds(excludeBrandIds);
+            response=bridgeProductService.productBrandList(categoryRequest);
+            return response;
         }else{
             List<String> brandIds=new ArrayList<>();
-            ActivityBrandCategoryRequest categoryRequest=new ActivityBrandCategoryRequest();
+
             if(null!=activityProducts && 0!=activityProducts.size()){
                 for (ActivityProduct product:activityProducts){
-                    brandIds.add(product.getProductBrandCode());
+                    if(StringUtils.isNotBlank(product.getProductBrandCode())){
+                         brandIds.add(product.getProductBrandCode());
+                    }
                 }
             }
             categoryRequest.setBrandIds(brandIds);
@@ -574,6 +588,7 @@ public class ActivityServiceImpl implements ActivityService {
         LOGGER.info("活动商品品类列表接口开始");
         HttpResponse response = HttpResponse.success();
         List<ProductCategoryRespVO> queryProductBrandRespVO=new ArrayList<>();
+        ActivityBrandCategoryRequest categoryRequest=new ActivityBrandCategoryRequest();
         Activity activity=new Activity();
         activity.setActivityId(activityId);
         List<ActivityProduct> activityProducts=activityProductDao.productCategoryList(activity);
@@ -582,15 +597,24 @@ public class ActivityServiceImpl implements ActivityService {
                 ProductCategoryAndBrandResponse2 response2= (ProductCategoryAndBrandResponse2) bridgeProductService.selectCategoryByBrandCode(product.getProductBrandCode(),"2").getData();
                 queryProductBrandRespVO.addAll(response2.getProductCategoryRespVOList());
             }
-
             Set<ProductCategoryRespVO> activitySet = new HashSet<>(queryProductBrandRespVO);
             queryProductBrandRespVO.clear();
             queryProductBrandRespVO.addAll(activitySet);
             response.setData(queryProductBrandRespVO);
             return  response;
+        }else if(null!=activityProducts&& activityProducts.get(0).getActivityScope()==4){
+            List<String> excludeCategoryCodes=new ArrayList<>();
+            for (ActivityProduct product:activityProducts){
+                if(StringUtils.isNotBlank(product.getProductCategoryCode())){
+                    excludeCategoryCodes.add(product.getProductCategoryCode());
+                }
+            }
+            categoryRequest.setExcludeCategoryCodes(excludeCategoryCodes);
+            response=bridgeProductService.excludeCategoryCodes(categoryRequest);
+            return response;
         }else{
             List<String> categoryCodes=new ArrayList<>();
-            ActivityBrandCategoryRequest categoryRequest=new ActivityBrandCategoryRequest();
+
             if(null!=activityProducts && 0!=activityProducts.size()){
                 for (ActivityProduct product:activityProducts){
                     if(StringUtils.isNotBlank(product.getProductCategoryCode())){
