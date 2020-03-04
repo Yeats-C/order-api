@@ -86,18 +86,7 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public HttpResponse<Map> activityList(Activity activity) {
         HttpResponse response = HttpResponse.success();
-        AuthToken authToken= AuthUtil.getCurrentAuth();
-        LOGGER.info("调用合伙人数据权限控制公共接口入参,personId={},resourceCode={}",authToken.getPersonId(),"ERP007003");
-        HttpResponse httpResponse = copartnerAreaService.selectStoreByPerson(authToken.getPersonId(), "ERP007003");
-        List<PublicAreaStore> dataList = JSONArray.parseArray(JSON.toJSONString(httpResponse.getData()), PublicAreaStore.class);
-        LOGGER.info("调用合伙人数据权限控制公共接口返回结果,dataList={}",dataList);
-        if (dataList == null || dataList.size() == 0) {
-            return HttpResponse.failure(ResultCode.SELECT_ACTIVITY_INFO_EXCEPTION);
-        }
-        //遍历门店id
-        List<String> storesIds = dataList.stream().map(PublicAreaStore::getStoreId).collect(Collectors.toList());
-        LOGGER.info("门店ids={}",storesIds);
-        activity.setStoresIds(storesIds);
+        activity.setStoresIds(storeIds("ERP007003"));
         LOGGER.info("查询促销活动列表activityList参数为：{}", activity);
 
         Integer totalCount=activityDao.totalCount(activity);
@@ -1096,6 +1085,21 @@ public class ActivityServiceImpl implements ActivityService {
         activityList.clear();
         activityList.addAll(activitySet);
         return activityList;
+    }
+
+    List<String> storeIds(String code){
+        AuthToken authToken= AuthUtil.getCurrentAuth();
+        LOGGER.info("调用合伙人数据权限控制公共接口入参,personId={},resourceCode={}",authToken.getPersonId(),code);
+        HttpResponse httpResponse = copartnerAreaService.selectStoreByPerson(authToken.getPersonId(), code);
+        List<PublicAreaStore> dataList = JSONArray.parseArray(JSON.toJSONString(httpResponse.getData()), PublicAreaStore.class);
+        LOGGER.info("调用合伙人数据权限控制公共接口返回结果,dataList={}",dataList);
+        if (dataList == null || dataList.size() == 0) {
+            return null;
+        }
+        //遍历门店id
+        List<String> storesIds = dataList.stream().map(PublicAreaStore::getStoreId).collect(Collectors.toList());
+        LOGGER.info("门店ids={}",storesIds);
+        return storesIds;
     }
 
 }
