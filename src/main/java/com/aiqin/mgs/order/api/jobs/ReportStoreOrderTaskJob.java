@@ -81,4 +81,23 @@ public class ReportStoreOrderTaskJob {
         log.info("开始执行售后管理--配送质量各地区退货定时任务============>结束，本次用时：{}毫秒", watch.getTime());
     }
 
+    /**
+     * 售后管理--各地区退货统计--直送退货
+     * 每天凌晨两点四十分执行
+     */
+    @Scheduled(cron = "0 40 2 * * ? ")
+    public void zsReportAreaReturnSituation() {
+        //计时器
+        StopWatch watch = new StopWatch();
+        //计时器开始
+        watch.start();
+        log.info("开始执行售后管理--直送各地区退货定时任务");
+        ReportAreaReturnSituationVo vo=new ReportAreaReturnSituationVo();
+        vo.setType(OrderTypeEnum.ORDER_TYPE_ZS.getCode());
+        reportStoreGoodsService.areaReturnSituation(vo);
+        //计时器结束
+        watch.stop();
+        log.info("开始执行售后管理--直送各地区退货定时任务============>结束，本次用时：{}毫秒", watch.getTime());
+    }
+
 }
