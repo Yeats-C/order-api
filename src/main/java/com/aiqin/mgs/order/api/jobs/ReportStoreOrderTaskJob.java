@@ -59,4 +59,24 @@ public class ReportStoreOrderTaskJob {
         log.info("开始执行售后管理--配送质量各地区退货定时任务============>结束，本次用时：{}毫秒", watch.getTime());
     }
 
+    /**
+     * 售后管理--各地区退货统计--配送一般退货
+     * 每天凌晨两点三十分执行
+     */
+    @Scheduled(cron = "0 30 2 * * ? ")
+    public void psybReportAreaReturnSituation() {
+        //计时器
+        StopWatch watch = new StopWatch();
+        //计时器开始
+        watch.start();
+        log.info("开始执行售后管理--配送一般各地区退货定时任务");
+        ReportAreaReturnSituationVo vo=new ReportAreaReturnSituationVo();
+        vo.setReasonCode("15");
+        vo.setType(2);
+        reportStoreGoodsService.areaReturnSituation(vo);
+        //计时器结束
+        watch.stop();
+        log.info("开始执行售后管理--配送质量各地区退货定时任务============>结束，本次用时：{}毫秒", watch.getTime());
+    }
+
 }
