@@ -673,7 +673,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
         } catch (Exception e) {
             logger.error("商品销售区域配置校验失败：{}", e);
             flag = false;
-            throw new BusinessException("商品销售区域配置校验失败：");
+            throw new BusinessException("商品销售区域校验失败：");
         }
         return flag;
     }
