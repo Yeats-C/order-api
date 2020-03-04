@@ -580,7 +580,7 @@ public class CartOrderServiceImpl implements CartOrderService {
         HttpResponse<Integer> response = HttpResponse.success();
         try {
             if (storeId != null) {
-                Integer total = cartOrderDao.getTotal(storeId);
+                Integer total = cartOrderDao.getTotal(storeId, ErpProductGiftEnum.PRODUCT.getCode());
                 LOGGER.info("返回总数量给购物车：{}", total);
                 return response.setData(total);
             }
