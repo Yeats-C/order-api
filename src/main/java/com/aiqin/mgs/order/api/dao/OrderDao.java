@@ -13,9 +13,12 @@ import java.util.List;
 import javax.validation.Valid;
 
 import com.aiqin.mgs.order.api.domain.request.UnPayVo;
+import com.aiqin.mgs.order.api.domain.request.order.QueryOrderListReqVO;
 import com.aiqin.mgs.order.api.domain.request.statistical.BusinessStatisticalRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.SkuSalesRequest;
 import com.aiqin.mgs.order.api.domain.response.*;
+import com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoRespVO;
+import com.aiqin.mgs.order.api.domain.response.order.QueryOrderListRespVO;
 import com.aiqin.mgs.order.api.domain.response.statistical.Last10DaysOrderStatistical;
 import com.aiqin.mgs.order.api.domain.statistical.BusinessStatistical;
 import com.aiqin.mgs.order.api.domain.statistical.SkuSales;
@@ -235,4 +238,10 @@ public interface OrderDao {
      * @return
      */
     Integer orderStoreCount(@Param("storeId")String storeId,@Param("startDate") Date startDay,@Param("endDay") Date endDay);
+
+    /*** 查询订单列表*/
+    List<QueryOrderListRespVO> selectListByQueryVO(QueryOrderListReqVO reqVO);
+
+    /** 通过编码查询订单*/
+    QueryOrderInfoRespVO selectByOrderCode(String orderCode);
 }

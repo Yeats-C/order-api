@@ -282,11 +282,11 @@ public interface ErpOrderRequestService {
     /**
      * 首单修改加盟商角色-权限
      *
-     * @param accountId
+     * @param franchiseeCode 加盟商编码
      * @return void
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2020/1/17 14:41
      */
-    void accountRole(String accountId);
+    void accountRole(String franchiseeCode);
 }

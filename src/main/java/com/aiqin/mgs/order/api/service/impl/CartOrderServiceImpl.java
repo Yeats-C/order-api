@@ -143,7 +143,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                     cartOrderInfo.setProductCategoryCode(cartOrderInfo1.getProductCategoryCode());//品类编码
                     cartOrderInfo.setProductCategoryName(cartOrderInfo1.getProductCategoryName());//品类编码
                     cartOrderInfo.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
-                    cartOrderInfo.setActivityId(skuActivityMap.containsKey(cartOrderInfo1.getSkuCode()) ? skuActivityMap.get(cartOrderInfo1.getSkuCode()) : null);
+                    cartOrderInfo.setActivityId(skuActivityMap.get(cartOrderInfo1.getSkuCode()));
                     try {
                         if (cartOrderInfo != null) {
                             //判断sku是否在购物车里面存在
@@ -470,7 +470,7 @@ public class CartOrderServiceImpl implements CartOrderService {
         BigDecimal activityAmountTotal = BigDecimal.ZERO;
         //勾选商品活动优惠金额
         BigDecimal activityDiscountAmount = BigDecimal.ZERO;
-        //商品总数量
+        //勾选商品本品总数量
         int totalNumber = 0;
         //所有勾选的商品中可使用A品券的商品活动均摊后金额汇总
         BigDecimal topTotalPrice = BigDecimal.ZERO;
@@ -552,7 +552,6 @@ public class CartOrderServiceImpl implements CartOrderService {
 
             activityAmountTotal = activityAmountTotal.add(groupActivityAmount);
             totalNumber += groupProductQuantity;
-            totalNumber += groupGiftQuantity;
             topTotalPrice = topTotalPrice.add(groupTopCouponMaxTotal);
             activityDiscountAmount = activityDiscountAmount.add(groupActivityDiscountAmount);
         }
@@ -581,7 +580,7 @@ public class CartOrderServiceImpl implements CartOrderService {
         HttpResponse<Integer> response = HttpResponse.success();
         try {
             if (storeId != null) {
-                Integer total = cartOrderDao.getTotal(storeId);
+                Integer total = cartOrderDao.getTotal(storeId, ErpProductGiftEnum.PRODUCT.getCode());
                 LOGGER.info("返回总数量给购物车：{}", total);
                 return response.setData(total);
             }
@@ -744,7 +743,7 @@ public class CartOrderServiceImpl implements CartOrderService {
             //筛选出当前满足的最大梯度
             if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(item.getRuleUnit())) {
                 //按照金额
-                if (item.getMeetingConditions().compareTo(totalMoney) >= 0) {
+                if (item.getMeetingConditions().compareTo(totalMoney) <= 0) {
                     if (curRule == null || item.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
                         curRule = item;
                     }
@@ -753,7 +752,7 @@ public class CartOrderServiceImpl implements CartOrderService {
 
             if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(item.getRuleUnit())) {
                 //按照金额
-                if (item.getMeetingConditions().compareTo(new BigDecimal(totalCount)) >= 0) {
+                if (item.getMeetingConditions().compareTo(new BigDecimal(totalCount)) <= 0) {
                     if (curRule == null || item.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
                         curRule = item;
                     }
@@ -786,9 +785,12 @@ public class CartOrderServiceImpl implements CartOrderService {
         cartOrderInfo.setCartId(IdUtil.uuid());
         cartOrderInfo.setSkuCode(skuDetail.getSkuCode());//skuId
         cartOrderInfo.setSpuId(skuDetail.getSpuId());//spuId
-        cartOrderInfo.setProductId(skuDetail.getProductId());//商品Code
+        cartOrderInfo.setProductId(skuDetail.getSkuCode());//商品Code
         cartOrderInfo.setStoreId(cart.getStoreId());//门店id
-        cartOrderInfo.setProductName(skuDetail.getProductName());//商品名称
+        cartOrderInfo.setProductName(skuDetail.getSkuName());//商品名称
+        cartOrderInfo.setSkuName(skuDetail.getSkuName());
+        cartOrderInfo.setSpuCode(skuDetail.getSpuCode());
+        cartOrderInfo.setSpuName(skuDetail.getSpuName());
         cartOrderInfo.setColor(skuDetail.getColorName());//商品颜色
         cartOrderInfo.setProductSize(skuDetail.getProductSize());//商品型号
         cartOrderInfo.setCreateSource(cart.getCreateSource());//插入商品来源
@@ -811,6 +813,8 @@ public class CartOrderServiceImpl implements CartOrderService {
         cartOrderInfo.setGiftParentCartId(cart.getCartId());
         cartOrderInfo.setActivityPrice(BigDecimal.ZERO);
         cartOrderInfo.setCreateTime(new Date());
+        cartOrderInfo.setProductPicturePath(skuDetail.getProductPicturePath());
+        cartOrderInfo.setLogo(skuDetail.getProductPicturePath());
         cartOrderInfo.setActivityId(cart.getActivityId());
         cartOrderInfo.setActivityName(cart.getActivityName());
         cartOrderInfo.setTagInfoList(skuDetail.getTagInfoList());
@@ -1046,7 +1050,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                                 //最后一行
                                 item.setLineAmountAfterActivity(restActivityAmountTotal);
                             } else {
-                                BigDecimal lineAmountAfterActivity = item.getLineActivityAmountTotal().divide(amountTotal, 6, RoundingMode.HALF_UP).multiply(activityAmountTotal).setScale(2, RoundingMode.HALF_UP);
+                                BigDecimal lineAmountAfterActivity = item.getLineAmountTotal().divide(amountTotal, 6, RoundingMode.HALF_UP).multiply(activityAmountTotal).setScale(2, RoundingMode.HALF_UP);
                                 item.setLineAmountAfterActivity(lineAmountAfterActivity);
                                 restActivityAmountTotal = restActivityAmountTotal.subtract(lineAmountAfterActivity);
                             }
@@ -1093,9 +1097,14 @@ public class CartOrderServiceImpl implements CartOrderService {
                         for (CartOrderInfo dataItem :
                                 data) {
                             if (item.getSkuCode().equals(dataItem.getSkuCode())) {
+                                item.setProductPicturePath(dataItem.getProductPicturePath());
+                                item.setLogo(dataItem.getProductPicturePath());
                                 item.setPrice(dataItem.getPriceTax());
                                 item.setTagInfoList(dataItem.getTagInfoList());
                                 item.setStockNum(dataItem.getStockNum());
+                                item.setSkuName(dataItem.getSkuName());
+                                item.setSpuCode(dataItem.getSpuCode());
+                                item.setSpuName(dataItem.getSpuName());
                                 break;
                             }
                         }

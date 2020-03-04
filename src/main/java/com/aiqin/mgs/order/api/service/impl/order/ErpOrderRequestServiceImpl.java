@@ -754,10 +754,10 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     }
 
     @Override
-    public void accountRole(String accountId) {
+    public void accountRole(String franchiseeCode) {
         try {
-            HttpClient httpClient = HttpClient.post(urlProperties.getSlcsApi() + "/conten/update/accountRole")
-                    .addParameter("account_id", accountId);
+            HttpClient httpClient = HttpClient.post(urlProperties.getSlcsApi() + "/conten/updateFranchiseeRoleByCode")
+                    .addParameter("franchisee_code", franchiseeCode);
             HttpResponse response = httpClient.action().result(new TypeReference<HttpResponse>() {
             });
         } catch (Exception e) {

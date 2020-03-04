@@ -73,6 +73,7 @@
             <if test="activeStoreRange!= null">
                 and active_store_range = #{activeStoreRange}
             </if>
+            order by begin_time desc
             <if test="pageSize!=null ">
                 limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
             </if>
@@ -203,7 +204,9 @@
         AND a.begin_time &lt; now()
         and a.finish_time &gt; NOW()
         and a.activity_status=0
+        AND s.is_delete = 0
         GROUP BY a.activity_id
+        order by a.begin_time desc
     </select>
 
     <select id="checkProcuct" resultType="com.aiqin.mgs.order.api.domain.Activity" resultMap="ActivityMapping"
@@ -240,7 +243,7 @@
         <if test="productBrandCode!= null">
             and p.product_brand_code = #{productBrandCode} and a.activity_scope=3
         </if>
-        <if test="productCategoryCode!= null">
+        <if test="productCategoryCode!= null  and productCategoryCode.size > 0">
             and p.product_category_code in
             <foreach collection="productCategoryCode" item="item" open="(" separator="," close=")">
                 #{item}
@@ -253,7 +256,52 @@
         AND a.begin_time &lt; now()
         and a.finish_time &gt; NOW()
         and a.activity_status=0
+        AND p.is_delete = 0
+        AND s.is_delete = 0
         GROUP BY a.activity_id
+        order by a.begin_time desc
+    </select>
+
+    <select id="singleProductElimination" resultType="com.aiqin.mgs.order.api.domain.Activity" resultMap="ActivityMapping"
+            parameterType="java.lang.String">
+        SELECT
+        a.activity_id,
+        a.activity_name,
+        a.activity_type,
+        a.activity_status,
+        a.begin_time,
+        a.finish_time,
+        a.publishing_organization,
+        a.activity_brief,
+        a.activity_pic_pc,
+        a.activity_pic_app,
+        a.create_by,
+        a.update_by,
+        a.create_time,
+        a.update_time,
+        a.active_store_range,
+        a.activity_scope
+        FROM
+        activity a
+        left JOIN activity_store s ON a.activity_id = s.activity_id
+        LEFT JOIN activity_product p ON a.activity_id = p.activity_id
+        WHERE
+        1 = 1
+        AND s.store_id in
+        (#{storeId}, 'all' )
+        <if test="productId!= null">
+            and p.sku_code != #{productId} and a.activity_scope=4
+        </if>
+        <if test="activityId!= null">
+            and a.activity_id = #{activityId}
+        </if>
+        AND a.begin_time &lt; now()
+        and a.finish_time &gt; NOW()
+        and a.activity_status=0
+        AND p.is_delete = 0
+        AND s.is_delete = 0
+        GROUP BY a.activity_id
+        order by a.begin_time desc
     </select>
 
 
