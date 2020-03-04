@@ -26,7 +26,7 @@ public interface CartOrderDao {
     String isYesCart(@Valid CartOrderInfo cartOrderInfo) throws Exception;
 
     //计算添加购物车中商品的总数量
-    Integer getTotal(@Param("storeId") String storeId) throws Exception;
+    Integer getTotal(@Param("storeId") String storeId, @Param("productGift") Integer productGift) throws Exception;
 
     // 删除购物车中商品
     void deleteCart(@Param("storeId") String storeId, @Param("skuCode") String skuId, @Param("lineCheckStatus") Integer lineCheckStatus, @Param("productType") Integer productType) throws Exception;

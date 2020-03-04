@@ -157,6 +157,9 @@
             <if test="storeId != null and storeId != '' ">
                 and store_id =#{storeId}
             </if>
+            <if test="productGift != null and productGift != ''or productGift == 0 ">
+                and product_gift = #{productGift}
+            </if>
         </where>
     </select>
 
