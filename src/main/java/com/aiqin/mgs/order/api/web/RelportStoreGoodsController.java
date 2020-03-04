@@ -13,6 +13,8 @@ import com.aiqin.mgs.order.api.domain.response.report.ReportOrderAndStoreListRes
 import com.aiqin.mgs.order.api.service.ReportAreaReturnSituationService;
 import com.aiqin.mgs.order.api.service.ReportStoreGoodsService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -77,6 +79,13 @@ public class RelportStoreGoodsController {
     public HttpResponse areaReturnSituation(@RequestBody ReportAreaReturnSituationVo vo) {
         reportStoreGoodsService.areaReturnSituation(vo);
         return HttpResponse.success();
+    }
+
+    @ApiOperation("售后管理---各地区退货排行榜TOP10")
+    @GetMapping("/topProvinceAmount")
+    @ApiImplicitParams({@ApiImplicitParam(name = "type", value = "退货类型 1:直送退货 2:质量退货 3:一般退货", dataType = "int", paramType = "query", required = true)})
+    public HttpResponse areaReturnSituation(Integer type) {
+        return HttpResponse.success(reportStoreGoodsService.topProvinceAmount(type));
     }
 
 }

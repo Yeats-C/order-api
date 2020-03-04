@@ -389,4 +389,9 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
         }
     }
 
+    @Override
+    public List<ReportAreaReturnSituation> topProvinceAmount(Integer type) {
+        return reportAreaReturnSituationDao.topProvinceAmount(type);
+    }
+
 }

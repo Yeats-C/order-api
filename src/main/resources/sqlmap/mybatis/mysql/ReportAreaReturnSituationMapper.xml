@@ -1,37 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.aiqin.mgs.order.api.dao.ReportAreaReturnSituationDao" >
-  <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation" >
-    <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="province_id" property="provinceId" jdbcType="VARCHAR" />
-    <result column="province_name" property="provinceName" jdbcType="VARCHAR" />
-    <result column="return_count" property="returnCount" jdbcType="BIGINT" />
-    <result column="return_amount" property="returnAmount" jdbcType="DECIMAL" />
-    <result column="type" property="type" jdbcType="TINYINT" />
-    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
-    <result column="reason_code" property="reasonCode" jdbcType="VARCHAR" />
-  </resultMap>
-  <sql id="Base_Column_List" >
+<mapper namespace="com.aiqin.mgs.order.api.dao.ReportAreaReturnSituationDao">
+    <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="province_id" property="provinceId" jdbcType="VARCHAR"/>
+        <result column="province_name" property="provinceName" jdbcType="VARCHAR"/>
+        <result column="return_count" property="returnCount" jdbcType="BIGINT"/>
+        <result column="return_amount" property="returnAmount" jdbcType="DECIMAL"/>
+        <result column="type" property="type" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="reason_code" property="reasonCode" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
     id, province_id, province_name, return_count, return_amount, type, create_time,reason_code
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
-    select 
-    <include refid="Base_Column_List" />
-    from report_area_return_situation
-    where id = #{id,jdbcType=BIGINT}
-  </select>
-  <delete id="deleteByProvinceAndType" parameterType="com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo" >
-    delete from report_area_return_situation
-    where type = #{type} and reason_code=#{reasonCode} and province_id in
-      <foreach collection="storeCodes"  item="item" open="(" separator="," close=")"  >
-          #{item}
-      </foreach>
-  </delete>
-  <delete id="deleteByType" parameterType="com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo" >
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from report_area_return_situation
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByProvinceAndType"
+            parameterType="com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo">
+        delete from report_area_return_situation
+        where type = #{type} and reason_code=#{reasonCode} and province_id in
+        <foreach collection="storeCodes" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+    <delete id="deleteByType" parameterType="com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo">
     delete from report_area_return_situation
     where type = #{type}
   </delete>
-  <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation" >
+    <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation">
     insert into report_area_return_situation (id, province_id, province_name, 
       return_count, return_amount, type, 
       create_time,reason_code)
@@ -39,80 +40,80 @@
       #{returnCount,jdbcType=BIGINT}, #{returnAmount,jdbcType=DECIMAL}, #{type,jdbcType=TINYINT}, 
       #{createTime,jdbcType=TIMESTAMP},#{reasonCode})
   </insert>
-  <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation" >
-    insert into report_area_return_situation
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        id,
-      </if>
-      <if test="provinceId != null" >
-        province_id,
-      </if>
-      <if test="provinceName != null" >
-        province_name,
-      </if>
-      <if test="returnCount != null" >
-        return_count,
-      </if>
-      <if test="returnAmount != null" >
-        return_amount,
-      </if>
-      <if test="type != null" >
-        type,
-      </if>
-      <if test="createTime != null" >
-        create_time,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        #{id,jdbcType=BIGINT},
-      </if>
-      <if test="provinceId != null" >
-        #{provinceId,jdbcType=VARCHAR},
-      </if>
-      <if test="provinceName != null" >
-        #{provinceName,jdbcType=VARCHAR},
-      </if>
-      <if test="returnCount != null" >
-        #{returnCount,jdbcType=BIGINT},
-      </if>
-      <if test="returnAmount != null" >
-        #{returnAmount,jdbcType=DECIMAL},
-      </if>
-      <if test="type != null" >
-        #{type,jdbcType=TINYINT},
-      </if>
-      <if test="createTime != null" >
-        #{createTime,jdbcType=TIMESTAMP},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation" >
-    update report_area_return_situation
-    <set >
-      <if test="provinceId != null" >
-        province_id = #{provinceId,jdbcType=VARCHAR},
-      </if>
-      <if test="provinceName != null" >
-        province_name = #{provinceName,jdbcType=VARCHAR},
-      </if>
-      <if test="returnCount != null" >
-        return_count = #{returnCount,jdbcType=BIGINT},
-      </if>
-      <if test="returnAmount != null" >
-        return_amount = #{returnAmount,jdbcType=DECIMAL},
-      </if>
-      <if test="type != null" >
-        type = #{type,jdbcType=TINYINT},
-      </if>
-      <if test="createTime != null" >
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-    </set>
-    where id = #{id,jdbcType=BIGINT}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation" >
+    <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation">
+        insert into report_area_return_situation
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="provinceId != null">
+                province_id,
+            </if>
+            <if test="provinceName != null">
+                province_name,
+            </if>
+            <if test="returnCount != null">
+                return_count,
+            </if>
+            <if test="returnAmount != null">
+                return_amount,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="provinceId != null">
+                #{provinceId,jdbcType=VARCHAR},
+            </if>
+            <if test="provinceName != null">
+                #{provinceName,jdbcType=VARCHAR},
+            </if>
+            <if test="returnCount != null">
+                #{returnCount,jdbcType=BIGINT},
+            </if>
+            <if test="returnAmount != null">
+                #{returnAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation">
+        update report_area_return_situation
+        <set>
+            <if test="provinceId != null">
+                province_id = #{provinceId,jdbcType=VARCHAR},
+            </if>
+            <if test="provinceName != null">
+                province_name = #{provinceName,jdbcType=VARCHAR},
+            </if>
+            <if test="returnCount != null">
+                return_count = #{returnCount,jdbcType=BIGINT},
+            </if>
+            <if test="returnAmount != null">
+                return_amount = #{returnAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation">
     update report_area_return_situation
     set province_id = #{provinceId,jdbcType=VARCHAR},
       province_name = #{provinceName,jdbcType=VARCHAR},
@@ -123,64 +124,77 @@
     where id = #{id,jdbcType=BIGINT}
   </update>
 
-  <select id="selectList" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo" >
-    select
-    <include refid="Base_Column_List" />
-    from report_area_return_situation
-    <where>
-      <if test="type != null" >
-        and type = #{type}
-      </if>
-      <if test="reasonCode != null and reasonCode !=''" >
-        and reason_code = #{reasonCode,jdbcType=VARCHAR}
-      </if>
-    </where>
-  </select>
+    <select id="selectList" resultMap="BaseResultMap"
+            parameterType="com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo">
+        select
+        <include refid="Base_Column_List"/>
+        from report_area_return_situation
+        <where>
+            <if test="type != null">
+                and type = #{type}
+            </if>
+            <if test="reasonCode != null and reasonCode !=''">
+                and reason_code = #{reasonCode,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
 
-  <insert id="insertBatch" parameterType="list">
-    insert into report_area_return_situation (province_id, province_name,
-    return_count, return_amount, type,
-    create_time,reason_code)
-    values
-    <foreach collection="records" item="item" index="index" separator=",">
-      (
-        #{item.provinceId,jdbcType=VARCHAR}, #{item.provinceName,jdbcType=VARCHAR},
-        #{item.returnCount,jdbcType=BIGINT}, #{item.returnAmount,jdbcType=DECIMAL}, #{item.type,jdbcType=TINYINT},
-        #{item.createTime,jdbcType=TIMESTAMP},#{item.reasonCode}
-      )
-    </foreach>
-  </insert>
+    <insert id="insertBatch" parameterType="list">
+        insert into report_area_return_situation (province_id, province_name,
+        return_count, return_amount, type,
+        create_time,reason_code)
+        values
+        <foreach collection="records" item="item" index="index" separator=",">
+            (
+            #{item.provinceId,jdbcType=VARCHAR}, #{item.provinceName,jdbcType=VARCHAR},
+            #{item.returnCount,jdbcType=BIGINT}, #{item.returnAmount,jdbcType=DECIMAL}, #{item.type,jdbcType=TINYINT},
+            #{item.createTime,jdbcType=TIMESTAMP},#{item.reasonCode}
+            )
+        </foreach>
+    </insert>
 
-  <select id="selectOrderAmountByStoreCodes" resultType="com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation" parameterType="com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo" >
-    SELECT sum(actual_return_order_amount) AS returnAmount FROM `return_order_info`
-    <where>
-      return_order_status=12 and return_order_type=2 and store_code in
-      <foreach collection="storeCodes"  item="item" open="(" separator="," close=")"  >
-        #{item}
-      </foreach>
-      <if test="type != null" >
-        and order_type = #{type}
-      </if>
-      <if test="reasonCode != null and reasonCode !=''" >
-        and return_reason_code = #{reasonCode,jdbcType=VARCHAR}
-      </if>
-    </where>
-  </select>
-
-    <select id="selectOrderCountByStoreCodes" resultType="com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation" parameterType="com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo" >
-        SELECT count(1) AS returnCount FROM `return_order_info`
+    <select id="selectOrderAmountByStoreCodes" resultType="com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation"
+            parameterType="com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo">
+        SELECT sum(actual_return_order_amount) AS returnAmount FROM `return_order_info`
         <where>
             return_order_status=12 and return_order_type=2 and store_code in
-            <foreach collection="storeCodes"  item="item" open="(" separator="," close=")"  >
+            <foreach collection="storeCodes" item="item" open="(" separator="," close=")">
                 #{item}
             </foreach>
-            <if test="type != null" >
+            <if test="type != null">
                 and order_type = #{type}
             </if>
-            <if test="reasonCode != null and reasonCode !=''" >
+            <if test="reasonCode != null and reasonCode !=''">
                 and return_reason_code = #{reasonCode,jdbcType=VARCHAR}
             </if>
         </where>
+    </select>
+
+    <select id="selectOrderCountByStoreCodes" resultType="com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation"
+            parameterType="com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo">
+        SELECT count(1) AS returnCount FROM `return_order_info`
+        <where>
+            return_order_status=12 and return_order_type=2 and store_code in
+            <foreach collection="storeCodes" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            <if test="type != null">
+                and order_type = #{type}
+            </if>
+            <if test="reasonCode != null and reasonCode !=''">
+                and return_reason_code = #{reasonCode,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <select id="topProvinceAmount" resultMap="BaseResultMap"
+            parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from report_area_return_situation
+        WHERE type=#{type}
+        ORDER BY return_amount desc
+        LIMIT 10
     </select>
 
 </mapper>

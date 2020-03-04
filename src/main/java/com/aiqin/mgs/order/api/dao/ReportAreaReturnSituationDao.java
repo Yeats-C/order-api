@@ -30,4 +30,6 @@ public interface ReportAreaReturnSituationDao {
 
     ReportAreaReturnSituation selectOrderCountByStoreCodes(ReportAreaReturnSituationVo vo);
 
+    List<ReportAreaReturnSituation> topProvinceAmount(@Param("type") Integer type);
+
 }
