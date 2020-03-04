@@ -1,5 +1,7 @@
 package com.aiqin.mgs.order.api.jobs;
 
+import com.aiqin.mgs.order.api.component.returnenums.OrderTypeEnum;
+import com.aiqin.mgs.order.api.component.returnenums.ReturnReasonEnum;
 import com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo;
 import com.aiqin.mgs.order.api.service.ReportStoreGoodsService;
 import lombok.extern.slf4j.Slf4j;
@@ -51,8 +53,8 @@ public class ReportStoreOrderTaskJob {
         watch.start();
         log.info("开始执行售后管理--配送质量各地区退货定时任务");
         ReportAreaReturnSituationVo vo=new ReportAreaReturnSituationVo();
-        vo.setReasonCode("14");
-        vo.setType(2);
+        vo.setReasonCode(ReturnReasonEnum.ORDER_TYPE_ZS.getCode());
+        vo.setType(OrderTypeEnum.ORDER_TYPE_PS.getCode());
         reportStoreGoodsService.areaReturnSituation(vo);
         //计时器结束
         watch.stop();
@@ -71,8 +73,8 @@ public class ReportStoreOrderTaskJob {
         watch.start();
         log.info("开始执行售后管理--配送一般各地区退货定时任务");
         ReportAreaReturnSituationVo vo=new ReportAreaReturnSituationVo();
-        vo.setReasonCode("15");
-        vo.setType(2);
+        vo.setReasonCode(ReturnReasonEnum.ORDER_TYPE_PS.getCode());
+        vo.setType(OrderTypeEnum.ORDER_TYPE_PS.getCode());
         reportStoreGoodsService.areaReturnSituation(vo);
         //计时器结束
         watch.stop();
