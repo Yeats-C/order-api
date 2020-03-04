@@ -11,11 +11,15 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.aiqin.mgs.order.api.base.BasePage;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.request.*;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.domain.request.order.QueryOrderListReqVO;
 import com.aiqin.mgs.order.api.domain.response.PartnerPayGateRep;
+import com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoRespVO;
+import com.aiqin.mgs.order.api.domain.response.order.QueryOrderListRespVO;
 
 @SuppressWarnings("all")
 public interface OrderService {
@@ -230,4 +234,10 @@ public interface OrderService {
 	 * @return
 	 */
 	HttpResponse<Integer> orderStoreCount(OrderCountReq orderCountReq);
+
+	/**  订单列表*/
+	BasePage<QueryOrderListRespVO> list(QueryOrderListReqVO reqVO);
+
+	/** 详情*/
+	QueryOrderInfoRespVO view(String orderCode);
 }
