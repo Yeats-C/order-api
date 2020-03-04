@@ -318,7 +318,7 @@ public class ActivityServiceImpl implements ActivityService {
             Activity activity=new Activity();
             activity.setActivityId(activityId);
             List<Activity> list=activityDao.activityList(activity);
-            if(list!=null && list.get(0)!=null){
+            if(list!=null&& 0!=list.size()&& list.get(0)!=null){
                 activityRequest.setActivity(list.get(0));
             }else{
                 return HttpResponse.failure(ResultCode.NOT_HAVE_PARAM);
