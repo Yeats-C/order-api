@@ -243,7 +243,7 @@
         <if test="productBrandCode!= null">
             and p.product_brand_code = #{productBrandCode} and a.activity_scope=3
         </if>
-        <if test="productCategoryCode!= null">
+        <if test="productCategoryCode!= null  and productCategoryCode.size > 0">
             and p.product_category_code in
             <foreach collection="productCategoryCode" item="item" open="(" separator="," close=")">
                 #{item}
