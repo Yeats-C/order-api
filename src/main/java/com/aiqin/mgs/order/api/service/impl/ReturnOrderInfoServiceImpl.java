@@ -314,7 +314,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             body.put("order_code",returnOrderInfo.getOrderStoreCode());
             body.put("order_return_code", returnOrderInfo.getReturnOrderCode());
             body.put("store_id",returnOrderInfo.getStoreId());
-            List<ReturnOrderDetail> details= returnOrderDetailDao.selectListByReturnOrderCode(returnOrderInfo.getOrderStoreCode());
+            List<ReturnOrderDetail> details= returnOrderDetailDao.selectListByReturnOrderCode(returnOrderInfo.getReturnOrderCode());
             List<Map<String, Object>> list = new ArrayList<>();
             for(ReturnOrderDetail rod:details){
                 String skuCode=rod.getSkuCode();
