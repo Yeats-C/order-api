@@ -760,7 +760,7 @@ public class ActivityServiceImpl implements ActivityService {
                 }else if(activityScope==2){
                     //按品类设置
                     ActivityCategoryRequest categoryRequest=new ActivityCategoryRequest();
-                    categoryRequest.setProductCategoryCode(product.getProductCategoryCode());
+                    categoryRequest.setCategoryCode(product.getProductCategoryCode());
                     categoryRequest.setLevel(product.getLevel());
                     categoryRequestList.add(categoryRequest);
                 }else if(activityScope==3){

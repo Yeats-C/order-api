@@ -17,8 +17,8 @@ public class ActivityCategoryRequest implements Serializable {
 
     /***商品品类编码*/
     @ApiModelProperty(value = "商品品类编码")
-    @JsonProperty("product_category_code")
-    private String productCategoryCode;
+    @JsonProperty("categoryCode")
+    private String categoryCode;
 
     /***品类级别*/
     @ApiModelProperty(value = "品类级别")
