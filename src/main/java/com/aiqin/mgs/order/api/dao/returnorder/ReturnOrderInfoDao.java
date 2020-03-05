@@ -63,4 +63,8 @@ public interface ReturnOrderInfoDao {
     //查询待ERP退货单，待生成爱亲退供单数据
     ReturnOrderInfo selectByOrderCodeAndSuccess(@Param("orderSuccess") Integer orderSuccess, @Param("returnOrderCode")String returnOrderCode);
 
+    //修改退货数量和总金额金额
+    Integer updateCountAndAmount(@Param("returnOrderCode") String returnOrderCode, @Param("actualReturnOrderAmount") BigDecimal actualReturnOrderAmount, @Param("actualProductCount") Long actualProductCount);
+
+
 }
