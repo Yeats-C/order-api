@@ -382,6 +382,10 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             returnOrderDetailDao.insertBatch(details);
             //添加日志
             insertLog(returnOrderCode,records.getCreateId(),records.getCreator(),ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey(),ConstantData.RETURN_ORDER_DETAIL);
+            //修改主表退货金额和数量
+            BigDecimal actualReturnOrderAmount=records.getReturnOrderInfo().getReturnOrderAmount();
+            Long actualProductCount=records.getReturnOrderInfo().getProductCount();
+            returnOrderInfoDao.updateCountAndAmount(returnOrderCode,actualReturnOrderAmount,actualProductCount);
             return HttpResponse.success();
         }
         return HttpResponse.failure(ResultCode.RETURN_ORDER_PARAMETER_FALL);
@@ -476,6 +480,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //修改主订单实际退货数量、实际退款总金额
             log.info("供应链入库完成--回调退货单,修改主订单实际退货数量、实际退款总金额入参,returnOrderId={},totalMoneyAll={},totalCount={}",returnOrderId,totalMoneyAll,totalCount);
             returnOrderInfoDao.updateLogisticsCountAndAmount(returnOrderId,totalMoneyAll,totalCount);
+            //修改主订单退货数量、退款总金额
+            returnOrderInfoDao.updateCountAndAmount(returnOrderId,totalMoneyAll,totalCount);
             //修改详情表实际退款金额
             log.info("供应链入库完成--回调退货单，修改详情表实际退款金额入参,returnOrderDetails={}",returnOrderDetails);
             returnOrderDetailDao.updateActualAmountBatch(returnOrderDetails);
