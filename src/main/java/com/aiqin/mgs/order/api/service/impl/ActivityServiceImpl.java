@@ -294,7 +294,10 @@ public class ActivityServiceImpl implements ActivityService {
             //活动补货门店数
             Integer storeNum=erpOrderInfoDao.getStoreNum(activity);
             //平均单价
-            BigDecimal averageUnitPrice=activitySales.getActivitySales().divide(activitySales.getActivitySalesNum(),0, RoundingMode.HALF_UP);
+            BigDecimal averageUnitPrice=BigDecimal.ZERO;
+            if(activitySales.getActivitySalesNum().compareTo(BigDecimal.ZERO)!=0){
+                averageUnitPrice=activitySales.getActivitySales().divide(activitySales.getActivitySalesNum(),0, RoundingMode.HALF_UP);
+            }
             activitySales.setProductSales(productSales);
             activitySales.setStoreNum(storeNum);
             activitySales.setAverageUnitPrice(averageUnitPrice);
