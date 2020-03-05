@@ -382,6 +382,10 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             returnOrderDetailDao.insertBatch(details);
             //添加日志
             insertLog(returnOrderCode,records.getCreateId(),records.getCreator(),ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey(),ConstantData.RETURN_ORDER_DETAIL);
+            //修改主表退货金额和数量
+            BigDecimal actualReturnOrderAmount=records.getReturnOrderInfo().getReturnOrderAmount();
+            Long actualProductCount=records.getReturnOrderInfo().getProductCount();
+            returnOrderInfoDao.updateCountAndAmount(returnOrderCode,actualReturnOrderAmount,actualProductCount);
             return HttpResponse.success();
         }
         return HttpResponse.failure(ResultCode.RETURN_ORDER_PARAMETER_FALL);
