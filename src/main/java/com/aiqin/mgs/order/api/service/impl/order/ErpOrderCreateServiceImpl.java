@@ -792,6 +792,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         BigDecimal totalAmountAfterActivity = BigDecimal.ZERO;
         for (CouponShareRequest item : details) {
             ErpProductPropertyTypeEnum propertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(item.getProductPropertyCode());
+            log.info("判断是否是A品卷,propertyTypeEnum={}", propertyTypeEnum);
+            log.info("判断是否是A品卷,isUseTopCoupon={}", propertyTypeEnum.isUseTopCoupon());
+            log.info("判断是否是A品卷,ProductGiftEnumCode={}", ErpProductGiftEnum.PRODUCT.getCode());
+            log.info("判断是否是A品卷,ProductGift={}", item.getProductGift());
             if (propertyTypeEnum.isUseTopCoupon() && ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductGift())) {
                 topProductList.add(item);
                 //分销总价=从活动的分摊总价取
