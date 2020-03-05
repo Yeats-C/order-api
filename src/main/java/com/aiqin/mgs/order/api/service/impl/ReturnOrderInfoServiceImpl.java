@@ -1099,6 +1099,15 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         return HttpResponse.success();
     }
 
+    @Override
+    public HttpResponse getOrderDetail(String orderCode) {
+        ErpOrderItem po=new ErpOrderItem();
+        po.setOrderStoreCode(orderCode);
+        po.setProductType(0);//商品类型  0商品 1赠品
+        List<ErpOrderItem> select = erpOrderItemDao.select(po);
+        return HttpResponse.success(select);
+    }
+
     /**
      * 插入日志表
      * @param orderCode
