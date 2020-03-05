@@ -448,11 +448,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             }
         }
         if (processTypeEnum.isAreaCheck()) {
-            //商品销售区域配置校验
-            boolean flag = erpOrderRequestService.areaCheck(storeInfo, orderProductItemList);
-            if (!flag) {
-                throw new BusinessException("商品销售区域校验失败");
-            }
+            //商品销售区域配置校验 TODO 供应链接口不通，暂时去掉
+//            boolean flag = erpOrderRequestService.areaCheck(storeInfo, orderProductItemList);
+//            if (!flag) {
+//                throw new BusinessException("商品销售区域校验失败");
+//            }
         }
         if (processTypeEnum.isRepertoryCheck()) {
             //商品库存校验
