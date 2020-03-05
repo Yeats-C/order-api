@@ -85,6 +85,9 @@
         <if test=" isActivity != null">
             and is_activity = #{isActivity}
         </if>
+        <if test=" productType != null">
+            and product_type = #{productType}
+        </if>
         order by create_time asc
         <if test="pageSize!=null ">
             limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}

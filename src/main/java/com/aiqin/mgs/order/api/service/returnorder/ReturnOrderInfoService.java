@@ -154,5 +154,12 @@ public interface ReturnOrderInfoService {
      */
     HttpResponse directDelivery(ReturnOrderReviewReqVo reqVo);
 
+    /**
+     * 一般退货--修改商品使用
+     * @param orderCode
+     * @return
+     */
+    HttpResponse getOrderDetail(String orderCode);
+
 
 }

@@ -19,10 +19,10 @@ public enum ErpOrderNodeProcessTypeEnum {
     PROCESS_2(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_4, ErpRequestPayTransactionTypeEnum.FIRST_DELIVERY, true, true, false, false, true, true, false, true, true, true, false, true),
     /***配送	- 正常补货*/
     PROCESS_3(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_1, ErpRequestPayTransactionTypeEnum.DELIVERY_REPLENISHMENT, true, true, true, true, true, true, true, true, false, true, true, true),
-    /***直送	- 普通首单*/
-    PROCESS_4(ErpOrderTypeEnum.DIRECT_SEND, ErpOrderCategoryEnum.ORDER_TYPE_1, ErpRequestPayTransactionTypeEnum.FIRST_DIRECT_DELIVERY, true, false, true, false, false, false, false, false, true, false, false, false),
     /***直送	- 正常补货*/
-    PROCESS_5(ErpOrderTypeEnum.DIRECT_SEND, ErpOrderCategoryEnum.ORDER_TYPE_2, ErpRequestPayTransactionTypeEnum.DIRECT_DELIVERY_REPLENISHMENT, true, false, true, false, false, false, false, false, false, false, false, false),
+    PROCESS_4(ErpOrderTypeEnum.DIRECT_SEND, ErpOrderCategoryEnum.ORDER_TYPE_1, ErpRequestPayTransactionTypeEnum.DIRECT_DELIVERY_REPLENISHMENT, true, false, true, false, false, false, false, false, false, false, false, false),
+    /***直送	- 普通首单*/
+    PROCESS_5(ErpOrderTypeEnum.DIRECT_SEND, ErpOrderCategoryEnum.ORDER_TYPE_2, ErpRequestPayTransactionTypeEnum.FIRST_DIRECT_DELIVERY, true, false, true, false, false, false, false, false, true, false, false, false),
     /***辅采直送	- 新店货架*/
     PROCESS_6(ErpOrderTypeEnum.ASSIST_PURCHASING, ErpOrderCategoryEnum.ORDER_TYPE_16, ErpRequestPayTransactionTypeEnum.FIRST_DIRECT_DELIVERY, true, false, false, false, false, false, false, false, true, false, false, false),
     /***辅采直送	- 货架补货*/

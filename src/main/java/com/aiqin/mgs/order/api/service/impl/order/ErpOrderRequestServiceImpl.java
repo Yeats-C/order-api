@@ -238,6 +238,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             paramMap.put("order_type", order.getOrderTypeCode());
             paramMap.put("detail_list", list);
 
+            logger.info("锁库请求参数：", paramMap);
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/lock/info").json(paramMap);
             HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
             });
@@ -625,6 +626,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 Map<String, Object> paramItemMap = new HashMap<>(16);
                 paramItemMap.put("line_code", item.getLineCode());
                 paramItemMap.put("sku_code", item.getSkuCode());
+                paramItemMap.put("lock_count", item.getProductCount());
                 paramList.add(paramItemMap);
             }
             Map<String, Object> paramMap = new HashMap<>(16);
@@ -671,7 +673,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
         } catch (Exception e) {
             logger.error("商品销售区域配置校验失败：{}", e);
             flag = false;
-            throw new BusinessException("商品销售区域配置校验失败：");
+            throw new BusinessException("商品销售区域校验失败：");
         }
         return flag;
     }
