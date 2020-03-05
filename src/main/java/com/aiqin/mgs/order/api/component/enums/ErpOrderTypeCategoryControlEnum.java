@@ -22,9 +22,9 @@ public enum ErpOrderTypeCategoryControlEnum {
     PROCESS_2(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_4, true, true, false, false, true, false),
     /***配送	- 正常补货*/
     PROCESS_3(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_1, true, false, false, false, true, true),
-    /***直送	- 普通首单*/
-    PROCESS_4(ErpOrderTypeEnum.DIRECT_SEND, ErpOrderCategoryEnum.ORDER_TYPE_1, true, false, false, false, true, true),
     /***直送	- 正常补货*/
+    PROCESS_4(ErpOrderTypeEnum.DIRECT_SEND, ErpOrderCategoryEnum.ORDER_TYPE_1, true, false, false, false, true, true),
+    /***直送	- 普通首单*/
     PROCESS_5(ErpOrderTypeEnum.DIRECT_SEND, ErpOrderCategoryEnum.ORDER_TYPE_2, true, true, false, false, true, false),
     /***辅采直送	- 新店货架*/
     PROCESS_6(ErpOrderTypeEnum.ASSIST_PURCHASING, ErpOrderCategoryEnum.ORDER_TYPE_16, true, false, true, true, false, false),
