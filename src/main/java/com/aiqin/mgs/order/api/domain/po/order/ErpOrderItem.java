@@ -137,7 +137,7 @@ public class ErpOrderItem extends PagesRequest {
     @JsonProperty("total_product_amount")
     private BigDecimal totalProductAmount;
 
-    @ApiModelProperty(value = "实际商品总价（发货商品总价）（元）")
+    @ApiModelProperty(value = "实际商品总价（发货商品总价,均摊后金额的比例）（元）")
     @JsonProperty("actual_total_product_amount")
     private BigDecimal actualTotalProductAmount;
 
