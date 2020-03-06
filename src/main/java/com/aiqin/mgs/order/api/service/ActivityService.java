@@ -136,7 +136,7 @@ public interface ActivityService {
      * @param response
      * @return
      */
-    HttpResponse excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response);
+    void excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response);
 
     /**
      * 活动商品筛选分页

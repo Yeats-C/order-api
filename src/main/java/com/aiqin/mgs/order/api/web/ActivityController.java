@@ -235,8 +235,8 @@ public class ActivityController {
      */
     @GetMapping("/excelActivitySalesStatistics")
     @ApiOperation("导出--活动列表-对比分析柱状图")
-    public HttpResponse excelActivitySalesStatistics(@RequestParam(name = "activityIdList") List<String> activityIdList, HttpServletResponse response){
-        return activitesService.excelActivitySalesStatistics(activityIdList,response);
+    public void excelActivitySalesStatistics(@RequestParam(name = "activityIdList") List<String> activityIdList, HttpServletResponse response){
+         activitesService.excelActivitySalesStatistics(activityIdList,response);
     }
 
 

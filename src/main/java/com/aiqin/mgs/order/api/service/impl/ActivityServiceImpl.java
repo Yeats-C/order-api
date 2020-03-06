@@ -703,7 +703,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public HttpResponse excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response) {
+    public void excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response) {
         LOGGER.info("导出--活动列表-对比分析柱状图excelActivitySalesStatistics参数为：{}", activityIdList);
         HttpResponse res = HttpResponse.success();
         try {
@@ -713,7 +713,7 @@ public class ActivityServiceImpl implements ActivityService {
                 activitySalesList.add(sales);
             }
             HSSFWorkbook wb = exportActivitySalesData(activitySalesList);
-            String excelName = "数据列表";
+            String excelName = "数据列表.xls";
             response.reset();
             response.setContentType("application/vnd.ms-excel;charset=UTF-8");
             response.setCharacterEncoding("UTF-8");
@@ -722,7 +722,6 @@ public class ActivityServiceImpl implements ActivityService {
             wb.write(os);
             os.flush();
             os.close();
-            return res;
         } catch (Exception ex) {
             throw new GroundRuntimeException(ex.getMessage());
         }
