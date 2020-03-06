@@ -405,17 +405,21 @@ public class CartOrderServiceImpl implements CartOrderService {
 
             //该行是否归到活动楼层
             boolean activityItemFlag = false;
-            if (StringUtils.isNotEmpty(item.getActivityId())) {
-                if (!uselessActivityIdList.contains(item.getActivityId())) {
-                    if (usefulActivityMap.containsKey(item.getActivityId())) {
-                        activityItemFlag = true;
-                    } else {
-                        HttpResponse<ActivityRequest> activityDetailResponse = activityService.getActivityDetail(item.getActivityId());
-                        if (RequestReturnUtil.validateHttpResponse(activityDetailResponse)) {
-                            usefulActivityMap.put(item.getActivityId(), activityDetailResponse.getData());
+
+            //配送才能解析活动，其他类型强制不解析活动
+            if (ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(productType)) {
+                if (StringUtils.isNotEmpty(item.getActivityId())) {
+                    if (!uselessActivityIdList.contains(item.getActivityId())) {
+                        if (usefulActivityMap.containsKey(item.getActivityId())) {
                             activityItemFlag = true;
                         } else {
-                            uselessActivityIdList.add(item.getActivityId());
+                            HttpResponse<ActivityRequest> activityDetailResponse = activityService.getActivityDetail(item.getActivityId());
+                            if (RequestReturnUtil.validateHttpResponse(activityDetailResponse)) {
+                                usefulActivityMap.put(item.getActivityId(), activityDetailResponse.getData());
+                                activityItemFlag = true;
+                            } else {
+                                uselessActivityIdList.add(item.getActivityId());
+                            }
                         }
                     }
                 }
