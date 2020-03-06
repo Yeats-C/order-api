@@ -676,6 +676,7 @@ public class CartOrderServiceImpl implements CartOrderService {
                 item.setLineActivityAmountTotal(totalMoney);
                 item.setLineActivityDiscountTotal(BigDecimal.ZERO);
                 item.setLineAmountAfterActivity(totalMoney);
+                item.setActivityId(null);
             }
         }
 
