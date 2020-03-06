@@ -1,6 +1,8 @@
 package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.PurchaseOrderDetail;
+import com.aiqin.mgs.order.api.domain.request.purchase.PurchaseOrderProductRequest;
+import com.aiqin.mgs.order.api.domain.response.purchase.*;
 import io.lettuce.core.dynamic.annotation.Param;
 
 import java.util.List;
@@ -22,4 +24,8 @@ public interface PurchaseOrderDetailDao {
     int updateByPurchaseOrderCode(PurchaseOrderDetail record);
 
     int updateByPrimaryKey(PurchaseOrderDetail record);
+
+    List<PurchaseOrderProduct> purchaseOrderList(PurchaseOrderProductRequest request);
+
+    Integer purchaseOrderCount(PurchaseOrderProductRequest request);
 }

@@ -66,12 +66,14 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
         }
 
         boolean flag = false;
+        if (order.getOrderTypeCode().equals(ErpOrderTypeEnum.DIRECT_SEND.getValue())) {
+            flag = true;
+        }
         if (ErpOrderStatusEnum.ORDER_STATUS_6.getCode().equals(order.getOrderStatus())) {
             if (ErpOrderNodeStatusEnum.STATUS_8.getCode().equals(order.getOrderNodeStatus())) {
-                flag = true;
+                    flag = true;
             }
         }
-
         if (flag) {
             List<ErpOrderItem> itemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
             //实发数量

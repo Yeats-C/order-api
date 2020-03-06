@@ -41,6 +41,9 @@ public class QueryOrderInfoItemRespVO {
     @ApiModelProperty("是否是赠品(0否1是)")
     private Integer givePromotion;
 
+    @ApiModelProperty("商品类型  0商品 1赠品")
+    private Integer productType;
+
     @ApiModelProperty("批次号")
     private String batchNumber;
 
@@ -56,7 +59,7 @@ public class QueryOrderInfoItemRespVO {
     @ApiModelProperty("数量")
     private Long num;
 
-    @ApiModelProperty("分销总价")
+    @ApiModelProperty("分销总价 分销单价*数量")
     private Long amount;
 
     @ApiModelProperty("活动分摊")
@@ -91,4 +94,7 @@ public class QueryOrderInfoItemRespVO {
 
     @ApiModelProperty("实际分销单价")
     private BigDecimal actualPrice;
+
+    @ApiModelProperty("熙耘采购价")
+    private BigDecimal purchaseAmount;
 }
