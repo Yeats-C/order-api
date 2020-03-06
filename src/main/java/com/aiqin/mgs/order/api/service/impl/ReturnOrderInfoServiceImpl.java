@@ -1004,8 +1004,10 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     @Override
     @Transactional
     public HttpResponse saveCancelOrder(String orderCode) {
+        log.info("客户取消订单---订单使用接口--入参orderCode={}",orderCode);
         //根据订单编码查询原始订单数据及详情数据
         ErpOrderInfo erpOrderInfo=erpOrderQueryService.getOrderAndItemByOrderCode(orderCode);
+        log.info("客户取消订单---订单使用接口--根据订单编码查询原始订单数据及详情数据erpOrderInfo={}",erpOrderInfo);
         if(null==erpOrderInfo){
             //此单号有误，未查到订单数据
             return HttpResponse.failure(ResultCode.NOT_FOUND_ORDER_DATA);
@@ -1029,7 +1031,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         returnOrderInfo.setTreatmentMethod(TreatmentMethodEnum.RETURN_AMOUNT_TYPE.getCode());
         //生成退货单
         returnOrderInfo.setId(null);
+        log.info("客户取消订单---订单使用接口--插入退货单主表入参returnOrderInfo={}",returnOrderInfo);
         returnOrderInfoDao.insertSelective(returnOrderInfo);
+        log.info("客户取消订单---订单使用接口--插入退货单主表成功");
         List<ReturnOrderDetail> details = itemList.stream().map(detailVo -> {
             ReturnOrderDetail detail = new ReturnOrderDetail();
             BeanUtils.copyProperties(detailVo, detail);
@@ -1041,7 +1045,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             return detail;
         }).collect(Collectors.toList());
         //生成退货单详情
+        log.info("客户取消订单---订单使用接口--插入退货单详情表入参details={}",details);
         returnOrderDetailDao.insertWriteDownOrderBatch(details);
+        log.info("客户取消订单---订单使用接口--插入退货单详情表成功");
         //添加日志
         insertLog(returnOrderCode,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(), WriteDownOrderStatusEnum.CANCEL_ORDER.getCode(),WriteDownOrderStatusEnum.CANCEL_ORDER.getName());
         return HttpResponse.success(returnOrderCode);
