@@ -204,7 +204,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             //折零系数 不填
             orderItem.setZeroDisassemblyCoefficient(null);
             //商品类型  0商品 1赠品
-            orderItem.setProductType(ErpProductGiftEnum.PRODUCT.getCode());
+            orderItem.setProductType(ErpProductGiftEnum.GIFT.getCode());
             //商品属性编码
             orderItem.setProductPropertyCode(product.getProductPropertyCode());
             //商品属性名称
@@ -237,6 +237,18 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             orderItem.setBoxGrossWeight(product.getBoxGrossWeight());
             //单个商品包装体积(mm³)
             orderItem.setBoxVolume(product.getBoxVolume());
+            //是否活动商品0否1是
+            orderItem.setIsActivity(YesOrNoEnum.NO.getCode());
+            //活动价（元）
+            orderItem.setActivityPrice(BigDecimal.ZERO);
+            //商品品牌编码
+            orderItem.setProductBrandCode(product.getProductBrandCode());
+            //商品品牌名称
+            orderItem.setProductBrandName(product.getProductBrandName());
+            //商品品类编码
+            orderItem.setProductCategoryCode(product.getProductCategoryCode());
+            //商品品类名称
+            orderItem.setProductCategoryName(product.getProductCategoryName());
             addGiftList.add(orderItem);
             //商品毛重汇总
             addBoxGrossWeightTotal = addBoxGrossWeightTotal.add((orderItem.getBoxGrossWeight() == null ? BigDecimal.ZERO : orderItem.getBoxGrossWeight()).multiply(new BigDecimal(orderItem.getProductCount())));
