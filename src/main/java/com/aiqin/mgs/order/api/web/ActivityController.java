@@ -221,9 +221,9 @@ public class ActivityController {
      * @param activityIdList
      * @return
      */
-    @GetMapping("/comparisonActivitySalesStatistics")
+    @PostMapping("/comparisonActivitySalesStatistics")
     @ApiOperation(value = "活动列表-对比分析柱状图")
-    public HttpResponse<List<ActivitySales>> comparisonActivitySalesStatistics(@RequestParam(name = "activityIdList") List<String> activityIdList){
+    public HttpResponse<List<ActivitySales>> comparisonActivitySalesStatistics(@RequestBody  List<String> activityIdList){
         return activitesService.comparisonActivitySalesStatistics(activityIdList);
     }
 
