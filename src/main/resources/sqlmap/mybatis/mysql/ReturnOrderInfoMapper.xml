@@ -1255,4 +1255,13 @@
     where
       order_success = #{orderSuccess}
   </select>
+
+  <update id="updateCountAndAmount">
+    update return_order_info
+    set
+    product_count = #{actualProductCount},
+    return_order_amount = #{actualReturnOrderAmount}
+    where return_order_code=#{returnOrderCode}
+  </update>
+
 </mapper>

@@ -943,10 +943,13 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     continue;
                 }
                 if (returnQuantityMap.containsKey(item.getLineCode())) {
-                    item.setReturnProductCount((item.getReturnProductCount() == null ? 0L : item.getReturnProductCount()) + returnQuantityMap.get(item.getLineCode()));
-                    if (item.getReturnProductCount() > item.getProductCount()) {
+
+                    //本次退货数量
+                    Long thisTimeReturnCount = returnQuantityMap.get(item.getLineCode());
+                    if (thisTimeReturnCount > (item.getActualInboundCount() - (item.getReturnProductCount() == null ? 0L : item.getReturnProductCount()))) {
                         throw new BusinessException("行号为" + item.getLineCode() + "的商品退货数量超出最大可退数量");
                     }
+                    item.setReturnProductCount((item.getReturnProductCount() == null ? 0L : item.getReturnProductCount()) + thisTimeReturnCount);
                     returnUpdateList.add(item);
                 }
             }

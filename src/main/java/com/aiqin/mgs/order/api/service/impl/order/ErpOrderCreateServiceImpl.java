@@ -448,11 +448,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             }
         }
         if (processTypeEnum.isAreaCheck()) {
-            //商品销售区域配置校验
-            boolean flag = erpOrderRequestService.areaCheck(storeInfo, orderProductItemList);
-            if (!flag) {
-                throw new BusinessException("商品销售区域配置校验失败");
-            }
+            //商品销售区域配置校验 TODO 供应链接口不通，暂时去掉
+//            boolean flag = erpOrderRequestService.areaCheck(storeInfo, orderProductItemList);
+//            if (!flag) {
+//                throw new BusinessException("商品销售区域校验失败");
+//            }
         }
         if (processTypeEnum.isRepertoryCheck()) {
             //商品库存校验
@@ -792,12 +792,18 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         BigDecimal totalAmountAfterActivity = BigDecimal.ZERO;
         for (CouponShareRequest item : details) {
             ErpProductPropertyTypeEnum propertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(item.getProductPropertyCode());
-            if (propertyTypeEnum.isUseTopCoupon() && ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductGift())) {
-                topProductList.add(item);
-                //分销总价=从活动的分摊总价取
-                totalFirstFenAmount = totalFirstFenAmount.add(item.getTotalPreferentialAmount());
-                totalProAmount = totalProAmount.add(item.getTotalProductAmount());
-                totalAmountAfterActivity = totalAmountAfterActivity.add(item.getTotalPreferentialAmount());
+            log.info("判断是否是A品卷,propertyTypeEnum={}", propertyTypeEnum);
+            log.info("判断是否是A品卷,ProductGiftEnumCode={}", ErpProductGiftEnum.PRODUCT.getCode());
+            log.info("判断是否是A品卷,ProductGift={}", item.getProductGift());
+            if(propertyTypeEnum!=null){
+                log.info("判断是否是A品卷,isUseTopCoupon={}", propertyTypeEnum.isUseTopCoupon());
+                if (propertyTypeEnum.isUseTopCoupon() && ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductGift())) {
+                    topProductList.add(item);
+                    //分销总价=从活动的分摊总价取
+                    totalFirstFenAmount = totalFirstFenAmount.add(item.getTotalPreferentialAmount());
+                    totalProAmount = totalProAmount.add(item.getTotalProductAmount());
+                    totalAmountAfterActivity = totalAmountAfterActivity.add(item.getTotalPreferentialAmount());
+                }
             }
         }
         log.info("A品券计算均摊金额,符合A品卷均摊的商品topProductList={}", topProductList);

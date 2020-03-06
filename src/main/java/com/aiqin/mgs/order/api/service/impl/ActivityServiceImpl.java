@@ -282,7 +282,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public HttpResponse<ActivitySales> getActivitySalesStatistics(String activityId) {
-        LOGGER.info("查询活动详情-销售数据-活动销售统计");
+        LOGGER.info("查询活动详情-销售数据-活动销售统计，参数activityId为: {}",activityId);
         try {
             HttpResponse response = HttpResponse.success();
             Activity activity=new Activity();
@@ -294,7 +294,10 @@ public class ActivityServiceImpl implements ActivityService {
             //活动补货门店数
             Integer storeNum=erpOrderInfoDao.getStoreNum(activity);
             //平均单价
-            BigDecimal averageUnitPrice=activitySales.getActivitySales().divide(activitySales.getActivitySalesNum(),0, RoundingMode.HALF_UP);
+            BigDecimal averageUnitPrice=BigDecimal.ZERO;
+            if(activitySales.getActivitySalesNum().compareTo(BigDecimal.ZERO)!=0){
+                averageUnitPrice=activitySales.getActivitySales().divide(activitySales.getActivitySalesNum(),0, RoundingMode.HALF_UP);
+            }
             activitySales.setProductSales(productSales);
             activitySales.setStoreNum(storeNum);
             activitySales.setAverageUnitPrice(averageUnitPrice);
@@ -318,7 +321,7 @@ public class ActivityServiceImpl implements ActivityService {
             Activity activity=new Activity();
             activity.setActivityId(activityId);
             List<Activity> list=activityDao.activityList(activity);
-            if(list!=null && list.get(0)!=null){
+            if(list!=null&& 0!=list.size()&& list.get(0)!=null){
                 activityRequest.setActivity(list.get(0));
             }else{
                 return HttpResponse.failure(ResultCode.NOT_HAVE_PARAM);
@@ -760,7 +763,7 @@ public class ActivityServiceImpl implements ActivityService {
                 }else if(activityScope==2){
                     //按品类设置
                     ActivityCategoryRequest categoryRequest=new ActivityCategoryRequest();
-                    categoryRequest.setProductCategoryCode(product.getProductCategoryCode());
+                    categoryRequest.setCategoryCode(product.getProductCategoryCode());
                     categoryRequest.setLevel(product.getLevel());
                     categoryRequestList.add(categoryRequest);
                 }else if(activityScope==3){
