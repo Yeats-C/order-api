@@ -223,7 +223,7 @@ public class ActivityController {
      */
     @GetMapping("/comparisonActivitySalesStatistics")
     @ApiOperation(value = "活动列表-对比分析柱状图")
-    public HttpResponse<List<ActivitySales>> comparisonActivitySalesStatistics(List<String> activityIdList){
+    public HttpResponse<List<ActivitySales>> comparisonActivitySalesStatistics(@RequestParam(name = "activityIdList") List<String> activityIdList){
         return activitesService.comparisonActivitySalesStatistics(activityIdList);
     }
 
@@ -235,7 +235,7 @@ public class ActivityController {
      */
     @PostMapping("/excelActivitySalesStatistics")
     @ApiOperation("导出--活动列表-对比分析柱状图")
-    public HttpResponse excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response){
+    public HttpResponse excelActivitySalesStatistics(@RequestParam(name = "activityIdList") List<String> activityIdList, HttpServletResponse response){
         return activitesService.excelActivitySalesStatistics(activityIdList,response);
     }
 

@@ -700,7 +700,7 @@ public class ActivityServiceImpl implements ActivityService {
             ActivitySales sales=getActivitySalesStatistics(activityId).getData();
             activitySalesList.add(sales);
         }
-        res.setData(activityIdList);
+        res.setData(activitySalesList);
         return res;
     }
 
