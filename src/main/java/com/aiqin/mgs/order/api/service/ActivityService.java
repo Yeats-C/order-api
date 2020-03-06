@@ -121,7 +121,7 @@ public interface ActivityService {
      * @param response
      * @return
      */
-    HttpResponse excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response);
+    void excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response);
 
     /**
      *活动列表-对比分析柱状图

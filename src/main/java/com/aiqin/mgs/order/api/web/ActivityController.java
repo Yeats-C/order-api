@@ -212,8 +212,8 @@ public class ActivityController {
      */
     @PostMapping("/excelActivityItem")
     @ApiOperation("导出--活动详情-销售数据-活动销售列表")
-    public HttpResponse excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response){
-        return activitesService.excelActivityItem(erpOrderItem,response);
+    public void excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response){
+        activitesService.excelActivityItem(erpOrderItem,response);
     }
 
     /**

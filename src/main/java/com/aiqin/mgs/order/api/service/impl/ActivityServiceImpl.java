@@ -668,15 +668,14 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public HttpResponse excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response) {
+    public void excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response) {
         LOGGER.info("导出--活动详情-销售数据-活动销售列表excelActivityItem参数为：{}", erpOrderItem);
-        HttpResponse res = HttpResponse.success();
         try {
             //只查询活动商品
             erpOrderItem.setIsActivity(1);
             List<ErpOrderItem> select = erpOrderItemDao.getActivityItem(erpOrderItem);
             HSSFWorkbook wb = exportData(select);
-            String excelName = "数据列表";
+            String excelName = "数据列表.xls";
             response.reset();
             response.setContentType("application/vnd.ms-excel;charset=UTF-8");
             response.setCharacterEncoding("UTF-8");
@@ -685,7 +684,6 @@ public class ActivityServiceImpl implements ActivityService {
             wb.write(os);
             os.flush();
             os.close();
-            return res;
         } catch (Exception ex) {
             throw new GroundRuntimeException(ex.getMessage());
         }
