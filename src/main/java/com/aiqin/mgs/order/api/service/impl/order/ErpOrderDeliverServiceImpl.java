@@ -117,6 +117,9 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 }
                 actualTotalProductAmount = actualTotalProductAmount.add(actualProductAmount);
 
+                //设置单个商品实际发货金额
+                item.setActualTotalProductAmount(actualProductAmount);
+
                 //商品毛重汇总
                 boxGrossWeightTotal = boxGrossWeightTotal.add((item.getBoxGrossWeight() == null ? BigDecimal.ZERO : item.getBoxGrossWeight()).multiply(new BigDecimal(actualProductCount)));
                 //商品体积汇总
