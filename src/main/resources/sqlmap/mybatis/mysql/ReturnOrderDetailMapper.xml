@@ -501,14 +501,13 @@
     </insert>
 
     <select id="countAmountByCategoryCode" parameterType="com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo" resultType="java.math.BigDecimal">
-        select coalesce(sum(actual_return_order_amount),0) as amount from return_order_detail
-        where product_category_code LIKE concat('#{categoryCode}','%')
+        select coalesce(sum(actual_total_product_amount),0) as amount from return_order_detail
+        where product_category_code LIKE concat('',#{categoryCode},'%')
         and return_order_code in (
             select order_store_code from return_order_info
-            WHERE order_type =#{type} and return_reason_code=#{reasonCode}
         <where>
             <if test="type!=null">
-                and type=#{type}
+                and order_type=#{type}
             </if>
             <if test="reasonCode!=null and reasonCode!=''">
                 and return_reason_code=#{reasonCode}

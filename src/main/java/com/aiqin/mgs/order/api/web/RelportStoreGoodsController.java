@@ -88,4 +88,11 @@ public class RelportStoreGoodsController {
         return HttpResponse.success(reportStoreGoodsService.topProvinceAmount(type));
     }
 
+    @ApiOperation("售后管理---退货商品分类统计")
+    @PostMapping("/reportCategoryGoods")
+    public HttpResponse reportCategoryGoods(@RequestBody ReportAreaReturnSituationVo type) {
+        reportStoreGoodsService.reportCategoryGoods(type);
+        return HttpResponse.success();
+    }
+
 }

@@ -405,6 +405,12 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
 
     @Override
     public void reportCategoryGoods(ReportAreaReturnSituationVo vo) {
+        Integer insertType=1;
+        if(vo.getType().equals(2)&&"14".equals(vo.getReasonCode())){
+            insertType=2;
+        }else if(vo.getType().equals(2)&&"15".equals(vo.getReasonCode())){
+            insertType=3;
+        }
         //查询所有一级品类的编码集合，然后遍历去查询金额
         String url=productHost+"/search/spu/sku/category";
         JSONObject body=new JSONObject();
@@ -423,26 +429,48 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
             list = JSONArray.parseArray(JSON.toJSONString(result.get("data")), ReportCategoryResponse.class);
             log.info("退货商品分类统计--调用product系统,查询所有一级品类为list={}",list);
         } else {
-            log.info("退货商品分类统计--调用slcs系统,查询所有一级品类异常");
+            log.info("退货商品分类统计--调用product系统,查询所有一级品类异常");
             return;
         }
         if(list!=null&&list.size()>0){
             Date time=new Date();
             List<ReportCategoryGoods> list1=new ArrayList();
+            BigDecimal totalAmount=BigDecimal.ZERO;
+            Map<String,BigDecimal> map=new HashMap<>();
+            //第一次循环查询金额
             for(ReportCategoryResponse rcr:list){
                 vo.setCategoryCode(rcr.getCategoryCode());
                 //查出某个一级品类的总金额
                 BigDecimal amount = returnOrderDetailDao.countAmountByCategoryCode(vo);
+                totalAmount=totalAmount.add(amount);
+                map.put(rcr.getCategoryCode(),amount);
+            }
+            log.info("退货商品分类统计--所有品类及各自金额map={}",map);
+            log.info("退货商品分类统计--所有品类总金额totalAmount={}",totalAmount);
+            //第二次循环计算比例
+            for(ReportCategoryResponse rcr:list){
+                vo.setCategoryCode(rcr.getCategoryCode());
+                //从map中取出某个一级品类的总金额
+                BigDecimal am = map.get(rcr.getCategoryCode());
                 ReportCategoryGoods rcg=new ReportCategoryGoods();
-                rcg.setAmount(amount);
+                BigDecimal proportion=BigDecimal.ZERO;
+                if(totalAmount.compareTo(BigDecimal.ZERO)==1){
+                    proportion=am.divide(totalAmount);
+                }
+                rcg.setAmount(am);
                 rcg.setCategoryCode(rcr.getCategoryCode());
                 rcg.setCategoryName(rcr.getCategoryName());
-                rcg.setType(vo.getType());
+                rcg.setType(insertType);
                 rcg.setCreateTime(time);
+                rcg.setProportion(proportion);
                 list1.add(rcg);
             }
             log.info("退货商品分类统计--插入退货商品分类统计表,入参list={}",list1);
             if(list1!=null&&list1.size()>0){
+                //删除数据
+                reportCategoryGoodsDao.deleteByType(insertType);
+                log.info("退货商品分类统计--清除"+insertType+"退货商品分类统计数据成功");
+                //插入数据
                 reportCategoryGoodsDao.insertBatch(list1);
                 log.info("退货商品分类统计--插入退货商品分类统计表成功");
             }

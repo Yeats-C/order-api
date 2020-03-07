@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ReportCategoryGoodsDao {
 
-    int deleteByPrimaryKey(Long id);
+    int deleteByType(Integer type);
 
     int insert(ReportCategoryGoods record);
 
