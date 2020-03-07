@@ -1,6 +1,9 @@
 package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.ReportCategoryGoods;
+import com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo;
+
+import java.util.List;
 
 public interface ReportCategoryGoodsDao {
 
@@ -15,4 +18,7 @@ public interface ReportCategoryGoodsDao {
     int updateByPrimaryKeySelective(ReportCategoryGoods record);
 
     int updateByPrimaryKey(ReportCategoryGoods record);
+
+    List<ReportCategoryGoods> selectList(ReportAreaReturnSituationVo vo);
+
 }
