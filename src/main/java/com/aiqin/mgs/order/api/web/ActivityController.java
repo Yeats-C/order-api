@@ -261,4 +261,6 @@ public class ActivityController {
         response.setData(activitesService.activityList(parameterRequest));
         return response;
     }
+
+
 }
