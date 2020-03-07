@@ -117,4 +117,16 @@
     </where>
   </select>
 
+  <insert id="insertBatch" parameterType="list">
+    insert into report_category_goods (category_code, category_name,
+    amount, proportion, create_time,type)
+    values
+    <foreach collection="records" item="item" index="index" separator=",">
+      (
+        #{item.categoryCode,jdbcType=VARCHAR}, #{item.categoryName,jdbcType=VARCHAR},
+        #{item.amount,jdbcType=DECIMAL}, #{item.proportion,jdbcType=DECIMAL}, #{item.createTime,jdbcType=TIMESTAMP},#{item.type,jdbcType=TINYINT}
+      )
+    </foreach>
+  </insert>
+
 </mapper>
