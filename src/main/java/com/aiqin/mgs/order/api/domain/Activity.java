@@ -10,6 +10,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @ApiModel("促销活动bean")
@@ -101,4 +102,9 @@ public class Activity extends PagesRequest implements Serializable {
     @ApiModelProperty(value = "活动范围：1.按单品设置2.按品类设置3.按品牌设置4.按单品排除")
     @JsonProperty("activity_scope")
     private Integer activityScope;
+
+    /***数据权限门店集合*/
+    @ApiModelProperty(value = "数据权限门店集合")
+    @JsonProperty("stores_ids")
+    private List<String> storesIds;
 }
