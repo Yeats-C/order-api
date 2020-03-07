@@ -36,4 +36,8 @@ public class ReportCategoryGoods {
     @JsonProperty("create_time")
     private Date createTime;
 
+    @ApiModelProperty("类型 1:直送退货 2:质量退货 3:一般退货")
+    @JsonProperty("type")
+    private Integer type;
+
 }

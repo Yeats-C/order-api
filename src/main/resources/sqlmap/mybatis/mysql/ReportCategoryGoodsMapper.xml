@@ -8,9 +8,10 @@
     <result column="amount" property="amount" jdbcType="DECIMAL" />
     <result column="proportion" property="proportion" jdbcType="DECIMAL" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="type" property="type" jdbcType="TINYINT"/>
   </resultMap>
   <sql id="Base_Column_List" >
-    id, category_code, category_name, amount, proportion, create_time
+    id, category_code, category_name, amount, proportion, create_time,type
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -24,10 +25,10 @@
   </delete>
   <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.ReportCategoryGoods" >
     insert into report_category_goods (id, category_code, category_name, 
-      amount, proportion, create_time
+      amount, proportion, create_time,type
       )
     values (#{id,jdbcType=BIGINT}, #{categoryCode,jdbcType=VARCHAR}, #{categoryName,jdbcType=VARCHAR}, 
-      #{amount,jdbcType=DECIMAL}, #{proportion,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}
+      #{amount,jdbcType=DECIMAL}, #{proportion,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP},#{type,jdbcType=TINYINT}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.ReportCategoryGoods" >

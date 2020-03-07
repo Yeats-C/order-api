@@ -33,7 +33,7 @@ public class ReportAreaReturnSituation implements Serializable {
     @JsonProperty("return_amount")
     private BigDecimal returnAmount;
 
-    @ApiModelProperty("类型")
+    @ApiModelProperty("类型 1:直送退货 2:质量退货 3:一般退货")
     @JsonProperty("type")
     private Integer type;
 
