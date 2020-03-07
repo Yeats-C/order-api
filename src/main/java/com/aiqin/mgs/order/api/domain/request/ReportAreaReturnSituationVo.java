@@ -30,4 +30,9 @@ public class ReportAreaReturnSituationVo implements Serializable {
     @JsonProperty("store_codes")
     private List<String> storeCodes;
 
+    @ApiModelProperty("品类编码")
+    @JsonProperty("category_code")
+    private String categoryCode;
+
+
 }
