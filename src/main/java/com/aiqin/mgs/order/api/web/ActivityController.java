@@ -1,8 +1,12 @@
 package com.aiqin.mgs.order.api.web;
 
 
+import com.aiqin.ground.util.exception.GroundRuntimeException;
+import com.aiqin.ground.util.protocol.MessageId;
+import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityProduct;
 import com.aiqin.mgs.order.api.domain.ActivitySales;
@@ -12,6 +16,7 @@ import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -260,6 +265,25 @@ public class ActivityController {
         HttpResponse response = HttpResponse.success();
         response.setData(activitesService.activityList(parameterRequest));
         return response;
+    }
+
+    @GetMapping("/selectCategoryByBrandCode")
+    @ApiOperation(value = "品牌和品类关系,condition_code为查询条件，type=2 通过品牌查品类,type=1 通过品类查品牌")
+    public HttpResponse<ProductCategoryAndBrandResponse2> selectCategoryByBrandCode(@RequestParam(value = "condition_code") String conditionCode,
+                                                                                    @RequestParam(value = "type") String type,@RequestParam(value = "activity_id") String activityId
+    ) {
+        if (StringUtils.isBlank(conditionCode) && StringUtils.isBlank(type) && StringUtils.isBlank(activityId)) {
+            return HttpResponse.failure(MessageId.create(Project.PRODUCT_API, 500, "必传项为空"));
+        }
+        try {
+            ProductCategoryAndBrandResponse2 responses= activitesService.ProductCategoryAndBrandResponse(conditionCode, type,activityId);
+            return HttpResponse.successGenerics(responses);
+        }catch (Exception e){
+            if(e instanceof GroundRuntimeException){
+                return HttpResponse.failure(MessageId.create(Project.SUPPLIER_API, -1, e.getMessage()));
+            }
+            return HttpResponse.failure(ResultCode.SELECT_ACTIVITY_INFO_EXCEPTION);
+        }
     }
 
 

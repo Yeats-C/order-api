@@ -1081,4 +1081,18 @@ public class ActivityServiceImpl implements ActivityService {
         return activityList;
     }
 
+    @Override
+    public ProductCategoryAndBrandResponse2 ProductCategoryAndBrandResponse(String conditionCode, String type, String activityId) {
+        HttpResponse res=   bridgeProductService.selectCategoryByBrandCode(conditionCode,type);
+        ProductCategoryAndBrandResponse2 response2=new ProductCategoryAndBrandResponse2();
+        if(null!=res.getData()){
+             response2= (ProductCategoryAndBrandResponse2)res.getData();
+        }
+
+        Activity activity=new Activity();
+        activity.setActivityId(activityId);
+        List<ActivityProduct> activityProducts=activityProductDao.activityProductList(activity);
+        return response2;
+    }
+
 }

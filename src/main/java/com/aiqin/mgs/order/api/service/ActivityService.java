@@ -151,4 +151,13 @@ public interface ActivityService {
      * @return
      */
     List<Activity> activityList(ActivityParameterRequest activityParameterRequest);
+
+    /**
+     * 品牌和品类关系,condition_code为查询条件，type=2 通过品牌查品类,type=1 通过品类查品牌
+     * @param conditionCode
+     * @param type
+     * @param activityId
+     * @return
+     */
+    ProductCategoryAndBrandResponse2 ProductCategoryAndBrandResponse(String conditionCode, String type, String activityId);
 }
