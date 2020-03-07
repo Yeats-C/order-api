@@ -7,9 +7,12 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.component.returnenums.OrderTypeEnum;
 import com.aiqin.mgs.order.api.component.returnenums.ReturnReasonEnum;
 import com.aiqin.mgs.order.api.dao.ReportAreaReturnSituationDao;
+import com.aiqin.mgs.order.api.dao.ReportCategoryGoodsDao;
 import com.aiqin.mgs.order.api.dao.ReportStoreGoodsDao;
 import com.aiqin.mgs.order.api.dao.ReportStoreGoodsDetailDao;
+import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
 import com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation;
+import com.aiqin.mgs.order.api.domain.ReportCategoryGoods;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoods;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail;
 import com.aiqin.mgs.order.api.domain.copartnerArea.NewStoreTreeResponse;
@@ -17,6 +20,7 @@ import com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsVo;
 import com.aiqin.mgs.order.api.domain.response.report.ProvinceAreaResponse;
+import com.aiqin.mgs.order.api.domain.response.report.ReportCategoryResponse;
 import com.aiqin.mgs.order.api.domain.response.report.ReportOrderAndStoreListResponse;
 import com.aiqin.mgs.order.api.domain.response.report.ReportOrderAndStoreResponse;
 import com.aiqin.mgs.order.api.service.ReportStoreGoodsService;
@@ -26,6 +30,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -61,6 +66,10 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
     private ReportStoreGoodsDetailDao reportStoreGoodsDetailDao;
     @Autowired
     private ReportAreaReturnSituationDao reportAreaReturnSituationDao;
+    @Autowired
+    private ReturnOrderDetailDao returnOrderDetailDao;
+    @Autowired
+    private ReportCategoryGoodsDao reportCategoryGoodsDao;
 
     @Override
     public Boolean insert(ReportStoreGoods entity) {
@@ -395,12 +404,49 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
     }
 
     @Override
-    public void reportCategoryGoods() {
-
-
-
-
-
+    public void reportCategoryGoods(ReportAreaReturnSituationVo vo) {
+        //查询所有一级品类的编码集合，然后遍历去查询金额
+        String url=productHost+"/search/spu/sku/category";
+        JSONObject body=new JSONObject();
+        body.put("level",1);
+        log.info("退货商品分类统计--调用product系统,查询所有一级品类,请求url={},body={}", url,body);
+        HttpClient httpClient = HttpClient.post(url).json(body);
+        Map<String,Object> result=null;
+        result= httpClient.action().result(new TypeReference<Map<String,Object>>() {});
+        log.info("退货商品分类统计--调用product系统,查询所有一级品类返回结果，result={}", JSON.toJSON(result));
+        if(result==null){
+            log.info("退货商品分类统计--调用product系统,查询所有一级品类失败");
+            return;
+        }
+        List<ReportCategoryResponse> list=new ArrayList<>();
+        if (StringUtils.isNotBlank(result.get("code").toString()) && "0".equals(String.valueOf(result.get("code")))) {
+            list = JSONArray.parseArray(JSON.toJSONString(result.get("data")), ReportCategoryResponse.class);
+            log.info("退货商品分类统计--调用product系统,查询所有一级品类为list={}",list);
+        } else {
+            log.info("退货商品分类统计--调用slcs系统,查询所有一级品类异常");
+            return;
+        }
+        if(list!=null&&list.size()>0){
+            Date time=new Date();
+            List<ReportCategoryGoods> list1=new ArrayList();
+            for(ReportCategoryResponse rcr:list){
+                vo.setCategoryCode(rcr.getCategoryCode());
+                //查出某个一级品类的总金额
+                BigDecimal amount = returnOrderDetailDao.countAmountByCategoryCode(vo);
+                ReportCategoryGoods rcg=new ReportCategoryGoods();
+                rcg.setAmount(amount);
+                rcg.setCategoryCode(rcr.getCategoryCode());
+                rcg.setCategoryName(rcr.getCategoryName());
+                rcg.setType(vo.getType());
+                rcg.setCreateTime(time);
+                list1.add(rcg);
+            }
+            log.info("退货商品分类统计--插入退货商品分类统计表,入参list={}",list1);
+            if(list1!=null&&list1.size()>0){
+                reportCategoryGoodsDao.insertBatch(list1);
+                log.info("退货商品分类统计--插入退货商品分类统计表成功");
+            }
+        }
     }
 
 }

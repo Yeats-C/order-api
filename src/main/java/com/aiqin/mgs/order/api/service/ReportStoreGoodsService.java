@@ -35,6 +35,6 @@ public interface ReportStoreGoodsService {
     List<ReportAreaReturnSituation> topProvinceAmount(Integer type);
 
     //退货商品分类统计
-    void reportCategoryGoods();
+    void reportCategoryGoods(ReportAreaReturnSituationVo vo);
 
 }
