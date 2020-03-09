@@ -1092,6 +1092,43 @@ public class ActivityServiceImpl implements ActivityService {
         Activity activity=new Activity();
         activity.setActivityId(activityId);
         List<ActivityProduct> activityProducts=activityProductDao.activityProductList(activity);
+        if(null!=activityProducts&&0!=activityProducts.size()){
+            if ("1".equals(type) &&! "2".equals(activityProducts.get(0).getActivityScope())&&! "4".equals(activityProducts.get(0).getActivityScope())){
+                //type=1 通过品类查品牌
+                List<QueryProductBrandRespVO> queryProductBrandRespVO=new ArrayList<>();
+                Iterator<ActivityProduct> it = activityProducts.iterator();
+                while(it.hasNext()){
+                    ActivityProduct str = it.next();
+                    for(QueryProductBrandRespVO brand:response2.getQueryProductBrandRespVO()){
+                        if (str.getProductBrandCode().equals(brand.getBrandId())){
+                            queryProductBrandRespVO.add(brand);
+                        }
+                    }
+                }
+                //去重
+                Set<QueryProductBrandRespVO> activitySet = new HashSet<>(queryProductBrandRespVO);
+                queryProductBrandRespVO.clear();
+                queryProductBrandRespVO.addAll(activitySet);
+                response2.setQueryProductBrandRespVO(queryProductBrandRespVO);
+            }else if("2".equals(type)&&! "3".equals(activityProducts.get(0).getActivityScope())){
+                //type=2 通过品牌查品类
+                List<ProductCategoryRespVO> productCategoryRespVOList=new ArrayList<>();
+                Iterator<ActivityProduct> it = activityProducts.iterator();
+                while(it.hasNext()){
+                    ActivityProduct str = it.next();
+                    for(ProductCategoryRespVO cate:response2.getProductCategoryRespVOList()){
+                        if(str.getProductCategoryCode().substring(0,2).equals(cate.getCategoryId())){
+                            productCategoryRespVOList.add(cate);
+                        }
+                    }
+                }
+                //去重
+                Set<ProductCategoryRespVO> activitySet = new HashSet<>(productCategoryRespVOList);
+                productCategoryRespVOList.clear();
+                productCategoryRespVOList.addAll(activitySet);
+                response2.setProductCategoryRespVOList(productCategoryRespVOList);
+            }
+        }
         return response2;
     }
 
