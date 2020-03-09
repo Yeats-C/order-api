@@ -50,6 +50,7 @@ public class ErpOrderPayController {
     @PostMapping("/orderPay")
     @ApiOperation(value = "订单发起支付")
     public HttpResponse orderPay(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
+        logger.info("发起订单支付：{}", erpOrderPayRequest);
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
@@ -68,6 +69,7 @@ public class ErpOrderPayController {
     @PostMapping("/orderPayResult")
     @ApiOperation(value = "订单支付结果查询")
     public HttpResponse<ErpOrderPayResultResponse> orderPayResult(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
+        logger.info("订单支付结果查询：{}", erpOrderPayRequest);
         HttpResponse response = HttpResponse.success();
         try {
             ErpOrderPayResultResponse erpOrderPayResultResponse = erpOrderPayNoTransactionalService.orderPayResult(erpOrderPayRequest);
@@ -85,6 +87,7 @@ public class ErpOrderPayController {
     @PostMapping("/orderPayCallback")
     @ApiOperation(value = "订单支付回调")
     public HttpResponse orderPayCallback(@RequestBody PayCallbackRequest payCallbackRequest) {
+        logger.info("订单支付回调：{}", payCallbackRequest);
         HttpResponse response = HttpResponse.success();
         try {
             erpOrderPayNoTransactionalService.orderPayCallback(payCallbackRequest);
@@ -101,6 +104,7 @@ public class ErpOrderPayController {
     @PostMapping("/orderLogisticsPayCallback")
     @ApiOperation(value = "订单物流费用支付回调")
     public HttpResponse orderLogisticsPayCallback(@RequestBody PayCallbackRequest payCallbackRequest) {
+        logger.info("订单物流费用支付回调：{}", payCallbackRequest);
         HttpResponse response = HttpResponse.success();
         try {
             erpOrderLogisticsNoTransactionalService.orderLogisticsPayCallback(payCallbackRequest);
@@ -117,6 +121,7 @@ public class ErpOrderPayController {
     @PostMapping("/orderRefundCallback")
     @ApiOperation(value = "订单退款回调")
     public HttpResponse orderRefundCallback(@RequestBody PayCallbackRequest payCallbackRequest) {
+        logger.info("订单退款回调：{}", payCallbackRequest);
         HttpResponse response = HttpResponse.success();
         try {
             erpOrderRefundNoTransactionalService.orderRefundCallback(payCallbackRequest);
@@ -133,6 +138,7 @@ public class ErpOrderPayController {
     @PostMapping("/orderLogisticsPay")
     @ApiOperation(value = "支付物流费用")
     public HttpResponse orderLogisticsPay(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
+        logger.info("支付物流费用：{}", erpOrderPayRequest);
         HttpResponse response = HttpResponse.success();
         try {
             //发起支付
@@ -150,6 +156,7 @@ public class ErpOrderPayController {
     @PostMapping("/orderLogisticsPayResult")
     @ApiOperation(value = "订单物流费用支付结果轮询")
     public HttpResponse<ErpOrderLogisticsPayResultResponse> orderLogisticsPayResult(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
+        logger.info("订单物流费用支付结果轮询：{}", erpOrderPayRequest);
         HttpResponse response = HttpResponse.success();
         try {
             ErpOrderLogisticsPayResultResponse resultResponse = erpOrderLogisticsNoTransactionalService.orderLogisticsPayResult(erpOrderPayRequest);
@@ -167,6 +174,7 @@ public class ErpOrderPayController {
     @PostMapping("/orderLogisticsPrintQuery")
     @ApiOperation(value = "订单物流费用支付凭证")
     public HttpResponse<ErpOrderLogisticsPrintQueryResponse> orderLogisticsPrintQuery(@RequestBody ErpOrderPayRequest erpOrderPayRequest) {
+        logger.info("订单物流费用支付凭证：{}", erpOrderPayRequest);
         HttpResponse response = HttpResponse.success();
         try {
             ErpOrderLogisticsPrintQueryResponse queryResponse = erpOrderLogisticsNoTransactionalService.orderLogisticsPrintQuery(erpOrderPayRequest);

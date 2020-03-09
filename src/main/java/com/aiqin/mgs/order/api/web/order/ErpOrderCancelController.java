@@ -40,6 +40,7 @@ public class ErpOrderCancelController {
     @PostMapping("/cancelOrderWithoutStock")
     @ApiOperation(value = "缺货终止交易")
     public HttpResponse cancelOrderWithoutStock(@RequestBody ErpOrderCancelRequest erpOrderCancelRequest) {
+        logger.info("发起缺货终止交易：{}", erpOrderCancelRequest);
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
@@ -58,6 +59,7 @@ public class ErpOrderCancelController {
     @PostMapping("/applyCancelOrder")
     @ApiOperation(value = "申请取消订单")
     public HttpResponse applyCancelOrder(@RequestBody ErpOrderCancelRequest erpOrderCancelRequest) {
+        logger.info("发起申请取消订单：{}", erpOrderCancelRequest);
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();

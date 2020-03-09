@@ -5,13 +5,13 @@ import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
-import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayWayEnum;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
-import com.aiqin.mgs.order.api.service.order.*;
+import com.aiqin.mgs.order.api.service.order.ErpOrderCreateService;
+import com.aiqin.mgs.order.api.service.order.ErpOrderPayNoTransactionalService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,19 +41,12 @@ public class ErpOrderCreateController {
     @Resource
     private ErpOrderCreateService erpOrderCreateService;
     @Resource
-    private ErpOrderPayService erpOrderPayService;
-    @Resource
     private ErpOrderPayNoTransactionalService erpOrderPayNoTransactionalService;
-    @Resource
-    private ErpOrderLogisticsNoTransactionalService erpOrderLogisticsNoTransactionalService;
-    @Resource
-    private ErpOrderCancelNoTransactionalService erpOrderCancelNoTransactionalService;
-    @Resource
-    private ErpOrderRefundNoTransactionalService erpOrderRefundNoTransactionalService;
 
     @PostMapping("/erpSaveOrder")
     @ApiOperation(value = "erp从购物车创建订单")
     public HttpResponse<ErpOrderInfo> erpSaveOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
+        logger.info("erp从购物车创建订单：{}", erpOrderSaveRequest);
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
@@ -79,6 +72,7 @@ public class ErpOrderCreateController {
     @PostMapping("/storeSaveOrder")
     @ApiOperation(value = "爱掌柜从购物车创建订单")
     public HttpResponse<ErpOrderInfo> storeSaveOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
+        logger.info("爱掌柜从购物车创建订单：{}", erpOrderSaveRequest);
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
@@ -104,6 +98,7 @@ public class ErpOrderCreateController {
     @PostMapping("/saveRackOrder")
     @ApiOperation(value = "创建货架订单")
     public HttpResponse<ErpOrderInfo> saveRackOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
+        logger.info("erp创建货架订单：{}", erpOrderSaveRequest);
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();

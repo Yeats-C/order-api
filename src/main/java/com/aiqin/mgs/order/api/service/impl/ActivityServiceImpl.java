@@ -795,38 +795,43 @@ public class ActivityServiceImpl implements ActivityService {
             ActivityParameterRequest activityParameterRequest=new ActivityParameterRequest();
             activityParameterRequest.setActivityId(spuProductReqVO.getActivityId());
             activityParameterRequest.setStoreId(spuProductReqVO.getStoreId());
+            if(null!=res.getData()){
+                PageResData<ProductSkuRespVo5> pageResData= (PageResData<ProductSkuRespVo5>) res.getData();
+                List<ProductSkuRespVo5> productSkuRespVo=pageResData.getDataList();
 
-            PageResData<ProductSkuRespVo5> pageResData= (PageResData<ProductSkuRespVo5>) res.getData();
-            List<ProductSkuRespVo5> productSkuRespVo=pageResData.getDataList();
-            for (ProductSkuRespVo5 vo:productSkuRespVo){
-                activityParameterRequest.setSkuCode(vo.getSkuCode());
-                activityParameterRequest.setProductBrandCode(vo.getProductBrandCode());
-                activityParameterRequest.setProductCategoryCode(vo.getProductCategoryCode());
-                vo.setActivityList(activityList(activityParameterRequest));
+                for (ProductSkuRespVo5 vo:productSkuRespVo){
+                    activityParameterRequest.setSkuCode(vo.getSkuCode());
+                    activityParameterRequest.setProductBrandCode(vo.getProductBrandCode());
+                    activityParameterRequest.setProductCategoryCode(vo.getProductCategoryCode());
+                    vo.setActivityList(activityList(activityParameterRequest));
 
-                shoppingCartRequest.setProductId(vo.getSkuCode());
-                Integer cartNum=getSkuNum(shoppingCartRequest).getData();
-                if (null == cartNum) {
-                    cartNum=0;
-                }
-                vo.setCartNum(cartNum);
-                vo.setStoreStockSkuNum(bridgeProductService.getStoreStockSkuNum(shoppingCartRequest));
-
-                if(null!=vo.getSkuStock()){
-                    if(vo.getSkuStock()>10){
-                        vo.setStoreStockExplain("有货");
-                    }else if(vo.getSkuStock()<=0){
-                        vo.setStoreStockExplain("缺货");
-                    }else if(vo.getSkuStock()>0 && vo.getSkuStock()<=10){
-                        vo.setStoreStockExplain("库存紧张");
+                    shoppingCartRequest.setProductId(vo.getSkuCode());
+                    Integer cartNum=getSkuNum(shoppingCartRequest).getData();
+                    if (null == cartNum) {
+                        cartNum=0;
                     }
-                }else{
-                    vo.setStoreStockExplain("缺货");
+                    vo.setCartNum(cartNum);
+                    vo.setStoreStockSkuNum(bridgeProductService.getStoreStockSkuNum(shoppingCartRequest));
+
+                    if(null!=vo.getSkuStock()){
+                        if(vo.getSkuStock()>10){
+                            vo.setStoreStockExplain("有货");
+                        }else if(vo.getSkuStock()<=0){
+                            vo.setStoreStockExplain("缺货");
+                        }else if(vo.getSkuStock()>0 && vo.getSkuStock()<=10){
+                            vo.setStoreStockExplain("库存紧张");
+                        }
+                    }else{
+                        vo.setStoreStockExplain("缺货");
+                    }
+                    if(StringUtils.isEmpty(vo.getItroImages())){
+                        vo.setItroImages("无");
+                    }
                 }
-                if(StringUtils.isEmpty(vo.getItroImages())){
-                    vo.setItroImages("无");
-                }
+            }else{
+                return HttpResponse.failure(ResultCode.SELECT_ACTIVITY_INFO_EXCEPTION_BY_PRODUCT);
             }
+
         }else{
             return HttpResponse.failure(ResultCode.SELECT_ACTIVITY_INFO_EXCEPTION);
         }
@@ -1100,6 +1105,20 @@ public class ActivityServiceImpl implements ActivityService {
         List<String> storesIds = dataList.stream().map(PublicAreaStore::getStoreId).collect(Collectors.toList());
         LOGGER.info("门店ids={}",storesIds);
         return storesIds;
+    }
+
+    @Override
+    public ProductCategoryAndBrandResponse2 ProductCategoryAndBrandResponse(String conditionCode, String type, String activityId) {
+        HttpResponse res=   bridgeProductService.selectCategoryByBrandCode(conditionCode,type);
+        ProductCategoryAndBrandResponse2 response2=new ProductCategoryAndBrandResponse2();
+        if(null!=res.getData()){
+             response2= (ProductCategoryAndBrandResponse2)res.getData();
+        }
+
+        Activity activity=new Activity();
+        activity.setActivityId(activityId);
+        List<ActivityProduct> activityProducts=activityProductDao.activityProductList(activity);
+        return response2;
     }
 
 }
