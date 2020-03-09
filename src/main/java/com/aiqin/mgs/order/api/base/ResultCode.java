@@ -105,6 +105,7 @@ public interface ResultCode {
     MessageId UPDATE_ACTIVITY_INFO_EXCEPTION = MessageId.create(Project.MARKET_API, 7, "更新活动信息时失败");
     MessageId DELETE_ACTIVITY_INFO_EXCEPTION = MessageId.create(Project.MARKET_API, 8, "删除活动信息时失败");
     MessageId SELECT_ACTIVITY_INFO_EXCEPTION = MessageId.create(Project.MARKET_API, 9, "查询活动信息时失败");
+    MessageId SELECT_ACTIVITY_INFO_EXCEPTION_BY_PRODUCT = MessageId.create(Project.MARKET_API, 12, "调用供应链接口查询活动信息时失败");
     MessageId SELECT_ACTIVITY_BY_CONDITION_EXCEPTION = MessageId.create(Project.MARKET_API, 10, "分页模糊查询活动时失败");
     MessageId UPDATE_ACTIVITY_EXCEPTION = MessageId.create(Project.MARKET_API, 11, "更新活动时失败");
     /**促销活动相关 end */

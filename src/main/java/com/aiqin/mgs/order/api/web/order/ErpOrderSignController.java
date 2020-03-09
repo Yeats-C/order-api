@@ -43,6 +43,7 @@ public class ErpOrderSignController {
     @PostMapping("/getNeedSignOrderQuantity")
     @ApiOperation(value = "查询门店未签收订单数量")
     public HttpResponse<ErpOrderSignResponse> getNeedSignOrderQuantity(@RequestBody ErpOrderSignRequest erpOrderSignRequest) {
+        logger.info("查询门店未签收订单数量：{}", erpOrderSignRequest);
         HttpResponse response = HttpResponse.success();
         try {
             int needSignOrderQuantity = erpOrderQueryService.getNeedSignOrderQuantity(erpOrderSignRequest.getStoreId());
@@ -62,6 +63,7 @@ public class ErpOrderSignController {
     @PostMapping("/getOrderSignDetail")
     @ApiOperation(value = "查询待签收订单详情")
     public HttpResponse<ErpOrderInfo> getOrderSignDetail(@RequestBody ErpOrderSignRequest erpOrderSignRequest) {
+        logger.info("查询待签收订单详情：{}", erpOrderSignRequest);
         HttpResponse response = HttpResponse.success();
         try {
             ErpOrderInfo order = erpOrderQueryService.getNeedSignOrderDetailByOrderCode(erpOrderSignRequest.getOrderCode());
@@ -79,6 +81,7 @@ public class ErpOrderSignController {
     @PostMapping("/orderSign")
     @ApiOperation(value = "订单签收")
     public HttpResponse orderSign(@RequestBody ErpOrderSignRequest erpOrderSignRequest) {
+        logger.info("订单签收：{}", erpOrderSignRequest);
         HttpResponse response = HttpResponse.success();
         try {
             erpOrderInfoService.orderSign(erpOrderSignRequest);

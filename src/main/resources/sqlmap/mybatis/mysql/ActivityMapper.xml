@@ -28,51 +28,61 @@
 
     <select id="activityList" resultType="java.util.List" resultMap="ActivityMapping"
             parameterType="com.aiqin.mgs.order.api.domain.Activity">
-        select activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization
-        ,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time,active_store_range
-        ,activity_scope
-        from activity
+        SELECT
+        a.activity_id,a.activity_name,a.activity_type,a.activity_status,a.begin_time,a.finish_time,a.publishing_organization,a.activity_brief
+        ,a.activity_pic_pc,a.activity_pic_app,a.create_by,a.update_by,a.create_time,a.update_time,activity_scope
+        FROM
+        activity a
+        JOIN activity_store s ON a.activity_id = s.activity_id
         <where>
             1=1
             <if test="activityId != '' and activityId != null">
-                and activity_id = #{activityId}
+                and a.activity_id = #{activityId}
             </if>
             <if test="activityName != '' and activityName!= null">
-                and activity_name = #{activityName}
+                and a.activity_name = #{activityName}
             </if>
             <if test="activityType!= null">
-                and activity_type = #{activityType}
+                and a.activity_type = #{activityType}
             </if>
             <if test="activityStatus!= null and activityStatus==3">
-                and finish_time &lt; now() or activity_status=1
+                and a.finish_time &lt; now() or activity_status=1
             </if>
             <if test="activityStatus!= null and activityStatus==2">
-                and begin_time &lt;= now() and finish_time &gt;= now() and activity_status=0
+                and a.begin_time &lt;= now() and finish_time &gt;= now() and activity_status=0
             </if>
             <if test="activityStatus!= null and activityStatus==3">
-                and begin_time &gt; now() and activity_status=0
+                and a.begin_time &gt; now() and activity_status=0
             </if>
             <if test="beginTime!= null">
-                and begin_time &gt;= #{beginTime}
+                and a.begin_time &gt;= #{beginTime}
             </if>
             <if test="finishTime!= null">
-                and finish_time &lt;= #{finishTime}
+                and a.finish_time &lt;= #{finishTime}
             </if>
             <if test="createBy != '' and createBy!= null">
-                and create_by = #{createBy}
+                and a.create_by = #{createBy}
             </if>
             <if test="updateBy != '' and updateBy!= null">
-                and update_by = #{updateBy}
+                and a.update_by = #{updateBy}
             </if>
             <if test="createTime!= null">
-                and create_time = #{createTime}
+                and a.create_time = #{createTime}
             </if>
             <if test="updateTime!= null">
-                and update_time = #{updateTime}
+                and a.update_time = #{updateTime}
             </if>
             <if test="activeStoreRange!= null">
-                and active_store_range = #{activeStoreRange}
+                and a.active_store_range = #{activeStoreRange}
             </if>
+            <if test="storesIds != null and storesIds.size > 0">
+                and s.store_id in
+                <foreach collection="storesIds" item="item" open="( all," separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            GROUP BY a.activity_id
             order by begin_time desc
             <if test="pageSize!=null ">
                 limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}

@@ -12,19 +12,24 @@ import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
+import com.aiqin.mgs.order.api.domain.copartnerArea.PublicAreaStore;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
+import com.aiqin.mgs.order.api.service.CopartnerAreaService;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.DateUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +39,7 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author csf
@@ -74,10 +80,15 @@ public class ActivityServiceImpl implements ActivityService {
     @Resource
     private CopartnerAreaRoleDao copartnerAreaRoleDao;
 
+    @Autowired
+    private CopartnerAreaService copartnerAreaService;
+
     @Override
     public HttpResponse<Map> activityList(Activity activity) {
-        LOGGER.info("查询促销活动列表activityList参数为：{}", activity);
         HttpResponse response = HttpResponse.success();
+        activity.setStoresIds(storeIds("ERP007003"));
+        LOGGER.info("查询促销活动列表activityList参数为：{}", activity);
+
         Integer totalCount=activityDao.totalCount(activity);
         Map data=new HashMap();
         List<Activity> activities=new ArrayList<>();
@@ -668,15 +679,14 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public HttpResponse excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response) {
+    public void excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response) {
         LOGGER.info("导出--活动详情-销售数据-活动销售列表excelActivityItem参数为：{}", erpOrderItem);
-        HttpResponse res = HttpResponse.success();
         try {
             //只查询活动商品
             erpOrderItem.setIsActivity(1);
             List<ErpOrderItem> select = erpOrderItemDao.getActivityItem(erpOrderItem);
             HSSFWorkbook wb = exportData(select);
-            String excelName = "数据列表";
+            String excelName = "数据列表.xls";
             response.reset();
             response.setContentType("application/vnd.ms-excel;charset=UTF-8");
             response.setCharacterEncoding("UTF-8");
@@ -685,7 +695,6 @@ public class ActivityServiceImpl implements ActivityService {
             wb.write(os);
             os.flush();
             os.close();
-            return res;
         } catch (Exception ex) {
             throw new GroundRuntimeException(ex.getMessage());
         }
@@ -700,12 +709,12 @@ public class ActivityServiceImpl implements ActivityService {
             ActivitySales sales=getActivitySalesStatistics(activityId).getData();
             activitySalesList.add(sales);
         }
-        res.setData(activityIdList);
+        res.setData(activitySalesList);
         return res;
     }
 
     @Override
-    public HttpResponse excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response) {
+    public void excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response) {
         LOGGER.info("导出--活动列表-对比分析柱状图excelActivitySalesStatistics参数为：{}", activityIdList);
         HttpResponse res = HttpResponse.success();
         try {
@@ -715,7 +724,7 @@ public class ActivityServiceImpl implements ActivityService {
                 activitySalesList.add(sales);
             }
             HSSFWorkbook wb = exportActivitySalesData(activitySalesList);
-            String excelName = "数据列表";
+            String excelName = "数据列表.xls";
             response.reset();
             response.setContentType("application/vnd.ms-excel;charset=UTF-8");
             response.setCharacterEncoding("UTF-8");
@@ -724,7 +733,6 @@ public class ActivityServiceImpl implements ActivityService {
             wb.write(os);
             os.flush();
             os.close();
-            return res;
         } catch (Exception ex) {
             throw new GroundRuntimeException(ex.getMessage());
         }
@@ -787,38 +795,43 @@ public class ActivityServiceImpl implements ActivityService {
             ActivityParameterRequest activityParameterRequest=new ActivityParameterRequest();
             activityParameterRequest.setActivityId(spuProductReqVO.getActivityId());
             activityParameterRequest.setStoreId(spuProductReqVO.getStoreId());
+            if(null!=res.getData()){
+                PageResData<ProductSkuRespVo5> pageResData= (PageResData<ProductSkuRespVo5>) res.getData();
+                List<ProductSkuRespVo5> productSkuRespVo=pageResData.getDataList();
 
-            PageResData<ProductSkuRespVo5> pageResData= (PageResData<ProductSkuRespVo5>) res.getData();
-            List<ProductSkuRespVo5> productSkuRespVo=pageResData.getDataList();
-            for (ProductSkuRespVo5 vo:productSkuRespVo){
-                activityParameterRequest.setSkuCode(vo.getSkuCode());
-                activityParameterRequest.setProductBrandCode(vo.getProductBrandCode());
-                activityParameterRequest.setProductCategoryCode(vo.getProductCategoryCode());
-                vo.setActivityList(activityList(activityParameterRequest));
+                for (ProductSkuRespVo5 vo:productSkuRespVo){
+                    activityParameterRequest.setSkuCode(vo.getSkuCode());
+                    activityParameterRequest.setProductBrandCode(vo.getProductBrandCode());
+                    activityParameterRequest.setProductCategoryCode(vo.getProductCategoryCode());
+                    vo.setActivityList(activityList(activityParameterRequest));
 
-                shoppingCartRequest.setProductId(vo.getSkuCode());
-                Integer cartNum=getSkuNum(shoppingCartRequest).getData();
-                if (null == cartNum) {
-                    cartNum=0;
-                }
-                vo.setCartNum(cartNum);
-                vo.setStoreStockSkuNum(bridgeProductService.getStoreStockSkuNum(shoppingCartRequest));
-
-                if(null!=vo.getSkuStock()){
-                    if(vo.getSkuStock()>10){
-                        vo.setStoreStockExplain("有货");
-                    }else if(vo.getSkuStock()<=0){
-                        vo.setStoreStockExplain("缺货");
-                    }else if(vo.getSkuStock()>0 && vo.getSkuStock()<=10){
-                        vo.setStoreStockExplain("库存紧张");
+                    shoppingCartRequest.setProductId(vo.getSkuCode());
+                    Integer cartNum=getSkuNum(shoppingCartRequest).getData();
+                    if (null == cartNum) {
+                        cartNum=0;
                     }
-                }else{
-                    vo.setStoreStockExplain("缺货");
+                    vo.setCartNum(cartNum);
+                    vo.setStoreStockSkuNum(bridgeProductService.getStoreStockSkuNum(shoppingCartRequest));
+
+                    if(null!=vo.getSkuStock()){
+                        if(vo.getSkuStock()>10){
+                            vo.setStoreStockExplain("有货");
+                        }else if(vo.getSkuStock()<=0){
+                            vo.setStoreStockExplain("缺货");
+                        }else if(vo.getSkuStock()>0 && vo.getSkuStock()<=10){
+                            vo.setStoreStockExplain("库存紧张");
+                        }
+                    }else{
+                        vo.setStoreStockExplain("缺货");
+                    }
+                    if(StringUtils.isEmpty(vo.getItroImages())){
+                        vo.setItroImages("无");
+                    }
                 }
-                if(StringUtils.isEmpty(vo.getItroImages())){
-                    vo.setItroImages("无");
-                }
+            }else{
+                return HttpResponse.failure(ResultCode.SELECT_ACTIVITY_INFO_EXCEPTION_BY_PRODUCT);
             }
+
         }else{
             return HttpResponse.failure(ResultCode.SELECT_ACTIVITY_INFO_EXCEPTION);
         }
@@ -1077,6 +1090,35 @@ public class ActivityServiceImpl implements ActivityService {
         activityList.clear();
         activityList.addAll(activitySet);
         return activityList;
+    }
+
+    List<String> storeIds(String code){
+        AuthToken authToken= AuthUtil.getCurrentAuth();
+        LOGGER.info("调用合伙人数据权限控制公共接口入参,personId={},resourceCode={}",authToken.getPersonId(),code);
+        HttpResponse httpResponse = copartnerAreaService.selectStoreByPerson(authToken.getPersonId(), code);
+        List<PublicAreaStore> dataList = JSONArray.parseArray(JSON.toJSONString(httpResponse.getData()), PublicAreaStore.class);
+        LOGGER.info("调用合伙人数据权限控制公共接口返回结果,dataList={}",dataList);
+        if (dataList == null || dataList.size() == 0) {
+            return null;
+        }
+        //遍历门店id
+        List<String> storesIds = dataList.stream().map(PublicAreaStore::getStoreId).collect(Collectors.toList());
+        LOGGER.info("门店ids={}",storesIds);
+        return storesIds;
+    }
+
+    @Override
+    public ProductCategoryAndBrandResponse2 ProductCategoryAndBrandResponse(String conditionCode, String type, String activityId) {
+        HttpResponse res=   bridgeProductService.selectCategoryByBrandCode(conditionCode,type);
+        ProductCategoryAndBrandResponse2 response2=new ProductCategoryAndBrandResponse2();
+        if(null!=res.getData()){
+             response2= (ProductCategoryAndBrandResponse2)res.getData();
+        }
+
+        Activity activity=new Activity();
+        activity.setActivityId(activityId);
+        List<ActivityProduct> activityProducts=activityProductDao.activityProductList(activity);
+        return response2;
     }
 
 }
