@@ -12,7 +12,7 @@ import java.util.Date;
 
 @ApiModel
 @Data
-public class RejectRecord{
+public class RejectRecordInfo {
     @ApiModelProperty(value = "")
     @JsonProperty("id")
     private Long id;
