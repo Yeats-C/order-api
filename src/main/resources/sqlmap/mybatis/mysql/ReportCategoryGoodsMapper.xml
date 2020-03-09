@@ -13,97 +13,11 @@
   <sql id="Base_Column_List" >
     id, category_code, category_name, amount, proportion, create_time,type
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
-    select 
-    <include refid="Base_Column_List" />
-    from report_category_goods
-    where id = #{id,jdbcType=BIGINT}
-  </select>
+
   <delete id="deleteByType" parameterType="java.lang.Integer" >
     delete from report_category_goods
     where type = #{type}
   </delete>
-  <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.ReportCategoryGoods" >
-    insert into report_category_goods (id, category_code, category_name, 
-      amount, proportion, create_time,type
-      )
-    values (#{id,jdbcType=BIGINT}, #{categoryCode,jdbcType=VARCHAR}, #{categoryName,jdbcType=VARCHAR}, 
-      #{amount,jdbcType=DECIMAL}, #{proportion,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP},#{type,jdbcType=TINYINT}
-      )
-  </insert>
-  <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.ReportCategoryGoods" >
-    insert into report_category_goods
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        id,
-      </if>
-      <if test="categoryCode != null" >
-        category_code,
-      </if>
-      <if test="categoryName != null" >
-        category_name,
-      </if>
-      <if test="amount != null" >
-        amount,
-      </if>
-      <if test="proportion != null" >
-        proportion,
-      </if>
-      <if test="createTime != null" >
-        create_time,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        #{id,jdbcType=BIGINT},
-      </if>
-      <if test="categoryCode != null" >
-        #{categoryCode,jdbcType=VARCHAR},
-      </if>
-      <if test="categoryName != null" >
-        #{categoryName,jdbcType=VARCHAR},
-      </if>
-      <if test="amount != null" >
-        #{amount,jdbcType=DECIMAL},
-      </if>
-      <if test="proportion != null" >
-        #{proportion,jdbcType=DECIMAL},
-      </if>
-      <if test="createTime != null" >
-        #{createTime,jdbcType=TIMESTAMP},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.ReportCategoryGoods" >
-    update report_category_goods
-    <set >
-      <if test="categoryCode != null" >
-        category_code = #{categoryCode,jdbcType=VARCHAR},
-      </if>
-      <if test="categoryName != null" >
-        category_name = #{categoryName,jdbcType=VARCHAR},
-      </if>
-      <if test="amount != null" >
-        amount = #{amount,jdbcType=DECIMAL},
-      </if>
-      <if test="proportion != null" >
-        proportion = #{proportion,jdbcType=DECIMAL},
-      </if>
-      <if test="createTime != null" >
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-    </set>
-    where id = #{id,jdbcType=BIGINT}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.aiqin.mgs.order.api.domain.ReportCategoryGoods" >
-    update report_category_goods
-    set category_code = #{categoryCode,jdbcType=VARCHAR},
-      category_name = #{categoryName,jdbcType=VARCHAR},
-      amount = #{amount,jdbcType=DECIMAL},
-      proportion = #{proportion,jdbcType=DECIMAL},
-      create_time = #{createTime,jdbcType=TIMESTAMP}
-    where id = #{id,jdbcType=BIGINT}
-  </update>
 
   <select id="selectList" resultMap="BaseResultMap"
           parameterType="com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo">

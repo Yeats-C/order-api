@@ -43,17 +43,17 @@ public class RelportStoreGoodsController {
         return new HttpResponse(reportStoreGoodsService.getList(searchVo));
     }
 
-    @ApiOperation("门店补货报表新增")
-    @PostMapping("/insert")
-    public HttpResponse<Boolean> addRelatedSales(@RequestBody ReportStoreGoods relatedSales) {
-        return new HttpResponse<>(reportStoreGoodsService.insert(relatedSales));
-    }
-
-    @ApiOperation("门店补货报表修改")
-    @PostMapping("/update")
-    public HttpResponse<Boolean> update(@RequestBody ReportStoreGoods relatedSales) {
-        return new HttpResponse<>(reportStoreGoodsService.update(relatedSales));
-    }
+//    @ApiOperation("门店补货报表新增")
+//    @PostMapping("/insert")
+//    public HttpResponse<Boolean> addRelatedSales(@RequestBody ReportStoreGoods relatedSales) {
+//        return new HttpResponse<>(reportStoreGoodsService.insert(relatedSales));
+//    }
+//
+//    @ApiOperation("门店补货报表修改")
+//    @PostMapping("/update")
+//    public HttpResponse<Boolean> update(@RequestBody ReportStoreGoods relatedSales) {
+//        return new HttpResponse<>(reportStoreGoodsService.update(relatedSales));
+//    }
 
     @ApiOperation("门店补货列表商品详情")
     @PostMapping("/getCountDetailList")
@@ -88,11 +88,18 @@ public class RelportStoreGoodsController {
         return HttpResponse.success(reportStoreGoodsService.topProvinceAmount(type));
     }
 
-    @ApiOperation("售后管理---退货商品分类统计")
+    @ApiOperation("售后管理---退货商品分类统计定时任务手动执行")
     @PostMapping("/reportCategoryGoods")
     public HttpResponse reportCategoryGoods(@RequestBody ReportAreaReturnSituationVo type) {
         reportStoreGoodsService.reportCategoryGoods(type);
         return HttpResponse.success();
+    }
+
+    @ApiOperation("售后管理---退货商品分类统计查询")
+    @GetMapping("/getReportCategoryGoods")
+    @ApiImplicitParams({@ApiImplicitParam(name = "type", value = "退货类型 1:直送退货 2:质量退货 3:一般退货", dataType = "int", paramType = "query", required = true)})
+    public HttpResponse getReportCategoryGoods(Integer type) {
+        return HttpResponse.success(reportStoreGoodsService.getReportCategoryGoods(type));
     }
 
 }

@@ -477,4 +477,11 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
         }
     }
 
+    @Override
+    public List<ReportCategoryGoods> getReportCategoryGoods(Integer type) {
+        ReportAreaReturnSituationVo vo=new ReportAreaReturnSituationVo();
+        vo.setType(type);
+        return reportCategoryGoodsDao.selectList(vo);
+    }
+
 }
