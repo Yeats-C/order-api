@@ -133,8 +133,7 @@ public class ActivityServiceImpl implements ActivityService {
         if(null==activityRequest
             ||null==activityRequest.getActivity()
             ||null==activityRequest.getActivityStores()
-            ||null==activityRequest.getActivityProducts()
-            ||null==activityRequest.getActivityRules()){
+            ||null==activityRequest.getActivityProducts()){
             return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
         }
         AuthToken authToken= AuthUtil.getCurrentAuth();
@@ -355,8 +354,7 @@ public class ActivityServiceImpl implements ActivityService {
             if(null==activityRequest
                     ||null==activityRequest.getActivity()
                     ||null==activityRequest.getActivityStores()
-                    ||null==activityRequest.getActivityProducts()
-                    ||null==activityRequest.getActivityRules()){
+                    ||null==activityRequest.getActivityProducts()){
                 return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
             }
             AuthToken authToken=AuthUtil.getCurrentAuth();
