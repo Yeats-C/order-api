@@ -66,8 +66,8 @@ public class ActivityProduct {
     @JsonProperty("discount")
     private BigDecimal discount;
 
-    /***减价金额*/
-    @ApiModelProperty(value = "减价金额")
+    /***减价金额，促销价格*/
+    @ApiModelProperty(value = "减价金额，促销价格")
     @JsonProperty("reduce")
     private BigDecimal reduce;
 

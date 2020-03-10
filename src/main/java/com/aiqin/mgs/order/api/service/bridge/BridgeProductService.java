@@ -284,6 +284,17 @@ public class BridgeProductService {
         HttpClient httpClient = HttpClient.get( path+sb.toString());
         HttpResponse<List<ProductCategoryRespVO>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ProductCategoryRespVO>>>() {
         });
+        if (Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")) {
+            List<ProductCategoryRespVO> lists=response.getData();
+            //门店端不展示赠品，物料，德明居，其他，只展示1到11到品类
+            Iterator<ProductCategoryRespVO> it = lists.iterator();
+            while(it.hasNext()){
+                ProductCategoryRespVO str = it.next();
+                if(str.getCategoryId().compareTo("11")>0){
+                    it.remove();
+                }
+            }
+        }
         return response;
     }
 
@@ -311,11 +322,23 @@ public class BridgeProductService {
         HttpClient httpClient = HttpClient.get( path+sb.toString());
         HttpResponse<List<ProductCategoryRespVO>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ProductCategoryRespVO>>>() {
         });
+        if (Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")) {
+            List<ProductCategoryRespVO> lists=response.getData();
+            //门店端不展示赠品，物料，德明居，其他，只展示1到11到品类
+            Iterator<ProductCategoryRespVO> it = lists.iterator();
+            while(it.hasNext()){
+                ProductCategoryRespVO str = it.next();
+                if(str.getCategoryId().compareTo("11")>0){
+                    it.remove();
+                }
+            }
+        }
+
         return response;
     }
 
     /**
-     * 供应链提供查询品牌树接口
+     * 供应链提供查询品牌接口
      * @param req
      * @return
      */
@@ -348,7 +371,7 @@ public class BridgeProductService {
 
 
     /**
-     * 供应链提供查询品牌树接口
+     * 供应链提供查询品类树接口
      * @param req
      * @return
      */
@@ -358,6 +381,18 @@ public class BridgeProductService {
         HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path);
         HttpResponse<List<ProductCategoryRespVO>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ProductCategoryRespVO>>>() {
         });
+        if (Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")) {
+            List<ProductCategoryRespVO> lists=response.getData();
+            //门店端不展示赠品，物料，德明居，其他，只展示1到11到品类
+            Iterator<ProductCategoryRespVO> it = lists.iterator();
+            while(it.hasNext()){
+                ProductCategoryRespVO pro = it.next();
+                if(pro.getCategoryId().compareTo("11")>0){
+                    it.remove();
+                }
+            }
+        }
+
         return response;
     }
 
@@ -372,6 +407,18 @@ public class BridgeProductService {
         HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path);
         HttpResponse<ProductCategoryAndBrandResponse2> response = httpClient.action().result(new TypeReference<HttpResponse<ProductCategoryAndBrandResponse2>>() {
         });
+        if (Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0") && type=="2") {
+            List<ProductCategoryRespVO> lists=response.getData().getProductCategoryRespVOList();
+            //门店端不展示赠品，物料，德明居，其他，只展示1到11到品类
+            Iterator<ProductCategoryRespVO> it = lists.iterator();
+            while(it.hasNext()){
+                ProductCategoryRespVO pro = it.next();
+                if(pro.getCategoryId().compareTo("11")>0){
+                    it.remove();
+                }
+            }
+        }
+
         return response;
     }
 }
