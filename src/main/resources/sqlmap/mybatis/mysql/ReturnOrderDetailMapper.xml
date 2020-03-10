@@ -38,6 +38,8 @@
         <result column="remark" property="remark" jdbcType="VARCHAR"/>
         <result column="evidence_url" property="evidenceUrl" jdbcType="VARCHAR"/>
         <result column="preferential_amount" property="preferentialAmount" jdbcType="DECIMAL"/>
+        <result column="product_category_code" property="productCategoryCode" jdbcType="VARCHAR"/>
+        <result column="product_category_name" property="productCategoryName" jdbcType="VARCHAR"/>
     </resultMap>
     <sql id="Base_Column_List">
     id, return_order_detail_id, return_order_code, sku_code, sku_name, picture_url, product_spec, 
@@ -45,7 +47,8 @@
     zero_disassembly_coefficient, activity_code, product_amount, total_product_amount, 
     return_product_count, actual_return_product_count, actual_total_product_amount, product_status, 
     tax_rate, line_code, use_status, source_code, source_type, create_by_id, create_by_name, 
-    update_by_id, update_by_name, create_time, update_time, remark, evidence_url, preferential_amount
+    update_by_id, update_by_name, create_time, update_time, remark, evidence_url, preferential_amount,
+    product_category_code,product_category_name
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
         select
@@ -169,6 +172,12 @@
             <if test="preferentialAmount != null">
                 preferential_amount,
             </if>
+            <if test="productCategoryCode != null">
+                product_category_code,
+            </if>
+            <if test="productCategoryName != null">
+                product_category_name,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -278,6 +287,12 @@
             </if>
             <if test="preferentialAmount != null">
                 #{preferentialAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="productCategoryCode != null">
+                #{productCategoryCode,jdbcType=VARCHAR},
+            </if>
+            <if test="productCategoryName != null">
+                #{productCategoryName,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
@@ -389,6 +404,12 @@
             <if test="preferentialAmount != null">
                 preferential_amount=#{preferentialAmount,jdbcType=DECIMAL},
             </if>
+            <if test="productCategoryCode != null">
+                product_category_code=#{productCategoryCode},
+            </if>
+            <if test="productCategoryName != null">
+                product_category_name=#{productCategoryName},
+            </if>
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
@@ -397,7 +418,8 @@
         insert into return_order_detail (return_order_detail_id, return_order_code,product_type,
         sku_code, sku_name,total_product_amount,return_product_count,model_code,product_status,
         product_spec,unit_name,color_code,color_name,create_by_id, create_by_name,picture_url,
-        create_time,remark,evidence_url,preferential_amount,line_code,unit_code,tax_rate,product_amount)
+        create_time,remark,evidence_url,preferential_amount,line_code,unit_code,tax_rate,
+        product_amount,product_category_code,product_category_name)
         values
         <foreach collection="records" item="item" index="index" separator=",">
             (
@@ -411,7 +433,8 @@
             #{item.createByName,jdbcType=VARCHAR},
             #{item.pictureUrl,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP},
             #{item.remark,jdbcType=VARCHAR},#{item.evidenceUrl,jdbcType=VARCHAR},#{item.preferentialAmount,jdbcType=DECIMAL},
-            #{item.lineCode},#{item.unitCode},#{item.taxRate},#{item.productAmount}
+            #{item.lineCode},#{item.unitCode},#{item.taxRate},#{item.productAmount},
+            #{item.productCategoryCode},#{item.productCategoryName}
             )
         </foreach>
     </insert>
@@ -457,7 +480,7 @@
         sku_code, sku_name,total_product_amount,return_product_count,model_code,product_status,
         product_spec,unit_name,color_code,color_name,create_by_id, create_by_name,picture_url,
         create_time,remark,evidence_url,preferential_amount,line_code,actual_return_product_count,
-        actual_total_product_amount,product_amount)
+        actual_total_product_amount,product_amount,product_category_code,product_category_name)
         values
         <foreach collection="records" item="item" index="index" separator=",">
             (
@@ -472,9 +495,25 @@
             #{item.pictureUrl,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP},
             #{item.remark,jdbcType=VARCHAR},#{item.evidenceUrl,jdbcType=VARCHAR},#{item.preferentialAmount,jdbcType=DECIMAL},
             #{item.lineCode},#{item.actualReturnProductCount},#{item.actualTotalProductAmount},
-            #{item.productAmount}
+            #{item.productAmount},#{item.productCategoryCode},#{item.productCategoryName}
             )
         </foreach>
     </insert>
+
+    <select id="countAmountByCategoryCode" parameterType="com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo" resultType="java.math.BigDecimal">
+        select coalesce(sum(actual_total_product_amount),0) as amount from return_order_detail
+        where product_category_code LIKE concat('',#{categoryCode},'%')
+        and return_order_code in (
+            select order_store_code from return_order_info
+        <where>
+            <if test="type!=null">
+                and order_type=#{type}
+            </if>
+            <if test="reasonCode!=null and reasonCode!=''">
+                and return_reason_code=#{reasonCode}
+            </if>
+        </where>
+        )
+    </select>
 
 </mapper>
