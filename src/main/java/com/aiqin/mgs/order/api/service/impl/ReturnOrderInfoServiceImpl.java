@@ -898,6 +898,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     returnOrderDetail.setActualTotalProductAmount(amount);
                     returnOrderDetail.setProductAmount(eoi.getProductAmount());
                     returnOrderDetail.setReturnProductCount(eoi.getProductCount());
+                    returnOrderDetail.setProductCategoryCode(eoi.getProductCategoryCode());
+                    returnOrderDetail.setProductCategoryName(eoi.getProductCategoryName());
                     detailsList.add(returnOrderDetail);
                 }else if(differenceCount.equals(productCount)){//全退
                     //计算公式：优惠分摊总金额（分摊后金额）
@@ -908,6 +910,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     returnOrderDetail.setActualTotalProductAmount(totalPreferentialAmount);
                     returnOrderDetail.setProductAmount(eoi.getProductAmount());
                     returnOrderDetail.setReturnProductCount(eoi.getProductCount());
+                    returnOrderDetail.setProductCategoryCode(eoi.getProductCategoryCode());
+                    returnOrderDetail.setProductCategoryName(eoi.getProductCategoryName());
                     detailsList.add(returnOrderDetail);
                 }
             }
@@ -1042,6 +1046,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             detail.setReturnOrderCode(returnOrderCode);
             detail.setCreateById(ConstantData.SYS_OPERTOR);
             detail.setCreateByName(ConstantData.SYS_OPERTOR);
+            detail.setProductCategoryCode(detailVo.getProductCategoryCode());
+            detail.setProductCategoryName(detailVo.getProductCategoryName());
             return detail;
         }).collect(Collectors.toList());
         //生成退货单详情
