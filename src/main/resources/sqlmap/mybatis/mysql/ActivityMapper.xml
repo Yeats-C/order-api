@@ -77,7 +77,7 @@
             </if>
             <if test="storesIds != null and storesIds.size > 0">
                 and s.store_id in
-                <foreach collection="storesIds" item="item" open="( all," separator="," close=")">
+                <foreach collection="storesIds" item="item" open="( 'all'," separator="," close=")">
                     #{item}
                 </foreach>
             </if>
