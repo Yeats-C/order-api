@@ -119,7 +119,7 @@ public class ErpOrderCartInfo {
     private Integer lineCheckStatus;
 
     @ApiModelProperty(value = "交易倍数")
-    @JsonProperty("zero_removalCoefficient")
+    @JsonProperty("zero_removal_coefficient")
     private Integer zeroRemovalCoefficient;
 
     @ApiModelProperty(value = "规格")
@@ -151,6 +151,31 @@ public class ErpOrderCartInfo {
     private String productCategoryCode;
 
     /***********************************非数据库字段***********************************/
+
+    /***活动价*/
+    @ApiModelProperty(value = "活动价")
+    @JsonProperty("activity_price")
+    private BigDecimal activityPrice;
+
+    /***行原价汇总（分销价汇总）*/
+    @ApiModelProperty(value = "行原价汇总（分销价汇总）")
+    @JsonProperty("line_amount_total")
+    private BigDecimal lineAmountTotal;
+
+    /***行活动价汇总*/
+    @ApiModelProperty(value = "行活动价汇总")
+    @JsonProperty("line_activity_amount_total")
+    private BigDecimal lineActivityAmountTotal;
+
+    /***行活动优惠的金额*/
+    @ApiModelProperty(value = "行活动优惠的金额，行根据活动使该行减少的金额，前端不显示")
+    @JsonProperty("line_activity_discount_total")
+    private BigDecimal lineActivityDiscountTotal;
+
+    /***行减去活动优惠之后分摊的金额*/
+    @ApiModelProperty(value = "计算了活动分摊之后的金额，前端不显示")
+    @JsonProperty("line_amount_after_activity")
+    private BigDecimal lineAmountAfterActivity;
 
     @ApiModelProperty(value = "库存数量")
     @JsonProperty("stock_num")

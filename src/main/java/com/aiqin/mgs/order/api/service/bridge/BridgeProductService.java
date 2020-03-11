@@ -118,6 +118,7 @@ public class BridgeProductService {
             if (!RequestReturnUtil.validateHttpResponse(response)) {
                 throw new BusinessException(response.getMessage());
             }
+            list = response.getData();
 
         } catch (BusinessException e) {
             log.info("获取商品信息失败：{}", e.getMessage());

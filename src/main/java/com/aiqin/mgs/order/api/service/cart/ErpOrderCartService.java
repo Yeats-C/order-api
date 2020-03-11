@@ -8,6 +8,7 @@ import com.aiqin.mgs.order.api.domain.request.cart.ErpCartQueryRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartUpdateRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpOrderCartAddResponse;
+import com.aiqin.mgs.order.api.domain.response.cart.ErpStoreCartQueryResponse;
 
 import java.util.List;
 
@@ -20,25 +21,100 @@ import java.util.List;
  */
 public interface ErpOrderCartService {
 
+    /**
+     * 插入行（原子操作）
+     *
+     * @param erpOrderCartInfo
+     * @param authToken
+     */
     void insertCartLine(ErpOrderCartInfo erpOrderCartInfo, AuthToken authToken);
 
+    /**
+     * 批量插入行
+     *
+     * @param list
+     * @param authToken
+     */
     void insertCartLineList(List<ErpOrderCartInfo> list, AuthToken authToken);
 
+    /**
+     * 通过主键更新行（原子操作）
+     *
+     * @param erpOrderCartInfo
+     * @param authToken
+     */
     void updateCartLine(ErpOrderCartInfo erpOrderCartInfo, AuthToken authToken);
 
+    /**
+     * 批量根据主键更新行
+     *
+     * @param list
+     * @param authToken
+     */
     void updateCartLineList(List<ErpOrderCartInfo> list, AuthToken authToken);
 
+    /**
+     * 根据cartId查询行
+     *
+     * @param cartId
+     * @return
+     */
     ErpOrderCartInfo getCartLineByCartId(String cartId);
 
+    /**
+     * 根据（部分）条件精确查询
+     *
+     * @param erpOrderCartInfo
+     * @return
+     */
     List<ErpOrderCartInfo> selectByProperty(ErpOrderCartInfo erpOrderCartInfo);
 
+    /**
+     * 根据cartId删除行
+     *
+     * @param cartId
+     */
     void deleteCartLine(String cartId);
 
+    /**
+     * 添加商品
+     *
+     * @param erpCartAddRequest
+     * @param auth
+     * @return
+     */
     ErpOrderCartAddResponse addProduct(ErpCartAddRequest erpCartAddRequest, AuthToken auth);
 
+    /**
+     * 全选/全不选
+     *
+     * @param erpCartChangeGroupCheckStatusRequest
+     * @param auth
+     */
     void changeGroupCheckStatus(ErpCartChangeGroupCheckStatusRequest erpCartChangeGroupCheckStatusRequest, AuthToken auth);
 
-    void updateCartLineProduct(ErpCartUpdateRequest erpCartUpdateRequest,AuthToken auth);
+    /**
+     * 更新一行
+     *
+     * @param erpCartUpdateRequest
+     * @param auth
+     */
+    void updateCartLineProduct(ErpCartUpdateRequest erpCartUpdateRequest, AuthToken auth);
 
-    ErpCartQueryResponse queryErpCartList(ErpCartQueryRequest erpCartQueryRequest);
+    /**
+     * erp端查询购物车
+     *
+     * @param erpCartQueryRequest
+     * @return
+     */
+    ErpCartQueryResponse queryErpCartList(ErpCartQueryRequest erpCartQueryRequest, AuthToken auth);
+
+    /**
+     * 查询爱掌柜购物车
+     *
+     * @param erpCartQueryRequest
+     * @param auth
+     * @return
+     */
+    ErpStoreCartQueryResponse queryStoreCartList(ErpCartQueryRequest erpCartQueryRequest, AuthToken auth);
 }
