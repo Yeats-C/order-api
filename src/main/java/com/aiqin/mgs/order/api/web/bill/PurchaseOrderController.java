@@ -50,7 +50,13 @@ public class PurchaseOrderController {
     @PostMapping("/sale/info")
     @ApiOperation(value = "耘链销售单回传")
     public HttpResponse updatePurchaseInfo(@Valid @RequestBody OrderIogisticsVo orderIogisticsVo) {
-        return purchaseOrderService.updatePurchaseInfo(orderIogisticsVo);
+        try {
+            return purchaseOrderService.updatePurchaseInfo(orderIogisticsVo);
+        } catch (BusinessException e) {
+            return HttpResponse.failure(MessageId.create(null,-1,e.getMessage()));
+        } catch (Exception e) {
+            return HttpResponse.failure(MessageId.create(null,-1,e.getMessage()));
+        }
     }
 
     /**

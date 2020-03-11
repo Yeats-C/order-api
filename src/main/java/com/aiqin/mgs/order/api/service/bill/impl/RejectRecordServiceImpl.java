@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.service.bill.impl;
 
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.returnenums.ReturnOrderStatusEnum;
@@ -13,6 +14,7 @@ import com.aiqin.mgs.order.api.domain.request.bill.ReturnDLReq;
 import com.aiqin.mgs.order.api.domain.request.bill.ReturnOrderDetailDLReq;
 import com.aiqin.mgs.order.api.domain.request.bill.ReturnOrderInfoDLReq;
 import com.aiqin.mgs.order.api.domain.request.RejectRequest;
+import com.aiqin.mgs.order.api.domain.request.purchase.RejectQueryRequest;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailReviewApiReqVo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewApiReqVo;
 import com.aiqin.mgs.order.api.domain.response.RejectResponse;
@@ -26,6 +28,7 @@ import com.aiqin.mgs.order.api.service.bill.CreateRejectRecordService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,6 +1,9 @@
 package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.OperationLog;
+import com.aiqin.mgs.order.api.domain.response.OrderOperationLog;
+
+import java.util.List;
 
 public interface OperationLogDao {
     int deleteByPrimaryKey(Long id);
@@ -19,4 +22,6 @@ public interface OperationLogDao {
     int updateByPrimaryKeySelective(OperationLog record);
 
     int updateByPrimaryKey(OperationLog record);
+
+    List<OrderOperationLog> list(String operationId);
 }
