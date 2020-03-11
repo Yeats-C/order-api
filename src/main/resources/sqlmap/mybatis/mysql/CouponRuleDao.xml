@@ -16,7 +16,7 @@
     select 
     <include refid="Base_Column_List" />
     from coupon_rule
-    where coupon_type = #{couponType,jdbcType=BIGINT}
+    where coupon_type = #{couponType}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     delete from coupon_rule

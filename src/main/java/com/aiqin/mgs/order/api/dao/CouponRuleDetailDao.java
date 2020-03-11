@@ -1,18 +1,23 @@
 package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.CouponRuleDetail;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface CouponRuleDetailDao {
 
-    int deleteByPrimaryKey(Long id);
+    int deleteByCouponType(Integer couponType);
 
     int insert(CouponRuleDetail record);
 
     int insertSelective(CouponRuleDetail record);
 
-    CouponRuleDetail selectByPrimaryKey(Long id);
+    List<CouponRuleDetail> selectDetailByCouponType(Integer couponType);
 
     int updateByPrimaryKeySelective(CouponRuleDetail record);
 
     int updateByPrimaryKey(CouponRuleDetail record);
+
+    int insertBatch(@Param("records") List<CouponRuleDetail> records);
 }
