@@ -394,6 +394,10 @@ public class ErpOrderInfo {
     @JsonProperty("update_time")
     private Date updateTime;
 
+    @ApiModelProperty(value = "返还的物流券金额")
+    @JsonProperty("goods_coupon")
+    private BigDecimal goodsCoupon;
+
     @ApiModelProperty(value = "主订单费用详情")
     @JsonProperty("order_fee")
     private ErpOrderFee orderFee;
