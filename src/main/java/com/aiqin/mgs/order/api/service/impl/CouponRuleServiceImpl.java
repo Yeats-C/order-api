@@ -1,7 +1,9 @@
 package com.aiqin.mgs.order.api.service.impl;
 
 import com.aiqin.mgs.order.api.dao.CouponRuleDao;
+import com.aiqin.mgs.order.api.dao.CouponRuleDetailDao;
 import com.aiqin.mgs.order.api.domain.CouponRule;
+import com.aiqin.mgs.order.api.domain.CouponRuleDetail;
 import com.aiqin.mgs.order.api.service.CouponRuleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +23,17 @@ public class CouponRuleServiceImpl implements CouponRuleService {
 
     @Autowired
     private CouponRuleDao couponRuleDao;
+    @Autowired
+    private CouponRuleDetailDao couponRuleDetailDao;
 
     @Override
     public List<CouponRule> getList() {
-        return couponRuleDao.selectList();
+        List<CouponRule> couponRules = couponRuleDao.selectList();
+        for(CouponRule cr:couponRules){
+            List<CouponRuleDetail> couponRuleDetails = couponRuleDetailDao.selectDetailByCouponType(cr.getCouponType());
+            cr.setCouponRuleDetailList(couponRuleDetails);
+        }
+        return couponRules;
     }
 
     @Override

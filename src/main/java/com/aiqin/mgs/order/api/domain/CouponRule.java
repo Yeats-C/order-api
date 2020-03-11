@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @ApiModel("优惠券优惠规则")
@@ -35,5 +36,9 @@ public class CouponRule {
     @ApiModelProperty(value = "修改时间")
     @JsonProperty("update_time")
     private Date updateTime;
+
+    @ApiModelProperty(value = "封装商品属性集合")
+    @JsonProperty("coupon_rule_detail_list")
+    private List<CouponRuleDetail> couponRuleDetailList;
 
 }
