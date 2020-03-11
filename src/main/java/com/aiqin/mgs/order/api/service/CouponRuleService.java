@@ -12,12 +12,32 @@ import java.util.List;
  */
 public interface CouponRuleService {
 
-    List<CouponRule>  getList();
+    /**
+     * 基础设置--活惠券规则设置列表
+     * @return
+     */
+    List<CouponRule> getList();
 
+    /**
+     * 基础设置--根据活惠券类型查看规则及商品属性
+     * 优惠券类型 0-物流券 1-服纺券 2-A品券
+     * @param couponType
+     * @return
+     */
     CouponRule getCouponRule(Integer couponType);
 
+    /**
+     * 基础设置--活惠券规则设置
+     * @param couponRule
+     * @return
+     */
     Boolean insert(CouponRule couponRule);
 
+    /**
+     * 基础设置--活惠券规则修改
+     * @param couponRule
+     * @return
+     */
     Boolean update(CouponRule couponRule);
 
 }
