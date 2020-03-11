@@ -1049,6 +1049,12 @@
     <if test="returnOrderType!=null">
       and return_order_type=#{returnOrderType,jdbcType=INTEGER}
     </if>
+    <if test="storeIds!=null">
+      and store_id in
+      <foreach collection="storeIds"  item="item" open="(" separator="," close=")"  >
+        #{item}
+      </foreach>
+    </if>
     order by create_time desc
   </select>
 
