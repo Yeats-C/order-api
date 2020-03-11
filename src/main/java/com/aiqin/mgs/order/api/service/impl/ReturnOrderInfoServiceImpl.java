@@ -715,19 +715,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     public PageResData<ReturnOrderInfo> getlist(PageRequestVO<AfterReturnOrderSearchVo> searchVo) {
         log.info("售后管理--退货单列表入参searchVo={}",searchVo);
         PageResData pageResData=new PageResData();
-        if(StringUtils.isBlank(searchVo.getSearchVO().getPersonId())||StringUtils.isBlank(searchVo.getSearchVO().getResourceCode())){
-            return pageResData;
-        }
-        log.info("调用合伙人数据权限控制公共接口入参,personId={},resourceCode={}",searchVo.getSearchVO().getPersonId(),searchVo.getSearchVO().getResourceCode());
-        HttpResponse httpResponse = copartnerAreaService.selectStoreByPerson(searchVo.getSearchVO().getPersonId(), searchVo.getSearchVO().getResourceCode());
-        List<PublicAreaStore> dataList = JSONArray.parseArray(JSON.toJSONString(httpResponse.getData()), PublicAreaStore.class);
-        log.info("调用合伙人数据权限控制公共接口返回结果,dataList={}",dataList);
-        if (dataList == null || dataList.size() == 0) {
-            return pageResData;
-        }
-        //遍历门店id
-        List<String> storesIds = dataList.stream().map(PublicAreaStore::getStoreId).collect(Collectors.toList());
-        log.info("门店ids={}",storesIds);
         //根据地区查询出的门店
         List<String> ids=new ArrayList<>();
         if(searchVo.getSearchVO()!=null&&null!=searchVo.getSearchVO().getAreaReq()){
@@ -753,16 +740,36 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 }
             }
         }
-
+        //保存数据权限查询出的数据
+        List<String> storesIds=new ArrayList<>();
         List<String> newIds=new ArrayList<>();
-        if(ids!=null&&ids.size()>0){
-            for(String id:ids){
-                if(storesIds.contains(id)){
-                    newIds.add(id);
-                }
+        if(searchVo.getSearchVO().getOrderType().equals(2)&&"15".equals(searchVo.getSearchVO().getReturnReasonCode())){//一般退货需要加数据权限
+            if(StringUtils.isBlank(searchVo.getSearchVO().getPersonId())||StringUtils.isBlank(searchVo.getSearchVO().getResourceCode())){
+                return pageResData;
             }
-        }else{
-            newIds.addAll(storesIds);
+            log.info("调用合伙人数据权限控制公共接口入参,personId={},resourceCode={}",searchVo.getSearchVO().getPersonId(),searchVo.getSearchVO().getResourceCode());
+            HttpResponse httpResponse = copartnerAreaService.selectStoreByPerson(searchVo.getSearchVO().getPersonId(), searchVo.getSearchVO().getResourceCode());
+            List<PublicAreaStore> dataList = JSONArray.parseArray(JSON.toJSONString(httpResponse.getData()), PublicAreaStore.class);
+            log.info("调用合伙人数据权限控制公共接口返回结果,dataList={}",dataList);
+            if (dataList == null || dataList.size() == 0) {
+                return pageResData;
+            }
+            //遍历门店id
+            storesIds = dataList.stream().map(PublicAreaStore::getStoreId).collect(Collectors.toList());
+            log.info("门店ids={}",storesIds);
+            if(ids!=null&&ids.size()>0){
+                for(String id:ids){
+                    if(storesIds.contains(id)){
+                        newIds.add(id);
+                    }
+                }
+            }else{
+                newIds.addAll(storesIds);
+            }
+        }else{//质量退货、直送退货
+            if(ids!=null&&ids.size()>0){
+                newIds.addAll(ids);
+            }
         }
         searchVo.getSearchVO().setStoreIds(newIds);
         PageHelper.startPage(searchVo.getPageNo(),searchVo.getPageSize());
