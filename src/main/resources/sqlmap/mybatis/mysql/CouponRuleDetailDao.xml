@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aiqin.mgs.order.api.dao.CouponRuleDetailDao" >
+  <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.CouponRuleDetail" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="coupon_type" property="couponType" jdbcType="TINYINT" />
+    <result column="product_property_code" property="productPropertyCode" jdbcType="VARCHAR" />
+    <result column="product_property_name" property="productPropertyName" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, coupon_type, product_property_code, product_property_name, create_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from coupon_rule_detail
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from coupon_rule_detail
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.CouponRuleDetail" >
+    insert into coupon_rule_detail (id, coupon_type, product_property_code, 
+      product_property_name, create_time)
+    values (#{id,jdbcType=BIGINT}, #{couponType,jdbcType=TINYINT}, #{productPropertyCode,jdbcType=VARCHAR}, 
+      #{productPropertyName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.CouponRuleDetail" >
+    insert into coupon_rule_detail
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="couponType != null" >
+        coupon_type,
+      </if>
+      <if test="productPropertyCode != null" >
+        product_property_code,
+      </if>
+      <if test="productPropertyName != null" >
+        product_property_name,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="couponType != null" >
+        #{couponType,jdbcType=TINYINT},
+      </if>
+      <if test="productPropertyCode != null" >
+        #{productPropertyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="productPropertyName != null" >
+        #{productPropertyName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.CouponRuleDetail" >
+    update coupon_rule_detail
+    <set >
+      <if test="couponType != null" >
+        coupon_type = #{couponType,jdbcType=TINYINT},
+      </if>
+      <if test="productPropertyCode != null" >
+        product_property_code = #{productPropertyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="productPropertyName != null" >
+        product_property_name = #{productPropertyName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.aiqin.mgs.order.api.domain.CouponRuleDetail" >
+    update coupon_rule_detail
+    set coupon_type = #{couponType,jdbcType=TINYINT},
+      product_property_code = #{productPropertyCode,jdbcType=VARCHAR},
+      product_property_name = #{productPropertyName,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>
