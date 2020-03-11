@@ -206,10 +206,30 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 
     @Override
     public PageResData<ReturnOrderInfo> list(ReturnOrderSearchVo searchVo) {
+        log.info("后台销售退货单管理列表入参searchVo={}",searchVo);
+        PageResData pageResData=new PageResData();
+        if(StringUtils.isBlank(searchVo.getPersonId())||StringUtils.isBlank(searchVo.getResourceCode())){
+            return pageResData;
+        }
+        log.info("调用合伙人数据权限控制公共接口入参,personId={},resourceCode={}",searchVo.getPersonId(),searchVo.getResourceCode());
+        HttpResponse httpResponse = copartnerAreaService.selectStoreByPerson(searchVo.getPersonId(), searchVo.getResourceCode());
+        List<PublicAreaStore> dataList = JSONArray.parseArray(JSON.toJSONString(httpResponse.getData()), PublicAreaStore.class);
+        log.info("调用合伙人数据权限控制公共接口返回结果,dataList={}",dataList);
+        if (dataList == null || dataList.size() == 0) {
+            return pageResData;
+        }
+        //遍历门店id
+        List<String>  storesIds = dataList.stream().map(PublicAreaStore::getStoreId).collect(Collectors.toList());
+        log.info("门店ids={}",storesIds);
+        if(storesIds!=null&&storesIds.size()>0){
+            searchVo.setStoreIds(storesIds);
+        }else{
+            return pageResData;
+        }
         PageHelper.startPage(searchVo.getPageNo(),searchVo.getPageSize());
         List<ReturnOrderInfo> content = returnOrderInfoDao.page(searchVo);
-        Integer pageCount = returnOrderInfoDao.pageCount(searchVo);
-        return new PageResData<>(pageCount, content);
+//        Integer pageCount = returnOrderInfoDao.pageCount(searchVo);
+        return new PageResData<>(Integer.valueOf((int)((Page) content).getTotal()), content);
     }
 
     @Override
