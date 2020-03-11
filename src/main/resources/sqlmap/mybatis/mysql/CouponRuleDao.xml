@@ -12,11 +12,11 @@
   <sql id="Base_Column_List" >
     id, coupon_type, coupon_name, proportion, create_time, update_time
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+  <select id="selectByCouponType" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
     from coupon_rule
-    where id = #{id,jdbcType=BIGINT}
+    where coupon_type = #{couponType,jdbcType=BIGINT}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     delete from coupon_rule
@@ -103,4 +103,11 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="selectList" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from coupon_rule
+  </select>
+
 </mapper>

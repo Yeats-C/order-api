@@ -2,6 +2,8 @@ package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.CouponRule;
 
+import java.util.List;
+
 public interface CouponRuleDao {
 
     int deleteByPrimaryKey(Long id);
@@ -10,9 +12,12 @@ public interface CouponRuleDao {
 
     int insertSelective(CouponRule record);
 
-    CouponRule selectByPrimaryKey(Long id);
+    CouponRule selectByCouponType(Integer couponType);
 
     int updateByPrimaryKeySelective(CouponRule record);
 
     int updateByPrimaryKey(CouponRule record);
+
+    List<CouponRule> selectList();
+
 }
