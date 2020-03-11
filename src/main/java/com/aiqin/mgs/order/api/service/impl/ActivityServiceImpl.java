@@ -12,19 +12,24 @@ import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
+import com.aiqin.mgs.order.api.domain.copartnerArea.PublicAreaStore;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
+import com.aiqin.mgs.order.api.service.CopartnerAreaService;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.DateUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +39,7 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author csf
@@ -74,10 +80,15 @@ public class ActivityServiceImpl implements ActivityService {
     @Resource
     private CopartnerAreaRoleDao copartnerAreaRoleDao;
 
+    @Autowired
+    private CopartnerAreaService copartnerAreaService;
+
     @Override
     public HttpResponse<Map> activityList(Activity activity) {
-        LOGGER.info("查询促销活动列表activityList参数为：{}", activity);
         HttpResponse response = HttpResponse.success();
+        activity.setStoresIds(storeIds("ERP007003"));
+        LOGGER.info("查询促销活动列表activityList参数为：{}", activity);
+
         Integer totalCount=activityDao.totalCount(activity);
         Map data=new HashMap();
         List<Activity> activities=new ArrayList<>();
@@ -283,7 +294,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public HttpResponse<ActivitySales> getActivitySalesStatistics(String activityId) {
-        LOGGER.info("查询活动详情-销售数据-活动销售统计");
+        LOGGER.info("查询活动详情-销售数据-活动销售统计，参数activityId为: {}",activityId);
         try {
             HttpResponse response = HttpResponse.success();
             Activity activity=new Activity();
@@ -295,7 +306,10 @@ public class ActivityServiceImpl implements ActivityService {
             //活动补货门店数
             Integer storeNum=erpOrderInfoDao.getStoreNum(activity);
             //平均单价
-            BigDecimal averageUnitPrice=activitySales.getActivitySales().divide(activitySales.getActivitySalesNum(),0, RoundingMode.HALF_UP);
+            BigDecimal averageUnitPrice=BigDecimal.ZERO;
+            if(activitySales.getActivitySalesNum().compareTo(BigDecimal.ZERO)!=0){
+                averageUnitPrice=activitySales.getActivitySales().divide(activitySales.getActivitySalesNum(),0, RoundingMode.HALF_UP);
+            }
             activitySales.setProductSales(productSales);
             activitySales.setStoreNum(storeNum);
             activitySales.setAverageUnitPrice(averageUnitPrice);
@@ -668,15 +682,14 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public HttpResponse excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response) {
+    public void excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response) {
         LOGGER.info("导出--活动详情-销售数据-活动销售列表excelActivityItem参数为：{}", erpOrderItem);
-        HttpResponse res = HttpResponse.success();
         try {
             //只查询活动商品
             erpOrderItem.setIsActivity(1);
             List<ErpOrderItem> select = erpOrderItemDao.getActivityItem(erpOrderItem);
             HSSFWorkbook wb = exportData(select);
-            String excelName = "数据列表";
+            String excelName = "数据列表.xls";
             response.reset();
             response.setContentType("application/vnd.ms-excel;charset=UTF-8");
             response.setCharacterEncoding("UTF-8");
@@ -685,7 +698,6 @@ public class ActivityServiceImpl implements ActivityService {
             wb.write(os);
             os.flush();
             os.close();
-            return res;
         } catch (Exception ex) {
             throw new GroundRuntimeException(ex.getMessage());
         }
@@ -700,12 +712,12 @@ public class ActivityServiceImpl implements ActivityService {
             ActivitySales sales=getActivitySalesStatistics(activityId).getData();
             activitySalesList.add(sales);
         }
-        res.setData(activityIdList);
+        res.setData(activitySalesList);
         return res;
     }
 
     @Override
-    public HttpResponse excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response) {
+    public void excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response) {
         LOGGER.info("导出--活动列表-对比分析柱状图excelActivitySalesStatistics参数为：{}", activityIdList);
         HttpResponse res = HttpResponse.success();
         try {
@@ -715,7 +727,7 @@ public class ActivityServiceImpl implements ActivityService {
                 activitySalesList.add(sales);
             }
             HSSFWorkbook wb = exportActivitySalesData(activitySalesList);
-            String excelName = "数据列表";
+            String excelName = "数据列表.xls";
             response.reset();
             response.setContentType("application/vnd.ms-excel;charset=UTF-8");
             response.setCharacterEncoding("UTF-8");
@@ -724,7 +736,6 @@ public class ActivityServiceImpl implements ActivityService {
             wb.write(os);
             os.flush();
             os.close();
-            return res;
         } catch (Exception ex) {
             throw new GroundRuntimeException(ex.getMessage());
         }
@@ -1082,6 +1093,21 @@ public class ActivityServiceImpl implements ActivityService {
         activityList.clear();
         activityList.addAll(activitySet);
         return activityList;
+    }
+
+    List<String> storeIds(String code){
+        AuthToken authToken= AuthUtil.getCurrentAuth();
+        LOGGER.info("调用合伙人数据权限控制公共接口入参,personId={},resourceCode={}",authToken.getPersonId(),code);
+        HttpResponse httpResponse = copartnerAreaService.selectStoreByPerson(authToken.getPersonId(), code);
+        List<PublicAreaStore> dataList = JSONArray.parseArray(JSON.toJSONString(httpResponse.getData()), PublicAreaStore.class);
+        LOGGER.info("调用合伙人数据权限控制公共接口返回结果,dataList={}",dataList);
+        if (dataList == null || dataList.size() == 0) {
+            return null;
+        }
+        //遍历门店id
+        List<String> storesIds = dataList.stream().map(PublicAreaStore::getStoreId).collect(Collectors.toList());
+        LOGGER.info("门店ids={}",storesIds);
+        return storesIds;
     }
 
     @Override

@@ -53,6 +53,31 @@
     from purchase_order_detail
     where id = #{id,jdbcType=BIGINT}
   </select>
+  <select id="purchaseOrderList"
+          resultType="com.aiqin.mgs.order.api.domain.response.purchase.PurchaseOrderProduct">
+    select id, purchase_order_detail_id as orderProductId, purchase_order_code as purchaseOrderCode,
+    sku_code as skuCode, sku_name as skuName, brand_code as brandId, brand_name as brandName, category_code as categoryId,
+    category_name as categoryName, product_spec as productSpec, color_name as colorName, model_code as modelNumber,
+    product_type as productType, purchase_whole as purchaseWhole, purchase_single as purchaseSingle,
+    base_product_spec as baseProductContent, box_gauge as boxGauge, total_count as singleCount,
+    tax_rate as taxRate, tax_amount as productAmount, total_tax_amount as productTotalAmount,
+   /* stock_count as stockCount, actual_single_count as actualSingleCount,*/ create_time as createTime, update_time as updateTime,
+    create_by_id as createById, create_by_name as createByName, factory_sku_code as factorySkuCode, line_code linnum
+    from purchase_order_detail
+    <where>
+      purchase_order_code = #{purchaseOrderId,jdbcType=VARCHAR}
+    </where>
+    <if test="isPage == 0">
+      LIMIT #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </if>
+  </select>
+  <select id="purchaseOrderCount" resultType="java.lang.Integer">
+    select count(1)
+    from purchase_order_detail
+    <where>
+      purchase_order_code = #{purchaseOrderId,jdbcType=VARCHAR}
+    </where>
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from purchase_order_detail
     where id = #{id,jdbcType=BIGINT}

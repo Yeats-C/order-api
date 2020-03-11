@@ -323,4 +323,10 @@ public interface Global {
      */
     int CHECK_INSERT_UPDATE_DELETE_SUCCESS = 0;
 
+    /**
+     * 商品类型  0商品 1赠品 2实物返
+     */
+    Integer PRODUCT_TYPE_0 = 0;
+    Integer PRODUCT_TYPE_1 = 1;
+    Integer PRODUCT_TYPE_2 = 2;
 }

@@ -11,7 +11,7 @@ import com.aiqin.mgs.order.api.component.enums.OrderSucessEnum;
 import com.aiqin.mgs.order.api.dao.PurchaseOrderDao;
 import com.aiqin.mgs.order.api.dao.PurchaseOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
-import com.aiqin.mgs.order.api.domain.PurchaseOrder;
+import com.aiqin.mgs.order.api.domain.PurchaseOrderInfo;
 import com.aiqin.mgs.order.api.domain.PurchaseOrderDetail;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
@@ -51,7 +51,7 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
     @Transactional(rollbackFor = Exception.class)
     public void addOrderAndDetail(ErpOrderInfo erpOrderInfo) {
         LOGGER.info("根据ERP订单生成爱亲采购单&采购单明细&修改订单同步状态，参数为：erpOrderInfo{}", erpOrderInfo);
-        PurchaseOrder purchaseOrder = null;
+        PurchaseOrderInfo purchaseOrder = null;
         try {
             //根据订单好查询，是否否已经生成采购单
             purchaseOrder = purchaseOrderDao.selectByOrderStoreCode(erpOrderInfo.getOrderStoreCode());
@@ -96,7 +96,7 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
      * @return
      */
     private void erpOrderInfoTopurchaseOrder(ErpOrderInfo erpOrderInfo) {
-        PurchaseOrder purchaseOrder = new PurchaseOrder();
+        PurchaseOrderInfo purchaseOrder = new PurchaseOrderInfo();
         purchaseOrder.setPurchaseOrderId(IdUtil.purchaseId());//业务id
         purchaseOrder.setPurchaseOrderCode(erpOrderInfo.getOrderStoreCode());//采购单号
         purchaseOrder.setCompanyCode(erpOrderInfo.getCompanyCode());//公司编码

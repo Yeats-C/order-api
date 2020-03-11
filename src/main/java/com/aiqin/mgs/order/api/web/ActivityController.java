@@ -217,8 +217,8 @@ public class ActivityController {
      */
     @PostMapping("/excelActivityItem")
     @ApiOperation("导出--活动详情-销售数据-活动销售列表")
-    public HttpResponse excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response){
-        return activitesService.excelActivityItem(erpOrderItem,response);
+    public void excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response){
+        activitesService.excelActivityItem(erpOrderItem,response);
     }
 
     /**
@@ -226,9 +226,9 @@ public class ActivityController {
      * @param activityIdList
      * @return
      */
-    @GetMapping("/comparisonActivitySalesStatistics")
+    @PostMapping("/comparisonActivitySalesStatistics")
     @ApiOperation(value = "活动列表-对比分析柱状图")
-    public HttpResponse<List<ActivitySales>> comparisonActivitySalesStatistics(List<String> activityIdList){
+    public HttpResponse<List<ActivitySales>> comparisonActivitySalesStatistics(@RequestBody  List<String> activityIdList){
         return activitesService.comparisonActivitySalesStatistics(activityIdList);
     }
 
@@ -238,10 +238,10 @@ public class ActivityController {
      * @param response
      * @return
      */
-    @PostMapping("/excelActivitySalesStatistics")
+    @GetMapping("/excelActivitySalesStatistics")
     @ApiOperation("导出--活动列表-对比分析柱状图")
-    public HttpResponse excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response){
-        return activitesService.excelActivitySalesStatistics(activityIdList,response);
+    public void excelActivitySalesStatistics(@RequestParam(name = "activityIdList") List<String> activityIdList, HttpServletResponse response){
+         activitesService.excelActivitySalesStatistics(activityIdList,response);
     }
 
 

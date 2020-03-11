@@ -773,10 +773,10 @@
     <!--活动相关订单销售额及活动订单数(当订单中的商品命中了这个促销活动时，这个订单纳入统计，统计主订单。-->
     <select id="getActivitySales" resultType="com.aiqin.mgs.order.api.domain.ActivitySales" parameterType="com.aiqin.mgs.order.api.domain.Activity">
         SELECT
-            SUM( total_product_amount ) AS activitySales,
-            COUNT( 1 ) AS activitySalesNum
+        COALESCE(SUM( total_product_amount ),0) AS activitySales,
+        COUNT( 1 ) AS activitySalesNum
         FROM
-            order_store_info
+        order_store_info
         WHERE
             is_activity =1
         <if test="activityId != '' and activityId != null">

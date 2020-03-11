@@ -121,7 +121,7 @@ public interface ActivityService {
      * @param response
      * @return
      */
-    HttpResponse excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response);
+    void excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response);
 
     /**
      *活动列表-对比分析柱状图
@@ -136,7 +136,7 @@ public interface ActivityService {
      * @param response
      * @return
      */
-    HttpResponse excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response);
+    void excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response);
 
     /**
      * 活动商品筛选分页
