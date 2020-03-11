@@ -22,11 +22,13 @@ import com.aiqin.mgs.order.api.dao.returnorder.RefundInfoDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
+import com.aiqin.mgs.order.api.domain.copartnerArea.PublicAreaStore;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderStatusVo;
+import com.aiqin.mgs.order.api.service.CopartnerAreaService;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderInfoService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
@@ -38,6 +40,7 @@ import com.aiqin.platform.flows.client.constant.StatusEnum;
 import com.aiqin.platform.flows.client.domain.vo.ActBaseProcessEntity;
 import com.aiqin.platform.flows.client.domain.vo.StartProcessParamVO;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.pagehelper.Page;
@@ -103,6 +106,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     private ErpOrderItemDao erpOrderItemDao;
     @Resource
     private ErpOrderInfoService erpOrderInfoService;
+    @Resource
+    private CopartnerAreaService copartnerAreaService;
 
 
     @Override
@@ -756,6 +761,23 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 
     @Override
     public PageResData<ReturnOrderInfo> getlist(PageRequestVO<AfterReturnOrderSearchVo> searchVo) {
+        log.info("售后管理--退货单列表入参searchVo={}",searchVo);
+        PageResData pageResData=new PageResData();
+        if(StringUtils.isBlank(searchVo.getSearchVO().getPersonId())||StringUtils.isBlank(searchVo.getSearchVO().getResourceCode())){
+            return pageResData;
+        }
+        log.info("调用合伙人数据权限控制公共接口入参,personId={},resourceCode={}",searchVo.getSearchVO().getPersonId(),searchVo.getSearchVO().getResourceCode());
+        HttpResponse httpResponse = copartnerAreaService.selectStoreByPerson(searchVo.getSearchVO().getPersonId(), searchVo.getSearchVO().getResourceCode());
+        List<PublicAreaStore> dataList = JSONArray.parseArray(JSON.toJSONString(httpResponse.getData()), PublicAreaStore.class);
+        log.info("调用合伙人数据权限控制公共接口返回结果,dataList={}",dataList);
+        if (dataList == null || dataList.size() == 0) {
+            return pageResData;
+        }
+        //遍历门店id
+        List<String> storesIds = dataList.stream().map(PublicAreaStore::getStoreId).collect(Collectors.toList());
+        log.info("门店ids={}",storesIds);
+        //根据地区查询出的门店
+        List<String> ids=new ArrayList<>();
         if(searchVo.getSearchVO()!=null&&null!=searchVo.getSearchVO().getAreaReq()){
             String url=slcsHost+"/store/getStoreAllId";
             JSONObject json=new JSONObject();
@@ -775,19 +797,30 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
                 log.info("根据省市区id查询门店请求结果，request={}",result);
                 if(result!=null&&"0".equals(result.get("code"))){
-                    List<String> ids=(List<String>)result.get("data");
-                    if(CollectionUtils.isNotEmpty(ids)){
-                        searchVo.getSearchVO().setStoreIds(ids);
-                    }
+                    ids=(List<String>)result.get("data");
                 }
             }
         }
+
+        List<String> newIds=new ArrayList<>();
+        if(ids!=null&&ids.size()>0){
+            for(String id:ids){
+                if(storesIds.contains(id)){
+                    newIds.add(id);
+                }
+            }
+        }else{
+            newIds.addAll(storesIds);
+        }
+        searchVo.getSearchVO().setStoreIds(newIds);
         PageHelper.startPage(searchVo.getPageNo(),searchVo.getPageSize());
         log.info("erp售后管理--退货单列表入参，searchVo={}",searchVo);
         ReturnOrderQueryVo queryVo=new ReturnOrderQueryVo();
         BeanUtils.copyProperties(searchVo.getSearchVO(),queryVo);
         List<ReturnOrderInfo> content = returnOrderInfoDao.selectAll(queryVo);
-        return new PageResData(Integer.valueOf((int)((Page) content).getTotal()) , content);
+        pageResData.setTotalCount(Integer.valueOf((int)((Page) content).getTotal()));
+        pageResData.setDataList(content);
+        return pageResData;
     }
 
     @Override
@@ -968,14 +1001,35 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 
     @Override
     public PageResData<ReturnOrderInfo> getWriteDownOrderList(PageRequestVO<WriteDownOrderSearchVo> searchVo) {
+        log.info("erp售后管理--冲减单列表入参searchVo={}",searchVo);
+        PageResData pageResData=new PageResData();
+        if(StringUtils.isBlank(searchVo.getSearchVO().getPersonId())||StringUtils.isBlank(searchVo.getSearchVO().getResourceCode())){
+            return pageResData;
+        }
+        log.info("调用合伙人数据权限控制公共接口入参,personId={},resourceCode={}",searchVo.getSearchVO().getPersonId(),searchVo.getSearchVO().getResourceCode());
+        HttpResponse httpResponse = copartnerAreaService.selectStoreByPerson(searchVo.getSearchVO().getPersonId(), searchVo.getSearchVO().getResourceCode());
+        List<PublicAreaStore> dataList = JSONArray.parseArray(JSON.toJSONString(httpResponse.getData()), PublicAreaStore.class);
+        log.info("调用合伙人数据权限控制公共接口返回结果,dataList={}",dataList);
+        if (dataList == null || dataList.size() == 0) {
+            return pageResData;
+        }
+        //遍历门店id
+        List<String> storesIds = dataList.stream().map(PublicAreaStore::getStoreId).collect(Collectors.toList());
+        log.info("门店ids={}",storesIds);
+        if (storesIds == null || storesIds.size() == 0) {
+            return pageResData;
+        }
         PageHelper.startPage(searchVo.getPageNo(),searchVo.getPageSize());
         ReturnOrderQueryVo afterReturnOrderSearchVo=new ReturnOrderQueryVo();
         BeanUtils.copyProperties(searchVo.getSearchVO(),afterReturnOrderSearchVo);
         //退货类型 3冲减单
         afterReturnOrderSearchVo.setReturnOrderType(ReturnOrderTypeEnum.WRITE_DOWN_ORDER_TYPE.getCode());
+        afterReturnOrderSearchVo.setStoreIds(storesIds);
         log.info("erp售后管理--冲减单列表，searchVo={}",searchVo);
         List<ReturnOrderInfo> content = returnOrderInfoDao.selectAll(afterReturnOrderSearchVo);
-        return new PageResData(Integer.valueOf((int)((Page) content).getTotal()) , content);
+        pageResData.setTotalCount(Integer.valueOf((int)((Page) content).getTotal()));
+        pageResData.setDataList(content);
+        return pageResData;
     }
 
     //@Override
