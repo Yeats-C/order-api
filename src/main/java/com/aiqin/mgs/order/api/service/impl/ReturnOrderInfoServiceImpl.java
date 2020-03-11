@@ -791,7 +791,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 newIds.addAll(ids);
             }
         }
-        searchVo.getSearchVO().setStoreIds(newIds);
+        if(newIds!=null&&newIds.size()>0){
+            searchVo.getSearchVO().setStoreIds(newIds);
+        }
         PageHelper.startPage(searchVo.getPageNo(),searchVo.getPageSize());
         log.info("erp售后管理--退货单列表入参，searchVo={}",searchVo);
         ReturnOrderQueryVo queryVo=new ReturnOrderQueryVo();
