@@ -213,37 +213,39 @@ public class ActivityServiceImpl implements ActivityService {
         //保存活动对应商品信息end
 
         //保存活动对应规则信息start
-        List<ActivityRule> activityRuleList = activityRequest.getActivityRules();
-        // 去重
-        Set<ActivityRule> activityRuleSet = new HashSet<>(activityRuleList);
-        activityRuleList.clear();
-        activityRuleList.addAll(activityRuleSet);
-        for (ActivityRule activityRule : activityRuleList) {
-            activityRule.setActivityId(activityId);
-            activityRule.setCreateTime(new Date());
-            activityRule.setUpdateTime(new Date());
-            String ruleId=IdUtil.activityId();
-            activityRule.setRuleId(ruleId);
-            //如果规则为满赠，插入赠品信息
-            if(activityRule.getActivityType()==2 && null!=activityRule.getGiftList()){
-                List<ActivityGift> activityGiftList=new ArrayList<>();
-                if(null!=activityRule.getGiftList() && 0!=activityRule.getGiftList().size()){
-                    for(ActivityGift gift:activityRule.getGiftList()){
-                        gift.setRuleId(ruleId);
-                        activityGiftList.add(gift);
-                    }
-                    int activityGiftRecord = activityGiftDao.insertList(activityGiftList);
-                    if (activityGiftRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
-                        return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
+        if(null!=activityRequest.getActivityRules()&&0!=activityRequest.getActivityRules().size()){
+            List<ActivityRule> activityRuleList = activityRequest.getActivityRules();
+            // 去重
+            Set<ActivityRule> activityRuleSet = new HashSet<>(activityRuleList);
+            activityRuleList.clear();
+            activityRuleList.addAll(activityRuleSet);
+            for (ActivityRule activityRule : activityRuleList) {
+                activityRule.setActivityId(activityId);
+                activityRule.setCreateTime(new Date());
+                activityRule.setUpdateTime(new Date());
+                String ruleId=IdUtil.activityId();
+                activityRule.setRuleId(ruleId);
+                //如果规则为满赠，插入赠品信息
+                if(activityRule.getActivityType()==2 && null!=activityRule.getGiftList()){
+                    List<ActivityGift> activityGiftList=new ArrayList<>();
+                    if(null!=activityRule.getGiftList() && 0!=activityRule.getGiftList().size()){
+                        for(ActivityGift gift:activityRule.getGiftList()){
+                            gift.setRuleId(ruleId);
+                            activityGiftList.add(gift);
+                        }
+                        int activityGiftRecord = activityGiftDao.insertList(activityGiftList);
+                        if (activityGiftRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+                            return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
+                        }
                     }
                 }
             }
+            int activityRuleRecord = activityRuleDao.insertList(activityRuleList);
+            if (activityRuleRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+                return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
+            }
+            LOGGER.info("保存活动对应规则信息成功");
         }
-        int activityRuleRecord = activityRuleDao.insertList(activityRuleList);
-        if (activityRuleRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
-            return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
-        }
-        LOGGER.info("保存活动对应规则信息成功");
         //保存活动对应规则信息end
         LOGGER.info("活动添加成功，活动id为{}，活动名称为{}", activityId, activity.getActivityName());
         return HttpResponse.success();
@@ -436,38 +438,41 @@ public class ActivityServiceImpl implements ActivityService {
             //保存活动对应商品信息end
 
             //保存活动对应规则信息start
-            activityRuleDao.deleteRuleByActivityId(activity.getActivityId());
-            List<ActivityRule> activityRuleList = activityRequest.getActivityRules();
-            // 去重
-            Set<ActivityRule> activityRuleSet = new HashSet<>(activityRuleList);
-            activityRuleList.clear();
-            activityRuleList.addAll(activityRuleSet);
-            for (ActivityRule activityRule : activityRuleList) {
-                activityRule.setActivityId(activity.getActivityId());
-                activityRule.setCreateTime(new Date());
-                activityRule.setUpdateTime(new Date());
-                String ruleId=IdUtil.activityId();
-                activityRule.setRuleId(ruleId);
-                //如果规则为满赠，插入赠品信息
-                if(activityRule.getActivityType()==2 && null!=activityRule.getGiftList()){
-                    List<ActivityGift> activityGiftList=new ArrayList<>();
-                    for(ActivityGift gift:activityRule.getGiftList()){
-                        gift.setRuleId(ruleId);
-                        activityGiftList.add(gift);
-                    }
-                    int activityGiftRecord = activityGiftDao.insertList(activityGiftList);
-                    if (activityGiftRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
-                        return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
+            if(null!=activityRequest.getActivityRules()&&0!=activityRequest.getActivityRules().size()) {
+                activityRuleDao.deleteRuleByActivityId(activity.getActivityId());
+                List<ActivityRule> activityRuleList = activityRequest.getActivityRules();
+                // 去重
+                Set<ActivityRule> activityRuleSet = new HashSet<>(activityRuleList);
+                activityRuleList.clear();
+                activityRuleList.addAll(activityRuleSet);
+                for (ActivityRule activityRule : activityRuleList) {
+                    activityRule.setActivityId(activity.getActivityId());
+                    activityRule.setCreateTime(new Date());
+                    activityRule.setUpdateTime(new Date());
+                    String ruleId = IdUtil.activityId();
+                    activityRule.setRuleId(ruleId);
+                    //如果规则为满赠，插入赠品信息
+                    if (activityRule.getActivityType() == 2 && null != activityRule.getGiftList()) {
+                        List<ActivityGift> activityGiftList = new ArrayList<>();
+                        for (ActivityGift gift : activityRule.getGiftList()) {
+                            gift.setRuleId(ruleId);
+                            activityGiftList.add(gift);
+                        }
+                        int activityGiftRecord = activityGiftDao.insertList(activityGiftList);
+                        if (activityGiftRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+                            return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
+                        }
                     }
                 }
+                int activityRuleRecord = activityRuleDao.insertList(activityRuleList);
+                if (activityRuleRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+                    LOGGER.error("更新活动-规则信息失败");
+                    return HttpResponse.failure(ResultCode.UPDATE_ACTIVITY_INFO_EXCEPTION);
+                }
+                LOGGER.info("保存活动对应规则信息成功");
             }
-            int activityRuleRecord = activityRuleDao.insertList(activityRuleList);
-            if (activityRuleRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
-                LOGGER.error("更新活动-规则信息失败");
-                return HttpResponse.failure(ResultCode.UPDATE_ACTIVITY_INFO_EXCEPTION);
-            }
-            LOGGER.info("保存活动对应规则信息成功");
             //保存活动对应规则信息end
+
             LOGGER.info("活动更新成功，活动id为{}，活动名称为{}", activity.getActivityId(), activity.getActivityName());
             return HttpResponse.success();
         } catch (Exception e) {
