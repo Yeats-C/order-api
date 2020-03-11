@@ -1,7 +1,6 @@
 package com.aiqin.mgs.order.api.web;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.CouponRule;
 import com.aiqin.mgs.order.api.service.CouponRuleService;
 import io.swagger.annotations.Api;
