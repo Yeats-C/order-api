@@ -9,6 +9,7 @@ import com.aiqin.mgs.order.api.component.enums.ErpProductPropertyTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.YesOrNoEnum;
 import com.aiqin.mgs.order.api.component.enums.activity.ActivityRuleUnitEnum;
 import com.aiqin.mgs.order.api.component.enums.activity.ActivityTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.cart.ErpProductGiftGiveTypeEnum;
 import com.aiqin.mgs.order.api.dao.cart.ErpOrderCartDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
@@ -223,6 +224,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 erpOrderCartInfo.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
                 erpOrderCartInfo.setLineCheckStatus(YesOrNoEnum.YES.getCode());
                 erpOrderCartInfo.setZeroRemovalCoefficient(skuDetail.getZeroRemovalCoefficient());
+                erpOrderCartInfo.setMaxOrderNum(skuDetail.getMaxOrderNum());
                 erpOrderCartInfo.setSpec(skuDetail.getSpec());
                 erpOrderCartInfo.setProductPropertyCode(skuDetail.getProductPropertyCode());
                 erpOrderCartInfo.setProductPropertyName(skuDetail.getProductPropertyName());
@@ -238,6 +240,10 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 throw new BusinessException("商品" + skuDetail.getSkuName() + "库存不足");
             }
 
+            //校验数量范围和规则
+            this.validateSkuQuantity(cartAmount, skuDetail.getMaxOrderNum(), skuDetail.getZeroRemovalCoefficient(), skuDetail.getSkuName());
+
+            //库存不足10个的商品返回
             if (skuDetail.getStockNum() < 10) {
                 ErpCartAddItemResponse cartAddItemResponse = new ErpCartAddItemResponse();
                 cartAddItemResponse.setSkuCode(skuDetail.getSkuCode());
@@ -328,6 +334,10 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         ErpOrderCartInfo cartLine = this.getCartLineByCartId(erpCartUpdateRequest.getCartId());
         if (cartLine == null) {
             throw new BusinessException("无效的行唯一标识");
+        }
+        if (!cartLine.getAmount().equals(erpCartUpdateRequest.getAmount())) {
+            //如果修改了数量，判断数量范围规则
+            this.validateSkuQuantity(erpCartUpdateRequest.getAmount(), cartLine.getMaxOrderNum(), cartLine.getZeroRemovalCoefficient(), cartLine.getSkuName());
         }
 
         cartLine.setAmount(erpCartUpdateRequest.getAmount());
@@ -531,6 +541,12 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                     activityParameterRequest.setProductCategoryCode(productItem.getProductCategoryCode());
                     List<Activity> activityList = activityService.activityList(activityParameterRequest);
                     productItem.setActivityList(activityList);
+
+                    //判断是否可用A品券
+                    ErpProductPropertyTypeEnum productPropertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(productItem.getProductPropertyCode());
+                    if (productPropertyTypeEnum != null && productPropertyTypeEnum.isUseTopCoupon()) {
+                        productItem.setTopCouponUsable(YesOrNoEnum.YES.getCode());
+                    }
                 }
             }
 
@@ -741,6 +757,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         ErpProductPropertyTypeEnum productPropertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(productItem.getProductPropertyCode());
                         if (productPropertyTypeEnum != null && productPropertyTypeEnum.isUseTopCoupon()) {
                             groupTopCouponMaxTotal = groupTopCouponMaxTotal.add(productItem.getLineAmountAfterActivity());
+                            productItem.setTopCouponUsable(YesOrNoEnum.YES.getCode());
                         }
                     }
                 }
@@ -816,9 +833,11 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
     }
 
     @Override
-    public int getCartProductTotalNum(ErpCartQueryRequest erpCartQueryRequest, AuthToken auth) {
+    public int getCartProductTotalNum(ErpCartNumQueryRequest erpCartNumQueryRequest, AuthToken auth) {
         ErpOrderCartInfo query = new ErpOrderCartInfo();
-        query.setStoreId(erpCartQueryRequest.getStoreId());
+        query.setStoreId(erpCartNumQueryRequest.getStoreId());
+        query.setProductType(erpCartNumQueryRequest.getProductType());
+        query.setLineCheckStatus(erpCartNumQueryRequest.getLineCheckStatus());
         List<ErpOrderCartInfo> select = this.selectByProperty(query);
         int cartProductTotalNum = 0;
         if (select != null && select.size() > 0) {
@@ -1398,6 +1417,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         erpOrderCartInfo.setLineActivityAmountTotal(BigDecimal.ZERO);
         erpOrderCartInfo.setLineActivityDiscountTotal(BigDecimal.ZERO);
         erpOrderCartInfo.setLineAmountAfterActivity(BigDecimal.ZERO);
+        erpOrderCartInfo.setGiftGiveType(ErpProductGiftGiveTypeEnum.TYPE_1.getCode());
         return erpOrderCartInfo;
     }
 
@@ -1465,6 +1485,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 erpOrderCartInfo.setLineActivityAmountTotal(BigDecimal.ZERO);
                 erpOrderCartInfo.setLineActivityDiscountTotal(BigDecimal.ZERO);
                 erpOrderCartInfo.setLineAmountAfterActivity(BigDecimal.ZERO);
+                erpOrderCartInfo.setGiftGiveType(ErpProductGiftGiveTypeEnum.TYPE_1.getCode());
             }
         }
         return erpOrderCartInfo;
@@ -1549,4 +1570,24 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         }
     }
 
+    /**
+     * 校验购物车数量规则
+     *
+     * @param amount                 目标数量
+     * @param maxOrderNum            最大订购量
+     * @param zeroRemovalCoefficient 交易倍数
+     * @param skuName                sku名称
+     */
+    private void validateSkuQuantity(int amount, Integer maxOrderNum, Integer zeroRemovalCoefficient, String skuName) {
+        if (maxOrderNum != null && maxOrderNum > 0) {
+            if (amount > maxOrderNum) {
+                throw new BusinessException("商品" + skuName + "数量超过最大订购量" + maxOrderNum);
+            }
+        }
+        if (zeroRemovalCoefficient != null && zeroRemovalCoefficient > 1) {
+            if (amount % zeroRemovalCoefficient != 0) {
+                throw new BusinessException("商品" + skuName + "商品数量必须是" + zeroRemovalCoefficient + "的倍数");
+            }
+        }
+    }
 }

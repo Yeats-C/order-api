@@ -118,6 +118,10 @@ public class ErpOrderCartInfo {
     @JsonProperty("zero_removal_coefficient")
     private Integer zeroRemovalCoefficient;
 
+    @ApiModelProperty(value = "最大订购数量")
+    @JsonProperty("max_order_num")
+    private Integer maxOrderNum;
+
     @ApiModelProperty(value = "规格")
     @JsonProperty("spec")
     private String spec;
@@ -148,10 +152,6 @@ public class ErpOrderCartInfo {
 
     /***********************************非数据库字段***********************************/
 
-    @ApiModelProperty(value = "活动名称")
-    @JsonProperty("activity_name")
-    private String activityName;
-
     /***活动价*/
     @ApiModelProperty(value = "活动价")
     @JsonProperty("activity_price")
@@ -180,6 +180,14 @@ public class ErpOrderCartInfo {
     @ApiModelProperty(value = "库存数量")
     @JsonProperty("stock_num")
     private Integer stockNum;
+
+    @ApiModelProperty(value = "能不能使用A品券 0、不能；1、能")
+    @JsonProperty("top_coupon_usable")
+    private Integer topCouponUsable = 0;
+
+    @ApiModelProperty(value = "赠品赠送方式 1、赠完为止")
+    @JsonProperty("gift_give_type")
+    private Integer giftGiveType;
 
     @ApiModelProperty(value = "标签列表")
     @JsonProperty("tag_info_list")

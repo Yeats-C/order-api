@@ -1134,6 +1134,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         returnOrderInfo.setActualReturnOrderAmount(erpOrderInfo.getOrderAmount());
         //生成退货单
         returnOrderInfo.setId(null);
+        //订单类型 1直送 2配送 3货架
+        if(StringUtils.isNotBlank(erpOrderInfo.getOrderTypeCode())){
+            Integer orderType=Integer.valueOf(erpOrderInfo.getOrderTypeCode());
+            returnOrderInfo.setOrderType(orderType);
+        }
         log.info("客户取消订单---订单使用接口--插入退货单主表入参returnOrderInfo={}",returnOrderInfo);
         returnOrderInfoDao.insertSelective(returnOrderInfo);
         log.info("客户取消订单---订单使用接口--插入退货单主表成功");
