@@ -504,7 +504,7 @@
         select coalesce(sum(actual_total_product_amount),0) as amount from return_order_detail
         where product_category_code LIKE concat('',#{categoryCode},'%')
         and return_order_code in (
-            select order_store_code from return_order_info
+            select return_order_code from return_order_info
         <where>
             <if test="type!=null">
                 and order_type=#{type}

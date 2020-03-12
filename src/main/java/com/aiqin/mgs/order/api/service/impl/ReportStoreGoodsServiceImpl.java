@@ -442,6 +442,7 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 vo.setCategoryCode(rcr.getCategoryCode());
                 //查出某个一级品类的总金额
                 BigDecimal amount = returnOrderDetailDao.countAmountByCategoryCode(vo);
+                log.info("退货商品分类统计--一级品类code={},金额amount={}",rcr.getCategoryCode(),amount);
                 totalAmount=totalAmount.add(amount);
                 map.put(rcr.getCategoryCode(),amount);
             }
@@ -455,7 +456,7 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 ReportCategoryGoods rcg=new ReportCategoryGoods();
                 BigDecimal proportion=BigDecimal.ZERO;
                 if(totalAmount.compareTo(BigDecimal.ZERO)==1){
-                    proportion=am.divide(totalAmount);
+                    proportion=am.divide(totalAmount,4,BigDecimal.ROUND_HALF_UP);
                 }
                 rcg.setAmount(am);
                 rcg.setCategoryCode(rcr.getCategoryCode());
