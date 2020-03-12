@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.service;
 
+import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.CouponRule;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public interface CouponRuleService {
      * @param couponRule
      * @return
      */
-    Boolean insert(CouponRule couponRule);
+//    Boolean insert(CouponRule couponRule);
 
     /**
      * 基础设置--活惠券规则修改

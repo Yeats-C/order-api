@@ -17,7 +17,7 @@ public class CouponRuleDetail {
 
     @ApiModelProperty(value = "优惠券类型 0-物流券 1-服纺券 2-A品券")
     @JsonProperty("coupon_type")
-    private Byte couponType;
+    private Integer couponType;
 
     @ApiModelProperty(value = "商品属性编码")
     @JsonProperty("product_property_code")
