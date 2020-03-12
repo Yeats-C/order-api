@@ -8,6 +8,7 @@ import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.po.order.*;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderOperationControlResponse;
+import com.aiqin.mgs.order.api.service.ActivityService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.PageAutoHelperUtil;
 import org.apache.commons.lang.StringUtils;
@@ -36,6 +37,8 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
     private ErpOrderFeeService erpOrderFeeService;
     @Resource
     private ErpOrderRefundService erpOrderRefundService;
+    @Resource
+    private ActivityService activityService;
 
     @Override
     public ErpOrderInfo getOrderByOrderId(String orderId) {
@@ -294,6 +297,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
     @Override
     public PageResData<ErpOrderInfo> findErpOrderList(ErpOrderQueryRequest erpOrderQueryRequest) {
         erpOrderQueryRequest.setQueryTypeEnum(ErpOrderTypeCategoryQueryTypeEnum.ERP_ORDER_LIST_QUERY);
+        erpOrderQueryRequest.setStoreIdList(activityService.storeIds("ERP004001"));
         return this.findOrderList(erpOrderQueryRequest);
     }
 

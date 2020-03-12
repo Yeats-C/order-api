@@ -1095,7 +1095,8 @@ public class ActivityServiceImpl implements ActivityService {
         return activityList;
     }
 
-    List<String> storeIds(String code){
+    @Override
+    public List<String> storeIds(String code){
         AuthToken authToken= AuthUtil.getCurrentAuth();
         LOGGER.info("调用合伙人数据权限控制公共接口入参,personId={},resourceCode={}",authToken.getPersonId(),code);
         HttpResponse httpResponse = copartnerAreaService.selectStoreByPerson(authToken.getPersonId(), code);
