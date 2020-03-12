@@ -141,7 +141,7 @@ public class ErpOrderCartController {
     }
 
     @ApiOperation(value = "清空购物车")
-    @PostMapping("/deleteCartLine")
+    @PostMapping("/deleteAllCartLine")
     public HttpResponse deleteAllCartLine(@RequestBody ErpCartQueryRequest erpCartQueryRequest) {
         logger.info("清空购物车：{}", erpCartQueryRequest);
         HttpResponse response = HttpResponse.success();
