@@ -1120,7 +1120,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         returnOrderInfo.setReturnOrderId(returnOrderId);
         returnOrderInfo.setReturnOrderCode(returnOrderCode);
         returnOrderInfo.setCreateTime(new Date());
-        //退货状态 改为：11-退货完成
+        //退货状态 改为：12-退货完成
         returnOrderInfo.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_RETURN.getKey());
         //退款方式 5:退到加盟商账户
         returnOrderInfo.setReturnMoneyType(ConstantData.RETURN_MONEY_TYPE);
@@ -1128,6 +1128,10 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         returnOrderInfo.setReturnOrderType(ReturnOrderTypeEnum.CANCEL_ORDER.getCode());
         //处理办法 4--仅退款
         returnOrderInfo.setTreatmentMethod(TreatmentMethodEnum.RETURN_AMOUNT_TYPE.getCode());
+        //退货总金额
+        returnOrderInfo.setReturnOrderAmount(erpOrderInfo.getOrderAmount());
+        //实际退货总金额
+        returnOrderInfo.setActualReturnOrderAmount(erpOrderInfo.getOrderAmount());
         //生成退货单
         returnOrderInfo.setId(null);
         log.info("客户取消订单---订单使用接口--插入退货单主表入参returnOrderInfo={}",returnOrderInfo);
@@ -1143,6 +1147,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             detail.setCreateByName(ConstantData.SYS_OPERTOR);
             detail.setProductCategoryCode(detailVo.getProductCategoryCode());
             detail.setProductCategoryName(detailVo.getProductCategoryName());
+            detail.setReturnProductCount(detailVo.getProductCount());
+            detail.setActualReturnProductCount(detailVo.getProductCount());
+            detail.setTotalProductAmount(detailVo.getTotalPreferentialAmount());
+            detail.setActualTotalProductAmount(detailVo.getTotalPreferentialAmount());
+            detail.setProductStatus(0);//默认新品
             return detail;
         }).collect(Collectors.toList());
         //生成退货单详情
