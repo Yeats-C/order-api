@@ -50,7 +50,25 @@ public class CouponRuleServiceImpl implements CouponRuleService {
 
     @Override
     public Boolean update(CouponRule couponRule) {
-        return couponRuleDao.updateByPrimaryKeySelective(couponRule)>0;
+        CouponRule couponRule1 = couponRuleDao.selectByCouponType(couponRule.getCouponType());
+        if(couponRule1!=null){
+            couponRule.setUpdateTime(new Date());
+            couponRuleDao.updateByPrimaryKeySelective(couponRule);
+        }else {
+            couponRule.setCreateTime(new Date());
+            couponRuleDao.insertSelective(couponRule);
+        }
+        if(couponRule.getCouponRuleDetailList()!=null&&couponRule.getCouponRuleDetailList().size()>0){
+            List<CouponRuleDetail> couponRuleDetails = couponRuleDetailDao.selectDetailByCouponType(couponRule.getCouponType());
+            if(couponRuleDetails!=null&&couponRuleDetails.size()>0){
+                couponRuleDetailDao.deleteByCouponType(couponRule.getCouponType());
+            }
+            List<CouponRuleDetail> couponRuleDetailList = couponRule.getCouponRuleDetailList();
+            couponRuleDetailList.forEach(p->p.setCreateTime(new Date()));
+            couponRuleDetailList.forEach(p->p.setCouponType(couponRule.getCouponType()));
+            couponRuleDetailDao.insertBatch(couponRuleDetailList);
+        }
+        return true;
     }
 
 //    @Override
