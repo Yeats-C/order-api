@@ -146,12 +146,18 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         returnOrderInfoDao.insertSelective(record);
         List<ReturnOrderDetail> details = reqVo.getDetails().stream().map(detailVo -> {
             ReturnOrderDetail detail = new ReturnOrderDetail();
+            //商品属性 0新品1残品
+            Integer productStatus=0;
+            if(null!=detailVo.getProductStatus()){
+                productStatus=detailVo.getProductStatus();
+            }
             BeanUtils.copyProperties(detailVo, detail);
             detail.setCreateTime(now);
             detail.setReturnOrderDetailId(IdUtil.uuid());
             detail.setReturnOrderCode(afterSaleCode);
             detail.setCreateById(reqVo.getCreateById());
             detail.setCreateByName(reqVo.getCreateByName());
+            detail.setProductStatus(productStatus);
             return detail;
         }).collect(Collectors.toList());
         log.info("发起退货--插入退货详情，details={}",details);
@@ -393,6 +399,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             returnOrderDetailDao.deleteByReturnOrderCode(returnOrderCode);
             details = details.stream().map(detailVo -> {
                 ReturnOrderDetail detail = new ReturnOrderDetail();
+                //商品属性 0新品1残品
+                Integer productStatus=0;
+                if(null!=detailVo.getProductStatus()){
+                    productStatus=detailVo.getProductStatus();
+                }
                 BeanUtils.copyProperties(detailVo, detail);
                 detail.setCreateTime(new Date());
                 detail.setReturnOrderDetailId(IdUtil.uuid());
@@ -401,6 +412,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 detail.setCreateByName(records.getCreator());
                 detail.setRemark("");
                 detail.setEvidenceUrl("");
+                detail.setProductStatus(productStatus);
                 return detail;
             }).collect(Collectors.toList());
             log.info("退货单详情修改,details={}",details);
