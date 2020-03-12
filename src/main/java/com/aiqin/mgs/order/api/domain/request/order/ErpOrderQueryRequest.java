@@ -78,4 +78,7 @@ public class ErpOrderQueryRequest {
     private List<String> primaryOrderCodeList;
     @JsonIgnore
     private ErpOrderTypeCategoryQueryTypeEnum queryTypeEnum;
+
+    /*门店Id集合（权限控制使用）*/
+    private List<String> storeIdList;
 }

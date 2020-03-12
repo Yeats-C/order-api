@@ -160,4 +160,9 @@ public interface ActivityService {
      * @return
      */
     ProductCategoryAndBrandResponse2 ProductCategoryAndBrandResponse(String conditionCode, String type, String activityId);
+
+    /**
+     * 通过列表id查询门店权限集合
+     */
+    List<String> storeIds(String code);
 }
