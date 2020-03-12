@@ -9,6 +9,7 @@ import com.aiqin.mgs.order.api.component.enums.ErpProductPropertyTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.YesOrNoEnum;
 import com.aiqin.mgs.order.api.component.enums.activity.ActivityRuleUnitEnum;
 import com.aiqin.mgs.order.api.component.enums.activity.ActivityTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.cart.ErpProductGiftGiveTypeEnum;
 import com.aiqin.mgs.order.api.dao.cart.ErpOrderCartDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
@@ -540,6 +541,12 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                     activityParameterRequest.setProductCategoryCode(productItem.getProductCategoryCode());
                     List<Activity> activityList = activityService.activityList(activityParameterRequest);
                     productItem.setActivityList(activityList);
+
+                    //判断是否可用A品券
+                    ErpProductPropertyTypeEnum productPropertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(productItem.getProductPropertyCode());
+                    if (productPropertyTypeEnum != null && productPropertyTypeEnum.isUseTopCoupon()) {
+                        productItem.setTopCouponUsable(YesOrNoEnum.YES.getCode());
+                    }
                 }
             }
 
@@ -750,6 +757,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         ErpProductPropertyTypeEnum productPropertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(productItem.getProductPropertyCode());
                         if (productPropertyTypeEnum != null && productPropertyTypeEnum.isUseTopCoupon()) {
                             groupTopCouponMaxTotal = groupTopCouponMaxTotal.add(productItem.getLineAmountAfterActivity());
+                            productItem.setTopCouponUsable(YesOrNoEnum.YES.getCode());
                         }
                     }
                 }
@@ -1409,6 +1417,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         erpOrderCartInfo.setLineActivityAmountTotal(BigDecimal.ZERO);
         erpOrderCartInfo.setLineActivityDiscountTotal(BigDecimal.ZERO);
         erpOrderCartInfo.setLineAmountAfterActivity(BigDecimal.ZERO);
+        erpOrderCartInfo.setGiftGiveType(ErpProductGiftGiveTypeEnum.TYPE_1.getCode());
         return erpOrderCartInfo;
     }
 
@@ -1476,6 +1485,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 erpOrderCartInfo.setLineActivityAmountTotal(BigDecimal.ZERO);
                 erpOrderCartInfo.setLineActivityDiscountTotal(BigDecimal.ZERO);
                 erpOrderCartInfo.setLineAmountAfterActivity(BigDecimal.ZERO);
+                erpOrderCartInfo.setGiftGiveType(ErpProductGiftGiveTypeEnum.TYPE_1.getCode());
             }
         }
         return erpOrderCartInfo;

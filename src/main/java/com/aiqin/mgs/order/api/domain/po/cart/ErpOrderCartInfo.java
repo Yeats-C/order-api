@@ -181,6 +181,14 @@ public class ErpOrderCartInfo {
     @JsonProperty("stock_num")
     private Integer stockNum;
 
+    @ApiModelProperty(value = "能不能使用A品券 0、不能；1、能")
+    @JsonProperty("top_coupon_usable")
+    private Integer topCouponUsable = 0;
+
+    @ApiModelProperty(value = "赠品赠送方式 1、赠完为止")
+    @JsonProperty("gift_give_type")
+    private Integer giftGiveType;
+
     @ApiModelProperty(value = "标签列表")
     @JsonProperty("tag_info_list")
     private List<TagInfo> tagInfoList;
