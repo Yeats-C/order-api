@@ -54,10 +54,6 @@ public class ErpOrderCartInfo {
     @JsonProperty("activity_id")
     private String activityId;
 
-     @ApiModelProperty(value = "活动名称")
-    @JsonProperty("activity_name")
-    private String activityName;
-
     @ApiModelProperty(value = "商品数量")
     @JsonProperty("amount")
     private Integer amount;
@@ -151,6 +147,10 @@ public class ErpOrderCartInfo {
     private String productCategoryCode;
 
     /***********************************非数据库字段***********************************/
+
+    @ApiModelProperty(value = "活动名称")
+    @JsonProperty("activity_name")
+    private String activityName;
 
     /***活动价*/
     @ApiModelProperty(value = "活动价")

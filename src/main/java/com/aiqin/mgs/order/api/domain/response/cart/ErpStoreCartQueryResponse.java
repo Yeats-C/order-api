@@ -44,4 +44,12 @@ public class ErpStoreCartQueryResponse {
     @JsonProperty("store_contacts_phone")
     private String storeContactsPhone;
 
+    @ApiModelProperty(value = "门店Id")
+    @JsonProperty("store_id")
+    private String storeId;
+
+    @ApiModelProperty(value = "订单类型 1直送 2配送")
+    @JsonProperty("product_type")
+    private Integer productType;
+
 }

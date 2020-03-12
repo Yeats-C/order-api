@@ -9,7 +9,6 @@
         cart_id as cartId,
         store_id as storeId,
         activity_id as activityId,
-        activity_name as activityName,
         amount as amount,
         price as price,
         logo as logo,
@@ -36,7 +35,7 @@
         update_time as updateTime,
         update_by_id as updateById,
         update_by_name as updateByName,
-        zero_removalCoefficient as zeroRemovalCoefficient
+        zero_removal_coefficient as zeroRemovalCoefficient
         from order_store_cart_copy1 where 1 = 1
         <if test="id != null and id != ''">
             and id = #{id}
@@ -71,15 +70,15 @@
     </update>
 
     <insert id="insert">
-        insert into order_store_cart_copy1(id, cart_id, store_id, activity_id, activity_name,
+        insert into order_store_cart_copy1(id, cart_id, store_id, activity_id,
                                            amount, price, logo, color, spec, product_size, sku_code, sku_name, spu_code,
                                            spu_name, product_type, product_gift, line_check_status,
                                            product_property_code,
                                            product_property_name, product_brand_code, product_brand_name,
                                            product_category_code, product_category_name, create_source, create_time,
                                            create_by_id, create_by_name, update_time, update_by_id, update_by_name,
-                                           zero_removalCoefficient)
-        values (#{id}, #{cartId}, #{storeId}, #{activityId}, #{activityName},
+                                           zero_removal_coefficient)
+        values (#{id}, #{cartId}, #{storeId}, #{activityId},
                 #{amount}, #{price}, #{logo}, #{color}, #{spec}, #{productSize}, #{skuCode}, #{skuName}, #{spuCode},
                 #{spuName}, #{productType}, #{productGift}, #{lineCheckStatus}, #{productPropertyCode},
                 #{productPropertyName}, #{productBrandCode}, #{productBrandName}, #{productCategoryCode},
