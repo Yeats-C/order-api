@@ -30,7 +30,7 @@
             parameterType="com.aiqin.mgs.order.api.domain.Activity">
         SELECT
         a.activity_id,a.activity_name,a.activity_type,a.activity_status,a.begin_time,a.finish_time,a.publishing_organization,a.activity_brief
-        ,a.activity_pic_pc,a.activity_pic_app,a.create_by,a.update_by,a.create_time,a.update_time,activity_scope
+        ,a.activity_pic_pc,a.activity_pic_app,a.create_by,a.update_by,a.create_time,a.update_time,active_store_range,activity_scope
         FROM
         activity a
         JOIN activity_store s ON a.activity_id = s.activity_id
