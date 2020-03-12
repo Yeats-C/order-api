@@ -2,13 +2,8 @@ package com.aiqin.mgs.order.api.service.cart;
 
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.cart.ErpOrderCartInfo;
-import com.aiqin.mgs.order.api.domain.request.cart.ErpCartAddRequest;
-import com.aiqin.mgs.order.api.domain.request.cart.ErpCartChangeGroupCheckStatusRequest;
-import com.aiqin.mgs.order.api.domain.request.cart.ErpCartQueryRequest;
-import com.aiqin.mgs.order.api.domain.request.cart.ErpCartUpdateRequest;
-import com.aiqin.mgs.order.api.domain.response.cart.ErpCartQueryResponse;
-import com.aiqin.mgs.order.api.domain.response.cart.ErpOrderCartAddResponse;
-import com.aiqin.mgs.order.api.domain.response.cart.ErpStoreCartQueryResponse;
+import com.aiqin.mgs.order.api.domain.request.cart.*;
+import com.aiqin.mgs.order.api.domain.response.cart.*;
 
 import java.util.List;
 
@@ -77,6 +72,13 @@ public interface ErpOrderCartService {
     void deleteCartLine(String cartId);
 
     /**
+     * 清空购物车
+     *
+     * @param erpCartQueryRequest
+     */
+    void deleteAllCartLine(ErpCartQueryRequest erpCartQueryRequest);
+
+    /**
      * 添加商品
      *
      * @param erpCartAddRequest
@@ -117,4 +119,40 @@ public interface ErpOrderCartService {
      * @return
      */
     ErpStoreCartQueryResponse queryStoreCartList(ErpCartQueryRequest erpCartQueryRequest, AuthToken auth);
+
+    /**
+     * 创建订单结算数据，存储到redis
+     *
+     * @param erpCartQueryRequest
+     * @param auth
+     * @return
+     */
+    ErpGenerateCartGroupTempResponse generateCartGroupTemp(ErpCartQueryRequest erpCartQueryRequest, AuthToken auth);
+
+    /**
+     * 查询订单结算缓存信息
+     *
+     * @param erpQueryCartGroupTempRequest
+     * @param auth
+     * @return
+     */
+    ErpStoreCartQueryResponse queryCartGroupTemp(ErpQueryCartGroupTempRequest erpQueryCartGroupTempRequest, AuthToken auth);
+
+    /**
+     * 返回购物车中的商品总数量
+     *
+     * @param erpCartQueryRequest
+     * @param auth
+     * @return
+     */
+    int getCartProductTotalNum(ErpCartQueryRequest erpCartQueryRequest, AuthToken auth);
+
+    /**
+     * 查询当前购物车活动条件满足情况
+     *
+     * @param storeActivityAchieveRequest
+     * @return
+     */
+    StoreActivityAchieveResponse getStoreActivityAchieveDetail(StoreActivityAchieveRequest storeActivityAchieveRequest);
+
 }

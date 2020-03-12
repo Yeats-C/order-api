@@ -92,10 +92,10 @@ public class BridgeProductService {
     /**
      * 获取sku详情列表
      *
-     * @param provinceCode
-     * @param cityCode
-     * @param companyCode
-     * @param skuCodeList
+     * @param provinceCode 省编码
+     * @param cityCode     市编码
+     * @param companyCode  公司编码
+     * @param skuCodeList  sku编码集合
      * @return java.util.List<com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetailResponse>
      * @author: Tao.Chen
      * @version: v1.0.0
@@ -130,6 +130,15 @@ public class BridgeProductService {
         return list;
     }
 
+    /**
+     * 获取单个sku详情
+     *
+     * @param provinceCode 省编码
+     * @param cityCode     市编码
+     * @param companyCode  公司编码
+     * @param skuCode      sku编码
+     * @return
+     */
     public ErpSkuDetail getProductSkuDetail(String provinceCode, String cityCode, String companyCode, String skuCode) {
 
         ErpSkuDetail skuDetail = null;
@@ -156,10 +165,10 @@ public class BridgeProductService {
 
         } catch (BusinessException e) {
             log.info("获取商品信息失败：{}", e.getMessage());
-            throw new BusinessException("获取商品信息失败：" + e.getMessage());
+//            throw new BusinessException("获取商品信息失败：" + e.getMessage());
         } catch (Exception e) {
             log.info("获取商品信息失败：{}", e);
-            throw new BusinessException("获取商品信息失败");
+//            throw new BusinessException("获取商品信息失败");
         }
         return skuDetail;
     }
