@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-@ApiModel("购物车查询请求参数")
+@ApiModel("购物车删除请求参数")
 public class ErpCartDeleteRequest {
 
     @ApiModelProperty(value = "购物车行唯一标识")

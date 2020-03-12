@@ -816,9 +816,11 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
     }
 
     @Override
-    public int getCartProductTotalNum(ErpCartQueryRequest erpCartQueryRequest, AuthToken auth) {
+    public int getCartProductTotalNum(ErpCartNumQueryRequest erpCartNumQueryRequest, AuthToken auth) {
         ErpOrderCartInfo query = new ErpOrderCartInfo();
-        query.setStoreId(erpCartQueryRequest.getStoreId());
+        query.setStoreId(erpCartNumQueryRequest.getStoreId());
+        query.setProductType(erpCartNumQueryRequest.getProductType());
+        query.setLineCheckStatus(erpCartNumQueryRequest.getLineCheckStatus());
         List<ErpOrderCartInfo> select = this.selectByProperty(query);
         int cartProductTotalNum = 0;
         if (select != null && select.size() > 0) {

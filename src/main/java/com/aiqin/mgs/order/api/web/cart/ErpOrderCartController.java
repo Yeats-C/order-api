@@ -198,11 +198,11 @@ public class ErpOrderCartController {
 
     @PostMapping("/getCartProductTotalNum")
     @ApiOperation(value = "返回购物车中的商品总数量")
-    public HttpResponse<Integer> getCartProductTotalNum(@Valid @RequestBody ErpCartQueryRequest erpCartQueryRequest) {
+    public HttpResponse<Integer> getCartProductTotalNum(@Valid @RequestBody ErpCartNumQueryRequest erpCartNumQueryRequest) {
         HttpResponse<Integer> response = HttpResponse.success();
         try {
             AuthToken auth = AuthUtil.getCurrentAuth();
-            int cartProductTotalNum = erpOrderCartService.getCartProductTotalNum(erpCartQueryRequest, auth);
+            int cartProductTotalNum = erpOrderCartService.getCartProductTotalNum(erpCartNumQueryRequest, auth);
             response.setData(cartProductTotalNum);
         } catch (BusinessException e) {
             logger.error("查询订单结算缓存数据失败：{}", e);

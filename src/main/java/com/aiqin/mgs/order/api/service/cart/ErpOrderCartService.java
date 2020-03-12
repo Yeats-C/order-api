@@ -141,11 +141,11 @@ public interface ErpOrderCartService {
     /**
      * 返回购物车中的商品总数量
      *
-     * @param erpCartQueryRequest
+     * @param erpCartNumQueryRequest
      * @param auth
      * @return
      */
-    int getCartProductTotalNum(ErpCartQueryRequest erpCartQueryRequest, AuthToken auth);
+    int getCartProductTotalNum(ErpCartNumQueryRequest erpCartNumQueryRequest, AuthToken auth);
 
     /**
      * 查询当前购物车活动条件满足情况
