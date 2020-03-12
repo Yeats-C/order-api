@@ -118,6 +118,10 @@ public class ErpOrderCartInfo {
     @JsonProperty("zero_removal_coefficient")
     private Integer zeroRemovalCoefficient;
 
+    @ApiModelProperty(value = "最大订购数量")
+    @JsonProperty("max_order_num")
+    private Integer maxOrderNum;
+
     @ApiModelProperty(value = "规格")
     @JsonProperty("spec")
     private String spec;
@@ -147,10 +151,6 @@ public class ErpOrderCartInfo {
     private String productCategoryCode;
 
     /***********************************非数据库字段***********************************/
-
-    @ApiModelProperty(value = "活动名称")
-    @JsonProperty("activity_name")
-    private String activityName;
 
     /***活动价*/
     @ApiModelProperty(value = "活动价")

@@ -35,7 +35,7 @@ public class ErpSkuDetail {
     private Integer maxOrderNum;
 
     @ApiModelProperty(value = "交易倍数")
-    @JsonProperty("zero_removal_coefficient")
+    @JsonProperty("zero_removalCoefficient")
     private Integer zeroRemovalCoefficient;
 
     @ApiModelProperty(value = "库存数量")
