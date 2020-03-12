@@ -47,12 +47,6 @@ public class CouponRuleController {
         return HttpResponse.success(new CouponRule());
     }
 
-//    @GetMapping("/insert")
-//    @ApiOperation(value = "基础设置--活惠券规则设置")
-//    public HttpResponse<Boolean> insert(@RequestBody CouponRule couponRule){
-//        return HttpResponse.success(couponRuleService.insert(couponRule));
-//    }
-
     @PostMapping("/update")
     @ApiOperation(value = "基础设置--活惠券规则修改")
     public HttpResponse<Boolean> update(@RequestBody CouponRule couponRule){
