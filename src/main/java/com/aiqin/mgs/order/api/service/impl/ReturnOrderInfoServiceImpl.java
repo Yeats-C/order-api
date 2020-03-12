@@ -1221,6 +1221,14 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         return HttpResponse.success(select);
     }
 
+    @Override
+    public PageResData<ReturnOrderInfo> azgList(ReturnOrderSearchVo searchVo) {
+        PageHelper.startPage(searchVo.getPageNo(),searchVo.getPageSize());
+        List<ReturnOrderInfo> content = returnOrderInfoDao.page(searchVo);
+        Integer pageCount = returnOrderInfoDao.pageCount(searchVo);
+        return new PageResData<>(pageCount, content);
+    }
+
     /**
      * 插入日志表
      * @param orderCode
