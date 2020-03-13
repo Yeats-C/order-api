@@ -9,6 +9,7 @@ import com.aiqin.mgs.order.api.component.enums.ErpProductPropertyTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.YesOrNoEnum;
 import com.aiqin.mgs.order.api.component.enums.activity.ActivityRuleUnitEnum;
 import com.aiqin.mgs.order.api.component.enums.activity.ActivityTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.cart.ErpCartLineStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.cart.ErpProductGiftGiveTypeEnum;
 import com.aiqin.mgs.order.api.dao.cart.ErpOrderCartDao;
 import com.aiqin.mgs.order.api.domain.*;
@@ -1508,6 +1509,12 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
             if (skuDetail == null || item.getAmount() > skuDetail.getStockNum()) {
                 item.setLineCheckStatus(YesOrNoEnum.NO.getCode());
                 updateList.add(item);
+
+                if (skuDetail == null) {
+                    item.setCartLineStatus(ErpCartLineStatusEnum.NOT_ALLOWED.getCode());
+                } else if (item.getAmount() > skuDetail.getStockNum()) {
+                    item.setCartLineStatus(ErpCartLineStatusEnum.UNDER_STOCK.getCode());
+                }
             }
             if (skuDetail != null) {
                 item.setStockNum(skuDetail.getStockNum());

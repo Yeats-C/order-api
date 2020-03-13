@@ -40,6 +40,7 @@
         <result column="preferential_amount" property="preferentialAmount" jdbcType="DECIMAL"/>
         <result column="product_category_code" property="productCategoryCode" jdbcType="VARCHAR"/>
         <result column="product_category_name" property="productCategoryName" jdbcType="VARCHAR"/>
+        <result column="bar_code" property="barCode" jdbcType="VARCHAR"/>
     </resultMap>
     <sql id="Base_Column_List">
     id, return_order_detail_id, return_order_code, sku_code, sku_name, picture_url, product_spec, 
@@ -48,7 +49,7 @@
     return_product_count, actual_return_product_count, actual_total_product_amount, product_status, 
     tax_rate, line_code, use_status, source_code, source_type, create_by_id, create_by_name, 
     update_by_id, update_by_name, create_time, update_time, remark, evidence_url, preferential_amount,
-    product_category_code,product_category_name
+    product_category_code,product_category_name,bar_code
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
         select
@@ -178,6 +179,9 @@
             <if test="productCategoryName != null">
                 product_category_name,
             </if>
+            <if test="barCode != null">
+                bar_code,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -293,6 +297,9 @@
             </if>
             <if test="productCategoryName != null">
                 #{productCategoryName,jdbcType=VARCHAR},
+            </if>
+            <if test="barCode != null">
+                #{barCode,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
@@ -410,6 +417,9 @@
             <if test="productCategoryName != null">
                 product_category_name=#{productCategoryName},
             </if>
+            <if test="barCode != null">
+                bar_code=#{barCode},
+            </if>
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
@@ -419,7 +429,7 @@
         sku_code, sku_name,total_product_amount,return_product_count,model_code,product_status,
         product_spec,unit_name,color_code,color_name,create_by_id, create_by_name,picture_url,
         create_time,remark,evidence_url,preferential_amount,line_code,unit_code,tax_rate,
-        product_amount,product_category_code,product_category_name)
+        product_amount,product_category_code,product_category_name,bar_code)
         values
         <foreach collection="records" item="item" index="index" separator=",">
             (
@@ -434,7 +444,7 @@
             #{item.pictureUrl,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP},
             #{item.remark,jdbcType=VARCHAR},#{item.evidenceUrl,jdbcType=VARCHAR},#{item.preferentialAmount,jdbcType=DECIMAL},
             #{item.lineCode},#{item.unitCode},#{item.taxRate},#{item.productAmount},
-            #{item.productCategoryCode},#{item.productCategoryName}
+            #{item.productCategoryCode},#{item.productCategoryName},#{item.barCode}
             )
         </foreach>
     </insert>
@@ -480,7 +490,7 @@
         sku_code, sku_name,total_product_amount,return_product_count,model_code,product_status,
         product_spec,unit_name,color_code,color_name,create_by_id, create_by_name,picture_url,
         create_time,remark,evidence_url,preferential_amount,line_code,actual_return_product_count,
-        actual_total_product_amount,product_amount,product_category_code,product_category_name)
+        actual_total_product_amount,product_amount,product_category_code,product_category_name,bar_code)
         values
         <foreach collection="records" item="item" index="index" separator=",">
             (
@@ -495,7 +505,7 @@
             #{item.pictureUrl,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP},
             #{item.remark,jdbcType=VARCHAR},#{item.evidenceUrl,jdbcType=VARCHAR},#{item.preferentialAmount,jdbcType=DECIMAL},
             #{item.lineCode},#{item.actualReturnProductCount},#{item.actualTotalProductAmount},
-            #{item.productAmount},#{item.productCategoryCode},#{item.productCategoryName}
+            #{item.productAmount},#{item.productCategoryCode},#{item.productCategoryName},#{item.barCode}
             )
         </foreach>
     </insert>

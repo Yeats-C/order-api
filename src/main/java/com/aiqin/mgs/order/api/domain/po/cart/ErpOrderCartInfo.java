@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.po.cart;
 
+import com.aiqin.mgs.order.api.component.enums.cart.ErpCartLineStatusEnum;
 import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.TagInfo;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -188,6 +189,10 @@ public class ErpOrderCartInfo {
     @ApiModelProperty(value = "赠品赠送方式 1、赠完为止")
     @JsonProperty("gift_give_type")
     private Integer giftGiveType;
+
+    @ApiModelProperty(value = "商品行（仅本品）状态  1、正常  2、库存不足，不允许选中和编辑 3、商品禁用或者没查询到商品，不允许选中和编辑")
+    @JsonProperty("cart_line_status")
+    private Integer cartLineStatus = ErpCartLineStatusEnum.NORMAL.getCode();
 
     @ApiModelProperty(value = "标签列表")
     @JsonProperty("tag_info_list")
