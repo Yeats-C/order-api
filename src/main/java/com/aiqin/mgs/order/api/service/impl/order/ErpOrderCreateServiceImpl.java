@@ -123,6 +123,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //锁库存
         if (processTypeEnum.isLockStock()) {
+            //TODO 修改成实时获取锁库结果并新建表保存
             boolean flag = erpOrderRequestService.lockStockInSupplyChain(order, erpOrderItemList, auth);
             if (!flag) {
                 throw new BusinessException("锁库存失败");

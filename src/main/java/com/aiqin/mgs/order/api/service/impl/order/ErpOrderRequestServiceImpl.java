@@ -218,6 +218,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
         boolean flag = true;
         try {
 
+            //TODO 按照sku汇总数量
             List<Map<String, Object>> list = new ArrayList<>();
             for (ErpOrderItem item :
                     itemList) {
@@ -682,6 +683,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     public boolean repertoryCheck(StoreInfo storeInfo, List<ErpOrderItem> orderProductItemList) {
         boolean flag = true;
         try {
+            //TODO 按照sku汇总数量
             for (ErpOrderItem item :
                     orderProductItemList) {
                 HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + "/stock/available/search")

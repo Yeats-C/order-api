@@ -16,11 +16,11 @@ public class ErpCartNumQueryRequest {
     @NotEmpty(message = "门店id不能为空")
     private String storeId;
 
-    @ApiModelProperty(value = "订单类型 1、只查直送 2、只查配送")
+    @ApiModelProperty(value = "订单类型 1、只查直送 2、只查配送 不传不筛选")
     @JsonProperty("product_type")
     private Integer productType;
 
-    @ApiModelProperty(value = "勾选状态 0、只查未勾选的 1、只查询勾选的  erp端查询必须传1")
+    @ApiModelProperty(value = "勾选状态 0、只查未勾选的 1、只查询勾选的   不传不筛选  erp端查询必须传1")
     @JsonProperty("line_check_status")
     private Integer lineCheckStatus;
 }

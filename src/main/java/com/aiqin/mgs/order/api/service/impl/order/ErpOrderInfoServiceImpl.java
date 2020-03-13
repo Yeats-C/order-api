@@ -150,6 +150,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             List<ErpOrderInfo> splitOrderList = new ArrayList<>();
 
             //请求供应链获取分组情况
+            //TODO 修改成从锁库的时候保存的数据获取仓库库房分组信息
             List<ErpOrderItemSplitGroupResponse> lineSplitGroupList = erpOrderRequestService.getRepositorySplitGroup(order);
             if (lineSplitGroupList == null || lineSplitGroupList.size() == 0) {
                 throw new BusinessException("未获取到供应链商品分组");
