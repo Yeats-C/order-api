@@ -1272,63 +1272,58 @@
 
   <select id="selectReturnOrderManagementList" resultType="com.aiqin.mgs.order.api.domain.response.returngoods.QueryReturnOrderManagementRespVO">
     select
-    a.return_order_code returnOrderCode,
-    a.return_order_type returnOrderType,
-    a.customer_name customerName,
-    a.transport_center_name transportCenterName,
-    a.warehouse_name warehouseName,
-    a.supplier_name supplierName,
-    a.return_order_status orderStatus,
-    a.create_time createDate,
-    a.product_count productNum,
-    #         a.product_total_amount productTotalAmount,
-    a.return_order_amount returnOrderAmount,
-    a.create_by_name createByName,
-    a.create_time createTime,
-    a.update_time updateTime,
-    a.update_by_name updateByName,
-    a.actual_product_count actualProductNum,
-    #         a.actual_product_channel_total_amount actualProductChannelTotalAmount,
-    a.actual_product_count actualProductTotalAmount
-    #         a.product_channel_total_amount productChannelTotalAmount
-    from return_order_info a
-    where  1=1
+    return_order_code returnOrderCode,
+    return_order_type returnOrderType,
+    customer_name customerName,
+    transport_center_name transportCenterName,
+    warehouse_name warehouseName,
+    supplier_name supplierName,
+    return_order_status orderStatus,
+    create_time createDate,
+    product_count productNum,
+    return_order_amount returnOrderAmount,
+    create_by_name createByName,
+    create_time createTime,
+    update_time updateTime,
+    update_by_name updateByName,
+    actual_product_count actualProductNum,
+    actual_product_count actualProductTotalAmount
+    from return_order_info
+    <where>
     <if test="companyCode != null">
-      and a.company_code = #{companyCode}
+      and company_code = #{companyCode}
     </if>
     <if test="createDateStart != null">
-      and a.create_time &gt;=#{createDateStart,jdbcType=TIMESTAMP}
+      and create_time &gt;=#{createDateStart,jdbcType=TIMESTAMP}
     </if>
     <if test="createDateEnd != null">
-      and a.create_time &lt;=#{createDateEnd,jdbcType=TIMESTAMP}
+      and create_time &lt;=#{createDateEnd,jdbcType=TIMESTAMP}
     </if>
     <if test="orderStatus != null and orderStatus != ''">
-      and a.return_order_status = #{orderStatus}
+      and return_order_status = #{orderStatus}
     </if>
     <if test="transportCenterCode != null and transportCenterCode != ''">
-      and a.transport_center_code = #{transportCenterCode}
+      and transport_center_code = #{transportCenterCode}
     </if>
     <if test="warehouseCode != null and warehouseCode != ''">
-      and a.warehouse_code = #{warehouseCode}
+      and warehouse_code = #{warehouseCode}
     </if>
-    <!--        <if test="beDelete != null and beDelete != ''">-->
-    <!--            and a.be_delete = #{beDelete}-->
-    <!--        </if>-->
     <if test="customerCode != null and customerCode != ''">
-      and a.customer_code like concat('%',#{customerCode},'%')
+      and customer_code LIKE CONCAT(#{customerCode},'%')
     </if>
     <if test="orderCode != null and orderCode != ''">
-      and a.order_store_code LIKE CONCAT(CONCAT('%',#{orderCode},'%'))
+      and order_store_code LIKE CONCAT(#{orderCode},'%')
     </if>
     <if test="returnOrderCode != null and returnOrderCode != ''">
-      and a.return_order_code LIKE CONCAT(CONCAT('%',#{returnOrderCode},'%'))
+      and return_order_code LIKE CONCAT(#{returnOrderCode},'%')
     </if>
     <if test="orderTypeCode != null and orderTypeCode.size > 0">
-      and a.order_type in
+      and order_type in
       <foreach collection="orderTypeCode" open="(" close=")" separator="," item="item">
         #{item}
       </foreach>
     </if>
+    </where>
     order by create_time desc
   </select>
   <resultMap id="selectReturnOrderDetail" type="com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderDetailRespVO">
