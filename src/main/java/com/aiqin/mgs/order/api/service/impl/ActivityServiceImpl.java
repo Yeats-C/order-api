@@ -18,6 +18,7 @@ import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import com.aiqin.mgs.order.api.service.CopartnerAreaService;
+import com.aiqin.mgs.order.api.service.CouponRuleService;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.DateUtil;
@@ -82,6 +83,9 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Autowired
     private CopartnerAreaService copartnerAreaService;
+
+    @Autowired
+    private CouponRuleService couponRuleService;
 
     @Override
     public HttpResponse<Map> activityList(Activity activity) {
@@ -798,6 +802,7 @@ public class ActivityServiceImpl implements ActivityService {
             ActivityParameterRequest activityParameterRequest=new ActivityParameterRequest();
             activityParameterRequest.setActivityId(spuProductReqVO.getActivityId());
             activityParameterRequest.setStoreId(spuProductReqVO.getStoreId());
+            Map dataMap=couponRuleMap();
             if(null!=res.getData()){
                 PageResData<ProductSkuRespVo5> pageResData= (PageResData<ProductSkuRespVo5>) res.getData();
                 List<ProductSkuRespVo5> productSkuRespVo=pageResData.getDataList();
@@ -829,6 +834,11 @@ public class ActivityServiceImpl implements ActivityService {
                     }
                     if(StringUtils.isEmpty(vo.getItroImages())){
                         vo.setItroImages("无");
+                    }
+                    if(dataMap.containsKey(vo.getProductPropertyCode())){
+                        vo.setCouponRule(1);//可使用优惠券
+                    }else{
+                        vo.setCouponRule(0);//不可使用优惠券
                     }
                 }
             }else{
@@ -1161,5 +1171,16 @@ public class ActivityServiceImpl implements ActivityService {
         }
         return response2;
     }
+
+    Map couponRuleMap(){
+        Map dateMap=new HashMap();
+        CouponRule couponRule=couponRuleService.getCouponRule(2);
+        if(null!=couponRule &&null!=couponRule.getCouponRuleDetailList()&&0<couponRule.getCouponRuleDetailList().size()){
+            for (CouponRuleDetail detail:couponRule.getCouponRuleDetailList()) {
+                dateMap.put(detail.getProductPropertyCode(),detail.getProductPropertyName());
+            }
+        }
+        return dateMap;
+    };
 
 }
