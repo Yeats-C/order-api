@@ -802,7 +802,7 @@ public class ActivityServiceImpl implements ActivityService {
             ActivityParameterRequest activityParameterRequest=new ActivityParameterRequest();
             activityParameterRequest.setActivityId(spuProductReqVO.getActivityId());
             activityParameterRequest.setStoreId(spuProductReqVO.getStoreId());
-            Map dataMap=couponRuleMap();
+            Map dataMap=couponRuleService.couponRuleMap();
             if(null!=res.getData()){
                 PageResData<ProductSkuRespVo5> pageResData= (PageResData<ProductSkuRespVo5>) res.getData();
                 List<ProductSkuRespVo5> productSkuRespVo=pageResData.getDataList();
@@ -1172,15 +1172,6 @@ public class ActivityServiceImpl implements ActivityService {
         return response2;
     }
 
-    Map couponRuleMap(){
-        Map dateMap=new HashMap();
-        CouponRule couponRule=couponRuleService.getCouponRule(2);
-        if(null!=couponRule &&null!=couponRule.getCouponRuleDetailList()&&0<couponRule.getCouponRuleDetailList().size()){
-            for (CouponRuleDetail detail:couponRule.getCouponRuleDetailList()) {
-                dateMap.put(detail.getProductPropertyCode(),detail.getProductPropertyName());
-            }
-        }
-        return dateMap;
-    };
+
 
 }
