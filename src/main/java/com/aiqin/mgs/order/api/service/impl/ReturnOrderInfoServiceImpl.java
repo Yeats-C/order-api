@@ -1141,6 +1141,17 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             Integer orderType=Integer.valueOf(erpOrderInfo.getOrderTypeCode());
             returnOrderInfo.setOrderType(orderType);
         }
+        //退货总数量
+        Long totalProCount=0L;
+        for(ErpOrderItem eoi:itemList){
+            if(null!=eoi.getProductCount()){
+                totalProCount=totalProCount+eoi.getProductCount();
+            }
+        }
+        //退货总数量
+        returnOrderInfo.setProductCount(totalProCount);
+        //实际退货总数量
+        returnOrderInfo.setActualProductCount(totalProCount);
         log.info("客户取消订单---订单使用接口--插入退货单主表入参returnOrderInfo={}",returnOrderInfo);
         returnOrderInfoDao.insertSelective(returnOrderInfo);
         log.info("客户取消订单---订单使用接口--插入退货单主表成功");
