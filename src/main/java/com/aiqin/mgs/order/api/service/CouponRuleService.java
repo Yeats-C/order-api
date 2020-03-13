@@ -1,9 +1,9 @@
 package com.aiqin.mgs.order.api.service;
 
-import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.CouponRule;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * description: CouponRuleService
@@ -40,5 +40,11 @@ public interface CouponRuleService {
      * @return
      */
     Boolean update(CouponRule couponRule);
+
+    /**
+     * 查询当前A品卷规则map
+     * @return
+     */
+     Map couponRuleMap();
 
 }

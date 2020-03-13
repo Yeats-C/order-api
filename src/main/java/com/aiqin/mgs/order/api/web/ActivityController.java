@@ -286,5 +286,15 @@ public class ActivityController {
         }
     }
 
+    /**
+     * 通过列表id查询门店权限集合
+     */
+    @PostMapping("/storeIds")
+    @ApiOperation("通过列表id查询门店权限集合")
+    HttpResponse<List<String>> storeIds(String menuCode){
+        HttpResponse response = HttpResponse.success();
+        response.setData(activitesService.storeIds(menuCode));
+        return response;
+    };
 
 }

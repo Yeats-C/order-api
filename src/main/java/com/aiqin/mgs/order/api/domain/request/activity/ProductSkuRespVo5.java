@@ -109,7 +109,7 @@ public class ProductSkuRespVo5 {
 
     @ApiModelProperty("是否能使用A品卷 0否 1是")
     @JsonProperty("coupon_rule")
-    private Integer couponRule;
+    private Integer couponRule=0;
 
 
 

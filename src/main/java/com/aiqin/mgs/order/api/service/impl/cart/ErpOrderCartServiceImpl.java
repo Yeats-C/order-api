@@ -5,7 +5,6 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpProductGiftEnum;
-import com.aiqin.mgs.order.api.component.enums.ErpProductPropertyTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.YesOrNoEnum;
 import com.aiqin.mgs.order.api.component.enums.activity.ActivityRuleUnitEnum;
 import com.aiqin.mgs.order.api.component.enums.activity.ActivityTypeEnum;
@@ -21,6 +20,7 @@ import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.*;
 import com.aiqin.mgs.order.api.domain.response.cart.*;
 import com.aiqin.mgs.order.api.service.ActivityService;
+import com.aiqin.mgs.order.api.service.CouponRuleService;
 import com.aiqin.mgs.order.api.service.RedisService;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.service.cart.ErpOrderCartService;
@@ -55,6 +55,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
 
     @Resource
     private RedisService redisService;
+
+    @Resource
+    private CouponRuleService couponRuleService;
 
     @Override
     public void insertCartLine(ErpOrderCartInfo erpOrderCartInfo, AuthToken authToken) {
@@ -401,7 +404,8 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
 
         //查询门店信息
         StoreInfo store = erpOrderRequestService.getStoreInfoByStoreId(erpCartQueryRequest.getStoreId());
-
+        //查询A品卷使用规则code Map
+        Map ruleMap=couponRuleService.couponRuleMap();
         ErpOrderCartInfo query = new ErpOrderCartInfo();
         query.setStoreId(erpCartQueryRequest.getStoreId());
         query.setProductType(erpCartQueryRequest.getProductType());
@@ -544,9 +548,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                     productItem.setActivityList(activityList);
 
                     //判断是否可用A品券
-                    ErpProductPropertyTypeEnum productPropertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(productItem.getProductPropertyCode());
-                    if (productPropertyTypeEnum != null && productPropertyTypeEnum.isUseTopCoupon()) {
-                        productItem.setTopCouponUsable(YesOrNoEnum.YES.getCode());
+                    if(ruleMap.containsKey(productItem.getProductPropertyCode())){
+                        //可使用优惠券
+                        productItem.setCouponRule(YesOrNoEnum.YES.getCode());
                     }
                 }
             }
@@ -605,7 +609,8 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
 
         //查询门店信息
         StoreInfo store = erpOrderRequestService.getStoreInfoByStoreId(erpCartQueryRequest.getStoreId());
-
+        //查询A品卷使用规则code Map
+        Map ruleMap=couponRuleService.couponRuleMap();
         ErpOrderCartInfo query = new ErpOrderCartInfo();
         query.setStoreId(erpCartQueryRequest.getStoreId());
         query.setProductType(erpCartQueryRequest.getProductType());
@@ -755,10 +760,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         groupActivityDiscountAmount = groupActivityDiscountAmount.add(productItem.getLineActivityDiscountTotal());
                         groupProductQuantity += productItem.getAmount();
 
-                        ErpProductPropertyTypeEnum productPropertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(productItem.getProductPropertyCode());
-                        if (productPropertyTypeEnum != null && productPropertyTypeEnum.isUseTopCoupon()) {
-                            groupTopCouponMaxTotal = groupTopCouponMaxTotal.add(productItem.getLineAmountAfterActivity());
-                            productItem.setTopCouponUsable(YesOrNoEnum.YES.getCode());
+                        if(ruleMap.containsKey(productItem.getProductPropertyCode())){
+                            //可使用优惠券
+                            productItem.setCouponRule(YesOrNoEnum.YES.getCode());
                         }
                     }
                 }

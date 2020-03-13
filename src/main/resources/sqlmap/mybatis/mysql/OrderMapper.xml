@@ -1484,7 +1484,10 @@
         update_by_name updateByName,
         update_time updateTime
         from order_store_info
-        where order_type_code = #{orderType}
+        <where>
+        <if test="orderType != null">
+            and order_type_code = #{orderType}
+        </if>
         <if test="companyCode != null">
             and company_code = #{companyCode}
         </if>
@@ -1506,18 +1509,13 @@
         <if test="supplierCode != null and supplierCode != ''">
             and supplier_code = #{supplierCode}
         </if>
-<!--        <if test="beLock != null and beLock != ''">-->
-<!--            and be_lock = #{beLock}-->
-<!--        </if>-->
-<!--        <if test="beException != null and beException != ''">-->
-<!--            and be_exception = #{beException}-->
-<!--        </if>-->
         <if test="customerName != null and customerName != ''">
-            and customer_name like concat('%',#{customerName},'%')
+            and customer_name like CONCAT(#{customerName},'%')
         </if>
         <if test="orderCode != null and orderCode != ''">
-            and order_store_code LIKE CONCAT(CONCAT('%',#{orderCode},'%'))
+            and order_store_code LIKE CONCAT(#{orderCode},'%')
         </if>
+        </where>
         order by create_time desc
     </select>
     <resultMap id="selectByOrderCode" type="com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoRespVO">

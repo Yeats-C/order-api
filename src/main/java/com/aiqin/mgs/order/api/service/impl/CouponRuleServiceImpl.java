@@ -1,6 +1,5 @@
 package com.aiqin.mgs.order.api.service.impl;
 
-import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.dao.CouponRuleDao;
 import com.aiqin.mgs.order.api.dao.CouponRuleDetailDao;
 import com.aiqin.mgs.order.api.domain.CouponRule;
@@ -11,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * description: CouponRuleServiceImpl
@@ -75,4 +76,16 @@ public class CouponRuleServiceImpl implements CouponRuleService {
 //    public Boolean update(CouponRule couponRule) {
 //        return couponRuleDao.updateByPrimaryKeySelective(couponRule)>0;
 //    }
+
+    @Override
+    public Map couponRuleMap(){
+        Map dateMap=new HashMap();
+        CouponRule couponRule=getCouponRule(2);
+        if(null!=couponRule &&null!=couponRule.getCouponRuleDetailList()&&0<couponRule.getCouponRuleDetailList().size()){
+            for (CouponRuleDetail detail:couponRule.getCouponRuleDetailList()) {
+                dateMap.put(detail.getProductPropertyCode(),detail.getProductPropertyName());
+            }
+        }
+        return dateMap;
+    };
 }

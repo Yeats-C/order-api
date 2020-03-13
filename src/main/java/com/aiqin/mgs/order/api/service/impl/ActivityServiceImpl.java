@@ -6,6 +6,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.YesOrNoEnum;
 import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
@@ -281,7 +282,7 @@ public class ActivityServiceImpl implements ActivityService {
         LOGGER.info("查询活动详情-销售数据-活动销售列表（分页）getActivityItem参数erpOrderItem为：{}", erpOrderItem);
         HttpResponse response = HttpResponse.success();
         //只查询活动商品
-        erpOrderItem.setIsActivity(1);
+        erpOrderItem.setIsActivity(YesOrNoEnum.YES.getCode());
         List<ErpOrderItem> select = erpOrderItemDao.getActivityItem(erpOrderItem);
         Integer totalCount = erpOrderItemDao.totalCount(erpOrderItem);
         Map data=new HashMap();
@@ -398,7 +399,7 @@ public class ActivityServiceImpl implements ActivityService {
             activityStoreList.addAll(activityStoreSet);
             for (ActivityStore activityStore : activityStoreList) {
                 if("all".equals(activityStore.getStoreId())){
-                    activity.setActiveStoreRange(1);
+                    activity.setActiveStoreRange(YesOrNoEnum.YES.getCode());
                 }
                 activityStore.setActivityId(activity.getActivityId());
                 activityStore.setCreateTime(new Date());
@@ -802,7 +803,7 @@ public class ActivityServiceImpl implements ActivityService {
             ActivityParameterRequest activityParameterRequest=new ActivityParameterRequest();
             activityParameterRequest.setActivityId(spuProductReqVO.getActivityId());
             activityParameterRequest.setStoreId(spuProductReqVO.getStoreId());
-            Map dataMap=couponRuleMap();
+            Map dataMap=couponRuleService.couponRuleMap();
             if(null!=res.getData()){
                 PageResData<ProductSkuRespVo5> pageResData= (PageResData<ProductSkuRespVo5>) res.getData();
                 List<ProductSkuRespVo5> productSkuRespVo=pageResData.getDataList();
@@ -836,9 +837,8 @@ public class ActivityServiceImpl implements ActivityService {
                         vo.setItroImages("无");
                     }
                     if(dataMap.containsKey(vo.getProductPropertyCode())){
-                        vo.setCouponRule(1);//可使用优惠券
-                    }else{
-                        vo.setCouponRule(0);//不可使用优惠券
+                        //可使用优惠券
+                        vo.setCouponRule(YesOrNoEnum.YES.getCode());
                     }
                 }
             }else{
@@ -1172,15 +1172,6 @@ public class ActivityServiceImpl implements ActivityService {
         return response2;
     }
 
-    Map couponRuleMap(){
-        Map dateMap=new HashMap();
-        CouponRule couponRule=couponRuleService.getCouponRule(2);
-        if(null!=couponRule &&null!=couponRule.getCouponRuleDetailList()&&0<couponRule.getCouponRuleDetailList().size()){
-            for (CouponRuleDetail detail:couponRule.getCouponRuleDetailList()) {
-                dateMap.put(detail.getProductPropertyCode(),detail.getProductPropertyName());
-            }
-        }
-        return dateMap;
-    };
+
 
 }
