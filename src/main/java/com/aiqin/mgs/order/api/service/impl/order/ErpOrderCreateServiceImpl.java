@@ -6,12 +6,15 @@ import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
+import com.aiqin.mgs.order.api.domain.po.cart.ErpOrderCartInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.CouponShareRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.ErpCartQueryRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
+import com.aiqin.mgs.order.api.domain.response.cart.ErpCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.OrderConfirmResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.StoreCartProductResponse;
 import com.aiqin.mgs.order.api.service.CartOrderService;
@@ -291,7 +294,14 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 }
             }
         } else {
-            list = cartOrderService.getErpProductList(storeId, orderType);
+//            list = cartOrderService.getErpProductList(storeId, orderType);
+            //修改erp查询list
+            ErpCartQueryRequest erpCartQueryRequest=new ErpCartQueryRequest();
+            erpCartQueryRequest.setProductType(orderType);
+            erpCartQueryRequest.setStoreId(storeId);
+            ErpCartQueryResponse erpCartQueryResponse = erpOrderCartService.queryErpCartList(erpCartQueryRequest, null);
+            //todo 返回值修改
+            List<ErpOrderCartInfo> cartInfoList = erpCartQueryResponse.getCartInfoList();
             if (list == null) {
                 throw new BusinessException("购物车没有勾选的商品");
             }
