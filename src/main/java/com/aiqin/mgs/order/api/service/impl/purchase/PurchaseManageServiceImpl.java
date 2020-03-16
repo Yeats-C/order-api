@@ -26,8 +26,6 @@ import java.util.List;
 public class PurchaseManageServiceImpl implements PurchaseManageService {
     private static final BigDecimal big = BigDecimal.valueOf(0);
 
-    // @Resource
-    // private PurchaseGroupService purchaseGroupService;
     @Resource
     private PurchaseOrderDao purchaseOrderDao;
     @Resource
@@ -37,12 +35,7 @@ public class PurchaseManageServiceImpl implements PurchaseManageService {
 
     @Override
     public HttpResponse<List<PurchaseOrder>> purchaseOrderList(PurchaseApplyRequest purchaseApplyRequest){
-        // List<PurchaseGroupVo> groupVoList = purchaseGroupService.getPurchaseGroup(null);
         PageResData pageResData = new PageResData();
-        // if (org.apache.commons.collections.CollectionUtils.isEmpty(groupVoList)) {
-        //     return HttpResponse.success(pageResData);
-        // }
-        // purchaseApplyRequest.setGroupList(groupVoList);
         List<PurchaseOrderResponse> list = purchaseOrderDao.purchaseOrderList(purchaseApplyRequest);
         Integer count = purchaseOrderDao.purchaseOrderCount(purchaseApplyRequest);
         pageResData.setDataList(list);

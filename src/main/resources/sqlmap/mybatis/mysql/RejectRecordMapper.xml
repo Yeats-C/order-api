@@ -752,7 +752,7 @@
       from reject_record
       <where>
         <if test="rejectRecordCode!=null and rejectRecordCode!=''">
-          and reject_record_code like concat( #{rejectRecordCode,jdbcType=VARCHAR},'%')
+          and reject_record_code like concat(#{rejectRecordCode,jdbcType=VARCHAR},'%')
         </if>
         <if test="purchaseGroupCode!=null and purchaseGroupCode!=''">
           and purchase_group_code = #{purchaseGroupCode,jdbcType=VARCHAR}
@@ -761,10 +761,10 @@
           and reject_record_status = #{rejectStatus,jdbcType=VARCHAR}
         </if>
         <if test="beginTime!=null  ">
-          and create_time <![CDATA[ >=]]>  #{beginTime,jdbcType=VARCHAR}
+          and create_time <![CDATA[ >=]]> #{beginTime,jdbcType=VARCHAR}
         </if>
-        <if test="  finishTime!=null">
-          and create_time <![CDATA[ <=]]>  #{finishTime,jdbcType=VARCHAR}
+        <if test="finishTime!=null">
+          and create_time <![CDATA[ <=]]> #{finishTime,jdbcType=VARCHAR}
         </if>
         <if test="transportCenterCode!=null ">
           and transport_center_code = #{transportCenterCode,jdbcType=VARCHAR}
@@ -785,7 +785,7 @@
     from reject_record
     <where>
       <if test="rejectRecordCode!=null and rejectRecordCode!=''">
-        and reject_record_code like concat( #{rejectRecordCode,jdbcType=VARCHAR},'%')
+        and reject_record_code like concat(#{rejectRecordCode,jdbcType=VARCHAR},'%')
       </if>
       <if test="purchaseGroupCode!=null and purchaseGroupCode!=''">
         and purchase_group_code = #{purchaseGroupCode,jdbcType=VARCHAR}
@@ -794,10 +794,10 @@
         and reject_record_status = #{rejectStatus,jdbcType=VARCHAR}
       </if>
       <if test="beginTime!=null  ">
-        and create_time <![CDATA[ >=]]>  #{beginTime,jdbcType=VARCHAR}
+        and create_time <![CDATA[ >=]]> #{beginTime,jdbcType=VARCHAR}
       </if>
       <if test="  finishTime!=null">
-        and create_time <![CDATA[ <=]]>  #{finishTime,jdbcType=VARCHAR}
+        and create_time <![CDATA[ <=]]> #{finishTime,jdbcType=VARCHAR}
       </if>
       <if test="transportCenterCode!=null ">
         and transport_center_code = #{transportCenterCode,jdbcType=VARCHAR}

@@ -42,11 +42,16 @@ public class GoodsRejectController {
             @ApiImplicitParam(name = "page_no", value = "当前页", type = "Integer"),
             @ApiImplicitParam(name = "page_size", value = "每页条数", type = "Integer"),
     })
-    public HttpResponse<PageResData<RejectRecordInfo>> rejectList(@RequestParam(value = "page_no", required = false) Integer page_no, @RequestParam(value = "page_size", required = false) Integer page_size,
-                                                                  @RequestParam(value = "begin_time", required = false) String beginTime, @RequestParam(value = "purchase_group_code", required = false) String purchase_group_code,
-                                                                  @RequestParam(value = "reject_record_code", required = false) String reject_record_code, @RequestParam(value = "reject_status", required = false) Integer reject_status,
-                                                                  @RequestParam(value = "transport_center_code", required = false) String transport_center_code, @RequestParam(value = "supplier_code", required = false) String supplier_code,
-                                                                  @RequestParam(value = "warehouse_code", required = false) String warehouse_code, @RequestParam(value = "finish_time", required = false) String finishTime) {
+    public HttpResponse<PageResData<RejectRecordInfo>> rejectList(@RequestParam(value = "page_no", required = false) Integer page_no,
+                                                                  @RequestParam(value = "page_size", required = false) Integer page_size,
+                                                                  @RequestParam(value = "begin_time", required = false) String beginTime,
+                                                                  @RequestParam(value = "purchase_group_code", required = false) String purchase_group_code,
+                                                                  @RequestParam(value = "reject_record_code", required = false) String reject_record_code,
+                                                                  @RequestParam(value = "reject_status", required = false) Integer reject_status,
+                                                                  @RequestParam(value = "transport_center_code", required = false) String transport_center_code,
+                                                                  @RequestParam(value = "supplier_code", required = false) String supplier_code,
+                                                                  @RequestParam(value = "warehouse_code", required = false) String warehouse_code,
+                                                                  @RequestParam(value = "finish_time", required = false) String finishTime) {
         RejectQueryRequest rejectQueryRequest = new RejectQueryRequest(beginTime, finishTime, reject_record_code, purchase_group_code, supplier_code, transport_center_code, warehouse_code, reject_status);
         rejectQueryRequest.setPageNo(page_no);
         rejectQueryRequest.setPageSize(page_size);
