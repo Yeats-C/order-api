@@ -16,6 +16,7 @@ import com.aiqin.mgs.order.api.domain.response.cart.OrderConfirmResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.StoreCartProductResponse;
 import com.aiqin.mgs.order.api.service.CartOrderService;
 import com.aiqin.mgs.order.api.service.SequenceGeneratorService;
+import com.aiqin.mgs.order.api.service.cart.ErpOrderCartService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
@@ -57,6 +58,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private ErpOrderFeeService erpOrderFeeService;
     @Resource
     private SequenceGeneratorService sequenceGeneratorService;
+    @Resource
+    private ErpOrderCartService erpOrderCartService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -917,7 +920,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         for (CartOrderInfo item :
                 cartProductList) {
             if (ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductGift())) {
-                cartOrderService.deleteByCartId(item.getCartId());
+//                cartOrderService.deleteByCartId(item.getCartId());
+                //新接口删除购物车
+                erpOrderCartService.deleteCartLine(item.getCartId());
             }
         }
     }
