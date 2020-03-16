@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**
@@ -35,4 +36,9 @@ public class ErpOrderSaveRequest {
     @ApiModelProperty(value = "A品券编码")
     @JsonProperty("top_coupon_code_list")
     private List<String> topCouponCodeList;
+
+    @ApiModelProperty(value = "订单结算缓存数据关联key")
+    @JsonProperty("cart_group_temp_key")
+    private String cartGroupTempKey;
+
 }

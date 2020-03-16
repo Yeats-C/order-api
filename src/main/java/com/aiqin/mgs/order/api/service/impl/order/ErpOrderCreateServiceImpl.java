@@ -12,11 +12,10 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.CouponShareRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartQueryRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.ErpQueryCartGroupTempRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
-import com.aiqin.mgs.order.api.domain.response.cart.ErpCartQueryResponse;
-import com.aiqin.mgs.order.api.domain.response.cart.OrderConfirmResponse;
-import com.aiqin.mgs.order.api.domain.response.cart.StoreCartProductResponse;
+import com.aiqin.mgs.order.api.domain.response.cart.*;
 import com.aiqin.mgs.order.api.service.CartOrderService;
 import com.aiqin.mgs.order.api.service.SequenceGeneratorService;
 import com.aiqin.mgs.order.api.service.cart.ErpOrderCartService;
@@ -109,9 +108,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //获取门店信息
         StoreInfo storeInfo = erpOrderRequestService.getStoreInfoByStoreId(erpOrderSaveRequest.getStoreId());
         //获取购物车商品
-        List<CartOrderInfo> cartProductList = getStoreCartProductList(erpOrderSaveRequest.getStoreId(), erpOrderSaveRequest.getOrderType(),orderSourceEnum);
+//        List<CartOrderInfo> cartProductList = getStoreCartProductList(erpOrderSaveRequest.getCartGroupTempKey(),erpOrderSaveRequest.getStoreId(), erpOrderSaveRequest.getOrderType(),orderSourceEnum);
+        List<ErpOrderCartInfo> cartProductList = getStoreCartProductList(erpOrderSaveRequest.getCartGroupTempKey(),erpOrderSaveRequest.getStoreId(), erpOrderSaveRequest.getOrderType(),orderSourceEnum);
 
         //构建订单商品明细行
+//        List<ErpOrderItem> erpOrderItemList = generateOrderItemList(cartProductList, storeInfo, processTypeEnum);
         List<ErpOrderItem> erpOrderItemList = generateOrderItemList(cartProductList, storeInfo, processTypeEnum);
 
         //数据校验
@@ -125,6 +126,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //保存订单、订单明细、订单支付、订单收货人信息、订单日志
         String orderId = insertOrder(order,orderFee, storeInfo, auth, erpOrderSaveRequest);
         //删除购物车商品
+//        deleteOrderProductFromCart(cartProductList);
         deleteOrderProductFromCart(cartProductList);
 
         //锁库存
@@ -258,38 +260,49 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @param orderType
      * @return
      */
-    private List<CartOrderInfo> getStoreCartProductList(String storeId, Integer orderType, ErpOrderSourceEnum orderSourceEnum) {
+//    private List<CartOrderInfo> getStoreCartProductList(String cartGroupTempKey,String storeId, Integer orderType, ErpOrderSourceEnum orderSourceEnum) {
+    private List<ErpOrderCartInfo> getStoreCartProductList(String cartGroupTempKey,String storeId, Integer orderType, ErpOrderSourceEnum orderSourceEnum) {
 
         List<CartOrderInfo> list = new ArrayList<>();
+        List<ErpOrderCartInfo> cartInfoList=new ArrayList<>();
 
         if (ErpOrderSourceEnum.STORE == orderSourceEnum) {
             //调用查询购物车接口
             CartOrderInfo cartOrderInfoQuery = new CartOrderInfo();
             cartOrderInfoQuery.setStoreId(storeId);
             cartOrderInfoQuery.setProductType(orderType);
-            HttpResponse listHttpResponse = cartOrderService.displayCartLineCheckProduct(cartOrderInfoQuery);
-            if (!RequestReturnUtil.validateHttpResponse(listHttpResponse)) {
+//            HttpResponse listHttpResponse = cartOrderService.displayCartLineCheckProduct(cartOrderInfoQuery);
+            ErpQueryCartGroupTempRequest erpQueryCartGroupTempRequest=new ErpQueryCartGroupTempRequest();
+            erpQueryCartGroupTempRequest.setCartGroupTempKey(cartGroupTempKey);
+            ErpStoreCartQueryResponse erpStoreCartQueryResponse = erpOrderCartService.queryCartGroupTemp(erpQueryCartGroupTempRequest, null);
+            if(erpStoreCartQueryResponse==null){
                 throw new BusinessException("获取购物车商品失败");
             }
-            StoreCartProductResponse data = (StoreCartProductResponse) listHttpResponse.getData();
-            if (data == null || data.getCartGroupList() == null || data.getCartGroupList().size() == 0) {
+            if(null==erpStoreCartQueryResponse.getCartGroupList()){
                 throw new BusinessException("购物车没有勾选的商品");
             }
+//            if (!RequestReturnUtil.validateHttpResponse(listHttpResponse)) {
+//                throw new BusinessException("获取购物车商品失败");
+//            }
+//            StoreCartProductResponse data = (StoreCartProductResponse) listHttpResponse.getData();
+//            if (data == null || data.getCartGroupList() == null || data.getCartGroupList().size() == 0) {
+//                throw new BusinessException("购物车没有勾选的商品");
+//            }
 
-            List<CartGroupInfo> cartGroupList = data.getCartGroupList();
-            for (CartGroupInfo item :
-                    cartGroupList) {
-                for (CartOrderInfo productItem :
-                        item.getCartProductList()) {
+//            List<CartGroupInfo> cartGroupList = data.getCartGroupList();
+            List<ErpCartGroupInfo> cartGroupList = erpStoreCartQueryResponse.getCartGroupList();
+            for (ErpCartGroupInfo item : cartGroupList) {
+                for (ErpOrderCartInfo productItem : item.getCartProductList()) {
                     if (!ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(orderType)) {
                         productItem.setActivityId(null);
-                        productItem.setActivityName(null);
+//                        productItem.setActivityName(null);
                     }
-                    list.add(productItem);
+                    cartInfoList.add(productItem);
                 }
                 if (ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(orderType)) {
                     if (item.getCartGiftList() != null && item.getCartGiftList().size() > 0) {
-                        list.addAll(item.getCartGiftList());
+//                        list.addAll(item.getCartGiftList());
+                        cartInfoList.addAll(item.getCartGiftList());
                     }
                 }
             }
@@ -300,13 +313,12 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             erpCartQueryRequest.setProductType(orderType);
             erpCartQueryRequest.setStoreId(storeId);
             ErpCartQueryResponse erpCartQueryResponse = erpOrderCartService.queryErpCartList(erpCartQueryRequest, null);
-            //todo 返回值修改
-            List<ErpOrderCartInfo> cartInfoList = erpCartQueryResponse.getCartInfoList();
+            cartInfoList = erpCartQueryResponse.getCartInfoList();
             if (list == null) {
                 throw new BusinessException("购物车没有勾选的商品");
             }
         }
-        return list;
+        return cartInfoList;
     }
 
     /**
@@ -320,19 +332,21 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @version: v1.0.0
      * @date 2019/11/27 19:02
      */
-    private List<ErpOrderItem> generateOrderItemList(List<CartOrderInfo> cartProductList, StoreInfo storeInfo, ErpOrderNodeProcessTypeEnum processTypeEnum) {
+//    private List<ErpOrderItem> generateOrderItemList(List<CartOrderInfo> cartProductList, StoreInfo storeInfo, ErpOrderNodeProcessTypeEnum processTypeEnum) {
+    private List<ErpOrderItem> generateOrderItemList(List<ErpOrderCartInfo> cartProductList, StoreInfo storeInfo, ErpOrderNodeProcessTypeEnum processTypeEnum) {
 
         //商品详情Map
         Map<String, ProductInfo> productMap = new HashMap<>(16);
 
         //遍历参数商品列表，获取商品详情，校验数据
-        for (CartOrderInfo item :
+        for (ErpOrderCartInfo item :
                 cartProductList) {
             if (!productMap.containsKey(item.getSkuCode())) {
                 //获取商品详情
                 ProductInfo product = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, item.getSkuCode());
                 if (product == null) {
-                    throw new BusinessException("未获取到商品" + item.getProductName() + "的信息");
+//                    throw new BusinessException("未获取到商品" + item.getProductName() + "的信息");
+                    throw new BusinessException("未获取到商品" + item.getSpuName() + "的信息");
                 }
                 productMap.put(item.getSkuCode(), product);
             }
@@ -342,8 +356,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //订单商品明细行
         List<ErpOrderItem> orderItemList = new ArrayList<>();
         //遍历参数商品列表，构建订单商品明细行
-        for (CartOrderInfo item :
-                cartProductList) {
+//        for (CartOrderInfo item : cartProductList) {
+        for (ErpOrderCartInfo item : cartProductList) {
             ProductInfo productInfo = productMap.get(item.getSkuCode());
 
             ErpOrderItem orderItem = new ErpOrderItem();
@@ -926,9 +940,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @version: v1.0.0
      * @date 2019/11/21 16:02
      */
-    private void deleteOrderProductFromCart(List<CartOrderInfo> cartProductList) {
-        for (CartOrderInfo item :
-                cartProductList) {
+//    private void deleteOrderProductFromCart(List<CartOrderInfo> cartProductList) {
+    private void deleteOrderProductFromCart(List<ErpOrderCartInfo> cartProductList) {
+//        for (CartOrderInfo item : cartProductList) {
+        for (ErpOrderCartInfo item : cartProductList) {
             if (ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductGift())) {
 //                cartOrderService.deleteByCartId(item.getCartId());
                 //新接口删除购物车
