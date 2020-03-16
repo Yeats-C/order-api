@@ -155,4 +155,9 @@ public interface ErpOrderCartService {
      */
     StoreActivityAchieveResponse getStoreActivityAchieveDetail(StoreActivityAchieveRequest storeActivityAchieveRequest);
 
+    /**
+     * 删除购物车多行
+     * @param erpCartDeleteMultipleRequest
+     */
+    void deleteMultipleCartLine(ErpCartDeleteMultipleRequest erpCartDeleteMultipleRequest);
 }

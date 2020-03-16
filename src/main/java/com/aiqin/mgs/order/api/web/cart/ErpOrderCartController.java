@@ -230,4 +230,22 @@ public class ErpOrderCartController {
         }
         return httpResponse;
     }
+
+    @ApiOperation(value = "购物车删除多行")
+    @PostMapping("/deleteMultipleCartLine")
+    public HttpResponse deleteMultipleCartLine(@RequestBody ErpCartDeleteMultipleRequest erpCartDeleteMultipleRequest) {
+        logger.info("删除购物车多行行：{}", erpCartDeleteMultipleRequest);
+        HttpResponse response = HttpResponse.success();
+        try {
+            AuthToken auth = AuthUtil.getCurrentAuth();
+            erpOrderCartService.deleteMultipleCartLine(erpCartDeleteMultipleRequest);
+        } catch (BusinessException e) {
+            logger.error("删除购物车行：{}", e);
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            logger.error("删除购物车行：{}", e);
+            response = HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
+        }
+        return response;
+    }
 }

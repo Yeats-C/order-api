@@ -406,20 +406,24 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         StoreInfo store = erpOrderRequestService.getStoreInfoByStoreId(erpCartQueryRequest.getStoreId());
         //查询A品卷使用规则code Map
         Map ruleMap=couponRuleService.couponRuleMap();
+        //购物车数据查询参数封装
         ErpOrderCartInfo query = new ErpOrderCartInfo();
         query.setStoreId(erpCartQueryRequest.getStoreId());
         query.setProductType(erpCartQueryRequest.getProductType());
+        //查询购物车数据集
         List<ErpOrderCartInfo> cartLineList = this.selectByProperty(query);
 
         //组装楼层列表
         List<ErpCartGroupInfo> cartGroupList = new ArrayList<>();
 
         if (cartLineList != null && cartLineList.size() > 0) {
+            //商品skuCode集合
             List<String> skuCodeList = new ArrayList<>();
             for (ErpOrderCartInfo item :
                     cartLineList) {
                 skuCodeList.add(item.getSkuCode());
             }
+            //查询商品详情
             Map<String, ErpSkuDetail> skuDetailMap = this.getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), skuCodeList);
 
             //把库存不足的行变成非选中状态
@@ -448,6 +452,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                             if (usefulActivityMap.containsKey(item.getActivityId())) {
                                 activityItemFlag = true;
                             } else {
+                                //通过活动id查询活动信息
                                 HttpResponse<ActivityRequest> activityDetailResponse = activityService.getActivityDetail(item.getActivityId());
                                 if (RequestReturnUtil.validateHttpResponse(activityDetailResponse)) {
                                     usefulActivityMap.put(item.getActivityId(), activityDetailResponse.getData());
@@ -941,6 +946,16 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         return storeActivityAchieveResponse;
     }
 
+    @Override
+    public void deleteMultipleCartLine(ErpCartDeleteMultipleRequest erpCartDeleteMultipleRequest) {
+        if(null==erpCartDeleteMultipleRequest && null==erpCartDeleteMultipleRequest.getCartIds()){
+            throw new BusinessException("参数为空");
+        }
+        for (String cartId:erpCartDeleteMultipleRequest.getCartIds()){
+            deleteCartLine(cartId);
+        }
+    }
+
     /**
      * 根据活动id和本品列表解析活动并且返回一个楼层
      *
@@ -1130,6 +1145,84 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 }
 
                 ;
+                break;
+            case TYPE_3:
+                //折扣
+
+                for (ActivityRule ruleItem :
+                        activityRules) {
+
+                    //筛选最小梯度
+                    if (firstRule == null || ruleItem.getMeetingConditions().compareTo(firstRule.getMeetingConditions()) < 0) {
+                        firstRule = ruleItem;
+                    }
+
+                    //是否把当前梯度作为命中梯度
+                    boolean flag = false;
+
+                    if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(ruleItem.getRuleUnit())) {
+                        //按照数量
+
+                        if (ruleItem.getMeetingConditions().compareTo(new BigDecimal(quantity)) <= 0) {
+                            if (curRule == null) {
+                                flag = true;
+                            } else {
+                                if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                    flag = true;
+                                }
+                            }
+                        }
+
+                    } else if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(ruleItem.getRuleUnit())) {
+                        //按照金额
+
+                        if (ruleItem.getMeetingConditions().compareTo(amountTotal) <= 0) {
+                            if (curRule == null) {
+                                flag = true;
+                            } else {
+                                if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                    flag = true;
+                                }
+                            }
+                        }
+
+                    } else {
+
+                    }
+
+                    if (flag) {
+                        curRule = ruleItem;
+                    }
+                }
+
+                if (curRule != null) {
+
+                    cartGroupInfo.setActivityRule(curRule);
+                    //计算满减均摊
+
+                    //当前剩余满减的金额
+                    BigDecimal restPreferentialAmount = curRule.getPreferentialAmount();
+
+                    if (activityAmountTotal.compareTo(BigDecimal.ZERO) > 0) {
+                        for (int i = 0; i < tempList.size(); i++) {
+                            ErpOrderCartInfo item = tempList.get(i);
+                            if (i == tempList.size() - 1) {
+                                //最后一行，用减法避免误差
+                                item.setLineActivityDiscountTotal(restPreferentialAmount);
+                            } else {
+                                BigDecimal lineActivityDiscountTotal = item.getLineActivityAmountTotal().divide(activityAmountTotal, 6, RoundingMode.HALF_UP).multiply(curRule.getPreferentialAmount()).setScale(2, RoundingMode.HALF_UP);
+                                item.setLineActivityDiscountTotal(lineActivityDiscountTotal);
+                                restPreferentialAmount = restPreferentialAmount.subtract(lineActivityDiscountTotal);
+                            }
+                            item.setLineAmountAfterActivity(item.getLineActivityAmountTotal().subtract(item.getLineActivityDiscountTotal()));
+                        }
+                    }
+                }
+                ;
+                break;
+            case TYPE_5:
+                //特价
+
                 break;
             default:
                 ;
