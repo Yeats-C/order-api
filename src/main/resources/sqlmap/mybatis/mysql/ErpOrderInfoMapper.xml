@@ -556,7 +556,7 @@
             and a1.split_status = 1 and date_format(a1.create_time,'%Y-%m-%d') &lt;= #{createTimeEnd,jdbcType=VARCHAR}
         </if>
         <if test="storeIdList != null and storeIdList.size > 0">
-            a1.store_id in
+            and a1.store_id in
             <foreach collection="storeIdList" item="item" open="(" separator="," close=")">
                 #{item}
             </foreach>

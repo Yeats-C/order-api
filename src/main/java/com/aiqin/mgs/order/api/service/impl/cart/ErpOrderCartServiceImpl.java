@@ -893,42 +893,45 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         ActivityRequest activityRequest = activityDetail.getData();
         Activity activity = activityRequest.getActivity();
         List<ActivityRule> activityRules = activityRequest.getActivityRules();
-
         //最低梯度
         ActivityRule firstRule = null;
         //当前满足梯度
         ActivityRule curRule = null;
 
-        for (ActivityRule item :
-                activityRules) {
+        if(null!=activityRules&&0<activityRules.size()){
 
-            //筛选出最低梯度
-            if (firstRule == null) {
-                firstRule = item;
-            }
-            if (item.getMeetingConditions().compareTo(firstRule.getMeetingConditions()) < 0) {
-                firstRule = item;
-            }
+           for (ActivityRule item :
+                    activityRules) {
 
-            //筛选出当前满足的最大梯度
-            if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(item.getRuleUnit())) {
-                //按照金额
-                if (item.getMeetingConditions().compareTo(totalMoney) <= 0) {
-                    if (curRule == null || item.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
-                        curRule = item;
+                //筛选出最低梯度
+                if (firstRule == null) {
+                    firstRule = item;
+                }
+                if (item.getMeetingConditions().compareTo(firstRule.getMeetingConditions()) < 0) {
+                    firstRule = item;
+                }
+
+                //筛选出当前满足的最大梯度
+                if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(item.getRuleUnit())) {
+                    //按照金额
+                    if (item.getMeetingConditions().compareTo(totalMoney) <= 0) {
+                        if (curRule == null || item.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                            curRule = item;
+                        }
                     }
                 }
-            }
 
-            if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(item.getRuleUnit())) {
-                //按照金额
-                if (item.getMeetingConditions().compareTo(new BigDecimal(totalCount)) <= 0) {
-                    if (curRule == null || item.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
-                        curRule = item;
+                if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(item.getRuleUnit())) {
+                    //按照金额
+                    if (item.getMeetingConditions().compareTo(new BigDecimal(totalCount)) <= 0) {
+                        if (curRule == null || item.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                            curRule = item;
+                        }
                     }
                 }
             }
         }
+
 
         storeActivityAchieveResponse.setActivity(activity);
         storeActivityAchieveResponse.setCurActivityRule(curRule);
@@ -1372,6 +1375,84 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 }
 
                 ;
+                break;
+                case TYPE_3:
+                //折扣
+
+                for (ActivityRule ruleItem :
+                        activityRules) {
+
+                    //筛选最小梯度
+                    if (firstRule == null || ruleItem.getMeetingConditions().compareTo(firstRule.getMeetingConditions()) < 0) {
+                        firstRule = ruleItem;
+                    }
+
+                    //是否把当前梯度作为命中梯度
+                    boolean flag = false;
+
+                    if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(ruleItem.getRuleUnit())) {
+                        //按照数量
+
+                        if (ruleItem.getMeetingConditions().compareTo(new BigDecimal(quantity)) <= 0) {
+                            if (curRule == null) {
+                                flag = true;
+                            } else {
+                                if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                    flag = true;
+                                }
+                            }
+                        }
+
+                    } else if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(ruleItem.getRuleUnit())) {
+                        //按照金额
+
+                        if (ruleItem.getMeetingConditions().compareTo(amountTotal) <= 0) {
+                            if (curRule == null) {
+                                flag = true;
+                            } else {
+                                if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                    flag = true;
+                                }
+                            }
+                        }
+
+                    } else {
+
+                    }
+
+                    if (flag) {
+                        curRule = ruleItem;
+                    }
+                }
+
+                if (curRule != null) {
+
+                    cartGroupInfo.setActivityRule(curRule);
+                    //计算满减均摊
+
+                    //当前剩余满减的金额
+                    BigDecimal restPreferentialAmount = curRule.getPreferentialAmount();
+
+                    if (activityAmountTotal.compareTo(BigDecimal.ZERO) > 0) {
+                        for (int i = 0; i < tempList.size(); i++) {
+                            ErpOrderCartInfo item = tempList.get(i);
+                            if (i == tempList.size() - 1) {
+                                //最后一行，用减法避免误差
+                                item.setLineActivityDiscountTotal(restPreferentialAmount);
+                            } else {
+                                BigDecimal lineActivityDiscountTotal = item.getLineActivityAmountTotal().divide(activityAmountTotal, 6, RoundingMode.HALF_UP).multiply(curRule.getPreferentialAmount()).setScale(2, RoundingMode.HALF_UP);
+                                item.setLineActivityDiscountTotal(lineActivityDiscountTotal);
+                                restPreferentialAmount = restPreferentialAmount.subtract(lineActivityDiscountTotal);
+                            }
+                            item.setLineAmountAfterActivity(item.getLineActivityAmountTotal().subtract(item.getLineActivityDiscountTotal()));
+                        }
+                    }
+                }
+                ;
+                break;
+                case TYPE_5:
+                //特价
+
                 break;
             default:
                 ;
