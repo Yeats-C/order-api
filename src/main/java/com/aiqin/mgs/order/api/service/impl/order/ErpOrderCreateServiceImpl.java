@@ -62,6 +62,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private SequenceGeneratorService sequenceGeneratorService;
     @Resource
     private ErpOrderCartService erpOrderCartService;
+    @Resource
+    private ErpStoreLockDetailsService erpStoreLockDetailsService;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -136,6 +139,12 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             if (!flag) {
                 throw new BusinessException("锁库存失败");
             }
+            //将结果插入到新表中
+            //TODO 根据供应链的返回结果定
+            StoreLockDetails storeLockDetails=new StoreLockDetails();
+            List<StoreLockDetails> list=new ArrayList<>();
+            list.add(storeLockDetails);
+//            erpStoreLockDetailsService.insertStoreLockDetails(list);
         }
 
         //返回订单信息
