@@ -22,17 +22,23 @@
     from store_lock_details
     where id = #{id,jdbcType=BIGINT}
   </select>
+  <select id="selectByLineCodeAndSkuCodeAndLockCount" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.StoreLockDetails" >
+    select
+    <include refid="Base_Column_List" />
+    from store_lock_details
+    where sku_code=  #{skuCode,jdbcType=VARCHAR} and lock_count=#{lockCount,jdbcType=BIGINT} and line_code=#{lineCode,jdbcType=BIGINT}
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     delete from store_lock_details
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.StoreLockDetails" >
-    insert into store_lock_details (id, transport_center_code, transport_center_name, 
-      warehouse_code, warehouse_name, sku_code, 
+    insert into store_lock_details (id, transport_center_code, transport_center_name,
+      warehouse_code, warehouse_name, sku_code,
       sku_name, lock_count, line_code
       )
-    values (#{id,jdbcType=BIGINT}, #{transportCenterCode,jdbcType=VARCHAR}, #{transportCenterName,jdbcType=VARCHAR}, 
-      #{warehouseCode,jdbcType=VARCHAR}, #{warehouseName,jdbcType=VARCHAR}, #{skuCode,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=BIGINT}, #{transportCenterCode,jdbcType=VARCHAR}, #{transportCenterName,jdbcType=VARCHAR},
+      #{warehouseCode,jdbcType=VARCHAR}, #{warehouseName,jdbcType=VARCHAR}, #{skuCode,jdbcType=VARCHAR},
       #{skuName,jdbcType=VARCHAR}, #{lockCount,jdbcType=BIGINT}, #{lineCode,jdbcType=BIGINT}
       )
   </insert>

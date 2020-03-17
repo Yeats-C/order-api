@@ -61,6 +61,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     private ErpOrderPayNoTransactionalService erpOrderPayNoTransactionalService;
     @Resource
     private ErpOrderCancelNoTransactionalService erpOrderCancelNoTransactionalService;
+    @Resource
+    private ErpStoreLockDetailsService erpStoreLockDetailsService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -151,7 +153,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
             //请求供应链获取分组情况
             //TODO 修改成从锁库的时候保存的数据获取仓库库房分组信息
-            List<ErpOrderItemSplitGroupResponse> lineSplitGroupList = erpOrderRequestService.getRepositorySplitGroup(order);
+//            List<ErpOrderItemSplitGroupResponse> lineSplitGroupList = erpOrderRequestService.getRepositorySplitGroup(order);
+            //新的数据
+            List<ErpOrderItemSplitGroupResponse> lineSplitGroupList = erpStoreLockDetailsService.getNewRepositorySplitGroup(order);
+
             if (lineSplitGroupList == null || lineSplitGroupList.size() == 0) {
                 throw new BusinessException("未获取到供应链商品分组");
             }

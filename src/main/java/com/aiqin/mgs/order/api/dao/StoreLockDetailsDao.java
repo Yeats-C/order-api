@@ -20,4 +20,7 @@ public interface StoreLockDetailsDao {
     int updateByPrimaryKey(StoreLockDetails record);
 
     int insertBatch(@Param("records") List<StoreLockDetails> records);
+
+    StoreLockDetails selectByLineCodeAndSkuCodeAndLockCount(StoreLockDetails record);
+
 }
