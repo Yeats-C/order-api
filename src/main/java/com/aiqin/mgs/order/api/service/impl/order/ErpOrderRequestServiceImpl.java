@@ -220,15 +220,33 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
             //TODO 按照sku汇总数量
             List<Map<String, Object>> list = new ArrayList<>();
-            for (ErpOrderItem item :
-                    itemList) {
+            Map<String,Long> countMap=new HashMap<>();
+            //汇总sku
+            for(ErpOrderItem item:itemList){
+                Long count=countMap.get(item.getSkuCode());
+                if(null!=countMap.get(item.getSkuCode())){
+                    count=count+item.getProductCount();
+                }
+                countMap.put(item.getSkuCode(),count);
+            }
+            for(Map.Entry<String,Long> data:countMap.entrySet()){
+                String skuCode=data.getKey();
                 Map<String, Object> paramItemMap = new HashMap<>(16);
-                paramItemMap.put("change_count", item.getProductCount());
+                paramItemMap.put("change_count", countMap.get(skuCode));
                 paramItemMap.put("city_code", order.getCityId());
                 paramItemMap.put("province_code", order.getProvinceId());
-                paramItemMap.put("sku_code", item.getSkuCode());
+                paramItemMap.put("sku_code", skuCode);
                 list.add(paramItemMap);
             }
+//            for (ErpOrderItem item :
+//                    itemList) {
+//                Map<String, Object> paramItemMap = new HashMap<>(16);
+//                paramItemMap.put("change_count", item.getProductCount());
+//                paramItemMap.put("city_code", order.getCityId());
+//                paramItemMap.put("province_code", order.getProvinceId());
+//                paramItemMap.put("sku_code", item.getSkuCode());
+//                list.add(paramItemMap);
+//            }
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("company_code", order.getCompanyCode());
             paramMap.put("company_name", order.getCompanyName());
