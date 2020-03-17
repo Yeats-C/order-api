@@ -8,6 +8,7 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.YesOrNoEnum;
 import com.aiqin.mgs.order.api.dao.*;
+import com.aiqin.mgs.order.api.dao.cart.ErpOrderCartDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.domain.*;
@@ -71,7 +72,7 @@ public class ActivityServiceImpl implements ActivityService {
     private ErpOrderInfoDao erpOrderInfoDao;
 
     @Resource
-    private CartOrderDao cartOrderDao;
+    private ErpOrderCartDao erpOrderCartDao;
 
     @Resource
     private ActivityGiftDao activityGiftDao;
@@ -510,7 +511,7 @@ public class ActivityServiceImpl implements ActivityService {
     public HttpResponse<Integer> getSkuNum(ShoppingCartRequest shoppingCartRequest) {
         LOGGER.info("返回购物车中的sku商品的数量getSkuNum参数为：{}", shoppingCartRequest);
         HttpResponse response = HttpResponse.success();
-        Integer skuNum=cartOrderDao.getSkuNum(shoppingCartRequest);
+        Integer skuNum=erpOrderCartDao.getSkuNum(shoppingCartRequest);
         response.setData(skuNum);
         return response;
     }

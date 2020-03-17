@@ -53,6 +53,9 @@
         <if test="activityId != null and activityId != ''">
             and activity_id = #{activityId}
         </if>
+        <if test="storeId != null and storeId != ''">
+            and store_id = #{storeId}
+        </if>
         <if test="lineCheckStatus != null and lineCheckStatus != '' or lineCheckStatus == 0 ">
             and line_check_status = #{lineCheckStatus}
         </if>
@@ -92,6 +95,23 @@
         from order_store_cart_info
         where id = #{id, jdbcType=BIGINT}
     </delete>
+
+    <!--返回购物车中的sku商品的数量-->
+    <select id="getSkuNum" resultType="java.lang.Integer" parameterType="com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest">
+        select SUM(amount) as amount from order_store_cart_info
+        <where>
+            1=1
+            <if test="storeId != null and storeId != '' ">
+                and store_id =#{storeId}
+            </if>
+            <if test="productId != null and productId != '' ">
+                and sku_code =#{productId}
+            </if>
+            <if test="productType != null and productType != '' ">
+                and product_type =#{productType}
+            </if>
+        </where>
+    </select>
 
 </mapper>
 

@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.dao.cart;
 
 import com.aiqin.mgs.order.api.domain.po.cart.ErpOrderCartInfo;
+import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 
 import java.util.List;
 
@@ -56,5 +57,12 @@ public interface ErpOrderCartDao {
      * @date 2020/3/10 10:11
      */
     int deleteByPrimaryKey(Long id);
+
+    /**
+     *返回购物车中的sku商品的数量
+     * @param shoppingCartRequest
+     * @return
+     */
+    Integer getSkuNum(ShoppingCartRequest shoppingCartRequest);
 
 }
