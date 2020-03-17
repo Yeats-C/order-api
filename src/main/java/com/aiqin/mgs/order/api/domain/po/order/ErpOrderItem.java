@@ -150,9 +150,9 @@ public class ErpOrderItem extends PagesRequest {
     private BigDecimal preferentialAmount;
 
     //TODO 增加A品券优惠金额
-    @ApiModelProperty(value = "A品券优惠金额（元）")
-    @JsonProperty("coupon_amount")
-    private BigDecimal couponAmount;
+//    @ApiModelProperty(value = "A品券优惠金额（元）")
+//    @JsonProperty("apin_coupon_amount")
+//    private BigDecimal apinCouponAmount;
 
     @ApiModelProperty(value = "活动优惠总金额,包括活动优惠和优惠券优惠（元）")
     @JsonProperty("total_acivity_amount")

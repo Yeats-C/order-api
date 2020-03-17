@@ -743,7 +743,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             itemRequest.setProductGift(item.getProductType());
             detailList.add(itemRequest);
         }
-
+        //A品券计算均摊金额
         couponSharePrice(detailList, topCouponCodeList);
 
         Map<Long, CouponShareRequest> map = new HashMap<>(16);
