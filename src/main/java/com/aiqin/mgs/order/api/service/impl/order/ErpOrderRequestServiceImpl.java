@@ -281,17 +281,39 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
         try {
 
             List<Map<String, Object>> list = new ArrayList<>();
-            for (ErpOrderItem item :
-                    order.getItemList()) {
+
+            Map<String,Long> countMap=new HashMap<>();
+            //汇总sku
+            for(ErpOrderItem item:order.getItemList()){
+                Long count=countMap.get(item.getSkuCode());
+                if(null!=countMap.get(item.getSkuCode())){
+                    count=count+item.getProductCount();
+                }
+                countMap.put(item.getSkuCode(),count);
+            }
+            for(Map.Entry<String,Long> data:countMap.entrySet()){
+                String skuCode=data.getKey();
                 Map<String, Object> paramItemMap = new HashMap<>(16);
-                paramItemMap.put("change_count", item.getProductCount());
-                paramItemMap.put("sku_code", item.getSkuCode());
+                paramItemMap.put("change_count", countMap.get(skuCode));
+                paramItemMap.put("sku_code", skuCode);
                 paramItemMap.put("transport_center_code", order.getTransportCenterCode());
                 paramItemMap.put("warehouse_code", order.getWarehouseCode());
                 paramItemMap.put("company_code", order.getCompanyCode());
                 paramItemMap.put("company_name", order.getCompanyName());
                 list.add(paramItemMap);
             }
+
+//            for (ErpOrderItem item :
+//                    order.getItemList()) {
+//                Map<String, Object> paramItemMap = new HashMap<>(16);
+//                paramItemMap.put("change_count", item.getProductCount());
+//                paramItemMap.put("sku_code", item.getSkuCode());
+//                paramItemMap.put("transport_center_code", order.getTransportCenterCode());
+//                paramItemMap.put("warehouse_code", order.getWarehouseCode());
+//                paramItemMap.put("company_code", order.getCompanyCode());
+//                paramItemMap.put("company_name", order.getCompanyName());
+//                list.add(paramItemMap);
+//            }
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("company_code", order.getCompanyCode());
             paramMap.put("company_name", order.getCompanyName());
