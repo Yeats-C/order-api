@@ -1,7 +1,6 @@
 package com.aiqin.mgs.order.api.web.purchase;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.domain.PurchaseOrderDetail;
 import com.aiqin.mgs.order.api.domain.request.purchase.PurchaseApplyRequest;
 import com.aiqin.mgs.order.api.domain.request.purchase.PurchaseOrderProductRequest;
 import com.aiqin.mgs.order.api.domain.response.purchase.*;
@@ -75,7 +74,7 @@ public class PurchaseManageController {
 
     @GetMapping("/order/details")
     @ApiOperation("查询采购单详情-采购信息")
-    public HttpResponse<PurchaseOrder> purchaseOrderDetails(@RequestParam("purchase_order_id") String purchaseOrderId) {
+    public HttpResponse<PurchaseDetailResponse> purchaseOrderDetails(@RequestParam("purchase_order_id") String purchaseOrderId) {
         return purchaseManageService.purchaseOrderDetails(purchaseOrderId);
     }
 
@@ -96,15 +95,4 @@ public class PurchaseManageController {
         return purchaseManageService.purchaseOrderProduct(request);
     }
 
-    // @GetMapping("/order/log")
-    // @ApiOperation("查询采购单-操作日志")
-    // public HttpResponse<List<OrderOperationLog>> purchaseOrderLog(@RequestParam("operation_id") String operationId) {
-    //     return purchaseManageService.purchaseOrderLog(operationId);
-    // }
-
-    @GetMapping("/order/amount")
-    @ApiOperation("查询采购单-采购数量金额/实际数量金额")
-    public HttpResponse<PurchaseApplyProductInfoResponse> purchaseOrderAmount(@RequestParam("purchase_order_code") String purchaseOrderCode) {
-        return purchaseManageService.purchaseOrderAmount(purchaseOrderCode);
-    }
 }
