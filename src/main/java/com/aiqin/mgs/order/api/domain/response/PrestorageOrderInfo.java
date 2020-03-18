@@ -142,4 +142,8 @@ public class PrestorageOrderInfo {
     @ApiModelProperty(value="门店ID")
     @JsonProperty("distributor_id")
     private String distributorId;
+
+    @ApiModelProperty(value="门店name")
+    @JsonProperty("distributor_name")
+    private String distributorName;
 }
