@@ -35,9 +35,9 @@ public class PurchaseManageServiceImpl implements PurchaseManageService {
     private OperationLogDao operationLogDao;
 
     @Override
-    public HttpResponse<List<PurchaseOrder>> purchaseOrderList(PurchaseApplyRequest purchaseApplyRequest){
+    public HttpResponse<PageResData<PurchaseOrder>> purchaseOrderList(PurchaseApplyRequest purchaseApplyRequest){
         PageResData pageResData = new PageResData();
-        List<PurchaseOrderResponse> list = purchaseOrderDao.purchaseOrderList(purchaseApplyRequest);
+        List<PurchaseOrder> list = purchaseOrderDao.purchaseOrderList(purchaseApplyRequest);
         Integer count = purchaseOrderDao.purchaseOrderCount(purchaseApplyRequest);
         pageResData.setDataList(list);
         pageResData.setTotalCount(count);
@@ -58,11 +58,11 @@ public class PurchaseManageServiceImpl implements PurchaseManageService {
             response.setLogList(logList);
         }
 
-        return HttpResponse.success(response);
+        return HttpResponse.successGenerics(response);
     }
 
     @Override
-    public HttpResponse<PurchaseOrderProduct> purchaseOrderProduct(PurchaseOrderProductRequest request){
+    public HttpResponse<PageResData<PurchaseOrderProduct>> purchaseOrderProduct(PurchaseOrderProductRequest request){
         PageResData pageResData = new PageResData();
         if(StringUtils.isBlank(request.getPurchaseOrderId())){
             return HttpResponse.success(pageResData);
