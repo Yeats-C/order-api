@@ -1746,6 +1746,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
             }
             if (skuDetail != null) {
                 item.setStockNum(skuDetail.getStockNum());
+                item.setIsSale(skuDetail.getIsSale());
             }
         }
 

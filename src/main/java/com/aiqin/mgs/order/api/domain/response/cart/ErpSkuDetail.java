@@ -94,4 +94,8 @@ public class ErpSkuDetail {
     @JsonProperty("tag_info_list")
     private List<TagInfo> tagInfoList;
 
+    @ApiModelProperty("是否可售：0为不可售，1为可售")
+    @JsonProperty("is_sale")
+    private Byte isSale;
+
 }
