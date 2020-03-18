@@ -52,13 +52,18 @@ public class ReportMemberServiceImpl implements ReportMemberService {
 		
 		try {
 			//区域权限控制
-			String resourceCode = "ERP012012";  //HUANGZYTODO
+			String resourceCode = "ERP012012";  
 			List<String> storeIds = getStoreIds(resourceCode);
 			if(CollectionUtils.isEmpty(storeIds)) {
 				return HttpResponse.success(new PageResData(0,null));
 			}
 			StringBuffer sb = new StringBuffer();
-			sb.append(memberUrl+"/member/alculate/qry/month/list?stat_year="+statYear+"&stat_month="+statMonth+"&page_no="+pageNo+"&page_size="+pageSize+"");
+			sb.append(memberUrl+"/member/alculate/qry/month/list?stat_year="+statYear+"&stat_month="+statMonth);
+			if(pageNo ==null && pageSize ==null) {
+				sb.append("&page_no=0&page_size=50");
+			}else {
+				sb.append("&page_no="+pageNo+"&page_size="+pageSize);
+			}
 			HttpClient httpClient = HttpClient.post(sb.toString()).json(storeIds);
 			log.info("请求地址="+sb.toString());
 		    return HttpResponse.success(httpClient.action().result(HttpResponse.class));
@@ -72,13 +77,18 @@ public class ReportMemberServiceImpl implements ReportMemberService {
 	public HttpResponse qryReportYearList(Integer statYear, Integer pageNo, Integer pageSize) {
 		try {
 			//区域权限控制
-			String resourceCode = "ERP012012";  //HUANGZYTODO
+			String resourceCode = "ERP012012";  
 			List<String> storeIds = getStoreIds(resourceCode);
 			if(CollectionUtils.isEmpty(storeIds)) {
 				return HttpResponse.success(new PageResData(0,null));
 			}
 			StringBuffer sb = new StringBuffer();
-			sb.append(memberUrl+"/member/alculate/qry/year/list?stat_year="+statYear+"&page_no="+pageNo+"&page_size="+pageSize+"");
+			sb.append(memberUrl+"/member/alculate/qry/year/list?stat_year="+statYear);
+			if(pageNo ==null && pageSize ==null) {
+				sb.append("&page_no=0&page_size=50");
+			}else {
+				sb.append("&page_no="+pageNo+"&page_size="+pageSize);
+			}
 			HttpClient httpClient = HttpClient.post(sb.toString()).json(storeIds);
 		    return HttpResponse.success(httpClient.action().result(HttpResponse.class));
 		}catch(Exception e) {
@@ -98,8 +108,8 @@ public class ReportMemberServiceImpl implements ReportMemberService {
 		
 		//获取登陆人信息
 		AuthToken authToken = AuthUtil.getCurrentAuth();
-//		HttpResponse response = copartnerAreaService.selectStoreByPerson(authToken.getTicketPersonId(),resourceCode); HUANGZYTODO
-		HttpResponse response = copartnerAreaService.selectStoreByPerson("12213",resourceCode);
+		HttpResponse response = copartnerAreaService.selectStoreByPerson(authToken.getTicketPersonId(),resourceCode);
+//		HttpResponse response = copartnerAreaService.selectStoreByPerson("12213",resourceCode);
 		List<PublicAreaStore> list = JsonUtil.fromJson(JsonUtil.toJson(response.getData()),new TypeReference<List<PublicAreaStore>>() {});  
 		if(CollectionUtils.isNotEmpty(list)) {
 			for(PublicAreaStore publicAreaStore : list) {
@@ -117,13 +127,18 @@ public class ReportMemberServiceImpl implements ReportMemberService {
 	public HttpResponse<ReportMemberSaleVo> qrySaleMonthList(String statYearMonth, Integer pageNo, Integer pageSize) {
 		try {
 			//区域权限控制
-			String resourceCode = "ERP012013";  //HUANGZYTODO
+			String resourceCode = "ERP012013";
 			List<String> storeIds = getStoreIds(resourceCode);
 			if(CollectionUtils.isEmpty(storeIds)) {
 				return HttpResponse.success(new PageResData(0,null));
 			}
 			StringBuffer sb = new StringBuffer();
-			sb.append(memberUrl+"/member/alculate/qry/sale/month/list?stat_year_month="+statYearMonth+"&page_no="+pageNo+"&page_size="+pageSize+"");
+			sb.append(memberUrl+"/member/alculate/qry/sale/month/list?stat_year_month="+statYearMonth);
+			if(pageNo ==null && pageSize ==null) {
+				sb.append("&page_no=0&page_size=50");
+			}else {
+				sb.append("&page_no="+pageNo+"&page_size="+pageSize);
+			}
 			HttpClient httpClient = HttpClient.post(sb.toString()).json(storeIds);
 		    return HttpResponse.success(httpClient.action().result(HttpResponse.class));
 		}catch(Exception e) {
@@ -138,13 +153,18 @@ public class ReportMemberServiceImpl implements ReportMemberService {
 	public HttpResponse<ReportMemberSaleVo> qrySaleYearList(String statYear, Integer pageNo, Integer pageSize) {
 		try {
 			//区域权限控制
-			String resourceCode = "ERP012013";  //HUANGZYTODO
+			String resourceCode = "ERP012013";
 			List<String> storeIds = getStoreIds(resourceCode);
 			if(CollectionUtils.isEmpty(storeIds)) {
 				return HttpResponse.success(new PageResData(0,null));
 			}
 			StringBuffer sb = new StringBuffer();
-			sb.append(memberUrl+"/member/alculate/qry/sale/year/list?stat_year="+statYear+"&page_no="+pageNo+"&page_size="+pageSize+"");
+			sb.append(memberUrl+"/member/alculate/qry/sale/year/list?stat_year="+statYear);
+			if(pageNo ==null && pageSize ==null) {
+				sb.append("&page_no=0&page_size=50");
+			}else {
+				sb.append("&page_no="+pageNo+"&page_size="+pageSize);
+			}
 			HttpClient httpClient = HttpClient.post(sb.toString()).json(storeIds);
 		    return HttpResponse.success(httpClient.action().result(HttpResponse.class));
 		}catch(Exception e) {

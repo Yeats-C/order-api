@@ -130,5 +130,14 @@
         delete from copartner_area_info where copartner_area_id = #{copartnerAreaId}
     </delete>
     
+    <select id = "qryCopartnerAreaList" resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp">
+    SELECT 
+      copartner_area_id AS copartnerAreaId,
+      copartner_area_name AS copartnerAreaName
+    FROM copartner_area_info
+    WHERE 1=1
+    ORDER BY copartner_area_id,copartner_area_name
+    </select>
+    
 </mapper>
 

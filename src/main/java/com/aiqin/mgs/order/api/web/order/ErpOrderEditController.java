@@ -41,11 +41,12 @@ public class ErpOrderEditController {
     @PostMapping("/addProductGift")
     @ApiOperation(value = "订单添加赠品")
     public HttpResponse addProductGift(@RequestBody ErpOrderEditRequest erpOrderEditRequest) {
+        logger.info("订单添加赠品：{}", erpOrderEditRequest);
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
             AuthToken auth = AuthUtil.getCurrentAuth();
-            erpOrderInfoService.addProductGift(erpOrderEditRequest, auth);
+            //TODO 去除该操作
         } catch (BusinessException e) {
             logger.error("订单添加赠品失败：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
@@ -60,6 +61,7 @@ public class ErpOrderEditController {
     @PostMapping("/orderCarryOutNextStep")
     @ApiOperation(value = "订单流程校正")
     public HttpResponse orderCarryOutNextStep(@RequestBody ErpOrderCarryOutNextStepRequest erpOrderCarryOutNextStepRequest) {
+        logger.info("订单流程校正：{}", erpOrderCarryOutNextStepRequest);
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();

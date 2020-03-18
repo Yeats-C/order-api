@@ -80,12 +80,12 @@ public class CartOrderInfo {
 
     /***商品品类名称*/
     @ApiModelProperty(value = "商品品类名称")
-    @JsonProperty("`product_category_name")
+    @JsonProperty("product_category_name")
     private String productCategoryName;
 
     /***商品品类编码*/
     @ApiModelProperty(value = "商品品类编码")
-    @JsonProperty("`product_category_code")
+    @JsonProperty("product_category_code")
     private String productCategoryCode;
 
 
@@ -94,8 +94,12 @@ public class CartOrderInfo {
     @JsonProperty("logo")
     private String logo="";
 
+    @ApiModelProperty(value = "主图片路径")
+    @JsonProperty("product_picture_path")
+    private String productPicturePath;
+
     /***商品原价*/
-    @ApiModelProperty(value = "商品原价")
+    @ApiModelProperty(value = "商品原价（分销价）")
     @JsonProperty("price")
     private BigDecimal price;
 
@@ -104,20 +108,25 @@ public class CartOrderInfo {
     @JsonProperty("activity_price")
     private BigDecimal activityPrice;
 
-//    /***商品特价*/
-//    @ApiModelProperty(value = "商品特价")
-//    @JsonProperty("special_price")
-//    private BigDecimal specialPrice;
+    /***行原价汇总（分销价汇总）*/
+    @ApiModelProperty(value = "行原价汇总（分销价汇总）")
+    @JsonProperty("line_amount_total")
+    private BigDecimal lineAmountTotal;
 
-//    /**实付金额总和*/
-//    @ApiModelProperty(value = "实付金额总和")
-//    @JsonProperty("account_actual_price")
-//    private BigDecimal accountActualPrice;
-//
-    /**应付金额总和*/
-    @ApiModelProperty(value = "行去掉活动优惠之后的总价")
-    @JsonProperty("account_total_price")
-    private BigDecimal accountTotalPrice;
+    /***行活动价汇总*/
+    @ApiModelProperty(value = "行活动价汇总")
+    @JsonProperty("line_activity_amount_total")
+    private BigDecimal lineActivityAmountTotal;
+
+    /***行活动优惠的金额*/
+    @ApiModelProperty(value = "行活动优惠的金额，行根据活动使该行减少的金额，前端不显示")
+    @JsonProperty("line_activity_discount_total")
+    private BigDecimal lineActivityDiscountTotal;
+
+    /***行减去活动优惠之后分摊的金额*/
+    @ApiModelProperty(value = "计算了活动分摊之后的金额，前端不显示")
+    @JsonProperty("line_amount_after_activity")
+    private BigDecimal lineAmountAfterActivity;
 
     /***商品颜色*/
     @ApiModelProperty(value = "商品颜色")
@@ -158,6 +167,19 @@ public class CartOrderInfo {
     @ApiModelProperty(value = "sku码")
     @JsonProperty("sku_code")
     private String skuCode;
+
+    /**sku名称--爱亲供应链字段*/
+    @ApiModelProperty(value = "sku名称")
+    @JsonProperty("sku_name")
+    private String skuName;
+
+    @ApiModelProperty(value = "spu码")
+    @JsonProperty("spu_code")
+    private String spuCode;
+
+    @ApiModelProperty(value = "spu名称")
+    @JsonProperty("spu_name")
+    private String spuName;
 
     /***spu码*/
     @ApiModelProperty(value = "spu码")
@@ -260,15 +282,14 @@ public class CartOrderInfo {
     @JsonProperty("zero_removalCoefficient")
     private Integer zeroRemovalCoefficient;
 
-    /**sku名称--爱亲供应链字段*/
-    @ApiModelProperty(value = "sku名称")
-    @JsonProperty("sku_name")
-    private String skuName;
-
     /**规格--爱亲供应链字段*/
     @ApiModelProperty(value = "规格")
     @JsonProperty("spec")
     private String spec;
+
+    @ApiModelProperty(value = "标签列表")
+    @JsonProperty("tag_info_list")
+    private List<TagInfo> tagInfoList;
 
     @ApiModelProperty(value = "本商品待选择活动列表")
     @JsonProperty("activity_list")

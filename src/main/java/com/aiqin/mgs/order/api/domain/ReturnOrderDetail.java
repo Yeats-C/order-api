@@ -121,4 +121,14 @@ public class ReturnOrderDetail {
 
     @ApiModelProperty(value = "均摊后单价")
     private BigDecimal preferentialAmount;
+
+    @ApiModelProperty(value = "商品品牌编码")
+    private String productCategoryCode;
+
+    @ApiModelProperty(value = "商品品牌名称")
+    private String productCategoryName;
+
+    @ApiModelProperty(value = "条形码")
+    private String barCode;
+
 }

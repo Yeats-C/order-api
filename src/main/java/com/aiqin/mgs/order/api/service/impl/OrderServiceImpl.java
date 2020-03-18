@@ -17,6 +17,8 @@ import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.Project;
+import com.aiqin.mgs.order.api.base.BasePage;
+import com.aiqin.mgs.order.api.base.PageUtil;
 import com.aiqin.mgs.order.api.component.*;
 import com.aiqin.mgs.order.api.component.PayTypeEnum;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
@@ -28,13 +30,19 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.pay.PayReq;
 import com.aiqin.mgs.order.api.domain.request.*;
+import com.aiqin.mgs.order.api.domain.request.order.QueryOrderListReqVO;
 import com.aiqin.mgs.order.api.domain.response.*;
+import com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoItemRespVO;
+import com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoRespVO;
+import com.aiqin.mgs.order.api.domain.response.order.QueryOrderListRespVO;
 import com.aiqin.mgs.order.api.intercepter.UrlInterceptor;
 import com.aiqin.mgs.order.api.service.*;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.util.DayUtil;
+import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.aiqin.mgs.order.api.util.DateUtil;
@@ -478,7 +486,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public HttpResponse orderCount(String skuCode, String storeId, int day) {
-        return HttpResponse.successGenerics(orderDao.querySaleSkuCount(skuCode, DateUtil.getBeforeDate(new Date(), day), storeId));
+        return HttpResponse.successGenerics(orderDao.querySaleSkuCount(storeId, DateUtil.getBeforeDate(new Date(), day), skuCode));
     }
 
     @Override
@@ -487,6 +495,19 @@ public class OrderServiceImpl implements OrderService {
         Integer count1 = orderDao.orderPrestorageCount(orderCountReq.getStoreId(), orderCountReq.getStartDay(), orderCountReq.getEndDay());
         Integer count2 = orderDao.orderStoreCount(orderCountReq.getStoreId(), orderCountReq.getStartDay(), orderCountReq.getEndDay());
         return HttpResponse.successGenerics((count1==null?0:count1) + (count2==null?0:count2));
+    }
+
+    @Override
+    public BasePage<QueryOrderListRespVO> list(QueryOrderListReqVO reqVO) {
+        // reqVO.setCompanyCode(getUser().getCompanyCode());
+        PageHelper.startPage(reqVO.getPageNo(), reqVO.getPageSize());
+        List<QueryOrderListRespVO> list = orderDao.selectListByQueryVO(reqVO);
+        return PageUtil.getPageList(reqVO.getPageNo(),list);
+    }
+
+    @Override
+    public QueryOrderInfoRespVO view(String orderCode) {
+        return orderDao.selectByOrderCode(orderCode);
     }
 
     private OrderQuery trans(OrderQuery orderQuery) {
@@ -1385,8 +1406,7 @@ public class OrderServiceImpl implements OrderService {
 //            list = orderDao.selectOrder(orderQuery);
 
             //计算总数据量
-            Integer totalCount = null;
-            totalCount = orderDao.reorerCount(reorerRequest);
+            Integer  totalCount = orderDao.reorerCount(reorerRequest);
 
             return HttpResponse.success(new PageResData(totalCount, list));
 

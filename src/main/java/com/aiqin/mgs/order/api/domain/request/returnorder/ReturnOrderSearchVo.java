@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @ApiModel("退货单列表搜索项")
 public class ReturnOrderSearchVo extends PagesRequest {
@@ -73,5 +75,16 @@ public class ReturnOrderSearchVo extends PagesRequest {
     @ApiModelProperty("收货区域 :区/县编码")
     @JsonProperty("district_id")
     private String districtId;
+
+    @ApiModelProperty(value = "用户id--数据权限使用")
+    @JsonProperty("person_id")
+    private String personId;
+
+    @ApiModelProperty(value = "菜单编码--数据权限使用")
+    @JsonProperty("resource_code")
+    private String resourceCode;
+
+    @ApiModelProperty("所有门店id")
+    private List<String> storeIds;
 
 }

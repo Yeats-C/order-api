@@ -740,4 +740,150 @@
       </if>
     </where>
   </select>
+    <select id="list" resultType="com.aiqin.mgs.order.api.domain.response.purchase.RejectRecordInfo">
+      select
+      id, reject_record_id rejectRecordId,reject_record_code rejectRecordCode, supplier_code supplierCode,
+      supplier_name supplierName,transport_center_code transportCenterName, warehouse_code warehouseCode,
+      warehouse_name warehouseName,reject_record_status rejectStatus,
+      purchase_group_code purchaseGroupCode,purchase_group_name purchaseGroupName, remark,
+      total_count singleCount,total_tax_amount productAmount,actual_total_tax_amount actualProductAmount,
+      create_by_id createById, create_by_name createByName, update_by_id updateBy_Id, update_by_name updateByName,
+      create_time createTime,update_time updateTime
+      from reject_record
+      <where>
+        <if test="rejectRecordCode!=null and rejectRecordCode!=''">
+          and reject_record_code like concat(#{rejectRecordCode,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="purchaseGroupCode!=null and purchaseGroupCode!=''">
+          and purchase_group_code = #{purchaseGroupCode,jdbcType=VARCHAR}
+        </if>
+        <if test="rejectStatus!=null ">
+          and reject_record_status = #{rejectStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="beginTime!=null  ">
+          and create_time <![CDATA[ >=]]> #{beginTime,jdbcType=VARCHAR}
+        </if>
+        <if test="finishTime!=null">
+          and create_time <![CDATA[ <=]]> #{finishTime,jdbcType=VARCHAR}
+        </if>
+        <if test="transportCenterCode!=null ">
+          and transport_center_code = #{transportCenterCode,jdbcType=VARCHAR}
+        </if>
+        <if test="warehouseCode!=null ">
+          and warehouse_code = #{warehouseCode,jdbcType=VARCHAR}
+        </if>
+        <if test="supplierCode!=null ">
+          and supplier_code = #{supplierCode,jdbcType=VARCHAR}
+        </if>
+      </where>
+      order by create_time desc
+      LIMIT #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </select>
+  <select id="listCount" resultType="java.lang.Integer">
+    select
+    count(1)
+    from reject_record
+    <where>
+      <if test="rejectRecordCode!=null and rejectRecordCode!=''">
+        and reject_record_code like concat(#{rejectRecordCode,jdbcType=VARCHAR},'%')
+      </if>
+      <if test="purchaseGroupCode!=null and purchaseGroupCode!=''">
+        and purchase_group_code = #{purchaseGroupCode,jdbcType=VARCHAR}
+      </if>
+      <if test="rejectStatus!=null ">
+        and reject_record_status = #{rejectStatus,jdbcType=VARCHAR}
+      </if>
+      <if test="beginTime!=null  ">
+        and create_time <![CDATA[ >=]]> #{beginTime,jdbcType=VARCHAR}
+      </if>
+      <if test="  finishTime!=null">
+        and create_time <![CDATA[ <=]]> #{finishTime,jdbcType=VARCHAR}
+      </if>
+      <if test="transportCenterCode!=null ">
+        and transport_center_code = #{transportCenterCode,jdbcType=VARCHAR}
+      </if>
+      <if test="warehouseCode!=null ">
+        and warehouse_code = #{warehouseCode,jdbcType=VARCHAR}
+      </if>
+      <if test="supplierCode!=null ">
+        and supplier_code = #{supplierCode,jdbcType=VARCHAR}
+      </if>
+    </where>
+  </select>
+  <resultMap id="BaseResultMap2" type="com.aiqin.mgs.order.api.domain.response.purchase.RejectRecordInfo">
+    <id column="id" jdbcType="BIGINT" property="id"/>
+    <result column="reject_record_id" jdbcType="VARCHAR" property="rejectRecordId"/>
+    <result column="reject_record_code" jdbcType="VARCHAR" property="rejectRecordCode"/>
+    <result column="duty_person" jdbcType="VARCHAR" property="dutyPerson"/>
+    <result column="contacts_person" jdbcType="VARCHAR" property="contactsPerson"/>
+    <result column="contacts_person_phone" jdbcType="VARCHAR" property="contactsPersonPhone"/>
+    <result column="province_id" jdbcType="VARCHAR" property="provinceId"/>
+    <result column="province_name" jdbcType="VARCHAR" property="provinceName"/>
+    <result column="city_id" jdbcType="VARCHAR" property="cityId"/>
+    <result column="city_name" jdbcType="VARCHAR" property="cityName"/>
+    <result column="district_id" jdbcType="VARCHAR" property="districtId"/>
+    <result column="district_name" jdbcType="VARCHAR" property="districtName"/>
+    <result column="address" jdbcType="VARCHAR" property="address"/>
+    <result column="expect_time" jdbcType="TIMESTAMP" property="expectTime"/>
+    <result column="valid_day" jdbcType="TIMESTAMP" property="validDay"/>
+    <result column="dictionary_id" jdbcType="VARCHAR" property="dictionaryId"/>
+    <result column="dictionary_name" jdbcType="VARCHAR" property="dictionaryName"/>
+    <result column="supplier_code" jdbcType="VARCHAR" property="supplierCode"/>
+    <result column="supplier_name" jdbcType="VARCHAR" property="supplierName"/>
+    <result column="purchase_group_code" jdbcType="VARCHAR" property="purchaseGroupCode"/>
+    <result column="purchase_group_name" jdbcType="VARCHAR" property="purchaseGroupName"/>
+    <result column="reject_status" jdbcType="BIT" property="rejectStatus"/>
+    <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    <result column="transport_remark" jdbcType="VARCHAR" property="transportRemark"/>
+    <result column="transport_url" jdbcType="VARCHAR" property="transportUrl"/>
+    <result column="out_stock_time" jdbcType="TIMESTAMP" property="outStockTime"/>
+    <result column="product_count" jdbcType="INTEGER" property="productCount"/>
+    <result column="product_amount" jdbcType="DECIMAL" property="productAmount"/>
+    <result column="single_count" jdbcType="INTEGER" property="singleCount"/>
+    <result column="gift_count" jdbcType="INTEGER" property="giftCount"/>
+    <result column="gift_amount" jdbcType="DECIMAL" property="giftAmount"/>
+    <result column="return_count" jdbcType="INTEGER" property="returnCount"/>
+    <result column="return_amount" jdbcType="DECIMAL" property="returnAmount"/>
+    <result column="untaxed_amount" jdbcType="DECIMAL" property="untaxedAmount"/>
+    <result column="actual_product_count" jdbcType="INTEGER" property="actualProductCount"/>
+    <result column="actual_product_amount" jdbcType="DECIMAL" property="actualProductAmount"/>
+    <result column="actual_single_count" jdbcType="INTEGER" property="actualSingleCount"/>
+    <result column="actual_gift_count" jdbcType="INTEGER" property="actualGiftCount"/>
+    <result column="actual_gift_amount" jdbcType="DECIMAL" property="actualGiftAmount"/>
+    <result column="actual_return_count" jdbcType="INTEGER" property="actualReturnCount"/>
+    <result column="actual_return_amount" jdbcType="DECIMAL" property="actualReturnAmount"/>
+    <result column="create_by_id" jdbcType="VARCHAR" property="createById"/>
+    <result column="create_by_name" jdbcType="VARCHAR" property="createByName"/>
+    <result column="update_by_id" jdbcType="VARCHAR" property="updateById"/>
+    <result column="update_by_name" jdbcType="VARCHAR" property="updateByName"/>
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    <result column="delivery_time" jdbcType="TIMESTAMP" property="deliveryTime"/>
+    <result column="finish_time" jdbcType="TIMESTAMP" property="finishTime"/>
+    <result column="transport_center_code" jdbcType="VARCHAR" property="transportCenterCode"/>
+    <result column="transport_center_name" jdbcType="VARCHAR" property="transportCenterName"/>
+    <result column="warehouse_code" jdbcType="VARCHAR" property="warehouseCode"/>
+    <result column="warehouse_name" jdbcType="VARCHAR" property="warehouseName"/>
+    <result column="settlement_method_code" jdbcType="VARCHAR" property="settlementMethodCode" />
+    <result column="settlement_method_name" jdbcType="VARCHAR" property="settlementMethodName" />
+    <result column="company_code" jdbcType="VARCHAR" property="companyCode" />
+    <result column="company_name" jdbcType="VARCHAR" property="companyName" />
+    <result column="score_code" jdbcType="VARCHAR" property="scoreCode" />
+  </resultMap>
+  <select id="selectByRejectCode" resultMap="BaseResultMap2">
+    select
+      id, reject_record_id, reject_record_code,charge_person duty_person,contact_person contacts_person,contact_mobile contacts_person_phone,
+      province_id, province_name, city_id, city_name, district_id, district_name,receive_address address,
+      pre_expect_time expect_time,valid_time valid_day, supplier_code, supplier_name,
+      purchase_group_code, purchase_group_name,reject_record_status reject_status, remark,remark transport_remark,
+      out_stock_time,total_count product_count,total_tax_amount product_amount,total_count single_count,
+      actual_total_count actual_product_count,actual_total_tax_amount actual_product_amount,actual_total_count actual_single_count,
+      create_by_id, create_by_name, update_by_id, update_by_name, create_time,
+      update_time,transport_center_code, transport_center_name, warehouse_code, warehouse_name,settlement_method_code,settlement_method_name,
+      company_name,company_code,delivery_time,finish_time
+    from
+    reject_record
+    where
+    reject_record_code = #{rejectRecordCode,jdbcType=VARCHAR}
+  </select>
 </mapper>

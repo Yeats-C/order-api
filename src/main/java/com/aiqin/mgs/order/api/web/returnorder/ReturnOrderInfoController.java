@@ -5,6 +5,7 @@ import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
@@ -13,6 +14,7 @@ import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * description: ReturnOrderInfoController
@@ -177,6 +179,18 @@ public class ReturnOrderInfoController {
     @ApiOperation("直送退货处理")
     public HttpResponse directDelivery(@RequestBody ReturnOrderReviewReqVo reqVo) {
         return returnOrderInfoService.directDelivery(reqVo);
+    }
+
+    @GetMapping("/getOrderDetail")
+    @ApiOperation("一般退货--修改商品使用")
+    public HttpResponse<List<ErpOrderItem>> getOrderDetail(String orderCode) {
+        return returnOrderInfoService.getOrderDetail(orderCode);
+    }
+
+    @ApiOperation("爱掌柜后台--订单管理--门店退货单列表（搜索）")
+    @PostMapping("/azgList")
+    public HttpResponse<PageResData<ReturnOrderInfo>> azgList(@RequestBody ReturnOrderSearchVo searchVo) {
+        return new HttpResponse<>(returnOrderInfoService.azgList(searchVo));
     }
 
 }

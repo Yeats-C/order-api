@@ -137,7 +137,7 @@ public class ErpOrderItem extends PagesRequest {
     @JsonProperty("total_product_amount")
     private BigDecimal totalProductAmount;
 
-    @ApiModelProperty(value = "实际商品总价（发货商品总价）（元）")
+    @ApiModelProperty(value = "实际商品总价（发货商品总价,均摊后金额的比例）（元）")
     @JsonProperty("actual_total_product_amount")
     private BigDecimal actualTotalProductAmount;
 
@@ -148,6 +148,8 @@ public class ErpOrderItem extends PagesRequest {
     @ApiModelProperty(value = "分摊后单价（元）")
     @JsonProperty("preferential_amount")
     private BigDecimal preferentialAmount;
+
+    //TODO 增加A品券优惠金额
 
     @ApiModelProperty(value = "活动优惠总金额,包括活动优惠和优惠券优惠（元）")
     @JsonProperty("total_acivity_amount")
@@ -244,6 +246,30 @@ public class ErpOrderItem extends PagesRequest {
     @ApiModelProperty(value = "门店名称")
     @JsonProperty("store_name")
     private String storeName;
+
+    @ApiModelProperty(value = "商品品牌编码")
+    @JsonProperty("product_brand_code")
+    private String productBrandCode;
+
+    @ApiModelProperty(value = "商品品牌名称")
+    @JsonProperty("product_brand_name")
+    private String productBrandName;
+
+    @ApiModelProperty(value = "商品品类编码")
+    @JsonProperty("product_category_code")
+    private String productCategoryCode;
+
+    @ApiModelProperty(value = "商品品类名称")
+    @JsonProperty("product_category_name")
+    private String productCategoryName;
+
+    /***仅活动优惠金额,用于统计*/
+    @JsonProperty("activity_discount_amount")
+    private BigDecimal activityDiscountAmount;
+
+    /***仅A品优惠金额，用于统计*/
+    @JsonProperty("top_coupon_discount_amount")
+    private BigDecimal topCouponDiscountAmount;
 
 
     public String getProductTypeDesc() {

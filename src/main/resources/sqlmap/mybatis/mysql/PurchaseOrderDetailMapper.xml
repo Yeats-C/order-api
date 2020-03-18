@@ -38,6 +38,7 @@
     <result column="update_by_name" jdbcType="VARCHAR" property="updateByName" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="actual_total_count" jdbcType="BIGINT" property="actualTotalCount" />
   </resultMap>
   <sql id="Base_Column_List">
     id, purchase_order_detail_id, purchase_order_code, spu_code, spu_name, sku_code, 
@@ -45,13 +46,37 @@
     color_name, model_code, unit_code, unit_name, product_type, purchase_whole, purchase_single, 
     base_product_spec, box_gauge, tax_rate, line_code, factory_sku_code, tax_amount, 
     total_tax_amount, total_count, actual_total_tax_amount, use_status, create_by_id, 
-    create_by_name, update_by_id, update_by_name, create_time, update_time
+    create_by_name, update_by_id, update_by_name, create_time, update_time, actual_total_count
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from purchase_order_detail
     where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="purchaseOrderList"
+          resultType="com.aiqin.mgs.order.api.domain.response.purchase.PurchaseOrderProduct">
+    select purchase_order_detail_id as orderProductId, purchase_order_code as purchaseOrderCode,
+    sku_code as skuCode, sku_name as skuName, brand_code as brandId, brand_name as brandName, category_code as categoryId,
+    category_name as categoryName, product_spec as productSpec, color_name as colorName, model_code as modelNumber,
+    product_type as productType, purchase_whole as purchaseWhole, purchase_single as purchaseSingle,
+    base_product_spec as baseProductContent, box_gauge as boxGauge, total_count as singleCount,
+    tax_rate as taxRate, tax_amount as productAmount, total_tax_amount as productTotalAmount,
+    actual_total_count as actualSingleCount, actual_total_tax_amount as actualTotalTaxAmount
+    from purchase_order_detail
+    <where>
+      purchase_order_code = #{purchaseOrderId,jdbcType=VARCHAR}
+    </where>
+    <if test="isPage == 0">
+      LIMIT #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </if>
+  </select>
+  <select id="purchaseOrderCount" resultType="java.lang.Integer">
+    select count(1)
+    from purchase_order_detail
+    <where>
+      purchase_order_code = #{purchaseOrderId,jdbcType=VARCHAR}
+    </where>
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from purchase_order_detail
@@ -65,9 +90,9 @@
       color_code, color_name, model_code, 
       unit_code, unit_name, product_type, 
       purchase_whole, purchase_single, base_product_spec, 
-      box_gauge, tax_rate, line_code, 
-      factory_sku_code, tax_amount, total_tax_amount, 
-      total_count, actual_total_tax_amount, use_status, 
+      box_gauge, tax_rate, line_code,
+    factory_sku_code, tax_amount, total_tax_amount, actual_total_count
+    total_count, actual_total_tax_amount, use_status,
       create_by_id, create_by_name, update_by_id, 
       update_by_name, create_time, update_time
       )
@@ -81,6 +106,7 @@
       #{item.purchaseWhole,jdbcType=BIGINT}, #{item.purchaseSingle,jdbcType=BIGINT}, #{item.baseProductSpec,jdbcType=BIGINT},
       #{item.boxGauge,jdbcType=VARCHAR}, #{item.taxRate,jdbcType=DECIMAL}, #{item.lineCode,jdbcType=BIGINT},
       #{item.factorySkuCode,jdbcType=VARCHAR}, #{item.taxAmount,jdbcType=DECIMAL}, #{item.totalTaxAmount,jdbcType=DECIMAL},
+      #{item.actualTotalCount,jdbcType=BIGINT},
       #{item.totalCount,jdbcType=BIGINT}, #{item.actualTotalTaxAmount,jdbcType=DECIMAL}, #{item.useStatus,jdbcType=VARCHAR},
       #{item.createById,jdbcType=VARCHAR}, #{item.createByName,jdbcType=VARCHAR}, #{item.updateById,jdbcType=VARCHAR},
       #{item.updateByName,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP}
@@ -170,6 +196,9 @@
       </if>
       <if test="totalCount != null">
         total_count,
+      </if>
+      <if test="actualTotalCount != null">
+        actual_total_count,
       </if>
       <if test="actualTotalTaxAmount != null">
         actual_total_tax_amount,
@@ -277,6 +306,9 @@
       </if>
       <if test="totalCount != null">
         #{totalCount,jdbcType=BIGINT},
+      </if>
+      <if test="actualTotalCount != null">
+        #{actualTotalCount,jdbcType=BIGINT},
       </if>
       <if test="actualTotalTaxAmount != null">
         #{actualTotalTaxAmount,jdbcType=DECIMAL},
@@ -388,6 +420,9 @@
       <if test="totalCount != null">
         total_count = #{totalCount,jdbcType=BIGINT},
       </if>
+      <if test="actualTotalCount != null">
+        actual_total_count = #{actualTotalCount,jdbcType=BIGINT},
+      </if>
       <if test="actualTotalTaxAmount != null">
         actual_total_tax_amount = #{actualTotalTaxAmount,jdbcType=DECIMAL},
       </if>
@@ -444,6 +479,7 @@
       tax_amount = #{taxAmount,jdbcType=DECIMAL},
       total_tax_amount = #{totalTaxAmount,jdbcType=DECIMAL},
       total_count = #{totalCount,jdbcType=BIGINT},
+      actual_total_count = #{actualTotalCount,jdbcType=BIGINT},
       actual_total_tax_amount = #{actualTotalTaxAmount,jdbcType=DECIMAL},
       use_status = #{useStatus,jdbcType=VARCHAR},
       create_by_id = #{createById,jdbcType=VARCHAR},

@@ -2,7 +2,11 @@ package com.aiqin.mgs.order.api.dao.returnorder;
 
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo3;
+import com.aiqin.mgs.order.api.domain.request.returngoods.QueryReturnOrderManagementReqVO;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
+import com.aiqin.mgs.order.api.domain.response.returngoods.QueryReturnOrderManagementRespVO;
+import com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderDetailRespVO;
+import com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderInfoApplyInboundDetailRespVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -63,4 +67,12 @@ public interface ReturnOrderInfoDao {
     //查询待ERP退货单，待生成爱亲退供单数据
     ReturnOrderInfo selectByOrderCodeAndSuccess(@Param("orderSuccess") Integer orderSuccess, @Param("returnOrderCode")String returnOrderCode);
 
+    //修改退货数量和总金额金额
+    Integer updateCountAndAmount(@Param("returnOrderCode") String returnOrderCode, @Param("actualReturnOrderAmount") BigDecimal actualReturnOrderAmount, @Param("actualProductCount") Long actualProductCount);
+
+    List<QueryReturnOrderManagementRespVO> selectReturnOrderManagementList(QueryReturnOrderManagementReqVO reqVO);
+
+    ReturnOrderDetailRespVO selectReturnOrderDetail(String code);
+
+    List<ReturnOrderInfoApplyInboundDetailRespVO> selectInbound(String code);
 }

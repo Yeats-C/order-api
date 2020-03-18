@@ -1,24 +1,34 @@
 package com.aiqin.mgs.order.api.dao;
 
-import com.aiqin.mgs.order.api.domain.PurchaseOrder;
+import com.aiqin.mgs.order.api.domain.PurchaseOrderInfo;
+import com.aiqin.mgs.order.api.domain.request.purchase.PurchaseApplyRequest;
+import com.aiqin.mgs.order.api.domain.response.purchase.*;
+
+import java.util.List;
 
 public interface PurchaseOrderDao {
     int deleteByPrimaryKey(Long id);
 
-    int insert(PurchaseOrder record);
+    int insert(PurchaseOrderInfo record);
 
     //根据ERP订单生成爱亲采购单
-    int insertSelective(PurchaseOrder record);
+    int insertSelective(PurchaseOrderInfo record);
 
-    PurchaseOrder selectByPrimaryKey(Long id);
+    PurchaseOrderInfo selectByPrimaryKey(Long id);
 
     //根据采购单号查询采购单
-    PurchaseOrder selectByOrderStoreCode(String orderStoreCode);
+    PurchaseOrderInfo selectByOrderStoreCode(String orderStoreCode);
 
-    int updateByOrderCode(PurchaseOrder record);
+    int updateByOrderCode(PurchaseOrderInfo record);
 
-    int updateByPrimaryKey(PurchaseOrder record);
+    int updateByPrimaryKey(PurchaseOrderInfo record);
 
     //取消订单
-    int updateByPurchaseOrderStatus(PurchaseOrder record);
+    int updateByPurchaseOrderStatus(PurchaseOrderInfo record);
+
+    List<PurchaseOrderResponse> purchaseOrderList(PurchaseApplyRequest purchaseApplyRequest);
+
+    Integer purchaseOrderCount(PurchaseApplyRequest purchaseApplyRequest);
+
+    PurchaseOrderInfo purchaseOrderInfo(String purchaseOrderId);
 }

@@ -23,7 +23,7 @@
     </select>
   <select id="selectOrder" resultType="java.math.BigDecimal" parameterType="com.aiqin.mgs.order.api.domain.request.FirstReportStoreAndOrderRerequest">
     select sum(order_amount) from order_store_info
-    where order_type_code=#{order_type_code} and order_category_code=#{order_category_code} and DATE_FORMAT(create_time,'%Y-%m')=#{countTime}
+    where order_type_code=#{order_type_code} and order_category_code=#{order_category_code} and DATE_FORMAT(create_time,'%Y')=#{countTime}
     and store_id in
     <foreach collection="records"  item="item" open="(" separator="," close=")"  >
       #{item}
@@ -32,6 +32,15 @@
     <select id="selectOrders" resultType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo" parameterType="com.aiqin.mgs.order.api.domain.request.FirstReportStoreAndOrderRerequest">
         select * from order_store_info
         where order_type_code=#{order_type_code} and order_category_code=#{order_category_code} and DATE_FORMAT(create_time,'%Y-%m')=#{countTime}
+        and store_id in
+        <foreach collection="records"  item="item" open="(" separator="," close=")"  >
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectOrderss" resultType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo" parameterType="com.aiqin.mgs.order.api.domain.request.FirstReportStoreAndOrderRerequest">
+        select * from order_store_info
+        where order_type_code=#{order_type_code} and order_category_code=#{order_category_code} and DATE_FORMAT(create_time,'%Y')=#{countTime}
         and store_id in
         <foreach collection="records"  item="item" open="(" separator="," close=")"  >
             #{item}

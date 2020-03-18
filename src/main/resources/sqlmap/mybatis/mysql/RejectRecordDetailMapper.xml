@@ -415,4 +415,43 @@
       </if>
     </where>
   </select>
+    <select id="selectByRejectId" resultType="com.aiqin.mgs.order.api.domain.response.purchase.RejectRecordDetail">
+      select
+        id, reject_record_detail_id, reject_record_code, sku_code, sku_name, brand_code,
+        brand_name, category_code, category_name, product_spec, color_code, color_name, model_code,
+        product_type, product_count, unit_code, unit_name, tax_rate, line_code, factory_sku_code,
+        tax_amount, total_tax_amount, total_count, actual_total_count, actual_total_tax_amount,
+        use_status, create_by_id, create_by_name, update_by_id, update_by_name, create_time,
+        update_time
+      from
+      reject_record_detail
+      where
+        reject_record_detail_id = #{rejectRecordId,jdbcType=VARCHAR}
+    </select>
+    <select id="selectProductByRejectCode"
+            resultType="com.aiqin.mgs.order.api.domain.response.purchase.RejectRecordDetailResponse">
+      SELECT
+        sum(product_count) as productCount ,
+        sku_code as skuCode,
+        sku_name as skuName,
+        brand_name as brandName,
+        category_name as categoryName,
+        total_count as singleCount,
+        product_spec as productSpec,
+        unit_name as unitName,
+        color_name as colorName,
+        model_code as modelNumber,
+        tax_rate as taxRate,
+        factory_sku_code as factorySkuCode,
+        product_type as productType,
+        tax_amount as productAmount,
+        actual_total_count as actualCount,
+        actual_total_tax_amount as actualAmount,
+        sum(tax_amount) as productTotalAmount,
+        sum(actual_total_count) as actualCount,
+        sum(actual_total_tax_amount) as actualAmount
+      FROM reject_record_detail
+      WHERE      reject_record_code = #{rejectRecordCode,jdbcType=VARCHAR}
+      GROUP BY sku_code,product_type
+    </select>
 </mapper>

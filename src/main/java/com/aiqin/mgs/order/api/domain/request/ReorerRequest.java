@@ -1,15 +1,19 @@
 package com.aiqin.mgs.order.api.domain.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
 @Api("参数-可退货的订单查询")
+@Data
 public class ReorerRequest extends PagesRequest{
 	
 	
@@ -52,55 +56,14 @@ public class ReorerRequest extends PagesRequest{
 	private String endTime;
 
 
+	@JsonProperty("update_time")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+	@ApiModelProperty("更新时间")
+	public Date updateTime;
 	public String getEndTime() {
 		return endTime;
 	}
 
 
-	public void setEndTime(String endTime) {
-		this.endTime = endTime;
-	}
 
-
-	public String getBeginTime() {
-		return beginTime;
-	}
-
-
-	public void setBeginTime(String beginTime) {
-		this.beginTime = beginTime;
-	}
-
-
-	public String getOrderId() {
-		return orderId;
-	}
-
-	public void setOrderId(String orderId) {
-		this.orderId = orderId;
-	}
-
-	public String getOrderCode() {
-		return orderCode;
-	}
-
-	public void setOrderCode(String orderCode) {
-		this.orderCode = orderCode;
-	}
-
-	public List<Integer> getStatusList() {
-		return statusList;
-	}
-
-	public void setStatusList(List<Integer> statusList) {
-		this.statusList = statusList;
-	}
-
-	public String getDistributorId() {
-		return distributorId;
-	}
-
-	public void setDistributorId(String distributorId) {
-		this.distributorId = distributorId;
-	}
 }

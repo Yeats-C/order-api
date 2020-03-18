@@ -26,7 +26,7 @@ public interface CartOrderDao {
     String isYesCart(@Valid CartOrderInfo cartOrderInfo) throws Exception;
 
     //计算添加购物车中商品的总数量
-    Integer getTotal(@Param("storeId") String storeId) throws Exception;
+    Integer getTotal(@Param("storeId") String storeId, @Param("productGift") Integer productGift) throws Exception;
 
     // 删除购物车中商品
     void deleteCart(@Param("storeId") String storeId, @Param("skuCode") String skuId, @Param("lineCheckStatus") Integer lineCheckStatus, @Param("productType") Integer productType) throws Exception;
@@ -49,14 +49,6 @@ public interface CartOrderDao {
      * @throws Exception
      */
     CartOrderInfo getCartByCartId(@Param("cartId") String cartId);
-
-    /**
-     * 根据购物车唯一标识获取这一行附带的赠品行
-     *
-     * @param giftParentCartId 购物车商品行唯一标识
-     * @return
-     */
-    List<CartOrderInfo> findByGiftParentCartId(@Param("giftParentCartId") String giftParentCartId);
 
     /**
      * 根据行唯一标识删除购物车商品行
@@ -86,11 +78,3 @@ public interface CartOrderDao {
     List<CartOrderInfo> selectByProperty(CartOrderInfo cartOrderInfo);
 
 }
-
-
-
-
-
-
-
-

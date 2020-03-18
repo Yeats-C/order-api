@@ -154,5 +154,18 @@ public interface ReturnOrderInfoService {
      */
     HttpResponse directDelivery(ReturnOrderReviewReqVo reqVo);
 
+    /**
+     * 一般退货--修改商品使用
+     * @param orderCode
+     * @return
+     */
+    HttpResponse getOrderDetail(String orderCode);
+
+    /**
+     *爱掌柜后台--订单管理--门店退货单列表（搜索）
+     * @param searchVo
+     * @return
+     */
+    PageResData<ReturnOrderInfo> azgList(ReturnOrderSearchVo searchVo);
 
 }

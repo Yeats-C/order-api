@@ -21,18 +21,19 @@
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="is_delete" jdbcType="BIGINT" property="isDelete"/>
         <result column="activity_scope" jdbcType="BIGINT" property="activityScope"/>
+        <result column="level" jdbcType="INTEGER" property="level"/>
     </resultMap>
     <sql id="Base_Column_List">
     id,activity_id, sku_code,product_name, product_code, product_brand_code,product_brand_name, product_category_code
     ,product_category_name, price_tax,discount,reduce,actual_price,status,create_time, update_time,is_delete,create_by
-    ,update_by,activity_scope
+    ,update_by,activity_scope,level
   </sql>
 
     <!--批量保存活动对应商品信息List-->
     <insert id="insertList" parameterType="java.util.List">
         insert into activity_product (activity_id, sku_code,product_name, product_code, product_brand_code,product_brand_name
         , product_category_code,product_category_name, price_tax,discount,reduce,actual_price,status,create_time
-        , update_time,is_delete,create_by,update_by,activity_scope )
+        , update_time,is_delete,create_by,update_by,activity_scope,level )
         values
         <foreach collection="list" item="activityProduct" separator=",">
             (#{activityProduct.activityId,jdbcType=VARCHAR},
@@ -52,7 +53,8 @@
             0,
             #{activityProduct.createBy,jdbcType=VARCHAR},
             #{activityProduct.updateBy,jdbcType=VARCHAR},
-            #{activityProduct.activityScope,jdbcType=INTEGER}
+            #{activityProduct.activityScope,jdbcType=INTEGER},
+            #{activityProduct.level,jdbcType=INTEGER}
             )
         </foreach>
     </insert>
@@ -62,7 +64,7 @@
             parameterType="com.aiqin.mgs.order.api.domain.Activity">
         select id,activity_id, sku_code,product_name, product_code, product_brand_code,product_brand_name, product_category_code
         ,product_category_name, price_tax,discount,reduce,actual_price,status,create_time, update_time,is_delete,create_by
-        ,update_by,activity_scope
+        ,update_by,activity_scope,level
         FROM activity_product
         where 1=1 and is_delete=0
         <if test="activityId != '' and activityId != null">
@@ -86,8 +88,12 @@
     <select id="productBrandList" resultType="java.util.List" resultMap="BaseResultMap"
             parameterType="com.aiqin.mgs.order.api.domain.ActivityProduct">
         SELECT
+            p.product_category_code,
+            p.product_category_name,
             p.product_brand_code,
-            p.product_brand_name
+            p.product_brand_name,
+            p.activity_id,
+            p.activity_scope
         FROM
             activity_product p
         LEFT JOIN activity a ON a.activity_id = p.activity_id
@@ -102,12 +108,17 @@
             p.product_brand_code
     </select>
 
-    <!--活动商品品牌列表接口-->
+    <!--活动商品品类列表接口-->
     <select id="productCategoryList" resultType="java.util.List" resultMap="BaseResultMap"
             parameterType="com.aiqin.mgs.order.api.domain.Activity">
         SELECT
         p.product_category_code,
-        p.product_category_name
+        p.product_category_name,
+        p.product_brand_code,
+        p.product_brand_name,
+        p.level,
+        p.activity_id,
+        p.activity_scope
         FROM
         activity_product p
         LEFT JOIN activity a ON a.activity_id = p.activity_id

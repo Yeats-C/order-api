@@ -6,9 +6,11 @@ import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
+import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.dto.ProductDistributorOrderDTO;
 import com.aiqin.mgs.order.api.domain.request.InventoryDetailRequest;
 import com.aiqin.mgs.order.api.domain.request.activity.*;
@@ -16,17 +18,16 @@ import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
 import com.aiqin.mgs.order.api.domain.response.NewFranchiseeResponse;
-import com.alibaba.fastjson.JSONObject;
+import com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetail;
+import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Createed by sunx on 2019/4/8.<br/>
@@ -88,6 +89,115 @@ public class BridgeProductService {
         return response;
     }
 
+    /**
+     * 获取sku详情列表
+     *
+     * @param provinceCode 省编码
+     * @param cityCode     市编码
+     * @param companyCode  公司编码
+     * @param skuCodeList  sku编码集合
+     * @return java.util.List<com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetailResponse>
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2020/3/10 10:54
+     */
+    public List<ErpSkuDetail> getProductSkuDetailList(String provinceCode, String cityCode, String companyCode, List<String> skuCodeList) {
+
+        List<ErpSkuDetail> list = new ArrayList<>();
+        try {
+            ShoppingCartProductRequest shoppingCartProductRequest = new ShoppingCartProductRequest();
+            shoppingCartProductRequest.setCityCode(cityCode);
+            shoppingCartProductRequest.setProvinceCode(provinceCode);
+            shoppingCartProductRequest.setCompanyCode(companyCode);
+            shoppingCartProductRequest.setSkuCodes(skuCodeList);
+            String path = "/search/spu/sku/detail2";
+            HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest);
+            HttpResponse<List<ErpSkuDetail>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ErpSkuDetail>>>() {
+            });
+
+            if (!RequestReturnUtil.validateHttpResponse(response)) {
+                throw new BusinessException(response.getMessage());
+            }
+            list = response.getData();
+
+        } catch (BusinessException e) {
+            log.info("获取商品信息失败：{}", e.getMessage());
+            throw new BusinessException("获取商品信息失败：" + e.getMessage());
+        } catch (Exception e) {
+            log.info("获取商品信息失败：{}", e);
+            throw new BusinessException("获取商品信息失败");
+        }
+        return list;
+    }
+
+    /**
+     * 获取单个sku详情
+     *
+     * @param provinceCode 省编码
+     * @param cityCode     市编码
+     * @param companyCode  公司编码
+     * @param skuCode      sku编码
+     * @return
+     */
+    public ErpSkuDetail getProductSkuDetail(String provinceCode, String cityCode, String companyCode, String skuCode) {
+
+        ErpSkuDetail skuDetail = null;
+        try {
+            ShoppingCartProductRequest shoppingCartProductRequest = new ShoppingCartProductRequest();
+            shoppingCartProductRequest.setCityCode(cityCode);
+            shoppingCartProductRequest.setProvinceCode(provinceCode);
+            shoppingCartProductRequest.setCompanyCode(companyCode);
+            List<String> skuCodeList = new ArrayList<>();
+            skuCodeList.add(skuCode);
+            shoppingCartProductRequest.setSkuCodes(skuCodeList);
+            String path = "/search/spu/sku/detail2";
+            HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest);
+            HttpResponse<List<ErpSkuDetail>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ErpSkuDetail>>>() {
+            });
+
+            if (!RequestReturnUtil.validateHttpResponse(response)) {
+                throw new BusinessException(response.getMessage());
+            }
+            List<ErpSkuDetail> list = response.getData();
+            if (list != null && list.size() > 0) {
+                skuDetail = list.get(0);
+            }
+
+        } catch (BusinessException e) {
+            log.info("获取商品信息失败：{}", e.getMessage());
+//            throw new BusinessException("获取商品信息失败：" + e.getMessage());
+        } catch (Exception e) {
+            log.info("获取商品信息失败：{}", e);
+//            throw new BusinessException("获取商品信息失败");
+        }
+        return skuDetail;
+    }
+
+    public CartOrderInfo getCartProductDetail(String provinceId, String cityId, String skuCode) {
+        ShoppingCartProductRequest shoppingCartProductRequest = new ShoppingCartProductRequest();
+        shoppingCartProductRequest.setCityCode(cityId);
+        shoppingCartProductRequest.setProvinceCode(provinceId);
+        shoppingCartProductRequest.setCompanyCode(OrderConstant.SELECT_PRODUCT_COMPANY_CODE);
+        List<String> skuCodeList = new ArrayList<>();
+        skuCodeList.add(skuCode);
+        shoppingCartProductRequest.setSkuCodes(skuCodeList);
+        String path = "/search/spu/sku/detail2";
+        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest);
+        HttpResponse<List<CartOrderInfo>> response = httpClient.action().result(new TypeReference<HttpResponse<List<CartOrderInfo>>>() {
+        });
+
+        CartOrderInfo cartOrderInfo = new CartOrderInfo();
+        if (!RequestReturnUtil.validateHttpResponse(response)) {
+
+        } else {
+            List<CartOrderInfo> data = response.getData();
+            if (data != null && data.size() > 0) {
+                cartOrderInfo = data.get(0);
+            }
+        }
+        return cartOrderInfo;
+    }
+
 
     /**
      * 获取门店的信息
@@ -134,7 +244,7 @@ public class BridgeProductService {
     public HttpResponse<PageResData<ProductSkuRespVo5>> getSkuPage(SpuProductReqVO spuProductReqVO){
         String path = "/search/spu/skuPage";
         HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(spuProductReqVO);
-        HttpResponse<PageResData<ProductSkuRespVo5>> response = httpClient.action().result(new TypeReference<HttpResponse<PageResData>>() {
+        HttpResponse<PageResData<ProductSkuRespVo5>> response = httpClient.action().result(new TypeReference<HttpResponse<PageResData<ProductSkuRespVo5>>>() {
         });
 
         return response;
@@ -145,13 +255,19 @@ public class BridgeProductService {
      * @param req
      * @return
      */
-    public HttpResponse getStoreStockSkuNum(ShoppingCartRequest req){
+    public Integer getStoreStockSkuNum(ShoppingCartRequest req){
+        Integer num=0;
         String path = "/store/stock/sku/info";
         HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path+"?store_id=" + req.getStoreId()+"&sku_code="+req.getProductId());
-        HttpResponse<Integer> response = httpClient.action().result(new TypeReference<HttpResponse<Integer>>() {
-        });
+        Map<String, Object> result = httpClient.action().result(new TypeReference<Map<String, Object>>() {});
+        if (StringUtils.isNotBlank(String.valueOf(result.get("code"))) && "0".equals(String.valueOf(result.get("code")))) {
+            Map data = (Map)result.get("data");
+            if(data!=null&&data.get("data")!=null){
+                num= Integer.valueOf(data.get("data").toString());
+            }
+        }
 
-        return response;
+        return num;
     }
 
     /**
@@ -163,10 +279,13 @@ public class BridgeProductService {
         String path = urlProperties.getProductApi() +"/product/category/list/categoryCodes";
         StringBuilder sb=new StringBuilder();
         String a="";
-        if(req.getCategoryCodes()!=null){
+        if(req.getCategoryCodes()!=null&&0!=req.getCategoryCodes().size()){
             a=req.getCategoryCodes().get(0);
+            sb.append("?category_codes="+a);
+        }else{
+            sb.append("?category_codes=");
         }
-        sb.append("?category_codes="+a);
+
         if(req.getCategoryCodes()!=null&&req.getCategoryCodes().size()>=1){
             for(int i=1;i<req.getCategoryCodes().size();i++){
                 sb.append("&category_codes="+req.getCategoryCodes().get(i));
@@ -175,22 +294,141 @@ public class BridgeProductService {
         HttpClient httpClient = HttpClient.get( path+sb.toString());
         HttpResponse<List<ProductCategoryRespVO>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ProductCategoryRespVO>>>() {
         });
+        if (Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")) {
+            List<ProductCategoryRespVO> lists=response.getData();
+            //门店端不展示赠品，物料，德明居，其他，只展示1到11到品类
+            Iterator<ProductCategoryRespVO> it = lists.iterator();
+            while(it.hasNext()){
+                ProductCategoryRespVO str = it.next();
+                if(str.getCategoryId().compareTo("11")>0){
+                    it.remove();
+                }
+            }
+        }
         return response;
     }
 
     /**
-     * 供应链提供查询品牌树接口
+     * 供应链提供查询品类树接口
+     * @param req
+     * @return
+     */
+    public HttpResponse excludeCategoryCodes(ActivityBrandCategoryRequest req){
+        String path = urlProperties.getProductApi() +"/product/category/list/excludeCategoryCodes";
+        StringBuilder sb=new StringBuilder();
+        String a="";
+        if(req.getExcludeCategoryCodes()!=null&&0!=req.getExcludeCategoryCodes().size()){
+            a=req.getExcludeCategoryCodes().get(0);
+            sb.append("?exclude_category_codes="+a);
+        }else{
+            sb.append("?exclude_category_codes=");
+        }
+
+        if(req.getExcludeCategoryCodes()!=null&&req.getExcludeCategoryCodes().size()>=1){
+            for(int i=1;i<req.getExcludeCategoryCodes().size();i++){
+                sb.append("&exclude_category_codes="+req.getExcludeCategoryCodes().get(i));
+            }
+        }
+        HttpClient httpClient = HttpClient.get( path+sb.toString());
+        HttpResponse<List<ProductCategoryRespVO>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ProductCategoryRespVO>>>() {
+        });
+        if (Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")) {
+            List<ProductCategoryRespVO> lists=response.getData();
+            //门店端不展示赠品，物料，德明居，其他，只展示1到11到品类
+            Iterator<ProductCategoryRespVO> it = lists.iterator();
+            while(it.hasNext()){
+                ProductCategoryRespVO str = it.next();
+                if(str.getCategoryId().compareTo("11")>0){
+                    it.remove();
+                }
+            }
+        }
+
+        return response;
+    }
+
+    /**
+     * 供应链提供查询品牌接口
      * @param req
      * @return
      */
     public HttpResponse productBrandList(ActivityBrandCategoryRequest req){
         String path = urlProperties.getProductApi()+"/product/brand/list";
-        JSONObject json=new JSONObject();
-        json.put("name",req.getName());
-        json.put("brand_ids",req.getBrandIds());
-        HttpClient httpClient = HttpClient.post(path).json(json);
-        HttpResponse<List<QueryProductBrandRespVO>> response = httpClient.action().result(new TypeReference<HttpResponse<List<QueryProductBrandRespVO>>>() {
+        if(StringUtils.isNotEmpty(req.getName())){
+            path=path+"?name="+req.getName();
+        }else{
+            path=path+"?name=";
+        }
+
+        StringBuilder sb=new StringBuilder();
+        if(req.getBrandIds()!=null&&req.getBrandIds().size()>0){
+            for(int i=0;i<req.getBrandIds().size();i++){
+                sb.append("&brand_ids="+req.getBrandIds().get(i));
+            }
+        }
+
+        StringBuilder exsb=new StringBuilder();
+        if(req.getExcludeBrandIds()!=null&&req.getExcludeBrandIds().size()>0){
+            for(int i=0;i<req.getExcludeBrandIds().size();i++){
+                exsb.append("&no_brand_ids="+req.getExcludeBrandIds().get(i));
+            }
+        }
+        HttpClient httpClient = HttpClient.post(path+sb);
+        HttpResponse<List<QueryProductBrandRespVO>>  response = httpClient.action().result(new TypeReference<HttpResponse<List<QueryProductBrandRespVO>>>() {
         });
+        return response;
+    }
+
+
+    /**
+     * 供应链提供查询品类树接口
+     * @param req
+     * @return
+     */
+    public HttpResponse categoryCodes(ActivityBrandCategoryRequest req){
+        String str=req.getCategoryCodes().get(0);
+        String path = "/product/category/list/categoryCodes?category_codes="+str;
+        HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path);
+        HttpResponse<List<ProductCategoryRespVO>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ProductCategoryRespVO>>>() {
+        });
+        if (Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")) {
+            List<ProductCategoryRespVO> lists=response.getData();
+            //门店端不展示赠品，物料，德明居，其他，只展示1到11到品类
+            Iterator<ProductCategoryRespVO> it = lists.iterator();
+            while(it.hasNext()){
+                ProductCategoryRespVO pro = it.next();
+                if(pro.getCategoryId().compareTo("11")>0){
+                    it.remove();
+                }
+            }
+        }
+
+        return response;
+    }
+
+    /**
+     * 品牌和品类关系,condition_code为查询条件，type=2 通过品牌查品类,type=1 通过品类查品牌
+     * @param condition_code
+     * @param type
+     * @return
+     */
+    public HttpResponse selectCategoryByBrandCode(String condition_code,String type){
+        String path = "/product/brand/selectCategoryByBrandCode?condition_code="+condition_code+"&type="+type;
+        HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path);
+        HttpResponse<ProductCategoryAndBrandResponse2> response = httpClient.action().result(new TypeReference<HttpResponse<ProductCategoryAndBrandResponse2>>() {
+        });
+        if (Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0") && type=="2") {
+            List<ProductCategoryRespVO> lists=response.getData().getProductCategoryRespVOList();
+            //门店端不展示赠品，物料，德明居，其他，只展示1到11到品类
+            Iterator<ProductCategoryRespVO> it = lists.iterator();
+            while(it.hasNext()){
+                ProductCategoryRespVO pro = it.next();
+                if(pro.getCategoryId().compareTo("11")>0){
+                    it.remove();
+                }
+            }
+        }
+
         return response;
     }
 }

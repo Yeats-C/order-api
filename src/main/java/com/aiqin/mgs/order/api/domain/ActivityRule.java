@@ -30,8 +30,8 @@ public class ActivityRule {
     @JsonProperty("activity_type")
     private Integer activityType;
 
-    /**优惠单位：1.按数量（件）2.按金额（元）*/
-    @ApiModelProperty(value = "优惠单位：1.按数量（件）2.按金额（元")
+    /**优惠单位：0.无条件 1.按数量（件）2.按金额（元）*/
+    @ApiModelProperty(value = "优惠单位：0.无条件 1.按数量（件）2.按金额（元")
     @JsonProperty("rule_unit")
     private Integer ruleUnit;
 
@@ -40,8 +40,8 @@ public class ActivityRule {
     @JsonProperty("meeting_conditions")
     private BigDecimal meetingConditions;
 
-    /**优惠金额*/
-    @ApiModelProperty(value = "优惠金额")
+    /**优惠金额、优惠件数、折扣点数（百分比）*/
+    @ApiModelProperty(value = "优惠金额、优惠件数、折扣点数（百分比）")
     @JsonProperty("preferential_amount")
     private BigDecimal preferentialAmount;
 
@@ -80,5 +80,19 @@ public class ActivityRule {
     @JsonProperty("gift_list")
     private List<ActivityGift> giftList;
 
+    /***附加字段 赠品数量*/
+    @ApiModelProperty(value = "赠品数量")
+    @JsonProperty("gift_number")
+    private Integer giftNumber;
 
+    public Integer getGiftNumber() {
+        int number = 0;
+        if (giftList != null && giftList.size() > 0) {
+            for (ActivityGift item :
+                    giftList) {
+                number += item.getNumbers() != null ? item.getNumbers() : 0;
+            }
+        }
+        return number;
+    }
 }

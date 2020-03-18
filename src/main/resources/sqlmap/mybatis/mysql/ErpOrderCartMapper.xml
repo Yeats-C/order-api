@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.cart.ErpOrderCartDao">
+
+    <select id="select" parameterType="com.aiqin.mgs.order.api.domain.po.cart.ErpOrderCartInfo"
+            resultType="com.aiqin.mgs.order.api.domain.po.cart.ErpOrderCartInfo">
+        select
+        id as id,
+        cart_id as cartId,
+        store_id as storeId,
+        activity_id as activityId,
+        amount as amount,
+        price as price,
+        logo as logo,
+        color as color,
+        spec as spec,
+        product_size as productSize,
+        sku_code as skuCode,
+        sku_name as skuName,
+        spu_code as spuCode,
+        spu_name as spuName,
+        product_type as productType,
+        product_gift as productGift,
+        line_check_status as lineCheckStatus,
+        product_property_code as productPropertyCode,
+        product_property_name as productPropertyName,
+        product_brand_code as productBrandCode,
+        product_brand_name as productBrandName,
+        product_category_code as productCategoryCode,
+        product_category_name as productCategoryName,
+        create_source as createSource,
+        create_time as createTime,
+        create_by_id as createById,
+        create_by_name as createByName,
+        update_time as updateTime,
+        update_by_id as updateById,
+        update_by_name as updateByName,
+        max_order_num as maxOrderNum,
+        zero_removal_coefficient as zeroRemovalCoefficient
+        from order_store_cart_info where 1 = 1
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="cartId != null and cartId != ''">
+            and cart_id = #{cartId}
+        </if>
+        <if test="productType != null and productType != ''">
+            and product_type = #{productType}
+        </if>
+        <if test="productGift != null and productGift != ''">
+            and product_gift = #{productGift}
+        </if>
+        <if test="activityId != null and activityId != ''">
+            and activity_id = #{activityId}
+        </if>
+        <if test="storeId != null and storeId != ''">
+            and store_id = #{storeId}
+        </if>
+        <if test="lineCheckStatus != null and lineCheckStatus != '' or lineCheckStatus == 0 ">
+            and line_check_status = #{lineCheckStatus}
+        </if>
+        order by id desc
+    </select>
+
+    <update id="updateByPrimaryKey">
+        update order_store_cart_info
+        set amount            = #{amount},
+            activity_id       = #{activityId},
+            line_check_status = #{lineCheckStatus},
+            update_by_id      = #{updateById},
+            update_by_name    = #{updateByName},
+            update_time       = sysdate()
+        where id = #{id}
+    </update>
+
+    <insert id="insert">
+        insert into order_store_cart_info(id, cart_id, store_id, activity_id,
+                                           amount, price, logo, color, spec, product_size, sku_code, sku_name, spu_code,
+                                           spu_name, product_type, product_gift, line_check_status,
+                                           product_property_code,
+                                           product_property_name, product_brand_code, product_brand_name,
+                                           product_category_code, product_category_name, create_source, create_time,
+                                           create_by_id, create_by_name, update_time, update_by_id, update_by_name,
+                                           max_order_num, zero_removal_coefficient)
+        values (#{id}, #{cartId}, #{storeId}, #{activityId},
+                #{amount}, #{price}, #{logo}, #{color}, #{spec}, #{productSize}, #{skuCode}, #{skuName}, #{spuCode},
+                #{spuName}, #{productType}, #{productGift}, #{lineCheckStatus}, #{productPropertyCode},
+                #{productPropertyName}, #{productBrandCode}, #{productBrandName}, #{productCategoryCode},
+                #{productCategoryName}, #{createSource}, sysdate(), #{createById}, #{createByName},
+                sysdate(), #{updateById}, #{updateByName}, #{maxOrderNum}, #{zeroRemovalCoefficient});
+    </insert>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from order_store_cart_info
+        where id = #{id, jdbcType=BIGINT}
+    </delete>
+
+    <!--返回购物车中的sku商品的数量-->
+    <select id="getSkuNum" resultType="java.lang.Integer" parameterType="com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest">
+        select SUM(amount) as amount from order_store_cart_info
+        <where>
+            1=1
+            <if test="storeId != null and storeId != '' ">
+                and store_id =#{storeId}
+            </if>
+            <if test="productId != null and productId != '' ">
+                and sku_code =#{productId}
+            </if>
+            <if test="productType != null and productType != '' ">
+                and product_type =#{productType}
+            </if>
+        </where>
+    </select>
+
+</mapper>
+

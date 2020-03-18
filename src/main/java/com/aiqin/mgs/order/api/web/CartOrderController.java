@@ -1,12 +1,19 @@
 package com.aiqin.mgs.order.api.web;
 
 
+import com.aiqin.ground.util.protocol.MessageId;
+import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.ResultCode;
+import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.cart.DeleteCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.StoreActivityAchieveRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.CartResponse;
+import com.aiqin.mgs.order.api.domain.response.cart.StoreActivityAchieveResponse;
+import com.aiqin.mgs.order.api.domain.response.cart.StoreCartProductResponse;
 import com.aiqin.mgs.order.api.service.CartOrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -88,7 +95,7 @@ public class CartOrderController {
             @ApiImplicitParam(name = "number", value = "商品数量", dataType = "Integer", paramType = "query", required = false),
             @ApiImplicitParam(name = "activity_id", value = "活动id", dataType = "String", paramType = "query", required = false)
     })
-    public HttpResponse<CartResponse> queryCartByStoreId(String store_id, Integer product_type, String sku_code, Integer line_check_status, Integer number,String activity_id) {
+    public HttpResponse<StoreCartProductResponse> queryCartByStoreId(String store_id, Integer product_type, String sku_code, Integer line_check_status, Integer number, String activity_id) {
         LOGGER.info("购物车展示列表参数：{},{},{},{},{}", store_id,product_type,sku_code,line_check_status,number,activity_id);
         return cartOrderService.queryCartByStoreId(store_id,product_type,sku_code,line_check_status,number,activity_id);
     }
@@ -111,8 +118,24 @@ public class CartOrderController {
      */
     @PostMapping("/displayCartLineCheckProduct")
     @ApiOperation(value = "显示勾选商品列表")
-    public HttpResponse<List<CartOrderInfo>> displayCartLineCheckProduct(CartOrderInfo cartOrderInfo){
+    public HttpResponse<StoreCartProductResponse> displayCartLineCheckProduct(CartOrderInfo cartOrderInfo){
         return cartOrderService.displayCartLineCheckProduct(cartOrderInfo);
     }
 
+    @PostMapping("/getStoreActivityAchieveDetail")
+    @ApiOperation(value = "查询当前购物车活动条件满足情况")
+    public HttpResponse<StoreActivityAchieveResponse> getStoreActivityAchieveDetail(@RequestBody StoreActivityAchieveRequest storeActivityAchieveRequest) {
+        HttpResponse<StoreActivityAchieveResponse> httpResponse = HttpResponse.success();
+        try {
+            StoreActivityAchieveResponse storeActivityAchieveDetail = cartOrderService.getStoreActivityAchieveDetail(storeActivityAchieveRequest);
+            httpResponse.setData(storeActivityAchieveDetail);
+        } catch (BusinessException e) {
+            LOGGER.info("创建订单失败：{}", e);
+            httpResponse = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            LOGGER.error("查询订单确认信息异常", e);
+            httpResponse = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return httpResponse;
+    }
 }

@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.jobs;
 
 import com.aiqin.mgs.order.api.domain.OrderMonthCalculateInfo;
+import com.aiqin.mgs.order.api.domain.ReportCategoryVo;
 import com.aiqin.mgs.order.api.domain.ReportCopartnerSaleVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
 import com.aiqin.mgs.order.api.service.CopartnerAreaService;
@@ -98,6 +99,8 @@ public class ReportCopartnerSaleJob {
 				ReportCopartnerSaleVo monthVo = new ReportCopartnerSaleVo();
 //				reportCopartnerSaleService.qryMonthTotal(year,month);
 //				reportCopartnerSaleService.deleteByMonth(year,month);
+				monthVo.setReportYear(year);
+				monthVo.setReportMonth(month);
 				monthVo.setReportSubtotalType(3); //HUANGZYTODO
 				reportCopartnerSaleService.save(monthVo);
 				

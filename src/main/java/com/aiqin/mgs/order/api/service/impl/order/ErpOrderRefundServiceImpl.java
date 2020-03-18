@@ -8,6 +8,7 @@ import com.aiqin.mgs.order.api.component.enums.pay.ErpPayFeeTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayTransactionTypeEnum;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderRefundDao;
+import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderPay;
@@ -43,6 +44,8 @@ public class ErpOrderRefundServiceImpl implements ErpOrderRefundService {
     private ReturnOrderInfoService returnOrderInfoService;
     @Resource
     private ErpOrderInfoService erpOrderInfoService;
+    @Resource
+    private ReturnOrderInfoDao returnOrderInfoDao;
 
     @Override
     public ErpOrderRefund getOrderRefundByRefundId(String payId) {
@@ -193,6 +196,11 @@ public class ErpOrderRefundServiceImpl implements ErpOrderRefundService {
             ErpOrderInfo order = erpOrderQueryService.getOrderByOrderId(orderRefund.getOrderId());
             order.setOrderNodeStatus(ErpPayStatusEnum.SUCCESS == payStatusEnum ? ErpOrderNodeStatusEnum.STATUS_37.getCode() : ErpOrderNodeStatusEnum.STATUS_38.getCode());
             erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
+
+            if (ErpPayStatusEnum.SUCCESS == payStatusEnum) {
+                //退款成功，修改退款状态
+                returnOrderInfoDao.updateRefundStatus(orderRefund.getRefundCode());
+            }
 
         }
 

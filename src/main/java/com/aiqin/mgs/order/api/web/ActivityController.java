@@ -1,8 +1,12 @@
 package com.aiqin.mgs.order.api.web;
 
 
+import com.aiqin.ground.util.exception.GroundRuntimeException;
+import com.aiqin.ground.util.protocol.MessageId;
+import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityProduct;
 import com.aiqin.mgs.order.api.domain.ActivitySales;
@@ -12,6 +16,7 @@ import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -212,8 +217,8 @@ public class ActivityController {
      */
     @PostMapping("/excelActivityItem")
     @ApiOperation("导出--活动详情-销售数据-活动销售列表")
-    public HttpResponse excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response){
-        return activitesService.excelActivityItem(erpOrderItem,response);
+    public void excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response){
+        activitesService.excelActivityItem(erpOrderItem,response);
     }
 
     /**
@@ -221,9 +226,9 @@ public class ActivityController {
      * @param activityIdList
      * @return
      */
-    @GetMapping("/comparisonActivitySalesStatistics")
+    @PostMapping("/comparisonActivitySalesStatistics")
     @ApiOperation(value = "活动列表-对比分析柱状图")
-    public HttpResponse<List<ActivitySales>> comparisonActivitySalesStatistics(List<String> activityIdList){
+    public HttpResponse<List<ActivitySales>> comparisonActivitySalesStatistics(@RequestBody  List<String> activityIdList){
         return activitesService.comparisonActivitySalesStatistics(activityIdList);
     }
 
@@ -233,10 +238,10 @@ public class ActivityController {
      * @param response
      * @return
      */
-    @PostMapping("/excelActivitySalesStatistics")
+    @GetMapping("/excelActivitySalesStatistics")
     @ApiOperation("导出--活动列表-对比分析柱状图")
-    public HttpResponse excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response){
-        return activitesService.excelActivitySalesStatistics(activityIdList,response);
+    public void excelActivitySalesStatistics(@RequestParam(name = "activityIdList") List<String> activityIdList, HttpServletResponse response){
+         activitesService.excelActivitySalesStatistics(activityIdList,response);
     }
 
 
@@ -246,7 +251,7 @@ public class ActivityController {
      */
     @PostMapping("/skuPage")
     @ApiOperation("活动商品查询（筛选+分页）")
-    public HttpResponse<PageResData<ProductSkuRespVo5>> skuPage(@Valid @RequestBody SpuProductReqVO spuProductReqVO){
+        public HttpResponse<PageResData<ProductSkuRespVo5>> skuPage(@Valid @RequestBody SpuProductReqVO spuProductReqVO){
         return activitesService.skuPage(spuProductReqVO);
     }
 
@@ -256,9 +261,40 @@ public class ActivityController {
      */
     @PostMapping("/productActivityList")
     @ApiOperation("通过条件查询一个商品有多少个进行中的活动")
-    public HttpResponse<List<Activity>> productActivityList(ActivityParameterRequest parameterRequest){
+    public HttpResponse<List<Activity>> productActivityList(@Valid @RequestBody ActivityParameterRequest parameterRequest){
         HttpResponse response = HttpResponse.success();
         response.setData(activitesService.activityList(parameterRequest));
         return response;
     }
+
+    @GetMapping("/selectCategoryByBrandCode")
+    @ApiOperation(value = "品牌和品类关系,condition_code为查询条件，type=2 通过品牌查品类,type=1 通过品类查品牌")
+    public HttpResponse<ProductCategoryAndBrandResponse2> selectCategoryByBrandCode(@RequestParam(value = "condition_code") String conditionCode,
+                                                                                    @RequestParam(value = "type") String type,@RequestParam(value = "activity_id") String activityId
+    ) {
+        if (StringUtils.isBlank(conditionCode) && StringUtils.isBlank(type) && StringUtils.isBlank(activityId)) {
+            return HttpResponse.failure(MessageId.create(Project.PRODUCT_API, 500, "必传项为空"));
+        }
+        try {
+            ProductCategoryAndBrandResponse2 responses= activitesService.ProductCategoryAndBrandResponse(conditionCode, type,activityId);
+            return HttpResponse.successGenerics(responses);
+        }catch (Exception e){
+            if(e instanceof GroundRuntimeException){
+                return HttpResponse.failure(MessageId.create(Project.SUPPLIER_API, -1, e.getMessage()));
+            }
+            return HttpResponse.failure(ResultCode.SELECT_ACTIVITY_INFO_EXCEPTION);
+        }
+    }
+
+    /**
+     * 通过列表id查询门店权限集合
+     */
+    @PostMapping("/storeIds")
+    @ApiOperation("通过列表id查询门店权限集合")
+    HttpResponse<List<String>> storeIds(String menuCode){
+        HttpResponse response = HttpResponse.success();
+        response.setData(activitesService.storeIds(menuCode));
+        return response;
+    };
+
 }

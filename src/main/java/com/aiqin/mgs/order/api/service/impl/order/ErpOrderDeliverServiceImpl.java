@@ -66,12 +66,14 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
         }
 
         boolean flag = false;
+        if (order.getOrderTypeCode().equals(ErpOrderTypeEnum.DIRECT_SEND.getValue())) {
+            flag = true;
+        }
         if (ErpOrderStatusEnum.ORDER_STATUS_6.getCode().equals(order.getOrderStatus())) {
             if (ErpOrderNodeStatusEnum.STATUS_8.getCode().equals(order.getOrderNodeStatus())) {
-                flag = true;
+                    flag = true;
             }
         }
-
         if (flag) {
             List<ErpOrderItem> itemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
             //实发数量
@@ -116,6 +118,9 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                     actualProductAmount = new BigDecimal(actualProductCount).multiply(item.getPreferentialAmount());
                 }
                 actualTotalProductAmount = actualTotalProductAmount.add(actualProductAmount);
+
+                //设置单个商品实际发货金额
+                item.setActualTotalProductAmount(actualProductAmount);
 
                 //商品毛重汇总
                 boxGrossWeightTotal = boxGrossWeightTotal.add((item.getBoxGrossWeight() == null ? BigDecimal.ZERO : item.getBoxGrossWeight()).multiply(new BigDecimal(actualProductCount)));
@@ -338,7 +343,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             BigDecimal thisFee = BigDecimal.ZERO;
             if (i < orderList.size() - 1) {
                 //该订单占用运费
-                thisFee = new BigDecimal(order.getActualProductCount()).divide(new BigDecimal(totalCount), 4, RoundingMode.HALF_UP);
+                thisFee = new BigDecimal(order.getActualProductCount()).divide(new BigDecimal(totalCount), 2, RoundingMode.HALF_UP);
                 useFee = useFee.add(thisFee);
             } else {
                 thisFee = fee.subtract(useFee);

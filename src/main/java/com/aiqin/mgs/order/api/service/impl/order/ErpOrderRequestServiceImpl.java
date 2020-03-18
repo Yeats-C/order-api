@@ -218,6 +218,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
         boolean flag = true;
         try {
 
+            //TODO 按照sku汇总数量
             List<Map<String, Object>> list = new ArrayList<>();
             for (ErpOrderItem item :
                     itemList) {
@@ -238,6 +239,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             paramMap.put("order_type", order.getOrderTypeCode());
             paramMap.put("detail_list", list);
 
+            logger.info("锁库请求参数：", paramMap);
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/lock/info").json(paramMap);
             HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
             });
@@ -625,6 +627,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 Map<String, Object> paramItemMap = new HashMap<>(16);
                 paramItemMap.put("line_code", item.getLineCode());
                 paramItemMap.put("sku_code", item.getSkuCode());
+                paramItemMap.put("lock_count", item.getProductCount());
                 paramList.add(paramItemMap);
             }
             Map<String, Object> paramMap = new HashMap<>(16);
@@ -671,7 +674,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
         } catch (Exception e) {
             logger.error("商品销售区域配置校验失败：{}", e);
             flag = false;
-            throw new BusinessException("商品销售区域配置校验失败：");
+            throw new BusinessException("商品销售区域校验失败：");
         }
         return flag;
     }
@@ -680,6 +683,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     public boolean repertoryCheck(StoreInfo storeInfo, List<ErpOrderItem> orderProductItemList) {
         boolean flag = true;
         try {
+            //TODO 按照sku汇总数量
             for (ErpOrderItem item :
                     orderProductItemList) {
                 HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + "/stock/available/search")
@@ -754,10 +758,10 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     }
 
     @Override
-    public void accountRole(String accountId) {
+    public void accountRole(String franchiseeCode) {
         try {
-            HttpClient httpClient = HttpClient.post(urlProperties.getSlcsApi() + "/conten/update/accountRole")
-                    .addParameter("account_id", accountId);
+            HttpClient httpClient = HttpClient.post(urlProperties.getSlcsApi() + "/conten/updateFranchiseeRoleByCode")
+                    .addParameter("franchisee_code", franchiseeCode);
             HttpResponse response = httpClient.action().result(new TypeReference<HttpResponse>() {
             });
         } catch (Exception e) {

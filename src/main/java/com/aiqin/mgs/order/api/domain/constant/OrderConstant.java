@@ -18,6 +18,9 @@ public class OrderConstant {
     /***订单未支付取消订单最大时间（毫秒）*/
     public static final long MAX_PAY_TIME_OUT_TIME = 1000L * 60 * 60 * 12;
 
+    /***订单结算数据在redis中缓存的数据时间（秒）*/
+    public static final long REDIS_ORDER_CART_GROUP_TEMP_TIME = 60L * 15;
+
     /***默认公司编码*/
     public static final String DEFAULT_COMPANY_CODE = "01";
     /***默认公司名称*/

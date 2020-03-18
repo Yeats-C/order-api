@@ -1,8 +1,11 @@
 package com.aiqin.mgs.order.api.service.bill;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.domain.RejectRecord;
 import com.aiqin.mgs.order.api.domain.request.bill.ReturnDLReq;
 import com.aiqin.mgs.order.api.domain.request.RejectRequest;
+import com.aiqin.mgs.order.api.domain.request.purchase.RejectQueryRequest;
 import com.aiqin.mgs.order.api.domain.response.RejectResponse;
 import com.aiqin.mgs.order.api.domain.response.RejectVoResponse;
 

@@ -360,7 +360,7 @@ public class ErpOrderInfo {
 
     @ApiModelProperty(value = "是否活动商品0否1是")
     @JsonProperty("is_activity")
-    private String isActivity;
+    private Integer isActivity;
 
     @ApiModelProperty(value = "整单活动id")
     @JsonProperty("activity_id")
@@ -393,6 +393,10 @@ public class ErpOrderInfo {
     @ApiModelProperty(value = "最近更新时间")
     @JsonProperty("update_time")
     private Date updateTime;
+
+    @ApiModelProperty(value = "返还的物流券金额")
+    @JsonProperty("goods_coupon")
+    private BigDecimal goodsCoupon;
 
     @ApiModelProperty(value = "主订单费用详情")
     @JsonProperty("order_fee")
