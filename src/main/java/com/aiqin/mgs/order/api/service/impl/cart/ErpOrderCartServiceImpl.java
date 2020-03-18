@@ -423,7 +423,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                     cartLineList) {
                 skuCodeList.add(item.getSkuCode());
             }
-            //查询商品详情
+            //查询商品详情集合
             Map<String, ErpSkuDetail> skuDetailMap = this.getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), skuCodeList);
 
             //把库存不足的行变成非选中状态
@@ -1011,6 +1011,13 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         cartGroupInfo.setActivity(activity);
         List<ActivityRule> activityRules = activityRequest.getActivityRules();
 
+        List<ActivityProduct> activityProducts = activityRequest.getActivityProducts();
+        Map productMap=new HashMap();
+        for(ActivityProduct pro:activityProducts){
+            productMap.put(pro.getSkuCode(),pro.getReduce());
+        }
+
+
         //活动类型
         ActivityTypeEnum activityTypeEnum = ActivityTypeEnum.getEnum(activity.getActivityType());
 
@@ -1198,36 +1205,54 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 if (curRule != null) {
 
                     cartGroupInfo.setActivityRule(curRule);
-                    //计算满减均摊
 
-                    //当前剩余满减的金额
+                    //计算折扣均摊
+
+                    //当前活动的折扣点数（百分比）
                     BigDecimal restPreferentialAmount = curRule.getPreferentialAmount();
 
                     if (activityAmountTotal.compareTo(BigDecimal.ZERO) > 0) {
                         for (int i = 0; i < tempList.size(); i++) {
                             ErpOrderCartInfo item = tempList.get(i);
-                            if (i == tempList.size() - 1) {
-                                //最后一行，用减法避免误差
-                                item.setLineActivityDiscountTotal(restPreferentialAmount);
-                            } else {
-                                BigDecimal lineActivityDiscountTotal = item.getLineActivityAmountTotal().divide(activityAmountTotal, 6, RoundingMode.HALF_UP).multiply(curRule.getPreferentialAmount()).setScale(2, RoundingMode.HALF_UP);
-                                item.setLineActivityDiscountTotal(lineActivityDiscountTotal);
-                                restPreferentialAmount = restPreferentialAmount.subtract(lineActivityDiscountTotal);
-                            }
-                            item.setLineAmountAfterActivity(item.getLineActivityAmountTotal().subtract(item.getLineActivityDiscountTotal()));
+
+                            //行减去活动优惠之后分摊的金额  =  当前活动的折扣点数（百分比） 乘以  商品原价（分销价）
+                            item.setLineAmountAfterActivity(restPreferentialAmount.multiply(item.getPrice()));
+                            //行活动优惠的金额，行根据活动使该行减少的金额，前端不显示  =  商品原价（分销价）  -  行活动优惠的金额，行根据活动使该行减少的金额，前端不显示
+                            item.setLineActivityDiscountTotal(item.getPrice().subtract(item.getLineActivityDiscountTotal()));
                         }
                     }
+
                 }
                 ;
                 break;
             case TYPE_5:
                 //特价
 
+                if (activityAmountTotal.compareTo(BigDecimal.ZERO) > 0) {
+
+                    for (int i = 0; i < tempList.size(); i++) {
+                        ErpOrderCartInfo item = tempList.get(i);
+                        Double reduce=0.00;
+                        //通过sku拿到活动特价金额
+                        if(null!=productMap.get(item.getSkuCode())){
+                            reduce= Double.valueOf(productMap.get(item.getSkuCode()).toString());
+                        }
+
+                        //行减去活动优惠之后分摊的金额  =  活动特价金额
+                        item.setLineAmountAfterActivity(BigDecimal.valueOf(reduce));
+
+                        //行活动优惠的金额，行根据活动使该行减少的金额，前端不显示  =   商品原价（分销价）- 减去活动优惠之后分摊的金额
+                        item.setLineActivityDiscountTotal(item.getPrice().multiply(item.getLineAmountAfterActivity()));
+                    }
+                }
+
                 break;
             default:
                 ;
         }
         cartGroupInfo.setFirstActivityRule(firstRule);
+
+
 
         return cartGroupInfo;
     }
@@ -1286,6 +1311,12 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         cartGroupInfo.setHasActivity(YesOrNoEnum.YES.getCode());
         cartGroupInfo.setActivity(activity);
         List<ActivityRule> activityRules = activityRequest.getActivityRules();
+
+        List<ActivityProduct> activityProducts = activityRequest.getActivityProducts();
+        Map productMap=new HashMap();
+        for(ActivityProduct pro:activityProducts){
+            productMap.put(pro.getSkuCode(),pro.getReduce());
+        }
 
         //活动类型
         ActivityTypeEnum activityTypeEnum = ActivityTypeEnum.getEnum(activity.getActivityType());
@@ -1362,6 +1393,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                                 //最后一行，用减法避免误差
                                 item.setLineActivityDiscountTotal(restPreferentialAmount);
                             } else {
+                                //行活动优惠的金额，行根据活动使该行减少的金额，前端不显示 = 行活动价汇总 除以  勾选的商品组活动价汇总，初始等于商品组分销价汇总  乘以   活动规则的优惠金额、优惠件数、折扣点数（百分比）
                                 BigDecimal lineActivityDiscountTotal = item.getLineActivityAmountTotal().divide(activityAmountTotal, 6, RoundingMode.HALF_UP).multiply(curRule.getPreferentialAmount()).setScale(2, RoundingMode.HALF_UP);
                                 item.setLineActivityDiscountTotal(lineActivityDiscountTotal);
                                 restPreferentialAmount = restPreferentialAmount.subtract(lineActivityDiscountTotal);
@@ -1469,7 +1501,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
 
                 ;
                 break;
-                case TYPE_3:
+            case TYPE_3:
                 //折扣
 
                 for (ActivityRule ruleItem :
@@ -1521,36 +1553,54 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 if (curRule != null) {
 
                     cartGroupInfo.setActivityRule(curRule);
-                    //计算满减均摊
 
-                    //当前剩余满减的金额
+                    //计算折扣均摊
+
+                    //当前活动的折扣点数（百分比）
                     BigDecimal restPreferentialAmount = curRule.getPreferentialAmount();
 
                     if (activityAmountTotal.compareTo(BigDecimal.ZERO) > 0) {
                         for (int i = 0; i < tempList.size(); i++) {
                             ErpOrderCartInfo item = tempList.get(i);
-                            if (i == tempList.size() - 1) {
-                                //最后一行，用减法避免误差
-                                item.setLineActivityDiscountTotal(restPreferentialAmount);
-                            } else {
-                                BigDecimal lineActivityDiscountTotal = item.getLineActivityAmountTotal().divide(activityAmountTotal, 6, RoundingMode.HALF_UP).multiply(curRule.getPreferentialAmount()).setScale(2, RoundingMode.HALF_UP);
-                                item.setLineActivityDiscountTotal(lineActivityDiscountTotal);
-                                restPreferentialAmount = restPreferentialAmount.subtract(lineActivityDiscountTotal);
-                            }
-                            item.setLineAmountAfterActivity(item.getLineActivityAmountTotal().subtract(item.getLineActivityDiscountTotal()));
+
+                            //行减去活动优惠之后分摊的金额  =  当前活动的折扣点数（百分比） 乘以  商品原价（分销价）
+                            item.setLineAmountAfterActivity(restPreferentialAmount.multiply(item.getPrice()));
+                            //行活动优惠的金额，行根据活动使该行减少的金额，前端不显示  =  商品原价（分销价）  -  行活动优惠的金额，行根据活动使该行减少的金额，前端不显示
+                            item.setLineActivityDiscountTotal(item.getPrice().subtract(item.getLineActivityDiscountTotal()));
                         }
                     }
+
                 }
                 ;
                 break;
-                case TYPE_5:
+            case TYPE_5:
                 //特价
+
+                if (activityAmountTotal.compareTo(BigDecimal.ZERO) > 0) {
+
+                    for (int i = 0; i < tempList.size(); i++) {
+                        ErpOrderCartInfo item = tempList.get(i);
+                        Double reduce=0.00;
+                        //通过sku拿到活动特价金额
+                        if(null!=productMap.get(item.getSkuCode())){
+                            reduce= Double.valueOf(productMap.get(item.getSkuCode()).toString());
+                        }
+
+                        //行减去活动优惠之后分摊的金额  =  活动特价金额
+                        item.setLineAmountAfterActivity(BigDecimal.valueOf(reduce));
+
+                        //行活动优惠的金额，行根据活动使该行减少的金额，前端不显示  =   商品原价（分销价）- 减去活动优惠之后分摊的金额
+                        item.setLineActivityDiscountTotal(item.getPrice().multiply(item.getLineAmountAfterActivity()));
+                    }
+                }
 
                 break;
             default:
                 ;
         }
         cartGroupInfo.setFirstActivityRule(firstRule);
+
+
 
         return cartGroupInfo;
     }
