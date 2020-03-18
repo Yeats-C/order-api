@@ -7,6 +7,7 @@
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.domain;
 import com.aiqin.mgs.order.api.base.PagesRequest;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -100,7 +101,10 @@ public class OrderAfterSaleQuery extends PagesRequest {
 	@JsonProperty("return_money_type")
 	private Integer returnMoneyType;
 
-	
+	@JsonProperty("update_time")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+	@ApiModelProperty("更新时间")
+	public Date updateTime;
 }
 
 
