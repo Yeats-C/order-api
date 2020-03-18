@@ -202,4 +202,8 @@ public class ErpOrderCartInfo {
     @JsonProperty("activity_list")
     private List<Activity> activityList;
 
+    @ApiModelProperty("是否可售：0为不可售，1为可售")
+    @JsonProperty("is_sale")
+    private Byte isSale;
+
 }
