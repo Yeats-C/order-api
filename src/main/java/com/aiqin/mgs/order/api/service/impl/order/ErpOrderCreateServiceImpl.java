@@ -17,6 +17,7 @@ import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.*;
 import com.aiqin.mgs.order.api.service.CartOrderService;
+import com.aiqin.mgs.order.api.service.CouponRuleService;
 import com.aiqin.mgs.order.api.service.SequenceGeneratorService;
 import com.aiqin.mgs.order.api.service.cart.ErpOrderCartService;
 import com.aiqin.mgs.order.api.service.order.*;
@@ -64,6 +65,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private ErpOrderCartService erpOrderCartService;
     @Resource
     private ErpStoreLockDetailsService erpStoreLockDetailsService;
+    @Resource
+    private CouponRuleService couponRuleService;
 
 
     @Override
@@ -828,13 +831,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //活动均摊后金额汇总
         BigDecimal totalAmountAfterActivity = BigDecimal.ZERO;
         for (CouponShareRequest item : details) {
-            ErpProductPropertyTypeEnum propertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(item.getProductPropertyCode());
-            log.info("判断是否是A品卷,propertyTypeEnum={}", propertyTypeEnum);
-            log.info("判断是否是A品卷,ProductGiftEnumCode={}", ErpProductGiftEnum.PRODUCT.getCode());
-            log.info("判断是否是A品卷,ProductGift={}", item.getProductGift());
-            if(propertyTypeEnum!=null){
-                log.info("判断是否是A品卷,isUseTopCoupon={}", propertyTypeEnum.isUseTopCoupon());
-                if (propertyTypeEnum.isUseTopCoupon() && ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductGift())) {
+            Map erpProductPropertyType = couponRuleService.couponRuleMap();
+            log.info("获取A品卷属性返回结果,erpProductPropertyType={}", erpProductPropertyType);
+            log.info(item.getSkuCode()+"此商品属性编码,productPropertyCode={}", item.getProductPropertyCode());
+            if(null!=erpProductPropertyType&&null!=erpProductPropertyType.get(item.getProductPropertyCode())){
+                if (ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductGift())) {
                     topProductList.add(item);
                     //分销总价=从活动的分摊总价取
                     totalFirstFenAmount = totalFirstFenAmount.add(item.getTotalPreferentialAmount());
@@ -842,6 +843,20 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                     totalAmountAfterActivity = totalAmountAfterActivity.add(item.getTotalPreferentialAmount());
                 }
             }
+//            ErpProductPropertyTypeEnum propertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(item.getProductPropertyCode());
+//            log.info("判断是否是A品卷,propertyTypeEnum={}", propertyTypeEnum);
+//            log.info("判断是否是A品卷,ProductGiftEnumCode={}", ErpProductGiftEnum.PRODUCT.getCode());
+//            log.info("判断是否是A品卷,ProductGift={}", item.getProductGift());
+//            if(propertyTypeEnum!=null){
+//                log.info("判断是否是A品卷,isUseTopCoupon={}", propertyTypeEnum.isUseTopCoupon());
+//                if (propertyTypeEnum.isUseTopCoupon() && ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductGift())) {
+//                    topProductList.add(item);
+//                    //分销总价=从活动的分摊总价取
+//                    totalFirstFenAmount = totalFirstFenAmount.add(item.getTotalPreferentialAmount());
+//                    totalProAmount = totalProAmount.add(item.getTotalProductAmount());
+//                    totalAmountAfterActivity = totalAmountAfterActivity.add(item.getTotalPreferentialAmount());
+//                }
+//            }
         }
         log.info("A品券计算均摊金额,符合A品卷均摊的商品topProductList={}", topProductList);
         //判断优惠券总金额和从活动的分摊总价取，如果A品卷总金额大于活动分摊总价，则A品券总金额=活动分摊总价
