@@ -32,6 +32,10 @@
     delete from store_lock_details
     where id = #{id,jdbcType=BIGINT}
   </delete>
+  <delete id="deleteBySkuCodeAndLockCount" parameterType="com.aiqin.mgs.order.api.domain.StoreLockDetails" >
+    delete from store_lock_details
+    where sku_code=  #{skuCode,jdbcType=VARCHAR} and transport_center_code = #{warehouseCode} and warehouse_code=#{warehouseCode}
+  </delete>
   <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.StoreLockDetails" >
     insert into store_lock_details (id, transport_center_code, transport_center_name,
       warehouse_code, warehouse_name, sku_code,

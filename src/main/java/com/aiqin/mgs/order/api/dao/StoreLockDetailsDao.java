@@ -9,6 +9,13 @@ public interface StoreLockDetailsDao {
 
     int deleteByPrimaryKey(Long id);
 
+    /**
+     * 根据skuCode、仓库编码、库房编码删除数据（本地解锁库存）
+     * @param record
+     * @return
+     */
+    int deleteBySkuCodeAndLockCount(StoreLockDetails record);
+
     int insert(StoreLockDetails record);
 
     int insertSelective(StoreLockDetails record);
