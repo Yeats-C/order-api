@@ -37,4 +37,11 @@ public interface ErpStoreLockDetailsService {
      */
     List<ErpOrderItemSplitGroupResponse> getNewRepositorySplitGroup(ErpOrderInfo order);
 
+    /**
+     * 根据skuCode、仓库编码、库房编码删除数据（本地解锁库存）
+     * @param record
+     * @return
+     */
+    int deleteBySkuCodeAndLockCount(StoreLockDetails record);
+
 }

@@ -63,4 +63,9 @@ public class ErpStoreLockDetailsServiceImpl implements ErpStoreLockDetailsServic
         return list;
     }
 
+    @Override
+    public int deleteBySkuCodeAndLockCount(StoreLockDetails record) {
+        return storeLockDetailsDao.deleteBySkuCodeAndLockCount(record);
+    }
+
 }
