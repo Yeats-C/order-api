@@ -442,7 +442,7 @@ public class BridgeProductService {
      * @return
      */
     public HttpResponse<PageResData<ProductSkuRespVo6>> getSkuPage2(SkuProductReqVO skuProductReqVO){
-        String path = "/search/spu/skuPage2 ";
+        String path = "/search/spu/skuPage2";
         HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(skuProductReqVO);
         HttpResponse<PageResData<ProductSkuRespVo6>> response = httpClient.action().result(new TypeReference<HttpResponse<PageResData<ProductSkuRespVo6>>>() {
         });
