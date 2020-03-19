@@ -26,6 +26,10 @@ public class ReduceDetailRequest extends PagesRequest {
     @JsonProperty("store_id")
     private String storeId;
 
+    @ApiModelProperty(value = "门店编号")
+    @JsonProperty("store_code")
+    private String storeCode;
+
 
     @JsonProperty("list_distributor_id")
     @ApiModelProperty(value = "erp专用，门店列表，查全部传空")
