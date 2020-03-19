@@ -71,6 +71,9 @@
 		 <if test="distributorId!=null and distributorId!='' ">
          and distributor_id = #{distributorId}
          </if>
+        <if test="distributorCode!=null and distributorCode!='' ">
+            and distributor_code = #{distributorCode}
+        </if>
         <if test="listDistributorId != null">
             and distributor_id in (
             <foreach collection="listDistributorId" item="distributorId" separator=",">

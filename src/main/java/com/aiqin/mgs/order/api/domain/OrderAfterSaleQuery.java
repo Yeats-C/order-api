@@ -100,7 +100,9 @@ public class OrderAfterSaleQuery extends PagesRequest {
 	@JsonProperty("return_money_type")
 	private Integer returnMoneyType;
 
-	
+	@ApiModelProperty(value="分销机构编码")
+	@JsonProperty("distributor_code")
+	private String distributorCode="";
 }
 
 
