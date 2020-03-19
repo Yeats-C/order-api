@@ -223,7 +223,7 @@
             and a.distributor_id = #{distributorId}
         </if>
         <if test="distributorCode!=null and distributorCode!='' ">
-            and distributor_code = #{distributorCode}
+            and a.distributor_code = #{distributorCode}
         </if>
 
         <if test="listDistributorId != null">
