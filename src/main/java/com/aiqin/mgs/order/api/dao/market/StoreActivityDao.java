@@ -9,4 +9,6 @@ public interface StoreActivityDao {
 
 
     List<ActivityReportOrderResp> selectActivityReportOrderInfo(@Param("storeId") String storeId, @Param("activityId") String activityId, @Param("beginTime") String beginTime, @Param("finishTime") String finishTime);
+
+    Long selectActivityOrderPackageSale(@Param("packageProductId") String packageProductId);
 }

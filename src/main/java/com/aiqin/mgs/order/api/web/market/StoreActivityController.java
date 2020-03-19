@@ -37,4 +37,13 @@ public class StoreActivityController {
                                                                                      @RequestParam(name = "finish_time", required = true) String finishTime) {
         return storeActivityService.selectActivityReportOrderInfo(storeId, activityId, beginTime, finishTime);
     }
+
+    @GetMapping("/order/package/sale")
+    @ApiOperation("查询套餐包列表销量")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "package_product_id", value = "套餐包id", dataType = "String", required = true)})
+    public HttpResponse selectActivityOrderPackageSale(@RequestParam(name = "package_product_id", required = true) String packageProductId) {
+        return storeActivityService.selectActivityOrderPackageSale(packageProductId);
+
+    }
 }

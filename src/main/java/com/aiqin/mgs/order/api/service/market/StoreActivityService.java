@@ -16,4 +16,11 @@ public interface StoreActivityService {
      * @return
      */
     HttpResponse<List<ActivityReportOrderResp>> selectActivityReportOrderInfo(String storeId, String activityId, String beginTime, String finishTime);
+
+    /**
+     *  查询套餐包列表销量
+     * @param packageProductId
+     * @return
+     */
+    HttpResponse selectActivityOrderPackageSale(String packageProductId);
 }

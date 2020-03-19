@@ -21,4 +21,15 @@ public class StoreActivityServiceImpl implements StoreActivityService{
         storeActivityDao.selectActivityReportOrderInfo(storeId, activityId, beginTime, finishTime);
         return null;
     }
+
+    /**
+     *  查询套餐包列表销量
+     * @param packageProductId
+     * @return
+     */
+    @Override
+    public HttpResponse selectActivityOrderPackageSale(String packageProductId) {
+        Long packageSale = storeActivityDao.selectActivityOrderPackageSale(packageProductId);
+        return HttpResponse.success(packageSale);
+    }
 }
