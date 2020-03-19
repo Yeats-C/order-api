@@ -223,6 +223,11 @@ public class OrderDetailInfo extends PagesRequest {
     @ApiModelProperty(value="未提货的退货数量")
     @JsonProperty("return_prestorage_amount")
     private Integer returnPrestorageAmount=0;
+
+
+	@JsonProperty("package_id")
+	@ApiModelProperty("套餐包id")
+	private String packageId;
 }
 
 
