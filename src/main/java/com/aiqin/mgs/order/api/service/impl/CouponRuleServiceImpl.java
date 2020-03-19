@@ -54,7 +54,7 @@ public class CouponRuleServiceImpl implements CouponRuleService {
         CouponRule couponRule1 = couponRuleDao.selectByCouponType(couponRule.getCouponType());
         if(couponRule1!=null){
             couponRule.setUpdateTime(new Date());
-            couponRuleDao.updateByPrimaryKeySelective(couponRule);
+            couponRuleDao.updateBycouponType(couponRule);
         }else {
             couponRule.setCreateTime(new Date());
             couponRuleDao.insertSelective(couponRule);

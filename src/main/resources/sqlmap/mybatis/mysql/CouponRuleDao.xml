@@ -73,26 +73,20 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.CouponRule" >
+  <update id="updateBycouponType" parameterType="com.aiqin.mgs.order.api.domain.CouponRule" >
     update coupon_rule
     <set >
-      <if test="couponType != null" >
-        coupon_type = #{couponType,jdbcType=TINYINT},
-      </if>
       <if test="couponName != null" >
         coupon_name = #{couponName,jdbcType=VARCHAR},
       </if>
       <if test="proportion != null" >
         proportion = #{proportion,jdbcType=DECIMAL},
       </if>
-      <if test="createTime != null" >
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
       <if test="updateTime != null" >
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
-    where id = #{id,jdbcType=BIGINT}
+    where coupon_type = #{couponType,jdbcType=TINYINT}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.aiqin.mgs.order.api.domain.CouponRule" >
     update coupon_rule
