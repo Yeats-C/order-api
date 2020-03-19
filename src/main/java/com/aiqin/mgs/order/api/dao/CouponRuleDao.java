@@ -14,7 +14,7 @@ public interface CouponRuleDao {
 
     CouponRule selectByCouponType(Integer couponType);
 
-    int updateByPrimaryKeySelective(CouponRule record);
+    int updateBycouponType(CouponRule record);
 
     int updateByPrimaryKey(CouponRule record);
 

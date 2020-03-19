@@ -25,18 +25,6 @@ public class PurchaseOrder {
     @JsonProperty("purchase_order_code")
     private String purchaseOrderCode;
 
-    @ApiModelProperty(value="采购申请单id")
-    @JsonProperty("purchase_apply_id")
-    private String purchaseApplyId;
-
-    @ApiModelProperty(value="采购申请单编码")
-    @JsonProperty("purchase_apply_code")
-    private String purchaseApplyCode;
-
-    @ApiModelProperty(value="采购申请单名称（审批名称）")
-    @JsonProperty("purchase_apply_name")
-    private String purchaseApplyName;
-
     @ApiModelProperty(value="仓库编码")
     @JsonProperty("transport_center_code")
     private String transportCenterCode;
@@ -234,5 +222,9 @@ public class PurchaseOrder {
     @ApiModelProperty(value="0:未同步,1已同步")
     @JsonProperty("synchr_status")
     private Integer synchrStatus;
+
+    @ApiModelProperty(value="来源单号")
+    @JsonProperty("source_code")
+    private String sourceCode;
 
 }

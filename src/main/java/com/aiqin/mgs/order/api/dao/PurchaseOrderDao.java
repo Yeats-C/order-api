@@ -26,7 +26,7 @@ public interface PurchaseOrderDao {
     //取消订单
     int updateByPurchaseOrderStatus(PurchaseOrderInfo record);
 
-    List<PurchaseOrderResponse> purchaseOrderList(PurchaseApplyRequest purchaseApplyRequest);
+    List<PurchaseOrder> purchaseOrderList(PurchaseApplyRequest purchaseApplyRequest);
 
     Integer purchaseOrderCount(PurchaseApplyRequest purchaseApplyRequest);
 

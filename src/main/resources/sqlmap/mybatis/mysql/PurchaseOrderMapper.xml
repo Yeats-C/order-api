@@ -657,32 +657,29 @@
   </select>
 
   <select id="purchaseOrderList" resultMap="BaseResultMap">
-    select <include refid="Base_Column_List"></include>
+    select
+    <include refid="Base_Column_List"></include>
+--     purchase_order_id purchaseOrderId, purchase_order_code purchaseOrderCode, company_code companyCode, company_name companyName,
+--     supplier_code supplierCode, supplier_name supplierName, transport_center_code transportCenterCode, transport_center_name transportCenterName,
+--     warehouse_code warehouseCode, warehouse_name warehouseName, purchase_group_code purchaseGroupCode, purchase_group_name purchaseGroupName,
+--     settlement_method_code settlementMethodCode, settlement_method_name settlementMethodName, source_code sourceCode,
+--     purchase_order_status purchaseOrderStatus, purchase_mode purchaseMode, total_count totalCount, total_tax_amount totalTaxAmount,
+--     actual_total_count actualTotalCount, actual_total_tax_amount actualTotalTaxAmount, pre_arrival_time preArrivalTime,
+--     valid_time validTime, create_by_id createById, create_by_name createByName, update_by_id updateById, update_by_name updateByName,
+--     create_time createTime, update_time updateTime
     from purchase_order
     <where>
-      <if test="createBeginTime != null">
-        and create_time &gt;= #{createBeginTime,jdbcType=VARCHAR}
+      <if test="beginTime != null">
+        and create_time &gt;= #{beginTime,jdbcType=VARCHAR}
       </if>
-      <if test="createFinishTime != null">
-        and create_time &lt;= #{createFinishTime,jdbcType=VARCHAR}
-      </if>
-      <if test="updateBeginTime != null">
-        and update_time &gt;= #{updateBeginTime,jdbcType=VARCHAR}
-      </if>
-      <if test="updateFinishTime != null">
-        and update_time &lt;= #{updateFinishTime,jdbcType=VARCHAR}
+      <if test="finishTime != null">
+        and create_time &lt;= #{finishTime,jdbcType=VARCHAR}
       </if>
       <if test="purchaseOrderCode != null">
         and purchase_order_code = #{purchaseOrderCode,jdbcType=VARCHAR}
       </if>
-      <if test="purchaseGroupCode != null">
-        and purchase_group_code = #{purchaseGroupCode,jdbcType=VARCHAR}
-      </if>
       <if test="supplierCode != null">
         and supplier_code = #{supplierCode,jdbcType=VARCHAR}
-      </if>
-      <if test="supplierName != null">
-        and supplier_name = #{supplierName,jdbcType=VARCHAR}
       </if>
       <if test="transportCenterCode != null">
         and transport_center_code = #{transportCenterCode,jdbcType=VARCHAR}
@@ -693,11 +690,11 @@
       <if test="purchaseOrderStatus != null">
         and purchase_order_status = #{purchaseOrderStatus,jdbcType=INTEGER}
       </if>
-      <if test="purchaseSource != null">
-        and purchase_source = #{purchaseSource,jdbcType=INTEGER}
+      <if test="sourceCode != null">
+        and source_code = #{sourceCode,jdbcType=VARCHAR}
       </if>
-      <if test="purchaseApplyCode != null">
-        and purchase_apply_code = #{purchaseApplyCode,jdbcType=VARCHAR}
+      <if test="purchaseMode != null">
+        and purchase_mode = #{purchaseMode,jdbcType=INTEGER}
       </if>
     </where>
     order by create_time desc
@@ -707,29 +704,17 @@
     select count(1)
     from purchase_order
     <where>
-      <if test="createBeginTime != null">
-        and create_time &gt;= #{createBeginTime,jdbcType=VARCHAR}
+      <if test="beginTime != null">
+        and create_time &gt;= #{beginTime,jdbcType=VARCHAR}
       </if>
-      <if test="createFinishTime != null">
-        and create_time &lt;= #{createFinishTime,jdbcType=VARCHAR}
-      </if>
-      <if test="updateBeginTime != null">
-        and update_time &gt;= #{updateBeginTime,jdbcType=VARCHAR}
-      </if>
-      <if test="updateFinishTime != null">
-        and update_time &lt;= #{updateFinishTime,jdbcType=VARCHAR}
+      <if test="finishTime != null">
+        and create_time &lt;= #{finishTime,jdbcType=VARCHAR}
       </if>
       <if test="purchaseOrderCode != null">
         and purchase_order_code = #{purchaseOrderCode,jdbcType=VARCHAR}
       </if>
-      <if test="purchaseGroupCode != null">
-        and purchase_group_code = #{purchaseGroupCode,jdbcType=VARCHAR}
-      </if>
       <if test="supplierCode != null">
         and supplier_code = #{supplierCode,jdbcType=VARCHAR}
-      </if>
-      <if test="supplierName != null">
-        and supplier_name = #{supplierName,jdbcType=VARCHAR}
       </if>
       <if test="transportCenterCode != null">
         and transport_center_code = #{transportCenterCode,jdbcType=VARCHAR}
@@ -740,11 +725,11 @@
       <if test="purchaseOrderStatus != null">
         and purchase_order_status = #{purchaseOrderStatus,jdbcType=INTEGER}
       </if>
-      <if test="purchaseSource != null">
-        and purchase_source = #{purchaseSource,jdbcType=INTEGER}
+      <if test="sourceCode != null">
+        and source_code = #{sourceCode,jdbcType=VARCHAR}
       </if>
-      <if test="purchaseApplyCode != null">
-        and purchase_apply_code = #{purchaseApplyCode,jdbcType=VARCHAR}
+      <if test="purchaseMode != null">
+        and purchase_mode = #{purchaseMode,jdbcType=INTEGER}
       </if>
     </where>
   </select>
