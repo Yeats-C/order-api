@@ -105,6 +105,9 @@ public class OrderAfterSaleQuery extends PagesRequest {
 	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	@ApiModelProperty("更新时间")
 	public Date updateTime;
+	@ApiModelProperty(value="分销机构编码")
+	@JsonProperty("distributor_code")
+	private String distributorCode="";
 }
 
 

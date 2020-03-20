@@ -16,6 +16,9 @@ import com.aiqin.mgs.order.api.domain.request.InventoryDetailRequest;
 import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
+import com.aiqin.mgs.order.api.domain.request.product.NewStoreCategory;
+import com.aiqin.mgs.order.api.domain.request.product.ProductSkuRespVo6;
+import com.aiqin.mgs.order.api.domain.request.product.SkuProductReqVO;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
 import com.aiqin.mgs.order.api.domain.response.NewFranchiseeResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetail;
@@ -430,5 +433,39 @@ public class BridgeProductService {
         }
 
         return response;
+    }
+
+
+    /**
+     * erp商品信息分页
+     * @param skuProductReqVO
+     * @return
+     */
+    public HttpResponse<PageResData<ProductSkuRespVo6>> getSkuPage2(SkuProductReqVO skuProductReqVO){
+        String path = "/search/spu/skuPage2";
+        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(skuProductReqVO);
+        HttpResponse<PageResData<ProductSkuRespVo6>> response = httpClient.action().result(new TypeReference<HttpResponse<PageResData<ProductSkuRespVo6>>>() {
+        });
+
+        return response;
+    }
+
+
+    /**
+     * 通过门店id集合获取门店的省市集合--slcs
+     * @param storeIdList
+     * @return
+     */
+    public List<NewStoreCategory> selectProvincesByStoreList(List<String> storeIdList){
+        String path = "/store/selectProvincesByStoreList";
+        HttpClient httpClient = HttpClient.post(urlProperties.getSlcsApi() + path).json(storeIdList);
+        HttpResponse response = httpClient.action().result(new TypeReference<HttpResponse>() {
+        });
+        List<NewStoreCategory> provinceList=new ArrayList<>();
+        if(Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")){
+            provinceList=(List<NewStoreCategory>)response.getData();
+        }
+
+        return provinceList;
     }
 }
