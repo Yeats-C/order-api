@@ -11,10 +11,11 @@
     <result column="sku_name" property="skuName" jdbcType="VARCHAR" />
     <result column="lock_count" property="lockCount" jdbcType="BIGINT" />
     <result column="line_code" property="lineCode" jdbcType="BIGINT" />
+    <result column="order_code" property="orderCode" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, transport_center_code, transport_center_name, warehouse_code, warehouse_name, 
-    sku_code, sku_name, lock_count, line_code
+    sku_code, sku_name, lock_count, line_code,order_code
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -152,13 +153,14 @@
 
   <insert id="insertBatch" parameterType="list">
     insert into store_lock_details (transport_center_code, transport_center_name,
-    warehouse_code, warehouse_name, sku_code,sku_name, lock_count, line_code)
+    warehouse_code, warehouse_name, sku_code,sku_name, lock_count, line_code,order_code)
     values
     <foreach collection="records" item="item" index="index" separator=",">
       (
         #{item.transportCenterCode,jdbcType=VARCHAR}, #{item.transportCenterName,jdbcType=VARCHAR},
         #{item.warehouseCode,jdbcType=VARCHAR}, #{item.warehouseName,jdbcType=VARCHAR}, #{item.skuCode,jdbcType=VARCHAR},
-        #{item.skuName,jdbcType=VARCHAR}, #{item.lockCount,jdbcType=BIGINT}, #{item.lineCode,jdbcType=BIGINT}
+        #{item.skuName,jdbcType=VARCHAR}, #{item.lockCount,jdbcType=BIGINT}, #{item.lineCode,jdbcType=BIGINT},
+        #{item.orderCode}
       )
     </foreach>
   </insert>

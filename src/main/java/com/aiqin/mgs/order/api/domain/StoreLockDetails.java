@@ -45,4 +45,8 @@ public class StoreLockDetails {
     @JsonProperty("line_code")
     private Long lineCode;
 
+    @ApiModelProperty(value="订单编码")
+    @JsonProperty("order_code")
+    private Long orderCode;
+
 }
