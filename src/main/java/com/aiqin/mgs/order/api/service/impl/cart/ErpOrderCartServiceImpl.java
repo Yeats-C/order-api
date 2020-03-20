@@ -1242,7 +1242,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         item.setLineAmountAfterActivity(BigDecimal.valueOf(reduce).multiply(new BigDecimal(item.getAmount())));
 
                         //行活动优惠的金额，行根据活动使该行减少的金额，前端不显示  =   商品原价（分销价）- 减去活动优惠之后分摊的金额
-                        item.setLineActivityDiscountTotal(item.getLineAmountTotal().multiply(item.getLineAmountAfterActivity()));
+                        item.setLineActivityDiscountTotal(item.getLineAmountTotal().subtract(item.getLineAmountAfterActivity()));
                     }
                 }
 
@@ -1590,7 +1590,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         item.setLineAmountAfterActivity(BigDecimal.valueOf(reduce).multiply(new BigDecimal(item.getAmount())));
 
                         //行活动优惠的金额，行根据活动使该行减少的金额，前端不显示  =   行原价汇总（分销价汇总）- 减去活动优惠之后分摊的金额
-                        item.setLineActivityDiscountTotal(item.getLineAmountTotal().multiply(item.getLineAmountAfterActivity()));
+                        item.setLineActivityDiscountTotal(item.getLineAmountTotal().subtract(item.getLineAmountAfterActivity()));
                     }
                 }
 
