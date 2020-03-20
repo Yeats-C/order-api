@@ -656,17 +656,16 @@
     where purchase_order_code = #{purchaseOrderCode,jdbcType=VARCHAR}
   </select>
 
-  <select id="purchaseOrderList" resultMap="BaseResultMap">
+  <select id="purchaseOrderList" resultType="com.aiqin.mgs.order.api.domain.response.purchase.PurchaseOrder">
     select
-    <include refid="Base_Column_List"></include>
---     purchase_order_id purchaseOrderId, purchase_order_code purchaseOrderCode, company_code companyCode, company_name companyName,
---     supplier_code supplierCode, supplier_name supplierName, transport_center_code transportCenterCode, transport_center_name transportCenterName,
---     warehouse_code warehouseCode, warehouse_name warehouseName, purchase_group_code purchaseGroupCode, purchase_group_name purchaseGroupName,
---     settlement_method_code settlementMethodCode, settlement_method_name settlementMethodName, source_code sourceCode,
---     purchase_order_status purchaseOrderStatus, purchase_mode purchaseMode, total_count totalCount, total_tax_amount totalTaxAmount,
---     actual_total_count actualTotalCount, actual_total_tax_amount actualTotalTaxAmount, pre_arrival_time preArrivalTime,
---     valid_time validTime, create_by_id createById, create_by_name createByName, update_by_id updateById, update_by_name updateByName,
---     create_time createTime, update_time updateTime
+    purchase_order_id purchaseOrderId, purchase_order_code purchaseOrderCode, company_code companyCode, company_name companyName,
+    supplier_code supplierCode, supplier_name supplierName, transport_center_code transportCenterCode, transport_center_name transportCenterName,
+    warehouse_code warehouseCode, warehouse_name warehouseName, purchase_group_code purchaseGroupCode, purchase_group_name purchaseGroupName,
+    settlement_method_code settlementMethodCode, settlement_method_name settlementMethodName, source_code sourceCode,
+    purchase_order_status purchaseOrderStatus, purchase_mode purchaseMode, total_count totalCount, total_tax_amount totalTaxAmount,
+    actual_total_count actualTotalCount, actual_total_tax_amount actualTotalTaxAmount, pre_arrival_time preArrivalTime,
+    valid_time validTime, create_by_id createById, create_by_name createByName, update_by_id updateById, update_by_name updateByName,
+    create_time createTime, update_time updateTime
     from purchase_order
     <where>
       <if test="beginTime != null">
