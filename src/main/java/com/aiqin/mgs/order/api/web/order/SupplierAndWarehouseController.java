@@ -1,7 +1,6 @@
 package com.aiqin.mgs.order.api.web.order;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderDetailRespVO;
 import com.aiqin.mgs.order.api.service.order.SupplierAndWarehouseService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -30,10 +29,16 @@ public class SupplierAndWarehouseController {
     @ApiOperation("查询供应商信息")
     @GetMapping("/getSupplierInfo")
     @ApiImplicitParams({@ApiImplicitParam(name = "supplier_code", value = "供应商编码", dataType = "string", paramType = "query", required = true)})
-    public HttpResponse<ReturnOrderDetailRespVO> getSupplierInfo(@RequestParam String supplier_code){
+    public HttpResponse getSupplierInfo(@RequestParam String supplier_code){
         return supplierAndWarehouseService.getSupplierInfo(supplier_code);
     }
 
+    @ApiOperation("查询供应商信息")
+    @GetMapping("/getWarehouseInfo")
+    @ApiImplicitParams({@ApiImplicitParam(name = "transport_center_code", value = "仓库编码", dataType = "string", paramType = "query", required = true)})
+    public HttpResponse getWarehouseInfo(@RequestParam String transport_center_code){
+        return supplierAndWarehouseService.getWarehouseInfo(transport_center_code);
+    }
 
 
 
