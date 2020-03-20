@@ -1218,7 +1218,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                             //行减去活动优惠之后分摊的金额  =  当前活动的折扣点数（百分比） 乘以  商品原价（分销价） 乘以  商品数量
                             item.setLineAmountAfterActivity(restPreferentialAmount.multiply(item.getPrice()).multiply(new BigDecimal(item.getAmount())));
                             //行活动优惠的金额，行根据活动使该行减少的金额，前端不显示  =  商品原价（分销价）  -  行活动优惠的金额，行根据活动使该行减少的金额，前端不显示
-                            item.setLineActivityDiscountTotal(item.getPrice().multiply(new BigDecimal(item.getAmount()).subtract(item.getLineActivityDiscountTotal())));
+                            item.setLineActivityDiscountTotal(item.getLineAmountTotal().subtract(item.getLineAmountAfterActivity()));
                         }
                     }
 
@@ -1242,7 +1242,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         item.setLineAmountAfterActivity(BigDecimal.valueOf(reduce).multiply(new BigDecimal(item.getAmount())));
 
                         //行活动优惠的金额，行根据活动使该行减少的金额，前端不显示  =   商品原价（分销价）- 减去活动优惠之后分摊的金额
-                        item.setLineActivityDiscountTotal(item.getPrice().multiply(new BigDecimal(item.getAmount()).multiply(item.getLineAmountAfterActivity())));
+                        item.setLineActivityDiscountTotal(item.getLineAmountTotal().multiply(item.getLineAmountAfterActivity()));
                     }
                 }
 
@@ -1565,8 +1565,8 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
 
                             //行减去活动优惠之后分摊的金额  =  当前活动的折扣点数（百分比） 乘以  商品原价（分销价） 乘以  商品数量
                             item.setLineAmountAfterActivity(restPreferentialAmount.multiply(item.getPrice()).multiply(new BigDecimal(item.getAmount())));
-                            //行活动优惠的金额，行根据活动使该行减少的金额，前端不显示  =  商品原价（分销价）  -  行活动优惠的金额，行根据活动使该行减少的金额，前端不显示
-                            item.setLineActivityDiscountTotal(item.getPrice().multiply(new BigDecimal(item.getAmount()).subtract(item.getLineActivityDiscountTotal())));
+                            //行活动优惠的金额，行根据活动使该行减少的金额，前端不显示  =  行原价汇总（分销价汇总）  -  行活动优惠的金额，行根据活动使该行减少的金额，前端不显示
+                            item.setLineActivityDiscountTotal(item.getLineAmountTotal().subtract(item.getLineAmountAfterActivity()));
                         }
                     }
 
@@ -1589,8 +1589,8 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         //行减去活动优惠之后分摊的金额  =  活动特价金额
                         item.setLineAmountAfterActivity(BigDecimal.valueOf(reduce).multiply(new BigDecimal(item.getAmount())));
 
-                        //行活动优惠的金额，行根据活动使该行减少的金额，前端不显示  =   商品原价（分销价）- 减去活动优惠之后分摊的金额
-                        item.setLineActivityDiscountTotal(item.getPrice().multiply(new BigDecimal(item.getAmount()).multiply(item.getLineAmountAfterActivity())));
+                        //行活动优惠的金额，行根据活动使该行减少的金额，前端不显示  =   行原价汇总（分销价汇总）- 减去活动优惠之后分摊的金额
+                        item.setLineActivityDiscountTotal(item.getLineAmountTotal().multiply(item.getLineAmountAfterActivity()));
                     }
                 }
 
