@@ -1375,7 +1375,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         }
 
                     } else {
-
+                        flag = true;
                     }
 
                     if (flag) {
