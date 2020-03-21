@@ -6,6 +6,7 @@ import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderLockStockTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderNodeProcessTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpProductGiftEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.*;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.*;
@@ -227,6 +228,8 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             //TODO 按照sku汇总数量
             List<Map<String, Object>> list = new ArrayList<>();
             Map<String,Long> countMap=new HashMap<>();
+            //记录skuCode和行号对应关系
+            Map<String,Long> skuCodeLineMap=new HashMap<>();
             //汇总sku
             for(ErpOrderItem item:itemList){
                 Long count=countMap.get(item.getSkuCode());
@@ -234,6 +237,9 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                     count=count+item.getProductCount();
                 }
                 countMap.put(item.getSkuCode(),count);
+                if(ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductType())){
+                    skuCodeLineMap.put(item.getSkuCode(),count);
+                }
             }
             for(Map.Entry<String,Long> data:countMap.entrySet()){
                 String skuCode=data.getKey();
@@ -279,6 +285,10 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 for(StockVoRequest stockVoRequest:list1){
                     StoreLockDetails storeLockDetail=new StoreLockDetails();
                     BeanUtils.copyProperties(stockVoRequest,storeLockDetail);
+                    if(null!=stockVoRequest.getSkuCode()&&null!=skuCodeLineMap.get(stockVoRequest.getSkuCode())){
+                        Long loneCode=Long.valueOf(skuCodeLineMap.get(stockVoRequest.getSkuCode()).toString());
+                        storeLockDetail.setLineCode(loneCode);
+                    }
                     records.add(storeLockDetail);
                 }
                 erpStoreLockDetailsService.insertStoreLockDetails(records);

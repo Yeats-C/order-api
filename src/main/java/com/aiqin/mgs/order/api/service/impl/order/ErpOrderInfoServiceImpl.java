@@ -156,7 +156,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 //            List<ErpOrderItemSplitGroupResponse> lineSplitGroupList = erpOrderRequestService.getRepositorySplitGroup(order);
             //新的数据
             List<ErpOrderItemSplitGroupResponse> lineSplitGroupList = erpStoreLockDetailsService.getNewRepositorySplitGroup(order);
-
+            logger.info("订单拆单，从本地查询锁库数据lineSplitGroupList={}",lineSplitGroupList);
             if (lineSplitGroupList == null || lineSplitGroupList.size() == 0) {
                 throw new BusinessException("未获取到供应链商品分组");
             }
