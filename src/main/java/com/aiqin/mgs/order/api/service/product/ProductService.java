@@ -2,8 +2,11 @@ package com.aiqin.mgs.order.api.service.product;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.domain.request.product.AreaReq;
 import com.aiqin.mgs.order.api.domain.request.product.ProductSkuRespVo6;
 import com.aiqin.mgs.order.api.domain.request.product.SkuProductReqVO;
+
+import java.util.List;
 
 /**
  * 商品信息查询service
@@ -20,4 +23,10 @@ public interface ProductService {
      * @return
      */
     HttpResponse<PageResData<ProductSkuRespVo6>> queryErpProductList(SkuProductReqVO skuProductReqVO);
+
+    /**
+     * erp查询商品信息列表权限数据集合
+     * @return
+     */
+    List<AreaReq> areaReq();
 }

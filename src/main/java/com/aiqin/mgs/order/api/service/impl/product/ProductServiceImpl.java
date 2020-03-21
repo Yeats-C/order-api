@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -34,11 +35,19 @@ public class ProductServiceImpl implements ProductService {
     public HttpResponse<PageResData<ProductSkuRespVo6>> queryErpProductList(SkuProductReqVO skuProductReqVO) {
         LOGGER.info("erp查询商品信息列表 queryErpProductList 参数为：{}", skuProductReqVO);
         //权限控制代码-----------------------------开始
+        skuProductReqVO.setAreaReqs(areaReq());
+        //权限控制代码-----------------------------结束
+        return bridgeProductService.getSkuPage2(skuProductReqVO);
+    }
 
+    @Override
+    public List<AreaReq> areaReq() {
+        LOGGER.info("eerp查询商品信息列表权限数据集合开始");
+        List<AreaReq>  areaReqs=new ArrayList<>();
         //通过商品查询菜单code查出当前拥有权限的门店数据
         List<String> storeIdList=activityService.storeIds("ERP002003");
         if(null!=storeIdList&&0<storeIdList.size()){
-            List<AreaReq>  areaReqs=null;
+
             //通过门店id集合查询出省市集合
             List<NewStoreCategory> provinceList=bridgeProductService.selectProvincesByStoreList(storeIdList);
             if(null!=provinceList&&0<provinceList.size()){
@@ -48,11 +57,9 @@ public class ProductServiceImpl implements ProductService {
                     areaReq.setProvinceCode(province.getProvinceId());
                     areaReqs.add(areaReq);
                 }
-                skuProductReqVO.setAreaReqs(areaReqs);
             }
 
         }
-        //权限控制代码-----------------------------结束
-        return bridgeProductService.getSkuPage2(skuProductReqVO);
+        return areaReqs;
     }
 }
