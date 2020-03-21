@@ -49,7 +49,7 @@ public class ErpStoreLockDetailsServiceImpl implements ErpStoreLockDetailsServic
             StoreLockDetails storeLockDetails=new StoreLockDetails();
             storeLockDetails.setLineCode(item.getLineCode());
             storeLockDetails.setSkuCode(item.getSkuCode());
-            storeLockDetails.setLockCount(item.getProductCount());
+            storeLockDetails.setChangeCount(Integer.valueOf(item.getProductCount().toString()));
             log.info("查询商品锁库信息，从本地查询商品skuCode={},lineCode={},lockCount={}",item.getSkuCode(),item.getLineCode(),item.getProductCount());
             StoreLockDetails storeLockDetails1 = storeLockDetailsDao.selectByLineCodeAndSkuCodeAndLockCount(storeLockDetails);
             log.info("查询商品锁库信息，从本地查询商品单行返回结果storeLockDetails1={}",storeLockDetails1);

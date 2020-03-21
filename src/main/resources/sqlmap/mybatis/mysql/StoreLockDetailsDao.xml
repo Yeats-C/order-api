@@ -224,15 +224,19 @@
   </delete>
 
   <insert id="insertBatch" parameterType="list">
-    insert into store_lock_details (transport_center_code, transport_center_name,
-    warehouse_code, warehouse_name, sku_code,sku_name, lock_count, line_code,order_code)
+    insert into store_lock_details (order_code, company_code,
+    company_name, transport_center_code, transport_center_name,
+    warehouse_code, warehouse_name, warehouse_type,
+    sku_code, sku_name, line_code,
+    change_count, purchase_group_code, purchase_group_name)
     values
     <foreach collection="records" item="item" index="index" separator=",">
       (
-      #{item.transportCenterCode,jdbcType=VARCHAR}, #{item.transportCenterName,jdbcType=VARCHAR},
-      #{item.warehouseCode,jdbcType=VARCHAR}, #{item.warehouseName,jdbcType=VARCHAR}, #{item.skuCode,jdbcType=VARCHAR},
-      #{item.skuName,jdbcType=VARCHAR}, #{item.lockCount,jdbcType=BIGINT}, #{item.lineCode,jdbcType=BIGINT},
-      #{item.orderCode}
+        #{item.orderCode,jdbcType=VARCHAR}, #{item.companyCode,jdbcType=VARCHAR},
+        #{item.companyName,jdbcType=VARCHAR}, #{item.transportCenterCode,jdbcType=VARCHAR}, #{item.transportCenterName,jdbcType=VARCHAR},
+        #{item.warehouseCode,jdbcType=VARCHAR}, #{item.warehouseName,jdbcType=VARCHAR}, #{item.warehouseType,jdbcType=VARCHAR},
+        #{item.skuCode,jdbcType=VARCHAR}, #{item.skuName,jdbcType=VARCHAR}, #{item.lineCode,jdbcType=BIGINT},
+        #{item.changeCount,jdbcType=INTEGER}, #{item.purchaseGroupCode,jdbcType=VARCHAR}, #{item.purchaseGroupName,jdbcType=VARCHAR}
       )
     </foreach>
   </insert>

@@ -10,15 +10,19 @@ import com.aiqin.mgs.order.api.component.enums.pay.*;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.po.order.*;
+import com.aiqin.mgs.order.api.domain.request.StockVoRequest;
 import com.aiqin.mgs.order.api.domain.request.order.PayRequest;
 import com.aiqin.mgs.order.api.domain.response.ProductSkuDetailResponse;
 import com.aiqin.mgs.order.api.domain.response.order.*;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
+import com.aiqin.mgs.order.api.service.order.ErpStoreLockDetailsService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -33,6 +37,8 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Resource
     private UrlProperties urlProperties;
+    @Autowired
+    private ErpStoreLockDetailsService erpStoreLockDetailsService;
 
     private static final Logger logger = LoggerFactory.getLogger(ErpOrderRequestServiceImpl.class);
 
@@ -261,9 +267,21 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/lock/info").json(paramMap);
             HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
             });
-
+            logger.info("锁库请求返回结果：", response);
             if (!RequestReturnUtil.validateHttpResponse(response)) {
                 throw new BusinessException(response.getMessage());
+            }
+            //本地缓存锁库存信息
+            if(null!=response.getData()){
+                List<StockVoRequest> list1 =(List<StockVoRequest>)response.getData();
+                logger.info("锁库请求返回结果list1={}", list1);
+                List<StoreLockDetails> records=new ArrayList<>();
+                for(StockVoRequest stockVoRequest:list1){
+                    StoreLockDetails storeLockDetail=new StoreLockDetails();
+                    BeanUtils.copyProperties(stockVoRequest,storeLockDetail);
+                    records.add(storeLockDetail);
+                }
+                erpStoreLockDetailsService.insertStoreLockDetails(records);
             }
         } catch (BusinessException e) {
             flag = false;
