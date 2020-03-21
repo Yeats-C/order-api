@@ -74,15 +74,17 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public ProductInfo getSkuDetail(String companyCode, String skuCode) {
-
+        logger.info("查询sku详情入参,companyCode={},skuCode={}",companyCode,skuCode);
         String url = urlProperties.getProductApi() + "/search/spu/sku/detail";
         url += "?company_code=" + companyCode;
         url += "&sku_code=" + skuCode;
         ProductInfo product = new ProductInfo();
         try {
+            logger.info("查询sku详情url={}",url);
             HttpClient httpClient = HttpClient.get(url);
             HttpResponse<ProductSkuDetailResponse> response = httpClient.action().result(new TypeReference<HttpResponse<ProductSkuDetailResponse>>() {
             });
+            logger.info("查询sku详情返回结果response={}",response.toString());
             if (!RequestReturnUtil.validateHttpResponse(response)) {
                 throw new BusinessException("获取商品信息失败");
             }
