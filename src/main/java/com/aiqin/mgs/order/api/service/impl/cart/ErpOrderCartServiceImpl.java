@@ -1223,7 +1223,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                             //设置行活动价  = 当前活动的折扣点数（百分比） 乘以  商品原价（分销价）
                             item.setActivityPrice(restPreferentialAmount.multiply(item.getPrice()).setScale(2, RoundingMode.HALF_UP));
                             //设置行活动价汇总  = 当前活动的折扣点数（百分比） 乘以  商品原价（分销价） 乘以  商品数量
-                            item.setLineActivityAmountTotal(restPreferentialAmount.multiply(item.getPrice()).multiply(new BigDecimal(item.getAmount())).setScale(2, RoundingMode.HALF_UP));
+//                            item.setLineActivityAmountTotal(restPreferentialAmount.multiply(item.getPrice()).multiply(new BigDecimal(item.getAmount())).setScale(2, RoundingMode.HALF_UP));
                         }
                     }
 
@@ -1253,7 +1253,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         item.setActivityPrice(BigDecimal.valueOf(reduce).setScale(2, RoundingMode.HALF_UP));
 
                         //行活动价汇总  =  活动特价金额 乘以  商品数量
-                        item.setLineActivityAmountTotal(BigDecimal.valueOf(reduce).multiply(new BigDecimal(item.getAmount())).setScale(2, RoundingMode.HALF_UP));
+//                        item.setLineActivityAmountTotal(BigDecimal.valueOf(reduce).multiply(new BigDecimal(item.getAmount())).setScale(2, RoundingMode.HALF_UP));
 
                     }
                 }
@@ -1582,7 +1582,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                             //设置行活动价  = 当前活动的折扣点数（百分比） 乘以  商品原价（分销价）
                             item.setActivityPrice(restPreferentialAmount.multiply(item.getPrice()).setScale(2, RoundingMode.HALF_UP));
                             //设置行活动价汇总  = 当前活动的折扣点数（百分比） 乘以  商品原价（分销价） 乘以  商品数量
-                            item.setLineActivityAmountTotal(restPreferentialAmount.multiply(item.getPrice()).multiply(new BigDecimal(item.getAmount())).setScale(2, RoundingMode.HALF_UP));
+//                            item.setLineActivityAmountTotal(restPreferentialAmount.multiply(item.getPrice()).multiply(new BigDecimal(item.getAmount())).setScale(2, RoundingMode.HALF_UP));
                         }
                     }
 
@@ -1612,7 +1612,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         item.setActivityPrice(BigDecimal.valueOf(reduce).setScale(2, RoundingMode.HALF_UP));
 
                         //行活动价汇总  =  活动特价金额 乘以  商品数量
-                        item.setLineActivityAmountTotal(BigDecimal.valueOf(reduce).multiply(new BigDecimal(item.getAmount())).setScale(2, RoundingMode.HALF_UP));
+//                        item.setLineActivityAmountTotal(BigDecimal.valueOf(reduce).multiply(new BigDecimal(item.getAmount())).setScale(2, RoundingMode.HALF_UP));
 
                     }
                 }
