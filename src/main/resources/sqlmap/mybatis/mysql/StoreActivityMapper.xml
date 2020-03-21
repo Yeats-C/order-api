@@ -1,9 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.aiqin.mgs.order.api.dao.ActivityGiftDao">
+<mapper namespace="com.aiqin.mgs.order.api.dao.market.StoreActivityDao">
 
-    <select id="selectActivityReportOrderInfo" resultType="com.aiqin.mgs.order.api.domain.response.market.ActivityReportOrderResp">
+    <select id="selectActivityReportOrder" resultType="java.lang.Long">
+       select count(1)
+        from order_detail od
+        left join order_info oi on oi.order_id = od.order_id
+        where oi.distributor_id = #{storeId}
+        and od.activity_id = #{activityId}
+        and od.create_time <![CDATA[>=]]> #{beginTime}
+        and od.create_time <![CDATA[<=]]> #{finishTime}
+        group by od.order_id
+    </select>
 
+    <select id="selectActivityReportMemberOrder" resultType="java.lang.Long">
+       select count(1)
+        from order_detail od
+        left join order_info oi on oi.order_id = od.order_id
+        where oi.distributor_id = #{storeId}
+        and od.activity_id = #{activityId}
+        and od.create_time <![CDATA[>=]]> #{beginTime}
+        and od.create_time <![CDATA[<=]]> #{finishTime}
+        and oi.member_id != null
+        group by od.order_id
+    </select>
+
+    <select id="selectActivityReportOrderSale" resultType="java.lang.Long">
+       select sum(od.actual_price*od.amount)
+        from order_detail od
+        left join order_info oi on oi.order_id = od.order_id
+        where oi.distributor_id = #{storeId}
+        and od.activity_id = #{activityId}
+        and od.create_time <![CDATA[>=]]> #{beginTime}
+        and od.create_time <![CDATA[<=]]> #{finishTime}
+        group by od.order_id
     </select>
 
     <select id="selectActivityOrderPackageSale" resultType="java.lang.Long">

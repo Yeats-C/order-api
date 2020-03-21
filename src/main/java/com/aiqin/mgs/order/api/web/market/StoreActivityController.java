@@ -31,7 +31,7 @@ public class StoreActivityController {
             @ApiImplicitParam(name = "activity_id", value = "活动id", dataType = "String", required = true),
             @ApiImplicitParam(name = "begin_time", value = "开始时间", dataType = "String", required = true),
             @ApiImplicitParam(name = "finish_time", value = "结束时间", dataType = "String", required = true)})
-    public HttpResponse<List<ActivityReportOrderResp>> selectActivityReportOrderInfo(@RequestParam(name = "store_id", required = true) String storeId,
+    public HttpResponse<ActivityReportOrderResp> selectActivityReportOrderInfo(@RequestParam(name = "store_id", required = true) String storeId,
                                                                                      @RequestParam(name = "activity_id", required = true) String activityId,
                                                                                      @RequestParam(name = "begin_time", required = true) String beginTime,
                                                                                      @RequestParam(name = "finish_time", required = true) String finishTime) {
