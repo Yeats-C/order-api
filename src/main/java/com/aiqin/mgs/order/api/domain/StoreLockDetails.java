@@ -13,6 +13,18 @@ public class StoreLockDetails {
     @JsonProperty("id")
     private Long id;
 
+    @ApiModelProperty(value="订单编码")
+    @JsonProperty("order_code")
+    private String orderCode;
+
+    @ApiModelProperty(value="公司编码")
+    @JsonProperty("company_code")
+    private String companyCode;
+
+    @ApiModelProperty(value="公司名称")
+    @JsonProperty("company_name")
+    private String companyName;
+
     @ApiModelProperty(value="仓库编码")
     @JsonProperty("transport_center_code")
     private String transportCenterCode;
@@ -29,6 +41,10 @@ public class StoreLockDetails {
     @JsonProperty("warehouse_name")
     private String warehouseName;
 
+    @ApiModelProperty(value="库房类型")
+    @JsonProperty("warehouse_type")
+    private String warehouseType;
+
     @ApiModelProperty(value="sku编码")
     @JsonProperty("sku_code")
     private String skuCode;
@@ -38,15 +54,19 @@ public class StoreLockDetails {
     private String skuName;
 
     @ApiModelProperty(value="锁定库存数")
-    @JsonProperty("lock_count")
-    private Long lockCount;
+    @JsonProperty("change_count")
+    private Integer changeCount;
 
     @ApiModelProperty(value="行号")
     @JsonProperty("line_code")
     private Long lineCode;
 
-    @ApiModelProperty(value="订单编码")
-    @JsonProperty("order_code")
-    private Long orderCode;
+    @ApiModelProperty(value="采购组编码")
+    @JsonProperty("purchase_group_code")
+    private String purchaseGroupCode;
+
+    @ApiModelProperty(value="采购组名称")
+    @JsonProperty("purchase_group_name")
+    private String purchaseGroupName;
 
 }
