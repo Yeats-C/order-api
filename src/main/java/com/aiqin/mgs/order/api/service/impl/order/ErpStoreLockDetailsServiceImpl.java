@@ -68,4 +68,9 @@ public class ErpStoreLockDetailsServiceImpl implements ErpStoreLockDetailsServic
         return storeLockDetailsDao.deleteBySkuCodeAndLockCount(record);
     }
 
+    @Override
+    public int deleteBySkuCode(String skuCode) {
+        return storeLockDetailsDao.deleteBySkuCode(skuCode);
+    }
+
 }

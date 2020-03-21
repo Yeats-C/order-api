@@ -16,6 +16,8 @@ public interface StoreLockDetailsDao {
      */
     int deleteBySkuCodeAndLockCount(StoreLockDetails record);
 
+    int deleteBySkuCode(String skuCode);
+
     int insert(StoreLockDetails record);
 
     int insertSelective(StoreLockDetails record);

@@ -44,4 +44,11 @@ public interface ErpStoreLockDetailsService {
      */
     int deleteBySkuCodeAndLockCount(StoreLockDetails record);
 
+    /**
+     * 根据skuCode删除数据（本地解锁库存）
+     * @param skuCode
+     * @return
+     */
+    int deleteBySkuCode(String skuCode);
+
 }

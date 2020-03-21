@@ -241,4 +241,9 @@
     </foreach>
   </insert>
 
+  <delete id="deleteBySkuCode" parameterType="java.lang.Long" >
+    delete from store_lock_details
+    where sku_code = #{skuCode}
+  </delete>
+
 </mapper>

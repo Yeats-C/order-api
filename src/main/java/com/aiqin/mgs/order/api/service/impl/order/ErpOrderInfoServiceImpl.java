@@ -392,7 +392,11 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
             this.updateOrderByPrimaryKeySelective(order, auth);
-
+            //删除本地锁库明细
+            for(ErpOrderItemSplitGroupResponse res1:lineSplitGroupList){
+                //删除本地缓存
+                erpStoreLockDetailsService.deleteBySkuCode(res1.getSkuCode());
+            }
 
         } else {
             //按照供应商拆单
