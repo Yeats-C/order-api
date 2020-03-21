@@ -230,6 +230,10 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             Map<String,Long> countMap=new HashMap<>();
             //记录skuCode和行号对应关系
             Map<String,Long> skuCodeLineMap=new HashMap<>();
+            //赠品
+            List<ErpOrderItem> giftList=new ArrayList<>();
+            //本品
+            List<ErpOrderItem> productList=new ArrayList<>();
             //汇总sku
             for(ErpOrderItem item:itemList){
                 Long count=countMap.get(item.getSkuCode());
@@ -238,7 +242,21 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 }
                 countMap.put(item.getSkuCode(),count);
                 if(ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductType())){
-                    skuCodeLineMap.put(item.getSkuCode(),count);
+                    productList.add(item);
+                }
+                if(ErpProductGiftEnum.GIFT.getCode().equals(item.getProductType())){
+                    giftList.add(item);
+                }
+            }
+            //过滤商品和赠品sku和行号的对应关系
+            for(ErpOrderItem eoi:productList){
+                if(null==skuCodeLineMap.get(eoi.getSkuCode())){
+                    skuCodeLineMap.put(eoi.getSkuCode(),eoi.getLineCode());
+                }
+            }
+            for(ErpOrderItem eoi:giftList){
+                if(null==skuCodeLineMap.get(eoi.getSkuCode())){
+                    skuCodeLineMap.put(eoi.getSkuCode(),eoi.getLineCode());
                 }
             }
             for(Map.Entry<String,Long> data:countMap.entrySet()){
