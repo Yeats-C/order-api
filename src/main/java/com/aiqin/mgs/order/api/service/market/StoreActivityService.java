@@ -15,7 +15,7 @@ public interface StoreActivityService {
      * @param finishTime
      * @return
      */
-    HttpResponse<ActivityReportOrderResp> selectActivityReportOrderInfo(String storeId, String activityId, String beginTime, String finishTime);
+    HttpResponse<List<ActivityReportOrderResp>> selectActivityReportOrderInfo(String storeId, String activityId, String beginTime, String finishTime);
 
     /**
      *  查询套餐包列表销量

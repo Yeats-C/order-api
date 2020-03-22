@@ -8,11 +8,9 @@ import java.util.List;
 public interface StoreActivityDao {
 
 
-    Long selectActivityReportOrder(@Param("storeId") String storeId, @Param("activityId") String activityId, @Param("beginTime") String beginTime, @Param("finishTime") String finishTime);
+    List<ActivityReportOrderResp> selectActivityReportOrder(@Param("storeId") String storeId, @Param("activityId") String activityId, @Param("beginTime") String beginTime, @Param("finishTime") String finishTime);
 
-    Long selectActivityReportMemberOrder(@Param("storeId") String storeId, @Param("activityId") String activityId, @Param("beginTime") String beginTime, @Param("finishTime") String finishTime);
 
-    Long selectActivityReportOrderSale(@Param("storeId") String storeId, @Param("activityId") String activityId, @Param("beginTime") String beginTime, @Param("finishTime") String finishTime);
 
     Long selectActivityOrderPackageSale(@Param("packageProductId") String packageProductId);
 }

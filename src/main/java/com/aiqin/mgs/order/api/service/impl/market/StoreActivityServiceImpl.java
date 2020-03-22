@@ -17,17 +17,9 @@ public class StoreActivityServiceImpl implements StoreActivityService{
 
 
     @Override
-    public HttpResponse<ActivityReportOrderResp> selectActivityReportOrderInfo(String storeId, String activityId, String beginTime, String finishTime) {
+    public HttpResponse<List<ActivityReportOrderResp>> selectActivityReportOrderInfo(String storeId, String activityId, String beginTime, String finishTime) {
         // 获取订单数
-        Long orderCount  = storeActivityDao.selectActivityReportOrder(storeId, activityId, beginTime, finishTime);
-        // 获取会员订单数
-        Long memberOrderCount  = storeActivityDao.selectActivityReportMemberOrder(storeId, activityId, beginTime, finishTime);
-        // 获取销售额
-        Long saleAmount  = storeActivityDao.selectActivityReportOrderSale(storeId, activityId, beginTime, finishTime);
-        ActivityReportOrderResp activityReportOrderResps = new ActivityReportOrderResp();
-        activityReportOrderResps.setOrderCount(orderCount);
-        activityReportOrderResps.setMemberOrderCount(memberOrderCount);
-        activityReportOrderResps.setSaleAmount(saleAmount);
+        List<ActivityReportOrderResp> activityReportOrderResps  = storeActivityDao.selectActivityReportOrder(storeId, activityId, beginTime, finishTime);
         return HttpResponse.success(activityReportOrderResps);
     }
 

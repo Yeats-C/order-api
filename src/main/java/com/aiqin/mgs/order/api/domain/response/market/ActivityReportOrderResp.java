@@ -14,13 +14,17 @@ import lombok.Data;
 @ApiModel("活动数据报表中每天的订单情况Resp")
 public class ActivityReportOrderResp {
 
+    @ApiModelProperty(value = "时间月日")
+    @JsonProperty("months_day")
+    private String monthsDay;
+
+    @ApiModelProperty(value = "会员状态 （0 非会员，1 会员）")
+    @JsonProperty("member_status")
+    private Integer memberStatus;
+
     @ApiModelProperty(value = "订单数")
     @JsonProperty("order_count")
     private Long orderCount;
-
-    @ApiModelProperty(value = "会员订单数")
-    @JsonProperty("member_order_count")
-    private Long memberOrderCount;
 
     @ApiModelProperty(value = "销售额")
     @JsonProperty("sale_amount")
