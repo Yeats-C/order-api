@@ -11,6 +11,7 @@ import com.aiqin.mgs.order.api.domain.response.order.ErpOrderOperationControlRes
 import com.aiqin.mgs.order.api.service.ActivityService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.PageAutoHelperUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+@Slf4j
 @Service
 public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
 
@@ -236,7 +237,8 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         erpOrderQueryRequest.setOrderTypeQueryList(orderTypeQueryList);
         erpOrderQueryRequest.setOrderCategoryQueryList(orderCategoryQueryList);
 
-
+        log.info(ErpOrderTypeCategoryQueryTypeEnum.getEnum(ErpOrderTypeCategoryQueryTypeEnum.STORE_ORDER_LIST_QUERY)
+                +"查询订单列表的订单类别编码集合为"+orderCategoryQueryList);
         //查询主订单列表
         erpOrderQueryRequest.setOrderLevel(ErpOrderLevelEnum.PRIMARY.getCode());
         PagesRequest page = new PagesRequest();
