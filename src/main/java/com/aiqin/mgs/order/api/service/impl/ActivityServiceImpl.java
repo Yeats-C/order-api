@@ -716,6 +716,8 @@ public class ActivityServiceImpl implements ActivityService {
         List<ActivitySales> activitySalesList=new ArrayList<>();
         for (String activityId: activityIdList){
             ActivitySales sales=getActivitySalesStatistics(activityId).getData();
+            Activity activity=(Activity) getActivityInformation(activityId).getData();
+            sales.setActivityName(activity.getActivityName());
             activitySalesList.add(sales);
         }
         res.setData(activitySalesList);
