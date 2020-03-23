@@ -225,7 +225,9 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public boolean lockStockInSupplyChain(ErpOrderInfo order, List<ErpOrderItem> itemList, AuthToken auth) {
-        log.info("创建订单,锁库存入参order={},itemList={},auth={}",order,itemList,auth);
+        log.info("创建订单,锁库存入参order={}",order);
+        log.info("创建订单,锁库存入参itemList={}",itemList);
+        log.info("创建订单,锁库存入参auth={}",auth);
         boolean flag = true;
         try {
 
