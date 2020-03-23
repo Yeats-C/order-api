@@ -1511,7 +1511,7 @@
         <if test="orderLock != null">
             and order_lock = #{orderLock}
         </if>
-        <if test="orderException != null'">
+        <if test="orderException != null">
             and order_exception = #{orderException}
         </if>
         </where>
