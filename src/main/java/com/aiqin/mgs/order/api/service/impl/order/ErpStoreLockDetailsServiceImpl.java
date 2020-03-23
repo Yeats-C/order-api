@@ -57,6 +57,7 @@ public class ErpStoreLockDetailsServiceImpl implements ErpStoreLockDetailsServic
             if(storeLockDetails1!=null){
                 ErpOrderItemSplitGroupResponse erpOrderItemSplitGroupResponse=new ErpOrderItemSplitGroupResponse();
                 BeanUtils.copyProperties(storeLockDetails1,erpOrderItemSplitGroupResponse);
+                erpOrderItemSplitGroupResponse.setLockCount(Long.valueOf(storeLockDetails1.getChangeCount()));
                 list.add(erpOrderItemSplitGroupResponse);
             }
         }
