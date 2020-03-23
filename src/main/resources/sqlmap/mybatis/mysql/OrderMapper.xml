@@ -1470,25 +1470,12 @@
         ORDER BY a.create_time DESC
     </select>
     <select id="selectListByQueryVO" resultType="com.aiqin.mgs.order.api.domain.response.order.QueryOrderListRespVO">
-        select order_store_code orderCode,
-        order_type_name orderType,
-        customer_name customerName,
-        transport_center_name transportCenterName,
-        warehouse_name warehouseName,
-        supplier_name supplierName,
-        order_status orderStatus,
-        create_time createDate,
-#         product_num productNum,
-#         product_total_amount productTotalAmount,
-#         product_channel_total_amount productChannelTotalAmount,
-        actual_product_count actualProductNum,
-#         actual_product_channel_total_amount actualProductChannelTotalAmount,
-#         actual_product_total_amount actualProductTotalAmount,
-        order_amount orderAmount,
-        create_by_name createByName,
-        create_time createTime,
-        update_by_name updateByName,
-        update_time updateTime
+        select order_store_code orderCode, order_type_name orderType, customer_name customerName,
+        transport_center_name transportCenterName, warehouse_name warehouseName, supplier_name supplierName,
+        order_status orderStatus, create_time createTime, create_by_name createByName,
+        update_by_name updateByName, update_time updateTime,
+        total_product_amount totalProductAmount, actual_product_count actualProductCount,
+        actual_total_product_amount actualTotalProductAmount
         from order_store_info
         <where>
         <if test="orderType != null">
@@ -1748,6 +1735,9 @@
                  left join order_store_detail_batch d on d.order_store_code = a.order_store_code
         where a.order_store_code = #{orderCode}
     </select>
-
+    <select id="orderProductBySum" resultType="java.lang.Long">
+      select sum(product_count) from order_store_detail
+      where order_store_code = #{orderStoreCode}
+    </select>
 </mapper>
 
