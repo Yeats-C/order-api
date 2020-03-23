@@ -328,7 +328,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             ErpCartQueryRequest erpCartQueryRequest=new ErpCartQueryRequest();
             erpCartQueryRequest.setProductType(orderType);
             erpCartQueryRequest.setStoreId(storeId);
+            log.info("创建订单,调用ERP购物车接口入参erpCartQueryRequest={}",erpCartQueryRequest);
             ErpCartQueryResponse erpCartQueryResponse = erpOrderCartService.queryErpCartList(erpCartQueryRequest, null);
+            log.info("创建订单,调用ERP购物车接口返回结果erpCartQueryResponse={}",erpCartQueryResponse);
             cartInfoList = erpCartQueryResponse.getCartInfoList();
             if (cartInfoList == null) {
                 throw new BusinessException("购物车没有勾选的商品");
