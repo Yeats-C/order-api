@@ -20,6 +20,7 @@ import com.aiqin.mgs.order.api.service.order.ErpStoreLockDetailsService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -33,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
@@ -223,7 +225,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public boolean lockStockInSupplyChain(ErpOrderInfo order, List<ErpOrderItem> itemList, AuthToken auth) {
-
+        log.info("创建订单,锁库存入参order={},itemList={},auth={}",order,itemList,auth);
         boolean flag = true;
         try {
 
@@ -243,13 +245,18 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                     count=count+item.getProductCount();
                 }
                 countMap.put(item.getSkuCode(),count);
+                //筛选出商品数据
                 if(ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductType())){
                     productList.add(item);
                 }
+                //筛选出赠品数据
                 if(ErpProductGiftEnum.GIFT.getCode().equals(item.getProductType())){
                     giftList.add(item);
                 }
             }
+            log.info("创建订单,锁库存,sku汇总countMap={}",countMap);
+            log.info("创建订单,锁库存,筛选出商品数据productList={}",productList);
+            log.info("创建订单,锁库存,筛选出赠品数据giftList={}",giftList);
             //过滤商品和赠品sku和行号的对应关系
             for(ErpOrderItem eoi:productList){
                 if(null==skuCodeLineMap.get(eoi.getSkuCode())){
