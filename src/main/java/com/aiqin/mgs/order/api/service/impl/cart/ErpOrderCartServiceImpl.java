@@ -28,6 +28,7 @@ import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +38,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 
+@Slf4j
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class ErpOrderCartServiceImpl implements ErpOrderCartService {
@@ -643,6 +645,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
             if (skuDetail == null) {
                 throw new BusinessException("未获取到商品" + item.getSkuName() + "信息");
             }
+            item.setStockNum(skuDetail.getStockNum());
             if (item.getAmount() > skuDetail.getStockNum()) {
                 throw new BusinessException("商品" + skuDetail.getSkuName() + "库存不足");
             }
@@ -830,6 +833,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
 
     @Override
     public ErpStoreCartQueryResponse queryCartGroupTemp(ErpQueryCartGroupTempRequest erpQueryCartGroupTempRequest, AuthToken auth) {
+        log.info("创建订单,查询订单结算缓存信息入参erpQueryCartGroupTempRequest={},auth={}",erpQueryCartGroupTempRequest,auth);
         Object o = redisService.get(erpQueryCartGroupTempRequest.getCartGroupTempKey());
         if (o == null) {
             throw new BusinessException("未找到结算数据或者结算数据已经过期");
@@ -839,6 +843,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
 
         ErpStoreCartQueryResponse queryResponse = JSON.parseObject(json, new TypeReference<ErpStoreCartQueryResponse>() {
         });
+        log.info("创建订单,查询订单结算缓存信息结果queryResponse={}",queryResponse);
         return queryResponse;
     }
 
@@ -1123,7 +1128,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         }
 
                     } else {
-
+                        flag = true;
                     }
 
                     if (flag) {
@@ -1194,7 +1199,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         }
 
                     } else {
-
+                        flag = true;
                     }
 
                     if (flag) {
@@ -1215,17 +1220,21 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         for (int i = 0; i < tempList.size(); i++) {
                             ErpOrderCartInfo item = tempList.get(i);
 
-                            //行减去活动优惠之后分摊的金额  =  当前活动的折扣点数（百分比） 乘以  商品原价（分销价）
-                            item.setLineAmountAfterActivity(restPreferentialAmount.multiply(item.getPrice()));
+                            //行减去活动优惠之后分摊的金额  =  当前活动的折扣点数（百分比） 乘以  商品原价（分销价） 乘以  商品数量
+                            item.setLineAmountAfterActivity(restPreferentialAmount.multiply(item.getPrice()).multiply(new BigDecimal(item.getAmount())).setScale(2, RoundingMode.HALF_UP));
                             //行活动优惠的金额，行根据活动使该行减少的金额，前端不显示  =  商品原价（分销价）  -  行活动优惠的金额，行根据活动使该行减少的金额，前端不显示
-                            item.setLineActivityDiscountTotal(item.getPrice().subtract(item.getLineActivityDiscountTotal()));
+                            item.setLineActivityDiscountTotal(item.getLineAmountTotal().subtract(item.getLineAmountAfterActivity()).setScale(2, RoundingMode.HALF_UP));
+                            //设置行活动价  = 当前活动的折扣点数（百分比） 乘以  商品原价（分销价）
+                            item.setActivityPrice(restPreferentialAmount.multiply(item.getPrice()).setScale(2, RoundingMode.HALF_UP));
+                            //设置行活动价汇总  = 当前活动的折扣点数（百分比） 乘以  商品原价（分销价） 乘以  商品数量
+//                            item.setLineActivityAmountTotal(restPreferentialAmount.multiply(item.getPrice()).multiply(new BigDecimal(item.getAmount())).setScale(2, RoundingMode.HALF_UP));
                         }
                     }
 
                 }
                 ;
                 break;
-            case TYPE_5:
+                case TYPE_5:
                 //特价
 
                 if (activityAmountTotal.compareTo(BigDecimal.ZERO) > 0) {
@@ -1238,11 +1247,18 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                             reduce= Double.valueOf(productMap.get(item.getSkuCode()).toString());
                         }
 
-                        //行减去活动优惠之后分摊的金额  =  活动特价金额
-                        item.setLineAmountAfterActivity(BigDecimal.valueOf(reduce));
+                        //行减去活动优惠之后分摊的金额  =  活动特价金额 乘以  商品数量
+                        item.setLineAmountAfterActivity(BigDecimal.valueOf(reduce).multiply(new BigDecimal(item.getAmount())).setScale(2, RoundingMode.HALF_UP));
 
                         //行活动优惠的金额，行根据活动使该行减少的金额，前端不显示  =   商品原价（分销价）- 减去活动优惠之后分摊的金额
-                        item.setLineActivityDiscountTotal(item.getPrice().multiply(item.getLineAmountAfterActivity()));
+                        item.setLineActivityDiscountTotal(item.getLineAmountTotal().subtract(item.getLineAmountAfterActivity()).setScale(2, RoundingMode.HALF_UP));
+
+                        //设置行活动价  = 当前活动的折扣点数（百分比） 乘以  商品原价（分销价）
+                        item.setActivityPrice(BigDecimal.valueOf(reduce).setScale(2, RoundingMode.HALF_UP));
+
+                        //行活动价汇总  =  活动特价金额 乘以  商品数量
+//                        item.setLineActivityAmountTotal(BigDecimal.valueOf(reduce).multiply(new BigDecimal(item.getAmount())).setScale(2, RoundingMode.HALF_UP));
+
                     }
                 }
 
@@ -1369,7 +1385,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         }
 
                     } else {
-
+                        flag = true;
                     }
 
                     if (flag) {
@@ -1398,7 +1414,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                                 item.setLineActivityDiscountTotal(lineActivityDiscountTotal);
                                 restPreferentialAmount = restPreferentialAmount.subtract(lineActivityDiscountTotal);
                             }
-                            item.setLineAmountAfterActivity(item.getLineActivityAmountTotal().subtract(item.getLineActivityDiscountTotal()));
+                            item.setLineAmountAfterActivity(item.getLineActivityAmountTotal().subtract(item.getLineActivityDiscountTotal()).setScale(2, RoundingMode.HALF_UP));
                         }
                     }
                 }
@@ -1445,7 +1461,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         }
 
                     } else {
-
+                        flag = true;
                     }
 
                     if (flag) {
@@ -1542,7 +1558,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         }
 
                     } else {
-
+                        flag = true;
                     }
 
                     if (flag) {
@@ -1563,10 +1579,14 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         for (int i = 0; i < tempList.size(); i++) {
                             ErpOrderCartInfo item = tempList.get(i);
 
-                            //行减去活动优惠之后分摊的金额  =  当前活动的折扣点数（百分比） 乘以  商品原价（分销价）
-                            item.setLineAmountAfterActivity(restPreferentialAmount.multiply(item.getPrice()));
+                            //行减去活动优惠之后分摊的金额  =  当前活动的折扣点数（百分比） 乘以  商品原价（分销价） 乘以  商品数量
+                            item.setLineAmountAfterActivity(restPreferentialAmount.multiply(item.getPrice()).multiply(new BigDecimal(item.getAmount())).setScale(2, RoundingMode.HALF_UP));
                             //行活动优惠的金额，行根据活动使该行减少的金额，前端不显示  =  商品原价（分销价）  -  行活动优惠的金额，行根据活动使该行减少的金额，前端不显示
-                            item.setLineActivityDiscountTotal(item.getPrice().subtract(item.getLineActivityDiscountTotal()));
+                            item.setLineActivityDiscountTotal(item.getLineAmountTotal().subtract(item.getLineAmountAfterActivity()).setScale(2, RoundingMode.HALF_UP));
+                            //设置行活动价  = 当前活动的折扣点数（百分比） 乘以  商品原价（分销价）
+                            item.setActivityPrice(restPreferentialAmount.multiply(item.getPrice()).setScale(2, RoundingMode.HALF_UP));
+                            //设置行活动价汇总  = 当前活动的折扣点数（百分比） 乘以  商品原价（分销价） 乘以  商品数量
+//                            item.setLineActivityAmountTotal(restPreferentialAmount.multiply(item.getPrice()).multiply(new BigDecimal(item.getAmount())).setScale(2, RoundingMode.HALF_UP));
                         }
                     }
 
@@ -1586,11 +1606,18 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                             reduce= Double.valueOf(productMap.get(item.getSkuCode()).toString());
                         }
 
-                        //行减去活动优惠之后分摊的金额  =  活动特价金额
-                        item.setLineAmountAfterActivity(BigDecimal.valueOf(reduce));
+                        //行减去活动优惠之后分摊的金额  =  活动特价金额 乘以  商品数量
+                        item.setLineAmountAfterActivity(BigDecimal.valueOf(reduce).multiply(new BigDecimal(item.getAmount())).setScale(2, RoundingMode.HALF_UP));
 
                         //行活动优惠的金额，行根据活动使该行减少的金额，前端不显示  =   商品原价（分销价）- 减去活动优惠之后分摊的金额
-                        item.setLineActivityDiscountTotal(item.getPrice().multiply(item.getLineAmountAfterActivity()));
+                        item.setLineActivityDiscountTotal(item.getLineAmountTotal().subtract(item.getLineAmountAfterActivity()).setScale(2, RoundingMode.HALF_UP));
+
+                        //设置行活动价  = 当前活动的折扣点数（百分比） 乘以  商品原价（分销价）
+                        item.setActivityPrice(BigDecimal.valueOf(reduce).setScale(2, RoundingMode.HALF_UP));
+
+                        //行活动价汇总  =  活动特价金额 乘以  商品数量
+//                        item.setLineActivityAmountTotal(BigDecimal.valueOf(reduce).multiply(new BigDecimal(item.getAmount())).setScale(2, RoundingMode.HALF_UP));
+
                     }
                 }
 
