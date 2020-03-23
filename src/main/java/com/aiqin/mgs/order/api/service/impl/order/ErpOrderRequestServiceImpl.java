@@ -243,6 +243,8 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 Long count=countMap.get(item.getSkuCode());
                 if(null!=countMap.get(item.getSkuCode())){
                     count=count+item.getProductCount();
+                }else {
+                    count=item.getProductCount();
                 }
                 countMap.put(item.getSkuCode(),count);
                 //筛选出商品数据
