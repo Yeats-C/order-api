@@ -42,7 +42,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<AreaReq> areaReq() {
-        LOGGER.info("eerp查询商品信息列表权限数据集合开始");
+        LOGGER.info("erp查询商品信息列表权限数据集合开始");
         List<AreaReq>  areaReqs=new ArrayList<>();
         //通过商品查询菜单code查出当前拥有权限的门店数据
         List<String> storeIdList=activityService.storeIds("ERP002003");
@@ -53,9 +53,12 @@ public class ProductServiceImpl implements ProductService {
             if(null!=provinceList&&0<provinceList.size()){
                 for (NewStoreCategory province:provinceList){
                     AreaReq areaReq=new AreaReq();
-                    areaReq.setCityCode(province.getCityId());
-                    areaReq.setProvinceCode(province.getProvinceId());
-                    areaReqs.add(areaReq);
+                    if(null!=province&&null!=province.getCityId()&&null!=province.getProvinceId()){
+                        areaReq.setCityCode(province.getCityId());
+                        areaReq.setProvinceCode(province.getProvinceId());
+                        areaReqs.add(areaReq);
+                    }
+
                 }
             }
 
