@@ -1,9 +1,12 @@
 package com.aiqin.mgs.order.api.domain.response.market;
 
+import com.aiqin.mgs.order.api.domain.OrderInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @author ch
@@ -29,5 +32,10 @@ public class ActivityReportOrderResp {
     @ApiModelProperty(value = "销售额")
     @JsonProperty("sale_amount")
     private Long saleAmount;
+
+    @JsonProperty("order_code")
+    @ApiModelProperty("订单编号集合")
+    private List<OrderInfo> orderCode;
+
 
 }

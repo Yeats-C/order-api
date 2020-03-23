@@ -6,7 +6,7 @@
         select
           t2.months_day as monthsDay,
           case when member_status=1 then t2.total else 0 end as memberOderCount,
-          sum(t2.total) as orderCount, t2.saleAmount as saleAmount
+          sum(t2.total) as orderCount, sum(t2.saleAmount) as saleAmount
         from(
             select
             t1.months_day , t1.member_status, count(t1.id) AS total, sum(t1.actual_price*t1.amount) as saleAmount
@@ -50,8 +50,41 @@
         group by od.order_id
     </select>
 
-    <select id="selectActivityOrderPackageSale" resultType="java.lang.Long">
-
+    <select id="selectActivityOrder" resultType="com.aiqin.mgs.order.api.domain.response.market.ActivityReportOrderResp">
+        select
+          case when member_status=1 then t2.total else 0 end as memberOderCount,
+          sum(t2.total) as orderCount, sum(t2.saleAmount) as saleAmount
+        from(
+            select
+            t1.member_status, count(t1.id) AS total, sum(t1.actual_price*t1.amount) as saleAmount
+            from(
+                select
+                 oi.id,
+                 case when length(TRIM(oi.member_id))>0 then '1' else '0' end as member_status,
+                 od.activity_id as activity_id, od.actual_price as actual_price, od.amount as amount
+                from order_info oi
+                left join order_detail od on oi.order_id = od.order_id
+               where oi.distributor_id='ABEC8D65036E5A45DBABCBA413FA56AEA2'
+            ) AS t1
+            where t1.activity_id = 'AF980FCB6366B84F799BF21BDD045AF50F'
+            group by t1.member_status order by t1.member_status desc
+        ) t2
     </select>
 
+    <select id="selectActivityOrderCode" resultType="com.aiqin.mgs.order.api.domain.OrderInfo">
+        select oi.order_code as orderCode
+        from order_detail od
+        left join order_info oi on od.order_id = oi.order_id
+        where oi.distributor_id=#{storeId}
+        and od.activity_id=#{activityId}
+    </select>
+
+    <select id="selectActivitySkuCode" resultType="String">
+        select sku_code as skuCodes
+        from order_info oi
+        left join order_detail od on od.order_id = oi.order_id
+        where
+        od.activity_id = #{activityId}
+        and oi.order_code = #{orderCodes}
+    </select>
 </mapper>

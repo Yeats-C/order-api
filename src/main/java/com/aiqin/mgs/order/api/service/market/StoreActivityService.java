@@ -23,4 +23,12 @@ public interface StoreActivityService {
      * @return
      */
     HttpResponse selectActivityOrderPackageSale(String packageProductId);
+
+    /**
+     *  查询活动数据报表实时订单情况
+     * @param storeId
+     * @param activityId
+     * @return
+     */
+    HttpResponse<ActivityReportOrderResp> selectActivityReportOrder(String storeId, String activityId);
 }

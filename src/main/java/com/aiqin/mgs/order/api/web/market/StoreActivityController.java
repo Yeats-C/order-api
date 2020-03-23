@@ -44,6 +44,18 @@ public class StoreActivityController {
             @ApiImplicitParam(name = "package_product_id", value = "套餐包id", dataType = "String", required = true)})
     public HttpResponse selectActivityOrderPackageSale(@RequestParam(name = "package_product_id", required = true) String packageProductId) {
         return storeActivityService.selectActivityOrderPackageSale(packageProductId);
-
     }
+
+    @GetMapping("/select/report/order")
+    @ApiOperation("查询活动数据报表实时订单情况")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "store_id", value = "门店id", dataType = "String", required = false),
+            @ApiImplicitParam(name = "activity_id", value = "活动id", dataType = "String", required = false)})
+    public HttpResponse<ActivityReportOrderResp> selectActivityReportOrder(@RequestParam(name = "store_id", required = false) String storeId,
+                                                                           @RequestParam(name = "activity_id", required = false) String activityId) {
+        return storeActivityService.selectActivityReportOrder(storeId, activityId);
+    }
+
+
+
 }
