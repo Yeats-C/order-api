@@ -1508,6 +1508,12 @@
         <if test="orderCode != null and orderCode != ''">
             and order_store_code LIKE CONCAT(#{orderCode},'%')
         </if>
+        <if test="orderLock != null">
+            and order_lock = #{orderLock}
+        </if>
+        <if test="orderException != null'">
+            and order_exception = #{orderException}
+        </if>
         </where>
         order by create_time desc
     </select>
