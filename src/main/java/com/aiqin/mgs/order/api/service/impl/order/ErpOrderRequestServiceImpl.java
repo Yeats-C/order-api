@@ -19,8 +19,11 @@ import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
 import com.aiqin.mgs.order.api.service.order.ErpStoreLockDetailsService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -300,20 +303,27 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             paramMap.put("order_type", order.getOrderTypeCode());
             paramMap.put("detail_list", list);
 
-            logger.info("锁库请求参数：", paramMap);
+            logger.info("锁库请求参数paramMap={}", paramMap);
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/lock/info").json(paramMap);
-            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
-            });
-            logger.info("锁库请求返回结果：", response);
-            if (!RequestReturnUtil.validateHttpResponse(response)) {
-                throw new BusinessException(response.getMessage());
+
+//            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
+//            });
+//            logger.info("锁库请求返回结果response={}", response);
+//            if (!RequestReturnUtil.validateHttpResponse(response)) {
+//                throw new BusinessException(response.getMessage());
+//            }
+            Map<String,Object> result1=httpClient.action().result(new TypeReference<Map<String,Object>>() {});
+            log.info("锁库请求返回结果，result1={}", JSON.toJSON(result1));
+            if(result1==null){
+                log.info("锁库请求返回失败");
+//                return false;
+                throw new BusinessException("锁库请求失败");
             }
-            //本地缓存锁库存信息
-            if(null!=response.getData()){
-                List<StockVoRequest> list1 =(List<StockVoRequest>)response.getData();
-                logger.info("锁库请求返回结果list1={}", list1);
+            if (StringUtils.isNotBlank(result1.get("code").toString()) && "0".equals(String.valueOf(result1.get("code")))) {
+                List<StockVoRequest> list2 = JSONArray.parseArray(JSON.toJSONString(result1.get("data")), StockVoRequest.class);
+                log.info("锁库请求返回list结果为list1={}",list2);
                 List<StoreLockDetails> records=new ArrayList<>();
-                for(StockVoRequest stockVoRequest:list1){
+                for(StockVoRequest stockVoRequest:list2){
                     StoreLockDetails storeLockDetail=new StoreLockDetails();
                     BeanUtils.copyProperties(stockVoRequest,storeLockDetail);
                     if(null!=stockVoRequest.getSkuCode()&&null!=skuCodeLineMap.get(stockVoRequest.getSkuCode())){
@@ -323,7 +333,28 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                     records.add(storeLockDetail);
                 }
                 erpStoreLockDetailsService.insertStoreLockDetails(records);
+            } else {
+//                log.info("锁库请求返回list结果异常");
+//                return false;
+                throw new BusinessException("锁库请求失败");
             }
+            //本地缓存锁库存信息
+//            if(null!=response.getData()){
+//                Map listMap=(Map)response.getData();
+//                List<StockVoRequest> list1 =(List<StockVoRequest>)response.getData();
+//                logger.info("锁库请求返回结果list1={}", list1);
+//                List<StoreLockDetails> records=new ArrayList<>();
+//                for(StockVoRequest stockVoRequest:list1){
+//                    StoreLockDetails storeLockDetail=new StoreLockDetails();
+//                    BeanUtils.copyProperties(stockVoRequest,storeLockDetail);
+//                    if(null!=stockVoRequest.getSkuCode()&&null!=skuCodeLineMap.get(stockVoRequest.getSkuCode())){
+//                        Long loneCode=Long.valueOf(skuCodeLineMap.get(stockVoRequest.getSkuCode()).toString());
+//                        storeLockDetail.setLineCode(loneCode);
+//                    }
+//                    records.add(storeLockDetail);
+//                }
+//                erpStoreLockDetailsService.insertStoreLockDetails(records);
+//            }
         } catch (BusinessException e) {
             flag = false;
             logger.error("锁定库存失败：{}", e.getMessage());
