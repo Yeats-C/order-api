@@ -373,6 +373,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             List<Map<String, Object>> list = new ArrayList<>();
 
             Map<String,Long> countMap=new HashMap<>();
+            List<String> skuCodes=new ArrayList<>();
             //汇总sku
             for(ErpOrderItem item:order.getItemList()){
                 Long count=countMap.get(item.getSkuCode());
@@ -391,6 +392,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 paramItemMap.put("company_code", order.getCompanyCode());
                 paramItemMap.put("company_name", order.getCompanyName());
                 list.add(paramItemMap);
+                skuCodes.add(skuCode);
             }
 
 //            for (ErpOrderItem item :
@@ -421,6 +423,13 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             if (!RequestReturnUtil.validateHttpResponse(response)) {
                 throw new BusinessException(response.getMessage());
             }
+            log.info("清除本地锁库存记录,入参skuCodes={}",skuCodes);
+            if(skuCodes!=null&&skuCodes.size()>0){
+                for(String skuCode:skuCodes){
+                    erpStoreLockDetailsService.deleteBySkuCode(skuCode);
+                }
+            }
+
         } catch (BusinessException e) {
             flag = false;
             logger.error("解锁库存失败：{}", e.getMessage());
