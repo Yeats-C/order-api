@@ -1562,6 +1562,7 @@
         <result column="adiscount_amount" jdbcType="DECIMAL" property="discountAmount" />
         <result column="asuit_coupon_money" jdbcType="DECIMAL" property="suitCouponMoney" />
         <result column="atop_coupon_money" jdbcType="DECIMAL" property="topCouponMoney" />
+        <result column="aactual_order_amount" jdbcType="DECIMAL" property="actualOrderAmount" />
         <collection property="productList" ofType="com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoItemRespVO">
             <result column="bsku_code" jdbcType="VARCHAR" property="skuCode" />
             <result column="bsku_name" jdbcType="VARCHAR" property="skuName" />
@@ -1620,7 +1621,7 @@
         a.actual_product_count aactual_product_count, a.total_volume atotal_volume, a.total_weight atotal_weight,
         a.actual_total_volume aactual_total_volume, a.actual_total_weight aactual_total_weight,
         a.total_product_amount atotal_product_amount, a.order_amount aorder_amount,
-        a.deliver_amount adeliver_amount, a.actual_total_product_amount aactual_total_product_amount,
+        a.deliver_amount adeliver_amount,
 
         b.sku_code bsku_code, b.sku_name bsku_name, b.picture_url bpicture_url,
         b.product_spec bspec, b.color_name bcolor_name, b.model_code bmodel, b.unit_name bunit_name,
@@ -1634,7 +1635,8 @@
         o.operation_type ooperation_type, o.operation_content ooperation_content,
         o.remark oremark, o.create_by_name ocreate_by_name, o.create_time ocreate_time,
 
-        f.suit_coupon_money asuit_coupon_money, f.top_coupon_money atop_coupon_money
+        f.suit_coupon_money asuit_coupon_money, f.top_coupon_money atop_coupon_money,
+        f.total_money aactual_total_product_amount, f.pay_money aactual_order_amount
 
 --         d.sku_code dsku_code, d.sku_name dsku_name, d.batch_code dbatch_code,
 --         d.product_date dproduct_date, d.batch_remark dbatch_remark,

@@ -29,7 +29,7 @@ public class ReturnGoodsController {
     @ApiOperation("退货单管理")
     @PostMapping("/returnOrderManagement")
     public HttpResponse<BasePage<QueryReturnOrderManagementRespVO>> returnOrderManagement(@RequestBody QueryReturnOrderManagementReqVO reqVO){
-        log.info("ReturnGoodsController---returnOrderManagement---param：[{}]", JSONObject.toJSONString(reqVO));
+        log.info("爱亲供应链退货单列表入参：[{}]", JSONObject.toJSONString(reqVO));
         try {
             return HttpResponse.success(returnGoodsService.returnOrderManagement(reqVO));
         } catch (Exception e) {
@@ -41,7 +41,7 @@ public class ReturnGoodsController {
     @ApiOperation("退货详情")
     @GetMapping("/returnOrderDetail")
     public HttpResponse<ReturnOrderDetailRespVO> returnOrderDetail(@RequestParam String code){
-        log.info("ReturnGoodsController---returnOrderDetail---param：[{}]", code);
+        log.info("爱亲供应链退货单详情入参：[{}]", code);
         try {
             return HttpResponse.success(returnGoodsService.returnOrderDetail(code));
         }catch (Exception e) {
