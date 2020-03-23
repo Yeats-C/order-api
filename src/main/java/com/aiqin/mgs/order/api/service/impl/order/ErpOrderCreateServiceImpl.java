@@ -425,7 +425,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             //优惠分摊总金额
             orderItem.setTotalPreferentialAmount(item.getLineAmountAfterActivity());
             //分摊后单价
-            orderItem.setPreferentialAmount(item.getLineAmountAfterActivity().divide(new BigDecimal(item.getAmount()),2, RoundingMode.DOWN));
+            if(null!=item.getLineAmountAfterActivity()){
+                orderItem.setPreferentialAmount(item.getLineAmountAfterActivity().divide(new BigDecimal(item.getAmount()),2, RoundingMode.DOWN));
+            }else{
+                orderItem.setPreferentialAmount(BigDecimal.ZERO);
+            }
             //活动优惠总金额
             orderItem.setTotalAcivityAmount(item.getLineActivityDiscountTotal());
             //税率
