@@ -383,6 +383,15 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                     cartLineList) {
                 totalNumber += item.getAmount();
                 accountActualPrice = accountActualPrice.add(item.getPrice().multiply(new BigDecimal(item.getAmount())));
+                //后来新加的
+                BigDecimal totalMoney = item.getPrice().multiply(new BigDecimal(item.getAmount()));
+                item.setActivityPrice(item.getPrice());
+                item.setLineAmountTotal(totalMoney);
+                item.setLineActivityAmountTotal(totalMoney);
+                item.setLineActivityDiscountTotal(BigDecimal.ZERO);
+                item.setLineAmountAfterActivity(totalMoney);
+                item.setActivityId(null);
+
             }
         }
         ErpCartQueryResponse queryResponse = new ErpCartQueryResponse();

@@ -277,7 +277,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 //    private List<CartOrderInfo> getStoreCartProductList(String cartGroupTempKey,String storeId, Integer orderType, ErpOrderSourceEnum orderSourceEnum) {
     private List<ErpOrderCartInfo> getStoreCartProductList(String cartGroupTempKey,String storeId, Integer orderType, ErpOrderSourceEnum orderSourceEnum) {
         log.info("创建订单,获取购物车商品入参cartGroupTempKey={},storeId={},orderType={},orderSourceEnum={}",cartGroupTempKey,storeId,orderType,orderSourceEnum);
-        List<CartOrderInfo> list = new ArrayList<>();
+//        List<CartOrderInfo> list = new ArrayList<>();
         List<ErpOrderCartInfo> cartInfoList=new ArrayList<>();
 
         if (ErpOrderSourceEnum.STORE == orderSourceEnum) {
@@ -330,7 +330,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             erpCartQueryRequest.setStoreId(storeId);
             ErpCartQueryResponse erpCartQueryResponse = erpOrderCartService.queryErpCartList(erpCartQueryRequest, null);
             cartInfoList = erpCartQueryResponse.getCartInfoList();
-            if (list == null) {
+            if (cartInfoList == null) {
                 throw new BusinessException("购物车没有勾选的商品");
             }
         }
