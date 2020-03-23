@@ -20,6 +20,9 @@ public class StoreActivityServiceImpl implements StoreActivityService{
     public HttpResponse<List<ActivityReportOrderResp>> selectActivityReportOrderInfo(String storeId, String activityId, String beginTime, String finishTime) {
         // 获取订单数
         List<ActivityReportOrderResp> activityReportOrderResps  = storeActivityDao.selectActivityReportOrder(storeId, activityId, beginTime, finishTime);
+        for (ActivityReportOrderResp a : activityReportOrderResps) {
+            a.setOrderCount(a.getMemberOderCount() + a.getOrderCount());
+        }
         return HttpResponse.success(activityReportOrderResps);
     }
 

@@ -18,13 +18,13 @@ public class ActivityReportOrderResp {
     @JsonProperty("months_day")
     private String monthsDay;
 
-    @ApiModelProperty(value = "会员状态 （0 非会员，1 会员）")
-    @JsonProperty("member_status")
-    private Integer memberStatus;
-
     @ApiModelProperty(value = "订单数")
     @JsonProperty("order_count")
     private Long orderCount;
+
+    @ApiModelProperty(value = "会员订单数")
+    @JsonProperty("member_order_count")
+    private Long memberOderCount;
 
     @ApiModelProperty(value = "销售额")
     @JsonProperty("sale_amount")
