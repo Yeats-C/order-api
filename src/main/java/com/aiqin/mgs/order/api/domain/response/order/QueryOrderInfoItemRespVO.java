@@ -38,63 +38,37 @@ public class QueryOrderInfoItemRespVO {
     @ApiModelProperty("拆零系数")
     private Integer zeroDisassemblyCoefficient;
 
-    @ApiModelProperty("是否是赠品(0否1是)")
-    private Integer givePromotion;
-
     @ApiModelProperty("商品类型  0商品 1赠品")
     private Integer productType;
 
-    @ApiModelProperty("批次号")
-    private String batchNumber;
-
     @ApiModelProperty("分销单价")
-    private BigDecimal price;
+    private BigDecimal productAmount;
 
     @ApiModelProperty("渠道单价")
-    private BigDecimal channelUnitPrice;
-
-    @ApiModelProperty("渠道总价")
-    private BigDecimal totalChannelPrice;
+    private BigDecimal purchaseAmount;
 
     @ApiModelProperty("数量")
-    private Long num;
+    private Long productCount;
 
-    @ApiModelProperty("分销总价 分销单价*数量")
-    private Long amount;
+    @ApiModelProperty("分销总价")
+    private BigDecimal totalProductAmount;
+
+    @ApiModelProperty("实发商品数量")
+    private Long actualProductCount;
 
     @ApiModelProperty("活动分摊")
-    private BigDecimal activityApportionment;
+    private BigDecimal totalAcivityAmount;
 
     @ApiModelProperty("优惠分摊")
-    private BigDecimal preferentialAllocation;
-
-    @ApiModelProperty("实发数量")
-    private Long actualDeliverNum;
+    private BigDecimal totalPreferentialAmount;
 
     @ApiModelProperty("活动编码(多个，隔开）")
     private String activityCode;
 
-    @ApiModelProperty("商品行号")
-    private Long productLineNum;
-
     @ApiModelProperty("赠品行号")
-    private Long promotionLineNum;
+    private Long giftLineCode;
 
     @ApiModelProperty("退货数量")
-    private Long returnNum;
+    private Long returnProductCount;
 
-    @ApiModelProperty("实际渠道单价")
-    private BigDecimal actualChannelUnitPrice;
-
-    @ApiModelProperty("实际渠道总价")
-    private BigDecimal actualTotalChannelPrice;
-
-    @ApiModelProperty("实际分销总价")
-    private BigDecimal actualAmount;
-
-    @ApiModelProperty("实际分销单价")
-    private BigDecimal actualPrice;
-
-    @ApiModelProperty("熙耘采购价")
-    private BigDecimal purchaseAmount;
 }
