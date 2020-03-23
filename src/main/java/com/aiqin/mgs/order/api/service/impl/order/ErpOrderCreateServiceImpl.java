@@ -113,6 +113,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         }
         //获取门店信息
         StoreInfo storeInfo = erpOrderRequestService.getStoreInfoByStoreId(erpOrderSaveRequest.getStoreId());
+        log.info("创建订单,获取门店信息返回结果storeInfo={}",storeInfo);
         //获取购物车商品
 //        List<CartOrderInfo> cartProductList = getStoreCartProductList(erpOrderSaveRequest.getCartGroupTempKey(),erpOrderSaveRequest.getStoreId(), erpOrderSaveRequest.getOrderType(),orderSourceEnum);
         List<ErpOrderCartInfo> cartProductList = getStoreCartProductList(erpOrderSaveRequest.getCartGroupTempKey(),erpOrderSaveRequest.getStoreId(), erpOrderSaveRequest.getOrderType(),orderSourceEnum);
@@ -129,6 +130,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //生成订单主体信息
         ErpOrderInfo order = generateOrder(erpOrderItemList, storeInfo, erpOrderSaveRequest, orderFee,auth);
+        log.info("创建订单,生成订单主体信息返回结果order={}",order);
         //保存订单、订单明细、订单支付、订单收货人信息、订单日志
         String orderId = insertOrder(order,orderFee, storeInfo, auth, erpOrderSaveRequest);
         //删除购物车商品
@@ -274,7 +276,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      */
 //    private List<CartOrderInfo> getStoreCartProductList(String cartGroupTempKey,String storeId, Integer orderType, ErpOrderSourceEnum orderSourceEnum) {
     private List<ErpOrderCartInfo> getStoreCartProductList(String cartGroupTempKey,String storeId, Integer orderType, ErpOrderSourceEnum orderSourceEnum) {
-
+        log.info("创建订单,获取购物车商品入参cartGroupTempKey={},storeId={},orderType={},orderSourceEnum={}",cartGroupTempKey,storeId,orderType,orderSourceEnum);
         List<CartOrderInfo> list = new ArrayList<>();
         List<ErpOrderCartInfo> cartInfoList=new ArrayList<>();
 
@@ -286,7 +288,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 //            HttpResponse listHttpResponse = cartOrderService.displayCartLineCheckProduct(cartOrderInfoQuery);
             ErpQueryCartGroupTempRequest erpQueryCartGroupTempRequest=new ErpQueryCartGroupTempRequest();
             erpQueryCartGroupTempRequest.setCartGroupTempKey(cartGroupTempKey);
+            log.info("创建订单,调用查询购物车接口入参erpQueryCartGroupTempRequest={}",erpQueryCartGroupTempRequest);
             ErpStoreCartQueryResponse erpStoreCartQueryResponse = erpOrderCartService.queryCartGroupTemp(erpQueryCartGroupTempRequest, null);
+            log.info("创建订单,调用查询购物车接口返回结果erpStoreCartQueryResponse={}",erpStoreCartQueryResponse);
             if(erpStoreCartQueryResponse==null){
                 throw new BusinessException("获取购物车商品失败");
             }
@@ -346,7 +350,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      */
 //    private List<ErpOrderItem> generateOrderItemList(List<CartOrderInfo> cartProductList, StoreInfo storeInfo, ErpOrderNodeProcessTypeEnum processTypeEnum) {
     private List<ErpOrderItem> generateOrderItemList(List<ErpOrderCartInfo> cartProductList, StoreInfo storeInfo, ErpOrderNodeProcessTypeEnum processTypeEnum) {
-
+        log.info("构建订单商品明细行数据入参cartProductList={},storeInfo={},processTypeEnum={}",cartProductList,storeInfo,processTypeEnum);
         //商品详情Map
         Map<String, ProductInfo> productMap = new HashMap<>(16);
 
@@ -463,7 +467,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
             orderItemList.add(orderItem);
         }
-
+        log.info("构建订单商品明细行数据返回结果orderItemList={}",orderItemList);
         return orderItemList;
     }
 

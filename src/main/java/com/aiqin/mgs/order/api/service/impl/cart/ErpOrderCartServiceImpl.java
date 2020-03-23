@@ -28,6 +28,7 @@ import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +38,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 
+@Slf4j
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class ErpOrderCartServiceImpl implements ErpOrderCartService {
@@ -831,6 +833,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
 
     @Override
     public ErpStoreCartQueryResponse queryCartGroupTemp(ErpQueryCartGroupTempRequest erpQueryCartGroupTempRequest, AuthToken auth) {
+        log.info("创建订单,查询订单结算缓存信息入参erpQueryCartGroupTempRequest={},auth={}",erpQueryCartGroupTempRequest,auth);
         Object o = redisService.get(erpQueryCartGroupTempRequest.getCartGroupTempKey());
         if (o == null) {
             throw new BusinessException("未找到结算数据或者结算数据已经过期");
@@ -840,6 +843,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
 
         ErpStoreCartQueryResponse queryResponse = JSON.parseObject(json, new TypeReference<ErpStoreCartQueryResponse>() {
         });
+        log.info("创建订单,查询订单结算缓存信息结果queryResponse={}",queryResponse);
         return queryResponse;
     }
 
