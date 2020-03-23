@@ -24,13 +24,13 @@ import java.util.Objects;
  */
 @Service
 public class ReturnGoodsServiceImpl implements ReturnGoodsService {
+
     @Autowired
     private ReturnOrderInfoDao returnOrderInfoMapper;
 
     @Override
     public BasePage<QueryReturnOrderManagementRespVO> returnOrderManagement(QueryReturnOrderManagementReqVO reqVO) {
         PageHelper.startPage(reqVO.getPageNo(), reqVO.getPageSize());
-        // reqVO.setCompanyCode(getUser().getCompanyCode());
         List<QueryReturnOrderManagementRespVO> list = returnOrderInfoMapper.selectReturnOrderManagementList(reqVO);
         return PageUtil.getPageList(reqVO.getPageNo(), list);
     }

@@ -1273,6 +1273,7 @@
   <select id="selectReturnOrderManagementList" resultType="com.aiqin.mgs.order.api.domain.response.returngoods.QueryReturnOrderManagementRespVO">
     select
     return_order_code returnOrderCode,
+    order_store_code orderStoreCode,
     return_order_type returnOrderType,
     customer_name customerName,
     transport_center_name transportCenterName,
@@ -1280,13 +1281,13 @@
     supplier_name supplierName,
     return_order_status orderStatus,
     create_time createDate,
-    product_count productNum,
+    product_count productCount,
     return_order_amount returnOrderAmount,
     create_by_name createByName,
     create_time createTime,
     update_time updateTime,
     update_by_name updateByName,
-    actual_product_count actualProductNum,
+    actual_product_count actualProductCount,
     actual_product_count actualProductTotalAmount
     from return_order_info
     <where>

@@ -16,7 +16,22 @@ public class QueryReturnOrderManagementRespVO {
     private String returnOrderCode;
 
     @ApiModelProperty("订单编码(订单号)")
-    private String orderCode;
+    private String orderStoreCode;
+
+    @ApiModelProperty("退货类型：客户退货、缺货退货、售后退货")
+    private String returnOrderType;
+
+    @ApiModelProperty("客户名称")
+    private String customerName;
+
+    @ApiModelProperty("仓库名称")
+    private String transportCenterName;
+
+    @ApiModelProperty("库房名称")
+    private String warehouseName;
+
+    @ApiModelProperty("供应商名称")
+    private String supplierName;
 
     @ApiModelProperty("退货单状态")
     private String orderStatus;
@@ -25,41 +40,17 @@ public class QueryReturnOrderManagementRespVO {
         this.orderStatus = ReturnOrderStatus.getAllStatus().get(orderStatus).getBackgroundOrderStatus();
     }
 
-    @ApiModelProperty("退货类型：客户退货、缺货退货、售后退货")
-    private String returnOrderType;
-
-    @ApiModelProperty("物流中心名称")
-    private String transportCenterName;
-
-    @ApiModelProperty("仓库名称")
-    private String warehouseName;
-
-    @ApiModelProperty("供应商名称")
-    private String supplierName;
-
-    @ApiModelProperty("客户名称")
-    private String customerName;
-
     @ApiModelProperty("商品数量")
-    private Long productNum;
-
-    @ApiModelProperty("分销总金额")
-    private Long productTotalAmount;
+    private Long productCount;
 
     @ApiModelProperty("退货金额")
     private Long returnOrderAmount;
 
     @ApiModelProperty("实际退货数量")
-    private Long actualProductNum;
+    private Long actualProductCount;
 
-    @ApiModelProperty("实际渠道总金额")
-    private Long actualProductChannelTotalAmount;
-
-    @ApiModelProperty("实际分销总金额")
+    @ApiModelProperty("实退商品金额")
     private Long actualProductTotalAmount;
-
-    @ApiModelProperty("渠道总金额")
-    private Long productChannelTotalAmount;
 
     @ApiModelProperty("创建人名称")
     private String createByName;
@@ -74,6 +65,5 @@ public class QueryReturnOrderManagementRespVO {
     @ApiModelProperty("修改时间")
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
-
 
 }

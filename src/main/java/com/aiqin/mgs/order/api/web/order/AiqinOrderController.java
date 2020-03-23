@@ -44,7 +44,7 @@ public class AiqinOrderController {
     @ApiOperation("订单详情")
     @GetMapping("/view")
     public HttpResponse<QueryOrderInfoRespVO> view(@RequestParam String orderCode){
-        log.info("OrderController---view---param：[{}]", orderCode);
+        log.info("爱亲供应链订单详情参数：[{}]", orderCode);
         try {
             return HttpResponse.success(orderService.view(orderCode));
         }catch (Exception e) {
