@@ -742,13 +742,13 @@
   </select>
     <select id="list" resultType="com.aiqin.mgs.order.api.domain.response.purchase.RejectRecordInfo">
       select
-      id, reject_record_id rejectRecordId,reject_record_code rejectRecordCode, supplier_code supplierCode,
-      supplier_name supplierName,transport_center_code transportCenterName, warehouse_code warehouseCode,
-      warehouse_name warehouseName,reject_record_status rejectStatus,
+      reject_record_id rejectRecordId, reject_record_code rejectRecordCode, supplier_code supplierCode,
+      supplier_name supplierName, transport_center_name transportCenterName, transport_center_code transportCenterCode,
+      warehouse_code warehouseCode, warehouse_name warehouseName, reject_record_status rejectRecordStatus,
       purchase_group_code purchaseGroupCode,purchase_group_name purchaseGroupName, remark,
-      total_count singleCount,total_tax_amount productAmount,actual_total_tax_amount actualProductAmount,
+      total_count totalCount,total_tax_amount totalTaxAmount,actual_total_tax_amount actualTotalTaxAmount,
       create_by_id createById, create_by_name createByName, update_by_id updateBy_Id, update_by_name updateByName,
-      create_time createTime,update_time updateTime
+      create_time createTime,update_time updateTime, actual_total_count actualTotalCount
       from reject_record
       <where>
         <if test="rejectRecordCode!=null and rejectRecordCode!=''">

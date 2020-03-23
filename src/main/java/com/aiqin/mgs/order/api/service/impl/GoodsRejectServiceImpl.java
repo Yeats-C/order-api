@@ -12,7 +12,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -30,11 +29,6 @@ public class GoodsRejectServiceImpl implements GoodsRejectService {
 
     @Override
     public HttpResponse<PageResData<RejectRecordInfo>> rejectList(RejectQueryRequest rejectApplyQueryRequest) {
-        // List<PurchaseGroupVo> groupVoList = purchaseGroupService.getPurchaseGroup(null);
-        // if (CollectionUtils.isEmpty(groupVoList)) {
-        //     return HttpResponse.successGenerics(new PageResData<>());
-        // }
-        // rejectApplyQueryRequest.setGroupList(groupVoList);
         List<RejectRecordInfo> list = rejectRecordDao.list(rejectApplyQueryRequest);
         Integer count = rejectRecordDao.listCount(rejectApplyQueryRequest);
         return HttpResponse.successGenerics(new PageResData<>(count, list));
