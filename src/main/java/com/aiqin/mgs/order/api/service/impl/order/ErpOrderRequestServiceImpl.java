@@ -225,7 +225,9 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public boolean lockStockInSupplyChain(ErpOrderInfo order, List<ErpOrderItem> itemList, AuthToken auth) {
-        log.info("创建订单,锁库存入参order={},itemList={},auth={}",order,itemList,auth);
+        log.info("创建订单,锁库存入参order={}",order);
+        log.info("创建订单,锁库存入参itemList={}",itemList);
+        log.info("创建订单,锁库存入参auth={}",auth);
         boolean flag = true;
         try {
 
@@ -243,6 +245,8 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 Long count=countMap.get(item.getSkuCode());
                 if(null!=countMap.get(item.getSkuCode())){
                     count=count+item.getProductCount();
+                }else {
+                    count=item.getProductCount();
                 }
                 countMap.put(item.getSkuCode(),count);
                 //筛选出商品数据
