@@ -35,30 +35,17 @@ public class QueryOrderListRespVO {
     @ApiModelProperty("订单状态(状态有点多，后面补)")
     private String orderStatus;
 
-    @ApiModelProperty("创建时间")
-    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createDate;
+    @ApiModelProperty("商品数量")
+    private Long productCount;
+
+    @ApiModelProperty("实发商品数量")
+    private Long actualProductCount;
 
     @ApiModelProperty("订单金额")
-    private BigDecimal orderAmount;
+    private BigDecimal totalProductAmount;
 
-    @ApiModelProperty("商品分销价总金额")
-    private BigDecimal productTotalAmount;
-
-    @ApiModelProperty("商品渠道价总金额")
-    private BigDecimal productChannelTotalAmount;
-
-    @ApiModelProperty("商品数量")
-    private Long productNum;
-
-    @ApiModelProperty("实际发货数量")
-    private Long actualProductNum;
-
-    @ApiModelProperty("实际渠道总价")
-    private BigDecimal actualProductChannelTotalAmount;
-
-    @ApiModelProperty("实际分销总价")
-    private BigDecimal actualProductTotalAmount;
+    @ApiModelProperty("实发订单金额")
+    private BigDecimal actualTotalProductAmount;
 
     @ApiModelProperty("创建人")
     private String createByName;

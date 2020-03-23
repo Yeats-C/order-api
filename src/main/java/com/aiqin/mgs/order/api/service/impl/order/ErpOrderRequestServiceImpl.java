@@ -6,19 +6,25 @@ import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderLockStockTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderNodeProcessTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpProductGiftEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.*;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.po.order.*;
+import com.aiqin.mgs.order.api.domain.request.StockVoRequest;
 import com.aiqin.mgs.order.api.domain.request.order.PayRequest;
 import com.aiqin.mgs.order.api.domain.response.ProductSkuDetailResponse;
 import com.aiqin.mgs.order.api.domain.response.order.*;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
+import com.aiqin.mgs.order.api.service.order.ErpStoreLockDetailsService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -28,11 +34,14 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Resource
     private UrlProperties urlProperties;
+    @Autowired
+    private ErpStoreLockDetailsService erpStoreLockDetailsService;
 
     private static final Logger logger = LoggerFactory.getLogger(ErpOrderRequestServiceImpl.class);
 
@@ -67,15 +76,17 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public ProductInfo getSkuDetail(String companyCode, String skuCode) {
-
+        logger.info("查询sku详情入参,companyCode={},skuCode={}",companyCode,skuCode);
         String url = urlProperties.getProductApi() + "/search/spu/sku/detail";
         url += "?company_code=" + companyCode;
         url += "&sku_code=" + skuCode;
         ProductInfo product = new ProductInfo();
         try {
+            logger.info("查询sku详情url={}",url);
             HttpClient httpClient = HttpClient.get(url);
             HttpResponse<ProductSkuDetailResponse> response = httpClient.action().result(new TypeReference<HttpResponse<ProductSkuDetailResponse>>() {
             });
+            logger.info("查询sku详情返回结果response={}",response.toString());
             if (!RequestReturnUtil.validateHttpResponse(response)) {
                 throw new BusinessException("获取商品信息失败");
             }
@@ -214,21 +225,71 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public boolean lockStockInSupplyChain(ErpOrderInfo order, List<ErpOrderItem> itemList, AuthToken auth) {
-
+        log.info("创建订单,锁库存入参order={}",order);
+        log.info("创建订单,锁库存入参itemList={}",itemList);
+        log.info("创建订单,锁库存入参auth={}",auth);
         boolean flag = true;
         try {
 
             //TODO 按照sku汇总数量
             List<Map<String, Object>> list = new ArrayList<>();
-            for (ErpOrderItem item :
-                    itemList) {
+            Map<String,Long> countMap=new HashMap<>();
+            //记录skuCode和行号对应关系
+            Map<String,Long> skuCodeLineMap=new HashMap<>();
+            //赠品
+            List<ErpOrderItem> giftList=new ArrayList<>();
+            //本品
+            List<ErpOrderItem> productList=new ArrayList<>();
+            //汇总sku
+            for(ErpOrderItem item:itemList){
+                Long count=countMap.get(item.getSkuCode());
+                if(null!=countMap.get(item.getSkuCode())){
+                    count=count+item.getProductCount();
+                }else {
+                    count=item.getProductCount();
+                }
+                countMap.put(item.getSkuCode(),count);
+                //筛选出商品数据
+                if(ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductType())){
+                    productList.add(item);
+                }
+                //筛选出赠品数据
+                if(ErpProductGiftEnum.GIFT.getCode().equals(item.getProductType())){
+                    giftList.add(item);
+                }
+            }
+            log.info("创建订单,锁库存,sku汇总countMap={}",countMap);
+            log.info("创建订单,锁库存,筛选出商品数据productList={}",productList);
+            log.info("创建订单,锁库存,筛选出赠品数据giftList={}",giftList);
+            //过滤商品和赠品sku和行号的对应关系
+            for(ErpOrderItem eoi:productList){
+                if(null==skuCodeLineMap.get(eoi.getSkuCode())){
+                    skuCodeLineMap.put(eoi.getSkuCode(),eoi.getLineCode());
+                }
+            }
+            for(ErpOrderItem eoi:giftList){
+                if(null==skuCodeLineMap.get(eoi.getSkuCode())){
+                    skuCodeLineMap.put(eoi.getSkuCode(),eoi.getLineCode());
+                }
+            }
+            for(Map.Entry<String,Long> data:countMap.entrySet()){
+                String skuCode=data.getKey();
                 Map<String, Object> paramItemMap = new HashMap<>(16);
-                paramItemMap.put("change_count", item.getProductCount());
+                paramItemMap.put("change_count", countMap.get(skuCode));
                 paramItemMap.put("city_code", order.getCityId());
                 paramItemMap.put("province_code", order.getProvinceId());
-                paramItemMap.put("sku_code", item.getSkuCode());
+                paramItemMap.put("sku_code", skuCode);
                 list.add(paramItemMap);
             }
+//            for (ErpOrderItem item :
+//                    itemList) {
+//                Map<String, Object> paramItemMap = new HashMap<>(16);
+//                paramItemMap.put("change_count", item.getProductCount());
+//                paramItemMap.put("city_code", order.getCityId());
+//                paramItemMap.put("province_code", order.getProvinceId());
+//                paramItemMap.put("sku_code", item.getSkuCode());
+//                list.add(paramItemMap);
+//            }
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("company_code", order.getCompanyCode());
             paramMap.put("company_name", order.getCompanyName());
@@ -243,9 +304,25 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/lock/info").json(paramMap);
             HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
             });
-
+            logger.info("锁库请求返回结果：", response);
             if (!RequestReturnUtil.validateHttpResponse(response)) {
                 throw new BusinessException(response.getMessage());
+            }
+            //本地缓存锁库存信息
+            if(null!=response.getData()){
+                List<StockVoRequest> list1 =(List<StockVoRequest>)response.getData();
+                logger.info("锁库请求返回结果list1={}", list1);
+                List<StoreLockDetails> records=new ArrayList<>();
+                for(StockVoRequest stockVoRequest:list1){
+                    StoreLockDetails storeLockDetail=new StoreLockDetails();
+                    BeanUtils.copyProperties(stockVoRequest,storeLockDetail);
+                    if(null!=stockVoRequest.getSkuCode()&&null!=skuCodeLineMap.get(stockVoRequest.getSkuCode())){
+                        Long loneCode=Long.valueOf(skuCodeLineMap.get(stockVoRequest.getSkuCode()).toString());
+                        storeLockDetail.setLineCode(loneCode);
+                    }
+                    records.add(storeLockDetail);
+                }
+                erpStoreLockDetailsService.insertStoreLockDetails(records);
             }
         } catch (BusinessException e) {
             flag = false;
@@ -263,17 +340,39 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
         try {
 
             List<Map<String, Object>> list = new ArrayList<>();
-            for (ErpOrderItem item :
-                    order.getItemList()) {
+
+            Map<String,Long> countMap=new HashMap<>();
+            //汇总sku
+            for(ErpOrderItem item:order.getItemList()){
+                Long count=countMap.get(item.getSkuCode());
+                if(null!=countMap.get(item.getSkuCode())){
+                    count=count+item.getProductCount();
+                }
+                countMap.put(item.getSkuCode(),count);
+            }
+            for(Map.Entry<String,Long> data:countMap.entrySet()){
+                String skuCode=data.getKey();
                 Map<String, Object> paramItemMap = new HashMap<>(16);
-                paramItemMap.put("change_count", item.getProductCount());
-                paramItemMap.put("sku_code", item.getSkuCode());
+                paramItemMap.put("change_count", countMap.get(skuCode));
+                paramItemMap.put("sku_code", skuCode);
                 paramItemMap.put("transport_center_code", order.getTransportCenterCode());
                 paramItemMap.put("warehouse_code", order.getWarehouseCode());
                 paramItemMap.put("company_code", order.getCompanyCode());
                 paramItemMap.put("company_name", order.getCompanyName());
                 list.add(paramItemMap);
             }
+
+//            for (ErpOrderItem item :
+//                    order.getItemList()) {
+//                Map<String, Object> paramItemMap = new HashMap<>(16);
+//                paramItemMap.put("change_count", item.getProductCount());
+//                paramItemMap.put("sku_code", item.getSkuCode());
+//                paramItemMap.put("transport_center_code", order.getTransportCenterCode());
+//                paramItemMap.put("warehouse_code", order.getWarehouseCode());
+//                paramItemMap.put("company_code", order.getCompanyCode());
+//                paramItemMap.put("company_name", order.getCompanyName());
+//                list.add(paramItemMap);
+//            }
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("company_code", order.getCompanyCode());
             paramMap.put("company_name", order.getCompanyName());
