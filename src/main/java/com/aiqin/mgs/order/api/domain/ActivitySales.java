@@ -41,5 +41,9 @@ public class ActivitySales implements Serializable {
     @JsonProperty("averageUnitPrice")
     private BigDecimal averageUnitPrice;
 
+    /**活动名称*/
+    @ApiModelProperty(value = "活动名称")
+    @JsonProperty("activity_name")
+    private String activityName="";
 
 }
