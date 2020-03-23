@@ -459,7 +459,7 @@ public class BridgeProductService {
     public List<NewStoreCategory> selectProvincesByStoreList(List<String> storeIdList){
         String path = "/store/selectProvincesByStoreList";
         HttpClient httpClient = HttpClient.post(urlProperties.getSlcsApi() + path).json(storeIdList);
-        HttpResponse response = httpClient.action().result(new TypeReference<HttpResponse>() {
+        HttpResponse response = httpClient.action().result(new TypeReference<HttpResponse<List<NewStoreCategory>>>() {
         });
         List<NewStoreCategory> provinceList=new ArrayList<>();
         if(Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")){
