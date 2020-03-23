@@ -15,6 +15,7 @@ import com.aiqin.mgs.order.api.domain.request.StockVoRequest;
 import com.aiqin.mgs.order.api.domain.request.order.PayRequest;
 import com.aiqin.mgs.order.api.domain.response.ProductSkuDetailResponse;
 import com.aiqin.mgs.order.api.domain.response.order.*;
+import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
 import com.aiqin.mgs.order.api.service.order.ErpStoreLockDetailsService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
@@ -45,6 +46,8 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     private UrlProperties urlProperties;
     @Autowired
     private ErpStoreLockDetailsService erpStoreLockDetailsService;
+    @Autowired
+    private ErpOrderItemService erpOrderItemService;
 
     private static final Logger logger = LoggerFactory.getLogger(ErpOrderRequestServiceImpl.class);
 
@@ -462,6 +465,16 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             if (!RequestReturnUtil.validateHttpResponse(response)) {
                 throw new BusinessException(response.getMessage());
             }
+
+            List<ErpOrderItem> erpOrderItems = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
+            log.info("清除本地锁库存记录,入参erpOrderItems{}",erpOrderItems);
+            if(erpOrderItems!=null&&erpOrderItems.size()>0){
+                for(ErpOrderItem eoi:erpOrderItems){
+                    erpStoreLockDetailsService.deleteBySkuCode(eoi.getSkuCode());
+                }
+            }
+
+
         } catch (BusinessException e) {
             flag = false;
             logger.error("解锁库存失败：{}", e.getMessage());
