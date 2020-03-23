@@ -215,7 +215,7 @@
     select
     <include refid="Base_Column_List" />
     from store_lock_details
-    where sku_code=  #{skuCode,jdbcType=VARCHAR} and lock_count=#{lockCount,jdbcType=BIGINT} and line_code=#{lineCode,jdbcType=BIGINT}
+    where sku_code=  #{skuCode,jdbcType=VARCHAR} and change_count=#{changeCount,jdbcType=BIGINT} and line_code=#{lineCode,jdbcType=BIGINT}
   </select>
 
   <delete id="deleteBySkuCodeAndLockCount" parameterType="com.aiqin.mgs.order.api.domain.StoreLockDetails" >

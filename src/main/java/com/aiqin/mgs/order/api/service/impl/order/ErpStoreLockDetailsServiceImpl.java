@@ -51,7 +51,8 @@ public class ErpStoreLockDetailsServiceImpl implements ErpStoreLockDetailsServic
             storeLockDetails.setSkuCode(item.getSkuCode());
             storeLockDetails.setChangeCount(Integer.valueOf(item.getProductCount().toString()));
             log.info("查询商品锁库信息，从本地查询商品skuCode={},lineCode={},lockCount={}",item.getSkuCode(),item.getLineCode(),item.getProductCount());
-            StoreLockDetails storeLockDetails1 = storeLockDetailsDao.selectByLineCodeAndSkuCodeAndLockCount(storeLockDetails);
+//            StoreLockDetails storeLockDetails1 = storeLockDetailsDao.selectByLineCodeAndSkuCodeAndLockCount(storeLockDetails);
+            StoreLockDetails storeLockDetails1 = storeLockDetailsDao.selectBySkuCode(item.getSkuCode());
             log.info("查询商品锁库信息，从本地查询商品单行返回结果storeLockDetails1={}",storeLockDetails1);
             if(storeLockDetails1!=null){
                 ErpOrderItemSplitGroupResponse erpOrderItemSplitGroupResponse=new ErpOrderItemSplitGroupResponse();
