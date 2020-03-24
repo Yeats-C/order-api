@@ -34,16 +34,16 @@ public class RejectRecordInfo {
     private String settlementMethodName;
 
     @ApiModelProperty(value = "负责人")
-    @JsonProperty("duty_person")
-    private String dutyPerson;
+    @JsonProperty("charge_person")
+    private String chargePerson;
 
     @ApiModelProperty(value = "联系人")
-    @JsonProperty("contacts_person")
-    private String contactsPerson;
+    @JsonProperty("contact_person")
+    private String contactPerson;
 
     @ApiModelProperty(value = "联系人电话")
-    @JsonProperty("contacts_person_phone")
-    private String contactsPersonPhone;
+    @JsonProperty("contact_mobile")
+    private String contactMobile;
 
     @ApiModelProperty(value = "收货区域 :省")
     @JsonProperty("province_id")
@@ -70,18 +70,18 @@ public class RejectRecordInfo {
     private String districtName;
 
     @ApiModelProperty(value = "收货地址")
-    @JsonProperty("address")
-    private String address;
+    @JsonProperty("receive_address")
+    private String receiveAddress;
 
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "预计配送时间")
-    @JsonProperty("expect_time")
-    private Date expectTime;
+    @JsonProperty("pre_expect_time")
+    private Date preExpectTime;
 
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "有效期")
-    @JsonProperty("valid_day")
-    private Date validDay;
+    @JsonProperty("valid_time")
+    private Date validTime;
 
     @ApiModelProperty(value = "供应商code")
     @JsonProperty("supplier_code")

@@ -9,19 +9,19 @@ import java.math.BigDecimal;
 @Data
 public class RejectRecordDetailResponse {
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "sku编码")
     @JsonProperty("sku_code")
     private String skuCode;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "sku名称")
     @JsonProperty("sku_name")
     private String skuName;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "品类")
     @JsonProperty("category_name")
     private String categoryName;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "品牌")
     @JsonProperty("brand_name")
     private String brandName;
 
@@ -37,21 +37,17 @@ public class RejectRecordDetailResponse {
     @JsonProperty("color_name")
     private String colorName;
 
-    @ApiModelProperty(value = "厂商sku")
-    @JsonProperty("factory_sku_code")
-    private String factorySkuCode;
-
     @ApiModelProperty(value = "型号")
-    @JsonProperty("model_number")
-    private String modelNumber;
+    @JsonProperty("model_code")
+    private String modelCode;
 
     @ApiModelProperty(value = "商品数量")
     @JsonProperty("product_count")
-    private String productCount;
+    private Long productCount;
 
     @ApiModelProperty(value = "最小单位数量")
-    @JsonProperty("single_count")
-    private String singleCount;
+    @JsonProperty("total_count")
+    private Long totalCount;
 
     @ApiModelProperty(value = "单位")
     @JsonProperty("unit_name")
@@ -62,19 +58,23 @@ public class RejectRecordDetailResponse {
     private BigDecimal taxRate;
 
     @ApiModelProperty(value = "含税单价")
-    @JsonProperty("product_amount")
-    private BigDecimal productAmount;
+    @JsonProperty("tax_amount")
+    private BigDecimal taxAmount;
 
     @ApiModelProperty(value = "含税总价")
-    @JsonProperty("product_total_amount")
-    private BigDecimal productTotalAmount;
+    @JsonProperty("total_tax_amount")
+    private BigDecimal totalTaxAmount;
 
-    @ApiModelProperty(value = "wms 传回来的实际数量")
-    @JsonProperty("actual_count")
-    private Integer actualCount;
+    @ApiModelProperty(value = "实际数量")
+    @JsonProperty("actual_total_count")
+    private Long actualTotalCount;
 
-    @ApiModelProperty(value = "wms 传回来的实际金额")
-    @JsonProperty("actual_amount")
-    private BigDecimal actualAmount;
+    @ApiModelProperty(value = "实际金额")
+    @JsonProperty("actual_total_tax_amount")
+    private BigDecimal actualTotalTaxAmount;
+
+    @ApiModelProperty(value = "行号")
+    @JsonProperty("line_code")
+    private Integer lineCode;
 
 }

@@ -814,44 +814,35 @@
     <id column="id" jdbcType="BIGINT" property="id"/>
     <result column="reject_record_id" jdbcType="VARCHAR" property="rejectRecordId"/>
     <result column="reject_record_code" jdbcType="VARCHAR" property="rejectRecordCode"/>
-    <result column="duty_person" jdbcType="VARCHAR" property="dutyPerson"/>
-    <result column="contacts_person" jdbcType="VARCHAR" property="contactsPerson"/>
-    <result column="contacts_person_phone" jdbcType="VARCHAR" property="contactsPersonPhone"/>
+    <result column="charge_person" jdbcType="VARCHAR" property="chargePerson"/>
+    <result column="contact_person" jdbcType="VARCHAR" property="contactPerson"/>
+    <result column="contact_mobile" jdbcType="VARCHAR" property="contactMobile"/>
     <result column="province_id" jdbcType="VARCHAR" property="provinceId"/>
     <result column="province_name" jdbcType="VARCHAR" property="provinceName"/>
     <result column="city_id" jdbcType="VARCHAR" property="cityId"/>
     <result column="city_name" jdbcType="VARCHAR" property="cityName"/>
     <result column="district_id" jdbcType="VARCHAR" property="districtId"/>
     <result column="district_name" jdbcType="VARCHAR" property="districtName"/>
-    <result column="address" jdbcType="VARCHAR" property="address"/>
-    <result column="expect_time" jdbcType="TIMESTAMP" property="expectTime"/>
-    <result column="valid_day" jdbcType="TIMESTAMP" property="validDay"/>
+    <result column="receive_address" jdbcType="VARCHAR" property="receiveAddress"/>
+    <result column="pre_expect_time" jdbcType="TIMESTAMP" property="preExpectTime"/>
+    <result column="valid_time" jdbcType="TIMESTAMP" property="validTime"/>
     <result column="dictionary_id" jdbcType="VARCHAR" property="dictionaryId"/>
     <result column="dictionary_name" jdbcType="VARCHAR" property="dictionaryName"/>
     <result column="supplier_code" jdbcType="VARCHAR" property="supplierCode"/>
     <result column="supplier_name" jdbcType="VARCHAR" property="supplierName"/>
     <result column="purchase_group_code" jdbcType="VARCHAR" property="purchaseGroupCode"/>
     <result column="purchase_group_name" jdbcType="VARCHAR" property="purchaseGroupName"/>
-    <result column="reject_status" jdbcType="BIT" property="rejectStatus"/>
+    <result column="reject_record_status" jdbcType="BIT" property="rejectRecordStatus"/>
     <result column="remark" jdbcType="VARCHAR" property="remark"/>
     <result column="transport_remark" jdbcType="VARCHAR" property="transportRemark"/>
     <result column="transport_url" jdbcType="VARCHAR" property="transportUrl"/>
     <result column="out_stock_time" jdbcType="TIMESTAMP" property="outStockTime"/>
     <result column="product_count" jdbcType="INTEGER" property="productCount"/>
-    <result column="product_amount" jdbcType="DECIMAL" property="productAmount"/>
-    <result column="single_count" jdbcType="INTEGER" property="singleCount"/>
-    <result column="gift_count" jdbcType="INTEGER" property="giftCount"/>
-    <result column="gift_amount" jdbcType="DECIMAL" property="giftAmount"/>
-    <result column="return_count" jdbcType="INTEGER" property="returnCount"/>
-    <result column="return_amount" jdbcType="DECIMAL" property="returnAmount"/>
-    <result column="untaxed_amount" jdbcType="DECIMAL" property="untaxedAmount"/>
+    <result column="total_tax_amount" jdbcType="DECIMAL" property="totalTaxAmount"/>
+    <result column="total_count" jdbcType="INTEGER" property="totalCount"/>
     <result column="actual_product_count" jdbcType="INTEGER" property="actualProductCount"/>
-    <result column="actual_product_amount" jdbcType="DECIMAL" property="actualProductAmount"/>
-    <result column="actual_single_count" jdbcType="INTEGER" property="actualSingleCount"/>
-    <result column="actual_gift_count" jdbcType="INTEGER" property="actualGiftCount"/>
-    <result column="actual_gift_amount" jdbcType="DECIMAL" property="actualGiftAmount"/>
-    <result column="actual_return_count" jdbcType="INTEGER" property="actualReturnCount"/>
-    <result column="actual_return_amount" jdbcType="DECIMAL" property="actualReturnAmount"/>
+    <result column="actual_total_tax_amount" jdbcType="DECIMAL" property="actualTotalTaxAmount"/>
+    <result column="actual_total_count" jdbcType="INTEGER" property="actualTotalCount"/>
     <result column="create_by_id" jdbcType="VARCHAR" property="createById"/>
     <result column="create_by_name" jdbcType="VARCHAR" property="createByName"/>
     <result column="update_by_id" jdbcType="VARCHAR" property="updateById"/>
@@ -872,15 +863,13 @@
   </resultMap>
   <select id="selectByRejectCode" resultMap="BaseResultMap2">
     select
-      id, reject_record_id, reject_record_code,charge_person duty_person,contact_person contacts_person,contact_mobile contacts_person_phone,
-      province_id, province_name, city_id, city_name, district_id, district_name,receive_address address,
-      pre_expect_time expect_time,valid_time valid_day, supplier_code, supplier_name,
-      purchase_group_code, purchase_group_name,reject_record_status reject_status, remark,remark transport_remark,
-      out_stock_time,total_count product_count,total_tax_amount product_amount,total_count single_count,
-      actual_total_count actual_product_count,actual_total_tax_amount actual_product_amount,actual_total_count actual_single_count,
-      create_by_id, create_by_name, update_by_id, update_by_name, create_time,
-      update_time,transport_center_code, transport_center_name, warehouse_code, warehouse_name,settlement_method_code,settlement_method_name,
-      company_name,company_code,delivery_time,finish_time
+      reject_record_id, reject_record_code, transport_center_code, transport_center_name, warehouse_code, warehouse_name,
+      supplier_code, supplier_name, purchase_group_code, purchase_group_name, charge_person, settlement_method_code,
+      settlement_method_name, contact_person, contact_mobile, province_id, province_name, city_id, city_name,
+      district_id, district_name, receive_address, reject_record_status, pre_expect_time, valid_time, remark,
+      out_stock_time, delivery_time, finish_time, create_time, update_time, create_by_id, create_by_name,
+      update_by_id, update_by_name, company_name, company_code, total_count, total_tax_amount,
+      actual_total_count, actual_total_tax_amount
     from
     reject_record
     where
