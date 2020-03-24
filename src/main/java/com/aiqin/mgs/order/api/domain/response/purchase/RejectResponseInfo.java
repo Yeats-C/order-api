@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.domain.response.purchase;
 
 import com.aiqin.mgs.order.api.domain.OperationLog;
+import com.aiqin.mgs.order.api.domain.OperationOrderLog;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
@@ -215,6 +216,6 @@ public class RejectResponseInfo {
 
     @ApiModelProperty("日志记录")
     @JsonProperty("log_list")
-    private List<OperationLog> logList;
+    private List<OperationOrderLog> logList;
 
 }

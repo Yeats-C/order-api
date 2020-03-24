@@ -6,6 +6,7 @@ import com.aiqin.mgs.order.api.dao.OperationLogDao;
 import com.aiqin.mgs.order.api.dao.RejectRecordDao;
 import com.aiqin.mgs.order.api.dao.RejectRecordDetailDao;
 import com.aiqin.mgs.order.api.domain.OperationLog;
+import com.aiqin.mgs.order.api.domain.OperationOrderLog;
 import com.aiqin.mgs.order.api.domain.request.purchase.RejectQueryRequest;
 import com.aiqin.mgs.order.api.domain.response.purchase.*;
 import com.aiqin.mgs.order.api.service.GoodsRejectService;
@@ -45,7 +46,7 @@ public class GoodsRejectServiceImpl implements GoodsRejectService {
         // 查询商品信息
         List<RejectRecordDetailResponse> productList = rejectRecordDetailDao.selectProductByRejectCode(rejectRecord.getRejectRecordCode());
         // 查询日志
-        List<OperationLog> logList = operationLogDao.searchOrderLog(rejectRecord.getRejectRecordCode(), 3);
+        List<OperationOrderLog> logList = operationLogDao.searchOrderLog(rejectRecord.getRejectRecordCode(), 3);
         rejectResponse.setLogList(logList);
         //rejectResponse.setBatchList(batchList);
         rejectResponse.setProductList(productList);

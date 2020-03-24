@@ -72,7 +72,7 @@ public interface ReturnOrderInfoDao {
 
     List<QueryReturnOrderManagementRespVO> selectReturnOrderManagementList(QueryReturnOrderManagementReqVO reqVO);
 
-    ReturnOrderDetailRespVO selectReturnOrderDetail(String code);
+    ReturnOrderDetailRespVO selectReturnOrderInfo(String code);
 
     List<ReturnOrderInfoApplyInboundDetailRespVO> selectInbound(String code);
 }

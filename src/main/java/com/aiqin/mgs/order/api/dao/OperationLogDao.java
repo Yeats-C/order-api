@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.OperationLog;
+import com.aiqin.mgs.order.api.domain.OperationOrderLog;
 import com.aiqin.mgs.order.api.domain.response.OrderOperationLog;
 import org.apache.ibatis.annotations.Param;
 
@@ -26,5 +27,5 @@ public interface OperationLogDao {
 
     List<OrderOperationLog> list(String operationId);
 
-    List<OperationLog> searchOrderLog(@Param("operationCode")String operationCode, @Param("sourceType") Integer sourceType);
+    List<OperationOrderLog> searchOrderLog(@Param("operationCode")String operationCode, @Param("sourceType") Integer sourceType);
 }
