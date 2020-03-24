@@ -1,9 +1,11 @@
 package com.aiqin.mgs.order.api.service.impl.market;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.dao.market.StoreActivityDao;
 import com.aiqin.mgs.order.api.domain.OrderDetailInfo;
 import com.aiqin.mgs.order.api.domain.OrderInfo;
+import com.aiqin.mgs.order.api.domain.activity.ActivityOrderInfo;
 import com.aiqin.mgs.order.api.domain.response.market.ActivityReportOrderResp;
 import com.aiqin.mgs.order.api.service.market.StoreActivityService;
 import org.springframework.stereotype.Service;
@@ -64,5 +66,27 @@ public class StoreActivityServiceImpl implements StoreActivityService{
         activityReportOrderResp.setOrderCode(orderCodes);
 
         return HttpResponse.success(activityReportOrderResp);
+    }
+
+    /**
+     *  查询活动数据关联订单数据
+     * @param activityId
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
+    @Override
+    public HttpResponse<PageResData<ActivityOrderInfo>> selectActivityReportRelationOrder(String activityId, Integer pageNo, Integer pageSize) {
+        PageResData p = new PageResData();
+        OrderDetailInfo orderDetailInfo = new OrderDetailInfo();
+        orderDetailInfo.setActivityId(activityId);
+        orderDetailInfo.setPageNo(pageNo);
+        orderDetailInfo.setPageSize(pageSize);
+        List<ActivityOrderInfo> activityOrderInfos = storeActivityDao.selectActivityReportRelationOrder(orderDetailInfo);
+        Integer count = storeActivityDao.selectActivityReportRelationOrderCount(orderDetailInfo);
+
+        p.setDataList(activityOrderInfos);
+        p.setTotalCount(count);
+        return HttpResponse.success(p);
     }
 }

@@ -1,6 +1,8 @@
 package com.aiqin.mgs.order.api.web.market;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.domain.activity.ActivityOrderInfo;
 import com.aiqin.mgs.order.api.domain.response.market.ActivityReportOrderResp;
 import com.aiqin.mgs.order.api.service.market.StoreActivityService;
 import io.swagger.annotations.Api;
@@ -54,6 +56,18 @@ public class StoreActivityController {
     public HttpResponse<ActivityReportOrderResp> selectActivityReportOrder(@RequestParam(name = "store_id", required = false) String storeId,
                                                                            @RequestParam(name = "activity_id", required = false) String activityId) {
         return storeActivityService.selectActivityReportOrder(storeId, activityId);
+    }
+
+    @GetMapping("/select/report/relation/order")
+    @ApiOperation("查询活动数据关联订单数据")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "activity_id", value = "活动id", dataType = "String", required = false),
+            @ApiImplicitParam(name = "page_no", value = "当前页", dataType = "Integer", required = false),
+            @ApiImplicitParam(name = "page_size", value = "当前条数", dataType = "Integer", required = false)})
+    public HttpResponse<PageResData<ActivityOrderInfo>> selectActivityReportRelationOrder(@RequestParam(name = "activity_id", required = false) String activityId,
+                                                                                          @RequestParam(name = "page_no", required = false) Integer pageNo,
+                                                                                          @RequestParam(name = "page_size", required = false) Integer pageSize) {
+        return storeActivityService.selectActivityReportRelationOrder(activityId, pageNo, pageSize);
     }
 
 
