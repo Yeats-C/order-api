@@ -1589,6 +1589,9 @@
             <result column="bactivity_code" jdbcType="VARCHAR" property="activityCode" />
             <result column="bgift_line_code" jdbcType="VARCHAR" property="giftLineCode" />
             <result column="breturn_product_count" jdbcType="BIGINT" property="returnProductCount" />
+            <result column="btotal_purchase_amount" jdbcType="DECIMAL" property="totalPurchaseAmount" />
+            <result column="bactual_total_product_amount" jdbcType="DECIMAL" property="actualTotalProductAmount" />
+            <result column="bactual_total_purchase_amount" jdbcType="DECIMAL" property="actualTotalPurchaseAmount" />
         </collection>
         <collection property="logs" ofType="com.aiqin.mgs.order.api.domain.OperationLog">
             <result column="ooperation_type" jdbcType="INTEGER" property="operationType" />
@@ -1632,11 +1635,15 @@
         b.sku_code bsku_code, b.sku_name bsku_name, b.picture_url bpicture_url,
         b.product_spec bspec, b.color_name bcolor_name, b.model_code bmodel, b.unit_name bunit_name,
         b.zero_disassembly_coefficient bzero_disassembly_coefficient, b.product_type bproduct_type,
-        b.product_amount bproduct_amount, b.purchase_amount bpurchase_amount, b.product_count bproduct_count,
+        ifnull(b.product_amount, 0) bproduct_amount, ifnull(b.purchase_amount, 0) bpurchase_amount,
+        ifnull(b.product_count, 0) bproduct_count, ifnull(b.actual_product_count, 0) bactual_product_count,
         b.total_product_amount bamount, b.total_product_amount btotal_product_amount,
-        b.actual_product_count bactual_product_count, b.total_preferential_amount btotal_preferential_amount,
+        b.total_preferential_amount btotal_preferential_amount,
         b.total_acivity_amount btotal_acivity_amount, b.activity_code bactivity_code,
         b.gift_line_code bgift_line_code, b.return_product_count breturn_product_count,
+        ifnull(b.product_count * b.purchase_amount, 0) btotal_purchase_amount,
+        ifnull(b.actual_product_count * b.product_amount, 0) bactual_total_product_amount,
+        ifnull(b.actual_product_count * b.purchase_amount, 0) bactual_total_purchase_amount,
 
         o.operation_type ooperation_type, o.operation_content ooperation_content,
         o.remark oremark, o.create_by_name ocreate_by_name, o.create_time ocreate_time,
@@ -1653,7 +1660,7 @@
         left join operation_log o on o.operation_code = a.order_store_code
         left join order_store_fee f on f.fee_id = a.fee_id
 --         left join order_store_detail_batch d on d.order_store_code = a.order_store_code
-        where a.order_store_code = #{orderCode}
+        where o.source_type = 0 and a.order_store_code = #{orderCode}
     </select>
     <select id="orderProductBySum" resultType="java.lang.Long">
       select sum(product_count) from order_store_detail
