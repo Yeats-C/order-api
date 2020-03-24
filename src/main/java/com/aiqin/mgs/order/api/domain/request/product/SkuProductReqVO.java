@@ -48,7 +48,7 @@ public class SkuProductReqVO extends PagesRequest {
 
 
 
-    @ApiModelProperty("是否可售：0为不可售，1为可售")
+    @ApiModelProperty("是否可售：0：在用，1停止进货，2：停止配送 3：停止销售")
     @JsonProperty("is_sale")
     private Byte isSale;
 

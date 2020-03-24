@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aiqin.mgs.order.api.dao.StoreLockDetailsDao" >
+  <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.StoreLockDetails" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="order_code" property="orderCode" jdbcType="VARCHAR" />
+    <result column="company_code" property="companyCode" jdbcType="VARCHAR" />
+    <result column="company_name" property="companyName" jdbcType="VARCHAR" />
+    <result column="transport_center_code" property="transportCenterCode" jdbcType="VARCHAR" />
+    <result column="transport_center_name" property="transportCenterName" jdbcType="VARCHAR" />
+    <result column="warehouse_code" property="warehouseCode" jdbcType="VARCHAR" />
+    <result column="warehouse_name" property="warehouseName" jdbcType="VARCHAR" />
+    <result column="warehouse_type" property="warehouseType" jdbcType="VARCHAR" />
+    <result column="sku_code" property="skuCode" jdbcType="VARCHAR" />
+    <result column="sku_name" property="skuName" jdbcType="VARCHAR" />
+    <result column="line_code" property="lineCode" jdbcType="BIGINT" />
+    <result column="change_count" property="changeCount" jdbcType="INTEGER" />
+    <result column="purchase_group_code" property="purchaseGroupCode" jdbcType="VARCHAR" />
+    <result column="purchase_group_name" property="purchaseGroupName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, order_code, company_code, company_name, transport_center_code, transport_center_name,
+    warehouse_code, warehouse_name, warehouse_type, sku_code, sku_name, line_code, change_count,
+    purchase_group_code, purchase_group_name
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    <include refid="Base_Column_List" />
+    from store_lock_details
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from store_lock_details
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.StoreLockDetails" >
+    insert into store_lock_details (id, order_code, company_code,
+      company_name, transport_center_code, transport_center_name,
+      warehouse_code, warehouse_name, warehouse_type,
+      sku_code, sku_name, line_code,
+      change_count, purchase_group_code, purchase_group_name
+      )
+    values (#{id,jdbcType=BIGINT}, #{orderCode,jdbcType=VARCHAR}, #{companyCode,jdbcType=VARCHAR},
+      #{companyName,jdbcType=VARCHAR}, #{transportCenterCode,jdbcType=VARCHAR}, #{transportCenterName,jdbcType=VARCHAR},
+      #{warehouseCode,jdbcType=VARCHAR}, #{warehouseName,jdbcType=VARCHAR}, #{warehouseType,jdbcType=VARCHAR},
+      #{skuCode,jdbcType=VARCHAR}, #{skuName,jdbcType=VARCHAR}, #{lineCode,jdbcType=BIGINT},
+      #{changeCount,jdbcType=INTEGER}, #{purchaseGroupCode,jdbcType=VARCHAR}, #{purchaseGroupName,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.StoreLockDetails" >
+    insert into store_lock_details
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="orderCode != null" >
+        order_code,
+      </if>
+      <if test="companyCode != null" >
+        company_code,
+      </if>
+      <if test="companyName != null" >
+        company_name,
+      </if>
+      <if test="transportCenterCode != null" >
+        transport_center_code,
+      </if>
+      <if test="transportCenterName != null" >
+        transport_center_name,
+      </if>
+      <if test="warehouseCode != null" >
+        warehouse_code,
+      </if>
+      <if test="warehouseName != null" >
+        warehouse_name,
+      </if>
+      <if test="warehouseType != null" >
+        warehouse_type,
+      </if>
+      <if test="skuCode != null" >
+        sku_code,
+      </if>
+      <if test="skuName != null" >
+        sku_name,
+      </if>
+      <if test="lineCode != null" >
+        line_code,
+      </if>
+      <if test="changeCount != null" >
+        change_count,
+      </if>
+      <if test="purchaseGroupCode != null" >
+        purchase_group_code,
+      </if>
+      <if test="purchaseGroupName != null" >
+        purchase_group_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="orderCode != null" >
+        #{orderCode,jdbcType=VARCHAR},
+      </if>
+      <if test="companyCode != null" >
+        #{companyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="companyName != null" >
+        #{companyName,jdbcType=VARCHAR},
+      </if>
+      <if test="transportCenterCode != null" >
+        #{transportCenterCode,jdbcType=VARCHAR},
+      </if>
+      <if test="transportCenterName != null" >
+        #{transportCenterName,jdbcType=VARCHAR},
+      </if>
+      <if test="warehouseCode != null" >
+        #{warehouseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="warehouseName != null" >
+        #{warehouseName,jdbcType=VARCHAR},
+      </if>
+      <if test="warehouseType != null" >
+        #{warehouseType,jdbcType=VARCHAR},
+      </if>
+      <if test="skuCode != null" >
+        #{skuCode,jdbcType=VARCHAR},
+      </if>
+      <if test="skuName != null" >
+        #{skuName,jdbcType=VARCHAR},
+      </if>
+      <if test="lineCode != null" >
+        #{lineCode,jdbcType=BIGINT},
+      </if>
+      <if test="changeCount != null" >
+        #{changeCount,jdbcType=INTEGER},
+      </if>
+      <if test="purchaseGroupCode != null" >
+        #{purchaseGroupCode,jdbcType=VARCHAR},
+      </if>
+      <if test="purchaseGroupName != null" >
+        #{purchaseGroupName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.StoreLockDetails" >
+    update store_lock_details
+    <set >
+      <if test="orderCode != null" >
+        order_code = #{orderCode,jdbcType=VARCHAR},
+      </if>
+      <if test="companyCode != null" >
+        company_code = #{companyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="companyName != null" >
+        company_name = #{companyName,jdbcType=VARCHAR},
+      </if>
+      <if test="transportCenterCode != null" >
+        transport_center_code = #{transportCenterCode,jdbcType=VARCHAR},
+      </if>
+      <if test="transportCenterName != null" >
+        transport_center_name = #{transportCenterName,jdbcType=VARCHAR},
+      </if>
+      <if test="warehouseCode != null" >
+        warehouse_code = #{warehouseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="warehouseName != null" >
+        warehouse_name = #{warehouseName,jdbcType=VARCHAR},
+      </if>
+      <if test="warehouseType != null" >
+        warehouse_type = #{warehouseType,jdbcType=VARCHAR},
+      </if>
+      <if test="skuCode != null" >
+        sku_code = #{skuCode,jdbcType=VARCHAR},
+      </if>
+      <if test="skuName != null" >
+        sku_name = #{skuName,jdbcType=VARCHAR},
+      </if>
+      <if test="lineCode != null" >
+        line_code = #{lineCode,jdbcType=BIGINT},
+      </if>
+      <if test="changeCount != null" >
+        change_count = #{changeCount,jdbcType=INTEGER},
+      </if>
+      <if test="purchaseGroupCode != null" >
+        purchase_group_code = #{purchaseGroupCode,jdbcType=VARCHAR},
+      </if>
+      <if test="purchaseGroupName != null" >
+        purchase_group_name = #{purchaseGroupName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.aiqin.mgs.order.api.domain.StoreLockDetails" >
+    update store_lock_details
+    set order_code = #{orderCode,jdbcType=VARCHAR},
+      company_code = #{companyCode,jdbcType=VARCHAR},
+      company_name = #{companyName,jdbcType=VARCHAR},
+      transport_center_code = #{transportCenterCode,jdbcType=VARCHAR},
+      transport_center_name = #{transportCenterName,jdbcType=VARCHAR},
+      warehouse_code = #{warehouseCode,jdbcType=VARCHAR},
+      warehouse_name = #{warehouseName,jdbcType=VARCHAR},
+      warehouse_type = #{warehouseType,jdbcType=VARCHAR},
+      sku_code = #{skuCode,jdbcType=VARCHAR},
+      sku_name = #{skuName,jdbcType=VARCHAR},
+      line_code = #{lineCode,jdbcType=BIGINT},
+      change_count = #{changeCount,jdbcType=INTEGER},
+      purchase_group_code = #{purchaseGroupCode,jdbcType=VARCHAR},
+      purchase_group_name = #{purchaseGroupName,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="selectByLineCodeAndSkuCodeAndLockCount" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.StoreLockDetails" >
+    select
+    <include refid="Base_Column_List" />
+    from store_lock_details
+    where sku_code=  #{skuCode,jdbcType=VARCHAR} and change_count=#{changeCount,jdbcType=BIGINT} and line_code=#{lineCode,jdbcType=BIGINT}
+  </select>
+
+  <delete id="deleteBySkuCodeAndLockCount" parameterType="com.aiqin.mgs.order.api.domain.StoreLockDetails" >
+    delete from store_lock_details
+    where sku_code=  #{skuCode,jdbcType=VARCHAR} and transport_center_code = #{warehouseCode} and warehouse_code=#{warehouseCode}
+  </delete>
+
+  <insert id="insertBatch" parameterType="list">
+    insert into store_lock_details (order_code, company_code,
+    company_name, transport_center_code, transport_center_name,
+    warehouse_code, warehouse_name, warehouse_type,
+    sku_code, sku_name, line_code,
+    change_count, purchase_group_code, purchase_group_name)
+    values
+    <foreach collection="records" item="item" index="index" separator=",">
+      (
+        #{item.orderCode,jdbcType=VARCHAR}, #{item.companyCode,jdbcType=VARCHAR},
+        #{item.companyName,jdbcType=VARCHAR}, #{item.transportCenterCode,jdbcType=VARCHAR}, #{item.transportCenterName,jdbcType=VARCHAR},
+        #{item.warehouseCode,jdbcType=VARCHAR}, #{item.warehouseName,jdbcType=VARCHAR}, #{item.warehouseType,jdbcType=VARCHAR},
+        #{item.skuCode,jdbcType=VARCHAR}, #{item.skuName,jdbcType=VARCHAR}, #{item.lineCode,jdbcType=BIGINT},
+        #{item.changeCount,jdbcType=INTEGER}, #{item.purchaseGroupCode,jdbcType=VARCHAR}, #{item.purchaseGroupName,jdbcType=VARCHAR}
+      )
+    </foreach>
+  </insert>
+
+  <delete id="deleteBySkuCode" parameterType="java.lang.String" >
+    delete from store_lock_details
+    where sku_code = #{skuCode}
+  </delete>
+
+    <select id="selectBySkuCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from store_lock_details
+        where sku_code=  #{skuCode}
+    </select>
+
+</mapper>

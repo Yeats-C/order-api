@@ -2,13 +2,10 @@ package com.aiqin.mgs.order.api.web.purchase;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
-import com.aiqin.mgs.order.api.domain.RejectRecord;
 import com.aiqin.mgs.order.api.domain.request.purchase.RejectQueryRequest;
-import com.aiqin.mgs.order.api.domain.response.RejectResponse;
 import com.aiqin.mgs.order.api.domain.response.purchase.RejectRecordInfo;
 import com.aiqin.mgs.order.api.domain.response.purchase.RejectResponseInfo;
 import com.aiqin.mgs.order.api.service.GoodsRejectService;
-import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;

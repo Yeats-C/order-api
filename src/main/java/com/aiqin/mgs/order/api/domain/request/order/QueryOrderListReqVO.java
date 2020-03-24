@@ -38,10 +38,10 @@ public class QueryOrderListReqVO extends PageReq {
     private String supplierCode;
 
     @ApiModelProperty("是否锁定(0否1是）")
-    private Integer beLock;
+    private Integer orderLock;
 
     @ApiModelProperty("是否是异常订单(0否1是)")
-    private Integer beException;
+    private Integer orderException;
 
     @ApiModelProperty("客户名称")
     private String customerName;

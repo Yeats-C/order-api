@@ -6,16 +6,20 @@ import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
+import com.aiqin.mgs.order.api.domain.po.cart.ErpOrderCartInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.CouponShareRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.ErpCartQueryRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.ErpQueryCartGroupTempRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
-import com.aiqin.mgs.order.api.domain.response.cart.OrderConfirmResponse;
-import com.aiqin.mgs.order.api.domain.response.cart.StoreCartProductResponse;
+import com.aiqin.mgs.order.api.domain.response.cart.*;
 import com.aiqin.mgs.order.api.service.CartOrderService;
+import com.aiqin.mgs.order.api.service.CouponRuleService;
 import com.aiqin.mgs.order.api.service.SequenceGeneratorService;
+import com.aiqin.mgs.order.api.service.cart.ErpOrderCartService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
@@ -57,6 +61,13 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private ErpOrderFeeService erpOrderFeeService;
     @Resource
     private SequenceGeneratorService sequenceGeneratorService;
+    @Resource
+    private ErpOrderCartService erpOrderCartService;
+    @Resource
+    private ErpStoreLockDetailsService erpStoreLockDetailsService;
+    @Resource
+    private CouponRuleService couponRuleService;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -102,10 +113,13 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         }
         //获取门店信息
         StoreInfo storeInfo = erpOrderRequestService.getStoreInfoByStoreId(erpOrderSaveRequest.getStoreId());
+        log.info("创建订单,获取门店信息返回结果storeInfo={}",storeInfo);
         //获取购物车商品
-        List<CartOrderInfo> cartProductList = getStoreCartProductList(erpOrderSaveRequest.getStoreId(), erpOrderSaveRequest.getOrderType(),orderSourceEnum);
+//        List<CartOrderInfo> cartProductList = getStoreCartProductList(erpOrderSaveRequest.getCartGroupTempKey(),erpOrderSaveRequest.getStoreId(), erpOrderSaveRequest.getOrderType(),orderSourceEnum);
+        List<ErpOrderCartInfo> cartProductList = getStoreCartProductList(erpOrderSaveRequest.getCartGroupTempKey(),erpOrderSaveRequest.getStoreId(), erpOrderSaveRequest.getOrderType(),orderSourceEnum);
 
         //构建订单商品明细行
+//        List<ErpOrderItem> erpOrderItemList = generateOrderItemList(cartProductList, storeInfo, processTypeEnum);
         List<ErpOrderItem> erpOrderItemList = generateOrderItemList(cartProductList, storeInfo, processTypeEnum);
 
         //数据校验
@@ -116,9 +130,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //生成订单主体信息
         ErpOrderInfo order = generateOrder(erpOrderItemList, storeInfo, erpOrderSaveRequest, orderFee,auth);
+        log.info("创建订单,生成订单主体信息返回结果order={}",order);
         //保存订单、订单明细、订单支付、订单收货人信息、订单日志
         String orderId = insertOrder(order,orderFee, storeInfo, auth, erpOrderSaveRequest);
         //删除购物车商品
+//        deleteOrderProductFromCart(cartProductList);
         deleteOrderProductFromCart(cartProductList);
 
         //锁库存
@@ -128,6 +144,12 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             if (!flag) {
                 throw new BusinessException("锁库存失败");
             }
+            //将结果插入到新表中
+            //TODO 根据供应链的返回结果定
+            StoreLockDetails storeLockDetails=new StoreLockDetails();
+            List<StoreLockDetails> list=new ArrayList<>();
+            list.add(storeLockDetails);
+//            erpStoreLockDetailsService.insertStoreLockDetails(list);
         }
 
         //返回订单信息
@@ -252,48 +274,69 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @param orderType
      * @return
      */
-    private List<CartOrderInfo> getStoreCartProductList(String storeId, Integer orderType, ErpOrderSourceEnum orderSourceEnum) {
-
-        List<CartOrderInfo> list = new ArrayList<>();
+//    private List<CartOrderInfo> getStoreCartProductList(String cartGroupTempKey,String storeId, Integer orderType, ErpOrderSourceEnum orderSourceEnum) {
+    private List<ErpOrderCartInfo> getStoreCartProductList(String cartGroupTempKey,String storeId, Integer orderType, ErpOrderSourceEnum orderSourceEnum) {
+        log.info("创建订单,获取购物车商品入参cartGroupTempKey={},storeId={},orderType={},orderSourceEnum={}",cartGroupTempKey,storeId,orderType,orderSourceEnum);
+//        List<CartOrderInfo> list = new ArrayList<>();
+        List<ErpOrderCartInfo> cartInfoList=new ArrayList<>();
 
         if (ErpOrderSourceEnum.STORE == orderSourceEnum) {
             //调用查询购物车接口
             CartOrderInfo cartOrderInfoQuery = new CartOrderInfo();
             cartOrderInfoQuery.setStoreId(storeId);
             cartOrderInfoQuery.setProductType(orderType);
-            HttpResponse listHttpResponse = cartOrderService.displayCartLineCheckProduct(cartOrderInfoQuery);
-            if (!RequestReturnUtil.validateHttpResponse(listHttpResponse)) {
+//            HttpResponse listHttpResponse = cartOrderService.displayCartLineCheckProduct(cartOrderInfoQuery);
+            ErpQueryCartGroupTempRequest erpQueryCartGroupTempRequest=new ErpQueryCartGroupTempRequest();
+            erpQueryCartGroupTempRequest.setCartGroupTempKey(cartGroupTempKey);
+            log.info("创建订单,调用查询购物车接口入参erpQueryCartGroupTempRequest={}",erpQueryCartGroupTempRequest);
+            ErpStoreCartQueryResponse erpStoreCartQueryResponse = erpOrderCartService.queryCartGroupTemp(erpQueryCartGroupTempRequest, null);
+            log.info("创建订单,调用查询购物车接口返回结果erpStoreCartQueryResponse={}",erpStoreCartQueryResponse);
+            if(erpStoreCartQueryResponse==null){
                 throw new BusinessException("获取购物车商品失败");
             }
-            StoreCartProductResponse data = (StoreCartProductResponse) listHttpResponse.getData();
-            if (data == null || data.getCartGroupList() == null || data.getCartGroupList().size() == 0) {
+            if(null==erpStoreCartQueryResponse.getCartGroupList()){
                 throw new BusinessException("购物车没有勾选的商品");
             }
+//            if (!RequestReturnUtil.validateHttpResponse(listHttpResponse)) {
+//                throw new BusinessException("获取购物车商品失败");
+//            }
+//            StoreCartProductResponse data = (StoreCartProductResponse) listHttpResponse.getData();
+//            if (data == null || data.getCartGroupList() == null || data.getCartGroupList().size() == 0) {
+//                throw new BusinessException("购物车没有勾选的商品");
+//            }
 
-            List<CartGroupInfo> cartGroupList = data.getCartGroupList();
-            for (CartGroupInfo item :
-                    cartGroupList) {
-                for (CartOrderInfo productItem :
-                        item.getCartProductList()) {
+//            List<CartGroupInfo> cartGroupList = data.getCartGroupList();
+            List<ErpCartGroupInfo> cartGroupList = erpStoreCartQueryResponse.getCartGroupList();
+            for (ErpCartGroupInfo item : cartGroupList) {
+                for (ErpOrderCartInfo productItem : item.getCartProductList()) {
                     if (!ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(orderType)) {
                         productItem.setActivityId(null);
-                        productItem.setActivityName(null);
+//                        productItem.setActivityName(null);
                     }
-                    list.add(productItem);
+                    cartInfoList.add(productItem);
                 }
                 if (ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(orderType)) {
                     if (item.getCartGiftList() != null && item.getCartGiftList().size() > 0) {
-                        list.addAll(item.getCartGiftList());
+//                        list.addAll(item.getCartGiftList());
+                        cartInfoList.addAll(item.getCartGiftList());
                     }
                 }
             }
         } else {
-            list = cartOrderService.getErpProductList(storeId, orderType);
-            if (list == null) {
+//            list = cartOrderService.getErpProductList(storeId, orderType);
+            //修改erp查询list
+            ErpCartQueryRequest erpCartQueryRequest=new ErpCartQueryRequest();
+            erpCartQueryRequest.setProductType(orderType);
+            erpCartQueryRequest.setStoreId(storeId);
+            log.info("创建订单,调用ERP购物车接口入参erpCartQueryRequest={}",erpCartQueryRequest);
+            ErpCartQueryResponse erpCartQueryResponse = erpOrderCartService.queryErpCartList(erpCartQueryRequest, null);
+            log.info("创建订单,调用ERP购物车接口返回结果erpCartQueryResponse={}",erpCartQueryResponse);
+            cartInfoList = erpCartQueryResponse.getCartInfoList();
+            if (cartInfoList == null) {
                 throw new BusinessException("购物车没有勾选的商品");
             }
         }
-        return list;
+        return cartInfoList;
     }
 
     /**
@@ -307,19 +350,21 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @version: v1.0.0
      * @date 2019/11/27 19:02
      */
-    private List<ErpOrderItem> generateOrderItemList(List<CartOrderInfo> cartProductList, StoreInfo storeInfo, ErpOrderNodeProcessTypeEnum processTypeEnum) {
-
+//    private List<ErpOrderItem> generateOrderItemList(List<CartOrderInfo> cartProductList, StoreInfo storeInfo, ErpOrderNodeProcessTypeEnum processTypeEnum) {
+    private List<ErpOrderItem> generateOrderItemList(List<ErpOrderCartInfo> cartProductList, StoreInfo storeInfo, ErpOrderNodeProcessTypeEnum processTypeEnum) {
+        log.info("构建订单商品明细行数据入参cartProductList={},storeInfo={},processTypeEnum={}",cartProductList,storeInfo,processTypeEnum);
         //商品详情Map
         Map<String, ProductInfo> productMap = new HashMap<>(16);
 
         //遍历参数商品列表，获取商品详情，校验数据
-        for (CartOrderInfo item :
+        for (ErpOrderCartInfo item :
                 cartProductList) {
             if (!productMap.containsKey(item.getSkuCode())) {
                 //获取商品详情
                 ProductInfo product = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, item.getSkuCode());
                 if (product == null) {
-                    throw new BusinessException("未获取到商品" + item.getProductName() + "的信息");
+//                    throw new BusinessException("未获取到商品" + item.getProductName() + "的信息");
+                    throw new BusinessException("未获取到商品" + item.getSpuName() + "的信息");
                 }
                 productMap.put(item.getSkuCode(), product);
             }
@@ -329,8 +374,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //订单商品明细行
         List<ErpOrderItem> orderItemList = new ArrayList<>();
         //遍历参数商品列表，构建订单商品明细行
-        for (CartOrderInfo item :
-                cartProductList) {
+//        for (CartOrderInfo item : cartProductList) {
+        for (ErpOrderCartInfo item : cartProductList) {
             ProductInfo productInfo = productMap.get(item.getSkuCode());
 
             ErpOrderItem orderItem = new ErpOrderItem();
@@ -382,7 +427,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             //优惠分摊总金额
             orderItem.setTotalPreferentialAmount(item.getLineAmountAfterActivity());
             //分摊后单价
-            orderItem.setPreferentialAmount(item.getLineAmountAfterActivity().divide(new BigDecimal(item.getAmount()),2, RoundingMode.DOWN));
+            if(null!=item.getLineAmountAfterActivity()){
+                orderItem.setPreferentialAmount(item.getLineAmountAfterActivity().divide(new BigDecimal(item.getAmount()),2, RoundingMode.DOWN));
+            }else{
+                orderItem.setPreferentialAmount(BigDecimal.ZERO);
+            }
             //活动优惠总金额
             orderItem.setTotalAcivityAmount(item.getLineActivityDiscountTotal());
             //税率
@@ -424,7 +473,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
             orderItemList.add(orderItem);
         }
-
+        log.info("构建订单商品明细行数据返回结果orderItemList={}",orderItemList);
         return orderItemList;
     }
 
@@ -707,7 +756,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             itemRequest.setProductGift(item.getProductType());
             detailList.add(itemRequest);
         }
-
+        //A品券计算均摊金额
         couponSharePrice(detailList, topCouponCodeList);
 
         Map<Long, CouponShareRequest> map = new HashMap<>(16);
@@ -749,8 +798,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         orderFee.setSuitCouponMoney(suitCouponMoneyTotal);
         orderFee.setTopCouponMoney(topCouponMoneyTotal);
         orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal));
-        orderFee.setTopCouponCodes(String.join(",", topCouponCodeList));
-
+        if(null!=topCouponCodeList&&topCouponCodeList.size()>0){
+            orderFee.setTopCouponCodes(String.join(",", topCouponCodeList));
+        }else {
+            orderFee.setTopCouponCodes("");
+        }
         return orderFee;
     }
 
@@ -792,13 +844,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //活动均摊后金额汇总
         BigDecimal totalAmountAfterActivity = BigDecimal.ZERO;
         for (CouponShareRequest item : details) {
-            ErpProductPropertyTypeEnum propertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(item.getProductPropertyCode());
-            log.info("判断是否是A品卷,propertyTypeEnum={}", propertyTypeEnum);
-            log.info("判断是否是A品卷,ProductGiftEnumCode={}", ErpProductGiftEnum.PRODUCT.getCode());
-            log.info("判断是否是A品卷,ProductGift={}", item.getProductGift());
-            if(propertyTypeEnum!=null){
-                log.info("判断是否是A品卷,isUseTopCoupon={}", propertyTypeEnum.isUseTopCoupon());
-                if (propertyTypeEnum.isUseTopCoupon() && ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductGift())) {
+            Map erpProductPropertyType = couponRuleService.couponRuleMap();
+            log.info("获取A品卷属性返回结果,erpProductPropertyType={}", erpProductPropertyType);
+            log.info(item.getSkuCode()+"此商品属性编码,productPropertyCode={}", item.getProductPropertyCode());
+            if(null!=erpProductPropertyType&&null!=erpProductPropertyType.get(item.getProductPropertyCode())){
+                if (ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductGift())) {
                     topProductList.add(item);
                     //分销总价=从活动的分摊总价取
                     totalFirstFenAmount = totalFirstFenAmount.add(item.getTotalPreferentialAmount());
@@ -806,6 +856,20 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                     totalAmountAfterActivity = totalAmountAfterActivity.add(item.getTotalPreferentialAmount());
                 }
             }
+//            ErpProductPropertyTypeEnum propertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(item.getProductPropertyCode());
+//            log.info("判断是否是A品卷,propertyTypeEnum={}", propertyTypeEnum);
+//            log.info("判断是否是A品卷,ProductGiftEnumCode={}", ErpProductGiftEnum.PRODUCT.getCode());
+//            log.info("判断是否是A品卷,ProductGift={}", item.getProductGift());
+//            if(propertyTypeEnum!=null){
+//                log.info("判断是否是A品卷,isUseTopCoupon={}", propertyTypeEnum.isUseTopCoupon());
+//                if (propertyTypeEnum.isUseTopCoupon() && ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductGift())) {
+//                    topProductList.add(item);
+//                    //分销总价=从活动的分摊总价取
+//                    totalFirstFenAmount = totalFirstFenAmount.add(item.getTotalPreferentialAmount());
+//                    totalProAmount = totalProAmount.add(item.getTotalProductAmount());
+//                    totalAmountAfterActivity = totalAmountAfterActivity.add(item.getTotalPreferentialAmount());
+//                }
+//            }
         }
         log.info("A品券计算均摊金额,符合A品卷均摊的商品topProductList={}", topProductList);
         //判断优惠券总金额和从活动的分摊总价取，如果A品卷总金额大于活动分摊总价，则A品券总金额=活动分摊总价
@@ -913,11 +977,14 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @version: v1.0.0
      * @date 2019/11/21 16:02
      */
-    private void deleteOrderProductFromCart(List<CartOrderInfo> cartProductList) {
-        for (CartOrderInfo item :
-                cartProductList) {
+//    private void deleteOrderProductFromCart(List<CartOrderInfo> cartProductList) {
+    private void deleteOrderProductFromCart(List<ErpOrderCartInfo> cartProductList) {
+//        for (CartOrderInfo item : cartProductList) {
+        for (ErpOrderCartInfo item : cartProductList) {
             if (ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductGift())) {
-                cartOrderService.deleteByCartId(item.getCartId());
+//                cartOrderService.deleteByCartId(item.getCartId());
+                //新接口删除购物车
+                erpOrderCartService.deleteCartLine(item.getCartId());
             }
         }
     }

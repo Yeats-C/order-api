@@ -17,39 +17,39 @@ public class RejectRecordInfo {
     @JsonProperty("id")
     private Long id;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "退供单id")
     @JsonProperty("reject_record_id")
     private String rejectRecordId;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "退供单编码")
     @JsonProperty("reject_record_code")
     private String rejectRecordCode;
 
-    @ApiModelProperty(value = "商品 结算方式")
+    @ApiModelProperty(value = "结算方式编码")
     @JsonProperty("settlement_method_code")
     private String settlementMethodCode;
 
-    @ApiModelProperty(value = "商品 结算方式")
+    @ApiModelProperty(value = "结算方式名称")
     @JsonProperty("settlement_method_name")
     private String settlementMethodName;
 
     @ApiModelProperty(value = "负责人")
-    @JsonProperty("duty_person")
-    private String dutyPerson;
+    @JsonProperty("charge_person")
+    private String chargePerson;
 
     @ApiModelProperty(value = "联系人")
-    @JsonProperty("contacts_person")
-    private String contactsPerson;
+    @JsonProperty("contact_person")
+    private String contactPerson;
 
     @ApiModelProperty(value = "联系人电话")
-    @JsonProperty("contacts_person_phone")
-    private String contactsPersonPhone;
+    @JsonProperty("contact_mobile")
+    private String contactMobile;
 
     @ApiModelProperty(value = "收货区域 :省")
     @JsonProperty("province_id")
     private String provinceId;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "省名称")
     @JsonProperty("province_name")
     private String provinceName;
 
@@ -57,7 +57,7 @@ public class RejectRecordInfo {
     @JsonProperty("city_id")
     private String cityId;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "市名称")
     @JsonProperty("city_name")
     private String cityName;
 
@@ -65,53 +65,45 @@ public class RejectRecordInfo {
     @JsonProperty("district_id")
     private String districtId;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "县名称")
     @JsonProperty("district_name")
     private String districtName;
 
     @ApiModelProperty(value = "收货地址")
-    @JsonProperty("address")
-    private String address;
+    @JsonProperty("receive_address")
+    private String receiveAddress;
 
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "预计配送时间")
-    @JsonProperty("expect_time")
-    private Date expectTime;
+    @JsonProperty("pre_expect_time")
+    private Date preExpectTime;
 
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "有效期")
-    @JsonProperty("valid_day")
-    private Date validDay;
-
-    @ApiModelProperty(value = "直属上级id (取字典表数据)")
-    @JsonProperty("dictionary_id")
-    private String dictionaryId;
-
-    @ApiModelProperty(value = "")
-    @JsonProperty("dictionary_name")
-    private String dictionaryName;
+    @JsonProperty("valid_time")
+    private Date validTime;
 
     @ApiModelProperty(value = "供应商code")
     @JsonProperty("supplier_code")
     private String supplierCode;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "供应商名称")
     @JsonProperty("supplier_name")
     private String supplierName;
 
-    @ApiModelProperty(value = "采购组 code")
+    @ApiModelProperty(value = "采购组编码")
     @JsonProperty("purchase_group_code")
     private String purchaseGroupCode;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "采购组名称")
     @JsonProperty("purchase_group_name")
     private String purchaseGroupName;
 
     @ApiModelProperty(value = "退供单状态:1 进行中  2 完成")
-    @JsonProperty("reject_status")
-    private Integer rejectStatus;
+    @JsonProperty("reject_record_status")
+    private Integer rejectRecordStatus;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "备注")
     @JsonProperty("remark")
     private String remark;
 
@@ -133,85 +125,45 @@ public class RejectRecordInfo {
     @JsonProperty("product_count")
     private Integer productCount;
 
-    @ApiModelProperty(value = "普通商品金额")
-    @JsonProperty("product_amount")
-    private BigDecimal productAmount;
-
     @ApiModelProperty(value = "单品数量")
-    @JsonProperty("single_count")
-    private Integer singleCount;
+    @JsonProperty("total_count")
+    private Integer totalCount;
 
-    @ApiModelProperty(value = "赠品数量")
-    @JsonProperty("gift_count")
-    private Integer giftCount;
+    @ApiModelProperty(value = "商品含税金额")
+    @JsonProperty("total_tax_amount")
+    private BigDecimal totalTaxAmount;
 
-    @ApiModelProperty(value = "赠品金额")
-    @JsonProperty("gift_amount")
-    private BigDecimal giftAmount;
+    @ApiModelProperty(value = "实际商品含税金额")
+    @JsonProperty("actual_total_tax_amount")
+    private BigDecimal actualTotalTaxAmount;
 
-    @ApiModelProperty(value = "实物返回数量")
-    @JsonProperty("return_count")
-    private Integer returnCount;
+    @ApiModelProperty(value = "实际最小单数数量")
+    @JsonProperty("actual_total_count")
+    private Integer actualTotalCount;
 
-    @ApiModelProperty(value = "实物返回金额")
-    @JsonProperty("return_amount")
-    private BigDecimal returnAmount;
-
-    @ApiModelProperty(value = "实际普通商品数量")
-    @JsonProperty("actual_product_count")
-    private Integer actualProductCount;
-
-    @ApiModelProperty(value = "实际普通商品金额")
-    @JsonProperty("actual_product_amount")
-    private BigDecimal actualProductAmount;
-
-    @ApiModelProperty(value = "实际单品数量")
-    @JsonProperty("actual_single_count")
-    private Integer actualSingleCount;
-
-    @ApiModelProperty(value = "实际赠品数量")
-    @JsonProperty("actual_gift_count")
-    private Integer actualGiftCount;
-
-    @ApiModelProperty(value = "实际赠品金额")
-    @JsonProperty("actual_gift_amount")
-    private BigDecimal actualGiftAmount;
-
-    @ApiModelProperty(value = "实际实物返回数量")
-    @JsonProperty("actual_return_count")
-    private Integer actualReturnCount;
-
-    @ApiModelProperty(value = "实际实物返回金额")
-    @JsonProperty("actual_return_amount")
-    private BigDecimal actualReturnAmount;
-
-    @ApiModelProperty(value = "未税金额")
-    @JsonProperty("untaxed_amount")
-    private BigDecimal untaxedAmount;
-
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "创建人id")
     @JsonProperty("create_by_id")
     private String createById;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "创建人名称")
     @JsonProperty("create_by_name")
     private String createByName;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "修改人id")
     @JsonProperty("update_by_id")
     private String updateById;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "修改人名称")
     @JsonProperty("update_by_name")
     private String updateByName;
 
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "创建时间")
     @JsonProperty("create_time")
     private Date createTime;
 
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "修改时间")
     @JsonProperty("update_time")
     private Date updateTime;
 

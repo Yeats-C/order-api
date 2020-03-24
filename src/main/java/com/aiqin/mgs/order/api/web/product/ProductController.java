@@ -6,6 +6,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
+import com.aiqin.mgs.order.api.domain.request.product.AreaReq;
 import com.aiqin.mgs.order.api.domain.request.product.ProductSkuRespVo6;
 import com.aiqin.mgs.order.api.domain.request.product.SkuProductReqVO;
 import com.aiqin.mgs.order.api.service.product.ProductService;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 @RequestMapping("/product")
@@ -36,6 +38,23 @@ public class ProductController {
         HttpResponse<PageResData<ProductSkuRespVo6>> response = HttpResponse.success();
         try {
             response = productService.queryErpProductList(skuProductReqVO);
+        } catch (BusinessException e) {
+            logger.error("erp查询商品信息列表：{}", e);
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            logger.error("erp查询商品信息列表：{}", e);
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
+    }
+
+    @PostMapping("/areaReq")
+    @ApiOperation(value = "erp查询商品信息列表权限数据集合")
+    public HttpResponse<List<AreaReq>> areaReq() {
+        HttpResponse<List<AreaReq>> response = HttpResponse.success();
+        try {
+            List<AreaReq> areaReqList = productService.areaReq();
+            response.setData(areaReqList);
         } catch (BusinessException e) {
             logger.error("erp查询商品信息列表：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));

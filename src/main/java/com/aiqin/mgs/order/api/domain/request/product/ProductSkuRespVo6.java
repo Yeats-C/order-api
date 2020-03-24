@@ -95,4 +95,8 @@ public class ProductSkuRespVo6 {
     @JsonProperty("stock_resp_vos")
     private List<StockBatchRespVO> stockRespVOS;
 
+    @ApiModelProperty("是否可售：0：可用，1:停止进货")
+    @JsonProperty("sale_type")
+    private Byte saleType;
+
 }

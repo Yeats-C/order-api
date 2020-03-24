@@ -5,6 +5,7 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.dao.OperationLogDao;
 import com.aiqin.mgs.order.api.dao.RejectRecordDao;
 import com.aiqin.mgs.order.api.dao.RejectRecordDetailDao;
+import com.aiqin.mgs.order.api.domain.OperationLog;
 import com.aiqin.mgs.order.api.domain.request.purchase.RejectQueryRequest;
 import com.aiqin.mgs.order.api.domain.response.purchase.*;
 import com.aiqin.mgs.order.api.service.GoodsRejectService;
@@ -12,7 +13,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -30,11 +30,6 @@ public class GoodsRejectServiceImpl implements GoodsRejectService {
 
     @Override
     public HttpResponse<PageResData<RejectRecordInfo>> rejectList(RejectQueryRequest rejectApplyQueryRequest) {
-        // List<PurchaseGroupVo> groupVoList = purchaseGroupService.getPurchaseGroup(null);
-        // if (CollectionUtils.isEmpty(groupVoList)) {
-        //     return HttpResponse.successGenerics(new PageResData<>());
-        // }
-        // rejectApplyQueryRequest.setGroupList(groupVoList);
         List<RejectRecordInfo> list = rejectRecordDao.list(rejectApplyQueryRequest);
         Integer count = rejectRecordDao.listCount(rejectApplyQueryRequest);
         return HttpResponse.successGenerics(new PageResData<>(count, list));
@@ -45,11 +40,14 @@ public class GoodsRejectServiceImpl implements GoodsRejectService {
         RejectResponseInfo rejectResponse = new RejectResponseInfo();
         RejectRecordInfo rejectRecord = rejectRecordDao.selectByRejectCode(rejectRecordCode);
         BeanUtils.copyProperties(rejectRecord, rejectResponse);
-        List<RejectRecordDetail> batchList = rejectRecordDetailDao.selectByRejectId(rejectRecord.getRejectRecordId());
+        // 查询批次信息
+        //List<RejectRecordDetail> batchList = rejectRecordDetailDao.selectByRejectId(rejectRecord.getRejectRecordId());
+        // 查询商品信息
         List<RejectRecordDetailResponse> productList = rejectRecordDetailDao.selectProductByRejectCode(rejectRecord.getRejectRecordCode());
-        // List<OperationLog> operationLogList = operationLogDao.list(rejectRecord.getRejectRecordId());
-        // rejectResponse.setLogList(operationLogList);
-        rejectResponse.setBatchList(batchList);
+        // 查询日志
+        List<OperationLog> logList = operationLogDao.searchOrderLog(rejectRecord.getRejectRecordCode(), 3);
+        rejectResponse.setLogList(logList);
+        //rejectResponse.setBatchList(batchList);
         rejectResponse.setProductList(productList);
         return HttpResponse.successGenerics(rejectResponse);
     }

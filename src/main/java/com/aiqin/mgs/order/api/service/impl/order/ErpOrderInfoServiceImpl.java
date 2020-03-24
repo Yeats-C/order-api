@@ -61,6 +61,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     private ErpOrderPayNoTransactionalService erpOrderPayNoTransactionalService;
     @Resource
     private ErpOrderCancelNoTransactionalService erpOrderCancelNoTransactionalService;
+    @Resource
+    private ErpStoreLockDetailsService erpStoreLockDetailsService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -151,7 +153,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
             //请求供应链获取分组情况
             //TODO 修改成从锁库的时候保存的数据获取仓库库房分组信息
-            List<ErpOrderItemSplitGroupResponse> lineSplitGroupList = erpOrderRequestService.getRepositorySplitGroup(order);
+//            List<ErpOrderItemSplitGroupResponse> lineSplitGroupList = erpOrderRequestService.getRepositorySplitGroup(order);
+            //新的数据
+            List<ErpOrderItemSplitGroupResponse> lineSplitGroupList = erpStoreLockDetailsService.getNewRepositorySplitGroup(order);
+            logger.info("订单拆单，从本地查询锁库数据lineSplitGroupList={}",lineSplitGroupList);
             if (lineSplitGroupList == null || lineSplitGroupList.size() == 0) {
                 throw new BusinessException("未获取到供应链商品分组");
             }
@@ -387,7 +392,11 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
             this.updateOrderByPrimaryKeySelective(order, auth);
-
+            //删除本地锁库明细
+            for(ErpOrderItemSplitGroupResponse res1:lineSplitGroupList){
+                //删除本地缓存
+                erpStoreLockDetailsService.deleteBySkuCode(res1.getSkuCode());
+            }
 
         } else {
             //按照供应商拆单

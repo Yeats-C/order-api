@@ -499,15 +499,23 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public BasePage<QueryOrderListRespVO> list(QueryOrderListReqVO reqVO) {
-        // reqVO.setCompanyCode(getUser().getCompanyCode());
         PageHelper.startPage(reqVO.getPageNo(), reqVO.getPageSize());
         List<QueryOrderListRespVO> list = orderDao.selectListByQueryVO(reqVO);
+        // 计算商品数量
+        if(CollectionUtils.isNotEmpty(list)){
+            for (QueryOrderListRespVO vo:list){
+                Long productCount = orderDao.orderProductBySum(vo.getOrderCode());
+                vo.setProductCount(productCount);
+            }
+        }
         return PageUtil.getPageList(reqVO.getPageNo(),list);
     }
 
     @Override
     public QueryOrderInfoRespVO view(String orderCode) {
-        return orderDao.selectByOrderCode(orderCode);
+        QueryOrderInfoRespVO queryOrderInfoRespVO = orderDao.selectByOrderCode(orderCode);
+        queryOrderInfoRespVO.setProductCount(orderDao.orderProductBySum(orderCode));;
+        return queryOrderInfoRespVO;
     }
 
     private OrderQuery trans(OrderQuery orderQuery) {

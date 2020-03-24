@@ -182,4 +182,10 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  <select id="searchOrderLog" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from operation_log
+    where operation_code = #{operationCode,jdbcType=VARCHAR}
+    and source_type = #{sourceType,jdbcType=INTEGER}
+  </select>
 </mapper>
