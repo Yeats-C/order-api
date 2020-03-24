@@ -6,6 +6,7 @@ import com.aiqin.mgs.order.api.dao.market.StoreActivityDao;
 import com.aiqin.mgs.order.api.domain.OrderDetailInfo;
 import com.aiqin.mgs.order.api.domain.OrderInfo;
 import com.aiqin.mgs.order.api.domain.activity.ActivityOrderInfo;
+import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.response.market.ActivityReportOrderResp;
 import com.aiqin.mgs.order.api.service.market.StoreActivityService;
 import org.springframework.stereotype.Service;
@@ -88,5 +89,16 @@ public class StoreActivityServiceImpl implements StoreActivityService{
         p.setDataList(activityOrderInfos);
         p.setTotalCount(count);
         return HttpResponse.success(p);
+    }
+
+    /**
+     *  查询活动商品销量和销售额
+     * @param activityOrderInfo
+     * @return
+     */
+    @Override
+    public HttpResponse<List<OrderDetailInfo>> selectActivityOrderProduct(ActivityOrderInfo activityOrderInfo) {
+        List<OrderDetailInfo> orderDetailInfos = storeActivityDao.selectActivityOrderProduct(activityOrderInfo);
+        return HttpResponse.success(orderDetailInfos);
     }
 }

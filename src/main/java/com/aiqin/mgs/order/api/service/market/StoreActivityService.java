@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.service.market;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.domain.OrderDetailInfo;
 import com.aiqin.mgs.order.api.domain.activity.ActivityOrderInfo;
 import com.aiqin.mgs.order.api.domain.response.market.ActivityReportOrderResp;
 
@@ -42,4 +43,11 @@ public interface StoreActivityService {
      * @return
      */
     HttpResponse<PageResData<ActivityOrderInfo>> selectActivityReportRelationOrder(String activityId, Integer pageNo, Integer pageSize);
+
+    /**
+     *  查询活动商品销量和销售额
+     * @param activityOrderInfo
+     * @return
+     */
+    HttpResponse<List<OrderDetailInfo>> selectActivityOrderProduct(ActivityOrderInfo activityOrderInfo);
 }

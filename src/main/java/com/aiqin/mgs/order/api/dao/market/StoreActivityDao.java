@@ -15,7 +15,7 @@ public interface StoreActivityDao {
 
     Long selectActivityOrderPackageSale(@Param("packageProductId") String packageProductId);
 
-    ActivityReportOrderResp selectActivityOrder(String storeId, String activityId);
+    ActivityReportOrderResp selectActivityOrder(@Param("storeId") String storeId, @Param("activityId") String activityId);
 
     List<OrderInfo> selectActivityOrderCode(@Param("storeId") String storeId, @Param("activityId") String activityId);
 
@@ -24,4 +24,6 @@ public interface StoreActivityDao {
     List<ActivityOrderInfo> selectActivityReportRelationOrder(OrderDetailInfo orderDetailInfo);
 
     Integer selectActivityReportRelationOrderCount(OrderDetailInfo orderDetailInfo);
+
+    List<OrderDetailInfo> selectActivityOrderProduct(ActivityOrderInfo activityOrderInfo);
 }

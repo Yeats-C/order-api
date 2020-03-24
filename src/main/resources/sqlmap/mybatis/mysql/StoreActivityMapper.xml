@@ -27,29 +27,6 @@
         group by t2.months_day
     </select>
 
-    <select id="selectActivityReportMemberOrder" resultType="java.lang.Long">
-       select count(1)
-        from order_detail od
-        left join order_info oi on oi.order_id = od.order_id
-        where oi.distributor_id = #{storeId}
-        and od.activity_id = #{activityId}
-        and od.create_time <![CDATA[>=]]> #{beginTime}
-        and od.create_time <![CDATA[<=]]> #{finishTime}
-        and oi.member_id != null
-        group by od.order_id
-    </select>
-
-    <select id="selectActivityReportOrderSale" resultType="java.lang.Long">
-       select sum(od.actual_price*od.amount)
-        from order_detail od
-        left join order_info oi on oi.order_id = od.order_id
-        where oi.distributor_id = #{storeId}
-        and od.activity_id = #{activityId}
-        and od.create_time <![CDATA[>=]]> #{beginTime}
-        and od.create_time <![CDATA[<=]]> #{finishTime}
-        group by od.order_id
-    </select>
-
     <select id="selectActivityOrder" resultType="com.aiqin.mgs.order.api.domain.response.market.ActivityReportOrderResp">
         select
           case when member_status=1 then t2.total else 0 end as memberOderCount,
@@ -64,9 +41,9 @@
                  od.activity_id as activity_id, od.actual_price as actual_price, od.amount as amount
                 from order_info oi
                 left join order_detail od on oi.order_id = od.order_id
-               where oi.distributor_id='ABEC8D65036E5A45DBABCBA413FA56AEA2'
+               where oi.distributor_id=#{storeId}
             ) AS t1
-            where t1.activity_id = 'AF980FCB6366B84F799BF21BDD045AF50F'
+            where t1.activity_id = #{activityId}
             group by t1.member_status order by t1.member_status desc
         ) t2
     </select>
@@ -114,5 +91,23 @@
         where activity_id = #{activityId}
         group by oi.order_code
         ) a
+    </select>
+
+    <select id="selectActivityOrderProduct" parameterType="com.aiqin.mgs.order.api.domain.activity.ActivityOrderInfo"
+            resultType="com.aiqin.mgs.order.api.domain.OrderDetailInfo">
+        select amount, actual_price as actualPrice
+        from order_detail
+        where activity_id=#{activityId}
+        <if test="activityType != null and activityType != 4">
+            <if test="skuCodes != null" >
+                and sku_code in
+                <foreach collection="skuCodes" separator="," open="(" close=")" item="item">
+                    #{item}
+                </foreach>
+            </if>
+        </if>
+        <if test="activityType != null and activityType == 4">
+
+        </if>
     </select>
 </mapper>

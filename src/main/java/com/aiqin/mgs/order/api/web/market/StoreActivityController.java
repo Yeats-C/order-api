@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.web.market;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.domain.OrderDetailInfo;
 import com.aiqin.mgs.order.api.domain.activity.ActivityOrderInfo;
 import com.aiqin.mgs.order.api.domain.response.market.ActivityReportOrderResp;
 import com.aiqin.mgs.order.api.service.market.StoreActivityService;
@@ -9,10 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -68,6 +66,12 @@ public class StoreActivityController {
                                                                                           @RequestParam(name = "page_no", required = false) Integer pageNo,
                                                                                           @RequestParam(name = "page_size", required = false) Integer pageSize) {
         return storeActivityService.selectActivityReportRelationOrder(activityId, pageNo, pageSize);
+    }
+
+    @PostMapping("/select/activity/order/product")
+    @ApiOperation("查询活动商品销量和销售额")
+    public HttpResponse<List<OrderDetailInfo>> selectActivityOrderProduct(@RequestBody ActivityOrderInfo activityOrderInfo) {
+        return storeActivityService.selectActivityOrderProduct(activityOrderInfo);
     }
 
 
