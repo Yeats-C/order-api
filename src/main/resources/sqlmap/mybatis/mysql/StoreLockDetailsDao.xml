@@ -246,11 +246,11 @@
     where sku_code = #{skuCode}
   </delete>
 
-    <select id="selectBySkuCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    <select id="selectByOrderCodeAndSkuCode" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.StoreLockDetails" >
         select
         <include refid="Base_Column_List" />
         from store_lock_details
-        where sku_code=  #{skuCode}
+        where order_code=#{orderCode} and sku_code=  #{skuCode}
     </select>
 
 </mapper>

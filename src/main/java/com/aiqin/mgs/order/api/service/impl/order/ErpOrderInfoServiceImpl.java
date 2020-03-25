@@ -114,9 +114,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     @Override
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public void orderSplit(String orderCode, AuthToken auth) {
-
+        logger.info("订单拆单--开始,入参orderCode={},auth={}",orderCode,auth);
         //原订单
         ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
+        logger.info("订单拆单--查询主单返回结果order={}",order);
         if (order == null) {
             throw new BusinessException("无效的订单编号");
         }
@@ -128,7 +129,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 flag = true;
             }
         }
-
+        logger.info("订单拆单--是否需要执行拆单如果为true则进行拆单,flag={}",flag);
         if (!flag) {
             //不是拆单状态
             return;
@@ -137,15 +138,17 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
         //原订单商品明细
         List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
+        logger.info("订单拆单--原订单商品明细 orderItemList={}",orderItemList);
         order.setItemList(orderItemList);
         //原订单日志
         List<ErpOrderOperationLog> orderOperationLogList = erpOrderOperationLogService.selectOrderOperationLogList(order.getOrderStoreCode());
-
+        logger.info("订单拆单--原订单日志 orderOperationLogList={}",orderOperationLogList);
         ErpOrderNodeProcessTypeEnum processTypeEnum = ErpOrderNodeProcessTypeEnum.getEnum(order.getOrderTypeCode(), order.getOrderCategoryCode());
+        logger.info("订单拆单--查询枚举 processTypeEnum={}",processTypeEnum);
         if (processTypeEnum == null) {
             throw new BusinessException("订单数据异常");
         }
-
+        logger.info("订单拆单--拆单类型 processType={}",processTypeEnum.isSplitByRepertory());
         if (processTypeEnum.isSplitByRepertory()) {
             //按照库存分组拆单
 
@@ -156,7 +159,6 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 //            List<ErpOrderItemSplitGroupResponse> lineSplitGroupList = erpOrderRequestService.getRepositorySplitGroup(order);
             //新的数据
             List<ErpOrderItemSplitGroupResponse> lineSplitGroupList = erpStoreLockDetailsService.getNewRepositorySplitGroup(order);
-            logger.info("订单拆单，从本地查询锁库数据lineSplitGroupList={}",lineSplitGroupList);
             if (lineSplitGroupList == null || lineSplitGroupList.size() == 0) {
                 throw new BusinessException("未获取到供应链商品分组");
             }
@@ -218,7 +220,9 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 list.add(item);
                 lineParamListMap.put(lineCode, list);
             }
-
+            logger.info("订单拆单--行号 -（仓库库房 - 数量）lineRepertoryMap={}",lineRepertoryMap);
+            logger.info("订单拆单--行号 - 参数根据行号分组的list lineParamListMap={}",lineParamListMap);
+            logger.info("订单拆单--行号 -仓库库房 -（仓库库房编码名称信息） repertoryDetailMap={}",repertoryDetailMap);
             //遍历原订单明细行
             for (ErpOrderItem item :
                     orderItemList) {
@@ -289,7 +293,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 }
 
             }
-
+            logger.info("行分组结果map  仓库库房 - 明细行 repertorySplitMap={}",repertorySplitMap);
             if (repertorySplitMap.size() > 1) {
                 //多个仓库库房组，拆分订单
 
