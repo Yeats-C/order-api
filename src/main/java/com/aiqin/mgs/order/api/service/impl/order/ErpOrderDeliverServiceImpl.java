@@ -283,13 +283,21 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_11.getCode());
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_10.getCode());
             erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
+            boolean flag=false;
+            //这两个都走线下支付物流费用
+            if(ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(order.getOrderTypeCode())){//配送
+                //首单或首单赠送
+                if(ErpOrderCategoryEnum.ORDER_TYPE_2.getValue().equals(order.getOrderCategoryCode())||ErpOrderCategoryEnum.ORDER_TYPE_4.getValue().equals(order.getOrderCategoryCode())){
+                    flag=true;
+                }
+            }
 
             if (!processTypeEnum.isHasLogisticsFee()) {
                 //不需要支付物流费用的订单
                 order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_11.getCode());
                 erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
             } else {
-                if (orderLogistics != null && ErpPayStatusEnum.SUCCESS.getCode().equals(orderLogistics.getPayStatus())) {
+                if ((orderLogistics != null && ErpPayStatusEnum.SUCCESS.getCode().equals(orderLogistics.getPayStatus()))||flag) {
                     order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_12.getCode());
                     order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_11.getCode());
                     erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
