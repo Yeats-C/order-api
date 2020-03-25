@@ -329,6 +329,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 for(StockVoRequest stockVoRequest:list2){
                     StoreLockDetails storeLockDetail=new StoreLockDetails();
                     BeanUtils.copyProperties(stockVoRequest,storeLockDetail);
+                    storeLockDetail.setOrderCode(order.getOrderStoreCode());
                     if(null!=stockVoRequest.getSkuCode()&&null!=skuCodeLineMap.get(stockVoRequest.getSkuCode())){
                         Long loneCode=Long.valueOf(skuCodeLineMap.get(stockVoRequest.getSkuCode()).toString());
                         storeLockDetail.setLineCode(loneCode);
