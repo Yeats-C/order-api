@@ -778,28 +778,41 @@
 
     <!--活动相关订单销售额及活动订单数(当订单中的商品命中了这个促销活动时，这个订单纳入统计，统计主订单。-->
     <select id="getActivitySales" resultType="com.aiqin.mgs.order.api.domain.ActivitySales" parameterType="com.aiqin.mgs.order.api.domain.Activity">
-        SELECT
-        COALESCE(SUM( total_product_amount ),0) AS activitySales,
+        SELECT COALESCE
+        ( SUM( i.total_product_amount ), 0 ) AS activitySales,
         COUNT( 1 ) AS activitySalesNum
         FROM
-        order_store_info
+        order_store_detail d
+        LEFT JOIN order_store_info i ON i.order_store_code = d.order_store_code
         WHERE
-            is_activity =1
+        d.is_activity = 1
         <if test="activityId != '' and activityId != null">
-            and activity_id = #{activityId}
+            and d.activity_id = #{activityId}
         </if>
+        GROUP BY
+        i.order_store_code
+
     </select>
 
     <!--活动补货门店数-->
     <select id="getStoreNum" resultType="java.lang.Integer" parameterType="com.aiqin.mgs.order.api.domain.Activity">
         SELECT
-            COUNT( a.storeCode )
+        COUNT( a.storeCode )
         FROM
-            ( SELECT store_code AS storeCode FROM order_store_info WHERE is_activity = 1
+        (
+        SELECT
+        i.store_code AS storeCode
+        FROM
+        order_store_detail d
+        LEFT JOIN order_store_info i ON i.order_store_code = d.order_store_code
+        WHERE
+        d.is_activity = 1
         <if test="activityId != '' and activityId != null">
-            and activity_id = #{activityId}
+            and d.activity_id = #{activityId}
         </if>
-            GROUP BY store_code ) a
+        GROUP BY
+        i.store_code
+        ) a
     </select>
 </mapper>
 

@@ -314,7 +314,7 @@ public class ActivityServiceImpl implements ActivityService {
             //平均单价
             BigDecimal averageUnitPrice=BigDecimal.ZERO;
             if(activitySales.getActivitySalesNum().compareTo(BigDecimal.ZERO)!=0){
-                averageUnitPrice=activitySales.getActivitySales().divide(activitySales.getActivitySalesNum(),0, RoundingMode.HALF_UP);
+                averageUnitPrice=activitySales.getActivitySales().divide(activitySales.getActivitySalesNum(),2, RoundingMode.HALF_UP);
             }
             activitySales.setProductSales(productSales);
             activitySales.setStoreNum(storeNum);
