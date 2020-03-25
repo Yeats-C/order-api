@@ -778,9 +778,11 @@
 
     <!--活动相关订单销售额及活动订单数(当订单中的商品命中了这个促销活动时，这个订单纳入统计，统计主订单。-->
     <select id="getActivitySales" resultType="com.aiqin.mgs.order.api.domain.ActivitySales" parameterType="com.aiqin.mgs.order.api.domain.Activity">
+        select SUM(a.activitySales1)	as activitySales,
+        count(a.activitySalesNum1) as activitySalesNum from (
         SELECT COALESCE
-        ( SUM( i.total_product_amount ), 0 ) AS activitySales,
-        COUNT( 1 ) AS activitySalesNum
+        ( SUM( i.total_product_amount ), 0 ) AS activitySales1,
+        COUNT( 1 ) AS activitySalesNum1
         FROM
         order_store_detail d
         LEFT JOIN order_store_info i ON i.order_store_code = d.order_store_code
@@ -790,8 +792,7 @@
             and d.activity_id = #{activityId}
         </if>
         GROUP BY
-        i.order_store_code
-
+        i.order_store_code ) a
     </select>
 
     <!--活动补货门店数-->
