@@ -430,7 +430,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             log.info("清除本地锁库存记录,入参skuCodes={}",skuCodes);
             if(skuCodes!=null&&skuCodes.size()>0){
                 for(String skuCode:skuCodes){
-                    erpStoreLockDetailsService.deleteBySkuCode(skuCode);
+                    erpStoreLockDetailsService.deleteBySkuCode(order.getOrderStoreCode(),skuCode);
                 }
             }
 
@@ -471,7 +471,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             log.info("清除本地锁库存记录,入参erpOrderItems{}",erpOrderItems);
             if(erpOrderItems!=null&&erpOrderItems.size()>0){
                 for(ErpOrderItem eoi:erpOrderItems){
-                    erpStoreLockDetailsService.deleteBySkuCode(eoi.getSkuCode());
+                    erpStoreLockDetailsService.deleteBySkuCode(order.getOrderStoreCode(),eoi.getSkuCode());
                 }
             }
 
