@@ -1144,7 +1144,9 @@ public class ActivityServiceImpl implements ActivityService {
                 while(it.hasNext()){
                     ActivityProduct str = it.next();
                     for(QueryProductBrandRespVO brand:response2.getQueryProductBrandRespVO()){
-                        if (str.getProductBrandCode().equals(brand.getBrandId())){
+                        if(null==str.getProductBrandCode()){
+                            queryProductBrandRespVO.add(brand);
+                        }else if (null!=str.getProductBrandCode()&&str.getProductBrandCode().equals(brand.getBrandId())){
                             queryProductBrandRespVO.add(brand);
                         }
                     }
@@ -1161,7 +1163,9 @@ public class ActivityServiceImpl implements ActivityService {
                 while(it.hasNext()){
                     ActivityProduct str = it.next();
                     for(ProductCategoryRespVO cate:response2.getProductCategoryRespVOList()){
-                        if(str.getProductCategoryCode().substring(0,2).equals(cate.getCategoryId())){
+                        if(null==str.getProductCategoryCode()){
+                            productCategoryRespVOList.add(cate);
+                        }else if(null!=str.getProductCategoryCode()&&str.getProductCategoryCode().substring(0,2).equals(cate.getCategoryId())){
                             productCategoryRespVOList.add(cate);
                         }
                     }
