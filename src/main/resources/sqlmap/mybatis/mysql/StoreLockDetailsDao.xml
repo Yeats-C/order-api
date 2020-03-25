@@ -241,9 +241,9 @@
     </foreach>
   </insert>
 
-  <delete id="deleteBySkuCode" parameterType="java.lang.String" >
+  <delete id="deleteByOrderCodeAndSkuCode" parameterType="com.aiqin.mgs.order.api.domain.StoreLockDetails" >
     delete from store_lock_details
-    where sku_code = #{skuCode}
+    where  order_code=#{orderCode} and sku_code = #{skuCode}
   </delete>
 
     <select id="selectByOrderCodeAndSkuCode" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.StoreLockDetails" >

@@ -49,6 +49,6 @@ public interface ErpStoreLockDetailsService {
      * @param skuCode
      * @return
      */
-    int deleteBySkuCode(String skuCode);
+    int deleteBySkuCode(String orderCode,String skuCode);
 
 }

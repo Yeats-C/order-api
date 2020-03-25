@@ -399,7 +399,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             //删除本地锁库明细
             for(ErpOrderItemSplitGroupResponse res1:lineSplitGroupList){
                 //删除本地缓存
-                erpStoreLockDetailsService.deleteBySkuCode(res1.getSkuCode());
+                erpStoreLockDetailsService.deleteBySkuCode(orderCode,res1.getSkuCode());
             }
 
         } else {
