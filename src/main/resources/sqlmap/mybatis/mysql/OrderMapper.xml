@@ -1564,7 +1564,7 @@
         <result column="atotal_product_amount" jdbcType="DECIMAL" property="totalProductAmount" />
         <result column="aorder_amount" jdbcType="DECIMAL" property="orderAmount" />
         <result column="adeliver_amount" jdbcType="DECIMAL" property="deliverAmount" />
-        <result column="actual_total_product_amount" jdbcType="DECIMAL" property="actualTotalProductAmount" />
+        <result column="aactual_total_product_amount" jdbcType="DECIMAL" property="actualTotalProductAmount" />
         <result column="adiscount_amount" jdbcType="DECIMAL" property="discountAmount" />
         <result column="asuit_coupon_money" jdbcType="DECIMAL" property="suitCouponMoney" />
         <result column="atop_coupon_money" jdbcType="DECIMAL" property="topCouponMoney" />
@@ -1630,7 +1630,7 @@
         a.actual_product_count aactual_product_count, a.total_volume atotal_volume, a.total_weight atotal_weight,
         a.actual_total_volume aactual_total_volume, a.actual_total_weight aactual_total_weight,
         a.total_product_amount atotal_product_amount, a.order_amount aorder_amount,
-        a.deliver_amount adeliver_amount,
+        a.deliver_amount adeliver_amount, a.actual_total_product_amount aactual_total_product_amount,
 
         b.sku_code bsku_code, b.sku_name bsku_name, b.picture_url bpicture_url,
         b.product_spec bspec, b.color_name bcolor_name, b.model_code bmodel, b.unit_name bunit_name,
