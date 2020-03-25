@@ -1631,7 +1631,7 @@
         a.actual_product_count aactual_product_count, a.total_volume atotal_volume, a.total_weight atotal_weight,
         a.actual_total_volume aactual_total_volume, a.actual_total_weight aactual_total_weight,
         a.total_product_amount atotal_product_amount, a.order_amount aorder_amount,
-        a.deliver_amount adeliver_amount, a.actual_total_product_amount aactual_total_product_amount,
+        a.actual_total_product_amount aactual_total_product_amount,
 
         b.sku_code bsku_code, b.sku_name bsku_name, b.picture_url bpicture_url,
         b.product_spec bspec, b.color_name bcolor_name, b.model_code bmodel, b.unit_name bunit_name,
@@ -1651,7 +1651,7 @@
 
         f.suit_coupon_money asuit_coupon_money, f.top_coupon_money atop_coupon_money,
         f.total_money aactual_total_product_amount, f.pay_money aactual_order_amount,
-        f.activity_money aactivity_money
+        f.activity_money aactivity_money, l.logistics_fee adeliver_amount
 
 --         d.sku_code dsku_code, d.sku_name dsku_name, d.batch_code dbatch_code,
 --         d.product_date dproduct_date, d.batch_remark dbatch_remark,
@@ -1661,6 +1661,7 @@
         left join order_store_detail b on a.order_store_code = b.order_store_code
         left join operation_log o on o.operation_code = a.order_store_code
         left join order_store_fee f on f.fee_id = a.fee_id
+        left join order_store_logistics l on l.logistics_id = a.logistics_id
 --         left join order_store_detail_batch d on d.order_store_code = a.order_store_code
         where o.source_type = 0 and a.order_store_code = #{orderCode}
     </select>
