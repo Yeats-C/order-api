@@ -314,7 +314,7 @@ public class ActivityServiceImpl implements ActivityService {
             //平均单价
             BigDecimal averageUnitPrice=BigDecimal.ZERO;
             if(activitySales.getActivitySalesNum().compareTo(BigDecimal.ZERO)!=0){
-                averageUnitPrice=activitySales.getActivitySales().divide(activitySales.getActivitySalesNum(),0, RoundingMode.HALF_UP);
+                averageUnitPrice=activitySales.getActivitySales().divide(activitySales.getActivitySalesNum(),2, RoundingMode.HALF_UP);
             }
             activitySales.setProductSales(productSales);
             activitySales.setStoreNum(storeNum);
@@ -1126,6 +1126,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public ProductCategoryAndBrandResponse2 ProductCategoryAndBrandResponse(String conditionCode, String type, String activityId) {
+        LOGGER.info("品牌品类对应关系查询接口ProductCategoryAndBrandResponse参数conditionCode为={},参数type为={},参数activityId为={}",conditionCode,type,activityId);
         HttpResponse res=   bridgeProductService.selectCategoryByBrandCode(conditionCode,type);
         ProductCategoryAndBrandResponse2 response2=new ProductCategoryAndBrandResponse2();
         if(null!=res.getData()){
