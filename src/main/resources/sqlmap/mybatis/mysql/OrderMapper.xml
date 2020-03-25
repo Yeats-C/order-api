@@ -1618,7 +1618,7 @@
         a.order_level aorder_level,a.main_order_code amain_order_code, a.supplier_name asupplier_name,
         a.transport_center_name atransport_center_name, a.warehouse_name awarehouse_name,
         a.invoice_type ainvoice_type, a.invoice_title ainvoice_title, a.transport_code atransport_code,
-        a.transport_company_code atransport_company_code, a.transport_company_name atransport_company,
+        a.transport_company_code atransport_company_code, a.transport_company_name atransport_company_name,
         a.payment_time apayment_time, a.delivery_time adelivery_time, a.transport_time atransport_time,
         a.receive_time areceive_time, a.create_time acreate_time, a.remake aremake, a.update_time aupdate_time,
         a.create_by_id acreate_by_id, a.create_by_name acreate_by_name, a.update_by_id aupdate_by_id,
