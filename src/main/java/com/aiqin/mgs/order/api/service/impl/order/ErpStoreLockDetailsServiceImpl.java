@@ -43,17 +43,18 @@ public class ErpStoreLockDetailsServiceImpl implements ErpStoreLockDetailsServic
 
     @Override
     public List<ErpOrderItemSplitGroupResponse> getNewRepositorySplitGroup(ErpOrderInfo order) {
-        log.info("查询商品锁库信息，从本地查询入参order={}",order);
+        log.info("订单拆单--查询商品锁库信息，从本地查询入参order={}",order);
         List<ErpOrderItemSplitGroupResponse> list = new ArrayList<>();
         for (ErpOrderItem item : order.getItemList()) {
             StoreLockDetails storeLockDetails=new StoreLockDetails();
-            storeLockDetails.setLineCode(item.getLineCode());
+//            storeLockDetails.setLineCode(item.getLineCode());
             storeLockDetails.setSkuCode(item.getSkuCode());
-            storeLockDetails.setChangeCount(Integer.valueOf(item.getProductCount().toString()));
-            log.info("查询商品锁库信息，从本地查询商品skuCode={},lineCode={},lockCount={}",item.getSkuCode(),item.getLineCode(),item.getProductCount());
+//            storeLockDetails.setChangeCount(Integer.valueOf(item.getProductCount().toString()));
+            storeLockDetails.setOrderCode(order.getOrderStoreCode());
+            log.info("订单拆单--查询商品锁库信息，从本地查询商品orderCode={},skuCode={}",order.getOrderStoreCode(),item.getSkuCode());
 //            StoreLockDetails storeLockDetails1 = storeLockDetailsDao.selectByLineCodeAndSkuCodeAndLockCount(storeLockDetails);
-            StoreLockDetails storeLockDetails1 = storeLockDetailsDao.selectBySkuCode(item.getSkuCode());
-            log.info("查询商品锁库信息，从本地查询商品单行返回结果storeLockDetails1={}",storeLockDetails1);
+            StoreLockDetails storeLockDetails1 = storeLockDetailsDao.selectByOrderCodeAndSkuCode(storeLockDetails);
+            log.info("订单拆单--查询商品锁库信息，从本地查询商品单行返回结果storeLockDetails1={}",storeLockDetails1);
             if(storeLockDetails1!=null){
                 ErpOrderItemSplitGroupResponse erpOrderItemSplitGroupResponse=new ErpOrderItemSplitGroupResponse();
                 BeanUtils.copyProperties(storeLockDetails1,erpOrderItemSplitGroupResponse);
@@ -61,7 +62,7 @@ public class ErpStoreLockDetailsServiceImpl implements ErpStoreLockDetailsServic
                 list.add(erpOrderItemSplitGroupResponse);
             }
         }
-        log.info("查询商品锁库信息，从本地查询返回结果list={}",list);
+        log.info("订单拆单--查询商品锁库信息，从本地查询返回结果list={}",list);
         return list;
     }
 
