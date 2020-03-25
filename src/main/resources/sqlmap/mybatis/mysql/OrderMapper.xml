@@ -1569,6 +1569,7 @@
         <result column="asuit_coupon_money" jdbcType="DECIMAL" property="suitCouponMoney" />
         <result column="atop_coupon_money" jdbcType="DECIMAL" property="topCouponMoney" />
         <result column="aactual_order_amount" jdbcType="DECIMAL" property="actualOrderAmount" />
+        <result column="aactivity_money" jdbcType="DECIMAL" property="activityDiscount" />
         <collection property="productList" ofType="com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoItemRespVO">
             <result column="bsku_code" jdbcType="VARCHAR" property="skuCode" />
             <result column="bsku_name" jdbcType="VARCHAR" property="skuName" />
@@ -1649,7 +1650,8 @@
         o.remark oremark, o.create_by_name ocreate_by_name, o.create_time ocreate_time,
 
         f.suit_coupon_money asuit_coupon_money, f.top_coupon_money atop_coupon_money,
-        f.total_money aactual_total_product_amount, f.pay_money aactual_order_amount
+        f.total_money aactual_total_product_amount, f.pay_money aactual_order_amount,
+        f.activity_money aactivity_money
 
 --         d.sku_code dsku_code, d.sku_name dsku_name, d.batch_code dbatch_code,
 --         d.product_date dproduct_date, d.batch_remark dbatch_remark,
