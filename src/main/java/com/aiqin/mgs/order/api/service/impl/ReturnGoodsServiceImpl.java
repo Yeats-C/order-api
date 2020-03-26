@@ -53,7 +53,7 @@ public class ReturnGoodsServiceImpl implements ReturnGoodsService {
         respVO.setItemList(itemList);
 
         // 查询退货单日志信息
-        List<OperationOrderLog> logList = operationLogDao.searchOrderLog(code, 3);
+        List<OperationOrderLog> logList = operationLogDao.searchOrderLog(code, 2);
         respVO.setLogList(logList);
         return respVO;
     }

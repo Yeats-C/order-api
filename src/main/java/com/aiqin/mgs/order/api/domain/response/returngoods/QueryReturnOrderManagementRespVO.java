@@ -18,7 +18,7 @@ public class QueryReturnOrderManagementRespVO {
     @ApiModelProperty("订单编码(订单号)")
     private String orderStoreCode;
 
-    @ApiModelProperty("退货类型：客户退货、缺货退货、售后退货")
+    @ApiModelProperty("退货类型： 0客户退货、1缺货退货、2售后退货、3冲减单 、4客户取消")
     private String returnOrderType;
 
     @ApiModelProperty("客户名称")
