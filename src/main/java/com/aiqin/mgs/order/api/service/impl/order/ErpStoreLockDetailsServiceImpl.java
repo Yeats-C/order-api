@@ -55,8 +55,8 @@ public class ErpStoreLockDetailsServiceImpl implements ErpStoreLockDetailsServic
             List<ErpOrderItem> eoiList=new ArrayList<>();
             if(null!=skuDetailListMap&&null!=skuDetailListMap.get(skuCode)){
                 eoiList=skuDetailListMap.get(skuCode);
-                eoiList.add(item);
             }
+            eoiList.add(item);
             skuDetailListMap.put(skuCode,eoiList);
         }
         log.info("订单拆单--将相同sku详情汇总，skuDetailListMap={}",skuDetailListMap);
