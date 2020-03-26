@@ -515,7 +515,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
             //遍历有活动的行
             for (Map.Entry<String, List<ErpOrderCartInfo>> entry :
                     activityCartMap.entrySet()) {
-                ErpCartGroupInfo cartGroupInfo = generateCartGroup(usefulActivityMap.get(entry.getKey()), store, entry.getValue());
+                ErpCartGroupInfo cartGroupInfo = generateCartGroup(usefulActivityMap.get(entry.getKey()), store, entry.getValue(),skuDetailMap);
                 cartGroupList.add(cartGroupInfo);
             }
         }
@@ -976,9 +976,10 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
      * @param activityRequest 活动详情
      * @param store           门店信息
      * @param list            本品列表
+     * @param skuDetailMap
      * @return
      */
-    private ErpCartGroupInfo generateCartGroup(ActivityRequest activityRequest, StoreInfo store, List<ErpOrderCartInfo> list) {
+    private ErpCartGroupInfo generateCartGroup(ActivityRequest activityRequest, StoreInfo store, List<ErpOrderCartInfo> list, Map<String, ErpSkuDetail> skuDetailMap) {
 
         ErpCartGroupInfo cartGroupInfo = new ErpCartGroupInfo();
         cartGroupInfo.setCartProductList(list);
@@ -1160,6 +1161,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                             giftList) {
                         //生成赠品行
                         ErpOrderCartInfo giftProductLine = createGiftProductLine(activity, giftItem, store);
+                        ErpSkuDetail skuDetail = skuDetailMap.get(giftProductLine.getSkuCode());
+                        giftProductLine.setStockNum(skuDetail.getStockNum());
+                        giftProductLine.setIsSale(skuDetail.getIsSale());
                         cartGiftList.add(giftProductLine);
                     }
                     cartGroupInfo.setCartGiftList(cartGiftList);
