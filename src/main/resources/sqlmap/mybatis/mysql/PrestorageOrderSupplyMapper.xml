@@ -143,6 +143,9 @@
             </foreach>
             )
         </if>
+        <if test="distributorCode!=null and distributorCode!=''">
+            and a.distributor_code = #{distributorCode}
+        </if>
         <if test="distributorName!=null and distributorName!=''">
             and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
         </if>
@@ -196,6 +199,9 @@
                 '${distributorId}'
             </foreach>
             )
+        </if>
+        <if test="distributorCode!=null and distributorCode!=''">
+            and a.distributor_code = #{distributorCode}
         </if>
         <if test="distributorName!=null and distributorName!=''">
             and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
