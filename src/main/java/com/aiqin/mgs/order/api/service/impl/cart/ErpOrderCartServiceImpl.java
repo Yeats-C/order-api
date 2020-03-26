@@ -1500,6 +1500,10 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         //生成赠品行
                         ErpOrderCartInfo giftProductLine = createGiftProductLineWithinStock(activity, giftItem, store, skuDetailMap, skuStockNumMap, true);
                         if (giftProductLine != null) {
+                            ErpSkuDetail skuDetail = skuDetailMap.get(giftProductLine.getSkuCode());
+                            giftProductLine.setStockNum(skuDetail.getStockNum());
+                            giftProductLine.setIsSale(skuDetail.getIsSale());
+                            giftProductLine.setActivityPrice(BigDecimal.ZERO);
                             cartGiftList.add(giftProductLine);
                             amountTotal = amountTotal.add(giftProductLine.getPrice().multiply(new BigDecimal(giftProductLine.getAmount())));
                         }
