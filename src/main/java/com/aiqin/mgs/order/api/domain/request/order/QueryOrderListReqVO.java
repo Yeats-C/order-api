@@ -25,7 +25,7 @@ public class QueryOrderListReqVO extends PageReq {
     private Integer orderStatus;
 
     @ApiModelProperty("订单类型")
-    @NotNull(message = "订单类型不能为空！(1直送，2配送，3辅采)")
+    //@NotNull(message = "订单类型不能为空！(1直送，2配送，3辅采)")
     private Integer orderType;
 
     @ApiModelProperty("物流中心编码")
@@ -38,10 +38,10 @@ public class QueryOrderListReqVO extends PageReq {
     private String supplierCode;
 
     @ApiModelProperty("是否锁定(0否1是）")
-    private Integer beLock;
+    private Integer orderLock;
 
     @ApiModelProperty("是否是异常订单(0否1是)")
-    private Integer beException;
+    private Integer orderException;
 
     @ApiModelProperty("客户名称")
     private String customerName;

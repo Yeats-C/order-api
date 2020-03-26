@@ -32,6 +32,8 @@ import com.aiqin.mgs.order.api.domain.pay.PayReq;
 import com.aiqin.mgs.order.api.domain.request.*;
 import com.aiqin.mgs.order.api.domain.request.order.QueryOrderListReqVO;
 import com.aiqin.mgs.order.api.domain.response.*;
+import com.aiqin.mgs.order.api.domain.response.activity.ActivityPackageProductDTO;
+import com.aiqin.mgs.order.api.domain.response.activity.StoreActivityDetailsResp;
 import com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoItemRespVO;
 import com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoRespVO;
 import com.aiqin.mgs.order.api.domain.response.order.QueryOrderListRespVO;
@@ -499,15 +501,23 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public BasePage<QueryOrderListRespVO> list(QueryOrderListReqVO reqVO) {
-        // reqVO.setCompanyCode(getUser().getCompanyCode());
         PageHelper.startPage(reqVO.getPageNo(), reqVO.getPageSize());
         List<QueryOrderListRespVO> list = orderDao.selectListByQueryVO(reqVO);
+        // 计算商品数量
+        if(CollectionUtils.isNotEmpty(list)){
+            for (QueryOrderListRespVO vo:list){
+                Long productCount = orderDao.orderProductBySum(vo.getOrderCode());
+                vo.setProductCount(productCount);
+            }
+        }
         return PageUtil.getPageList(reqVO.getPageNo(),list);
     }
 
     @Override
     public QueryOrderInfoRespVO view(String orderCode) {
-        return orderDao.selectByOrderCode(orderCode);
+        QueryOrderInfoRespVO queryOrderInfoRespVO = orderDao.selectByOrderCode(orderCode);
+        queryOrderInfoRespVO.setProductCount(orderDao.orderProductBySum(orderCode));;
+        return queryOrderInfoRespVO;
     }
 
     private OrderQuery trans(OrderQuery orderQuery) {
@@ -578,26 +588,67 @@ public class OrderServiceImpl implements OrderService {
         inventoryDetailRequest.setStoragePosition(1);
         inventoryDetailRequest.setStorageType(1);
         orderInfo.getDetailList().stream().forEach(input -> {
-            OperateStockVo stockVo = new OperateStockVo();
-            stockVo.setStoreCode(orderInfo.getOrderInfo().getDistributorCode());
-            stockVo.setStoreId(orderInfo.getOrderInfo().getDistributorId());
-            stockVo.setRecordNumber(Optional.ofNullable(input.getAmount()).orElse(0));
-            stockVo.setProductSku(input.getSkuCode());
-            stockVo.setRecordType(StockChangeTypeEnum.OUT_STORAGE.getCode());
-            stockVo.setBillType(BillTypeEnum.DOOR_SALE.getCode());
-            stockVo.setStorageType(StorageTypeEnum.DOOR_STORE.getCode());
-            /*stockVo.setStoragePosition(ReturnGoodsToStockEnum.DISPLAY_STOCK.getCode());*/
-            stockVo.setProductSku(input.getSkuCode());
-            stockVo.setOperator(orderInfo.getOrderInfo().getCashierName());
-            stockVo.setCreateByName(orderInfo.getOrderInfo().getCashierName());
-            stockVo.setStoragePosition(1);
-            stockVo.setReleaseStatus(ReleaseStatusEnum.RELEASE.getCode());
-            stockVo.setRelateNumber(orderInfo.getOrderInfo().getOrderCode());
-            operateStockVos.add(stockVo);
+            //套餐包
+            if (input.getPackageId()!=null){
+
+                List<ActivityPackageProductDTO> activityPackageProductDTOS=getPackageDetails(input.getPackageId());
+                if (activityPackageProductDTOS!=null){
+                    activityPackageProductDTOS.stream().forEach(product->{
+                            OperateStockVo stockVo = new OperateStockVo();
+                            stockVo.setStoreCode(orderInfo.getOrderInfo().getDistributorCode());
+                            stockVo.setStoreId(orderInfo.getOrderInfo().getDistributorId());
+                            stockVo.setRecordNumber(Optional.ofNullable(product.getSkuCount()).orElse(0));
+                            stockVo.setProductSku(product.getSkuCode());
+                            stockVo.setRecordType(StockChangeTypeEnum.OUT_STORAGE.getCode());
+                            stockVo.setBillType(BillTypeEnum.DOOR_SALE.getCode());
+                            stockVo.setStorageType(StorageTypeEnum.DOOR_STORE.getCode());
+                            /*stockVo.setStoragePosition(ReturnGoodsToStockEnum.DISPLAY_STOCK.getCode());*/
+                            stockVo.setProductSku(product.getSkuCode());
+                            stockVo.setOperator(orderInfo.getOrderInfo().getCashierName());
+                            stockVo.setCreateByName(orderInfo.getOrderInfo().getCashierName());
+                            stockVo.setStoragePosition(1);
+                            stockVo.setReleaseStatus(ReleaseStatusEnum.RELEASE.getCode());
+                            stockVo.setRelateNumber(orderInfo.getOrderInfo().getOrderCode());
+                            operateStockVos.add(stockVo);
+                    });
+                }
+            }else {
+                OperateStockVo stockVo = new OperateStockVo();
+                stockVo.setStoreCode(orderInfo.getOrderInfo().getDistributorCode());
+                stockVo.setStoreId(orderInfo.getOrderInfo().getDistributorId());
+                stockVo.setRecordNumber(Optional.ofNullable(input.getAmount()).orElse(0));
+                stockVo.setProductSku(input.getSkuCode());
+                stockVo.setRecordType(StockChangeTypeEnum.OUT_STORAGE.getCode());
+                stockVo.setBillType(BillTypeEnum.DOOR_SALE.getCode());
+                stockVo.setStorageType(StorageTypeEnum.DOOR_STORE.getCode());
+                /*stockVo.setStoragePosition(ReturnGoodsToStockEnum.DISPLAY_STOCK.getCode());*/
+                stockVo.setProductSku(input.getSkuCode());
+                stockVo.setOperator(orderInfo.getOrderInfo().getCashierName());
+                stockVo.setCreateByName(orderInfo.getOrderInfo().getCashierName());
+                stockVo.setStoragePosition(1);
+                stockVo.setReleaseStatus(ReleaseStatusEnum.RELEASE.getCode());
+                stockVo.setRelateNumber(orderInfo.getOrderInfo().getOrderCode());
+                operateStockVos.add(stockVo);
+            }
+
         });
         inventoryDetailRequest.setInventoryRecordRequests(operateStockVos);
         inventoryDetailRequests.add(inventoryDetailRequest);
         return bridgeProductService.changeStock(inventoryDetailRequests);
+    }
+
+    private List<ActivityPackageProductDTO> getPackageDetails(String packageId) {
+
+        HttpClient httpClient = HttpClient.get(urlProperties.getMarketApi() + "/activity/details/select/package/product/info?package_id=" + packageId);
+        HttpResponse<List<ActivityPackageProductDTO>> result = httpClient.action().result(new TypeReference<HttpResponse<List<ActivityPackageProductDTO>>>() {
+        });
+
+            if (Objects.nonNull(result) && Objects.equals("0", result.getCode())) {
+                List<ActivityPackageProductDTO> data = result.getData();
+
+                return data;
+            }
+            return null;
     }
 
 

@@ -55,5 +55,12 @@ public class AfterReturnOrderSearchVo implements Serializable {
     @JsonProperty("return_reason_code")
     private String returnReasonCode;
 
+    @ApiModelProperty(value = "用户id--数据权限使用")
+    @JsonProperty("person_id")
+    private String personId;
+
+    @ApiModelProperty(value = "菜单编码--数据权限使用")
+    @JsonProperty("resource_code")
+    private String resourceCode;
 
 }

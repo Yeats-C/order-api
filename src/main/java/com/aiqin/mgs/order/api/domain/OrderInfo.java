@@ -182,6 +182,10 @@ public class OrderInfo extends PagesRequest {
 	@JsonProperty("turn_return_view")
 	private Integer turnReturnView;
 
+	@JsonProperty("sku_codes")
+	@ApiModelProperty("sku编码集合")
+	private List<String> skuCodes;
+
 
 
 	public Integer getTurnReturnView() {
@@ -510,7 +514,14 @@ public class OrderInfo extends PagesRequest {
 	public void setReceiveTime(Date receiveTime) {
 		this.receiveTime = receiveTime;
 	}
-	
+
+	public List<String> getSkuCodes() {
+		return skuCodes;
+	}
+
+	public void setSkuCodes(List<String> skuCodes) {
+		this.skuCodes = skuCodes;
+	}
 }
 
 

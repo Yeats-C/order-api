@@ -121,7 +121,7 @@ public interface ActivityService {
      * @param response
      * @return
      */
-    HttpResponse excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response);
+    void excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response);
 
     /**
      *活动列表-对比分析柱状图
@@ -136,7 +136,7 @@ public interface ActivityService {
      * @param response
      * @return
      */
-    HttpResponse excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response);
+    void excelActivitySalesStatistics(List<String> activityIdList, HttpServletResponse response);
 
     /**
      * 活动商品筛选分页
@@ -151,4 +151,18 @@ public interface ActivityService {
      * @return
      */
     List<Activity> activityList(ActivityParameterRequest activityParameterRequest);
+
+    /**
+     * 品牌和品类关系,condition_code为查询条件，type=2 通过品牌查品类,type=1 通过品类查品牌
+     * @param conditionCode
+     * @param type
+     * @param activityId
+     * @return
+     */
+    ProductCategoryAndBrandResponse2 ProductCategoryAndBrandResponse(String conditionCode, String type, String activityId);
+
+    /**
+     * 通过列表id查询门店权限集合
+     */
+    List<String> storeIds(String code);
 }

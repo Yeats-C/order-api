@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aiqin.mgs.order.api.dao.ReportCategoryGoodsDao" >
+  <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.ReportCategoryGoods" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="category_code" property="categoryCode" jdbcType="VARCHAR" />
+    <result column="category_name" property="categoryName" jdbcType="VARCHAR" />
+    <result column="amount" property="amount" jdbcType="DECIMAL" />
+    <result column="proportion" property="proportion" jdbcType="DECIMAL" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="type" property="type" jdbcType="TINYINT"/>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, category_code, category_name, amount, proportion, create_time,type
+  </sql>
+
+  <delete id="deleteByType" parameterType="java.lang.Integer" >
+    delete from report_category_goods
+    where type = #{type}
+  </delete>
+
+  <select id="selectList" resultMap="BaseResultMap"
+          parameterType="com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo">
+    select
+    <include refid="Base_Column_List"/>
+    from report_category_goods
+    <where>
+      <if test="type != null">
+        and type = #{type}
+      </if>
+    </where>
+  </select>
+
+  <insert id="insertBatch" parameterType="list">
+    insert into report_category_goods (category_code, category_name,
+    amount, proportion, create_time,type)
+    values
+    <foreach collection="records" item="item" index="index" separator=",">
+      (
+        #{item.categoryCode,jdbcType=VARCHAR}, #{item.categoryName,jdbcType=VARCHAR},
+        #{item.amount,jdbcType=DECIMAL}, #{item.proportion,jdbcType=DECIMAL}, #{item.createTime,jdbcType=TIMESTAMP},#{item.type,jdbcType=TINYINT}
+      )
+    </foreach>
+  </insert>
+
+</mapper>

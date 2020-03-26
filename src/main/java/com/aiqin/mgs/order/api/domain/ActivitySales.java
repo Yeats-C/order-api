@@ -19,17 +19,17 @@ public class ActivitySales implements Serializable {
     /**活动相关订单销售额(当订单中的商品命中了这个促销活动时，这个订单纳入统计，统计主订单。)*/
     @ApiModelProperty(value = "活动相关订单销售额(当订单中的商品命中了这个促销活动时，这个订单纳入统计，统计主订单。)")
     @JsonProperty("activitySales")
-    private BigDecimal activitySales;
+    private BigDecimal activitySales=BigDecimal.ZERO;
 
     /**活动订单数(当订单中的商品命中了这个促销活动时，这个订单纳入统计，统计主订单。)*/
     @ApiModelProperty(value = "活动订单数(当订单中的商品命中了这个促销活动时，这个订单纳入统计，统计主订单。")
     @JsonProperty("activitySalesNum")
-    private BigDecimal activitySalesNum;
+    private BigDecimal activitySalesNum=BigDecimal.ZERO;
 
     /**活动商品销售额 */
     @ApiModelProperty(value = "活动商品销售额")
     @JsonProperty("productSales")
-    private BigDecimal productSales;
+    private BigDecimal productSales=BigDecimal.ZERO;
 
     /**补货门店数 */
     @ApiModelProperty(value = "补货门店数")
@@ -39,7 +39,11 @@ public class ActivitySales implements Serializable {
     /**平均单价 */
     @ApiModelProperty(value = "平均单价")
     @JsonProperty("averageUnitPrice")
-    private BigDecimal averageUnitPrice;
+    private BigDecimal averageUnitPrice=BigDecimal.ZERO;
 
+    /**活动名称*/
+    @ApiModelProperty(value = "活动名称")
+    @JsonProperty("activity_name")
+    private String activityName="";
 
 }

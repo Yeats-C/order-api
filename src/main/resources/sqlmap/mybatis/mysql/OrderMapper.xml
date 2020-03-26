@@ -222,6 +222,9 @@
         <if test="distributorId!=null and distributorId!='' ">
             and a.distributor_id = #{distributorId}
         </if>
+        <if test="distributorCode!=null and distributorCode!='' ">
+            and a.distributor_code = #{distributorCode}
+        </if>
 
         <if test="listDistributorId != null">
             and a.distributor_id in (
@@ -318,6 +321,9 @@
         WHERE 1=1 and order_type = 1
         <if test="distributorId!=null and distributorId!='' ">
             and a.distributor_id = #{distributorId}
+        </if>
+        <if test="distributorCode!=null and distributorCode!='' ">
+            and a.distributor_code = #{distributorCode}
         </if>
         <if test="listDistributorId != null">
             and a.distributor_id in (
@@ -1464,27 +1470,17 @@
         ORDER BY a.create_time DESC
     </select>
     <select id="selectListByQueryVO" resultType="com.aiqin.mgs.order.api.domain.response.order.QueryOrderListRespVO">
-        select order_store_code orderCode,
-        order_type_name orderType,
-        customer_name customerName,
-        transport_center_name transportCenterName,
-        warehouse_name warehouseName,
-        supplier_name supplierName,
-        order_status orderStatus,
-        create_time createDate,
-#         product_num productNum,
-#         product_total_amount productTotalAmount,
-#         product_channel_total_amount productChannelTotalAmount,
-        actual_product_count actualProductNum,
-#         actual_product_channel_total_amount actualProductChannelTotalAmount,
-#         actual_product_total_amount actualProductTotalAmount,
-        order_amount orderAmount,
-        create_by_name createByName,
-        create_time createTime,
-        update_by_name updateByName,
-        update_time updateTime
+        select order_store_code orderCode, order_type_name orderType, customer_name customerName,
+        transport_center_name transportCenterName, warehouse_name warehouseName, supplier_name supplierName,
+        order_status orderStatus, create_time createTime, create_by_name createByName,
+        update_by_name updateByName, update_time updateTime,
+        total_product_amount totalProductAmount, actual_product_count actualProductCount,
+        actual_total_product_amount actualTotalProductAmount
         from order_store_info
-        where order_type_code = #{orderType}
+        <where>
+        <if test="orderType != null">
+            and order_type_code = #{orderType}
+        </if>
         <if test="companyCode != null">
             and company_code = #{companyCode}
         </if>
@@ -1506,83 +1502,75 @@
         <if test="supplierCode != null and supplierCode != ''">
             and supplier_code = #{supplierCode}
         </if>
-<!--        <if test="beLock != null and beLock != ''">-->
-<!--            and be_lock = #{beLock}-->
-<!--        </if>-->
-<!--        <if test="beException != null and beException != ''">-->
-<!--            and be_exception = #{beException}-->
-<!--        </if>-->
         <if test="customerName != null and customerName != ''">
-            and customer_name like concat('%',#{customerName},'%')
+            and customer_name like CONCAT(#{customerName},'%')
         </if>
         <if test="orderCode != null and orderCode != ''">
-            and order_store_code LIKE CONCAT(CONCAT('%',#{orderCode},'%'))
+            and order_store_code LIKE CONCAT(#{orderCode},'%')
         </if>
+        <if test="orderLock != null">
+            and order_lock = #{orderLock}
+        </if>
+        <if test="orderException != null">
+            and order_exception = #{orderException}
+        </if>
+        </where>
         order by create_time desc
     </select>
     <resultMap id="selectByOrderCode" type="com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoRespVO">
         <result column="aorder_code" jdbcType="VARCHAR" property="orderCode" />
-        <result column="aorder_type" jdbcType="VARCHAR" property="orderType" />
-        <result column="acustomer_name" jdbcType="VARCHAR" property="customerName" />
-        <result column="acustomer_code" jdbcType="VARCHAR" property="customerCode" />
-        <result column="acreate_date" jdbcType="TIMESTAMP" property="createDate" />
         <result column="aorder_status" jdbcType="INTEGER" property="orderStatus" />
-        <result column="abe_lock" jdbcType="INTEGER" property="beLock" />
-        <result column="abe_exception" jdbcType="INTEGER" property="beException" />
+        <result column="aorder_lock" jdbcType="INTEGER" property="orderLock" />
+        <result column="aorder_exception" jdbcType="INTEGER" property="orderException" />
         <result column="apayment_status" jdbcType="INTEGER" property="paymentStatus" />
+        <result column="apayment_name" jdbcType="VARCHAR" property="paymentName" />
+        <result column="aorder_type_name" jdbcType="VARCHAR" property="orderTypeName" />
+        <result column="aorder_category_code" jdbcType="VARCHAR" property="orderCategoryCode" />
+        <result column="aorder_category_name" jdbcType="VARCHAR" property="orderCategoryName" />
+        <result column="amain_order_code" jdbcType="VARCHAR" property="mainOrderCode" />
+        <result column="aorder_level" jdbcType="INTEGER" property="orderLevel" />
+        <result column="asupplier_name" jdbcType="VARCHAR" property="supplierName" />
         <result column="atransport_center_name" jdbcType="VARCHAR" property="transportCenterName" />
         <result column="awarehouse_name" jdbcType="VARCHAR" property="warehouseName" />
-        <result column="asupplier_name" jdbcType="VARCHAR" property="supplierName" />
-        <result column="adistribution_mode" jdbcType="VARCHAR" property="distributionMode" />
-        <result column="aconsignee" jdbcType="VARCHAR" property="consignee" />
-        <result column="aconsignee_phone" jdbcType="VARCHAR" property="consigneePhone" />
+        <result column="ainvoice_type" jdbcType="VARCHAR" property="invoiceType" />
+        <result column="ainvoice_title" jdbcType="VARCHAR" property="invoiceTitle" />
+        <result column="atransport_company_code" jdbcType="VARCHAR" property="transportCompanyCode" />
+        <result column="atransport_company_name" jdbcType="VARCHAR" property="transportCompanyName" />
+        <result column="atransport_code" jdbcType="VARCHAR" property="transportCode" />
+        <result column="apayment_time" jdbcType="TIMESTAMP" property="paymentTime" />
+        <result column="adelivery_time" jdbcType="TIMESTAMP" property="deliveryTime" />
+        <result column="atransport_time" jdbcType="TIMESTAMP" property="transportTime" />
+        <result column="areceive_time" jdbcType="TIMESTAMP" property="receiveTime" />
+        <result column="aremake" jdbcType="VARCHAR" property="remake" />
+        <result column="acreate_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="aupdate_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="acreate_by_name" jdbcType="VARCHAR" property="createByName" />
+        <result column="aupdate_by_name" jdbcType="VARCHAR" property="updateByName" />
+        <result column="acustomer_code" jdbcType="VARCHAR" property="customerCode" />
+        <result column="acustomer_name" jdbcType="VARCHAR" property="customerName" />
+        <result column="adistribution_mode_name" jdbcType="VARCHAR" property="distributionModeName" />
+        <result column="areceive_person" jdbcType="VARCHAR" property="receivePerson" />
+        <result column="areceive_mobile" jdbcType="VARCHAR" property="receiveMobile" />
+        <result column="azip_code" jdbcType="VARCHAR" property="zipCode" />
         <result column="aprovince_name" jdbcType="VARCHAR" property="provinceName" />
         <result column="acity_name" jdbcType="VARCHAR" property="cityName" />
         <result column="adistrict_name" jdbcType="VARCHAR" property="districtName" />
         <result column="adetail_address" jdbcType="VARCHAR" property="detailAddress" />
-        <result column="azip_code" jdbcType="VARCHAR" property="zipCode" />
-        <result column="apayment_type" jdbcType="VARCHAR" property="paymentType" />
-        <result column="adeliver_amount" jdbcType="DECIMAL" property="deliverAmount" />
-        <result column="aproduct_total_amount" jdbcType="DECIMAL" property="productTotalAmount" />
-        <result column="aproduct_channel_total_amount" jdbcType="DECIMAL" property="productChannelTotalAmount" />
-        <result column="adiscount_amount" jdbcType="DECIMAL" property="discountAmount" />
+        <result column="aactual_product_count" jdbcType="DECIMAL" property="actualProductCount" />
+        <result column="atotal_volume" jdbcType="BIGINT" property="totalVolume" />
+        <result column="atotal_weight" jdbcType="BIGINT" property="totalWeight" />
+        <result column="aactual_total_volume" jdbcType="BIGINT" property="actualTotalVolume" />
+        <result column="aactual_total_weight" jdbcType="BIGINT" property="actualTotalWeight" />
+        <result column="atotal_product_amount" jdbcType="DECIMAL" property="totalProductAmount" />
         <result column="aorder_amount" jdbcType="DECIMAL" property="orderAmount" />
-        <result column="aproduct_num" jdbcType="DECIMAL" property="productNum" />
-        <result column="apayment_time" jdbcType="TIMESTAMP" property="paymentTime" />
-        <result column="adelivery_time" jdbcType="TIMESTAMP" property="deliveryTime" />
-        <result column="atransport_time" jdbcType="TIMESTAMP" property="transportTime" />
-        <result column="areceiving_time" jdbcType="TIMESTAMP" property="receivingTime" />
-        <result column="ainvoice_type" jdbcType="VARCHAR" property="invoiceType" />
-        <result column="ainvoice_title" jdbcType="VARCHAR" property="invoiceTitle" />
-        <result column="aoperator" jdbcType="VARCHAR" property="operator" />
-        <result column="aoperator_time" jdbcType="TIMESTAMP" property="operatorTime" />
-        <result column="aactivity_discount" jdbcType="DECIMAL" property="activityDiscount" />
-        <result column="aweight" jdbcType="BIGINT" property="weight" />
-        <result column="avolume" jdbcType="BIGINT" property="volume" />
-        <result column="abe_master_order" jdbcType="INTEGER" property="beMasterOrder" />
-        <result column="amaster_order_code" jdbcType="VARCHAR" property="masterOrderCode" />
-        <result column="aorder_original" jdbcType="VARCHAR" property="orderOriginal" />
-        <result column="aremake" jdbcType="VARCHAR" property="remake" />
-        <result column="astore_type_code" jdbcType="VARCHAR" property="storeTypeCode" />
-        <result column="astore_type" jdbcType="VARCHAR" property="storeType" />
-        <result column="aorder_category" jdbcType="VARCHAR" property="orderCategory" />
-        <result column="alogistics_remission_ratio" jdbcType="INTEGER" property="logisticsRemissionRatio" />
-        <result column="acreate_by_name" jdbcType="VARCHAR" property="createByName" />
-        <result column="acreate_time" jdbcType="TIMESTAMP" property="createTime" />
-        <result column="aupdate_by_name" jdbcType="VARCHAR" property="updateByName" />
-        <result column="aupdate_time" jdbcType="TIMESTAMP" property="updateTime" />
-        <result column="aactual_product_channel_total_amount" jdbcType="DECIMAL" property="actualProductChannelTotalAmount" />
+        <result column="adeliver_amount" jdbcType="DECIMAL" property="deliverAmount" />
+        <result column="aactual_total_product_amount" jdbcType="DECIMAL" property="actualTotalProductAmount" />
+        <result column="adiscount_amount" jdbcType="DECIMAL" property="discountAmount" />
+        <result column="asuit_coupon_money" jdbcType="DECIMAL" property="suitCouponMoney" />
+        <result column="atop_coupon_money" jdbcType="DECIMAL" property="topCouponMoney" />
         <result column="aactual_order_amount" jdbcType="DECIMAL" property="actualOrderAmount" />
-        <result column="aactual_product_num" jdbcType="DECIMAL" property="actualProductNum" />
-        <result column="aorder_original_name" jdbcType="VARCHAR" property="orderOriginalName" />
-        <result column="aactual_weight" jdbcType="BIGINT" property="actualWeight" />
-        <result column="aactual_volume" jdbcType="BIGINT" property="actualVolume" />
-        <result column="aactual_product_total_amount" jdbcType="DECIMAL" property="actualProductTotalAmount" />
-        <result column="atransport_company" jdbcType="VARCHAR" property="transportCompany" />
-        <result column="atransport_company_code" jdbcType="VARCHAR" property="transportCompanyCode" />
-        <result column="atransport_number" jdbcType="VARCHAR" property="transportNumber" />
+        <result column="aactivity_money" jdbcType="DECIMAL" property="activityDiscount" />
         <collection property="productList" ofType="com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoItemRespVO">
-            <id column="bid" property="id"/>
             <result column="bsku_code" jdbcType="VARCHAR" property="skuCode" />
             <result column="bsku_name" jdbcType="VARCHAR" property="skuName" />
             <result column="bpicture_url" jdbcType="VARCHAR" property="pictureUrl" />
@@ -1591,159 +1579,95 @@
             <result column="bmodel" jdbcType="VARCHAR" property="model" />
             <result column="bunit_name" jdbcType="VARCHAR" property="unitName" />
             <result column="bzero_disassembly_coefficient" jdbcType="INTEGER" property="zeroDisassemblyCoefficient" />
-            <result column="bgive_promotion" jdbcType="INTEGER" property="givePromotion" />
             <result column="bproduct_type" jdbcType="INTEGER" property="productType" />
-            <result column="bbatch_number" jdbcType="VARCHAR" property="batchNumber" />
-            <result column="bprice" jdbcType="DECIMAL" property="price" />
-            <result column="bchannel_unit_price" jdbcType="DECIMAL" property="channelUnitPrice" />
-            <result column="bnum" jdbcType="BIGINT" property="num" />
-            <result column="bamount" jdbcType="DECIMAL" property="amount" />
-            <result column="btotal_channel_price" jdbcType="DECIMAL" property="totalChannelPrice" />
-            <result column="bactivity_apportionment" jdbcType="DECIMAL" property="activityApportionment" />
-            <result column="bpreferential_allocation" jdbcType="DECIMAL" property="preferentialAllocation" />
-            <result column="bactual_deliver_num" jdbcType="BIGINT" property="actualDeliverNum" />
-            <result column="bactivity_code" jdbcType="VARCHAR" property="activityCode" />
-            <result column="bproduct_line_num" jdbcType="BIGINT" property="productLineNum" />
-            <result column="bpromotion_line_num" jdbcType="BIGINT" property="promotionLineNum" />
-            <result column="breturn_num" jdbcType="BIGINT" property="returnNum" />
-            <result column="bchannel_unit_price" jdbcType="DECIMAL" property="channelUnitPrice" />
-            <result column="btotal_channel_price" jdbcType="INTEGER" property="totalChannelPrice" />
-            <result column="bactual_channel_unit_price" jdbcType="DECIMAL" property="actualChannelUnitPrice" />
-            <result column="bactual_total_channel_price" jdbcType="DECIMAL" property="actualTotalChannelPrice" />
-            <result column="bactual_amount" jdbcType="DECIMAL" property="actualAmount" />
-            <result column="bactual_price" jdbcType="DECIMAL" property="actualPrice" />
+            <result column="bproduct_amount" jdbcType="DECIMAL" property="productAmount" />
             <result column="bpurchase_amount" jdbcType="DECIMAL" property="purchaseAmount" />
+            <result column="bproduct_count" jdbcType="BIGINT" property="productCount" />
+            <result column="btotal_product_amount" jdbcType="VARCHAR" property="totalProductAmount" />
+            <result column="bactual_product_count" jdbcType="DECIMAL" property="actualProductCount" />
+            <result column="btotal_preferential_amount" jdbcType="DECIMAL" property="totalPreferentialAmount" />
+            <result column="btotal_acivity_amount" jdbcType="DECIMAL" property="totalAcivityAmount" />
+            <result column="bactivity_code" jdbcType="VARCHAR" property="activityCode" />
+            <result column="bgift_line_code" jdbcType="VARCHAR" property="giftLineCode" />
+            <result column="breturn_product_count" jdbcType="BIGINT" property="returnProductCount" />
+            <result column="btotal_purchase_amount" jdbcType="DECIMAL" property="totalPurchaseAmount" />
+            <result column="bactual_total_product_amount" jdbcType="DECIMAL" property="actualTotalProductAmount" />
+            <result column="bactual_total_purchase_amount" jdbcType="DECIMAL" property="actualTotalPurchaseAmount" />
         </collection>
-<!--        <collection property="logs" ofType="com.aiqin.mgs.product.api.domain.response.order.QueryOrderInfoLogRespVO">-->
-<!--            <result column="cstatus" jdbcType="INTEGER" property="status" />-->
-<!--            <result column="cstatus_desc" jdbcType="VARCHAR" property="statusDesc" />-->
-<!--            <result column="ccontent" jdbcType="VARCHAR" property="content" />-->
-<!--            <result column="cremark" jdbcType="VARCHAR" property="remark" />-->
-<!--            <result column="coperator" jdbcType="VARCHAR" property="operator" />-->
-<!--            <result column="coperator_time" jdbcType="TIMESTAMP" property="operatorTime" />-->
-<!--        </collection>-->
-        <collection property="batchList" ofType="com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoItemBatchRespVO">
-            <result column="dsku_code" jdbcType="VARCHAR" property="skuCode" />
-            <result column="dsku_name" jdbcType="VARCHAR" property="skuName" />
-            <result column="dnum" jdbcType="BIGINT" property="num" />
-            <result column="dactualDeliverNum" jdbcType="BIGINT" property="actualDeliverNum" />
-            <result column="dproduct_time" jdbcType="TIMESTAMP" property="productTime" />
-            <result column="dbatch_remark" jdbcType="VARCHAR" property="batchRemark" />
-            <result column="dbatch_number" jdbcType="VARCHAR" property="batchNumber" />
-            <result column="dlock_type" jdbcType="INTEGER" property="lockType" />
-            <result column="dsupplier_code" jdbcType="VARCHAR" property="supplierCode" />
-            <result column="dsupplier_name" jdbcType="VARCHAR" property="supplierName" />
+        <collection property="logs" ofType="com.aiqin.mgs.order.api.domain.OperationLog">
+            <result column="ooperation_type" jdbcType="INTEGER" property="operationType" />
+            <result column="ooperation_content" jdbcType="VARCHAR" property="operationContent" />
+            <result column="oremark" jdbcType="VARCHAR" property="remark" />
+            <result column="ocreate_by_name" jdbcType="VARCHAR" property="createByName" />
+            <result column="ocreate_time" jdbcType="TIMESTAMP" property="createTime" />
         </collection>
+        <!--<collection property="batchList" ofType="com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoItemBatchRespVO">-->
+            <!--<result column="dsku_code" jdbcType="VARCHAR" property="skuCode" />-->
+            <!--<result column="dsku_name" jdbcType="VARCHAR" property="skuName" />-->
+            <!--<result column="ddbatch_code" jdbcType="VARCHAR" property="batchCode" />-->
+            <!--<result column="dproduct_date" jdbcType="TIMESTAMP" property="productDate" />-->
+            <!--<result column="dbatch_remark" jdbcType="VARCHAR" property="batchRemark" />-->
+            <!--<result column="dproduct_count" jdbcType="BIGINT" property="productCount" />-->
+            <!--<result column="dactual_product_count" jdbcType="BIGINT" property="actualProductCount" />-->
+        <!--</collection>-->
     </resultMap>
     <select id="selectByOrderCode" resultMap="selectByOrderCode">
-        select a.order_store_code aorder_code,
-               a.order_type_name aorder_type,
-               a.customer_name acustomer_name,
-               a.customer_code acustomer_code,
-               a.create_time acreate_date,
-               a.order_status aorder_status,
-               a.order_lock abe_lock,
-               a.order_exception abe_exception,
-               a.payment_status apayment_status,
-               a.transport_center_name atransport_center_name,
-               a.warehouse_name awarehouse_name,
-               a.supplier_name asupplier_name,
-               a.distribution_mode_name adistribution_mode,
-               a.province_name aprovince_name,
-               a.city_name acity_name,
-               a.district_name adistrict_name,
-               a.receive_address adetail_address,
-               a.zip_code azip_code,
-               a.payment_name apayment_type,
-               a.deliver_amount adeliver_amount,
-#                a.product_num aproduct_num,
-               a.payment_time apayment_time,
-               a.delivery_time adelivery_time,
-               a.transport_time atransport_time,
-#                a.product_channel_total_amount aproduct_channel_total_amount,
-               a.total_product_amount aproduct_total_amount,
-               a.receive_time areceiving_time,
-               a.invoice_type ainvoice_type,
-               a.invoice_title ainvoice_title,
-               a.update_by_name aoperator,
-               a.update_time aoperator_time,
-               a.discount_amount aactivity_discount,
-               a.total_weight aweight,
-               a.total_volume avolume,
-#                a.be_master_order abe_master_order,
-               a.main_order_code amaster_order_code,
-               a.source_code aorder_original,
-               a.remake aremake,
-               a.store_type astore_type,
-               a.store_type astore_type_code,
-               a.order_category_name aorder_category,
-#                a.logistics_remission_ratio alogistics_remission_ratio,
-               a.create_by_id acreate_by_id,
-               a.create_by_name acreate_by_name,
-               a.create_time acreate_time,
-               a.update_by_id aupdate_by_id,
-               a.update_by_name aupdate_by_name,
-               a.update_time aupdate_time,
-#                a.actual_product_count aactual_order_amount,
-#                a.actual_product_channel_total_amount aactual_product_channel_total_amount,
-               a.actual_total_volume aactual_volume,
-               a.actual_total_weight aactual_weight,
-               a.actual_total_product_amount aactual_product_total_amount,
-               a.source_name aorder_original_name,
-               a.transport_company_name atransport_company,
-               a.transport_company_code atransport_company_code,
-               a.transport_center_name atransport_number,
-               b.id bid,
-               b.sku_code bsku_code,
-               b.sku_name bsku_name,
-               b.picture_url bpicture_url,
-               b.product_spec bspec,
-               b.color_name bcolor_name,
-               b.model_code bmodel,
-               b.unit_name bunit_name,
-               b.zero_disassembly_coefficient bzero_disassembly_coefficient,
-               if( b.product_type=0,1,0) givePromotion,
-               b.product_amount bprice,
-#                b.channel_unit_price bchannel_unit_price,
-#                b.total_channel_price btotal_channel_price,
-               b.product_count bnum,
-               b.total_product_amount bamount,
-               b.total_preferential_amount bactivity_apportionment,
-               b.total_preferential_amount bpreferential_allocation,
-               b.actual_product_count bactual_deliver_num,
-               b.activity_code bactivity_code,
-               b.line_code bproduct_line_num,
-               b.gift_line_code bpromotion_line_num,
-               b.return_product_count breturn_num,
-               b.purchase_amount bpurchase_amount,
-#                b.channel_unit_price bchannel_unit_price,
-#                b.total_channel_price btotal_channel_price,
-#                b.actual_channel_unit_price bactual_channel_unit_price,
-#                b.actual_total_channel_price bactual_total_channel_price,
-               b.actual_total_product_amount bactual_amount,
-#                b.actual_price bactual_price,
-#                c.status cstatus,
-#                c.status_desc cstatus_desc,
-#                c.content ccontent,
-#                c.remark cremark,
-#                c.operator coperator,
-#                c.operator_time coperator_time,
-               d.sku_code dsku_code,
-               d.sku_name dsku_name,
-               d.product_count dnum,
-               d.actual_product_count dactualDeliverNum,
-               d.product_date dproduct_time,
-               d.batch_remark dbatch_remark,
-               d.batch_code dbatch_number
-#                d.lock_type dlock_type,
-#                d.supplier_code dsupplier_code,
-#                d.supplier_name dsupplier_name
-        from order_store_info a
-                 left join order_store_detail b on a.order_store_code = b.order_store_code
-#                  left join order_info_log c on c.order_code = a.order_code
-                 left join order_store_detail_batch d on d.order_store_code = a.order_store_code
-        where a.order_store_code = #{orderCode}
-    </select>
+      select
+        a.order_store_code aorder_code, a.order_status aorder_status, a.order_lock aorder_lock,
+        a.order_exception aorder_exception, a.payment_status apayment_status, a.payment_name apayment_name,
+        a.order_type_name aorder_type_name, a.order_category_code aorder_category_code, a.order_category_name aorder_category_name,
+        a.order_level aorder_level,a.main_order_code amain_order_code, a.supplier_name asupplier_name,
+        a.transport_center_name atransport_center_name, a.warehouse_name awarehouse_name,
+        a.invoice_type ainvoice_type, a.invoice_title ainvoice_title, a.transport_code atransport_code,
+        a.transport_company_code atransport_company_code, a.transport_company_name atransport_company_name,
+        a.payment_time apayment_time, a.delivery_time adelivery_time, a.transport_time atransport_time,
+        a.receive_time areceive_time, a.create_time acreate_time, a.remake aremake, a.update_time aupdate_time,
+        a.create_by_id acreate_by_id, a.create_by_name acreate_by_name, a.update_by_id aupdate_by_id,
+        a.update_by_name aupdate_by_name,
+        a.customer_code acustomer_code, a.customer_name acustomer_name, a.distribution_mode_name adistribution_mode_name,
+        a.receive_person areceive_person, a.receive_mobile areceive_mobile, a.zip_code azip_code,
+        a.province_name aprovince_name, a.city_name acity_name, a.district_name adistrict_name,
+        a.receive_address adetail_address,
+        a.actual_product_count aactual_product_count, a.total_volume atotal_volume, a.total_weight atotal_weight,
+        a.actual_total_volume aactual_total_volume, a.actual_total_weight aactual_total_weight,
+        a.total_product_amount atotal_product_amount, a.order_amount aorder_amount,
+        a.actual_total_product_amount aactual_total_product_amount,
 
+        b.sku_code bsku_code, b.sku_name bsku_name, b.picture_url bpicture_url,
+        b.product_spec bspec, b.color_name bcolor_name, b.model_code bmodel, b.unit_name bunit_name,
+        b.zero_disassembly_coefficient bzero_disassembly_coefficient, b.product_type bproduct_type,
+        ifnull(b.product_amount, 0) bproduct_amount, ifnull(b.purchase_amount, 0) bpurchase_amount,
+        ifnull(b.product_count, 0) bproduct_count, ifnull(b.actual_product_count, 0) bactual_product_count,
+        b.total_product_amount bamount, b.total_product_amount btotal_product_amount,
+        b.total_preferential_amount btotal_preferential_amount,
+        b.total_acivity_amount btotal_acivity_amount, b.activity_code bactivity_code,
+        b.gift_line_code bgift_line_code, b.return_product_count breturn_product_count,
+        ifnull(b.product_count * b.purchase_amount, 0) btotal_purchase_amount,
+        ifnull(b.actual_product_count * b.product_amount, 0) bactual_total_product_amount,
+        ifnull(b.actual_product_count * b.purchase_amount, 0) bactual_total_purchase_amount,
+
+        o.operation_type ooperation_type, o.operation_content ooperation_content,
+        o.remark oremark, o.create_by_name ocreate_by_name, o.create_time ocreate_time,
+
+        f.suit_coupon_money asuit_coupon_money, f.top_coupon_money atop_coupon_money,
+        f.total_money aactual_total_product_amount, f.pay_money aactual_order_amount,
+        f.activity_money aactivity_money, l.logistics_fee adeliver_amount
+
+--         d.sku_code dsku_code, d.sku_name dsku_name, d.batch_code dbatch_code,
+--         d.product_date dproduct_date, d.batch_remark dbatch_remark,
+--         d.product_count dproduct_count, d.actual_product_count dactual_product_count
+
+        from order_store_info a
+        left join order_store_detail b on a.order_store_code = b.order_store_code
+        left join operation_log o on o.operation_code = a.order_store_code
+        left join order_store_fee f on f.fee_id = a.fee_id
+        left join order_store_logistics l on l.logistics_id = a.logistics_id
+--         left join order_store_detail_batch d on d.order_store_code = a.order_store_code
+        where o.source_type = 0 and a.order_store_code = #{orderCode}
+    </select>
+    <select id="orderProductBySum" resultType="java.lang.Long">
+      select sum(product_count) from order_store_detail
+      where order_store_code = #{orderStoreCode}
+    </select>
 </mapper>
 

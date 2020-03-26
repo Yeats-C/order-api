@@ -211,32 +211,15 @@ public interface OrderDao {
 
     List<String> getUnPayMemberIdList(UnPayVo unPayVo);
 
-    /**
-     * @param distributorId
-     * @param startDate
-     * @param skuCode
-     * @return 查询门店sku在一定时间内的销量
-     */
+    /** @return 查询门店sku在一定时间内的销量*/
     int querySaleSkuCount(@Param("distributorId") String distributorId,
                                    @Param("startDate") Date startDate,
                                    @Param("skuCode") String skuCode);
 
-    /**
-     * 预存商品的销售量
-     * @param storeId
-     * @param startDay
-     * @param endDay
-     * @return
-     */
+    /** 预存商品的销售量*/
     Integer orderPrestorageCount(@Param("storeId")String storeId,@Param("startDate") Date startDay,@Param("endDay") Date endDay);
 
-    /**
-     * 正常销售订单的销售量-已完成状态2）
-     * @param storeId
-     * @param startDay
-     * @param endDay
-     * @return
-     */
+    /** 正常销售订单的销售量-已完成状态2）*/
     Integer orderStoreCount(@Param("storeId")String storeId,@Param("startDate") Date startDay,@Param("endDay") Date endDay);
 
     /*** 查询订单列表*/
@@ -244,4 +227,7 @@ public interface OrderDao {
 
     /** 通过编码查询订单*/
     QueryOrderInfoRespVO selectByOrderCode(String orderCode);
+
+    /** 计算订单商品总和*/
+    Long orderProductBySum(String orderStoreCode);
 }

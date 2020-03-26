@@ -222,6 +222,9 @@
             <if test="storeId!=null">
                 and d.store_id  = #{storeId,jdbcType=VARCHAR}
             </if>
+             <if test="storeCode!=null">
+                and d.store_code  = #{storeCode,jdbcType=VARCHAR}
+            </if>
 
             <if test="listDistributorId != null">
                 and a.store_id in (
@@ -270,6 +273,9 @@
             </if>
             <if test="storeId!=null">
                 and d.store_id  = #{storeId,jdbcType=VARCHAR}
+            </if>
+            <if test="storeCode!=null">
+                and d.store_code  = #{storeCode,jdbcType=VARCHAR}
             </if>
             <if test="listDistributorId != null">
                 and a.store_id in (

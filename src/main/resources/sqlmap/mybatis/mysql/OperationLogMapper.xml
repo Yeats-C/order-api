@@ -17,14 +17,14 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, operation_code, operation_type, source_type, operation_content, remark, use_status, 
+    operation_code, operation_type, source_type, operation_content, remark, use_status,
     create_by_id, create_by_name, update_by_id, update_by_name, create_time, update_time
   </sql>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+  <select id="list" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from operation_log
-    where id = #{id,jdbcType=BIGINT}
+    where operation_code = #{operationId,jdbcType=BIGINT}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from operation_log
@@ -182,4 +182,14 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  <select id="searchOrderLog" resultType="com.aiqin.mgs.order.api.domain.OperationOrderLog">
+    select
+    operation_code operationCode, operation_type operationType, source_type sourceType,
+    operation_content operationContent, remark, use_status useStatus, create_by_id createById,
+    create_by_name createByName, update_by_id updateById, update_by_name updateByName,
+    create_time createTime, update_time updateTime
+    from operation_log
+    where operation_code = #{operationCode,jdbcType=VARCHAR}
+    and source_type = #{sourceType,jdbcType=INTEGER}
+  </select>
 </mapper>

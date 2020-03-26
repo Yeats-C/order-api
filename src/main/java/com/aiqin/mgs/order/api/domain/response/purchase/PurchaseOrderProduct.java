@@ -110,6 +110,10 @@ public class PurchaseOrderProduct {
     @JsonProperty("actual_single_count")
     private Integer actualSingleCount;
 
+    @ApiModelProperty(value="实际含税总价")
+    @JsonProperty("actual_total_tax_amount")
+    private BigDecimal actualTotalTaxAmount;
+
     @ApiModelProperty(value="厂商SKU编码")
     @JsonProperty("factory_sku_code")
     private String factorySkuCode;

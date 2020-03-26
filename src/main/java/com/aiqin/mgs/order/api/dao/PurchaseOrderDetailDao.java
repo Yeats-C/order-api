@@ -8,15 +8,12 @@ import io.lettuce.core.dynamic.annotation.Param;
 import java.util.List;
 
 public interface PurchaseOrderDetailDao {
+
     int deleteByPrimaryKey(Long id);
 
     int insertList(@Param("record") List<PurchaseOrderDetail> record);
 
-    /**
-     * 根据ERP订单生成爱亲采购单明细
-     * @param record
-     * @return
-     */
+    /** 根据ERP订单生成爱亲采购单明细*/
     int insertSelective(PurchaseOrderDetail record);
 
     PurchaseOrderDetail selectByPrimaryKey(Long id);

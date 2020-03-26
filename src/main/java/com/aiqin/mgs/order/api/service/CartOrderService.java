@@ -69,7 +69,7 @@ public interface CartOrderService {
     HttpResponse<StoreCartProductResponse> displayCartLineCheckProduct(CartOrderInfo cartOrderInfo);
 
     /**
-     * 获取erp端购物车信息
+     * 获取erp端购物车信息，用于生成订单
      *
      * @param storeId     门店id
      * @param productType 商品类型

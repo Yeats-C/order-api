@@ -107,4 +107,10 @@ public class ProductSkuRespVo5 {
     @JsonProperty("store_stock_explain")
     private String storeStockExplain;
 
+    @ApiModelProperty("是否能使用A品卷 0否 1是")
+    @JsonProperty("coupon_rule")
+    private Integer couponRule=0;
+
+
+
 }

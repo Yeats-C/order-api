@@ -8,8 +8,10 @@ import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.po.order.*;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderOperationControlResponse;
+import com.aiqin.mgs.order.api.service.ActivityService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.PageAutoHelperUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+@Slf4j
 @Service
 public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
 
@@ -36,6 +38,8 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
     private ErpOrderFeeService erpOrderFeeService;
     @Resource
     private ErpOrderRefundService erpOrderRefundService;
+    @Resource
+    private ActivityService activityService;
 
     @Override
     public ErpOrderInfo getOrderByOrderId(String orderId) {
@@ -233,7 +237,8 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         erpOrderQueryRequest.setOrderTypeQueryList(orderTypeQueryList);
         erpOrderQueryRequest.setOrderCategoryQueryList(orderCategoryQueryList);
 
-
+        log.info(ErpOrderTypeCategoryQueryTypeEnum.getEnum(ErpOrderTypeCategoryQueryTypeEnum.STORE_ORDER_LIST_QUERY)
+                +"查询订单列表的订单类别编码集合为"+orderCategoryQueryList);
         //查询主订单列表
         erpOrderQueryRequest.setOrderLevel(ErpOrderLevelEnum.PRIMARY.getCode());
         PagesRequest page = new PagesRequest();
@@ -294,6 +299,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
     @Override
     public PageResData<ErpOrderInfo> findErpOrderList(ErpOrderQueryRequest erpOrderQueryRequest) {
         erpOrderQueryRequest.setQueryTypeEnum(ErpOrderTypeCategoryQueryTypeEnum.ERP_ORDER_LIST_QUERY);
+        erpOrderQueryRequest.setStoreIdList(activityService.storeIds("ERP004001"));
         return this.findOrderList(erpOrderQueryRequest);
     }
 

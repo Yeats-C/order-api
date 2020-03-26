@@ -90,6 +90,8 @@
     <result column="review_operator_id" property="reviewOperatorId" jdbcType="VARCHAR" />
     <result column="review_time" property="reviewTime" jdbcType="TIMESTAMP" />
     <result column="order_success" property="orderSuccess" jdbcType="BIT" />
+    <result column="return_good_amount" property="returnGoodAmount" jdbcType="DECIMAL" />
+    <result column="actual_return_good_amount" property="actualReturnGoodAmount" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, return_order_id, return_order_code, order_store_code, company_code, company_name,
@@ -1049,6 +1051,12 @@
     <if test="returnOrderType!=null">
       and return_order_type=#{returnOrderType,jdbcType=INTEGER}
     </if>
+    <if test="storeIds!=null">
+      and store_id in
+      <foreach collection="storeIds"  item="item" open="(" separator="," close=")"  >
+        #{item}
+      </foreach>
+    </if>
     order by create_time desc
   </select>
 
@@ -1263,5 +1271,104 @@
     return_order_amount = #{actualReturnOrderAmount}
     where return_order_code=#{returnOrderCode}
   </update>
+
+  <select id="selectReturnOrderManagementList" resultType="com.aiqin.mgs.order.api.domain.response.returngoods.QueryReturnOrderManagementRespVO">
+    select
+    return_order_code returnOrderCode,
+    order_store_code orderStoreCode,
+    return_order_type returnOrderType,
+    customer_name customerName,
+    transport_center_name transportCenterName,
+    warehouse_name warehouseName,
+    supplier_name supplierName,
+    return_order_status orderStatus,
+    create_time createDate,
+    product_count productCount,
+    return_order_amount returnOrderAmount,
+    create_by_name createByName,
+    create_time createTime,
+    update_time updateTime,
+    update_by_name updateByName,
+    actual_product_count actualProductCount,
+    actual_product_count actualProductTotalAmount
+    from return_order_info
+    <where>
+    <if test="companyCode != null">
+      and company_code = #{companyCode}
+    </if>
+    <if test="createDateStart != null">
+      and create_time &gt;=#{createDateStart,jdbcType=TIMESTAMP}
+    </if>
+    <if test="createDateEnd != null">
+      and create_time &lt;=#{createDateEnd,jdbcType=TIMESTAMP}
+    </if>
+    <if test="orderStatus != null and orderStatus != ''">
+      and return_order_status = #{orderStatus}
+    </if>
+    <if test="transportCenterCode != null and transportCenterCode != ''">
+      and transport_center_code = #{transportCenterCode}
+    </if>
+    <if test="warehouseCode != null and warehouseCode != ''">
+      and warehouse_code = #{warehouseCode}
+    </if>
+    <if test="customerCode != null and customerCode != ''">
+      and customer_code LIKE CONCAT(#{customerCode},'%')
+    </if>
+    <if test="orderCode != null and orderCode != ''">
+      and order_store_code LIKE CONCAT(#{orderCode},'%')
+    </if>
+    <if test="returnOrderCode != null and returnOrderCode != ''">
+      and return_order_code LIKE CONCAT(#{returnOrderCode},'%')
+    </if>
+    <if test="orderTypeCode != null and orderTypeCode.size > 0">
+      and order_type in
+      <foreach collection="orderTypeCode" open="(" close=")" separator="," item="item">
+        #{item}
+      </foreach>
+    </if>
+    </where>
+    order by create_time desc
+  </select>
+
+  <select id="selectReturnOrderInfo" resultType="com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderDetailRespVO">
+    select
+      return_order_code areturnOrderCode, order_store_code orderStoreCode,
+      return_order_status returnOrderStatus, return_order_type returnOrderType,
+      order_type orderType, return_lock returnLock, payment_status paymentStatus,
+      payment_code paymentCode, payment_name paymentName, transport_center_code transportCenterCode,
+      transport_center_name transportCenterName, warehouse_code warehouseCode,
+      warehouse_name warehouseName, supplier_code supplierCode, supplier_name supplierName,
+      treatment_method treatmentMethod, logistics_company_name logisticsCompanyName,
+      logistics_code logisticsCode, delivery_time deliveryTime, receive_time receiveTime,
+      create_time createTime, update_time updateTime, create_by_name createByName,
+      update_by_name updateByName, remark, return_reason_content returnReasonContent,
+      inspection_remark inspectionRemark, company_name companyName, customer_code customerCode,
+      customer_name customerName, distribution_mode_name distributionModeName,
+      receive_person receivePerson, receive_mobile receiveMobile, zip_code zipCode, province_name provinceName,
+      city_name cityName, district_name districtName, receive_address receiveAddress,
+      product_count productCount, total_weight totalWeight, total_volume totalVolume,
+      actual_total_weight actualTotalWeight, actual_total_volume actualTotalVolume,
+      actual_product_count actualProductCount, actual_return_order_amount actualReturnOrderAmount,
+      return_order_amount returnOrderAmount, return_good_amount returnGoodAmount,
+      actual_return_good_amount actualReturnGoodAmount
+    from return_order_info
+    where return_order_code = #{code}
+  </select>
+  <select id="selectInbound"
+          resultType="com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderInfoApplyInboundDetailRespVO">
+    select
+      sku_code skuCode,
+      sku_name skuName,
+      batch_code batchNumber,
+      product_count num,
+      actual_product_count praNum,
+#             supplier_name supplierName,
+#             supplier_code supplierCode,
+      product_date manufactureTime,
+#             store_house_code storeHouseCode,
+      batch_remark batchRemark
+    from return_order_detail_batch
+    where return_order_code = #{code}
+  </select>
 
 </mapper>

@@ -57,7 +57,7 @@ public class ReorerRequest extends PagesRequest{
 
 
 	@JsonProperty("update_time")
-	@JsonFormat( pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	@ApiModelProperty("更新时间")
 	public Date updateTime;
 	public String getEndTime() {

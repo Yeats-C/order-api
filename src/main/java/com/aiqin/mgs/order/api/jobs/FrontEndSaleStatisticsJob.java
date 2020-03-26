@@ -59,6 +59,6 @@ public class FrontEndSaleStatisticsJob {
 
          //计时器结束
         watch.stop();
-        logger.info("查询退货单退款定时任务=====>结束，本次用时：{}毫秒", watch.getTime());
+        logger.info("处理前台销售统计数据=====>结束，本次用时：{}毫秒", watch.getTime());
     }
 }

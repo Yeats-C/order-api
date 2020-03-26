@@ -71,6 +71,8 @@ public class PurchaseOrderDetail implements Serializable {
     private BigDecimal totalTaxAmount;
     @ApiModelProperty(value = "最小单位数量")
     private Long totalCount;
+    @ApiModelProperty(value = "实际最小单位数量")
+    private Long actualTotalCount;
     @ApiModelProperty(value = "实际含税总价")
     private BigDecimal actualTotalTaxAmount;
     @ApiModelProperty(value = "0. 启用   1.禁用")

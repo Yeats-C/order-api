@@ -161,5 +161,11 @@ public interface ReturnOrderInfoService {
      */
     HttpResponse getOrderDetail(String orderCode);
 
+    /**
+     *爱掌柜后台--订单管理--门店退货单列表（搜索）
+     * @param searchVo
+     * @return
+     */
+    PageResData<ReturnOrderInfo> azgList(ReturnOrderSearchVo searchVo);
 
 }

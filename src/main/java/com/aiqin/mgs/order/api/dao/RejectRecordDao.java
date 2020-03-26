@@ -2,6 +2,8 @@ package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.RejectRecord;
 import com.aiqin.mgs.order.api.domain.request.RejectRequest;
+import com.aiqin.mgs.order.api.domain.request.purchase.RejectQueryRequest;
+import com.aiqin.mgs.order.api.domain.response.purchase.RejectRecordInfo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -34,4 +36,10 @@ public interface RejectRecordDao {
     List<RejectRecord> selectByRequest(RejectRequest rejectRequest);
 
     RejectRecord selectByRejectRecordCode(@Param("rejectRecordCode")String rejectRecordCode);
+
+    List<RejectRecordInfo> list(RejectQueryRequest rejectApplyQueryRequest);
+
+    Integer listCount(RejectQueryRequest rejectApplyQueryRequest);
+
+    RejectRecordInfo selectByRejectCode(String rejectRecordCode);
 }

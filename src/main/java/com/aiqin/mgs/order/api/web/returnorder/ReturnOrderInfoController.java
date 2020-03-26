@@ -187,5 +187,10 @@ public class ReturnOrderInfoController {
         return returnOrderInfoService.getOrderDetail(orderCode);
     }
 
+    @ApiOperation("爱掌柜后台--订单管理--门店退货单列表（搜索）")
+    @PostMapping("/azgList")
+    public HttpResponse<PageResData<ReturnOrderInfo>> azgList(@RequestBody ReturnOrderSearchVo searchVo) {
+        return new HttpResponse<>(returnOrderInfoService.azgList(searchVo));
+    }
 
 }

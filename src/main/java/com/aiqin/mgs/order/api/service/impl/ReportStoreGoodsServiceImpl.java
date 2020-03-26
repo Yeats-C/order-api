@@ -1,22 +1,36 @@
 package com.aiqin.mgs.order.api.service.impl;
 
 import com.aiqin.ground.util.http.HttpClient;
+import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.component.returnenums.OrderTypeEnum;
+import com.aiqin.mgs.order.api.component.returnenums.ReturnReasonEnum;
+import com.aiqin.mgs.order.api.dao.ReportAreaReturnSituationDao;
+import com.aiqin.mgs.order.api.dao.ReportCategoryGoodsDao;
 import com.aiqin.mgs.order.api.dao.ReportStoreGoodsDao;
 import com.aiqin.mgs.order.api.dao.ReportStoreGoodsDetailDao;
+import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
+import com.aiqin.mgs.order.api.domain.ReportAreaReturnSituation;
+import com.aiqin.mgs.order.api.domain.ReportCategoryGoods;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoods;
 import com.aiqin.mgs.order.api.domain.ReportStoreGoodsDetail;
+import com.aiqin.mgs.order.api.domain.copartnerArea.NewStoreTreeResponse;
+import com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsDetailVo;
 import com.aiqin.mgs.order.api.domain.request.ReportStoreGoodsVo;
+import com.aiqin.mgs.order.api.domain.response.report.ProvinceAreaResponse;
+import com.aiqin.mgs.order.api.domain.response.report.ReportCategoryResponse;
 import com.aiqin.mgs.order.api.domain.response.report.ReportOrderAndStoreListResponse;
 import com.aiqin.mgs.order.api.domain.response.report.ReportOrderAndStoreResponse;
 import com.aiqin.mgs.order.api.service.ReportStoreGoodsService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -44,10 +58,18 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
 
     @Value("${bridge.url.slcs_api}")
     private String slcsiHost;
+    @Value("${bridge.url.product-api}")
+    private String productHost;
     @Autowired
     private ReportStoreGoodsDao reportStoreGoodsDao;
     @Autowired
     private ReportStoreGoodsDetailDao reportStoreGoodsDetailDao;
+    @Autowired
+    private ReportAreaReturnSituationDao reportAreaReturnSituationDao;
+    @Autowired
+    private ReturnOrderDetailDao returnOrderDetailDao;
+    @Autowired
+    private ReportCategoryGoodsDao reportCategoryGoodsDao;
 
     @Override
     public Boolean insert(ReportStoreGoods entity) {
@@ -286,6 +308,181 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
         }else{
             log.info("校验查询所有门店编码为空");
         }
+    }
+
+    @Override
+    public void areaReturnSituation(ReportAreaReturnSituationVo vo) {
+        Integer category=1;
+        if(vo.getType().equals(OrderTypeEnum.ORDER_TYPE_PS.getCode())&&vo.getReasonCode().equals(ReturnReasonEnum.ORDER_TYPE_ZS.getCode())){//配送质量
+            category=2;
+        }else if(vo.getType().equals(OrderTypeEnum.ORDER_TYPE_PS.getCode())&&vo.getReasonCode().equals(ReturnReasonEnum.ORDER_TYPE_PS.getCode())){//配送一般
+            category=3;
+        }
+        String productUrl=productHost+"/area/province";
+        log.info("调用product系统,查询所有省,请求url={}",productUrl);
+        HttpClient httpClient1 = HttpClient.get(productUrl);
+        Map<String,Object> res=null;
+        res= httpClient1.action().result(new TypeReference<Map<String,Object>>() {});
+        log.info("调用product系统,查询所有省返回结果，result={}", JSON.toJSON(res));
+        List<ProvinceAreaResponse> proList =new ArrayList<>();
+        if (StringUtils.isNotBlank(res.get("code").toString()) && "0".equals(String.valueOf(res.get("code")))) {
+            proList = JSONArray.parseArray(JSON.toJSONString(res.get("data")), ProvinceAreaResponse.class);
+            log.info("调用product系统,查询所有省集合为list={}",proList);
+        } else {
+            log.info("调用product系统,查询所有省异常");
+            return;
+        }
+        List<ReportAreaReturnSituation> records=new ArrayList<>();
+        List<String> provinceIds=new ArrayList<>();
+        if(proList!=null&&proList.size()>0){
+            for(ProvinceAreaResponse par:proList){
+                String provinceId=par.getAreaId();
+                provinceIds.add(provinceId);
+                String provinceName=par.getAreaName();
+                String url=slcsiHost+"/store/getStoresByAreaCode";
+                JSONObject body=new JSONObject();
+                body.put("province_id",provinceId);
+                log.info("调用slcs系统,根据省查询所有门店编码,请求url={},body={}", url,body);
+                HttpClient httpClient = HttpClient.post(url).json(body);
+                Map<String,Object> result=null;
+                result= httpClient.action().result(new TypeReference<Map<String,Object>>() {});
+                log.info("调用slcs系统,根据省查询所有门店编码返回结果，result={}", JSON.toJSON(result));
+                if(result==null){
+                    log.info("调用slcs系统,根据省查询所有门店编码失败");
+                    return;
+                }
+                List<String> storeCodes=new ArrayList<>();
+                if (StringUtils.isNotBlank(result.get("code").toString()) && "0".equals(String.valueOf(result.get("code")))) {
+                    List<NewStoreTreeResponse> list = JSONArray.parseArray(JSON.toJSONString(result.get("data")), NewStoreTreeResponse.class);
+                    log.info("调用slcs系统,根据省查询所有门店为list={}",list);
+                    storeCodes = list.stream().map(NewStoreTreeResponse::getStoreCode).collect(Collectors.toList());
+                    log.info("调用slcs系统,根据省查询所有门店编码数组为storeCodes={}",storeCodes);
+                } else {
+                    log.info("调用slcs系统,根据省查询所有门店编码异常");
+                    return;
+                }
+                BigDecimal amount=BigDecimal.ZERO;
+                Long count=0L;
+                if(storeCodes!=null&&storeCodes.size()>0){
+                    vo.setStoreCodes(storeCodes);
+                    ReportAreaReturnSituation rars = reportAreaReturnSituationDao.selectOrderAmountByStoreCodes(vo);
+                    ReportAreaReturnSituation rars2 =reportAreaReturnSituationDao.selectOrderCountByStoreCodes(vo);
+                    if(rars!=null&&rars.getReturnAmount()!=null){
+                        amount=rars.getReturnAmount();
+                    }
+                    if(rars2!=null&&rars2.getReturnCount()!=null){
+                        count=rars2.getReturnCount();
+                    }
+                }
+                ReportAreaReturnSituation rars3=new ReportAreaReturnSituation();
+                rars3.setCreateTime(new Date());
+                rars3.setProvinceId(provinceId);
+                rars3.setProvinceName(provinceName);
+                rars3.setReasonCode(vo.getReasonCode());
+                rars3.setReturnAmount(amount);
+                rars3.setReturnCount(count);
+                rars3.setType(category);
+                records.add(rars3);
+            }
+            if(records!=null&&records.size()>0){
+                ReportAreaReturnSituationVo vo1=new ReportAreaReturnSituationVo();
+                vo1.setType(category);
+                //清空数据
+                reportAreaReturnSituationDao.deleteByType(vo1);
+                //插入数据
+                reportAreaReturnSituationDao.insertBatch(records);
+            }
+        } else {
+            log.info("调用product系统,查询所有省数据为空");
+            return;
+        }
+    }
+
+    @Override
+    public List<ReportAreaReturnSituation> topProvinceAmount(Integer type) {
+        return reportAreaReturnSituationDao.topProvinceAmount(type);
+    }
+
+    @Override
+    public void reportCategoryGoods(ReportAreaReturnSituationVo vo) {
+        Integer insertType=1;
+        if(vo.getType().equals(2)&&"14".equals(vo.getReasonCode())){
+            insertType=2;
+        }else if(vo.getType().equals(2)&&"15".equals(vo.getReasonCode())){
+            insertType=3;
+        }
+        //查询所有一级品类的编码集合，然后遍历去查询金额
+        String url=productHost+"/search/spu/sku/category";
+        JSONObject body=new JSONObject();
+        body.put("level",1);
+        log.info("退货商品分类统计--调用product系统,查询所有一级品类,请求url={},body={}", url,body);
+        HttpClient httpClient = HttpClient.post(url).json(body);
+        Map<String,Object> result=null;
+        result= httpClient.action().result(new TypeReference<Map<String,Object>>() {});
+        log.info("退货商品分类统计--调用product系统,查询所有一级品类返回结果，result={}", JSON.toJSON(result));
+        if(result==null){
+            log.info("退货商品分类统计--调用product系统,查询所有一级品类失败");
+            return;
+        }
+        List<ReportCategoryResponse> list=new ArrayList<>();
+        if (StringUtils.isNotBlank(result.get("code").toString()) && "0".equals(String.valueOf(result.get("code")))) {
+            list = JSONArray.parseArray(JSON.toJSONString(result.get("data")), ReportCategoryResponse.class);
+            log.info("退货商品分类统计--调用product系统,查询所有一级品类为list={}",list);
+        } else {
+            log.info("退货商品分类统计--调用product系统,查询所有一级品类异常");
+            return;
+        }
+        if(list!=null&&list.size()>0){
+            Date time=new Date();
+            List<ReportCategoryGoods> list1=new ArrayList();
+            BigDecimal totalAmount=BigDecimal.ZERO;
+            Map<String,BigDecimal> map=new HashMap<>();
+            //第一次循环查询金额
+            for(ReportCategoryResponse rcr:list){
+                vo.setCategoryCode(rcr.getCategoryCode());
+                //查出某个一级品类的总金额
+                BigDecimal amount = returnOrderDetailDao.countAmountByCategoryCode(vo);
+                log.info("退货商品分类统计--一级品类code={},金额amount={}",rcr.getCategoryCode(),amount);
+                totalAmount=totalAmount.add(amount);
+                map.put(rcr.getCategoryCode(),amount);
+            }
+            log.info("退货商品分类统计--所有品类及各自金额map={}",map);
+            log.info("退货商品分类统计--所有品类总金额totalAmount={}",totalAmount);
+            //第二次循环计算比例
+            for(ReportCategoryResponse rcr:list){
+                vo.setCategoryCode(rcr.getCategoryCode());
+                //从map中取出某个一级品类的总金额
+                BigDecimal am = map.get(rcr.getCategoryCode());
+                ReportCategoryGoods rcg=new ReportCategoryGoods();
+                BigDecimal proportion=BigDecimal.ZERO;
+                if(totalAmount.compareTo(BigDecimal.ZERO)==1){
+                    proportion=am.divide(totalAmount,4,BigDecimal.ROUND_HALF_UP);
+                }
+                rcg.setAmount(am);
+                rcg.setCategoryCode(rcr.getCategoryCode());
+                rcg.setCategoryName(rcr.getCategoryName());
+                rcg.setType(insertType);
+                rcg.setCreateTime(time);
+                rcg.setProportion(proportion);
+                list1.add(rcg);
+            }
+            log.info("退货商品分类统计--插入退货商品分类统计表,入参list={}",list1);
+            if(list1!=null&&list1.size()>0){
+                //删除数据
+                reportCategoryGoodsDao.deleteByType(insertType);
+                log.info("退货商品分类统计--清除"+insertType+"退货商品分类统计数据成功");
+                //插入数据
+                reportCategoryGoodsDao.insertBatch(list1);
+                log.info("退货商品分类统计--插入退货商品分类统计表成功");
+            }
+        }
+    }
+
+    @Override
+    public List<ReportCategoryGoods> getReportCategoryGoods(Integer type) {
+        ReportAreaReturnSituationVo vo=new ReportAreaReturnSituationVo();
+        vo.setType(type);
+        return reportCategoryGoodsDao.selectList(vo);
     }
 
 }

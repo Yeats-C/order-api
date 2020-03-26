@@ -5,7 +5,6 @@ import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCarryOutNextStepRequest;
-import com.aiqin.mgs.order.api.domain.request.order.ErpOrderEditRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSignRequest;
 
 import java.util.List;
@@ -66,18 +65,6 @@ public interface ErpOrderInfoService {
      * @date 2019/12/11 10:19
      */
     void updateOrderByPrimaryKeySelectiveNoLog(ErpOrderInfo po, AuthToken auth);
-
-    /**
-     * 待支付订单新增赠品行
-     *
-     * @param erpOrderEditRequest
-     * @param auth
-     * @return void
-     * @author: Tao.Chen
-     * @version: v1.0.0
-     * @date 2019/12/11 10:56
-     */
-    void addProductGift(ErpOrderEditRequest erpOrderEditRequest, AuthToken auth);
 
     /**
      * 订单拆单逻辑
