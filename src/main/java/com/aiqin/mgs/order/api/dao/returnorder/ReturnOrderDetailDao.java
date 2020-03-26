@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.dao.returnorder;
 import com.aiqin.mgs.order.api.domain.ReturnOrderDetail;
 import com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailReviewApiReqVo;
+import com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderInfoItemRespVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -33,5 +34,7 @@ public interface ReturnOrderDetailDao {
     String selectUrlsByReturnOrderDetailId(String returnOrderDetailId);
 
     BigDecimal countAmountByCategoryCode(ReportAreaReturnSituationVo vo);
+
+    List<ReturnOrderInfoItemRespVO> selectReturnOrderList(@Param("returnOrderCode") String returnOrderCode);
 
 }

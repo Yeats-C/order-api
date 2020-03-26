@@ -215,7 +215,7 @@
     select
     <include refid="Base_Column_List" />
     from store_lock_details
-    where sku_code=  #{skuCode,jdbcType=VARCHAR} and lock_count=#{lockCount,jdbcType=BIGINT} and line_code=#{lineCode,jdbcType=BIGINT}
+    where sku_code=  #{skuCode,jdbcType=VARCHAR} and change_count=#{changeCount,jdbcType=BIGINT} and line_code=#{lineCode,jdbcType=BIGINT}
   </select>
 
   <delete id="deleteBySkuCodeAndLockCount" parameterType="com.aiqin.mgs.order.api.domain.StoreLockDetails" >
@@ -241,9 +241,16 @@
     </foreach>
   </insert>
 
-  <delete id="deleteBySkuCode" parameterType="java.lang.Long" >
+  <delete id="deleteByOrderCodeAndSkuCode" parameterType="com.aiqin.mgs.order.api.domain.StoreLockDetails" >
     delete from store_lock_details
-    where sku_code = #{skuCode}
+    where  order_code=#{orderCode} and sku_code = #{skuCode}
   </delete>
+
+    <select id="selectByOrderCodeAndSkuCode" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.StoreLockDetails" >
+        select
+        <include refid="Base_Column_List" />
+        from store_lock_details
+        where order_code=#{orderCode} and sku_code=  #{skuCode}
+    </select>
 
 </mapper>

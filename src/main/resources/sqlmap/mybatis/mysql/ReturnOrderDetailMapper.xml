@@ -41,6 +41,10 @@
         <result column="product_category_code" property="productCategoryCode" jdbcType="VARCHAR"/>
         <result column="product_category_name" property="productCategoryName" jdbcType="VARCHAR"/>
         <result column="bar_code" property="barCode" jdbcType="VARCHAR"/>
+        <result column="channel_amount" property="channelAmount" jdbcType="DECIMAL"/>
+        <result column="channel_total_amount" property="channelTotalAmount" jdbcType="DECIMAL"/>
+        <result column="actual_channel_total_amount" property="actualChannelTotalAmount" jdbcType="DECIMAL"/>
+        <result column="gift_line_code" property="giftLineCode" jdbcType="BIGINT"/>
     </resultMap>
     <sql id="Base_Column_List">
     id, return_order_detail_id, return_order_code, sku_code, sku_name, picture_url, product_spec, 
@@ -524,6 +528,20 @@
             </if>
         </where>
         )
+    </select>
+
+    <select id="selectReturnOrderList" resultType="com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderInfoItemRespVO">
+     select
+         sku_code skuCode, sku_name skuName, picture_url pictureUrl, product_spec productSpec,
+         color_name colorName, model_code modelCode, unit_name unitName, activity_code activityCode,
+         product_type productType, product_status productStatus, return_product_count returnProductCount,
+         base_product_spec baseProductSpec, actual_return_product_count actualReturnProductCount,
+         product_amount productAmount, total_product_amount totalProductAmount,
+         actual_total_product_amount actualTotalProductAmount, channel_amount channelAmount,
+         channel_total_amount channelTotalAmount, actual_channel_total_amount actualChannelTotalAmount,
+         gift_line_code giftLineLode
+     from return_order_detail
+     where return_order_code = #{returnOrderCode}
     </select>
 
 </mapper>

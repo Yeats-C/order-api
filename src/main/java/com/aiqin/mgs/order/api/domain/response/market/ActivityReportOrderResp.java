@@ -1,9 +1,12 @@
 package com.aiqin.mgs.order.api.domain.response.market;
 
+import com.aiqin.mgs.order.api.domain.OrderInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @author ch
@@ -14,16 +17,25 @@ import lombok.Data;
 @ApiModel("活动数据报表中每天的订单情况Resp")
 public class ActivityReportOrderResp {
 
+    @ApiModelProperty(value = "时间月日")
+    @JsonProperty("months_day")
+    private String monthsDay;
+
     @ApiModelProperty(value = "订单数")
     @JsonProperty("order_count")
     private Long orderCount;
 
     @ApiModelProperty(value = "会员订单数")
     @JsonProperty("member_order_count")
-    private Long memberOrderCount;
+    private Long memberOderCount;
 
     @ApiModelProperty(value = "销售额")
     @JsonProperty("sale_amount")
     private Long saleAmount;
+
+    @JsonProperty("order_code")
+    @ApiModelProperty("订单编号集合")
+    private List<OrderInfo> orderCode;
+
 
 }

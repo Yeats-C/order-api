@@ -383,6 +383,15 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                     cartLineList) {
                 totalNumber += item.getAmount();
                 accountActualPrice = accountActualPrice.add(item.getPrice().multiply(new BigDecimal(item.getAmount())));
+                //后来新加的
+                BigDecimal totalMoney = item.getPrice().multiply(new BigDecimal(item.getAmount()));
+                item.setActivityPrice(item.getPrice());
+                item.setLineAmountTotal(totalMoney);
+                item.setLineActivityAmountTotal(totalMoney);
+                item.setLineActivityDiscountTotal(BigDecimal.ZERO);
+                item.setLineAmountAfterActivity(totalMoney);
+                item.setActivityId(null);
+
             }
         }
         ErpCartQueryResponse queryResponse = new ErpCartQueryResponse();
@@ -506,7 +515,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
             //遍历有活动的行
             for (Map.Entry<String, List<ErpOrderCartInfo>> entry :
                     activityCartMap.entrySet()) {
-                ErpCartGroupInfo cartGroupInfo = generateCartGroup(usefulActivityMap.get(entry.getKey()), store, entry.getValue());
+                ErpCartGroupInfo cartGroupInfo = generateCartGroup(usefulActivityMap.get(entry.getKey()), store, entry.getValue(),skuDetailMap);
                 cartGroupList.add(cartGroupInfo);
             }
         }
@@ -967,9 +976,10 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
      * @param activityRequest 活动详情
      * @param store           门店信息
      * @param list            本品列表
+     * @param skuDetailMap
      * @return
      */
-    private ErpCartGroupInfo generateCartGroup(ActivityRequest activityRequest, StoreInfo store, List<ErpOrderCartInfo> list) {
+    private ErpCartGroupInfo generateCartGroup(ActivityRequest activityRequest, StoreInfo store, List<ErpOrderCartInfo> list, Map<String, ErpSkuDetail> skuDetailMap) {
 
         ErpCartGroupInfo cartGroupInfo = new ErpCartGroupInfo();
         cartGroupInfo.setCartProductList(list);
@@ -1151,6 +1161,11 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                             giftList) {
                         //生成赠品行
                         ErpOrderCartInfo giftProductLine = createGiftProductLine(activity, giftItem, store);
+                        ErpSkuDetail skuDetail = skuDetailMap.get(giftProductLine.getSkuCode());
+                        giftProductLine.setStockNum(skuDetail.getStockNum());
+                        giftProductLine.setIsSale(skuDetail.getIsSale());
+                        giftProductLine.setActivityPrice(BigDecimal.ZERO);
+
                         cartGiftList.add(giftProductLine);
                     }
                     cartGroupInfo.setCartGiftList(cartGiftList);
@@ -1485,6 +1500,10 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         //生成赠品行
                         ErpOrderCartInfo giftProductLine = createGiftProductLineWithinStock(activity, giftItem, store, skuDetailMap, skuStockNumMap, true);
                         if (giftProductLine != null) {
+                            ErpSkuDetail skuDetail = skuDetailMap.get(giftProductLine.getSkuCode());
+                            giftProductLine.setStockNum(skuDetail.getStockNum());
+                            giftProductLine.setIsSale(skuDetail.getIsSale());
+                            giftProductLine.setActivityPrice(BigDecimal.ZERO);
                             cartGiftList.add(giftProductLine);
                             amountTotal = amountTotal.add(giftProductLine.getPrice().multiply(new BigDecimal(giftProductLine.getAmount())));
                         }

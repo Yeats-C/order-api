@@ -515,7 +515,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public QueryOrderInfoRespVO view(String orderCode) {
-        return orderDao.selectByOrderCode(orderCode);
+        QueryOrderInfoRespVO queryOrderInfoRespVO = orderDao.selectByOrderCode(orderCode);
+        queryOrderInfoRespVO.setProductCount(orderDao.orderProductBySum(orderCode));;
+        return queryOrderInfoRespVO;
     }
 
     private OrderQuery trans(OrderQuery orderQuery) {

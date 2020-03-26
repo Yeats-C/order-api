@@ -15,6 +15,7 @@ import com.aiqin.mgs.order.api.domain.request.StockVoRequest;
 import com.aiqin.mgs.order.api.domain.request.order.PayRequest;
 import com.aiqin.mgs.order.api.domain.response.ProductSkuDetailResponse;
 import com.aiqin.mgs.order.api.domain.response.order.*;
+import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
 import com.aiqin.mgs.order.api.service.order.ErpStoreLockDetailsService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
@@ -45,6 +46,8 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     private UrlProperties urlProperties;
     @Autowired
     private ErpStoreLockDetailsService erpStoreLockDetailsService;
+    @Autowired
+    private ErpOrderItemService erpOrderItemService;
 
     private static final Logger logger = LoggerFactory.getLogger(ErpOrderRequestServiceImpl.class);
 
@@ -326,6 +329,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 for(StockVoRequest stockVoRequest:list2){
                     StoreLockDetails storeLockDetail=new StoreLockDetails();
                     BeanUtils.copyProperties(stockVoRequest,storeLockDetail);
+                    storeLockDetail.setOrderCode(order.getOrderStoreCode());
                     if(null!=stockVoRequest.getSkuCode()&&null!=skuCodeLineMap.get(stockVoRequest.getSkuCode())){
                         Long loneCode=Long.valueOf(skuCodeLineMap.get(stockVoRequest.getSkuCode()).toString());
                         storeLockDetail.setLineCode(loneCode);
@@ -373,6 +377,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             List<Map<String, Object>> list = new ArrayList<>();
 
             Map<String,Long> countMap=new HashMap<>();
+            List<String> skuCodes=new ArrayList<>();
             //汇总sku
             for(ErpOrderItem item:order.getItemList()){
                 Long count=countMap.get(item.getSkuCode());
@@ -391,6 +396,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 paramItemMap.put("company_code", order.getCompanyCode());
                 paramItemMap.put("company_name", order.getCompanyName());
                 list.add(paramItemMap);
+                skuCodes.add(skuCode);
             }
 
 //            for (ErpOrderItem item :
@@ -421,6 +427,13 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             if (!RequestReturnUtil.validateHttpResponse(response)) {
                 throw new BusinessException(response.getMessage());
             }
+            log.info("清除本地锁库存记录,入参skuCodes={}",skuCodes);
+            if(skuCodes!=null&&skuCodes.size()>0){
+                for(String skuCode:skuCodes){
+                    erpStoreLockDetailsService.deleteBySkuCode(order.getOrderStoreCode(),skuCode);
+                }
+            }
+
         } catch (BusinessException e) {
             flag = false;
             logger.error("解锁库存失败：{}", e.getMessage());
@@ -453,6 +466,16 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             if (!RequestReturnUtil.validateHttpResponse(response)) {
                 throw new BusinessException(response.getMessage());
             }
+
+            List<ErpOrderItem> erpOrderItems = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
+            log.info("清除本地锁库存记录,入参erpOrderItems{}",erpOrderItems);
+            if(erpOrderItems!=null&&erpOrderItems.size()>0){
+                for(ErpOrderItem eoi:erpOrderItems){
+                    erpStoreLockDetailsService.deleteBySkuCode(order.getOrderStoreCode(),eoi.getSkuCode());
+                }
+            }
+
+
         } catch (BusinessException e) {
             flag = false;
             logger.error("解锁库存失败：{}", e.getMessage());

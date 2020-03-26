@@ -16,7 +16,7 @@ public interface StoreLockDetailsDao {
      */
     int deleteBySkuCodeAndLockCount(StoreLockDetails record);
 
-    int deleteBySkuCode(String skuCode);
+    int deleteByOrderCodeAndSkuCode(StoreLockDetails record);
 
     int insert(StoreLockDetails record);
 
@@ -31,5 +31,7 @@ public interface StoreLockDetailsDao {
     int insertBatch(@Param("records") List<StoreLockDetails> records);
 
     StoreLockDetails selectByLineCodeAndSkuCodeAndLockCount(StoreLockDetails record);
+
+    StoreLockDetails selectByOrderCodeAndSkuCode(StoreLockDetails record);
 
 }

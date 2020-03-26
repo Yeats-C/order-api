@@ -277,7 +277,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 //    private List<CartOrderInfo> getStoreCartProductList(String cartGroupTempKey,String storeId, Integer orderType, ErpOrderSourceEnum orderSourceEnum) {
     private List<ErpOrderCartInfo> getStoreCartProductList(String cartGroupTempKey,String storeId, Integer orderType, ErpOrderSourceEnum orderSourceEnum) {
         log.info("创建订单,获取购物车商品入参cartGroupTempKey={},storeId={},orderType={},orderSourceEnum={}",cartGroupTempKey,storeId,orderType,orderSourceEnum);
-        List<CartOrderInfo> list = new ArrayList<>();
+//        List<CartOrderInfo> list = new ArrayList<>();
         List<ErpOrderCartInfo> cartInfoList=new ArrayList<>();
 
         if (ErpOrderSourceEnum.STORE == orderSourceEnum) {
@@ -328,9 +328,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             ErpCartQueryRequest erpCartQueryRequest=new ErpCartQueryRequest();
             erpCartQueryRequest.setProductType(orderType);
             erpCartQueryRequest.setStoreId(storeId);
+            log.info("创建订单,调用ERP购物车接口入参erpCartQueryRequest={}",erpCartQueryRequest);
             ErpCartQueryResponse erpCartQueryResponse = erpOrderCartService.queryErpCartList(erpCartQueryRequest, null);
+            log.info("创建订单,调用ERP购物车接口返回结果erpCartQueryResponse={}",erpCartQueryResponse);
             cartInfoList = erpCartQueryResponse.getCartInfoList();
-            if (list == null) {
+            if (cartInfoList == null) {
                 throw new BusinessException("购物车没有勾选的商品");
             }
         }
@@ -425,7 +427,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             //优惠分摊总金额
             orderItem.setTotalPreferentialAmount(item.getLineAmountAfterActivity());
             //分摊后单价
-            orderItem.setPreferentialAmount(item.getLineAmountAfterActivity().divide(new BigDecimal(item.getAmount()),2, RoundingMode.DOWN));
+            if(null!=item.getLineAmountAfterActivity()){
+                orderItem.setPreferentialAmount(item.getLineAmountAfterActivity().divide(new BigDecimal(item.getAmount()),2, RoundingMode.DOWN));
+            }else{
+                orderItem.setPreferentialAmount(BigDecimal.ZERO);
+            }
             //活动优惠总金额
             orderItem.setTotalAcivityAmount(item.getLineActivityDiscountTotal());
             //税率
@@ -792,8 +798,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         orderFee.setSuitCouponMoney(suitCouponMoneyTotal);
         orderFee.setTopCouponMoney(topCouponMoneyTotal);
         orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal));
-        orderFee.setTopCouponCodes(String.join(",", topCouponCodeList));
-
+        if(null!=topCouponCodeList&&topCouponCodeList.size()>0){
+            orderFee.setTopCouponCodes(String.join(",", topCouponCodeList));
+        }else {
+            orderFee.setTopCouponCodes("");
+        }
         return orderFee;
     }
 

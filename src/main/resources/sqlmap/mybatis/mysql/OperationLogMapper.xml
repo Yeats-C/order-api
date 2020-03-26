@@ -182,4 +182,14 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  <select id="searchOrderLog" resultType="com.aiqin.mgs.order.api.domain.OperationOrderLog">
+    select
+    operation_code operationCode, operation_type operationType, source_type sourceType,
+    operation_content operationContent, remark, use_status useStatus, create_by_id createById,
+    create_by_name createByName, update_by_id updateById, update_by_name updateByName,
+    create_time createTime, update_time updateTime
+    from operation_log
+    where operation_code = #{operationCode,jdbcType=VARCHAR}
+    and source_type = #{sourceType,jdbcType=INTEGER}
+  </select>
 </mapper>

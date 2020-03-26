@@ -314,7 +314,7 @@ public class ActivityServiceImpl implements ActivityService {
             //平均单价
             BigDecimal averageUnitPrice=BigDecimal.ZERO;
             if(activitySales.getActivitySalesNum().compareTo(BigDecimal.ZERO)!=0){
-                averageUnitPrice=activitySales.getActivitySales().divide(activitySales.getActivitySalesNum(),0, RoundingMode.HALF_UP);
+                averageUnitPrice=activitySales.getActivitySales().divide(activitySales.getActivitySalesNum(),2, RoundingMode.HALF_UP);
             }
             activitySales.setProductSales(productSales);
             activitySales.setStoreNum(storeNum);
@@ -716,6 +716,8 @@ public class ActivityServiceImpl implements ActivityService {
         List<ActivitySales> activitySalesList=new ArrayList<>();
         for (String activityId: activityIdList){
             ActivitySales sales=getActivitySalesStatistics(activityId).getData();
+            Activity activity=(Activity) getActivityInformation(activityId).getData();
+            sales.setActivityName(activity.getActivityName());
             activitySalesList.add(sales);
         }
         res.setData(activitySalesList);
@@ -1124,6 +1126,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public ProductCategoryAndBrandResponse2 ProductCategoryAndBrandResponse(String conditionCode, String type, String activityId) {
+        LOGGER.info("品牌品类对应关系查询接口ProductCategoryAndBrandResponse参数conditionCode为={},参数type为={},参数activityId为={}",conditionCode,type,activityId);
         HttpResponse res=   bridgeProductService.selectCategoryByBrandCode(conditionCode,type);
         ProductCategoryAndBrandResponse2 response2=new ProductCategoryAndBrandResponse2();
         if(null!=res.getData()){
@@ -1141,7 +1144,9 @@ public class ActivityServiceImpl implements ActivityService {
                 while(it.hasNext()){
                     ActivityProduct str = it.next();
                     for(QueryProductBrandRespVO brand:response2.getQueryProductBrandRespVO()){
-                        if (str.getProductBrandCode().equals(brand.getBrandId())){
+                        if(null==str.getProductBrandCode()){
+                            queryProductBrandRespVO.add(brand);
+                        }else if (null!=str.getProductBrandCode()&&str.getProductBrandCode().equals(brand.getBrandId())){
                             queryProductBrandRespVO.add(brand);
                         }
                     }
@@ -1158,7 +1163,9 @@ public class ActivityServiceImpl implements ActivityService {
                 while(it.hasNext()){
                     ActivityProduct str = it.next();
                     for(ProductCategoryRespVO cate:response2.getProductCategoryRespVOList()){
-                        if(str.getProductCategoryCode().substring(0,2).equals(cate.getCategoryId())){
+                        if(null==str.getProductCategoryCode()){
+                            productCategoryRespVOList.add(cate);
+                        }else if(null!=str.getProductCategoryCode()&&str.getProductCategoryCode().substring(0,2).equals(cate.getCategoryId())){
                             productCategoryRespVOList.add(cate);
                         }
                     }

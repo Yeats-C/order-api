@@ -1,7 +1,9 @@
 package com.aiqin.mgs.order.api.domain.response.returngoods;
 
-import com.aiqin.mgs.order.api.base.ReturnOrderStatus;
+import com.aiqin.mgs.order.api.domain.OperationLog;
+import com.aiqin.mgs.order.api.domain.OperationOrderLog;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -13,193 +15,200 @@ import java.util.List;
 @Data
 @ApiModel("退货详情返回vo")
 public class ReturnOrderDetailRespVO {
-    @ApiModelProperty("退货订单编码")
+
+    /** 退货信息*/
+    @ApiModelProperty("退货单号")
+    @JsonProperty("return_order_code")
     private String returnOrderCode;
 
     @ApiModelProperty("订单编码(订单号)")
-    private String orderCode;
+    @JsonProperty("order_store_code")
+    private String orderStoreCode;
 
-    @ApiModelProperty("创建时间")
-    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createDate;
+    @ApiModelProperty("状态1-待审核，2-审核通过，3-订单同步中，4-等待退货验收，5-等待退货入库，6-等待审批，11-退货完成，" +
+            "12-退款完成，97-退货终止，98-审核不通过，99-已取消")
+    @JsonProperty("return_order_status")
+    private Integer returnOrderStatus;
 
-    @ApiModelProperty("类型：直送、配送、首单、首单赠送")
-    private String orderType;
+    @ApiModelProperty("退货类型 0客户退货、1缺货退货、2售后退货、3冲减单 、4客户取消")
+    @JsonProperty("return_order_type")
+    private Integer returnOrderType;
 
-    @ApiModelProperty("订单类型编码")
-    private Integer orderTypeCode;
+    @ApiModelProperty("订单类型 1直送 2配送 3货架")
+    @JsonProperty("order_type")
+    private Integer orderType;
 
-    @ApiModelProperty("退货类型：客户退货、缺货退货、售后退货")
-    private String returnOrderType;
+    @ApiModelProperty("锁定状态 0是 1否")
+    @JsonProperty("return_lock")
+    private Integer returnLock;
 
-    @ApiModelProperty("退货类型编码")
-    private Integer returnOrderTypeCode;
-
-    @ApiModelProperty("支付状态0未支付1已支付")
+    @ApiModelProperty("支付状态  0 已支付 1未支付")
+    @JsonProperty("payment_status")
     private Integer paymentStatus;
 
-    @ApiModelProperty("是否锁定(0否1是）")
-    private Integer beLock;
+    @ApiModelProperty("支付方式")
+    @JsonProperty("payment_name")
+    private String paymentName;
 
-    @ApiModelProperty("是否删除(0否1是)")
-    private Integer beDelete;
-
-    @ApiModelProperty("物流中心名称")
+    @ApiModelProperty("仓库")
+    @JsonProperty("transport_center_name")
     private String transportCenterName;
 
-    @ApiModelProperty("仓库名称")
+    @ApiModelProperty("库房")
+    @JsonProperty("warehouse_name")
     private String warehouseName;
 
-    @ApiModelProperty("供应商名称")
+    @ApiModelProperty("供应商")
+    @JsonProperty("supplier_name")
     private String supplierName;
 
-    @ApiModelProperty("客户名称")
-    private String customerName;
+    @ApiModelProperty("处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款 99--已取消")
+    @JsonProperty("treatment_method")
+    private Integer treatmentMethod;
 
-    @ApiModelProperty("客户名称")
-    private String customerCode;
+    @ApiModelProperty("公司/渠道")
+    @JsonProperty("company_name")
+    private String companyName;
 
-    @ApiModelProperty("收货人")
-    private String consignee;
+    @ApiModelProperty("物流公司")
+    @JsonProperty("logistics_company_name")
+    private String logisticsCompanyName;
 
-    @ApiModelProperty("收货人手机号")
-    private String consigneePhone;
-
-    @ApiModelProperty("地址")
-    private String address;
-
-    @ApiModelProperty("省名称")
-    private String provinceName;
-
-    @ApiModelProperty("市名称")
-    private String cityName;
-
-    @ApiModelProperty("区名称")
-    private String districtName;
-
-    @ApiModelProperty("详细地址")
-    private String detailAddress;
-
-    @ApiModelProperty("邮编")
-    private String zipCode;
-
-    @ApiModelProperty("配送方式")
-    private String distributionMode;
-
-    @ApiModelProperty("订单状态(状态有点多，后面补)")
-    private String orderStatus;
-
-    public void setOrderStatus(Integer orderStatus) {
-        this.orderStatus = ReturnOrderStatus.getAllStatus().get(orderStatus).getBackgroundOrderStatus();
-    }
-    @ApiModelProperty("支付方式")
-    private String paymentType;
-
-    @ApiModelProperty("运费")
-    private Long deliverAmount;
-
-    @ApiModelProperty("商品数量")
-    private Long productNum;
-
-    @ApiModelProperty("商品总金额")
-    private Long productTotalAmount;
-
-    @ApiModelProperty("退货金额")
-    private Long returnOrderAmount;
-
-    @ApiModelProperty("重量")
-    private Long weight;
-
-    @ApiModelProperty("体积")
-    private Long volume;
+    @ApiModelProperty("物流单号")
+    @JsonProperty("logistics_code")
+    private String logisticsCode;
 
     @ApiModelProperty("发货时间")
+    @JsonProperty("delivery_time")
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     private Date deliveryTime;
 
     @ApiModelProperty("收货时间")
+    @JsonProperty("receive_time")
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date receivingTime;
+    private Date receiveTime;
 
-    @ApiModelProperty("操作人")
-    private String operator;
+    @ApiModelProperty("创建时间")
+    @JsonProperty("create_time")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date createTime;
 
     @ApiModelProperty("操作时间")
+    @JsonProperty("update_time")
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date operatorTime;
+    private Date updateTime;
 
-    @ApiModelProperty("验货备注")
-    private String inspectionRemark;
+    @ApiModelProperty("创建人")
+    @JsonProperty("create_by_name")
+    private String createByName;
 
-    @ApiModelProperty("公司编码")
-    private String companyCode;
+    @ApiModelProperty("操作人")
+    @JsonProperty("update_by_name")
+    private String updateByName;
 
-    @ApiModelProperty("公司名称")
-    private String companyName;
-
-    @ApiModelProperty("运输公司")
-    private String transportCompany;
-
-    @ApiModelProperty("运输单号")
-    private String transportNumber;
-
-    @ApiModelProperty("退货原因描述")
+    @ApiModelProperty("退货原因")
+    @JsonProperty("return_reason_content")
     private String returnReasonContent;
 
     @ApiModelProperty("备注")
-    private String remake;
+    @JsonProperty("remark")
+    private String remark;
 
-    @ApiModelProperty("处理办法（1退货退款2仅退货）")
-    private Integer treatmentMethod;
+    @ApiModelProperty("验货备注")
+    @JsonProperty("inspection_remark")
+    private String inspectionRemark;
 
-    @ApiModelProperty("来源名称")
-    private String orderOriginalName;
+    /** 客户信息及地址*/
+    @ApiModelProperty("客户编码")
+    @JsonProperty("customer_code")
+    private String customerCode;
 
-    @ApiModelProperty("来源编码")
-    private String orderOriginal;
+    @ApiModelProperty("客户名称")
+    @JsonProperty("customer_name")
+    private String customerName;
 
-    @ApiModelProperty("创建人编码")
-    private String createById;
+    @ApiModelProperty("配送方式")
+    @JsonProperty("distribution_mode_name")
+    private String distributionModeName;
 
-    @ApiModelProperty("创建人名称")
-    private String createByName;
+    @ApiModelProperty(value = "收货人")
+    @JsonProperty("receive_person")
+    private String receivePerson;
 
-    @ApiModelProperty("创建时间")
-    private Date createTime;
+    @ApiModelProperty(value = "收货人电话")
+    @JsonProperty("receive_mobile")
+    private String receiveMobile;
 
-    @ApiModelProperty("修改人编码")
-    private String updateById;
+    @ApiModelProperty(value = "邮编")
+    @JsonProperty("zip_code")
+    private String zipCode;
 
-    @ApiModelProperty("修改人名称")
-    private String updateByName;
+    @ApiModelProperty(value = "省名称")
+    @JsonProperty("province_name")
+    private String provinceName;
 
-    @ApiModelProperty("修改时间")
-    private Date updateTime;
+    @ApiModelProperty(value = "市名称")
+    @JsonProperty("city_name")
+    private String cityName;
 
-    @ApiModelProperty("实际重量")
-    private BigDecimal actualWeight;
+    @ApiModelProperty(value = "县名称")
+    @JsonProperty("district_name")
+    private String districtName;
 
-    @ApiModelProperty("实际退货数量")
-    private Long actualProductNum;
+    @ApiModelProperty(value = "收货地址")
+    @JsonProperty("receive_address")
+    private String receiveAddress;
 
-    @ApiModelProperty("实际体积")
-    private BigDecimal actualVolume;
+    /** 渠道信息*/
+    @ApiModelProperty(value = "商品数量")
+    @JsonProperty("product_count")
+    private Long productCount;
 
-    @ApiModelProperty("实际分销价")
-    private BigDecimal actualProductTotalAmount;
+    @ApiModelProperty(value = "实退商品数量")
+    @JsonProperty("actual_product_count")
+    private Long actualProductCount;
 
-    @ApiModelProperty("实际退货金额")
+    @ApiModelProperty(value = "重量")
+    @JsonProperty("total_weight")
+    private Long totalWeight;
+
+    @ApiModelProperty(value = "实退重量")
+    @JsonProperty("actual_total_weight")
+    private Long actualTotalWeight;
+
+    @ApiModelProperty(value = "体积")
+    @JsonProperty("total_volume")
+    private Long totalVolume;
+
+    @ApiModelProperty(value = "实退体积")
+    @JsonProperty("actual_total_volume")
+    private Long actualTotalVolume;
+
+    @ApiModelProperty(value = "商品总金额")
+    @JsonProperty("return_order_amount")
+    private BigDecimal returnOrderAmount;
+
+    @ApiModelProperty(value = "实退商品总金额")
+    @JsonProperty("actual_return_order_amount")
     private BigDecimal actualReturnOrderAmount;
 
-    @ApiModelProperty("渠道总金额")
-    private BigDecimal productChannelTotalAmount;
+    @ApiModelProperty(value = "退货金额")
+    @JsonProperty("return_good_amount")
+    private BigDecimal returnGoodAmount;
 
-    @ApiModelProperty("实际渠道（商品）总金额")
-    private BigDecimal actualProductChannelTotalAmount;
+    @ApiModelProperty(value = "实际退货金额")
+    @JsonProperty("actual_return_good_amount")
+    private BigDecimal actualReturnGoodAmount;
 
     @ApiModelProperty("退货订单商品")
+    @JsonProperty("item_list")
     private List<ReturnOrderInfoItemRespVO> itemList;
 
-    @ApiModelProperty("批次信息")
-    private List<ReturnOrderInfoApplyInboundDetailRespVO> detailList;
+//    @ApiModelProperty("批次信息")
+//    @JsonProperty("batch_list")
+//    private List<ReturnOrderInfoApplyInboundDetailRespVO> batchList;
+
+    @ApiModelProperty("日志记录")
+    @JsonProperty("log_list")
+    private List<OperationOrderLog> logList;
 }
