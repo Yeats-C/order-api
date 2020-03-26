@@ -1164,6 +1164,8 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         ErpSkuDetail skuDetail = skuDetailMap.get(giftProductLine.getSkuCode());
                         giftProductLine.setStockNum(skuDetail.getStockNum());
                         giftProductLine.setIsSale(skuDetail.getIsSale());
+                        giftProductLine.setActivityPrice(BigDecimal.ZERO);
+
                         cartGiftList.add(giftProductLine);
                     }
                     cartGroupInfo.setCartGiftList(cartGiftList);
