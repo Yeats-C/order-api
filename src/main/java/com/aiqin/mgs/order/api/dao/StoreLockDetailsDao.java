@@ -32,6 +32,6 @@ public interface StoreLockDetailsDao {
 
     StoreLockDetails selectByLineCodeAndSkuCodeAndLockCount(StoreLockDetails record);
 
-    StoreLockDetails selectByOrderCodeAndSkuCode(StoreLockDetails record);
+    List<StoreLockDetails> selectByOrderCodeAndSkuCode(StoreLockDetails record);
 
 }
