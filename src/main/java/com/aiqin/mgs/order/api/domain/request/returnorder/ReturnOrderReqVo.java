@@ -129,4 +129,12 @@ public class ReturnOrderReqVo implements Serializable {
     @ApiModelProperty(value = "明细")
     private List<ReturnOrderDetail> details;
 
+    @ApiModelProperty(value = "支付方式编码")
+//    @JsonProperty("payment_code")
+    private String paymentCode;
+
+    @ApiModelProperty(value = "支付方式名称")
+//    @JsonProperty("payment_name")
+    private String paymentName;
+
 }
