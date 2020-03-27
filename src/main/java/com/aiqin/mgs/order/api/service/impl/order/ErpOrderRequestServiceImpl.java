@@ -371,6 +371,9 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public boolean unlockStockInSupplyChainByDetail(ErpOrderInfo order, ErpOrderLockStockTypeEnum orderLockStockTypeEnum, AuthToken auth) {
+        log.info("解锁库存（根据明细解锁）--入参order={}",order);
+        log.info("解锁库存（根据明细解锁）--入参 orderLockStockTypeEnum={}",orderLockStockTypeEnum);
+        log.info("解锁库存（根据明细解锁）--入参 auth={}",auth);
         boolean flag = true;
         try {
 
@@ -383,9 +386,12 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 Long count=countMap.get(item.getSkuCode());
                 if(null!=countMap.get(item.getSkuCode())){
                     count=count+item.getProductCount();
+                }else {
+                    count=item.getProductCount();
                 }
                 countMap.put(item.getSkuCode(),count);
             }
+            log.info("解锁库存（根据明细解锁）--sku数量汇总 countMap={}",countMap);
             for(Map.Entry<String,Long> data:countMap.entrySet()){
                 String skuCode=data.getKey();
                 Map<String, Object> paramItemMap = new HashMap<>(16);
@@ -419,12 +425,13 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             paramMap.put("order_code", order.getOrderStoreCode());
             paramMap.put("order_type", order.getOrderTypeCode());
             paramMap.put("stock_vo", list);
-
+            log.info("解锁库存（根据明细解锁）--调用供应链解锁接口,入参 paramMap={}",paramMap);
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/change/stock").json(paramMap);
             HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
             });
-
+            log.info("解锁库存（根据明细解锁）--调用供应链解锁接口,返回结果 response={}",JSON.toJSONString(response));
             if (!RequestReturnUtil.validateHttpResponse(response)) {
+                log.info("解锁库存（根据明细解锁）--调用供应链解锁接口,返回结果--解锁异常");
                 throw new BusinessException(response.getMessage());
             }
             log.info("清除本地锁库存记录,入参skuCodes={}",skuCodes);
