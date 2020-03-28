@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 爱亲采购单 控制器
@@ -41,7 +43,9 @@ public class PurchaseOrderController {
     @PostMapping("/add")
     @ApiOperation(value = "根据销售单，生成爱亲采购单")
     public HttpResponse synchronizationPurchaseOrder(@Valid @RequestBody ErpOrderInfo erpOrderInfo) {
-        return purchaseOrderService.createPurchaseOrder(erpOrderInfo);
+        List<ErpOrderInfo> list = new ArrayList<>();
+        list.add(erpOrderInfo);
+        return purchaseOrderService.createPurchaseOrder(list);
     }
 
     /**

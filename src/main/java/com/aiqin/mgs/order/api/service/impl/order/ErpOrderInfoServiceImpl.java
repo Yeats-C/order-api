@@ -554,7 +554,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     item.setItemList(itemList);
 
                     //同步订单到供应链，只调用一次接口，不管成功失败都算执行完成这一步
-                    HttpResponse httpResponse = purchaseOrderService.createPurchaseOrder(item);
+                    //HttpResponse httpResponse = purchaseOrderService.createPurchaseOrder(item);
 
                     if (ErpOrderTypeEnum.ASSIST_PURCHASING.getValue().equals(item.getOrderTypeCode())) {
                         //如果是货架订单，直接变成已签收状态
@@ -590,6 +590,9 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 }
             }
         }
+
+        HttpResponse httpResponse = purchaseOrderService.createPurchaseOrder(list);
+
 
     }
 

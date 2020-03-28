@@ -5,6 +5,8 @@ import com.aiqin.mgs.order.api.domain.DeliveryInfoVo;
 import com.aiqin.mgs.order.api.domain.OrderIogisticsVo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 
+import java.util.List;
+
 /**
  * 爱亲采购单 接口
  */
@@ -16,7 +18,7 @@ public interface PurchaseOrderService {
      * @param erpOrderInfo
      * @return
      */
-    HttpResponse createPurchaseOrder(ErpOrderInfo erpOrderInfo);
+    HttpResponse createPurchaseOrder(List<ErpOrderInfo> erpOrderInfo);
 
     /**
      * 耘链销售单回传
