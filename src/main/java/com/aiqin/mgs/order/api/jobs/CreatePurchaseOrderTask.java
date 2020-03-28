@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -62,7 +63,9 @@ public class CreatePurchaseOrderTask {
                     logger.info("根据订单生成采购单定时任务=====>开始");
                     try {
                         //根据ERP订单生成爱亲采购单,采购单明细,修改订单同步状态&根据爱亲采购单，生成耘链销售单,添加操作日志
-                        createPurchaseOrderService.addOrderAndDetail(orderInfo);
+                        List<ErpOrderInfo> list = new ArrayList<>();
+                        list.add(orderInfo);
+                        createPurchaseOrderService.addOrderAndDetail(list);
                     } catch (Exception e) {
                         logger.error("根据订单生成采购单定时任务=====>失败" + e);
                     }

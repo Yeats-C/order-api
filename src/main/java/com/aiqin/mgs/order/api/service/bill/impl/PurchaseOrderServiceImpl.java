@@ -48,14 +48,14 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     PurchaseOrderDetailBatchDao purchaseOrderDetailBatchDao;
 
     @Override
-    public HttpResponse createPurchaseOrder(@Valid ErpOrderInfo erpOrderInfo) {
-        LOGGER.info("根据ERP订单生成爱亲采购单，采购单开始，erpOrderInfo{}", erpOrderInfo);
-        if (erpOrderInfo != null & erpOrderInfo.getItemList() != null && erpOrderInfo.getItemList().size() > 0) {
+    public HttpResponse createPurchaseOrder(@Valid List<ErpOrderInfo> erpOrderInfos) {
+        LOGGER.info("根据ERP订单生成爱亲采购单，采购单开始，erpOrderInfo{}", erpOrderInfos);
+        if (CollectionUtils.isNotEmpty(erpOrderInfos)) {
             //异步执行。
-            purchaseOrderExecutor(erpOrderInfo);
+            purchaseOrderExecutor(erpOrderInfos);
             return HttpResponse.success();
         } else {
-            LOGGER.error("订单为空 erpOrderInfo {}" + erpOrderInfo);
+            LOGGER.error("订单为空 erpOrderInfo {}" + erpOrderInfos);
             return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
         }
     }
@@ -177,16 +177,15 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     /**
      * 异步执行.
      *
-     * @param erpOrderInfo
      */
-    private void purchaseOrderExecutor(ErpOrderInfo erpOrderInfo) {
+    private void purchaseOrderExecutor(List<ErpOrderInfo> erpOrderInfos) {
         ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
         singleThreadExecutor.execute(new Runnable() {
             @Override
             public void run() {
                 try {
                     //根据ERP订单生成爱亲采购单&采购单明细&修改订单同步状态
-                    createPurchaseOrderService.addOrderAndDetail(erpOrderInfo);
+                    createPurchaseOrderService.addOrderAndDetail(erpOrderInfos);
                 } catch (Exception e) {
                     LOGGER.error("同步ERP采购单失败" + e);
                     throw new RuntimeException();

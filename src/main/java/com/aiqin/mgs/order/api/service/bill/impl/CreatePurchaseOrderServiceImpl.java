@@ -18,6 +18,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.service.bill.CreatePurchaseOrderService;
 import com.aiqin.mgs.order.api.service.bill.OperationLogService;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,42 +50,45 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addOrderAndDetail(ErpOrderInfo erpOrderInfo) {
-        LOGGER.info("根据ERP订单生成爱亲采购单&采购单明细&修改订单同步状态，参数为：erpOrderInfo{}", erpOrderInfo);
+    public void addOrderAndDetail(List<ErpOrderInfo> erpOrderInfos) {
+        LOGGER.info("根据ERP订单生成爱亲采购单&采购单明细&修改订单同步状态，参数为：erpOrderInfo{}", erpOrderInfos);
         PurchaseOrderInfo purchaseOrder = null;
-        try {
-            //根据订单好查询，是否否已经生成采购单
-            purchaseOrder = purchaseOrderDao.selectByOrderStoreCode(erpOrderInfo.getOrderStoreCode());
-        } catch (Exception e) {
-            LOGGER.error("根据订单号查询采购单异常", e);
-            throw new RuntimeException();
+        for(ErpOrderInfo erpOrderInfo:erpOrderInfos){
+            try {
+                //根据订单好查询，是否否已经生成采购单
+                purchaseOrder = purchaseOrderDao.selectByOrderStoreCode(erpOrderInfo.getOrderStoreCode());
+            } catch (Exception e) {
+                LOGGER.error("根据订单号查询采购单异常", e);
+                throw new RuntimeException();
+            }
+
+            if (purchaseOrder != null) {
+                //修改ERP订单同步状态
+                erpOrderInfoDao.updateOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_SUCCESS.getCode(), erpOrderInfo.getOrderStoreCode());
+                LOGGER.info("此订单号" + purchaseOrder.getPurchaseOrderCode() + "已经生成采购单，无需再次生成");
+                return;
+            }
+
+            try {
+                //根据ERP订单生成爱亲采购单
+                erpOrderInfoTopurchaseOrder(erpOrderInfo);
+                //根据ERP订单明细生成爱亲采购单明细
+                itemListToPurchaseOrderDetail(erpOrderInfo.getItemList());
+
+                //修改ERP订单同步状态
+                erpOrderInfoDao.updateOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_SUCCESS.getCode(), erpOrderInfo.getOrderStoreCode());
+
+                //根据ERP订单生成爱亲采购单,采购单明细,修改订单同步状态&根据爱亲采购单，生成耘链销售单，添加操作日志
+                addOperationLog(erpOrderInfo);
+            } catch (Exception e) {
+                LOGGER.error("根据ERP订单生成爱亲采购单异常" + e);
+                throw new RuntimeException();
+            }
         }
 
-        if (purchaseOrder != null) {
-            //修改ERP订单同步状态
-            erpOrderInfoDao.updateOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_SUCCESS.getCode(), erpOrderInfo.getOrderStoreCode());
-            LOGGER.info("此订单号" + purchaseOrder.getPurchaseOrderCode() + "已经生成采购单，无需再次生成");
-            return;
-        }
+        //根据爱亲采购单，生成耘链销售单开始
+        createSaleOrder(erpOrderInfos);
 
-        try {
-            //根据ERP订单生成爱亲采购单
-            erpOrderInfoTopurchaseOrder(erpOrderInfo);
-            //根据ERP订单明细生成爱亲采购单明细
-            itemListToPurchaseOrderDetail(erpOrderInfo.getItemList());
-
-            //根据爱亲采购单，生成耘链销售单开始
-            createSaleOrder(erpOrderInfo);
-
-            //修改ERP订单同步状态
-            erpOrderInfoDao.updateOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_SUCCESS.getCode(), erpOrderInfo.getOrderStoreCode());
-
-            //根据ERP订单生成爱亲采购单,采购单明细,修改订单同步状态&根据爱亲采购单，生成耘链销售单，添加操作日志
-            addOperationLog(erpOrderInfo);
-        } catch (Exception e) {
-            LOGGER.error("根据ERP订单生成爱亲采购单异常" + e);
-            throw new RuntimeException();
-        }
         LOGGER.info("根据ERP订单生成爱亲采购单&采购单明细&生成耘链销售单&修改订单同步状态,成功");
     }
 
@@ -208,16 +212,18 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
      *
      * @param erpOrderInfo
      */
-    private void createSaleOrder(ErpOrderInfo erpOrderInfo) {
-        LOGGER.info("根据爱亲采购单，生成耘链销售单开始，参数为：erpOrderInfo{}", erpOrderInfo);
+    private void createSaleOrder(List<ErpOrderInfo> erpOrderInfo) {
+        LOGGER.info("根据爱亲采购单，生成耘链销售单开始，参数为：erpOrderInfo{}",  JSONObject.toJSONString(erpOrderInfo));
         try {
-            String url = purchaseHost + "/order/aiqin/sale";
-            HttpClient httpGet = HttpClient.post(url).json(erpOrderInfo).timeout(10000);
-            LOGGER.info("根据爱亲采购单，生成耘链销售单开始url:" + url + " httpGet:" + httpGet);
-            HttpResponse<Object> response = httpGet.action().result(new TypeReference<HttpResponse<Object>>() {
-            });
-            if (!RequestReturnUtil.validateHttpResponse(response)) {
-                throw new BusinessException(response.getMessage());
+            for(ErpOrderInfo orderInfo:erpOrderInfo){
+                String url = purchaseHost + "/order/aiqin/sale";
+                HttpClient httpGet = HttpClient.post(url).json(orderInfo).timeout(10000);
+                LOGGER.info("根据爱亲采购单，生成耘链销售单开始url:" + url + " httpGet:" + httpGet);
+                HttpResponse<Object> response = httpGet.action().result(new TypeReference<HttpResponse<Object>>() {
+                });
+                if (!RequestReturnUtil.validateHttpResponse(response)) {
+                    throw new BusinessException(response.getMessage());
+                }
             }
         } catch (Exception e) {
             LOGGER.error("根据爱亲采购单，生成耘链销售单失败returnOrderCode： " + erpOrderInfo);

@@ -227,7 +227,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             }
         }
         if (ErpOrderTypeEnum.DIRECT_SEND.getCode().equals(erpOrderSaveRequest.getOrderType()) && erpOrder) {
-            erpOrderSaveRequest.setOrderCategory(ErpOrderCategoryEnum.ORDER_TYPE_1.getCode());
+            erpOrderSaveRequest.setOrderCategory(ErpOrderCategoryEnum.ORDER_TYPE_2.getCode());
         } else {
             if (erpOrderSaveRequest.getOrderCategory() == null) {
                 throw new BusinessException("请传入订单类别");
@@ -527,7 +527,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @date 2019/11/27 19:04
      */
     private ErpOrderInfo generateOrder(List<ErpOrderItem> orderItemList, StoreInfo storeInfo, ErpOrderSaveRequest erpOrderSaveRequest,ErpOrderFee orderFee, AuthToken auth) {
-
+        log.info("构建订单信息--入参,orderItemList={}",orderItemList);
+        log.info("构建订单信息--入参,storeInfo={}",storeInfo);
+        log.info("构建订单信息--入参,erpOrderSaveRequest={}",erpOrderSaveRequest);
+        log.info("构建订单信息--入参,orderFee={}",orderFee);
+        log.info("构建订单信息--入参,auth={}",auth);
         //商品毛重(kg)
         BigDecimal boxGrossWeightTotal = BigDecimal.ZERO;
         //商品包装体积(mm³)
@@ -636,7 +640,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setScourSheetStatus(ErpOrderScourSheetStatusEnum.NOT_NEED.getCode());
         //是否活动商品0否1是
         order.setIsActivity(isActivity);
-
+        log.info("构建订单信息--封装结果,order={}",order);
         return order;
     }
 
