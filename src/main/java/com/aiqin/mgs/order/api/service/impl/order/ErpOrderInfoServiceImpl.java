@@ -532,15 +532,17 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     @Override
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public void orderSendToSupply(String orderCode, AuthToken auth) {
-
+        logger.info("同步订单到供应链--入参,orderCode={}",orderCode);
+        logger.info("同步订单到供应链--入参, auth={}",auth);
         List<ErpOrderInfo> list = new ArrayList<>();
         ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
+        logger.info("同步订单到供应链--原始订单信息, order={}",order);
         if (ErpOrderLevelEnum.PRIMARY.getCode().equals(order.getOrderLevel()) && StatusEnum.YES.getCode().equals(order.getSplitStatus())) {
             list.addAll(erpOrderQueryService.getSecondOrderListByPrimaryCode(orderCode));
         } else {
             list.add(order);
         }
-
+        logger.info("同步订单到供应链--拆单信息, list={}",list);
 
         for (ErpOrderInfo item :
                 list) {
