@@ -227,7 +227,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             }
         }
         if (ErpOrderTypeEnum.DIRECT_SEND.getCode().equals(erpOrderSaveRequest.getOrderType()) && erpOrder) {
-            erpOrderSaveRequest.setOrderCategory(ErpOrderCategoryEnum.ORDER_TYPE_1.getCode());
+            erpOrderSaveRequest.setOrderCategory(ErpOrderCategoryEnum.ORDER_TYPE_2.getCode());
         } else {
             if (erpOrderSaveRequest.getOrderCategory() == null) {
                 throw new BusinessException("请传入订单类别");
