@@ -277,10 +277,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
                     } else {
                         //总金额 new BigDecimal(lockCount)).divide(new BigDecimal(item.getProductCount()), 2, RoundingMode.HALF_UP
-                        BigDecimal totalPreferentialAmount = item.getTotalProductAmount().multiply(new BigDecimal(item.getProductCount()));
+//                        BigDecimal totalPreferentialAmount = item.getTotalProductAmount().multiply(new BigDecimal(item.getProductCount()));
                         //拆出来的行均摊总金额
 //                        newSplitItem.setTotalPreferentialAmount(item.getTotalPreferentialAmount().subtract(lineTotalPreferentialAmount));
-                        newSplitItem.setTotalPreferentialAmount(totalPreferentialAmount.subtract(lineTotalPreferentialAmount));
+                        newSplitItem.setTotalPreferentialAmount(item.getTotalProductAmount().subtract(lineTotalPreferentialAmount));
 
                         //拆出来的行活动优惠金额
                         newSplitItem.setTotalAcivityAmount(item.getTotalAcivityAmount().subtract(lineTotalAcivityAmount));
