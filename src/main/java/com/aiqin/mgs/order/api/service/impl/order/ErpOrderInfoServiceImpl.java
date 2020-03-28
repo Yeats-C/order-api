@@ -545,6 +545,26 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             list.add(order);
         }
         logger.info("同步订单到供应链--拆单信息, list={}", JSON.toJSONString(list));
+        List<ErpOrderInfo> newList = new ArrayList<>();
+        for (ErpOrderInfo item :
+                list) {
+            if (ErpOrderStatusEnum.ORDER_STATUS_4.getCode().equals(item.getOrderStatus())) {
+                if (ErpOrderNodeStatusEnum.STATUS_6.getCode().equals(item.getOrderNodeStatus())) {
+                    List<ErpOrderItem> itemList = erpOrderItemService.selectOrderItemListByOrderId(item.getOrderStoreId());
+                    item.setItemList(itemList);
+                    //同步订单到供应链，只调用一次接口，不管成功失败都算执行完成这一步
+                    //HttpResponse httpResponse = purchaseOrderService.createPurchaseOrder(item);
+                    newList.add(item);
+                }
+            }
+        }
+        logger.info("同步订单到供应链--拆单信息--真正入参, newList={}", JSON.toJSONString(newList));
+        if(newList!=null&&newList.size()>0){
+            //同步订单到供应链，只调用一次接口，不管成功失败都算执行完成这一步
+            HttpResponse httpResponse = purchaseOrderService.createPurchaseOrder(newList);
+        }else {
+            throw new BusinessException("同步订单到供应链--拆单信息为空");
+        }
 
         for (ErpOrderInfo item :
                 list) {
@@ -554,7 +574,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     item.setItemList(itemList);
 
                     //同步订单到供应链，只调用一次接口，不管成功失败都算执行完成这一步
-                    //HttpResponse httpResponse = purchaseOrderService.createPurchaseOrder(item);
+//                    HttpResponse httpResponse = purchaseOrderService.createPurchaseOrder(item);
 
                     if (ErpOrderTypeEnum.ASSIST_PURCHASING.getValue().equals(item.getOrderTypeCode())) {
                         //如果是货架订单，直接变成已签收状态
@@ -590,9 +610,6 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 }
             }
         }
-
-        HttpResponse httpResponse = purchaseOrderService.createPurchaseOrder(list);
-
 
     }
 
