@@ -22,6 +22,8 @@ import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import com.aiqin.mgs.order.api.util.CopyBeanUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -542,7 +544,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         } else {
             list.add(order);
         }
-        logger.info("同步订单到供应链--拆单信息, list={}",list);
+        logger.info("同步订单到供应链--拆单信息, list={}", JSON.toJSONString(list));
 
         for (ErpOrderInfo item :
                 list) {
