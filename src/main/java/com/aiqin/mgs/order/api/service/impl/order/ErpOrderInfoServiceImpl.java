@@ -269,7 +269,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 //                        BigDecimal totalPreferentialAmount = item.getTotalProductAmount().multiply(new BigDecimal(lockCount)).divide(new BigDecimal(item.getProductCount()), 2, RoundingMode.HALF_UP);
                         //拆出来的行均摊总金额 = 原始订单分摊总价*（锁库数量/商品总数量）
                         BigDecimal totalPreferentialAmount = item.getPreferentialAmount().multiply(new BigDecimal(lockCount)).divide(new BigDecimal(item.getProductCount()), 2, RoundingMode.HALF_UP);
-
+                        logger.info("订单拆单--行号 -拆单 lockCount={},totalPreferentialAmount={}",lockCount,totalPreferentialAmount);
                         lineTotalPreferentialAmount = lineTotalPreferentialAmount.add(totalPreferentialAmount);
                         newSplitItem.setTotalPreferentialAmount(totalPreferentialAmount);
 
@@ -286,7 +286,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                         //拆出来的行活动优惠金额
                         newSplitItem.setTotalAcivityAmount(item.getTotalAcivityAmount().subtract(lineTotalAcivityAmount));
                     }
-
+                    logger.info("订单拆单--行号 -拆单newSplitItem={}",newSplitItem);
                     lineSplitList.add(newSplitItem);
                     repertorySplitMap.put(repertoryKey, lineSplitList);
 
