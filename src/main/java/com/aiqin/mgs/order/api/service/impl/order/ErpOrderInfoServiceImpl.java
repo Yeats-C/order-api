@@ -265,8 +265,11 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     newSplitItem.setProductCount(lockCount);
                     if (i < lineParamList.size() - 1) {
 
-                        //拆出来的行均摊总金额
-                        BigDecimal totalPreferentialAmount = item.getTotalProductAmount().multiply(new BigDecimal(lockCount)).divide(new BigDecimal(item.getProductCount()), 2, RoundingMode.HALF_UP);
+                        //拆出来的行均摊总金额--原来的逻辑=原始订单行总价*（锁库数量/商品总数量）
+//                        BigDecimal totalPreferentialAmount = item.getTotalProductAmount().multiply(new BigDecimal(lockCount)).divide(new BigDecimal(item.getProductCount()), 2, RoundingMode.HALF_UP);
+                        //拆出来的行均摊总金额 = 原始订单分摊总价*（锁库数量/商品总数量）
+                        BigDecimal totalPreferentialAmount = item.getPreferentialAmount().multiply(new BigDecimal(lockCount)).divide(new BigDecimal(item.getProductCount()), 2, RoundingMode.HALF_UP);
+
                         lineTotalPreferentialAmount = lineTotalPreferentialAmount.add(totalPreferentialAmount);
                         newSplitItem.setTotalPreferentialAmount(totalPreferentialAmount);
 
@@ -276,11 +279,9 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                         newSplitItem.setTotalAcivityAmount(totalAcivityAmount);
 
                     } else {
-                        //总金额 new BigDecimal(lockCount)).divide(new BigDecimal(item.getProductCount()), 2, RoundingMode.HALF_UP
-//                        BigDecimal totalPreferentialAmount = item.getTotalProductAmount().multiply(new BigDecimal(item.getProductCount()));
-                        //拆出来的行均摊总金额
-//                        newSplitItem.setTotalPreferentialAmount(item.getTotalPreferentialAmount().subtract(lineTotalPreferentialAmount));
-                        newSplitItem.setTotalPreferentialAmount(item.getTotalProductAmount().subtract(lineTotalPreferentialAmount));
+                        //拆出来的行均摊总金额=原始分摊总金额-本次遍历优惠分摊总金额（分摊后金额）
+                        newSplitItem.setTotalPreferentialAmount(item.getTotalPreferentialAmount().subtract(lineTotalPreferentialAmount));
+//                        newSplitItem.setTotalPreferentialAmount(item.getTotalProductAmount().subtract(lineTotalPreferentialAmount));
 
                         //拆出来的行活动优惠金额
                         newSplitItem.setTotalAcivityAmount(item.getTotalAcivityAmount().subtract(lineTotalAcivityAmount));
