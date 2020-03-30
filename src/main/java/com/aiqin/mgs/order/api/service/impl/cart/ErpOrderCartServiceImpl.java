@@ -1162,6 +1162,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         //生成赠品行
                         ErpOrderCartInfo giftProductLine = createGiftProductLine(activity, giftItem, store);
                         ErpSkuDetail skuDetail = skuDetailMap.get(giftProductLine.getSkuCode());
+                        if(null==skuDetail){
+                            skuDetail=bridgeProductService.getProductSkuDetail(store.getProvinceId(),store.getCityId(),store.getCompanyCode(),giftProductLine.getSkuCode());
+                        }
                         giftProductLine.setStockNum(skuDetail.getStockNum());
                         giftProductLine.setIsSale(skuDetail.getIsSale());
                         giftProductLine.setActivityPrice(BigDecimal.ZERO);
@@ -1501,6 +1504,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         ErpOrderCartInfo giftProductLine = createGiftProductLineWithinStock(activity, giftItem, store, skuDetailMap, skuStockNumMap, true);
                         if (giftProductLine != null) {
                             ErpSkuDetail skuDetail = skuDetailMap.get(giftProductLine.getSkuCode());
+                            if(null==skuDetail){
+                                skuDetail=bridgeProductService.getProductSkuDetail(store.getProvinceId(),store.getCityId(),store.getCompanyCode(),giftProductLine.getSkuCode());
+                            }
                             giftProductLine.setStockNum(skuDetail.getStockNum());
                             giftProductLine.setIsSale(skuDetail.getIsSale());
                             giftProductLine.setActivityPrice(BigDecimal.ZERO);
