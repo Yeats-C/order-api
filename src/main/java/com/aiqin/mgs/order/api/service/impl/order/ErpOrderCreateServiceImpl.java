@@ -30,6 +30,7 @@ import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.aiqin.platform.flows.client.constant.AjaxJson;
 import com.aiqin.platform.flows.client.constant.FormUpdateUrlType;
 import com.aiqin.platform.flows.client.domain.vo.ActBaseProcessEntity;
+import com.aiqin.platform.flows.client.domain.vo.FormCallBackVo;
 import com.aiqin.platform.flows.client.domain.vo.StartProcessParamVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -211,6 +212,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //返回订单
         return order;
+    }
+
+    @Override
+    public String callback(FormCallBackVo formCallBackVo) {
+        return "";
     }
 
     /**
@@ -1435,15 +1441,16 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      */
     public HttpResponse submitActBaseProcess(String approvalCode, String applier, String positionCode) {
         StartProcessParamVO paramVO = new StartProcessParamVO();
-        // A品券发放申请
+        // 订单金额超过市值赠送总金额审批申请
+        //TODO 改成正确的审批流key
         paramVO.setCostType(ConstantData.APPLY_COUPON01_KEY);
         paramVO.setFormType(ConstantData.APPLY_COUPON01_KEY);
         paramVO.setFormUrl("http://order.api.aiqin.com/approval/formDetail/" + approvalCode);//表单详情页面地址 必传
         paramVO.setCurrentUser(applier);
         paramVO.setFormNo(approvalCode);
-        paramVO.setTitle("A品卷发放审批");
-        paramVO.setRemark("A品卷发放审批");
-        paramVO.setFormUpdateUrl("http://order.api.aiqin.com/approval/callback");//回调地址
+        paramVO.setTitle("订单金额超过市值赠送总金额审批");
+        paramVO.setRemark("订单金额超过市值赠送总金额审批");
+        paramVO.setFormUpdateUrl("http://order.api.aiqin.com/erpOrderCreateController/callback");//回调地址
         paramVO.setFormUpdateUrlType(FormUpdateUrlType.HTTP);
         paramVO.setSignTicket(IdUtil.uuid());
         paramVO.setReceiptType("1");
