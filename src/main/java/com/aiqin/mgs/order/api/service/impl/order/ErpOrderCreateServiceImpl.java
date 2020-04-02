@@ -1313,6 +1313,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private ErpOrderFee firstGivePrice(StoreInfo storeInfo,List<ErpOrderItem> itemList,List<String> topCouponCodeList) {
         //赠送市值
         BigDecimal marketValue = storeInfo.getMarketValue();
+        //赠送市值余额
+        BigDecimal marketValueBalance = storeInfo.getMarketValueBalance();
         //赠送费用
         BigDecimal freeCost = storeInfo.getFreeCost();
         List<CouponShareRequest> detailList = new ArrayList<>();
@@ -1364,6 +1366,39 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             totalMoneyTotal = totalMoneyTotal.add(item.getTotalProductAmount());
             activityMoneyTotal = activityMoneyTotal.add(item.getActivityDiscountAmount());
             topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponDiscountAmount());
+        }
+        //判断订单总金额是否大于赠送市值
+        if(totalMoneyTotal.compareTo(marketValueBalance)==1){//大于赠送市值，走审批
+            //TODO 走审批
+
+
+
+        }else{//计算分摊
+            //计算比例系数=总金额/赠送总市值
+            BigDecimal pro=totalMoneyTotal.divide(marketValue);
+            //根据系数，算实付金额=赠送费用X系数
+            BigDecimal shiFuAmount=pro.multiply(pro);
+            //统计分摊总金额和，用于最后一行做减法
+            BigDecimal fenTanAmount=BigDecimal.ZERO;
+            //遍历详情从新算金额
+            for(int i=0;i<itemList.size();i++){
+                ErpOrderItem item=itemList.get(i);
+                BigDecimal productAmount = item.getProductAmount();
+                BigDecimal totalPreferentialAmount=productAmount.divide(totalMoneyTotal).multiply(shiFuAmount);
+                fenTanAmount=fenTanAmount.add(totalPreferentialAmount);
+                item.setTotalPreferentialAmount(totalPreferentialAmount);
+                if(i==itemList.size()){
+                    //最后一行做减法
+                    item.setPreferentialAmount(shiFuAmount.subtract(fenTanAmount));
+                }
+                item.setPreferentialAmount(totalPreferentialAmount.divide(new BigDecimal(item.getProductCount())));
+//                item.setTopCouponDiscountAmount(couponShareRequest.getApinCouponAmount());
+                item.setTotalAcivityAmount(item.getActivityDiscountAmount().add(item.getTopCouponDiscountAmount()));
+
+                totalMoneyTotal = totalMoneyTotal.add(item.getTotalProductAmount());
+                activityMoneyTotal = activityMoneyTotal.add(item.getActivityDiscountAmount());
+                topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponDiscountAmount());
+            }
         }
 
 
