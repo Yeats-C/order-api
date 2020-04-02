@@ -126,6 +126,10 @@ public class ErpOrderCreateController {
         return erpOrderCreateService.callback(formCallBackVo);
     }
 
-
+    @ApiOperation("订单金额超出市值赠送金额--根据formNo查询审批详情")
+    @GetMapping("/formDetail/{form_no}")
+    public HttpResponse<CouponApprovalDetail> getDetailByformNo(@PathVariable(value = "form_no") String formNo) {
+        return HttpResponse.success(erpOrderCreateService.getDetailByformNo(formNo));
+    }
 
 }

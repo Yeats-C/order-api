@@ -219,6 +219,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         return "";
     }
 
+    @Override
+    public CouponApprovalDetail getDetailByformNo(String formNo) {
+        return null;
+    }
+
     /**
      * 校验保存订单参数
      *
@@ -1445,7 +1450,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //TODO 改成正确的审批流key
         paramVO.setCostType(ConstantData.APPLY_COUPON01_KEY);
         paramVO.setFormType(ConstantData.APPLY_COUPON01_KEY);
-        paramVO.setFormUrl("http://order.api.aiqin.com/approval/formDetail/" + approvalCode);//表单详情页面地址 必传
+        paramVO.setFormUrl("http://order.api.aiqin.com/erpOrderCreateController/formDetail/" + approvalCode);//表单详情页面地址 必传
         paramVO.setCurrentUser(applier);
         paramVO.setFormNo(approvalCode);
         paramVO.setTitle("订单金额超过市值赠送总金额审批");
