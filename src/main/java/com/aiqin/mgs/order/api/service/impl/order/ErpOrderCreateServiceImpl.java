@@ -1305,4 +1305,78 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         return orderCode;
     }
 
+    /**
+     * 首单赠送金额计算
+     * @param itemList
+     * @param topCouponCodeList
+     */
+    private ErpOrderFee firstGivePrice(StoreInfo storeInfo,List<ErpOrderItem> itemList,List<String> topCouponCodeList) {
+        //
+
+        List<CouponShareRequest> detailList = new ArrayList<>();
+        for (ErpOrderItem item :
+                itemList) {
+            CouponShareRequest itemRequest = new CouponShareRequest();
+            itemRequest.setLineCode(item.getLineCode());
+            itemRequest.setSkuCode(item.getSkuCode());
+            itemRequest.setProductCount(item.getProductCount());
+            itemRequest.setTotalProductAmount(item.getTotalProductAmount());
+            itemRequest.setProductPropertyCode(item.getProductPropertyCode());
+            itemRequest.setTotalPreferentialAmount(item.getTotalPreferentialAmount());
+            itemRequest.setPreferentialAmount(item.getTotalPreferentialAmount().divide(new BigDecimal(item.getProductCount()),2, RoundingMode.DOWN));
+            itemRequest.setApinCouponAmount(BigDecimal.ZERO);
+            itemRequest.setProductGift(item.getProductType());
+            detailList.add(itemRequest);
+        }
+        //A品券计算均摊金额
+        couponSharePrice(detailList, topCouponCodeList);
+
+        Map<Long, CouponShareRequest> map = new HashMap<>(16);
+        for (CouponShareRequest item :
+                detailList) {
+            map.put(item.getLineCode(), item);
+        }
+
+        ErpOrderFee orderFee = new ErpOrderFee();
+
+
+        //订单总额（元）
+        BigDecimal totalMoneyTotal = BigDecimal.ZERO;
+        //活动优惠金额（元）
+        BigDecimal activityMoneyTotal = BigDecimal.ZERO;
+        //服纺券优惠金额（元）
+        BigDecimal suitCouponMoneyTotal = BigDecimal.ZERO;
+        //A品券优惠金额（元）
+        BigDecimal topCouponMoneyTotal = BigDecimal.ZERO;
+        //实付金额（元）
+        BigDecimal payMoneyTotal = BigDecimal.ZERO;
+
+        for (ErpOrderItem item :
+                itemList) {
+            CouponShareRequest couponShareRequest = map.get(item.getLineCode());
+            item.setTotalPreferentialAmount(couponShareRequest.getTotalPreferentialAmount());
+            item.setPreferentialAmount(couponShareRequest.getPreferentialAmount());
+            item.setTopCouponDiscountAmount(couponShareRequest.getApinCouponAmount());
+            item.setTotalAcivityAmount(item.getActivityDiscountAmount().add(item.getTopCouponDiscountAmount()));
+
+            totalMoneyTotal = totalMoneyTotal.add(item.getTotalProductAmount());
+            activityMoneyTotal = activityMoneyTotal.add(item.getActivityDiscountAmount());
+            topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponDiscountAmount());
+        }
+
+
+        orderFee.setTotalMoney(totalMoneyTotal);
+        orderFee.setActivityMoney(activityMoneyTotal);
+        orderFee.setSuitCouponMoney(suitCouponMoneyTotal);
+        orderFee.setTopCouponMoney(topCouponMoneyTotal);
+        orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal));
+        if(null!=topCouponCodeList&&topCouponCodeList.size()>0){
+            orderFee.setTopCouponCodes(String.join(",", topCouponCodeList));
+        }else {
+            orderFee.setTopCouponCodes("");
+        }
+        return orderFee;
+    }
+
+
 }
