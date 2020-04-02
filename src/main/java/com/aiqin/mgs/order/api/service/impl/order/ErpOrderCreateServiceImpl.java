@@ -1,6 +1,10 @@
 package com.aiqin.mgs.order.api.service.impl.order;
 
+import com.aiqin.ground.util.http.HttpClient;
+import com.aiqin.ground.util.id.IdUtil;
+import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.ConstantData;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
@@ -23,8 +27,13 @@ import com.aiqin.mgs.order.api.service.cart.ErpOrderCartService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
+import com.aiqin.platform.flows.client.constant.AjaxJson;
+import com.aiqin.platform.flows.client.constant.FormUpdateUrlType;
+import com.aiqin.platform.flows.client.domain.vo.ActBaseProcessEntity;
+import com.aiqin.platform.flows.client.domain.vo.StartProcessParamVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +56,8 @@ import java.util.Map;
 @Service
 public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
+    @Value("${activiti.host}")
+    private String activitiHost;
     @Resource
     private ErpOrderQueryService erpOrderQueryService;
     @Resource
@@ -1415,5 +1426,41 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         return orderFee;
     }
 
+    /**
+     * 封装 订单金额超过市值赠送总金额调用审批
+     *
+     * @param approvalCode 审批号
+     * @param applier      申请人
+     * @param positionCode 部门编码
+     */
+    public HttpResponse submitActBaseProcess(String approvalCode, String applier, String positionCode) {
+        StartProcessParamVO paramVO = new StartProcessParamVO();
+        // A品券发放申请
+        paramVO.setCostType(ConstantData.APPLY_COUPON01_KEY);
+        paramVO.setFormType(ConstantData.APPLY_COUPON01_KEY);
+        paramVO.setFormUrl("http://order.api.aiqin.com/approval/formDetail/" + approvalCode);//表单详情页面地址 必传
+        paramVO.setCurrentUser(applier);
+        paramVO.setFormNo(approvalCode);
+        paramVO.setTitle("A品卷发放审批");
+        paramVO.setRemark("A品卷发放审批");
+        paramVO.setFormUpdateUrl("http://order.api.aiqin.com/approval/callback");//回调地址
+        paramVO.setFormUpdateUrlType(FormUpdateUrlType.HTTP);
+        paramVO.setSignTicket(IdUtil.uuid());
+        paramVO.setReceiptType("1");
+        paramVO.setPositionCode(positionCode);
+        log.info("调用审批流发起申请,request={}", paramVO);
+        String url = activitiHost + "/activiti/common/submit";
+        HttpClient httpClient = HttpClient.post(url).json(paramVO).timeout(10000);
+        AjaxJson result = httpClient.action().result(AjaxJson.class);
+        log.info("调用审批流发起申请返回结果,result={}", result);
+        if (result.getSuccess()) {
+            ActBaseProcessEntity actBaseProcessEntity = JsonUtil.fromJson(JsonUtil.toJson(result.getObj()), ActBaseProcessEntity.class);
+            log.info("发起申请成功,request={}", paramVO);
+//            formKeyDao.insert(new FormKey(paramVO.getFormNo(),paramVO.getFormType()));
+            return HttpResponse.success(actBaseProcessEntity);
+        }
+        log.error("发起申请失败,request={}", paramVO);
+        return HttpResponse.success();
+    }
 
 }
