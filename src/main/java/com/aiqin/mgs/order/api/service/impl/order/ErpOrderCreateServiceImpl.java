@@ -1311,8 +1311,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @param topCouponCodeList
      */
     private ErpOrderFee firstGivePrice(StoreInfo storeInfo,List<ErpOrderItem> itemList,List<String> topCouponCodeList) {
-        //
-
+        //赠送市值
+        BigDecimal marketValue = storeInfo.getMarketValue();
+        //赠送费用
+        BigDecimal freeCost = storeInfo.getFreeCost();
         List<CouponShareRequest> detailList = new ArrayList<>();
         for (ErpOrderItem item :
                 itemList) {

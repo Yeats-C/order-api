@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * 门店信息
  *
@@ -98,5 +100,21 @@ public class StoreInfo {
     @ApiModelProperty(value="地址")
     @JsonProperty("address")
     private String address;
+
+    @ApiModelProperty("首单赠送市值金额")
+    @JsonProperty(value = "market_value")
+    private BigDecimal marketValue;
+
+    @ApiModelProperty("首单赠送费用")
+    @JsonProperty(value = "free_cost")
+    private BigDecimal freeCost;
+
+    @ApiModelProperty("首单赠送市值余额")
+    @JsonProperty(value = "market_value_balance")
+    private BigDecimal marketValueBalance;
+
+    @ApiModelProperty("首单赠送费用余额")
+    @JsonProperty(value = "free_cost_balance")
+    private BigDecimal freeCostBalance;
 
 }
