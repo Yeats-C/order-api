@@ -8,6 +8,7 @@ import com.aiqin.mgs.order.api.base.ConstantData;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
+import com.aiqin.mgs.order.api.dao.OrderGiveFeeDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.po.cart.ErpOrderCartInfo;
@@ -41,10 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 创建订单service
@@ -79,6 +77,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private ErpStoreLockDetailsService erpStoreLockDetailsService;
     @Resource
     private CouponRuleService couponRuleService;
+    @Resource
+    private OrderGiveFeeDao orderGiveFeeDao;
 
 
     @Override
@@ -1434,6 +1434,13 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         }else {
             orderFee.setTopCouponCodes("");
         }
+        //存储到本地数据库
+        OrderGiveFee record=new OrderGiveFee();
+        record.setAmount(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal));
+        record.setCreateTime(new Date());
+        record.setOrderCode(orderFee.getOrderId());
+        record.setStoreId(storeInfo.getStoreId());
+        orderGiveFeeDao.insertSelective(record);
         return orderFee;
     }
 
