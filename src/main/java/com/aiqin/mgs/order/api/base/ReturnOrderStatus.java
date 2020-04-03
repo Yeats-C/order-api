@@ -28,6 +28,7 @@ public enum ReturnOrderStatus {
     RETURN_ORDER_SYNCHRONIZATION(3, "等待退货", "退单同步中", "货单同步给订单、供应链系统", "服务单同步过程中，请等待系统确认", "1", "4", "99，97"),
     WAITING_FOR_RETURN_TO_INSPECTION(4, "等待退货", "等待退货验货", "等待客户把退货寄回来，然后验货", "您的服务单等待寄回入库", "1", "11", "99，97"),
     WAITING_FOR_RETURN_TO_THE_WAREHOUSE(5, "等待退货", "等待退货入库", "验货完成，然后入库", "您的服务单等待寄回入库", "1", "11", "99，97"),
+    WAITING_FOR_RETURN_TO_THE_WAREHOUSE1(6, "等待审批", "等待审批", "运营中台挂账", "需要给客户返A品券，走下审批", "1", "12", "99，97"),
     RETURN_COMPLETED(11, "等待退货", "退货完成", "退货入库完成", "您的服务单已收货完成", "1", "12", null),
     REFUND_COMPLETED(12, "退款完成", "退款完成", "退款完成", "您的服务单已退款完成", "1", null, null),
     RETURN_ABNORMALLY_TERMINATED(97, "已取消", "退货异常终止", "退货终止，长时间不寄回退货", "您的服务单已终止", "1", null, null),
