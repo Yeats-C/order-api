@@ -20,6 +20,7 @@ import com.aiqin.mgs.order.api.domain.request.cart.ErpCartQueryRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpQueryCartGroupTempRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
+import com.aiqin.mgs.order.api.domain.response.StoreMarketValueResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.*;
 import com.aiqin.mgs.order.api.service.CartOrderService;
 import com.aiqin.mgs.order.api.service.CouponRuleService;
@@ -33,6 +34,8 @@ import com.aiqin.platform.flows.client.constant.FormUpdateUrlType;
 import com.aiqin.platform.flows.client.domain.vo.ActBaseProcessEntity;
 import com.aiqin.platform.flows.client.domain.vo.FormCallBackVo;
 import com.aiqin.platform.flows.client.domain.vo.StartProcessParamVO;
+import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,6 +60,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
     @Value("${activiti.host}")
     private String activitiHost;
+    @Value("${bridge.url.slcs_api}")
+    private String slcsHost;
     @Resource
     private ErpOrderQueryService erpOrderQueryService;
     @Resource
@@ -1481,5 +1486,30 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         log.error("发起申请失败,request={}", paramVO);
         return HttpResponse.success();
     }
+
+    /**
+     * 修改slcs门店市值赠余额
+     */
+    private void upGive(String storeCode,Double marketValueBalance,Double freeCostBalance){
+        log.info("修改slcs门店市值赠余额,入参storeCode={},marketValueBalance={},freeCostBalance={}",storeCode,marketValueBalance,freeCostBalance);
+        String url=slcsHost+"/store/updateValue";
+        JSONObject json=new JSONObject();
+        StoreMarketValueResponse storeMarketValueResponse=new StoreMarketValueResponse();
+        storeMarketValueResponse.setFreeCostBalance(freeCostBalance);
+        storeMarketValueResponse.setMarketValueBalance(marketValueBalance);
+        storeMarketValueResponse.setStoreCode(storeCode);
+        json.put("storeMarketValueResponse",storeMarketValueResponse);
+        log.info("修改slcs门店市值赠余额,调用修改赠送市值余额接口,url={},parm={}",url,json);
+        HttpClient httpClient = HttpClient.post(url).json(json);
+        Map<String ,Object> res=null;
+        res = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+        log.info("同步到虚拟资产:"+res);
+        if(res!=null&&"0".equals(res.get("code"))){
+            log.info("修改slcs门店市值赠余额,调用修改赠送市值余额接口,成功");
+        }
+
+    }
+
+
 
 }
