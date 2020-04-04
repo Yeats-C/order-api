@@ -34,7 +34,7 @@ public class GiftQuotasUseController {
     }
 
     /**
-     * 添加活动
+     * 添加兑换赠品积分账户使用明细
      *
      * @param
      * @return
