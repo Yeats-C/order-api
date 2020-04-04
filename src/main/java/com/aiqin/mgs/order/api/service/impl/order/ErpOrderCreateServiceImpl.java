@@ -1434,7 +1434,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         }else {
             orderFee.setTopCouponCodes("");
         }
-        //存储到本地数据库
+        //存储赠送市值到本地数据库
         OrderGiveFee record=new OrderGiveFee();
         record.setAmount(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal));
         record.setCreateTime(new Date());
