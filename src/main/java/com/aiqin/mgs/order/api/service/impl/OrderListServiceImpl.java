@@ -26,6 +26,8 @@ import com.aiqin.mgs.order.api.domain.response.statistical.StatisticalPurchaseAm
 import com.aiqin.mgs.order.api.domain.response.stock.StockLockRespVo;
 import com.aiqin.mgs.order.api.service.BridgeStockService;
 import com.aiqin.mgs.order.api.service.OrderListService;
+import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
+import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
 import com.aiqin.mgs.order.api.util.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -75,6 +77,10 @@ public class OrderListServiceImpl implements OrderListService {
     private OrderSplitsNumDao orderSplitsNumDao;
     @Resource
     private ErpOrderInfoDao erpOrderInfoDao;
+    @Resource
+    private ErpOrderItemService erpOrderItemService;
+    @Resource
+    private ErpOrderRequestService erpOrderRequestService;
 
 
 
@@ -256,7 +262,29 @@ public class OrderListServiceImpl implements OrderListService {
         //判断拆单的子订单是否已经全部发货完成
         Boolean flag = checkComplete(deliverVo.getOrderCode());
         if(flag){//全部完成，进行分摊计算
-//            firstGivePrice();
+            ErpOrderInfo po=new ErpOrderInfo();
+            po.setOrderStoreCode(deliverVo.getOrderCode());
+            //查询主订单
+            List<ErpOrderInfo> select = erpOrderInfoDao.select(po);
+            if(select!=null&&select.size()>0) {
+                ErpOrderInfo erpOrderInfo = select.get(0);
+                //获取门店信息
+                StoreInfo storeInfo = erpOrderRequestService.getStoreInfoByStoreId(erpOrderInfo.getStoreId());
+                if(erpOrderInfo!=null&&StringUtils.isNotBlank(erpOrderInfo.getMainOrderCode())){
+                    //查询所有子订单号
+                    po.setOrderStoreCode(null);
+                    po.setMainOrderCode(erpOrderInfo.getMainOrderCode());
+                    List<ErpOrderInfo> splictOrder = erpOrderInfoDao.select(po);
+                    for(ErpOrderInfo orderInfo:splictOrder){
+                        List<ErpOrderItem> erpOrderItems = erpOrderItemService.selectOrderItemListByOrderId(orderInfo.getOrderStoreId());
+                        List<String> topCouponCodeList=null;
+                        firstGivePrice(storeInfo,erpOrderItems,topCouponCodeList);
+                        //TODO 表中数据更新
+                    }
+
+                }
+            }
+
         }
         return br;
     }
