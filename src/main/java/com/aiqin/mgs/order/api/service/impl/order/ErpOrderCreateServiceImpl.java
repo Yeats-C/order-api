@@ -36,6 +36,7 @@ import com.aiqin.platform.flows.client.domain.vo.FormCallBackVo;
 import com.aiqin.platform.flows.client.domain.vo.StartProcessParamVO;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -142,13 +143,29 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //数据校验
         productCheck(processTypeEnum, storeInfo, erpOrderItemList);
 
-        //计算A品券分摊金额
-        ErpOrderFee orderFee = shareTopCouponPrice(erpOrderItemList, erpOrderSaveRequest.getTopCouponCodeList());
 
+        ErpOrderFee orderFee = new ErpOrderFee();
+        //生成订单code
+        String orderCode = sequenceGeneratorService.generateOrderCode();
+        //判断是否需要审批--赠送市值余额不够。进行审批 true
+        Boolean flag1=false;
+        //首单赠送--加入了市值赠送金额判断
+        if(ErpOrderTypeEnum.DIRECT_SEND.getCode().equals(erpOrderSaveRequest.getOrderType())&&ErpOrderCategoryEnum.ORDER_TYPE_4.getCode().equals(erpOrderSaveRequest.getOrderCategory())){
+            Map<ErpOrderFee,Boolean> res=firstGivePrice(orderCode,storeInfo,erpOrderItemList, erpOrderSaveRequest.getTopCouponCodeList());
+            for(Map.Entry<ErpOrderFee,Boolean> r:res.entrySet()){
+                orderFee = r.getKey();
+                flag1=r.getValue();
+            }
+        }else {
+            //计算A品券分摊金额
+            orderFee = shareTopCouponPrice(erpOrderItemList, erpOrderSaveRequest.getTopCouponCodeList());
+        }
         //生成订单主体信息
-        ErpOrderInfo order = generateOrder(erpOrderItemList, storeInfo, erpOrderSaveRequest, orderFee,auth);
+//        ErpOrderInfo order = generateOrder(erpOrderItemList, storeInfo, erpOrderSaveRequest, orderFee,auth);
+        ErpOrderInfo order = generateOrder(flag1,erpOrderItemList, storeInfo, erpOrderSaveRequest, orderFee,auth);
         log.info("创建订单,生成订单主体信息返回结果order={}",order);
         //保存订单、订单明细、订单支付、订单收货人信息、订单日志
+        order.setOrderStoreCode(orderCode);
         String orderId = insertOrder(order,orderFee, storeInfo, auth, erpOrderSaveRequest);
         //删除购物车商品
 //        deleteOrderProductFromCart(cartProductList);
@@ -553,7 +570,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @version: v1.0.0
      * @date 2019/11/27 19:04
      */
-    private ErpOrderInfo generateOrder(List<ErpOrderItem> orderItemList, StoreInfo storeInfo, ErpOrderSaveRequest erpOrderSaveRequest,ErpOrderFee orderFee, AuthToken auth) {
+//    private ErpOrderInfo generateOrder(List<ErpOrderItem> orderItemList, StoreInfo storeInfo, ErpOrderSaveRequest erpOrderSaveRequest,ErpOrderFee orderFee, AuthToken auth) {
+    private ErpOrderInfo generateOrder(boolean flag,List<ErpOrderItem> orderItemList, StoreInfo storeInfo, ErpOrderSaveRequest erpOrderSaveRequest,ErpOrderFee orderFee, AuthToken auth) {
         log.info("构建订单信息--入参,orderItemList={}",orderItemList);
         log.info("构建订单信息--入参,storeInfo={}",storeInfo);
         log.info("构建订单信息--入参,erpOrderSaveRequest={}",erpOrderSaveRequest);
@@ -595,10 +613,21 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setCustomerCode(storeInfo.getStoreCode());
         //客户名称 存门店名称
         order.setCustomerName(storeInfo.getStoreName());
-        //订单状态
-        order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
-        //订单流程节点状态
-        order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_1.getCode());
+        if(flag){
+            //订单状态
+            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_7.getCode());
+            //订单流程节点状态
+            order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_1.getCode());
+        }else {
+            //订单状态
+            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
+            //订单流程节点状态
+            order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_1.getCode());
+        }
+//        //订单状态
+//        order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
+//        //订单流程节点状态
+//        order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_1.getCode());
         //是否锁定(0是1否）
         order.setOrderLock(StatusEnum.NO.getCode());
         //是否是异常订单(0是1否)
@@ -965,8 +994,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         String orderId = OrderPublic.getUUID();
         //生成费用id
         String feeId = OrderPublic.getUUID();
-        //生成订单code
-        String orderCode = sequenceGeneratorService.generateOrderCode();
+//        //生成订单code
+//        String orderCode = sequenceGeneratorService.generateOrderCode();
         //初始支付状态
         ErpPayStatusEnum payStatusEnum = ErpPayStatusEnum.UNPAID;
 
@@ -975,15 +1004,18 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             //订单id
             item.setOrderStoreId(orderId);
             //订单编码
-            item.setOrderStoreCode(orderCode);
+//            item.setOrderStoreCode(orderCode);
+            item.setOrderStoreCode(order.getOrderStoreCode());
             //订单明细id
             item.setOrderInfoDetailId(OrderPublic.getUUID());
             item.setUseStatus(StatusEnum.YES.getValue());
         }
         //保存订单
         order.setOrderStoreId(orderId);
-        order.setOrderStoreCode(orderCode);
-        order.setMainOrderCode(orderCode);
+//        order.setOrderStoreCode(orderCode);
+        order.setOrderStoreCode(order.getOrderStoreCode());
+//        order.setMainOrderCode(orderCode);
+        order.setMainOrderCode(order.getOrderStoreCode());
         order.setFeeId(feeId);
         erpOrderInfoService.saveOrder(order, auth);
 
@@ -1337,7 +1369,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @param itemList
      * @param topCouponCodeList
      */
-    private ErpOrderFee firstGivePrice(StoreInfo storeInfo,List<ErpOrderItem> itemList,List<String> topCouponCodeList) {
+    private Map<ErpOrderFee,Boolean> firstGivePrice(String orderCode,StoreInfo storeInfo,List<ErpOrderItem> itemList,List<String> topCouponCodeList) {
+        Map<ErpOrderFee,Boolean> resMap=new HashMap<>();
+        //true:赠送市值余额不够发起审批 false:不用审批
+        Boolean flag=false;
         //赠送市值
         BigDecimal marketValue = storeInfo.getMarketValue();
         //赠送市值余额
@@ -1397,8 +1432,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //判断订单总金额是否大于赠送市值
         if(totalMoneyTotal.compareTo(marketValueBalance)==1){//大于赠送市值，走审批
             //TODO 走审批
-
-
+            flag=true;
+            //orderCode 订单编码
 
         }else{//计算分摊
             //计算比例系数=总金额/赠送总市值
@@ -1443,10 +1478,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         OrderGiveFee record=new OrderGiveFee();
         record.setAmount(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal));
         record.setCreateTime(new Date());
-        record.setOrderCode(orderFee.getOrderId());
+        record.setOrderCode(orderCode);
         record.setStoreId(storeInfo.getStoreId());
         orderGiveFeeDao.insertSelective(record);
-        return orderFee;
+        resMap.put(orderFee,flag);
+        return resMap;
     }
 
     /**
