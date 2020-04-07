@@ -79,4 +79,19 @@
       status = #{status,jdbcType=INTEGER}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="selectByOrderCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from order_splits_num
+    where order_code = #{orderCode,jdbcType=VARCHAR}
+  </select>
+
+  <update id="updateByOrderCode" parameterType="com.aiqin.mgs.order.api.domain.OrderSplitsNum" >
+    update order_splits_num
+    set
+      num = #{num,jdbcType=INTEGER}
+    where order_code = #{orderCode,jdbcType=VARCHAR}
+  </update>
+
 </mapper>

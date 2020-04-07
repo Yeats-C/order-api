@@ -15,4 +15,8 @@ public interface OrderSplitsNumDao {
     int updateByPrimaryKeySelective(OrderSplitsNum record);
 
     int updateByPrimaryKey(OrderSplitsNum record);
+
+    OrderSplitsNum selectByOrderCode(String orderCode);
+
+    int updateByOrderCode(OrderSplitsNum record);
 }

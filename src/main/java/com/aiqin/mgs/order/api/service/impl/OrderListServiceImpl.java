@@ -9,15 +9,11 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.component.OrderStatusEnum;
 import com.aiqin.mgs.order.api.component.ParamUnit;
 import com.aiqin.mgs.order.api.component.SequenceService;
-import com.aiqin.mgs.order.api.dao.OrderListDao;
-import com.aiqin.mgs.order.api.dao.OrderListLogisticsDao;
-import com.aiqin.mgs.order.api.dao.OrderListProductDao;
-import com.aiqin.mgs.order.api.dao.OrderStatusDao;
-import com.aiqin.mgs.order.api.domain.OrderList;
-import com.aiqin.mgs.order.api.domain.OrderListLogistics;
-import com.aiqin.mgs.order.api.domain.OrderListProduct;
-import com.aiqin.mgs.order.api.domain.StoreInfo;
+import com.aiqin.mgs.order.api.dao.*;
+import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
+import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.CouponShareRequest;
 import com.aiqin.mgs.order.api.domain.request.orderList.*;
@@ -75,6 +71,11 @@ public class OrderListServiceImpl implements OrderListService {
     private OrderStatusDao orderStatusDao;
     @Resource
     private BridgeStockService bridgeStockService;
+    @Resource
+    private OrderSplitsNumDao orderSplitsNumDao;
+    @Resource
+    private ErpOrderInfoDao erpOrderInfoDao;
+
 
 
     //供应链项目地址
@@ -252,6 +253,11 @@ public class OrderListServiceImpl implements OrderListService {
         param.setImplementContent("发货完成");
         Boolean re = orderListLogisticsDao.insertLogistics(param);
         //TODO 分摊计算
+        //判断拆单的子订单是否已经全部发货完成
+        Boolean flag = checkComplete(deliverVo.getOrderCode());
+        if(flag){//全部完成，进行分摊计算
+//            firstGivePrice();
+        }
         return br;
     }
 
@@ -737,6 +743,38 @@ public class OrderListServiceImpl implements OrderListService {
             orderFee.setTopCouponCodes("");
         }
         return orderFee;
+    }
+
+    /**
+     * 判断拆单的子订单是否已经全部发货完成
+     * @param splitOrderCode
+     * @return
+     */
+    private Boolean checkComplete(String splitOrderCode){
+        Boolean flag=false;
+        ErpOrderInfo po=new ErpOrderInfo();
+        po.setOrderStoreCode(splitOrderCode);
+        List<ErpOrderInfo> select = erpOrderInfoDao.select(po);
+        if(select!=null&&select.size()>0){
+            ErpOrderInfo erpOrderInfo=select.get(0);
+            if(erpOrderInfo!=null&&StringUtils.isNotBlank(erpOrderInfo.getMainOrderCode())){
+                OrderSplitsNum orderSplitsNum = orderSplitsNumDao.selectByOrderCode(erpOrderInfo.getMainOrderCode());
+                if(null!=orderSplitsNum&&null!=orderSplitsNum.getNum()){
+                    Integer num=orderSplitsNum.getNum();
+                    if(num.equals(1)){//本次发货完成为最后一次
+                        flag=true;
+                    }
+                    if(!num.equals(0)){
+                        //更新完成次数
+                        OrderSplitsNum record=new OrderSplitsNum();
+                        record.setOrderCode(erpOrderInfo.getMainOrderCode());
+                        record.setNum(num-1);
+                        orderSplitsNumDao.updateByOrderCode(record);
+                    }
+                }
+            }
+        }
+        return flag;
     }
 
 }
