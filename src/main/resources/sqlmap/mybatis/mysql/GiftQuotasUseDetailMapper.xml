@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.gift.GiftQuotasUseDetailDao">
+
+
+    <select id="select" parameterType="com.aiqin.mgs.order.api.domain.po.gift.GiftQuotasUseDetail"
+            resultType="com.aiqin.mgs.order.api.domain.po.gift.GiftQuotasUseDetail">
+        select
+        id,
+        change_in_gift_quota as changeInGiftQuota,
+        bill_code as billCode,
+        bill_link as billLink,
+        type,
+        DATE_FORMAT( begin_time, '%Y-%m-%d %h:%i:%s' ) AS beginTime,
+        DATE_FORMAT( finish_time, '%Y-%m-%d %h:%i:%s' ) AS finishTime,
+        store_id as storeId,
+        DATE_FORMAT( create_time, '%Y-%m-%d %h:%i:%s' ) AS createTime,
+        create_by as createBy,
+        DATE_FORMAT( update_time, '%Y-%m-%d %h:%i:%s' ) AS updateTime,
+        update_by as updateBy
+        from gift_quotas_use_detail where 1 = 1
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="storeId != null and storeId != ''">
+            and store_id = #{storeId}
+        </if>
+        order by create_time desc
+    </select>
+
+    <!--插入活动主表信息-->
+    <insert id="add" parameterType="com.aiqin.mgs.order.api.domain.po.gift.GiftQuotasUseDetail">
+        insert into gift_quotas_use_detail
+			(change_in_gift_quota,
+             bill_code,
+             bill_link,
+             type,
+             begin_time,
+             finish_time,
+             store_id,
+             create_time,
+             create_by,
+             update_time,
+             update_by)
+		values
+		    (#{changeInGiftQuota},
+             #{billCode},
+             #{billLink},
+             type,
+             #{beginTime},
+             #{finishTime},
+             #{storeId},
+             now(),
+             #{createBy},
+             now(),
+             #{updateBy})
+	</insert>
+
+</mapper>
