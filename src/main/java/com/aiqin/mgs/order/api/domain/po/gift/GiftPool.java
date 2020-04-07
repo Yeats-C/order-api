@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.po.gift;
 
+import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
@@ -17,7 +18,7 @@ import java.util.Date;
  */
 @Data
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class GiftPool {
+public class GiftPool extends PagesRequest {
 
     @ApiModelProperty(value = "主键")
     @JsonProperty("id")

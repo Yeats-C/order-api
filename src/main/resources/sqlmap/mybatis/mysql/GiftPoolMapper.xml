@@ -54,4 +54,47 @@
              #{updateBy})
 	</insert>
 
+     <!--查询赠品池列表-->
+     <select id="getGiftPoolList" resultType="com.aiqin.mgs.order.api.domain.po.gift.GiftPool"
+             parameterType="com.aiqin.mgs.order.api.domain.po.gift.GiftPool">
+        SELECT
+              id,
+              sku_code AS skuCode,
+              sku_name AS skuName,
+              spu_code AS spuCode,
+              spu_name AS spuName,
+              price_tax AS priceTax,
+              manufacturer_guide_price AS manufacturerGuidePrice,
+              use_status AS useStatus,
+              create_time AS createTime,
+              update_time AS updateTime,
+              create_by AS createBy,
+              update_by AS updateBy
+          FROM
+              gift_pool where 1 = 1
+          <if test="skuCode != null and skuCode != ''">
+              and sku_code = #{skuCode}
+          </if>
+          <if test="skuName != null and skuName != ''">
+              and sku_name = #{skuName}
+          </if>
+         <if test="pageSize != null and pageSize != ''">
+             limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+          </if>
+     </select>
+
+     <!--查询赠品池列表总数-->
+     <select id="getTotalNum" resultType="java.lang.Integer" parameterType="com.aiqin.mgs.order.api.domain.po.gift.GiftPool">
+          SELECT
+            count(0)
+          FROM
+          gift_pool where 1 = 1
+          <if test="skuCode != null and skuCode != ''">
+               and sku_code = #{skuCode}
+          </if>
+          <if test="skuName != null and skuName != ''">
+               and sku_name = #{skuName}
+          </if>
+     </select>
+
 </mapper>
