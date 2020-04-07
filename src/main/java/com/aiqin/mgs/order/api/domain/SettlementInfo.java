@@ -49,7 +49,16 @@ public class SettlementInfo extends PagesRequest {
     @ApiModelProperty(value = "积分折扣")
     @JsonProperty("point_percentage")
     private Integer pointPercentage=0;
-    
+
+
+
+    @ApiModelProperty("满减金额")
+    @JsonProperty("full_sum")
+    private Integer fullSum;
+
+    @ApiModelProperty("第N件特价金额")
+    @JsonProperty("lucky_sum")
+    private Integer luckySum;
     
     @ApiModelProperty(value = "活动优惠")
     @JsonProperty("activity_discount")
