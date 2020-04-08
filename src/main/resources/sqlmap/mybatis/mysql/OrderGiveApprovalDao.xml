@@ -247,11 +247,66 @@
     where id = #{id,jdbcType=BIGINT}
   </update>
 
-  <select id="selectByformNo" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  <select id="selectByFormNo" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
     <include refid="Base_Column_List" />
     from order_give_approval
     where form_no = #{formNo,jdbcType=VARCHAR}
   </select>
+
+  <update id="updateByFormNoSelective" parameterType="com.aiqin.mgs.order.api.domain.OrderGiveApproval" >
+    update order_give_approval
+    <set >
+      <if test="fanchiseeName != null" >
+        fanchisee_name = #{fanchiseeName,jdbcType=VARCHAR},
+      </if>
+      <if test="fanchiseeId != null" >
+        fanchisee_id = #{fanchiseeId,jdbcType=VARCHAR},
+      </if>
+      <if test="storeId != null" >
+        store_id = #{storeId,jdbcType=VARCHAR},
+      </if>
+      <if test="storeName != null" >
+        store_name = #{storeName,jdbcType=VARCHAR},
+      </if>
+      <if test="marketValue != null" >
+        market_value = #{marketValue,jdbcType=DECIMAL},
+      </if>
+      <if test="actualMarketValue != null" >
+        actual_market_value = #{actualMarketValue,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="processTitle != null" >
+        process_title = #{processTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="processType != null" >
+        process_type = #{processType,jdbcType=VARCHAR},
+      </if>
+      <if test="statuStr != null" >
+        statu_str = #{statuStr,jdbcType=VARCHAR},
+      </if>
+      <if test="applierName != null" >
+        applier_name = #{applierName,jdbcType=VARCHAR},
+      </if>
+      <if test="applierId != null" >
+        applier_id = #{applierId,jdbcType=VARCHAR},
+      </if>
+      <if test="preNodeOptUser != null" >
+        pre_node_opt_user = #{preNodeOptUser,jdbcType=VARCHAR},
+      </if>
+      <if test="preNodeTime != null" >
+        pre_node_time = #{preNodeTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderCode != null" >
+        order_code = #{orderCode,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where form_no = #{formNo,jdbcType=VARCHAR}
+  </update>
 
 </mapper>

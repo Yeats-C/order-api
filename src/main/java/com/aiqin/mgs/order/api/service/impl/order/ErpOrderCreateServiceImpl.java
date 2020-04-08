@@ -7,7 +7,9 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ConstantData;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
+import com.aiqin.mgs.order.api.component.enums.StatusEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
+import com.aiqin.mgs.order.api.component.returnenums.StoreStatusEnum;
 import com.aiqin.mgs.order.api.dao.OrderGiveApprovalDao;
 import com.aiqin.mgs.order.api.dao.OrderGiveFeeDao;
 import com.aiqin.mgs.order.api.domain.*;
@@ -21,6 +23,8 @@ import com.aiqin.mgs.order.api.domain.request.cart.ErpCartQueryRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpQueryCartGroupTempRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
+import com.aiqin.mgs.order.api.domain.request.returnorder.FranchiseeAssetVo;
+import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
 import com.aiqin.mgs.order.api.domain.response.StoreMarketValueResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.*;
 import com.aiqin.mgs.order.api.service.CartOrderService;
@@ -30,8 +34,7 @@ import com.aiqin.mgs.order.api.service.cart.ErpOrderCartService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
-import com.aiqin.platform.flows.client.constant.AjaxJson;
-import com.aiqin.platform.flows.client.constant.FormUpdateUrlType;
+import com.aiqin.platform.flows.client.constant.*;
 import com.aiqin.platform.flows.client.domain.vo.ActBaseProcessEntity;
 import com.aiqin.platform.flows.client.domain.vo.FormCallBackVo;
 import com.aiqin.platform.flows.client.domain.vo.StartProcessParamVO;
@@ -39,7 +42,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -240,13 +245,56 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     }
 
     @Override
+    @Transactional
     public String callback(FormCallBackVo formCallBackVo) {
-        return "";
+        String result = "success";
+        log.info("首单赠送超额审批进入回调,request={}", formCallBackVo);
+        OrderGiveApproval orderGiveApproval = orderGiveApprovalDao.selectByFormNo(formCallBackVo.getFormNo());
+        log.info("首单赠送超额审批回调,查询原始记录结果orderGiveApproval={}", orderGiveApproval);
+        if (orderGiveApproval != null) {
+            if (formCallBackVo.getUpdateFormStatus().equals(Indicator.COST_FORM_STATUS_APPROVED.getCode())) {
+                //审核通过，修改本地主表状态
+                orderGiveApproval.setStatus(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_PASS.getValue());
+                orderGiveApproval.setStatuStr(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_PASS.getDesc());
+                log.info("首单赠送超额审批回调结束");
+            } else if (TpmBpmUtils.isPass(formCallBackVo.getUpdateFormStatus(), formCallBackVo.getOptBtn())) {
+                orderGiveApproval.setStatus(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT.getValue());
+                orderGiveApproval.setStatuStr(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT.getDesc());
+            } else {
+                if (formCallBackVo.getOptBtn().equals(IndicatorStr.PROCESS_BTN_REJECT_FIRST.getCode())) {
+                    //驳回发起人
+                    orderGiveApproval.setStatus(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_BACK.getValue());
+                    orderGiveApproval.setStatuStr(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_BACK.getDesc());
+                } else if (formCallBackVo.getOptBtn().equals(IndicatorStr.PROCESS_BTN_REJECT_END.getCode())) {
+                    //驳回并结束
+                    orderGiveApproval.setStatus(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_END.getValue());
+                    orderGiveApproval.setStatuStr(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_END.getDesc());
+                } else if (formCallBackVo.getOptBtn().equals(IndicatorStr.PROCESS_BTN_CANCEL.getCode())) {
+                    //撤销
+                    orderGiveApproval.setStatus(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_CANCEL.getValue());
+                    orderGiveApproval.setStatuStr(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_CANCEL.getDesc());
+                } else if (formCallBackVo.getOptBtn().equals(IndicatorStr.PROCESS_BTN_KILL.getCode())) {
+                    //终止
+                    orderGiveApproval.setStatus(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_END.getValue());
+                    orderGiveApproval.setStatuStr(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_END.getDesc());
+                } else {
+                    //终止
+                    orderGiveApproval.setStatus(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_END.getValue());
+                    orderGiveApproval.setStatuStr(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_END.getDesc());
+                }
+            }
+            //更新本地审批表数据
+            orderGiveApprovalDao.updateByFormNoSelective(orderGiveApproval);
+        } else {
+            //result = "false";
+        }
+        return result;
     }
+
 
     @Override
     public OrderGiveApproval getDetailByformNo(String formNo) {
-        return orderGiveApprovalDao.selectByformNo(formNo);
+        return orderGiveApprovalDao.selectByFormNo(formNo);
     }
 
     /**
