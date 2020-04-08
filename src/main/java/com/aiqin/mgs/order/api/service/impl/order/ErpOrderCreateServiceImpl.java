@@ -8,6 +8,7 @@ import com.aiqin.mgs.order.api.base.ConstantData;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
+import com.aiqin.mgs.order.api.dao.OrderGiveApprovalDao;
 import com.aiqin.mgs.order.api.dao.OrderGiveFeeDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
@@ -85,6 +86,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private CouponRuleService couponRuleService;
     @Resource
     private OrderGiveFeeDao orderGiveFeeDao;
+    @Resource
+    private OrderGiveApprovalDao orderGiveApprovalDao;
 
 
     @Override
@@ -242,8 +245,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     }
 
     @Override
-    public CouponApprovalDetail getDetailByformNo(String formNo) {
-        return null;
+    public OrderGiveApproval getDetailByformNo(String formNo) {
+        return orderGiveApprovalDao.selectByformNo(formNo);
     }
 
     /**

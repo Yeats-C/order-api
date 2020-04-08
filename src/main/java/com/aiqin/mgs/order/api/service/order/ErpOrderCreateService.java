@@ -1,7 +1,7 @@
 package com.aiqin.mgs.order.api.service.order;
 
 import com.aiqin.mgs.order.api.domain.AuthToken;
-import com.aiqin.mgs.order.api.domain.CouponApprovalDetail;
+import com.aiqin.mgs.order.api.domain.OrderGiveApproval;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
 import com.aiqin.platform.flows.client.domain.vo.FormCallBackVo;
@@ -60,5 +60,5 @@ public interface ErpOrderCreateService {
      * @param formNo
      * @return
      */
-    CouponApprovalDetail getDetailByformNo(String formNo);
+    OrderGiveApproval getDetailByformNo(String formNo);
 }

@@ -15,4 +15,7 @@ public interface OrderGiveApprovalDao {
     int updateByPrimaryKeySelective(OrderGiveApproval record);
 
     int updateByPrimaryKey(OrderGiveApproval record);
+
+    OrderGiveApproval selectByformNo(String id);
+
 }

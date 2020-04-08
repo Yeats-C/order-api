@@ -32,6 +32,7 @@
     from order_give_approval
     where id = #{id,jdbcType=BIGINT}
   </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     delete from order_give_approval
     where id = #{id,jdbcType=BIGINT}
@@ -245,4 +246,12 @@
       order_code = #{orderCode,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="selectByformNo" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from order_give_approval
+    where form_no = #{formNo,jdbcType=VARCHAR}
+  </select>
+
 </mapper>
