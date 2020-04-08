@@ -38,6 +38,7 @@
         <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
         <result column="receive_type" jdbcType="VARCHAR" property="receiveType"/>
         <result column="package_id" jdbcType="VARCHAR" property="packageId"/>
+        <result column="total_price" jdbcType="INTEGER" property="totalPrice"/>
     </resultMap>
 
     <resultMap id="ProductsMapping" type="com.aiqin.mgs.order.api.domain.response.OrderProductsResponse">
