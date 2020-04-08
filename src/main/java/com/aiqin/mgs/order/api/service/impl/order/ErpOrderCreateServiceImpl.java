@@ -1631,7 +1631,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         if(hashCode<0){
             hashCode = -hashCode;
         }
-        String value = "AC"+valueOf + String.format("%015d", hashCode);
+        String value = "MV"+valueOf + String.format("%015d", hashCode);
         return value;
     }
 
