@@ -5,6 +5,7 @@ import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ConstantData;
+import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.StatusEnum;
@@ -1485,7 +1486,18 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             //TODO 走审批
             flag=true;
             //orderCode 订单编码
-
+            String approvalCode=createFormNo();
+            OrderGiveApproval record=new OrderGiveApproval();
+            record.setActualMarketValue(totalMoneyTotal);
+            record.setFanchiseeId(storeInfo.getFranchiseeId());
+            record.setFanchiseeName(storeInfo.getFranchiseeName());
+            record.setMarketValue(storeInfo.getMarketValue());
+            record.setOrderCode(orderCode);
+            //发起审批
+            HttpResponse httpResponse = submitActBaseProcess(approvalCode, storeInfo.getStoreName(), "", record);
+            if(!"0".equals(httpResponse.getCode())){
+                throw new BusinessException("订单金额超过市值赠送总金额审批申请失败");
+            }
         }else{//计算分摊
             //计算比例系数=总金额/赠送总市值
             BigDecimal pro=totalMoneyTotal.divide(marketValue);
@@ -1543,7 +1555,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @param applier      申请人
      * @param positionCode 部门编码
      */
-    public HttpResponse submitActBaseProcess(String approvalCode, String applier, String positionCode) {
+    public HttpResponse submitActBaseProcess(String approvalCode, String applier, String positionCode,OrderGiveApproval record) {
         StartProcessParamVO paramVO = new StartProcessParamVO();
         // 订单金额超过市值赠送总金额审批申请
         //TODO 改成正确的审批流key
@@ -1567,11 +1579,19 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         if (result.getSuccess()) {
             ActBaseProcessEntity actBaseProcessEntity = JsonUtil.fromJson(JsonUtil.toJson(result.getObj()), ActBaseProcessEntity.class);
             log.info("发起申请成功,request={}", paramVO);
-//            formKeyDao.insert(new FormKey(paramVO.getFormNo(),paramVO.getFormType()));
+            //将审批信息添加到本地审批表中
+            record.setProcessTitle("订单金额超过市值赠送总金额审批");
+            //todo
+//            record.setProcessType();
+            record.setApplierId(applier);
+            record.setApplierName(applier);
+            record.setFormNo(approvalCode);
+            record.setCreateTime(new Date());
+            orderGiveApprovalDao.insertSelective(record);
             return HttpResponse.success(actBaseProcessEntity);
         }
         log.error("发起申请失败,request={}", paramVO);
-        return HttpResponse.success();
+        return HttpResponse.failure(ResultCode.MARKET_VALUE_APPLY_FALL);
     }
 
     /**
@@ -1597,6 +1617,22 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
     }
 
-
+    /**
+     * 生成16位唯一性的审批编码
+     * @return
+     */
+    public static String createFormNo(){
+        //随机生成一位整数
+        int random = (int) (Math.random()*9+1);
+        String valueOf = String.valueOf(random);
+        //生成uuid的hashCode值
+        int hashCode = UUID.randomUUID().toString().hashCode();
+        //可能为负数
+        if(hashCode<0){
+            hashCode = -hashCode;
+        }
+        String value = "AC"+valueOf + String.format("%015d", hashCode);
+        return value;
+    }
 
 }
