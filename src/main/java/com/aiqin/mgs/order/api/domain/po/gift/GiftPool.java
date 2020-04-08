@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 兑兑换赠品池明细
+ * 兑换赠品池明细
  *
  * @author: csf
  * @version: v1.0.0
