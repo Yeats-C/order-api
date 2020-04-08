@@ -228,6 +228,10 @@ public class OrderDetailInfo extends PagesRequest {
 	@JsonProperty("package_id")
 	@ApiModelProperty("套餐包id")
 	private String packageId;
+
+	@JsonProperty("total_price")
+	@ApiModelProperty("行总金额")
+	private Integer totalPrice;
 }
 
 
