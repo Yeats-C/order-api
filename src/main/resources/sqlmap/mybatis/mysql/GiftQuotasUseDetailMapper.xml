@@ -28,7 +28,7 @@
         order by create_time desc
     </select>
 
-    <!--插入活动主表信息-->
+    <!--插入兑换赠品积分账户使用明细信息-->
     <insert id="add" parameterType="com.aiqin.mgs.order.api.domain.po.gift.GiftQuotasUseDetail">
         insert into gift_quotas_use_detail
 			(change_in_gift_quota,
@@ -46,7 +46,7 @@
 		    (#{changeInGiftQuota},
              #{billCode},
              #{billLink},
-             type,
+             #{type},
              #{beginTime},
              #{finishTime},
              #{storeId},

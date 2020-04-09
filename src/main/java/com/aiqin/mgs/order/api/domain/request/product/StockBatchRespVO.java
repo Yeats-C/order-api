@@ -76,4 +76,8 @@ public class StockBatchRespVO {
     @ApiModelProperty("仓库下属的库房")
     private List<WarehouseResVo> warehouseResVoList;
 
+    @ApiModelProperty("是否可售：0：可用，1:停止进货")
+    @JsonProperty("sale_type")
+    private Integer saleType;
+
 }
