@@ -257,6 +257,15 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 //审核通过，修改本地主表状态
                 orderGiveApproval.setStatus(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_PASS.getValue());
                 orderGiveApproval.setStatuStr(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_PASS.getDesc());
+                //修改主订单状态 改为待支付
+                ErpOrderInfo po=new ErpOrderInfo();
+                po.setOrderStoreCode(orderGiveApproval.getOrderCode());
+                //待支付
+                po.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
+                AuthToken auth=new AuthToken();
+                auth.setPersonId(ConstantData.SYS_OPERTOR);
+                auth.setPersonName(ConstantData.SYS_OPERTOR);
+                erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(po,auth);
                 log.info("首单赠送超额审批回调结束");
             } else if (TpmBpmUtils.isPass(formCallBackVo.getUpdateFormStatus(), formCallBackVo.getOptBtn())) {
                 orderGiveApproval.setStatus(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT.getValue());
