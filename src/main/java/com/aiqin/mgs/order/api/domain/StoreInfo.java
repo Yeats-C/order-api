@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
  * @date 2019/11/21 15:57
  */
 @Data
+@ApiModel("门店信息实体类")
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class StoreInfo {
 
