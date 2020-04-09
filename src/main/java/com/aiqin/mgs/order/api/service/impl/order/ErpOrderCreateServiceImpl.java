@@ -10,6 +10,7 @@ import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.StatusEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.pay.ErpPayWayEnum;
 import com.aiqin.mgs.order.api.component.returnenums.StoreStatusEnum;
 import com.aiqin.mgs.order.api.dao.OrderGiveApprovalDao;
 import com.aiqin.mgs.order.api.dao.OrderGiveFeeDao;
@@ -22,6 +23,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.CouponShareRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartQueryRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpQueryCartGroupTempRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
 import com.aiqin.mgs.order.api.domain.request.returnorder.FranchiseeAssetVo;
@@ -94,7 +96,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private OrderGiveFeeDao orderGiveFeeDao;
     @Resource
     private OrderGiveApprovalDao orderGiveApprovalDao;
-
+    @Resource
+    private ErpOrderPayNoTransactionalService erpOrderPayNoTransactionalService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -266,6 +269,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 auth.setPersonId(ConstantData.SYS_OPERTOR);
                 auth.setPersonName(ConstantData.SYS_OPERTOR);
                 erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(po,auth);
+                //发起支付 自动轮询
+                ErpOrderPayRequest payRequest = new ErpOrderPayRequest();
+                payRequest.setOrderCode(orderGiveApproval.getOrderCode());
+                payRequest.setPayWay(ErpPayWayEnum.PAY_1.getCode());
+                erpOrderPayNoTransactionalService.orderPayStartMethodGroup(payRequest, auth, true);
                 log.info("首单赠送超额审批回调结束");
             } else if (TpmBpmUtils.isPass(formCallBackVo.getUpdateFormStatus(), formCallBackVo.getOptBtn())) {
                 orderGiveApproval.setStatus(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT.getValue());
