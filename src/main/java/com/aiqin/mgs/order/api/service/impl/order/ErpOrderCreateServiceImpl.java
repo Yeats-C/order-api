@@ -1558,9 +1558,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     public HttpResponse submitActBaseProcess(String approvalCode, String applier, String positionCode,OrderGiveApproval record) {
         StartProcessParamVO paramVO = new StartProcessParamVO();
         // 订单金额超过市值赠送总金额审批申请
-        //TODO 改成正确的审批流key
-        paramVO.setCostType(ConstantData.APPLY_COUPON01_KEY);
-        paramVO.setFormType(ConstantData.APPLY_COUPON01_KEY);
+        paramVO.setCostType(ConstantData.FIRST_SINGLE_EXCESS_KEY);
+        paramVO.setFormType(ConstantData.FIRST_SINGLE_EXCESS_KEY);
         paramVO.setFormUrl("http://order.api.aiqin.com/erpOrderCreateController/formDetail/" + approvalCode);//表单详情页面地址 必传
         paramVO.setCurrentUser(applier);
         paramVO.setFormNo(approvalCode);
