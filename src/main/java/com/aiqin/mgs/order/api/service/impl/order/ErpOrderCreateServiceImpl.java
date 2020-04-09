@@ -35,6 +35,7 @@ import com.aiqin.mgs.order.api.service.CouponRuleService;
 import com.aiqin.mgs.order.api.service.SequenceGeneratorService;
 import com.aiqin.mgs.order.api.service.cart.ErpOrderCartService;
 import com.aiqin.mgs.order.api.service.order.*;
+import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.aiqin.platform.flows.client.constant.*;
@@ -265,9 +266,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 po.setOrderStoreCode(orderGiveApproval.getOrderCode());
                 //待支付
                 po.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
-                AuthToken auth=new AuthToken();
-                auth.setPersonId(ConstantData.SYS_OPERTOR);
-                auth.setPersonName(ConstantData.SYS_OPERTOR);
+//                AuthToken auth=new AuthToken();
+//                auth.setPersonId(ConstantData.SYS_OPERTOR);
+//                auth.setPersonName(ConstantData.SYS_OPERTOR);
+//                AuthUtil.loginCheck();
+                AuthToken auth = AuthUtil.getCurrentAuth();
                 erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(po,auth);
                 //发起支付 自动轮询
                 ErpOrderPayRequest payRequest = new ErpOrderPayRequest();
