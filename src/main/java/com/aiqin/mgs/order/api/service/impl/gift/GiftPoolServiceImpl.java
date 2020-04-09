@@ -15,6 +15,7 @@ import com.aiqin.mgs.order.api.domain.po.cart.ErpOrderCartInfo;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftPool;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartAddRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartAddSkuItem;
+import com.aiqin.mgs.order.api.domain.request.product.StockBatchRespVO;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpCartAddItemResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpOrderCartAddResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetail;
@@ -72,6 +73,21 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         PageResData pageResData=new PageResData();
         List<GiftPool> giftPoolList=giftPoolDao.getGiftPoolList(giftPool);
         int totalNum=giftPoolDao.getTotalNum(giftPool);
+
+        //仓库信息数据  此处应调用供应链查询库存信息接口  目前是做数据展示
+        StockBatchRespVO stockBatchRespVO=new StockBatchRespVO();
+        stockBatchRespVO.setTransportCenterCode("1081");
+        stockBatchRespVO.setTransportCenterName("华北仓");
+        stockBatchRespVO.setWarehouseCode("1071");
+        stockBatchRespVO.setWarehouseName("华北销售库");
+        stockBatchRespVO.setAvailableNum(1000L);
+        ArrayList list=new ArrayList();
+        list.add(stockBatchRespVO);
+        for(GiftPool gift:giftPoolList){
+            gift.setStockRespVOS(list);
+        }
+        //假数据展示完毕
+
         pageResData.setDataList(giftPoolList);
         pageResData.setTotalCount(totalNum);
         httpResponse.setData(pageResData);

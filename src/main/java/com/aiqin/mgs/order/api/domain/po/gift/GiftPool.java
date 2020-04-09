@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.domain.po.gift;
 
 import com.aiqin.mgs.order.api.base.PagesRequest;
+import com.aiqin.mgs.order.api.domain.request.product.StockBatchRespVO;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
@@ -8,6 +9,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 兑换赠品池明细
@@ -68,4 +70,7 @@ public class GiftPool extends PagesRequest {
     @JsonProperty("update_by")
     private String updateBy;
 
+    @ApiModelProperty("库存列表")
+    @JsonProperty("stock_resp_vos")
+    private List<StockBatchRespVO> stockRespVOS;
 }
