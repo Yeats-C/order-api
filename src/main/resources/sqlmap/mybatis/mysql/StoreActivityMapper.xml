@@ -39,8 +39,8 @@
                  oi.id,
                  case when length(TRIM(oi.member_id))>0 then '1' else '0' end as member_status,
                  od.activity_id as activity_id, od.actual_price as actual_price, od.amount as amount
-                from order_info oi
-                left join order_detail od on oi.order_id = od.order_id
+                from order_consumer_info oi
+                left join order_consumer_detail od on oi.order_id = od.order_id
                where oi.distributor_id=#{storeId}
             ) AS t1
             where t1.activity_id = #{activityId}
@@ -50,16 +50,16 @@
 
     <select id="selectActivityOrderCode" resultType="com.aiqin.mgs.order.api.domain.OrderInfo">
         select oi.order_code as orderCode
-        from order_detail od
-        left join order_info oi on od.order_id = oi.order_id
+        from order_consumer_detail od
+        left join order_consumer_info oi on od.order_id = oi.order_id
         where oi.distributor_id=#{storeId}
         and od.activity_id=#{activityId}
     </select>
 
     <select id="selectActivitySkuCode" resultType="String">
         select sku_code as skuCodes
-        from order_info oi
-        left join order_detail od on od.order_id = oi.order_id
+        from order_consumer_info oi
+        left join order_consumer_detail od on od.order_id = oi.order_id
         where
         od.activity_id = #{activityId}
         and oi.order_code = #{orderCodes}
