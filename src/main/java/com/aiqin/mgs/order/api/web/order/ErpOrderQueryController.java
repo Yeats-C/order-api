@@ -97,4 +97,21 @@ public class ErpOrderQueryController {
         }
         return response;
     }
+
+    @PostMapping("/approvalFindStoreOrderList")
+    @ApiOperation(value = "赠送市值审批--查询销售单订单列表")
+    public HttpResponse<PageResData<ErpOrderInfo>> approvalFindStoreOrderList(@RequestBody ErpOrderQueryRequest erpOrderQueryRequest) {
+        HttpResponse response = HttpResponse.success();
+        try {
+            PageResData<ErpOrderInfo> orderList = erpOrderQueryService.findStoreOrderList(erpOrderQueryRequest);
+            response.setData(orderList);
+        } catch (BusinessException e) {
+            logger.error("查询销售单订单列表异常：{}", e);
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            logger.error("查询销售单订单列表异常：{}", e);
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
+    }
 }
