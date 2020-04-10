@@ -486,6 +486,7 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 			copartnerAreaDao.deleteById(copartnerAreaId);
 			copartnerAreaStoreDao.deleteById(copartnerAreaId);
 			copartnerAreaRoleDao.deleteById(copartnerAreaId);
+			copartnerAreaDao.deleteByUpId(copartnerAreaId);
 
 		    return HttpResponse.success(true);
 		}catch(Exception e) {
