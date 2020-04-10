@@ -75,4 +75,21 @@ public class GiftPool extends PagesRequest {
     @ApiModelProperty("库存列表")
     @JsonProperty("stock_resp_vos")
     private List<StockBatchRespVO> stockRespVOS;
+
+    @ApiModelProperty("门店id，爱掌柜使用字段")
+    @JsonProperty("store_id")
+    private String storeId;
+
+
+    @ApiModelProperty("仓库权限IdList【爱掌柜门店权限使用，前端请忽视此字段】")
+    @JsonProperty("warehouse_code_list")
+    private List<String> warehouseCodeList;
+
+    @ApiModelProperty(value = "交易倍数【爱掌柜使用】")
+    @JsonProperty("zero_removalCoefficient")
+    private Integer zeroRemovalCoefficient;
+
+    @ApiModelProperty(value = "库存数量【爱掌柜使用】")
+    @JsonProperty("stock_num")
+    private Integer stockNum;
 }

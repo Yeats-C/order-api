@@ -3,31 +3,6 @@
 <mapper namespace="com.aiqin.mgs.order.api.dao.gift.GiftPoolDao">
 
 
-<!--    <select id="select" parameterType="com.aiqin.mgs.order.api.domain.po.gift.GiftQuotasUseDetail"-->
-<!--            resultType="com.aiqin.mgs.order.api.domain.po.gift.GiftQuotasUseDetail">-->
-<!--        select-->
-<!--        id,-->
-<!--        change_in_gift_quota as changeInGiftQuota,-->
-<!--        bill_code as billCode,-->
-<!--        bill_link as billLink,-->
-<!--        type,-->
-<!--        DATE_FORMAT( begin_time, '%Y-%m-%d %h:%i:%s' ) AS beginTime,-->
-<!--        DATE_FORMAT( finish_time, '%Y-%m-%d %h:%i:%s' ) AS finishTime,-->
-<!--        store_id as storeId,-->
-<!--        DATE_FORMAT( create_time, '%Y-%m-%d %h:%i:%s' ) AS createTime,-->
-<!--        create_by as createBy,-->
-<!--        DATE_FORMAT( update_time, '%Y-%m-%d %h:%i:%s' ) AS updateTime,-->
-<!--        update_by as updateBy-->
-<!--        from gift_quotas_use_detail where 1 = 1-->
-<!--        <if test="id != null and id != ''">-->
-<!--            and id = #{id}-->
-<!--        </if>-->
-<!--        <if test="storeId != null and storeId != ''">-->
-<!--            and store_id = #{storeId}-->
-<!--        </if>-->
-<!--        order by create_time desc-->
-<!--    </select>-->
-
     <!--插入赠品池赠品信息-->
     <insert id="add" parameterType="com.aiqin.mgs.order.api.domain.po.gift.GiftPool">
         insert into gift_pool
@@ -54,7 +29,19 @@
              #{updateBy})
 	</insert>
 
-     <!--查询赠品池列表-->
+    <!--修改赠品状态-->
+    <update id="updateUseStatus" parameterType="com.aiqin.mgs.order.api.domain.po.gift.GiftPool">
+        update gift_pool
+        <set>
+            <if test="useStatus != null">
+                use_status = #{useStatus,jdbcType=BIT},
+            </if>
+            update_time = now()
+            where id = #{id,jdbcType=VARCHAR}
+        </set>
+    </update>
+
+    <!--查询赠品池列表-->
      <select id="getGiftPoolList" resultType="com.aiqin.mgs.order.api.domain.po.gift.GiftPool"
              parameterType="com.aiqin.mgs.order.api.domain.po.gift.GiftPool">
         SELECT
@@ -96,5 +83,60 @@
                and sku_name = #{skuName}
           </if>
      </select>
+
+    <!--通过仓库code List 查询门店拥有权限的赠品池数据-->
+    <select id="getGiftPoolListByWarehouseCodeList" resultType="com.aiqin.mgs.order.api.domain.po.gift.GiftPool"
+            parameterType="com.aiqin.mgs.order.api.domain.po.gift.GiftPool">
+        SELECT
+        g.id,
+        g.sku_code AS skuCode,
+        g.sku_name AS skuName,
+        g.spu_code AS spuCode,
+        g.spu_name AS spuName,
+        g.price_tax AS priceTax,
+        g.manufacturer_guide_price AS manufacturerGuidePrice,
+        g.use_status AS useStatus,
+        g.create_time AS createTime,
+        g.update_time AS updateTime,
+        g.create_by AS createBy,
+        g.update_by AS updateBy
+        FROM
+        gift_pool g left join complimentary_warehouse_correspondence c on g.sku_code = c.sku_code  where 1 = 1
+        <if test="skuCode != null and skuCode != ''">
+            and g.sku_code = #{skuCode}
+        </if>
+        <if test="skuName != null and skuName != ''">
+            and g.sku_name = #{skuName}
+        </if>
+        <if test="warehouseCodeList != null and warehouseCodeList.size > 0">
+            and c.warehouse_code in
+            <foreach collection="warehouseCodeList" item="item" open="( 'all'," separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="pageSize != null and pageSize != ''">
+            limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+        </if>
+    </select>
+
+    <!--查询赠品池列表总数-->
+    <select id="getTotalNumByWarehouseCodeList" resultType="java.lang.Integer" parameterType="com.aiqin.mgs.order.api.domain.po.gift.GiftPool">
+        SELECT
+        count(0)
+        FROM
+        gift_pool g left join complimentary_warehouse_correspondence c on g.sku_code = c.sku_code  where 1 = 1
+        <if test="skuCode != null and skuCode != ''">
+            and g.sku_code = #{skuCode}
+        </if>
+        <if test="skuName != null and skuName != ''">
+            and g.sku_name = #{skuName}
+        </if>
+        <if test="warehouseCodeList != null and warehouseCodeList.size > 0">
+            and c.warehouse_code in
+            <foreach collection="warehouseCodeList" item="item" open="( 'all'," separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
 
 </mapper>

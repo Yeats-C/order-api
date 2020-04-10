@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.service.impl.gift;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpProductGiftEnum;
 import com.aiqin.mgs.order.api.component.enums.YesOrNoEnum;
@@ -240,6 +241,18 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         return addResponse;
     }
 
+    @Override
+    public HttpResponse updateUseStatus(GiftPool giftPool) {
+        LOGGER.info("修改兑换赠品池赠品状态 updateUseStatus 参数 giftPool 为：{}", giftPool);
+        if(null==giftPool.getId() || null==giftPool.getUseStatus()){
+            return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
+        }
+        HttpResponse httpResponse=HttpResponse.success();
+        giftPoolDao.updateUseStatus(giftPool);
+        return httpResponse;
+
+    }
+
     /**
      * 获取sku详情，返回map
      *
@@ -307,6 +320,40 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         erpOrderCartInfo.setUpdateById(authToken.getPersonId());
         erpOrderCartInfo.setUpdateByName(authToken.getPersonName());
         erpOrderGiftPoolCartDao.updateByPrimaryKey(erpOrderCartInfo);
+    }
+
+    @Override
+    public HttpResponse<PageResData<GiftPool>> getGiftPoolListByStoreId(GiftPool giftPool) {
+        LOGGER.info("爱掌柜通过门店id及筛选项查询赠品池列表 getGiftPoolListByStoreId 参数 giftPool 为：{}", giftPool);
+        HttpResponse httpResponse=HttpResponse.success();
+        PageResData pageResData=new PageResData();
+        //通过门店id查询门店省市信息
+        StoreInfo store = erpOrderRequestService.getStoreInfoByStoreId(giftPool.getStoreId());
+        //TODO 此处需通过门店省市id查询此门店有多少仓库的权限【接口暂时待供应链提供】
+        //总之，应该拿到一个仓库list数据，string类型
+
+
+        List<GiftPool> giftPoolList=giftPoolDao.getGiftPoolListByWarehouseCodeList(giftPool);
+        List<String> skuCodeList = new ArrayList<>();
+        for (GiftPool item : giftPoolList) {
+            if (StringUtils.isEmpty(item.getSkuCode())) {
+                throw new BusinessException("缺失sku编码");
+            }
+            skuCodeList.add(item.getSkuCode());
+        }
+        //获取商品详情
+        Map<String, ErpSkuDetail> skuDetailMap = getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), skuCodeList);
+        for (GiftPool item : giftPoolList) {
+            item.setStockNum(skuDetailMap.get(item.getSkuCode()).getStockNum());
+            item.setZeroRemovalCoefficient(skuDetailMap.get(item.getSkuCode()).getZeroRemovalCoefficient());
+        }
+        int totalNum=giftPoolDao.getTotalNumByWarehouseCodeList(giftPool);
+
+
+        pageResData.setDataList(giftPoolList);
+        pageResData.setTotalCount(totalNum);
+        httpResponse.setData(pageResData);
+        return httpResponse;
     }
 
 }

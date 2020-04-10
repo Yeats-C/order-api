@@ -31,4 +31,18 @@ public interface GiftPoolService {
      * @return
      */
     ErpOrderCartAddResponse addProduct(ErpCartAddRequest erpCartAddRequest, AuthToken auth);
+
+    /**
+     *修改兑换赠品池赠品状态
+     * @param giftPool
+     * @return
+     */
+    HttpResponse updateUseStatus(GiftPool giftPool);
+
+    /**
+     * 爱掌柜通过门店id及筛选项查询赠品池列表
+     * @param giftPool
+     * @return
+     */
+    HttpResponse<PageResData<GiftPool>> getGiftPoolListByStoreId(GiftPool giftPool);
 }

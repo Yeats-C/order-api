@@ -25,6 +25,26 @@ public interface GiftPoolDao {
      * @return
      */
     int getTotalNum(GiftPool giftPool);
+    /**
+     * 修改兑换赠品池赠品
+     * @param giftPool
+     * @return
+     */
+    int updateUseStatus(GiftPool giftPool);
+
+    /**
+     * 通过仓库code List 查询门店拥有权限的赠品池数据
+     * @param giftPool
+     * @return
+     */
+    List<GiftPool> getGiftPoolListByWarehouseCodeList(GiftPool giftPool);
+
+    /**
+     * 通过仓库code List 查询门店拥有权限的赠品池数据总数
+     * @param giftPool
+     * @return
+     */
+    int getTotalNumByWarehouseCodeList(GiftPool giftPool);
 }
 
 
