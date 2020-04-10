@@ -105,18 +105,18 @@ public class StoreInfo {
 
     @ApiModelProperty("首单赠送市值金额")
     @JsonProperty(value = "market_value")
-    private BigDecimal marketValue;
+    private Double marketValue;
 
     @ApiModelProperty("首单赠送费用")
     @JsonProperty(value = "free_cost")
-    private BigDecimal freeCost;
+    private Double freeCost;
 
     @ApiModelProperty("首单赠送市值余额")
     @JsonProperty(value = "market_value_balance")
-    private BigDecimal marketValueBalance;
+    private Double marketValueBalance;
 
     @ApiModelProperty("首单赠送费用余额")
     @JsonProperty(value = "free_cost_balance")
-    private BigDecimal freeCostBalance;
+    private Double freeCostBalance;
 
 }

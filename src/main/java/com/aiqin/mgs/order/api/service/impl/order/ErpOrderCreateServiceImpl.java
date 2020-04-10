@@ -1446,11 +1446,13 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //true:赠送市值余额不够发起审批 false:不用审批
         Boolean flag=false;
         //赠送市值
-        BigDecimal marketValue = storeInfo.getMarketValue();
+        Double marketValue = storeInfo.getMarketValue();
         //赠送市值余额
-        BigDecimal marketValueBalance = storeInfo.getMarketValueBalance();
+        Double marketValueBalance = storeInfo.getMarketValueBalance();
         //赠送费用
-        BigDecimal freeCost = storeInfo.getFreeCost();
+        Double freeCost = storeInfo.getFreeCost();
+        //赠送费用余额
+        Double freeCostBalance1=storeInfo.getFreeCostBalance();
         List<CouponShareRequest> detailList = new ArrayList<>();
         for (ErpOrderItem item :
                 itemList) {
@@ -1502,7 +1504,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponDiscountAmount());
         }
         //判断订单总金额是否大于赠送市值
-        if(totalMoneyTotal.compareTo(marketValueBalance)==1){//大于赠送市值，走审批
+        if(totalMoneyTotal.compareTo(new BigDecimal(marketValueBalance))==1){//大于赠送市值，走审批
             //TODO 走审批
             flag=true;
             //orderCode 订单编码
@@ -1511,8 +1513,12 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             record.setActualMarketValue(totalMoneyTotal);
             record.setFanchiseeId(storeInfo.getFranchiseeId());
             record.setFanchiseeName(storeInfo.getFranchiseeName());
-            record.setMarketValue(storeInfo.getMarketValue());
+            record.setMarketValue(new BigDecimal(storeInfo.getMarketValue()));
             record.setOrderCode(orderCode);
+            //赠送市值余额--用于修改
+            marketValueBalance = 0.0;
+            //赠送费用余额--用于修改
+            freeCostBalance1=0.0;
             //发起审批
             HttpResponse httpResponse = submitActBaseProcess(approvalCode, storeInfo.getStoreName(), "", record);
             if(!"0".equals(httpResponse.getCode())){
@@ -1520,7 +1526,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             }
         }else{//计算分摊
             //计算比例系数=总金额/赠送总市值
-            BigDecimal pro=totalMoneyTotal.divide(marketValue);
+            BigDecimal pro=totalMoneyTotal.divide(new BigDecimal(marketValue));
             //根据系数，算实付金额=赠送费用X系数
             BigDecimal shiFuAmount=pro.multiply(pro);
             //统计分摊总金额和，用于最后一行做减法
@@ -1544,6 +1550,12 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 activityMoneyTotal = activityMoneyTotal.add(item.getActivityDiscountAmount());
                 topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponDiscountAmount());
             }
+            //支付金额
+            BigDecimal zhi=totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal);
+            //赠送市值余额--用于修改
+            marketValueBalance = marketValueBalance-totalMoneyTotal.doubleValue();
+            //赠送费用余额--用于修改
+            freeCostBalance1=freeCostBalance1-zhi.doubleValue();
         }
 
 
@@ -1564,6 +1576,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         record.setOrderCode(orderCode);
         record.setStoreId(storeInfo.getStoreId());
         orderGiveFeeDao.insertSelective(record);
+        //修改门店系统的市值余额
+        upGive(storeInfo.getStoreCode(),marketValueBalance,freeCostBalance1);
         resMap.put(orderFee,flag);
         return resMap;
     }
