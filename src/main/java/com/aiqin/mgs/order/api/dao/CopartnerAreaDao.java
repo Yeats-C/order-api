@@ -55,7 +55,7 @@ public interface CopartnerAreaDao {
 
 	void deleteById(@Valid @Param("copartnerAreaId") String copartnerAreaId);
 	
-	void deleteByUpId(@Valid @Param("copartnerAreaId") String copartnerAreaId);
+	void updateUpId(@Valid @Param("copartnerAreaIdUpOld") String copartnerAreaIdUpOld,@Valid @Param("copartnerAreaIdUpNew") String copartnerAreaIdUpNew,@Valid @Param("copartnerAreaNameUpNew") String copartnerAreaNameUpNew);
 	
 	List<CopartnerAreaVo> copartnerAreaVoList(@Valid CopartnerAreaVo param);
 
