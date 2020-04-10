@@ -130,9 +130,9 @@
         delete from copartner_area_info where copartner_area_id = #{copartnerAreaId}
     </delete>
     
-    <delete id="deleteByUpId" parameterType="java.lang.String">
-        delete from copartner_area_info where copartner_area_id_up = #{copartnerAreaId}
-    </delete>
+    <update id="deleteByUpId" parameterType="java.lang.String">
+        update copartner_area_info set copartner_area_id_up ='',copartner_area_name_up='' where copartner_area_id_up = #{copartnerAreaId}
+    </update>
     
     <select id = "qryCopartnerAreaList" resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp">
     SELECT 
