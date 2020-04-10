@@ -677,11 +677,11 @@ public class OrderListServiceImpl implements OrderListService {
      */
     private ErpOrderFee firstGivePrice(StoreInfo storeInfo, List<ErpOrderItem> itemList, List<String> topCouponCodeList) {
         //赠送市值
-        BigDecimal marketValue = storeInfo.getMarketValue();
+        BigDecimal marketValue = new BigDecimal(storeInfo.getMarketValue());
         //赠送市值余额
-        BigDecimal marketValueBalance = storeInfo.getMarketValueBalance();
+        BigDecimal marketValueBalance = new BigDecimal(storeInfo.getMarketValueBalance());
         //赠送费用
-        BigDecimal freeCost = storeInfo.getFreeCost();
+        BigDecimal freeCost = new BigDecimal(storeInfo.getFreeCost());
         List<CouponShareRequest> detailList = new ArrayList<>();
         for (ErpOrderItem item :
                 itemList) {
