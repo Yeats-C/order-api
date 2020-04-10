@@ -19,6 +19,7 @@ import com.aiqin.mgs.order.api.domain.request.CouponShareRequest;
 import com.aiqin.mgs.order.api.domain.request.orderList.*;
 import com.aiqin.mgs.order.api.domain.request.stock.StockLockReqVo;
 import com.aiqin.mgs.order.api.domain.request.stock.StockLockSkuReqVo;
+import com.aiqin.mgs.order.api.domain.response.StoreMarketValueResponse;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.FirstOrderTimeRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderSaveRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
@@ -30,6 +31,7 @@ import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
 import com.aiqin.mgs.order.api.util.DateUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -61,6 +63,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @Transactional(rollbackFor = Exception.class)
 public class OrderListServiceImpl implements OrderListService {
+    @Value("${bridge.url.slcs_api}")
+    private String slcsHost;
     @Resource
     private OrderListDao orderListDao;
     @Resource
@@ -682,6 +686,8 @@ public class OrderListServiceImpl implements OrderListService {
         BigDecimal marketValueBalance = new BigDecimal(storeInfo.getMarketValueBalance());
         //赠送费用
         BigDecimal freeCost = new BigDecimal(storeInfo.getFreeCost());
+        //赠送费用余额
+        Double freeCostBalance1=storeInfo.getFreeCostBalance();
         List<CouponShareRequest> detailList = new ArrayList<>();
         for (ErpOrderItem item :
                 itemList) {
@@ -759,6 +765,13 @@ public class OrderListServiceImpl implements OrderListService {
             topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponDiscountAmount());
         }
 
+        //支付金额
+//        BigDecimal zhi=totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal);
+//        //赠送市值余额--用于修改
+//        marketValueBalance = marketValueBalance.subtract(totalMoneyTotal);
+//        //赠送费用余额--用于修改
+//        freeCostBalance1=freeCostBalance1-zhi.doubleValue();
+        //
 
         orderFee.setTotalMoney(totalMoneyTotal);
         orderFee.setActivityMoney(activityMoneyTotal);
@@ -803,6 +816,29 @@ public class OrderListServiceImpl implements OrderListService {
             }
         }
         return flag;
+    }
+
+    /**
+     * 修改slcs门店市值赠余额
+     */
+    private void upGive(String storeCode,Double marketValueBalance,Double freeCostBalance){
+        log.info("修改slcs门店市值赠余额,入参storeCode={},marketValueBalance={},freeCostBalance={}",storeCode,marketValueBalance,freeCostBalance);
+        String url=slcsHost+"/store/updateValue";
+        JSONObject json=new JSONObject();
+        StoreMarketValueResponse storeMarketValueResponse=new StoreMarketValueResponse();
+        storeMarketValueResponse.setFreeCostBalance(freeCostBalance);
+        storeMarketValueResponse.setMarketValueBalance(marketValueBalance);
+        storeMarketValueResponse.setStoreCode(storeCode);
+        json.put("storeMarketValueResponse",storeMarketValueResponse);
+        log.info("修改slcs门店市值赠余额,调用修改赠送市值余额接口,url={},parm={}",url,json);
+        HttpClient httpClient = HttpClient.post(url).json(json);
+        Map<String ,Object> res=null;
+        res = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+        log.info("同步到虚拟资产:"+res);
+        if(res!=null&&"0".equals(res.get("code"))){
+            log.info("修改slcs门店市值赠余额,调用修改赠送市值余额接口,成功");
+        }
+
     }
 
 }
