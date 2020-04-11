@@ -68,7 +68,7 @@
     <select id="selectActivityReportRelationOrder" parameterType="com.aiqin.mgs.order.api.domain.OrderDetailInfo"
             resultType="com.aiqin.mgs.order.api.domain.activity.ActivityOrderInfo">
         select
-          od.activity_name as activityName, oi.order_code as orderCode,
+          od.activity_name as activityName, oi.order_code as orderCode,od.activity_id as activityId,
           ifnull(sum(ifnull(od.actual_price,0)*ifnull(od.amount,0)),0) saleAmount,
           oi.member_name as memberName, oi.member_phone as memberPhone, oi.create_time as createTime
         from order_consumer_detail od
