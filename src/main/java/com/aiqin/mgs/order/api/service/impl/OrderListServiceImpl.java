@@ -6,6 +6,7 @@ import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.OrderStatusEnum;
 import com.aiqin.mgs.order.api.component.ParamUnit;
 import com.aiqin.mgs.order.api.component.SequenceService;
@@ -20,6 +21,7 @@ import com.aiqin.mgs.order.api.domain.request.orderList.*;
 import com.aiqin.mgs.order.api.domain.request.stock.StockLockReqVo;
 import com.aiqin.mgs.order.api.domain.request.stock.StockLockSkuReqVo;
 import com.aiqin.mgs.order.api.domain.response.StoreMarketValueResponse;
+import com.aiqin.mgs.order.api.domain.response.order.ErpOrderItemSplitGroupResponse;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.FirstOrderTimeRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderSaveRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
@@ -29,6 +31,8 @@ import com.aiqin.mgs.order.api.service.BridgeStockService;
 import com.aiqin.mgs.order.api.service.OrderListService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
+import com.aiqin.mgs.order.api.util.AuthUtil;
+import com.aiqin.mgs.order.api.util.CopyBeanUtil;
 import com.aiqin.mgs.order.api.util.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -247,6 +251,7 @@ public class OrderListServiceImpl implements OrderListService {
 
     @Override
     public Boolean updateOrderStatusDeliver(DeliverVo deliverVo) {
+        log.info("修改订单为发货状态,入参deliverVo={}",deliverVo);
         Boolean br = orderListDao.updateStatusByCode(deliverVo.getOrderCode(), 11);
         List<ActualDeliverVo> actualDeliverVos = deliverVo.getActualDeliverVos();
         for (ActualDeliverVo vo : actualDeliverVos) {
@@ -262,30 +267,44 @@ public class OrderListServiceImpl implements OrderListService {
         param.setImplementTime(new Date());
         param.setImplementContent("发货完成");
         Boolean re = orderListLogisticsDao.insertLogistics(param);
-        //TODO 分摊计算
+        log.info("修改订单为发货状态---进入分摊计算");
         //判断拆单的子订单是否已经全部发货完成
         Boolean flag = checkComplete(deliverVo.getOrderCode());
+        log.info("修改订单为发货状态---分摊计算--判断拆单的子订单是否已经全部发货完成flag={}",flag);
         if(flag){//全部完成，进行分摊计算
+            log.info("修改订单为发货状态---全部发货完成,进行分摊计算");
             ErpOrderInfo po=new ErpOrderInfo();
             po.setOrderStoreCode(deliverVo.getOrderCode());
             //查询主订单
             List<ErpOrderInfo> select = erpOrderInfoDao.select(po);
+            log.info("修改订单为发货状态---全部发货完成,进行分摊计算--查询主订单数据集合为select={}",select);
             if(select!=null&&select.size()>0) {
                 ErpOrderInfo erpOrderInfo = select.get(0);
+                log.info("修改订单为发货状态---全部发货完成,进行分摊计算--查询主订单数据为 erpOrderInfo={}",erpOrderInfo);
                 //获取门店信息
                 StoreInfo storeInfo = erpOrderRequestService.getStoreInfoByStoreId(erpOrderInfo.getStoreId());
+                log.info("修改订单为发货状态---全部发货完成,进行分摊计算--查询门店信息数据为 storeInfo={}",storeInfo);
                 if(erpOrderInfo!=null&&StringUtils.isNotBlank(erpOrderInfo.getMainOrderCode())){
+                    log.info("修改订单为发货状态---全部发货完成,进行分摊计算--主单号为 mainOrderCode={}",erpOrderInfo.getMainOrderCode());
                     //查询所有子订单号
                     po.setOrderStoreCode(null);
                     po.setMainOrderCode(erpOrderInfo.getMainOrderCode());
                     List<ErpOrderInfo> splictOrder = erpOrderInfoDao.select(po);
+                    log.info("修改订单为发货状态---全部发货完成,进行分摊计算--查询所有子订单号为 splictOrder={}",splictOrder);
+                    List<ErpOrderItem> erpOrderItemList=new ArrayList<>();
                     for(ErpOrderInfo orderInfo:splictOrder){
                         List<ErpOrderItem> erpOrderItems = erpOrderItemService.selectOrderItemListByOrderId(orderInfo.getOrderStoreId());
                         List<String> topCouponCodeList=null;
-                        firstGivePrice(storeInfo,erpOrderItems,topCouponCodeList);
-                        //TODO 表中数据更新
+//                        ErpOrderFee erpOrderFee = firstGivePrice(storeInfo, erpOrderItems, topCouponCodeList);
+                        chai(erpOrderItems);
+                        log.info("修改订单为发货状态---全部发货完成,进行分摊计算--封装后子单明细数据为 erpOrderItems={}",erpOrderItems);
+                        erpOrderItemList.addAll(erpOrderItems);
                     }
-
+                    //获取登陆人信息
+                    AuthToken authToken = AuthUtil.getCurrentAuth();
+                    log.info("修改订单为发货状态---全部发货完成,进行分摊计算--更新明细表实收分摊价格入参 erpOrderItemList={}",erpOrderItemList);
+                    //更新明细表实收分摊价格
+                    erpOrderItemService.updateOrderItemList(erpOrderItemList,authToken);
                 }
             }
 
@@ -839,6 +858,20 @@ public class OrderListServiceImpl implements OrderListService {
             log.info("修改slcs门店市值赠余额,调用修改赠送市值余额接口,成功");
         }
 
+    }
+
+    //计算分摊
+    private void chai(List<ErpOrderItem> orderItemList){
+        log.info("修改订单为发货状态---全部发货完成,进行分摊计算--子单明细入参 orderItemList={}",orderItemList);
+        //遍历原订单明细行
+        for (ErpOrderItem item : orderItemList) {
+            //拆出来的行均摊总金额 = 原始订单分摊单价 * 实收数量
+            BigDecimal totalPreferentialAmount = item.getPreferentialAmount().multiply(new BigDecimal(item.getActualProductCount()));
+            //拆出来的行活动优惠金额=原始订单活动单价 * 实收数量
+            BigDecimal totalAcivityAmount = item.getActivityPrice().multiply(new BigDecimal(item.getActualProductCount()));
+            item.setTotalPreferentialAmount(totalPreferentialAmount);
+            item.setTotalAcivityAmount(totalAcivityAmount);
+        }
     }
 
 }
