@@ -335,18 +335,21 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 		try {
 
 			String copartnerAreaId = "";
+			String copartnerAreaIdOld = "";
 			//删除新增
 			if(StringUtils.isNotBlank(param.getCopartnerAreaDetail().getCopartnerAreaId())) {
-				copartnerAreaId = param.getCopartnerAreaDetail().getCopartnerAreaId();
-				copartnerAreaDao.deleteById(copartnerAreaId);
-				copartnerAreaStoreDao.deleteById(copartnerAreaId);
-				copartnerAreaRoleDao.deleteById(copartnerAreaId);
+				copartnerAreaIdOld = param.getCopartnerAreaDetail().getCopartnerAreaId();
+				copartnerAreaDao.deleteById(copartnerAreaIdOld);
+				copartnerAreaStoreDao.deleteById(copartnerAreaIdOld);
+				copartnerAreaRoleDao.deleteById(copartnerAreaIdOld);
 			}
 			if(StringUtils.isNotBlank(param.getCopartnerAreaDetail().getCopartnerAreaId()) && param.getCopartnerAreaDetail().getCopartnerAreaId().equals("0")) {
 				copartnerAreaId = "0";
 			}else {
 				copartnerAreaId = IdUtil.uuid();
 			}
+			//修改关联关系
+			copartnerAreaDao.updateUpId(copartnerAreaIdOld, copartnerAreaId, param.getCopartnerAreaDetail().getCopartnerAreaName());
 			
 			//基本信息
 			if(param.getCopartnerAreaDetail() !=null ) {
@@ -486,6 +489,7 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 			copartnerAreaDao.deleteById(copartnerAreaId);
 			copartnerAreaStoreDao.deleteById(copartnerAreaId);
 			copartnerAreaRoleDao.deleteById(copartnerAreaId);
+			copartnerAreaDao.updateUpId(copartnerAreaId, "", "");
 
 		    return HttpResponse.success(true);
 		}catch(Exception e) {
@@ -542,7 +546,7 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 						    
 						  //获取第二层下级列表
 						    CopartnerAreaVo scodCopartnerAreaVo = new CopartnerAreaVo();
-						    scodCopartnerAreaVo.setCopartnerAreaIdUp(vo.getCopartnerAreaId());
+						    scodCopartnerAreaVo.setCopartnerAreaIdUp(downAreaVo.getCopartnerAreaId());
 							List<CopartnerAreaVo> scodAreaList = copartnerAreaDao.copartnerAreaVoList(scodCopartnerAreaVo);
 						    if(CollectionUtils.isNotEmpty(scodAreaList)) {
 						    	for(CopartnerAreaVo scodAreaVo : areaList) {
