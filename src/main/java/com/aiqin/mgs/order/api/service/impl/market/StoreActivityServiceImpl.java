@@ -81,8 +81,8 @@ public class StoreActivityServiceImpl implements StoreActivityService{
         PageResData p = new PageResData();
         OrderDetailInfo orderDetailInfo = new OrderDetailInfo();
         orderDetailInfo.setActivityId(activityId);
-        orderDetailInfo.setPageNo(pageNo);
-        orderDetailInfo.setPageSize(pageSize);
+        orderDetailInfo.setPageNo(pageNo==null?1:pageNo);
+        orderDetailInfo.setPageSize(pageSize==null?20:pageSize);
         List<ActivityOrderInfo> activityOrderInfos = storeActivityDao.selectActivityReportRelationOrder(orderDetailInfo);
         Integer count = storeActivityDao.selectActivityReportRelationOrderCount(orderDetailInfo);
 

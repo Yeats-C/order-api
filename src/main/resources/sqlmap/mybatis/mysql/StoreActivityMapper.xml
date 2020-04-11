@@ -71,8 +71,8 @@
           od.activity_name as activityName, oi.order_code as orderCode,
           ifnull(sum(ifnull(od.actual_price,0)*ifnull(od.amount,0)),0) saleAmount,
           oi.member_name as memberName, oi.member_phone as memberPhone, oi.create_time as createTime
-        from order_detail od
-        left join order_info oi on oi.order_id=od.order_id
+        from order_consumer_detail od
+        left join order_consumer_info oi on oi.order_id=od.order_id
         where activity_id = #{activityId}
         group by oi.order_code
         limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
@@ -86,8 +86,8 @@
           od.activity_name as activityName, oi.order_code as orderCode,
           ifnull(sum(ifnull(od.actual_price,0)*ifnull(od.amount,0)),0) saleAmount,
           oi.member_name as memberName, oi.member_phone as memberPhone, oi.create_time as createTime
-        from order_detail od
-        left join order_info oi on oi.order_id=od.order_id
+        from order_consumer_detail od
+        left join order_consumer_info oi on oi.order_id=od.order_id
         where activity_id = #{activityId}
         group by oi.order_code
         ) a
