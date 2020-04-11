@@ -16,6 +16,7 @@ public enum ErpProductGiftEnum {
     PRODUCT(0, "0", "商品"),
     /***赠品*/
     GIFT(1, "1", "赠品"),
+    /***赠品积分所选商品*/
     JIFEN(2, "2", "赠品积分所选商品");
 
     private Integer code;
