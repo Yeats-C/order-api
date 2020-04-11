@@ -5,6 +5,8 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftPool;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartAddRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.ErpCartQueryRequest;
+import com.aiqin.mgs.order.api.domain.response.cart.ErpCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpOrderCartAddResponse;
 
 public interface GiftPoolService {
@@ -45,4 +47,19 @@ public interface GiftPoolService {
      * @return
      */
     HttpResponse<PageResData<GiftPool>> getGiftPoolListByStoreId(GiftPool giftPool);
+
+    /**
+     * 爱掌柜查询赠品购物车列表
+     * @param erpCartQueryRequest
+     * @param auth
+     * @return
+     */
+    ErpCartQueryResponse queryGiftCartList(ErpCartQueryRequest erpCartQueryRequest, AuthToken auth);
+
+    /**
+     * 根据cartId删除行
+     *
+     * @param cartId
+     */
+    void deleteCartLine(String cartId);
 }
