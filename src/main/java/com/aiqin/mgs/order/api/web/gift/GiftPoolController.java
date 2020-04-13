@@ -10,6 +10,9 @@ import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftPool;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartAddRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.ErpCartDeleteRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.ErpCartQueryRequest;
+import com.aiqin.mgs.order.api.domain.response.cart.ErpCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpOrderCartAddResponse;
 import com.aiqin.mgs.order.api.service.gift.GiftPoolService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
@@ -53,9 +56,9 @@ public class GiftPoolController {
         return giftPoolService.getGiftPoolList(giftPool);
     }
 
-    @PostMapping("/addGift")
+    @PostMapping("/addGiftToCart")
     @ApiOperation(value = "添加兑换赠品到购物车")
-    public HttpResponse<ErpOrderCartAddResponse> addGift(@RequestBody ErpCartAddRequest erpCartAddRequest) {
+    public HttpResponse<ErpOrderCartAddResponse> addGiftToCart(@RequestBody ErpCartAddRequest erpCartAddRequest) {
         LOGGER.info("添加商品到购物车：{}", erpCartAddRequest);
         HttpResponse<ErpOrderCartAddResponse> response = HttpResponse.success();
         try {
@@ -67,6 +70,65 @@ public class GiftPoolController {
         } catch (Exception e) {
             LOGGER.error("添加商品到购物车失败：{}", e);
             response = HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+        }
+        return response;
+    }
+
+    /**
+     * 修改兑换赠品池赠品状态
+     *
+     * @param
+     * @return
+     */
+    @PostMapping("/updateUseStatus")
+    @ApiOperation(value = "修改兑换赠品池赠品状态")
+    public HttpResponse updateUseStatus(@RequestBody GiftPool giftPool) {
+        return giftPoolService.updateUseStatus(giftPool);
+    }
+
+    /**
+     * 爱掌柜通过门店id及筛选项查询赠品池列表
+     * @param
+     * @return
+     */
+    @PostMapping("/getGiftPoolListByStoreId")
+    @ApiOperation(value = "爱掌柜通过门店id及筛选项查询赠品池列表")
+    public HttpResponse<PageResData<GiftPool>> getGiftPoolListByStoreId(@RequestBody GiftPool giftPool){
+        return giftPoolService.getGiftPoolListByStoreId(giftPool);
+    }
+
+    @PostMapping("/queryGiftCartList")
+    @ApiOperation(value = "爱掌柜查询赠品购物车列表")
+    public HttpResponse<ErpCartQueryResponse> queryGiftCartList(@RequestBody ErpCartQueryRequest erpCartQueryRequest) {
+        HttpResponse<ErpCartQueryResponse> response = HttpResponse.success();
+        try {
+            AuthToken auth = AuthUtil.getCurrentAuth();
+            ErpCartQueryResponse queryResponse = giftPoolService.queryGiftCartList(erpCartQueryRequest, auth);
+            response.setData(queryResponse);
+        } catch (BusinessException e) {
+            LOGGER.error("查询购物车列表：{}", e);
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            LOGGER.error("查询购物车列表：{}", e);
+            response = HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        return response;
+    }
+
+    @ApiOperation(value = "购物车删除单行")
+    @PostMapping("/deleteCartLine")
+    public HttpResponse deleteCartLine(@RequestBody ErpCartDeleteRequest erpCartDeleteRequest) {
+        LOGGER.info("删除购物车行：{}", erpCartDeleteRequest);
+        HttpResponse response = HttpResponse.success();
+        try {
+            AuthToken auth = AuthUtil.getCurrentAuth();
+            giftPoolService.deleteCartLine(erpCartDeleteRequest.getCartId());
+        } catch (BusinessException e) {
+            LOGGER.error("删除购物车行：{}", e);
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            LOGGER.error("删除购物车行：{}", e);
+            response = HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
         }
         return response;
     }
