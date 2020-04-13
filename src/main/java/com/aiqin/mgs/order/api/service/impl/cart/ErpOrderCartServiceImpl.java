@@ -24,6 +24,7 @@ import com.aiqin.mgs.order.api.service.CouponRuleService;
 import com.aiqin.mgs.order.api.service.RedisService;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.service.cart.ErpOrderCartService;
+import com.aiqin.mgs.order.api.service.gift.GiftPoolService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.alibaba.fastjson.JSON;
@@ -60,6 +61,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
 
     @Resource
     private CouponRuleService couponRuleService;
+
+    @Resource
+    private GiftPoolService giftPoolService;
 
     @Override
     public void insertCartLine(ErpOrderCartInfo erpOrderCartInfo, AuthToken authToken) {
@@ -829,7 +833,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         response.setStoreContactsPhone(store.getContactsPhone());
         response.setStoreId(store.getStoreId());
         response.setProductType(erpCartQueryRequest.getProductType());
-
+        //查询兑换赠品相关信息
+        ErpCartQueryResponse erpCartQueryResponse=giftPoolService.queryGiftCartList(erpCartQueryRequest,auth);
+        response.setErpCartQueryResponse(erpCartQueryResponse);
         String redisKey = IdUtil.uuid();
         boolean set = redisService.setSeconds(redisKey, response, OrderConstant.REDIS_ORDER_CART_GROUP_TEMP_TIME);
         if (!set) {
