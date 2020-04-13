@@ -1668,4 +1668,17 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         return value;
     }
 
+    /**
+     * 计算均摊金额--新修改
+     *
+     * @param orderId 主订单号
+     */
+    private void couponSharePrice1(String orderId) {
+        log.info("计算均摊金额--新修改,orderId={}", orderId);
+        //查询主订单费用信息
+        ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(orderId);
+        log.info("计算均摊金额--主订单费用信息结果,orderFee={}", orderFee);
+
+    }
+
 }
