@@ -140,7 +140,10 @@ public class OrderAfterSaleDetailInfo extends PagesRequest {
 	@JsonProperty("activity_id")
 	private String activityId;
 
-	
+
+	@JsonProperty("package_id")
+	@ApiModelProperty("套餐包id")
+	private String packageId;
     
 }
 

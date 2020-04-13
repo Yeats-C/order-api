@@ -380,6 +380,7 @@ public class OrderServiceAfterImpl implements OrderAfterService {
                             info.setUnit(orderDetailInfo.getUnit());
                             info.setLogo(orderDetailInfo.getLogo());
                             info.setActivityId(orderDetailInfo.getActivityId());
+                            info.setPackageId(orderDetailInfo.getPackageId());
                         }
                         saleDetailInfoList.set(j, info);
                     }
