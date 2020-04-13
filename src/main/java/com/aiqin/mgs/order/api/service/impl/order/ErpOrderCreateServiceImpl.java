@@ -889,7 +889,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             detailList.add(itemRequest);
         }
         //A品券计算均摊金额
-        couponSharePrice(detailList, topCouponCodeList);
+//        couponSharePrice(detailList, topCouponCodeList);
 
         Map<Long, CouponShareRequest> map = new HashMap<>(16);
         for (CouponShareRequest item :
@@ -1469,7 +1469,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             detailList.add(itemRequest);
         }
         //A品券计算均摊金额
-        couponSharePrice(detailList, topCouponCodeList);
+//        couponSharePrice(detailList, topCouponCodeList);
 
         Map<Long, CouponShareRequest> map = new HashMap<>(16);
         for (CouponShareRequest item :
@@ -1673,12 +1673,86 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      *
      * @param orderId 主订单号
      */
-    private void couponSharePrice1(String orderId) {
+    private void couponSharePrice(List<CouponShareRequest> details,String orderId) {
         log.info("计算均摊金额--新修改,orderId={}", orderId);
         //查询主订单费用信息
         ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(orderId);
         log.info("计算均摊金额--主订单费用信息结果,orderFee={}", orderFee);
+        if(orderFee==null){
+            throw new BusinessException("计算均摊金额--主订单费用信息结果为空");
+        }
+        //A品券总金额
+        BigDecimal topCouponMoney = orderFee.getTopCouponMoney();
+        log.info("计算均摊金额--A品券总金额,topCouponMoney={}", topCouponMoney);
+        //计算A品券金额
+        List<CouponShareRequest> topProductList = new ArrayList<>();
+        //存储符合A品卷均摊的商品的总分销价(上一次分摊总价)
+        BigDecimal totalFirstFenAmount = BigDecimal.ZERO;
+        //总分销价(商品组价值)
+        BigDecimal totalProAmount = BigDecimal.ZERO;
+        //活动均摊后金额汇总
+        BigDecimal totalAmountAfterActivity = BigDecimal.ZERO;
+        for (CouponShareRequest item : details) {
+            Map erpProductPropertyType = couponRuleService.couponRuleMap();
+            log.info("获取A品卷属性返回结果,erpProductPropertyType={}", erpProductPropertyType);
+            log.info(item.getSkuCode()+"此商品属性编码,productPropertyCode={}", item.getProductPropertyCode());
+            if(null!=erpProductPropertyType&&null!=erpProductPropertyType.get(item.getProductPropertyCode())){
+                if (ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductGift())) {
+                    topProductList.add(item);
+                    //活动分摊后金额
+                    BigDecimal totalpPreferentialAmount = BigDecimal.ZERO;
+                    if(item.getTotalProductAmount()!=null){
+                        totalpPreferentialAmount=item.getTotalProductAmount();
+                    }
+                    //分销总价=从活动的分摊总价取
+                    totalFirstFenAmount = totalFirstFenAmount.add(totalpPreferentialAmount);
+                    totalProAmount = totalProAmount.add(item.getTotalProductAmount());
+                    totalAmountAfterActivity = totalAmountAfterActivity.add(item.getTotalPreferentialAmount());
+                }
+            }
+        }
+        log.info("A品券计算均摊金额,符合A品卷均摊的商品topProductList={}", topProductList);
+        //判断优惠券总金额和从活动的分摊总价取，如果A品卷总金额大于活动分摊总价，则A品券总金额=活动分摊总价
+        if (topCouponMoney.subtract(totalFirstFenAmount).compareTo(BigDecimal.ZERO) == 1) {
+            topCouponMoney = totalFirstFenAmount;
+        }
+        //商品组实收(商品组价值-A品卷)
+        BigDecimal auGroupAmount = totalFirstFenAmount.subtract(topCouponMoney);
+        log.info("A品券计算均摊金额--总分销价:totalProAmount={},上一次分摊总价:totalFirstFenAmount={},商品组实收:auGroupAmount={}", totalProAmount, totalFirstFenAmount, auGroupAmount);
+        //计算累加各行A品券优惠金额（最后一行使用）
+        BigDecimal totalApinAmount = BigDecimal.ZERO;
+        if (topProductList != null && topProductList.size() > 0) {
+            for (int i = 0; i < topProductList.size(); i++) {
+                CouponShareRequest csr = topProductList.get(i);
+                //A品卷分摊后总价值
+                BigDecimal totalPreferentialAmount = csr.getTotalPreferentialAmount();
+                //本行A品卷优惠金额
+                BigDecimal apinCouponAmount = BigDecimal.ZERO;
 
+                //本行活动均摊后金额
+                BigDecimal lineAmountAfterActivity = csr.getTotalPreferentialAmount();
+                if (i < topProductList.size() - 1) {
+                    //非最后一行，根据比例计算
+
+                    //计算本行占用了A品券的金额
+                    apinCouponAmount = topCouponMoney.multiply(lineAmountAfterActivity).divide(totalAmountAfterActivity, 2, RoundingMode.HALF_UP);
+                    //A品券剩余金额
+                    totalApinAmount = totalApinAmount.add(apinCouponAmount);
+                } else {
+                    //最后一行，用减法防止误差
+                    apinCouponAmount = topCouponMoney.subtract(totalApinAmount);
+                }
+
+                //计算本行A品券均摊之后的金额
+                totalPreferentialAmount = totalPreferentialAmount.subtract(apinCouponAmount);
+                //分摊单价
+                BigDecimal preferentialAmount = totalPreferentialAmount.divide(new BigDecimal(csr.getProductCount()), 2, RoundingMode.DOWN);
+                csr.setTotalPreferentialAmount(totalPreferentialAmount);
+                csr.setPreferentialAmount(preferentialAmount);
+                csr.setApinCouponAmount(apinCouponAmount);
+            }
+        }
+        log.info("A品券计算均摊金额处理结果,details={}", details);
     }
 
 }
