@@ -3,7 +3,7 @@
 <mapper namespace="com.aiqin.mgs.order.api.dao.gift.GiftQuotasUseDetailDao">
 
 
-    <select id="select" parameterType="com.aiqin.mgs.order.api.domain.po.gift.GiftQuotasUseDetail"
+    <select id="select" parameterType="com.aiqin.mgs.order.api.domain.po.gift.GiftQuotasUseDetailPageRequest"
             resultType="com.aiqin.mgs.order.api.domain.po.gift.GiftQuotasUseDetail">
         select
         id,
@@ -19,13 +19,22 @@
         DATE_FORMAT( update_time, '%Y-%m-%d %h:%i:%s' ) AS updateTime,
         update_by as updateBy
         from gift_quotas_use_detail where 1 = 1
-        <if test="id != null and id != ''">
-            and id = #{id}
-        </if>
         <if test="storeId != null and storeId != ''">
             and store_id = #{storeId}
         </if>
         order by create_time desc
+        <if test="pageSize!=null ">
+            limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+        </if>
+    </select>
+
+    <select id="getTotalNum" parameterType="com.aiqin.mgs.order.api.domain.po.gift.GiftQuotasUseDetailPageRequest" resultType="java.lang.Integer">
+        select
+        count(1)
+        from gift_quotas_use_detail where 1 = 1
+        <if test="storeId != null and storeId != ''">
+            and store_id = #{storeId}
+        </if>
     </select>
 
     <!--插入兑换赠品积分账户使用明细信息-->
