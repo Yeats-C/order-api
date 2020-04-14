@@ -469,7 +469,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             orderQuery.setOrderId(orderId);
             SettlementInfo settlementInfo = settlementDao.jkselectsettlement(orderQuery);
             if (settlementInfo != null) {
-                settlementInfo.setActivityDiscount(settlementInfo.getActivityDiscount()+settlementInfo.getFullSum()+settlementInfo.getLuckySum());
+                settlementInfo.setActivityDiscount(Optional.ofNullable(settlementInfo.getActivityDiscount()).orElse(0)+ Optional.ofNullable(settlementInfo.getFullSum()).orElse(0)+Optional.ofNullable(settlementInfo.getLuckySum()).orElse(0));
                 settlementInfo.setTotalCouponsDiscount(settlementInfo.getActivityDiscount());
 
                 if (orderInfo.getOrderStatus() == 0) {
