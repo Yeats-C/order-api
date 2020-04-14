@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.dao.gift;
 
 import com.aiqin.mgs.order.api.domain.po.gift.GiftQuotasUseDetail;
+import com.aiqin.mgs.order.api.domain.po.gift.GiftQuotasUseDetailPageRequest;
 
 import java.util.List;
 
@@ -10,9 +11,11 @@ public interface GiftQuotasUseDetailDao {
      * @param giftQuotasUseDetail
      * @return
      */
-    List<GiftQuotasUseDetail> select(GiftQuotasUseDetail giftQuotasUseDetail);
+    List<GiftQuotasUseDetail> select(GiftQuotasUseDetailPageRequest giftQuotasUseDetail);
 
     int add(GiftQuotasUseDetail giftQuotasUseDetail);
+
+    int getTotalNum(GiftQuotasUseDetailPageRequest giftQuotasUseDetail);
 }
 
 
