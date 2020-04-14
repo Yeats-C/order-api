@@ -15,8 +15,8 @@
                  oi.id, date_format(oi.create_time,"%m-%d") as months_day,
                  case when length(TRIM(oi.member_id))>0 then '1' else '0' end as member_status,
                  od.activity_id as activity_id, od.actual_price as actual_price, od.amount as amount
-                from order_info oi
-                left join order_detail od on oi.order_id = od.order_id
+                from order_consumer_info oi
+                left join order_consumer_detail od on oi.order_id = od.order_id
                 where oi.distributor_id=#{storeId}
                 and oi.create_time <![CDATA[>=]]> #{beginTime}
                 and oi.create_time <![CDATA[<=]]> #{finishTime}
