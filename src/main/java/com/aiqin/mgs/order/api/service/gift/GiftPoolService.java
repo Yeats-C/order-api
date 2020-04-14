@@ -62,4 +62,11 @@ public interface GiftPoolService {
      * @param cartId
      */
     void deleteCartLine(String cartId);
+
+    /**
+     * 清空购物车
+     *
+     * @param erpCartQueryRequest
+     */
+    void deleteAllCartLine(ErpCartQueryRequest erpCartQueryRequest);
 }

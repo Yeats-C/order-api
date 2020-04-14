@@ -457,4 +457,18 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         }
         return result;
     }
+
+    @Override
+    public void deleteAllCartLine(ErpCartQueryRequest erpCartQueryRequest) {
+        ErpOrderCartInfo query = new ErpOrderCartInfo();
+        query.setStoreId(erpCartQueryRequest.getStoreId());
+        query.setProductType(erpCartQueryRequest.getProductType());
+        List<ErpOrderCartInfo> cartLineList = erpOrderGiftPoolCartDao.select(query);
+        if (cartLineList != null && cartLineList.size() > 0) {
+            for (ErpOrderCartInfo item :
+                    cartLineList) {
+                this.deleteCartLine(item.getCartId());
+            }
+        }
+    }
 }
