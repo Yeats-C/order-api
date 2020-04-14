@@ -17,6 +17,7 @@ import com.aiqin.mgs.order.api.domain.po.gift.GiftPool;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartAddRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartAddSkuItem;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartQueryRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.request.product.StockBatchRespVO;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpCartAddItemResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpCartQueryResponse;
@@ -328,6 +329,11 @@ public class GiftPoolServiceImpl implements GiftPoolService {
     @Override
     public HttpResponse<PageResData<GiftPool>> getGiftPoolListByStoreId(GiftPool giftPool) {
         LOGGER.info("爱掌柜通过门店id及筛选项查询赠品池列表 getGiftPoolListByStoreId 参数 giftPool 为：{}", giftPool);
+        if(null==giftPool.getStoreId()){
+            throw new BusinessException("缺失门店id--store_id");
+        }else if(null==giftPool.getProductType()){
+            throw new BusinessException("缺失订单类型--product_type");
+        }
         HttpResponse httpResponse=HttpResponse.success();
         PageResData pageResData=new PageResData();
         //通过门店id查询门店省市信息
@@ -347,8 +353,23 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         //获取商品详情
         Map<String, ErpSkuDetail> skuDetailMap = getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), skuCodeList);
         for (GiftPool item : giftPoolList) {
-            item.setStockNum(skuDetailMap.get(item.getSkuCode()).getStockNum());
-            item.setZeroRemovalCoefficient(skuDetailMap.get(item.getSkuCode()).getZeroRemovalCoefficient());
+            ErpSkuDetail erpSkuDetail=skuDetailMap.get(item.getSkuCode());
+            if(null==erpSkuDetail){
+                throw new BusinessException("供应链调用 /search/spu/sku/detail2 接口 查询有误 ,skuCode为"+item.getSkuCode()+"商品查询失败");
+            }
+            item.setStockNum(erpSkuDetail.getStockNum());
+            item.setZeroRemovalCoefficient(erpSkuDetail.getZeroRemovalCoefficient());
+            item.setMaxOrderNum(erpSkuDetail.getMaxOrderNum());
+            item.setProductPicturePath(erpSkuDetail.getProductPicturePath());
+
+            ShoppingCartRequest shoppingCartRequest=new ShoppingCartRequest();
+            shoppingCartRequest.setStoreId(giftPool.getStoreId());
+            shoppingCartRequest.setProductType(giftPool.getProductType());
+            Integer cartNum=erpOrderGiftPoolCartDao.getSkuNum(shoppingCartRequest);
+            if(null==cartNum){
+                cartNum=0;
+            }
+            item.setCartNum(cartNum);
         }
         int totalNum=giftPoolDao.getTotalNumByWarehouseCodeList(giftPool);
 
