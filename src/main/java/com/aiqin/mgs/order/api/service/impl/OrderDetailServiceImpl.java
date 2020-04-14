@@ -187,8 +187,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     public HttpResponse selectorderdetailsum(@Valid OrderDetailQuery orderDetailQuery) {
 
         try {
-
-            return HttpResponse.success(orderDetailDao.selectorderdetailsum(orderDetailQuery));
+            OrderDetailInfo orderDetailInfo=orderDetailDao.selectorderdetailsum(orderDetailQuery);
+            return HttpResponse.success(orderDetailInfo);
 
         } catch (Exception e) {
 
