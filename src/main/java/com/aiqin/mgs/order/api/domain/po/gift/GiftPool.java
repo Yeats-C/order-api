@@ -80,16 +80,33 @@ public class GiftPool extends PagesRequest {
     @JsonProperty("store_id")
     private String storeId;
 
+    /***订单类型*/
+    @ApiModelProperty(value = "订单类型 1直送 2配送 3货架，爱掌柜使用字段")
+    @JsonProperty("product_type")
+    private Integer productType;
+
 
     @ApiModelProperty("仓库权限IdList【爱掌柜门店权限使用，前端请忽视此字段】")
     @JsonProperty("warehouse_code_list")
     private List<String> warehouseCodeList;
 
     @ApiModelProperty(value = "交易倍数【爱掌柜使用】")
-    @JsonProperty("zero_removalCoefficient")
+    @JsonProperty("zero_removal_coefficient")
     private Integer zeroRemovalCoefficient;
 
     @ApiModelProperty(value = "库存数量【爱掌柜使用】")
     @JsonProperty("stock_num")
     private Integer stockNum;
+
+    @ApiModelProperty(value = "最大订货数【爱掌柜使用】")
+    @JsonProperty("max_order_num")
+    private Integer maxOrderNum;
+
+    @ApiModelProperty(value = "主图片路径【爱掌柜使用】")
+    @JsonProperty("product_picture_path")
+    private String productPicturePath;
+
+    @ApiModelProperty(value = "已加入兑换赠品购物车数量【爱掌柜使用】")
+    @JsonProperty("cart_num")
+    private Integer cartNum;
 }

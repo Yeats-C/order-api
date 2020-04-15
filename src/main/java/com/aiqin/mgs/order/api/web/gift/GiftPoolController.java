@@ -133,4 +133,21 @@ public class GiftPoolController {
         return response;
     }
 
+    @ApiOperation(value = "清空兑换赠品池购物车")
+    @PostMapping("/deleteAllCartLine")
+    public HttpResponse deleteAllCartLine(@RequestBody ErpCartQueryRequest erpCartQueryRequest) {
+        LOGGER.info("清空购物车：{}", erpCartQueryRequest);
+        HttpResponse response = HttpResponse.success();
+        try {
+            giftPoolService.deleteAllCartLine(erpCartQueryRequest);
+        } catch (BusinessException e) {
+            LOGGER.error("清空购物车失败：{}", e);
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            LOGGER.error("清空购物车失败：{}", e);
+            response = HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
+        }
+        return response;
+    }
+
 }
