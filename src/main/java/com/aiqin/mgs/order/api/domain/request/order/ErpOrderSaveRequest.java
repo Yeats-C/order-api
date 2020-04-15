@@ -41,4 +41,12 @@ public class ErpOrderSaveRequest {
     @JsonProperty("cart_group_temp_key")
     private String cartGroupTempKey;
 
+    @ApiModelProperty(value = "申请人")
+    @JsonProperty("applier")
+    private String applier;
+
+    @ApiModelProperty(value = "部门编码")
+    @JsonProperty("dept_code")
+    private Integer deptCode;
+
 }
