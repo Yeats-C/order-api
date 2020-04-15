@@ -8,6 +8,7 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.AuthToken;
+import com.aiqin.mgs.order.api.domain.po.gift.GiftCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftPool;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartAddRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartDeleteRequest;
@@ -20,7 +21,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 
@@ -93,7 +97,7 @@ public class GiftPoolController {
      */
     @PostMapping("/getGiftPoolListByStoreId")
     @ApiOperation(value = "爱掌柜通过门店id及筛选项查询赠品池列表")
-    public HttpResponse<PageResData<GiftPool>> getGiftPoolListByStoreId(@RequestBody GiftPool giftPool){
+    public HttpResponse<GiftCartQueryResponse> getGiftPoolListByStoreId(@RequestBody GiftPool giftPool){
         return giftPoolService.getGiftPoolListByStoreId(giftPool);
     }
 

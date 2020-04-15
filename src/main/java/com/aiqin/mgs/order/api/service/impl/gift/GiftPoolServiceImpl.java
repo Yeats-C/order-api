@@ -13,11 +13,9 @@ import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.po.cart.ErpOrderCartInfo;
+import com.aiqin.mgs.order.api.domain.po.gift.GiftCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftPool;
-import com.aiqin.mgs.order.api.domain.request.cart.ErpCartAddRequest;
-import com.aiqin.mgs.order.api.domain.request.cart.ErpCartAddSkuItem;
-import com.aiqin.mgs.order.api.domain.request.cart.ErpCartQueryRequest;
-import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.*;
 import com.aiqin.mgs.order.api.domain.request.product.StockBatchRespVO;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpCartAddItemResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpCartQueryResponse;
@@ -327,7 +325,7 @@ public class GiftPoolServiceImpl implements GiftPoolService {
     }
 
     @Override
-    public HttpResponse<PageResData<GiftPool>> getGiftPoolListByStoreId(GiftPool giftPool) {
+    public HttpResponse<GiftCartQueryResponse> getGiftPoolListByStoreId(GiftPool giftPool) {
         LOGGER.info("爱掌柜通过门店id及筛选项查询赠品池列表 getGiftPoolListByStoreId 参数 giftPool 为：{}", giftPool);
         if(null==giftPool.getStoreId()){
             throw new BusinessException("缺失门店id--store_id");
@@ -335,7 +333,7 @@ public class GiftPoolServiceImpl implements GiftPoolService {
             throw new BusinessException("缺失订单类型--product_type");
         }
         HttpResponse httpResponse=HttpResponse.success();
-        PageResData pageResData=new PageResData();
+        GiftCartQueryResponse giftCartQueryResponse=new GiftCartQueryResponse();
         //通过门店id查询门店省市信息
         StoreInfo store = erpOrderRequestService.getStoreInfoByStoreId(giftPool.getStoreId());
         //TODO 此处需通过门店省市id查询此门店有多少仓库的权限【接口暂时待供应链提供】
@@ -372,11 +370,15 @@ public class GiftPoolServiceImpl implements GiftPoolService {
             item.setCartNum(cartNum);
         }
         int totalNum=giftPoolDao.getTotalNumByWarehouseCodeList(giftPool);
-
-
-        pageResData.setDataList(giftPoolList);
-        pageResData.setTotalCount(totalNum);
-        httpResponse.setData(pageResData);
+        ErpCartNumQueryRequest erpCartNumQueryRequest=new ErpCartNumQueryRequest();
+        erpCartNumQueryRequest.setStoreId(giftPool.getStoreId());
+        erpCartNumQueryRequest.setProductType(giftPool.getProductType());
+        erpCartNumQueryRequest.setLineCheckStatus(1);
+        BigDecimal totalPrice= getCartProductTotalPrice(erpCartNumQueryRequest);
+        giftCartQueryResponse.setGiftPoolList(giftPoolList);
+        giftCartQueryResponse.setTotalNumber(totalNum);
+        giftCartQueryResponse.setAccountActualPrice(totalPrice);
+        httpResponse.setData(giftCartQueryResponse);
         return httpResponse;
     }
 
@@ -491,5 +493,35 @@ public class GiftPoolServiceImpl implements GiftPoolService {
                 this.deleteCartLine(item.getCartId());
             }
         }
+    }
+
+    private int getCartProductTotalNum(ErpCartNumQueryRequest erpCartNumQueryRequest) {
+        ErpOrderCartInfo query = new ErpOrderCartInfo();
+        query.setStoreId(erpCartNumQueryRequest.getStoreId());
+        query.setProductType(erpCartNumQueryRequest.getProductType());
+        query.setLineCheckStatus(erpCartNumQueryRequest.getLineCheckStatus());
+        List<ErpOrderCartInfo> select = erpOrderGiftPoolCartDao.select(query);
+        int cartProductTotalNum = 0;
+        if (select != null && select.size() > 0) {
+            for (ErpOrderCartInfo item :
+                    select) {
+                cartProductTotalNum += item.getAmount();
+            }
+        }
+        return cartProductTotalNum;
+    }
+    private BigDecimal getCartProductTotalPrice(ErpCartNumQueryRequest erpCartNumQueryRequest) {
+        ErpOrderCartInfo query = new ErpOrderCartInfo();
+        query.setStoreId(erpCartNumQueryRequest.getStoreId());
+        query.setProductType(erpCartNumQueryRequest.getProductType());
+        query.setLineCheckStatus(erpCartNumQueryRequest.getLineCheckStatus());
+        List<ErpOrderCartInfo> select = erpOrderGiftPoolCartDao.select(query);
+        BigDecimal cartProductTotalPrice = BigDecimal.ZERO;
+        if (select != null && select.size() > 0) {
+            for (ErpOrderCartInfo item : select) {
+                cartProductTotalPrice.add(item.getPrice().multiply(new BigDecimal(item.getPrice().toString()))) ;
+            }
+        }
+        return cartProductTotalPrice;
     }
 }
