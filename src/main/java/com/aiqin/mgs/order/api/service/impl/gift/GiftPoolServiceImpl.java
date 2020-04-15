@@ -524,4 +524,16 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         }
         return cartProductTotalPrice;
     }
+
+    @Override
+    public HttpResponse<Integer> getSkuNum(ShoppingCartRequest shoppingCartRequest) {
+        LOGGER.info("返回购物车中的sku商品的数量getSkuNum参数为：{}", shoppingCartRequest);
+        HttpResponse response = HttpResponse.success();
+        Integer skuNum=erpOrderGiftPoolCartDao.getSkuNum(shoppingCartRequest);
+        if(null==skuNum){
+            skuNum=0;
+        }
+        response.setData(skuNum);
+        return response;
+    }
 }

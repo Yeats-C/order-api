@@ -13,6 +13,7 @@ import com.aiqin.mgs.order.api.domain.po.gift.GiftPool;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartAddRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartDeleteRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartQueryRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpOrderCartAddResponse;
 import com.aiqin.mgs.order.api.service.gift.GiftPoolService;
@@ -21,12 +22,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/giftPool")
@@ -152,6 +151,17 @@ public class GiftPoolController {
             response = HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
         }
         return response;
+    }
+
+    /**
+     * 返回兑换赠品购物车中的sku商品的数量
+     * @param shoppingCartRequest
+     * @return
+     */
+    @GetMapping("/getSkuNum")
+    @ApiOperation(value = "返回兑换赠品购物车中的sku商品的数量，只传store_id，product_id，product_type")
+    public HttpResponse<Integer> getSkuNum(@Valid ShoppingCartRequest shoppingCartRequest) {
+        return giftPoolService.getSkuNum(shoppingCartRequest);
     }
 
 }
