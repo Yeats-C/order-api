@@ -39,7 +39,7 @@ public class StoreActivityServiceImpl implements StoreActivityService{
      */
     @Override
     public HttpResponse selectActivityOrderPackageSale(String packageProductId) {
-        Long packageSale = storeActivityDao.selectActivityOrderPackageSale(packageProductId);
+        Integer packageSale = storeActivityDao.selectActivityOrderPackageSale(packageProductId);
         return HttpResponse.success(packageSale);
     }
 

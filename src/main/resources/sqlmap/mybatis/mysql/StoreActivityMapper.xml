@@ -92,7 +92,9 @@
         group by oi.order_code
         ) a
     </select>
-
+    <select id="selectActivityOrderPackageSale" resultType="integer">
+        select sum(amount)  from order_consumer_detail where package_id=#{packageId}
+    </select>
     <select id="selectActivityOrderProduct" parameterType="com.aiqin.mgs.order.api.domain.activity.ActivityOrderInfo"
             resultType="com.aiqin.mgs.order.api.domain.OrderDetailInfo">
         select amount, actual_price as actualPrice

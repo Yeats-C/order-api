@@ -13,7 +13,7 @@ public interface StoreActivityDao {
 
     List<ActivityReportOrderResp> selectActivityReportOrder(@Param("storeId") String storeId, @Param("activityId") String activityId, @Param("beginTime") String beginTime, @Param("finishTime") String finishTime);
 
-    Long selectActivityOrderPackageSale(@Param("packageProductId") String packageProductId);
+    Integer selectActivityOrderPackageSale(@Param("packageId") String packageProductId);
 
     ActivityReportOrderResp selectActivityOrder(@Param("storeId") String storeId, @Param("activityId") String activityId);
 
