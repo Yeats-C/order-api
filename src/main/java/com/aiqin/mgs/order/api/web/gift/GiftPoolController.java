@@ -8,10 +8,12 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.AuthToken;
+import com.aiqin.mgs.order.api.domain.po.gift.GiftCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftPool;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartAddRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartDeleteRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartQueryRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpOrderCartAddResponse;
 import com.aiqin.mgs.order.api.service.gift.GiftPoolService;
@@ -23,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/giftPool")
@@ -93,7 +96,7 @@ public class GiftPoolController {
      */
     @PostMapping("/getGiftPoolListByStoreId")
     @ApiOperation(value = "爱掌柜通过门店id及筛选项查询赠品池列表")
-    public HttpResponse<PageResData<GiftPool>> getGiftPoolListByStoreId(@RequestBody GiftPool giftPool){
+    public HttpResponse<GiftCartQueryResponse> getGiftPoolListByStoreId(@RequestBody GiftPool giftPool){
         return giftPoolService.getGiftPoolListByStoreId(giftPool);
     }
 
@@ -148,6 +151,17 @@ public class GiftPoolController {
             response = HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
         }
         return response;
+    }
+
+    /**
+     * 返回兑换赠品购物车中的sku商品的数量
+     * @param shoppingCartRequest
+     * @return
+     */
+    @GetMapping("/getSkuNum")
+    @ApiOperation(value = "返回兑换赠品购物车中的sku商品的数量，只传store_id，product_id，product_type")
+    public HttpResponse<Integer> getSkuNum(@Valid ShoppingCartRequest shoppingCartRequest) {
+        return giftPoolService.getSkuNum(shoppingCartRequest);
     }
 
 }

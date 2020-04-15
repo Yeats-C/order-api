@@ -3,9 +3,11 @@ package com.aiqin.mgs.order.api.service.gift;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.AuthToken;
+import com.aiqin.mgs.order.api.domain.po.gift.GiftCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftPool;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartAddRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartQueryRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpOrderCartAddResponse;
 
@@ -46,7 +48,7 @@ public interface GiftPoolService {
      * @param giftPool
      * @return
      */
-    HttpResponse<PageResData<GiftPool>> getGiftPoolListByStoreId(GiftPool giftPool);
+    HttpResponse<GiftCartQueryResponse> getGiftPoolListByStoreId(GiftPool giftPool);
 
     /**
      * 爱掌柜查询赠品购物车列表
@@ -69,4 +71,11 @@ public interface GiftPoolService {
      * @param erpCartQueryRequest
      */
     void deleteAllCartLine(ErpCartQueryRequest erpCartQueryRequest);
+
+    /**
+     * 返回购物车中的sku商品的数量
+     * @param shoppingCartRequest
+     * @return
+     */
+    HttpResponse<Integer> getSkuNum(ShoppingCartRequest shoppingCartRequest);
 }
