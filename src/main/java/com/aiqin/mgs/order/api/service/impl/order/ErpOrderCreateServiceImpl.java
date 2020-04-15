@@ -164,7 +164,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         Boolean flag1=false;
         //首单赠送--加入了市值赠送金额判断
         if(ErpOrderTypeEnum.DIRECT_SEND.getCode().equals(erpOrderSaveRequest.getOrderType())&&ErpOrderCategoryEnum.ORDER_TYPE_4.getCode().equals(erpOrderSaveRequest.getOrderCategory())){
-            Map<ErpOrderFee,Boolean> res=firstGivePrice(orderCode,storeInfo,erpOrderItemList, erpOrderSaveRequest.getTopCouponCodeList());
+            Map<ErpOrderFee,Boolean> res=firstGivePrice(erpOrderSaveRequest.getApplier(),erpOrderSaveRequest.getDeptCode(),orderCode,storeInfo,erpOrderItemList, erpOrderSaveRequest.getTopCouponCodeList());
             for(Map.Entry<ErpOrderFee,Boolean> r:res.entrySet()){
                 orderFee = r.getKey();
                 flag1=r.getValue();
@@ -1441,7 +1441,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @param itemList
      * @param topCouponCodeList
      */
-    private Map<ErpOrderFee,Boolean> firstGivePrice(String orderCode,StoreInfo storeInfo,List<ErpOrderItem> itemList,List<String> topCouponCodeList) {
+    private Map<ErpOrderFee,Boolean> firstGivePrice(String applier,String deptCode,String orderCode,StoreInfo storeInfo,List<ErpOrderItem> itemList,List<String> topCouponCodeList) {
         Map<ErpOrderFee,Boolean> resMap=new HashMap<>();
         //true:赠送市值余额不够发起审批 false:不用审批
         Boolean flag=false;

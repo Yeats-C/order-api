@@ -47,6 +47,6 @@ public class ErpOrderSaveRequest {
 
     @ApiModelProperty(value = "部门编码")
     @JsonProperty("dept_code")
-    private Integer deptCode;
+    private String deptCode;
 
 }
