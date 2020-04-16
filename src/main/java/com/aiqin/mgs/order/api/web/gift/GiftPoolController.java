@@ -10,10 +10,7 @@ import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftPool;
-import com.aiqin.mgs.order.api.domain.request.cart.ErpCartAddRequest;
-import com.aiqin.mgs.order.api.domain.request.cart.ErpCartDeleteRequest;
-import com.aiqin.mgs.order.api.domain.request.cart.ErpCartQueryRequest;
-import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.*;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpOrderCartAddResponse;
 import com.aiqin.mgs.order.api.service.gift.GiftPoolService;
@@ -162,6 +159,24 @@ public class GiftPoolController {
     @ApiOperation(value = "返回兑换赠品购物车中的sku商品的数量，只传store_id，product_id，product_type")
     public HttpResponse<Integer> getSkuNum(@Valid ShoppingCartRequest shoppingCartRequest) {
         return giftPoolService.getSkuNum(shoppingCartRequest);
+    }
+
+    @PostMapping("/updateCartLineProduct")
+    @ApiOperation(value = "修改兑换赠品购物车行数据")
+    public HttpResponse updateCartLineProduct(@RequestBody ErpCartUpdateRequest erpCartUpdateRequest) {
+        LOGGER.info("修改购物车行数据：{}", erpCartUpdateRequest);
+        HttpResponse response = HttpResponse.success();
+        try {
+            AuthToken auth = AuthUtil.getCurrentAuth();
+            giftPoolService.updateCartLineProduct(erpCartUpdateRequest, auth);
+        } catch (BusinessException e) {
+            LOGGER.error("修改兑换赠品购物车行数据失败：{}", e);
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            LOGGER.error("修改兑换赠品购物车行数据失败：{}", e);
+            response = HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
+        }
+        return response;
     }
 
 }
