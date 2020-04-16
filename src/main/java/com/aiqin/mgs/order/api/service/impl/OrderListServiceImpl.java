@@ -12,6 +12,7 @@ import com.aiqin.mgs.order.api.component.ParamUnit;
 import com.aiqin.mgs.order.api.component.SequenceService;
 import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
+import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
@@ -42,6 +43,7 @@ import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,6 +91,8 @@ public class OrderListServiceImpl implements OrderListService {
     private ErpOrderItemService erpOrderItemService;
     @Resource
     private ErpOrderRequestService erpOrderRequestService;
+    @Autowired
+    private ReturnOrderInfoDao returnOrderInfoDao;
 
 
 
@@ -251,7 +255,7 @@ public class OrderListServiceImpl implements OrderListService {
 
     @Override
     public Boolean updateOrderStatusDeliver(DeliverVo deliverVo) {
-        log.info("修改订单为发货状态,入参deliverVo={}",deliverVo);
+        log.info("修改订单为发货状态,入参deliverVo={}",JSON.toJSONString(deliverVo));
         Boolean br = orderListDao.updateStatusByCode(deliverVo.getOrderCode(), 11);
         List<ActualDeliverVo> actualDeliverVos = deliverVo.getActualDeliverVos();
         for (ActualDeliverVo vo : actualDeliverVos) {
@@ -302,9 +306,19 @@ public class OrderListServiceImpl implements OrderListService {
                     }
                     //获取登陆人信息
                     AuthToken authToken = AuthUtil.getCurrentAuth();
-                    log.info("修改订单为发货状态---全部发货完成,进行分摊计算--更新明细表实收分摊价格入参 erpOrderItemList={}",erpOrderItemList);
+                    log.info("修改订单为发货状态---全部发货完成,进行分摊计算--更新明细表实收分摊价格入参 erpOrderItemList={}",JSON.toJSONString(erpOrderItemList));
                     //更新明细表实收分摊价格
                     erpOrderItemService.updateOrderItemList(erpOrderItemList,authToken);
+                    //如果子订单中有退货情况，现在更想预生成的退货单的 是否发起退货状态
+                    if(erpOrderItemList!=null&&erpOrderItemList.size()>0){
+                        //遍历出所有的子订单号
+                        List<String> orderCodes=erpOrderItemList.stream().map(ErpOrderItem::getOrderStoreCode).collect(Collectors.toList());
+                        log.info("修改订单为发货状态---全部发货完成,修改退货单是否发起退货状态，入参orderCodes={}",JSON.toJSONString(orderCodes));
+                        if(null!=orderCodes&&orderCodes.size()>0){
+                            returnOrderInfoDao.updateReallyReturn(orderCodes);
+                            log.info("修改订单为发货状态---全部发货完成,修改退货单是否发起退货状态，成功");
+                        }
+                    }
                 }
             }
 
