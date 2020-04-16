@@ -97,12 +97,21 @@
     </select>
     <select id="selectActivityOrderProduct" parameterType="com.aiqin.mgs.order.api.domain.activity.ActivityOrderInfo"
             resultType="com.aiqin.mgs.order.api.domain.OrderDetailInfo">
-        select amount, actual_price as actualPrice,sku_code as skuCode
+        select amount, actual_price as actualPrice,sku_code as skuCode,package_id as packageId
         from order_consumer_detail
         where activity_id=#{activityId}
         <if test="activityType != null and activityType != 4">
             <if test="skuCodes != null" >
                 and sku_code in
+                <foreach collection="skuCodes" separator="," open="(" close=")" item="item">
+                    #{item}
+                </foreach>
+            </if>
+        </if>
+        <if test="activityType != null and activityType == 4">
+            <if test="skuCodes != null" >
+                and
+                package_id in
                 <foreach collection="skuCodes" separator="," open="(" close=")" item="item">
                     #{item}
                 </foreach>
