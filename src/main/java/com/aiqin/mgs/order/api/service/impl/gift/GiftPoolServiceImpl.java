@@ -359,6 +359,9 @@ public class GiftPoolServiceImpl implements GiftPoolService {
             item.setZeroRemovalCoefficient(erpSkuDetail.getZeroRemovalCoefficient());
             item.setMaxOrderNum(erpSkuDetail.getMaxOrderNum());
             item.setProductPicturePath(erpSkuDetail.getProductPicturePath());
+            item.setColorName(erpSkuDetail.getColorName());
+            item.setModelNumber(erpSkuDetail.getModelNumber());
+            item.setSpec(erpSkuDetail.getSpec());
 
             ShoppingCartRequest shoppingCartRequest=new ShoppingCartRequest();
             shoppingCartRequest.setStoreId(giftPool.getStoreId());
