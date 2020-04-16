@@ -363,6 +363,7 @@ public class GiftPoolServiceImpl implements GiftPoolService {
             ShoppingCartRequest shoppingCartRequest=new ShoppingCartRequest();
             shoppingCartRequest.setStoreId(giftPool.getStoreId());
             shoppingCartRequest.setProductType(giftPool.getProductType());
+            shoppingCartRequest.setProductId(item.getSkuCode());
             Integer cartNum=erpOrderGiftPoolCartDao.getSkuNum(shoppingCartRequest);
             if(null==cartNum){
                 cartNum=0;
