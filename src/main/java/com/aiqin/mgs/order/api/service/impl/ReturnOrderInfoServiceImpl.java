@@ -113,7 +113,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     @Override
     @Transactional
     public HttpResponse save(ReturnOrderReqVo reqVo) {
-        log.info("发起退货--入参，reqVo={}",reqVo);
+        log.info("发起退货--入参"+JSON.toJSONString(reqVo));
         //查询订单是否存在未处理售后单
         List<ReturnOrderInfo> returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndStatus(reqVo.getOrderStoreCode(), 1);
         Assert.isTrue(CollectionUtils.isEmpty(returnOrderInfo), "该订单还有未审核售后单，请稍后提交");
