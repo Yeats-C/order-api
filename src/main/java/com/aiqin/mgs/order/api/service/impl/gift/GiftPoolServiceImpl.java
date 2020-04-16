@@ -316,7 +316,7 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         }
     }
 
-    private void updateCartLine(ErpOrderCartInfo erpOrderCartInfo, AuthToken authToken) {
+    private void    updateCartLine(ErpOrderCartInfo erpOrderCartInfo, AuthToken authToken) {
         erpOrderCartInfo.setCreateById(authToken.getPersonId());
         erpOrderCartInfo.setCreateByName(authToken.getPersonName());
         erpOrderCartInfo.setUpdateById(authToken.getPersonId());
@@ -359,10 +359,14 @@ public class GiftPoolServiceImpl implements GiftPoolService {
             item.setZeroRemovalCoefficient(erpSkuDetail.getZeroRemovalCoefficient());
             item.setMaxOrderNum(erpSkuDetail.getMaxOrderNum());
             item.setProductPicturePath(erpSkuDetail.getProductPicturePath());
+            item.setColorName(erpSkuDetail.getColorName());
+            item.setModelNumber(erpSkuDetail.getModelNumber());
+            item.setSpec(erpSkuDetail.getSpec());
 
             ShoppingCartRequest shoppingCartRequest=new ShoppingCartRequest();
             shoppingCartRequest.setStoreId(giftPool.getStoreId());
             shoppingCartRequest.setProductType(giftPool.getProductType());
+            shoppingCartRequest.setProductId(item.getSkuCode());
             Integer cartNum=erpOrderGiftPoolCartDao.getSkuNum(shoppingCartRequest);
             if(null==cartNum){
                 cartNum=0;
@@ -535,5 +539,43 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         }
         response.setData(skuNum);
         return response;
+    }
+
+    @Override
+    public void updateCartLineProduct(ErpCartUpdateRequest erpCartUpdateRequest, AuthToken auth) {
+        if (erpCartUpdateRequest == null) {
+            throw new BusinessException("空参数");
+        }
+        if (erpCartUpdateRequest.getCartId() == null) {
+            throw new BusinessException("缺失行唯一标识");
+        }
+        if (erpCartUpdateRequest.getAmount() == null) {
+            throw new BusinessException("缺失数量");
+        } else {
+            if (erpCartUpdateRequest.getAmount() < 0) {
+                throw new BusinessException("商品数量不能小于0");
+            }
+        }
+        if (erpCartUpdateRequest.getLineCheckStatus() == null) {
+            throw new BusinessException("缺失选中状态");
+        } else {
+            if (!YesOrNoEnum.exist(erpCartUpdateRequest.getLineCheckStatus())) {
+                throw new BusinessException("无效的选中状态");
+            }
+        }
+
+        ErpOrderCartInfo cartLine = this.getCartLineByCartId(erpCartUpdateRequest.getCartId());
+        if (cartLine == null) {
+            throw new BusinessException("无效的行唯一标识");
+        }
+        if (!cartLine.getAmount().equals(erpCartUpdateRequest.getAmount())) {
+            //如果修改了数量，判断数量范围规则
+            this.validateSkuQuantity(erpCartUpdateRequest.getAmount(), cartLine.getMaxOrderNum(), cartLine.getZeroRemovalCoefficient(), cartLine.getSkuName());
+        }
+
+        cartLine.setAmount(erpCartUpdateRequest.getAmount());
+        cartLine.setLineCheckStatus(erpCartUpdateRequest.getLineCheckStatus());
+        cartLine.setActivityId(erpCartUpdateRequest.getActivityId());
+        this.updateCartLine(cartLine, auth);
     }
 }

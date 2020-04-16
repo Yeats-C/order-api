@@ -7,6 +7,7 @@ import com.aiqin.mgs.order.api.domain.po.gift.GiftCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftPool;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartAddRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartQueryRequest;
+import com.aiqin.mgs.order.api.domain.request.cart.ErpCartUpdateRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpOrderCartAddResponse;
@@ -78,4 +79,12 @@ public interface GiftPoolService {
      * @return
      */
     HttpResponse<Integer> getSkuNum(ShoppingCartRequest shoppingCartRequest);
+
+    /**
+     * 更新一行
+     *
+     * @param erpCartUpdateRequest
+     * @param auth
+     */
+    void updateCartLineProduct(ErpCartUpdateRequest erpCartUpdateRequest, AuthToken auth);
 }
