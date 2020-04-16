@@ -109,4 +109,16 @@ public class GiftPool extends PagesRequest {
     @ApiModelProperty(value = "已加入兑换赠品购物车数量【爱掌柜使用】")
     @JsonProperty("cart_num")
     private Integer cartNum;
+
+    @ApiModelProperty(value = "颜色名称【爱掌柜使用】")
+    @JsonProperty("color_name")
+    private String colorName;
+
+    @ApiModelProperty(value = "型号【爱掌柜使用】")
+    @JsonProperty("model_number")
+    private String modelNumber;
+
+    @ApiModelProperty(value = "规格【爱掌柜使用】")
+    @JsonProperty("spec")
+    private String spec;
 }
