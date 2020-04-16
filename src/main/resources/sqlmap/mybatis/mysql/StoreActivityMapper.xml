@@ -97,8 +97,8 @@
     </select>
     <select id="selectActivityOrderProduct" parameterType="com.aiqin.mgs.order.api.domain.activity.ActivityOrderInfo"
             resultType="com.aiqin.mgs.order.api.domain.OrderDetailInfo">
-        select amount, actual_price as actualPrice
-        from order_detail
+        select amount, actual_price as actualPrice,sku_code as skuCode
+        from order_consumer_detail
         where activity_id=#{activityId}
         <if test="activityType != null and activityType != 4">
             <if test="skuCodes != null" >
