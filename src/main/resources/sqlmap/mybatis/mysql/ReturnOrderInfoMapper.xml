@@ -110,7 +110,8 @@
     discount_amount_infos, store_id, store_code, store_name, nature_code, nature_name,
     review_remark, review_operator, refund_status, process_type, remark, use_status,
     create_by_id, create_by_name, update_by_id, update_by_name, create_time, update_time,
-    source_type, order_success, return_money_type, order_category, review_operator_id, review_time
+    source_type, order_success, return_money_type, order_category, review_operator_id, review_time,
+    return_good_amount,actual_return_good_amount,really_return
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
@@ -387,6 +388,9 @@
       <if test="reviewTime != null" >
         review_time,
       </if>
+      <if test="reallyReturn != null" >
+        really_return,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -649,6 +653,9 @@
       </if>
       <if test="reviewTime != null" >
         #{reviewTime},
+      </if>
+      <if test="reallyReturn != null" >
+        #{reallyReturn},
       </if>
     </trim>
   </insert>
@@ -913,6 +920,9 @@
       <if test="reviewTime != null" >
         review_time=#{reviewTime},
       </if>
+      <if test="reallyReturn != null" >
+        really_return=#{reallyReturn},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -1003,7 +1013,7 @@
     <include refid="Base_Column_List" />
     from return_order_info
     where
-    1=1
+    really_return=1
     <if test="returnOrderStatus!=null">
      and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
     </if>
@@ -1067,8 +1077,8 @@
     count(1)
     from return_order_info
     where
-    1=1
-      <if test="returnOrderStatus!=null">
+    really_return=1
+    <if test="returnOrderStatus!=null">
           and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
       </if>
       <if test="returnOrderCode!=null and returnOrderCode!=''">
@@ -1124,9 +1134,9 @@
     <include refid="Base_Column_List" />
     from return_order_info
     where
-    1=1
+    really_return=1
     <if test="id!=null and id!=''">
-    id = #{id,jdbcType=BIGINT}
+      and id = #{id,jdbcType=BIGINT}
     </if>
     <if test="returnOrderStatus!=null and returnOrderStatus!=''">
       and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
@@ -1166,6 +1176,7 @@
     <include refid="Base_Column_List" />
     from return_order_info
     <where>
+        really_return=1
         <if test="returnOrderStatus!=null">
           and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
         </if>
@@ -1212,6 +1223,7 @@
   <select id="selectByParames" parameterType="com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo3" resultMap="BaseResultMap">
     select * from return_order_info
     <where>
+      really_return=1
       <if test="returnOrderStatus!=null">
         and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
       </if>
