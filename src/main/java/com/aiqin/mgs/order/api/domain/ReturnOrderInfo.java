@@ -361,4 +361,13 @@ public class ReturnOrderInfo {
 
     @ApiModelProperty(value = "同步是否成功（创建退供单） 0 不生成采购单 1 待生成采购单 2采购单生成成功")
     private Integer orderSuccess;
+
+    @ApiModelProperty(value = "是否真的发起退货 0:预生成退货单 1:原始订单全部发货完成生成退货单")
+    private Integer reallyReturn;
+
+    @ApiModelProperty(value = "退货金额")
+    private BigDecimal returnGoodAmount;
+
+    @ApiModelProperty(value = "实际退货金额")
+    private BigDecimal actualReturnGoodAmount;
 }

@@ -92,6 +92,7 @@
     <result column="order_success" property="orderSuccess" jdbcType="BIT" />
     <result column="return_good_amount" property="returnGoodAmount" jdbcType="DECIMAL" />
     <result column="actual_return_good_amount" property="actualReturnGoodAmount" jdbcType="DECIMAL" />
+    <result column="really_return" property="reallyReturn" jdbcType="BIT" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, return_order_id, return_order_code, order_store_code, company_code, company_name,
