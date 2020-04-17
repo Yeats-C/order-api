@@ -9,8 +9,11 @@ import com.aiqin.mgs.order.api.domain.request.cart.ErpCartAddRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartQueryRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartUpdateRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
+import com.aiqin.mgs.order.api.domain.request.gift.GiftCartUpdateRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpOrderCartAddResponse;
+
+import java.util.List;
 
 public interface GiftPoolService {
 
@@ -87,4 +90,11 @@ public interface GiftPoolService {
      * @param auth
      */
     void updateCartLineProduct(ErpCartUpdateRequest erpCartUpdateRequest, AuthToken auth);
+
+    /**
+     * 赠品购物车更新多行
+     * @param giftCartUpdateRequestList
+     * @param auth
+     */
+    void updateCartMultilineProducts(List<GiftCartUpdateRequest> giftCartUpdateRequestList, AuthToken auth);
 }
