@@ -890,6 +890,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         }
         //A品券计算均摊金额
 //        couponSharePrice(detailList, topCouponCodeList);
+        //A品券总金额
+        BigDecimal totalCouponSharePrice = getTotalCouponSharePrice(topCouponCodeList);
 
         Map<Long, CouponShareRequest> map = new HashMap<>(16);
         for (CouponShareRequest item :
@@ -921,21 +923,54 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
             totalMoneyTotal = totalMoneyTotal.add(item.getTotalProductAmount());
             activityMoneyTotal = activityMoneyTotal.add(item.getActivityDiscountAmount());
-            topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponDiscountAmount());
+//            topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponDiscountAmount());
         }
 
 
         orderFee.setTotalMoney(totalMoneyTotal);
         orderFee.setActivityMoney(activityMoneyTotal);
         orderFee.setSuitCouponMoney(suitCouponMoneyTotal);
-        orderFee.setTopCouponMoney(topCouponMoneyTotal);
-        orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal));
+//        orderFee.setTopCouponMoney(topCouponMoneyTotal);
+        orderFee.setTopCouponMoney(totalCouponSharePrice);
+//        orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal));
+        orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(totalCouponSharePrice));
         if(null!=topCouponCodeList&&topCouponCodeList.size()>0){
             orderFee.setTopCouponCodes(String.join(",", topCouponCodeList));
         }else {
             orderFee.setTopCouponCodes("");
         }
         return orderFee;
+    }
+
+    /**
+     * A品券优惠总金额
+     *
+     * @param couponCodeList
+     */
+    private BigDecimal getTotalCouponSharePrice(List<String> couponCodeList) {
+        log.info("A品券计算均摊金额入参,couponCodeList={}", couponCodeList);
+        //A品券总金额
+        BigDecimal topCouponMoney = BigDecimal.ZERO;
+        List<String> topCouponCodeUniqueCheckList = new ArrayList<>();
+        if (couponCodeList != null && couponCodeList.size() > 0) {
+            for (String couponCode : couponCodeList) {
+                if (topCouponCodeUniqueCheckList.contains(couponCode)) {
+                    throw new BusinessException("A品券重复提交");
+                } else {
+                    topCouponCodeUniqueCheckList.add(couponCode);
+                }
+                CouponDetail couponDetail = erpOrderRequestService.getCouponDetailByCode(couponCode);
+                if (couponDetail.getActiveCondition() == 1) {
+                    throw new BusinessException("优惠券已经被使用");
+                }
+                if (couponDetail.getActiveCondition() == 2) {
+                    throw new BusinessException("优惠券已经过期");
+                }
+                topCouponMoney = topCouponMoney.add(couponDetail.getNominalValue());
+            }
+        }
+        log.info("A品券计算均摊金额--A品券总金额,topCouponMoney={}", topCouponMoney);
+        return topCouponMoney;
     }
 
     /**
