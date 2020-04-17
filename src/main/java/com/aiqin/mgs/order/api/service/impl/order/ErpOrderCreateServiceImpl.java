@@ -1476,7 +1476,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @param itemList
      * @param topCouponCodeList
      */
-    private Map<ErpOrderFee,Boolean> firstGivePrice(String applier,String deptCode,String orderCode,StoreInfo storeInfo,List<ErpOrderItem> itemList,List<String> topCouponCodeList) {
+    private Map<ErpOrderFee,Boolean> firstGivePrice(String applier,String positionCode,String orderCode,StoreInfo storeInfo,List<ErpOrderItem> itemList,List<String> topCouponCodeList) {
         Map<ErpOrderFee,Boolean> resMap=new HashMap<>();
         //true:赠送市值余额不够发起审批 false:不用审批
         Boolean flag=false;
@@ -1503,7 +1503,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             itemRequest.setProductGift(item.getProductType());
             detailList.add(itemRequest);
         }
-        //A品券计算均摊金额
+        //A品券计算均摊金额 没有A品卷跳过计算
 //        couponSharePrice(detailList, topCouponCodeList);
 
         Map<Long, CouponShareRequest> map = new HashMap<>(16);
@@ -1555,7 +1555,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             //赠送费用余额--用于修改
             freeCostBalance1=0.0;
             //发起审批
-            HttpResponse httpResponse = submitActBaseProcess(approvalCode, storeInfo.getStoreName(), "", record);
+            HttpResponse httpResponse = submitActBaseProcess(approvalCode, applier, positionCode, record);
             if(!"0".equals(httpResponse.getCode())){
                 throw new BusinessException("订单金额超过市值赠送总金额审批申请失败");
             }
