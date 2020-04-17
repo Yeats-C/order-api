@@ -106,9 +106,6 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         if (erpCartAddRequest.getProducts() == null || erpCartAddRequest.getProducts().size() == 0) {
             throw new BusinessException("商品不能为空");
         }
-        if (erpCartAddRequest.getSpuCode() == null) {
-            throw new BusinessException("productId为空");
-        }
         if (erpCartAddRequest.getStoreId() == null) {
             throw new BusinessException("门店id为空");
         }
