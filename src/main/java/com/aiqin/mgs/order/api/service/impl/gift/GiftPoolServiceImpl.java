@@ -16,6 +16,7 @@ import com.aiqin.mgs.order.api.domain.po.cart.ErpOrderCartInfo;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftPool;
 import com.aiqin.mgs.order.api.domain.request.cart.*;
+import com.aiqin.mgs.order.api.domain.request.gift.GiftCartUpdateRequest;
 import com.aiqin.mgs.order.api.domain.request.product.StockBatchRespVO;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpCartAddItemResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpCartQueryResponse;
@@ -574,5 +575,27 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         cartLine.setLineCheckStatus(erpCartUpdateRequest.getLineCheckStatus());
         cartLine.setActivityId(erpCartUpdateRequest.getActivityId());
         this.updateCartLine(cartLine, auth);
+    }
+
+    @Override
+    public void updateCartMultilineProducts(List<GiftCartUpdateRequest> giftCartUpdateRequestList, AuthToken auth) {
+        for (GiftCartUpdateRequest request:giftCartUpdateRequestList){
+            if(null==request.getCartId()){
+                ErpCartAddRequest erpCartAddRequest=new ErpCartAddRequest();
+                erpCartAddRequest.setCreateSource("1");
+                erpCartAddRequest.setProductType(request.getProductType());
+                erpCartAddRequest.setStoreId(request.getStoreId());
+                erpCartAddRequest.setProducts(request.getProducts());
+                addProduct(erpCartAddRequest,auth);
+            }else{
+                ErpCartUpdateRequest erpCartUpdateRequest=new ErpCartUpdateRequest();
+                erpCartUpdateRequest.setActivityId(request.getActivityId());
+                erpCartUpdateRequest.setAmount(request.getAmount());
+                erpCartUpdateRequest.setCartId(request.getCartId());
+                erpCartUpdateRequest.setLineCheckStatus(request.getLineCheckStatus());
+                updateCartLineProduct(erpCartUpdateRequest,auth);
+            }
+        }
+
     }
 }

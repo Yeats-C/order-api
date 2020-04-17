@@ -11,6 +11,7 @@ import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftPool;
 import com.aiqin.mgs.order.api.domain.request.cart.*;
+import com.aiqin.mgs.order.api.domain.request.gift.GiftCartUpdateRequest;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpOrderCartAddResponse;
 import com.aiqin.mgs.order.api.service.gift.GiftPoolService;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/giftPool")
@@ -169,6 +171,25 @@ public class GiftPoolController {
         try {
             AuthToken auth = AuthUtil.getCurrentAuth();
             giftPoolService.updateCartLineProduct(erpCartUpdateRequest, auth);
+        } catch (BusinessException e) {
+            LOGGER.error("修改兑换赠品购物车行数据失败：{}", e);
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            LOGGER.error("修改兑换赠品购物车行数据失败：{}", e);
+            response = HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
+        }
+        return response;
+    }
+
+
+    @PostMapping("/updateCartMultilineProducts")
+    @ApiOperation(value = "修改兑换赠品购物车多行数据")
+        public HttpResponse updateCartMultilineProducts(@RequestBody List<GiftCartUpdateRequest> giftCartUpdateRequestList) {
+        LOGGER.info("修改购物车行数据：{}", giftCartUpdateRequestList);
+        HttpResponse response = HttpResponse.success();
+        try {
+            AuthToken auth = AuthUtil.getCurrentAuth();
+            giftPoolService.updateCartMultilineProducts(giftCartUpdateRequestList, auth);
         } catch (BusinessException e) {
             LOGGER.error("修改兑换赠品购物车行数据失败：{}", e);
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
