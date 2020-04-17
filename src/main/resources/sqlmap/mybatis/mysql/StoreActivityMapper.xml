@@ -41,7 +41,7 @@
                  od.activity_id as activity_id, od.actual_price as actual_price, od.amount as amount
                 from order_consumer_info oi
                 left join order_consumer_detail od on oi.order_id = od.order_id
-               where oi.distributor_id=#{storeId}
+               where oi.distributor_id=#{storeId} and oi.order_status in (1,2,3,5,6,7)
             ) AS t1
             where t1.activity_id = #{activityId}
             group by t1.member_status order by t1.member_status desc
