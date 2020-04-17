@@ -53,7 +53,7 @@
         from order_consumer_detail od
         left join order_consumer_info oi on od.order_id = oi.order_id
         where oi.distributor_id=#{storeId}
-        and od.activity_id=#{activityId}
+        and od.activity_id=#{activityId} and oi.order_status  NOT IN ('0','4')
     </select>
 
     <select id="selectActivitySkuCode" resultType="String">
@@ -97,12 +97,12 @@
     </select>
     <select id="selectActivityOrderProduct" parameterType="com.aiqin.mgs.order.api.domain.activity.ActivityOrderInfo"
             resultType="com.aiqin.mgs.order.api.domain.OrderDetailInfo">
-        select amount, actual_price as actualPrice,sku_code as skuCode,package_id as packageId
-        from order_consumer_detail
-        where activity_id=#{activityId}
+        select  od.amount as amount , od.actual_price as actualPrice,od.sku_code as skuCode,od.package_id as packageId
+        from order_consumer_detail od,order_consumer_info oi
+        where  oi.order_id=od.order_id and activity_id=#{activityId}
         <if test="activityType != null and activityType != 4">
             <if test="skuCodes != null" >
-                and sku_code in
+                and od.sku_code in
                 <foreach collection="skuCodes" separator="," open="(" close=")" item="item">
                     #{item}
                 </foreach>
@@ -111,14 +111,13 @@
         <if test="activityType != null and activityType == 4">
             <if test="skuCodes != null" >
                 and
-                package_id in
+                od.package_id in
                 <foreach collection="skuCodes" separator="," open="(" close=")" item="item">
                     #{item}
                 </foreach>
             </if>
         </if>
-        <if test="activityType != null and activityType == 4">
+        and oi.order_status  NOT IN ('0','4')
 
-        </if>
     </select>
 </mapper>
