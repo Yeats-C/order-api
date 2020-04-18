@@ -23,7 +23,7 @@
 <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
 <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
 <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
-
+    <result column="member_price" jdbcType="INTEGER" property="memberPrice"/>
 <result column="retail_price" jdbcType="INTEGER" property="retailPrice"/>
 <result column="actual_price" jdbcType="INTEGER" property="actualPrice"/>
 <result column="spec" jdbcType="VARCHAR" property="spec"/>
