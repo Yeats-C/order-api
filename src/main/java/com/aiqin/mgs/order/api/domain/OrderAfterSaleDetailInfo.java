@@ -118,7 +118,11 @@ public class OrderAfterSaleDetailInfo extends PagesRequest {
 	@ApiModelProperty(value="非入库字段-零售价格")
 	@JsonProperty("retail_price")
     private Integer retailPrice;
-	
+
+	@JsonProperty("member_price")
+	@ApiModelProperty("会员价")
+	private Long memberPrice;
+
     @ApiModelProperty("非入库字段-实际")
     @JsonProperty("actual_price")
     private Integer actualPrice;

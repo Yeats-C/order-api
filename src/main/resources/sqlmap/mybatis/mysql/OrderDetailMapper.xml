@@ -39,6 +39,7 @@
         <result column="receive_type" jdbcType="VARCHAR" property="receiveType"/>
         <result column="package_id" jdbcType="VARCHAR" property="packageId"/>
         <result column="total_price" jdbcType="INTEGER" property="totalPrice"/>
+        <result column="member_price" jdbcType="VARCHAR" property="memberPrice"/>
     </resultMap>
 
     <resultMap id="ProductsMapping" type="com.aiqin.mgs.order.api.domain.response.OrderProductsResponse">
@@ -124,6 +125,9 @@
         <if test="skuName!=null">
             sku_name,
         </if>
+        <if test="memberPrice!=null">
+            member_price,
+        </if>
         create_time,update_time,create_by,update_by,package_id,total_price)
         values
         (#{orderId},#{orderCode},#{orderDetailId},#{productId},#{productCode},#{productName},#{listName},#{skuCode},#{spuCode},#{barCode},#{spec},#{unit},#{retailPrice},#{actualPrice},#{amount},#{productStatus},#{logo},#{typeId},#{typeName},
@@ -145,6 +149,9 @@
         </if>
         <if test="skuName!=null">
             #{skuName},
+        </if>
+        <if test="memberPrice!=null">
+            #{memberPrice},
         </if>
         CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,#{createBy},#{updateBy},#{packageId},#{totalPrice})
     </insert>
