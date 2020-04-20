@@ -579,6 +579,10 @@ public class GiftPoolServiceImpl implements GiftPoolService {
 
     @Override
     public void updateCartMultilineProducts(List<GiftCartUpdateRequest> giftCartUpdateRequestList, AuthToken auth) {
+        LOGGER.info("修改兑换赠品购物车多行数据 updateCartMultilineProducts 参数为：{}", giftCartUpdateRequestList);
+        Map map=new HashMap();
+        String storeId=null;
+        Integer productType=0;
         for (GiftCartUpdateRequest request:giftCartUpdateRequestList){
             if(null==request.getCartId()){
                 ErpCartAddRequest erpCartAddRequest=new ErpCartAddRequest();
@@ -594,8 +598,27 @@ public class GiftPoolServiceImpl implements GiftPoolService {
                 erpCartUpdateRequest.setCartId(request.getCartId());
                 erpCartUpdateRequest.setLineCheckStatus(request.getLineCheckStatus());
                 updateCartLineProduct(erpCartUpdateRequest,auth);
+
+                map.put(request.getCartId(),request.getCartId());
+                storeId=request.getStoreId();
+                productType=request.getProductType();
             }
         }
+
+        if(null!=storeId){
+            ErpOrderCartInfo query = new ErpOrderCartInfo();
+            query.setStoreId(storeId);
+            query.setProductType(productType);
+            query.setLineCheckStatus(YesOrNoEnum.YES.getCode());
+            List<ErpOrderCartInfo> cartLineList = erpOrderGiftPoolCartDao.select(query);
+
+            for(ErpOrderCartInfo erpOrderCartInfo:cartLineList){
+                if(!map.containsKey(erpOrderCartInfo.getCartId())){
+                    erpOrderGiftPoolCartDao.deleteByPrimaryKey(erpOrderCartInfo.getId());
+                }
+            }
+        }
+
 
     }
 }

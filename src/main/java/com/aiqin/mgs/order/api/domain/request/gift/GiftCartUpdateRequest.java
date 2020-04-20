@@ -29,11 +29,11 @@ public class GiftCartUpdateRequest {
     private Integer lineCheckStatus;
 
 
-    @ApiModelProperty(value = "门店Id【新增必填】")
+    @ApiModelProperty(value = "门店Id【必填】")
     @JsonProperty("store_id")
     private String storeId;
 
-    @ApiModelProperty(value = "订单类型 1直送 2配送【新增必填】")
+    @ApiModelProperty(value = "订单类型 1直送 2配送【必填】")
     @JsonProperty("product_type")
     private Integer productType;
 
