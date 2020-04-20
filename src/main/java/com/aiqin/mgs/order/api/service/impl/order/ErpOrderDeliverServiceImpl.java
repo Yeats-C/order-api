@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.service.impl.order;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
+import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
@@ -37,6 +38,8 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
     private ErpOrderItemService erpOrderItemService;
     @Resource
     private ErpOrderLogisticsService erpOrderLogisticsService;
+    @Resource
+    private ErpOrderInfoDao erpOrderInfoDao;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -144,7 +147,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             }
             erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
             //todo 更新主单明细赠品的实际发货数量
-
+            updateGiftGoodsAutCount(order.getMainOrderCode(),itemList,auth);
 
         } else {
             throw new BusinessException("只有等待拣货状态且没有出货的订单才能执行该操作");
@@ -331,6 +334,13 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_10.getCode());
             erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
             //todo 判断是否全部发货，然后做均摊
+            //查询子单是否全部发货完成
+            Boolean aBoolean = checkSendOk(order.getMainOrderCode());
+            log.info("判断子单是否全部发货完成,返回结果 aBoolean={}",aBoolean);
+            if(aBoolean){//全部发货完成
+
+            }
+
             boolean flag=false;
             //这两个都走线下支付物流费用
             if(ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(order.getOrderTypeCode())){//配送
@@ -409,4 +419,31 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
         }
     }
+
+    /**
+     * 判断子单是否全部发货完成
+     * @param mainOrderCode
+     * @return true:全部发货完成 false:未全部发货
+     */
+    private Boolean checkSendOk(String mainOrderCode){
+        log.info("判断子单是否全部发货完成,入参mainOrderCode={}",mainOrderCode);
+        ErpOrderInfo po=new ErpOrderInfo();
+        po.setMainOrderCode(mainOrderCode);
+        List<ErpOrderInfo> list=erpOrderInfoDao.select(po);
+        if(list!=null&&list.size()>0){
+            log.info("判断子单是否全部发货完成,原始订单集合为 list={}",JSON.toJSONString(list));
+            for(ErpOrderInfo eoi:list){
+                Integer orderStatus = eoi.getOrderStatus();
+                //判断订单状态是否是 11:发货完成或者 97:缺货终止
+                if(orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_11.getCode())||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_97.getCode())){
+                }else{
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+
 }
