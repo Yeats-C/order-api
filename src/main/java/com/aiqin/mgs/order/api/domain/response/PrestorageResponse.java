@@ -65,4 +65,8 @@ public class PrestorageResponse {
     @ApiModelProperty(value="下单时间",example = "2001-01-01 01:01:01")
     @JsonProperty("create_time")
     private Date createTime;
+
+    @ApiModelProperty("订单code")
+    @JsonProperty("order_code")
+    private String orderCode;
 }
