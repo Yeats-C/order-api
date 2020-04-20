@@ -60,8 +60,7 @@
         <result column="distributor_code" jdbcType="VARCHAR" property="distributorCode"/>
         <result column="distributor_id" jdbcType="VARCHAR" property="distributorId"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
-        <result column="order_code" javaType="VARCHAR"  property="orderCode"/>
-
+        <result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
     </resultMap>
     <resultMap id="LastBuyMapping" type="com.aiqin.mgs.order.api.domain.response.LastBuyResponse">
         <result column="new_consume_time" jdbcType="TIMESTAMP" property="newConsumeTime"/>
