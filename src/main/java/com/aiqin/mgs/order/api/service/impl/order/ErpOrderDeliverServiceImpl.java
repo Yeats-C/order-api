@@ -369,6 +369,24 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
         }
     }
 
+    /**
+     * 子单全部发货完后进行均摊
+     * @param mainOrderCode
+     */
+    private void shareEqually(String mainOrderCode){
+        log.info("子单全部发货完成进行均摊--入参 mainOrderCode={}",mainOrderCode);
+        ErpOrderInfo orderAndItemByOrderCode = erpOrderQueryService.getOrderAndItemByOrderCode(mainOrderCode);
+        log.info("子单全部发货完成进行均摊--查询原始主订单及详情返回结果 orderAndItemByOrderCode={}",JSON.toJSONString(orderAndItemByOrderCode));
+        //活动均摊
+
+        //A品券均摊
+
+        //赠品均摊
+
+
+
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void distributeLogisticsFee(String logisticsCode) {
