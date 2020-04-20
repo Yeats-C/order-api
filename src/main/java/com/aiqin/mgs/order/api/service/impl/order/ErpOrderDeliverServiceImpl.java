@@ -11,6 +11,8 @@ import com.aiqin.mgs.order.api.domain.request.order.*;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
+import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
 
@@ -128,7 +131,6 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 boxVolumeTotal = boxVolumeTotal.add((item.getBoxVolume() == null ? BigDecimal.ZERO : item.getBoxVolume()).multiply(new BigDecimal(actualProductCount)));
 
             }
-
             erpOrderItemService.updateOrderItemList(itemList, auth);
 
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_9.getCode());
@@ -141,9 +143,54 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 order.setScourSheetStatus(ErpOrderScourSheetStatusEnum.WAIT.getCode());
             }
             erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
+            //todo 更新主单明细赠品的实际发货数量
+
 
         } else {
             throw new BusinessException("只有等待拣货状态且没有出货的订单才能执行该操作");
+        }
+
+
+    }
+
+    /**
+     * 根据主订单号修改赠品实发数量
+     * @param mainOrderCode
+     * @param itemList
+     */
+    private void updateGiftGoodsAutCount(String mainOrderCode,List<ErpOrderItem> itemList ,AuthToken auth){
+        log.info("根据主订单号修改赠品实发数量,mainOrderCode={}",mainOrderCode);
+        log.info("根据主订单号修改赠品实发数量,itemList={}", JSON.toJSONString(itemList));
+        log.info("根据主订单号修改赠品实发数量,auth={}",auth);
+        List<ErpOrderItem> items=new ArrayList<>();
+        Map<String,Long> map=new HashMap<>();
+        for(ErpOrderItem eoi:itemList){
+            //挑选出赠品明细行
+            if(null!=eoi.getProductType()&&!eoi.getProductType().equals(ErpProductGiftEnum.PRODUCT.getCode())){
+                map.put(eoi.getSkuCode(),eoi.getActualProductCount());
+            }
+        }
+        log.info("根据主订单号修改赠品实发数量,赠品 map={}",map);
+        //判断是否有赠品，如果有则进行后面的数量修改
+        if(null!=map&&map.size()>0){
+            //根据主订单编码，查询主订单明细，进行赠品数量修改
+            List<ErpOrderItem> erpOrderItemList = erpOrderItemService.selectOrderItemListByOrderCode(mainOrderCode);
+            for(ErpOrderItem erpOrderItem:erpOrderItemList){
+                //挑选出赠品明细行
+                if(null!=erpOrderItem.getProductType()&&!erpOrderItem.getProductType().equals(ErpProductGiftEnum.PRODUCT.getCode())&&map.containsKey(erpOrderItem.getSkuCode())){
+                    //根据sku拿到赠品实发数量
+                    Long count=map.get(erpOrderItem.getSkuCode());
+                    if(null!=erpOrderItem.getActualProductCount()){
+                        count=count+erpOrderItem.getActualProductCount();
+                    }
+                    erpOrderItem.setActualProductCount(count);
+                    items.add(erpOrderItem);
+                }
+            }
+            log.info("根据主订单号修改赠品实发数量,需修改的明细集合 items={}",JSON.toJSONString(items));
+            //进行赠品实发数量修改
+            erpOrderItemService.updateOrderItemList(itemList, auth);
+            log.info("根据主订单号修改赠品实发数量,成功");
         }
 
 
@@ -283,6 +330,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_11.getCode());
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_10.getCode());
             erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
+            //todo 判断是否全部发货，然后做均摊
             boolean flag=false;
             //这两个都走线下支付物流费用
             if(ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(order.getOrderTypeCode())){//配送
