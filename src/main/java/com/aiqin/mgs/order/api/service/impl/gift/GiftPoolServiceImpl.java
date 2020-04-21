@@ -188,7 +188,7 @@ public class GiftPoolServiceImpl implements GiftPoolService {
                 erpOrderCartInfo.setProductSize(skuDetail.getModelNumber());
                 erpOrderCartInfo.setProductType(erpCartAddRequest.getProductType());
                 erpOrderCartInfo.setCreateSource(erpCartAddRequest.getCreateSource());
-                erpOrderCartInfo.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
+                erpOrderCartInfo.setProductGift(ErpProductGiftEnum.JIFEN.getCode());
                 erpOrderCartInfo.setLineCheckStatus(YesOrNoEnum.YES.getCode());
                 erpOrderCartInfo.setZeroRemovalCoefficient(skuDetail.getZeroRemovalCoefficient());
                 erpOrderCartInfo.setMaxOrderNum(skuDetail.getMaxOrderNum());
@@ -521,7 +521,7 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         BigDecimal cartProductTotalPrice = BigDecimal.ZERO;
         if (select != null && select.size() > 0) {
             for (ErpOrderCartInfo item : select) {
-                cartProductTotalPrice.add(item.getPrice().multiply(new BigDecimal(item.getPrice().toString()))) ;
+                cartProductTotalPrice= cartProductTotalPrice.add(item.getPrice().multiply(new BigDecimal(item.getAmount().toString()))) ;
             }
         }
         return cartProductTotalPrice;
@@ -580,10 +580,10 @@ public class GiftPoolServiceImpl implements GiftPoolService {
     @Override
     public void updateCartMultilineProducts(List<GiftCartUpdateRequest> giftCartUpdateRequestList, AuthToken auth) {
         LOGGER.info("修改兑换赠品购物车多行数据 updateCartMultilineProducts 参数为：{}", giftCartUpdateRequestList);
-        Map map=new HashMap();
-        String storeId=null;
-        Integer productType=0;
-        for (GiftCartUpdateRequest req:giftCartUpdateRequestList) {
+        Map map = new HashMap();
+        String storeId = null;
+        Integer productType = 0;
+        for (GiftCartUpdateRequest req : giftCartUpdateRequestList) {
             if (null != req.getCartId()) {
                 map.put(req.getCartId(), req.getCartId());
                 storeId = req.getStoreId();
@@ -592,35 +592,35 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         }
 
         if (null != storeId) {
-                ErpOrderCartInfo query = new ErpOrderCartInfo();
-                query.setStoreId(storeId);
-                query.setProductType(productType);
-                query.setLineCheckStatus(YesOrNoEnum.YES.getCode());
-                List<ErpOrderCartInfo> cartLineList = erpOrderGiftPoolCartDao.select(query);
+            ErpOrderCartInfo query = new ErpOrderCartInfo();
+            query.setStoreId(storeId);
+            query.setProductType(productType);
+            query.setLineCheckStatus(YesOrNoEnum.YES.getCode());
+            List<ErpOrderCartInfo> cartLineList = erpOrderGiftPoolCartDao.select(query);
 
-                for (ErpOrderCartInfo erpOrderCartInfo : cartLineList) {
-                    if (!map.containsKey(erpOrderCartInfo.getCartId())) {
-                        erpOrderGiftPoolCartDao.deleteByPrimaryKey(erpOrderCartInfo.getId());
-                    }
+            for (ErpOrderCartInfo erpOrderCartInfo : cartLineList) {
+                if (!map.containsKey(erpOrderCartInfo.getCartId())) {
+                    erpOrderGiftPoolCartDao.deleteByPrimaryKey(erpOrderCartInfo.getId());
                 }
             }
-            for (GiftCartUpdateRequest request : giftCartUpdateRequestList) {
-                if (null == request.getCartId()) {
-                    ErpCartAddRequest erpCartAddRequest = new ErpCartAddRequest();
-                    erpCartAddRequest.setCreateSource("1");
-                    erpCartAddRequest.setProductType(request.getProductType());
-                    erpCartAddRequest.setStoreId(request.getStoreId());
-                    erpCartAddRequest.setProducts(request.getProducts());
-                    addProduct(erpCartAddRequest, auth);
-                } else {
-                    ErpCartUpdateRequest erpCartUpdateRequest = new ErpCartUpdateRequest();
-                    erpCartUpdateRequest.setActivityId(request.getActivityId());
-                    erpCartUpdateRequest.setAmount(request.getAmount());
-                    erpCartUpdateRequest.setCartId(request.getCartId());
-                    erpCartUpdateRequest.setLineCheckStatus(request.getLineCheckStatus());
-                    updateCartLineProduct(erpCartUpdateRequest, auth);
+        }
+        for (GiftCartUpdateRequest request : giftCartUpdateRequestList) {
+            if (null == request.getCartId()) {
+                ErpCartAddRequest erpCartAddRequest = new ErpCartAddRequest();
+                erpCartAddRequest.setCreateSource("1");
+                erpCartAddRequest.setProductType(request.getProductType());
+                erpCartAddRequest.setStoreId(request.getStoreId());
+                erpCartAddRequest.setProducts(request.getProducts());
+                addProduct(erpCartAddRequest, auth);
+            } else {
+                ErpCartUpdateRequest erpCartUpdateRequest = new ErpCartUpdateRequest();
+                erpCartUpdateRequest.setActivityId(request.getActivityId());
+                erpCartUpdateRequest.setAmount(request.getAmount());
+                erpCartUpdateRequest.setCartId(request.getCartId());
+                erpCartUpdateRequest.setLineCheckStatus(request.getLineCheckStatus());
+                updateCartLineProduct(erpCartUpdateRequest, auth);
 
-                }
             }
+        }
     }
 }

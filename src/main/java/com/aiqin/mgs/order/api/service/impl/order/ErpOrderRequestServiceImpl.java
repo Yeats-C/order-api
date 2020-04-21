@@ -246,6 +246,8 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             List<ErpOrderItem> giftList=new ArrayList<>();
             //本品
             List<ErpOrderItem> productList=new ArrayList<>();
+            //积分兑换赠品
+            List<ErpOrderItem> integralGiftList=new ArrayList<>();
             //汇总sku
             for(ErpOrderItem item:itemList){
                 Long count=countMap.get(item.getSkuCode());
@@ -263,6 +265,10 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 if(ErpProductGiftEnum.GIFT.getCode().equals(item.getProductType())){
                     giftList.add(item);
                 }
+                //筛选出积分兑换赠品数据
+                if(ErpProductGiftEnum.JIFEN.getCode().equals(item.getProductType())){
+                    integralGiftList.add(item);
+                }
             }
             log.info("创建订单,锁库存,sku汇总countMap={}",countMap);
             log.info("创建订单,锁库存,筛选出商品数据productList={}",productList);
@@ -274,6 +280,11 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 }
             }
             for(ErpOrderItem eoi:giftList){
+                if(null==skuCodeLineMap.get(eoi.getSkuCode())){
+                    skuCodeLineMap.put(eoi.getSkuCode(),eoi.getLineCode());
+                }
+            }
+            for(ErpOrderItem eoi:integralGiftList){
                 if(null==skuCodeLineMap.get(eoi.getSkuCode())){
                     skuCodeLineMap.put(eoi.getSkuCode(),eoi.getLineCode());
                 }
