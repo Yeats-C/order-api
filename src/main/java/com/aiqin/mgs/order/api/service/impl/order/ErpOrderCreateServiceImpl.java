@@ -137,6 +137,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 //        deleteOrderProductFromCart(cartProductList);
         deleteOrderProductFromCart(cartProductList);
 
+        //扣除订单积分兑换赠品额度
+
         //锁库存
         if (processTypeEnum.isLockStock()) {
             //TODO 修改成实时获取锁库结果并新建表保存
@@ -321,6 +323,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                         cartInfoList.addAll(item.getCartGiftList());
                     }
                 }
+            }
+            //兑换赠品相关商品
+            if (erpStoreCartQueryResponse.getErpCartQueryResponse().getCartInfoList() != null && erpStoreCartQueryResponse.getErpCartQueryResponse().getCartInfoList().size() > 0) {
+                cartInfoList.addAll(erpStoreCartQueryResponse.getErpCartQueryResponse().getCartInfoList());
             }
         } else {
 //            list = cartOrderService.getErpProductList(storeId, orderType);
