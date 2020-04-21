@@ -22,6 +22,8 @@ import com.aiqin.mgs.order.api.domain.request.product.SkuProductReqVO;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
 import com.aiqin.mgs.order.api.domain.response.NewFranchiseeResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetail;
+import com.aiqin.mgs.order.api.domain.response.gift.StoreAvailableGiftQuotaResponse;
+import com.aiqin.mgs.order.api.util.MathUtil;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
@@ -30,6 +32,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -37,7 +40,7 @@ import java.util.*;
  */
 @Service
 @Slf4j
-public class BridgeProductService {
+public class BridgeProductService<main> {
 
     @Resource
     private UrlProperties urlProperties;
@@ -467,5 +470,45 @@ public class BridgeProductService {
         }
 
         return provinceList;
+    }
+
+    /**
+     * 通过门店id返回可用赠品额度--slcs
+     * @param storeId
+     * @return
+     */
+    public BigDecimal getStoreAvailableGiftGuota(String storeId){
+        String path = "/store/getStoreAvailableGiftGuota?store_id="+storeId;
+        HttpClient httpClient = HttpClient.get(urlProperties.getSlcsApi() + path);
+        HttpResponse response = httpClient.action().result(new TypeReference<HttpResponse>() {
+        });
+        BigDecimal availableGiftQuota=BigDecimal.ZERO;
+        if(Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")){
+            availableGiftQuota= MathUtil.getBigDecimal(response.getData());
+        }
+
+        return availableGiftQuota;
+    }
+    /**
+     * 修改门店可用赠品额度--slcs
+     * @param storeId
+     * @param availableGiftQuota
+     * @return
+     */
+    public HttpResponse updateAvailableGiftQuota(String storeId,BigDecimal availableGiftQuota){
+        String path = "/store/updateAvailableGiftQuota";
+        StoreAvailableGiftQuotaResponse storeAvailableGiftQuotaResponse=new StoreAvailableGiftQuotaResponse();
+        storeAvailableGiftQuotaResponse.setStoreId(storeId);
+        storeAvailableGiftQuotaResponse.setAvailableGiftQuota(availableGiftQuota);
+        HttpClient httpClient = HttpClient.post(urlProperties.getSlcsApi() + path).json(storeAvailableGiftQuotaResponse);
+        HttpResponse response = httpClient.action().result(new TypeReference<HttpResponse>() {
+        });
+
+        return response;
+    }
+
+    public static void main(String[] args) {
+        BridgeProductService bridgeProductService=new BridgeProductService();
+        bridgeProductService.updateAvailableGiftQuota("ABD720FA0AFA064FD7AC1FD354C1D6D7AB",new BigDecimal(15));
     }
 }
