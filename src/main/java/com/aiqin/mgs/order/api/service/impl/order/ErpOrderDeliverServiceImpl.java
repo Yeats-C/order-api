@@ -350,7 +350,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             Boolean aBoolean = checkSendOk(order.getMainOrderCode());
             log.info("判断子单是否全部发货完成,返回结果 aBoolean={}",aBoolean);
             if(aBoolean){//全部发货完成
-
+                shareEqually(order.getMainOrderCode());
             }
 
             boolean flag=false;
@@ -574,7 +574,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 activityAfterMap.put(eo.getOrderInfoDetailId(),eo);
             }
         }
-        log.info("子单全部发货完成进行均摊--活动id:商品数量 activityAfterMap={}",activityAfterMap);
+        log.info("子单全部发货完成进行均摊--活动分摊--活动分摊后的数据 activityAfterMap={}",activityAfterMap);
         //遍历原始明细行，将活动分摊后的数据填充进去
         for(ErpOrderItem e:itemList){
             String orderInfoDetailId = e.getOrderInfoDetailId();
@@ -584,7 +584,8 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 e.setPreferentialAmount(o.getPreferentialAmount());
             }
         }
-        /******************A品券均摊**********************/
+        log.info("子单全部发货完成进行均摊--活动分摊--分摊后 分摊后原始明细行集合 itemList={}",JSON.toJSONString(itemList));
+        /************************************A品券均摊**********************************/
         //A品券商品明细行
         List<ErpOrderItem> list = new ArrayList<>();
         //符合分摊A品卷规则的商品
@@ -614,6 +615,8 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
         log.info("子单全部发货完成进行均摊--A品券分摊--A品券抵扣金额 topCouponMoney={}",topCouponMoney);
         amount=priceAmount.subtract(topCouponMoney);
         log.info("子单全部发货完成进行均摊--A品券分摊--商品金额 amount={}",amount);
+        //记录A品券分摊后的数据
+        Map<String,ErpOrderItem> couponAfterMap=new HashMap<>();
         for(ErpOrderItem o:list){
             //本行商品价值
             BigDecimal totalPreferentialAmount = o.getTotalPreferentialAmount();
@@ -628,18 +631,72 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             o.setTotalPreferentialAmount(to);
             o.setPreferentialAmount(per);
             o.setTopCouponDiscountAmount(at);
+            couponAfterMap.put(o.getOrderInfoDetailId(),o);
         }
-        //todo 存入map填充数据
-
-        log.info("子单全部发货完成进行均摊--可用A品券商品明细行 list={}",JSON.toJSONString(list));
-
-
-
-
-        //赠品均摊
-
-
-
+        log.info("子单全部发货完成进行均摊--A品券分摊--分摊结果map couponAfterMap={}",couponAfterMap);
+        for(ErpOrderItem f:itemList){
+            String orderInfoDetailId = f.getOrderInfoDetailId();
+            if(null!=couponAfterMap.get(orderInfoDetailId)){
+                ErpOrderItem o= couponAfterMap.get(orderInfoDetailId);
+                f.setTotalPreferentialAmount(o.getTotalPreferentialAmount());
+                f.setPreferentialAmount(o.getPreferentialAmount());
+            }
+        }
+        log.info("子单全部发货完成进行均摊--A品券分摊--分摊后原始明细行集合 itemList={}",JSON.toJSONString(itemList));
+        /************************************赠品均摊**********************************/
+        //实付金额
+        BigDecimal payMoney = erpOrderFee.getPayMoney();
+        log.info("子单全部发货完成进行均摊--赠品均摊--实付金额 payMoney={}",payMoney);
+        //商品总价值=（商品或活动赠品分摊总额相加）+（自选赠品实发数量X分销价）的和
+        BigDecimal totalMoney = erpOrderFee.getPayMoney();
+        //遍历明细行，计算商品总价值
+        for(ErpOrderItem p:itemList){
+            Integer productType = p.getProductType();
+            if(ErpProductGiftEnum.JIFEN.getCode().equals(productType)){
+                //兑换赠品本行商品价值=分销价X订货数量
+                BigDecimal multiply = p.getProductAmount().multiply(new BigDecimal(p.getActualProductCount()));
+                p.setTotalPreferentialAmount(multiply);
+                totalMoney=totalMoney.add(multiply);
+            }else{
+                //其他商品按照分摊总金额累加
+                totalMoney=totalMoney.add(p.getTotalPreferentialAmount());
+            }
+        }
+        log.info("子单全部发货完成进行均摊--赠品均摊--商品总价值 totalMoney={}",totalMoney);
+        //最后分摊完的商品明细，用于明细更新使用
+        List<ErpOrderItem> resList=new ArrayList<>();
+        //遍历明细行，进行分摊
+        for(ErpOrderItem k:itemList){
+            //分摊总价=商品原始分摊总价X实付金额/商品总价值
+            BigDecimal tper = k.getTotalPreferentialAmount().multiply(payMoney).divide(totalMoney, 2, BigDecimal.ROUND_HALF_UP);
+            //商品类型
+            Integer productType = k.getProductType();
+            BigDecimal s=BigDecimal.ZERO;
+            if(ErpProductGiftEnum.PRODUCT.getCode().equals(productType)){
+                //商品分摊单价=分摊总金额/订货数量
+                s=tper.divide(new BigDecimal(k.getProductCount()));
+            }else {
+                //赠品分摊单价=分摊总金额/实发数量
+                s=tper.divide(new BigDecimal(k.getActualProductCount()));
+            }
+            k.setTotalPreferentialAmount(tper);
+            k.setPreferentialAmount(s);
+            ErpOrderItem er=new ErpOrderItem();
+            er.setTotalPreferentialAmount(k.getTotalPreferentialAmount());
+            er.setPreferentialAmount(k.getPreferentialAmount());
+            er.setTopCouponDiscountAmount(k.getTopCouponDiscountAmount());
+            er.setOrderInfoDetailId(k.getOrderInfoDetailId());
+            er.setId(k.getId());
+            resList.add(er);
+        }
+        log.info("子单全部发货完成进行均摊--赠品均摊--分摊完后原始订单明细集合 itemList={}",JSON.toJSONString(itemList));
+        /*****************************************分摊计算结束，更新明细表*****************************************/
+        log.info("子单全部发货完成进行均摊--所有分摊结束--更新原始订单明细集合 resList={}",JSON.toJSONString(resList));
+        AuthToken auth=new AuthToken();
+        auth.setPersonId("系统操作");
+        auth.setPersonName("系统操作");
+        erpOrderItemService.updateOrderItemList(resList,auth);
+        log.info("子单全部发货完成进行均摊--更新明细表结束");
     }
 
     @Override
