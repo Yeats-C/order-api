@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.service.impl.order;
 
+import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
@@ -8,7 +9,10 @@ import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
+import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
 import com.aiqin.mgs.order.api.domain.request.order.*;
+import com.aiqin.mgs.order.api.service.ActivityService;
+import com.aiqin.mgs.order.api.service.CouponRuleService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
@@ -21,10 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -40,6 +41,10 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
     private ErpOrderLogisticsService erpOrderLogisticsService;
     @Resource
     private ErpOrderInfoDao erpOrderInfoDao;
+    @Resource
+    private CouponRuleService couponRuleService;
+    @Resource
+    private ActivityService activityService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -377,7 +382,59 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
         log.info("子单全部发货完成进行均摊--入参 mainOrderCode={}",mainOrderCode);
         ErpOrderInfo orderAndItemByOrderCode = erpOrderQueryService.getOrderAndItemByOrderCode(mainOrderCode);
         log.info("子单全部发货完成进行均摊--查询原始主订单及详情返回结果 orderAndItemByOrderCode={}",JSON.toJSONString(orderAndItemByOrderCode));
+        /******************挑选活动和可用A品券商品明细**********************/
+        List<ErpOrderItem> itemList = orderAndItemByOrderCode.getItemList();
+        //A品券商品明细行
+        List<ErpOrderItem> list = new ArrayList<>();
+        //符合分摊A品卷规则的商品
+        Map map = couponRuleService.couponRuleMap();
+        //活动id:商品明细行
+        Map<String, List<ErpOrderItem>> activityCartMap = new HashMap<>();
+        //活动id:商品金额
+        Map<String, BigDecimal> activityMoneyMap = new HashMap<>();
+        //商品金额=活动价X订货数量（赠品的话：活动价X发货数量）
+        BigDecimal totalMoney=BigDecimal.ZERO;
+        //活动id:商品价值
+        Map<String, BigDecimal> activityPriceMoneyMap = new HashMap<>();
+        //商品金额
+        BigDecimal totalPriceMoney=BigDecimal.ZERO;
+        //筛选出活动明细行
+        for(ErpOrderItem item:itemList){
+            //商品属性编码
+            String productPropertyCode = item.getProductPropertyCode();
+            //商品类型  0商品 1赠品
+            Integer productType = item.getProductType();
+            //判断是否是A品券商品
+            if(null!=productPropertyCode&&map.containsKey(productPropertyCode)&&null!=productType&&productType.equals(ErpProductGiftEnum.PRODUCT.getCode())){
+                list.add(item);
+            }
+            if (activityCartMap.containsKey(item.getActivityId())) {
+                List<ErpOrderItem> items = activityCartMap.get(item.getActivityId());
+                items.add(item);
+                activityCartMap.put(item.getActivityId(),items);
+                totalMoney=activityMoneyMap.get(item.getActivityId());
+                totalMoney=;
+                activityMoneyMap.put(item.getActivityId(),);
+            }else {
+                List<ErpOrderItem> items1 =new ArrayList<>();
+                items1.add(item);
+                activityCartMap.put(item.getActivityId(),items1);
+            }
+        }
+        log.info("子单全部发货完成进行均摊--可用A品券商品明细行 list={}",JSON.toJSONString(list));
+        log.info("子单全部发货完成进行均摊--活动id:商品明细行 activityCartMap={}",activityCartMap);
+        /******************商品挑选完成进行活动均摊**********************/
         //活动均摊
+        for(Map.Entry<String, List<ErpOrderItem>> m:activityCartMap.entrySet()){
+            HttpResponse<ActivityRequest> activityDetailResponse = activityService.getActivityDetail(m.getKey());
+
+
+
+        }
+
+
+
+
 
         //A品券均摊
 
