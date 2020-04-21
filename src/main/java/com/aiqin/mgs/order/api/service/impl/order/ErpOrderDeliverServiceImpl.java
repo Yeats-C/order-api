@@ -3,12 +3,14 @@ package com.aiqin.mgs.order.api.service.impl.order;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
+import com.aiqin.mgs.order.api.component.enums.activity.ActivityRuleUnitEnum;
 import com.aiqin.mgs.order.api.component.enums.activity.ActivityTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityRule;
 import com.aiqin.mgs.order.api.domain.AuthToken;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
@@ -48,6 +50,8 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
     private CouponRuleService couponRuleService;
     @Resource
     private ActivityService activityService;
+    @Resource
+    private ErpOrderFeeService erpOrderFeeService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -387,30 +391,25 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
         log.info("子单全部发货完成进行均摊--查询原始主订单及详情返回结果 orderAndItemByOrderCode={}",JSON.toJSONString(orderAndItemByOrderCode));
         /******************挑选活动和可用A品券商品明细**********************/
         List<ErpOrderItem> itemList = orderAndItemByOrderCode.getItemList();
-        //A品券商品明细行
-        List<ErpOrderItem> list = new ArrayList<>();
-        //符合分摊A品卷规则的商品
-        Map map = couponRuleService.couponRuleMap();
+
         //活动id:商品明细行
         Map<String, List<ErpOrderItem>> activityCartMap = new HashMap<>();
         //活动id:商品总金额
         Map<String, BigDecimal> activityMoneyMap = new HashMap<>();
         //活动id:商品总价值
         Map<String, BigDecimal> activityPriceMoneyMap = new HashMap<>();
+        //活动id:商品数量 用于活动
+        Map<String, Integer> quantityMap = new HashMap<>();
         //筛选出活动明细行
         for(ErpOrderItem item:itemList){
-            //商品属性编码
-            String productPropertyCode = item.getProductPropertyCode();
             //商品类型  0商品 1赠品
             Integer productType = item.getProductType();
             //商品总金额=活动价X订货数量（赠品的话：活动价X发货数量）
             BigDecimal totalMoney=BigDecimal.ZERO;
             //商品总价值=分销单价X订货数量
             BigDecimal totalPriceMoney=BigDecimal.ZERO;
-            //判断是否是A品券商品
-            if(null!=productPropertyCode&&map.containsKey(productPropertyCode)&&null!=productType&&productType.equals(ErpProductGiftEnum.PRODUCT.getCode())){
-                list.add(item);
-            }
+            //商品数量
+            Integer quantity = 0;
             //活动id:商品明细行 添加数据
             if (null!=item.getActivityId()&&activityCartMap.containsKey(item.getActivityId())) {
                 List<ErpOrderItem> items = activityCartMap.get(item.getActivityId());
@@ -438,6 +437,11 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 totalPriceMoney=totalPriceMoney.add(multiply1);
                 activityPriceMoneyMap.put(item.getActivityId(),totalPriceMoney);
 
+                if(null!=item.getActivityId()){
+                    quantity=quantityMap.get(item.getActivityId());
+                }
+                quantity=quantity+item.getProductCount().intValue();
+                quantityMap.put(item.getActivityId(),quantity);
             }else {
                 List<ErpOrderItem> items1 =new ArrayList<>();
                 items1.add(item);
@@ -464,11 +468,13 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 activityPriceMoneyMap.put(item.getActivityId(),totalPriceMoney);
             }
         }
-        log.info("子单全部发货完成进行均摊--可用A品券商品明细行 list={}",JSON.toJSONString(list));
         log.info("子单全部发货完成进行均摊--活动id:商品明细行 activityCartMap={}",activityCartMap);
         log.info("子单全部发货完成进行均摊--活动id:商品金额 activityMoneyMap={}",activityMoneyMap);
         log.info("子单全部发货完成进行均摊--活动id:商品价值 activityPriceMoneyMap={}",activityPriceMoneyMap);
+        log.info("子单全部发货完成进行均摊--活动id:商品数量 quantityMap={}",quantityMap);
         /******************商品挑选完成进行活动均摊**********************/
+        //记录活动分摊后的数据
+        Map<String,ErpOrderItem> activityAfterMap=new HashMap<>();
         //活动均摊
         for(Map.Entry<String, List<ErpOrderItem>> m:activityCartMap.entrySet()){
             HttpResponse<ActivityRequest> activityDetailResponse = activityService.getActivityDetail(m.getKey());
@@ -483,8 +489,66 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             BigDecimal productAmount=activityMoneyMap.get(activityId);
             //商品总价值
             BigDecimal productPriceAmount=activityPriceMoneyMap.get(activityId);
+            //缓存当前命中的规则
+            ActivityRule curRule = null;
+            //最小梯度
+            ActivityRule firstRule = null;
+            //商品数量
+            Integer quantity = quantityMap.get(activityId);
+            //优惠金额
+            BigDecimal youHuiAmount=BigDecimal.ZERO;
             switch (activityType){
                 case 1:
+                    for(ActivityRule ruleItem:activityRules){
+
+                        //筛选最小梯度
+                        if (firstRule == null || ruleItem.getMeetingConditions().compareTo(firstRule.getMeetingConditions()) < 0) {
+                            firstRule = ruleItem;
+                        }
+
+                        //是否把当前梯度作为命中梯度
+                        boolean flag = false;
+
+                        if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(ruleItem.getRuleUnit())) {
+                            //按照数量
+
+                            if (ruleItem.getMeetingConditions().compareTo(new BigDecimal(quantity)) <= 0) {
+                                if (curRule == null) {
+                                    flag = true;
+                                } else {
+                                    if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                        flag = true;
+                                    }
+                                }
+                            }
+
+                        } else if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(ruleItem.getRuleUnit())) {
+                            //按照金额
+
+                            if (ruleItem.getMeetingConditions().compareTo(productPriceAmount) <= 0) {
+                                if (curRule == null) {
+                                    flag = true;
+                                } else {
+                                    if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                        flag = true;
+                                    }
+                                }
+                            }
+
+                        } else {
+
+                        }
+
+                        if (flag) {
+                            curRule = ruleItem;
+                        }
+
+                    }
+                    if (curRule != null) {//命中规则
+                        youHuiAmount=curRule.getPreferentialAmount();
+                        //满减活动商品总金额=商品总金额-优惠金额
+                        productAmount=productAmount.subtract(youHuiAmount);
+                    }
                     break;
                 case 2:
                     break;
@@ -505,18 +569,72 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 BigDecimal totalPreferentialAmount=fenxiaozongjia.multiply(productAmount).divide(productPriceAmount,2,BigDecimal.ROUND_HALF_UP);
                 //分摊单价
                 BigDecimal preferentialAmount=totalPreferentialAmount.divide(new BigDecimal(eo.getProductCount()),2,BigDecimal.ROUND_HALF_UP);
-
-
-
+                eo.setTotalPreferentialAmount(totalPreferentialAmount);
+                eo.setPreferentialAmount(preferentialAmount);
+                activityAfterMap.put(eo.getOrderInfoDetailId(),eo);
             }
-
         }
+        log.info("子单全部发货完成进行均摊--活动id:商品数量 activityAfterMap={}",activityAfterMap);
+        //遍历原始明细行，将活动分摊后的数据填充进去
+        for(ErpOrderItem e:itemList){
+            String orderInfoDetailId = e.getOrderInfoDetailId();
+            if(null!=activityAfterMap.get(orderInfoDetailId)){
+                ErpOrderItem o= activityAfterMap.get(orderInfoDetailId);
+                e.setTotalPreferentialAmount(o.getTotalPreferentialAmount());
+                e.setPreferentialAmount(o.getPreferentialAmount());
+            }
+        }
+        /******************A品券均摊**********************/
+        //A品券商品明细行
+        List<ErpOrderItem> list = new ArrayList<>();
+        //符合分摊A品卷规则的商品
+        Map map = couponRuleService.couponRuleMap();
+        //商品总价值
+        BigDecimal priceAmount=BigDecimal.ZERO;
+        //商品总金额
+        BigDecimal amount=BigDecimal.ZERO;
+        String orderId="";
+        for(ErpOrderItem o:itemList){
+            //商品属性编码
+            String productPropertyCode = o.getProductPropertyCode();
+            //商品类型  0商品 1赠品
+            Integer productType = o.getProductType();
+            //判断是否是A品券商品
+            if(null!=productPropertyCode&&map.containsKey(productPropertyCode)&&null!=productType&&productType.equals(ErpProductGiftEnum.PRODUCT.getCode())){
+                list.add(o);
+                priceAmount=priceAmount.add(o.getTotalPreferentialAmount());
+            }
+            orderId=o.getOrderStoreId();
+        }
+        log.info("子单全部发货完成进行均摊--A品券分摊--商品价值 priceAmount={}",priceAmount);
+        //查询A品券抵扣金额
+        ErpOrderFee erpOrderFee=erpOrderFeeService.getOrderFeeByOrderId(orderId);
+        log.info("子单全部发货完成进行均摊--A品券分摊--费用信息 erpOrderFee={}",erpOrderFee);
+        BigDecimal topCouponMoney = erpOrderFee.getTopCouponMoney();
+        log.info("子单全部发货完成进行均摊--A品券分摊--A品券抵扣金额 topCouponMoney={}",topCouponMoney);
+        amount=priceAmount.subtract(topCouponMoney);
+        log.info("子单全部发货完成进行均摊--A品券分摊--商品金额 amount={}",amount);
+        for(ErpOrderItem o:list){
+            //本行商品价值
+            BigDecimal totalPreferentialAmount = o.getTotalPreferentialAmount();
+            //分摊总金额=本行商品价值X商品总金额/商品总价值
+            BigDecimal to=totalPreferentialAmount.multiply(amount).divide(priceAmount,2,BigDecimal.ROUND_HALF_UP);
+            //分摊单价
+            BigDecimal per=to.divide(new BigDecimal(o.getProductCount()),2,BigDecimal.ROUND_HALF_UP);
+            //A品券单行抵扣总金额=A品券抵扣金额X本行商品价值/商品总价值
+            BigDecimal at = topCouponMoney.multiply(totalPreferentialAmount).divide(priceAmount, 2, BigDecimal.ROUND_HALF_UP);
+            //A品券单行每个商品抵扣金额
+            BigDecimal ap=at.divide(new BigDecimal(o.getProductCount()));
+            o.setTotalPreferentialAmount(to);
+            o.setPreferentialAmount(per);
+            o.setTopCouponDiscountAmount(at);
+        }
+        //todo 存入map填充数据
+
+        log.info("子单全部发货完成进行均摊--可用A品券商品明细行 list={}",JSON.toJSONString(list));
 
 
 
-
-
-        //A品券均摊
 
         //赠品均摊
 
