@@ -7,6 +7,7 @@ import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.po.cart.ErpOrderCartInfo;
+import com.aiqin.mgs.order.api.domain.po.gift.GiftQuotasUseDetail;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
@@ -19,7 +20,9 @@ import com.aiqin.mgs.order.api.domain.response.cart.*;
 import com.aiqin.mgs.order.api.service.CartOrderService;
 import com.aiqin.mgs.order.api.service.CouponRuleService;
 import com.aiqin.mgs.order.api.service.SequenceGeneratorService;
+import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.service.cart.ErpOrderCartService;
+import com.aiqin.mgs.order.api.service.gift.GiftQuotasUseDetailService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
@@ -67,6 +70,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private ErpStoreLockDetailsService erpStoreLockDetailsService;
     @Resource
     private CouponRuleService couponRuleService;
+    @Resource
+    private BridgeProductService bridgeProductService;
+    @Resource
+    private GiftQuotasUseDetailService giftQuotasUseDetailService;
 
 
     @Override
@@ -137,7 +144,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 //        deleteOrderProductFromCart(cartProductList);
         deleteOrderProductFromCart(cartProductList);
 
-        //扣除订单积分兑换赠品额度
+        //扣除订单积分兑换赠品额度并插入赠品额度明细使用记录
+        integralGift(cartProductList,storeInfo,order.getOrderStoreCode(),auth);
 
         //锁库存
         if (processTypeEnum.isLockStock()) {
@@ -157,6 +165,36 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //返回订单信息
         return erpOrderQueryService.getOrderByOrderId(orderId);
     }
+
+    private void integralGift(List<ErpOrderCartInfo> cartProductList, StoreInfo storeInfo, String orderStoreCode, AuthToken auth) {
+        log.info("扣除兑换赠品积分，并添加积分使用记录开始，参数为{}"+cartProductList,storeInfo,orderStoreCode);
+        BigDecimal giftAmount=BigDecimal.ZERO;
+        for(ErpOrderCartInfo erp:cartProductList){
+            if(ErpProductGiftEnum.JIFEN.getCode().equals(erp.getProductType())){
+                giftAmount=giftAmount.add(erp.getPrice().multiply(new BigDecimal(erp.getAmount().toString())));
+            }
+        }
+        //查詢門店员赠品额度
+        BigDecimal availableGiftQuota=bridgeProductService.getStoreAvailableGiftGuota(storeInfo.getStoreId());
+        //计算订单使用过后的赠品额度
+        BigDecimal newAvailableGiftQuota=availableGiftQuota.subtract(giftAmount);
+        //更新订单使用过后的赠品额度
+        bridgeProductService.updateAvailableGiftQuota(storeInfo.getStoreId(),newAvailableGiftQuota);
+
+        //新建一个赠品额度使用明细对象
+        GiftQuotasUseDetail giftQuotasUseDetail=new GiftQuotasUseDetail();
+        giftQuotasUseDetail.setStoreId(storeInfo.getStoreId());
+        giftQuotasUseDetail.setChangeInGiftQuota("-"+giftAmount);
+        giftQuotasUseDetail.setBillCode(orderStoreCode);
+        giftQuotasUseDetail.setType(2);
+        giftQuotasUseDetail.setCreateBy(auth.getPersonName());
+        giftQuotasUseDetail.setUpdateBy(auth.getPersonName());
+        //插入一条赠品明细使用记录
+        giftQuotasUseDetailService.add(giftQuotasUseDetail);
+
+    }
+
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
