@@ -131,4 +131,11 @@ public class ReturnOrderDetail {
     @ApiModelProperty(value = "条形码")
     private String barCode;
 
+    /***仅A品优惠金额，用于统计*/
+    @ApiModelProperty(value = "本行A品券优惠总额度")
+    private BigDecimal topCouponDiscountAmount;
+
+    @ApiModelProperty(value = "本行A品券优惠单品额度")
+    private BigDecimal topCouponAmount;
+
 }
