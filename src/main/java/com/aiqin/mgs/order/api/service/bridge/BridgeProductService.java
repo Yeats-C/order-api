@@ -20,6 +20,7 @@ import com.aiqin.mgs.order.api.domain.request.product.NewStoreCategory;
 import com.aiqin.mgs.order.api.domain.request.product.ProductSkuRespVo6;
 import com.aiqin.mgs.order.api.domain.request.product.SkuProductReqVO;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
+import com.aiqin.mgs.order.api.domain.request.stock.ProductSkuStockRespVo;
 import com.aiqin.mgs.order.api.domain.response.NewFranchiseeResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetail;
 import com.aiqin.mgs.order.api.domain.response.gift.StoreAvailableGiftQuotaResponse;
@@ -507,8 +508,30 @@ public class BridgeProductService<main> {
         return response;
     }
 
+    /**
+     * 根据skucode获取库存详情--product
+     * @param skuCodes
+     * @return
+     */
+    public List<ProductSkuStockRespVo> findStockDetail(List<String> skuCodes){
+        String path = "/search/spu/findStockDetail";
+//        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(skuCodes);
+        HttpClient httpClient = HttpClient.post("http://product.api.aiqin.com" + path).json(skuCodes);
+        HttpResponse response = httpClient.action().result(new TypeReference<HttpResponse<List<ProductSkuStockRespVo>>>() {
+        });
+        List<ProductSkuStockRespVo> stockRespVoList=new ArrayList<>();
+        if(Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")){
+            stockRespVoList= (List<ProductSkuStockRespVo>)response.getData();
+        }
+
+        return stockRespVoList;
+    }
+
     public static void main(String[] args) {
         BridgeProductService bridgeProductService=new BridgeProductService();
-        bridgeProductService.updateAvailableGiftQuota("ABD720FA0AFA064FD7AC1FD354C1D6D7AB",new BigDecimal(15));
+        List<String> skuCodes=new ArrayList<>();
+        skuCodes.add("991191");
+        skuCodes.add("307489");
+        System.out.println(bridgeProductService.findStockDetail(skuCodes));
     }
 }

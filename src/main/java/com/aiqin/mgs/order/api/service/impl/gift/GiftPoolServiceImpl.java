@@ -7,17 +7,20 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpProductGiftEnum;
 import com.aiqin.mgs.order.api.component.enums.YesOrNoEnum;
+import com.aiqin.mgs.order.api.dao.gift.ComplimentaryWarehouseCorrespondenceDao;
 import com.aiqin.mgs.order.api.dao.gift.ErpOrderGiftPoolCartDao;
 import com.aiqin.mgs.order.api.dao.gift.GiftPoolDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.po.cart.ErpOrderCartInfo;
+import com.aiqin.mgs.order.api.domain.po.gift.ComplimentaryWarehouseCorrespondence;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftPool;
 import com.aiqin.mgs.order.api.domain.request.cart.*;
 import com.aiqin.mgs.order.api.domain.request.gift.GiftCartUpdateRequest;
 import com.aiqin.mgs.order.api.domain.request.product.StockBatchRespVO;
+import com.aiqin.mgs.order.api.domain.request.stock.ProductSkuStockRespVo;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpCartAddItemResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpOrderCartAddResponse;
@@ -58,6 +61,9 @@ public class GiftPoolServiceImpl implements GiftPoolService {
     @Resource
     private BridgeProductService bridgeProductService;
 
+    @Resource
+    private ComplimentaryWarehouseCorrespondenceDao correspondenceDao;
+
 
 
 
@@ -67,6 +73,24 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         HttpResponse httpResponse=HttpResponse.success();
         giftPoolDao.add(giftPool);
         //TODO  此处需调用供应链接口，通过skuCode查询仓库信息，并记录表
+        List<String> skuCodes=new ArrayList<>();
+        skuCodes.add(giftPool.getSkuCode());
+        List<ProductSkuStockRespVo> stockRespVoList=bridgeProductService.findStockDetail(skuCodes);
+        if(null==stockRespVoList){
+            throw new BusinessException("查询供应链 根据skucode获取库存详情 /search/spu/findStockDetail 接口失败，参数为"+giftPool.getSkuCode());
+        }
+        ProductSkuStockRespVo respVo=stockRespVoList.get(0);
+        if(null==respVo || null==respVo.getStockBatchRespVOList()){
+            throw new BusinessException("查询供应链 根据skucode获取库存详情 /search/spu/findStockDetail 接口失败，库存信息为空，参数为"+giftPool.getSkuCode());
+        }
+        List<ComplimentaryWarehouseCorrespondence> correspondenceList=new ArrayList<>();
+        for(StockBatchRespVO stockBatchRespVO:respVo.getStockBatchRespVOList()){
+            ComplimentaryWarehouseCorrespondence correspondence=new ComplimentaryWarehouseCorrespondence();
+            correspondence.setSkuCode(stockBatchRespVO.getSkuCode());
+            correspondence.setWarehouseCode(stockBatchRespVO.getTransportCenterCode());
+            correspondenceList.add(correspondence);
+        }
+        correspondenceDao.insertList(correspondenceList);
         return httpResponse;
     }
 
