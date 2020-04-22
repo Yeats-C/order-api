@@ -651,6 +651,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             o.setTotalPreferentialAmount(to);
             o.setPreferentialAmount(per);
             o.setTopCouponDiscountAmount(at);
+            o.setTopCouponAmount(ap);
             couponAfterMap.put(o.getOrderInfoDetailId(),o);
         }
         log.info("子单全部发货完成进行均摊--A品券分摊--分摊结果map couponAfterMap={}",couponAfterMap);
