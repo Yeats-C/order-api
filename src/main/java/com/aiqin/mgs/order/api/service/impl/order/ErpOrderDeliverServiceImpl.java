@@ -7,6 +7,7 @@ import com.aiqin.mgs.order.api.component.enums.activity.ActivityRuleUnitEnum;
 import com.aiqin.mgs.order.api.component.enums.activity.ActivityTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
+import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivityRule;
 import com.aiqin.mgs.order.api.domain.AuthToken;
@@ -24,6 +25,7 @@ import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -52,6 +55,8 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
     private ActivityService activityService;
     @Resource
     private ErpOrderFeeService erpOrderFeeService;
+    @Autowired
+    private ReturnOrderInfoDao returnOrderInfoDao;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -350,7 +355,22 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             Boolean aBoolean = checkSendOk(order.getMainOrderCode());
             log.info("判断子单是否全部发货完成,返回结果 aBoolean={}",aBoolean);
             if(aBoolean){//全部发货完成
+                //三步均摊
                 shareEqually(order.getMainOrderCode());
+                //遍历退货单，查看是否有退单
+                ErpOrderInfo e=new ErpOrderInfo();
+                e.setMainOrderCode(order.getMainOrderCode());
+                List<ErpOrderInfo> orderList = erpOrderQueryService.select(e);
+                //如果子订单中有退货情况，现在更想预生成的退货单的 是否发起退货状态
+                if(orderList!=null&&orderList.size()>0){
+                    //遍历出所有的子订单号
+                    List<String> orderCodes=orderList.stream().map(ErpOrderInfo::getOrderStoreCode).collect(Collectors.toList());
+                    log.info("修改订单为发货状态---全部发货完成,修改退货单是否发起退货状态，入参orderCodes={}",JSON.toJSONString(orderCodes));
+                    if(null!=orderCodes&&orderCodes.size()>0){
+                        returnOrderInfoDao.updateReallyReturn(orderCodes);
+                        log.info("修改订单为发货状态---全部发货完成,修改退货单是否发起退货状态，成功");
+                    }
+                }
             }
 
             boolean flag=false;

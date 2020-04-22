@@ -271,58 +271,58 @@ public class OrderListServiceImpl implements OrderListService {
         param.setImplementTime(new Date());
         param.setImplementContent("发货完成");
         Boolean re = orderListLogisticsDao.insertLogistics(param);
-        log.info("修改订单为发货状态---进入分摊计算");
-        //判断拆单的子订单是否已经全部发货完成
-        Boolean flag = checkComplete(deliverVo.getOrderCode());
-        log.info("修改订单为发货状态---分摊计算--判断拆单的子订单是否已经全部发货完成flag={}",flag);
-        if(flag){//全部完成，进行分摊计算
-            log.info("修改订单为发货状态---全部发货完成,进行分摊计算");
-            ErpOrderInfo po=new ErpOrderInfo();
-            po.setOrderStoreCode(deliverVo.getOrderCode());
-            //查询主订单
-            List<ErpOrderInfo> select = erpOrderInfoDao.select(po);
-            log.info("修改订单为发货状态---全部发货完成,进行分摊计算--查询主订单数据集合为select={}",select);
-            if(select!=null&&select.size()>0) {
-                ErpOrderInfo erpOrderInfo = select.get(0);
-                log.info("修改订单为发货状态---全部发货完成,进行分摊计算--查询主订单数据为 erpOrderInfo={}",erpOrderInfo);
-                //获取门店信息
-                StoreInfo storeInfo = erpOrderRequestService.getStoreInfoByStoreId(erpOrderInfo.getStoreId());
-                log.info("修改订单为发货状态---全部发货完成,进行分摊计算--查询门店信息数据为 storeInfo={}",storeInfo);
-                if(erpOrderInfo!=null&&StringUtils.isNotBlank(erpOrderInfo.getMainOrderCode())){
-                    log.info("修改订单为发货状态---全部发货完成,进行分摊计算--主单号为 mainOrderCode={}",erpOrderInfo.getMainOrderCode());
-                    //查询所有子订单号
-                    po.setOrderStoreCode(null);
-                    po.setMainOrderCode(erpOrderInfo.getMainOrderCode());
-                    List<ErpOrderInfo> splictOrder = erpOrderInfoDao.select(po);
-                    log.info("修改订单为发货状态---全部发货完成,进行分摊计算--查询所有子订单号为 splictOrder={}",splictOrder);
-                    List<ErpOrderItem> erpOrderItemList=new ArrayList<>();
-                    for(ErpOrderInfo orderInfo:splictOrder){
-                        List<ErpOrderItem> erpOrderItems = erpOrderItemService.selectOrderItemListByOrderId(orderInfo.getOrderStoreId());
-                        List<String> topCouponCodeList=null;
-//                        ErpOrderFee erpOrderFee = firstGivePrice(storeInfo, erpOrderItems, topCouponCodeList);
-                        chai(erpOrderItems);
-                        log.info("修改订单为发货状态---全部发货完成,进行分摊计算--封装后子单明细数据为 erpOrderItems={}",erpOrderItems);
-                        erpOrderItemList.addAll(erpOrderItems);
-                    }
-                    //获取登陆人信息
-                    AuthToken authToken = AuthUtil.getCurrentAuth();
-                    log.info("修改订单为发货状态---全部发货完成,进行分摊计算--更新明细表实收分摊价格入参 erpOrderItemList={}",JSON.toJSONString(erpOrderItemList));
-                    //更新明细表实收分摊价格
-                    erpOrderItemService.updateOrderItemList(erpOrderItemList,authToken);
-                    //如果子订单中有退货情况，现在更想预生成的退货单的 是否发起退货状态
-                    if(erpOrderItemList!=null&&erpOrderItemList.size()>0){
-                        //遍历出所有的子订单号
-                        List<String> orderCodes=erpOrderItemList.stream().map(ErpOrderItem::getOrderStoreCode).collect(Collectors.toList());
-                        log.info("修改订单为发货状态---全部发货完成,修改退货单是否发起退货状态，入参orderCodes={}",JSON.toJSONString(orderCodes));
-                        if(null!=orderCodes&&orderCodes.size()>0){
-                            returnOrderInfoDao.updateReallyReturn(orderCodes);
-                            log.info("修改订单为发货状态---全部发货完成,修改退货单是否发起退货状态，成功");
-                        }
-                    }
-                }
-            }
-
-        }
+//        log.info("修改订单为发货状态---进入分摊计算");
+//        //判断拆单的子订单是否已经全部发货完成
+//        Boolean flag = checkComplete(deliverVo.getOrderCode());
+//        log.info("修改订单为发货状态---分摊计算--判断拆单的子订单是否已经全部发货完成flag={}",flag);
+//        if(flag){//全部完成，进行分摊计算
+//            log.info("修改订单为发货状态---全部发货完成,进行分摊计算");
+//            ErpOrderInfo po=new ErpOrderInfo();
+//            po.setOrderStoreCode(deliverVo.getOrderCode());
+//            //查询主订单
+//            List<ErpOrderInfo> select = erpOrderInfoDao.select(po);
+//            log.info("修改订单为发货状态---全部发货完成,进行分摊计算--查询主订单数据集合为select={}",select);
+//            if(select!=null&&select.size()>0) {
+//                ErpOrderInfo erpOrderInfo = select.get(0);
+//                log.info("修改订单为发货状态---全部发货完成,进行分摊计算--查询主订单数据为 erpOrderInfo={}",erpOrderInfo);
+//                //获取门店信息
+//                StoreInfo storeInfo = erpOrderRequestService.getStoreInfoByStoreId(erpOrderInfo.getStoreId());
+//                log.info("修改订单为发货状态---全部发货完成,进行分摊计算--查询门店信息数据为 storeInfo={}",storeInfo);
+//                if(erpOrderInfo!=null&&StringUtils.isNotBlank(erpOrderInfo.getMainOrderCode())){
+//                    log.info("修改订单为发货状态---全部发货完成,进行分摊计算--主单号为 mainOrderCode={}",erpOrderInfo.getMainOrderCode());
+//                    //查询所有子订单号
+//                    po.setOrderStoreCode(null);
+//                    po.setMainOrderCode(erpOrderInfo.getMainOrderCode());
+//                    List<ErpOrderInfo> splictOrder = erpOrderInfoDao.select(po);
+//                    log.info("修改订单为发货状态---全部发货完成,进行分摊计算--查询所有子订单号为 splictOrder={}",splictOrder);
+//                    List<ErpOrderItem> erpOrderItemList=new ArrayList<>();
+//                    for(ErpOrderInfo orderInfo:splictOrder){
+//                        List<ErpOrderItem> erpOrderItems = erpOrderItemService.selectOrderItemListByOrderId(orderInfo.getOrderStoreId());
+//                        List<String> topCouponCodeList=null;
+////                        ErpOrderFee erpOrderFee = firstGivePrice(storeInfo, erpOrderItems, topCouponCodeList);
+//                        chai(erpOrderItems);
+//                        log.info("修改订单为发货状态---全部发货完成,进行分摊计算--封装后子单明细数据为 erpOrderItems={}",erpOrderItems);
+//                        erpOrderItemList.addAll(erpOrderItems);
+//                    }
+//                    //获取登陆人信息
+//                    AuthToken authToken = AuthUtil.getCurrentAuth();
+//                    log.info("修改订单为发货状态---全部发货完成,进行分摊计算--更新明细表实收分摊价格入参 erpOrderItemList={}",JSON.toJSONString(erpOrderItemList));
+//                    //更新明细表实收分摊价格
+//                    erpOrderItemService.updateOrderItemList(erpOrderItemList,authToken);
+//                    //如果子订单中有退货情况，现在更想预生成的退货单的 是否发起退货状态
+//                    if(erpOrderItemList!=null&&erpOrderItemList.size()>0){
+//                        //遍历出所有的子订单号
+//                        List<String> orderCodes=erpOrderItemList.stream().map(ErpOrderItem::getOrderStoreCode).collect(Collectors.toList());
+//                        log.info("修改订单为发货状态---全部发货完成,修改退货单是否发起退货状态，入参orderCodes={}",JSON.toJSONString(orderCodes));
+//                        if(null!=orderCodes&&orderCodes.size()>0){
+//                            returnOrderInfoDao.updateReallyReturn(orderCodes);
+//                            log.info("修改订单为发货状态---全部发货完成,修改退货单是否发起退货状态，成功");
+//                        }
+//                    }
+//                }
+//            }
+//
+//        }
         return br;
     }
 
