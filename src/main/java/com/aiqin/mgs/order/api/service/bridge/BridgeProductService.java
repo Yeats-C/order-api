@@ -515,8 +515,7 @@ public class BridgeProductService<main> {
      */
     public List<ProductSkuStockRespVo> findStockDetail(List<String> skuCodes){
         String path = "/search/spu/findStockDetail";
-//        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(skuCodes);
-        HttpClient httpClient = HttpClient.post("http://product.api.aiqin.com" + path).json(skuCodes);
+        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(skuCodes);
         HttpResponse response = httpClient.action().result(new TypeReference<HttpResponse<List<ProductSkuStockRespVo>>>() {
         });
         List<ProductSkuStockRespVo> stockRespVoList=new ArrayList<>();
@@ -527,11 +526,27 @@ public class BridgeProductService<main> {
         return stockRespVoList;
     }
 
+    /**
+     * 通过省市code查出对应的运输中心--product
+     * @param provinceCode
+     * @param cityCode
+     * @return
+     */
+    public List<String> findTransportCenter(String provinceCode,String cityCode){
+        String path = "/search/spu/findTransportCenter?province_code="+provinceCode+"&city_code="+cityCode;
+        HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path);
+        HttpResponse response = httpClient.action().result(new TypeReference<HttpResponse<List<String>>>() {
+        });
+        List<String> transportCenterList=new ArrayList<>();
+        if(Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")){
+            transportCenterList= (List<String>)response.getData();
+        }
+
+        return transportCenterList;
+    }
+
     public static void main(String[] args) {
         BridgeProductService bridgeProductService=new BridgeProductService();
-        List<String> skuCodes=new ArrayList<>();
-        skuCodes.add("991191");
-        skuCodes.add("307489");
-        System.out.println(bridgeProductService.findStockDetail(skuCodes));
+        System.out.println(bridgeProductService.findTransportCenter("110000","110101"));
     }
 }

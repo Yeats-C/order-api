@@ -360,7 +360,8 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         StoreInfo store = erpOrderRequestService.getStoreInfoByStoreId(giftPool.getStoreId());
         //TODO 此处需通过门店省市id查询此门店有多少仓库的权限【接口暂时待供应链提供】
         //总之，应该拿到一个仓库list数据，string类型
-
+        List<String> warehouseCodeList=bridgeProductService.findTransportCenter(store.getProvinceId(),store.getCityId());
+        giftPool.setWarehouseCodeList(warehouseCodeList);
 
         List<GiftPool> giftPoolList=giftPoolDao.getGiftPoolListByWarehouseCodeList(giftPool);
         List<String> skuCodeList = new ArrayList<>();
