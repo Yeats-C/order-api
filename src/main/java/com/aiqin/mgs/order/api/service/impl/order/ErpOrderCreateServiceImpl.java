@@ -768,6 +768,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setScourSheetStatus(ErpOrderScourSheetStatusEnum.NOT_NEED.getCode());
         //是否活动商品0否1是
         order.setIsActivity(isActivity);
+        //配送方式编码
+        order.setDistributionModeCode(erpOrderSaveRequest.getDistributionModeCode());
+        //配送方式名称
+        order.setDistributionModeName(erpOrderSaveRequest.getDistributionModeName());
         log.info("构建订单信息--封装结果,order={}",order);
         return order;
     }
