@@ -49,4 +49,12 @@ public class ErpOrderSaveRequest {
     @JsonProperty("dept_code")
     private String deptCode;
 
+    @ApiModelProperty(value = "配送方式编码")
+    @JsonProperty("distribution_mode_code")
+    private String distributionModeCode;
+
+    @ApiModelProperty(value = "配送方式名称")
+    @JsonProperty("distribution_mode_name")
+    private String distributionModeName;
+
 }
