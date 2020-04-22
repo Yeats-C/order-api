@@ -71,4 +71,9 @@ public class ConstantData {
      */
     public static final String SYS_OPERTOR = "系统操作";
 
+    /**
+     * 首单赠送市值使用超额申请工作流，流程key
+     */
+    public static final String FIRST_SINGLE_EXCESS_KEY = "ERP_FIRST_SINGLE_EXCESS";
+
 }

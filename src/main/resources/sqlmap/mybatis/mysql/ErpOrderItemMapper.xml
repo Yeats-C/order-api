@@ -131,6 +131,9 @@
         <if test="signDifferenceReason != null and signDifferenceReason != '' ">
             sign_difference_reason = #{signDifferenceReason},
         </if>
+        <if test="topCouponDiscountAmount != null ">
+            top_coupon_discount_amount = #{topCouponDiscountAmount},
+        </if>
         update_by_id = #{updateById},
         update_by_name = #{updateByName},
         update_time = sysdate()

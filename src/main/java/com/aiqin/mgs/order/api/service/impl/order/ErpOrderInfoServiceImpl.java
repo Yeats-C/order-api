@@ -5,8 +5,10 @@ import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayWayEnum;
+import com.aiqin.mgs.order.api.dao.OrderSplitsNumDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
+import com.aiqin.mgs.order.api.domain.OrderSplitsNum;
 import com.aiqin.mgs.order.api.domain.ProductInfo;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
@@ -65,6 +67,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     private ErpOrderCancelNoTransactionalService erpOrderCancelNoTransactionalService;
     @Resource
     private ErpStoreLockDetailsService erpStoreLockDetailsService;
+    @Resource
+    private OrderSplitsNumDao orderSplitsNumDao;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -405,6 +409,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 //删除本地缓存
                 erpStoreLockDetailsService.deleteBySkuCode(orderCode,res1.getSkuCode());
             }
+            //根据仓库拆单--添加到子订单发货表中
+            if(null!=repertorySplitMap&&repertorySplitMap.size()>0){
+                insertOrderSplitsNum(order.getOrderStoreCode(),repertorySplitMap.size());
+            }
 
         } else {
             //按照供应商拆单
@@ -529,6 +537,12 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
             this.updateOrderByPrimaryKeySelective(order, auth);
+
+            //根据供应商拆单--添加到子订单发货表中
+            if(null!=supplierItemMap&&supplierItemMap.size()>0){
+                insertOrderSplitsNum(order.getOrderStoreCode(),supplierItemMap.size());
+            }
+
         }
 
     }
@@ -879,4 +893,15 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         this.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
     }
 
+    /**
+     * 将拆单数量存入拆单数量表中
+     * @param num
+     * @param orderCode
+     */
+    private void insertOrderSplitsNum(String orderCode,Integer num){
+        OrderSplitsNum record=new OrderSplitsNum();
+        record.setNum(num);
+        record.setOrderCode(orderCode);
+        orderSplitsNumDao.insertSelective(record);
+    }
 }

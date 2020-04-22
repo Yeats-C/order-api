@@ -6,10 +6,7 @@ import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.*;
 import com.aiqin.mgs.order.api.component.SequenceService;
-import com.aiqin.mgs.order.api.component.enums.ErpLogOperationTypeEnum;
-import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
-import com.aiqin.mgs.order.api.component.enums.ErpOrderReturnRequestEnum;
-import com.aiqin.mgs.order.api.component.enums.ErpOrderReturnStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOperationTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOrderSourceEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayTypeEnum;
@@ -113,10 +110,18 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     @Override
     @Transactional
     public HttpResponse save(ReturnOrderReqVo reqVo) {
-        log.info("发起退货--入参，reqVo={}",reqVo);
+        log.info("发起退货--入参"+JSON.toJSONString(reqVo));
         //查询订单是否存在未处理售后单
         List<ReturnOrderInfo> returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndStatus(reqVo.getOrderStoreCode(), 1);
         Assert.isTrue(CollectionUtils.isEmpty(returnOrderInfo), "该订单还有未审核售后单，请稍后提交");
+        //校验原始订单的主订单关联的所有子订单是否退货完成
+        ErpOrderInfo orderByOrderCode = erpOrderQueryService.getOrderByOrderCode(reqVo.getOrderStoreCode());
+        Boolean aBoolean = checkSendOk(orderByOrderCode.getMainOrderCode());
+        //是否真的发起退货 0:预生成退货单 1:原始订单全部发货完成生成退货单
+        Integer reallyReturn=0;
+        if(aBoolean){
+            reallyReturn=1;
+        }
         ReturnOrderInfo record = new ReturnOrderInfo();
         Date now = new Date();
         BeanUtils.copyProperties(reqVo, record);
@@ -142,6 +147,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //退货单--退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户
         record.setReturnMoneyType(ConstantData.RETURN_MONEY_TYPE);
         record.setOrderSuccess(1);
+        record.setReallyReturn(reallyReturn);
         log.info("发起退货--插入退货信息，record={}",record);
         returnOrderInfoDao.insertSelective(record);
         List<ReturnOrderDetail> details = reqVo.getDetails().stream().map(detailVo -> {
@@ -210,6 +216,31 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             }
         }
         return HttpResponse.success();
+    }
+
+    /**
+     * 判断子单是否全部发货完成
+     * @param mainOrderCode
+     * @return true:全部发货完成 false:未全部发货
+     */
+    private Boolean checkSendOk(String mainOrderCode){
+        log.info("判断子单是否全部发货完成,入参mainOrderCode={}",mainOrderCode);
+        ErpOrderInfo po=new ErpOrderInfo();
+        po.setMainOrderCode(mainOrderCode);
+        List<ErpOrderInfo> list=erpOrderQueryService.select(po);
+        if(list!=null&&list.size()>0){
+            log.info("判断子单是否全部发货完成,原始订单集合为 list={}",JSON.toJSONString(list));
+            for(ErpOrderInfo eoi:list){
+                Integer orderStatus = eoi.getOrderStatus();
+                //判断订单状态是否是 11:发货完成或者 97:缺货终止
+                if(orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_11.getCode())||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_97.getCode())){
+                }else{
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override

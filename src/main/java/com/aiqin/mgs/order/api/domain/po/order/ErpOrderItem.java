@@ -95,7 +95,7 @@ public class ErpOrderItem extends PagesRequest {
     @JsonProperty("zero_disassembly_coefficient")
     private Long zeroDisassemblyCoefficient;
 
-    @ApiModelProperty(value = "商品类型 0商品（本品） 1赠品")
+    @ApiModelProperty(value = "商品类型 0商品（本品） 1赠品 2兑换赠品")
     @JsonProperty("product_type")
     private Integer productType;
 

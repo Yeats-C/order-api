@@ -1,28 +1,41 @@
 package com.aiqin.mgs.order.api.service.impl.order;
 
+import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
+import com.aiqin.mgs.order.api.component.enums.activity.ActivityRuleUnitEnum;
+import com.aiqin.mgs.order.api.component.enums.activity.ActivityTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
+import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
+import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
+import com.aiqin.mgs.order.api.domain.Activity;
+import com.aiqin.mgs.order.api.domain.ActivityRule;
 import com.aiqin.mgs.order.api.domain.AuthToken;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
+import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
 import com.aiqin.mgs.order.api.domain.request.order.*;
+import com.aiqin.mgs.order.api.service.ActivityService;
+import com.aiqin.mgs.order.api.service.CouponRuleService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
+import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
 
@@ -34,6 +47,16 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
     private ErpOrderItemService erpOrderItemService;
     @Resource
     private ErpOrderLogisticsService erpOrderLogisticsService;
+    @Resource
+    private ErpOrderInfoDao erpOrderInfoDao;
+    @Resource
+    private CouponRuleService couponRuleService;
+    @Resource
+    private ActivityService activityService;
+    @Resource
+    private ErpOrderFeeService erpOrderFeeService;
+    @Autowired
+    private ReturnOrderInfoDao returnOrderInfoDao;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -128,7 +151,6 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 boxVolumeTotal = boxVolumeTotal.add((item.getBoxVolume() == null ? BigDecimal.ZERO : item.getBoxVolume()).multiply(new BigDecimal(actualProductCount)));
 
             }
-
             erpOrderItemService.updateOrderItemList(itemList, auth);
 
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_9.getCode());
@@ -141,9 +163,54 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 order.setScourSheetStatus(ErpOrderScourSheetStatusEnum.WAIT.getCode());
             }
             erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
+            //todo 更新主单明细赠品的实际发货数量
+            updateGiftGoodsAutCount(order.getMainOrderCode(),itemList,auth);
 
         } else {
             throw new BusinessException("只有等待拣货状态且没有出货的订单才能执行该操作");
+        }
+
+
+    }
+
+    /**
+     * 根据主订单号修改赠品实发数量
+     * @param mainOrderCode
+     * @param itemList
+     */
+    private void updateGiftGoodsAutCount(String mainOrderCode,List<ErpOrderItem> itemList ,AuthToken auth){
+        log.info("根据主订单号修改赠品实发数量,mainOrderCode={}",mainOrderCode);
+        log.info("根据主订单号修改赠品实发数量,itemList={}", JSON.toJSONString(itemList));
+        log.info("根据主订单号修改赠品实发数量,auth={}",auth);
+        List<ErpOrderItem> items=new ArrayList<>();
+        Map<String,Long> map=new HashMap<>();
+        for(ErpOrderItem eoi:itemList){
+            //挑选出赠品明细行
+            if(null!=eoi.getProductType()&&!eoi.getProductType().equals(ErpProductGiftEnum.PRODUCT.getCode())){
+                map.put(eoi.getSkuCode(),eoi.getActualProductCount());
+            }
+        }
+        log.info("根据主订单号修改赠品实发数量,赠品 map={}",map);
+        //判断是否有赠品，如果有则进行后面的数量修改
+        if(null!=map&&map.size()>0){
+            //根据主订单编码，查询主订单明细，进行赠品数量修改
+            List<ErpOrderItem> erpOrderItemList = erpOrderItemService.selectOrderItemListByOrderCode(mainOrderCode);
+            for(ErpOrderItem erpOrderItem:erpOrderItemList){
+                //挑选出赠品明细行
+                if(null!=erpOrderItem.getProductType()&&!erpOrderItem.getProductType().equals(ErpProductGiftEnum.PRODUCT.getCode())&&map.containsKey(erpOrderItem.getSkuCode())){
+                    //根据sku拿到赠品实发数量
+                    Long count=map.get(erpOrderItem.getSkuCode());
+                    if(null!=erpOrderItem.getActualProductCount()){
+                        count=count+erpOrderItem.getActualProductCount();
+                    }
+                    erpOrderItem.setActualProductCount(count);
+                    items.add(erpOrderItem);
+                }
+            }
+            log.info("根据主订单号修改赠品实发数量,需修改的明细集合 items={}",JSON.toJSONString(items));
+            //进行赠品实发数量修改
+            erpOrderItemService.updateOrderItemList(itemList, auth);
+            log.info("根据主订单号修改赠品实发数量,成功");
         }
 
 
@@ -283,6 +350,29 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_11.getCode());
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_10.getCode());
             erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
+            //todo 判断是否全部发货，然后做均摊
+            //查询子单是否全部发货完成
+            Boolean aBoolean = checkSendOk(order.getMainOrderCode());
+            log.info("判断子单是否全部发货完成,返回结果 aBoolean={}",aBoolean);
+            if(aBoolean){//全部发货完成
+                //三步均摊
+                shareEqually(order.getMainOrderCode());
+                //遍历退货单，查看是否有退单
+                ErpOrderInfo e=new ErpOrderInfo();
+                e.setMainOrderCode(order.getMainOrderCode());
+                List<ErpOrderInfo> orderList = erpOrderQueryService.select(e);
+                //如果子订单中有退货情况，现在更想预生成的退货单的 是否发起退货状态
+                if(orderList!=null&&orderList.size()>0){
+                    //遍历出所有的子订单号
+                    List<String> orderCodes=orderList.stream().map(ErpOrderInfo::getOrderStoreCode).collect(Collectors.toList());
+                    log.info("修改订单为发货状态---全部发货完成,修改退货单是否发起退货状态，入参orderCodes={}",JSON.toJSONString(orderCodes));
+                    if(null!=orderCodes&&orderCodes.size()>0){
+                        returnOrderInfoDao.updateReallyReturn(orderCodes);
+                        log.info("修改订单为发货状态---全部发货完成,修改退货单是否发起退货状态，成功");
+                    }
+                }
+            }
+
             boolean flag=false;
             //这两个都走线下支付物流费用
             if(ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(order.getOrderTypeCode())){//配送
@@ -309,6 +399,324 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             //均摊物流费用
             this.distributeLogisticsFee(orderLogistics.getLogisticsCode());
         }
+    }
+
+    /**
+     * 子单全部发货完后进行均摊
+     * @param mainOrderCode
+     */
+    private void shareEqually(String mainOrderCode){
+        log.info("子单全部发货完成进行均摊--入参 mainOrderCode={}",mainOrderCode);
+        ErpOrderInfo orderAndItemByOrderCode = erpOrderQueryService.getOrderAndItemByOrderCode(mainOrderCode);
+        log.info("子单全部发货完成进行均摊--查询原始主订单及详情返回结果 orderAndItemByOrderCode={}",JSON.toJSONString(orderAndItemByOrderCode));
+        /******************挑选活动和可用A品券商品明细**********************/
+        List<ErpOrderItem> itemList = orderAndItemByOrderCode.getItemList();
+
+        //活动id:商品明细行
+        Map<String, List<ErpOrderItem>> activityCartMap = new HashMap<>();
+        //活动id:商品总金额
+        Map<String, BigDecimal> activityMoneyMap = new HashMap<>();
+        //活动id:商品总价值
+        Map<String, BigDecimal> activityPriceMoneyMap = new HashMap<>();
+        //活动id:商品数量 用于活动
+        Map<String, Integer> quantityMap = new HashMap<>();
+        //筛选出活动明细行
+        for(ErpOrderItem item:itemList){
+            //商品类型  0商品 1赠品
+            Integer productType = item.getProductType();
+            //商品总金额=活动价X订货数量（赠品的话：活动价X发货数量）
+            BigDecimal totalMoney=BigDecimal.ZERO;
+            //商品总价值=分销单价X订货数量
+            BigDecimal totalPriceMoney=BigDecimal.ZERO;
+            //商品数量
+            Integer quantity = 0;
+            //活动id:商品明细行 添加数据
+            if (null!=item.getActivityId()&&activityCartMap.containsKey(item.getActivityId())) {
+                List<ErpOrderItem> items = activityCartMap.get(item.getActivityId());
+                items.add(item);
+                activityCartMap.put(item.getActivityId(),items);
+                if(null!=activityMoneyMap.get(item.getActivityId())){
+                    totalMoney=activityMoneyMap.get(item.getActivityId());
+                }
+                //判断是否为赠品
+                if(ErpProductGiftEnum.GIFT.getCode().equals(productType)){
+                    //赠品使用实发数量
+                    BigDecimal multiply = item.getActivityPrice().multiply(new BigDecimal(item.getActualProductCount()));
+                    totalMoney=totalMoney.add(multiply);
+                }else{
+                    //商品用订货数量
+                    BigDecimal multiply = item.getActivityPrice().multiply(new BigDecimal(item.getProductCount()));
+                    totalMoney=totalMoney.add(multiply);
+                }
+                activityMoneyMap.put(item.getActivityId(),totalMoney);
+
+                if(null!=activityPriceMoneyMap.get(item.getActivityId())){
+                    totalPriceMoney=activityPriceMoneyMap.get(item.getActivityId());
+                }
+                BigDecimal multiply1 = item.getProductAmount().multiply(new BigDecimal(item.getProductCount()));
+                totalPriceMoney=totalPriceMoney.add(multiply1);
+                activityPriceMoneyMap.put(item.getActivityId(),totalPriceMoney);
+
+                if(null!=item.getActivityId()){
+                    quantity=quantityMap.get(item.getActivityId());
+                }
+                quantity=quantity+item.getProductCount().intValue();
+                quantityMap.put(item.getActivityId(),quantity);
+            }else {
+                List<ErpOrderItem> items1 =new ArrayList<>();
+                items1.add(item);
+                activityCartMap.put(item.getActivityId(),items1);
+                if(null!=activityMoneyMap.get(item.getActivityId())){
+                    totalMoney=activityMoneyMap.get(item.getActivityId());
+                }
+                if(ErpProductGiftEnum.GIFT.getCode().equals(productType)){
+                    //赠品使用实发数量
+                    BigDecimal multiply = item.getActivityPrice().multiply(new BigDecimal(item.getActualProductCount()));
+                    totalMoney=totalMoney.add(multiply);
+                }else{
+                    //商品用订货数量
+                    BigDecimal multiply = item.getActivityPrice().multiply(new BigDecimal(item.getProductCount()));
+                    totalMoney=totalMoney.add(multiply);
+                }
+                activityMoneyMap.put(item.getActivityId(),totalMoney);
+
+                BigDecimal multiply1 = item.getProductAmount().multiply(new BigDecimal(item.getProductCount()));
+                if(null!=activityPriceMoneyMap.get(item.getActivityId())){
+                    totalPriceMoney=activityPriceMoneyMap.get(item.getActivityId());
+                }
+                totalPriceMoney=totalPriceMoney.add(multiply1);
+                activityPriceMoneyMap.put(item.getActivityId(),totalPriceMoney);
+            }
+        }
+        log.info("子单全部发货完成进行均摊--活动id:商品明细行 activityCartMap={}",activityCartMap);
+        log.info("子单全部发货完成进行均摊--活动id:商品金额 activityMoneyMap={}",activityMoneyMap);
+        log.info("子单全部发货完成进行均摊--活动id:商品价值 activityPriceMoneyMap={}",activityPriceMoneyMap);
+        log.info("子单全部发货完成进行均摊--活动id:商品数量 quantityMap={}",quantityMap);
+        /******************商品挑选完成进行活动均摊**********************/
+        //记录活动分摊后的数据
+        Map<String,ErpOrderItem> activityAfterMap=new HashMap<>();
+        //活动均摊
+        for(Map.Entry<String, List<ErpOrderItem>> m:activityCartMap.entrySet()){
+            HttpResponse<ActivityRequest> activityDetailResponse = activityService.getActivityDetail(m.getKey());
+            ActivityRequest activityRequest=activityDetailResponse.getData();
+            Activity activity = activityRequest.getActivity();
+            List<ActivityRule> activityRules = activityRequest.getActivityRules();
+            /**活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单*/
+            Integer activityType = activity.getActivityType();
+            String activityId= m.getKey();
+            List<ErpOrderItem> li=m.getValue();
+            //商品总金额
+            BigDecimal productAmount=activityMoneyMap.get(activityId);
+            //商品总价值
+            BigDecimal productPriceAmount=activityPriceMoneyMap.get(activityId);
+            //缓存当前命中的规则
+            ActivityRule curRule = null;
+            //最小梯度
+            ActivityRule firstRule = null;
+            //商品数量
+            Integer quantity = quantityMap.get(activityId);
+            //优惠金额
+            BigDecimal youHuiAmount=BigDecimal.ZERO;
+            switch (activityType){
+                case 1:
+                    for(ActivityRule ruleItem:activityRules){
+
+                        //筛选最小梯度
+                        if (firstRule == null || ruleItem.getMeetingConditions().compareTo(firstRule.getMeetingConditions()) < 0) {
+                            firstRule = ruleItem;
+                        }
+
+                        //是否把当前梯度作为命中梯度
+                        boolean flag = false;
+
+                        if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(ruleItem.getRuleUnit())) {
+                            //按照数量
+
+                            if (ruleItem.getMeetingConditions().compareTo(new BigDecimal(quantity)) <= 0) {
+                                if (curRule == null) {
+                                    flag = true;
+                                } else {
+                                    if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                        flag = true;
+                                    }
+                                }
+                            }
+
+                        } else if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(ruleItem.getRuleUnit())) {
+                            //按照金额
+
+                            if (ruleItem.getMeetingConditions().compareTo(productPriceAmount) <= 0) {
+                                if (curRule == null) {
+                                    flag = true;
+                                } else {
+                                    if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                        flag = true;
+                                    }
+                                }
+                            }
+
+                        } else {
+
+                        }
+
+                        if (flag) {
+                            curRule = ruleItem;
+                        }
+
+                    }
+                    if (curRule != null) {//命中规则
+                        youHuiAmount=curRule.getPreferentialAmount();
+                        //满减活动商品总金额=商品总金额-优惠金额
+                        productAmount=productAmount.subtract(youHuiAmount);
+                    }
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    break;
+                case 5:
+                    break;
+                case 6:
+                    break;
+
+            }
+            for(ErpOrderItem eo:li){
+                //分销总价=商品价值
+                BigDecimal fenxiaozongjia=eo.getProductAmount().multiply(new BigDecimal(eo.getProductCount()));
+                //分摊总额=商品价值X商品总金额/商品总价值
+                BigDecimal totalPreferentialAmount=fenxiaozongjia.multiply(productAmount).divide(productPriceAmount,2,BigDecimal.ROUND_HALF_UP);
+                //分摊单价
+                BigDecimal preferentialAmount=totalPreferentialAmount.divide(new BigDecimal(eo.getProductCount()),2,BigDecimal.ROUND_HALF_UP);
+                eo.setTotalPreferentialAmount(totalPreferentialAmount);
+                eo.setPreferentialAmount(preferentialAmount);
+                activityAfterMap.put(eo.getOrderInfoDetailId(),eo);
+            }
+        }
+        log.info("子单全部发货完成进行均摊--活动分摊--活动分摊后的数据 activityAfterMap={}",activityAfterMap);
+        //遍历原始明细行，将活动分摊后的数据填充进去
+        for(ErpOrderItem e:itemList){
+            String orderInfoDetailId = e.getOrderInfoDetailId();
+            if(null!=activityAfterMap.get(orderInfoDetailId)){
+                ErpOrderItem o= activityAfterMap.get(orderInfoDetailId);
+                e.setTotalPreferentialAmount(o.getTotalPreferentialAmount());
+                e.setPreferentialAmount(o.getPreferentialAmount());
+            }
+        }
+        log.info("子单全部发货完成进行均摊--活动分摊--分摊后 分摊后原始明细行集合 itemList={}",JSON.toJSONString(itemList));
+        /************************************A品券均摊**********************************/
+        //A品券商品明细行
+        List<ErpOrderItem> list = new ArrayList<>();
+        //符合分摊A品卷规则的商品
+        Map map = couponRuleService.couponRuleMap();
+        //商品总价值
+        BigDecimal priceAmount=BigDecimal.ZERO;
+        //商品总金额
+        BigDecimal amount=BigDecimal.ZERO;
+        String orderId="";
+        for(ErpOrderItem o:itemList){
+            //商品属性编码
+            String productPropertyCode = o.getProductPropertyCode();
+            //商品类型  0商品 1赠品
+            Integer productType = o.getProductType();
+            //判断是否是A品券商品
+            if(null!=productPropertyCode&&map.containsKey(productPropertyCode)&&null!=productType&&productType.equals(ErpProductGiftEnum.PRODUCT.getCode())){
+                list.add(o);
+                priceAmount=priceAmount.add(o.getTotalPreferentialAmount());
+            }
+            orderId=o.getOrderStoreId();
+        }
+        log.info("子单全部发货完成进行均摊--A品券分摊--商品价值 priceAmount={}",priceAmount);
+        //查询A品券抵扣金额
+        ErpOrderFee erpOrderFee=erpOrderFeeService.getOrderFeeByOrderId(orderId);
+        log.info("子单全部发货完成进行均摊--A品券分摊--费用信息 erpOrderFee={}",erpOrderFee);
+        BigDecimal topCouponMoney = erpOrderFee.getTopCouponMoney();
+        log.info("子单全部发货完成进行均摊--A品券分摊--A品券抵扣金额 topCouponMoney={}",topCouponMoney);
+        amount=priceAmount.subtract(topCouponMoney);
+        log.info("子单全部发货完成进行均摊--A品券分摊--商品金额 amount={}",amount);
+        //记录A品券分摊后的数据
+        Map<String,ErpOrderItem> couponAfterMap=new HashMap<>();
+        for(ErpOrderItem o:list){
+            //本行商品价值
+            BigDecimal totalPreferentialAmount = o.getTotalPreferentialAmount();
+            //分摊总金额=本行商品价值X商品总金额/商品总价值
+            BigDecimal to=totalPreferentialAmount.multiply(amount).divide(priceAmount,2,BigDecimal.ROUND_HALF_UP);
+            //分摊单价
+            BigDecimal per=to.divide(new BigDecimal(o.getProductCount()),2,BigDecimal.ROUND_HALF_UP);
+            //A品券单行抵扣总金额=A品券抵扣金额X本行商品价值/商品总价值
+            BigDecimal at = topCouponMoney.multiply(totalPreferentialAmount).divide(priceAmount, 2, BigDecimal.ROUND_HALF_UP);
+            //A品券单行每个商品抵扣金额
+            BigDecimal ap=at.divide(new BigDecimal(o.getProductCount()));
+            o.setTotalPreferentialAmount(to);
+            o.setPreferentialAmount(per);
+            o.setTopCouponDiscountAmount(at);
+            couponAfterMap.put(o.getOrderInfoDetailId(),o);
+        }
+        log.info("子单全部发货完成进行均摊--A品券分摊--分摊结果map couponAfterMap={}",couponAfterMap);
+        for(ErpOrderItem f:itemList){
+            String orderInfoDetailId = f.getOrderInfoDetailId();
+            if(null!=couponAfterMap.get(orderInfoDetailId)){
+                ErpOrderItem o= couponAfterMap.get(orderInfoDetailId);
+                f.setTotalPreferentialAmount(o.getTotalPreferentialAmount());
+                f.setPreferentialAmount(o.getPreferentialAmount());
+            }
+        }
+        log.info("子单全部发货完成进行均摊--A品券分摊--分摊后原始明细行集合 itemList={}",JSON.toJSONString(itemList));
+        /************************************赠品均摊**********************************/
+        //实付金额
+        BigDecimal payMoney = erpOrderFee.getPayMoney();
+        log.info("子单全部发货完成进行均摊--赠品均摊--实付金额 payMoney={}",payMoney);
+        //商品总价值=（商品或活动赠品分摊总额相加）+（自选赠品实发数量X分销价）的和
+        BigDecimal totalMoney = erpOrderFee.getPayMoney();
+        //遍历明细行，计算商品总价值
+        for(ErpOrderItem p:itemList){
+            Integer productType = p.getProductType();
+            if(ErpProductGiftEnum.JIFEN.getCode().equals(productType)){
+                //兑换赠品本行商品价值=分销价X订货数量
+                BigDecimal multiply = p.getProductAmount().multiply(new BigDecimal(p.getActualProductCount()));
+                p.setTotalPreferentialAmount(multiply);
+                totalMoney=totalMoney.add(multiply);
+            }else{
+                //其他商品按照分摊总金额累加
+                totalMoney=totalMoney.add(p.getTotalPreferentialAmount());
+            }
+        }
+        log.info("子单全部发货完成进行均摊--赠品均摊--商品总价值 totalMoney={}",totalMoney);
+        //最后分摊完的商品明细，用于明细更新使用
+        List<ErpOrderItem> resList=new ArrayList<>();
+        //遍历明细行，进行分摊
+        for(ErpOrderItem k:itemList){
+            //分摊总价=商品原始分摊总价X实付金额/商品总价值
+            BigDecimal tper = k.getTotalPreferentialAmount().multiply(payMoney).divide(totalMoney, 2, BigDecimal.ROUND_HALF_UP);
+            //商品类型
+            Integer productType = k.getProductType();
+            BigDecimal s=BigDecimal.ZERO;
+            if(ErpProductGiftEnum.PRODUCT.getCode().equals(productType)){
+                //商品分摊单价=分摊总金额/订货数量
+                s=tper.divide(new BigDecimal(k.getProductCount()));
+            }else {
+                //赠品分摊单价=分摊总金额/实发数量
+                s=tper.divide(new BigDecimal(k.getActualProductCount()));
+            }
+            k.setTotalPreferentialAmount(tper);
+            k.setPreferentialAmount(s);
+            ErpOrderItem er=new ErpOrderItem();
+            er.setTotalPreferentialAmount(k.getTotalPreferentialAmount());
+            er.setPreferentialAmount(k.getPreferentialAmount());
+            er.setTopCouponDiscountAmount(k.getTopCouponDiscountAmount());
+            er.setOrderInfoDetailId(k.getOrderInfoDetailId());
+            er.setId(k.getId());
+            resList.add(er);
+        }
+        log.info("子单全部发货完成进行均摊--赠品均摊--分摊完后原始订单明细集合 itemList={}",JSON.toJSONString(itemList));
+        /*****************************************分摊计算结束，更新明细表*****************************************/
+        log.info("子单全部发货完成进行均摊--所有分摊结束--更新原始订单明细集合 resList={}",JSON.toJSONString(resList));
+        AuthToken auth=new AuthToken();
+        auth.setPersonId("系统操作");
+        auth.setPersonName("系统操作");
+        erpOrderItemService.updateOrderItemList(resList,auth);
+        log.info("子单全部发货完成进行均摊--更新明细表结束");
     }
 
     @Override
@@ -361,4 +769,31 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
         }
     }
+
+    /**
+     * 判断子单是否全部发货完成
+     * @param mainOrderCode
+     * @return true:全部发货完成 false:未全部发货
+     */
+    private Boolean checkSendOk(String mainOrderCode){
+        log.info("判断子单是否全部发货完成,入参mainOrderCode={}",mainOrderCode);
+        ErpOrderInfo po=new ErpOrderInfo();
+        po.setMainOrderCode(mainOrderCode);
+        List<ErpOrderInfo> list=erpOrderInfoDao.select(po);
+        if(list!=null&&list.size()>0){
+            log.info("判断子单是否全部发货完成,原始订单集合为 list={}",JSON.toJSONString(list));
+            for(ErpOrderInfo eoi:list){
+                Integer orderStatus = eoi.getOrderStatus();
+                //判断订单状态是否是 11:发货完成或者 97:缺货终止
+                if(orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_11.getCode())||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_97.getCode())){
+                }else{
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+
 }

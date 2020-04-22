@@ -182,7 +182,7 @@ public class ReturnOrderInfoController {
     }
 
     @GetMapping("/getOrderDetail")
-    @ApiOperation("一般退货--修改商品使用")
+    @ApiOperation("一般退货--修改商品使用-查询订单详情")
     public HttpResponse<List<ErpOrderItem>> getOrderDetail(String orderCode) {
         return returnOrderInfoService.getOrderDetail(orderCode);
     }

@@ -1,8 +1,10 @@
 package com.aiqin.mgs.order.api.service.order;
 
 import com.aiqin.mgs.order.api.domain.AuthToken;
+import com.aiqin.mgs.order.api.domain.OrderGiveApproval;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
+import com.aiqin.platform.flows.client.domain.vo.FormCallBackVo;
 
 /**
  * 创建订单service
@@ -45,4 +47,18 @@ public interface ErpOrderCreateService {
      * @date 2019/12/9 14:00
      */
     ErpOrderInfo saveRackOrder(ErpOrderSaveRequest erpOrderSaveRequest, AuthToken auth);
+
+    /**
+     * 订单金额超出市值赠送金额--审批流回调地址
+     * @param formCallBackVo
+     * @return
+     */
+    String callback(FormCallBackVo formCallBackVo);
+
+    /**
+     * 根据formNo查询审批详情
+     * @param formNo
+     * @return
+     */
+    OrderGiveApproval getDetailByformNo(String formNo);
 }
