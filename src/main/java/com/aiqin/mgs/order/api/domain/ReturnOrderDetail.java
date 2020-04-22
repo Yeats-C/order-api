@@ -51,7 +51,7 @@ public class ReturnOrderDetail {
     @ApiModelProperty(value = "单位名称")
     private String unitName;
 
-    @ApiModelProperty(value = "商品类型 0商品 1赠品")
+    @ApiModelProperty(value = "商品类型 0商品 1赠品 2:兑换赠品")
     private Integer productType;
 
     @ApiModelProperty(value = "拆零系数")
