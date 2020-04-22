@@ -162,6 +162,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         String orderCode = sequenceGeneratorService.generateOrderCode();
         //判断是否需要审批--赠送市值余额不够。进行审批 true
         Boolean flag1=false;
+        //判断是首单赠送市值订单。进行审批 true
+        Boolean flag2=false;
         //首单赠送--加入了市值赠送金额判断
         if(ErpOrderTypeEnum.DIRECT_SEND.getCode().equals(erpOrderSaveRequest.getOrderType())&&ErpOrderCategoryEnum.ORDER_TYPE_4.getCode().equals(erpOrderSaveRequest.getOrderCategory())){
             Map<ErpOrderFee,Boolean> res=firstGivePrice(erpOrderSaveRequest.getApplier(),erpOrderSaveRequest.getDeptCode(),orderCode,storeInfo,erpOrderItemList, erpOrderSaveRequest.getTopCouponCodeList());
@@ -169,13 +171,14 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 orderFee = r.getKey();
                 flag1=r.getValue();
             }
+            flag2=true;
         }else {
             //计算A品券分摊金额
             orderFee = shareTopCouponPrice(erpOrderItemList, erpOrderSaveRequest.getTopCouponCodeList());
         }
         //生成订单主体信息
 //        ErpOrderInfo order = generateOrder(erpOrderItemList, storeInfo, erpOrderSaveRequest, orderFee,auth);
-        ErpOrderInfo order = generateOrder(flag1,erpOrderItemList, storeInfo, erpOrderSaveRequest, orderFee,auth);
+        ErpOrderInfo order = generateOrder(flag1,flag2,erpOrderItemList, storeInfo, erpOrderSaveRequest, orderFee,auth);
         log.info("创建订单,生成订单主体信息返回结果order={}",order);
         //保存订单、订单明细、订单支付、订单收货人信息、订单日志
         order.setOrderStoreCode(orderCode);
@@ -633,6 +636,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     /**
      * 构建订单信息
      *
+     * @param flag       是否是首单赠送超额审批 true：需要审批
+     * @param flag1      是否是首单赠送市值订单 true：是
      * @param orderItemList       订单商品明细行
      * @param storeInfo           门店信息
      * @param erpOrderSaveRequest 保存订单参数
@@ -643,7 +648,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @date 2019/11/27 19:04
      */
 //    private ErpOrderInfo generateOrder(List<ErpOrderItem> orderItemList, StoreInfo storeInfo, ErpOrderSaveRequest erpOrderSaveRequest,ErpOrderFee orderFee, AuthToken auth) {
-    private ErpOrderInfo generateOrder(boolean flag,List<ErpOrderItem> orderItemList, StoreInfo storeInfo, ErpOrderSaveRequest erpOrderSaveRequest,ErpOrderFee orderFee, AuthToken auth) {
+    private ErpOrderInfo generateOrder(boolean flag,boolean flag1,List<ErpOrderItem> orderItemList, StoreInfo storeInfo, ErpOrderSaveRequest erpOrderSaveRequest,ErpOrderFee orderFee, AuthToken auth) {
         log.info("构建订单信息--入参,orderItemList={}",orderItemList);
         log.info("构建订单信息--入参,storeInfo={}",storeInfo);
         log.info("构建订单信息--入参,erpOrderSaveRequest={}",erpOrderSaveRequest);
@@ -772,6 +777,12 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setDistributionModeCode(erpOrderSaveRequest.getDistributionModeCode());
         //配送方式名称
         order.setDistributionModeName(erpOrderSaveRequest.getDistributionModeName());
+        //是否为首单市值赠送订单 0:不是 1:是
+        if(flag1){
+            order.setFirstMarketValueGift(1);
+        }else {
+            order.setFirstMarketValueGift(0);
+        }
         log.info("构建订单信息--封装结果,order={}",order);
         return order;
     }
