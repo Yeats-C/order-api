@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Data
-@ApiModel(value = "erp端查询购物车返回数据")
+@ApiModel(value = "查询赠品池返回数据")
 public class GiftCartQueryResponse {
 
     @ApiModelProperty(value = "兑换赠品池商品列表")
