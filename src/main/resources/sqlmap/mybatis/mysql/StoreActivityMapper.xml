@@ -33,12 +33,12 @@
           sum(t2.total) as orderCount, sum(t2.saleAmount) as saleAmount
         from(
             select
-            t1.member_status, count(DISTINCT t1.id) AS total, sum(t1.actual_price*t1.amount) as saleAmount
+            t1.member_status, count(DISTINCT t1.id) AS total, sum(t1.total_price) as saleAmount
             from(
                 select
                  oi.id,
                  case when length(TRIM(oi.member_id))>0 then '1' else '0' end as member_status,
-                 od.activity_id as activity_id, od.actual_price as actual_price, od.amount as amount
+                 od.activity_id as activity_id, od.total_price as total_price, od.amount as amount
                 from order_consumer_info oi
                 left join order_consumer_detail od on oi.order_id = od.order_id
                where oi.distributor_id=#{storeId} and oi.order_status in (1,2,3,5,6,7)
@@ -69,7 +69,7 @@
             resultType="com.aiqin.mgs.order.api.domain.activity.ActivityOrderInfo">
         select
           od.activity_name as activityName, oi.order_code as orderCode,od.activity_id as activityId,
-          ifnull(sum(ifnull(od.actual_price,0)*ifnull(od.amount,0)),0) saleAmount,
+          ifnull(sum(od.total_price),0) saleAmount,
           oi.member_name as memberName, oi.member_phone as memberPhone, oi.create_time as createTime
         from order_consumer_detail od
         left join order_consumer_info oi on oi.order_id=od.order_id
@@ -97,7 +97,7 @@
     </select>
     <select id="selectActivityOrderProduct" parameterType="com.aiqin.mgs.order.api.domain.activity.ActivityOrderInfo"
             resultType="com.aiqin.mgs.order.api.domain.OrderDetailInfo">
-        select  od.amount as amount , od.actual_price as actualPrice,od.sku_code as skuCode,od.package_id as packageId
+        select  od.amount as amount , od.actual_price as actualPrice,od.sku_code as skuCode,od.package_id as packageId,od.total_price as totalPrice
         from order_consumer_detail od,order_consumer_info oi
         where  oi.order_id=od.order_id and activity_id=#{activityId}
         <if test="activityType != null and activityType != 4">
@@ -118,6 +118,6 @@
             </if>
         </if>
         and oi.order_status  NOT IN ('0','4')
-
+        and oi.gift_status=0
     </select>
 </mapper>
