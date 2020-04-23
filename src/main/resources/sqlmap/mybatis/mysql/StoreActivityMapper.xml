@@ -118,6 +118,5 @@
             </if>
         </if>
         and oi.order_status  NOT IN ('0','4')
-        and oi.gift_status=0
     </select>
 </mapper>
