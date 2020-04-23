@@ -114,7 +114,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //查询订单是否存在未处理售后单
         List<ReturnOrderInfo> returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndStatus(reqVo.getOrderStoreCode(), 1);
         Assert.isTrue(CollectionUtils.isEmpty(returnOrderInfo), "该订单还有未审核售后单，请稍后提交");
-        //校验原始订单的主订单关联的所有子订单是否退货完成
+        //校验原始订单的主订单关联的所有子订单是否发货完成
         ErpOrderInfo orderByOrderCode = erpOrderQueryService.getOrderByOrderCode(reqVo.getOrderStoreCode());
         Boolean aBoolean = checkSendOk(orderByOrderCode.getMainOrderCode());
         //是否真的发起退货 0:预生成退货单 1:原始订单全部发货完成生成退货单
