@@ -7,17 +7,20 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpProductGiftEnum;
 import com.aiqin.mgs.order.api.component.enums.YesOrNoEnum;
+import com.aiqin.mgs.order.api.dao.gift.ComplimentaryWarehouseCorrespondenceDao;
 import com.aiqin.mgs.order.api.dao.gift.ErpOrderGiftPoolCartDao;
 import com.aiqin.mgs.order.api.dao.gift.GiftPoolDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.po.cart.ErpOrderCartInfo;
+import com.aiqin.mgs.order.api.domain.po.gift.ComplimentaryWarehouseCorrespondence;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftPool;
 import com.aiqin.mgs.order.api.domain.request.cart.*;
 import com.aiqin.mgs.order.api.domain.request.gift.GiftCartUpdateRequest;
 import com.aiqin.mgs.order.api.domain.request.product.StockBatchRespVO;
+import com.aiqin.mgs.order.api.domain.request.stock.ProductSkuStockRespVo;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpCartAddItemResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpCartQueryResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpOrderCartAddResponse;
@@ -58,6 +61,9 @@ public class GiftPoolServiceImpl implements GiftPoolService {
     @Resource
     private BridgeProductService bridgeProductService;
 
+    @Resource
+    private ComplimentaryWarehouseCorrespondenceDao correspondenceDao;
+
 
 
 
@@ -67,6 +73,24 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         HttpResponse httpResponse=HttpResponse.success();
         giftPoolDao.add(giftPool);
         //TODO  此处需调用供应链接口，通过skuCode查询仓库信息，并记录表
+        List<String> skuCodes=new ArrayList<>();
+        skuCodes.add(giftPool.getSkuCode());
+        List<ProductSkuStockRespVo> stockRespVoList=bridgeProductService.findStockDetail(skuCodes);
+        if(null==stockRespVoList){
+            throw new BusinessException("查询供应链 根据skucode获取库存详情 /search/spu/findStockDetail 接口失败，参数为"+giftPool.getSkuCode());
+        }
+        ProductSkuStockRespVo respVo=stockRespVoList.get(0);
+        if(null==respVo || null==respVo.getStockBatchRespVOList()){
+            throw new BusinessException("查询供应链 根据skucode获取库存详情 /search/spu/findStockDetail 接口失败，库存信息为空，参数为"+giftPool.getSkuCode());
+        }
+        List<ComplimentaryWarehouseCorrespondence> correspondenceList=new ArrayList<>();
+        for(StockBatchRespVO stockBatchRespVO:respVo.getStockBatchRespVOList()){
+            ComplimentaryWarehouseCorrespondence correspondence=new ComplimentaryWarehouseCorrespondence();
+            correspondence.setSkuCode(stockBatchRespVO.getSkuCode());
+            correspondence.setWarehouseCode(stockBatchRespVO.getTransportCenterCode());
+            correspondenceList.add(correspondence);
+        }
+        correspondenceDao.insertList(correspondenceList);
         return httpResponse;
     }
 
@@ -188,7 +212,7 @@ public class GiftPoolServiceImpl implements GiftPoolService {
                 erpOrderCartInfo.setProductSize(skuDetail.getModelNumber());
                 erpOrderCartInfo.setProductType(erpCartAddRequest.getProductType());
                 erpOrderCartInfo.setCreateSource(erpCartAddRequest.getCreateSource());
-                erpOrderCartInfo.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
+                erpOrderCartInfo.setProductGift(ErpProductGiftEnum.JIFEN.getCode());
                 erpOrderCartInfo.setLineCheckStatus(YesOrNoEnum.YES.getCode());
                 erpOrderCartInfo.setZeroRemovalCoefficient(skuDetail.getZeroRemovalCoefficient());
                 erpOrderCartInfo.setMaxOrderNum(skuDetail.getMaxOrderNum());
@@ -336,7 +360,8 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         StoreInfo store = erpOrderRequestService.getStoreInfoByStoreId(giftPool.getStoreId());
         //TODO 此处需通过门店省市id查询此门店有多少仓库的权限【接口暂时待供应链提供】
         //总之，应该拿到一个仓库list数据，string类型
-
+        List<String> warehouseCodeList=bridgeProductService.findTransportCenter(store.getProvinceId(),store.getCityId());
+        giftPool.setWarehouseCodeList(warehouseCodeList);
 
         List<GiftPool> giftPoolList=giftPoolDao.getGiftPoolListByWarehouseCodeList(giftPool);
         List<String> skuCodeList = new ArrayList<>();
@@ -521,7 +546,7 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         BigDecimal cartProductTotalPrice = BigDecimal.ZERO;
         if (select != null && select.size() > 0) {
             for (ErpOrderCartInfo item : select) {
-                cartProductTotalPrice.add(item.getPrice().multiply(new BigDecimal(item.getPrice().toString()))) ;
+                cartProductTotalPrice= cartProductTotalPrice.add(item.getPrice().multiply(new BigDecimal(item.getAmount().toString()))) ;
             }
         }
         return cartProductTotalPrice;
@@ -580,10 +605,10 @@ public class GiftPoolServiceImpl implements GiftPoolService {
     @Override
     public void updateCartMultilineProducts(List<GiftCartUpdateRequest> giftCartUpdateRequestList, AuthToken auth) {
         LOGGER.info("修改兑换赠品购物车多行数据 updateCartMultilineProducts 参数为：{}", giftCartUpdateRequestList);
-        Map map=new HashMap();
-        String storeId=null;
-        Integer productType=0;
-        for (GiftCartUpdateRequest req:giftCartUpdateRequestList) {
+        Map map = new HashMap();
+        String storeId = null;
+        Integer productType = 0;
+        for (GiftCartUpdateRequest req : giftCartUpdateRequestList) {
             if (null != req.getCartId()) {
                 map.put(req.getCartId(), req.getCartId());
                 storeId = req.getStoreId();
@@ -592,35 +617,35 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         }
 
         if (null != storeId) {
-                ErpOrderCartInfo query = new ErpOrderCartInfo();
-                query.setStoreId(storeId);
-                query.setProductType(productType);
-                query.setLineCheckStatus(YesOrNoEnum.YES.getCode());
-                List<ErpOrderCartInfo> cartLineList = erpOrderGiftPoolCartDao.select(query);
+            ErpOrderCartInfo query = new ErpOrderCartInfo();
+            query.setStoreId(storeId);
+            query.setProductType(productType);
+            query.setLineCheckStatus(YesOrNoEnum.YES.getCode());
+            List<ErpOrderCartInfo> cartLineList = erpOrderGiftPoolCartDao.select(query);
 
-                for (ErpOrderCartInfo erpOrderCartInfo : cartLineList) {
-                    if (!map.containsKey(erpOrderCartInfo.getCartId())) {
-                        erpOrderGiftPoolCartDao.deleteByPrimaryKey(erpOrderCartInfo.getId());
-                    }
+            for (ErpOrderCartInfo erpOrderCartInfo : cartLineList) {
+                if (!map.containsKey(erpOrderCartInfo.getCartId())) {
+                    erpOrderGiftPoolCartDao.deleteByPrimaryKey(erpOrderCartInfo.getId());
                 }
             }
-            for (GiftCartUpdateRequest request : giftCartUpdateRequestList) {
-                if (null == request.getCartId()) {
-                    ErpCartAddRequest erpCartAddRequest = new ErpCartAddRequest();
-                    erpCartAddRequest.setCreateSource("1");
-                    erpCartAddRequest.setProductType(request.getProductType());
-                    erpCartAddRequest.setStoreId(request.getStoreId());
-                    erpCartAddRequest.setProducts(request.getProducts());
-                    addProduct(erpCartAddRequest, auth);
-                } else {
-                    ErpCartUpdateRequest erpCartUpdateRequest = new ErpCartUpdateRequest();
-                    erpCartUpdateRequest.setActivityId(request.getActivityId());
-                    erpCartUpdateRequest.setAmount(request.getAmount());
-                    erpCartUpdateRequest.setCartId(request.getCartId());
-                    erpCartUpdateRequest.setLineCheckStatus(request.getLineCheckStatus());
-                    updateCartLineProduct(erpCartUpdateRequest, auth);
+        }
+        for (GiftCartUpdateRequest request : giftCartUpdateRequestList) {
+            if (null == request.getCartId()) {
+                ErpCartAddRequest erpCartAddRequest = new ErpCartAddRequest();
+                erpCartAddRequest.setCreateSource("1");
+                erpCartAddRequest.setProductType(request.getProductType());
+                erpCartAddRequest.setStoreId(request.getStoreId());
+                erpCartAddRequest.setProducts(request.getProducts());
+                addProduct(erpCartAddRequest, auth);
+            } else {
+                ErpCartUpdateRequest erpCartUpdateRequest = new ErpCartUpdateRequest();
+                erpCartUpdateRequest.setActivityId(request.getActivityId());
+                erpCartUpdateRequest.setAmount(request.getAmount());
+                erpCartUpdateRequest.setCartId(request.getCartId());
+                erpCartUpdateRequest.setLineCheckStatus(request.getLineCheckStatus());
+                updateCartLineProduct(erpCartUpdateRequest, auth);
 
-                }
             }
+        }
     }
 }

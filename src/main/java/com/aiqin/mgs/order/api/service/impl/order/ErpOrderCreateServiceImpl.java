@@ -1,40 +1,65 @@
 package com.aiqin.mgs.order.api.service.impl.order;
 
+import com.aiqin.ground.util.http.HttpClient;
+import com.aiqin.ground.util.id.IdUtil;
+import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.ConstantData;
+import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
+import com.aiqin.mgs.order.api.component.enums.StatusEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
+import com.aiqin.mgs.order.api.component.enums.pay.ErpPayWayEnum;
+import com.aiqin.mgs.order.api.component.returnenums.StoreStatusEnum;
+import com.aiqin.mgs.order.api.dao.OrderGiveApprovalDao;
+import com.aiqin.mgs.order.api.dao.OrderGiveFeeDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.po.cart.ErpOrderCartInfo;
+import com.aiqin.mgs.order.api.domain.po.gift.GiftQuotasUseDetail;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.CouponShareRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpCartQueryRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ErpQueryCartGroupTempRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
+import com.aiqin.mgs.order.api.domain.request.returnorder.FranchiseeAssetVo;
+import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
+import com.aiqin.mgs.order.api.domain.response.StoreMarketValueResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.*;
 import com.aiqin.mgs.order.api.service.CartOrderService;
 import com.aiqin.mgs.order.api.service.CouponRuleService;
 import com.aiqin.mgs.order.api.service.SequenceGeneratorService;
+import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.service.cart.ErpOrderCartService;
+import com.aiqin.mgs.order.api.service.gift.GiftQuotasUseDetailService;
 import com.aiqin.mgs.order.api.service.order.*;
+import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
+import com.aiqin.platform.flows.client.constant.*;
+import com.aiqin.platform.flows.client.domain.vo.ActBaseProcessEntity;
+import com.aiqin.platform.flows.client.domain.vo.FormCallBackVo;
+import com.aiqin.platform.flows.client.domain.vo.StartProcessParamVO;
+import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 创建订单service
@@ -47,6 +72,10 @@ import java.util.Map;
 @Service
 public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
+    @Value("${activiti.host}")
+    private String activitiHost;
+    @Value("${bridge.url.slcs_api}")
+    private String slcsHost;
     @Resource
     private ErpOrderQueryService erpOrderQueryService;
     @Resource
@@ -67,6 +96,16 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private ErpStoreLockDetailsService erpStoreLockDetailsService;
     @Resource
     private CouponRuleService couponRuleService;
+    @Resource
+    private OrderGiveFeeDao orderGiveFeeDao;
+    @Resource
+    private OrderGiveApprovalDao orderGiveApprovalDao;
+    @Resource
+    private ErpOrderPayNoTransactionalService erpOrderPayNoTransactionalService;
+    @Resource
+    private BridgeProductService bridgeProductService;
+    @Resource
+    private GiftQuotasUseDetailService giftQuotasUseDetailService;
 
 
     @Override
@@ -125,17 +164,39 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //数据校验
         productCheck(processTypeEnum, storeInfo, erpOrderItemList);
 
-        //计算A品券分摊金额
-        ErpOrderFee orderFee = shareTopCouponPrice(erpOrderItemList, erpOrderSaveRequest.getTopCouponCodeList());
 
+        ErpOrderFee orderFee = new ErpOrderFee();
+        //生成订单code
+        String orderCode = sequenceGeneratorService.generateOrderCode();
+        //判断是否需要审批--赠送市值余额不够。进行审批 true
+        Boolean flag1=false;
+        //判断是首单赠送市值订单。进行审批 true
+        Boolean flag2=false;
+        //首单赠送--加入了市值赠送金额判断
+        if(ErpOrderTypeEnum.DIRECT_SEND.getCode().equals(erpOrderSaveRequest.getOrderType())&&ErpOrderCategoryEnum.ORDER_TYPE_4.getCode().equals(erpOrderSaveRequest.getOrderCategory())){
+            Map<ErpOrderFee,Boolean> res=firstGivePrice(erpOrderSaveRequest.getApplier(),erpOrderSaveRequest.getDeptCode(),orderCode,storeInfo,erpOrderItemList, erpOrderSaveRequest.getTopCouponCodeList());
+            for(Map.Entry<ErpOrderFee,Boolean> r:res.entrySet()){
+                orderFee = r.getKey();
+                flag1=r.getValue();
+            }
+            flag2=true;
+        }else {
+            //计算A品券分摊金额
+            orderFee = shareTopCouponPrice(erpOrderItemList, erpOrderSaveRequest.getTopCouponCodeList());
+        }
         //生成订单主体信息
-        ErpOrderInfo order = generateOrder(erpOrderItemList, storeInfo, erpOrderSaveRequest, orderFee,auth);
+//        ErpOrderInfo order = generateOrder(erpOrderItemList, storeInfo, erpOrderSaveRequest, orderFee,auth);
+        ErpOrderInfo order = generateOrder(flag1,flag2,erpOrderItemList, storeInfo, erpOrderSaveRequest, orderFee,auth);
         log.info("创建订单,生成订单主体信息返回结果order={}",order);
         //保存订单、订单明细、订单支付、订单收货人信息、订单日志
+        order.setOrderStoreCode(orderCode);
         String orderId = insertOrder(order,orderFee, storeInfo, auth, erpOrderSaveRequest);
         //删除购物车商品
 //        deleteOrderProductFromCart(cartProductList);
         deleteOrderProductFromCart(cartProductList);
+
+        //扣除订单积分兑换赠品额度并插入赠品额度明细使用记录
+        integralGift(cartProductList,storeInfo,order.getOrderStoreCode(),auth);
 
         //锁库存
         if (processTypeEnum.isLockStock()) {
@@ -155,6 +216,36 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //返回订单信息
         return erpOrderQueryService.getOrderByOrderId(orderId);
     }
+
+    private void integralGift(List<ErpOrderCartInfo> cartProductList, StoreInfo storeInfo, String orderStoreCode, AuthToken auth) {
+        log.info("扣除兑换赠品积分，并添加积分使用记录开始，参数为{}"+cartProductList,storeInfo,orderStoreCode);
+        BigDecimal giftAmount=BigDecimal.ZERO;
+        for(ErpOrderCartInfo erp:cartProductList){
+            if(ErpProductGiftEnum.JIFEN.getCode().equals(erp.getProductType())){
+                giftAmount=giftAmount.add(erp.getPrice().multiply(new BigDecimal(erp.getAmount().toString())));
+            }
+        }
+        //查詢門店员赠品额度
+        BigDecimal availableGiftQuota=bridgeProductService.getStoreAvailableGiftGuota(storeInfo.getStoreId());
+        //计算订单使用过后的赠品额度
+        BigDecimal newAvailableGiftQuota=availableGiftQuota.subtract(giftAmount);
+        //更新订单使用过后的赠品额度
+        bridgeProductService.updateAvailableGiftQuota(storeInfo.getStoreId(),newAvailableGiftQuota);
+
+        //新建一个赠品额度使用明细对象
+        GiftQuotasUseDetail giftQuotasUseDetail=new GiftQuotasUseDetail();
+        giftQuotasUseDetail.setStoreId(storeInfo.getStoreId());
+        giftQuotasUseDetail.setChangeInGiftQuota("-"+giftAmount);
+        giftQuotasUseDetail.setBillCode(orderStoreCode);
+        giftQuotasUseDetail.setType(2);
+        giftQuotasUseDetail.setCreateBy(auth.getPersonName());
+        giftQuotasUseDetail.setUpdateBy(auth.getPersonName());
+        //插入一条赠品明细使用记录
+        giftQuotasUseDetailService.add(giftQuotasUseDetail);
+
+    }
+
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -200,6 +291,75 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //返回订单
         return order;
+    }
+
+    @Override
+    @Transactional
+    public String callback(FormCallBackVo formCallBackVo) {
+        String result = "success";
+        log.info("首单赠送超额审批进入回调,request={}", formCallBackVo);
+        OrderGiveApproval orderGiveApproval = orderGiveApprovalDao.selectByFormNo(formCallBackVo.getFormNo());
+        log.info("首单赠送超额审批回调,查询原始记录结果orderGiveApproval={}", orderGiveApproval);
+        if (orderGiveApproval != null) {
+            if (formCallBackVo.getUpdateFormStatus().equals(Indicator.COST_FORM_STATUS_APPROVED.getCode())) {
+                //审核通过，修改本地主表状态
+                orderGiveApproval.setStatus(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_PASS.getValue());
+                orderGiveApproval.setStatuStr(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_PASS.getDesc());
+                //修改主订单状态 改为待支付
+                ErpOrderInfo po=new ErpOrderInfo();
+                po.setOrderStoreCode(orderGiveApproval.getOrderCode());
+                //待支付
+                po.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
+//                AuthToken auth=new AuthToken();
+//                auth.setPersonId(ConstantData.SYS_OPERTOR);
+//                auth.setPersonName(ConstantData.SYS_OPERTOR);
+//                AuthUtil.loginCheck();
+                AuthToken auth = AuthUtil.getCurrentAuth();
+                erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(po,auth);
+                //发起支付 自动轮询
+                ErpOrderPayRequest payRequest = new ErpOrderPayRequest();
+                payRequest.setOrderCode(orderGiveApproval.getOrderCode());
+                payRequest.setPayWay(ErpPayWayEnum.PAY_1.getCode());
+                erpOrderPayNoTransactionalService.orderPayStartMethodGroup(payRequest, auth, true);
+                log.info("首单赠送超额审批回调结束");
+            } else if (TpmBpmUtils.isPass(formCallBackVo.getUpdateFormStatus(), formCallBackVo.getOptBtn())) {
+                orderGiveApproval.setStatus(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT.getValue());
+                orderGiveApproval.setStatuStr(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT.getDesc());
+            } else {
+                if (formCallBackVo.getOptBtn().equals(IndicatorStr.PROCESS_BTN_REJECT_FIRST.getCode())) {
+                    //驳回发起人
+                    orderGiveApproval.setStatus(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_BACK.getValue());
+                    orderGiveApproval.setStatuStr(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_BACK.getDesc());
+                } else if (formCallBackVo.getOptBtn().equals(IndicatorStr.PROCESS_BTN_REJECT_END.getCode())) {
+                    //驳回并结束
+                    orderGiveApproval.setStatus(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_END.getValue());
+                    orderGiveApproval.setStatuStr(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_END.getDesc());
+                } else if (formCallBackVo.getOptBtn().equals(IndicatorStr.PROCESS_BTN_CANCEL.getCode())) {
+                    //撤销
+                    orderGiveApproval.setStatus(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_CANCEL.getValue());
+                    orderGiveApproval.setStatuStr(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_CANCEL.getDesc());
+                } else if (formCallBackVo.getOptBtn().equals(IndicatorStr.PROCESS_BTN_KILL.getCode())) {
+                    //终止
+                    orderGiveApproval.setStatus(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_END.getValue());
+                    orderGiveApproval.setStatuStr(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_END.getDesc());
+                } else {
+                    //终止
+                    orderGiveApproval.setStatus(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_END.getValue());
+                    orderGiveApproval.setStatuStr(com.aiqin.platform.flows.client.constant.StatusEnum.AUDIT_END.getDesc());
+                }
+            }
+            //更新本地审批表数据
+            orderGiveApprovalDao.updateByFormNoSelective(orderGiveApproval);
+        } else {
+            //result = "false";
+        }
+        return result;
+    }
+
+
+    @Override
+    public OrderGiveApproval getDetailByformNo(String formNo) {
+        return orderGiveApprovalDao.selectByFormNo(formNo);
     }
 
     /**
@@ -321,6 +481,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                         cartInfoList.addAll(item.getCartGiftList());
                     }
                 }
+            }
+            //兑换赠品相关商品
+            if (erpStoreCartQueryResponse.getErpCartQueryResponse().getCartInfoList() != null && erpStoreCartQueryResponse.getErpCartQueryResponse().getCartInfoList().size() > 0) {
+                cartInfoList.addAll(erpStoreCartQueryResponse.getErpCartQueryResponse().getCartInfoList());
             }
         } else {
 //            list = cartOrderService.getErpProductList(storeId, orderType);
@@ -517,6 +681,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     /**
      * 构建订单信息
      *
+     * @param flag       是否是首单赠送超额审批 true：需要审批
+     * @param flag1      是否是首单赠送市值订单 true：是
      * @param orderItemList       订单商品明细行
      * @param storeInfo           门店信息
      * @param erpOrderSaveRequest 保存订单参数
@@ -526,7 +692,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
      * @version: v1.0.0
      * @date 2019/11/27 19:04
      */
-    private ErpOrderInfo generateOrder(List<ErpOrderItem> orderItemList, StoreInfo storeInfo, ErpOrderSaveRequest erpOrderSaveRequest,ErpOrderFee orderFee, AuthToken auth) {
+//    private ErpOrderInfo generateOrder(List<ErpOrderItem> orderItemList, StoreInfo storeInfo, ErpOrderSaveRequest erpOrderSaveRequest,ErpOrderFee orderFee, AuthToken auth) {
+    private ErpOrderInfo generateOrder(boolean flag,boolean flag1,List<ErpOrderItem> orderItemList, StoreInfo storeInfo, ErpOrderSaveRequest erpOrderSaveRequest,ErpOrderFee orderFee, AuthToken auth) {
         log.info("构建订单信息--入参,orderItemList={}",orderItemList);
         log.info("构建订单信息--入参,storeInfo={}",storeInfo);
         log.info("构建订单信息--入参,erpOrderSaveRequest={}",erpOrderSaveRequest);
@@ -568,10 +735,21 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setCustomerCode(storeInfo.getStoreCode());
         //客户名称 存门店名称
         order.setCustomerName(storeInfo.getStoreName());
-        //订单状态
-        order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
-        //订单流程节点状态
-        order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_1.getCode());
+        if(flag){
+            //订单状态
+            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_7.getCode());
+            //订单流程节点状态
+            order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_1.getCode());
+        }else {
+            //订单状态
+            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
+            //订单流程节点状态
+            order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_1.getCode());
+        }
+//        //订单状态
+//        order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
+//        //订单流程节点状态
+//        order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_1.getCode());
         //是否锁定(0是1否）
         order.setOrderLock(StatusEnum.NO.getCode());
         //是否是异常订单(0是1否)
@@ -640,6 +818,16 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setScourSheetStatus(ErpOrderScourSheetStatusEnum.NOT_NEED.getCode());
         //是否活动商品0否1是
         order.setIsActivity(isActivity);
+        //配送方式编码
+        order.setDistributionModeCode(erpOrderSaveRequest.getDistributionModeCode());
+        //配送方式名称
+        order.setDistributionModeName(erpOrderSaveRequest.getDistributionModeName());
+        //是否为首单市值赠送订单 0:不是 1:是
+        if(flag1){
+            order.setFirstMarketValueGift(1);
+        }else {
+            order.setFirstMarketValueGift(0);
+        }
         log.info("构建订单信息--封装结果,order={}",order);
         return order;
     }
@@ -761,7 +949,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             detailList.add(itemRequest);
         }
         //A品券计算均摊金额
-        couponSharePrice(detailList, topCouponCodeList);
+//        couponSharePrice(detailList, topCouponCodeList);
+        //A品券总金额
+        BigDecimal totalCouponSharePrice = getTotalCouponSharePrice(topCouponCodeList);
 
         Map<Long, CouponShareRequest> map = new HashMap<>(16);
         for (CouponShareRequest item :
@@ -793,21 +983,54 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
             totalMoneyTotal = totalMoneyTotal.add(item.getTotalProductAmount());
             activityMoneyTotal = activityMoneyTotal.add(item.getActivityDiscountAmount());
-            topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponDiscountAmount());
+//            topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponDiscountAmount());
         }
 
 
         orderFee.setTotalMoney(totalMoneyTotal);
         orderFee.setActivityMoney(activityMoneyTotal);
         orderFee.setSuitCouponMoney(suitCouponMoneyTotal);
-        orderFee.setTopCouponMoney(topCouponMoneyTotal);
-        orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal));
+//        orderFee.setTopCouponMoney(topCouponMoneyTotal);
+        orderFee.setTopCouponMoney(totalCouponSharePrice);
+//        orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal));
+        orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(totalCouponSharePrice));
         if(null!=topCouponCodeList&&topCouponCodeList.size()>0){
             orderFee.setTopCouponCodes(String.join(",", topCouponCodeList));
         }else {
             orderFee.setTopCouponCodes("");
         }
         return orderFee;
+    }
+
+    /**
+     * A品券优惠总金额
+     *
+     * @param couponCodeList
+     */
+    private BigDecimal getTotalCouponSharePrice(List<String> couponCodeList) {
+        log.info("A品券计算均摊金额入参,couponCodeList={}", couponCodeList);
+        //A品券总金额
+        BigDecimal topCouponMoney = BigDecimal.ZERO;
+        List<String> topCouponCodeUniqueCheckList = new ArrayList<>();
+        if (couponCodeList != null && couponCodeList.size() > 0) {
+            for (String couponCode : couponCodeList) {
+                if (topCouponCodeUniqueCheckList.contains(couponCode)) {
+                    throw new BusinessException("A品券重复提交");
+                } else {
+                    topCouponCodeUniqueCheckList.add(couponCode);
+                }
+                CouponDetail couponDetail = erpOrderRequestService.getCouponDetailByCode(couponCode);
+                if (couponDetail.getActiveCondition() == 1) {
+                    throw new BusinessException("优惠券已经被使用");
+                }
+                if (couponDetail.getActiveCondition() == 2) {
+                    throw new BusinessException("优惠券已经过期");
+                }
+                topCouponMoney = topCouponMoney.add(couponDetail.getNominalValue());
+            }
+        }
+        log.info("A品券计算均摊金额--A品券总金额,topCouponMoney={}", topCouponMoney);
+        return topCouponMoney;
     }
 
     /**
@@ -938,8 +1161,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         String orderId = OrderPublic.getUUID();
         //生成费用id
         String feeId = OrderPublic.getUUID();
-        //生成订单code
-        String orderCode = sequenceGeneratorService.generateOrderCode();
+//        //生成订单code
+//        String orderCode = sequenceGeneratorService.generateOrderCode();
         //初始支付状态
         ErpPayStatusEnum payStatusEnum = ErpPayStatusEnum.UNPAID;
 
@@ -948,15 +1171,18 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             //订单id
             item.setOrderStoreId(orderId);
             //订单编码
-            item.setOrderStoreCode(orderCode);
+//            item.setOrderStoreCode(orderCode);
+            item.setOrderStoreCode(order.getOrderStoreCode());
             //订单明细id
             item.setOrderInfoDetailId(OrderPublic.getUUID());
             item.setUseStatus(StatusEnum.YES.getValue());
         }
         //保存订单
         order.setOrderStoreId(orderId);
-        order.setOrderStoreCode(orderCode);
-        order.setMainOrderCode(orderCode);
+//        order.setOrderStoreCode(orderCode);
+        order.setOrderStoreCode(order.getOrderStoreCode());
+//        order.setMainOrderCode(orderCode);
+        order.setMainOrderCode(order.getOrderStoreCode());
         order.setFeeId(feeId);
         erpOrderInfoService.saveOrder(order, auth);
 
@@ -1303,6 +1529,325 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         erpOrderFeeService.saveOrderFee(orderFee, auth);
 
         return orderCode;
+    }
+
+    /**
+     * 首单赠送金额计算
+     * @param itemList
+     * @param topCouponCodeList
+     */
+    private Map<ErpOrderFee,Boolean> firstGivePrice(String applier,String positionCode,String orderCode,StoreInfo storeInfo,List<ErpOrderItem> itemList,List<String> topCouponCodeList) {
+        Map<ErpOrderFee,Boolean> resMap=new HashMap<>();
+        //true:赠送市值余额不够发起审批 false:不用审批
+        Boolean flag=false;
+        //赠送市值
+        Double marketValue = storeInfo.getMarketValue();
+        //赠送市值余额
+        Double marketValueBalance = storeInfo.getMarketValueBalance();
+        //赠送费用
+        Double freeCost = storeInfo.getFreeCost();
+        //赠送费用余额
+        Double freeCostBalance1=storeInfo.getFreeCostBalance();
+        List<CouponShareRequest> detailList = new ArrayList<>();
+        for (ErpOrderItem item :
+                itemList) {
+            CouponShareRequest itemRequest = new CouponShareRequest();
+            itemRequest.setLineCode(item.getLineCode());
+            itemRequest.setSkuCode(item.getSkuCode());
+            itemRequest.setProductCount(item.getProductCount());
+            itemRequest.setTotalProductAmount(item.getTotalProductAmount());
+            itemRequest.setProductPropertyCode(item.getProductPropertyCode());
+            itemRequest.setTotalPreferentialAmount(item.getTotalPreferentialAmount());
+            itemRequest.setPreferentialAmount(item.getTotalPreferentialAmount().divide(new BigDecimal(item.getProductCount()),2, RoundingMode.DOWN));
+            itemRequest.setApinCouponAmount(BigDecimal.ZERO);
+            itemRequest.setProductGift(item.getProductType());
+            detailList.add(itemRequest);
+        }
+        //A品券计算均摊金额 没有A品卷跳过计算
+//        couponSharePrice(detailList, topCouponCodeList);
+
+        Map<Long, CouponShareRequest> map = new HashMap<>(16);
+        for (CouponShareRequest item :
+                detailList) {
+            map.put(item.getLineCode(), item);
+        }
+
+        ErpOrderFee orderFee = new ErpOrderFee();
+
+
+        //订单总额（元）
+        BigDecimal totalMoneyTotal = BigDecimal.ZERO;
+        //活动优惠金额（元）
+        BigDecimal activityMoneyTotal = BigDecimal.ZERO;
+        //服纺券优惠金额（元）
+        BigDecimal suitCouponMoneyTotal = BigDecimal.ZERO;
+        //A品券优惠金额（元）
+        BigDecimal topCouponMoneyTotal = BigDecimal.ZERO;
+        //实付金额（元）
+        BigDecimal payMoneyTotal = BigDecimal.ZERO;
+
+        for (ErpOrderItem item :
+                itemList) {
+            CouponShareRequest couponShareRequest = map.get(item.getLineCode());
+            item.setTotalPreferentialAmount(couponShareRequest.getTotalPreferentialAmount());
+            item.setPreferentialAmount(couponShareRequest.getPreferentialAmount());
+            item.setTopCouponDiscountAmount(couponShareRequest.getApinCouponAmount());
+            item.setTotalAcivityAmount(item.getActivityDiscountAmount().add(item.getTopCouponDiscountAmount()));
+
+            totalMoneyTotal = totalMoneyTotal.add(item.getTotalProductAmount());
+            activityMoneyTotal = activityMoneyTotal.add(item.getActivityDiscountAmount());
+            topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponDiscountAmount());
+        }
+        //判断订单总金额是否大于赠送市值
+        if(totalMoneyTotal.compareTo(new BigDecimal(marketValueBalance))==1){//大于赠送市值，走审批
+            //TODO 走审批
+            flag=true;
+            //orderCode 订单编码
+            String approvalCode=createFormNo();
+            OrderGiveApproval record=new OrderGiveApproval();
+            record.setActualMarketValue(totalMoneyTotal);
+            record.setFanchiseeId(storeInfo.getFranchiseeId());
+            record.setFanchiseeName(storeInfo.getFranchiseeName());
+            record.setMarketValue(new BigDecimal(storeInfo.getMarketValue()));
+            record.setOrderCode(orderCode);
+            //赠送市值余额--用于修改
+            marketValueBalance = 0.0;
+            //赠送费用余额--用于修改
+            freeCostBalance1=0.0;
+            //发起审批
+            HttpResponse httpResponse = submitActBaseProcess(approvalCode, applier, positionCode, record);
+            if(!"0".equals(httpResponse.getCode())){
+                throw new BusinessException("订单金额超过市值赠送总金额审批申请失败");
+            }
+        }else{//计算分摊
+            //计算比例系数=总金额/赠送总市值
+            BigDecimal pro=totalMoneyTotal.divide(new BigDecimal(marketValue));
+            //根据系数，算实付金额=赠送费用X系数
+            BigDecimal shiFuAmount=pro.multiply(pro);
+            //统计分摊总金额和，用于最后一行做减法
+            BigDecimal fenTanAmount=BigDecimal.ZERO;
+            //遍历详情从新算金额
+            for(int i=0;i<itemList.size();i++){
+                ErpOrderItem item=itemList.get(i);
+                BigDecimal productAmount = item.getProductAmount();
+                BigDecimal totalPreferentialAmount=productAmount.divide(totalMoneyTotal).multiply(shiFuAmount);
+                fenTanAmount=fenTanAmount.add(totalPreferentialAmount);
+                item.setTotalPreferentialAmount(totalPreferentialAmount);
+                if(i==itemList.size()){
+                    //最后一行做减法
+                    item.setPreferentialAmount(shiFuAmount.subtract(fenTanAmount));
+                }
+                item.setPreferentialAmount(totalPreferentialAmount.divide(new BigDecimal(item.getProductCount())));
+//                item.setTopCouponDiscountAmount(couponShareRequest.getApinCouponAmount());
+                item.setTotalAcivityAmount(item.getActivityDiscountAmount().add(item.getTopCouponDiscountAmount()));
+
+                totalMoneyTotal = totalMoneyTotal.add(item.getTotalProductAmount());
+                activityMoneyTotal = activityMoneyTotal.add(item.getActivityDiscountAmount());
+                topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponDiscountAmount());
+            }
+            //支付金额
+            BigDecimal zhi=totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal);
+            //赠送市值余额--用于修改
+            marketValueBalance = marketValueBalance-totalMoneyTotal.doubleValue();
+            //赠送费用余额--用于修改
+            freeCostBalance1=freeCostBalance1-zhi.doubleValue();
+        }
+
+
+        orderFee.setTotalMoney(totalMoneyTotal);
+        orderFee.setActivityMoney(activityMoneyTotal);
+        orderFee.setSuitCouponMoney(suitCouponMoneyTotal);
+        orderFee.setTopCouponMoney(topCouponMoneyTotal);
+        orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal));
+        if(null!=topCouponCodeList&&topCouponCodeList.size()>0){
+            orderFee.setTopCouponCodes(String.join(",", topCouponCodeList));
+        }else {
+            orderFee.setTopCouponCodes("");
+        }
+        //存储赠送市值到本地数据库
+        OrderGiveFee record=new OrderGiveFee();
+        record.setAmount(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal));
+        record.setCreateTime(new Date());
+        record.setOrderCode(orderCode);
+        record.setStoreId(storeInfo.getStoreId());
+        orderGiveFeeDao.insertSelective(record);
+        //修改门店系统的市值余额
+        upGive(storeInfo.getStoreCode(),marketValueBalance,freeCostBalance1);
+        resMap.put(orderFee,flag);
+        return resMap;
+    }
+
+    /**
+     * 封装 订单金额超过市值赠送总金额调用审批
+     *
+     * @param approvalCode 审批号
+     * @param applier      申请人
+     * @param positionCode 部门编码
+     */
+    public HttpResponse submitActBaseProcess(String approvalCode, String applier, String positionCode,OrderGiveApproval record) {
+        StartProcessParamVO paramVO = new StartProcessParamVO();
+        // 订单金额超过市值赠送总金额审批申请
+        paramVO.setCostType(ConstantData.FIRST_SINGLE_EXCESS_KEY);
+        paramVO.setFormType(ConstantData.FIRST_SINGLE_EXCESS_KEY);
+        paramVO.setFormUrl("http://order.api.aiqin.com/erpOrderCreateController/formDetail/" + approvalCode);//表单详情页面地址 必传
+        paramVO.setCurrentUser(applier);
+        paramVO.setFormNo(approvalCode);
+        paramVO.setTitle("订单金额超过市值赠送总金额审批");
+        paramVO.setRemark("订单金额超过市值赠送总金额审批");
+        paramVO.setFormUpdateUrl("http://order.api.aiqin.com/erpOrderCreateController/callback");//回调地址
+        paramVO.setFormUpdateUrlType(FormUpdateUrlType.HTTP);
+        paramVO.setSignTicket(IdUtil.uuid());
+        paramVO.setReceiptType("1");
+        paramVO.setPositionCode(positionCode);
+        log.info("调用审批流发起申请,request={}", paramVO);
+        String url = activitiHost + "/activiti/common/submit";
+        HttpClient httpClient = HttpClient.post(url).json(paramVO).timeout(10000);
+        AjaxJson result = httpClient.action().result(AjaxJson.class);
+        log.info("调用审批流发起申请返回结果,result={}", result);
+        if (result.getSuccess()) {
+            ActBaseProcessEntity actBaseProcessEntity = JsonUtil.fromJson(JsonUtil.toJson(result.getObj()), ActBaseProcessEntity.class);
+            log.info("发起申请成功,request={}", paramVO);
+            //将审批信息添加到本地审批表中
+            record.setProcessTitle("订单金额超过市值赠送总金额审批");
+            //todo
+//            record.setProcessType();
+            record.setApplierId(applier);
+            record.setApplierName(applier);
+            record.setFormNo(approvalCode);
+            record.setCreateTime(new Date());
+            orderGiveApprovalDao.insertSelective(record);
+            return HttpResponse.success(actBaseProcessEntity);
+        }
+        log.error("发起申请失败,request={}", paramVO);
+        return HttpResponse.failure(ResultCode.MARKET_VALUE_APPLY_FALL);
+    }
+
+    /**
+     * 修改slcs门店市值赠余额
+     */
+    private void upGive(String storeCode,Double marketValueBalance,Double freeCostBalance){
+        log.info("修改slcs门店市值赠余额,入参storeCode={},marketValueBalance={},freeCostBalance={}",storeCode,marketValueBalance,freeCostBalance);
+        String url=slcsHost+"/store/updateValue";
+        JSONObject json=new JSONObject();
+        StoreMarketValueResponse storeMarketValueResponse=new StoreMarketValueResponse();
+        storeMarketValueResponse.setFreeCostBalance(freeCostBalance);
+        storeMarketValueResponse.setMarketValueBalance(marketValueBalance);
+        storeMarketValueResponse.setStoreCode(storeCode);
+        json.put("storeMarketValueResponse",storeMarketValueResponse);
+        log.info("修改slcs门店市值赠余额,调用修改赠送市值余额接口,url={},parm={}",url,json);
+        HttpClient httpClient = HttpClient.post(url).json(json);
+        Map<String ,Object> res=null;
+        res = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+        log.info("同步到虚拟资产:"+res);
+        if(res!=null&&"0".equals(res.get("code"))){
+            log.info("修改slcs门店市值赠余额,调用修改赠送市值余额接口,成功");
+        }
+
+    }
+
+    /**
+     * 生成16位唯一性的审批编码
+     * @return
+     */
+    public static String createFormNo(){
+        //随机生成一位整数
+        int random = (int) (Math.random()*9+1);
+        String valueOf = String.valueOf(random);
+        //生成uuid的hashCode值
+        int hashCode = UUID.randomUUID().toString().hashCode();
+        //可能为负数
+        if(hashCode<0){
+            hashCode = -hashCode;
+        }
+        String value = "MV"+valueOf + String.format("%015d", hashCode);
+        return value;
+    }
+
+    /**
+     * 计算均摊金额--新修改
+     *
+     * @param orderId 主订单号
+     */
+    private void couponSharePrice(List<CouponShareRequest> details,String orderId) {
+        log.info("计算均摊金额--新修改,orderId={}", orderId);
+        //查询主订单费用信息
+        ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(orderId);
+        log.info("计算均摊金额--主订单费用信息结果,orderFee={}", orderFee);
+        if(orderFee==null){
+            throw new BusinessException("计算均摊金额--主订单费用信息结果为空");
+        }
+        //A品券总金额
+        BigDecimal topCouponMoney = orderFee.getTopCouponMoney();
+        log.info("计算均摊金额--A品券总金额,topCouponMoney={}", topCouponMoney);
+        //计算A品券金额
+        List<CouponShareRequest> topProductList = new ArrayList<>();
+        //存储符合A品卷均摊的商品的总分销价(上一次分摊总价)
+        BigDecimal totalFirstFenAmount = BigDecimal.ZERO;
+        //总分销价(商品组价值)
+        BigDecimal totalProAmount = BigDecimal.ZERO;
+        //活动均摊后金额汇总
+        BigDecimal totalAmountAfterActivity = BigDecimal.ZERO;
+        for (CouponShareRequest item : details) {
+            Map erpProductPropertyType = couponRuleService.couponRuleMap();
+            log.info("获取A品卷属性返回结果,erpProductPropertyType={}", erpProductPropertyType);
+            log.info(item.getSkuCode()+"此商品属性编码,productPropertyCode={}", item.getProductPropertyCode());
+            if(null!=erpProductPropertyType&&null!=erpProductPropertyType.get(item.getProductPropertyCode())){
+                if (ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductGift())) {
+                    topProductList.add(item);
+                    //活动分摊后金额
+                    BigDecimal totalpPreferentialAmount = BigDecimal.ZERO;
+                    if(item.getTotalProductAmount()!=null){
+                        totalpPreferentialAmount=item.getTotalProductAmount();
+                    }
+                    //分销总价=从活动的分摊总价取
+                    totalFirstFenAmount = totalFirstFenAmount.add(totalpPreferentialAmount);
+                    totalProAmount = totalProAmount.add(item.getTotalProductAmount());
+                    totalAmountAfterActivity = totalAmountAfterActivity.add(item.getTotalPreferentialAmount());
+                }
+            }
+        }
+        log.info("A品券计算均摊金额,符合A品卷均摊的商品topProductList={}", topProductList);
+        //判断优惠券总金额和从活动的分摊总价取，如果A品卷总金额大于活动分摊总价，则A品券总金额=活动分摊总价
+        if (topCouponMoney.subtract(totalFirstFenAmount).compareTo(BigDecimal.ZERO) == 1) {
+            topCouponMoney = totalFirstFenAmount;
+        }
+        //商品组实收(商品组价值-A品卷)
+        BigDecimal auGroupAmount = totalFirstFenAmount.subtract(topCouponMoney);
+        log.info("A品券计算均摊金额--总分销价:totalProAmount={},上一次分摊总价:totalFirstFenAmount={},商品组实收:auGroupAmount={}", totalProAmount, totalFirstFenAmount, auGroupAmount);
+        //计算累加各行A品券优惠金额（最后一行使用）
+        BigDecimal totalApinAmount = BigDecimal.ZERO;
+        if (topProductList != null && topProductList.size() > 0) {
+            for (int i = 0; i < topProductList.size(); i++) {
+                CouponShareRequest csr = topProductList.get(i);
+                //A品卷分摊后总价值
+                BigDecimal totalPreferentialAmount = csr.getTotalPreferentialAmount();
+                //本行A品卷优惠金额
+                BigDecimal apinCouponAmount = BigDecimal.ZERO;
+
+                //本行活动均摊后金额
+                BigDecimal lineAmountAfterActivity = csr.getTotalPreferentialAmount();
+                if (i < topProductList.size() - 1) {
+                    //非最后一行，根据比例计算
+
+                    //计算本行占用了A品券的金额
+                    apinCouponAmount = topCouponMoney.multiply(lineAmountAfterActivity).divide(totalAmountAfterActivity, 2, RoundingMode.HALF_UP);
+                    //A品券剩余金额
+                    totalApinAmount = totalApinAmount.add(apinCouponAmount);
+                } else {
+                    //最后一行，用减法防止误差
+                    apinCouponAmount = topCouponMoney.subtract(totalApinAmount);
+                }
+
+                //计算本行A品券均摊之后的金额
+                totalPreferentialAmount = totalPreferentialAmount.subtract(apinCouponAmount);
+                //分摊单价
+                BigDecimal preferentialAmount = totalPreferentialAmount.divide(new BigDecimal(csr.getProductCount()), 2, RoundingMode.DOWN);
+                csr.setTotalPreferentialAmount(totalPreferentialAmount);
+                csr.setPreferentialAmount(preferentialAmount);
+                csr.setApinCouponAmount(apinCouponAmount);
+            }
+        }
+        log.info("A品券计算均摊金额处理结果,details={}", details);
     }
 
 }

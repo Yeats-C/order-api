@@ -2,8 +2,11 @@ package com.aiqin.mgs.order.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.math.BigDecimal;
 
 /**
  * 门店信息
@@ -13,6 +16,7 @@ import lombok.Data;
  * @date 2019/11/21 15:57
  */
 @Data
+@ApiModel("门店信息实体类")
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class StoreInfo {
 
@@ -98,5 +102,21 @@ public class StoreInfo {
     @ApiModelProperty(value="地址")
     @JsonProperty("address")
     private String address;
+
+    @ApiModelProperty("首单赠送市值金额")
+    @JsonProperty(value = "market_value")
+    private Double marketValue;
+
+    @ApiModelProperty("首单赠送费用")
+    @JsonProperty(value = "free_cost")
+    private Double freeCost;
+
+    @ApiModelProperty("首单赠送市值余额")
+    @JsonProperty(value = "market_value_balance")
+    private Double marketValueBalance;
+
+    @ApiModelProperty("首单赠送费用余额")
+    @JsonProperty(value = "free_cost_balance")
+    private Double freeCostBalance;
 
 }

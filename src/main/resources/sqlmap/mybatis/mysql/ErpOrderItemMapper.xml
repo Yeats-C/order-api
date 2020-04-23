@@ -131,6 +131,9 @@
         <if test="signDifferenceReason != null and signDifferenceReason != '' ">
             sign_difference_reason = #{signDifferenceReason},
         </if>
+        <if test="topCouponDiscountAmount != null ">
+            top_coupon_discount_amount = #{topCouponDiscountAmount},
+        </if>
         update_by_id = #{updateById},
         update_by_name = #{updateByName},
         update_time = sysdate()
@@ -153,7 +156,7 @@
                                        gift_line_code, company_code, company_name, sign_difference_reason, box_gross_weight, box_volume,
                                        product_brand_code,product_brand_name,product_category_code,product_category_name,activity_id,is_activity,activity_price,
                                        use_status, create_by_id, create_by_name, update_by_id, update_by_name, create_time,
-                                       update_time,top_coupon_discount_amount)
+                                       update_time,top_coupon_discount_amount,top_coupon_amount)
         values (#{orderInfoDetailId}, #{orderStoreId}, #{orderStoreCode}, #{spuCode}, #{spuName},
                 #{skuCode}, #{skuName}, #{productPropertyCode}, #{productPropertyName}, #{supplierCode},
                 #{supplierName},
@@ -166,7 +169,7 @@
                 #{signDifferenceReason}, #{boxGrossWeight}, #{boxVolume},
                 #{productBrandCode},#{productBrandName},#{productCategoryCode},#{productCategoryName},#{activityId},#{isActivity},#{activityPrice},
                 #{useStatus}, #{createById}, #{createByName}, #{updateById},
-                #{updateByName}, sysdate(), sysdate(),#{topCouponDiscountAmount})
+                #{updateByName}, sysdate(), sysdate(),#{topCouponDiscountAmount},#{topCouponAmount})
     </insert>
 
     <select id="getProductSales" resultType="java.math.BigDecimal" parameterType="com.aiqin.mgs.order.api.domain.Activity">

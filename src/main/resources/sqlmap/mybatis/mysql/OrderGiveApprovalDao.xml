@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.aiqin.mgs.order.api.dao.OrderGiveApprovalDao" >
+  <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.OrderGiveApproval" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="form_no" property="formNo" jdbcType="VARCHAR" />
+    <result column="fanchisee_name" property="fanchiseeName" jdbcType="VARCHAR" />
+    <result column="fanchisee_id" property="fanchiseeId" jdbcType="VARCHAR" />
+    <result column="store_id" property="storeId" jdbcType="VARCHAR" />
+    <result column="store_name" property="storeName" jdbcType="VARCHAR" />
+    <result column="market_value" property="marketValue" jdbcType="DECIMAL" />
+    <result column="actual_market_value" property="actualMarketValue" jdbcType="DECIMAL" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="process_title" property="processTitle" jdbcType="VARCHAR" />
+    <result column="process_type" property="processType" jdbcType="VARCHAR" />
+    <result column="statu_str" property="statuStr" jdbcType="VARCHAR" />
+    <result column="applier_name" property="applierName" jdbcType="VARCHAR" />
+    <result column="applier_id" property="applierId" jdbcType="VARCHAR" />
+    <result column="pre_node_opt_user" property="preNodeOptUser" jdbcType="VARCHAR" />
+    <result column="pre_node_time" property="preNodeTime" jdbcType="TIMESTAMP" />
+    <result column="order_code" property="orderCode" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, form_no, fanchisee_name, fanchisee_id, store_id, store_name, market_value, actual_market_value, 
+    create_time, status, process_title, process_type, statu_str, applier_name, applier_id, 
+    pre_node_opt_user, pre_node_time, order_code
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from order_give_approval
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from order_give_approval
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.OrderGiveApproval" >
+    insert into order_give_approval (id, form_no, fanchisee_name, 
+      fanchisee_id, store_id, store_name, 
+      market_value, actual_market_value, create_time, 
+      status, process_title, process_type, 
+      statu_str, applier_name, applier_id, 
+      pre_node_opt_user, pre_node_time, order_code
+      )
+    values (#{id,jdbcType=BIGINT}, #{formNo,jdbcType=VARCHAR}, #{fanchiseeName,jdbcType=VARCHAR}, 
+      #{fanchiseeId,jdbcType=VARCHAR}, #{storeId,jdbcType=VARCHAR}, #{storeName,jdbcType=VARCHAR}, 
+      #{marketValue,jdbcType=DECIMAL}, #{actualMarketValue,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{status,jdbcType=INTEGER}, #{processTitle,jdbcType=VARCHAR}, #{processType,jdbcType=VARCHAR}, 
+      #{statuStr,jdbcType=VARCHAR}, #{applierName,jdbcType=VARCHAR}, #{applierId,jdbcType=VARCHAR}, 
+      #{preNodeOptUser,jdbcType=VARCHAR}, #{preNodeTime,jdbcType=TIMESTAMP}, #{orderCode,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.OrderGiveApproval" >
+    insert into order_give_approval
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="formNo != null" >
+        form_no,
+      </if>
+      <if test="fanchiseeName != null" >
+        fanchisee_name,
+      </if>
+      <if test="fanchiseeId != null" >
+        fanchisee_id,
+      </if>
+      <if test="storeId != null" >
+        store_id,
+      </if>
+      <if test="storeName != null" >
+        store_name,
+      </if>
+      <if test="marketValue != null" >
+        market_value,
+      </if>
+      <if test="actualMarketValue != null" >
+        actual_market_value,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="processTitle != null" >
+        process_title,
+      </if>
+      <if test="processType != null" >
+        process_type,
+      </if>
+      <if test="statuStr != null" >
+        statu_str,
+      </if>
+      <if test="applierName != null" >
+        applier_name,
+      </if>
+      <if test="applierId != null" >
+        applier_id,
+      </if>
+      <if test="preNodeOptUser != null" >
+        pre_node_opt_user,
+      </if>
+      <if test="preNodeTime != null" >
+        pre_node_time,
+      </if>
+      <if test="orderCode != null" >
+        order_code,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="formNo != null" >
+        #{formNo,jdbcType=VARCHAR},
+      </if>
+      <if test="fanchiseeName != null" >
+        #{fanchiseeName,jdbcType=VARCHAR},
+      </if>
+      <if test="fanchiseeId != null" >
+        #{fanchiseeId,jdbcType=VARCHAR},
+      </if>
+      <if test="storeId != null" >
+        #{storeId,jdbcType=VARCHAR},
+      </if>
+      <if test="storeName != null" >
+        #{storeName,jdbcType=VARCHAR},
+      </if>
+      <if test="marketValue != null" >
+        #{marketValue,jdbcType=DECIMAL},
+      </if>
+      <if test="actualMarketValue != null" >
+        #{actualMarketValue,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="processTitle != null" >
+        #{processTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="processType != null" >
+        #{processType,jdbcType=VARCHAR},
+      </if>
+      <if test="statuStr != null" >
+        #{statuStr,jdbcType=VARCHAR},
+      </if>
+      <if test="applierName != null" >
+        #{applierName,jdbcType=VARCHAR},
+      </if>
+      <if test="applierId != null" >
+        #{applierId,jdbcType=VARCHAR},
+      </if>
+      <if test="preNodeOptUser != null" >
+        #{preNodeOptUser,jdbcType=VARCHAR},
+      </if>
+      <if test="preNodeTime != null" >
+        #{preNodeTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderCode != null" >
+        #{orderCode,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.OrderGiveApproval" >
+    update order_give_approval
+    <set >
+      <if test="formNo != null" >
+        form_no = #{formNo,jdbcType=VARCHAR},
+      </if>
+      <if test="fanchiseeName != null" >
+        fanchisee_name = #{fanchiseeName,jdbcType=VARCHAR},
+      </if>
+      <if test="fanchiseeId != null" >
+        fanchisee_id = #{fanchiseeId,jdbcType=VARCHAR},
+      </if>
+      <if test="storeId != null" >
+        store_id = #{storeId,jdbcType=VARCHAR},
+      </if>
+      <if test="storeName != null" >
+        store_name = #{storeName,jdbcType=VARCHAR},
+      </if>
+      <if test="marketValue != null" >
+        market_value = #{marketValue,jdbcType=DECIMAL},
+      </if>
+      <if test="actualMarketValue != null" >
+        actual_market_value = #{actualMarketValue,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="processTitle != null" >
+        process_title = #{processTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="processType != null" >
+        process_type = #{processType,jdbcType=VARCHAR},
+      </if>
+      <if test="statuStr != null" >
+        statu_str = #{statuStr,jdbcType=VARCHAR},
+      </if>
+      <if test="applierName != null" >
+        applier_name = #{applierName,jdbcType=VARCHAR},
+      </if>
+      <if test="applierId != null" >
+        applier_id = #{applierId,jdbcType=VARCHAR},
+      </if>
+      <if test="preNodeOptUser != null" >
+        pre_node_opt_user = #{preNodeOptUser,jdbcType=VARCHAR},
+      </if>
+      <if test="preNodeTime != null" >
+        pre_node_time = #{preNodeTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderCode != null" >
+        order_code = #{orderCode,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.aiqin.mgs.order.api.domain.OrderGiveApproval" >
+    update order_give_approval
+    set form_no = #{formNo,jdbcType=VARCHAR},
+      fanchisee_name = #{fanchiseeName,jdbcType=VARCHAR},
+      fanchisee_id = #{fanchiseeId,jdbcType=VARCHAR},
+      store_id = #{storeId,jdbcType=VARCHAR},
+      store_name = #{storeName,jdbcType=VARCHAR},
+      market_value = #{marketValue,jdbcType=DECIMAL},
+      actual_market_value = #{actualMarketValue,jdbcType=DECIMAL},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      status = #{status,jdbcType=INTEGER},
+      process_title = #{processTitle,jdbcType=VARCHAR},
+      process_type = #{processType,jdbcType=VARCHAR},
+      statu_str = #{statuStr,jdbcType=VARCHAR},
+      applier_name = #{applierName,jdbcType=VARCHAR},
+      applier_id = #{applierId,jdbcType=VARCHAR},
+      pre_node_opt_user = #{preNodeOptUser,jdbcType=VARCHAR},
+      pre_node_time = #{preNodeTime,jdbcType=TIMESTAMP},
+      order_code = #{orderCode,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="selectByFormNo" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from order_give_approval
+    where form_no = #{formNo,jdbcType=VARCHAR}
+  </select>
+
+  <update id="updateByFormNoSelective" parameterType="com.aiqin.mgs.order.api.domain.OrderGiveApproval" >
+    update order_give_approval
+    <set >
+      <if test="fanchiseeName != null" >
+        fanchisee_name = #{fanchiseeName,jdbcType=VARCHAR},
+      </if>
+      <if test="fanchiseeId != null" >
+        fanchisee_id = #{fanchiseeId,jdbcType=VARCHAR},
+      </if>
+      <if test="storeId != null" >
+        store_id = #{storeId,jdbcType=VARCHAR},
+      </if>
+      <if test="storeName != null" >
+        store_name = #{storeName,jdbcType=VARCHAR},
+      </if>
+      <if test="marketValue != null" >
+        market_value = #{marketValue,jdbcType=DECIMAL},
+      </if>
+      <if test="actualMarketValue != null" >
+        actual_market_value = #{actualMarketValue,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="processTitle != null" >
+        process_title = #{processTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="processType != null" >
+        process_type = #{processType,jdbcType=VARCHAR},
+      </if>
+      <if test="statuStr != null" >
+        statu_str = #{statuStr,jdbcType=VARCHAR},
+      </if>
+      <if test="applierName != null" >
+        applier_name = #{applierName,jdbcType=VARCHAR},
+      </if>
+      <if test="applierId != null" >
+        applier_id = #{applierId,jdbcType=VARCHAR},
+      </if>
+      <if test="preNodeOptUser != null" >
+        pre_node_opt_user = #{preNodeOptUser,jdbcType=VARCHAR},
+      </if>
+      <if test="preNodeTime != null" >
+        pre_node_time = #{preNodeTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderCode != null" >
+        order_code = #{orderCode,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where form_no = #{formNo,jdbcType=VARCHAR}
+  </update>
+
+</mapper>

@@ -5,7 +5,7 @@
 
     <!--批量保存活动对应商品信息List-->
     <insert id="insertList" parameterType="java.util.List">
-        insert into activity_product (sku_code, warehouse_code)
+        insert into complimentary_warehouse_correspondence (sku_code, warehouse_code)
         values
         <foreach collection="list" item="complimentaryWarehouseCorrespondence" separator=",">
             (#{complimentaryWarehouseCorrespondence.skuCode,jdbcType=VARCHAR},

@@ -95,7 +95,7 @@ public class ErpOrderItem extends PagesRequest {
     @JsonProperty("zero_disassembly_coefficient")
     private Long zeroDisassemblyCoefficient;
 
-    @ApiModelProperty(value = "商品类型 0商品（本品） 1赠品")
+    @ApiModelProperty(value = "商品类型 0商品（本品） 1赠品 2兑换赠品")
     @JsonProperty("product_type")
     private Integer productType;
 
@@ -273,8 +273,13 @@ public class ErpOrderItem extends PagesRequest {
     private BigDecimal activityDiscountAmount;
 
     /***仅A品优惠金额，用于统计*/
+    @ApiModelProperty(value = "本行A品券优惠总额度")
     @JsonProperty("top_coupon_discount_amount")
     private BigDecimal topCouponDiscountAmount;
+
+    @ApiModelProperty(value = "本行A品券优惠单品额度")
+    @JsonProperty("top_coupon_amount")
+    private BigDecimal topCouponAmount;
 
 
     public String getProductTypeDesc() {
