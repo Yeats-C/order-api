@@ -101,7 +101,8 @@
         g.create_by AS createBy,
         g.update_by AS updateBy
         FROM
-        gift_pool g left join complimentary_warehouse_correspondence c on g.sku_code = c.sku_code  where 1 = 1
+        gift_pool g left join complimentary_warehouse_correspondence c on g.sku_code = c.sku_code
+        where 1 = 1 and g.use_status=0
         <if test="skuCode != null and skuCode != ''">
             and g.sku_code = #{skuCode}
         </if>
