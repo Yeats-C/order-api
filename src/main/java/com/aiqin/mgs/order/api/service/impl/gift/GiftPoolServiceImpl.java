@@ -483,6 +483,7 @@ public class GiftPoolServiceImpl implements GiftPoolService {
                     item.setPrice(skuDetail.getPriceTax());
                     item.setTagInfoList(skuDetail.getTagInfoList());
                     item.setStockNum(skuDetail.getStockNum());
+                    item.setIsSale(skuDetail.getIsSale());
                 } else {
                     LOGGER.info("查询商品信息 /search/spu/sku/detail2  接口 sku为"+item.getSkuCode()+"查询失败");
                 }
