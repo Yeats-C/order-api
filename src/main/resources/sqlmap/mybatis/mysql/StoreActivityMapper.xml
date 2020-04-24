@@ -30,15 +30,15 @@
     <select id="selectActivityOrder" resultType="com.aiqin.mgs.order.api.domain.response.market.ActivityReportOrderResp">
         select
           case when member_status=1 then t2.total else 0 end as memberOderCount,
-          sum(t2.total) as orderCount, sum(t2.saleAmount) as saleAmount
+          sum(t2.total) as orderCount, sum(t2.saleAmount) as saleAmount, sum(t2.costAmount) as costAmount
         from(
             select
-            t1.member_status, count(DISTINCT t1.id) AS total, sum(t1.total_price) as saleAmount
+            t1.member_status, count(DISTINCT t1.id) AS total, sum(t1.total_price) as saleAmount,t1.costAmount
             from(
                 select
                  oi.id,
                  case when length(TRIM(oi.member_id))>0 then '1' else '0' end as member_status,
-                 od.activity_id as activity_id, od.total_price as total_price, od.amount as amount
+                 od.activity_id as activity_id, od.total_price as total_price, od.amount*od.cost_price as costAmount
                 from order_consumer_info oi
                 left join order_consumer_detail od on oi.order_id = od.order_id
                where oi.distributor_id=#{storeId} and oi.order_status in (1,2,3,5,6,7)

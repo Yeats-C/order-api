@@ -33,6 +33,10 @@ public class ActivityReportOrderResp {
     @JsonProperty("sale_amount")
     private Long saleAmount;
 
+    @ApiModelProperty(value = "成本额")
+    @JsonProperty("cost_amount")
+    private Long costAmount;
+
     @JsonProperty("order_code")
     @ApiModelProperty("订单编号集合")
     private List<OrderInfo> orderCode;

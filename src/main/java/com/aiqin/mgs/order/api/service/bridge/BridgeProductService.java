@@ -64,6 +64,7 @@ public class BridgeProductService<main> {
     }
 
     public HttpResponse changeStock(List<InventoryDetailRequest> stockReqVos) {
+        log.info("修改库存{}", JsonUtil.toJson(stockReqVos));
         StringBuilder sb = new StringBuilder();
         sb.append(urlProperties.getProductApi()).append("/inventory/update/detail");
         HttpClient orderClient =HttpClient.post(sb.toString()).json(stockReqVos);
