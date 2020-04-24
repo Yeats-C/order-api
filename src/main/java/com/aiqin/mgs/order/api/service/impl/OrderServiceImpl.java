@@ -394,11 +394,11 @@ public class OrderServiceImpl implements OrderService {
             } else if (one.getOrderStatus().equals(Global.ORDER_STATUS_5) || one.getOrderStatus().equals(Global.ORDER_STATUS_6)|| one.getOrderStatus().equals(Global.ORDER_STATUS_2)) {
                 //设置不可退货状态：
                 //可退货 ：已提货-已提货退货 >0
-                //可退货 ：购买数量-已提货-未提货退货 >0
+                //可退货 ：购买数量-已提货退货-未提货退货 >0
                 List<PrestorageOrderSupplyDetail> p = prestorageOrderSupplyDetailDao.selectPrestorageOrderDetailByOrderId(one.getOrderId());
                 one.setTurnReturnView(1);
                 for (PrestorageOrderSupplyDetail prestorageOrderSupplyDetail : p) {
-                    if (prestorageOrderSupplyDetail.getAmount()-prestorageOrderSupplyDetail.getSupplyAmount() - prestorageOrderSupplyDetail.getReturnPrestorageAmount()>0) {
+                    if (prestorageOrderSupplyDetail.getAmount()-prestorageOrderSupplyDetail.getReturnAmount() - prestorageOrderSupplyDetail.getReturnPrestorageAmount()>0) {
                         one.setTurnReturnView(0);
                     }
                 }
