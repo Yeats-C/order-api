@@ -23,7 +23,8 @@
         update_time as updateTime,
         update_by_id as updateById,
         update_by_name as updateByName,
-        status as status
+        status as status,
+        used_gift_quota as usedGiftQuota
         from order_store_fee
         where 1 = 1
         and status = 1
@@ -85,11 +86,11 @@
         insert into order_store_fee (fee_id, order_id, pay_id, pay_status, total_money, activity_money,
                                      suit_coupon_money, top_coupon_money, pay_money, goods_coupon, top_coupon_codes,
                                      create_time, create_by_id, create_by_name, update_time, update_by_id,
-                                     update_by_name)
+                                     update_by_name,used_gift_quota)
         values (#{feeId}, #{orderId}, #{payId}, #{payStatus}, #{totalMoney}, #{activityMoney},
                 #{suitCouponMoney}, #{topCouponMoney}, #{payMoney}, #{goodsCoupon}, #{topCouponCodes},
                 sysdate(), #{createById}, #{createByName}, sysdate(), #{updateById},
-                #{updateByName})
+                #{updateByName},#{usedGiftQuota})
     </insert>
 
 </mapper>

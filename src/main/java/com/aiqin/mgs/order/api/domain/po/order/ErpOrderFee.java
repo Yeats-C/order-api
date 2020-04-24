@@ -68,6 +68,10 @@ public class ErpOrderFee {
     @JsonProperty("goods_coupon")
     private BigDecimal goodsCoupon;
 
+    @ApiModelProperty(value = "使用赠品额度")
+    @JsonProperty("used_gift_quota")
+    private BigDecimal usedGiftQuota;
+
     @ApiModelProperty(value = "关联A品券编码")
     @JsonProperty("top_coupon_codes")
     private String topCouponCodes;
