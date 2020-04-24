@@ -600,8 +600,8 @@ public class OrderServiceImpl implements OrderService {
                             stockVo.setStoreId(orderInfo.getOrderInfo().getDistributorId());
                             stockVo.setRecordNumber(Optional.ofNullable(product.getSkuCount()).orElse(0)*Optional.ofNullable(input.getAmount()).orElse(0));
                             stockVo.setProductSku(product.getSkuCode());
-                            stockVo.setRecordType(StockChangeTypeEnum.PACKAGE_OUT.getCode());
-                            stockVo.setBillType(BillTypeEnum.DOOR_SALE.getCode());
+                            stockVo.setRecordType(StockChangeTypeEnum.OUT_STORAGE.getCode());
+                            stockVo.setBillType(BillTypeEnum.PACKAGE_SALE.getCode());
                             stockVo.setStorageType(StorageTypeEnum.DOOR_STORE.getCode());
                             /*stockVo.setStoragePosition(ReturnGoodsToStockEnum.DISPLAY_STOCK.getCode());*/
                             stockVo.setProductSku(product.getSkuCode());
