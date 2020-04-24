@@ -490,7 +490,8 @@
         a2.top_coupon_money as topCouponMoney,
         a2.suit_coupon_money as suitCouponMoney,
         a2.pay_status as payStatus,
-        a2.goods_coupon as goodsCoupon
+        a2.goods_coupon as goodsCoupon,
+        a1.first_market_value_gift as firstMarketValueGift
         from order_store_info a1
         left join order_store_fee a2 on a1.fee_id = a2.fee_id
         where 1 = 1
@@ -564,6 +565,9 @@
             <foreach collection="storeIdList" item="item" open="(" separator="," close=")">
                 #{item}
             </foreach>
+        </if>
+        <if test="firstMarketValueGift != null">
+            and a1.first_market_value_gift = #{firstMarketValueGift}
         </if>
         order by a1.create_time desc
     </select>

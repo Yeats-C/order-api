@@ -70,6 +70,10 @@ public class ErpOrderQueryRequest {
     @JsonProperty("order_level")
     private Integer orderLevel;
 
+    @ApiModelProperty(value = "是否为首单市值赠送订单 0:不是 1:是")
+    @JsonProperty("first_market_value_gift")
+    private Integer firstMarketValueGift;
+
     @JsonIgnore
     private List<Integer> orderTypeQueryList;
     @JsonIgnore

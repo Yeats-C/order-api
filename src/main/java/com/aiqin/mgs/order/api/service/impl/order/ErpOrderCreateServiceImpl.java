@@ -7,11 +7,10 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ConstantData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
-import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.StatusEnum;
+import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayWayEnum;
-import com.aiqin.mgs.order.api.component.returnenums.StoreStatusEnum;
 import com.aiqin.mgs.order.api.dao.OrderGiveApprovalDao;
 import com.aiqin.mgs.order.api.dao.OrderGiveFeeDao;
 import com.aiqin.mgs.order.api.domain.*;
@@ -27,8 +26,6 @@ import com.aiqin.mgs.order.api.domain.request.cart.ErpQueryCartGroupTempRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
-import com.aiqin.mgs.order.api.domain.request.returnorder.FranchiseeAssetVo;
-import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
 import com.aiqin.mgs.order.api.domain.response.StoreMarketValueResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.*;
 import com.aiqin.mgs.order.api.service.CartOrderService;
@@ -47,11 +44,8 @@ import com.aiqin.platform.flows.client.domain.vo.FormCallBackVo;
 import com.aiqin.platform.flows.client.domain.vo.StartProcessParamVO;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -972,6 +966,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         BigDecimal topCouponMoneyTotal = BigDecimal.ZERO;
         //实付金额（元）
         BigDecimal payMoneyTotal = BigDecimal.ZERO;
+        //使用赠品额度（元）
+        BigDecimal usedGiftQuota = BigDecimal.ZERO;
 
         for (ErpOrderItem item :
                 itemList) {
@@ -984,6 +980,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             totalMoneyTotal = totalMoneyTotal.add(item.getTotalProductAmount());
             activityMoneyTotal = activityMoneyTotal.add(item.getActivityDiscountAmount());
 //            topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponDiscountAmount());
+            if(ErpProductGiftEnum.JIFEN.getCode().equals(item.getProductType())){
+                usedGiftQuota=usedGiftQuota.add(item.getProductAmount().multiply(new BigDecimal(item.getProductCount().toString())));
+            }
         }
 
 
@@ -994,6 +993,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         orderFee.setTopCouponMoney(totalCouponSharePrice);
 //        orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal));
         orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(totalCouponSharePrice));
+        orderFee.setUsedGiftQuota(usedGiftQuota);
         if(null!=topCouponCodeList&&topCouponCodeList.size()>0){
             orderFee.setTopCouponCodes(String.join(",", topCouponCodeList));
         }else {
