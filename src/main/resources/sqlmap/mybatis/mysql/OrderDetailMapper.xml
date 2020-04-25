@@ -236,7 +236,7 @@
     <select id="selectorderdetailsum" resultMap="OrderInfoDetailMapping">
         select sum(actual_price) as actual_price ,count(amount) as amount from
         (
-        SELECT IFNULL(SUM(IFNULL(a.actual_price,0)*IFNULL(a.amount,0)),0) AS actual_price,COUNT(a.order_id) AS amount
+        SELECT SUM(IFNULL(a.total_price,0)) AS actual_price,COUNT(a.order_id) AS amount
         FROM order_consumer_detail a,order_consumer_info b
         WHERE 1=1
         AND a.order_id = b.order_id
