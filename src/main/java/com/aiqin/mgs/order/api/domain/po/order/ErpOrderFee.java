@@ -104,6 +104,14 @@ public class ErpOrderFee {
     @JsonProperty("status")
     private Integer status;
 
+    @ApiModelProperty(value = "服纺券作废金额（元）")
+    @JsonProperty("nullify_suit_coupon_money")
+    private BigDecimal nullifySuitCouponMoney;
+
+    @ApiModelProperty(value = "A品券作废金额（元）")
+    @JsonProperty("nullify_top_coupon_money")
+    private BigDecimal nullifyTopCouponMoney;
+
     /**
      * 非数据库字段
      */
