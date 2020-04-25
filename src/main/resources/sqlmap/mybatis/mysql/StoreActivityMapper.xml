@@ -33,7 +33,7 @@
           sum(t2.total) as orderCount, sum(t2.saleAmount) as saleAmount, sum(t2.costAmount) as costAmount
         from(
             select
-            t1.member_status, count(DISTINCT t1.id) AS total, sum(t1.total_price) as saleAmount,t1.costAmount
+            t1.member_status, count(DISTINCT t1.id) AS total, sum(t1.total_price) as saleAmount,sum(t1.costAmount) as costAmount
             from(
                 select
                  oi.id,
