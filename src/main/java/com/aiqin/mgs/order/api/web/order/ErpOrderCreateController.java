@@ -7,7 +7,7 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayWayEnum;
 import com.aiqin.mgs.order.api.domain.AuthToken;
-import com.aiqin.mgs.order.api.domain.CouponApprovalDetail;
+import com.aiqin.mgs.order.api.domain.OrderGiveApproval;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
@@ -128,7 +128,7 @@ public class ErpOrderCreateController {
 
     @ApiOperation("订单金额超出市值赠送金额--根据formNo查询审批详情")
     @GetMapping("/formDetail/{form_no}")
-    public HttpResponse<CouponApprovalDetail> getDetailByformNo(@PathVariable(value = "form_no") String formNo) {
+    public HttpResponse<OrderGiveApproval> getDetailByformNo(@PathVariable(value = "form_no") String formNo) {
         return HttpResponse.success(erpOrderCreateService.getDetailByformNo(formNo));
     }
 
