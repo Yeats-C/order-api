@@ -192,8 +192,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 //        deleteOrderProductFromCart(cartProductList);
         deleteOrderProductFromCart(cartProductList);
 
-        //删除兑换赠品购物车商品
-        deleteGiftProductFromCart(erpOrderSaveRequest.getCartGroupTempKey());
+        if(null!=erpOrderSaveRequest.getCartGroupTempKey()){
+            //删除兑换赠品购物车商品
+            deleteGiftProductFromCart(erpOrderSaveRequest.getCartGroupTempKey());
+        }
+
 
         //扣除订单积分兑换赠品额度并插入赠品额度明细使用记录
         integralGift(cartProductList,storeInfo,order.getOrderStoreCode(),auth);
