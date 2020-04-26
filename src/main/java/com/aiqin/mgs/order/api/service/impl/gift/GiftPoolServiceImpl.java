@@ -70,6 +70,11 @@ public class GiftPoolServiceImpl implements GiftPoolService {
     @Override
     public HttpResponse add(GiftPool giftPool) {
         LOGGER.info("添加兑换赠品池赠品 add 参数 giftPool 为：{}", giftPool);
+        //通过skuCode查询赠品池是否已存在此赠品信息
+        List<GiftPool> giftPoolList= giftPoolDao.getGiftPoolList(giftPool);
+        if(null!=giftPoolList&&giftPoolList.size()>0){
+            throw new BusinessException("赠品池已存在此赠品，请勿重复添加！");
+        }
         HttpResponse httpResponse=HttpResponse.success();
         giftPoolDao.add(giftPool);
         //TODO  此处需调用供应链接口，通过skuCode查询仓库信息，并记录表
@@ -338,7 +343,7 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         }
     }
 
-    private void    updateCartLine(ErpOrderCartInfo erpOrderCartInfo, AuthToken authToken) {
+    private void  updateCartLine(ErpOrderCartInfo erpOrderCartInfo, AuthToken authToken) {
         erpOrderCartInfo.setCreateById(authToken.getPersonId());
         erpOrderCartInfo.setCreateByName(authToken.getPersonName());
         erpOrderCartInfo.setUpdateById(authToken.getPersonId());
