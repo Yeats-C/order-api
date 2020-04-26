@@ -108,19 +108,22 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         List<GiftPool> giftPoolList=giftPoolDao.getGiftPoolList(giftPool);
         int totalNum=giftPoolDao.getTotalNum(giftPool);
 
-        //仓库信息数据  此处应调用供应链查询库存信息接口  目前是做数据展示
-        StockBatchRespVO stockBatchRespVO=new StockBatchRespVO();
-        stockBatchRespVO.setTransportCenterCode("1081");
-        stockBatchRespVO.setTransportCenterName("华北仓");
-        stockBatchRespVO.setWarehouseCode("1071");
-        stockBatchRespVO.setWarehouseName("华北销售库");
-        stockBatchRespVO.setAvailableNum(1000L);
-        ArrayList list=new ArrayList();
-        list.add(stockBatchRespVO);
+        List<String> skuCodes=new ArrayList<>();
         for(GiftPool gift:giftPoolList){
-            gift.setStockRespVOS(list);
+            skuCodes.add(gift.getSkuCode());
         }
-        //假数据展示完毕
+        List<ProductSkuStockRespVo> stockRespVoList=bridgeProductService.findStockDetail(skuCodes);
+
+        for(ProductSkuStockRespVo stockRespVo:stockRespVoList){
+
+            for (GiftPool gift:giftPoolList){
+
+                if(stockRespVo.getSkuCode().equals(gift.getSkuCode())){
+
+                    gift.setStockRespVOS(stockRespVo.getStockBatchRespVOList());
+                }
+            }
+        }
 
         pageResData.setDataList(giftPoolList);
         pageResData.setTotalCount(totalNum);
