@@ -33,6 +33,7 @@ import com.aiqin.mgs.order.api.service.CouponRuleService;
 import com.aiqin.mgs.order.api.service.SequenceGeneratorService;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.service.cart.ErpOrderCartService;
+import com.aiqin.mgs.order.api.service.gift.GiftPoolService;
 import com.aiqin.mgs.order.api.service.gift.GiftQuotasUseDetailService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.AuthUtil;
@@ -100,6 +101,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private BridgeProductService bridgeProductService;
     @Resource
     private GiftQuotasUseDetailService giftQuotasUseDetailService;
+    @Resource
+    private GiftPoolService giftPoolService;
 
 
     @Override
@@ -189,6 +192,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 //        deleteOrderProductFromCart(cartProductList);
         deleteOrderProductFromCart(cartProductList);
 
+        //删除兑换赠品购物车商品
+        deleteGiftProductFromCart(erpOrderSaveRequest.getCartGroupTempKey());
+
         //扣除订单积分兑换赠品额度并插入赠品额度明细使用记录
         integralGift(cartProductList,storeInfo,order.getOrderStoreCode(),auth);
 
@@ -209,6 +215,28 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //返回订单信息
         return erpOrderQueryService.getOrderByOrderId(orderId);
+    }
+
+    /**
+     * 删除兑换赠品购物车商品
+     * @param cartGroupTempKey
+     */
+    private void deleteGiftProductFromCart(String cartGroupTempKey) {
+        ErpQueryCartGroupTempRequest erpQueryCartGroupTempRequest=new ErpQueryCartGroupTempRequest();
+        erpQueryCartGroupTempRequest.setCartGroupTempKey(cartGroupTempKey);
+        log.info("创建订单[删除兑换赠品购物车商品],调用查询购物车接口入参erpQueryCartGroupTempRequest={}",erpQueryCartGroupTempRequest);
+        ErpStoreCartQueryResponse erpStoreCartQueryResponse = erpOrderCartService.queryCartGroupTemp(erpQueryCartGroupTempRequest, null);
+        log.info("创建订单[删除兑换赠品购物车商品],调用查询购物车接口返回结果erpStoreCartQueryResponse={}",erpStoreCartQueryResponse);
+        if(null!=erpStoreCartQueryResponse.getErpCartQueryResponse()
+                && null!=erpStoreCartQueryResponse.getErpCartQueryResponse().getCartInfoList()
+                && erpStoreCartQueryResponse.getErpCartQueryResponse().getCartInfoList().size()>0){
+            List<ErpOrderCartInfo> cartInfoList=erpStoreCartQueryResponse.getErpCartQueryResponse().getCartInfoList();
+           for(ErpOrderCartInfo erpOrderCartInfo:cartInfoList){
+               giftPoolService.deleteCartLine(erpOrderCartInfo.getCartId());
+           }
+        }
+
+
     }
 
     private void integralGift(List<ErpOrderCartInfo> cartProductList, StoreInfo storeInfo, String orderStoreCode, AuthToken auth) {
