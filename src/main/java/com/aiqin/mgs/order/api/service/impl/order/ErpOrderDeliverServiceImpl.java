@@ -4,7 +4,6 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.activity.ActivityRuleUnitEnum;
-import com.aiqin.mgs.order.api.component.enums.activity.ActivityTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
@@ -16,11 +15,13 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderLogistics;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
-import com.aiqin.mgs.order.api.domain.request.order.*;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderDeliverItemRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderDeliverRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderTransportLogisticsRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderTransportRequest;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import com.aiqin.mgs.order.api.service.CouponRuleService;
 import com.aiqin.mgs.order.api.service.order.*;
-import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,10 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -431,7 +435,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             //商品数量
             Integer quantity = 0;
             //活动id:商品明细行 添加数据
-            if (null!=item.getActivityId()&&activityCartMap.containsKey(item.getActivityId())) {
+                if (null!=item.getActivityId()&&activityCartMap.containsKey(item.getActivityId())) {
                 List<ErpOrderItem> items = activityCartMap.get(item.getActivityId());
                 items.add(item);
                 activityCartMap.put(item.getActivityId(),items);
