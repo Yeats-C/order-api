@@ -119,5 +119,7 @@ public interface ResultCode {
     MessageId QUERY_INSPECTION_DETAIL_ERROR = MessageId.create(Project.PURCHASE_API,100,"查询验货信息失败");
     MessageId SAVE_INSPECTION_DATA_FAILED = MessageId.create(Project.PURCHASE_API,100,"保存验货信息失败");
 
-
+    /**赠品池相关 start */
+    MessageId GIFT_POOL_ALREADY_EXISTS = MessageId.create(Project.MARKET_API, 110, "赠品池已存在此赠品");
+    /**赠品池相关 end */
 }
