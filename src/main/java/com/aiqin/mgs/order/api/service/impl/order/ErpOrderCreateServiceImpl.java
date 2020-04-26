@@ -968,6 +968,12 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         BigDecimal payMoneyTotal = BigDecimal.ZERO;
         //使用赠品额度（元）
         BigDecimal usedGiftQuota = BigDecimal.ZERO;
+        //服纺券作废金额（元）
+        BigDecimal nullifySuitCouponMoneyTotal = BigDecimal.ZERO;
+        //A品券作废金额（元）
+        BigDecimal nullifyTopCouponMoneyTotal = BigDecimal.ZERO;
+        //18A商品总金额（元）
+        BigDecimal groupTopProductTotal = BigDecimal.ZERO;
 
         for (ErpOrderItem item :
                 itemList) {
@@ -979,16 +985,29 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
             totalMoneyTotal = totalMoneyTotal.add(item.getTotalProductAmount());
             activityMoneyTotal = activityMoneyTotal.add(item.getActivityDiscountAmount());
-//            topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponDiscountAmount());
+            topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponDiscountAmount());
             if(ErpProductGiftEnum.JIFEN.getCode().equals(item.getProductType())){
                 usedGiftQuota=usedGiftQuota.add(item.getProductAmount().multiply(new BigDecimal(item.getProductCount().toString())));
+            }else if(ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductType())){
+                //商品判断商品类型，是否属于18A
+                ErpProductPropertyTypeEnum productPropertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(item.getProductPropertyCode());
+                if (productPropertyTypeEnum != null && productPropertyTypeEnum.isUseTopCoupon()) {
+                    //计算18A商品总金额
+                    groupTopProductTotal = groupTopProductTotal.add(item.getProductAmount().multiply(new BigDecimal(item.getProductCount().toString())));
+                }
             }
-        }
 
+        }
+        nullifyTopCouponMoneyTotal=nullifyTopCouponMoneyTotal.add(topCouponMoneyTotal.subtract(groupTopProductTotal));
+        if(nullifyTopCouponMoneyTotal.compareTo(BigDecimal.ZERO)==-1){
+            nullifyTopCouponMoneyTotal=BigDecimal.ZERO;
+        }
 
         orderFee.setTotalMoney(totalMoneyTotal);
         orderFee.setActivityMoney(activityMoneyTotal);
         orderFee.setSuitCouponMoney(suitCouponMoneyTotal);
+        orderFee.setNullifySuitCouponMoney(nullifySuitCouponMoneyTotal);
+        orderFee.setNullifyTopCouponMoney(nullifyTopCouponMoneyTotal);
 //        orderFee.setTopCouponMoney(topCouponMoneyTotal);
         orderFee.setTopCouponMoney(totalCouponSharePrice);
 //        orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal));
