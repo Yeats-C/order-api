@@ -368,6 +368,9 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         GiftCartQueryResponse giftCartQueryResponse=new GiftCartQueryResponse();
         //通过门店id查询门店省市信息
         StoreInfo store = erpOrderRequestService.getStoreInfoByStoreId(giftPool.getStoreId());
+        if(StringUtils.isEmpty(store.getProvinceId())||StringUtils.isEmpty(store.getCityId())){
+            return HttpResponse.failure(ResultCode.PROVINCE_AND_CITY_INFORMATION_IS_EMPTY);
+        }
         //TODO 此处需通过门店省市id查询此门店有多少仓库的权限【接口暂时待供应链提供】
         //总之，应该拿到一个仓库list数据，string类型
         List<String> warehouseCodeList=bridgeProductService.findTransportCenter(store.getProvinceId(),store.getCityId());
