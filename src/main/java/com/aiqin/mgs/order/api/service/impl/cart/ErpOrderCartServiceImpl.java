@@ -1861,7 +1861,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 ErpSkuDetail skuDetail = skuDetailMap.get(item.getSkuCode());
                 if (skuDetail != null) {
                     item.setLogo(skuDetail.getProductPicturePath());
-                    item.setPrice(skuDetail.getPriceTax());
+//                    item.setPrice(skuDetail.getPriceTax());
                     item.setTagInfoList(skuDetail.getTagInfoList());
                     item.setStockNum(skuDetail.getStockNum());
                 } else {
