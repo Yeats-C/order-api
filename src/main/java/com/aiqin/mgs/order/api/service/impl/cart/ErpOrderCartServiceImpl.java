@@ -225,7 +225,14 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 erpOrderCartInfo.setSkuName(skuDetail.getSkuName());
                 erpOrderCartInfo.setActivityId(item.getActivityId());
                 erpOrderCartInfo.setAmount(item.getAmount());
-                erpOrderCartInfo.setPrice(skuDetail.getPriceTax());
+                //首单赠送类型的订单时订单中商品的分销价取熙耘中商品基本信息中的厂商指导价
+                if(YesOrNoEnum.YES.getCode().equals(erpCartAddRequest.getFirstOrderGift())){
+                    erpOrderCartInfo.setPrice(skuDetail.getManufacturerGuidePrice());
+                }else{
+                    //其余类型取分销价
+                    erpOrderCartInfo.setPrice(skuDetail.getPriceTax());
+                }
+
                 erpOrderCartInfo.setLogo(skuDetail.getProductPicturePath());
                 erpOrderCartInfo.setColor(skuDetail.getColorName());
                 erpOrderCartInfo.setProductSize(skuDetail.getModelNumber());

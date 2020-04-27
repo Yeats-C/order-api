@@ -98,4 +98,8 @@ public class ErpSkuDetail {
     @JsonProperty("is_sale")
     private Byte isSale;
 
+    @ApiModelProperty("厂家指导价")
+    @JsonProperty("manufacturer_guide_price")
+    private BigDecimal manufacturerGuidePrice;
+
 }
