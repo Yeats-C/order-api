@@ -102,13 +102,13 @@ public interface ResultCode {
     /** 黄祉壹   2018-11-05 结束     */
 
     /**促销活动相关 start */
-    MessageId ADD_ACTIVITY_INFO_EXCEPTION = MessageId.create(Project.MARKET_API, 6, "新增活动时失败");
-    MessageId UPDATE_ACTIVITY_INFO_EXCEPTION = MessageId.create(Project.MARKET_API, 7, "更新活动信息时失败");
-    MessageId DELETE_ACTIVITY_INFO_EXCEPTION = MessageId.create(Project.MARKET_API, 8, "删除活动信息时失败");
-    MessageId SELECT_ACTIVITY_INFO_EXCEPTION = MessageId.create(Project.MARKET_API, 9, "查询活动信息时失败");
-    MessageId SELECT_ACTIVITY_INFO_EXCEPTION_BY_PRODUCT = MessageId.create(Project.MARKET_API, 12, "调用供应链接口查询活动信息时失败");
-    MessageId SELECT_ACTIVITY_BY_CONDITION_EXCEPTION = MessageId.create(Project.MARKET_API, 10, "分页模糊查询活动时失败");
-    MessageId UPDATE_ACTIVITY_EXCEPTION = MessageId.create(Project.MARKET_API, 11, "更新活动时失败");
+    MessageId ADD_ACTIVITY_INFO_EXCEPTION = MessageId.create(Project.ORDER_API, 6, "新增活动时失败");
+    MessageId UPDATE_ACTIVITY_INFO_EXCEPTION = MessageId.create(Project.ORDER_API, 7, "更新活动信息时失败");
+    MessageId DELETE_ACTIVITY_INFO_EXCEPTION = MessageId.create(Project.ORDER_API, 8, "删除活动信息时失败");
+    MessageId SELECT_ACTIVITY_INFO_EXCEPTION = MessageId.create(Project.ORDER_API, 9, "查询活动信息时失败");
+    MessageId SELECT_ACTIVITY_INFO_EXCEPTION_BY_PRODUCT = MessageId.create(Project.ORDER_API, 12, "调用供应链接口查询活动信息时失败");
+    MessageId SELECT_ACTIVITY_BY_CONDITION_EXCEPTION = MessageId.create(Project.ORDER_API, 10, "分页模糊查询活动时失败");
+    MessageId UPDATE_ACTIVITY_EXCEPTION = MessageId.create(Project.ORDER_API, 11, "更新活动时失败");
     /**促销活动相关 end */
 
     //退货
@@ -120,6 +120,7 @@ public interface ResultCode {
     MessageId SAVE_INSPECTION_DATA_FAILED = MessageId.create(Project.PURCHASE_API,100,"保存验货信息失败");
 
     /**赠品池相关 start */
-    MessageId GIFT_POOL_ALREADY_EXISTS = MessageId.create(Project.MARKET_API, 110, "赠品池已存在此赠品");
+    MessageId GIFT_POOL_ALREADY_EXISTS = MessageId.create(Project.ORDER_API, 110, "赠品池已存在此赠品");
+    MessageId PROVINCE_AND_CITY_INFORMATION_IS_EMPTY = MessageId.create(Project.STORE_API, 110, "此门店省市信息为空");
     /**赠品池相关 end */
 }
