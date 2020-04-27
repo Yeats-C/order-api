@@ -215,7 +215,8 @@ public class GiftPoolServiceImpl implements GiftPoolService {
                 erpOrderCartInfo.setSkuName(skuDetail.getSkuName());
                 erpOrderCartInfo.setActivityId(item.getActivityId());
                 erpOrderCartInfo.setAmount(item.getAmount());
-                erpOrderCartInfo.setPrice(skuDetail.getPriceTax());
+                //兑换赠品池商品的分销价取熙耘中商品基本信息中的厂商指导价
+                erpOrderCartInfo.setPrice(skuDetail.getManufacturerGuidePrice());
                 erpOrderCartInfo.setLogo(skuDetail.getProductPicturePath());
                 erpOrderCartInfo.setColor(skuDetail.getColorName());
                 erpOrderCartInfo.setProductSize(skuDetail.getModelNumber());
