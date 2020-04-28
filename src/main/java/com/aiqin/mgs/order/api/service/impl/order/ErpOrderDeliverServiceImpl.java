@@ -463,6 +463,9 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
 
                 if(null!=item.getActivityId()){
                     quantity=quantityMap.get(item.getActivityId());
+                    if(null==quantity){
+                        quantity=0;
+                    }
                 }
                 quantity=quantity+item.getProductCount().intValue();
                 quantityMap.put(item.getActivityId(),quantity);
@@ -717,6 +720,23 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
         log.info("子单全部发货完成进行均摊--赠品均摊--分摊完后原始订单明细集合 itemList={}",JSON.toJSONString(itemList));
         /*****************************************分摊计算结束，更新明细表*****************************************/
         log.info("子单全部发货完成进行均摊--所有分摊结束--更新原始订单明细集合 resList={}",JSON.toJSONString(resList));
+        /*****************************************分摊计算结束，发放赠品额度start*****************************************/
+        //订单类型为配送    订单类别为普通补货  【只有这个组合类型调物流卷和发放赠品额度】
+        if(ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(orderAndItemByOrderCode.getOrderTypeCode())
+                && ErpOrderCategoryEnum.ORDER_TYPE_1.getCode().equals(orderAndItemByOrderCode.getOrderCategoryCode())){
+            //只有18A商品会发放赠品额度
+            BigDecimal commodityAmountOfTop=BigDecimal.ZERO;
+            for (ErpOrderItem item:resList){
+                ErpProductPropertyTypeEnum propertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(item.getProductPropertyCode());
+                //判断是18A商品  并且是主商品（赠品不发放额度）
+                if (propertyTypeEnum.isUseTopCoupon() && ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductType())) {
+                    commodityAmountOfTop=commodityAmountOfTop.add(item.getTotalPreferentialAmount());
+                }
+            }
+
+        }
+        /*****************************************分摊计算结束，发放赠品额度end*****************************************/
+
         AuthToken auth=new AuthToken();
         auth.setPersonId("系统操作");
         auth.setPersonName("系统操作");
@@ -800,5 +820,8 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
         return false;
     }
 
-
+    public static void main(String[] args) {
+        ErpOrderDeliverServiceImpl service=new ErpOrderDeliverServiceImpl();
+        service.shareEqually("20200428000001");
+    }
 }
