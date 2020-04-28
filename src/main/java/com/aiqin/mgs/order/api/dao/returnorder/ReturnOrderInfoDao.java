@@ -77,5 +77,5 @@ public interface ReturnOrderInfoDao {
     List<ReturnOrderInfoApplyInboundDetailRespVO> selectInbound(String code);
 
     //根据原始订单号，修改是否真的发起退货状态
-    Integer updateReallyReturn(List<String> orderCodes);
+    Integer updateReallyReturn(@Param("orderCodes") List<String> orderCodes);
 }
