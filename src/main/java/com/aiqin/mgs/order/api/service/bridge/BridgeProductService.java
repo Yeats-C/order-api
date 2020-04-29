@@ -12,6 +12,7 @@ import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.dto.ProductDistributorOrderDTO;
+import com.aiqin.mgs.order.api.domain.po.gift.NewStoreGradient;
 import com.aiqin.mgs.order.api.domain.request.InventoryDetailRequest;
 import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
@@ -546,8 +547,29 @@ public class BridgeProductService<main> {
         return transportCenterList;
     }
 
+    /**
+     * 通过门店code查询门店赠品比例信息--slcs
+     * @param storeCode
+     * @return
+     */
+    public NewStoreGradient selectStoreGiveawayByStoreCode(String storeCode){
+        String path = "/storeGiveaway/selectStoreGiveawayByStoreCode?store_code="+storeCode;
+        HttpClient httpClient = HttpClient.get(urlProperties.getSlcsApi() + path);
+        HttpResponse response = httpClient.action().result(new TypeReference<HttpResponse<NewStoreGradient>>() {
+        });
+        NewStoreGradient gradient=null;
+        if(Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")){
+            gradient= (NewStoreGradient)response.getData();
+        }
+
+        return gradient;
+    }
+
+
+
+
     public static void main(String[] args) {
         BridgeProductService bridgeProductService=new BridgeProductService();
-        System.out.println(bridgeProductService.findTransportCenter("110000","110101"));
+        System.out.println(bridgeProductService.selectStoreGiveawayByStoreCode("60000011"));
     }
 }
