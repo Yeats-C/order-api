@@ -112,6 +112,10 @@ public class ErpOrderFee {
     @JsonProperty("nullify_top_coupon_money")
     private BigDecimal nullifyTopCouponMoney;
 
+    @ApiModelProperty(value = "发放赠品额度")
+    @JsonProperty("complimentary_amount")
+    private BigDecimal complimentaryAmount;
+
     /**
      * 非数据库字段
      */

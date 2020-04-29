@@ -26,7 +26,8 @@
         status as status,
         used_gift_quota as usedGiftQuota,
         nullify_suit_coupon_money as nullifySuitCouponMoney,
-        nullify_top_coupon_money as nullifyTopCouponMoney
+        nullify_top_coupon_money as nullifyTopCouponMoney,
+        complimentary_amount as complimentaryAmount
         from order_store_fee
         where 1 = 1
         and status = 1
@@ -77,6 +78,9 @@
         </if>
         <if test="topCouponCodes != null">
             top_coupon_codes = #{topCouponCodes},
+        </if>
+        <if test="complimentaryAmount != null">
+            complimentary_amount = #{complimentaryAmount},
         </if>
         update_by_id = #{updateById},
         update_by_name = #{updateByName},
