@@ -53,7 +53,7 @@
     return_product_count, actual_return_product_count, actual_total_product_amount, product_status, 
     tax_rate, line_code, use_status, source_code, source_type, create_by_id, create_by_name, 
     update_by_id, update_by_name, create_time, update_time, remark, evidence_url, preferential_amount,
-    product_category_code,product_category_name,bar_code
+    product_category_code,product_category_name,bar_code,complimentary_amount
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
         select
