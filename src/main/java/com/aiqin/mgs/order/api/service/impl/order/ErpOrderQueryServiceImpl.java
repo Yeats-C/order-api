@@ -5,10 +5,13 @@ import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
+import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.po.order.*;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest;
+import com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetail;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderOperationControlResponse;
 import com.aiqin.mgs.order.api.service.ActivityService;
+import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.PageAutoHelperUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +43,8 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
     private ErpOrderRefundService erpOrderRefundService;
     @Resource
     private ActivityService activityService;
+    @Resource
+    private BridgeProductService bridgeProductService;
 
     @Override
     public ErpOrderInfo getOrderByOrderId(String orderId) {
@@ -96,6 +101,19 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         if (order != null) {
 
             List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
+            List<String> skuCodeList=new ArrayList<>();
+            for(ErpOrderItem item:orderItemList){
+                skuCodeList.add(item.getSkuCode());
+            }
+            Map<String, ErpSkuDetail> skuDetailMap=getProductSkuDetailMap(order.getProvinceId(),order.getCityId(),skuCodeList);
+            for(ErpOrderItem item:orderItemList){
+                ErpSkuDetail detail=skuDetailMap.get(item.getSkuCode());
+                if (null!=detail){
+                    item.setPriceTax(detail.getPriceTax());
+                }else{
+                    log.info("订单详情--查询sku分销价--/search/spu/sku/detail2 查询商品详情失败，skuCode为{}"+item.getSkuCode());
+                }
+            }
             order.setItemList(orderItemList);
 
             List<ErpOrderOperationLog> operationLogList = erpOrderOperationLogService.selectOrderOperationLogList(order.getOrderStoreCode());
@@ -430,5 +448,23 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                 order.setOrderRefund(orderRefund);
             }
         }
+    }
+
+    /**
+     * 获取sku详情，返回map
+     *
+     * @param provinceCode 省编码
+     * @param cityCode     市编码
+     * @param skuCodeList  sku编码list
+     * @return
+     */
+    private Map<String, ErpSkuDetail> getProductSkuDetailMap(String provinceCode, String cityCode, List<String> skuCodeList) {
+        Map<String, ErpSkuDetail> skuDetailMap = new HashMap<>(16);
+        List<ErpSkuDetail> productSkuDetailList = bridgeProductService.getProductSkuDetailList(provinceCode, cityCode, OrderConstant.SELECT_PRODUCT_COMPANY_CODE, skuCodeList);
+        for (ErpSkuDetail item :
+                productSkuDetailList) {
+            skuDetailMap.put(item.getSkuCode(), item);
+        }
+        return skuDetailMap;
     }
 }

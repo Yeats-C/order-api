@@ -281,6 +281,10 @@ public class ErpOrderItem extends PagesRequest {
     @JsonProperty("top_coupon_amount")
     private BigDecimal topCouponAmount;
 
+    @ApiModelProperty(value = "爱亲分销价【订单详情展示字段】")
+    @JsonProperty("price_tax")
+    private BigDecimal priceTax;
+
 
     public String getProductTypeDesc() {
         return ErpProductGiftEnum.getEnumDesc(productType);
