@@ -19,6 +19,8 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -115,6 +117,44 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                 }
             }
             order.setItemList(orderItemList);
+
+            ItemOrderFee itemOrderFee=new ItemOrderFee();
+            //子订单商品价值：（子订单分销价求和）元
+            BigDecimal totalMoney=BigDecimal.ZERO;
+            //子订单活动优惠：活动优惠金额求和）元
+            BigDecimal  activityMoney=BigDecimal.ZERO;
+            //A品券抵减：（子订单A品券抵扣分摊求和）元
+            BigDecimal  topCouponMoney=BigDecimal.ZERO;
+            //服纺券抵减:（子订单服纺券抵扣分摊求和）元
+            BigDecimal  suitCouponMoney=BigDecimal.ZERO;
+            //使用赠品额度：（使用赠品额度求和）元
+            BigDecimal  usedGiftQuota=BigDecimal.ZERO;
+            //实付金额
+            BigDecimal  payMoney=BigDecimal.ZERO;
+            for(ErpOrderItem item:orderItemList){
+                if(null==item.getTopCouponDiscountAmount()){
+                    item.setTopCouponDiscountAmount(BigDecimal.ZERO);
+                }
+                if(null==item.getActualTotalProductAmount()){
+                    item.setActualTotalProductAmount(BigDecimal.ZERO);
+                }
+                totalMoney=totalMoney.add(item.getPriceTax().multiply(new BigDecimal(item.getProductCount()))).setScale(2, RoundingMode.DOWN);
+                activityMoney=activityMoney.add(item.getTotalAcivityAmount()).setScale(2, RoundingMode.DOWN);
+                topCouponMoney=topCouponMoney.add(item.getTopCouponDiscountAmount()).setScale(2, RoundingMode.DOWN);
+                if(ErpProductGiftEnum.JIFEN.getCode().equals(item.getProductType())){
+                    usedGiftQuota=usedGiftQuota.add(item.getProductAmount().multiply(new BigDecimal(item.getProductCount()))).setScale(2, RoundingMode.DOWN);
+                }
+                payMoney=payMoney.add(item.getActualTotalProductAmount()).setScale(2, RoundingMode.DOWN);
+
+            }
+            itemOrderFee.setTotalMoney(totalMoney);
+            itemOrderFee.setActivityMoney(activityMoney);
+            itemOrderFee.setTopCouponMoney(topCouponMoney);
+            itemOrderFee.setSuitCouponMoney(suitCouponMoney);
+            itemOrderFee.setUsedGiftQuota(usedGiftQuota);
+            itemOrderFee.setPayMoney(payMoney);
+            order.setItemOrderFee(itemOrderFee);
+
 
             List<ErpOrderOperationLog> operationLogList = erpOrderOperationLogService.selectOrderOperationLogList(order.getOrderStoreCode());
             order.setOperationLogList(operationLogList);
