@@ -402,6 +402,10 @@ public class ErpOrderInfo {
     @JsonProperty("order_fee")
     private ErpOrderFee orderFee;
 
+    @ApiModelProperty(value = "子订单费用详情")
+    @JsonProperty("item_order_fee")
+    private ItemOrderFee itemOrderFee;
+
     @ApiModelProperty(value = "按钮组件控制")
     @JsonProperty("operation")
     private ErpOrderOperationControlResponse operation;
