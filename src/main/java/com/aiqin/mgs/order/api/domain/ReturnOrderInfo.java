@@ -370,4 +370,7 @@ public class ReturnOrderInfo {
 
     @ApiModelProperty(value = "实际退货金额")
     private BigDecimal actualReturnGoodAmount;
+
+    @ApiModelProperty(value = "退回赠品额度")
+    private BigDecimal complimentaryAmount;
 }
