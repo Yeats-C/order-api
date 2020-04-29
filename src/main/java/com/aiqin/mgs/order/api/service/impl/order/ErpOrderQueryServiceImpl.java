@@ -115,6 +115,12 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                 }else{
                     log.info("订单详情--查询sku分销价--/search/spu/sku/detail2 查询商品详情失败，skuCode为{}"+item.getSkuCode());
                 }
+                if(ErpProductGiftEnum.JIFEN.getCode().equals(item.getProductType())){
+                    item.setUsedGiftQuota(item.getProductAmount().multiply(new BigDecimal(item.getProductCount())).setScale(2, RoundingMode.DOWN));
+                }else{
+                    item.setUsedGiftQuota(BigDecimal.ZERO);
+                }
+
             }
             order.setItemList(orderItemList);
 

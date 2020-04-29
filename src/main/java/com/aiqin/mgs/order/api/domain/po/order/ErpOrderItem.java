@@ -285,6 +285,10 @@ public class ErpOrderItem extends PagesRequest {
     @JsonProperty("price_tax")
     private BigDecimal priceTax;
 
+    @ApiModelProperty(value = "使用赠品额度【订单详情展示字段】")
+    @JsonProperty("used_gift_quota")
+    private BigDecimal usedGiftQuota;
+
 
     public String getProductTypeDesc() {
         return ErpProductGiftEnum.getEnumDesc(productType);
