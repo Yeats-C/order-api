@@ -968,7 +968,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             itemRequest.setTotalProductAmount(item.getTotalProductAmount());
             itemRequest.setProductPropertyCode(item.getProductPropertyCode());
 //            itemRequest.setTotalPreferentialAmount(item.getTotalPreferentialAmount());
-            itemRequest.setPreferentialAmount(item.getTotalPreferentialAmount().divide(new BigDecimal(item.getProductCount()),2, RoundingMode.DOWN));
+//            itemRequest.setPreferentialAmount(item.getTotalPreferentialAmount().divide(new BigDecimal(item.getProductCount()),2, RoundingMode.DOWN));
             itemRequest.setApinCouponAmount(BigDecimal.ZERO);
             itemRequest.setProductGift(item.getProductType());
             detailList.add(itemRequest);
@@ -1608,7 +1608,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             itemRequest.setTotalProductAmount(item.getTotalProductAmount());
             itemRequest.setProductPropertyCode(item.getProductPropertyCode());
 //            itemRequest.setTotalPreferentialAmount(item.getTotalPreferentialAmount());
-            itemRequest.setPreferentialAmount(item.getTotalPreferentialAmount().divide(new BigDecimal(item.getProductCount()),2, RoundingMode.DOWN));
+//            itemRequest.setPreferentialAmount(item.getTotalPreferentialAmount().divide(new BigDecimal(item.getProductCount()),2, RoundingMode.DOWN));
             itemRequest.setApinCouponAmount(BigDecimal.ZERO);
             itemRequest.setProductGift(item.getProductType());
             detailList.add(itemRequest);
