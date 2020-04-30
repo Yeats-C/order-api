@@ -3,19 +3,18 @@ package com.aiqin.mgs.order.api.service.impl.order;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
-import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayWayEnum;
 import com.aiqin.mgs.order.api.dao.OrderSplitsNumDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.OrderSplitsNum;
-import com.aiqin.mgs.order.api.domain.ProductInfo;
-import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
-import com.aiqin.mgs.order.api.domain.request.order.*;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCarryOutNextStepRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSignRequest;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderItemSplitGroupResponse;
 import com.aiqin.mgs.order.api.service.SequenceGeneratorService;
 import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
@@ -25,7 +24,6 @@ import com.aiqin.mgs.order.api.util.CopyBeanUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -272,10 +270,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                         //拆出来的行均摊总金额--原来的逻辑=原始订单行总价*（锁库数量/商品总数量）
 //                        BigDecimal totalPreferentialAmount = item.getTotalProductAmount().multiply(new BigDecimal(lockCount)).divide(new BigDecimal(item.getProductCount()), 2, RoundingMode.HALF_UP);
                         //拆出来的行均摊总金额 = 原始订单分摊总价*（锁库数量/商品总数量）
-                        BigDecimal totalPreferentialAmount = item.getTotalPreferentialAmount().multiply(new BigDecimal(lockCount)).divide(new BigDecimal(item.getProductCount()), 2, RoundingMode.HALF_UP);
-                        logger.info("订单拆单--行号 -拆单 lockCount={},totalPreferentialAmount={}",lockCount,totalPreferentialAmount);
-                        lineTotalPreferentialAmount = lineTotalPreferentialAmount.add(totalPreferentialAmount);
-                        newSplitItem.setTotalPreferentialAmount(totalPreferentialAmount);
+//                        BigDecimal totalPreferentialAmount = item.getTotalPreferentialAmount().multiply(new BigDecimal(lockCount)).divide(new BigDecimal(item.getProductCount()), 2, RoundingMode.HALF_UP);
+//                        logger.info("订单拆单--行号 -拆单 lockCount={},totalPreferentialAmount={}",lockCount,totalPreferentialAmount);
+//                        lineTotalPreferentialAmount = lineTotalPreferentialAmount.add(totalPreferentialAmount);
+//                        newSplitItem.setTotalPreferentialAmount(totalPreferentialAmount);
 
                         //拆出来的行活动优惠金额
                         BigDecimal totalAcivityAmount = item.getTotalAcivityAmount().multiply(new BigDecimal(lockCount)).divide(new BigDecimal(item.getProductCount()), 2, RoundingMode.HALF_UP);
@@ -284,7 +282,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
                     } else {
                         //拆出来的行均摊总金额=原始分摊总金额-本次遍历优惠分摊总金额（分摊后金额）
-                        newSplitItem.setTotalPreferentialAmount(item.getTotalPreferentialAmount().subtract(lineTotalPreferentialAmount));
+//                        newSplitItem.setTotalPreferentialAmount(item.getTotalPreferentialAmount().subtract(lineTotalPreferentialAmount));
 //                        newSplitItem.setTotalPreferentialAmount(item.getTotalProductAmount().subtract(lineTotalPreferentialAmount));
 
                         //拆出来的行活动优惠金额
