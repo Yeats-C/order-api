@@ -250,7 +250,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 giftAmount=giftAmount.add(erp.getPrice().multiply(new BigDecimal(erp.getAmount().toString())));
             }
         }
-        //查詢門店员赠品额度
+        //查詢門店赠品额度
         BigDecimal availableGiftQuota=bridgeProductService.getStoreAvailableGiftGuota(storeInfo.getStoreId());
         //计算订单使用过后的赠品额度
         BigDecimal newAvailableGiftQuota=availableGiftQuota.subtract(giftAmount);
