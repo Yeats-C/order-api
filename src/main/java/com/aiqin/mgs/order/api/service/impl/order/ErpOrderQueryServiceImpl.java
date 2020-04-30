@@ -101,7 +101,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
     public ErpOrderInfo getOrderDetailByOrderCode(String orderCode) {
         ErpOrderInfo order = this.getOrderByOrderCode(orderCode);
         if (order != null) {
-
+            Integer orderStatus = order.getOrderStatus();
             List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
             List<String> skuCodeList=new ArrayList<>();
             for(ErpOrderItem item:orderItemList){
@@ -151,6 +151,10 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                     usedGiftQuota=usedGiftQuota.add(item.getProductAmount().multiply(new BigDecimal(item.getProductCount()))).setScale(2, RoundingMode.DOWN);
                 }
                 payMoney=payMoney.add(item.getActualTotalProductAmount()).setScale(2, RoundingMode.DOWN);
+                if(orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_11.getCode())||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_97.getCode())){
+                }else{
+                    item.setTotalPreferentialAmount(BigDecimal.ZERO);
+                }
 
             }
             itemOrderFee.setTotalMoney(totalMoney);
