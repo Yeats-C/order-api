@@ -614,7 +614,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             //商品总价
             orderItem.setTotalProductAmount(item.getLineActivityAmountTotal());
             //优惠分摊总金额
-            orderItem.setTotalPreferentialAmount(item.getLineAmountAfterActivity());
+//            orderItem.setTotalPreferentialAmount(item.getLineAmountAfterActivity());
             //分摊后单价
             if(null!=item.getLineAmountAfterActivity()){
                 orderItem.setPreferentialAmount(item.getLineAmountAfterActivity().divide(new BigDecimal(item.getAmount()),2, RoundingMode.DOWN));
@@ -941,7 +941,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 }
 
                 //优惠分摊总金额（分摊后金额）
-                item.setTotalPreferentialAmount(totalPreferentialAmount);
+//                item.setTotalPreferentialAmount(totalPreferentialAmount);
                 //分摊后单价
                 item.setPreferentialAmount(preferentialAmount);
                 //活动优惠总金额
@@ -967,7 +967,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             itemRequest.setProductCount(item.getProductCount());
             itemRequest.setTotalProductAmount(item.getTotalProductAmount());
             itemRequest.setProductPropertyCode(item.getProductPropertyCode());
-            itemRequest.setTotalPreferentialAmount(item.getTotalPreferentialAmount());
+//            itemRequest.setTotalPreferentialAmount(item.getTotalPreferentialAmount());
             itemRequest.setPreferentialAmount(item.getTotalPreferentialAmount().divide(new BigDecimal(item.getProductCount()),2, RoundingMode.DOWN));
             itemRequest.setApinCouponAmount(BigDecimal.ZERO);
             itemRequest.setProductGift(item.getProductType());
@@ -1009,7 +1009,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         for (ErpOrderItem item :
                 itemList) {
             CouponShareRequest couponShareRequest = map.get(item.getLineCode());
-            item.setTotalPreferentialAmount(couponShareRequest.getTotalPreferentialAmount());
+//            item.setTotalPreferentialAmount(couponShareRequest.getTotalPreferentialAmount());
             item.setPreferentialAmount(couponShareRequest.getPreferentialAmount());
             item.setTopCouponDiscountAmount(couponShareRequest.getApinCouponAmount());
             item.setTotalAcivityAmount(item.getActivityDiscountAmount().add(item.getTopCouponDiscountAmount()));
@@ -1184,7 +1184,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 totalPreferentialAmount = totalPreferentialAmount.subtract(apinCouponAmount);
                 //分摊单价
                 BigDecimal preferentialAmount = totalPreferentialAmount.divide(new BigDecimal(csr.getProductCount()), 2, RoundingMode.DOWN);
-                csr.setTotalPreferentialAmount(totalPreferentialAmount);
+//                csr.setTotalPreferentialAmount(totalPreferentialAmount);
                 csr.setPreferentialAmount(preferentialAmount);
                 csr.setApinCouponAmount(apinCouponAmount);
             }
@@ -1377,7 +1377,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             //商品总价
             orderItem.setTotalProductAmount(item.getPrice().multiply(new BigDecimal(item.getQuantity())));
             //优惠分摊总金额
-            orderItem.setTotalPreferentialAmount(orderItem.getTotalProductAmount());
+//            orderItem.setTotalPreferentialAmount(orderItem.getTotalProductAmount());
             //分摊后单价
             orderItem.setPreferentialAmount(orderItem.getProductAmount());
             //活动优惠总金额
@@ -1607,7 +1607,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             itemRequest.setProductCount(item.getProductCount());
             itemRequest.setTotalProductAmount(item.getTotalProductAmount());
             itemRequest.setProductPropertyCode(item.getProductPropertyCode());
-            itemRequest.setTotalPreferentialAmount(item.getTotalPreferentialAmount());
+//            itemRequest.setTotalPreferentialAmount(item.getTotalPreferentialAmount());
             itemRequest.setPreferentialAmount(item.getTotalPreferentialAmount().divide(new BigDecimal(item.getProductCount()),2, RoundingMode.DOWN));
             itemRequest.setApinCouponAmount(BigDecimal.ZERO);
             itemRequest.setProductGift(item.getProductType());
@@ -1639,7 +1639,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         for (ErpOrderItem item :
                 itemList) {
             CouponShareRequest couponShareRequest = map.get(item.getLineCode());
-            item.setTotalPreferentialAmount(couponShareRequest.getTotalPreferentialAmount());
+//            item.setTotalPreferentialAmount(couponShareRequest.getTotalPreferentialAmount());
             item.setPreferentialAmount(couponShareRequest.getPreferentialAmount());
             item.setTopCouponDiscountAmount(couponShareRequest.getApinCouponAmount());
             item.setTotalAcivityAmount(item.getActivityDiscountAmount().add(item.getTopCouponDiscountAmount()));
@@ -1682,7 +1682,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 BigDecimal productAmount = item.getProductAmount();
                 BigDecimal totalPreferentialAmount=productAmount.divide(totalMoneyTotal).multiply(shiFuAmount);
                 fenTanAmount=fenTanAmount.add(totalPreferentialAmount);
-                item.setTotalPreferentialAmount(totalPreferentialAmount);
+//                item.setTotalPreferentialAmount(totalPreferentialAmount);
                 if(i==itemList.size()){
                     //最后一行做减法
                     item.setPreferentialAmount(shiFuAmount.subtract(fenTanAmount));
@@ -1892,7 +1892,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 totalPreferentialAmount = totalPreferentialAmount.subtract(apinCouponAmount);
                 //分摊单价
                 BigDecimal preferentialAmount = totalPreferentialAmount.divide(new BigDecimal(csr.getProductCount()), 2, RoundingMode.DOWN);
-                csr.setTotalPreferentialAmount(totalPreferentialAmount);
+//                csr.setTotalPreferentialAmount(totalPreferentialAmount);
                 csr.setPreferentialAmount(preferentialAmount);
                 csr.setApinCouponAmount(apinCouponAmount);
             }
