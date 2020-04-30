@@ -151,7 +151,10 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                     usedGiftQuota=usedGiftQuota.add(item.getProductAmount().multiply(new BigDecimal(item.getProductCount()))).setScale(2, RoundingMode.DOWN);
                 }
                 payMoney=payMoney.add(item.getActualTotalProductAmount()).setScale(2, RoundingMode.DOWN);
-                if(orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_11.getCode())||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_97.getCode())){
+                if(orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_11.getCode())
+                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_97.getCode())
+                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_13.getCode())
+                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_12.getCode())){
                 }else{
                     item.setTotalPreferentialAmount(BigDecimal.ZERO);
                 }
