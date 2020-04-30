@@ -222,7 +222,7 @@
             <if test="storeId!=null">
                 and d.store_id  = #{storeId,jdbcType=VARCHAR}
             </if>
-             <if test="storeCode!=null">
+             <if test="storeCode!=null and storeCode!=''">
                 and d.store_code  = #{storeCode,jdbcType=VARCHAR}
             </if>
 
@@ -274,7 +274,7 @@
             <if test="storeId!=null">
                 and d.store_id  = #{storeId,jdbcType=VARCHAR}
             </if>
-            <if test="storeCode!=null">
+            <if test="storeCode!=null and storeCode!=''">
                 and d.store_code  = #{storeCode,jdbcType=VARCHAR}
             </if>
             <if test="listDistributorId != null">
