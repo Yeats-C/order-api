@@ -496,7 +496,7 @@ public class GiftPoolServiceImpl implements GiftPoolService {
                 ErpSkuDetail skuDetail = skuDetailMap.get(item.getSkuCode());
                 if (skuDetail != null) {
                     item.setLogo(skuDetail.getProductPicturePath());
-                    item.setPrice(skuDetail.getPriceTax());
+                    item.setPrice(skuDetail.getManufacturerGuidePrice());
                     item.setTagInfoList(skuDetail.getTagInfoList());
                     item.setStockNum(skuDetail.getStockNum());
                     item.setIsSale(skuDetail.getIsSale());

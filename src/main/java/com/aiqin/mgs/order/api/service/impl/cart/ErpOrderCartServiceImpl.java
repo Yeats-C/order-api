@@ -841,7 +841,20 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         response.setStoreId(store.getStoreId());
         response.setProductType(erpCartQueryRequest.getProductType());
         //查询兑换赠品相关信息
+
         ErpCartQueryResponse erpCartQueryResponse=giftPoolService.queryGiftCartList(erpCartQueryRequest,auth);
+        //查詢門店赠品额度
+        BigDecimal availableGiftQuota=bridgeProductService.getStoreAvailableGiftGuota(store.getStoreId());
+        //此订单兑换赠品金额
+        BigDecimal giftAmount=BigDecimal.ZERO;
+        if(null!=erpCartQueryResponse&&null!=erpCartQueryResponse.getCartInfoList()&&erpCartQueryResponse.getCartInfoList().size()>0){
+            for(ErpOrderCartInfo erp:erpCartQueryResponse.getCartInfoList()){
+                giftAmount=giftAmount.add(erp.getPrice().multiply(new BigDecimal(erp.getAmount().toString()))).setScale(2, RoundingMode.DOWN);
+            }
+        }
+        if(giftAmount.compareTo(availableGiftQuota)==1){
+            throw new BusinessException("兑换赠品金额---"+giftAmount+"大于门店赠品额度---"+availableGiftQuota+"，请重新选择赠品后下单！");
+        }
         response.setErpCartQueryResponse(erpCartQueryResponse);
         String redisKey = IdUtil.uuid();
         boolean set = redisService.setSeconds(redisKey, response, OrderConstant.REDIS_ORDER_CART_GROUP_TEMP_TIME);

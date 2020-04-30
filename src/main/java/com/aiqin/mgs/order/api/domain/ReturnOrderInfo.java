@@ -110,7 +110,7 @@ public class ReturnOrderInfo {
 //    @JsonProperty("payment_name")
     private String paymentName;
 
-    @ApiModelProperty(value = "处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款 99--已取消")
+    @ApiModelProperty(value = "处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款 5--A品挂账  6退赠品额度  99--已取消")
 //    @JsonProperty("treatment_method")
     private Integer treatmentMethod;
 
@@ -370,4 +370,7 @@ public class ReturnOrderInfo {
 
     @ApiModelProperty(value = "实际退货金额")
     private BigDecimal actualReturnGoodAmount;
+
+    @ApiModelProperty(value = "退回赠品额度")
+    private BigDecimal complimentaryAmount;
 }
