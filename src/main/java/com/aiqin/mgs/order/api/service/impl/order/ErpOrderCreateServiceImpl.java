@@ -246,7 +246,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         log.info("扣除兑换赠品积分，并添加积分使用记录开始，参数为{}"+cartProductList,storeInfo,orderStoreCode);
         BigDecimal giftAmount=BigDecimal.ZERO;
         for(ErpOrderCartInfo erp:cartProductList){
-            if(ErpProductGiftEnum.JIFEN.getCode().equals(erp.getProductType())){
+            if(ErpProductGiftEnum.JIFEN.getCode().equals(erp.getProductGift())){
                 giftAmount=giftAmount.add(erp.getPrice().multiply(new BigDecimal(erp.getAmount().toString())));
             }
         }
