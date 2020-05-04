@@ -732,6 +732,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
         AuthToken auth=new AuthToken();
 
         /*****************************************分摊计算结束，发放赠品额度start*****************************************/
+        log.info("分摊计算结束--判断是否发放赠品额度--主订单信息为 orderAndItemByOrderCode={}",JSON.toJSONString(orderAndItemByOrderCode));
         //订单类型为配送    订单类别为普通补货  【只有这个组合类型调物流卷和发放赠品额度】
         if(ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(orderAndItemByOrderCode.getOrderTypeCode())
                 && ErpOrderCategoryEnum.ORDER_TYPE_1.getCode().equals(orderAndItemByOrderCode.getOrderCategoryCode())){
@@ -757,18 +758,19 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                             rebatesProportion=storeGradient.getRebatesProportion();
                         }
                     }
-
+                    log.info("子单全部发货完成进行均摊--赠品均摊--分摊完后--赠品比例为 rebatesProportion={}",rebatesProportion);
                     if(rebatesProportion>0){
                         //18A主商品金额总和乘以赠品比例
                         commodityAmountOfTop=commodityAmountOfTop.multiply(BigDecimal.valueOf(rebatesProportion)).divide(new BigDecimal(100)).setScale(2, RoundingMode.DOWN);
 
                         //查詢門店员赠品额度
                         BigDecimal availableGiftQuota=bridgeProductService.getStoreAvailableGiftGuota(orderAndItemByOrderCode.getStoreId());
-                        //计算订单使用过后的赠品额度
+                        //计算订单赠品额度发放后的赠品额度
                         BigDecimal newAvailableGiftQuota=availableGiftQuota.add(commodityAmountOfTop);
                         //更新订单使用过后的赠品额度
                         bridgeProductService.updateAvailableGiftQuota(orderAndItemByOrderCode.getStoreId(),newAvailableGiftQuota);
-
+                        log.info("子单全部发货完成进行均摊--赠品均摊--分摊完后--赠品额度更新信息为：应发放赠品额度 commodityAmountOfTop={}",commodityAmountOfTop
+                                +"查詢門店员赠品额度 availableGiftQuota={}"+availableGiftQuota+"计算订单赠品额度发放后的赠品额度 newAvailableGiftQuota={}"+newAvailableGiftQuota);
                         //新建一个赠品额度使用明细对象
                         GiftQuotasUseDetail giftQuotasUseDetail=new GiftQuotasUseDetail();
                         giftQuotasUseDetail.setStoreId(orderAndItemByOrderCode.getStoreId());
