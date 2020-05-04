@@ -97,7 +97,7 @@
             </if>
 
             GROUP BY a.activity_id
-            order by begin_time desc
+            order by a.create_time desc
             <if test="pageSize!=null ">
                 limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
             </if>
