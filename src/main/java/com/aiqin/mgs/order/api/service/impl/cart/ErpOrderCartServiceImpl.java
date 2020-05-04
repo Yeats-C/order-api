@@ -791,6 +791,8 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         if(ruleMap.containsKey(productItem.getProductPropertyCode())){
                             //可使用优惠券
                             productItem.setCouponRule(YesOrNoEnum.YES.getCode());
+
+                            groupTopCouponMaxTotal=productItem.getLineAmountTotal();
                         }
                     }
                 }
