@@ -740,10 +740,12 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             BigDecimal commodityAmountOfTop=BigDecimal.ZERO;
             //赠品返回额度比例
             Double rebatesProportion=0.00;
-            for (ErpOrderItem item:resList){
-                ErpProductPropertyTypeEnum propertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(item.getProductPropertyCode());
+
+            //查询A品卷使用规则code Map
+            Map ruleMap=couponRuleService.couponRuleMap();
+            for (ErpOrderItem item:itemList){
                 //判断是18A商品  并且是主商品（赠品不发放额度）
-                if (propertyTypeEnum.isUseTopCoupon() && ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductType())) {
+                if (ruleMap.containsKey(item.getProductPropertyCode()) && ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductType())) {
                     commodityAmountOfTop=commodityAmountOfTop.add(item.getTotalPreferentialAmount());
                 }
             }
