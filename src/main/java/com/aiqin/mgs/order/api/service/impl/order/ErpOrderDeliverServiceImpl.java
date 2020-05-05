@@ -452,7 +452,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                     totalMoney=activityMoneyMap.get(item.getActivityId());
                 }
                 //判断是否为赠品
-                if(ErpProductGiftEnum.GIFT.getCode().equals(productType)){
+                if(ErpProductGiftEnum.GIFT.getCode().equals(productType)||ErpProductGiftEnum.JIFEN.getCode().equals(productType)){
                     //赠品使用实发数量
                     BigDecimal multiply = item.getActivityPrice().multiply(new BigDecimal(item.getActualProductCount()));
                     totalMoney=totalMoney.add(multiply);
@@ -485,7 +485,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 if(null!=activityMoneyMap.get(item.getActivityId())){
                     totalMoney=activityMoneyMap.get(item.getActivityId());
                 }
-                if(ErpProductGiftEnum.GIFT.getCode().equals(productType)){
+                if(ErpProductGiftEnum.GIFT.getCode().equals(productType)||ErpProductGiftEnum.JIFEN.getCode().equals(productType)){
                     //赠品使用实发数量
                     BigDecimal multiply = item.getActivityPrice().multiply(new BigDecimal(item.getActualProductCount()));
                     totalMoney=totalMoney.add(multiply);
