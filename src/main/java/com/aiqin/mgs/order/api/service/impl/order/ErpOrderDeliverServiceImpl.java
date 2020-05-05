@@ -719,8 +719,9 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             k.setTotalPreferentialAmount(tper);
             k.setPreferentialAmount(s);
             ErpOrderItem er=new ErpOrderItem();
-            er.setTotalPreferentialAmount(k.getTotalPreferentialAmount());
-            er.setPreferentialAmount(k.getPreferentialAmount());
+            // TODO 此处分摊后金额 莫名其妙除以了2，得看下计算
+//            er.setTotalPreferentialAmount(k.getTotalPreferentialAmount());
+//            er.setPreferentialAmount(k.getPreferentialAmount());
             er.setTopCouponDiscountAmount(k.getTopCouponDiscountAmount());
             er.setOrderInfoDetailId(k.getOrderInfoDetailId());
             er.setId(k.getId());
