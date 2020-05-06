@@ -689,14 +689,14 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
         //遍历明细行，计算商品总价值
         for(ErpOrderItem p:itemList){
             Integer productType = p.getProductType();
-            if(ErpProductGiftEnum.JIFEN.getCode().equals(productType)){
+            if(ErpProductGiftEnum.JIFEN.getCode().equals(productType)||ErpProductGiftEnum.GIFT.getCode().equals(productType)){
                 //兑换赠品本行商品价值=分销价X订货数量
                 BigDecimal multiply = p.getProductAmount().multiply(new BigDecimal(p.getActualProductCount()));
                 p.setTotalPreferentialAmount(multiply);
                 totalMoney=totalMoney.add(multiply);
             }else{
                 //其他商品按照分摊总金额累加
-                totalMoney=totalMoney.add(p.getTotalPreferentialAmount());
+//                totalMoney=totalMoney.add(p.getTotalPreferentialAmount());
             }
         }
         log.info("子单全部发货完成进行均摊--赠品均摊--商品总价值 totalMoney={}",totalMoney);
@@ -720,8 +720,8 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             k.setPreferentialAmount(s);
             ErpOrderItem er=new ErpOrderItem();
             // TODO 此处分摊后金额 莫名其妙除以了2，得看下计算
-//            er.setTotalPreferentialAmount(k.getTotalPreferentialAmount());
-//            er.setPreferentialAmount(k.getPreferentialAmount());
+            er.setTotalPreferentialAmount(k.getTotalPreferentialAmount());
+            er.setPreferentialAmount(k.getPreferentialAmount());
             er.setTopCouponDiscountAmount(k.getTopCouponDiscountAmount());
             er.setOrderInfoDetailId(k.getOrderInfoDetailId());
             er.setId(k.getId());
