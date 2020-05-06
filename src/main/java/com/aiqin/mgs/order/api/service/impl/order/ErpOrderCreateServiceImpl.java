@@ -1029,9 +1029,16 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             }
 
         }
-        nullifyTopCouponMoneyTotal=nullifyTopCouponMoneyTotal.add(topCouponMoneyTotal.subtract(groupTopProductTotal));
+        nullifyTopCouponMoneyTotal=nullifyTopCouponMoneyTotal.add(totalCouponSharePrice.subtract(groupTopProductTotal));
         if(nullifyTopCouponMoneyTotal.compareTo(BigDecimal.ZERO)==-1){
+            //A品卷金额小于18A商品总额
             nullifyTopCouponMoneyTotal=BigDecimal.ZERO;
+            orderFee.setTopCouponMoney(totalCouponSharePrice);
+            orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(totalCouponSharePrice));
+        }else{
+            //A品卷金额大于18A商品总额
+            orderFee.setTopCouponMoney(groupTopProductTotal);
+            orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(groupTopProductTotal));
         }
 
         orderFee.setTotalMoney(totalMoneyTotal);
@@ -1040,9 +1047,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         orderFee.setNullifySuitCouponMoney(nullifySuitCouponMoneyTotal);
         orderFee.setNullifyTopCouponMoney(nullifyTopCouponMoneyTotal);
 //        orderFee.setTopCouponMoney(topCouponMoneyTotal);
-        orderFee.setTopCouponMoney(totalCouponSharePrice);
+
 //        orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal));
-        orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(totalCouponSharePrice));
+
         orderFee.setUsedGiftQuota(usedGiftQuota);
         if(null!=topCouponCodeList&&topCouponCodeList.size()>0){
             orderFee.setTopCouponCodes(String.join(",", topCouponCodeList));
