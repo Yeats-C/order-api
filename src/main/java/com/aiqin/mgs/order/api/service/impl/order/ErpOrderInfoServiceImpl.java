@@ -643,6 +643,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void orderSign(ErpOrderSignRequest erpOrderSignRequest) {
+        logger.info("签收开始--erpOrderSignRequest={}",erpOrderSignRequest);
         if (erpOrderSignRequest == null || StringUtils.isEmpty(erpOrderSignRequest.getPersonId())) {
             throw new BusinessException("缺失用户id");
         }
@@ -712,8 +713,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             updateItemList.add(updateItem);
 
             //订单类型为配送    订单类别为普通补货  【只有这个组合类型调物流卷和发放赠品额度】
-            if(ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(order.getOrderTypeCode())
-                    && ErpOrderCategoryEnum.ORDER_TYPE_1.getCode().equals(order.getOrderCategoryCode())
+            if(ErpOrderTypeEnum.DISTRIBUTION.getCode().toString().equals(order.getOrderTypeCode())
+                    && ErpOrderCategoryEnum.ORDER_TYPE_1.getCode().toString().equals(order.getOrderCategoryCode())
                     &&ruleMap.containsKey(item.getProductPropertyCode())
                     && ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductType())){
                 commodityAmountOfTop=commodityAmountOfTop.add(item.getTotalPreferentialAmount());
@@ -732,7 +733,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         logger.info("签收结束--判断是否发放赠品额度--主订单信息为 order={}",JSON.toJSONString(order));
 
 
-        logger.info("签收完毕--主订单商品18A类型总金额为commodityAmountOfTop----",commodityAmountOfTop);
+        logger.info("签收完毕--主订单商品18A类型总金额为commodityAmountOfTop={}",commodityAmountOfTop);
             //判断18A商品金额总和大于0
         if(commodityAmountOfTop.compareTo(BigDecimal.ZERO)==1){
             //赠品返回额度比例
@@ -741,7 +742,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
             if(null!=gradient&&null!=gradient.getStoreGradientList()&&gradient.getStoreGradientList().size()>0){
                 for(StoreGradient storeGradient:gradient.getStoreGradientList()){
-                    if(commodityAmountOfTop.compareTo(BigDecimal.valueOf(storeGradient.getTiDuMaxValue()))==1){
+                    if(commodityAmountOfTop.compareTo(BigDecimal.valueOf(storeGradient.getMinimumValue()))==1){
                         rebatesProportion=storeGradient.getRebatesProportion();
                     }
                 }
