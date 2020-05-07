@@ -65,7 +65,7 @@
             <if test="activityStatus!= null and activityStatus==2">
                 and a.begin_time &lt;= now() and finish_time &gt;= now() and activity_status=0
             </if>
-            <if test="activityStatus!= null and activityStatus==3">
+            <if test="activityStatus!= null and activityStatus==1">
                 and a.begin_time &gt; now() and activity_status=0
             </if>
             <if test="beginTime!= null">
@@ -195,7 +195,7 @@
             <if test="activityStatus!= null and activityStatus==2">
                 and a.begin_time &lt;= now() and finish_time &gt;= now() and activity_status=0
             </if>
-            <if test="activityStatus!= null and activityStatus==3">
+            <if test="activityStatus!= null and activityStatus==1">
                 and a.begin_time &gt; now() and activity_status=0
             </if>
             <if test="beginTime!= null">
