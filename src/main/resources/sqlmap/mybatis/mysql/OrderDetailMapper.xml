@@ -244,6 +244,9 @@
         <if test="activityId!=null and activityId!=''">
             AND a.activity_id =#{activityId}
         </if>
+        <if test="endDate!=null">
+            AND a.create_time &lt; #{endDate}
+        </if>
         group by a.order_code
         ) c
     </select>

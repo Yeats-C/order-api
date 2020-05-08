@@ -69,6 +69,7 @@ public class OrderDetailQuery extends PagesRequest {
 	
 	@ApiModelProperty(value="起始时间,date类型",example = "2001-01-01 01:01:01")
 	@JsonProperty("begin_date")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private Date beginDate;
 	
 	@ApiModelProperty(value="结束时间,date类型",example = "2001-01-01 01:01:01")

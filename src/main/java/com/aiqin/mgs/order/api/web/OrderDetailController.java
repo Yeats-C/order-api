@@ -104,14 +104,14 @@ public class OrderDetailController {
      * @param 
      * @return
      */
-//    @PostMapping("/selectorderdetailsum")
-//    @ApiOperation(value = "查询订单明细部分汇总-(支持活动ID汇总、)")
-//    public HttpResponse selectorderdetailsum(@Valid @RequestBody OrderDetailQuery orderDetailQuery) {
-//
-//
-//    	LOGGER.info("查询订单明细部分汇总-（支持活动ID汇总、）参数：{}",orderDetailQuery);
-//        return orderDetailService.selectorderdetailsum(orderDetailQuery);//查询订单明细部分汇总-（支持活动ID汇总、）
-//    }
+    @PostMapping("/selectorderdetailsum")
+    @ApiOperation(value = "查询订单明细部分汇总-(支持活动ID汇总、)")
+    public HttpResponse selectorderdetailsum(@Valid @RequestBody OrderDetailQuery orderDetailQuery) {
+
+
+    	LOGGER.info("查询订单明细部分汇总-（支持活动ID汇总、）参数：{}",orderDetailQuery);
+        return orderDetailService.selectorderdetailsum(orderDetailQuery);//查询订单明细部分汇总-（支持活动ID汇总、）
+    }
     
     
     /**
