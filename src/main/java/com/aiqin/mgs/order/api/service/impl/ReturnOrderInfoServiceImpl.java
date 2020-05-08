@@ -23,6 +23,7 @@ import com.aiqin.mgs.order.api.domain.copartnerArea.PublicAreaStore;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
+import com.aiqin.mgs.order.api.domain.request.StoreQuotaRequest;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderStatusVo;
 import com.aiqin.mgs.order.api.service.CopartnerAreaService;
@@ -813,6 +814,10 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         Assert.notNull(returnOrderInfo, "退货单不存在");
         //查询退货单详情
         List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderCode);
+        //退货总金额(赠品金额+商品金额已算好) 加
+        BigDecimal returnOrderAmount = returnOrderInfo.getReturnOrderAmount();
+        returnOrderInfo.setReturnOrderAmount(returnOrderAmount.add(returnOrderInfo.getTopCouponDiscountAmount()));
+//        BigDecimal reduce = returnOrderDetails.stream().map(ReturnOrderDetail::getTopCouponDiscountAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
         //查询日志详情
         List<ErpOrderOperationLog> erpOrderOperationLogs = getOrderOperationLogList(returnOrderCode);
         ReturnOrderDetailVO respVo = new ReturnOrderDetailVO();
@@ -972,7 +977,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //冲减单总金额
         BigDecimal totalAmount=new BigDecimal(0);
         //兑换赠品累计金额
-        BigDecimal totalZengAmount=new BigDecimal(0);
+//        BigDecimal totalZengAmount=new BigDecimal(0);
+        BigDecimal complimentaryAmount=new BigDecimal(0);
         //发起冲减单所有商品总数量
         Long totalCount=0L;
         List<ReturnOrderDetail> detailsList=new ArrayList<>();
@@ -1000,7 +1006,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     //计算公式：此商品退货总金额=分摊后单价 X 发起冲减单数量
                     BigDecimal amount=preferentialAmount.multiply(BigDecimal.valueOf(differenceCount));
                     if(ErpProductGiftEnum.JIFEN.getCode().equals(productType)){//2兑换赠品
-                        totalZengAmount=totalZengAmount.add(amount);
+                        complimentaryAmount=complimentaryAmount.add(amount);
                     }else{
                         totalAmount=totalAmount.add(amount);
                     }
@@ -1014,10 +1020,13 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     returnOrderDetail.setProductCategoryCode(eoi.getProductCategoryCode());
                     returnOrderDetail.setProductCategoryName(eoi.getProductCategoryName());
                     returnOrderDetail.setBarCode(eoi.getBarCode());
+                    //可用赠品额度
+                    returnOrderDetail.setComplimentaryAmount(complimentaryAmount);
                     detailsList.add(returnOrderDetail);
                 }else if(differenceCount.equals(productCount)){//全退
                     if(ErpProductGiftEnum.JIFEN.getCode().equals(productType)){//2兑换赠品
-                        totalZengAmount=totalZengAmount.add(totalPreferentialAmount);
+//                        totalZengAmount=totalZengAmount.add(totalPreferentialAmount);
+                        complimentaryAmount=complimentaryAmount.add(totalPreferentialAmount);
                     }else{
                         //计算公式：优惠分摊总金额（分摊后金额）
                         totalAmount=totalAmount.add(totalPreferentialAmount);
@@ -1031,6 +1040,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     returnOrderDetail.setProductCategoryCode(eoi.getProductCategoryCode());
                     returnOrderDetail.setProductCategoryName(eoi.getProductCategoryName());
                     returnOrderDetail.setBarCode(eoi.getBarCode());
+                    //可用赠品额度
+                    returnOrderDetail.setComplimentaryAmount(complimentaryAmount);
                     detailsList.add(returnOrderDetail);
                 }
             }
@@ -1049,10 +1060,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 returnOrderInfo.setActualProductCount(totalCount);
                 returnOrderInfo.setProductCount(totalCount);
                 returnOrderInfo.setActualReturnOrderAmount(totalAmount);
-                //todo 主表添加赠品金额字段
-//                returnOrderInfo.settotalZengAmount(totalAmount);
+                //应退赠品总金额
+//                returnOrderInfo.setTotalZengAmount(totalAmount);
+                returnOrderInfo.setComplimentaryAmount(complimentaryAmount);
                 //退货金额=商品冲减金额+赠品退积分金额
-                returnOrderInfo.setReturnOrderAmount(totalAmount.add(totalZengAmount));
+                returnOrderInfo.setReturnOrderAmount(totalAmount.add(complimentaryAmount));
                 //退款方式 5:退到加盟商账户
                 returnOrderInfo.setReturnMoneyType(ConstantData.RETURN_MONEY_TYPE);
                 //退货类型 3冲减单
@@ -1081,14 +1093,41 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 insertLog(returnOrderCode,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR,ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(), WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getCode(),WriteDownOrderStatusEnum.CREATE_ORDER_STATUS.getName());
                 //发起退款
                 refund(returnOrderCode);
-                //todo 发起退积分方法
-
+                //发起退积分方法
+                refundPoints(returnOrderInfo);
                 return HttpResponse.success();
             }
 
         }
         return HttpResponse.failure(ResultCode.NOT_FOUND_ORDER_DATA);
     }
+
+    /**
+     * 封装-退积分方法
+     * @param returnOrderInfo
+     * @return
+     */
+   public boolean refundPoints(ReturnOrderInfo returnOrderInfo){
+       log.info("退积分方法的入参：{}",returnOrderInfo);
+       StoreQuotaRequest storeQuotaRequest = new StoreQuotaRequest();
+       storeQuotaRequest.setStoreCode(returnOrderInfo.getStoreCode());
+       storeQuotaRequest.setComplimentaryAmount(returnOrderInfo.getComplimentaryAmount());
+       log.info("积分的方法入参：{}",storeQuotaRequest);
+       log.info("开始调用slcs系统-------------");
+       StringBuilder url = new StringBuilder();
+       url.append(slcsHost).append("/store/updateQuota");
+       log.info("退积分的url路径：{}",url);
+       HttpClient httpClient = HttpClient.post(url.toString()).json(storeQuotaRequest);
+       Map<String, Object> result = null;
+       result = httpClient.action().result(new TypeReference<Map<String, Object>>() {
+       });
+       log.info("发起退积分申请结果，request={}",JSON.toJSON(result));
+       if(result!=null&&"0".equals(result.get("code"))){
+           log.info("退积分完成");
+           return true;
+       }
+       return false;
+   }
 
     @Override
     public PageResData<ReturnOrderInfo> getWriteDownOrderList(PageRequestVO<WriteDownOrderSearchVo> searchVo) {

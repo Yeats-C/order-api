@@ -13,6 +13,7 @@ import com.aiqin.platform.flows.client.domain.vo.FormCallBackVo;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.List;
 
@@ -193,4 +194,9 @@ public class ReturnOrderInfoController {
         return new HttpResponse<>(returnOrderInfoService.azgList(searchVo));
     }
 
+//    @ApiOperation("退积分")
+//    @PostMapping("/updateStores")
+//    public Boolean updateStores(@RequestBody ReturnOrderInfo returnOrderInfo){
+//        return returnOrderInfoService.refundPoints(returnOrderInfo);
+//    }
 }
