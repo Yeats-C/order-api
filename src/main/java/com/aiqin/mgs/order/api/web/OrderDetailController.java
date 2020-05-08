@@ -10,31 +10,18 @@
 package com.aiqin.mgs.order.api.web;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.domain.CartInfo;
-import com.aiqin.mgs.order.api.domain.OrderDetailInfo;
 import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
-import com.aiqin.mgs.order.api.domain.OrderInfo;
-import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.request.ProdisorRequest;
 import com.aiqin.mgs.order.api.domain.request.ProductStoreRequest;
-import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.OrderDetailService;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.sql.Date;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 @RestController
@@ -117,14 +104,14 @@ public class OrderDetailController {
      * @param 
      * @return
      */
-    @PostMapping("/selectorderdetailsum")
-    @ApiOperation(value = "查询订单明细部分汇总-(支持活动ID汇总、)")
-    public HttpResponse selectorderdetailsum(@Valid @RequestBody OrderDetailQuery orderDetailQuery) {
-        
-    	
-    	LOGGER.info("查询订单明细部分汇总-（支持活动ID汇总、）参数：{}",orderDetailQuery);    	
-        return orderDetailService.selectorderdetailsum(orderDetailQuery);//查询订单明细部分汇总-（支持活动ID汇总、）
-    }
+//    @PostMapping("/selectorderdetailsum")
+//    @ApiOperation(value = "查询订单明细部分汇总-(支持活动ID汇总、)")
+//    public HttpResponse selectorderdetailsum(@Valid @RequestBody OrderDetailQuery orderDetailQuery) {
+//
+//
+//    	LOGGER.info("查询订单明细部分汇总-（支持活动ID汇总、）参数：{}",orderDetailQuery);
+//        return orderDetailService.selectorderdetailsum(orderDetailQuery);//查询订单明细部分汇总-（支持活动ID汇总、）
+//    }
     
     
     /**
