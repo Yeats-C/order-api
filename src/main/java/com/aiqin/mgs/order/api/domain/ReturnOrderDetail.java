@@ -141,4 +141,10 @@ public class ReturnOrderDetail {
     @ApiModelProperty(value = "退回赠品额度")
     private BigDecimal complimentaryAmount;
 
+    @ApiModelProperty(value = "退积分金额")
+    private BigDecimal complimentaryAmount;
+
+    @ApiModelProperty(value = "服纺券单品金额")
+    private BigDecimal returnClothingSpinning;
+
 }
