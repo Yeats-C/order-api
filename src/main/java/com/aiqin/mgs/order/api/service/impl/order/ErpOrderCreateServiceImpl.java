@@ -250,23 +250,26 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 giftAmount=giftAmount.add(erp.getPrice().multiply(new BigDecimal(erp.getAmount().toString())));
             }
         }
-        //查詢門店赠品额度
-        BigDecimal availableGiftQuota=bridgeProductService.getStoreAvailableGiftGuota(storeInfo.getStoreId());
-        //计算订单使用过后的赠品额度
-        BigDecimal newAvailableGiftQuota=availableGiftQuota.subtract(giftAmount);
-        //更新订单使用过后的赠品额度
-        bridgeProductService.updateAvailableGiftQuota(storeInfo.getStoreId(),newAvailableGiftQuota);
+        if(giftAmount.compareTo(BigDecimal.ZERO)==1){
+            //查詢門店赠品额度
+            BigDecimal availableGiftQuota=bridgeProductService.getStoreAvailableGiftGuota(storeInfo.getStoreId());
+            //计算订单使用过后的赠品额度
+            BigDecimal newAvailableGiftQuota=availableGiftQuota.subtract(giftAmount);
+            //更新订单使用过后的赠品额度
+            bridgeProductService.updateAvailableGiftQuota(storeInfo.getStoreId(),newAvailableGiftQuota);
 
-        //新建一个赠品额度使用明细对象
-        GiftQuotasUseDetail giftQuotasUseDetail=new GiftQuotasUseDetail();
-        giftQuotasUseDetail.setStoreId(storeInfo.getStoreId());
-        giftQuotasUseDetail.setChangeInGiftQuota("-"+giftAmount);
-        giftQuotasUseDetail.setBillCode(orderStoreCode);
-        giftQuotasUseDetail.setType(2);
-        giftQuotasUseDetail.setCreateBy(auth.getPersonName());
-        giftQuotasUseDetail.setUpdateBy(auth.getPersonName());
-        //插入一条赠品明细使用记录
-        giftQuotasUseDetailService.add(giftQuotasUseDetail);
+            //新建一个赠品额度使用明细对象
+            GiftQuotasUseDetail giftQuotasUseDetail=new GiftQuotasUseDetail();
+            giftQuotasUseDetail.setStoreId(storeInfo.getStoreId());
+            giftQuotasUseDetail.setChangeInGiftQuota("-"+giftAmount);
+            giftQuotasUseDetail.setBillCode(orderStoreCode);
+            giftQuotasUseDetail.setType(2);
+            giftQuotasUseDetail.setCreateBy(auth.getPersonName());
+            giftQuotasUseDetail.setUpdateBy(auth.getPersonName());
+            //插入一条赠品明细使用记录
+            giftQuotasUseDetailService.add(giftQuotasUseDetail);
+        }
+
 
     }
 
