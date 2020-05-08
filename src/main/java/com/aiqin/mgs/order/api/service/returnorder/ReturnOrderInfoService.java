@@ -168,4 +168,5 @@ public interface ReturnOrderInfoService {
      */
     PageResData<ReturnOrderInfo> azgList(ReturnOrderSearchVo searchVo);
 
+//    boolean refundPoints(ReturnOrderInfo returnOrderInfo);
 }

@@ -93,6 +93,8 @@
     <result column="return_good_amount" property="returnGoodAmount" jdbcType="DECIMAL" />
     <result column="actual_return_good_amount" property="actualReturnGoodAmount" jdbcType="DECIMAL" />
     <result column="really_return" property="reallyReturn" jdbcType="BIT" />
+    <result column="complimentary_amount" property="complimentaryAmount" jdbcType="DECIMAL" />
+    <result column="top_coupon_discount_amount" property="topCouponDiscountAmount" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, return_order_id, return_order_code, order_store_code, company_code, company_name,
@@ -111,7 +113,7 @@
     review_remark, review_operator, refund_status, process_type, remark, use_status,
     create_by_id, create_by_name, update_by_id, update_by_name, create_time, update_time,
     source_type, order_success, return_money_type, order_category, review_operator_id, review_time,
-    return_good_amount,actual_return_good_amount,really_return
+    return_good_amount,actual_return_good_amount,really_return,complimentary_amount,top_coupon_discount_amount
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
@@ -391,6 +393,9 @@
       <if test="reallyReturn != null" >
         really_return,
       </if>
+      <if test="complimentaryAmount != null">
+        complimentary_amount,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -656,6 +661,9 @@
       </if>
       <if test="reallyReturn != null" >
         #{reallyReturn},
+      </if>
+      <if test="complimentaryAmount != null">
+        #{complimentaryAmount},
       </if>
     </trim>
   </insert>

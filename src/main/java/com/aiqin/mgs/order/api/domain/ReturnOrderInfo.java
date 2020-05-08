@@ -373,4 +373,11 @@ public class ReturnOrderInfo {
 
     @ApiModelProperty(value = "退回赠品额度")
     private BigDecimal complimentaryAmount;
+
+    @ApiModelProperty(value = "退积分金额")
+    private BigDecimal complimentaryAmount;
+
+    @ApiModelProperty(value = "本行A品券优惠总额度")
+    private BigDecimal topCouponDiscountAmount;
+
 }
