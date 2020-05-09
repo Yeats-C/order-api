@@ -12,6 +12,7 @@ import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.dto.ProductDistributorOrderDTO;
+import com.aiqin.mgs.order.api.domain.po.gift.NewStoreGradient;
 import com.aiqin.mgs.order.api.domain.request.InventoryDetailRequest;
 import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
@@ -20,8 +21,11 @@ import com.aiqin.mgs.order.api.domain.request.product.NewStoreCategory;
 import com.aiqin.mgs.order.api.domain.request.product.ProductSkuRespVo6;
 import com.aiqin.mgs.order.api.domain.request.product.SkuProductReqVO;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
+import com.aiqin.mgs.order.api.domain.request.stock.ProductSkuStockRespVo;
 import com.aiqin.mgs.order.api.domain.response.NewFranchiseeResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetail;
+import com.aiqin.mgs.order.api.domain.response.gift.StoreAvailableGiftQuotaResponse;
+import com.aiqin.mgs.order.api.util.MathUtil;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
@@ -30,6 +34,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -37,7 +42,7 @@ import java.util.*;
  */
 @Service
 @Slf4j
-public class BridgeProductService {
+public class BridgeProductService<main> {
 
     @Resource
     private UrlProperties urlProperties;
@@ -60,6 +65,7 @@ public class BridgeProductService {
     }
 
     public HttpResponse changeStock(List<InventoryDetailRequest> stockReqVos) {
+        log.info("修改库存{}", JsonUtil.toJson(stockReqVos));
         StringBuilder sb = new StringBuilder();
         sb.append(urlProperties.getProductApi()).append("/inventory/update/detail");
         HttpClient orderClient =HttpClient.post(sb.toString()).json(stockReqVos);
@@ -467,5 +473,103 @@ public class BridgeProductService {
         }
 
         return provinceList;
+    }
+
+    /**
+     * 通过门店id返回可用赠品额度--slcs
+     * @param storeId
+     * @return
+     */
+    public BigDecimal getStoreAvailableGiftGuota(String storeId){
+        String path = "/store/getStoreAvailableGiftGuota?store_id="+storeId;
+        HttpClient httpClient = HttpClient.get(urlProperties.getSlcsApi() + path);
+        HttpResponse response = httpClient.action().result(new TypeReference<HttpResponse>() {
+        });
+        BigDecimal availableGiftQuota=BigDecimal.ZERO;
+        if(Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")){
+            availableGiftQuota= MathUtil.getBigDecimal(response.getData());
+        }
+
+        return availableGiftQuota;
+    }
+    /**
+     * 修改门店可用赠品额度--slcs
+     * @param storeId
+     * @param availableGiftQuota
+     * @return
+     */
+    public HttpResponse updateAvailableGiftQuota(String storeId,BigDecimal availableGiftQuota){
+        String path = "/store/updateAvailableGiftQuota";
+        StoreAvailableGiftQuotaResponse storeAvailableGiftQuotaResponse=new StoreAvailableGiftQuotaResponse();
+        storeAvailableGiftQuotaResponse.setStoreId(storeId);
+        storeAvailableGiftQuotaResponse.setAvailableGiftQuota(availableGiftQuota);
+        HttpClient httpClient = HttpClient.post(urlProperties.getSlcsApi() + path).json(storeAvailableGiftQuotaResponse);
+        HttpResponse response = httpClient.action().result(new TypeReference<HttpResponse>() {
+        });
+
+        return response;
+    }
+
+    /**
+     * 根据skucode获取库存详情--product
+     * @param skuCodes
+     * @return
+     */
+    public List<ProductSkuStockRespVo> findStockDetail(List<String> skuCodes){
+        String path = "/search/spu/findStockDetail";
+        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(skuCodes);
+        HttpResponse response = httpClient.action().result(new TypeReference<HttpResponse<List<ProductSkuStockRespVo>>>() {
+        });
+        List<ProductSkuStockRespVo> stockRespVoList=new ArrayList<>();
+        if(Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")){
+            stockRespVoList= (List<ProductSkuStockRespVo>)response.getData();
+        }
+
+        return stockRespVoList;
+    }
+
+    /**
+     * 通过省市code查出对应的运输中心--product
+     * @param provinceCode
+     * @param cityCode
+     * @return
+     */
+    public List<String> findTransportCenter(String provinceCode,String cityCode){
+        String path = "/search/spu/findTransportCenter?province_code="+provinceCode+"&city_code="+cityCode;
+        HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path);
+        HttpResponse response = httpClient.action().result(new TypeReference<HttpResponse<List<String>>>() {
+        });
+        List<String> transportCenterList=new ArrayList<>();
+        if(Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")){
+            transportCenterList= (List<String>)response.getData();
+        }
+
+        return transportCenterList;
+    }
+
+    /**
+     * 通过门店code查询门店赠品比例信息--slcs
+     * @param storeCode
+     * @return
+     */
+    public NewStoreGradient selectStoreGiveawayByStoreCode(String storeCode){
+        String path = "/storeGiveaway/selectStoreGiveawayByStoreCode?store_code="+storeCode;
+        HttpClient httpClient = HttpClient.get(urlProperties.getSlcsApi() + path);
+        HttpResponse response = httpClient.action().result(new TypeReference<HttpResponse<NewStoreGradient>>() {
+        });
+        NewStoreGradient gradient=null;
+        if(Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")){
+            gradient= (NewStoreGradient)response.getData();
+        }
+
+        return gradient;
+    }
+
+
+
+
+    public static void main(String[] args) {
+        BridgeProductService bridgeProductService=new BridgeProductService();
+        System.out.println(bridgeProductService.selectStoreGiveawayByStoreCode("60000011"));
     }
 }

@@ -93,7 +93,8 @@
         update_by_id as updateById,
         update_by_name as updateByName,
         create_time as createTime,
-        update_time as updateTime
+        update_time as updateTime,
+        first_market_value_gift as firstMarketValueGift
         from order_store_info
         where 1 = 1
         <if test="id != null and id != ''">
@@ -167,6 +168,9 @@
         </if>
         <if test="storeCode != null and storeCode != ''">
             and store_code = #{storeCode}
+        </if>
+        <if test="firstMarketValueGift != null">
+            and first_market_value_gift = #{firstMarketValueGift}
         </if>
         order by create_time desc
 
@@ -364,7 +368,7 @@
                                       transport_code, logistics_id, fee_id, order_return, order_return_process, franchisee_id,
                                       franchisee_code, franchisee_name, order_success, scour_sheet_status, use_status, source_code, source_name,
                                       source_type, activity_id, is_activity, create_by_id, create_by_name, update_by_id, update_by_name,
-                                      create_time, update_time)
+                                      create_time, update_time,first_market_value_gift)
         values (#{orderStoreId}, #{orderStoreCode}, #{companyCode}, #{companyName},
                 #{orderTypeCode}, #{orderTypeName}, #{orderCategoryCode},
                 #{orderCategoryName}, #{supplierCode}, #{supplierName},
@@ -385,7 +389,7 @@
                 #{transportCode}, #{logisticsId}, #{feeId}, #{orderReturn}, #{orderReturnProcess}, #{franchiseeId},
                 #{franchiseeCode}, #{franchiseeName}, #{orderSuccess}, #{scourSheetStatus}, #{useStatus}, #{sourceCode}, #{sourceName},
                 #{sourceType}, #{activityId}, #{isActivity}, #{createById}, #{createByName}, #{updateById}, #{updateByName},
-                sysdate(), sysdate())
+                sysdate(), sysdate(),#{firstMarketValueGift})
     </insert>
 
     <select id="findOrderList" parameterType="com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest"
@@ -486,7 +490,8 @@
         a2.top_coupon_money as topCouponMoney,
         a2.suit_coupon_money as suitCouponMoney,
         a2.pay_status as payStatus,
-        a2.goods_coupon as goodsCoupon
+        a2.goods_coupon as goodsCoupon,
+        a1.first_market_value_gift as firstMarketValueGift
         from order_store_info a1
         left join order_store_fee a2 on a1.fee_id = a2.fee_id
         where 1 = 1
@@ -560,6 +565,9 @@
             <foreach collection="storeIdList" item="item" open="(" separator="," close=")">
                 #{item}
             </foreach>
+        </if>
+        <if test="firstMarketValueGift != null">
+            and a1.first_market_value_gift = #{firstMarketValueGift}
         </if>
         order by a1.create_time desc
     </select>

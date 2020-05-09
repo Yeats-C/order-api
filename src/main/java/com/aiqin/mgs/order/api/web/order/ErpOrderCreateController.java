@@ -7,20 +7,19 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayWayEnum;
 import com.aiqin.mgs.order.api.domain.AuthToken;
+import com.aiqin.mgs.order.api.domain.OrderGiveApproval;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
 import com.aiqin.mgs.order.api.service.order.ErpOrderCreateService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderPayNoTransactionalService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
+import com.aiqin.platform.flows.client.domain.vo.FormCallBackVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -120,4 +119,17 @@ public class ErpOrderCreateController {
         }
         return response;
     }
+
+    @PostMapping("/callback")
+    @ApiOperation("订单金额超出市值赠送金额--审批流回调地址")
+    public String getByBrandName(@RequestBody FormCallBackVo formCallBackVo) {
+        return erpOrderCreateService.callback(formCallBackVo);
+    }
+
+    @ApiOperation("订单金额超出市值赠送金额--根据formNo查询审批详情")
+    @GetMapping("/formDetail/{form_no}")
+    public HttpResponse<OrderGiveApproval> getDetailByformNo(@PathVariable(value = "form_no") String formNo) {
+        return HttpResponse.success(erpOrderCreateService.getDetailByformNo(formNo));
+    }
+
 }

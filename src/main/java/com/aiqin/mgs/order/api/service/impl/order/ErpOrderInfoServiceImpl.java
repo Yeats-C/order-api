@@ -3,27 +3,34 @@ package com.aiqin.mgs.order.api.service.impl.order;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
-import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayWayEnum;
+import com.aiqin.mgs.order.api.dao.OrderSplitsNumDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
-import com.aiqin.mgs.order.api.domain.ProductInfo;
-import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
+import com.aiqin.mgs.order.api.domain.OrderSplitsNum;
+import com.aiqin.mgs.order.api.domain.po.gift.GiftQuotasUseDetail;
+import com.aiqin.mgs.order.api.domain.po.gift.NewStoreGradient;
+import com.aiqin.mgs.order.api.domain.po.gift.StoreGradient;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
-import com.aiqin.mgs.order.api.domain.request.order.*;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCarryOutNextStepRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSignRequest;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderItemSplitGroupResponse;
+import com.aiqin.mgs.order.api.service.CouponRuleService;
 import com.aiqin.mgs.order.api.service.SequenceGeneratorService;
 import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
+import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
+import com.aiqin.mgs.order.api.service.gift.GiftQuotasUseDetailService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import com.aiqin.mgs.order.api.util.CopyBeanUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +72,14 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     private ErpOrderCancelNoTransactionalService erpOrderCancelNoTransactionalService;
     @Resource
     private ErpStoreLockDetailsService erpStoreLockDetailsService;
+    @Resource
+    private OrderSplitsNumDao orderSplitsNumDao;
+    @Resource
+    private CouponRuleService couponRuleService;
+    @Resource
+    private BridgeProductService bridgeProductService;
+    @Resource
+    private GiftQuotasUseDetailService giftQuotasUseDetailService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -405,6 +420,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 //删除本地缓存
                 erpStoreLockDetailsService.deleteBySkuCode(orderCode,res1.getSkuCode());
             }
+            //根据仓库拆单--添加到子订单发货表中
+            if(null!=repertorySplitMap&&repertorySplitMap.size()>0){
+                insertOrderSplitsNum(order.getOrderStoreCode(),repertorySplitMap.size());
+            }
 
         } else {
             //按照供应商拆单
@@ -529,6 +548,12 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_4.getCode());
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
             this.updateOrderByPrimaryKeySelective(order, auth);
+
+            //根据供应商拆单--添加到子订单发货表中
+            if(null!=supplierItemMap&&supplierItemMap.size()>0){
+                insertOrderSplitsNum(order.getOrderStoreCode(),supplierItemMap.size());
+            }
+
         }
 
     }
@@ -618,6 +643,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void orderSign(ErpOrderSignRequest erpOrderSignRequest) {
+        logger.info("签收开始--erpOrderSignRequest={}",erpOrderSignRequest);
         if (erpOrderSignRequest == null || StringUtils.isEmpty(erpOrderSignRequest.getPersonId())) {
             throw new BusinessException("缺失用户id");
         }
@@ -669,6 +695,11 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         }
         List<ErpOrderItem> itemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
         List<ErpOrderItem> updateItemList = new ArrayList<>();
+        //只有18A商品会发放赠品额度
+        BigDecimal commodityAmountOfTop=BigDecimal.ZERO;
+        //查询A品卷使用规则code Map
+        Map ruleMap=couponRuleService.couponRuleMap();
+
         for (ErpOrderItem item :
                 itemList) {
             if (!orderItemSignMap.containsKey(item.getLineCode())) {
@@ -680,6 +711,16 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             updateItem.setActualInboundCount(signItem.getActualInboundCount());
             updateItem.setSignDifferenceReason(signItem.getSignDifferenceReason());
             updateItemList.add(updateItem);
+
+            //订单类型为配送    订单类别为普通补货  【只有这个组合类型调物流卷和发放赠品额度】
+            if(ErpOrderTypeEnum.DISTRIBUTION.getCode().toString().equals(order.getOrderTypeCode())
+                    && ErpOrderCategoryEnum.ORDER_TYPE_1.getCode().toString().equals(order.getOrderCategoryCode())
+                    &&ruleMap.containsKey(item.getProductPropertyCode())
+                    && ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductType())){
+                commodityAmountOfTop=commodityAmountOfTop.add(item.getTotalPreferentialAmount());
+            }
+
+
         }
         erpOrderItemService.updateOrderItemList(updateItemList, auth);
 
@@ -687,6 +728,71 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_12.getCode());
         order.setReceiveTime(new Date());
         this.updateOrderByPrimaryKeySelective(order, auth);
+
+        /*****************************************签收完毕，发放赠品额度start*****************************************/
+        logger.info("签收结束--判断是否发放赠品额度--主订单信息为 order={}",JSON.toJSONString(order));
+
+
+        logger.info("签收完毕--主订单商品18A类型总金额为commodityAmountOfTop={}",commodityAmountOfTop);
+            //判断18A商品金额总和大于0
+        if(commodityAmountOfTop.compareTo(BigDecimal.ZERO)==1){
+            //赠品返回额度比例
+            Double rebatesProportion=0.00;
+            NewStoreGradient gradient=bridgeProductService.selectStoreGiveawayByStoreCode(order.getStoreCode());
+
+            if(null!=gradient&&null!=gradient.getStoreGradientList()&&gradient.getStoreGradientList().size()>0){
+                for(StoreGradient storeGradient:gradient.getStoreGradientList()){
+                    if(commodityAmountOfTop.compareTo(BigDecimal.valueOf(storeGradient.getMinimumValue()))==1){
+                        rebatesProportion=storeGradient.getRebatesProportion();
+                    }
+                }
+                logger.info("签收完毕--赠品比例为 rebatesProportion={}",rebatesProportion);
+                if(rebatesProportion>0){
+                    //18A主商品金额总和乘以赠品比例
+                    commodityAmountOfTop=commodityAmountOfTop.multiply(BigDecimal.valueOf(rebatesProportion)).divide(new BigDecimal(100)).setScale(2, RoundingMode.DOWN);
+
+                    //查詢門店员赠品额度
+                    BigDecimal availableGiftQuota=bridgeProductService.getStoreAvailableGiftGuota(order.getStoreId());
+                    //计算订单赠品额度发放后的赠品额度
+                    BigDecimal newAvailableGiftQuota=availableGiftQuota.add(commodityAmountOfTop);
+                    //更新订单使用过后的赠品额度
+                    bridgeProductService.updateAvailableGiftQuota(order.getStoreId(),newAvailableGiftQuota);
+                    logger.info("签收完毕--赠品额度更新信息为：应发放赠品额度 commodityAmountOfTop={}",commodityAmountOfTop
+                            +"查詢門店员赠品额度 availableGiftQuota={}"+availableGiftQuota+"计算订单赠品额度发放后的赠品额度 newAvailableGiftQuota={}"+newAvailableGiftQuota);
+                    //新建一个赠品额度使用明细对象
+                    GiftQuotasUseDetail giftQuotasUseDetail=new GiftQuotasUseDetail();
+                    giftQuotasUseDetail.setStoreId(order.getStoreId());
+                    giftQuotasUseDetail.setChangeInGiftQuota("+"+commodityAmountOfTop);
+                    giftQuotasUseDetail.setBillCode(order.getOrderStoreCode());
+                    giftQuotasUseDetail.setType(3);
+                    giftQuotasUseDetail.setCreateBy(auth.getPersonName());
+                    giftQuotasUseDetail.setUpdateBy(auth.getPersonName());
+                    //插入一条赠品明细使用记录
+                    giftQuotasUseDetailService.add(giftQuotasUseDetail);
+
+                    //更新订单费用信息表-发放赠品额度字段
+                    ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(order.getOrderStoreId());
+                    if(null!=orderFee){
+                        if(null!=orderFee.getComplimentaryAmount()){
+                            BigDecimal complimentaryAmount=orderFee.getComplimentaryAmount();
+                            complimentaryAmount=complimentaryAmount.add(commodityAmountOfTop);
+                            orderFee.setComplimentaryAmount(complimentaryAmount);
+                        }else{
+                            orderFee.setComplimentaryAmount(commodityAmountOfTop);
+                        }
+
+                        erpOrderFeeService.updateOrderFeeByPrimaryKeySelective(orderFee,auth);
+                    }else{
+                        logger.info("分摊计算结束，发放赠品额度-查询支付信息异常，查询订单号为"+order.getOrderStoreCode());
+                    }
+
+                }
+
+            }
+
+
+        }
+        /*****************************************分摊计算结束，发放赠品额度end*****************************************/
 
         //首单，修改门店状态
         if (processTypeEnum.getOrderCategoryEnum().isFirstOrder()) {
@@ -879,4 +985,15 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         this.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
     }
 
+    /**
+     * 将拆单数量存入拆单数量表中
+     * @param num
+     * @param orderCode
+     */
+    private void insertOrderSplitsNum(String orderCode,Integer num){
+        OrderSplitsNum record=new OrderSplitsNum();
+        record.setNum(num);
+        record.setOrderCode(orderCode);
+        orderSplitsNumDao.insertSelective(record);
+    }
 }

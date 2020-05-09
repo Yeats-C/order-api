@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.gift.ComplimentaryWarehouseCorrespondenceDao">
+
+
+    <!--批量保存活动对应商品信息List-->
+    <insert id="insertList" parameterType="java.util.List">
+        insert into complimentary_warehouse_correspondence (sku_code, warehouse_code)
+        values
+        <foreach collection="list" item="complimentaryWarehouseCorrespondence" separator=",">
+            (#{complimentaryWarehouseCorrespondence.skuCode,jdbcType=VARCHAR},
+            #{complimentaryWarehouseCorrespondence.warehouseCode,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+
+
+</mapper>

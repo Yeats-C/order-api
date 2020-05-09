@@ -6,19 +6,23 @@ import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.OrderStatusEnum;
 import com.aiqin.mgs.order.api.component.ParamUnit;
 import com.aiqin.mgs.order.api.component.SequenceService;
-import com.aiqin.mgs.order.api.dao.OrderListDao;
-import com.aiqin.mgs.order.api.dao.OrderListLogisticsDao;
-import com.aiqin.mgs.order.api.dao.OrderListProductDao;
-import com.aiqin.mgs.order.api.dao.OrderStatusDao;
-import com.aiqin.mgs.order.api.domain.OrderList;
-import com.aiqin.mgs.order.api.domain.OrderListLogistics;
-import com.aiqin.mgs.order.api.domain.OrderListProduct;
+import com.aiqin.mgs.order.api.dao.*;
+import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
+import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
+import com.aiqin.mgs.order.api.domain.*;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
+import com.aiqin.mgs.order.api.domain.request.CouponShareRequest;
 import com.aiqin.mgs.order.api.domain.request.orderList.*;
 import com.aiqin.mgs.order.api.domain.request.stock.StockLockReqVo;
 import com.aiqin.mgs.order.api.domain.request.stock.StockLockSkuReqVo;
+import com.aiqin.mgs.order.api.domain.response.StoreMarketValueResponse;
+import com.aiqin.mgs.order.api.domain.response.order.ErpOrderItemSplitGroupResponse;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.FirstOrderTimeRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderSaveRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
@@ -26,14 +30,20 @@ import com.aiqin.mgs.order.api.domain.response.statistical.StatisticalPurchaseAm
 import com.aiqin.mgs.order.api.domain.response.stock.StockLockRespVo;
 import com.aiqin.mgs.order.api.service.BridgeStockService;
 import com.aiqin.mgs.order.api.service.OrderListService;
+import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
+import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
+import com.aiqin.mgs.order.api.util.AuthUtil;
+import com.aiqin.mgs.order.api.util.CopyBeanUtil;
 import com.aiqin.mgs.order.api.util.DateUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +51,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -57,6 +69,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @Transactional(rollbackFor = Exception.class)
 public class OrderListServiceImpl implements OrderListService {
+    @Value("${bridge.url.slcs_api}")
+    private String slcsHost;
     @Resource
     private OrderListDao orderListDao;
     @Resource
@@ -69,6 +83,17 @@ public class OrderListServiceImpl implements OrderListService {
     private OrderStatusDao orderStatusDao;
     @Resource
     private BridgeStockService bridgeStockService;
+    @Resource
+    private OrderSplitsNumDao orderSplitsNumDao;
+    @Resource
+    private ErpOrderInfoDao erpOrderInfoDao;
+    @Resource
+    private ErpOrderItemService erpOrderItemService;
+    @Resource
+    private ErpOrderRequestService erpOrderRequestService;
+    @Autowired
+    private ReturnOrderInfoDao returnOrderInfoDao;
+
 
 
     //供应链项目地址
@@ -230,6 +255,7 @@ public class OrderListServiceImpl implements OrderListService {
 
     @Override
     public Boolean updateOrderStatusDeliver(DeliverVo deliverVo) {
+        log.info("修改订单为发货状态,入参deliverVo={}",JSON.toJSONString(deliverVo));
         Boolean br = orderListDao.updateStatusByCode(deliverVo.getOrderCode(), 11);
         List<ActualDeliverVo> actualDeliverVos = deliverVo.getActualDeliverVos();
         for (ActualDeliverVo vo : actualDeliverVos) {
@@ -245,6 +271,58 @@ public class OrderListServiceImpl implements OrderListService {
         param.setImplementTime(new Date());
         param.setImplementContent("发货完成");
         Boolean re = orderListLogisticsDao.insertLogistics(param);
+//        log.info("修改订单为发货状态---进入分摊计算");
+//        //判断拆单的子订单是否已经全部发货完成
+//        Boolean flag = checkComplete(deliverVo.getOrderCode());
+//        log.info("修改订单为发货状态---分摊计算--判断拆单的子订单是否已经全部发货完成flag={}",flag);
+//        if(flag){//全部完成，进行分摊计算
+//            log.info("修改订单为发货状态---全部发货完成,进行分摊计算");
+//            ErpOrderInfo po=new ErpOrderInfo();
+//            po.setOrderStoreCode(deliverVo.getOrderCode());
+//            //查询主订单
+//            List<ErpOrderInfo> select = erpOrderInfoDao.select(po);
+//            log.info("修改订单为发货状态---全部发货完成,进行分摊计算--查询主订单数据集合为select={}",select);
+//            if(select!=null&&select.size()>0) {
+//                ErpOrderInfo erpOrderInfo = select.get(0);
+//                log.info("修改订单为发货状态---全部发货完成,进行分摊计算--查询主订单数据为 erpOrderInfo={}",erpOrderInfo);
+//                //获取门店信息
+//                StoreInfo storeInfo = erpOrderRequestService.getStoreInfoByStoreId(erpOrderInfo.getStoreId());
+//                log.info("修改订单为发货状态---全部发货完成,进行分摊计算--查询门店信息数据为 storeInfo={}",storeInfo);
+//                if(erpOrderInfo!=null&&StringUtils.isNotBlank(erpOrderInfo.getMainOrderCode())){
+//                    log.info("修改订单为发货状态---全部发货完成,进行分摊计算--主单号为 mainOrderCode={}",erpOrderInfo.getMainOrderCode());
+//                    //查询所有子订单号
+//                    po.setOrderStoreCode(null);
+//                    po.setMainOrderCode(erpOrderInfo.getMainOrderCode());
+//                    List<ErpOrderInfo> splictOrder = erpOrderInfoDao.select(po);
+//                    log.info("修改订单为发货状态---全部发货完成,进行分摊计算--查询所有子订单号为 splictOrder={}",splictOrder);
+//                    List<ErpOrderItem> erpOrderItemList=new ArrayList<>();
+//                    for(ErpOrderInfo orderInfo:splictOrder){
+//                        List<ErpOrderItem> erpOrderItems = erpOrderItemService.selectOrderItemListByOrderId(orderInfo.getOrderStoreId());
+//                        List<String> topCouponCodeList=null;
+////                        ErpOrderFee erpOrderFee = firstGivePrice(storeInfo, erpOrderItems, topCouponCodeList);
+//                        chai(erpOrderItems);
+//                        log.info("修改订单为发货状态---全部发货完成,进行分摊计算--封装后子单明细数据为 erpOrderItems={}",erpOrderItems);
+//                        erpOrderItemList.addAll(erpOrderItems);
+//                    }
+//                    //获取登陆人信息
+//                    AuthToken authToken = AuthUtil.getCurrentAuth();
+//                    log.info("修改订单为发货状态---全部发货完成,进行分摊计算--更新明细表实收分摊价格入参 erpOrderItemList={}",JSON.toJSONString(erpOrderItemList));
+//                    //更新明细表实收分摊价格
+//                    erpOrderItemService.updateOrderItemList(erpOrderItemList,authToken);
+//                    //如果子订单中有退货情况，现在更想预生成的退货单的 是否发起退货状态
+//                    if(erpOrderItemList!=null&&erpOrderItemList.size()>0){
+//                        //遍历出所有的子订单号
+//                        List<String> orderCodes=erpOrderItemList.stream().map(ErpOrderItem::getOrderStoreCode).collect(Collectors.toList());
+//                        log.info("修改订单为发货状态---全部发货完成,修改退货单是否发起退货状态，入参orderCodes={}",JSON.toJSONString(orderCodes));
+//                        if(null!=orderCodes&&orderCodes.size()>0){
+//                            returnOrderInfoDao.updateReallyReturn(orderCodes);
+//                            log.info("修改订单为发货状态---全部发货完成,修改退货单是否发起退货状态，成功");
+//                        }
+//                    }
+//                }
+//            }
+//
+//        }
         return br;
     }
 
@@ -628,4 +706,186 @@ public class OrderListServiceImpl implements OrderListService {
         re.setYesterdayPurchaseAmount(Optional.ofNullable(yesterday_amount).orElse(0L).longValue());
         return re;
     }
+
+    /**
+     * 发货后计算--首单赠送金额计算
+     * @param itemList
+     * @param topCouponCodeList
+     */
+    private ErpOrderFee firstGivePrice(StoreInfo storeInfo, List<ErpOrderItem> itemList, List<String> topCouponCodeList) {
+        //赠送市值
+        BigDecimal marketValue = new BigDecimal(storeInfo.getMarketValue());
+        //赠送市值余额
+        BigDecimal marketValueBalance = new BigDecimal(storeInfo.getMarketValueBalance());
+        //赠送费用
+        BigDecimal freeCost = new BigDecimal(storeInfo.getFreeCost());
+        //赠送费用余额
+        Double freeCostBalance1=storeInfo.getFreeCostBalance();
+        List<CouponShareRequest> detailList = new ArrayList<>();
+        for (ErpOrderItem item :
+                itemList) {
+            CouponShareRequest itemRequest = new CouponShareRequest();
+            itemRequest.setLineCode(item.getLineCode());
+            itemRequest.setSkuCode(item.getSkuCode());
+            //实收数量
+            itemRequest.setProductCount(item.getProductCount());
+            //实收商品总价=实收数量X单价
+            itemRequest.setTotalProductAmount(item.getProductAmount().multiply(new BigDecimal(item.getActualProductCount())));
+            itemRequest.setProductPropertyCode(item.getProductPropertyCode());
+            itemRequest.setTotalPreferentialAmount(item.getTotalPreferentialAmount());
+            itemRequest.setPreferentialAmount(item.getTotalPreferentialAmount().divide(new BigDecimal(item.getProductCount()),2, RoundingMode.DOWN));
+            itemRequest.setApinCouponAmount(BigDecimal.ZERO);
+            itemRequest.setProductGift(item.getProductType());
+            detailList.add(itemRequest);
+        }
+        //A品券计算均摊金额
+//        couponSharePrice(detailList, topCouponCodeList);
+
+        Map<Long, CouponShareRequest> map = new HashMap<>(16);
+        for (CouponShareRequest item :
+                detailList) {
+            map.put(item.getLineCode(), item);
+        }
+
+        ErpOrderFee orderFee = new ErpOrderFee();
+
+        //订单总额（元）
+        BigDecimal totalMoneyTotal = BigDecimal.ZERO;
+        //活动优惠金额（元）
+        BigDecimal activityMoneyTotal = BigDecimal.ZERO;
+        //服纺券优惠金额（元）
+        BigDecimal suitCouponMoneyTotal = BigDecimal.ZERO;
+        //A品券优惠金额（元）
+        BigDecimal topCouponMoneyTotal = BigDecimal.ZERO;
+        //实付金额（元）
+        BigDecimal payMoneyTotal = BigDecimal.ZERO;
+
+        for (ErpOrderItem item :
+                itemList) {
+            CouponShareRequest couponShareRequest = map.get(item.getLineCode());
+            item.setTotalPreferentialAmount(couponShareRequest.getTotalPreferentialAmount());
+            item.setPreferentialAmount(couponShareRequest.getPreferentialAmount());
+            item.setTopCouponDiscountAmount(couponShareRequest.getApinCouponAmount());
+            item.setTotalAcivityAmount(item.getActivityDiscountAmount().add(item.getTopCouponDiscountAmount()));
+
+            totalMoneyTotal = totalMoneyTotal.add(item.getTotalProductAmount());
+            activityMoneyTotal = activityMoneyTotal.add(item.getActivityDiscountAmount());
+            topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponDiscountAmount());
+        }
+        //计算比例系数=总金额/赠送总市值
+        BigDecimal pro=totalMoneyTotal.divide(marketValue);
+        //根据系数，算实付金额=赠送费用X系数
+        BigDecimal shiFuAmount=pro.multiply(pro);
+        //统计分摊总金额和，用于最后一行做减法
+        BigDecimal fenTanAmount=BigDecimal.ZERO;
+        //遍历详情从新算金额
+        for(int i=0;i<itemList.size();i++){
+            ErpOrderItem item=itemList.get(i);
+            BigDecimal productAmount = item.getProductAmount();
+            BigDecimal totalPreferentialAmount=productAmount.divide(totalMoneyTotal).multiply(shiFuAmount);
+            fenTanAmount=fenTanAmount.add(totalPreferentialAmount);
+            item.setTotalPreferentialAmount(totalPreferentialAmount);
+            if(i==itemList.size()){
+                //最后一行做减法
+                item.setPreferentialAmount(shiFuAmount.subtract(fenTanAmount));
+            }
+            item.setPreferentialAmount(totalPreferentialAmount.divide(new BigDecimal(item.getActualProductCount())));
+//                item.setTopCouponDiscountAmount(couponShareRequest.getApinCouponAmount());
+            item.setTotalAcivityAmount(item.getActivityDiscountAmount().add(item.getTopCouponDiscountAmount()));
+
+            totalMoneyTotal = totalMoneyTotal.add(item.getTotalProductAmount());
+            activityMoneyTotal = activityMoneyTotal.add(item.getActivityDiscountAmount());
+            topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponDiscountAmount());
+        }
+
+        //支付金额
+//        BigDecimal zhi=totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal);
+//        //赠送市值余额--用于修改
+//        marketValueBalance = marketValueBalance.subtract(totalMoneyTotal);
+//        //赠送费用余额--用于修改
+//        freeCostBalance1=freeCostBalance1-zhi.doubleValue();
+        //
+
+        orderFee.setTotalMoney(totalMoneyTotal);
+        orderFee.setActivityMoney(activityMoneyTotal);
+        orderFee.setSuitCouponMoney(suitCouponMoneyTotal);
+        orderFee.setTopCouponMoney(topCouponMoneyTotal);
+        orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal));
+        if(null!=topCouponCodeList&&topCouponCodeList.size()>0){
+            orderFee.setTopCouponCodes(String.join(",", topCouponCodeList));
+        }else {
+            orderFee.setTopCouponCodes("");
+        }
+        return orderFee;
+    }
+
+    /**
+     * 判断拆单的子订单是否已经全部发货完成
+     * @param splitOrderCode
+     * @return
+     */
+    private Boolean checkComplete(String splitOrderCode){
+        Boolean flag=false;
+        ErpOrderInfo po=new ErpOrderInfo();
+        po.setOrderStoreCode(splitOrderCode);
+        List<ErpOrderInfo> select = erpOrderInfoDao.select(po);
+        if(select!=null&&select.size()>0){
+            ErpOrderInfo erpOrderInfo=select.get(0);
+            if(erpOrderInfo!=null&&StringUtils.isNotBlank(erpOrderInfo.getMainOrderCode())){
+                OrderSplitsNum orderSplitsNum = orderSplitsNumDao.selectByOrderCode(erpOrderInfo.getMainOrderCode());
+                if(null!=orderSplitsNum&&null!=orderSplitsNum.getNum()){
+                    Integer num=orderSplitsNum.getNum();
+                    if(num.equals(1)){//本次发货完成为最后一次
+                        flag=true;
+                    }
+                    if(!num.equals(0)){
+                        //更新完成次数
+                        OrderSplitsNum record=new OrderSplitsNum();
+                        record.setOrderCode(erpOrderInfo.getMainOrderCode());
+                        record.setNum(num-1);
+                        orderSplitsNumDao.updateByOrderCode(record);
+                    }
+                }
+            }
+        }
+        return flag;
+    }
+
+    /**
+     * 修改slcs门店市值赠余额
+     */
+    private void upGive(String storeCode,Double marketValueBalance,Double freeCostBalance){
+        log.info("修改slcs门店市值赠余额,入参storeCode={},marketValueBalance={},freeCostBalance={}",storeCode,marketValueBalance,freeCostBalance);
+        String url=slcsHost+"/store/updateValue";
+        JSONObject json=new JSONObject();
+        StoreMarketValueResponse storeMarketValueResponse=new StoreMarketValueResponse();
+        storeMarketValueResponse.setFreeCostBalance(freeCostBalance);
+        storeMarketValueResponse.setMarketValueBalance(marketValueBalance);
+        storeMarketValueResponse.setStoreCode(storeCode);
+        json.put("storeMarketValueResponse",storeMarketValueResponse);
+        log.info("修改slcs门店市值赠余额,调用修改赠送市值余额接口,url={},parm={}",url,json);
+        HttpClient httpClient = HttpClient.post(url).json(json);
+        Map<String ,Object> res=null;
+        res = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+        log.info("同步到虚拟资产:"+res);
+        if(res!=null&&"0".equals(res.get("code"))){
+            log.info("修改slcs门店市值赠余额,调用修改赠送市值余额接口,成功");
+        }
+
+    }
+
+    //计算分摊
+    private void chai(List<ErpOrderItem> orderItemList){
+        log.info("修改订单为发货状态---全部发货完成,进行分摊计算--子单明细入参 orderItemList={}",orderItemList);
+        //遍历原订单明细行
+        for (ErpOrderItem item : orderItemList) {
+            //拆出来的行均摊总金额 = 原始订单分摊单价 * 实收数量
+            BigDecimal totalPreferentialAmount = item.getPreferentialAmount().multiply(new BigDecimal(item.getActualProductCount()));
+            //拆出来的行活动优惠金额=原始订单活动单价 * 实收数量
+            BigDecimal totalAcivityAmount = item.getActivityPrice().multiply(new BigDecimal(item.getActualProductCount()));
+            item.setTotalPreferentialAmount(totalPreferentialAmount);
+            item.setTotalAcivityAmount(totalAcivityAmount);
+        }
+    }
+
 }

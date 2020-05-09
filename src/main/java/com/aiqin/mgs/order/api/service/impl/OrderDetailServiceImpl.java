@@ -187,8 +187,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     public HttpResponse selectorderdetailsum(@Valid OrderDetailQuery orderDetailQuery) {
 
         try {
-
-            return HttpResponse.success(orderDetailDao.selectorderdetailsum(orderDetailQuery));
+            OrderDetailInfo orderDetailInfo=orderDetailDao.selectorderdetailsum(orderDetailQuery);
+            return HttpResponse.success(orderDetailInfo);
 
         } catch (Exception e) {
 
@@ -469,7 +469,9 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             orderQuery.setOrderId(orderId);
             SettlementInfo settlementInfo = settlementDao.jkselectsettlement(orderQuery);
             if (settlementInfo != null) {
+                settlementInfo.setActivityDiscount(Optional.ofNullable(settlementInfo.getActivityDiscount()).orElse(0)+ Optional.ofNullable(settlementInfo.getFullSum()).orElse(0)+Optional.ofNullable(settlementInfo.getLuckySum()).orElse(0));
                 settlementInfo.setTotalCouponsDiscount(settlementInfo.getActivityDiscount());
+
                 if (orderInfo.getOrderStatus() == 0) {
                     settlementInfo.setOrderActual(0);
                     settlementInfo.setOrderReceivable(0);

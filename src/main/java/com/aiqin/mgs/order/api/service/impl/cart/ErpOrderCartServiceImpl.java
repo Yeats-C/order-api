@@ -24,6 +24,7 @@ import com.aiqin.mgs.order.api.service.CouponRuleService;
 import com.aiqin.mgs.order.api.service.RedisService;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.service.cart.ErpOrderCartService;
+import com.aiqin.mgs.order.api.service.gift.GiftPoolService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.alibaba.fastjson.JSON;
@@ -60,6 +61,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
 
     @Resource
     private CouponRuleService couponRuleService;
+
+    @Resource
+    private GiftPoolService giftPoolService;
 
     @Override
     public void insertCartLine(ErpOrderCartInfo erpOrderCartInfo, AuthToken authToken) {
@@ -221,7 +225,14 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 erpOrderCartInfo.setSkuName(skuDetail.getSkuName());
                 erpOrderCartInfo.setActivityId(item.getActivityId());
                 erpOrderCartInfo.setAmount(item.getAmount());
-                erpOrderCartInfo.setPrice(skuDetail.getPriceTax());
+                //首单赠送类型的订单时订单中商品的分销价取熙耘中商品基本信息中的厂商指导价
+                if(YesOrNoEnum.YES.getCode().equals(erpCartAddRequest.getFirstOrderGift())){
+                    erpOrderCartInfo.setPrice(skuDetail.getManufacturerGuidePrice());
+                }else{
+                    //其余类型取分销价
+                    erpOrderCartInfo.setPrice(skuDetail.getPriceTax());
+                }
+
                 erpOrderCartInfo.setLogo(skuDetail.getProductPicturePath());
                 erpOrderCartInfo.setColor(skuDetail.getColorName());
                 erpOrderCartInfo.setProductSize(skuDetail.getModelNumber());
@@ -780,6 +791,8 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         if(ruleMap.containsKey(productItem.getProductPropertyCode())){
                             //可使用优惠券
                             productItem.setCouponRule(YesOrNoEnum.YES.getCode());
+
+                            groupTopCouponMaxTotal=productItem.getLineAmountTotal();
                         }
                     }
                 }
@@ -829,7 +842,22 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         response.setStoreContactsPhone(store.getContactsPhone());
         response.setStoreId(store.getStoreId());
         response.setProductType(erpCartQueryRequest.getProductType());
+        //查询兑换赠品相关信息
 
+        ErpCartQueryResponse erpCartQueryResponse=giftPoolService.queryGiftCartList(erpCartQueryRequest,auth);
+        //查詢門店赠品额度
+        BigDecimal availableGiftQuota=bridgeProductService.getStoreAvailableGiftGuota(store.getStoreId());
+        //此订单兑换赠品金额
+        BigDecimal giftAmount=BigDecimal.ZERO;
+        if(null!=erpCartQueryResponse&&null!=erpCartQueryResponse.getCartInfoList()&&erpCartQueryResponse.getCartInfoList().size()>0){
+            for(ErpOrderCartInfo erp:erpCartQueryResponse.getCartInfoList()){
+                giftAmount=giftAmount.add(erp.getPrice().multiply(new BigDecimal(erp.getAmount().toString()))).setScale(2, RoundingMode.DOWN);
+            }
+        }
+        if(giftAmount.compareTo(availableGiftQuota)==1){
+            throw new BusinessException("兑换赠品金额---"+giftAmount+"大于门店赠品额度---"+availableGiftQuota+"，请重新选择赠品后下单！");
+        }
+        response.setErpCartQueryResponse(erpCartQueryResponse);
         String redisKey = IdUtil.uuid();
         boolean set = redisService.setSeconds(redisKey, response, OrderConstant.REDIS_ORDER_CART_GROUP_TEMP_TIME);
         if (!set) {
@@ -1848,7 +1876,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 ErpSkuDetail skuDetail = skuDetailMap.get(item.getSkuCode());
                 if (skuDetail != null) {
                     item.setLogo(skuDetail.getProductPicturePath());
-                    item.setPrice(skuDetail.getPriceTax());
+//                    item.setPrice(skuDetail.getPriceTax());
                     item.setTagInfoList(skuDetail.getTagInfoList());
                     item.setStockNum(skuDetail.getStockNum());
                 } else {

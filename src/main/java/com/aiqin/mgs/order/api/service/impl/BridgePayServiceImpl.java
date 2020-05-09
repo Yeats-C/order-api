@@ -28,7 +28,7 @@ public class BridgePayServiceImpl implements BridgePayService {
     /**
      * 支付
      * @param vo
-     * @return
+     * @returnorderafter
      */
     @Override
     public HttpResponse<PartnerGetCodeUrlRep> mainSwept(PayReq vo) {

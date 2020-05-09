@@ -67,7 +67,7 @@ public class ActivityController {
     @PostMapping("/add")
     @ApiOperation(value = "添加活动")
     public HttpResponse add(@RequestBody ActivityRequest activityRequest) {
-        //将商品添加到购物车
+
         return activitesService.addActivity(activityRequest);
     }
 

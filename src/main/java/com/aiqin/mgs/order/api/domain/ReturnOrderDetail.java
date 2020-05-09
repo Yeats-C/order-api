@@ -51,7 +51,7 @@ public class ReturnOrderDetail {
     @ApiModelProperty(value = "单位名称")
     private String unitName;
 
-    @ApiModelProperty(value = "商品类型 0商品 1赠品")
+    @ApiModelProperty(value = "商品类型 0商品 1赠品 2:兑换赠品")
     private Integer productType;
 
     @ApiModelProperty(value = "拆零系数")
@@ -130,5 +130,21 @@ public class ReturnOrderDetail {
 
     @ApiModelProperty(value = "条形码")
     private String barCode;
+
+    /***仅A品优惠金额，用于统计*/
+    @ApiModelProperty(value = "本行A品券优惠总额度")
+    private BigDecimal topCouponDiscountAmount;
+
+    @ApiModelProperty(value = "本行A品券优惠单品额度")
+    private BigDecimal topCouponAmount;
+
+//    @ApiModelProperty(value = "退回赠品额度")
+//    private BigDecimal complimentaryAmount;
+
+    @ApiModelProperty(value = "退积分金额")
+    private BigDecimal complimentaryAmount;
+
+    @ApiModelProperty(value = "服纺券单品金额")
+    private BigDecimal returnClothingSpinning;
 
 }

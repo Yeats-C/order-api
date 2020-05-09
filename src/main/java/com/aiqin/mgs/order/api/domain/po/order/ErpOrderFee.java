@@ -68,6 +68,10 @@ public class ErpOrderFee {
     @JsonProperty("goods_coupon")
     private BigDecimal goodsCoupon;
 
+    @ApiModelProperty(value = "使用赠品额度")
+    @JsonProperty("used_gift_quota")
+    private BigDecimal usedGiftQuota;
+
     @ApiModelProperty(value = "关联A品券编码")
     @JsonProperty("top_coupon_codes")
     private String topCouponCodes;
@@ -99,6 +103,18 @@ public class ErpOrderFee {
     @ApiModelProperty(value = "数据状态 1有效 0删除")
     @JsonProperty("status")
     private Integer status;
+
+    @ApiModelProperty(value = "服纺券作废金额（元）")
+    @JsonProperty("nullify_suit_coupon_money")
+    private BigDecimal nullifySuitCouponMoney;
+
+    @ApiModelProperty(value = "A品券作废金额（元）")
+    @JsonProperty("nullify_top_coupon_money")
+    private BigDecimal nullifyTopCouponMoney;
+
+    @ApiModelProperty(value = "发放赠品额度")
+    @JsonProperty("complimentary_amount")
+    private BigDecimal complimentaryAmount;
 
     /**
      * 非数据库字段

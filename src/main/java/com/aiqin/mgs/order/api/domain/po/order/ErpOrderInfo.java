@@ -402,6 +402,10 @@ public class ErpOrderInfo {
     @JsonProperty("order_fee")
     private ErpOrderFee orderFee;
 
+    @ApiModelProperty(value = "子订单费用详情")
+    @JsonProperty("item_order_fee")
+    private ItemOrderFee itemOrderFee;
+
     @ApiModelProperty(value = "按钮组件控制")
     @JsonProperty("operation")
     private ErpOrderOperationControlResponse operation;
@@ -425,6 +429,10 @@ public class ErpOrderInfo {
     @ApiModelProperty(value = "订单日志")
     @JsonProperty("operation_log_list")
     private List<ErpOrderOperationLog> operationLogList;
+
+    @ApiModelProperty(value = "是否为首单市值赠送订单 0:不是 1:是")
+    @JsonProperty("first_market_value_gift")
+    private Integer firstMarketValueGift;
 
     public String getOrderStatusDesc() {
         return ErpOrderStatusEnum.getEnumDesc(orderStatus);

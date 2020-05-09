@@ -5,10 +5,13 @@ import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
+import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.po.order.*;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest;
+import com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetail;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderOperationControlResponse;
 import com.aiqin.mgs.order.api.service.ActivityService;
+import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.PageAutoHelperUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +19,8 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +45,8 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
     private ErpOrderRefundService erpOrderRefundService;
     @Resource
     private ActivityService activityService;
+    @Resource
+    private BridgeProductService bridgeProductService;
 
     @Override
     public ErpOrderInfo getOrderByOrderId(String orderId) {
@@ -92,12 +99,77 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
 
     @Override
     public ErpOrderInfo getOrderDetailByOrderCode(String orderCode) {
+        log.info("根据订单编号查询订单详情信息 getOrderDetailByOrderCode 参数为：orderCode={}"+orderCode);
         ErpOrderInfo order = this.getOrderByOrderCode(orderCode);
         if (order != null) {
-
+            Integer orderStatus = order.getOrderStatus();
             List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
-            order.setItemList(orderItemList);
+            List<String> skuCodeList=new ArrayList<>();
+            for(ErpOrderItem item:orderItemList){
+                skuCodeList.add(item.getSkuCode());
+            }
+            Map<String, ErpSkuDetail> skuDetailMap=getProductSkuDetailMap(order.getProvinceId(),order.getCityId(),skuCodeList);
+            for(ErpOrderItem item:orderItemList){
+                ErpSkuDetail detail=skuDetailMap.get(item.getSkuCode());
+                if (null!=detail){
+                    item.setPriceTax(detail.getPriceTax());
+                }else{
+                    log.info("订单详情--查询sku分销价--/search/spu/sku/detail2 查询商品详情失败，skuCode为{}"+item.getSkuCode());
+                }
+                if(ErpProductGiftEnum.JIFEN.getCode().equals(item.getProductType())){
+                    item.setUsedGiftQuota(item.getProductAmount().multiply(new BigDecimal(item.getProductCount())).setScale(2, RoundingMode.DOWN));
+                }else{
+                    item.setUsedGiftQuota(BigDecimal.ZERO);
+                }
 
+            }
+            order.setItemList(orderItemList);
+            log.info("根据订单编号查询订单详情信息 子订单详情为：orderItemList={}"+orderItemList);
+            ItemOrderFee itemOrderFee=new ItemOrderFee();
+            //子订单商品价值：（子订单分销价求和）元
+            BigDecimal totalMoney=BigDecimal.ZERO;
+            //子订单活动优惠：活动优惠金额求和）元
+            BigDecimal  activityMoney=BigDecimal.ZERO;
+            //A品券抵减：（子订单A品券抵扣分摊求和）元
+            BigDecimal  topCouponMoney=BigDecimal.ZERO;
+            //服纺券抵减:（子订单服纺券抵扣分摊求和）元
+            BigDecimal  suitCouponMoney=BigDecimal.ZERO;
+            //使用赠品额度：（使用赠品额度求和）元
+            BigDecimal  usedGiftQuota=BigDecimal.ZERO;
+            //实付金额
+            BigDecimal  payMoney=BigDecimal.ZERO;
+            for(ErpOrderItem item:orderItemList){
+                if(null==item.getTopCouponDiscountAmount()){
+                    item.setTopCouponDiscountAmount(BigDecimal.ZERO);
+                }
+                if(null==item.getActualTotalProductAmount()){
+                    item.setActualTotalProductAmount(BigDecimal.ZERO);
+                }
+                totalMoney=totalMoney.add(item.getPriceTax().multiply(new BigDecimal(item.getProductCount()))).setScale(2, RoundingMode.DOWN);
+                activityMoney=activityMoney.add(item.getTotalAcivityAmount()).setScale(2, RoundingMode.DOWN);
+                topCouponMoney=topCouponMoney.add(item.getTopCouponDiscountAmount()).setScale(2, RoundingMode.DOWN);
+                if(ErpProductGiftEnum.JIFEN.getCode().equals(item.getProductType())){
+                    usedGiftQuota=usedGiftQuota.add(item.getProductAmount().multiply(new BigDecimal(item.getProductCount()))).setScale(2, RoundingMode.DOWN);
+                }
+                payMoney=payMoney.add(item.getActualTotalProductAmount()).setScale(2, RoundingMode.DOWN);
+                if(orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_11.getCode())
+                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_97.getCode())
+                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_13.getCode())
+                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_12.getCode())){
+                }else{
+                    item.setTotalPreferentialAmount(BigDecimal.ZERO);
+                }
+
+            }
+            itemOrderFee.setTotalMoney(totalMoney);
+            itemOrderFee.setActivityMoney(activityMoney);
+            itemOrderFee.setTopCouponMoney(topCouponMoney);
+            itemOrderFee.setSuitCouponMoney(suitCouponMoney);
+            itemOrderFee.setUsedGiftQuota(usedGiftQuota);
+            itemOrderFee.setPayMoney(payMoney);
+            order.setItemOrderFee(itemOrderFee);
+
+            log.info("根据订单编号查询订单详情信息 子订单支付信息为：itemOrderFee={}"+itemOrderFee);
             List<ErpOrderOperationLog> operationLogList = erpOrderOperationLogService.selectOrderOperationLogList(order.getOrderStoreCode());
             order.setOperationLogList(operationLogList);
 
@@ -122,16 +194,16 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                 }
             }
             order.setOrderFee(orderFee);
-
+            log.info("根据订单编号查询订单详情信息 订单支付信息为：orderFee={}"+orderFee);
 
             //订单物流信息
             ErpOrderLogistics orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsId(order.getLogisticsId());
             order.setOrderLogistics(orderLogistics);
-
+            log.info("根据订单编号查询订单详情信息 订单物流信息：orderLogistics={}"+orderLogistics);
             //退款信息
             ErpOrderRefund orderRefund = erpOrderRefundService.getOrderRefundByOrderIdAndRefundType(order.getOrderStoreId(), ErpOrderRefundTypeEnum.ORDER_CANCEL);
             order.setOrderRefund(orderRefund);
-
+            log.info("根据订单编号查询订单详情信息 退款信息：orderRefund={}"+orderRefund);
             //操作按钮配置
             orderOperationConfig(order);
 
@@ -430,5 +502,23 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                 order.setOrderRefund(orderRefund);
             }
         }
+    }
+
+    /**
+     * 获取sku详情，返回map
+     *
+     * @param provinceCode 省编码
+     * @param cityCode     市编码
+     * @param skuCodeList  sku编码list
+     * @return
+     */
+    private Map<String, ErpSkuDetail> getProductSkuDetailMap(String provinceCode, String cityCode, List<String> skuCodeList) {
+        Map<String, ErpSkuDetail> skuDetailMap = new HashMap<>(16);
+        List<ErpSkuDetail> productSkuDetailList = bridgeProductService.getProductSkuDetailList(provinceCode, cityCode, OrderConstant.SELECT_PRODUCT_COMPANY_CODE, skuCodeList);
+        for (ErpSkuDetail item :
+                productSkuDetailList) {
+            skuDetailMap.put(item.getSkuCode(), item);
+        }
+        return skuDetailMap;
     }
 }

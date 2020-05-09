@@ -391,13 +391,14 @@ public class OrderServiceImpl implements OrderService {
             //设置不可退货状态
             if (one.getOrderStatus().equals(Global.ORDER_STATUS_0)) {
                 one.setTurnReturnView(1);
-            } else if (one.getOrderStatus().equals(Global.ORDER_STATUS_5) || one.getOrderStatus().equals(Global.ORDER_STATUS_6)) {
+            } else if (one.getOrderStatus().equals(Global.ORDER_STATUS_5) || one.getOrderStatus().equals(Global.ORDER_STATUS_6)|| one.getOrderStatus().equals(Global.ORDER_STATUS_2)) {
                 //设置不可退货状态：
                 //可退货 ：已提货-已提货退货 >0
+                //可退货 ：购买数量-已提货退货-未提货退货 >0
                 List<PrestorageOrderSupplyDetail> p = prestorageOrderSupplyDetailDao.selectPrestorageOrderDetailByOrderId(one.getOrderId());
                 one.setTurnReturnView(1);
                 for (PrestorageOrderSupplyDetail prestorageOrderSupplyDetail : p) {
-                    if (prestorageOrderSupplyDetail.getSupplyAmount() > prestorageOrderSupplyDetail.getReturnAmount()) {
+                    if (prestorageOrderSupplyDetail.getAmount()-prestorageOrderSupplyDetail.getReturnAmount() - prestorageOrderSupplyDetail.getReturnPrestorageAmount()>0) {
                         one.setTurnReturnView(0);
                     }
                 }
@@ -597,10 +598,10 @@ public class OrderServiceImpl implements OrderService {
                             OperateStockVo stockVo = new OperateStockVo();
                             stockVo.setStoreCode(orderInfo.getOrderInfo().getDistributorCode());
                             stockVo.setStoreId(orderInfo.getOrderInfo().getDistributorId());
-                            stockVo.setRecordNumber(Optional.ofNullable(product.getSkuCount()).orElse(0));
+                            stockVo.setRecordNumber(Optional.ofNullable(product.getSkuCount()).orElse(0)*Optional.ofNullable(input.getAmount()).orElse(0));
                             stockVo.setProductSku(product.getSkuCode());
                             stockVo.setRecordType(StockChangeTypeEnum.OUT_STORAGE.getCode());
-                            stockVo.setBillType(BillTypeEnum.DOOR_SALE.getCode());
+                            stockVo.setBillType(BillTypeEnum.PACKAGE_SALE.getCode());
                             stockVo.setStorageType(StorageTypeEnum.DOOR_STORE.getCode());
                             /*stockVo.setStoragePosition(ReturnGoodsToStockEnum.DISPLAY_STOCK.getCode());*/
                             stockVo.setProductSku(product.getSkuCode());

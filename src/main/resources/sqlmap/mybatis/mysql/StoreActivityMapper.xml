@@ -15,8 +15,8 @@
                  oi.id, date_format(oi.create_time,"%m-%d") as months_day,
                  case when length(TRIM(oi.member_id))>0 then '1' else '0' end as member_status,
                  od.activity_id as activity_id, od.actual_price as actual_price, od.amount as amount
-                from order_info oi
-                left join order_detail od on oi.order_id = od.order_id
+                from order_consumer_info oi
+                left join order_consumer_detail od on oi.order_id = od.order_id
                 where oi.distributor_id=#{storeId}
                 and oi.create_time <![CDATA[>=]]> #{beginTime}
                 and oi.create_time <![CDATA[<=]]> #{finishTime}
@@ -30,18 +30,18 @@
     <select id="selectActivityOrder" resultType="com.aiqin.mgs.order.api.domain.response.market.ActivityReportOrderResp">
         select
           case when member_status=1 then t2.total else 0 end as memberOderCount,
-          sum(t2.total) as orderCount, sum(t2.saleAmount) as saleAmount
+          sum(t2.total) as orderCount, sum(t2.saleAmount) as saleAmount, sum(t2.costAmount) as costAmount
         from(
             select
-            t1.member_status, count(t1.id) AS total, sum(t1.actual_price*t1.amount) as saleAmount
+            t1.member_status, count(DISTINCT t1.id) AS total, sum(t1.total_price) as saleAmount,sum(t1.costAmount) as costAmount
             from(
                 select
                  oi.id,
                  case when length(TRIM(oi.member_id))>0 then '1' else '0' end as member_status,
-                 od.activity_id as activity_id, od.actual_price as actual_price, od.amount as amount
-                from order_info oi
-                left join order_detail od on oi.order_id = od.order_id
-               where oi.distributor_id=#{storeId}
+                 od.activity_id as activity_id, od.total_price as total_price, od.amount*od.cost_price as costAmount
+                from order_consumer_info oi
+                left join order_consumer_detail od on oi.order_id = od.order_id
+               where oi.distributor_id=#{storeId} and oi.order_status in (1,2,3,5,6,7)
             ) AS t1
             where t1.activity_id = #{activityId}
             group by t1.member_status order by t1.member_status desc
@@ -50,16 +50,16 @@
 
     <select id="selectActivityOrderCode" resultType="com.aiqin.mgs.order.api.domain.OrderInfo">
         select oi.order_code as orderCode
-        from order_detail od
-        left join order_info oi on od.order_id = oi.order_id
+        from order_consumer_detail od
+        left join order_consumer_info oi on od.order_id = oi.order_id
         where oi.distributor_id=#{storeId}
-        and od.activity_id=#{activityId}
+        and od.activity_id=#{activityId} and oi.order_status  NOT IN ('0','4')
     </select>
 
     <select id="selectActivitySkuCode" resultType="String">
         select sku_code as skuCodes
-        from order_info oi
-        left join order_detail od on od.order_id = oi.order_id
+        from order_consumer_info oi
+        left join order_consumer_detail od on od.order_id = oi.order_id
         where
         od.activity_id = #{activityId}
         and oi.order_code = #{orderCodes}
@@ -68,12 +68,12 @@
     <select id="selectActivityReportRelationOrder" parameterType="com.aiqin.mgs.order.api.domain.OrderDetailInfo"
             resultType="com.aiqin.mgs.order.api.domain.activity.ActivityOrderInfo">
         select
-          od.activity_name as activityName, oi.order_code as orderCode,
-          ifnull(sum(ifnull(od.actual_price,0)*ifnull(od.amount,0)),0) saleAmount,
+          od.activity_name as activityName, oi.order_code as orderCode,od.activity_id as activityId,
+          ifnull(sum(od.total_price),0) saleAmount,
           oi.member_name as memberName, oi.member_phone as memberPhone, oi.create_time as createTime
-        from order_detail od
-        left join order_info oi on oi.order_id=od.order_id
-        where activity_id = #{activityId}
+        from order_consumer_detail od
+        left join order_consumer_info oi on oi.order_id=od.order_id
+        where activity_id = #{activityId} and oi.order_status  NOT IN ('0','4')
         group by oi.order_code
         limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
     </select>
@@ -86,28 +86,37 @@
           od.activity_name as activityName, oi.order_code as orderCode,
           ifnull(sum(ifnull(od.actual_price,0)*ifnull(od.amount,0)),0) saleAmount,
           oi.member_name as memberName, oi.member_phone as memberPhone, oi.create_time as createTime
-        from order_detail od
-        left join order_info oi on oi.order_id=od.order_id
-        where activity_id = #{activityId}
+        from order_consumer_detail od
+        left join order_consumer_info oi on oi.order_id=od.order_id
+        where activity_id = #{activityId} and oi.order_status  NOT IN ('0','4')
         group by oi.order_code
         ) a
     </select>
-
+    <select id="selectActivityOrderPackageSale" resultType="integer">
+        select sum(amount)  from order_consumer_detail where package_id=#{packageId}
+    </select>
     <select id="selectActivityOrderProduct" parameterType="com.aiqin.mgs.order.api.domain.activity.ActivityOrderInfo"
             resultType="com.aiqin.mgs.order.api.domain.OrderDetailInfo">
-        select amount, actual_price as actualPrice
-        from order_detail
-        where activity_id=#{activityId}
+        select  od.amount as amount , od.actual_price as actualPrice,od.sku_code as skuCode,od.package_id as packageId,od.total_price as totalPrice
+        from order_consumer_detail od,order_consumer_info oi
+        where  oi.order_id=od.order_id and activity_id=#{activityId}
         <if test="activityType != null and activityType != 4">
             <if test="skuCodes != null" >
-                and sku_code in
+                and od.sku_code in
                 <foreach collection="skuCodes" separator="," open="(" close=")" item="item">
                     #{item}
                 </foreach>
             </if>
         </if>
         <if test="activityType != null and activityType == 4">
-
+            <if test="skuCodes != null" >
+                and
+                od.package_id in
+                <foreach collection="skuCodes" separator="," open="(" close=")" item="item">
+                    #{item}
+                </foreach>
+            </if>
         </if>
+        and oi.order_status  NOT IN ('0','4')
     </select>
 </mapper>

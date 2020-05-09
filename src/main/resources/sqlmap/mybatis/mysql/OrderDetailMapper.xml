@@ -38,6 +38,8 @@
         <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
         <result column="receive_type" jdbcType="VARCHAR" property="receiveType"/>
         <result column="package_id" jdbcType="VARCHAR" property="packageId"/>
+        <result column="total_price" jdbcType="INTEGER" property="totalPrice"/>
+        <result column="member_price" jdbcType="VARCHAR" property="memberPrice"/>
     </resultMap>
 
     <resultMap id="ProductsMapping" type="com.aiqin.mgs.order.api.domain.response.OrderProductsResponse">
@@ -123,7 +125,10 @@
         <if test="skuName!=null">
             sku_name,
         </if>
-        create_time,update_time,create_by,update_by,package_id)
+        <if test="memberPrice!=null">
+            member_price,
+        </if>
+        create_time,update_time,create_by,update_by,package_id,total_price)
         values
         (#{orderId},#{orderCode},#{orderDetailId},#{productId},#{productCode},#{productName},#{listName},#{skuCode},#{spuCode},#{barCode},#{spec},#{unit},#{retailPrice},#{actualPrice},#{amount},#{productStatus},#{logo},#{typeId},#{typeName},
         <if test="giftStatus!=null">
@@ -145,7 +150,10 @@
         <if test="skuName!=null">
             #{skuName},
         </if>
-        CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,#{createBy},#{updateBy},#{packageId})
+        <if test="memberPrice!=null">
+            #{memberPrice},
+        </if>
+        CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,#{createBy},#{updateBy},#{packageId},#{totalPrice})
     </insert>
 
     <!-- 修改订单明细退货数据-->
@@ -226,15 +234,18 @@
 
     <!-- 查询订单明细部分汇总-（支持活动ID汇总、）-->
     <select id="selectorderdetailsum" resultMap="OrderInfoDetailMapping">
-        select sum(actual_price),count(amount) from
+        select sum(actual_price) as actual_price ,count(amount) as amount from
         (
-        SELECT IFNULL(SUM(IFNULL(a.actual_price,0)*IFNULL(a.amount,0)),0) AS actual_price,COUNT(a.order_id) AS amount
+        SELECT SUM(IFNULL(a.total_price,0)) AS actual_price,COUNT(a.order_id) AS amount
         FROM order_consumer_detail a,order_consumer_info b
         WHERE 1=1
         AND a.order_id = b.order_id
         AND b.order_status NOT IN ('0','4')
         <if test="activityId!=null and activityId!=''">
             AND a.activity_id =#{activityId}
+        </if>
+        <if test="endDate!=null">
+            AND a.create_time &lt; #{endDate}
         </if>
         group by a.order_code
         ) c
@@ -565,6 +576,9 @@
         </if>
         <if test="couponDiscount!=null and couponDiscount!='' ">
             coupon_discount =#{couponDiscount},
+        </if>
+        <if test="totalPrice!=null and totalPrice!='' ">
+            total_price =#{totalPrice},
         </if>
          update_by = #{updateBy,jdbcType=VARCHAR}
          where order_code =#{orderCode} and order_detail_id=#{orderDetailId}

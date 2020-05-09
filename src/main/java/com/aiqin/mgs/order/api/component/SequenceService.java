@@ -104,7 +104,9 @@ public class SequenceService {
      */
     public String generateOrderAfterSaleCode(String companyCode, Integer afterSaleType) {
         String dateStr = DateUtils.formatDate(new Date(), FMT_PATTERN_DAY);
+        // TODO: 2020/5/7
         Integer sequence = sequenceRedisDao.nextSequence(SequenceType.ORDER_AFTER_SALE, dateStr, EXPIRED_TIME_MONTH);
+//        Integer sequence = 1;
         String type = "";
         //0-售后退货 1-缺货取消(发货冲减) 2-客户取消
         switch (afterSaleType) {

@@ -224,10 +224,17 @@ public class OrderDetailInfo extends PagesRequest {
     @JsonProperty("return_prestorage_amount")
     private Integer returnPrestorageAmount=0;
 
+	@JsonProperty("member_price")
+	@ApiModelProperty("会员价")
+	private Long memberPrice;
 
 	@JsonProperty("package_id")
 	@ApiModelProperty("套餐包id")
 	private String packageId;
+
+	@JsonProperty("total_price")
+	@ApiModelProperty("行总金额")
+	private Integer totalPrice;
 }
 
 

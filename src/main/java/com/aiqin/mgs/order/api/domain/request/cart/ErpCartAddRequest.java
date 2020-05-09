@@ -31,4 +31,8 @@ public class ErpCartAddRequest {
     @JsonProperty("create_source")
     private String createSource;
 
+    @ApiModelProperty(value = "是否是首单赠送 1 是 0 否")
+    @JsonProperty("first_order_gift")
+    private Integer firstOrderGift;
+
 }

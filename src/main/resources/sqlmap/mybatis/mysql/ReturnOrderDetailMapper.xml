@@ -41,6 +41,9 @@
         <result column="product_category_code" property="productCategoryCode" jdbcType="VARCHAR"/>
         <result column="product_category_name" property="productCategoryName" jdbcType="VARCHAR"/>
         <result column="bar_code" property="barCode" jdbcType="VARCHAR"/>
+        <result column="top_coupon_amount" property="topCouponAmount" jdbcType="DECIMAL"/>
+        <result column="complimentary_amount" property="complimentaryAmount" jdbcType="DECIMAL"/>
+        <result column="return_clothing_spinning" property="returnClothingSpinning" jdbcType="DECIMAL"/>
         <result column="channel_amount" property="channelAmount" jdbcType="DECIMAL"/>
         <result column="channel_total_amount" property="channelTotalAmount" jdbcType="DECIMAL"/>
         <result column="actual_channel_total_amount" property="actualChannelTotalAmount" jdbcType="DECIMAL"/>
@@ -53,7 +56,9 @@
     return_product_count, actual_return_product_count, actual_total_product_amount, product_status, 
     tax_rate, line_code, use_status, source_code, source_type, create_by_id, create_by_name, 
     update_by_id, update_by_name, create_time, update_time, remark, evidence_url, preferential_amount,
-    product_category_code,product_category_name,bar_code
+    product_category_code,product_category_name,bar_code,complimentary_amount
+    product_category_code,product_category_name,bar_code,top_coupon_discount_amount,top_coupon_amount,complimentary_amount,
+    return_clothing_spinning
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
         select
@@ -433,7 +438,7 @@
         sku_code, sku_name,total_product_amount,return_product_count,model_code,product_status,
         product_spec,unit_name,color_code,color_name,create_by_id, create_by_name,picture_url,
         create_time,remark,evidence_url,preferential_amount,line_code,unit_code,tax_rate,
-        product_amount,product_category_code,product_category_name,bar_code)
+        product_amount,product_category_code,product_category_name,bar_code,top_coupon_discount_amount,top_coupon_amount)
         values
         <foreach collection="records" item="item" index="index" separator=",">
             (
@@ -448,7 +453,7 @@
             #{item.pictureUrl,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP},
             #{item.remark,jdbcType=VARCHAR},#{item.evidenceUrl,jdbcType=VARCHAR},#{item.preferentialAmount,jdbcType=DECIMAL},
             #{item.lineCode},#{item.unitCode},#{item.taxRate},#{item.productAmount},
-            #{item.productCategoryCode},#{item.productCategoryName},#{item.barCode}
+            #{item.productCategoryCode},#{item.productCategoryName},#{item.barCode},#{item.topCouponDiscountAmount},#{item.topCouponAmount}
             )
         </foreach>
     </insert>
@@ -494,7 +499,7 @@
         sku_code, sku_name,total_product_amount,return_product_count,model_code,product_status,
         product_spec,unit_name,color_code,color_name,create_by_id, create_by_name,picture_url,
         create_time,remark,evidence_url,preferential_amount,line_code,actual_return_product_count,
-        actual_total_product_amount,product_amount,product_category_code,product_category_name,bar_code)
+        actual_total_product_amount,product_amount,product_category_code,product_category_name,bar_code,complimentary_amount)
         values
         <foreach collection="records" item="item" index="index" separator=",">
             (
@@ -509,7 +514,8 @@
             #{item.pictureUrl,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP},
             #{item.remark,jdbcType=VARCHAR},#{item.evidenceUrl,jdbcType=VARCHAR},#{item.preferentialAmount,jdbcType=DECIMAL},
             #{item.lineCode},#{item.actualReturnProductCount},#{item.actualTotalProductAmount},
-            #{item.productAmount},#{item.productCategoryCode},#{item.productCategoryName},#{item.barCode}
+            #{item.productAmount},#{item.productCategoryCode},#{item.productCategoryName},#{item.barCode},
+            #{item.complimentaryAmount}
             )
         </foreach>
     </insert>

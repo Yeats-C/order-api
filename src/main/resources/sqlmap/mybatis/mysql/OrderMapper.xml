@@ -60,7 +60,7 @@
         <result column="distributor_code" jdbcType="VARCHAR" property="distributorCode"/>
         <result column="distributor_id" jdbcType="VARCHAR" property="distributorId"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
-
+        <result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
     </resultMap>
     <resultMap id="LastBuyMapping" type="com.aiqin.mgs.order.api.domain.response.LastBuyResponse">
         <result column="new_consume_time" jdbcType="TIMESTAMP" property="newConsumeTime"/>
@@ -197,7 +197,7 @@
     <select id="selectprestorageorderDetails" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="LastPrestorageMapping"
             resultType="java.util.List">
 
-        select d.prestorage_order_supply_detail_id,d.product_name ,d.amount ,d.return_amount ,d.return_prestorage_amount,d.supply_amount,d.sku_code ,d.prestorage_order_supply_id,s.distributor_code ,s.distributor_id from prestorage_order_supply s,prestorage_order_supply_detail d
+        select d.prestorage_order_supply_detail_id,d.product_name ,d.amount ,d.return_amount ,d.return_prestorage_amount,d.supply_amount,d.sku_code ,d.prestorage_order_supply_id,s.distributor_code ,s.distributor_id ,s.order_code from prestorage_order_supply s,prestorage_order_supply_detail d
         where  d.prestorage_order_supply_detail_id = #{prestorageOrderSupplyDetailId} and s.prestorage_order_supply_id=d.prestorage_order_supply_id
 
 

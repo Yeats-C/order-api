@@ -26,6 +26,8 @@ public enum ErpOrderStatusEnum {
     ORDER_STATUS_4(4, "4", "订单同步中", ""),
     /***等待拣货*/
     ORDER_STATUS_6(6, "6", "等待拣货", ""),
+    /***赠送市值余额不够，进行审批*/
+    ORDER_STATUS_7(7, "7", "审核中", ""),
 //    /***正在拣货*/
 //    ORDER_STATUS_7(7, "7", "正在拣货",""),
 //    /***扫描完成*/

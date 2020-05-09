@@ -4,6 +4,7 @@ import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.aiqin.mgs.order.api.component.enums.ErpProductGiftEnum;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -18,6 +19,7 @@ import java.util.Date;
  * @date 2019/12/9 10:11
  */
 @Data
+@ApiModel("订单商品明细行实体")
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class ErpOrderItem extends PagesRequest {
 
@@ -93,7 +95,7 @@ public class ErpOrderItem extends PagesRequest {
     @JsonProperty("zero_disassembly_coefficient")
     private Long zeroDisassemblyCoefficient;
 
-    @ApiModelProperty(value = "商品类型 0商品（本品） 1赠品")
+    @ApiModelProperty(value = "商品类型 0商品（本品） 1赠品 2兑换赠品")
     @JsonProperty("product_type")
     private Integer productType;
 
@@ -271,8 +273,21 @@ public class ErpOrderItem extends PagesRequest {
     private BigDecimal activityDiscountAmount;
 
     /***仅A品优惠金额，用于统计*/
+    @ApiModelProperty(value = "本行A品券优惠总额度")
     @JsonProperty("top_coupon_discount_amount")
     private BigDecimal topCouponDiscountAmount;
+
+    @ApiModelProperty(value = "本行A品券优惠单品额度")
+    @JsonProperty("top_coupon_amount")
+    private BigDecimal topCouponAmount;
+
+    @ApiModelProperty(value = "爱亲分销价【订单详情展示字段】")
+    @JsonProperty("price_tax")
+    private BigDecimal priceTax;
+
+    @ApiModelProperty(value = "使用赠品额度【订单详情展示字段】")
+    @JsonProperty("used_gift_quota")
+    private BigDecimal usedGiftQuota;
 
 
     public String getProductTypeDesc() {

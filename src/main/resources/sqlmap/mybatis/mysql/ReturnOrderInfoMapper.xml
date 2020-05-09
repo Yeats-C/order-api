@@ -92,6 +92,9 @@
     <result column="order_success" property="orderSuccess" jdbcType="BIT" />
     <result column="return_good_amount" property="returnGoodAmount" jdbcType="DECIMAL" />
     <result column="actual_return_good_amount" property="actualReturnGoodAmount" jdbcType="DECIMAL" />
+    <result column="really_return" property="reallyReturn" jdbcType="BIT" />
+    <result column="complimentary_amount" property="complimentaryAmount" jdbcType="DECIMAL" />
+    <result column="top_coupon_discount_amount" property="topCouponDiscountAmount" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, return_order_id, return_order_code, order_store_code, company_code, company_name,
@@ -109,7 +112,8 @@
     discount_amount_infos, store_id, store_code, store_name, nature_code, nature_name,
     review_remark, review_operator, refund_status, process_type, remark, use_status,
     create_by_id, create_by_name, update_by_id, update_by_name, create_time, update_time,
-    source_type, order_success, return_money_type, order_category, review_operator_id, review_time
+    source_type, order_success, return_money_type, order_category, review_operator_id, review_time,
+    return_good_amount,actual_return_good_amount,really_return,complimentary_amount,top_coupon_discount_amount
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
@@ -386,6 +390,12 @@
       <if test="reviewTime != null" >
         review_time,
       </if>
+      <if test="reallyReturn != null" >
+        really_return,
+      </if>
+      <if test="complimentaryAmount != null">
+        complimentary_amount,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -648,6 +658,12 @@
       </if>
       <if test="reviewTime != null" >
         #{reviewTime},
+      </if>
+      <if test="reallyReturn != null" >
+        #{reallyReturn},
+      </if>
+      <if test="complimentaryAmount != null">
+        #{complimentaryAmount},
       </if>
     </trim>
   </insert>
@@ -912,6 +928,9 @@
       <if test="reviewTime != null" >
         review_time=#{reviewTime},
       </if>
+      <if test="reallyReturn != null" >
+        really_return=#{reallyReturn},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -1002,7 +1021,7 @@
     <include refid="Base_Column_List" />
     from return_order_info
     where
-    1=1
+    really_return=1
     <if test="returnOrderStatus!=null">
      and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
     </if>
@@ -1066,8 +1085,8 @@
     count(1)
     from return_order_info
     where
-    1=1
-      <if test="returnOrderStatus!=null">
+    really_return=1
+    <if test="returnOrderStatus!=null">
           and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
       </if>
       <if test="returnOrderCode!=null and returnOrderCode!=''">
@@ -1123,9 +1142,9 @@
     <include refid="Base_Column_List" />
     from return_order_info
     where
-    1=1
+    really_return=1
     <if test="id!=null and id!=''">
-    id = #{id,jdbcType=BIGINT}
+      and id = #{id,jdbcType=BIGINT}
     </if>
     <if test="returnOrderStatus!=null and returnOrderStatus!=''">
       and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
@@ -1165,6 +1184,7 @@
     <include refid="Base_Column_List" />
     from return_order_info
     <where>
+        really_return=1
         <if test="returnOrderStatus!=null">
           and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
         </if>
@@ -1211,6 +1231,7 @@
   <select id="selectByParames" parameterType="com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo3" resultMap="BaseResultMap">
     select * from return_order_info
     <where>
+      really_return=1
       <if test="returnOrderStatus!=null">
         and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
       </if>
@@ -1370,5 +1391,15 @@
     from return_order_detail_batch
     where return_order_code = #{code}
   </select>
+
+    <update id="updateReallyReturn" parameterType="java.util.List">
+    update return_order_info
+    set
+    really_return = 1
+    where order_store_code in
+        <foreach collection="orderCodes"  item="item" open="(" separator="," close=")"  >
+            #{item}
+        </foreach>
+  </update>
 
 </mapper>

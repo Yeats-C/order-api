@@ -52,4 +52,8 @@ public class ErpStoreCartQueryResponse {
     @JsonProperty("product_type")
     private Integer productType;
 
+    @ApiModelProperty(value = "兑换赠品购物车商品列表")
+    @JsonProperty("erp_cart_query_response")
+    private ErpCartQueryResponse erpCartQueryResponse;
+
 }
