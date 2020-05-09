@@ -46,6 +46,7 @@ import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.spi.LoggerRegistry;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,6 +57,7 @@ import org.springframework.util.Assert;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -1128,6 +1130,56 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
        }
        return false;
    }
+
+
+    /**
+     * 封装-A品卷
+     * @param
+     * @return
+     */
+   public HttpResponse aGoodsVolume(String  orderCode){
+       log.info("原始订单编码：{}" + orderCode);
+       ErpOrderInfo erpOrderInfo=erpOrderQueryService.getOrderAndItemByOrderCode(orderCode);
+       if(null==erpOrderInfo){
+           //此单号有误，未查到订单数据
+           return HttpResponse.failure(ResultCode.NOT_FOUND_ORDER_DATA);
+       }
+       List<ErpOrderItem> itemList = erpOrderInfo.getItemList();
+       //总的A品卷金额
+       BigDecimal topCouponDiscountAmount = BigDecimal.ZERO;
+       log.info("商品明细：{}" + itemList);
+       if (CollectionUtils.isNotEmpty(itemList)) {
+           for (ErpOrderItem orderItem : itemList) {
+               //商品的数量
+               Long productCount = orderItem.getProductCount();
+               String skuCode = orderItem.getSkuCode();
+               //订单中的单品优惠卷金额
+               BigDecimal topCouponAmount = orderItem.getTopCouponAmount();
+               //查出这个商品退货数量
+               ReturnOrderDetail returnOrderDetail = returnOrderDetailDao.selectReturnOrder(skuCode);
+               log.info("退货商品明细：{}" + returnOrderDetail);
+               //实退数量
+               Long actualReturnProductCount = returnOrderDetail.getActualReturnProductCount();
+               if (productCount != actualReturnProductCount){ //部分退
+                   //商品实退数量的A品金额
+                   BigDecimal bigDecimal = new BigDecimal(actualReturnProductCount);
+                   BigDecimal productAGoodsAmount = topCouponAmount.multiply(bigDecimal);
+                   topCouponDiscountAmount = topCouponDiscountAmount.add(productAGoodsAmount);
+               }else if (productCount == actualReturnProductCount){  //全退
+                   topCouponDiscountAmount = orderItem.getTopCouponDiscountAmount();
+               }
+           }
+           ReturnOrderInfo returnOrderInfo = new ReturnOrderInfo();
+           returnOrderInfo.setTopCouponDiscountAmount(topCouponDiscountAmount);
+           returnOrderInfo.setOrderStoreCode(orderCode);
+           //修改退货主订单中的A品优惠券总金额
+           int count = returnOrderInfoDao.updateReturnOrder(returnOrderInfo);
+           log.info("修改退货主订单返回结果：{}"+count);
+
+       }
+       return null;
+   }
+
 
     @Override
     public PageResData<ReturnOrderInfo> getWriteDownOrderList(PageRequestVO<WriteDownOrderSearchVo> searchVo) {
