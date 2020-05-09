@@ -820,7 +820,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderCode);
         //退货总金额(赠品金额+商品金额已算好) 加
         BigDecimal returnOrderAmount = returnOrderInfo.getReturnOrderAmount();
-        returnOrderInfo.setReturnOrderAmount(returnOrderAmount.add(returnOrderInfo.getTopCouponDiscountAmount()));
+        BigDecimal topCouponDiscountAmount =returnOrderInfo.getTopCouponDiscountAmount();
+        if(null==topCouponDiscountAmount){
+            topCouponDiscountAmount=BigDecimal.ZERO;
+        }
+        returnOrderInfo.setReturnOrderAmount(returnOrderAmount.add(topCouponDiscountAmount));
 //        BigDecimal reduce = returnOrderDetails.stream().map(ReturnOrderDetail::getTopCouponDiscountAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
         //查询日志详情
         List<ErpOrderOperationLog> erpOrderOperationLogs = getOrderOperationLogList(returnOrderCode);
