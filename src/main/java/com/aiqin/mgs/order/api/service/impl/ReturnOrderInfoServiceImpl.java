@@ -234,7 +234,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             for(ErpOrderInfo eoi:list){
                 Integer orderStatus = eoi.getOrderStatus();
                 //判断订单状态是否是 11:发货完成或者 97:缺货终止
-                if(orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_11.getCode())||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_97.getCode())){
+                if(orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_11.getCode())
+                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_97.getCode())
+                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_12.getCode())
+                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_13.getCode())){
+                    return true;
                 }else{
                     return false;
                 }
