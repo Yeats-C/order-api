@@ -99,6 +99,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
 
     @Override
     public ErpOrderInfo getOrderDetailByOrderCode(String orderCode) {
+        log.info("根据订单编号查询订单详情信息 getOrderDetailByOrderCode 参数为：orderCode={}"+orderCode);
         ErpOrderInfo order = this.getOrderByOrderCode(orderCode);
         if (order != null) {
             Integer orderStatus = order.getOrderStatus();
@@ -123,7 +124,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
 
             }
             order.setItemList(orderItemList);
-
+            log.info("根据订单编号查询订单详情信息 子订单详情为：orderItemList={}"+orderItemList);
             ItemOrderFee itemOrderFee=new ItemOrderFee();
             //子订单商品价值：（子订单分销价求和）元
             BigDecimal totalMoney=BigDecimal.ZERO;
@@ -168,7 +169,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             itemOrderFee.setPayMoney(payMoney);
             order.setItemOrderFee(itemOrderFee);
 
-
+            log.info("根据订单编号查询订单详情信息 子订单支付信息为：itemOrderFee={}"+itemOrderFee);
             List<ErpOrderOperationLog> operationLogList = erpOrderOperationLogService.selectOrderOperationLogList(order.getOrderStoreCode());
             order.setOperationLogList(operationLogList);
 
@@ -193,16 +194,16 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                 }
             }
             order.setOrderFee(orderFee);
-
+            log.info("根据订单编号查询订单详情信息 订单支付信息为：orderFee={}"+orderFee);
 
             //订单物流信息
             ErpOrderLogistics orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsId(order.getLogisticsId());
             order.setOrderLogistics(orderLogistics);
-
+            log.info("根据订单编号查询订单详情信息 订单物流信息：orderLogistics={}"+orderLogistics);
             //退款信息
             ErpOrderRefund orderRefund = erpOrderRefundService.getOrderRefundByOrderIdAndRefundType(order.getOrderStoreId(), ErpOrderRefundTypeEnum.ORDER_CANCEL);
             order.setOrderRefund(orderRefund);
-
+            log.info("根据订单编号查询订单详情信息 退款信息：orderRefund={}"+orderRefund);
             //操作按钮配置
             orderOperationConfig(order);
 
