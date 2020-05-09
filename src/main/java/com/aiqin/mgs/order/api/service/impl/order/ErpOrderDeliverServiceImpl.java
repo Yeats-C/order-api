@@ -444,7 +444,9 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 if (null!=item.getActivityId()&&activityCartMap.containsKey(item.getActivityId())) {
                 List<ErpOrderItem> items = activityCartMap.get(item.getActivityId());
                 items.add(item);
-                activityCartMap.put(item.getActivityId(),items);
+                if(null!=item.getActivityId()){
+                    activityCartMap.put(item.getActivityId(),items);
+                }
                 if(null!=activityMoneyMap.get(item.getActivityId())){
                     totalMoney=activityMoneyMap.get(item.getActivityId());
                 }
