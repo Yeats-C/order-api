@@ -389,7 +389,7 @@
             resultType="java.lang.Long">
         select COALESCE(SUM(return_amount),0) from service_project_reduce_detail
         <where>
-            order_type = 1
+            order_type = 2
             <if test="storeId!=null">
                 and store_id = #{storeId,jdbcType=VARCHAR}
             </if>
