@@ -17,6 +17,12 @@ public interface ResultCode {
     MessageId CHANGE_STORE_ERROR=MessageId.create(Project.ORDER_API, -1, "修改库存失败");
     MessageId STATUS_CHANGE_ERROR=MessageId.create(Project.ORDER_API, -1, "订单状态修改失败");
     MessageId FIRST_REPORT_ERROP =MessageId.create(Project.ORDER_API,-2,"查询首单报表数据为空");
+    MessageId RETURN_ORDER_CODE_ERROP =MessageId.create(Project.ORDER_API,-3,"查询退货单编码为空");
+    MessageId FRANCHISEE_VIRTUAL_ERROP =MessageId.create(Project.ORDER_API,-4,"同步虚拟资产失败");
+    MessageId A_GOODS_ERROP =MessageId.create(Project.ORDER_API,-5,"A品卷总金额为空");
+    MessageId ERP_ORDER_ITEM_ERROP =MessageId.create(Project.ORDER_API,-6,"商品详情集合为空");
+    MessageId ERP_FRANCHISEE_ERROP =MessageId.create(Project.ORDER_API,-7,"冲减单--同步A品卷失败");
+
 
     /** 黄祉壹   2018-11-05 开始     */
     

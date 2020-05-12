@@ -1,9 +1,11 @@
 package com.aiqin.mgs.order.api.service.impl;
 
 import com.aiqin.ground.util.http.HttpClient;
+import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ConstantData;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderReturnRequestEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderReturnStatusEnum;
 import com.aiqin.mgs.order.api.component.returnenums.StoreStatusEnum;
@@ -37,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -241,6 +244,79 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
     }
 
     /**
+     * 生成A品卷
+     * @param
+     * @return
+     */
+    public HttpResponse  AGoodsVolumeGenerate(BigDecimal topCouponDiscountAmount,String franchiseeid,String returnCode){
+        log.info("生成A品卷入参：{},{},{}",topCouponDiscountAmount,franchiseeid,returnCode);
+        List<FranchiseeAssetVo> franchiseeAssets=new ArrayList<>();
+        Double totalMoney = topCouponDiscountAmount.doubleValue();
+        if(totalMoney!=null){
+            //计算面值为100的A品券数量
+            int num=(int)(totalMoney/100);
+            //计算剩余钱数
+            double balance=totalMoney%100;
+            //存储A品卷信息
+            List<CouponInfo> couponInfoList=new ArrayList<>();
+            for(int i=0;i<num;i++){
+                CouponInfo couponInfo=new CouponInfo();
+                couponInfo.setCouponName(ConstantData.COUPON_NAME_A);
+                couponInfo.setCouponType(ConstantData.COUPON_TYPE);
+                couponInfo.setFranchiseeId(franchiseeid);
+                couponInfo.setOrderId(returnCode);
+                //开始时间
+                Date date = new Date();
+//                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                String format = simpleDateFormat.format(date);
+                couponInfo.setValidityStartTime(date);
+                couponInfo.setValidityEndTime(obtainDate());
+                couponInfo.setCouponCode(couponCode());
+                couponInfo.setNominalValue(ConstantData.NOMINAL_VALUE);
+                couponInfoList.add(couponInfo);
+                FranchiseeAssetVo franchiseeAsset=new FranchiseeAssetVo();
+                BeanUtils.copyProperties(couponInfo,franchiseeAsset);
+                franchiseeAssets.add(franchiseeAsset);
+            }
+            if(balance>0){
+                CouponInfo couponInfo=new CouponInfo();
+                couponInfo.setCouponName(ConstantData.COUPON_NAME_A);
+                couponInfo.setCouponType(ConstantData.COUPON_TYPE);
+                couponInfo.setFranchiseeId(franchiseeid);
+                couponInfo.setOrderId(returnCode);
+                //开始时间
+                Date date = new Date();
+                couponInfo.setValidityStartTime(date);
+                couponInfo.setValidityEndTime(obtainDate());
+                couponInfo.setCouponCode(couponCode());
+                couponInfo.setNominalValue(BigDecimal.valueOf(balance));
+                couponInfoList.add(couponInfo);
+                FranchiseeAssetVo franchiseeAsset=new FranchiseeAssetVo();
+                BeanUtils.copyProperties(couponInfo,franchiseeAsset);
+                franchiseeAssets.add(franchiseeAsset);
+            }
+            if(CollectionUtils.isNotEmpty(franchiseeAssets)){
+                log.info("A品券同步到虚拟资产开始，franchiseeAssets={}",franchiseeAssets);
+                franchiseeAssets.forEach(p -> p.setFranchiseeId(franchiseeid));
+                franchiseeAssets.forEach(p -> p.setCreateTime(new Date()));
+                String url=slcsHost+"/franchiseeVirtual/VirtualA";
+                JSONObject json=new JSONObject();
+                json.put("list",franchiseeAssets);
+                HttpClient httpClient = HttpClient.post(url).json(json);
+                Map<String ,Object> res=null;
+                res = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+                log.info("同步到虚拟资产:"+res);
+                if(res!=null&&"0".equals(res.get("code"))){
+                    log.info("A品卷完成");
+                    return HttpResponse.success();
+                }
+                return HttpResponse.failure(ResultCode.FRANCHISEE_VIRTUAL_ERROP);
+            }
+        }
+        return HttpResponse.failure(ResultCode.A_GOODS_ERROP);
+    }
+
+    /**
      * 生成A品券编码
      * @return
      */
@@ -251,6 +327,27 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
         return str;
     }
 
+    /**
+     * 生成当前月份时间+3
+     */
+    public static Date obtainDate(){
+        Calendar instance = Calendar.getInstance();
+        Date date = new Date();
+        instance.setTime(date);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        instance.add(instance.MONTH,3);
+        Date time1 = instance.getTime();
+        String format = simpleDateFormat.format(time1);
+        Date parse = null;
+        try {
+             parse = simpleDateFormat.parse(format);
+            return parse;
+        } catch (ParseException e) {
+            log.info("context",e);
+            return null;
+        }
+
+    }
     /**
      * 修改退货单状态--A品卷审批为非“同意”状态时，全部改为01待审核状态
      * @param status
