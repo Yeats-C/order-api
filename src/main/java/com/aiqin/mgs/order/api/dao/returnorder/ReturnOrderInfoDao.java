@@ -78,7 +78,7 @@ public interface ReturnOrderInfoDao {
 
     //根据原始订单号，修改是否真的发起退货状态
     Integer updateReallyReturn(@Param("orderCodes") List<String> orderCodes);
-    Integer updateReallyReturn(List<String> orderCodes);
+//    Integer updateReallyReturn(List<String> orderCodes);
     //修改退货A品卷总金额
     int updateReturnOrder(ReturnOrderInfo returnOrderInfos);
     //查询退货单编码
