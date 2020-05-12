@@ -18,6 +18,7 @@ import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.request.product.NewStoreCategory;
+import com.aiqin.mgs.order.api.domain.request.product.ProductSkuRequest2;
 import com.aiqin.mgs.order.api.domain.request.product.ProductSkuRespVo6;
 import com.aiqin.mgs.order.api.domain.request.product.SkuProductReqVO;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
@@ -104,13 +105,13 @@ public class BridgeProductService<main> {
      * @param provinceCode 省编码
      * @param cityCode     市编码
      * @param companyCode  公司编码
-     * @param skuCodeList  sku编码集合
+     * @param productSkuRequest2List  sku信息集合
      * @return java.util.List<com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetailResponse>
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2020/3/10 10:54
      */
-    public List<ErpSkuDetail> getProductSkuDetailList(String provinceCode, String cityCode, String companyCode, List<String> skuCodeList) {
+    public List<ErpSkuDetail> getProductSkuDetailList(String provinceCode, String cityCode, String companyCode, List<ProductSkuRequest2> productSkuRequest2List) {
 
         List<ErpSkuDetail> list = new ArrayList<>();
         try {
@@ -118,7 +119,7 @@ public class BridgeProductService<main> {
             shoppingCartProductRequest.setCityCode(cityCode);
             shoppingCartProductRequest.setProvinceCode(provinceCode);
             shoppingCartProductRequest.setCompanyCode(companyCode);
-            shoppingCartProductRequest.setSkuCodes(skuCodeList);
+            shoppingCartProductRequest.setProductSkuRequest2List(productSkuRequest2List);
             String path = "/search/spu/sku/detail2";
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest);
             HttpResponse<List<ErpSkuDetail>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ErpSkuDetail>>>() {

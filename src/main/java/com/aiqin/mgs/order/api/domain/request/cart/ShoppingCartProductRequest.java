@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.request.cart;
 
+import com.aiqin.mgs.order.api.domain.request.product.ProductSkuRequest2;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -27,6 +28,10 @@ public class ShoppingCartProductRequest {
     @ApiModelProperty(value = "省code")
     @JsonProperty("province_code")
     private String provinceCode;
+
+    @ApiModelProperty(value = "商品集合")
+    @JsonProperty("product_sku_request2_list")
+    private List<ProductSkuRequest2> productSkuRequest2List;
 
 
 
