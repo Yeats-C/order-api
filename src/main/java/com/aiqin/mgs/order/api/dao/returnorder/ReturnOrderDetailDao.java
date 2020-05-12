@@ -37,4 +37,6 @@ public interface ReturnOrderDetailDao {
 
     List<ReturnOrderInfoItemRespVO> selectReturnOrderList(@Param("returnOrderCode") String returnOrderCode);
 
+    ReturnOrderDetail selectReturnOrder(String skuCode);
+
 }
