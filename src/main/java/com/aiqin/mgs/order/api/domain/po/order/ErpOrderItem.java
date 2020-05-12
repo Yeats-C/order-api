@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.domain.po.order;
 
 import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.aiqin.mgs.order.api.component.enums.ErpProductGiftEnum;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
@@ -280,6 +281,17 @@ public class ErpOrderItem extends PagesRequest {
     @ApiModelProperty(value = "本行A品券优惠单品额度")
     @JsonProperty("top_coupon_amount")
     private BigDecimal topCouponAmount;
+
+    /***批次*/
+    @ApiModelProperty(value = "批次号")
+    private String batchNumber;
+
+    @ApiModelProperty(value = "批次号时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date batchDate;
+
+    @ApiModelProperty(value = "批次编码号")
+    private String batchCode;
 
 
     public String getProductTypeDesc() {

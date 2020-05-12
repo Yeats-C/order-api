@@ -1391,6 +1391,9 @@
     from return_order_detail_batch
     where return_order_code = #{code}
   </select>
+    <select id="selectReturnCode" resultType="java.lang.String">
+      select return_order_code as returnOrderCode from  return_order_info where store_code = #{storeCode}
+    </select>
 
     <update id="updateReallyReturn" parameterType="java.util.List">
     update return_order_info
@@ -1405,7 +1408,8 @@
     update return_order_info
     set
     top_coupon_discount_amount = #{topCouponDiscountAmount,jdbcType=DECIMAL}
-    where  order_store_code = #{orderStoreCode,jdbcType=VARCHAR}
+    where  return_order_code = #{returnOrderCode,jdbcType=VARCHAR}
   </update>
+
 
 </mapper>
