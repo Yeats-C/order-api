@@ -171,6 +171,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             detail.setProductStatus(productStatus);
             return detail;
         }).collect(Collectors.toList());
+        //增加批次字段
         log.info("发起退货--插入退货详情，details={}",details);
         returnOrderDetailDao.insertBatch(details);
         //添加日志
