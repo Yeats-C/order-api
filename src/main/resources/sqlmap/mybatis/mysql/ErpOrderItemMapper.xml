@@ -63,7 +63,6 @@
         update_time as updateTime,
         preferential_amount as preferentialAmount,
         top_coupon_amount as topCouponAmount,
-        batch_info_code as batchInfoCode,
         batch_code as batchCode,
         batch_date as batchDate,
         warehouse_type_code as warehouseTypeCode,

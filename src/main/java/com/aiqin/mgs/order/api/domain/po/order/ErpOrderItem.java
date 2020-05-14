@@ -300,9 +300,9 @@ public class ErpOrderItem extends PagesRequest {
     @ApiModelProperty(value = "批次号")
     private String batchCode;
 
-    @ApiModelProperty("批次编号")
-    @JsonProperty(value = "batch_info_code")
-    private String batchInfoCode;
+//    @ApiModelProperty("批次编号")
+//    @JsonProperty(value = "batch_info_code")
+//    private String batchInfoCode;
 
     @ApiModelProperty(value = "传入库房编码:1:销售库，2:特卖库")
     @JsonProperty("warehouse_type_code")
