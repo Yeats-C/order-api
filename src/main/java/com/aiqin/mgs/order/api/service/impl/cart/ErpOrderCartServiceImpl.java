@@ -171,6 +171,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
             ProductSkuRequest2 productSkuRequest2=new ProductSkuRequest2();
             productSkuRequest2.setSkuCode(item.getSkuCode());
             productSkuRequest2.setBatchInfoCode(item.getBatchInfoCode());
+            if(null==item.getWarehouseTypeCode()){
+                item.setWarehouseTypeCode("1");
+            }
             productSkuRequest2.setWarehouseTypeCode(item.getWarehouseTypeCode());
             productSkuRequest2List.add(productSkuRequest2);
         }
@@ -259,7 +262,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 erpOrderCartInfo.setBatchCode(skuDetail.getBatchCode());
                 erpOrderCartInfo.setBatchInfoCode(skuDetail.getBatchInfoCode());
                 erpOrderCartInfo.setBatchDate(skuDetail.getBatchDate());
-
+                erpOrderCartInfo.setWarehouseTypeCode(item.getWarehouseTypeCode());
                 addList.add(erpOrderCartInfo);
             }
 
@@ -456,6 +459,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 ProductSkuRequest2 productSkuRequest2=new ProductSkuRequest2();
                 productSkuRequest2.setSkuCode(item.getSkuCode());
                 productSkuRequest2.setBatchInfoCode(item.getBatchInfoCode());
+                if(null==item.getWarehouseTypeCode()){
+                    item.setWarehouseTypeCode("1");
+                }
                 productSkuRequest2.setWarehouseTypeCode(item.getWarehouseTypeCode());
                 productSkuRequest2List.add(productSkuRequest2);
             }
@@ -670,6 +676,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
             ProductSkuRequest2 productSkuRequest2=new ProductSkuRequest2();
             productSkuRequest2.setSkuCode(item.getSkuCode());
             productSkuRequest2.setBatchInfoCode(item.getBatchInfoCode());
+            if(null==item.getWarehouseTypeCode()){
+                item.setWarehouseTypeCode("1");
+            }
             productSkuRequest2.setWarehouseTypeCode(item.getWarehouseTypeCode());
             productSkuRequest2List.add(productSkuRequest2);
         }
@@ -824,6 +833,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                     groupActivityAmount = groupActivityAmount.add(giftItem.getLineActivityAmountTotal());
                     groupActivityDiscountAmount = groupActivityDiscountAmount.add(giftItem.getLineActivityDiscountTotal());
                     groupGiftQuantity += giftItem.getAmount();
+
                 }
             }
 
@@ -1891,6 +1901,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 ProductSkuRequest2 productSkuRequest2=new ProductSkuRequest2();
                 productSkuRequest2.setSkuCode(item.getSkuCode());
                 productSkuRequest2.setBatchInfoCode(item.getBatchInfoCode());
+                if(null==item.getWarehouseTypeCode()){
+                    item.setWarehouseTypeCode("1");
+                }
                 productSkuRequest2.setWarehouseTypeCode(item.getWarehouseTypeCode());
                 productSkuRequest2List.add(productSkuRequest2);
             }
