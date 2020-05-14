@@ -283,14 +283,14 @@ public class ErpOrderItem extends PagesRequest {
     private BigDecimal topCouponAmount;
 
     /***批次*/
-    @ApiModelProperty(value = "批次号")
-    private String batchNumber;
+    @ApiModelProperty(value = "批次编码号")
+    private String batchInfoCode;
 
     @ApiModelProperty(value = "批次号时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date batchDate;
 
-    @ApiModelProperty(value = "批次编码号")
+    @ApiModelProperty(value = "批次号")
     private String batchCode;
 
 

@@ -63,7 +63,7 @@
         update_time as updateTime,
         preferential_amount as preferentialAmount,
         top_coupon_amount as topCouponAmount,
-        batch_number as batchNumber,
+        batch_info_code as batchInfoCode,
         batch_code as batchCode,
         batch_date as batchDate
         from order_store_detail
