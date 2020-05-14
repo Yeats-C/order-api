@@ -290,16 +290,20 @@ public class ErpOrderItem extends PagesRequest {
     @JsonProperty("used_gift_quota")
     private BigDecimal usedGiftQuota;
 
-    /***批次*/
-    @ApiModelProperty(value = "批次号")
-    private String batchNumber;
-
     @ApiModelProperty(value = "批次号时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date batchDate;
 
     @ApiModelProperty(value = "批次编码号")
     private String batchCode;
+
+    @ApiModelProperty("批次编号")
+    @JsonProperty(value = "batch_info_code")
+    private String batchInfoCode;
+
+    @ApiModelProperty(value = "传入库房编码:1:销售库，2:特卖库")
+    @JsonProperty("warehouse_type_code")
+    private String warehouseTypeCode;
 
 
     public String getProductTypeDesc() {

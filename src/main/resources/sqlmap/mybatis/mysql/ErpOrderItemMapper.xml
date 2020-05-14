@@ -63,9 +63,10 @@
         update_time as updateTime,
         preferential_amount as preferentialAmount,
         top_coupon_amount as topCouponAmount,
-        batch_number as batchNumber,
         batch_code as batchCode,
-        batch_date as batchDate
+        batch_date as batchDate,
+        warehouse_type_code as warehouseTypeCode,
+        batch_info_code as batchInfoCode
         from order_store_detail
         where 1 = 1
         <if test=" id != null and id != '' ">
