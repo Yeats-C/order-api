@@ -577,9 +577,12 @@ public class BridgeProductService<main> {
     public Map<String, ErpSkuDetail> getProductSkuDetailMap(String provinceCode, String cityCode, List<ProductSkuRequest2> productSkuRequest2List) {
         Map<String, ErpSkuDetail> skuDetailMap = new HashMap<>(16);
         List<ErpSkuDetail> productSkuDetailList = getProductSkuDetailList(provinceCode, cityCode, OrderConstant.SELECT_PRODUCT_COMPANY_CODE, productSkuRequest2List);
-        for (ErpSkuDetail item :
-                productSkuDetailList) {
-            skuDetailMap.put(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode(), item);
+        for (ErpSkuDetail item : productSkuDetailList) {
+            String batchInfoCode=null;
+            if(null!= item.getBatchList()&&item.getBatchList().size()>0&&null!=item.getBatchList().get(0).getBatchInfoCode()){
+                batchInfoCode=item.getBatchList().get(0).getBatchInfoCode();
+            }
+            skuDetailMap.put(item.getSkuCode()+"BATCH_INFO_CODE"+batchInfoCode, item);
         }
         return skuDetailMap;
     }
