@@ -17,6 +17,8 @@ import com.aiqin.mgs.order.api.domain.request.product.StockBatchInfoRequest;
 import com.aiqin.mgs.order.api.domain.request.product.StockLockDetailRequest;
 import com.aiqin.mgs.order.api.domain.response.ProductSkuDetailResponse;
 import com.aiqin.mgs.order.api.domain.response.order.*;
+import com.aiqin.mgs.order.api.domain.response.stock.StockChangeRequest;
+import com.aiqin.mgs.order.api.domain.response.stock.StockInfoRequest;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
 import com.aiqin.mgs.order.api.service.order.ErpStoreLockDetailsService;
@@ -452,17 +454,59 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 //                paramItemMap.put("company_name", order.getCompanyName());
 //                list.add(paramItemMap);
 //            }
-            Map<String, Object> paramMap = new HashMap<>();
-            paramMap.put("company_code", order.getCompanyCode());
-            paramMap.put("company_name", order.getCompanyName());
-            paramMap.put("operation_person_id", auth.getPersonId());
-            paramMap.put("operation_person_name", auth.getPersonName());
-            paramMap.put("operation_type", orderLockStockTypeEnum.getCode());
-            paramMap.put("order_code", order.getOrderStoreCode());
-            paramMap.put("order_type", order.getOrderTypeCode());
-            paramMap.put("stock_vo", list);
-            log.info("解锁库存（根据明细解锁）--调用供应链解锁接口,入参 paramMap={}",paramMap);
-            HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/change/stock").json(paramMap);
+//            Map<String, Object> paramMap = new HashMap<>();
+//            paramMap.put("company_code", order.getCompanyCode());
+//            paramMap.put("company_name", order.getCompanyName());
+//            paramMap.put("operation_person_id", auth.getPersonId());
+//            paramMap.put("operation_person_name", auth.getPersonName());
+//            paramMap.put("operation_type", orderLockStockTypeEnum.getCode());
+//            paramMap.put("order_code", order.getOrderStoreCode());
+//            paramMap.put("order_type", order.getOrderTypeCode());
+//            paramMap.put("stock_vo", list);
+
+
+
+
+            StockChangeRequest stockChangeRequest =new StockChangeRequest();
+            //操作类型：3.解锁库存
+            stockChangeRequest.setOperationType(3);
+            //库存集合
+            List<StockInfoRequest> stockList=new ArrayList<>();
+            //批次库存集合
+            List<StockBatchInfoRequest> stockBatchList=new ArrayList<>();
+
+            //修改成从锁库的时候保存的数据获取仓库库房分组信息
+            List<ErpOrderItemSplitGroupResponse> splitGroupResponses=erpStoreLockDetailsService.getNewRepositorySplitGroup(order);
+
+            for(ErpOrderItemSplitGroupResponse item:splitGroupResponses){
+                StockInfoRequest stockInfoRequest=new StockInfoRequest();
+                stockInfoRequest.setCompanyCode(order.getCompanyCode());
+                stockInfoRequest.setCompanyName(order.getCompanyName());
+                stockInfoRequest.setTransportCenterCode(item.getTransportCenterCode());
+                stockInfoRequest.setTransportCenterName(item.getTransportCenterName());
+                stockInfoRequest.setWarehouseCode(item.getWarehouseCode());
+                stockInfoRequest.setWarehouseName(item.getWarehouseName());
+                stockInfoRequest.setWarehouseType(Integer.valueOf(item.getWarehouseType()));
+                stockInfoRequest.setSkuCode(item.getSkuCode());
+                stockInfoRequest.setSkuName(item.getSkuName());
+                stockInfoRequest.setChangeCount(item.getLockCount());
+                stockList.add(stockInfoRequest);
+            }
+
+            for(ErpOrderItem item:order.getItemList()){
+                StockBatchInfoRequest stockBatchInfoRequest=new StockBatchInfoRequest();
+                stockBatchInfoRequest.setBatchCode(item.getBatchCode());
+                stockBatchInfoRequest.setBatchInfoCode(item.getBatchInfoCode());
+                stockBatchInfoRequest.setChangeCount(item.getProductCount());
+                stockBatchInfoRequest.setSkuCode(item.getSkuCode());
+                stockBatchInfoRequest.setSkuName(item.getSkuName());
+                stockBatchList.add(stockBatchInfoRequest);
+            }
+            stockChangeRequest.setStockList(stockList);
+            stockChangeRequest.setStockBatchList(stockBatchList);
+
+            log.info("解锁库存（根据明细解锁）--调用供应链解锁接口,入参 stockChangeRequest={}",stockChangeRequest);
+            HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/change/stock").json(stockChangeRequest);
             HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
             });
             log.info("解锁库存（根据明细解锁）--调用供应链解锁接口,返回结果 response={}",JSON.toJSONString(response));
