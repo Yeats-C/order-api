@@ -12,7 +12,6 @@ import com.aiqin.mgs.order.api.dao.gift.ErpOrderGiftPoolCartDao;
 import com.aiqin.mgs.order.api.dao.gift.GiftPoolDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
-import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.po.cart.ErpOrderCartInfo;
 import com.aiqin.mgs.order.api.domain.po.gift.ComplimentaryWarehouseCorrespondence;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftCartQueryResponse;
@@ -169,7 +168,7 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         }
 
         //获取商品详情
-        Map<String, ErpSkuDetail> skuDetailMap = getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), productSkuRequest2List);
+        Map<String, ErpSkuDetail> skuDetailMap = bridgeProductService.getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), productSkuRequest2List);
 
         //获取当前门店购物车已有的商品
         Map<String, ErpOrderCartInfo> cartLineMap = new HashMap<>(16);
@@ -300,23 +299,7 @@ public class GiftPoolServiceImpl implements GiftPoolService {
 
     }
 
-    /**
-     * 获取sku详情，返回map
-     *
-     * @param provinceCode 省编码
-     * @param cityCode     市编码
-     * @param productSkuRequest2List  skux信息list
-     * @return
-     */
-    private Map<String, ErpSkuDetail> getProductSkuDetailMap(String provinceCode, String cityCode, List<ProductSkuRequest2> productSkuRequest2List) {
-        Map<String, ErpSkuDetail> skuDetailMap = new HashMap<>(16);
-        List<ErpSkuDetail> productSkuDetailList = bridgeProductService.getProductSkuDetailList(provinceCode, cityCode, OrderConstant.SELECT_PRODUCT_COMPANY_CODE, productSkuRequest2List);
-        for (ErpSkuDetail item :
-                productSkuDetailList) {
-            skuDetailMap.put(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode(), item);
-        }
-        return skuDetailMap;
-    }
+
 
     /**
      * 校验购物车数量规则
@@ -403,7 +386,7 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         }
         if(null!=productSkuRequest2List&& productSkuRequest2List.size()>0){
             //获取商品详情
-            Map<String, ErpSkuDetail> skuDetailMap = getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), productSkuRequest2List);
+            Map<String, ErpSkuDetail> skuDetailMap = bridgeProductService.getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), productSkuRequest2List);
             for (GiftPool item : giftPoolList) {
                 ErpSkuDetail erpSkuDetail=skuDetailMap.get(item.getSkuCode()+"BATCH_INFO_CODE");
                 if(null==erpSkuDetail){
@@ -513,7 +496,7 @@ public class GiftPoolServiceImpl implements GiftPoolService {
                 productSkuRequest2.setWarehouseTypeCode(item.getWarehouseTypeCode());
                 productSkuRequest2List.add(productSkuRequest2);
             }
-            Map<String, ErpSkuDetail> skuDetailMap = this.getProductSkuDetailMap(provinceCode, cityCode, productSkuRequest2List);
+            Map<String, ErpSkuDetail> skuDetailMap = bridgeProductService.getProductSkuDetailMap(provinceCode, cityCode, productSkuRequest2List);
 
             for (ErpOrderCartInfo item :
                     cartList) {

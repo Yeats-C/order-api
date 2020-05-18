@@ -13,6 +13,8 @@ import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.po.order.*;
 import com.aiqin.mgs.order.api.domain.request.StockVoRequest;
 import com.aiqin.mgs.order.api.domain.request.order.PayRequest;
+import com.aiqin.mgs.order.api.domain.request.product.StockBatchInfoRequest;
+import com.aiqin.mgs.order.api.domain.request.product.StockLockDetailRequest;
 import com.aiqin.mgs.order.api.domain.response.ProductSkuDetailResponse;
 import com.aiqin.mgs.order.api.domain.response.order.*;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
@@ -81,11 +83,13 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     }
 
     @Override
-    public ProductInfo getSkuDetail(String companyCode, String skuCode) {
-        logger.info("查询sku详情入参,companyCode={},skuCode={}",companyCode,skuCode);
+    public ProductInfo getSkuDetail(String companyCode, String skuCode, String warehouseTypeCode, String batchInfoCode) {
+        logger.info("查询sku详情入参,companyCode={},skuCode={},warehouseTypeCode={},batchInfoCode={}",companyCode,skuCode,warehouseTypeCode,batchInfoCode);
         String url = urlProperties.getProductApi() + "/search/spu/sku/detail";
         url += "?company_code=" + companyCode;
         url += "&sku_code=" + skuCode;
+        url += "&warehouse_type_code=" + warehouseTypeCode;
+        url += "&batch_Info_Code=" + batchInfoCode;
         ProductInfo product = new ProductInfo();
         try {
             logger.info("查询sku详情url={}",url);
@@ -127,6 +131,10 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             if (data.getProductSkuBoxPackings() != null && data.getProductSkuBoxPackings().size() > 0) {
                 product.setBoxGrossWeight(data.getProductSkuBoxPackings().get(0).getBoxGrossWeight());
                 product.setBoxVolume(data.getProductSkuBoxPackings().get(0).getBoxVolume());
+            }
+            //如果批次信息List不为空
+            if(null!=data.getBatchList()&&data.getBatchList().size()>0){
+                product.setPrice(data.getBatchList().get(0).getBatchPrice());
             }
 
         } catch (BusinessException e) {
@@ -237,9 +245,13 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
         boolean flag = true;
         try {
 
-            //TODO 按照sku汇总数量
-            List<Map<String, Object>> list = new ArrayList<>();
+            // 按照sku汇总数量  但是得增加批次信息
+            //锁库sku信息集合
+            List<StockLockDetailRequest> list = new ArrayList<>();
+            //sku总数量集合
             Map<String,Long> countMap=new HashMap<>();
+            //sku批次信息集合
+            Map<String,List<StockBatchInfoRequest>> productMap=new HashMap<>();
             //记录skuCode和行号对应关系
             Map<String,Long> skuCodeLineMap=new HashMap<>();
             //赠品
@@ -251,12 +263,24 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             //汇总sku
             for(ErpOrderItem item:itemList){
                 Long count=countMap.get(item.getSkuCode());
+                List<StockBatchInfoRequest> batchList=productMap.get(item.getSkuCode());
+                //TODO 商品批次相关信息还得增加销售库特卖库标识
+                StockBatchInfoRequest stockBatchInfoRequest=new StockBatchInfoRequest();
+                stockBatchInfoRequest.setBatchCode(item.getBatchCode());
+                stockBatchInfoRequest.setBatchInfoCode(item.getBatchInfoCode());
+                stockBatchInfoRequest.setChangeCount(item.getProductCount());
+                stockBatchInfoRequest.setSkuCode(item.getSkuCode());
+                stockBatchInfoRequest.setSkuName(item.getSkuName());
                 if(null!=countMap.get(item.getSkuCode())){
                     count=count+item.getProductCount();
+                    batchList.add(stockBatchInfoRequest);
                 }else {
                     count=item.getProductCount();
+                    batchList=new ArrayList<>();
+                    batchList.add(stockBatchInfoRequest);
                 }
                 countMap.put(item.getSkuCode(),count);
+                productMap.put(item.getSkuCode(),batchList);
                 //筛选出商品数据
                 if(ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductType())){
                     productList.add(item);
@@ -291,12 +315,13 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             }
             for(Map.Entry<String,Long> data:countMap.entrySet()){
                 String skuCode=data.getKey();
-                Map<String, Object> paramItemMap = new HashMap<>(16);
-                paramItemMap.put("change_count", countMap.get(skuCode));
-                paramItemMap.put("city_code", order.getCityId());
-                paramItemMap.put("province_code", order.getProvinceId());
-                paramItemMap.put("sku_code", skuCode);
-                list.add(paramItemMap);
+                StockLockDetailRequest stockLockDetailRequest=new StockLockDetailRequest();
+                stockLockDetailRequest.setChangeCount(countMap.get(skuCode).intValue());
+                stockLockDetailRequest.setCityCode(order.getCityId());
+                stockLockDetailRequest.setProvinceCode(order.getProvinceId());
+                stockLockDetailRequest.setSkuCode(skuCode);
+                stockLockDetailRequest.setBatchList(productMap.get(skuCode));
+                list.add(stockLockDetailRequest);
             }
 //            for (ErpOrderItem item :
 //                    itemList) {
@@ -349,7 +374,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 }
                 erpStoreLockDetailsService.insertStoreLockDetails(records);
             } else {
-//                log.info("锁库请求返回list结果异常");
+                log.info("锁库请求返回list结果异常");
 //                return false;
                 throw new BusinessException("锁库请求失败");
             }

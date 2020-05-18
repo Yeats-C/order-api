@@ -179,7 +179,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         }
 
         //获取商品详情
-        Map<String, ErpSkuDetail> skuDetailMap = getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), productSkuRequest2List);
+        Map<String, ErpSkuDetail> skuDetailMap = bridgeProductService.getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), productSkuRequest2List);
 
         //获取当前门店购物车已有的商品
         Map<String, ErpOrderCartInfo> cartLineMap = new HashMap<>(16);
@@ -466,7 +466,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 productSkuRequest2List.add(productSkuRequest2);
             }
             //查询商品详情集合
-            Map<String, ErpSkuDetail> skuDetailMap = this.getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), productSkuRequest2List);
+            Map<String, ErpSkuDetail> skuDetailMap = bridgeProductService.getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), productSkuRequest2List);
 
             //把库存不足的行变成非选中状态
             uncheckUnderStockLine(cartLineList, skuDetailMap, auth);
@@ -683,7 +683,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
             productSkuRequest2List.add(productSkuRequest2);
         }
         //缓存商品详情信息
-        Map<String, ErpSkuDetail> skuDetailMap = this.getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), productSkuRequest2List);
+        Map<String, ErpSkuDetail> skuDetailMap = bridgeProductService.getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), productSkuRequest2List);
         //缓存当前剩余的库存数量
         Map<String, Integer> skuStockNumMap = new HashMap<>(16);
         for (ErpOrderCartInfo item :
@@ -1867,23 +1867,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
 
     }
 
-    /**
-     * 获取sku详情，返回map
-     *
-     * @param provinceCode 省编码
-     * @param cityCode     市编码
-     * @param productSkuRequest2List  sku信息list
-     * @return
-     */
-    private Map<String, ErpSkuDetail> getProductSkuDetailMap(String provinceCode, String cityCode, List<ProductSkuRequest2> productSkuRequest2List) {
-        Map<String, ErpSkuDetail> skuDetailMap = new HashMap<>(16);
-        List<ErpSkuDetail> productSkuDetailList = bridgeProductService.getProductSkuDetailList(provinceCode, cityCode, OrderConstant.SELECT_PRODUCT_COMPANY_CODE, productSkuRequest2List);
-        for (ErpSkuDetail item :
-                productSkuDetailList) {
-            skuDetailMap.put(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode(), item);
-        }
-        return skuDetailMap;
-    }
+
 
     /**
      * 获取最新的商品价格数据
@@ -1907,7 +1891,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 productSkuRequest2.setWarehouseTypeCode(item.getWarehouseTypeCode());
                 productSkuRequest2List.add(productSkuRequest2);
             }
-            Map<String, ErpSkuDetail> skuDetailMap = this.getProductSkuDetailMap(provinceCode, cityCode, productSkuRequest2List);
+            Map<String, ErpSkuDetail> skuDetailMap = bridgeProductService.getProductSkuDetailMap(provinceCode, cityCode, productSkuRequest2List);
 
             for (ErpOrderCartInfo item :
                     cartList) {

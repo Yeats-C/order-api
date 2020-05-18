@@ -551,14 +551,18 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //遍历参数商品列表，获取商品详情，校验数据
         for (ErpOrderCartInfo item :
                 cartProductList) {
-            if (!productMap.containsKey(item.getSkuCode())) {
+            if (!productMap.containsKey(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode())) {
+                // 此处查询单个sku详情增加批次信息【购物车已经选择了批次】和销售库特卖库标识
                 //获取商品详情
-                ProductInfo product = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, item.getSkuCode());
+                ProductInfo product = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, item.getSkuCode(),item.getWarehouseTypeCode(),item.getBatchInfoCode());
                 if (product == null) {
-//                    throw new BusinessException("未获取到商品" + item.getProductName() + "的信息");
                     throw new BusinessException("未获取到商品" + item.getSpuName() + "的信息");
                 }
-                productMap.put(item.getSkuCode(), product);
+                product.setBatchCode(item.getBatchCode());
+                product.setBatchDate(item.getBatchDate());
+                product.setBatchInfoCode(item.getBatchInfoCode());
+                product.setWarehouseTypeCode(item.getWarehouseTypeCode());
+                productMap.put(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode(), product);
             }
         }
 
@@ -568,7 +572,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //遍历参数商品列表，构建订单商品明细行
 //        for (CartOrderInfo item : cartProductList) {
         for (ErpOrderCartInfo item : cartProductList) {
-            ProductInfo productInfo = productMap.get(item.getSkuCode());
+            ProductInfo productInfo = productMap.get(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
 
             ErpOrderItem orderItem = new ErpOrderItem();
             orderItem.setLineCode(lineCode++);
@@ -663,6 +667,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 orderItem.setTotalAcivityAmount(BigDecimal.ZERO);
             }
 
+            //增加批次信息
+            orderItem.setBatchCode(productInfo.getBatchCode());
+            orderItem.setBatchDate(productInfo.getBatchDate());
+            orderItem.setBatchInfoCode(productInfo.getBatchInfoCode());
+            orderItem.setWarehouseTypeCode(productInfo.getWarehouseTypeCode());
             orderItemList.add(orderItem);
         }
         log.info("构建订单商品明细行数据返回结果orderItemList={}",orderItemList);
@@ -1322,7 +1331,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             }
 
             //获取商品详情
-            ProductInfo product = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, item.getSkuCode());
+            ProductInfo product = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, item.getSkuCode(), OrderConstant.SELECT_PRODUCT_COMPANY_CODE, item.getSkuCode());
             if (product == null) {
                 throw new BusinessException("第" + lineIndex + "行商品不存在");
             }
