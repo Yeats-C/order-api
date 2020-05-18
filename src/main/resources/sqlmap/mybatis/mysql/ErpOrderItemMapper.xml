@@ -161,7 +161,8 @@
                                        gift_line_code, company_code, company_name, sign_difference_reason, box_gross_weight, box_volume,
                                        product_brand_code,product_brand_name,product_category_code,product_category_name,activity_id,is_activity,activity_price,
                                        use_status, create_by_id, create_by_name, update_by_id, update_by_name, create_time,
-                                       update_time,top_coupon_discount_amount,top_coupon_amount)
+                                       update_time,top_coupon_discount_amount,top_coupon_amount,batch_code,batch_date
+                                       ,warehouse_type_code,batch_info_code)
         values (#{orderInfoDetailId}, #{orderStoreId}, #{orderStoreCode}, #{spuCode}, #{spuName},
                 #{skuCode}, #{skuName}, #{productPropertyCode}, #{productPropertyName}, #{supplierCode},
                 #{supplierName},
@@ -174,7 +175,8 @@
                 #{signDifferenceReason}, #{boxGrossWeight}, #{boxVolume},
                 #{productBrandCode},#{productBrandName},#{productCategoryCode},#{productCategoryName},#{activityId},#{isActivity},#{activityPrice},
                 #{useStatus}, #{createById}, #{createByName}, #{updateById},
-                #{updateByName}, sysdate(), sysdate(),#{topCouponDiscountAmount},#{topCouponAmount})
+                #{updateByName}, sysdate(), sysdate(),#{topCouponDiscountAmount},#{topCouponAmount},#{batchCode}
+                ,#{batchDate},#{warehouseTypeCode},#{batchInfoCode})
     </insert>
 
     <select id="getProductSales" resultType="java.math.BigDecimal" parameterType="com.aiqin.mgs.order.api.domain.Activity">

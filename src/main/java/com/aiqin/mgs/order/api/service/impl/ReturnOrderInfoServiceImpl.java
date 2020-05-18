@@ -4,7 +4,10 @@ import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.base.*;
+import com.aiqin.mgs.order.api.base.ConstantData;
+import com.aiqin.mgs.order.api.base.PageRequestVO;
+import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.component.SequenceService;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOperationTypeEnum;
@@ -46,7 +49,6 @@ import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.logging.log4j.spi.LoggerRegistry;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,7 +61,6 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -1044,6 +1045,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     returnOrderDetail.setBarCode(eoi.getBarCode());
                     //批次
                     returnOrderDetail.setBatchInfoCode(eoi.getBatchInfoCode());
+//                    returnOrderDetail.setBatchNumber(eoi.getBatchNumber());
                     returnOrderDetail.setBatchCode(eoi.getBatchCode());
                     returnOrderDetail.setBatchDate(eoi.getBatchDate());
                     //可用赠品额度
@@ -1071,6 +1073,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     returnOrderDetail.setBarCode(eoi.getBarCode());
                     //批次号
                     returnOrderDetail.setBatchInfoCode(eoi.getBatchInfoCode());
+//                    returnOrderDetail.setBatchNumber(eoi.getBatchNumber());
                     returnOrderDetail.setBatchCode(eoi.getBatchCode());
                     returnOrderDetail.setBatchDate(eoi.getBatchDate());
                     //可用赠品额度
