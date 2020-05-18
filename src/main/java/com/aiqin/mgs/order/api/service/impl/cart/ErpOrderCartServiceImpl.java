@@ -1759,6 +1759,12 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         erpOrderCartInfo.setLineActivityDiscountTotal(BigDecimal.ZERO);
         erpOrderCartInfo.setLineAmountAfterActivity(BigDecimal.ZERO);
         erpOrderCartInfo.setGiftGiveType(ErpProductGiftGiveTypeEnum.TYPE_1.getCode());
+
+        if(null!=skuDetail.getBatchList()&&skuDetail.getBatchList().size()>0){
+            erpOrderCartInfo.setBatchCode(skuDetail.getBatchList().get(0).getBatchCode());
+            erpOrderCartInfo.setBatchInfoCode(skuDetail.getBatchList().get(0).getBatchInfoCode());
+            erpOrderCartInfo.setBatchDate(skuDetail.getBatchList().get(0).getBatchDate());
+        }
         return erpOrderCartInfo;
     }
 
@@ -1828,6 +1834,12 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 erpOrderCartInfo.setLineActivityDiscountTotal(BigDecimal.ZERO);
                 erpOrderCartInfo.setLineAmountAfterActivity(BigDecimal.ZERO);
                 erpOrderCartInfo.setGiftGiveType(ErpProductGiftGiveTypeEnum.TYPE_1.getCode());
+
+                if(null!=skuDetail.getBatchList()&&skuDetail.getBatchList().size()>0){
+                    erpOrderCartInfo.setBatchCode(skuDetail.getBatchList().get(0).getBatchCode());
+                    erpOrderCartInfo.setBatchInfoCode(skuDetail.getBatchList().get(0).getBatchInfoCode());
+                    erpOrderCartInfo.setBatchDate(skuDetail.getBatchList().get(0).getBatchDate());
+                }
             }
         }
         return erpOrderCartInfo;
