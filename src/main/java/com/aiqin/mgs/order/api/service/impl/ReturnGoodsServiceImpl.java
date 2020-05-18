@@ -9,10 +9,7 @@ import com.aiqin.mgs.order.api.domain.OperationLog;
 import com.aiqin.mgs.order.api.domain.OperationOrderLog;
 import com.aiqin.mgs.order.api.domain.ReturnOrderDetail;
 import com.aiqin.mgs.order.api.domain.request.returngoods.QueryReturnOrderManagementReqVO;
-import com.aiqin.mgs.order.api.domain.response.returngoods.QueryReturnOrderManagementRespVO;
-import com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderDetailRespVO;
-import com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderInfoApplyInboundDetailRespVO;
-import com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderInfoItemRespVO;
+import com.aiqin.mgs.order.api.domain.response.returngoods.*;
 import com.aiqin.mgs.order.api.service.ReturnGoodsService;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +48,9 @@ public class ReturnGoodsServiceImpl implements ReturnGoodsService {
         // 查询退货单商品信息
         List<ReturnOrderInfoItemRespVO> itemList = returnOrderDetailDao.selectReturnOrderList(code);
         respVO.setItemList(itemList);
+        // 查询退货单批次商品信息
+        List<ReturnOrderInfoItemBatchRespVO> itemBatchList = returnOrderDetailDao.selectReturnOrderBatchList(code);
+        respVO.setItemBatchList(itemBatchList);
 
         // 查询退货单日志信息
         List<OperationOrderLog> logList = operationLogDao.searchOrderLog(code, 2);

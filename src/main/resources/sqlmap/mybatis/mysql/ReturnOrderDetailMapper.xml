@@ -544,12 +544,21 @@
      select
          sku_code skuCode, sku_name skuName, picture_url pictureUrl, product_spec productSpec,
          color_name colorName, model_code modelCode, unit_name unitName, activity_code activityCode,
-         product_type productType, product_status productStatus, return_product_count returnProductCount,
-         base_product_spec baseProductSpec, actual_return_product_count actualReturnProductCount,
-         product_amount productAmount, total_product_amount totalProductAmount,
-         actual_total_product_amount actualTotalProductAmount, channel_amount channelAmount,
-         channel_total_amount channelTotalAmount, actual_channel_total_amount actualChannelTotalAmount,
+         product_type productType, product_status productStatus, sum(return_product_count) returnProductCount,
+         base_product_spec baseProductSpec, sum(actual_return_product_count) actualReturnProductCount,
+         product_amount productAmount, sum(total_product_amount) totalProductAmount,
+         sum(actual_total_product_amount) actualTotalProductAmount, channel_amount channelAmount,
+         sum(channel_total_amount) channelTotalAmount, sum(actual_channel_total_amount) actualChannelTotalAmount,
          gift_line_code giftLineLode
+     from return_order_detail
+     where return_order_code = #{returnOrderCode}
+     group by sku_code,batch_info_code
+    </select>
+
+    <select id="selectReturnOrderBatchList" resultType="com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderInfoItemBatchRespVO">
+     select
+         sku_code skuCode, sku_name skuName,batch_code batchCode,return_product_count returnProductCount,
+         actual_return_product_count actualReturnProductCount
      from return_order_detail
      where return_order_code = #{returnOrderCode}
     </select>
