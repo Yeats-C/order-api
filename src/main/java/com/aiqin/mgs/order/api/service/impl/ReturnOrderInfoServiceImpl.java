@@ -301,7 +301,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 reqVo.setTreatmentMethod(TreatmentMethodEnum.RETURN_AMOUNT_AND_GOODS_TYPE.getCode());
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg();
                 //同步数据到供应链
-                sysFlag = true;
+                 sysFlag= true;
                 break;
             case 2:
                 reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_APPLY.getKey());
@@ -1044,6 +1044,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     returnOrderDetail.setProductCategoryName(eoi.getProductCategoryName());
                     returnOrderDetail.setBarCode(eoi.getBarCode());
                     //批次
+                    returnOrderDetail.setBatchInfoCode(eoi.getBatchInfoCode());
 //                    returnOrderDetail.setBatchNumber(eoi.getBatchNumber());
                     returnOrderDetail.setBatchCode(eoi.getBatchCode());
                     returnOrderDetail.setBatchDate(eoi.getBatchDate());
@@ -1071,6 +1072,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     returnOrderDetail.setProductCategoryName(eoi.getProductCategoryName());
                     returnOrderDetail.setBarCode(eoi.getBarCode());
                     //批次号
+                    returnOrderDetail.setBatchInfoCode(eoi.getBatchInfoCode());
 //                    returnOrderDetail.setBatchNumber(eoi.getBatchNumber());
                     returnOrderDetail.setBatchCode(eoi.getBatchCode());
                     returnOrderDetail.setBatchDate(eoi.getBatchDate());
