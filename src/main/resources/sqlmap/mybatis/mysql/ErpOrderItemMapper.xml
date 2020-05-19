@@ -29,6 +29,7 @@
         product_type as productType,
         product_count as productCount,
         product_amount as productAmount,
+        product_amount as priceTax,
         purchase_amount as purchaseAmount,
         total_product_amount as totalProductAmount,
         actual_total_product_amount as actualTotalProductAmount,
