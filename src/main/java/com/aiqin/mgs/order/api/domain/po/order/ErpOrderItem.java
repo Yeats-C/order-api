@@ -292,14 +292,17 @@ public class ErpOrderItem extends PagesRequest {
 
     /***批次*/
     @ApiModelProperty(value = "批次号")
-    private String batchNumber;
+    @JsonProperty("batch_code")
+    private String batchCode;
 
     @ApiModelProperty(value = "批次号时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonProperty("batch_date")
     private Date batchDate;
 
     @ApiModelProperty(value = "批次编码号")
-    private String batchCode;
+    @JsonProperty("batch_info_code")
+    private String batchInfoCode;
 
 
     public String getProductTypeDesc() {
