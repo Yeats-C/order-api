@@ -48,7 +48,7 @@ public class ErpOrderCreateController {
         logger.info("erp从购物车创建订单：{}", erpOrderSaveRequest);
         HttpResponse response = HttpResponse.success();
         try {
-            AuthUtil.loginCheck();
+//            AuthUtil.loginCheck();
             AuthToken auth = AuthUtil.getCurrentAuth();
             ErpOrderInfo erpOrderInfo = erpOrderCreateService.erpSaveOrder(erpOrderSaveRequest, auth);
             response.setData(erpOrderInfo);

@@ -250,10 +250,14 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             // 按照sku汇总数量  但是得增加批次信息
             //锁库sku信息集合
             List<StockLockDetailRequest> list = new ArrayList<>();
-            //sku总数量集合
+            //销售库sku总数量集合
             Map<String,Long> countMap=new HashMap<>();
-            //sku批次信息集合
+            //销售库sku批次信息集合
             Map<String,List<StockBatchInfoRequest>> productMap=new HashMap<>();
+            //特卖库sku总数量集合
+            Map<String,Long> countMap2=new HashMap<>();
+            //特卖库sku批次信息集合
+            Map<String,List<StockBatchInfoRequest>> productMap2=new HashMap<>();
             //记录skuCode和行号对应关系
             Map<String,Long> skuCodeLineMap=new HashMap<>();
             //赠品
@@ -264,8 +268,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             List<ErpOrderItem> integralGiftList=new ArrayList<>();
             //汇总sku
             for(ErpOrderItem item:itemList){
-                Long count=countMap.get(item.getSkuCode());
-                List<StockBatchInfoRequest> batchList=productMap.get(item.getSkuCode());
+
                 //TODO 商品批次相关信息还得增加销售库特卖库标识
                 StockBatchInfoRequest stockBatchInfoRequest=new StockBatchInfoRequest();
                 stockBatchInfoRequest.setBatchCode(item.getBatchCode());
@@ -273,16 +276,45 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 stockBatchInfoRequest.setChangeCount(item.getProductCount());
                 stockBatchInfoRequest.setSkuCode(item.getSkuCode());
                 stockBatchInfoRequest.setSkuName(item.getSkuName());
-                if(null!=countMap.get(item.getSkuCode())){
-                    count=count+item.getProductCount();
-                    batchList.add(stockBatchInfoRequest);
-                }else {
-                    count=item.getProductCount();
-                    batchList=new ArrayList<>();
-                    batchList.add(stockBatchInfoRequest);
+                stockBatchInfoRequest.setWarehouseType(Integer.valueOf(item.getWarehouseTypeCode()));
+                if(item.getWarehouseTypeCode().equals("1")){
+                    Long count=countMap.get(item.getSkuCode());
+                    List<StockBatchInfoRequest> batchList=productMap.get(item.getSkuCode());
+                    if(null!=countMap.get(item.getSkuCode())){
+                        count=count+item.getProductCount();
+                        if(null!=stockBatchInfoRequest.getBatchInfoCode()){
+                            batchList.add(stockBatchInfoRequest);
+                        }
+                    }else {
+                        count=item.getProductCount();
+                        if(null!=stockBatchInfoRequest.getBatchInfoCode()){
+                            batchList=new ArrayList<>();
+                            batchList.add(stockBatchInfoRequest);
+                        }
+
+                    }
+                    countMap.put(item.getSkuCode(),count);
+                    productMap.put(item.getSkuCode(),batchList);
+                }else if(item.getWarehouseTypeCode().equals("2")){
+                    Long count=countMap2.get(item.getSkuCode());
+                    List<StockBatchInfoRequest> batchList=productMap2.get(item.getSkuCode());
+                    if(null!=countMap2.get(item.getSkuCode())){
+                        count=count+item.getProductCount();
+                        if(null!=stockBatchInfoRequest.getBatchInfoCode()){
+                            batchList.add(stockBatchInfoRequest);
+                        }
+                    }else {
+                        count=item.getProductCount();
+                        if(null!=stockBatchInfoRequest.getBatchInfoCode()){
+                            batchList=new ArrayList<>();
+                            batchList.add(stockBatchInfoRequest);
+                        }
+
+                    }
+                    countMap2.put(item.getSkuCode(),count);
+                    productMap2.put(item.getSkuCode(),batchList);
                 }
-                countMap.put(item.getSkuCode(),count);
-                productMap.put(item.getSkuCode(),batchList);
+
                 //筛选出商品数据
                 if(ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductType())){
                     productList.add(item);
@@ -315,6 +347,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                     skuCodeLineMap.put(eoi.getSkuCode(),eoi.getLineCode());
                 }
             }
+            //销售库数据
             for(Map.Entry<String,Long> data:countMap.entrySet()){
                 String skuCode=data.getKey();
                 StockLockDetailRequest stockLockDetailRequest=new StockLockDetailRequest();
@@ -322,7 +355,20 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 stockLockDetailRequest.setCityCode(order.getCityId());
                 stockLockDetailRequest.setProvinceCode(order.getProvinceId());
                 stockLockDetailRequest.setSkuCode(skuCode);
+                stockLockDetailRequest.setWarehouseTypeCode(1);
                 stockLockDetailRequest.setBatchList(productMap.get(skuCode));
+                list.add(stockLockDetailRequest);
+            }
+            //特卖库数据
+            for(Map.Entry<String,Long> data:countMap2.entrySet()){
+                String skuCode=data.getKey();
+                StockLockDetailRequest stockLockDetailRequest=new StockLockDetailRequest();
+                stockLockDetailRequest.setChangeCount(countMap.get(skuCode).intValue());
+                stockLockDetailRequest.setCityCode(order.getCityId());
+                stockLockDetailRequest.setProvinceCode(order.getProvinceId());
+                stockLockDetailRequest.setSkuCode(skuCode);
+                stockLockDetailRequest.setWarehouseTypeCode(2);
+                stockLockDetailRequest.setBatchList(productMap2.get(skuCode));
                 list.add(stockLockDetailRequest);
             }
 //            for (ErpOrderItem item :
