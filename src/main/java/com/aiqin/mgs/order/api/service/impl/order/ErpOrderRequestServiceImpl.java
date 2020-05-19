@@ -188,6 +188,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             AuthUtil.addParameter(httpClient, auth);
             HttpResponse<Boolean> response = httpClient.action().result(new TypeReference<HttpResponse<Boolean>>() {
             });
+            logger.info("取消订单请求回调为：response{}", response);
             if (RequestReturnUtil.validateHttpResponse(response)) {
                 if (response.getData()) {
                     flag = true;
@@ -595,7 +596,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/unlock/info").json(paramMap);
             HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
             });
-
+            log.info("解锁库存回调为response={}"+response);
             if (!RequestReturnUtil.validateHttpResponse(response)) {
                 throw new BusinessException(response.getMessage());
             }
