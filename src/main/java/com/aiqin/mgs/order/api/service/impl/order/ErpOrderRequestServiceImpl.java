@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.service.impl.order;
 
 import com.aiqin.ground.util.http.HttpClient;
+import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderLockStockTypeEnum;
@@ -188,7 +189,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             AuthUtil.addParameter(httpClient, auth);
             HttpResponse<Boolean> response = httpClient.action().result(new TypeReference<HttpResponse<Boolean>>() {
             });
-            logger.info("取消订单请求回调为：response{}", response);
+            logger.info("取消订单请求回调为：response{}", JsonUtil.toJson(response));
             if (RequestReturnUtil.validateHttpResponse(response)) {
                 if (response.getData()) {
                     flag = true;
@@ -596,7 +597,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/unlock/info").json(paramMap);
             HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
             });
-            log.info("解锁库存回调为response={}"+response);
+            log.info("解锁库存回调为response={}"+ JsonUtil.toJson(response));
             if (!RequestReturnUtil.validateHttpResponse(response)) {
                 throw new BusinessException(response.getMessage());
             }
