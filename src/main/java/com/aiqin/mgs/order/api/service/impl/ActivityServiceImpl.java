@@ -759,13 +759,13 @@ public class ActivityServiceImpl implements ActivityService {
         ShoppingCartRequest shoppingCartRequest=new ShoppingCartRequest();
         shoppingCartRequest.setStoreId(spuProductReqVO.getStoreId());
         //通过门店id返回门店省市公司信息
-        HttpResponse<StoreInfo> storeInfo = bridgeProductService.getStoreInfo(shoppingCartRequest);
-        if(storeInfo==null||storeInfo.getData()==null){
+        StoreInfo store = bridgeProductService.getStoreInfoByStoreId(shoppingCartRequest.getStoreId());
+        if(store==null){
             return HttpResponse.failure(ResultCode.NO_HAVE_STORE_ERROR);
         }
         spuProductReqVO.setCompanyCode("14");
-        spuProductReqVO.setProvinceCode(storeInfo.getData().getProvinceId());
-        spuProductReqVO.setCityCode(storeInfo.getData().getCityId());
+        spuProductReqVO.setProvinceCode(store.getProvinceId());
+        spuProductReqVO.setCityCode(store.getCityId());
         //设置查询库房 1销售库  2特卖库
         spuProductReqVO.setWarehouseTypeCode("1");
         Activity activity=new Activity();
