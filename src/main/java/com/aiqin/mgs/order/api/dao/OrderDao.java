@@ -19,6 +19,7 @@ import com.aiqin.mgs.order.api.domain.request.statistical.SkuSalesRequest;
 import com.aiqin.mgs.order.api.domain.response.*;
 import com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoRespVO;
 import com.aiqin.mgs.order.api.domain.response.order.QueryOrderListRespVO;
+import com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderInfoItemBatchRespVO;
 import com.aiqin.mgs.order.api.domain.response.statistical.Last10DaysOrderStatistical;
 import com.aiqin.mgs.order.api.domain.statistical.BusinessStatistical;
 import com.aiqin.mgs.order.api.domain.statistical.SkuSales;
@@ -230,4 +231,7 @@ public interface OrderDao {
 
     /** 计算订单商品总和*/
     Long orderProductBySum(String orderStoreCode);
+
+    /** 通过编码查询订单批次商品*/
+    List<ReturnOrderInfoItemBatchRespVO> orderProductBatchByOrder(String orderCode);
 }

@@ -17,6 +17,10 @@ public class ReturnOrderInfoItemBatchRespVO {
     @JsonProperty("sku_name")
     private String skuName;
 
+    @ApiModelProperty("行号")
+    @JsonProperty("line_code")
+    private String lineCode;
+
     @ApiModelProperty("批次号【展示字段】")
     @JsonProperty("batch_code")
     private String batchCode;

@@ -1637,14 +1637,14 @@
         b.product_spec bspec, b.color_name bcolor_name, b.model_code bmodel, b.unit_name bunit_name,
         b.zero_disassembly_coefficient bzero_disassembly_coefficient, b.product_type bproduct_type,
         ifnull(b.product_amount, 0) bproduct_amount, ifnull(b.purchase_amount, 0) bpurchase_amount,
-        ifnull(b.product_count, 0) bproduct_count, ifnull(b.actual_product_count, 0) bactual_product_count,
-        b.total_product_amount bamount, b.total_product_amount btotal_product_amount,
-        b.total_preferential_amount btotal_preferential_amount,
-        b.total_acivity_amount btotal_acivity_amount, b.activity_code bactivity_code,
+        sum(ifnull(b.product_count, 0)) bproduct_count, sum(ifnull(b.actual_product_count, 0)) bactual_product_count,
+        sum(b.total_product_amount) bamount, sum(b.total_product_amount) btotal_product_amount,
+        sum(b.total_preferential_amount) btotal_preferential_amount,
+        sum(b.total_acivity_amount) btotal_acivity_amount, b.activity_code bactivity_code,
         b.gift_line_code bgift_line_code, b.return_product_count breturn_product_count,
-        ifnull(b.product_count * b.purchase_amount, 0) btotal_purchase_amount,
-        ifnull(b.actual_product_count * b.product_amount, 0) bactual_total_product_amount,
-        ifnull(b.actual_product_count * b.purchase_amount, 0) bactual_total_purchase_amount,
+        sum(ifnull(b.product_count * b.purchase_amount, 0)) btotal_purchase_amount,
+        sum(ifnull(b.actual_product_count * b.product_amount, 0)) bactual_total_product_amount,
+        sum(ifnull(b.actual_product_count * b.purchase_amount, 0)) bactual_total_purchase_amount,
 
         o.operation_type ooperation_type, o.operation_content ooperation_content,
         o.remark oremark, o.create_by_name ocreate_by_name, o.create_time ocreate_time,
@@ -1664,9 +1664,17 @@
         left join order_store_logistics l on l.logistics_id = a.logistics_id
 --         left join order_store_detail_batch d on d.order_store_code = a.order_store_code
         where o.source_type = 0 and a.order_store_code = #{orderCode}
+        group by sku_code,batch_info_code,a.order_store_code
     </select>
     <select id="orderProductBySum" resultType="java.lang.Long">
       select sum(product_count) from order_store_detail
+      where order_store_code = #{orderStoreCode}
+    </select>
+    <select id="orderProductBatchByOrder" resultType="com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderInfoItemBatchRespVO">
+      select
+      line_code lineCode, sku_code skuCode, sku_name skuName,batch_code batchCode, batch_info_code batchInfoCode, supplier_code supplierCode, supplier_name supplierName,
+      product_count productCount, actual_inbound_count actualReturnProductCount, return_product_count returnProductCount
+      from order_store_detail
       where order_store_code = #{orderStoreCode}
     </select>
 </mapper>

@@ -1042,7 +1042,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     returnOrderDetail.setProductCategoryName(eoi.getProductCategoryName());
                     returnOrderDetail.setBarCode(eoi.getBarCode());
                     //批次
-                    returnOrderDetail.setBatchNumber(eoi.getBatchNumber());
+                    returnOrderDetail.setBatchNumber(eoi.getBatchCode());
                     returnOrderDetail.setBatchCode(eoi.getBatchCode());
                     returnOrderDetail.setBatchDate(eoi.getBatchDate());
                     //可用赠品额度
@@ -1069,7 +1069,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     returnOrderDetail.setProductCategoryName(eoi.getProductCategoryName());
                     returnOrderDetail.setBarCode(eoi.getBarCode());
                     //批次号
-                    returnOrderDetail.setBatchNumber(eoi.getBatchNumber());
+                    returnOrderDetail.setBatchNumber(eoi.getBatchCode());
                     returnOrderDetail.setBatchCode(eoi.getBatchCode());
                     returnOrderDetail.setBatchDate(eoi.getBatchDate());
                     //可用赠品额度

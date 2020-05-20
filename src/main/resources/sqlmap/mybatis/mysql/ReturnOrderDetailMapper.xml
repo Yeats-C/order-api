@@ -552,7 +552,7 @@
          gift_line_code giftLineLode
      from return_order_detail
      where return_order_code = #{returnOrderCode}
-     group by sku_code,batch_info_code
+     group by sku_code,batch_info_code,return_order_code
     </select>
 
     <select id="selectReturnOrderBatchList" resultType="com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderInfoItemBatchRespVO">
