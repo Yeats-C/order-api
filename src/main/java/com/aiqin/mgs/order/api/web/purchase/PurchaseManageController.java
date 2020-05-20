@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.web.purchase;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.domain.PurchaseBatch;
 import com.aiqin.mgs.order.api.domain.request.purchase.PurchaseApplyRequest;
 import com.aiqin.mgs.order.api.domain.request.purchase.PurchaseOrderProductRequest;
 import com.aiqin.mgs.order.api.domain.response.purchase.*;
@@ -12,10 +13,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -89,6 +87,29 @@ public class PurchaseManageController {
         request.setPageSize(pageSize);
         request.setPageNo(pageNo);
         return purchaseManageService.purchaseOrderProduct(request);
+    }
+
+    @GetMapping("/order/product/batch")
+    @ApiOperation("查询采购单商品-商品批次列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "purchase_order_code", value = "采购单code", type = "String"),
+            @ApiImplicitParam(name = "is_page", value = "是否分页 0.分页 1.不分页", type = "Integer"),
+            @ApiImplicitParam(name = "page_no", value = "当前页", type = "Integer"),
+            @ApiImplicitParam(name = "page_size", value = "每页条数", type = "Integer")})
+    public HttpResponse<PageResData<PurchaseBatch>> purchaseOrderProductBatch(@RequestParam("purchase_order_code") String purchaseOrderCode,
+                                                                   @RequestParam(value = "is_page", required = false) Integer isPage,
+                                                                   @RequestParam(value = "page_no", required = false) Integer pageNo,
+                                                                   @RequestParam(value = "page_size", required = false) Integer pageSize) {
+        PurchaseOrderProductRequest request = new PurchaseOrderProductRequest(purchaseOrderCode, isPage);
+        request.setPageSize(pageSize);
+        request.setPageNo(pageNo);
+        return purchaseManageService.purchaseOrderProductBatch(request);
+    }
+
+    @PostMapping("insert/batch/product")
+    @ApiOperation("新增商品批次列表")
+    public HttpResponse insertBatch(@RequestBody  PurchaseBatch purchaseBatch){
+        return purchaseManageService.insertBatch(purchaseBatch);
     }
 
 }
