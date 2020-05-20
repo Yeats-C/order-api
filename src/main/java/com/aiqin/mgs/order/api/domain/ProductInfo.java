@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 商品信息
@@ -64,5 +65,18 @@ public class ProductInfo {
     private BigDecimal boxGrossWeight;
     /***箱子体积*/
     private BigDecimal boxVolume;
+
+    /***批次号*/
+    private String batchCode;
+
+
+    /***批次日期*/
+    private Date batchDate;
+
+    /***批次编号*/
+    private String batchInfoCode;
+
+    /***传入库房编码:1:销售库，2:特卖库*/
+    private String warehouseTypeCode;
 
 }

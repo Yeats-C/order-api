@@ -4,7 +4,10 @@ import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.base.*;
+import com.aiqin.mgs.order.api.base.ConstantData;
+import com.aiqin.mgs.order.api.base.PageRequestVO;
+import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.component.SequenceService;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOperationTypeEnum;
@@ -46,7 +49,6 @@ import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.logging.log4j.spi.LoggerRegistry;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,7 +61,6 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -171,6 +172,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             detail.setProductStatus(productStatus);
             return detail;
         }).collect(Collectors.toList());
+        //增加批次字段
         log.info("发起退货--插入退货详情，details={}",details);
         returnOrderDetailDao.insertBatch(details);
         //添加日志
@@ -299,7 +301,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 reqVo.setTreatmentMethod(TreatmentMethodEnum.RETURN_AMOUNT_AND_GOODS_TYPE.getCode());
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg();
                 //同步数据到供应链
-                sysFlag = true;
+                 sysFlag= true;
                 break;
             case 2:
                 reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_APPLY.getKey());
@@ -1042,7 +1044,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     returnOrderDetail.setProductCategoryName(eoi.getProductCategoryName());
                     returnOrderDetail.setBarCode(eoi.getBarCode());
                     //批次
-                    returnOrderDetail.setBatchNumber(eoi.getBatchCode());
+                    returnOrderDetail.setBatchInfoCode(eoi.getBatchInfoCode());
+//                    returnOrderDetail.setBatchNumber(eoi.getBatchNumber());
                     returnOrderDetail.setBatchCode(eoi.getBatchCode());
                     returnOrderDetail.setBatchDate(eoi.getBatchDate());
                     //可用赠品额度
@@ -1069,7 +1072,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     returnOrderDetail.setProductCategoryName(eoi.getProductCategoryName());
                     returnOrderDetail.setBarCode(eoi.getBarCode());
                     //批次号
-                    returnOrderDetail.setBatchNumber(eoi.getBatchCode());
+                    returnOrderDetail.setBatchInfoCode(eoi.getBatchInfoCode());
+//                    returnOrderDetail.setBatchNumber(eoi.getBatchNumber());
                     returnOrderDetail.setBatchCode(eoi.getBatchCode());
                     returnOrderDetail.setBatchDate(eoi.getBatchDate());
                     //可用赠品额度

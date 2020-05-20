@@ -29,6 +29,7 @@
         product_type as productType,
         product_count as productCount,
         product_amount as productAmount,
+        product_amount as priceTax,
         purchase_amount as purchaseAmount,
         total_product_amount as totalProductAmount,
         actual_total_product_amount as actualTotalProductAmount,
@@ -63,9 +64,10 @@
         update_time as updateTime,
         preferential_amount as preferentialAmount,
         top_coupon_amount as topCouponAmount,
-        batch_number as batchNumber,
         batch_code as batchCode,
-        batch_date as batchDate
+        batch_date as batchDate,
+        warehouse_type_code as warehouseTypeCode,
+        batch_info_code as batchInfoCode
         from order_store_detail
         where 1 = 1
         <if test=" id != null and id != '' ">
@@ -160,7 +162,8 @@
                                        gift_line_code, company_code, company_name, sign_difference_reason, box_gross_weight, box_volume,
                                        product_brand_code,product_brand_name,product_category_code,product_category_name,activity_id,is_activity,activity_price,
                                        use_status, create_by_id, create_by_name, update_by_id, update_by_name, create_time,
-                                       update_time,top_coupon_discount_amount,top_coupon_amount)
+                                       update_time,top_coupon_discount_amount,top_coupon_amount,batch_code,batch_date
+                                       ,warehouse_type_code,batch_info_code)
         values (#{orderInfoDetailId}, #{orderStoreId}, #{orderStoreCode}, #{spuCode}, #{spuName},
                 #{skuCode}, #{skuName}, #{productPropertyCode}, #{productPropertyName}, #{supplierCode},
                 #{supplierName},
@@ -173,7 +176,8 @@
                 #{signDifferenceReason}, #{boxGrossWeight}, #{boxVolume},
                 #{productBrandCode},#{productBrandName},#{productCategoryCode},#{productCategoryName},#{activityId},#{isActivity},#{activityPrice},
                 #{useStatus}, #{createById}, #{createByName}, #{updateById},
-                #{updateByName}, sysdate(), sysdate(),#{topCouponDiscountAmount},#{topCouponAmount})
+                #{updateByName}, sysdate(), sysdate(),#{topCouponDiscountAmount},#{topCouponAmount},#{batchCode}
+                ,#{batchDate},#{warehouseTypeCode},#{batchInfoCode})
     </insert>
 
     <select id="getProductSales" resultType="java.math.BigDecimal" parameterType="com.aiqin.mgs.order.api.domain.Activity">

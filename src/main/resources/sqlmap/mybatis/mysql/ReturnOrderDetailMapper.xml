@@ -44,7 +44,7 @@
         <result column="top_coupon_amount" property="topCouponAmount" jdbcType="DECIMAL"/>
         <result column="complimentary_amount" property="complimentaryAmount" jdbcType="DECIMAL"/>
         <result column="return_clothing_spinning" property="returnClothingSpinning" jdbcType="DECIMAL"/>
-        <result column="batch_number" property="batchNumber" jdbcType="VARCHAR"/>
+        <result column="batch_info_code" property="batchInfoCode" jdbcType="VARCHAR"/>
         <result column="batch_date" property="batchDate" jdbcType="TIMESTAMP"/>
         <result column="batch_code" property="batchCode" jdbcType="VARCHAR"/>
         <result column="channel_amount" property="channelAmount" jdbcType="DECIMAL"/>
@@ -61,7 +61,7 @@
     update_by_id, update_by_name, create_time, update_time, remark, evidence_url, preferential_amount,
     product_category_code,product_category_name,bar_code,complimentary_amount
     product_category_code,product_category_name,bar_code,top_coupon_discount_amount,top_coupon_amount,complimentary_amount,
-    return_clothing_spinning,batch_number,batch_date,batch_code
+    return_clothing_spinning,batch_info_code,batch_date,batch_code
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
         select
@@ -441,7 +441,8 @@
         sku_code, sku_name,total_product_amount,return_product_count,model_code,product_status,
         product_spec,unit_name,color_code,color_name,create_by_id, create_by_name,picture_url,
         create_time,remark,evidence_url,preferential_amount,line_code,unit_code,tax_rate,
-        product_amount,product_category_code,product_category_name,bar_code,top_coupon_discount_amount,top_coupon_amount)
+        product_amount,product_category_code,product_category_name,bar_code,top_coupon_discount_amount,top_coupon_amount,
+        batch_info_code,batch_date,batch_code)
         values
         <foreach collection="records" item="item" index="index" separator=",">
             (
@@ -456,7 +457,8 @@
             #{item.pictureUrl,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP},
             #{item.remark,jdbcType=VARCHAR},#{item.evidenceUrl,jdbcType=VARCHAR},#{item.preferentialAmount,jdbcType=DECIMAL},
             #{item.lineCode},#{item.unitCode},#{item.taxRate},#{item.productAmount},
-            #{item.productCategoryCode},#{item.productCategoryName},#{item.barCode},#{item.topCouponDiscountAmount},#{item.topCouponAmount}
+            #{item.productCategoryCode},#{item.productCategoryName},#{item.barCode},#{item.topCouponDiscountAmount},#{item.topCouponAmount},
+            #{item.batchInfoCode},#{item.batchDate},#{item.batchCode}
             )
         </foreach>
     </insert>
@@ -502,7 +504,7 @@
         sku_code, sku_name,total_product_amount,return_product_count,model_code,product_status,
         product_spec,unit_name,color_code,color_name,create_by_id, create_by_name,picture_url,
         create_time,remark,evidence_url,preferential_amount,line_code,actual_return_product_count,
-        actual_total_product_amount,product_amount,product_category_code,product_category_name,bar_code,complimentary_amount,batch_number
+        actual_total_product_amount,product_amount,product_category_code,product_category_name,bar_code,complimentary_amount,batch_info_code
         ,batch_code,batch_date)
         values
         <foreach collection="records" item="item" index="index" separator=",">
@@ -519,7 +521,7 @@
             #{item.remark,jdbcType=VARCHAR},#{item.evidenceUrl,jdbcType=VARCHAR},#{item.preferentialAmount,jdbcType=DECIMAL},
             #{item.lineCode},#{item.actualReturnProductCount},#{item.actualTotalProductAmount},
             #{item.productAmount},#{item.productCategoryCode},#{item.productCategoryName},#{item.barCode},
-            #{item.complimentaryAmount},#{item.batchNumber},#{item.batchCode},#{item.batchDate}
+            #{item.complimentaryAmount},#{item.batchInfoCode},#{item.batchCode},#{item.batchDate}
             )
         </foreach>
     </insert>

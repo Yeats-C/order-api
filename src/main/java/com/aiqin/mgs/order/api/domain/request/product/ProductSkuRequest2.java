@@ -18,7 +18,7 @@ public class ProductSkuRequest2 {
 
     @JsonProperty("warehouse_type_code")
     @ApiModelProperty( value = "传入库房编码:1:销售库，2:特卖库" )
-    private String  warehouseTypeCode;
+    private String  warehouseTypeCode="1";
 
 
     @ApiModelProperty("批次编号")

@@ -5,9 +5,9 @@ import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
-import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.po.order.*;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest;
+import com.aiqin.mgs.order.api.domain.request.product.ProductSkuRequest2;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetail;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderOperationControlResponse;
 import com.aiqin.mgs.order.api.service.ActivityService;
@@ -108,9 +108,24 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             for(ErpOrderItem item:orderItemList){
                 skuCodeList.add(item.getSkuCode());
             }
-            Map<String, ErpSkuDetail> skuDetailMap=getProductSkuDetailMap(order.getProvinceId(),order.getCityId(),skuCodeList);
+            List<ProductSkuRequest2> productSkuRequest2List=new ArrayList<>();
+            for (ErpOrderItem item :orderItemList) {
+                if (StringUtils.isEmpty(item.getSkuCode())) {
+                    throw new BusinessException("缺失sku编码");
+                }
+
+                ProductSkuRequest2 productSkuRequest2=new ProductSkuRequest2();
+                productSkuRequest2.setSkuCode(item.getSkuCode());
+                productSkuRequest2.setBatchInfoCode(item.getBatchInfoCode());
+                if(null==item.getWarehouseTypeCode()){
+                    item.setWarehouseTypeCode("1");
+                }
+                productSkuRequest2.setWarehouseTypeCode(item.getWarehouseTypeCode());
+                productSkuRequest2List.add(productSkuRequest2);
+            }
+            Map<String, ErpSkuDetail> skuDetailMap=bridgeProductService.getProductSkuDetailMap(order.getProvinceId(),order.getCityId(),productSkuRequest2List);
             for(ErpOrderItem item:orderItemList){
-                ErpSkuDetail detail=skuDetailMap.get(item.getSkuCode());
+                ErpSkuDetail detail=skuDetailMap.get(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
                 if (null!=detail){
                     item.setPriceTax(detail.getPriceTax());
                 }else{
@@ -144,6 +159,9 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                 }
                 if(null==item.getActualTotalProductAmount()){
                     item.setActualTotalProductAmount(BigDecimal.ZERO);
+                }
+                if(null==item.getPriceTax()){
+                    item.setPriceTax(BigDecimal.ZERO);
                 }
                 totalMoney=totalMoney.add(item.getPriceTax().multiply(new BigDecimal(item.getProductCount()))).setScale(2, RoundingMode.DOWN);
                 activityMoney=activityMoney.add(item.getTotalAcivityAmount()).setScale(2, RoundingMode.DOWN);
@@ -504,21 +522,5 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         }
     }
 
-    /**
-     * 获取sku详情，返回map
-     *
-     * @param provinceCode 省编码
-     * @param cityCode     市编码
-     * @param skuCodeList  sku编码list
-     * @return
-     */
-    private Map<String, ErpSkuDetail> getProductSkuDetailMap(String provinceCode, String cityCode, List<String> skuCodeList) {
-        Map<String, ErpSkuDetail> skuDetailMap = new HashMap<>(16);
-        List<ErpSkuDetail> productSkuDetailList = bridgeProductService.getProductSkuDetailList(provinceCode, cityCode, OrderConstant.SELECT_PRODUCT_COMPANY_CODE, skuCodeList);
-        for (ErpSkuDetail item :
-                productSkuDetailList) {
-            skuDetailMap.put(item.getSkuCode(), item);
-        }
-        return skuDetailMap;
-    }
+
 }
