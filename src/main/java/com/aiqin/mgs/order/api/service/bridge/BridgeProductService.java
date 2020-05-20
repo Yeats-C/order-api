@@ -586,6 +586,23 @@ public class BridgeProductService<main> {
         }
         return skuDetailMap;
     }
+    /**
+     * 获取sku详情，返回map
+     *
+     * @param provinceCode 省编码
+     * @param cityCode     市编码
+     * @param productSkuRequest2List  sku信息list
+     * @return
+     */
+    public Map<String, ErpSkuDetail> getProductSkuDetailMap1(String provinceCode, String cityCode, List<ProductSkuRequest2> productSkuRequest2List) {
+        Map<String, ErpSkuDetail> skuDetailMap = new HashMap<>(16);
+        List<ErpSkuDetail> productSkuDetailList = getProductSkuDetailList(provinceCode, cityCode, OrderConstant.SELECT_PRODUCT_COMPANY_CODE, productSkuRequest2List);
+        for (ErpSkuDetail item : productSkuDetailList) {
+
+            skuDetailMap.put(item.getSkuCode(), item);
+        }
+        return skuDetailMap;
+    }
 
 
 
