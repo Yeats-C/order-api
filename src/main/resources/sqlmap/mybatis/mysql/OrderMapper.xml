@@ -1673,7 +1673,8 @@
     <select id="orderProductBatchByOrder" resultType="com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderInfoItemBatchRespVO">
       select
       line_code lineCode, sku_code skuCode, sku_name skuName,batch_code batchCode, batch_info_code batchInfoCode, supplier_code supplierCode, supplier_name supplierName,
-      product_count productCount, actual_inbound_count actualReturnProductCount, return_product_count returnProductCount
+      product_count returnProductCount, actual_inbound_count actualReturnProductCount, return_product_count returnTotalCount,
+      batch_date productDate
       from order_store_detail
       where order_store_code = #{orderStoreCode}
     </select>

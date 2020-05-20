@@ -1,9 +1,12 @@
 package com.aiqin.mgs.order.api.domain.response.returngoods;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.Date;
 
 @Data
 @ApiModel("商品批次信息")
@@ -30,8 +33,9 @@ public class ReturnOrderInfoItemBatchRespVO {
     private String batchInfoCode;
 
     @ApiModelProperty("生产日期")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonProperty("product_date")
-    private String productDate;
+    private Date productDate;
 
     @ApiModelProperty("批次备注")
     @JsonProperty("batch_remark")
@@ -52,6 +56,10 @@ public class ReturnOrderInfoItemBatchRespVO {
     @ApiModelProperty("实发数量")
     @JsonProperty("actual_return_product_count")
     private String actualReturnProductCount;
+
+    @ApiModelProperty("退货数量")
+    @JsonProperty("return_total_count")
+    private String returnTotalCount;
 
     @ApiModelProperty("库位号")
     @JsonProperty("location_code")

@@ -559,9 +559,11 @@
 
     <select id="selectReturnOrderBatchList" resultType="com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderInfoItemBatchRespVO">
      select
-         sku_code skuCode, sku_name skuName,batch_code batchCode,return_product_count returnProductCount,
-         actual_return_product_count actualReturnProductCount
-     from return_order_detail
+         sku_code skuCode, sku_name skuName,batch_code batchCode,batch_info_code batchInfoCode,return_product_count returnProductCount,
+         actual_return_product_count actualReturnProductCount,batch_date productDate, ri.supplier_code supplierCode,
+         ri.supplier_name supplierName
+     from return_order_detail r
+     left join return_order_info ri on ri.return_order_code = r.return_order_code
      where return_order_code = #{returnOrderCode}
     </select>
     <select id="selectReturnOrder" resultType="com.aiqin.mgs.order.api.domain.ReturnOrderDetail">
