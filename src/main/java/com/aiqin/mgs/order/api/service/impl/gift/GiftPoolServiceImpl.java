@@ -242,10 +242,13 @@ public class GiftPoolServiceImpl implements GiftPoolService {
                 erpOrderCartInfo.setProductBrandName(skuDetail.getProductBrandName());
 
                 //增加批次信息
-                erpOrderCartInfo.setBatchCode(skuDetail.getBatchCode());
-                erpOrderCartInfo.setBatchInfoCode(skuDetail.getBatchInfoCode());
-                erpOrderCartInfo.setBatchDate(skuDetail.getBatchDate());
-                erpOrderCartInfo.setWarehouseTypeCode(item.getWarehouseTypeCode());
+                if(null!= skuDetail.getBatchList()&&skuDetail.getBatchList().size()>0&&null!=skuDetail.getBatchList().get(0).getBatchInfoCode()){
+                    //增加批次信息
+                    erpOrderCartInfo.setBatchCode(skuDetail.getBatchList().get(0).getBatchCode());
+                    erpOrderCartInfo.setBatchInfoCode(skuDetail.getBatchList().get(0).getBatchInfoCode());
+                    erpOrderCartInfo.setBatchDate(skuDetail.getBatchList().get(0).getBatchDate());
+                    erpOrderCartInfo.setWarehouseTypeCode(item.getWarehouseTypeCode());
+                }
                 addList.add(erpOrderCartInfo);
             }
 

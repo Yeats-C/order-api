@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.domain.request.activity;
 
 import com.aiqin.mgs.order.api.domain.Activity;
+import com.aiqin.mgs.order.api.domain.request.product.BatchRespVo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -110,6 +111,10 @@ public class ProductSkuRespVo5 {
     @ApiModelProperty("是否能使用A品卷 0否 1是")
     @JsonProperty("coupon_rule")
     private Integer couponRule=0;
+
+    @ApiModelProperty("批次信息")
+    @JsonProperty(value = "batch_list")
+    private List<BatchRespVo> batchList;
 
 
 
