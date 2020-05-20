@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.domain.po.gift;
 
 import com.aiqin.mgs.order.api.base.PagesRequest;
+import com.aiqin.mgs.order.api.domain.request.product.BatchRespVo;
 import com.aiqin.mgs.order.api.domain.request.product.StockBatchRespVO;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -121,4 +122,10 @@ public class GiftPool extends PagesRequest {
     @ApiModelProperty(value = "规格【爱掌柜使用】")
     @JsonProperty("spec")
     private String spec;
+
+    @ApiModelProperty("批次信息【爱掌柜使用】")
+    @JsonProperty(value = "batch_list")
+    private List<BatchRespVo> batchList;
+
+
 }
