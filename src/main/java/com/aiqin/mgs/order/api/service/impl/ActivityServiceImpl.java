@@ -18,6 +18,7 @@ import com.aiqin.mgs.order.api.domain.copartnerArea.PublicAreaStore;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
+import com.aiqin.mgs.order.api.domain.request.product.BatchRespVo;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import com.aiqin.mgs.order.api.service.CopartnerAreaService;
 import com.aiqin.mgs.order.api.service.CouponRuleService;
@@ -759,18 +760,19 @@ public class ActivityServiceImpl implements ActivityService {
         ShoppingCartRequest shoppingCartRequest=new ShoppingCartRequest();
         shoppingCartRequest.setStoreId(spuProductReqVO.getStoreId());
         //通过门店id返回门店省市公司信息
-        HttpResponse<StoreInfo> storeInfo = bridgeProductService.getStoreInfo(shoppingCartRequest);
-        if(storeInfo==null||storeInfo.getData()==null){
+        StoreInfo store = bridgeProductService.getStoreInfoByStoreId(shoppingCartRequest.getStoreId());
+        if(store==null){
             return HttpResponse.failure(ResultCode.NO_HAVE_STORE_ERROR);
         }
         spuProductReqVO.setCompanyCode("14");
-        spuProductReqVO.setProvinceCode(storeInfo.getData().getProvinceId());
-        spuProductReqVO.setCityCode(storeInfo.getData().getCityId());
+        spuProductReqVO.setProvinceCode(store.getProvinceId());
+        spuProductReqVO.setCityCode(store.getCityId());
         //设置查询库房 1销售库  2特卖库
         spuProductReqVO.setWarehouseTypeCode("1");
         Activity activity=new Activity();
         activity.setActivityId(spuProductReqVO.getActivityId());
         List<ActivityProduct> activityProducts=activityProductDao.activityProductList(activity);
+        Activity act=getActivityInformation(spuProductReqVO.getActivityId()).getData();
         if(null!=activityProducts && 0!=activityProducts.size()){
             Integer activityScope=activityProducts.get(0).getActivityScope();
             List<String> parameterList=new ArrayList<>();
@@ -842,6 +844,12 @@ public class ActivityServiceImpl implements ActivityService {
                     if(dataMap.containsKey(vo.getProductPropertyCode())){
                         //可使用优惠券
                         vo.setCouponRule(YesOrNoEnum.YES.getCode());
+                    }
+
+                    if(null!=vo.getBatchList()&&vo.getBatchList().size()>0){
+                        for(BatchRespVo batchRespVo:vo.getBatchList()){
+                            batchRespVo.setActivityType(act.getActivityType());
+                        }
                     }
                 }
             }else{

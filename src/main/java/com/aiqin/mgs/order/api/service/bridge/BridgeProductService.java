@@ -9,6 +9,7 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
+import com.aiqin.mgs.order.api.domain.FranchiseeInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.dto.ProductDistributorOrderDTO;
@@ -26,6 +27,7 @@ import com.aiqin.mgs.order.api.domain.request.stock.ProductSkuStockRespVo;
 import com.aiqin.mgs.order.api.domain.response.NewFranchiseeResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetail;
 import com.aiqin.mgs.order.api.domain.response.gift.StoreAvailableGiftQuotaResponse;
+import com.aiqin.mgs.order.api.domain.response.order.StoreFranchiseeInfoResponse;
 import com.aiqin.mgs.order.api.util.MathUtil;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -157,9 +159,12 @@ public class BridgeProductService<main> {
             shoppingCartProductRequest.setCityCode(cityCode);
             shoppingCartProductRequest.setProvinceCode(provinceCode);
             shoppingCartProductRequest.setCompanyCode(companyCode);
-            List<String> skuCodeList = new ArrayList<>();
-            skuCodeList.add(skuCode);
-            shoppingCartProductRequest.setSkuCodes(skuCodeList);
+            List<ProductSkuRequest2> productSkuRequest2List=new ArrayList<>();
+            ProductSkuRequest2 productSkuRequest2=new ProductSkuRequest2();
+            productSkuRequest2.setSkuCode(skuCode);
+            productSkuRequest2.setWarehouseTypeCode("1");
+            productSkuRequest2List.add(productSkuRequest2);
+            shoppingCartProductRequest.setProductSkuRequest2List(productSkuRequest2List);
             String path = "/search/spu/sku/detail2";
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest);
             HttpResponse<List<ErpSkuDetail>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ErpSkuDetail>>>() {
@@ -585,6 +590,52 @@ public class BridgeProductService<main> {
             skuDetailMap.put(item.getSkuCode()+"BATCH_INFO_CODE"+batchInfoCode, item);
         }
         return skuDetailMap;
+    }
+    /**
+     * 获取sku详情，返回map
+     *
+     * @param provinceCode 省编码
+     * @param cityCode     市编码
+     * @param productSkuRequest2List  sku信息list
+     * @return
+     */
+    public Map<String, ErpSkuDetail> getProductSkuDetailMap1(String provinceCode, String cityCode, List<ProductSkuRequest2> productSkuRequest2List) {
+        Map<String, ErpSkuDetail> skuDetailMap = new HashMap<>(16);
+        List<ErpSkuDetail> productSkuDetailList = getProductSkuDetailList(provinceCode, cityCode, OrderConstant.SELECT_PRODUCT_COMPANY_CODE, productSkuRequest2List);
+        for (ErpSkuDetail item : productSkuDetailList) {
+
+            skuDetailMap.put(item.getSkuCode(), item);
+        }
+        return skuDetailMap;
+    }
+
+
+    public StoreInfo getStoreInfoByStoreId(String storeId) {
+        StoreInfo storeInfo = new StoreInfo();
+        try {
+            HttpClient httpClient = HttpClient.get(urlProperties.getSlcsApi() + "/store/info?store_id=" + storeId);
+            HttpResponse<StoreFranchiseeInfoResponse> response = httpClient.action().result(new TypeReference<HttpResponse<StoreFranchiseeInfoResponse>>() {
+            });
+            if (!RequestReturnUtil.validateHttpResponse(response)) {
+                throw new BusinessException("获取门店信息失败");
+            }
+            StoreFranchiseeInfoResponse data = response.getData();
+            if (data == null) {
+                throw new BusinessException("无效的门店");
+            }
+            storeInfo = data.getStoreInfo();
+            FranchiseeInfo franchiseeInfo = data.getFranchiseeInfo();
+            if (storeInfo != null && franchiseeInfo != null) {
+                storeInfo.setFranchiseeName(franchiseeInfo.getFranchiseeName());
+            }
+        } catch (BusinessException e) {
+            log.info("获取门店信息失败：{}", e.getMessage());
+            throw new BusinessException(e.getMessage());
+        } catch (Exception e) {
+            log.info("获取门店信息失败：{}", e);
+            throw new BusinessException("获取门店信息失败");
+        }
+        return storeInfo;
     }
 
 

@@ -242,10 +242,13 @@ public class GiftPoolServiceImpl implements GiftPoolService {
                 erpOrderCartInfo.setProductBrandName(skuDetail.getProductBrandName());
 
                 //增加批次信息
-                erpOrderCartInfo.setBatchCode(skuDetail.getBatchCode());
-                erpOrderCartInfo.setBatchInfoCode(skuDetail.getBatchInfoCode());
-                erpOrderCartInfo.setBatchDate(skuDetail.getBatchDate());
-                erpOrderCartInfo.setWarehouseTypeCode(item.getWarehouseTypeCode());
+                if(null!= skuDetail.getBatchList()&&skuDetail.getBatchList().size()>0&&null!=skuDetail.getBatchList().get(0).getBatchInfoCode()){
+                    //增加批次信息
+                    erpOrderCartInfo.setBatchCode(skuDetail.getBatchList().get(0).getBatchCode());
+                    erpOrderCartInfo.setBatchInfoCode(skuDetail.getBatchList().get(0).getBatchInfoCode());
+                    erpOrderCartInfo.setBatchDate(skuDetail.getBatchList().get(0).getBatchDate());
+                    erpOrderCartInfo.setWarehouseTypeCode(item.getWarehouseTypeCode());
+                }
                 addList.add(erpOrderCartInfo);
             }
 
@@ -386,9 +389,9 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         }
         if(null!=productSkuRequest2List&& productSkuRequest2List.size()>0){
             //获取商品详情
-            Map<String, ErpSkuDetail> skuDetailMap = bridgeProductService.getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), productSkuRequest2List);
+            Map<String, ErpSkuDetail> skuDetailMap = bridgeProductService.getProductSkuDetailMap1(store.getProvinceId(), store.getCityId(), productSkuRequest2List);
             for (GiftPool item : giftPoolList) {
-                ErpSkuDetail erpSkuDetail=skuDetailMap.get(item.getSkuCode()+"BATCH_INFO_CODE");
+                ErpSkuDetail erpSkuDetail=skuDetailMap.get(item.getSkuCode());
                 if(null==erpSkuDetail){
                     throw new BusinessException("供应链调用 /search/spu/sku/detail2 接口 查询有误 ,skuCode为"+item.getSkuCode()+"商品查询失败");
                 }
@@ -399,7 +402,7 @@ public class GiftPoolServiceImpl implements GiftPoolService {
                 item.setColorName(erpSkuDetail.getColorName());
                 item.setModelNumber(erpSkuDetail.getModelNumber());
                 item.setSpec(erpSkuDetail.getSpec());
-
+                item.setBatchList(erpSkuDetail.getBatchList());
                 ShoppingCartRequest shoppingCartRequest=new ShoppingCartRequest();
                 shoppingCartRequest.setStoreId(giftPool.getStoreId());
                 shoppingCartRequest.setProductType(giftPool.getProductType());
