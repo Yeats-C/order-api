@@ -18,6 +18,7 @@ import com.aiqin.mgs.order.api.domain.copartnerArea.PublicAreaStore;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
+import com.aiqin.mgs.order.api.domain.request.product.BatchRespVo;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import com.aiqin.mgs.order.api.service.CopartnerAreaService;
 import com.aiqin.mgs.order.api.service.CouponRuleService;
@@ -771,6 +772,7 @@ public class ActivityServiceImpl implements ActivityService {
         Activity activity=new Activity();
         activity.setActivityId(spuProductReqVO.getActivityId());
         List<ActivityProduct> activityProducts=activityProductDao.activityProductList(activity);
+        Activity act=getActivityInformation(spuProductReqVO.getActivityId()).getData();
         if(null!=activityProducts && 0!=activityProducts.size()){
             Integer activityScope=activityProducts.get(0).getActivityScope();
             List<String> parameterList=new ArrayList<>();
@@ -842,6 +844,12 @@ public class ActivityServiceImpl implements ActivityService {
                     if(dataMap.containsKey(vo.getProductPropertyCode())){
                         //可使用优惠券
                         vo.setCouponRule(YesOrNoEnum.YES.getCode());
+                    }
+
+                    if(null!=vo.getBatchList()&&vo.getBatchList().size()>0){
+                        for(BatchRespVo batchRespVo:vo.getBatchList()){
+                            batchRespVo.setActivityType(act.getActivityType());
+                        }
                     }
                 }
             }else{

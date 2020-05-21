@@ -42,4 +42,9 @@ public class BatchRespVo {
     @ApiModelProperty("批次价格")
     @JsonProperty("batch_price")
     private BigDecimal batchPrice=new BigDecimal("0");
+
+    /**活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单*/
+    @ApiModelProperty(value = "活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单【爱掌柜使用字段】")
+    @JsonProperty("activity_type")
+    private Integer activityType;
 }
