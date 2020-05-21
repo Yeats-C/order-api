@@ -159,9 +159,12 @@ public class BridgeProductService<main> {
             shoppingCartProductRequest.setCityCode(cityCode);
             shoppingCartProductRequest.setProvinceCode(provinceCode);
             shoppingCartProductRequest.setCompanyCode(companyCode);
-            List<String> skuCodeList = new ArrayList<>();
-            skuCodeList.add(skuCode);
-            shoppingCartProductRequest.setSkuCodes(skuCodeList);
+            List<ProductSkuRequest2> productSkuRequest2List=new ArrayList<>();
+            ProductSkuRequest2 productSkuRequest2=new ProductSkuRequest2();
+            productSkuRequest2.setSkuCode(skuCode);
+            productSkuRequest2.setWarehouseTypeCode("1");
+            productSkuRequest2List.add(productSkuRequest2);
+            shoppingCartProductRequest.setProductSkuRequest2List(productSkuRequest2List);
             String path = "/search/spu/sku/detail2";
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest);
             HttpResponse<List<ErpSkuDetail>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ErpSkuDetail>>>() {
