@@ -512,101 +512,107 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
         Map<String,ErpOrderItem> activityAfterMap=new HashMap<>();
         //活动均摊
         for(Map.Entry<String, List<ErpOrderItem>> m:activityCartMap.entrySet()){
-            HttpResponse<ActivityRequest> activityDetailResponse = activityService.getActivityDetail(m.getKey());
-            ActivityRequest activityRequest=activityDetailResponse.getData();
-            Activity activity = activityRequest.getActivity();
-            List<ActivityRule> activityRules = activityRequest.getActivityRules();
-            /**活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单*/
-            Integer activityType = activity.getActivityType();
-            String activityId= m.getKey();
-            List<ErpOrderItem> li=m.getValue();
-            //商品总金额
-            BigDecimal productAmount=activityMoneyMap.get(activityId);
-            //商品总价值
-            BigDecimal productPriceAmount=activityPriceMoneyMap.get(activityId);
-            //缓存当前命中的规则
-            ActivityRule curRule = null;
-            //最小梯度
-            ActivityRule firstRule = null;
-            //商品数量
-            Integer quantity = quantityMap.get(activityId);
-            //优惠金额
-            BigDecimal youHuiAmount=BigDecimal.ZERO;
-            switch (activityType){
-                case 1:
-                    for(ActivityRule ruleItem:activityRules){
+            if(m.getKey() != null){
+                HttpResponse<ActivityRequest> activityDetailResponse = activityService.getActivityDetail(m.getKey());
+                ActivityRequest activityRequest=activityDetailResponse.getData();
+                if(activityRequest != null){
+                    Activity activity = activityRequest.getActivity();
+                    List<ActivityRule> activityRules = activityRequest.getActivityRules();
 
-                        //筛选最小梯度
-                        if (firstRule == null || ruleItem.getMeetingConditions().compareTo(firstRule.getMeetingConditions()) < 0) {
-                            firstRule = ruleItem;
-                        }
+                    /**活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单*/
+                    Integer activityType = activity.getActivityType();
+                    String activityId= m.getKey();
+                    List<ErpOrderItem> li=m.getValue();
+                    //商品总金额
+                    BigDecimal productAmount=activityMoneyMap.get(activityId);
+                    //商品总价值
+                    BigDecimal productPriceAmount=activityPriceMoneyMap.get(activityId);
+                    //缓存当前命中的规则
+                    ActivityRule curRule = null;
+                    //最小梯度
+                    ActivityRule firstRule = null;
+                    //商品数量
+                    Integer quantity = quantityMap.get(activityId);
+                    //优惠金额
+                    BigDecimal youHuiAmount=BigDecimal.ZERO;
+                    switch (activityType){
+                        case 1:
+                            for(ActivityRule ruleItem:activityRules){
 
-                        //是否把当前梯度作为命中梯度
-                        boolean flag = false;
-
-                        if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(ruleItem.getRuleUnit())) {
-                            //按照数量
-
-                            if (ruleItem.getMeetingConditions().compareTo(new BigDecimal(quantity)) <= 0) {
-                                if (curRule == null) {
-                                    flag = true;
-                                } else {
-                                    if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
-                                        flag = true;
-                                    }
+                                //筛选最小梯度
+                                if (firstRule == null || ruleItem.getMeetingConditions().compareTo(firstRule.getMeetingConditions()) < 0) {
+                                    firstRule = ruleItem;
                                 }
-                            }
 
-                        } else if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(ruleItem.getRuleUnit())) {
-                            //按照金额
+                                //是否把当前梯度作为命中梯度
+                                boolean flag = false;
 
-                            if (ruleItem.getMeetingConditions().compareTo(productPriceAmount) <= 0) {
-                                if (curRule == null) {
-                                    flag = true;
-                                } else {
-                                    if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
-                                        flag = true;
+                                if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(ruleItem.getRuleUnit())) {
+                                    //按照数量
+
+                                    if (ruleItem.getMeetingConditions().compareTo(new BigDecimal(quantity)) <= 0) {
+                                        if (curRule == null) {
+                                            flag = true;
+                                        } else {
+                                            if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                                flag = true;
+                                            }
+                                        }
                                     }
+
+                                } else if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(ruleItem.getRuleUnit())) {
+                                    //按照金额
+
+                                    if (ruleItem.getMeetingConditions().compareTo(productPriceAmount) <= 0) {
+                                        if (curRule == null) {
+                                            flag = true;
+                                        } else {
+                                            if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                                flag = true;
+                                            }
+                                        }
+                                    }
+
+                                } else {
+
                                 }
+
+                                if (flag) {
+                                    curRule = ruleItem;
+                                }
+
                             }
-
-                        } else {
-
-                        }
-
-                        if (flag) {
-                            curRule = ruleItem;
-                        }
+                            if (curRule != null) {//命中规则
+                                youHuiAmount=curRule.getPreferentialAmount();
+                                //满减活动商品总金额=商品总金额-优惠金额
+                                productAmount=productAmount.subtract(youHuiAmount);
+                            }
+                            break;
+                        case 2:
+                            break;
+                        case 3:
+                            break;
+                        case 4:
+                            break;
+                        case 5:
+                            break;
+                        case 6:
+                            break;
 
                     }
-                    if (curRule != null) {//命中规则
-                        youHuiAmount=curRule.getPreferentialAmount();
-                        //满减活动商品总金额=商品总金额-优惠金额
-                        productAmount=productAmount.subtract(youHuiAmount);
-                    }
-                    break;
-                case 2:
-                    break;
-                case 3:
-                    break;
-                case 4:
-                    break;
-                case 5:
-                    break;
-                case 6:
-                    break;
 
-            }
-            for(ErpOrderItem eo:li){
-                //分销总价=商品价值
-                BigDecimal fenxiaozongjia=eo.getProductAmount().multiply(new BigDecimal(eo.getProductCount()));
-                //分摊总额=商品价值X商品总金额/商品总价值
-                BigDecimal totalPreferentialAmount=fenxiaozongjia.multiply(productAmount).divide(productPriceAmount,2,BigDecimal.ROUND_HALF_UP);
-                //分摊单价
-                BigDecimal preferentialAmount=totalPreferentialAmount.divide(new BigDecimal(eo.getProductCount()),2,BigDecimal.ROUND_HALF_UP);
-                eo.setTotalPreferentialAmount(totalPreferentialAmount);
-                eo.setPreferentialAmount(preferentialAmount);
-                activityAfterMap.put(eo.getOrderInfoDetailId(),eo);
+                    for(ErpOrderItem eo:li){
+                        //分销总价=商品价值
+                        BigDecimal fenxiaozongjia=eo.getProductAmount().multiply(new BigDecimal(eo.getProductCount()));
+                        //分摊总额=商品价值X商品总金额/商品总价值
+                        BigDecimal totalPreferentialAmount=fenxiaozongjia.multiply(productAmount).divide(productPriceAmount,2,BigDecimal.ROUND_HALF_UP);
+                        //分摊单价
+                        BigDecimal preferentialAmount=totalPreferentialAmount.divide(new BigDecimal(eo.getProductCount()),2,BigDecimal.ROUND_HALF_UP);
+                        eo.setTotalPreferentialAmount(totalPreferentialAmount);
+                        eo.setPreferentialAmount(preferentialAmount);
+                        activityAfterMap.put(eo.getOrderInfoDetailId(),eo);
+                    }
+                }
             }
         }
         log.info("子单全部发货完成进行均摊--活动分摊--活动分摊后的数据 activityAfterMap={}",activityAfterMap);
