@@ -21,10 +21,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 @Slf4j
 @Service
 public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
@@ -189,6 +187,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
 
             log.info("根据订单编号查询订单详情信息 子订单支付信息为：itemOrderFee={}"+itemOrderFee);
             List<ErpOrderOperationLog> operationLogList = erpOrderOperationLogService.selectOrderOperationLogList(order.getOrderStoreCode());
+            Collections.reverse(operationLogList);
             order.setOperationLogList(operationLogList);
 
             if (ErpOrderLevelEnum.PRIMARY.getCode().equals(order.getOrderLevel())) {
