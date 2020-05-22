@@ -396,7 +396,10 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         ErpOrderCartInfo query = new ErpOrderCartInfo();
         query.setStoreId(erpCartQueryRequest.getStoreId());
         query.setProductType(erpCartQueryRequest.getProductType());
-        query.setLineCheckStatus(YesOrNoEnum.YES.getCode());
+
+        if(null!=erpCartQueryRequest.getLineCheckStatus()){
+            query.setLineCheckStatus(erpCartQueryRequest.getLineCheckStatus());
+        }
         List<ErpOrderCartInfo> cartLineList = this.selectByProperty(query);
 
         //分销价汇总
