@@ -264,6 +264,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                     erpOrderCartInfo.setBatchInfoCode(skuDetail.getBatchList().get(0).getBatchInfoCode());
                     erpOrderCartInfo.setBatchDate(skuDetail.getBatchList().get(0).getBatchDate());
                     erpOrderCartInfo.setWarehouseTypeCode(item.getWarehouseTypeCode());
+                    if(!YesOrNoEnum.YES.getCode().equals(erpCartAddRequest.getFirstOrderGift())){
+                        erpOrderCartInfo.setPrice(skuDetail.getBatchList().get(0).getBatchPrice());
+                    }
                 }
                 addList.add(erpOrderCartInfo);
             }
