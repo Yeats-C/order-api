@@ -311,11 +311,11 @@ public class BridgeProductService<main> {
         });
         if (Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")) {
             List<ProductCategoryRespVO> lists=response.getData();
-            //门店端不展示赠品，物料，德明居，其他，只展示1到11到品类
+            //门店端不展示物料，德明居，其他，只展示1到12到品类
             Iterator<ProductCategoryRespVO> it = lists.iterator();
             while(it.hasNext()){
                 ProductCategoryRespVO str = it.next();
-                if(str.getCategoryId().compareTo("11")>0){
+                if(str.getCategoryId().compareTo("12")>0){
                     it.remove();
                 }
             }
@@ -349,11 +349,11 @@ public class BridgeProductService<main> {
         });
         if (Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")) {
             List<ProductCategoryRespVO> lists=response.getData();
-            //门店端不展示赠品，物料，德明居，其他，只展示1到11到品类
+            //门店端不展示物料，德明居，其他，只展示1到12到品类
             Iterator<ProductCategoryRespVO> it = lists.iterator();
             while(it.hasNext()){
                 ProductCategoryRespVO str = it.next();
-                if(str.getCategoryId().compareTo("11")>0){
+                if(str.getCategoryId().compareTo("12")>0){
                     it.remove();
                 }
             }
@@ -408,11 +408,11 @@ public class BridgeProductService<main> {
         });
         if (Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")) {
             List<ProductCategoryRespVO> lists=response.getData();
-            //门店端不展示赠品，物料，德明居，其他，只展示1到11到品类
+            //门店端不展示物料，德明居，其他，只展示1到12到品类
             Iterator<ProductCategoryRespVO> it = lists.iterator();
             while(it.hasNext()){
                 ProductCategoryRespVO pro = it.next();
-                if(pro.getCategoryId().compareTo("11")>0){
+                if(pro.getCategoryId().compareTo("12")>0){
                     it.remove();
                 }
             }
@@ -434,11 +434,11 @@ public class BridgeProductService<main> {
         });
         if (Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0") && type=="2") {
             List<ProductCategoryRespVO> lists=response.getData().getProductCategoryRespVOList();
-            //门店端不展示赠品，物料，德明居，其他，只展示1到11到品类
+            //门店端不展示物料，德明居，其他，只展示1到12到品类
             Iterator<ProductCategoryRespVO> it = lists.iterator();
             while(it.hasNext()){
-                ProductCategoryRespVO pro = it.next();
-                if(pro.getCategoryId().compareTo("11")>0){
+                ProductCategoryRespVO str = it.next();
+                if(str.getCategoryId().compareTo("12")>0){
                     it.remove();
                 }
             }
