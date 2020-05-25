@@ -1877,6 +1877,10 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
             }
             if (skuDetail != null) {
                 item.setStockNum(skuDetail.getStockNum());
+
+                if(null!=skuDetail.getBatchList()&&skuDetail.getBatchList().size()>0&&null!=skuDetail.getBatchList().get(0).getBatchNum()){
+                    item.setStockNum(skuDetail.getBatchList().get(0).getBatchNum().intValue());
+                }
                 item.setIsSale(skuDetail.getIsSale());
             }
         }
