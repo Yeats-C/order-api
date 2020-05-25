@@ -82,12 +82,12 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         List<String> skuCodes=new ArrayList<>();
         skuCodes.add(giftPool.getSkuCode());
         List<ProductSkuStockRespVo> stockRespVoList=bridgeProductService.findStockDetail(skuCodes);
-        if(null==stockRespVoList){
+        if(null==stockRespVoList || stockRespVoList.size()<=0){
             throw new BusinessException("查询供应链 根据skucode获取库存详情 /search/spu/findStockDetail 接口失败，参数为"+giftPool.getSkuCode());
         }
         ProductSkuStockRespVo respVo=stockRespVoList.get(0);
-        if(null==respVo || null==respVo.getStockBatchRespVOList()){
-            throw new BusinessException("查询供应链 根据skucode获取库存详情 /search/spu/findStockDetail 接口失败，库存信息为空，参数为"+giftPool.getSkuCode());
+        if(null==respVo || null==respVo.getStockBatchRespVOList() || respVo.getStockBatchRespVOList().size()<=0){
+            throw new BusinessException("查询供应链 根据skucode获取库存详情 /search/spu/findStockDetail 接口失败，该sku无库存，无法加入赠品池，参数为"+giftPool.getSkuCode());
         }
         List<ComplimentaryWarehouseCorrespondence> correspondenceList=new ArrayList<>();
         for(StockBatchRespVO stockBatchRespVO:respVo.getStockBatchRespVOList()){
