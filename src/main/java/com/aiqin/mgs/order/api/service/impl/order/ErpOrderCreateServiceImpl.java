@@ -1051,8 +1051,12 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         }else{
             //A品卷金额大于18A商品总额
             orderFee.setTopCouponMoney(groupTopProductTotal);
-            orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(groupTopProductTotal));
+            orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(groupTopProductTotal).subtract(usedGiftQuota));
         }
+        log.info("创建订单 --计算均摊金额-- 生成支付信息-- 自选赠品金额 usedGiftQuota={}"+usedGiftQuota+
+                "|===| 活动优惠金额 activityMoneyTotal={}"+activityMoneyTotal+
+                "|===| 服纺券优惠金额 suitCouponMoneyTotal={}"+suitCouponMoneyTotal+
+                "|===| A品券优惠金额 topCouponMoneyTotal={}"+topCouponMoneyTotal);
 
         orderFee.setTotalMoney(totalMoneyTotal);
         orderFee.setActivityMoney(activityMoneyTotal);
@@ -1721,7 +1725,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 }
             }
             //支付金额
-            BigDecimal zhi=totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal);
+            BigDecimal zhi=totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal).subtract(usedGiftQuota);
             //赠送市值余额--用于修改
             marketValueBalance = marketValueBalance-totalMoneyTotal.doubleValue();
             //赠送费用余额--用于修改
@@ -1733,6 +1737,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         orderFee.setActivityMoney(activityMoneyTotal);
         orderFee.setSuitCouponMoney(suitCouponMoneyTotal);
         orderFee.setTopCouponMoney(topCouponMoneyTotal);
+        log.info("创建订单 --首单赠送金额计算-- 生成支付信息-- 自选赠品金额 usedGiftQuota={}"+usedGiftQuota+
+                "|===| 活动优惠金额 activityMoneyTotal={}"+activityMoneyTotal+
+                "|===| 服纺券优惠金额 suitCouponMoneyTotal={}"+suitCouponMoneyTotal+
+                "|===| A品券优惠金额 topCouponMoneyTotal={}"+topCouponMoneyTotal);
         orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal).subtract(usedGiftQuota));
         if(null!=topCouponCodeList&&topCouponCodeList.size()>0){
             orderFee.setTopCouponCodes(String.join(",", topCouponCodeList));
