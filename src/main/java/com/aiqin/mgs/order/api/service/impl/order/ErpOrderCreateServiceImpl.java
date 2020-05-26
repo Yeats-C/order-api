@@ -1047,7 +1047,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             //A品卷金额小于18A商品总额
             nullifyTopCouponMoneyTotal=BigDecimal.ZERO;
             orderFee.setTopCouponMoney(totalCouponSharePrice);
-            orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(totalCouponSharePrice));
+            orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(totalCouponSharePrice).subtract(usedGiftQuota));
         }else{
             //A品卷金额大于18A商品总额
             orderFee.setTopCouponMoney(groupTopProductTotal);
@@ -1655,6 +1655,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         BigDecimal topCouponMoneyTotal = BigDecimal.ZERO;
         //实付金额（元）
         BigDecimal payMoneyTotal = BigDecimal.ZERO;
+        //自选赠品金额（元）
+        BigDecimal usedGiftQuota = BigDecimal.ZERO;
 
         for (ErpOrderItem item :
                 itemList) {
@@ -1714,6 +1716,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 totalMoneyTotal = totalMoneyTotal.add(item.getTotalProductAmount());
                 activityMoneyTotal = activityMoneyTotal.add(item.getActivityDiscountAmount());
                 topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponDiscountAmount());
+                if(ErpProductGiftEnum.JIFEN.getCode().equals(item.getProductType())){
+                    usedGiftQuota=usedGiftQuota.add(item.getTotalProductAmount());
+                }
             }
             //支付金额
             BigDecimal zhi=totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal);
@@ -1728,7 +1733,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         orderFee.setActivityMoney(activityMoneyTotal);
         orderFee.setSuitCouponMoney(suitCouponMoneyTotal);
         orderFee.setTopCouponMoney(topCouponMoneyTotal);
-        orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal));
+        orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(topCouponMoneyTotal).subtract(usedGiftQuota));
         if(null!=topCouponCodeList&&topCouponCodeList.size()>0){
             orderFee.setTopCouponCodes(String.join(",", topCouponCodeList));
         }else {

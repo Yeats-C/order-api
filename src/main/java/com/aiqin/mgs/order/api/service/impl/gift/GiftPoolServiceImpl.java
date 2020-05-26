@@ -78,7 +78,7 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         }
 
         giftPoolDao.add(giftPool);
-        //TODO  此处需调用供应链接口，通过skuCode查询仓库信息，并记录表
+
         List<String> skuCodes=new ArrayList<>();
         skuCodes.add(giftPool.getSkuCode());
         List<ProductSkuStockRespVo> stockRespVoList=bridgeProductService.findStockDetail(skuCodes);
