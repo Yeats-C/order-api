@@ -1053,11 +1053,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             orderFee.setTopCouponMoney(groupTopProductTotal);
             orderFee.setPayMoney(totalMoneyTotal.subtract(activityMoneyTotal).subtract(suitCouponMoneyTotal).subtract(groupTopProductTotal).subtract(usedGiftQuota));
         }
-        log.info("创建订单 --计算均摊金额-- 生成支付信息-- 自选赠品金额 usedGiftQuota={}"+usedGiftQuota+
+        log.info("创建订单 ---- 生成支付信息-- 自选赠品金额 usedGiftQuota={}"+usedGiftQuota+
                 "|===| 活动优惠金额 activityMoneyTotal={}"+activityMoneyTotal+
                 "|===| 服纺券优惠金额 suitCouponMoneyTotal={}"+suitCouponMoneyTotal+
                 "|===| A品券优惠金额 topCouponMoneyTotal={}"+topCouponMoneyTotal);
-
+        log.info("创建订单 --计算均摊金额-- 生成支付信息-- 订单总额 totalMoneyTotal={}"+totalMoneyTotal);
         orderFee.setTotalMoney(totalMoneyTotal);
         orderFee.setActivityMoney(activityMoneyTotal);
         orderFee.setSuitCouponMoney(suitCouponMoneyTotal);
@@ -1732,7 +1732,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             freeCostBalance1=freeCostBalance1-zhi.doubleValue();
         }
 
-
+        log.info("创建订单 --首单赠送金额计算-- 生成支付信息-- 订单总额 totalMoneyTotal={}"+totalMoneyTotal);
         orderFee.setTotalMoney(totalMoneyTotal);
         orderFee.setActivityMoney(activityMoneyTotal);
         orderFee.setSuitCouponMoney(suitCouponMoneyTotal);
