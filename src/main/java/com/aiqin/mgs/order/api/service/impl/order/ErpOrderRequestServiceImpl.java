@@ -392,7 +392,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             paramMap.put("order_type", order.getOrderTypeCode());
             paramMap.put("detail_list", list);
 
-            logger.info("锁库请求参数paramMap={}", paramMap);
+            logger.info("锁库请求参数paramMap={}", JSON.toJSONString(paramMap));
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/lock/info").json(paramMap);
 
 //            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
