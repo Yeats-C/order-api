@@ -243,9 +243,9 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public boolean lockStockInSupplyChain(ErpOrderInfo order, List<ErpOrderItem> itemList, AuthToken auth) {
-        log.info("创建订单,锁库存入参order={}",order);
-        log.info("创建订单,锁库存入参itemList={}",itemList);
-        log.info("创建订单,锁库存入参auth={}",auth);
+        log.info("创建订单,锁库存入参order={}",JSON.toJSON(order));
+        log.info("创建订单,锁库存入参itemList={}",JSON.toJSON(itemList));
+        log.info("创建订单,锁库存入参auth={}",JSON.toJSON(auth));
         boolean flag = true;
         try {
 
@@ -270,7 +270,9 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             List<ErpOrderItem> integralGiftList=new ArrayList<>();
             //汇总sku
             for(ErpOrderItem item:itemList){
-
+                if(null==item.getWarehouseTypeCode()){
+                    item.setWarehouseTypeCode("1");
+                }
                 //TODO 商品批次相关信息还得增加销售库特卖库标识
                 StockBatchInfoRequest stockBatchInfoRequest=new StockBatchInfoRequest();
                 stockBatchInfoRequest.setBatchCode(item.getBatchCode());
@@ -330,9 +332,9 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                     integralGiftList.add(item);
                 }
             }
-            log.info("创建订单,锁库存,sku汇总countMap={}",countMap);
-            log.info("创建订单,锁库存,筛选出商品数据productList={}",productList);
-            log.info("创建订单,锁库存,筛选出赠品数据giftList={}",giftList);
+            log.info("创建订单,锁库存,sku汇总countMap={}",JSON.toJSON(countMap));
+            log.info("创建订单,锁库存,筛选出商品数据productList={}",JSON.toJSON(productList));
+            log.info("创建订单,锁库存,筛选出赠品数据giftList={}",JSON.toJSON(giftList));
             //过滤商品和赠品sku和行号的对应关系
             for(ErpOrderItem eoi:productList){
                 if(null==skuCodeLineMap.get(eoi.getSkuCode())){
