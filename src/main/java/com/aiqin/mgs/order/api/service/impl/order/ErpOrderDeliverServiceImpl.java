@@ -716,10 +716,10 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             BigDecimal s=BigDecimal.ZERO;
             if(ErpProductGiftEnum.PRODUCT.getCode().equals(productType)){
                 //商品分摊单价=分摊总金额/订货数量
-                s=tper.divide(new BigDecimal(k.getProductCount()));
+                s=tper.divide(new BigDecimal(k.getProductCount()),2,BigDecimal.ROUND_HALF_UP);
             }else {
                 //赠品分摊单价=分摊总金额/实发数量
-                s=tper.divide(new BigDecimal(k.getActualProductCount()));
+                s=tper.divide(new BigDecimal(k.getActualProductCount()),2,BigDecimal.ROUND_HALF_UP);
             }
             k.setTotalPreferentialAmount(tper);
             k.setPreferentialAmount(s);
