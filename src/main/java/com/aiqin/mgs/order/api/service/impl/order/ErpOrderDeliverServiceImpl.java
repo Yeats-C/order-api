@@ -668,7 +668,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             //A品券单行抵扣总金额=A品券抵扣金额X本行商品价值/商品总价值
             BigDecimal at = topCouponMoney.multiply(totalPreferentialAmount).divide(priceAmount, 2, BigDecimal.ROUND_HALF_UP);
             //A品券单行每个商品抵扣金额
-            BigDecimal ap=at.divide(new BigDecimal(o.getProductCount()));
+            BigDecimal ap=at.divide(new BigDecimal(o.getProductCount()),2,BigDecimal.ROUND_HALF_UP);
             o.setTotalPreferentialAmount(to);
             o.setPreferentialAmount(per);
             o.setTopCouponDiscountAmount(at);
