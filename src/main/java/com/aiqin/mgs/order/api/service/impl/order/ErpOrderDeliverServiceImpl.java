@@ -728,6 +728,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             er.setPreferentialAmount(k.getPreferentialAmount());
             er.setTopCouponDiscountAmount(k.getTopCouponDiscountAmount());
             er.setOrderInfoDetailId(k.getOrderInfoDetailId());
+            er.setTopCouponAmount(k.getTopCouponAmount());
             er.setId(k.getId());
             resList.add(er);
         }
