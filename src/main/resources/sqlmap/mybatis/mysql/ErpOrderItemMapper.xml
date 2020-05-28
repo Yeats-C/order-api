@@ -63,6 +63,7 @@
         create_time as createTime,
         update_time as updateTime,
         preferential_amount as preferentialAmount,
+        top_coupon_discount_amount as topCouponDiscountAmount,
         top_coupon_amount as topCouponAmount,
         batch_code as batchCode,
         batch_date as batchDate,
