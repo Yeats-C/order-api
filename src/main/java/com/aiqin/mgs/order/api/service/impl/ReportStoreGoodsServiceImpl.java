@@ -1,7 +1,7 @@
 package com.aiqin.mgs.order.api.service.impl;
 
 import com.aiqin.ground.util.http.HttpClient;
-import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.component.returnenums.OrderTypeEnum;
@@ -30,7 +30,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -43,8 +42,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 /**
  * description: ReportStoreGoodsServiceImpl
@@ -120,7 +119,7 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
         log.info("调用slcs系统,查询所有门店编码,请求url={}", url);
         HttpClient httpClient = HttpClient.get(url);
         Map<String, Object> result = httpClient.action().result(new TypeReference<Map<String, Object>>() {});
-        log.info("调用slcs系统,查询所有门店编码返回结果，result={}", JSON.toJSON(result));
+        log.info("调用slcs系统,查询所有门店编码返回结果，result={}", JsonUtil.toJson(result));
         if(result==null){
             log.info("调用slcs系统,--查询所有门店编码失败");
             return;
@@ -323,7 +322,7 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
         HttpClient httpClient1 = HttpClient.get(productUrl);
         Map<String,Object> res=null;
         res= httpClient1.action().result(new TypeReference<Map<String,Object>>() {});
-        log.info("调用product系统,查询所有省返回结果，result={}", JSON.toJSON(res));
+        log.info("调用product系统,查询所有省返回结果，result={}", JsonUtil.toJson(res));
         List<ProvinceAreaResponse> proList =new ArrayList<>();
         if (StringUtils.isNotBlank(res.get("code").toString()) && "0".equals(String.valueOf(res.get("code")))) {
             proList = JSONArray.parseArray(JSON.toJSONString(res.get("data")), ProvinceAreaResponse.class);
@@ -346,7 +345,7 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 HttpClient httpClient = HttpClient.post(url).json(body);
                 Map<String,Object> result=null;
                 result= httpClient.action().result(new TypeReference<Map<String,Object>>() {});
-                log.info("调用slcs系统,根据省查询所有门店编码返回结果，result={}", JSON.toJSON(result));
+                log.info("调用slcs系统,根据省查询所有门店编码返回结果，result={}", JsonUtil.toJson(result));
                 if(result==null){
                     log.info("调用slcs系统,根据省查询所有门店编码失败");
                     return;
@@ -419,7 +418,7 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
         HttpClient httpClient = HttpClient.post(url).json(body);
         Map<String,Object> result=null;
         result= httpClient.action().result(new TypeReference<Map<String,Object>>() {});
-        log.info("退货商品分类统计--调用product系统,查询所有一级品类返回结果，result={}", JSON.toJSON(result));
+        log.info("退货商品分类统计--调用product系统,查询所有一级品类返回结果，result={}", JsonUtil.toJson(result));
         if(result==null){
             log.info("退货商品分类统计--调用product系统,查询所有一级品类失败");
             return;

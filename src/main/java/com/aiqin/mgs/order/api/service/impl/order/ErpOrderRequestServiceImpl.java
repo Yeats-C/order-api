@@ -243,9 +243,9 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public boolean lockStockInSupplyChain(ErpOrderInfo order, List<ErpOrderItem> itemList, AuthToken auth) {
-        log.info("创建订单,锁库存入参order={}",JSON.toJSON(order));
-        log.info("创建订单,锁库存入参itemList={}",JSON.toJSON(itemList));
-        log.info("创建订单,锁库存入参auth={}",JSON.toJSON(auth));
+        log.info("创建订单,锁库存入参order={}",JsonUtil.toJson(order));
+        log.info("创建订单,锁库存入参itemList={}",JsonUtil.toJson(itemList));
+        log.info("创建订单,锁库存入参auth={}",JsonUtil.toJson(auth));
         boolean flag = true;
         try {
 
@@ -332,9 +332,9 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                     integralGiftList.add(item);
                 }
             }
-            log.info("创建订单,锁库存,sku汇总countMap={}",JSON.toJSON(countMap));
-            log.info("创建订单,锁库存,筛选出商品数据productList={}",JSON.toJSON(productList));
-            log.info("创建订单,锁库存,筛选出赠品数据giftList={}",JSON.toJSON(giftList));
+            log.info("创建订单,锁库存,sku汇总countMap={}",JsonUtil.toJson(countMap));
+            log.info("创建订单,锁库存,筛选出商品数据productList={}",JsonUtil.toJson(productList));
+            log.info("创建订单,锁库存,筛选出赠品数据giftList={}",JsonUtil.toJson(giftList));
             //过滤商品和赠品sku和行号的对应关系
             for(ErpOrderItem eoi:productList){
                 if(null==skuCodeLineMap.get(eoi.getSkuCode())){
@@ -394,7 +394,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             paramMap.put("order_type", order.getOrderTypeCode());
             paramMap.put("detail_list", list);
 
-            logger.info("锁库请求参数paramMap={}", JSON.toJSON(paramMap));
+            logger.info("锁库请求参数paramMap={}", JsonUtil.toJson(paramMap));
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/lock/info").json(paramMap);
 
 //            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
@@ -404,7 +404,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 //                throw new BusinessException(response.getMessage());
 //            }
             Map<String,Object> result1=httpClient.action().result(new TypeReference<Map<String,Object>>() {});
-            log.info("锁库请求返回结果，result1={}", JSON.toJSON(result1));
+            log.info("锁库请求返回结果，result1={}", JsonUtil.toJson(result1));
             if(result1==null){
                 log.info("锁库请求返回失败");
 //                return false;
@@ -459,9 +459,9 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public boolean unlockStockInSupplyChainByDetail(ErpOrderInfo order, ErpOrderLockStockTypeEnum orderLockStockTypeEnum, AuthToken auth) {
-        log.info("解锁库存（根据明细解锁）--入参order={}",JSON.toJSON(order));
-        log.info("解锁库存（根据明细解锁）--入参 orderLockStockTypeEnum={}",JSON.toJSON(orderLockStockTypeEnum));
-        log.info("解锁库存（根据明细解锁）--入参 auth={}",JSON.toJSON(auth));
+        log.info("解锁库存（根据明细解锁）--入参order={}",JsonUtil.toJson(order));
+        log.info("解锁库存（根据明细解锁）--入参 orderLockStockTypeEnum={}",JsonUtil.toJson(orderLockStockTypeEnum));
+        log.info("解锁库存（根据明细解锁）--入参 auth={}",JsonUtil.toJson(auth));
         boolean flag = true;
         try {
 
@@ -555,11 +555,11 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             stockChangeRequest.setStockList(stockList);
             stockChangeRequest.setStockBatchList(stockBatchList);
 
-            log.info("解锁库存（根据明细解锁）--调用供应链解锁接口,入参 stockChangeRequest={}", JSON.toJSON(stockChangeRequest));
+            log.info("解锁库存（根据明细解锁）--调用供应链解锁接口,入参 stockChangeRequest={}", JsonUtil.toJson(stockChangeRequest));
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/change/stock").json(stockChangeRequest);
             HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
             });
-            log.info("解锁库存（根据明细解锁）--调用供应链解锁接口,返回结果 response={}",JSON.toJSONString(response));
+            log.info("解锁库存（根据明细解锁）--调用供应链解锁接口,返回结果 response={}",JsonUtil.toJson(response));
             if (!RequestReturnUtil.validateHttpResponse(response)) {
                 log.info("解锁库存（根据明细解锁）--调用供应链解锁接口,返回结果--解锁异常");
                 throw new BusinessException(response.getMessage());

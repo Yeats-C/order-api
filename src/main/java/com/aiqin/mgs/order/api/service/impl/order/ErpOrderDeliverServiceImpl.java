@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.service.impl.order;
 
+import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
@@ -25,7 +26,6 @@ import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.service.gift.GiftQuotasUseDetailService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.util.OrderPublic;
-import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -190,7 +190,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
      */
     private void updateGiftGoodsAutCount(String mainOrderCode,List<ErpOrderItem> itemList ,AuthToken auth){
         log.info("根据主订单号修改赠品实发数量,mainOrderCode={}",mainOrderCode);
-        log.info("根据主订单号修改赠品实发数量,itemList={}", JSON.toJSONString(itemList));
+        log.info("根据主订单号修改赠品实发数量,itemList={}", JsonUtil.toJson(itemList));
         log.info("根据主订单号修改赠品实发数量,auth={}",auth);
         List<ErpOrderItem> items=new ArrayList<>();
         Map<String,Long> map=new HashMap<>();
@@ -217,7 +217,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                     items.add(erpOrderItem);
                 }
             }
-            log.info("根据主订单号修改赠品实发数量,需修改的明细集合 items={}",JSON.toJSONString(items));
+            log.info("根据主订单号修改赠品实发数量,需修改的明细集合 items={}",JsonUtil.toJson(items));
             //进行赠品实发数量修改
             erpOrderItemService.updateOrderItemList(itemList, auth);
             log.info("根据主订单号修改赠品实发数量,成功");
@@ -375,7 +375,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 if(orderList!=null&&orderList.size()>0){
                     //遍历出所有的子订单号
                     List<String> orderCodes=orderList.stream().map(ErpOrderInfo::getOrderStoreCode).collect(Collectors.toList());
-                    log.info("修改订单为发货状态---全部发货完成,修改退货单是否发起退货状态，入参orderCodes={}",JSON.toJSONString(orderCodes));
+                    log.info("修改订单为发货状态---全部发货完成,修改退货单是否发起退货状态，入参orderCodes={}",JsonUtil.toJson(orderCodes));
                     if(null!=orderCodes&&orderCodes.size()>0){
                         returnOrderInfoDao.updateReallyReturn(orderCodes);
                         log.info("修改订单为发货状态---全部发货完成,修改退货单是否发起退货状态，成功");
@@ -418,7 +418,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
     private void shareEqually(String mainOrderCode){
         log.info("子单全部发货完成进行均摊--入参 mainOrderCode={}",mainOrderCode);
         ErpOrderInfo orderAndItemByOrderCode = erpOrderQueryService.getOrderAndItemByOrderCode(mainOrderCode);
-        log.info("子单全部发货完成进行均摊--查询原始主订单及详情返回结果 orderAndItemByOrderCode={}",JSON.toJSONString(orderAndItemByOrderCode));
+        log.info("子单全部发货完成进行均摊--查询原始主订单及详情返回结果 orderAndItemByOrderCode={}",JsonUtil.toJson(orderAndItemByOrderCode));
         /******************挑选活动和可用A品券商品明细**********************/
         List<ErpOrderItem> itemList = orderAndItemByOrderCode.getItemList();
 
@@ -625,7 +625,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 e.setPreferentialAmount(o.getPreferentialAmount());
             }
         }
-        log.info("子单全部发货完成进行均摊--活动分摊--分摊后 分摊后原始明细行集合 itemList={}",JSON.toJSONString(itemList));
+        log.info("子单全部发货完成进行均摊--活动分摊--分摊后 分摊后原始明细行集合 itemList={}",JsonUtil.toJson(itemList));
         /************************************A品券均摊**********************************/
         //A品券商品明细行
         List<ErpOrderItem> list = new ArrayList<>();
@@ -684,7 +684,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 f.setPreferentialAmount(o.getPreferentialAmount());
             }
         }
-        log.info("子单全部发货完成进行均摊--A品券分摊--分摊后原始明细行集合 itemList={}",JSON.toJSONString(itemList));
+        log.info("子单全部发货完成进行均摊--A品券分摊--分摊后原始明细行集合 itemList={}",JsonUtil.toJson(itemList));
         /************************************赠品均摊**********************************/
         //实付金额
         BigDecimal payMoney = erpOrderFee.getPayMoney();
@@ -732,9 +732,9 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             er.setId(k.getId());
             resList.add(er);
         }
-        log.info("子单全部发货完成进行均摊--赠品均摊--分摊完后原始订单明细集合 itemList={}",JSON.toJSONString(itemList));
+        log.info("子单全部发货完成进行均摊--赠品均摊--分摊完后原始订单明细集合 itemList={}",JsonUtil.toJson(itemList));
         /*****************************************分摊计算结束，更新明细表*****************************************/
-        log.info("子单全部发货完成进行均摊--所有分摊结束--更新原始订单明细集合 resList={}",JSON.toJSONString(resList));
+        log.info("子单全部发货完成进行均摊--所有分摊结束--更新原始订单明细集合 resList={}",JsonUtil.toJson(resList));
         AuthToken auth=new AuthToken();
         auth.setPersonId("系统操作");
         auth.setPersonName("系统操作");
@@ -804,7 +804,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
         po.setMainOrderCode(mainOrderCode);
         List<ErpOrderInfo> list=erpOrderInfoDao.select(po);
         if(list!=null&&list.size()>0){
-            log.info("判断子单是否全部发货完成,原始订单集合为 list={}",JSON.toJSONString(list));
+            log.info("判断子单是否全部发货完成,原始订单集合为 list={}",JsonUtil.toJson(list));
             for(ErpOrderInfo eoi:list){
                 Integer orderStatus = eoi.getOrderStatus();
                 //判断订单状态是否是 11:发货完成或者 97:缺货终止

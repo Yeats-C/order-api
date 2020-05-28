@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.service.bill.impl;
 
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.id.IdUtil;
+import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpLogOperationTypeEnum;
@@ -13,14 +14,13 @@ import com.aiqin.mgs.order.api.dao.PurchaseOrderDao;
 import com.aiqin.mgs.order.api.dao.PurchaseOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.PurchaseBatch;
-import com.aiqin.mgs.order.api.domain.PurchaseOrderInfo;
 import com.aiqin.mgs.order.api.domain.PurchaseOrderDetail;
+import com.aiqin.mgs.order.api.domain.PurchaseOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.service.bill.CreatePurchaseOrderService;
 import com.aiqin.mgs.order.api.service.bill.OperationLogService;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -258,7 +258,7 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
      * @param erpOrderInfo
      */
     private void createSaleOrder(List<ErpOrderInfo> erpOrderInfo) {
-        LOGGER.info("根据爱亲采购单，生成耘链销售单开始，参数为：erpOrderInfo{}",  JSONObject.toJSONString(erpOrderInfo));
+        LOGGER.info("根据爱亲采购单，生成耘链销售单开始，参数为：erpOrderInfo{}",  JsonUtil.toJson(erpOrderInfo));
         try {
             for(ErpOrderInfo orderInfo:erpOrderInfo){
                 String url = purchaseHost + "/order/aiqin/sale";

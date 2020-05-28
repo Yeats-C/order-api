@@ -116,7 +116,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     @Override
     @Transactional
     public HttpResponse save(ReturnOrderReqVo reqVo) {
-        log.info("发起退货--入参"+JSON.toJSONString(reqVo));
+        log.info("发起退货--入参"+JsonUtil.toJson(reqVo));
         //查询订单是否存在未处理售后单
         List<ReturnOrderInfo> returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndStatus(reqVo.getOrderStoreCode(), 1);
         Assert.isTrue(CollectionUtils.isEmpty(returnOrderInfo), "该订单还有未审核售后单，请稍后提交");
@@ -236,7 +236,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         po.setMainOrderCode(mainOrderCode);
         List<ErpOrderInfo> list=erpOrderQueryService.select(po);
         if(list!=null&&list.size()>0){
-            log.info("判断子单是否全部发货完成,原始订单集合为 list={}",JSON.toJSONString(list));
+            log.info("判断子单是否全部发货完成,原始订单集合为 list={}",JsonUtil.toJson(list));
             for(ErpOrderInfo eoi:list){
                 Integer orderStatus = eoi.getOrderStatus();
                 //判断订单状态是否是 11:发货完成或者 97:缺货终止
@@ -1163,7 +1163,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
        Map<String, Object> result = null;
        result = httpClient.action().result(new TypeReference<Map<String, Object>>() {
        });
-       log.info("发起退积分申请结果，request={}",JSON.toJSON(result));
+       log.info("发起退积分申请结果，request={}",JsonUtil.toJson(result));
        if(result!=null&&"0".equals(result.get("code"))){
            log.info("退积分完成");
            return true;
