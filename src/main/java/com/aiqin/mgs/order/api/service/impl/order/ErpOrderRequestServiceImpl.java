@@ -595,7 +595,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             paramMap.put("operation_type", ErpOrderLockStockTypeEnum.UNLOCK.getCode());
             paramMap.put("order_code", order.getOrderStoreCode());
             paramMap.put("order_type", order.getOrderTypeCode());
-
+            log.info("解锁库存参数为 paramMap={}"+ JsonUtil.toJson(paramMap));
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/unlock/info").json(paramMap);
             HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
             });
