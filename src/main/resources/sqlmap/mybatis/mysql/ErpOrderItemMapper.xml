@@ -140,6 +140,9 @@
         <if test="topCouponDiscountAmount != null ">
             top_coupon_discount_amount = #{topCouponDiscountAmount},
         </if>
+        <if test="topCouponAmount != null ">
+            top_coupon_amount = #{topCouponAmount},
+        </if>
         update_by_id = #{updateById},
         update_by_name = #{updateByName},
         update_time = sysdate()
