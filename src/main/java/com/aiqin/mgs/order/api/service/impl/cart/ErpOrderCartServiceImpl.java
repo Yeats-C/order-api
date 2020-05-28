@@ -1158,7 +1158,29 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 }
 
                 if (curRule != null) {
+
                     cartGroupInfo.setActivityRule(curRule);
+
+                    //计算满减均摊
+
+                    //当前剩余满减的金额
+                    BigDecimal restPreferentialAmount = curRule.getPreferentialAmount();
+
+                    if (activityAmountTotal.compareTo(BigDecimal.ZERO) > 0) {
+                        for (int i = 0; i < tempList.size(); i++) {
+                            ErpOrderCartInfo item = tempList.get(i);
+                            if (i == tempList.size() - 1) {
+                                //最后一行，用减法避免误差
+                                item.setLineActivityDiscountTotal(restPreferentialAmount);
+                            } else {
+                                //行活动优惠的金额，行根据活动使该行减少的金额，前端不显示 = 行活动价汇总 除以  勾选的商品组活动价汇总，初始等于商品组分销价汇总  乘以   活动规则的优惠金额、优惠件数、折扣点数（百分比）
+                                BigDecimal lineActivityDiscountTotal = item.getLineActivityAmountTotal().divide(activityAmountTotal, 6, RoundingMode.HALF_UP).multiply(curRule.getPreferentialAmount()).setScale(2, RoundingMode.HALF_UP);
+                                item.setLineActivityDiscountTotal(lineActivityDiscountTotal);
+                                restPreferentialAmount = restPreferentialAmount.subtract(lineActivityDiscountTotal);
+                            }
+                            item.setLineAmountAfterActivity(item.getLineActivityAmountTotal().subtract(item.getLineActivityDiscountTotal()).setScale(2, RoundingMode.HALF_UP));
+                        }
+                    }
                 }
                 ;
                 break;
