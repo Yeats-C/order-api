@@ -828,6 +828,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                             productItem.setCouponRule(YesOrNoEnum.YES.getCode());
 
                             groupTopCouponMaxTotal=productItem.getLineAmountTotal();
+                            topTotalPrice = topTotalPrice.add(groupTopCouponMaxTotal);
                         }
                     }
                 }
@@ -863,7 +864,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
 
             activityAmountTotal = activityAmountTotal.add(groupActivityAmount);
             totalNumber += groupProductQuantity;
-            topTotalPrice = topTotalPrice.add(groupTopCouponMaxTotal);
+
             activityDiscountAmount = activityDiscountAmount.add(groupActivityDiscountAmount);
         }
 
