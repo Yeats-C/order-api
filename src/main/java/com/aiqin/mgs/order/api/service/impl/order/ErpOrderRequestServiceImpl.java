@@ -459,9 +459,9 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public boolean unlockStockInSupplyChainByDetail(ErpOrderInfo order, ErpOrderLockStockTypeEnum orderLockStockTypeEnum, AuthToken auth) {
-        log.info("解锁库存（根据明细解锁）--入参order={}",order);
-        log.info("解锁库存（根据明细解锁）--入参 orderLockStockTypeEnum={}",orderLockStockTypeEnum);
-        log.info("解锁库存（根据明细解锁）--入参 auth={}",auth);
+        log.info("解锁库存（根据明细解锁）--入参order={}",JSON.toJSON(order));
+        log.info("解锁库存（根据明细解锁）--入参 orderLockStockTypeEnum={}",JSON.toJSON(orderLockStockTypeEnum));
+        log.info("解锁库存（根据明细解锁）--入参 auth={}",JSON.toJSON(auth));
         boolean flag = true;
         try {
 
@@ -555,7 +555,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             stockChangeRequest.setStockList(stockList);
             stockChangeRequest.setStockBatchList(stockBatchList);
 
-            log.info("解锁库存（根据明细解锁）--调用供应链解锁接口,入参 stockChangeRequest={}",stockChangeRequest);
+            log.info("解锁库存（根据明细解锁）--调用供应链解锁接口,入参 stockChangeRequest={}", JSON.toJSON(stockChangeRequest));
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/change/stock").json(stockChangeRequest);
             HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
             });
