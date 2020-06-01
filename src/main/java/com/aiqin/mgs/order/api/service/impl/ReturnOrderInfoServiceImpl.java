@@ -13,6 +13,7 @@ import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayTypeEnum;
 import com.aiqin.mgs.order.api.component.returnenums.*;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
+import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderOperationLogDao;
 import com.aiqin.mgs.order.api.dao.returnorder.RefundInfoDao;
@@ -28,6 +29,7 @@ import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderStatusVo;
 import com.aiqin.mgs.order.api.service.CopartnerAreaService;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
+import com.aiqin.mgs.order.api.service.impl.order.ErpOrderInfoServiceImpl;
 import com.aiqin.mgs.order.api.service.order.ErpOrderInfoService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
@@ -110,6 +112,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     private ErpOrderInfoService erpOrderInfoService;
     @Resource
     private CopartnerAreaService copartnerAreaService;
+    @Resource
+    private ErpOrderInfoDao erpOrderInfoDao;
 
 
     @Override
@@ -1023,9 +1027,10 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     }
                     totalCount=totalCount+differenceCount;
                     //实退商品的A品卷金额
-                    BigDecimal CommodityA = topCouponAmount.multiply(BigDecimal.valueOf(differenceCount));
-                    topCouponDiscountAmount = topCouponDiscountAmount.add(CommodityA);
-                    //todo 少参数
+                    if(!"0.0000".equals(topCouponAmount.toString())){
+                        BigDecimal CommodityA = topCouponAmount.multiply(BigDecimal.valueOf(differenceCount));
+                        topCouponDiscountAmount = topCouponDiscountAmount.add(CommodityA);
+                    }
                     BeanUtils.copyProperties(eoi,returnOrderDetail);
                     returnOrderDetail.setActualReturnProductCount(differenceCount);
                     returnOrderDetail.setActualTotalProductAmount(amount);
@@ -1051,8 +1056,10 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     }
                     totalCount=totalCount+differenceCount;
                     //实退商品的A品卷金额
-                    BigDecimal AllCommodityA = topCouponAmount.multiply(BigDecimal.valueOf(productCount));
-                    topCouponDiscountAmount = topCouponDiscountAmount.add(AllCommodityA);
+                    if (!"0.0000".equals(topCouponAmount.toString())){
+                        BigDecimal AllCommodityA = topCouponAmount.multiply(BigDecimal.valueOf(productCount));
+                        topCouponDiscountAmount = topCouponDiscountAmount.add(AllCommodityA);
+                    }
                     BeanUtils.copyProperties(eoi,returnOrderDetail);
                     returnOrderDetail.setActualReturnProductCount(differenceCount);
                     returnOrderDetail.setActualTotalProductAmount(totalPreferentialAmount);
@@ -1080,6 +1087,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 returnOrderInfo.setReturnOrderId(returnOrderId);
                 returnOrderInfo.setReturnOrderCode(returnOrderCode);
                 returnOrderInfo.setCreateTime(new Date());
+                //是否真的发起退货 改为：1-原始订单全部发货完成生成退货单
+                returnOrderInfo.setReallyReturn(1);
                 //退货状态 改为：11-退货完成
                 returnOrderInfo.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_RETURN.getKey());
                 returnOrderInfo.setActualProductCount(totalCount);
@@ -1088,6 +1097,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 //应退赠品总金额
 //                returnOrderInfo.setTotalZengAmount(totalAmount);
                 returnOrderInfo.setComplimentaryAmount(complimentaryAmount);
+//                //退A品卷总金额
+//                returnOrderInfo.setTopCouponDiscountAmount(topCouponDiscountAmount);
                 //退货金额=商品冲减金额+赠品退积分金额
                 returnOrderInfo.setReturnOrderAmount(totalAmount.add(complimentaryAmount));
                 //退款方式 5:退到加盟商账户
@@ -1119,15 +1130,33 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 //发起退款
                 refund(returnOrderCode);
                 //发起退积分方法
-                refundPoints(returnOrderInfo);
+                boolean b = refundPoints(returnOrderInfo);
+                if (!b){
+                    return HttpResponse.failure(ResultCode.ERP_FRANCHISEE_INTEGRAL_ERROR);
+                }
                 //发起退A品卷
-                HttpResponse httpResponse = AGoodsVolumeGenerate(topCouponDiscountAmount, franchiseeId, returnOrderCode);
-                if (httpResponse!=null && "0".equals(httpResponse.getCode()) ){
-                    log.info("冲减单已完成");
+                if(!"0".equals(topCouponDiscountAmount.toString())){
+                   log.info("开始退A品卷");
+                   AGoodsVolumeGenerate(topCouponDiscountAmount, franchiseeId, returnOrderCode);
+//                    HttpResponse httpResponse = AGoodsVolumeGenerate(topCouponDiscountAmount, franchiseeId, returnOrderCode);
+//                    if (httpResponse!=null && "0".equals(httpResponse.getCode()) ){
+//                        log.info("冲减单已完成");
+//                        return HttpResponse.success();
+//                    }
+//                    return HttpResponse.failure(ResultCode.ERP_FRANCHISEE_ERROP);
+                }else {
+                    log.info("未使用A品卷，无需退优惠券");
+                }
+//                return HttpResponse.success();
+                //修改主订单中的冲减单状态
+                int count = erpOrderInfoDao.updateScourSheetStatus(orderCode);
+                if (count != 0){
+                    log.info("修改主订单中冲减单状态成功");
                     return HttpResponse.success();
                 }
-                return HttpResponse.failure(ResultCode.ERP_FRANCHISEE_ERROP);
+                return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
             }
+
 
         }
         return HttpResponse.failure(ResultCode.NOT_FOUND_ORDER_DATA);
