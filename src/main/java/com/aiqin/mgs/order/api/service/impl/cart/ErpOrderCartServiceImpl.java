@@ -665,7 +665,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         //查询门店信息
         StoreInfo store = erpOrderRequestService.getStoreInfoByStoreId(erpCartQueryRequest.getStoreId());
         //查询A品卷使用规则code Map
-        Map ruleMap=couponRuleService.couponRuleMap();
+        Map<String,BigDecimal> ruleMap=couponRuleService.couponRuleMap();
+        //A品卷规则额度
+        BigDecimal ruleTop=BigDecimal.ZERO;
         ErpOrderCartInfo query = new ErpOrderCartInfo();
         query.setStoreId(erpCartQueryRequest.getStoreId());
         query.setProductType(erpCartQueryRequest.getProductType());
@@ -824,6 +826,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         groupProductQuantity += productItem.getAmount();
 
                         if(ruleMap.containsKey(productItem.getProductPropertyCode())){
+                            ruleTop=ruleMap.get(productItem.getProductPropertyCode());
                             //可使用优惠券
                             productItem.setCouponRule(YesOrNoEnum.YES.getCode());
 
@@ -877,7 +880,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         ErpStoreCartQueryResponse response = new ErpStoreCartQueryResponse();
         response.setActivityAmountTotal(activityAmountTotal);
         response.setTotalNumber(totalNumber);
-        response.setTopTotalPrice(topTotalPrice);
+        response.setTopTotalPrice(topTotalPrice.multiply(ruleTop).setScale(2, RoundingMode.DOWN));
         response.setCartGroupList(cartGroupList);
         response.setActivityDiscountAmount(activityDiscountAmount);
         response.setStoreAddress(store.getAddress());

@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.service;
 
 import com.aiqin.mgs.order.api.domain.CouponRule;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +46,6 @@ public interface CouponRuleService {
      * 查询当前A品卷规则map
      * @return
      */
-     Map couponRuleMap();
+     Map<String, BigDecimal> couponRuleMap();
 
 }
