@@ -22,6 +22,7 @@ public interface ResultCode {
     MessageId A_GOODS_ERROP =MessageId.create(Project.ORDER_API,-5,"A品卷总金额为空");
     MessageId ERP_ORDER_ITEM_ERROP =MessageId.create(Project.ORDER_API,-6,"商品详情集合为空");
     MessageId ERP_FRANCHISEE_ERROP =MessageId.create(Project.ORDER_API,-7,"冲减单--同步A品卷失败");
+    MessageId ERP_FRANCHISEE_INTEGRAL_ERROR =MessageId.create(Project.ORDER_API,-7,"冲减单--退积分失败");
 
 
     /** 黄祉壹   2018-11-05 开始     */
