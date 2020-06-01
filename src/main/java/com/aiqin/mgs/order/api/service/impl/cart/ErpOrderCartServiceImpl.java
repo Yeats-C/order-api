@@ -828,7 +828,13 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                             productItem.setCouponRule(YesOrNoEnum.YES.getCode());
 
                             groupTopCouponMaxTotal=productItem.getLineAmountTotal();
-                            topTotalPrice = topTotalPrice.add(productItem.getLineAmountAfterActivity());
+
+                            if(null!=item.getActivityRule()&&null!=item.getActivityRule().getActivityType()&&item.getActivityRule().getActivityType()==2){
+                                topTotalPrice = topTotalPrice.add(productItem.getLineActivityAmountTotal());
+                            }else{
+                                topTotalPrice = topTotalPrice.add(productItem.getLineAmountAfterActivity());
+                            }
+
                         }
                     }
                 }
