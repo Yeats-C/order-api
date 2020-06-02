@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.service.bill.impl;
 
 import com.aiqin.ground.util.id.IdUtil;
+import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.mgs.order.api.component.enums.PurchaseOrderStatusEnum;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderDeliverItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderTransportLogisticsRequest;
@@ -92,9 +93,9 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
             //更新采购单
             PurchaseOrderInfo purchaseOrder = new PurchaseOrderInfo();
-            purchaseOrder.setActualTotalCount(purchaseInfo.getActualTotalCount());//
-            purchaseOrder.setDeliveryTime(purchaseInfo.getDeliveryTime());//
-            purchaseOrder.setContactPerson(purchaseInfo.getDeliveryPersonId());//
+            purchaseOrder.setActualTotalCount(purchaseInfo.getActualTotalCount());
+            purchaseOrder.setDeliveryTime(purchaseInfo.getDeliveryTime());
+            purchaseOrder.setContactPerson(purchaseInfo.getDeliveryPersonId());
             purchaseOrder.setPurchaseOrderCode(purchaseInfo.getOrderStoreCode());
             purchaseOrder.setUpdateById(purchaseInfo.getPersonId());
             purchaseOrder.setUpdateByName(purchaseInfo.getPersonName());
@@ -142,18 +143,26 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
     @Override
     public HttpResponse updateOrderStoreLogistics(DeliveryInfoVo deliveryInfoVo) {
-        LOGGER.info("发运单回传开始，deliveryInfoVo {}" + deliveryInfoVo);
+        LOGGER.info("发运单回传开始，deliveryInfoVo {}" + JsonUtil.toJson(deliveryInfoVo));
         try {
             ErpOrderTransportRequest orderTransport = new ErpOrderTransportRequest();
             ErpOrderTransportLogisticsRequest logistics = new ErpOrderTransportLogisticsRequest();
-            logistics.setLogisticsCode(deliveryInfoVo.getTransportCode());//物流单号
-            logistics.setLogisticsCentreCode(deliveryInfoVo.getTransportCompanyCode());//物流公司编码
-            logistics.setLogisticsCentreName(deliveryInfoVo.getTransportCompanyName());//物流公司名称
-            logistics.setSendRepertoryCode(deliveryInfoVo.getTransportCenterCode());//发货仓库编码
-            logistics.setSendRepertoryName(deliveryInfoVo.getTransportCenterName());//发货仓库名称
-            logistics.setLogisticsFee(deliveryInfoVo.getTransportAmount());//物流费用
-            orderTransport.setLogistics(logistics);//物流信息 不需要物流单的订单不需要传
-            orderTransport.setTransportTime(deliveryInfoVo.getTransportDate());//发运时间
+            //物流单号
+            logistics.setLogisticsCode(deliveryInfoVo.getTransportCode());
+            //物流公司编码
+            logistics.setLogisticsCentreCode(deliveryInfoVo.getTransportCompanyCode());
+            //物流公司名称
+            logistics.setLogisticsCentreName(deliveryInfoVo.getTransportCompanyName());
+            //发货仓库编码
+            logistics.setSendRepertoryCode(deliveryInfoVo.getTransportCenterCode());
+            //发货仓库名称
+            logistics.setSendRepertoryName(deliveryInfoVo.getTransportCenterName());
+            //物流费用
+            logistics.setLogisticsFee(deliveryInfoVo.getTransportAmount());
+            //物流信息 不需要物流单的订单不需要传
+            orderTransport.setLogistics(logistics);
+            //发运时间
+            orderTransport.setTransportTime(deliveryInfoVo.getTransportDate());
             //orderTransport.setDistributionModeCode(deliveryInfoVo.getDistributionModeCode());//配送方式编码
             //orderTransport.setDistributionModeName(deliveryInfoVo.getDistributionModeName());//配送方式名称
             orderTransport.setPersonId(deliveryInfoVo.getCustomerCode());
