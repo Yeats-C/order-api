@@ -363,11 +363,11 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_11.getCode());
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_10.getCode());
             erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
-            //todo 判断是否全部发货，然后做均摊
             //查询子单是否全部发货完成
             Boolean aBoolean = checkSendOk(order.getMainOrderCode());
             log.info("判断子单是否全部发货完成,返回结果 aBoolean={}",aBoolean);
-            if(aBoolean){//全部发货完成
+            //全部发货完成
+            if(aBoolean){
                 //三步均摊
                 shareEqually(order.getMainOrderCode());
                 //遍历退货单，查看是否有退单
@@ -388,7 +388,8 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
 
             boolean flag=false;
             //这两个都走线下支付物流费用
-            if(ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(order.getOrderTypeCode())){//配送
+            //配送
+            if(ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(order.getOrderTypeCode())){
                 //首单或首单赠送
                 if(ErpOrderCategoryEnum.ORDER_TYPE_2.getValue().equals(order.getOrderCategoryCode())||ErpOrderCategoryEnum.ORDER_TYPE_4.getValue().equals(order.getOrderCategoryCode())){
                     flag=true;
@@ -661,22 +662,33 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
         log.info("子单全部发货完成进行均摊--A品券分摊--商品金额 amount={}",amount);
         //记录A品券分摊后的数据
         Map<String,ErpOrderItem> couponAfterMap=new HashMap<>();
-        for(ErpOrderItem o:list){
+        //A品卷分摊后最后一行金额
+        BigDecimal lastCouponMoney=topCouponMoney;
+        for(int i=0;i<list.size();i++){
             //本行商品价值
-            BigDecimal totalPreferentialAmount = o.getTotalPreferentialAmount();
+            BigDecimal totalPreferentialAmount = list.get(i).getTotalPreferentialAmount();
             //分摊总金额=本行商品价值X商品总金额/商品总价值
-            BigDecimal to=totalPreferentialAmount.multiply(amount).divide(priceAmount,2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal to=totalPreferentialAmount.multiply(list.get(i).getTotalProductAmount()).divide(priceAmount,2,BigDecimal.ROUND_HALF_UP);
             //分摊单价
-            BigDecimal per=to.divide(new BigDecimal(o.getProductCount()),2,BigDecimal.ROUND_HALF_UP);
-            //A品券单行抵扣总金额=A品券抵扣金额X本行商品价值/商品总价值
-            BigDecimal at = topCouponMoney.multiply(totalPreferentialAmount).divide(priceAmount, 2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal per=to.divide(new BigDecimal(list.get(i).getProductCount()),2,BigDecimal.ROUND_HALF_UP);
+
+            BigDecimal at=BigDecimal.ZERO;
+            //最后一行做减法
+            if(i==list.size()-1){
+                at=lastCouponMoney;
+            }else{
+                //A品券单行抵扣总金额=A品券抵扣金额X本行商品价值/商品总价值
+                at = topCouponMoney.multiply(totalPreferentialAmount).divide(priceAmount, 2, BigDecimal.ROUND_HALF_UP);
+                lastCouponMoney=lastCouponMoney.subtract(at);
+            }
+
             //A品券单行每个商品抵扣金额
-            BigDecimal ap=at.divide(new BigDecimal(o.getProductCount()),2,BigDecimal.ROUND_HALF_UP);
-            o.setTotalPreferentialAmount(to);
-            o.setPreferentialAmount(per);
-            o.setTopCouponDiscountAmount(at);
-            o.setTopCouponAmount(ap);
-            couponAfterMap.put(o.getOrderInfoDetailId(),o);
+            BigDecimal ap=at.divide(new BigDecimal(list.get(i).getProductCount()),2,BigDecimal.ROUND_HALF_UP);
+            list.get(i).setTotalPreferentialAmount(to);
+            list.get(i).setPreferentialAmount(per);
+            list.get(i).setTopCouponDiscountAmount(at);
+            list.get(i).setTopCouponAmount(ap);
+            couponAfterMap.put(list.get(i).getOrderInfoDetailId(),list.get(i));
         }
         log.info("子单全部发货完成进行均摊--A品券分摊--分摊结果map couponAfterMap={}",couponAfterMap);
         for(ErpOrderItem f:itemList){
@@ -823,6 +835,6 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
 
     public static void main(String[] args) {
         ErpOrderDeliverServiceImpl service=new ErpOrderDeliverServiceImpl();
-        service.shareEqually("20200428000001");
+        service.shareEqually("20200602000007");
     }
 }
