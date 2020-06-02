@@ -223,6 +223,11 @@ public class ErpOrderCartInfo {
     @JsonProperty("is_sale")
     private Byte isSale;
 
+    /**活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单*/
+    @ApiModelProperty(value = "活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单")
+    @JsonProperty("activity_type")
+    private Integer activityType;
+
 
 
 }
