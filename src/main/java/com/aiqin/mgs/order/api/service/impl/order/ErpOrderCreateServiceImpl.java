@@ -501,6 +501,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                         productItem.setActivityId(null);
 //                        productItem.setActivityName(null);
                     }
+                    if(null!=item.getActivityRule()&&null!=item.getActivityRule().getActivityType()){
+                        productItem.setActivityType(item.getActivityRule().getActivityType());
+                    }
                     cartInfoList.add(productItem);
                 }
                 if (ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(orderType)) {
@@ -673,6 +676,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             orderItem.setBatchDate(productInfo.getBatchDate());
             orderItem.setBatchInfoCode(productInfo.getBatchInfoCode());
             orderItem.setWarehouseTypeCode(productInfo.getWarehouseTypeCode());
+
+            //活动类型
+            orderItem.setActivityType(item.getActivityType());
             orderItemList.add(orderItem);
         }
         log.info("构建订单商品明细行数据返回结果orderItemList={}",orderItemList);
@@ -971,6 +977,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
     private ErpOrderFee shareTopCouponPrice(List<ErpOrderItem> itemList,List<String> topCouponCodeList) {
 
+        //查询A品卷使用规则code Map
+        Map<String,BigDecimal> ruleMap=couponRuleService.couponRuleMap();
+        //A品卷规则额度
+        BigDecimal ruleTop=BigDecimal.ZERO;
+
         List<CouponShareRequest> detailList = new ArrayList<>();
         for (ErpOrderItem item :
                 itemList) {
@@ -1034,14 +1045,21 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 usedGiftQuota=usedGiftQuota.add(item.getProductAmount().multiply(new BigDecimal(item.getProductCount().toString())));
             }else if(ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductType())){
                 //商品判断商品类型，是否属于18A
-                ErpProductPropertyTypeEnum productPropertyTypeEnum = ErpProductPropertyTypeEnum.getEnum(item.getProductPropertyCode());
-                if (productPropertyTypeEnum != null && productPropertyTypeEnum.isUseTopCoupon()) {
+                if(ruleMap.containsKey(item.getProductPropertyCode())){
+                    //18A规则系数
+                    ruleTop=ruleMap.get(item.getProductPropertyCode());
                     //计算18A商品总金额
-                    groupTopProductTotal = groupTopProductTotal.add(item.getProductAmount().multiply(new BigDecimal(item.getProductCount().toString())));
+                    if(item.getActivityType()==2){
+                        groupTopProductTotal=groupTopProductTotal.add(item.getTotalProductAmount());
+                    }else{
+                        groupTopProductTotal=groupTopProductTotal.add(item.getTotalPreferentialAmount());
+                    }
                 }
             }
 
         }
+        //计算出的18A商品总金额得乘以设置的规则系数
+        groupTopProductTotal=groupTopProductTotal.multiply(ruleTop).setScale(2, RoundingMode.DOWN);
         nullifyTopCouponMoneyTotal=nullifyTopCouponMoneyTotal.add(totalCouponSharePrice.subtract(groupTopProductTotal));
         if(nullifyTopCouponMoneyTotal.compareTo(BigDecimal.ZERO)==-1){
             //A品卷金额小于18A商品总额
