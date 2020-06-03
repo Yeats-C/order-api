@@ -698,6 +698,19 @@ public class CopartnerAreaServiceImpl implements CopartnerAreaService {
 		List<CopartnerAreaUp> roleList = copartnerAreaRoleDao.qryCopartnerAreaListBypersonId(personId);
 		return HttpResponse.success(roleList);
 	}
+
+
+	/**
+	 * 新建区域-下辖公司-新增二级公司
+	 * @param copartnerAreaName
+	 * @return
+	 */
+	@Override
+	public HttpResponse selcetCompany(String copartnerAreaName) {
+        log.info("新建区域-下辖公司-新增二级公司：{} " , copartnerAreaName);
+//		copartnerAreaStoreDao.slecetTwoCompanyByName(copartnerAreaName);
+		return null;
+	}
 }
 
 

@@ -67,5 +67,6 @@ public interface CopartnerAreaService {
 	HttpResponse saveAreaStore(CopartnerAreaStoreVo param);
 
 	HttpResponse<CopartnerAreaUp> qryCopartnerAreaListBypersonId(String personId);
-	
+	//新建区域-下辖公司-新增二级公司
+    HttpResponse selcetCompany(String copartnerAreaName);
 }
