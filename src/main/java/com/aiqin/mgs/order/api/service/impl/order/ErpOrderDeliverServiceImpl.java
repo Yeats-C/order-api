@@ -505,6 +505,15 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 }
                 totalPriceMoney=totalPriceMoney.add(multiply1);
                 activityPriceMoneyMap.put(item.getActivityId(),totalPriceMoney);
+
+                if(null!=item.getActivityId()){
+                    quantity=quantityMap.get(item.getActivityId());
+                    if(null==quantity){
+                        quantity=0;
+                    }
+                }
+                quantity=quantity+item.getProductCount().intValue();
+                quantityMap.put(item.getActivityId(),quantity);
             }
         }
         log.info("子单全部发货完成进行均摊--活动id:商品明细行 activityCartMap={}",activityCartMap);
