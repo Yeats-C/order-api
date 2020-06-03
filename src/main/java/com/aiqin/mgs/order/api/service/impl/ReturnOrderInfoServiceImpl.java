@@ -29,7 +29,6 @@ import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderStatusVo;
 import com.aiqin.mgs.order.api.service.CopartnerAreaService;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
-import com.aiqin.mgs.order.api.service.impl.order.ErpOrderInfoServiceImpl;
 import com.aiqin.mgs.order.api.service.order.ErpOrderInfoService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
@@ -1005,7 +1004,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 //数量
                 Long productCount=eoi.getProductCount();
                 //A品卷单品金额
-                BigDecimal topCouponAmount = eoi.getTopCouponAmount();
+                BigDecimal topCouponAmount = eoi.getTopCouponAmount() == null ? BigDecimal.ZERO : eoi.getTopCouponAmount();
                 //实发数量
                 Long actualProductCount=eoi.getActualProductCount();
                 if(null==actualProductCount){
@@ -1027,7 +1026,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     }
                     totalCount=totalCount+differenceCount;
                     //实退商品的A品卷金额
-                    if(!"0.0000".equals(topCouponAmount.toString())){
+                    if(!"0".equals(topCouponAmount.toString())) {
                         BigDecimal CommodityA = topCouponAmount.multiply(BigDecimal.valueOf(differenceCount));
                         topCouponDiscountAmount = topCouponDiscountAmount.add(CommodityA);
                     }
@@ -1056,7 +1055,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     }
                     totalCount=totalCount+differenceCount;
                     //实退商品的A品卷金额
-                    if (!"0.0000".equals(topCouponAmount.toString())){
+                    if (!"0".equals(topCouponAmount.toString())) {
                         BigDecimal AllCommodityA = topCouponAmount.multiply(BigDecimal.valueOf(productCount));
                         topCouponDiscountAmount = topCouponDiscountAmount.add(AllCommodityA);
                     }
@@ -1097,7 +1096,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 //应退赠品总金额
 //                returnOrderInfo.setTotalZengAmount(totalAmount);
                 returnOrderInfo.setComplimentaryAmount(complimentaryAmount);
-//                //退A品卷总金额
+                //退A品卷总金额
 //                returnOrderInfo.setTopCouponDiscountAmount(topCouponDiscountAmount);
                 //退货金额=商品冲减金额+赠品退积分金额
                 returnOrderInfo.setReturnOrderAmount(totalAmount.add(complimentaryAmount));
@@ -1156,8 +1155,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 }
                 return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
             }
-
-
         }
         return HttpResponse.failure(ResultCode.NOT_FOUND_ORDER_DATA);
     }
