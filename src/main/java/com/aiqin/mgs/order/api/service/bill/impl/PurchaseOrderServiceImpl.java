@@ -105,10 +105,14 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             //更新采购单明细
             for (OrderStoreDetail orderStoreDetail : purchaseInfo.getOrderStoreDetail()) {
                 PurchaseOrderDetail purchaseOrderDetail = new PurchaseOrderDetail();
-                purchaseOrderDetail.setLineCode(orderStoreDetail.getLineCode());//行号
-                purchaseOrderDetail.setSkuCode(orderStoreDetail.getSkuCode());//SKU编码
-                purchaseOrderDetail.setSkuName(orderStoreDetail.getSkuName());//SKU名称
-                purchaseOrderDetail.setTotalCount(orderStoreDetail.getActualProductCount());//实发数量
+                //行号
+                purchaseOrderDetail.setLineCode(orderStoreDetail.getLineCode());
+                //SKU编码
+                purchaseOrderDetail.setSkuCode(orderStoreDetail.getSkuCode());
+                //SKU名称
+                purchaseOrderDetail.setSkuName(orderStoreDetail.getSkuName());
+                //实发数量
+                purchaseOrderDetail.setTotalCount(orderStoreDetail.getActualProductCount());
                 purchaseOrderDetail.setPurchaseOrderCode(purchaseInfo.getOrderStoreCode());
                 purchaseOrderDetail.setUpdateById(purchaseInfo.getPersonId());
                 purchaseOrderDetail.setUpdateByName(purchaseInfo.getPersonName());
@@ -123,11 +127,16 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                     purchaseOrderDetailBatch.setPurchaseOrderDetailBatchId(IdUtil.purchaseId());
                     purchaseOrderDetailBatch.setPurchaseOrderCode(purchaseInfo.getOrderStoreCode());
                     purchaseOrderDetailBatch.setBatchCode(batchStoreDetail.getBatchCode());
-                    purchaseOrderDetailBatch.setSkuCode(batchStoreDetail.getSkuCode());//SKU编码
-                    purchaseOrderDetailBatch.setSkuCode(batchStoreDetail.getSkuName());//SKU名称
-                    purchaseOrderDetailBatch.setActualTotalCount(purchaseInfo.getActualTotalCount());//实际销售数量
-                    purchaseOrderDetailBatch.setBatchCode(batchStoreDetail.getSkuName());//SKU名称
-                    purchaseOrderDetailBatch.setLineCode(batchStoreDetail.getLineCode());//行号
+                    //SKU编码
+                    purchaseOrderDetailBatch.setSkuCode(batchStoreDetail.getSkuCode());
+                    //SKU名称
+                    purchaseOrderDetailBatch.setSkuCode(batchStoreDetail.getSkuName());
+                    //实际销售数量
+                    purchaseOrderDetailBatch.setActualTotalCount(purchaseInfo.getActualTotalCount());
+                    //SKU名称
+                    purchaseOrderDetailBatch.setBatchCode(batchStoreDetail.getSkuName());
+                    //行号
+                    purchaseOrderDetailBatch.setLineCode(batchStoreDetail.getLineCode());
                     purchaseOrderDetailBatch.setCreateById(purchaseInfo.getPersonId());
                     purchaseOrderDetailBatch.setCreateByName(purchaseInfo.getPersonName());
                     purchaseOrderDetailBatch.setCreateTime(new Date());
@@ -208,7 +217,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     public HttpResponse updateCancelOrderinfo(String orderStoreCode) {
         PurchaseOrderInfo purchaseOrder = new PurchaseOrderInfo();
         Integer purchaseOrderStatusRemove = PurchaseOrderStatusEnum.PURCHASE_ORDER_STATUS_REMOVE.getCode();
-        purchaseOrder.setPurchaseOrderStatus(purchaseOrderStatusRemove);//采购单状态
+        //采购单状态
+        purchaseOrder.setPurchaseOrderStatus(purchaseOrderStatusRemove);
         purchaseOrder.setPurchaseOrderCode(orderStoreCode);
         int result = purchaseOrderDao.updateByPurchaseOrderStatus(purchaseOrder);
         if (result == 1) {
