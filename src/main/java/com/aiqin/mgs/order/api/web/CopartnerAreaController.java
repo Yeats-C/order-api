@@ -278,4 +278,14 @@ public class CopartnerAreaController {
     public HttpResponse saveAreaStore(@RequestBody CopartnerAreaStoreVo param) {
         return copartnerAreaService.saveAreaStore(param);
     }
+
+
+    /**
+     * 新建区域-下辖公司-新增二级公司-查询二级公司
+     */
+    @GetMapping("/get/two/company")
+    @ApiOperation("新建区域-下辖公司-新增-查询二级公司")
+    public HttpResponse saveTwoCompany(@RequestParam String  copartnerAreaName){
+        return copartnerAreaService.selcetCompany(copartnerAreaName);
+    }
 }
