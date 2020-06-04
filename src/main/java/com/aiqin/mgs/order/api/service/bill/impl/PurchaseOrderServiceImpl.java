@@ -50,7 +50,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
     @Override
     public HttpResponse createPurchaseOrder(@Valid List<ErpOrderInfo> erpOrderInfos) {
-        LOGGER.info("根据ERP订单生成爱亲采购单，采购单开始，erpOrderInfo{}", erpOrderInfos);
+        LOGGER.info("根据ERP订单生成爱亲采购单，采购单开始，erpOrderInfo{}", JsonUtil.toJson(erpOrderInfos));
         if (CollectionUtils.isNotEmpty(erpOrderInfos)) {
             //异步执行。
             purchaseOrderExecutor(erpOrderInfos);
