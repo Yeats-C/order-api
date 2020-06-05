@@ -21,6 +21,7 @@ public interface WholesaleCustomersDao {
     int totalCount(WholesaleCustomers  wholesaleCustomers);
 
 
+    int insert(WholesaleCustomers wholesaleCustomers);
 }
 
 

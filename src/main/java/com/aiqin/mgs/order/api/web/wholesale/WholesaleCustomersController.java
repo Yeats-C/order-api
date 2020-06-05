@@ -9,9 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -34,6 +32,13 @@ public class WholesaleCustomersController {
     public HttpResponse<PageResData<WholesaleCustomers>> list(WholesaleCustomers wholesaleCustomers){
         return wholesaleCustomersService.list(wholesaleCustomers);
     }
+
+    @ApiOperation("新增审批")
+    @PostMapping("/insert")
+    public HttpResponse insert(@RequestBody WholesaleCustomers wholesaleCustomers) {
+        return wholesaleCustomersService.insert(wholesaleCustomers);
+    }
+
 
 
 

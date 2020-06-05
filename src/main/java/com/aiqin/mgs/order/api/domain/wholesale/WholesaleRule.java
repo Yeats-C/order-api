@@ -48,5 +48,5 @@ public class WholesaleRule implements Serializable {
 
     @ApiModelProperty(value = "规则类型：1.仓库  2.品牌  3品类  4 单品")
     @JsonProperty("type")
-    private String type;
+    private int type;
 }
