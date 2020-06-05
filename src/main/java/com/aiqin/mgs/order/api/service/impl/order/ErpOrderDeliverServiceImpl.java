@@ -25,6 +25,7 @@ import com.aiqin.mgs.order.api.service.CouponRuleService;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.service.gift.GiftQuotasUseDetailService;
 import com.aiqin.mgs.order.api.service.order.*;
+import com.aiqin.mgs.order.api.util.OrderPublic;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -264,41 +265,41 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             if (logistics.getLogisticsFee() == null) {
                 throw new BusinessException("缺失物流费用");
             }
-//            orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsCode(logistics.getLogisticsCode());
-//            if(orderLogistics!=null){
-//                throw new BusinessException("此物流单号已存在");
-//            }
-//            if (orderLogistics == null) {
-//                //新的物流信息，先保存物流信息
-//
-//                ErpOrderLogistics newOrderLogistics = new ErpOrderLogistics();
-//                newOrderLogistics.setLogisticsId(OrderPublic.getUUID());
-//                newOrderLogistics.setLogisticsCode(logistics.getLogisticsCode());
-//                newOrderLogistics.setLogisticsCentreCode(logistics.getLogisticsCentreCode());
-//                newOrderLogistics.setLogisticsCentreName(logistics.getLogisticsCentreName());
-//                newOrderLogistics.setSendRepertoryCode(logistics.getSendRepertoryCode());
-//                newOrderLogistics.setSendRepertoryName(logistics.getSendRepertoryName());
-//                newOrderLogistics.setLogisticsFee(logistics.getLogisticsFee());
-//                newOrderLogistics.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
-//                erpOrderLogisticsService.saveOrderLogistics(newOrderLogistics, auth);
-//                orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsCode(logistics.getLogisticsCode());
-//            } else {
-//                if (orderLogistics.getLogisticsFee().compareTo(logistics.getLogisticsFee()) != 0) {
-//                    throw new BusinessException("物流单费用与已有物流单费用不相等");
-//                }
-//                if (!orderLogistics.getLogisticsCentreCode().equals(logistics.getLogisticsCentreCode())) {
-//                    throw new BusinessException("物流公司编码与已有物流单物流公司编码不相同");
-//                }
-//                if (!orderLogistics.getLogisticsCentreName().equals(logistics.getLogisticsCentreName())) {
-//                    throw new BusinessException("物流公司名称与已有物流单物流公司名称不相同");
-//                }
-//                if (!orderLogistics.getSendRepertoryCode().equals(logistics.getSendRepertoryCode())) {
-//                    throw new BusinessException("发货仓库编码与已有物流单发货仓库编码不相同");
-//                }
-//                if (!orderLogistics.getSendRepertoryName().equals(logistics.getSendRepertoryName())) {
-//                    throw new BusinessException("发货仓库名称与已有物流单发货仓库名称不相同");
-//                }
-//            }
+            orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsCode(logistics.getLogisticsCode());
+            if(orderLogistics!=null){
+                throw new BusinessException("此物流单号已存在");
+            }
+            if (orderLogistics == null) {
+                //新的物流信息，先保存物流信息
+
+                ErpOrderLogistics newOrderLogistics = new ErpOrderLogistics();
+                newOrderLogistics.setLogisticsId(OrderPublic.getUUID());
+                newOrderLogistics.setLogisticsCode(logistics.getLogisticsCode());
+                newOrderLogistics.setLogisticsCentreCode(logistics.getLogisticsCentreCode());
+                newOrderLogistics.setLogisticsCentreName(logistics.getLogisticsCentreName());
+                newOrderLogistics.setSendRepertoryCode(logistics.getSendRepertoryCode());
+                newOrderLogistics.setSendRepertoryName(logistics.getSendRepertoryName());
+                newOrderLogistics.setLogisticsFee(logistics.getLogisticsFee());
+                newOrderLogistics.setPayStatus(ErpPayStatusEnum.UNPAID.getCode());
+                erpOrderLogisticsService.saveOrderLogistics(newOrderLogistics, auth);
+                orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsCode(logistics.getLogisticsCode());
+            } else {
+                if (orderLogistics.getLogisticsFee().compareTo(logistics.getLogisticsFee()) != 0) {
+                    throw new BusinessException("物流单费用与已有物流单费用不相等");
+                }
+                if (!orderLogistics.getLogisticsCentreCode().equals(logistics.getLogisticsCentreCode())) {
+                    throw new BusinessException("物流公司编码与已有物流单物流公司编码不相同");
+                }
+                if (!orderLogistics.getLogisticsCentreName().equals(logistics.getLogisticsCentreName())) {
+                    throw new BusinessException("物流公司名称与已有物流单物流公司名称不相同");
+                }
+                if (!orderLogistics.getSendRepertoryCode().equals(logistics.getSendRepertoryCode())) {
+                    throw new BusinessException("发货仓库编码与已有物流单发货仓库编码不相同");
+                }
+                if (!orderLogistics.getSendRepertoryName().equals(logistics.getSendRepertoryName())) {
+                    throw new BusinessException("发货仓库名称与已有物流单发货仓库名称不相同");
+                }
+            }
         }
 
         List<String> orderCodeList = erpOrderTransportRequest.getOrderCodeList();
