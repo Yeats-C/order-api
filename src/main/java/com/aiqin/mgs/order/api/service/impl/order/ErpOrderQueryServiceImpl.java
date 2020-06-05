@@ -182,7 +182,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             itemOrderFee.setTopCouponMoney(topCouponMoney);
             itemOrderFee.setSuitCouponMoney(suitCouponMoney);
             itemOrderFee.setUsedGiftQuota(usedGiftQuota);
-            itemOrderFee.setPayMoney(payMoney);
+            itemOrderFee.setPayMoney(payMoney.subtract(topCouponMoney));
             order.setItemOrderFee(itemOrderFee);
 
             log.info("根据订单编号查询订单详情信息 子订单支付信息为：itemOrderFee={}"+itemOrderFee);

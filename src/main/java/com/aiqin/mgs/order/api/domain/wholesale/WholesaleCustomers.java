@@ -9,6 +9,9 @@ import lombok.Data;
 import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * @author 批发客户信息bean
+ */
 @Data
 @ApiModel("批发客户信息bean")
 public class WholesaleCustomers extends PagesRequest implements Serializable {

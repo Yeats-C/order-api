@@ -370,6 +370,13 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             if(aBoolean){
                 //三步均摊
                 shareEqually(order.getMainOrderCode());
+
+                //判断是否拆单，是否是子订单
+                if(order.getOrderStoreCode()!=order.getMainOrderCode()){
+                    //更新子订单里的均摊金额
+                    updateSubOrder(order.getMainOrderCode());
+                }
+
                 //遍历退货单，查看是否有退单
                 ErpOrderInfo e=new ErpOrderInfo();
                 e.setMainOrderCode(order.getMainOrderCode());
@@ -413,6 +420,51 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             //均摊物流费用
             this.distributeLogisticsFee(orderLogistics.getLogisticsCode());
         }
+    }
+
+    /**
+     * 均摊完毕更新子订单明细
+     * @param mainOrderCode
+     */
+    private void updateSubOrder(String mainOrderCode) {
+        log.info("均摊完毕更新子订单明细--入参 mainOrderCode={}",mainOrderCode);
+        ErpOrderInfo orderAndItemByOrderCode = erpOrderQueryService.getOrderAndItemByOrderCode(mainOrderCode);
+        log.info("均摊完毕更新子订单明细--查询原始主订单及详情返回结果 orderAndItemByOrderCode={}",JsonUtil.toJson(orderAndItemByOrderCode));
+        List<ErpOrderItem> itemList = orderAndItemByOrderCode.getItemList();
+        //获取有A品卷均摊数据的明细数据，存入Map
+        Map<String,BigDecimal> topMap=new HashMap();
+        for(ErpOrderItem item:itemList){
+            if(null!=item.getTopCouponAmount()&&item.getTopCouponAmount().compareTo(BigDecimal.ZERO)==1){
+                topMap.put(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode(),item.getTopCouponAmount());
+            }
+        }
+        //子订单明细集合
+        List<ErpOrderItem> subItemList=new ArrayList<>();
+        //需更新的子订单明细集合
+        List<ErpOrderItem> updateSubItemList=new ArrayList<>();
+        /*********************************通过主订单编码查询子订单code集合**************************/
+        List<String> subOrderCodeList=erpOrderInfoDao.subOrderList(mainOrderCode);
+        for (String orderCode:subOrderCodeList){
+            ErpOrderInfo subOrderAndItemByOrderCode = erpOrderQueryService.getOrderAndItemByOrderCode(orderCode);
+            subItemList.addAll(subOrderAndItemByOrderCode.getItemList());
+        }
+
+        for(ErpOrderItem item:subItemList){
+            if(topMap.containsKey(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode())){
+                BigDecimal topCouponAmount=topMap.get(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
+                item.setTopCouponAmount(topCouponAmount);
+                item.setTopCouponDiscountAmount(topCouponAmount.multiply(new BigDecimal(item.getActualProductCount())));
+                updateSubItemList.add(item);
+            }
+        }
+        /*****************************************子订单数据更新结束，更新明细表*****************************************/
+        log.info("均摊完毕更新子订单明细--所有分摊结束--更新子订单明细集合 resList={}",JsonUtil.toJson(updateSubItemList));
+        AuthToken auth=new AuthToken();
+        auth.setPersonId("系统操作");
+        auth.setPersonName("系统操作");
+        erpOrderItemService.updateOrderItemList(updateSubItemList,auth);
+        log.info("均摊完毕更新子订单明细--更新明细表结束");
+
     }
 
     /**

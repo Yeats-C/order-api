@@ -828,5 +828,16 @@
         i.store_code
         ) a
     </select>
+
+    <!--通过主订单code查询所有子订单合集-->
+    <select id="subOrderList" resultType="java.lang.String">
+         SELECT
+            order_store_code
+        FROM
+            order_store_info
+        WHERE
+            main_order_code = #{mainOrderCode}
+            AND order_store_code != #{mainOrderCode}
+    </select>
 </mapper>
 
