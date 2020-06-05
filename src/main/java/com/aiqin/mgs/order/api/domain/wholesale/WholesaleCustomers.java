@@ -8,6 +8,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author 批发客户信息bean
@@ -106,4 +107,20 @@ public class WholesaleCustomers extends PagesRequest implements Serializable {
     @ApiModelProperty(value="修改人")
     @JsonProperty("update_by")
     private String updateBy;
+
+    @ApiModelProperty(value="仓库List")
+    @JsonProperty("warehouse_list")
+    private List<WholesaleRule> warehouseList;
+
+    @ApiModelProperty(value="品牌List")
+    @JsonProperty("brand_list")
+    private List<WholesaleRule> brandList;
+
+    @ApiModelProperty(value="品类List")
+    @JsonProperty("category_list")
+    private List<WholesaleRule> categoryList;
+
+    @ApiModelProperty(value="单品List")
+    @JsonProperty("product_list")
+    private List<WholesaleRule> productList;
 }

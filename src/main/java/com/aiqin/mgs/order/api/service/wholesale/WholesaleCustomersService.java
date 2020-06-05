@@ -14,4 +14,5 @@ public interface WholesaleCustomersService {
     HttpResponse<PageResData<WholesaleCustomers>> list(WholesaleCustomers wholesaleCustomers);
 
 
+    HttpResponse insert(WholesaleCustomers wholesaleCustomers);
 }
