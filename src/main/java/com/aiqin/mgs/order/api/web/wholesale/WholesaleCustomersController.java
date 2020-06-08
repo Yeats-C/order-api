@@ -33,16 +33,27 @@ public class WholesaleCustomersController {
         return wholesaleCustomersService.list(wholesaleCustomers);
     }
 
-    @ApiOperation("新增审批")
+    @ApiOperation("新增批发客户")
     @PostMapping("/insert")
     public HttpResponse insert(@RequestBody WholesaleCustomers wholesaleCustomers) {
         return wholesaleCustomersService.insert(wholesaleCustomers);
     }
 
+    /**
+     * 通过customerCode查询批发客户
+     * @param customerCode
+     * @return
+     */
+    @GetMapping("/getCustomerByCode")
+    @ApiOperation(value = "通过code查询批发客户")
+    public HttpResponse<WholesaleCustomers> getCustomerByCode(String customerCode){
+        return wholesaleCustomersService.getCustomerByCode(customerCode);
+    }
 
-
-
-
-
+    @ApiOperation("修改批发客户")
+    @PostMapping("/update")
+    public HttpResponse update(@RequestBody WholesaleCustomers wholesaleCustomers) {
+        return wholesaleCustomersService.update(wholesaleCustomers);
+    }
 
 }

@@ -2,7 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aiqin.mgs.order.api.dao.wholesale.WholesaleCustomersDao">
 
-
     <!--批发客户列表-->
     <select id="list" resultType="com.aiqin.mgs.order.api.domain.wholesale.WholesaleCustomers"
             parameterType="com.aiqin.mgs.order.api.domain.wholesale.WholesaleCustomers">
@@ -34,13 +33,13 @@
             <where>
                 1=1
                 <if test="customerCode != '' and customerCode != null">
-                    and customer_code =like CONCAT(CONCAT('',#{customerCode}),'%')
+                    and customer_code like CONCAT(CONCAT('%',#{customerCode}),'%')
                 </if>
                 <if test="customerName != '' and customerName != null">
-                    and customer_name =like CONCAT(CONCAT('',#{customerName}),'%')
+                    and customer_name like CONCAT(CONCAT('%',#{customerName}),'%')
                 </if>
                 <if test="phoneNumber != '' and phoneNumber != null">
-                    and phone_number =like CONCAT(CONCAT('',#{phoneNumber}),'%')
+                    and phone_number like CONCAT(CONCAT('%',#{phoneNumber}),'%')
                 </if>
                 <if test="provinceId != '' and provinceId != null">
                     and province_id = #{provinceId}
@@ -67,13 +66,13 @@
         <where>
             1=1
             <if test="customerCode != '' and customerCode != null">
-                and customer_code =like CONCAT(CONCAT('',#{customerCode}),'%')
+                and customer_code like CONCAT(CONCAT('%',#{customerCode}),'%')
             </if>
             <if test="customerName != '' and customerName != null">
-                and customer_name =like CONCAT(CONCAT('',#{customerName}),'%')
+                and customer_name like CONCAT(CONCAT('%',#{customerName}),'%')
             </if>
             <if test="phoneNumber != '' and phoneNumber != null">
-                and phone_number =like CONCAT(CONCAT('',#{phoneNumber}),'%')
+                and phone_number like CONCAT(CONCAT('%',#{phoneNumber}),'%')
             </if>
             <if test="provinceId != '' and provinceId != null">
                 and province_id = #{provinceId}
@@ -83,6 +82,28 @@
             </if>
             <if test="districtId != '' and districtId != null">
                 and district_id = #{districtId}
+            </if>
+        </where>
+    </select>
+
+    <!--通过customerCode查询批发客户商品权限-->
+    <select id="getWholesaleRuleList" resultType="com.aiqin.mgs.order.api.domain.wholesale.WholesaleRule">
+        SELECT
+        customer_code as customerCode,
+        warehouse_code as warehouseCode,
+        sku_code as skuCode,
+        sku_name as skuName,
+        product_category_code as productCategroyCode,
+        product_category_name as productCategoryName,
+        product_brand_code as productBrandCode,
+        product_brand_name as productBrandName,
+        type
+        FROM
+        wholesale_rule
+        <where>
+            1=1
+            <if test="customerCode != '' and customerCode != null">
+                and customer_code = #{customerCode}
             </if>
         </where>
     </select>
@@ -102,7 +123,8 @@
             district_id,
             district_name,
             street_address,
-            company_code company_name,
+            company_code,
+            company_name,
             use_status,
             affiliated_company,
             invite_people_code,
@@ -113,11 +135,97 @@
             update_time
         )
         values
-        ( #{customer_code},#{customer_name},#{contact_person},#{phone_number},#{identity_number},#{province_id},
-        #{province_name},#{city_id},#{city_name},#{district_id},#{district_name},#{street_address},
-        #{company_code company_name},#{use_status},#{affiliated_company},#{invite_people_code},#{invite_people_name},
-        #{create_by},#{update_by},sysdate(),sysdate()}
+        ( #{customerCode},#{customerName},#{contactPerson},#{phoneNumber},#{identityNumber},#{provinceId},
+        #{provinceName},#{cityId},#{cityName},#{districtId},#{districtName},#{streetAddress},
+        #{companyCode},#{companyName},0,#{affiliatedCompany},#{invitePeopleCode},#{invitePeopleName},
+        #{createBy},#{updateBy},sysdate(),sysdate()
 	    )
     </insert>
+
+    <!--批量插入批发客户商品权限规则-->
+    <insert id="bulkInsertionRules" parameterType="java.util.List">
+        insert into wholesale_rule (customer_code, warehouse_code,sku_code, sku_name, product_category_code,product_category_name,product_brand_code,product_brand_name,type)
+        values
+        <foreach collection="list" item="rule" separator=",">
+            (
+            #{rule.customerCode,jdbcType=VARCHAR},
+            #{rule.warehouseCode,jdbcType=VARCHAR},
+            #{rule.skuCode,jdbcType=VARCHAR},
+            #{rule.skuName,jdbcType=VARCHAR},
+            #{rule.productCategoryCode,jdbcType=VARCHAR},
+            #{rule.productCategoryName,jdbcType=VARCHAR},
+            #{rule.productBrandCode,jdbcType=VARCHAR},
+            #{rule.productBrandName,jdbcType=VARCHAR},
+            #{rule.type,jdbcType=INTEGER}
+            )
+        </foreach>
+    </insert>
+
+    <!--修改批发客户-->
+    <update id="update" parameterType="com.aiqin.mgs.order.api.domain.wholesale.WholesaleCustomers">
+        update wholesale_customers
+        <set>
+            <if test="customerName != null and customerCode !=''">
+                customer_name = #{customerName,jdbcType=VARCHAR},
+            </if>
+            <if test="contactPerson != null and contactPerson !=''">
+                contact_person = #{contactPerson,jdbcType=VARCHAR},
+            </if>
+            <if test="phoneNumber != null and phoneNumber !=''">
+                phone_number = #{phoneNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="identityNumber != null and identityNumber !=''">
+                identity_number = #{identityNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="provinceId != null" >
+                province_id = #{provinceId,jdbcType=VARCHAR},
+            </if>
+            <if test="provinceName != null" >
+                province_name = #{provinceName,jdbcType=VARCHAR},
+            </if>
+            <if test="cityId != null" >
+                city_id = #{cityId,jdbcType=VARCHAR},
+            </if>
+            <if test="cityName != null" >
+                city_name = #{cityName,jdbcType=VARCHAR},
+            </if>
+            <if test="districtId != null" >
+                district_id = #{districtId,jdbcType=VARCHAR},
+            </if>
+            <if test="streetAddress != null" >
+                street_address = #{streetAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="companyCode != null" >
+                company_code = #{companyCode,jdbcType=VARCHAR},
+            </if>
+            <if test="companyName != null" >
+                company_name = #{companyName,jdbcType=VARCHAR},
+            </if>
+            <if test="useStatus != null">
+                use_status = #{useStatus,jdbcType=BIT},
+            </if>
+            <if test="affiliatedCompany != null">
+                affiliated_company = #{affiliatedCompany,jdbcType=VARCHAR},
+            </if>
+            <if test="invitePeopleCode != null">
+                invite_people_code = #{invitePeopleCode,jdbcType=VARCHAR},
+            </if>
+            <if test="invitePeopleName != null">
+                invite_people_name = #{invitePeopleName,jdbcType=VARCHAR},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=VARCHAR},
+            </if>
+            update_time = now()
+            where customer_code = #{customerCode,jdbcType=VARCHAR}
+        </set>
+    </update>
+
+    <!--清空批发空户的商品权限-->
+    <delete id="clearRules">
+        delete from wholesale_rule
+        where customer_code = #{customerCode,jdbcType=VARCHAR}
+    </delete>
+
 </mapper>
 
