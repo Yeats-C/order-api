@@ -117,4 +117,11 @@ public interface ErpOrderInfoDao {
      * @param orderCode
      */
     int updateScourSheetStatus(String orderCode);
+
+    /**
+     * 通过主订单编码查询子订单code集合
+     * @param mainOrderCode
+     * @return
+     */
+    List<String> subOrderList(@Param("mainOrderCode") String mainOrderCode);
 }

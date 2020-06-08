@@ -13,5 +13,24 @@ public interface WholesaleCustomersService {
      */
     HttpResponse<PageResData<WholesaleCustomers>> list(WholesaleCustomers wholesaleCustomers);
 
+    /**
+     * 新增批发客户
+     * @param wholesaleCustomers
+     * @return
+     */
+    HttpResponse insert(WholesaleCustomers wholesaleCustomers);
 
+    /**
+     * 通过customerCode查询批发客户
+     * @param customerCode
+     * @return
+     */
+    HttpResponse<WholesaleCustomers> getCustomerByCode(String customerCode);
+
+    /**
+     * 修改批发客户
+     * @param wholesaleCustomers
+     * @return
+     */
+    HttpResponse update(WholesaleCustomers wholesaleCustomers);
 }
