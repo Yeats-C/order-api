@@ -41,11 +41,17 @@ public class AppServiceImpl implements AppService {
     @Override
     public HttpResponse appUpload(MultipartFile file) {
         Map<String, String> stringMap=new HashMap<>();
+        AppVersionInfo appVersionInfo=new AppVersionInfo();
         try {
             stringMap= ossUtil.uploadFile(file);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return HttpResponse.success(stringMap);
+        if (stringMap!=null){
+
+            appVersionInfo.setAppBuild(stringMap.get("appBuild"));
+            appVersionInfo.setUpdateUrl(stringMap.get("url"));
+        }
+        return HttpResponse.success(appVersionInfo);
     }
 }

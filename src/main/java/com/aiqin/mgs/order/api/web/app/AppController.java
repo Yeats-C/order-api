@@ -44,7 +44,7 @@ public class AppController {
 
     @PostMapping("/verson/upload")
     @ApiOperation("上传安装包")
-    public HttpResponse appUpload(MultipartFile file) {
+    public HttpResponse<AppVersionInfo> appUpload(MultipartFile file) {
         return appService.appUpload(file);
     }
     @PostMapping("/verson/add")
