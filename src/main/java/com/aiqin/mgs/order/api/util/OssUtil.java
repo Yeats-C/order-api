@@ -44,6 +44,11 @@ public class OssUtil {
         Map<String, String> map = new HashMap<>();
         OSSClient ossClient = new OSSClient(endPoint, accessKeyId, accessKeySecret);
         String type = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+        String appBuild=file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("_"));
+        if (appBuild!=null){
+            appBuild=StringUtils.substringBefore(appBuild,".");
+            appBuild=appBuild.substring(1);
+        }
         String fileName = dir + "/" + UUID.randomUUID() + type;
         ossClient.putObject(bucketName, fileName, new ByteArrayInputStream(file.getBytes()));
         ossClient.shutdown();
@@ -53,6 +58,7 @@ public class OssUtil {
         map.put("name", fileName);
         map.put("url", url);
         map.put("dir", dir);
+        map.put("appBuild", appBuild);
         return map;
     }
 
