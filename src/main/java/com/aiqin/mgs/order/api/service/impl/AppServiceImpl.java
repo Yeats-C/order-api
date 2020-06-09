@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.service.impl;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.dao.AppVersionDao;
 import com.aiqin.mgs.order.api.domain.AppVersionInfo;
 import com.aiqin.mgs.order.api.service.AppService;
 import com.aiqin.mgs.order.api.util.OssUtil;
@@ -22,7 +23,8 @@ public class AppServiceImpl implements AppService {
 
     @Autowired
     private OssUtil ossUtil;
-
+    @Autowired
+    private AppVersionDao appVersionDao;
     @Override
     public HttpResponse<AppVersionInfo> appActive(AppVersionInfo appVersionInfo) {
         return null;
@@ -30,7 +32,8 @@ public class AppServiceImpl implements AppService {
 
     @Override
     public HttpResponse appAdd(AppVersionInfo appVersionInfo) {
-        return null;
+        int n= appVersionDao.add(appVersionInfo);
+        return HttpResponse.success(n);
     }
 
     @Override

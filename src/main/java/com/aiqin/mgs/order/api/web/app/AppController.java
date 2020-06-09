@@ -47,6 +47,7 @@ public class AppController {
     public HttpResponse<AppVersionInfo> appUpload(MultipartFile file) {
         return appService.appUpload(file);
     }
+
     @PostMapping("/verson/add")
     @ApiOperation("添加更新")
     public HttpResponse appAdd(@Validated @RequestBody AppVersionInfo appVersionInfo) {
