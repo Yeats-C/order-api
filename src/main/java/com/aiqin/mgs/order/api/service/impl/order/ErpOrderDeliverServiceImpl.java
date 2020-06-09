@@ -650,7 +650,13 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                             if (curRule != null) {//命中规则
                                 youHuiAmount=curRule.getPreferentialAmount();
                                 //满减活动商品总金额=商品总金额-优惠金额
-                                productAmount=productAmount.subtract(youHuiAmount);
+                                if(productAmount.compareTo(youHuiAmount)==1){
+                                    productAmount=productAmount.subtract(youHuiAmount);
+                                }else{
+                                    //优惠金额大于活动商品总价值
+                                    productAmount=BigDecimal.ZERO;
+                                }
+
                             }
                             break;
                         case 2:

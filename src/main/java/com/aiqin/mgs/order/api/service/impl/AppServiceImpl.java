@@ -1,13 +1,18 @@
 package com.aiqin.mgs.order.api.service.impl;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.dao.AppVersionDao;
 import com.aiqin.mgs.order.api.domain.AppVersionInfo;
+import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.service.AppService;
+import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OssUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,15 +27,28 @@ public class AppServiceImpl implements AppService {
 
     @Autowired
     private OssUtil ossUtil;
-
+    @Autowired
+    private AppVersionDao appVersionDao;
     @Override
     public HttpResponse<AppVersionInfo> appActive(AppVersionInfo appVersionInfo) {
         return null;
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public HttpResponse appAdd(AppVersionInfo appVersionInfo) {
-        return null;
+        AuthUtil.loginCheck();
+        AuthToken auth = AuthUtil.getCurrentAuth();
+        appVersionInfo.setCreateBy(auth.getPersonName());
+        appVersionInfo.setCreateById(auth.getPersonId());
+        appVersionInfo.setCreateTime(new Date());
+        appVersionInfo.setState(1);
+        appVersionInfo.setUpdateById(auth.getPersonId());
+        appVersionInfo.setUpdateByName(auth.getPersonName());
+        appVersionInfo.setUpdateTime(new Date());
+        appVersionDao.updateStateAll(appVersionInfo);
+        int n= appVersionDao.add(appVersionInfo);
+        return HttpResponse.success(n);
     }
 
     @Override

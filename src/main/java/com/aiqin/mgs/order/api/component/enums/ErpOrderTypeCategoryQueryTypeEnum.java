@@ -24,6 +24,8 @@ public enum ErpOrderTypeCategoryQueryTypeEnum {
     STORE_ORDER_LIST_QUERY(5, "5", "爱掌柜查询订单列表订单类型类别"),
     /***爱掌柜查询购物车可创建订单类型类别*/
     STORE_CART_ORDER_CREATE(6, "6", "爱掌柜查询购物车可创建订单类型类别"),
+    /***运营ERP查询批发订单列表*/
+    ERP_WHOLESALE_ORDER_LIST_QUERY(7, "7", "运营ERP查询批发订单列表"),
     ;
 
     /***数字类型状态*/

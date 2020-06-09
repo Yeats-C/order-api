@@ -313,6 +313,10 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                 if (!item.isStoreQuery()) {
                     continue;
                 }
+            } else if (queryTypeEnum == ErpOrderTypeCategoryQueryTypeEnum.ERP_WHOLESALE_ORDER_LIST_QUERY) {
+                if (!item.isErpWholesaleQuery()) {
+                    continue;
+                }
             } else {
                 continue;
             }
@@ -407,6 +411,12 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
     @Override
     public String getMaxOrderCodeByCurrentDay(String currentDay) {
         return erpOrderInfoDao.getMaxOrderCodeByCurrentDay(currentDay);
+    }
+
+    @Override
+    public PageResData<ErpOrderInfo> findErpWholesaleOrderList(ErpOrderQueryRequest erpOrderQueryRequest) {
+        erpOrderQueryRequest.setQueryTypeEnum(ErpOrderTypeCategoryQueryTypeEnum.ERP_WHOLESALE_ORDER_LIST_QUERY);
+        return this.findOrderList(erpOrderQueryRequest);
     }
 
     /**
