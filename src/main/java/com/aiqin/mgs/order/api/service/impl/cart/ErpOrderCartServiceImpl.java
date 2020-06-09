@@ -157,7 +157,13 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         if (erpCartAddRequest.getProductType() == null) {
             throw new BusinessException("商品类型为空");
         }
-        StoreInfo store = erpOrderRequestService.getStoreInfoByStoreId(erpCartAddRequest.getStoreId());
+        StoreInfo store = new StoreInfo();
+        if(YesOrNoEnum.YES.getCode().equals(erpCartAddRequest.getIsWholesale())){
+            store.setProvinceId(null);
+            store.setCityId(null);
+        }else{
+            store=erpOrderRequestService.getStoreInfoByStoreId(erpCartAddRequest.getStoreId());
+        }
 
         List<ProductSkuRequest2> productSkuRequest2List=new ArrayList<>();
         for (ErpCartAddSkuItem item :
@@ -184,7 +190,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         //获取当前门店购物车已有的商品
         Map<String, ErpOrderCartInfo> cartLineMap = new HashMap<>(16);
         ErpOrderCartInfo queryInfo = new ErpOrderCartInfo();
-        queryInfo.setStoreId(store.getStoreId());
+        queryInfo.setStoreId(erpCartAddRequest.getStoreId());
         queryInfo.setProductType(erpCartAddRequest.getProductType());
         List<ErpOrderCartInfo> select = erpOrderCartDao.select(queryInfo);
         if (select != null && select.size() > 0) {
@@ -236,10 +242,15 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 //首单赠送类型的订单时订单中商品的分销价取熙耘中商品基本信息中的厂商指导价
                 if(YesOrNoEnum.YES.getCode().equals(erpCartAddRequest.getFirstOrderGift())){
                     erpOrderCartInfo.setPrice(skuDetail.getManufacturerGuidePrice());
-                }else{
-                    //其余类型取分销价
-                    erpOrderCartInfo.setPrice(skuDetail.getPriceTax());
                 }
+                //批发订单中商品的价格取前端传来的批发价格
+                if(YesOrNoEnum.YES.getCode().equals(erpCartAddRequest.getIsWholesale())){
+                    erpOrderCartInfo.setPrice(item.getWholesalePrice());
+                }
+
+                //其余类型取分销价
+                erpOrderCartInfo.setPrice(skuDetail.getPriceTax());
+
 
                 erpOrderCartInfo.setLogo(skuDetail.getProductPicturePath());
                 erpOrderCartInfo.setColor(skuDetail.getColorName());

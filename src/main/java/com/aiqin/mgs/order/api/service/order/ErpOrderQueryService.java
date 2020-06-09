@@ -168,4 +168,11 @@ public interface ErpOrderQueryService {
      * @date 2019/12/24 18:53
      */
     String getMaxOrderCodeByCurrentDay(String currentDay);
+
+    /**
+     * 查询批发订单列表
+     * @param erpOrderQueryRequest
+     * @return
+     */
+    PageResData<ErpOrderInfo> findErpWholesaleOrderList(ErpOrderQueryRequest erpOrderQueryRequest);
 }
