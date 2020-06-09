@@ -30,12 +30,22 @@
         values
             ( #{systemType},
             #{appVersion},
-            #{gift.productCode,jdbcType=VARCHAR},
-            #{gift.numbers,jdbcType=INTEGER},
-            #{gift.ruleId,jdbcType=VARCHAR})
+            #{appType},
+            #{appBuild},
+            #{updateUrl} ,#{updateDesc}, #{createTime}, #{createBy}, #{createById}, #{updateById}, #{updateByName}, #{updateTime}, #{state})
     </insert>
 
+<update id="updateStateAll" parameterType="com.aiqin.mgs.order.api.domain.AppVersionInfo">
+    update app_version_info set state=2 where
 
+         system_type = #{systemType}
+         and state=1
+        <if test=" appType != '' and appType!=null">
+         and app_type=#{appType}
+        </if>
+
+
+</update>
 
 
 </mapper>

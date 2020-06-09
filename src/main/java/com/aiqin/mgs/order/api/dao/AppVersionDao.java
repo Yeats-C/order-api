@@ -10,4 +10,11 @@ import com.aiqin.mgs.order.api.domain.AppVersionInfo;
  */
 public interface AppVersionDao {
     int add(AppVersionInfo appVersionInfo);
+
+    /**
+     * 将所有同类型的状态修改为结束
+     * @param appVersionInfo
+     * @return
+     */
+    int updateStateAll(AppVersionInfo appVersionInfo);
 }
