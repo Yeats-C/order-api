@@ -59,7 +59,7 @@ public class AppController {
 
     @PostMapping("/verson/list")
     @ApiOperation("版本列表")
-    public HttpResponse<PageResData> appList(@Validated @RequestBody PagesRequest pagesRequest) {
+    public HttpResponse<PageResData<AppVersionInfo>> appList(@Validated @RequestBody PagesRequest pagesRequest) {
         LOGGER.info("获取配送直送账户信息以及明细[{}]", JsonUtil.toJson(pagesRequest));
         return appService.appList(pagesRequest);
     }
