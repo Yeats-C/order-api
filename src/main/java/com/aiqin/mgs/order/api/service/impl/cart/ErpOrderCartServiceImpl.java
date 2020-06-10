@@ -249,15 +249,13 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 //首单赠送类型的订单时订单中商品的分销价取熙耘中商品基本信息中的厂商指导价
                 if(YesOrNoEnum.YES.getCode().equals(erpCartAddRequest.getFirstOrderGift())){
                     erpOrderCartInfo.setPrice(skuDetail.getManufacturerGuidePrice());
-                }
-                //批发订单中商品的价格取前端传来的批发价格
-                if(YesOrNoEnum.YES.getCode().equals(erpCartAddRequest.getIsWholesale())){
+                }else if(YesOrNoEnum.YES.getCode().equals(erpCartAddRequest.getIsWholesale())){
+                    //批发订单中商品的价格取前端传来的批发价格
                     erpOrderCartInfo.setPrice(item.getWholesalePrice());
+                }else{
+                    //其余类型取分销价
+                    erpOrderCartInfo.setPrice(skuDetail.getPriceTax());
                 }
-
-                //其余类型取分销价
-                erpOrderCartInfo.setPrice(skuDetail.getPriceTax());
-
 
                 erpOrderCartInfo.setLogo(skuDetail.getProductPicturePath());
                 erpOrderCartInfo.setColor(skuDetail.getColorName());
@@ -282,7 +280,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                     erpOrderCartInfo.setBatchInfoCode(skuDetail.getBatchList().get(0).getBatchInfoCode());
                     erpOrderCartInfo.setBatchDate(skuDetail.getBatchList().get(0).getBatchDate());
                     erpOrderCartInfo.setWarehouseTypeCode(item.getWarehouseTypeCode());
-                    if(!YesOrNoEnum.YES.getCode().equals(erpCartAddRequest.getFirstOrderGift())){
+                    if(!YesOrNoEnum.YES.getCode().equals(erpCartAddRequest.getFirstOrderGift())&&!YesOrNoEnum.YES.getCode().equals(erpCartAddRequest.getIsWholesale())){
                         erpOrderCartInfo.setPrice(skuDetail.getBatchList().get(0).getBatchPrice());
                     }
                 }
