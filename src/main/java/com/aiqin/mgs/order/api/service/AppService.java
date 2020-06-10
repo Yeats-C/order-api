@@ -1,6 +1,8 @@
 package com.aiqin.mgs.order.api.service;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.aiqin.mgs.order.api.domain.AppVersionInfo;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,7 +18,7 @@ public interface AppService {
 
     HttpResponse appAdd(AppVersionInfo appVersionInfo);
 
-    HttpResponse<List<AppVersionInfo>> appList(AppVersionInfo appVersionInfo);
+    HttpResponse<PageResData> appList(PagesRequest pagesRequest);
 
     HttpResponse appUpload(MultipartFile file);
 }

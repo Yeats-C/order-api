@@ -1,6 +1,8 @@
 package com.aiqin.mgs.order.api.service.impl;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.aiqin.mgs.order.api.dao.AppVersionDao;
 import com.aiqin.mgs.order.api.domain.AppVersionInfo;
 import com.aiqin.mgs.order.api.domain.AuthToken;
@@ -52,8 +54,9 @@ public class AppServiceImpl implements AppService {
     }
 
     @Override
-    public HttpResponse<List<AppVersionInfo>> appList(AppVersionInfo appVersionInfo) {
-        return null;
+    public HttpResponse<PageResData> appList(PagesRequest pagesRequest) {
+        List<AppVersionInfo> appVersionInfos= appVersionDao.selectAppList(pagesRequest);
+        return HttpResponse.success(new PageResData(appVersionInfos.size(), appVersionInfos));
     }
 
     @Override

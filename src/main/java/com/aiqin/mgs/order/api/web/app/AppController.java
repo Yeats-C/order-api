@@ -2,6 +2,8 @@ package com.aiqin.mgs.order.api.web.app;
 
 import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.AppVersionInfo;
 import com.aiqin.mgs.order.api.service.AppService;
@@ -57,8 +59,8 @@ public class AppController {
 
     @PostMapping("/verson/list")
     @ApiOperation("版本列表")
-    public HttpResponse<List<AppVersionInfo>> appList(@Validated @RequestBody AppVersionInfo appVersionInfo) {
-        LOGGER.info("获取配送直送账户信息以及明细[{}]", JsonUtil.toJson(appVersionInfo));
-        return appService.appList(appVersionInfo);
+    public HttpResponse<PageResData> appList(@Validated @RequestBody PagesRequest pagesRequest) {
+        LOGGER.info("获取配送直送账户信息以及明细[{}]", JsonUtil.toJson(pagesRequest));
+        return appService.appList(pagesRequest);
     }
 }

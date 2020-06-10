@@ -35,17 +35,22 @@
             #{updateUrl} ,#{updateDesc}, #{createTime}, #{createBy}, #{createById}, #{updateById}, #{updateByName}, #{updateTime}, #{state})
     </insert>
 
-<update id="updateStateAll" parameterType="com.aiqin.mgs.order.api.domain.AppVersionInfo">
-    update app_version_info set state=2 where
+    <update id="updateStateAll" parameterType="com.aiqin.mgs.order.api.domain.AppVersionInfo">
+        update app_version_info set state=2 where
 
-         system_type = #{systemType}
-         and state=1
-        <if test=" appType != '' and appType!=null">
-         and app_type=#{appType}
-        </if>
+             system_type = #{systemType}
+             and state=1
+            <if test=" appType != '' and appType!=null">
+             and app_type=#{appType}
+            </if>
 
 
-</update>
-
+    </update>
+    <select id="selectAppList" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.base.PagesRequest">
+        select
+        <include refid="Base_Column_List"/>
+        from app_version_info where  state=1   ORDER BY id DESC
+            limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </select>
 
 </mapper>

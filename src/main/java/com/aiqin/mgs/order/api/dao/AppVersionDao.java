@@ -1,7 +1,10 @@
 package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.aiqin.mgs.order.api.domain.AppVersionInfo;
+
+import java.util.List;
 
 /**
  * @author jinghaibo
@@ -17,4 +20,6 @@ public interface AppVersionDao {
      * @return
      */
     int updateStateAll(AppVersionInfo appVersionInfo);
+
+    List<AppVersionInfo> selectAppList(PagesRequest pagesRequest);
 }
