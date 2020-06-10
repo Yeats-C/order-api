@@ -180,6 +180,13 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
             if(null==item.getWarehouseTypeCode()){
                 item.setWarehouseTypeCode("1");
             }
+            if(YesOrNoEnum.YES.getCode().equals(erpCartAddRequest.getIsWholesale())){
+                if (item.getWarehouseCode() == null) {
+                    throw new BusinessException("批次订货缺失sku库房code");
+                }
+                List<String> warehouseCodes=new ArrayList<>();
+                warehouseCodes.add(item.getWarehouseCode());
+            }
             productSkuRequest2.setWarehouseTypeCode(item.getWarehouseTypeCode());
             productSkuRequest2List.add(productSkuRequest2);
         }

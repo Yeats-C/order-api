@@ -1049,7 +1049,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                     //18A规则系数
                     ruleTop=ruleMap.get(item.getProductPropertyCode());
                     //计算18A商品总金额
-                    if(item.getActivityType()==2){
+                    if(null!=item.getActivityType()&&item.getActivityType()==2){
                         groupTopProductTotal=groupTopProductTotal.add(item.getTotalProductAmount());
                     }else{
                         groupTopProductTotal=groupTopProductTotal.add(item.getTotalPreferentialAmount());

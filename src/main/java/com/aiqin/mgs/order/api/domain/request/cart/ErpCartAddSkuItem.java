@@ -34,4 +34,8 @@ public class ErpCartAddSkuItem {
     @ApiModelProperty(value = "爱亲批发价")
     @JsonProperty("wholesale_price")
     private BigDecimal wholesalePrice;
+
+    @ApiModelProperty(value = "仓库编码")
+    @JsonProperty("warehouse_code")
+    private String warehouseCode;
 }
