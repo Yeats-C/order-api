@@ -132,4 +132,30 @@ public class ErpOrderCreateController {
         return HttpResponse.success(erpOrderCreateService.getDetailByformNo(formNo));
     }
 
+    @PostMapping("/saveWholesaleOrder")
+    @ApiOperation(value = "创建货架订单")
+    public HttpResponse<ErpOrderInfo> saveWholesaleOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
+        logger.info("erp创建货架订单：{}", erpOrderSaveRequest);
+        HttpResponse response = HttpResponse.success();
+        try {
+            AuthUtil.loginCheck();
+            AuthToken auth = AuthUtil.getCurrentAuth();
+            ErpOrderInfo erpOrderInfo = erpOrderCreateService.saveWholesaleOrder(erpOrderSaveRequest, auth);
+            response.setData(erpOrderInfo);
+
+            ErpOrderPayRequest payRequest = new ErpOrderPayRequest();
+            payRequest.setOrderCode(erpOrderInfo.getOrderStoreCode());
+            payRequest.setPayWay(ErpPayWayEnum.PAY_1.getCode());
+            erpOrderPayNoTransactionalService.orderPayStartMethodGroup(payRequest, auth, true);
+
+        } catch (BusinessException e) {
+            logger.info("创建批发订单失败：{}", e);
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            logger.info("创建批发订单失败：{}", e);
+            response = HttpResponse.failure(ResultCode.ADD_EXCEPTION);
+        }
+        return response;
+    }
+
 }

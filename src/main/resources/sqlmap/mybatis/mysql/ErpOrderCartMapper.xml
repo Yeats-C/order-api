@@ -40,7 +40,8 @@
         batch_code as batchCode,
         batch_date as batchDate,
         warehouse_type_code as warehouseTypeCode,
-        batch_info_code as batchInfoCode
+        batch_info_code as batchInfoCode,
+        warehouse_code as warehouseCode
         from order_store_cart_info where 1 = 1
         <if test="id != null and id != ''">
             and id = #{id}
@@ -86,14 +87,14 @@
                                            product_category_code, product_category_name, create_source, create_time,
                                            create_by_id, create_by_name, update_time, update_by_id, update_by_name,
                                            max_order_num, zero_removal_coefficient,batch_code,batch_date,
-                                           warehouse_type_code,batch_info_code)
+                                           warehouse_type_code,batch_info_code,warehouse_code)
         values (#{id}, #{cartId}, #{storeId}, #{activityId},
                 #{amount}, #{price}, #{logo}, #{color}, #{spec}, #{productSize}, #{skuCode}, #{skuName}, #{spuCode},
                 #{spuName}, #{productType}, #{productGift}, #{lineCheckStatus}, #{productPropertyCode},
                 #{productPropertyName}, #{productBrandCode}, #{productBrandName}, #{productCategoryCode},
                 #{productCategoryName}, #{createSource}, sysdate(), #{createById}, #{createByName},
                 sysdate(), #{updateById}, #{updateByName}, #{maxOrderNum}, #{zeroRemovalCoefficient},#{batchCode},#{batchDate},
-                #{warehouseTypeCode},#{batchInfoCode});
+                #{warehouseTypeCode},#{batchInfoCode},#{warehouseCode});
     </insert>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
