@@ -33,7 +33,9 @@ public class AppServiceImpl implements AppService {
     private AppVersionDao appVersionDao;
     @Override
     public HttpResponse<AppVersionInfo> appActive(AppVersionInfo appVersionInfo) {
-        return null;
+        AppVersionInfo appVersionInfo1=appVersionDao.selectAppActive(appVersionInfo);
+
+        return HttpResponse.successGenerics(appVersionInfo1);
     }
 
     @Override
