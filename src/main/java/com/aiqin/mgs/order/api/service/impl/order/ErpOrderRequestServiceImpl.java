@@ -724,6 +724,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public boolean sendOrderPayRequest(ErpOrderInfo order, ErpOrderFee orderFee) {
+        logger.info("发起支付，参数 order={},orderFee={}"+JsonUtil.toJson(order),JsonUtil.toJson(orderFee));
         boolean flag = true;
         try {
 

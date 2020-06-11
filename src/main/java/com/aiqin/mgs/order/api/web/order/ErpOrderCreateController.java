@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.web.order;
 
+import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
@@ -45,7 +46,7 @@ public class ErpOrderCreateController {
     @PostMapping("/erpSaveOrder")
     @ApiOperation(value = "erp从购物车创建订单")
     public HttpResponse<ErpOrderInfo> erpSaveOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
-        logger.info("erp从购物车创建订单：{}", erpOrderSaveRequest);
+        logger.info("erp从购物车创建订单：{}", JsonUtil.toJson(erpOrderSaveRequest));
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
@@ -71,7 +72,7 @@ public class ErpOrderCreateController {
     @PostMapping("/storeSaveOrder")
     @ApiOperation(value = "爱掌柜从购物车创建订单")
     public HttpResponse<ErpOrderInfo> storeSaveOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
-        logger.info("爱掌柜从购物车创建订单：{}", erpOrderSaveRequest);
+        logger.info("爱掌柜从购物车创建订单：{}", JsonUtil.toJson(erpOrderSaveRequest));
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
@@ -97,7 +98,7 @@ public class ErpOrderCreateController {
     @PostMapping("/saveRackOrder")
     @ApiOperation(value = "创建货架订单")
     public HttpResponse<ErpOrderInfo> saveRackOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
-        logger.info("erp创建货架订单：{}", erpOrderSaveRequest);
+        logger.info("erp创建货架订单：{}", JsonUtil.toJson(erpOrderSaveRequest));
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
@@ -133,9 +134,9 @@ public class ErpOrderCreateController {
     }
 
     @PostMapping("/saveWholesaleOrder")
-    @ApiOperation(value = "创建批发订单")
+    @ApiOperation(value = "erp创建批发订单")
     public HttpResponse<ErpOrderInfo> saveWholesaleOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
-        logger.info("erp创建批发订单：{}", erpOrderSaveRequest);
+        logger.info("erp创建批发订单：{}", JsonUtil.toJson(erpOrderSaveRequest));
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();

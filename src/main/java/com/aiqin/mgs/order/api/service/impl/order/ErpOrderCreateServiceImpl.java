@@ -1980,7 +1980,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
 
 
-        //构建和保存货架订单，返回订单编号
+        //构建和保存批发订单，返回订单编号
         String orderCode = generateAndSaveWholesaleOrder(erpOrderSaveRequest, orderItemList, wholesaleCustomer, auth);
 
         ErpOrderInfo order = erpOrderQueryService.getOrderByOrderCode(orderCode);
