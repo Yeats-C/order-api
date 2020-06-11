@@ -186,4 +186,60 @@ public class WholesaleCustomersServiceImpl implements WholesaleCustomersService 
         wholesaleCustomersDao.bulkInsertionRules(wholesaleRuleList);
         return httpResponse;
     }
+
+    @Override
+    public HttpResponse<WholesaleCustomers> getCustomerByNameOrAccount(String parameter) {
+        LOGGER.info("通过名称或者账户查询批发客户 参数 parameter 为{}"+parameter);
+        if(null==parameter){
+            return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
+        }
+        HttpResponse httpResponse=HttpResponse.success();
+        WholesaleCustomers wholesaleCustomer=new WholesaleCustomers();
+        wholesaleCustomer.setCustomerName(parameter);
+        wholesaleCustomer.setCustomerAccount(parameter);
+        List<WholesaleCustomers> wholesaleCustomers=wholesaleCustomersDao.list(wholesaleCustomer);
+        if(null==wholesaleCustomers||wholesaleCustomers.size()<=0){
+            return HttpResponse.failure(ResultCode.NOT_HAVE_PARAM);
+        }else{
+            wholesaleCustomer=wholesaleCustomers.get(0);
+        }
+        if(null==wholesaleCustomer||null==wholesaleCustomer.getCustomerCode()){
+            return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+        List<WholesaleRule> wholesaleRuleList=wholesaleCustomersDao.getWholesaleRuleList(wholesaleCustomer.getCustomerCode());
+        //仓库List
+        List<WholesaleRule> warehouseList=new ArrayList<>();
+        //品牌List
+        List<WholesaleRule> brandList=new ArrayList<>();
+        //品类List
+        List<WholesaleRule> categoryList=new ArrayList<>();
+        //单品List
+        List<WholesaleRule> productList=new ArrayList<>();
+        if(null!=wholesaleRuleList&&wholesaleRuleList.size()>0){
+            for(WholesaleRule rule:wholesaleRuleList){
+                switch (rule.getType()) {
+                    case 1:
+                        warehouseList.add(rule);
+                        break;
+                    case 2:
+                        brandList.add(rule);
+                        break;
+                    case 3:
+                        categoryList.add(rule);
+                        break;
+                    case 4:
+                        productList.add(rule);
+                        break;
+                }
+            }
+            wholesaleCustomer.setWarehouseList(warehouseList);
+            wholesaleCustomer.setBrandList(brandList);
+            wholesaleCustomer.setCategoryList(categoryList);
+            wholesaleCustomer.setProductList(productList);
+        }
+
+        httpResponse.setData(wholesaleCustomer);
+
+        return httpResponse;
+    }
 }
