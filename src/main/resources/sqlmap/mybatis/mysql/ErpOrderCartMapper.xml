@@ -70,6 +70,9 @@
     <update id="updateByPrimaryKey">
         update order_store_cart_info
         set amount            = #{amount},
+            <if test="price != null and price != ''">
+                price       = #{price},
+            </if>
             activity_id       = #{activityId},
             line_check_status = #{lineCheckStatus},
             update_by_id      = #{updateById},
