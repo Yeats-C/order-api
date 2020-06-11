@@ -133,9 +133,9 @@ public class ErpOrderCreateController {
     }
 
     @PostMapping("/saveWholesaleOrder")
-    @ApiOperation(value = "创建货架订单")
+    @ApiOperation(value = "创建批发订单")
     public HttpResponse<ErpOrderInfo> saveWholesaleOrder(@RequestBody ErpOrderSaveRequest erpOrderSaveRequest) {
-        logger.info("erp创建货架订单：{}", erpOrderSaveRequest);
+        logger.info("erp创建批发订单：{}", erpOrderSaveRequest);
         HttpResponse response = HttpResponse.success();
         try {
             AuthUtil.loginCheck();
