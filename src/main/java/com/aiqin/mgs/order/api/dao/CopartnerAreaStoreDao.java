@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.aiqin.mgs.order.api.domain.copartnerArea.*;
 import com.aiqin.mgs.order.api.domain.request.UnPayVo;
 import com.aiqin.mgs.order.api.domain.request.statistical.BusinessStatisticalRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.SkuSalesRequest;
@@ -22,10 +23,6 @@ import com.aiqin.mgs.order.api.domain.statistical.SkuSales;
 import org.apache.ibatis.annotations.Param;
 
 import com.aiqin.mgs.order.api.domain.*;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreList;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreVo;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
-import com.aiqin.mgs.order.api.domain.copartnerArea.PublicAreaStore;
 import com.aiqin.mgs.order.api.domain.request.DevelRequest;
 import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
@@ -62,6 +59,5 @@ public interface CopartnerAreaStoreDao {
 
 	void deleteByAreaStore(@Valid @Param("storeId") String storeId);
 
-
-
+	CopartnerAreaDetail slecetTwoCompanyByName(@Param("copartnerAreaCompany") String copartnerAreaCompany);
 }
