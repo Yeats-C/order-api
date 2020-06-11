@@ -33,7 +33,7 @@ public enum ErpOrderTypeCategoryControlEnum {
     /***辅采直送	- 游泳游乐*/
     PROCESS_8(ErpOrderTypeEnum.ASSIST_PURCHASING, ErpOrderCategoryEnum.ORDER_TYPE_172, true, false, true, true, false, false, false, false),
     /***配送	- 批发订货*/
-    PROCESS_9(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_54, false, false, false, false, false, false, true, true),
+    PROCESS_9(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_51, false, false, false, false, false, false, true, true),
     ;
 
     ErpOrderTypeCategoryControlEnum(ErpOrderTypeEnum orderTypeEnum, ErpOrderCategoryEnum orderCategoryEnum, boolean erpQuery, boolean erpCartCreate, boolean erpRackQuery, boolean erpRackCreate, boolean storeQuery, boolean storeCartCreate,boolean erpWholesaleQuery,boolean erpWholesaleCreate) {

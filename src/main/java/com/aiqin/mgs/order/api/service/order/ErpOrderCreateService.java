@@ -61,4 +61,12 @@ public interface ErpOrderCreateService {
      * @return
      */
     OrderGiveApproval getDetailByformNo(String formNo);
+
+    /**
+     * 创建批发订单
+     * @param erpOrderSaveRequest
+     * @param auth
+     * @return
+     */
+    ErpOrderInfo saveWholesaleOrder(ErpOrderSaveRequest erpOrderSaveRequest, AuthToken auth);
 }
