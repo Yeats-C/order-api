@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.LogisticsRuleDao">
+
+    <insert id="saveRule">
+        insert into logistics_relief_info (rult_type,rult_type_name,rult_code,
+        create_time,create_by_id,create_by_name)
+        values (
+        #{rultType,jdbcType=INTEGER},
+        #{rultTypeName,jdbcType=VARCHAR},
+        #{rultCode,jdbcType=VARCHAR},
+        now(),
+        #{createById,jdbcType=VARCHAR},
+        #{createByName,jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="saveProduct">
+        insert into logistics_relief_product(rult_type,rult_code,product_code,product_name,
+        sales_standard,brand,category,types,fare_sill,create_time)
+        values (
+          #{rultType,jdbcType=INTEGER},
+          #{rultCode,jdbcType=VARCHAR},
+          #{productCode,jdbcType=VARCHAR},
+          #{productName,jdbcType=VARCHAR},
+          #{salesStandard,jdbcType=VARCHAR},
+          #{brand,jdbcType=VARCHAR},
+          #{category,jdbcType=VARCHAR},
+          #{types,jdbcType=INTEGER},
+          #{fareSill,jdbcType=DECIMAL},
+          now()
+        )
+
+    </insert>
+    <insert id="addProduct" parameterType="list">
+     insert into logistics_relief_product(rult_type,rult_code,product_code,product_name,
+     sales_standard,brand,category,types,fare_sill,create_time)
+     values
+        <foreach collection="newlyLogisticsRuleInfo" item="item" index="index" separator=",">
+            (
+            #{item.rultType,jdbcType=INTEGER}, #{item.rultCode,jdbcType=VARCHAR},
+            #{item.productCode,jdbcType=VARCHAR}, #{item.productName,jdbcType=VARCHAR},
+            #{item.salesStandard,jdbcType=VARCHAR}, #{item.brand,jdbcType=VARCHAR},
+            #{item.category,jdbcType=VARCHAR},#{item.types,jdbcType=INTEGER},
+            #{item.fareSill,jdbcType=DECIMAL},
+            now()
+            )
+        </foreach>
+    </insert>
+    <update id="updateStatus">
+        update logistics_relief_product
+        set
+        <if test="effectiveStatus != null">
+            effective_status = #{effectiveStatus,jdbcType=INTEGER},
+        </if>
+        <if test="updateByName != null and updateByName != ''">
+            update_by_name = #{updateByName,jdbcType=VARCHAR},
+        </if>
+        update_time = now()
+        where rult_code = #{rultCode,jdbcType=VARCHAR}
+    </update>
+    <update id="updateSingle">
+        update logistics_relief_product
+        set
+        <if test="fareSill != null">
+            fare_sill = #{fareSill,jdbcType=DECIMAL},
+        </if>
+        update_by_name = #{updateByName,jdbcType=VARCHAR},
+        update_time = now()
+        where rult_code = #{rultCode,jdbcType=VARCHAR} and product_code = #{productCode,jdbcType=VARCHAR} and rult_type = #{rultType,jdbcType=INTEGER}
+    </update>
+    <update id="updatefareSill">
+        update logistics_relief_product
+        set
+           fare_sill = #{fareSill,jdbcType=DECIMAL},
+           update_by_name = #{updateByName,jdbcType=VARCHAR},
+           update_time = now()
+        where
+           rult_code = #{rultCode,jdbcType=VARCHAR} and rult_type = #{rultType,jdbcType=INTEGER} and product_code = #{productCode,jdbcType=VARCHAR}
+    </update>
+    <delete id="deleteLogisticsRule">
+        delete from logistics_relief_info where rult_code = #{rultCode,jdbcType=VARCHAR}
+    </delete>
+    <delete id="deleteLogisticsProduct">
+        delete from  logistics_relief_product where rult_code = #{rultCode,jdbcType=VARCHAR}
+    </delete>
+    <delete id="deleteProduct" parameterType="java.util.List">
+        delete from  logistics_relief_product
+        where
+        <foreach collection="delecteProductList" item="item" index="index"  separator="or" >
+            (
+            rult_code =  #{item.rultCode,jdbcType=VARCHAR} and
+            rult_type =  #{item.rultType,jdbcType=INTEGER} and
+            product_code =  #{item.productCode,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </delete>
+    <delete id="deleteAll" parameterType="java.lang.String">
+        delete from logistics_relief_product where rult_code = #{rultCode,jdbcType=VARCHAR}
+    </delete>
+    <select id="getLogisticsRule" resultType="com.aiqin.mgs.order.api.domain.logisticsRule.LogisticsRuleInfo">
+        SELECT product_code as productCode,product_name as productName,fare_sill as fareSill,rult_type as rultType,
+        rult_code as rultCode
+        FROM logistics_relief_product
+        WHERE rult_code = #{rultCode,jdbcType=VARCHAR}
+    </select>
+    <select id="selectAll" resultType="com.aiqin.mgs.order.api.domain.response.LogisticsAllResponse">
+         select * from (
+         select
+         rult_code as rultCode, rult_type as rultType,
+         GROUP_CONCAT(product_code) as productCode,
+         GROUP_CONCAT(product_name) as productName,
+         brand, category, fare_sill as fareSill, types,effective_status as effectiveStatus,
+         update_time as updateTime,
+         update_by_name as updateByName,
+         sales_standard as salesStandard
+         from logistics_relief_product group by rult_type HAVING rult_type in (2,3)
+         union all
+         select
+         rult_code as rultCode, rult_type as rultType, product_code as productCode, product_name as productName , brand, category, fare_sill as fareSill, types, effective_status as effectiveStatus, update_time as updateTime,
+         update_by_name as updateByName,  sales_standard as salesStandard
+        from logistics_relief_product where rult_type  in (0,1)
+        )
+        logistics_relief_product
+        where 1=1
+            <if test="productCode != null and productCode !=''">
+                and productCode like CONCAT('%',#{productCode},'%')
+            </if>
+            <if test="productName != null and productName != ''">
+                and productName like CONCAT('%',#{productName},'%')
+            </if>
+            <if test="effectiveStatus != null">
+                and effectiveStatus = #{effectiveStatus,jdbcType=INTEGER}
+            </if>
+         order by updateTime desc
+    </select>
+</mapper>

@@ -31,4 +31,8 @@ public class CopartnerAreaSave{
 	@ApiModelProperty(value = "公司人员及权限")
     @JsonProperty("role_list")
     private List<CopartnerAreaRoleList> roleList;
+
+    @ApiModelProperty(value = "下辖公司")
+    @JsonProperty("down_company_list")
+    private List<CopartnerAreaDetail> downCompanyList;
 }

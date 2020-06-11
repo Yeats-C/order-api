@@ -199,4 +199,11 @@ public class ReturnOrderInfoController {
 //    public Boolean updateStores(@RequestBody ReturnOrderInfo returnOrderInfo){
 //        return returnOrderInfoService.refundPoints(returnOrderInfo);
 //    }
+
+    @ApiOperation("新增批发退货信息")
+    @PostMapping("/save/wholesale")
+    public HttpResponse saveWholesale(@RequestBody ReturnOrderReqVo reqVo){
+        return returnOrderInfoService.saveWholesaleReturn(reqVo);
+    }
+
 }
