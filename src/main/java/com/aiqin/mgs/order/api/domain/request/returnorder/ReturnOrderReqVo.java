@@ -78,7 +78,7 @@ public class ReturnOrderReqVo implements Serializable {
     @ApiModelProperty(value = "退货类型  0客户退货、1缺货退货、2售后退货、3冲减单")
     private Integer returnOrderType;
 
-    @ApiModelProperty(value = "处理方式，0-整单退、1-部分退")
+    @ApiModelProperty(value = "处理方式，0-整单退、1-部分退 3-退货退款(批发使用)")
     private Integer processType;
 
     @ApiModelProperty(value = "收货地址")

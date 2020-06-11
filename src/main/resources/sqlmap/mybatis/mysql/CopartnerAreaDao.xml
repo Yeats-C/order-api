@@ -79,6 +79,7 @@
             #{memo}
          )
     </insert>
+
     <select id="selectCopartnerAreaInfo" resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo">
         select 
             id as id,
@@ -129,11 +130,37 @@
     <delete id="deleteById" parameterType="java.lang.String">
         delete from copartner_area_info where copartner_area_id = #{copartnerAreaId}
     </delete>
-    
     <update id="updateUpId" parameterType="java.lang.String">
         update copartner_area_info set copartner_area_id_up =#{copartnerAreaIdUpNew},copartner_area_name_up=#{copartnerAreaNameUpNew} where copartner_area_id_up = #{copartnerAreaIdUpOld}
     </update>
-    
+    <update id="updateCopartnerAreaUp">
+        update copartner_area_info
+        set copartner_area_id_up = #{copartnerAreaIdUp},
+            copartner_area_name_up = #{copartnerAreaNameUp},
+            update_time = now()
+        <where>
+           <if test="companyIdList != null and companyIdList.size > 0">
+              and copartner_area_id in
+               <foreach collection="companyIdList" item="item" open="(" separator="," close=")">
+                   #{item}
+               </foreach>
+           </if>
+        </where>
+    </update>
+    <update id="putCompanyById">
+        update copartner_area_info
+        set copartner_area_id_up = null,
+            copartner_area_name_up = null,
+            update_time = now()
+        <where>
+            <if test="copartnerAreaIds != null and copartnerAreaIds.size > 0 ">
+                copartner_area_id in
+                <foreach collection="copartnerAreaIds" item="item" open="(" separator="," close=")">
+                     #{item}
+                </foreach>
+            </if>
+        </where>
+    </update>
     <select id = "qryCopartnerAreaList" resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp">
     SELECT 
       copartner_area_id AS copartnerAreaId,
@@ -142,6 +169,12 @@
     WHERE 1=1
     ORDER BY copartner_area_id,copartner_area_name
     </select>
-    
+    <select id="getCopartnerAreaTwoCompany"
+            resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaDetail">
+    SELECT copartner_area_id AS copartnerAreaId , copartner_area_name AS copartnerAreaName
+    FROM copartner_area_info
+    WHERE copartner_area_id_up =  #{copartnerAreaId}
+    </select>
+
 </mapper>
 

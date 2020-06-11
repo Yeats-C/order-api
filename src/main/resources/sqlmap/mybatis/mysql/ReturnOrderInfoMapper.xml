@@ -1394,8 +1394,7 @@
     <select id="selectReturnCode" resultType="java.lang.String">
       select return_order_code as returnOrderCode from  return_order_info where store_code = #{storeCode}
     </select>
-
-    <update id="updateReallyReturn" parameterType="java.util.List">
+  <update id="updateReallyReturn" parameterType="java.util.List">
     update return_order_info
     set
     really_return = 1
