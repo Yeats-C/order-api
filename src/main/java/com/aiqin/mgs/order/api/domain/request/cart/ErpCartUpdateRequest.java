@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 @ApiModel("购物车修改请求参数")
 public class ErpCartUpdateRequest {
@@ -24,5 +26,9 @@ public class ErpCartUpdateRequest {
     @ApiModelProperty(value = "选中状态：0、不选 1、选中 必填，不修改传原来的值")
     @JsonProperty("line_check_status")
     private Integer lineCheckStatus;
+
+    @ApiModelProperty(value = "商品价格 选填")
+    @JsonProperty("price")
+    private BigDecimal price;
 
 }

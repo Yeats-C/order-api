@@ -404,6 +404,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         cartLine.setAmount(erpCartUpdateRequest.getAmount());
         cartLine.setLineCheckStatus(erpCartUpdateRequest.getLineCheckStatus());
         cartLine.setActivityId(erpCartUpdateRequest.getActivityId());
+        if(null!=erpCartUpdateRequest&&null!=erpCartUpdateRequest.getPrice()){
+            cartLine.setPrice(erpCartUpdateRequest.getPrice());
+        }
         this.updateCartLine(cartLine, auth);
     }
 
