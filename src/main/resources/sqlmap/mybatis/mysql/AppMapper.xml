@@ -35,17 +35,59 @@
             #{updateUrl} ,#{updateDesc}, #{createTime}, #{createBy}, #{createById}, #{updateById}, #{updateByName}, #{updateTime}, #{state})
     </insert>
 
-<update id="updateStateAll" parameterType="com.aiqin.mgs.order.api.domain.AppVersionInfo">
-    update app_version_info set state=2 where
+    <update id="updateStateAll" parameterType="com.aiqin.mgs.order.api.domain.AppVersionInfo">
+        update app_version_info set state=2 where
 
-         system_type = #{systemType}
-         and state=1
+             system_type = #{systemType}
+             and state=1
+            <if test=" appType != '' and appType!=null">
+             and app_type=#{appType}
+            </if>
+
+
+    </update>
+    <select id="selectAppList" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.base.PagesRequest">
+        select
+        <include refid="Base_Column_List"/>
+        from app_version_info where  state=1   ORDER BY id DESC
+            limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </select>
+    <select id="selectAppActive" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.AppVersionInfo">
+        select
+        <include refid="Base_Column_List"/>
+        from app_version_info where  state=1
         <if test=" appType != '' and appType!=null">
-         and app_type=#{appType}
+            and app_type=#{appType}
         </if>
 
-
-</update>
-
-
+        <if test=" systemType != '' and systemType!=null">
+            and system_type=#{systemType}
+        </if>
+        ORDER BY id DESC limit 1
+    </select>
+    <update id="update" parameterType="com.aiqin.mgs.order.api.domain.AppVersionInfo">
+        update app_version_info set
+        <if test=" systemType != '' and systemType!=null">
+             system_type=#{systemType} ,
+        </if>
+        <if test=" appVersion != '' and appVersion!=null">
+            app_version=#{appVersion} ,
+        </if>
+        <if test=" appType != '' and appType!=null">
+            app_type=#{appType} ,
+        </if>
+        <if test=" updateUrl != '' and updateUrl!=null">
+            update_url=#{updateUrl} ,
+        </if>
+        <if test=" updateDesc != '' and updateDesc!=null">
+            update_desc=#{updateDesc} ,
+        </if>
+        <if test=" updateDesc != '' and updateDesc!=null">
+            update_desc=#{updateDesc} ,
+        </if>
+         update_by_id=#{updateById},
+        update_by_name=#{updateByName},
+        update_time=#{updateTime}
+        where id=#{id}
+    </update>
 </mapper>

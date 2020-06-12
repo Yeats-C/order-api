@@ -1,6 +1,8 @@
 package com.aiqin.mgs.order.api.service.impl;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.aiqin.mgs.order.api.dao.AppVersionDao;
 import com.aiqin.mgs.order.api.domain.AppVersionInfo;
 import com.aiqin.mgs.order.api.domain.AuthToken;
@@ -31,7 +33,9 @@ public class AppServiceImpl implements AppService {
     private AppVersionDao appVersionDao;
     @Override
     public HttpResponse<AppVersionInfo> appActive(AppVersionInfo appVersionInfo) {
-        return null;
+        AppVersionInfo appVersionInfo1=appVersionDao.selectAppActive(appVersionInfo);
+
+        return HttpResponse.successGenerics(appVersionInfo1);
     }
 
     @Override
@@ -39,21 +43,32 @@ public class AppServiceImpl implements AppService {
     public HttpResponse appAdd(AppVersionInfo appVersionInfo) {
         AuthUtil.loginCheck();
         AuthToken auth = AuthUtil.getCurrentAuth();
-        appVersionInfo.setCreateBy(auth.getPersonName());
-        appVersionInfo.setCreateById(auth.getPersonId());
-        appVersionInfo.setCreateTime(new Date());
-        appVersionInfo.setState(1);
-        appVersionInfo.setUpdateById(auth.getPersonId());
-        appVersionInfo.setUpdateByName(auth.getPersonName());
-        appVersionInfo.setUpdateTime(new Date());
-        appVersionDao.updateStateAll(appVersionInfo);
-        int n= appVersionDao.add(appVersionInfo);
+        int n=0;
+        if (appVersionInfo.getId()!=null){
+
+            appVersionInfo.setUpdateById(auth.getPersonId());
+            appVersionInfo.setUpdateByName(auth.getPersonName());
+            appVersionInfo.setUpdateTime(new Date());
+             n= appVersionDao.update(appVersionInfo);
+        }else {
+            appVersionInfo.setCreateBy(auth.getPersonName());
+            appVersionInfo.setCreateById(auth.getPersonId());
+            appVersionInfo.setCreateTime(new Date());
+            appVersionInfo.setState(1);
+            appVersionInfo.setUpdateById(auth.getPersonId());
+            appVersionInfo.setUpdateByName(auth.getPersonName());
+            appVersionInfo.setUpdateTime(new Date());
+            appVersionDao.updateStateAll(appVersionInfo);
+             n= appVersionDao.add(appVersionInfo);
+        }
+
         return HttpResponse.success(n);
     }
 
     @Override
-    public HttpResponse<List<AppVersionInfo>> appList(AppVersionInfo appVersionInfo) {
-        return null;
+    public HttpResponse<PageResData<AppVersionInfo>> appList(PagesRequest pagesRequest) {
+        List<AppVersionInfo> appVersionInfos= appVersionDao.selectAppList(pagesRequest);
+        return HttpResponse.success(new PageResData(appVersionInfos.size(), appVersionInfos));
     }
 
     @Override
