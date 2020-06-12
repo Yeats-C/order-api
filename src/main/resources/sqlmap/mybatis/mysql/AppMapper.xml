@@ -65,4 +65,29 @@
         </if>
         ORDER BY id DESC limit 1
     </select>
+    <update id="update" parameterType="com.aiqin.mgs.order.api.domain.AppVersionInfo">
+        update app_version_info set
+        <if test=" systemType != '' and systemType!=null">
+             system_type=#{systemType} ,
+        </if>
+        <if test=" appVersion != '' and appVersion!=null">
+            app_version=#{appVersion} ,
+        </if>
+        <if test=" appType != '' and appType!=null">
+            app_type=#{appType} ,
+        </if>
+        <if test=" updateUrl != '' and updateUrl!=null">
+            update_url=#{updateUrl} ,
+        </if>
+        <if test=" updateDesc != '' and updateDesc!=null">
+            update_desc=#{updateDesc} ,
+        </if>
+        <if test=" updateDesc != '' and updateDesc!=null">
+            update_desc=#{updateDesc} ,
+        </if>
+         update_by_id=#{updateById},
+        update_by_name=#{updateByName},
+        update_time=#{updateTime}
+        where id=#{id}
+    </update>
 </mapper>

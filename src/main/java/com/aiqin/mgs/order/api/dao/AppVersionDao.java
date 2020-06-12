@@ -24,4 +24,6 @@ public interface AppVersionDao {
     List<AppVersionInfo> selectAppList(PagesRequest pagesRequest);
 
     AppVersionInfo selectAppActive(AppVersionInfo appVersionInfo);
+
+    int update(AppVersionInfo appVersionInfo);
 }

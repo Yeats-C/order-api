@@ -43,15 +43,25 @@ public class AppServiceImpl implements AppService {
     public HttpResponse appAdd(AppVersionInfo appVersionInfo) {
         AuthUtil.loginCheck();
         AuthToken auth = AuthUtil.getCurrentAuth();
-        appVersionInfo.setCreateBy(auth.getPersonName());
-        appVersionInfo.setCreateById(auth.getPersonId());
-        appVersionInfo.setCreateTime(new Date());
-        appVersionInfo.setState(1);
-        appVersionInfo.setUpdateById(auth.getPersonId());
-        appVersionInfo.setUpdateByName(auth.getPersonName());
-        appVersionInfo.setUpdateTime(new Date());
-        appVersionDao.updateStateAll(appVersionInfo);
-        int n= appVersionDao.add(appVersionInfo);
+        int n=0;
+        if (appVersionInfo.getId()!=null){
+
+            appVersionInfo.setUpdateById(auth.getPersonId());
+            appVersionInfo.setUpdateByName(auth.getPersonName());
+            appVersionInfo.setUpdateTime(new Date());
+             n= appVersionDao.update(appVersionInfo);
+        }else {
+            appVersionInfo.setCreateBy(auth.getPersonName());
+            appVersionInfo.setCreateById(auth.getPersonId());
+            appVersionInfo.setCreateTime(new Date());
+            appVersionInfo.setState(1);
+            appVersionInfo.setUpdateById(auth.getPersonId());
+            appVersionInfo.setUpdateByName(auth.getPersonName());
+            appVersionInfo.setUpdateTime(new Date());
+            appVersionDao.updateStateAll(appVersionInfo);
+             n= appVersionDao.add(appVersionInfo);
+        }
+
         return HttpResponse.success(n);
     }
 

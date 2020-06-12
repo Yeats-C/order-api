@@ -14,13 +14,13 @@ import java.util.Date;
 @Data
 public class AppVersionInfo {
     //id 类型。平台 版本号。下载地址 更新描述 更新人 更新时间 状态
-    private int id;
+    private Integer id;
     /**
      * 系统类型，1 安卓，2 苹果
      */
     @ApiModelProperty(value = "系统类型，1 安卓，2 苹果")
     @JsonProperty("system_type")
-    private int systemType;
+    private Integer systemType;
 
     @ApiModelProperty(value = "系统版本号")
     @JsonProperty("app_version")
@@ -28,7 +28,7 @@ public class AppVersionInfo {
 
     @ApiModelProperty(value = "类型，1 POS收银App，2 爱掌柜app")
     @JsonProperty("app_type")
-    private int appType;
+    private Integer appType;
 
     @ApiModelProperty(value = "内部系统版本号")
     @JsonProperty("app_build")
@@ -69,5 +69,5 @@ public class AppVersionInfo {
 
     @ApiModelProperty(value = "状态：0：未开始，1：进行中，2：已结束")
     @JsonProperty("state")
-    private int state;
+    private Integer state;
 }
