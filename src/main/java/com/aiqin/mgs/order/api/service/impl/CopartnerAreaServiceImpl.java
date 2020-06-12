@@ -362,7 +362,8 @@ public class CopartnerAreaServiceImpl implements  CopartnerAreaService {
 				copartnerAreaDao.saveCopartnerArea(vo);
 			}
 			//下辖公司
-			if(StringUtils.isBlank(param.getCopartnerAreaDetail().getCopartnerAreaId()) && param.getCopartnerAreaDetail().getCopartnerAreaId().equals("0")){
+//			if(StringUtils.isBlank(param.getCopartnerAreaDetail().getCopartnerAreaId()) && param.getCopartnerAreaDetail().getCopartnerAreaId().equals("0")){
+			if (StringUtils.isBlank(copartnerAreaIdOld) && "".equals(copartnerAreaIdOld)){
 			   if (CollectionUtils.isNotEmpty(param.getDownCompanyList())) {
 			     	List<CopartnerAreaDetail> downCompanyList = param.getDownCompanyList();
 			     	log.info("获取下辖公司集合：{}", downCompanyList);
