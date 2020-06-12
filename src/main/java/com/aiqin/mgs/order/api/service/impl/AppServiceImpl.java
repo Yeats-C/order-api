@@ -88,4 +88,10 @@ public class AppServiceImpl implements AppService {
         }
         return HttpResponse.success(appVersionInfo);
     }
+
+    @Override
+    public HttpResponse appDelete(AppVersionInfo appVersionInfo) {
+        appVersionDao.delete(appVersionInfo);
+        return HttpResponse.success();
+    }
 }

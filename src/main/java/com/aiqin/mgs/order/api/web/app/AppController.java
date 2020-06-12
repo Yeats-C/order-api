@@ -40,7 +40,6 @@ public class AppController {
     @PostMapping("/verson/active")
     @ApiOperation("活动当前的版本信息")
     public HttpResponse<AppVersionInfo> appActive( @RequestBody AppVersionInfo appVersionInfo) {
-        LOGGER.info("获取配送直送账户信息以及明细[{}]", JsonUtil.toJson(appVersionInfo));
         return appService.appActive(appVersionInfo);
     }
 
@@ -53,14 +52,20 @@ public class AppController {
     @PostMapping("/verson/add")
     @ApiOperation("添加更新")
     public HttpResponse appAdd(@Validated @RequestBody AppVersionInfo appVersionInfo) {
-        LOGGER.info("获取配送直送账户信息以及明细[{}]", JsonUtil.toJson(appVersionInfo));
         return appService.appAdd(appVersionInfo);
     }
 
     @PostMapping("/verson/list")
     @ApiOperation("版本列表")
     public HttpResponse<PageResData<AppVersionInfo>> appList( @RequestBody PagesRequest pagesRequest) {
-        LOGGER.info("获取配送直送账户信息以及明细[{}]", JsonUtil.toJson(pagesRequest));
         return appService.appList(pagesRequest);
+    }
+
+
+
+    @PostMapping("/verson/delete")
+    @ApiOperation("删除版本")
+    public HttpResponse appDelete( @RequestBody AppVersionInfo appVersionInfo) {
+        return appService.appDelete(appVersionInfo);
     }
 }

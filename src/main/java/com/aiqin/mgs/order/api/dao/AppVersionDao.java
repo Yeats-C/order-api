@@ -28,4 +28,6 @@ public interface AppVersionDao {
     int update(AppVersionInfo appVersionInfo);
 
     int selectSize(PagesRequest pagesRequest);
+
+    void delete(AppVersionInfo appVersionInfo);
 }
