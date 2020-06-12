@@ -67,7 +67,7 @@ public class AppVersionInfo {
     @JsonProperty("update_time")
     private Date updateTime;
 
-    @ApiModelProperty(value = "状态：0：未开始，1：进行中，2：已结束")
+    @ApiModelProperty(value = "状态：0：已删除，1：上架中，2：已下架")
     @JsonProperty("state")
     private Integer state;
 }
