@@ -21,4 +21,6 @@ public interface AppService {
     HttpResponse<PageResData<AppVersionInfo>> appList(PagesRequest pagesRequest);
 
     HttpResponse appUpload(MultipartFile file);
+
+    HttpResponse appDelete(AppVersionInfo appVersionInfo);
 }

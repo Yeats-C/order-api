@@ -57,6 +57,9 @@
         count(id)
         from app_version_info where  state &gt;0
     </select>
+    <delete id="delete" parameterType="com.aiqin.mgs.order.api.domain.AppVersionInfo">
+       update app_version_info set state=0 where id=#{id} and state !=1;
+    </delete>
     <select id="selectAppActive" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.AppVersionInfo">
         select
         <include refid="Base_Column_List"/>
