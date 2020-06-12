@@ -68,7 +68,8 @@ public class AppServiceImpl implements AppService {
     @Override
     public HttpResponse<PageResData<AppVersionInfo>> appList(PagesRequest pagesRequest) {
         List<AppVersionInfo> appVersionInfos= appVersionDao.selectAppList(pagesRequest);
-        return HttpResponse.success(new PageResData(appVersionInfos.size(), appVersionInfos));
+        int size=appVersionDao.selectSize(pagesRequest);
+        return HttpResponse.success(new PageResData(size, appVersionInfos));
     }
 
     @Override

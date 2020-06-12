@@ -26,4 +26,6 @@ public interface AppVersionDao {
     AppVersionInfo selectAppActive(AppVersionInfo appVersionInfo);
 
     int update(AppVersionInfo appVersionInfo);
+
+    int selectSize(PagesRequest pagesRequest);
 }

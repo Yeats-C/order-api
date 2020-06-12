@@ -52,6 +52,11 @@
         from app_version_info where  state=1   ORDER BY id DESC
             limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
     </select>
+    <select id="selectSize" parameterType="com.aiqin.mgs.order.api.base.PagesRequest" resultType="integer">
+        select
+        count(id)
+        from app_version_info where  state=1
+    </select>
     <select id="selectAppActive" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.AppVersionInfo">
         select
         <include refid="Base_Column_List"/>
