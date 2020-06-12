@@ -100,7 +100,7 @@
         warehouse_code as warehouseCode,
         sku_code as skuCode,
         sku_name as skuName,
-        product_category_code as productCategroyCode,
+        product_category_code as productCategoryCode,
         product_category_name as productCategoryName,
         product_brand_code as productBrandCode,
         product_brand_name as productBrandName,
