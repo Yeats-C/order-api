@@ -8,6 +8,7 @@
             SELECT
                 customer_code as customerCode,
                 customer_name as customerName,
+                customer_account as customerAccount,
                 contact_person as contactPerson,
                 phone_number as phoneNumber,
                 identity_number as identityNumber,
@@ -37,6 +38,9 @@
                 </if>
                 <if test="customerName != '' and customerName != null">
                     and customer_name like CONCAT(CONCAT('%',#{customerName}),'%')
+                </if>
+                <if test="customerAccount != '' and customerAccount != null">
+                    or customer_account = #{customerAccount}
                 </if>
                 <if test="phoneNumber != '' and phoneNumber != null">
                     and phone_number like CONCAT(CONCAT('%',#{phoneNumber}),'%')
@@ -70,6 +74,9 @@
             </if>
             <if test="customerName != '' and customerName != null">
                 and customer_name like CONCAT(CONCAT('%',#{customerName}),'%')
+            </if>
+            <if test="customerAccount != '' and customerAccount != null">
+                or customer_account = #{customerAccount}
             </if>
             <if test="phoneNumber != '' and phoneNumber != null">
                 and phone_number like CONCAT(CONCAT('%',#{phoneNumber}),'%')
@@ -113,6 +120,7 @@
         INSERT INTO wholesale_customers (
             customer_code,
             customer_name,
+            customer_account,
             contact_person,
             phone_number,
             identity_number,
@@ -135,7 +143,7 @@
             update_time
         )
         values
-        ( #{customerCode},#{customerName},#{contactPerson},#{phoneNumber},#{identityNumber},#{provinceId},
+        ( #{customerCode},#{customerName},#{customerAccount},#{contactPerson},#{phoneNumber},#{identityNumber},#{provinceId},
         #{provinceName},#{cityId},#{cityName},#{districtId},#{districtName},#{streetAddress},
         #{companyCode},#{companyName},0,#{affiliatedCompany},#{invitePeopleCode},#{invitePeopleName},
         #{createBy},#{updateBy},sysdate(),sysdate()
@@ -167,6 +175,9 @@
         <set>
             <if test="customerName != null and customerCode !=''">
                 customer_name = #{customerName,jdbcType=VARCHAR},
+            </if>
+            <if test="customerAccount != null and customerAccount !=''">
+                customer_account = #{customerAccount,jdbcType=VARCHAR},
             </if>
             <if test="contactPerson != null and contactPerson !=''">
                 contact_person = #{contactPerson,jdbcType=VARCHAR},

@@ -50,4 +50,8 @@ public class CopartnerAreaDetail{
 	@ApiModelProperty(value = "上级合伙人名称")
     @JsonProperty("copartner_area_name_up")
     private String copartnerAreaNameUp;
+
+    @ApiModelProperty(value = "下辖公司-区域id集合--为了修改二级公司的上级公司用")
+    @JsonProperty("company_id_list")
+    private List<String> companyIdList;
 }

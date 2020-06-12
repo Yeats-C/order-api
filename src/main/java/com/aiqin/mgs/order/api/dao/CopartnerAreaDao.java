@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.aiqin.mgs.order.api.domain.copartnerArea.*;
 import com.aiqin.mgs.order.api.domain.request.UnPayVo;
 import com.aiqin.mgs.order.api.domain.request.statistical.BusinessStatisticalRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.SkuSalesRequest;
@@ -22,11 +23,6 @@ import com.aiqin.mgs.order.api.domain.statistical.SkuSales;
 import org.apache.ibatis.annotations.Param;
 
 import com.aiqin.mgs.order.api.domain.*;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaList;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaListReq;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo;
-import com.aiqin.mgs.order.api.domain.copartnerArea.SystemResource;
 import com.aiqin.mgs.order.api.domain.request.DevelRequest;
 import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
@@ -67,4 +63,10 @@ public interface CopartnerAreaDao {
 
 	List<CopartnerAreaUp> qryCopartnerAreaList();
 
+    //修改二级公司的上级公司
+	void updateCopartnerAreaUp(CopartnerAreaDetail copartnerAreaDetail);
+    //查询下辖公司
+	List<CopartnerAreaDetail> getCopartnerAreaTwoCompany(String copartnerAreaId);
+	//删除下辖公司
+	void putCompanyById(@Param("copartnerAreaIds") List<String> copartnerAreaIds);
 }

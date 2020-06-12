@@ -33,4 +33,11 @@ public interface WholesaleCustomersService {
      * @return
      */
     HttpResponse update(WholesaleCustomers wholesaleCustomers);
+
+    /**
+     * 通过名称或者账户查询批发客户
+     * @param parameter
+     * @return
+     */
+    HttpResponse<WholesaleCustomers> getCustomerByNameOrAccount(String parameter);
 }

@@ -25,6 +25,10 @@ public class WholesaleCustomers extends PagesRequest implements Serializable {
     @JsonProperty("customer_name")
     private String customerName;
 
+    @ApiModelProperty(value = "批发客户账户")
+    @JsonProperty("customer_account")
+    private String customerAccount;
+
     @ApiModelProperty(value = "联系人")
     @JsonProperty("contact_person")
     private String contactPerson;

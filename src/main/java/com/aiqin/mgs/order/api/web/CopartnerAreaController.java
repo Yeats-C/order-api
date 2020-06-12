@@ -13,20 +13,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaDetail;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaList;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaListReq;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleDetail;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleList;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleVo;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaSave;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreList;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreVo;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo;
-import com.aiqin.mgs.order.api.domain.copartnerArea.NewStoreTreeResponse;
-import com.aiqin.mgs.order.api.domain.copartnerArea.PublicAreaStore;
-import com.aiqin.mgs.order.api.domain.copartnerArea.SystemResource;
+import com.aiqin.mgs.order.api.domain.copartnerArea.*;
 import com.aiqin.mgs.order.api.domain.request.*;
 import com.aiqin.mgs.order.api.domain.request.returnorder.AreaReq;
 import com.aiqin.mgs.order.api.domain.response.LatelyResponse;
@@ -43,7 +30,9 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 
+import jdk.nashorn.internal.objects.annotations.Getter;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -183,6 +172,14 @@ public class CopartnerAreaController {
     	LOGGER.info("经营区域详情基本信息请求参数：copartnerAreaId={}",copartnerAreaId);
     	return copartnerAreaService.getCopartnerAreaRole(copartnerAreaId);
     }
+
+    @GetMapping("/detail/down/company")
+    @ApiOperation(value ="经营区域详情-下辖公司")
+    public HttpResponse<CopartnerAreaDetail> getCopartnerAreaDownCompany(@RequestParam(value = "copartner_area_id",required = true)
+                                                    String copartnerAreaId){
+        return copartnerAreaService.getCopartnerAreaCompany(copartnerAreaId);
+    }
+
     
     @GetMapping("/delete")
     @ApiOperation(value = "删除区域设置")
@@ -285,7 +282,16 @@ public class CopartnerAreaController {
      */
     @GetMapping("/get/two/company")
     @ApiOperation("新建区域-下辖公司-新增-查询二级公司")
-    public HttpResponse saveTwoCompany(@RequestParam String  copartnerAreaName){
-        return copartnerAreaService.selcetCompany(copartnerAreaName);
+    public HttpResponse<CopartnerAreaDetail> saveTwoCompany(@RequestParam(value = "copartner_area_company") String copartnerAreaCompany){
+        return copartnerAreaService.selcetCompany(copartnerAreaCompany);
+    }
+
+    /**
+     * 新建区域-下辖公司-删除
+     */
+    @PostMapping("/delect/two/company")
+    @ApiOperation("新建区域-下辖公司-删除")
+    public HttpResponse delectCompany(@RequestBody List<String> copartnerAreaIds ){
+        return copartnerAreaService.delectTwoCompany(copartnerAreaIds);
     }
 }

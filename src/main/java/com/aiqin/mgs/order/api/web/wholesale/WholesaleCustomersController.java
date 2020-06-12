@@ -56,4 +56,15 @@ public class WholesaleCustomersController {
         return wholesaleCustomersService.update(wholesaleCustomers);
     }
 
+    /**
+     * 通过名称或者账户查询批发客户
+     * @param parameter
+     * @return
+     */
+    @GetMapping("/getCustomerByNameOrAccount")
+    @ApiOperation(value = "通过名称或者账户查询批发客户")
+    public HttpResponse<WholesaleCustomers> getCustomerByNameOrAccount(String parameter){
+        return wholesaleCustomersService.getCustomerByNameOrAccount(parameter);
+    }
+
 }
