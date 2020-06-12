@@ -27,6 +27,7 @@ import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSaveRequest;
 import com.aiqin.mgs.order.api.domain.request.product.ProductSkuRequest2;
+import com.aiqin.mgs.order.api.domain.response.LogisticsAllResponse;
 import com.aiqin.mgs.order.api.domain.response.StoreMarketValueResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.*;
 import com.aiqin.mgs.order.api.domain.wholesale.WholesaleCustomers;
@@ -2315,7 +2316,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //判断是否减免物流费用
         int logisticsFeeStatus=getLogisticsFeeStatus(orderItemList);
-
+        order.setLogisticsFeeStatus(logisticsFeeStatus);
         erpOrderInfoService.saveOrder(order, auth);
 
         //保存订单费用信息
@@ -2344,93 +2345,93 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     }
 
     private int getLogisticsFeeStatus(List<ErpOrderItem> orderItemList) {
-//        LogisticsRuleRequest logisticsRuleRequest=new LogisticsRuleRequest();
-//        List<LogisticsAllResponse> logisticsAllResponseList =(List<LogisticsAllResponse>)logisticsRuleService.selectLogisticsList(logisticsRuleRequest).getData().getResult();
-//        if(null!=orderItemList&&orderItemList.size()>0&&null!=logisticsAllResponseList && logisticsAllResponseList.size()>0){
-//            for(LogisticsAllResponse logisticsAllResponse:logisticsAllResponseList){
-//                //根据活动类型解析活动
-//                switch (logisticsAllResponse.getRultType()) {
-//                    case 0:
-//                        //单品购买数量
-//
-//                        for (ErpOrderItem item : orderItemList) {
-//                            //判断订单里是否存在单品
-//                            if(logisticsAllResponse.getProductCode().equals(item.getSkuCode())){
-//                                //判断是否满足条件
-//                                if(new BigDecimal(item.getProductCount()).compareTo(logisticsAllResponse.getFareSill())>-1){
-//                                    return 1;
-//                                }
-//                            }
-//                        }
-//                        break;
-//                    case 1:
-//                        //单品购买金额
-//
-//                        for (ErpOrderItem item : orderItemList) {
-//                            //判断订单里是否存在单品
-//                            if(logisticsAllResponse.getProductCode().equals(item.getSkuCode())){
-//                                //计算单品总金额
-//                                BigDecimal totalProductAmount=new BigDecimal(item.getProductCount()).multiply(item.getProductAmount());
-//                                //判断是否满足条件
-//                                if((totalProductAmount.compareTo(logisticsAllResponse.getFareSill())>-1){
-//                                    return 1;
-//                                }
-//                            }
-//                        }
-//                        break;
-//                    case 2:
-//                        //累计购买数量
-//
-//                        Long count=0L;
-//                        String[] skuList= logisticsAllResponse.getProductCode().split(",");
-//                        Map map =new HashMap();
-//                        for(String skuCode:skuList){
-//                            map.put(skuCode,skuCode);
-//                        }
-//
-//                        for (ErpOrderItem item : orderItemList) {
-//                            //判断订单里是否存在规则配置里的sku
-//                            if(map.containsKey(item.getSkuCode())){
-//                                //计算满足条件sku总数量
-//                                count+=item.getProductCount();
-//                            }
-//                        }
-//
-//                        //判断是否满足条件
-//                        if(new BigDecimal(count).compareTo(logisticsAllResponse.getFareSill())>-1){
-//                            return 1;
-//                        }
-//
-//                        break;
-//                    case 3:
-//                        //累计购买金额
-//
-//                        Long count=0L;
-//                        String[] skuList= logisticsAllResponse.getProductCode().split(",");
-//                        Map map =new HashMap();
-//                        for(String skuCode:skuList){
-//                            map.put(skuCode,skuCode);
-//                        }
-//
-//                        for (ErpOrderItem item : orderItemList) {
-//                            //判断订单里是否存在规则配置里的sku
-//                            if(map.containsKey(item.getSkuCode())){
-//                                //计算满足条件sku总数量
-//                                count+=item.getProductCount();
-//                            }
-//                        }
-//
-//                        //判断是否满足条件
-//                        if(new BigDecimal(count).compareTo(logisticsAllResponse.getFareSill())>-1){
-//                            return 1;
-//                        }
-//                        break;
-//                    default:
-//                        ;
-//                }
-//
-//            }
-//        }
+        LogisticsRuleRequest logisticsRuleRequest=new LogisticsRuleRequest();
+        List<LogisticsAllResponse> logisticsAllResponseList =(List<LogisticsAllResponse>)logisticsRuleService.selectLogisticsList(logisticsRuleRequest).getData().getResult();
+        if(null!=orderItemList&&orderItemList.size()>0&&null!=logisticsAllResponseList && logisticsAllResponseList.size()>0){
+            for(LogisticsAllResponse logisticsAllResponse:logisticsAllResponseList){
+                //根据活动类型解析活动
+                switch (logisticsAllResponse.getRultType()) {
+                    case 0:
+                        //单品购买数量
+
+                        for (ErpOrderItem item : orderItemList) {
+                            //判断订单里是否存在单品
+                            if(logisticsAllResponse.getProductCode().equals(item.getSkuCode())){
+                                //判断是否满足条件
+                                if(new BigDecimal(item.getProductCount()).compareTo(logisticsAllResponse.getFareSill())>-1){
+                                    return 1;
+                                }
+                            }
+                        }
+                        break;
+                    case 1:
+                        //单品购买金额
+
+                        for (ErpOrderItem item : orderItemList) {
+                            //判断订单里是否存在单品
+                            if(logisticsAllResponse.getProductCode().equals(item.getSkuCode())){
+                                //计算单品总金额
+                                BigDecimal totalProductAmount=new BigDecimal(item.getProductCount()).multiply(item.getProductAmount());
+                                //判断是否满足条件
+                                if(totalProductAmount.compareTo(logisticsAllResponse.getFareSill())>-1){
+                                    return 1;
+                                }
+                            }
+                        }
+                        break;
+                    case 2:
+                        //累计购买数量
+
+                        Long count=0L;
+                        String[] skuList= logisticsAllResponse.getProductCode().split(",");
+                        Map map =new HashMap();
+                        for(String skuCode:skuList){
+                            map.put(skuCode,skuCode);
+                        }
+
+                        for (ErpOrderItem item : orderItemList) {
+                            //判断订单里是否存在规则配置里的sku
+                            if(map.containsKey(item.getSkuCode())){
+                                //计算满足条件sku总数量
+                                count+=item.getProductCount();
+                            }
+                        }
+
+                        //判断是否满足条件
+                        if(new BigDecimal(count).compareTo(logisticsAllResponse.getFareSill())>-1){
+                            return 1;
+                        }
+
+                        break;
+                    case 3:
+                        //累计购买金额
+
+                        BigDecimal price=BigDecimal.ZERO;
+                        String[] skuCodes= logisticsAllResponse.getProductCode().split(",");
+                        Map dataMap =new HashMap();
+                        for(String skuCode:skuCodes){
+                            dataMap.put(skuCode,skuCode);
+                        }
+
+                        for (ErpOrderItem item : orderItemList) {
+                            //判断订单里是否存在规则配置里的sku
+                            if(dataMap.containsKey(item.getSkuCode())){
+                                //计算满足条件sku总金额
+                                price=price.add(new BigDecimal(item.getProductCount()).multiply(item.getProductAmount()));
+                            }
+                        }
+
+                        //判断是否满足条件
+                        if(price.compareTo(logisticsAllResponse.getFareSill())>-1){
+                            return 1;
+                        }
+                        break;
+                    default:
+                        ;
+                }
+
+            }
+        }
         return 0;
     }
 
