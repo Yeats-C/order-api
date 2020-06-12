@@ -94,7 +94,8 @@
         update_by_name as updateByName,
         create_time as createTime,
         update_time as updateTime,
-        first_market_value_gift as firstMarketValueGift
+        first_market_value_gift as firstMarketValueGift,
+        logistics_fee_status as logisticsFeeStatus
         from order_store_info
         where 1 = 1
         <if test="id != null and id != ''">
@@ -368,7 +369,7 @@
                                       transport_code, logistics_id, fee_id, order_return, order_return_process, franchisee_id,
                                       franchisee_code, franchisee_name, order_success, scour_sheet_status, use_status, source_code, source_name,
                                       source_type, activity_id, is_activity, create_by_id, create_by_name, update_by_id, update_by_name,
-                                      create_time, update_time,first_market_value_gift)
+                                      create_time, update_time,first_market_value_gift,logistics_fee_status)
         values (#{orderStoreId}, #{orderStoreCode}, #{companyCode}, #{companyName},
                 #{orderTypeCode}, #{orderTypeName}, #{orderCategoryCode},
                 #{orderCategoryName}, #{supplierCode}, #{supplierName},
@@ -389,7 +390,7 @@
                 #{transportCode}, #{logisticsId}, #{feeId}, #{orderReturn}, #{orderReturnProcess}, #{franchiseeId},
                 #{franchiseeCode}, #{franchiseeName}, #{orderSuccess}, #{scourSheetStatus}, #{useStatus}, #{sourceCode}, #{sourceName},
                 #{sourceType}, #{activityId}, #{isActivity}, #{createById}, #{createByName}, #{updateById}, #{updateByName},
-                sysdate(), sysdate(),#{firstMarketValueGift})
+                sysdate(), sysdate(),#{firstMarketValueGift},#{logisticsFeeStatus})
     </insert>
 
     <select id="findOrderList" parameterType="com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest"

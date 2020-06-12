@@ -5,6 +5,7 @@ import com.aiqin.mgs.order.api.domain.LogisticsRuleRequest;
 import com.aiqin.mgs.order.api.domain.echoLogisticsRule;
 import com.aiqin.mgs.order.api.domain.logisticsRule.LogisticsRuleInfo;
 import com.aiqin.mgs.order.api.domain.LogisticsRuleInfoList;
+import com.aiqin.mgs.order.api.util.ResultModel;
 
 public interface LogisticsRuleService {
     //新增物流减免
@@ -18,5 +19,5 @@ public interface LogisticsRuleService {
     //编辑物流减免规则
     HttpResponse updateLogistics(LogisticsRuleInfoList logisticsRuleInfoList);
     //多条件查询列表
-    HttpResponse selectLogisticsList(LogisticsRuleRequest logisticsRuleRequest);
+    HttpResponse<ResultModel> selectLogisticsList(LogisticsRuleRequest logisticsRuleRequest);
 }
