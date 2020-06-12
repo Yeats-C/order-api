@@ -26,6 +26,7 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.copartnerArea.*;
+import com.aiqin.mgs.order.api.domain.logisticsRule.LogisticsRuleInfo;
 import com.aiqin.mgs.order.api.domain.pay.PayReq;
 import com.aiqin.mgs.order.api.domain.request.*;
 import com.aiqin.mgs.order.api.domain.response.*;
@@ -361,18 +362,49 @@ public class CopartnerAreaServiceImpl implements  CopartnerAreaService {
 				copartnerAreaDao.saveCopartnerArea(vo);
 			}
 			//下辖公司
-			if (CollectionUtils.isNotEmpty(param.getDownCompanyList())) {
-				List<CopartnerAreaDetail> downCompanyList = param.getDownCompanyList();
-				log.info("获取下辖公司集合：{}", downCompanyList);
-				List<String> collect = downCompanyList.stream().map(CopartnerAreaDetail::getCopartnerAreaId).collect(Collectors.toList());
-				log.info("下辖公司id集合：{}", collect);
-				CopartnerAreaDetail copartnerAreaDetail = new CopartnerAreaDetail();
-				copartnerAreaDetail.setCompanyIdList(collect);
-				copartnerAreaDetail.setCopartnerAreaIdUp(copartnerAreaId);
-				copartnerAreaDetail.setCopartnerAreaNameUp(param.getCopartnerAreaDetail().getCopartnerAreaName());
-				log.info("修改下辖公司对象：{}", copartnerAreaDetail);
-				copartnerAreaDao.updateCopartnerAreaUp(copartnerAreaDetail);
-
+			if(StringUtils.isBlank(param.getCopartnerAreaDetail().getCopartnerAreaId()) && param.getCopartnerAreaDetail().getCopartnerAreaId().equals("0")){
+			   if (CollectionUtils.isNotEmpty(param.getDownCompanyList())) {
+			     	List<CopartnerAreaDetail> downCompanyList = param.getDownCompanyList();
+			     	log.info("获取下辖公司集合：{}", downCompanyList);
+				    List<String> collect = downCompanyList.stream().map(CopartnerAreaDetail::getCopartnerAreaId).collect(Collectors.toList());
+				    log.info("下辖公司id集合：{}", collect);
+				    CopartnerAreaDetail copartnerAreaDetail = new CopartnerAreaDetail();
+				    copartnerAreaDetail.setCompanyIdList(collect);
+				    copartnerAreaDetail.setCopartnerAreaIdUp(copartnerAreaId);
+				    copartnerAreaDetail.setCopartnerAreaNameUp(param.getCopartnerAreaDetail().getCopartnerAreaName());
+				    log.info("修改下辖公司对象：{}", copartnerAreaDetail);
+				    copartnerAreaDao.updateCopartnerAreaUp(copartnerAreaDetail);
+			   }
+			}else {
+				//编辑的时候新增还是删除掉的
+				List<CopartnerAreaDetail> copartnerAreaTwoCompany = copartnerAreaDao.getCopartnerAreaByOneId(param.getCopartnerAreaDetail().getCopartnerAreaName());
+				//大于就是编辑的时候新增
+				if( param.getDownCompanyList().size()   > copartnerAreaTwoCompany.size()) {
+					List<String> collect = copartnerAreaTwoCompany.stream().map(CopartnerAreaDetail::getCopartnerAreaId).collect(Collectors.toList());
+					//要新增的集合合伙人公司
+					List<CopartnerAreaDetail> collect1 = param.getDownCompanyList().stream().filter(CopartnerAreaDetail -> !collect.contains(CopartnerAreaDetail.getCopartnerAreaId())).collect(Collectors.toList());
+					log.info("筛选后-要新增的-合伙人公司：{}",collect1);
+					//转成一个id集合
+					List<String> copartnerAreaIdList = collect1.stream().map(CopartnerAreaDetail::getCopartnerAreaId).collect(Collectors.toList());
+					log.info("筛选后-要新增的-合伙人公司的id：{}",copartnerAreaIdList);
+					CopartnerAreaDetail copartnerAreaDetail = new CopartnerAreaDetail();
+					copartnerAreaDetail.setCompanyIdList(copartnerAreaIdList);
+					copartnerAreaDetail.setCopartnerAreaIdUp(copartnerAreaId);
+					copartnerAreaDetail.setCopartnerAreaNameUp(param.getCopartnerAreaDetail().getCopartnerAreaName());
+					log.info("编辑新的二级合伙人公司-上级id和名称-实体：{}",copartnerAreaDetail);
+					copartnerAreaDao.updateCopartnerAreaUp(copartnerAreaDetail);
+				}else {
+					//编辑的时候会删除掉合伙人公司
+					//下辖公司的所有id
+					List<String> collect = param.getDownCompanyList().stream().map(CopartnerAreaDetail::getCopartnerAreaId).collect(Collectors.toList());
+					//筛选出来要删除的上级id和名称
+					List<CopartnerAreaDetail> collect1 = copartnerAreaTwoCompany.stream().filter(CopartnerAreaDetail -> !collect.contains(CopartnerAreaDetail.getCopartnerAreaId())).collect(Collectors.toList());
+                    log.info("编辑时-删除的二级合伙人公司：{}",collect1);
+                    //筛选出来要删除的区域id
+					List<String> copartnerAreaIdLists = collect1.stream().map(CopartnerAreaDetail::getCopartnerAreaId).collect(Collectors.toList());
+					log.info("编辑时-删除的二级合伙人公司的id：{}",copartnerAreaIdLists);
+					copartnerAreaDao.copartnerAreaIdByList(copartnerAreaIdLists);
+				}
 			}
 
 			//门店信息
