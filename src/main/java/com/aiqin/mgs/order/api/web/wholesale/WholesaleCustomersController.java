@@ -67,4 +67,17 @@ public class WholesaleCustomersController {
         return wholesaleCustomersService.getCustomerByNameOrAccount(parameter);
     }
 
+    /**
+     * 校验账户是否存在
+     * @param customerAccount
+     * @return
+     */
+    @GetMapping("/checkAccountExists")
+    @ApiOperation(value = "校验账户是否存在 true 不存在 false 存在")
+    public HttpResponse checkAccountExists(String customerAccount){
+        return wholesaleCustomersService.checkAccountExists(customerAccount);
+    }
+
+
+
 }

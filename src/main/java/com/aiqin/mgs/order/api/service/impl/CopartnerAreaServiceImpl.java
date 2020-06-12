@@ -713,10 +713,10 @@ public class CopartnerAreaServiceImpl implements  CopartnerAreaService {
 	@Override
 	public HttpResponse<CopartnerAreaDetail> selcetCompany(String copartnerAreaCompany) {
 		log.info("新建区域-下辖公司-新增二级公司方法入参：{} ", copartnerAreaCompany);
-		CopartnerAreaDetail copartnerAreaDetail = copartnerAreaStoreDao.slecetTwoCompanyByName(copartnerAreaCompany);
-		log.info("查询二级公司返回结果： {}", copartnerAreaDetail);
-		if (copartnerAreaDetail != null) {
-			return HttpResponse.success(copartnerAreaDetail);
+		List<CopartnerAreaDetail> copartnerAreaDetails = copartnerAreaStoreDao.slecetTwoCompanyByName(copartnerAreaCompany);
+		log.info("查询二级公司返回结果： {}", copartnerAreaDetails);
+		if (copartnerAreaDetails != null) {
+			return HttpResponse.success(copartnerAreaDetails);
 		}
 		return HttpResponse.success();
 	}

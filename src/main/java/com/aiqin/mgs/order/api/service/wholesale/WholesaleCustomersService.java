@@ -40,4 +40,11 @@ public interface WholesaleCustomersService {
      * @return
      */
     HttpResponse<WholesaleCustomers> getCustomerByNameOrAccount(String parameter);
+
+    /**
+     * 校验账户是否存在
+     * @param customerAccount
+     * @return
+     */
+    HttpResponse checkAccountExists(String customerAccount);
 }
