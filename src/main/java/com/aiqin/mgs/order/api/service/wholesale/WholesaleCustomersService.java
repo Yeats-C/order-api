@@ -4,6 +4,8 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.wholesale.WholesaleCustomers;
 
+import java.util.List;
+
 public interface WholesaleCustomersService {
 
     /**
@@ -39,7 +41,7 @@ public interface WholesaleCustomersService {
      * @param parameter
      * @return
      */
-    HttpResponse<WholesaleCustomers> getCustomerByNameOrAccount(String parameter);
+    HttpResponse<List<WholesaleCustomers>> getCustomerByNameOrAccount(String parameter);
 
     /**
      * 校验账户是否存在

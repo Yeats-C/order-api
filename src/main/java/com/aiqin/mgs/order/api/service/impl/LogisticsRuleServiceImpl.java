@@ -241,7 +241,7 @@ public class LogisticsRuleServiceImpl implements LogisticsRuleService {
      * @return
      */
     @Override
-    public HttpResponse selectLogisticsList(LogisticsRuleRequest logisticsRuleRequest) {
+    public HttpResponse<ResultModel> selectLogisticsList(LogisticsRuleRequest logisticsRuleRequest) {
         LOGGER.info("多条件查询列表-方法入参：{}",logisticsRuleRequest);
         Integer PageNo = logisticsRuleRequest.getPageNo();
         Integer PageSize = logisticsRuleRequest.getPageSize();
