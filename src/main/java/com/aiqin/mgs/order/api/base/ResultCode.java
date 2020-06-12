@@ -130,4 +130,8 @@ public interface ResultCode {
     MessageId GIFT_POOL_ALREADY_EXISTS = MessageId.create(Project.ORDER_API, 110, "赠品池已存在此赠品");
     MessageId PROVINCE_AND_CITY_INFORMATION_IS_EMPTY = MessageId.create(Project.STORE_API, 110, "此门店省市信息为空");
     /**赠品池相关 end */
+
+    /**批发客户相关 start */
+    MessageId ACCOUNT_ALREADY_EXISTS = MessageId.create(Project.ORDER_API, 111, "此账户已存在");
+    /**批发客户相关 end */
 }

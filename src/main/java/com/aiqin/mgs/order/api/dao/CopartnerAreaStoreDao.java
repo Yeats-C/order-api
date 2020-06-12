@@ -7,34 +7,12 @@
  * ****************************************************************************/
 package com.aiqin.mgs.order.api.dao;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
 
 import com.aiqin.mgs.order.api.domain.copartnerArea.*;
-import com.aiqin.mgs.order.api.domain.request.UnPayVo;
-import com.aiqin.mgs.order.api.domain.request.statistical.BusinessStatisticalRequest;
-import com.aiqin.mgs.order.api.domain.request.statistical.SkuSalesRequest;
-import com.aiqin.mgs.order.api.domain.response.*;
-import com.aiqin.mgs.order.api.domain.response.statistical.Last10DaysOrderStatistical;
-import com.aiqin.mgs.order.api.domain.statistical.BusinessStatistical;
-import com.aiqin.mgs.order.api.domain.statistical.SkuSales;
 import org.apache.ibatis.annotations.Param;
-
-import com.aiqin.mgs.order.api.domain.*;
-import com.aiqin.mgs.order.api.domain.request.DevelRequest;
-import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
-import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
-import com.aiqin.mgs.order.api.domain.response.OrderResponse;
-import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
-import com.aiqin.mgs.order.api.domain.response.SelectByMemberPayCountResponse;
-import com.aiqin.mgs.order.api.domain.response.SkuSaleResponse;
-import com.aiqin.mgs.order.api.domain.response.LastBuyResponse;
-import com.aiqin.mgs.order.api.domain.response.LatelyResponse;
-import com.aiqin.mgs.order.api.domain.response.MevBuyResponse;
-import com.aiqin.mgs.order.api.domain.response.OradskuResponse;
-import org.apache.ibatis.annotations.Select;
 
 
 public interface CopartnerAreaStoreDao {
@@ -59,5 +37,5 @@ public interface CopartnerAreaStoreDao {
 
 	void deleteByAreaStore(@Valid @Param("storeId") String storeId);
 
-	CopartnerAreaDetail slecetTwoCompanyByName(@Param("copartnerAreaCompany") String copartnerAreaCompany);
+	List<CopartnerAreaDetail> slecetTwoCompanyByName(@Param("copartnerAreaCompany") String copartnerAreaCompany);
 }

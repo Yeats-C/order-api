@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 @RequestMapping("/wholesaleCustomers")
@@ -63,8 +64,21 @@ public class WholesaleCustomersController {
      */
     @GetMapping("/getCustomerByNameOrAccount")
     @ApiOperation(value = "通过名称或者账户查询批发客户")
-    public HttpResponse<WholesaleCustomers> getCustomerByNameOrAccount(String parameter){
+    public HttpResponse<List<WholesaleCustomers>> getCustomerByNameOrAccount(String parameter){
         return wholesaleCustomersService.getCustomerByNameOrAccount(parameter);
     }
+
+    /**
+     * 校验账户是否存在
+     * @param customerAccount
+     * @return
+     */
+    @GetMapping("/checkAccountExists")
+    @ApiOperation(value = "校验账户是否存在 true 不存在 false 存在")
+    public HttpResponse checkAccountExists(String customerAccount){
+        return wholesaleCustomersService.checkAccountExists(customerAccount);
+    }
+
+
 
 }

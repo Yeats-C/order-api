@@ -32,6 +32,7 @@ import com.aiqin.mgs.order.api.domain.response.cart.*;
 import com.aiqin.mgs.order.api.domain.wholesale.WholesaleCustomers;
 import com.aiqin.mgs.order.api.service.CartOrderService;
 import com.aiqin.mgs.order.api.service.CouponRuleService;
+import com.aiqin.mgs.order.api.service.LogisticsRuleService;
 import com.aiqin.mgs.order.api.service.SequenceGeneratorService;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.service.cart.ErpOrderCartService;
@@ -106,6 +107,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private GiftQuotasUseDetailService giftQuotasUseDetailService;
     @Resource
     private GiftPoolService giftPoolService;
+    @Resource
+    private LogisticsRuleService logisticsRuleService;
 
 
     @Override
@@ -2295,7 +2298,24 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_NO.getCode());
         //生成冲减单状态
         order.setScourSheetStatus(ErpOrderScourSheetStatusEnum.NOT_NEED.getCode());
+        //门店id
+        order.setStoreId(wholesaleCustomers.getCustomerCode());
+        //门店编码
+        order.setStoreCode(wholesaleCustomers.getCustomerAccount());
+        //门店名称
+        order.setStoreName(wholesaleCustomers.getCustomerName());
+        //加盟商id
+        order.setFranchiseeId(wholesaleCustomers.getCustomerCode());
+        //加盟商编码
+        order.setFranchiseeCode(wholesaleCustomers.getCustomerAccount());
+        //加盟商名称
+        order.setFranchiseeName(wholesaleCustomers.getCustomerName());
+        //是否活动商品0否1是
         order.setIsActivity(YesOrNoEnum.NO.getCode());
+
+        //判断是否减免物流费用
+//        int logisticsFeeStatus=getLogisticsFeeStatus(orderItemList);
+
         erpOrderInfoService.saveOrder(order, auth);
 
         //保存订单费用信息
@@ -2322,6 +2342,217 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         return orderCode;
     }
+
+    /*private int getLogisticsFeeStatus(List<ErpOrderItem> orderItemList) {
+        LogisticsRuleRequest logisticsRuleRequest=new LogisticsRuleRequest();
+        List<LogisticsAllResponse> logisticsAllResponseList =(List<LogisticsAllResponse>)logisticsRuleService.selectLogisticsList(logisticsRuleRequest).getData().getResult();
+        if(null!=orderItemList&&orderItemList.size()>0&&null!=logisticsAllResponseList && logisticsAllResponseList.size()>0){
+            for(LogisticsAllResponse logisticsAllResponse:logisticsAllResponseList){
+                //根据活动类型解析活动
+                switch (logisticsAllResponse.getRultType()) {
+                    case 0:
+                        //单品购买数量
+
+                        for (ErpOrderItem item : orderItemList) {
+                            //判断订单里是否存在单品
+                            if(logisticsAllResponse.getProductCode().equals(item.getSkuCode())){
+
+                            }
+                        }
+                        break;
+                    case TYPE_2:
+                        //满赠
+
+                        for (ActivityRule ruleItem :
+                                activityRules) {
+
+                            //筛选最小梯度
+                            if (firstRule == null || ruleItem.getMeetingConditions().compareTo(firstRule.getMeetingConditions()) < 0) {
+                                firstRule = ruleItem;
+                            }
+
+                            //是否把当前梯度作为命中梯度
+                            boolean flag = false;
+
+                            if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(ruleItem.getRuleUnit())) {
+                                //按照数量
+
+                                if (ruleItem.getMeetingConditions().compareTo(new BigDecimal(quantity)) <= 0) {
+                                    if (curRule == null) {
+                                        flag = true;
+                                    } else {
+                                        if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                            flag = true;
+                                        }
+                                    }
+                                }
+
+                            } else if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(ruleItem.getRuleUnit())) {
+                                //按照金额
+
+                                if (ruleItem.getMeetingConditions().compareTo(amountTotal) <= 0) {
+                                    if (curRule == null) {
+                                        flag = true;
+                                    } else {
+                                        if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                            flag = true;
+                                        }
+                                    }
+                                }
+
+                            } else {
+                                flag = true;
+                            }
+
+                            if (flag) {
+                                curRule = ruleItem;
+                            }
+                        }
+
+                        if (curRule != null) {
+
+                            cartGroupInfo.setActivityRule(curRule);
+
+                            //满赠规则组
+                            List<ActivityGift> giftList = curRule.getGiftList();
+
+                            //存放生成的赠品行
+                            List<ErpOrderCartInfo> cartGiftList = new ArrayList<>();
+
+                            //生成赠品行
+                            for (ActivityGift giftItem :
+                                    giftList) {
+                                //生成赠品行
+                                ErpOrderCartInfo giftProductLine = createGiftProductLine(activity, giftItem, store);
+                                ErpSkuDetail skuDetail = skuDetailMap.get(giftProductLine.getSkuCode()+"BATCH_INFO_CODE"+giftProductLine.getBatchInfoCode()
+                                );
+                                if(null==skuDetail){
+                                    skuDetail=bridgeProductService.getProductSkuDetail(store.getProvinceId(),store.getCityId(),store.getCompanyCode(),giftProductLine.getSkuCode());
+                                }
+                                giftProductLine.setStockNum(skuDetail.getStockNum());
+                                giftProductLine.setIsSale(skuDetail.getIsSale());
+                                giftProductLine.setActivityPrice(BigDecimal.ZERO);
+
+                                cartGiftList.add(giftProductLine);
+                            }
+                            cartGroupInfo.setCartGiftList(cartGiftList);
+                        }
+
+                        ;
+                        break;
+                    case TYPE_3:
+                        //折扣
+
+                        for (ActivityRule ruleItem :
+                                activityRules) {
+
+                            //筛选最小梯度
+                            if (firstRule == null || ruleItem.getMeetingConditions().compareTo(firstRule.getMeetingConditions()) < 0) {
+                                firstRule = ruleItem;
+                            }
+
+                            //是否把当前梯度作为命中梯度
+                            boolean flag = false;
+
+                            if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(ruleItem.getRuleUnit())) {
+                                //按照数量
+
+                                if (ruleItem.getMeetingConditions().compareTo(new BigDecimal(quantity)) <= 0) {
+                                    if (curRule == null) {
+                                        flag = true;
+                                    } else {
+                                        if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                            flag = true;
+                                        }
+                                    }
+                                }
+
+                            } else if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(ruleItem.getRuleUnit())) {
+                                //按照金额
+
+                                if (ruleItem.getMeetingConditions().compareTo(amountTotal) <= 0) {
+                                    if (curRule == null) {
+                                        flag = true;
+                                    } else {
+                                        if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                            flag = true;
+                                        }
+                                    }
+                                }
+
+                            } else {
+                                flag = true;
+                            }
+
+                            if (flag) {
+                                curRule = ruleItem;
+                            }
+                        }
+
+                        if (curRule != null) {
+
+                            cartGroupInfo.setActivityRule(curRule);
+
+                            //计算折扣均摊
+
+                            //当前活动的折扣点数（百分比）
+                            BigDecimal restPreferentialAmount = curRule.getPreferentialAmount();
+
+                            if (activityAmountTotal.compareTo(BigDecimal.ZERO) > 0) {
+                                for (int i = 0; i < tempList.size(); i++) {
+                                    ErpOrderCartInfo item = tempList.get(i);
+
+                                    //行减去活动优惠之后分摊的金额  =  当前活动的折扣点数（百分比） 乘以  商品原价（分销价） 乘以  商品数量
+                                    item.setLineAmountAfterActivity(restPreferentialAmount.multiply(item.getPrice()).multiply(new BigDecimal(item.getAmount())).setScale(2, RoundingMode.HALF_UP));
+                                    //行活动优惠的金额，行根据活动使该行减少的金额，前端不显示  =  商品原价（分销价）  -  行活动优惠的金额，行根据活动使该行减少的金额，前端不显示
+                                    item.setLineActivityDiscountTotal(item.getLineAmountTotal().subtract(item.getLineAmountAfterActivity()).setScale(2, RoundingMode.HALF_UP));
+                                    //设置行活动价  = 当前活动的折扣点数（百分比） 乘以  商品原价（分销价）
+                                    item.setActivityPrice(restPreferentialAmount.multiply(item.getPrice()).setScale(2, RoundingMode.HALF_UP));
+                                    //设置行活动价汇总  = 当前活动的折扣点数（百分比） 乘以  商品原价（分销价） 乘以  商品数量
+//                            item.setLineActivityAmountTotal(restPreferentialAmount.multiply(item.getPrice()).multiply(new BigDecimal(item.getAmount())).setScale(2, RoundingMode.HALF_UP));
+                                }
+                            }
+
+                        }
+                        ;
+                        break;
+                    case TYPE_5:
+                        //特价
+
+                        if (activityAmountTotal.compareTo(BigDecimal.ZERO) > 0) {
+
+                            for (int i = 0; i < tempList.size(); i++) {
+                                ErpOrderCartInfo item = tempList.get(i);
+                                Double reduce=0.00;
+                                //通过sku拿到活动特价金额
+                                if(null!=productMap.get(item.getSkuCode())){
+                                    reduce= Double.valueOf(productMap.get(item.getSkuCode()).toString());
+                                }
+
+                                //行减去活动优惠之后分摊的金额  =  活动特价金额 乘以  商品数量
+                                item.setLineAmountAfterActivity(BigDecimal.valueOf(reduce).multiply(new BigDecimal(item.getAmount())).setScale(2, RoundingMode.HALF_UP));
+
+                                //行活动优惠的金额，行根据活动使该行减少的金额，前端不显示  =   商品原价（分销价）- 减去活动优惠之后分摊的金额
+                                item.setLineActivityDiscountTotal(item.getLineAmountTotal().subtract(item.getLineAmountAfterActivity()).setScale(2, RoundingMode.HALF_UP));
+
+                                //设置行活动价  = 当前活动的折扣点数（百分比） 乘以  商品原价（分销价）
+                                item.setActivityPrice(BigDecimal.valueOf(reduce).setScale(2, RoundingMode.HALF_UP));
+
+                                //行活动价汇总  =  活动特价金额 乘以  商品数量
+//                        item.setLineActivityAmountTotal(BigDecimal.valueOf(reduce).multiply(new BigDecimal(item.getAmount())).setScale(2, RoundingMode.HALF_UP));
+
+                            }
+                        }
+
+                        break;
+                    default:
+                        ;
+                }
+
+            }
+        }
+        return 0;
+    }*/
 
 
 }

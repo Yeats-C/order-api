@@ -434,6 +434,10 @@ public class ErpOrderInfo {
     @JsonProperty("first_market_value_gift")
     private Integer firstMarketValueGift;
 
+    @ApiModelProperty(value = "是否减免物流费用 0否  1是")
+    @JsonProperty("logistics_fee_status")
+    private Integer logisticsFeeStatus=0;
+
     public String getOrderStatusDesc() {
         return ErpOrderStatusEnum.getEnumDesc(orderStatus);
     }

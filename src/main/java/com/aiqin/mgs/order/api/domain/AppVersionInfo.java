@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -18,23 +19,27 @@ public class AppVersionInfo {
     /**
      * 系统类型，1 安卓，2 苹果
      */
+    @NotNull
     @ApiModelProperty(value = "系统类型，1 安卓，2 苹果")
     @JsonProperty("system_type")
     private Integer systemType;
 
+    @NotNull
     @ApiModelProperty(value = "系统版本号")
     @JsonProperty("app_version")
     private String appVersion;
+
 
     @ApiModelProperty(value = "类型，1 POS收银App，2 爱掌柜app")
     @JsonProperty("app_type")
     private Integer appType;
 
+    @NotNull
     @ApiModelProperty(value = "内部系统版本号")
     @JsonProperty("app_build")
     private String appBuild;
 
-
+    @NotNull
     @ApiModelProperty(value = "下载地址")
     @JsonProperty("update_url")
     private String updateUrl;

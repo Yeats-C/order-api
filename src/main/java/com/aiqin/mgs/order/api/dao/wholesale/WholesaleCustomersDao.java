@@ -56,6 +56,13 @@ public interface WholesaleCustomersDao {
      * @return
      */
     int clearRules(String customerCode);
+
+    /**
+     * 通过账户查询批发客户数量（校验账户是否已存在）
+     * @param customerAccount
+     * @return
+     */
+    int selectCustomerByParameter(@Param("customerAccount") String customerAccount);
 }
 
 

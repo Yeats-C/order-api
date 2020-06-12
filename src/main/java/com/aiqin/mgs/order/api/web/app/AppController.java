@@ -39,7 +39,7 @@ public class AppController {
 
     @PostMapping("/verson/active")
     @ApiOperation("活动当前的版本信息")
-    public HttpResponse<AppVersionInfo> appActive(@Validated @RequestBody AppVersionInfo appVersionInfo) {
+    public HttpResponse<AppVersionInfo> appActive( @RequestBody AppVersionInfo appVersionInfo) {
         LOGGER.info("获取配送直送账户信息以及明细[{}]", JsonUtil.toJson(appVersionInfo));
         return appService.appActive(appVersionInfo);
     }

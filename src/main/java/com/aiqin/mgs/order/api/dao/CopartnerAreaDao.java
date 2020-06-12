@@ -69,4 +69,8 @@ public interface CopartnerAreaDao {
 	List<CopartnerAreaDetail> getCopartnerAreaTwoCompany(String copartnerAreaId);
 	//删除下辖公司
 	void putCompanyById(@Param("copartnerAreaIds") List<String> copartnerAreaIds);
+    //编辑时删除的二级公司
+    void copartnerAreaIdByList(@Param("copartnerAreaIdLists") List<String> copartnerAreaIdLists);
+    //查询一级下的二级
+    List<CopartnerAreaDetail> getCopartnerAreaByOneId(String copartnerAreaName);
 }

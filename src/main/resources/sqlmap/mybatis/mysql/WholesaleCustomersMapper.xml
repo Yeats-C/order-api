@@ -114,6 +114,18 @@
             </if>
         </where>
     </select>
+    <select id="selectCustomerByParameter" resultType="java.lang.Integer">
+        SELECT
+        count(1)
+        FROM
+        wholesale_customers
+        <where>
+            1=1
+            <if test="customerAccount != '' and customerAccount != null">
+                and customer_account = #{customerAccount}
+            </if>
+        </where>
+    </select>
 
     <!--新增批发客户-->
     <insert id="insert" parameterType="com.aiqin.mgs.order.api.domain.wholesale.WholesaleCustomers">
