@@ -39,6 +39,7 @@ import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.service.cart.ErpOrderCartService;
 import com.aiqin.mgs.order.api.service.gift.GiftPoolService;
 import com.aiqin.mgs.order.api.service.gift.GiftQuotasUseDetailService;
+import com.aiqin.mgs.order.api.service.impl.LogisticsRuleServiceImpl;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.service.wholesale.WholesaleCustomersService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
@@ -2346,7 +2347,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
     private int getLogisticsFeeStatus(List<ErpOrderItem> orderItemList) {
         LogisticsRuleRequest logisticsRuleRequest=new LogisticsRuleRequest();
-        List<LogisticsAllResponse> logisticsAllResponseList =(List<LogisticsAllResponse>)logisticsRuleService.selectLogisticsList(logisticsRuleRequest).getData().getResult();
+        List<LogisticsAllResponse> logisticsAllResponseList =(List<LogisticsAllResponse>)logisticsRuleService.selectLogisticsList(logisticsRuleRequest).getData();
         if(null!=orderItemList&&orderItemList.size()>0&&null!=logisticsAllResponseList && logisticsAllResponseList.size()>0){
             for(LogisticsAllResponse logisticsAllResponse:logisticsAllResponseList){
                 //根据活动类型解析活动
@@ -2433,6 +2434,14 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             }
         }
         return 0;
+    }
+
+    public static void main(String[] args) {
+        LogisticsRuleServiceImpl logisticsRuleService=new LogisticsRuleServiceImpl();
+        LogisticsRuleRequest logisticsRuleRequest=new LogisticsRuleRequest();
+        List<LogisticsAllResponse> logisticsAllResponseList =(List<LogisticsAllResponse>)logisticsRuleService.selectLogisticsList(logisticsRuleRequest).getData();
+        System.out.println(JsonUtil.toJson(logisticsAllResponseList));
+        System.out.println(JsonUtil.toJson(logisticsRuleService.selectLogisticsList(logisticsRuleRequest).getData()));
     }
 
 

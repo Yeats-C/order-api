@@ -6,6 +6,7 @@ import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
@@ -28,12 +29,14 @@ import com.aiqin.mgs.order.api.domain.response.NewFranchiseeResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetail;
 import com.aiqin.mgs.order.api.domain.response.gift.StoreAvailableGiftQuotaResponse;
 import com.aiqin.mgs.order.api.domain.response.order.StoreFranchiseeInfoResponse;
+import com.aiqin.mgs.order.api.domain.wholesale.JoinMerchant;
 import com.aiqin.mgs.order.api.util.MathUtil;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -49,6 +52,9 @@ public class BridgeProductService<main> {
 
     @Resource
     private UrlProperties urlProperties;
+
+    @Value("${center.main.url}")
+    private String centerMainUrl;
 
     /**
      * 获取低库存畅缺商品明细信息
@@ -638,11 +644,70 @@ public class BridgeProductService<main> {
         return storeInfo;
     }
 
+    public HttpResponse<JoinMerchant> addFranchisee(JoinMerchant joinMerchant){
+        StringBuilder sb = new StringBuilder();
+        sb.append(centerMainUrl).append("/franchisee/add/franchisee");
+//        sb.append("http://control.api.aiqin.com").append("/franchisee/add/franchisee");
+        log.info("添加批发客户组织架构[{}]", JsonUtil.toJson(joinMerchant));
+        HttpClient httpClient = HttpClient.post(sb.toString()).json(joinMerchant);
+
+        HttpResponse<JoinMerchant> httpResponse = httpClient.action().result(new TypeReference<HttpResponse<JoinMerchant>>() {
+        });
+        if (!httpResponse.getCode().equals(MessageId.SUCCESS_CODE)) {
+            log.error("批发客户创建主控架构失败，返回信息 httpResponse ={}"+httpResponse);
+            return HttpResponse.failure(ResultCode.FAILED_TO_CREATE_MASTER_ACCOUNT);
+        }
+
+        return httpResponse;
+    }
+
+    public HttpResponse<JoinMerchant> addFranchiseeAccount(JoinMerchant joinMerchant){
+        StringBuilder sb = new StringBuilder();
+//        sb.append(centerMainUrl).append("/franchisee/add/franchisee/account");
+        sb.append("http://control.api.aiqin.com").append("/franchisee/add/franchisee/account");
+        log.info("添加批发客户组织架构[{}]", JsonUtil.toJson(joinMerchant));
+        HttpClient httpClient = HttpClient.post(sb.toString()).json(joinMerchant);
+
+        HttpResponse<JoinMerchant> httpResponse = httpClient.action().result(new TypeReference<HttpResponse<JoinMerchant>>() {
+        });
+        if (!httpResponse.getCode().equals(MessageId.SUCCESS_CODE)) {
+            log.error("批发客户创建主控账户失败，返回信息 httpResponse ={}"+httpResponse);
+            return HttpResponse.failure(ResultCode.FAILED_TO_CREATE_MASTER_ACCOUNT);
+        }
+
+        return httpResponse;
+    }
+
 
 
 
     public static void main(String[] args) {
         BridgeProductService bridgeProductService=new BridgeProductService();
-        System.out.println(bridgeProductService.selectStoreGiveawayByStoreCode("60000011"));
+        JoinMerchant joinMerchant=new JoinMerchant();
+        joinMerchant.setFranchiseeCode("70000001");
+        joinMerchant.setFranchiseeName("测试新增批发客户");
+        joinMerchant.setMobile("11122246666");
+        joinMerchant.setCardNo("110101199003079032");
+        joinMerchant.setCardType("1");
+        joinMerchant.setCompanyCode("01");
+        joinMerchant.setCompanyName("爱亲科技");
+        StringBuffer stringBuffer=new StringBuffer();
+        stringBuffer.append("北京市");
+        stringBuffer.append("北京市");
+        stringBuffer.append("朝阳区");
+        stringBuffer.append("狂人学院");
+        joinMerchant.setAddress(stringBuffer.toString());
+        joinMerchant.setProperty(2);
+        joinMerchant.setCreateBy("111111测试主控新增批发客户");
+        joinMerchant.setPersonId("111111");
+
+        joinMerchant.setDepartmentCode("160200086");
+        joinMerchant.setDepartmentName("测试新增批发客户(内部)");
+        joinMerchant.setDepartmentLevel(2);
+        joinMerchant.setCompanyCode("16");
+        joinMerchant.setCompanyName("门店管理");
+        String[] roleId = {"JS0089"};
+        joinMerchant.setRoleId(roleId);
+        System.out.println(JsonUtil.toJson(bridgeProductService.addFranchiseeAccount(joinMerchant)));
     }
 }
