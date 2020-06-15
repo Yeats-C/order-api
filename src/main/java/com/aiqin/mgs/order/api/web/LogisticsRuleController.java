@@ -6,6 +6,7 @@ import com.aiqin.mgs.order.api.domain.LogisticsRuleInfoList;
 import com.aiqin.mgs.order.api.domain.LogisticsRuleRequest;
 import com.aiqin.mgs.order.api.domain.echoLogisticsRule;
 import com.aiqin.mgs.order.api.domain.logisticsRule.LogisticsRuleInfo;
+import com.aiqin.mgs.order.api.domain.response.LogisticsAllResponse;
 import com.aiqin.mgs.order.api.service.LogisticsRuleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -52,7 +53,7 @@ public class LogisticsRuleController {
 
     @PostMapping("/select/logistics")
     @ApiOperation("多条件查询列表")
-    public HttpResponse selectLogistics(@RequestBody LogisticsRuleRequest logisticsRuleRequest){
+    public HttpResponse<LogisticsAllResponse> selectLogistics(@RequestBody LogisticsRuleRequest logisticsRuleRequest){
         return logisticsRuleService.selectLogisticsList(logisticsRuleRequest);
     }
 }

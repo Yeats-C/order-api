@@ -28,7 +28,7 @@ public class ReturnOrderReqVo implements Serializable {
     private String orderStoreCode;
 
     @NotNull(message = "订单类型不能为空")
-    @ApiModelProperty(value = "订单类型(订单类型 0直送、1配送、2辅采)")
+    @ApiModelProperty(value = "订单类型(订单类型 0直送、1配送、2辅采 )")
     private Integer orderType;
 
     @NotBlank(message = "公司编码不能为空")
@@ -123,7 +123,7 @@ public class ReturnOrderReqVo implements Serializable {
     @ApiModelProperty(value = "来源类型:1-web收银台 2-安卓收银台 3-微信公众号")
     private Integer sourceType;
 
-    @ApiModelProperty(value = "订单类别：1：收单配送 2：首单赠送 3：配送补货 4：首单直送 5：直送补货")
+    @ApiModelProperty(value = "订单类别：1：收单配送 2：首单赠送 3：配送补货 4：首单直送 5：直送补货 51：批发普通订货")
     private Integer orderCategory;
 
     @ApiModelProperty(value = "明细")
