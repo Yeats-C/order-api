@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.service.impl;
 
+import com.aiqin.ground.util.exception.GroundRuntimeException;
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.json.JsonUtil;
@@ -50,6 +51,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.asm.Advice;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -1608,72 +1610,88 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     @Transactional(rollbackFor = Exception.class)
     public HttpResponse saveWholesaleReturn(ReturnOrderReqVo reqVo) {
         log.info("发起批发退货--入参"+JSON.toJSONString(reqVo));
-        //查询订单是否存在未处理售后单
-        List<ReturnOrderInfo> returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndStatus(reqVo.getOrderStoreCode(), 1);
-        Assert.isTrue(CollectionUtils.isEmpty(returnOrderInfo), "该订单还有未审核售后单，请稍后提交");
-        //校验原始订单的主订单关联的所有子订单是否发货完成
-        ErpOrderInfo orderByOrderCode = erpOrderQueryService.getOrderByOrderCode(reqVo.getOrderStoreCode());
-        Boolean aBoolean = checkSendOk(orderByOrderCode.getMainOrderCode());
-        //是否真的发起退货 0:预生成退货单 1:原始订单全部发货完成生成退货单
-        Integer reallyReturn=0;
-        if(aBoolean){
-            reallyReturn=1;
-        }
-        ReturnOrderInfo record = new ReturnOrderInfo();
-        Date now = new Date();
-        BeanUtils.copyProperties(reqVo, record);
-        String returnOrderId = IdUtil.uuid();
-        String afterSaleCode = sequenceService.generateOrderAfterSaleCode(reqVo.getCompanyCode(), reqVo.getReturnOrderType());
-        record.setReturnOrderId(returnOrderId);
-        record.setReturnOrderCode(afterSaleCode);
-        record.setCreateTime(now);
-        //判断是ERP还是批发客户发起的退货
-        if ("3".equals(reqVo.getProcessType())){
-            record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey());
-        }else {
-            //批发客户发起的退货状态为审核中
-            record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey());
-        }
-        //实退商品数量
-        record.setActualProductCount(record.getProductCount());
-        //实退商品总金额
-        record.setActualReturnOrderAmount(record.getReturnOrderAmount());
-        //退货类型
-        record.setReturnOrderType(2);
-        //退货单--退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户
-        record.setReturnMoneyType(ConstantData.RETURN_MONEY_TYPE);
-        record.setOrderSuccess(1);
-        record.setReallyReturn(reallyReturn);
-        log.info("发起批发退货--插入批发退货信息，record={}",record);
-        returnOrderInfoDao.insertSelective(record);
-        List<ReturnOrderDetail> details = reqVo.getDetails().stream().map(detailVo -> {
-            ReturnOrderDetail detail = new ReturnOrderDetail();
-            //商品属性 0新品1残品
-            Integer productStatus=0;
-            if(null!=detailVo.getProductStatus()){
-                productStatus=detailVo.getProductStatus();
+        try{
+            //查询订单是否存在未处理售后单
+            List<ReturnOrderInfo> returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndStatus(reqVo.getOrderStoreCode(), 1);
+            Assert.isTrue(CollectionUtils.isEmpty(returnOrderInfo), "该订单还有未审核售后单，请稍后提交");
+            //校验原始订单的主订单关联的所有子订单是否发货完成
+            ErpOrderInfo orderByOrderCode = erpOrderQueryService.getOrderByOrderCode(reqVo.getOrderStoreCode());
+            Boolean aBoolean = checkSendOk(orderByOrderCode.getMainOrderCode());
+            //是否真的发起退货 0:预生成退货单 1:原始订单全部发货完成生成退货单
+            Integer reallyReturn=0;
+            if(aBoolean){
+                reallyReturn=1;
             }
-            BeanUtils.copyProperties(detailVo, detail);
-            detail.setCreateTime(now);
-            detail.setReturnOrderDetailId(IdUtil.uuid());
-            detail.setReturnOrderCode(afterSaleCode);
-            detail.setCreateById(reqVo.getCreateById());
-            detail.setCreateByName(reqVo.getCreateByName());
-            detail.setProductStatus(productStatus);
-            return detail;
-        }).collect(Collectors.toList());
-        log.info("发起批发退货--插入批发退货详情，details={}",details);
-        returnOrderDetailDao.insertBatch(details);
-        //添加日志
-        log.info("发起退货--插入日志，details={}",details);
-        insertLog(afterSaleCode,reqVo.getCreateById(),reqVo.getCreateByName(),ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),
-               record.getReturnOrderStatus() == ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey() ? record.getReturnOrderStatus() : ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey(),
-               record.getReturnOrderStatus() == ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey() ? ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getMsg() : ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg());
-        //修改原始订单数据
-        log.info("发起退货--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}",record.getOrderStoreCode(), ErpOrderReturnStatusEnum.WAIT,null,record.getCreateById(),record.getCreateByName());
-        erpOrderInfoService.updateOrderReturnStatus(record.getOrderStoreCode(), ErpOrderReturnRequestEnum.WAIT,null,record.getCreateById(),record.getCreateByName());
-        log.info("发起退货--修改原始订单数据结束");
-        return HttpResponse.success();
+            ReturnOrderInfo record = new ReturnOrderInfo();
+            Date now = new Date();
+            BeanUtils.copyProperties(reqVo, record);
+            String returnOrderId = IdUtil.uuid();
+            String afterSaleCode = sequenceService.generateOrderAfterSaleCode(reqVo.getCompanyCode(), reqVo.getReturnOrderType());
+            record.setReturnOrderId(returnOrderId);
+            record.setReturnOrderCode(afterSaleCode);
+            record.setCreateTime(now);
+            //判断是ERP还是批发客户发起的退货
+            if ("3".equals(reqVo.getProcessType())){
+                record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey());
+            }else {
+                //批发客户发起的退货状态为审核中
+                record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey());
+            }
+            //实退商品数量
+            record.setActualProductCount(record.getProductCount());
+            //实退商品总金额
+            record.setActualReturnOrderAmount(record.getReturnOrderAmount());
+            //退货类型
+            record.setReturnOrderType(2);
+            //退货单--退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户
+            record.setReturnMoneyType(ConstantData.RETURN_MONEY_TYPE);
+            record.setOrderSuccess(1);
+            record.setReallyReturn(reallyReturn);
+            log.info("发起批发退货--插入批发退货信息，record={}",record);
+            returnOrderInfoDao.insertSelective(record);
+            List<ReturnOrderDetail> details = reqVo.getDetails().stream().map(detailVo -> {
+                ReturnOrderDetail detail = new ReturnOrderDetail();
+                //商品属性 0新品1残品
+                Integer productStatus=0;
+                if(null!=detailVo.getProductStatus()){
+                    productStatus=detailVo.getProductStatus();
+                }
+                BeanUtils.copyProperties(detailVo, detail);
+                detail.setCreateTime(now);
+                detail.setReturnOrderDetailId(IdUtil.uuid());
+                detail.setReturnOrderCode(afterSaleCode);
+                detail.setCreateById(reqVo.getCreateById());
+                detail.setCreateByName(reqVo.getCreateByName());
+                detail.setProductStatus(productStatus);
+                return detail;
+            }).collect(Collectors.toList());
+            log.info("发起批发退货--插入批发退货详情，details={}",details);
+            returnOrderDetailDao.insertBatch(details);
+            //添加日志
+            log.info("发起批发退货--插入日志，details={}",details);
+            insertLog(afterSaleCode,reqVo.getCreateById(),reqVo.getCreateByName(),ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),
+                    record.getReturnOrderStatus() == ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey() ? record.getReturnOrderStatus() : ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey(),
+                    record.getReturnOrderStatus() == ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey() ? ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getMsg() : ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg());
+            //修改原始订单数据
+            log.info("发起批发退货--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}",record.getOrderStoreCode(), ErpOrderReturnStatusEnum.WAIT,null,record.getCreateById(),record.getCreateByName());
+            erpOrderInfoService.updateOrderReturnStatus(record.getOrderStoreCode(), ErpOrderReturnRequestEnum.WAIT,null,record.getCreateById(),record.getCreateByName());
+            log.info("发起批发退货--修改原始订单数据结束");
+            log.info("审核后-调用发起批发退货开始");
+            ReturnOrderReviewReqVo reqVo1 = new ReturnOrderReviewReqVo();
+            reqVo1.setOperateStatus(reqVo.getProcessType());
+            reqVo1.setReturnOrderCode(afterSaleCode);
+            HttpResponse httpResponse = updateReturnStatus(reqVo1);
+            log.info("erp同步供应链，生成退供单结束,httpResponse={}",httpResponse);
+            if(!"0".equals(httpResponse.getCode())){
+                //erp同步供应链，生成退供单失败
+                throw new RuntimeException("erp同步供应链，生成退供单失败");
+            }
+            return HttpResponse.success();
+        }catch (Exception e){
+            log.error("批发退货-请求：{},{}",reqVo,e);
+            throw new GroundRuntimeException("发起批发退货出现未知异常,请联系系统管理员");
+        }
+
     }
 
 
