@@ -98,6 +98,7 @@
         SELECT
         customer_code as customerCode,
         warehouse_code as warehouseCode,
+        warehouse_name as warehouseName,
         sku_code as skuCode,
         sku_name as skuName,
         product_category_code as productCategoryCode,
@@ -164,12 +165,13 @@
 
     <!--批量插入批发客户商品权限规则-->
     <insert id="bulkInsertionRules" parameterType="java.util.List">
-        insert into wholesale_rule (customer_code, warehouse_code,sku_code, sku_name, product_category_code,product_category_name,product_brand_code,product_brand_name,type)
+        insert into wholesale_rule (customer_code, warehouse_code,warehouse_name,sku_code, sku_name, product_category_code,product_category_name,product_brand_code,product_brand_name,type)
         values
         <foreach collection="list" item="rule" separator=",">
             (
             #{rule.customerCode,jdbcType=VARCHAR},
             #{rule.warehouseCode,jdbcType=VARCHAR},
+            #{rule.warehouseName,jdbcType=VARCHAR},
             #{rule.skuCode,jdbcType=VARCHAR},
             #{rule.skuName,jdbcType=VARCHAR},
             #{rule.productCategoryCode,jdbcType=VARCHAR},
