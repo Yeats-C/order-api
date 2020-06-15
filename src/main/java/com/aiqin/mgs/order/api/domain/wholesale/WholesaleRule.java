@@ -22,6 +22,10 @@ public class WholesaleRule implements Serializable {
     @JsonProperty("warehouse_code")
     private String warehouseCode;
 
+    @ApiModelProperty(value = "仓库名称")
+    @JsonProperty("warehouse_name")
+    private String warehouseName;
+
     @ApiModelProperty("sku编号")
     @JsonProperty("sku_code")
     private String skuCode;

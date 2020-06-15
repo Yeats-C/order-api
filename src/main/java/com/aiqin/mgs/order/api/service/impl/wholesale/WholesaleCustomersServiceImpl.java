@@ -37,7 +37,26 @@ public class WholesaleCustomersServiceImpl implements WholesaleCustomersService 
         LOGGER.info("批发客户列表 参数wholesaleCustomers为{}"+wholesaleCustomers);
         HttpResponse httpResponse=HttpResponse.success();
         PageResData pageResData=new PageResData();
-        pageResData.setDataList(wholesaleCustomersDao.list(wholesaleCustomers));
+        List<WholesaleCustomers> wholesaleCustomersList=wholesaleCustomersDao.list(wholesaleCustomers);
+        for(WholesaleCustomers customer:wholesaleCustomersList){
+            List<WholesaleRule> wholesaleRuleList=wholesaleCustomersDao.getWholesaleRuleList(customer.getCustomerCode());
+            List<String> deliveryCenterList=new ArrayList<>();
+            if(null!=wholesaleRuleList&&wholesaleRuleList.size()>0){
+                for(WholesaleRule rule:wholesaleRuleList){
+                    switch (rule.getType()) {
+                        case 1:
+                            deliveryCenterList.add(rule.getWarehouseName());
+                            break;
+                        default:
+                            //nothing
+                            break;
+
+                    }
+                }
+                customer.setDeliveryCenterList(deliveryCenterList);
+            }
+        }
+        pageResData.setDataList(wholesaleCustomersList);
         pageResData.setTotalCount(wholesaleCustomersDao.totalCount(wholesaleCustomers));
         httpResponse.setData(pageResData);
         return httpResponse;
@@ -133,6 +152,9 @@ public class WholesaleCustomersServiceImpl implements WholesaleCustomersService 
                         break;
                     case 4:
                         productList.add(rule);
+                        break;
+                    default:
+                        //nothing
                         break;
                 }
             }
