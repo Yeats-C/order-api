@@ -8,6 +8,7 @@ import com.aiqin.mgs.order.api.domain.echoLogisticsRule;
 import com.aiqin.mgs.order.api.domain.logisticsRule.LogisticsRuleInfo;
 import com.aiqin.mgs.order.api.domain.response.LogisticsAllResponse;
 import com.aiqin.mgs.order.api.service.LogisticsRuleService;
+import com.aiqin.mgs.order.api.util.ResultModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,7 @@ public class LogisticsRuleController {
 
     @PostMapping("/select/logistics")
     @ApiOperation("多条件查询列表")
-    public HttpResponse<LogisticsAllResponse> selectLogistics(@RequestBody LogisticsRuleRequest logisticsRuleRequest){
+    public HttpResponse<ResultModel<LogisticsAllResponse>> selectLogistics(@RequestBody LogisticsRuleRequest logisticsRuleRequest){
         return logisticsRuleService.selectLogisticsList(logisticsRuleRequest);
     }
 }
