@@ -18,5 +18,5 @@ public interface LogisticsRuleService {
     //编辑物流减免规则
     HttpResponse updateLogistics(LogisticsRuleInfoList logisticsRuleInfoList);
     //多条件查询列表
-    HttpResponse selectLogisticsList(LogisticsRuleRequest logisticsRuleRequest);
+    HttpResponse  selectLogisticsList(LogisticsRuleRequest logisticsRuleRequest);
 }
