@@ -73,4 +73,6 @@ public interface CopartnerAreaDao {
     void copartnerAreaIdByList(@Param("copartnerAreaIdLists") List<String> copartnerAreaIdLists);
     //查询一级下的二级
     List<CopartnerAreaDetail> getCopartnerAreaByOneId(String copartnerAreaName);
+    //门店id查询区域信息
+    CopartnerAreaUp getCopartnerAreaById(String storeId);
 }

@@ -202,7 +202,7 @@ public class ReturnOrderInfoController {
 
     @ApiOperation("新增批发退货信息")
     @PostMapping("/save/wholesale")
-    public HttpResponse saveWholesale(@RequestBody ReturnOrderReqVo reqVo){
+    public HttpResponse saveWholesale(@RequestBody ReturnWholesaleOrderReqVo reqVo){
         return returnOrderInfoService.saveWholesaleReturn(reqVo);
     }
 
