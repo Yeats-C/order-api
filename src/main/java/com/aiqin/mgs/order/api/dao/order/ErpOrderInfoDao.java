@@ -4,6 +4,7 @@ import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivitySales;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest;
+import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderFranchisee;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -117,4 +118,11 @@ public interface ErpOrderInfoDao {
      * @param orderCode
      */
     int updateScourSheetStatus(String orderCode);
+
+    /**
+     * 获取加盟商编码
+     * @param orderStoreCode
+     */
+     ReturnOrderFranchisee selectFranchisee(String orderStoreCode);
+
 }

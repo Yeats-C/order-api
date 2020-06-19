@@ -173,7 +173,7 @@ public interface ReturnOrderInfoService {
      * @param reqVo
      * @return
      */
-    HttpResponse saveWholesaleReturn(ReturnOrderReqVo reqVo);
+    HttpResponse saveWholesaleReturn(ReturnWholesaleOrderReqVo reqVo);
 
 
 //    boolean refundPoints(ReturnOrderInfo returnOrderInfo);

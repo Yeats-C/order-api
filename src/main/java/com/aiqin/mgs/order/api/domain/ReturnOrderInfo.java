@@ -90,6 +90,22 @@ public class ReturnOrderInfo {
 //    @JsonProperty("customer_name")
     private String customerName;
 
+    //新加加盟商和合伙人
+    @ApiModelProperty("加盟商编码")
+    private String franchiseeCode;
+
+    @ApiModelProperty("加盟商名称")
+    private String franchiseeName;
+
+    @ApiModelProperty("合伙人编码")
+    private String copartnerAreaId;
+
+    @ApiModelProperty("合伙人名称")
+    private String copartnerAreaName;
+
+    @ApiModelProperty("业务形式 0门店退货 1批发退货")
+    private Integer businessForm;
+
     @ApiModelProperty(value = "是否锁定  0是 1否")
 //    @JsonProperty("return_lock")
     private Integer returnLock;

@@ -60,6 +60,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -133,6 +134,19 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         Integer reallyReturn=0;
         if(aBoolean){
             reallyReturn=1;
+        }
+        //获取加盟商以及合伙人
+        ReturnOrderFranchisee returnOrderFranchisee = erpOrderInfoDao.selectFranchisee(reqVo.getOrderStoreCode());
+        if (returnOrderFranchisee != null){
+            reqVo.setFranchiseeCode(returnOrderFranchisee.getFranchiseeCode());
+            reqVo.setFranchiseeName(returnOrderFranchisee.getFranchiseeName());
+            reqVo.setCopartnerAreaId(returnOrderFranchisee.getCopartnerAreaId());
+            reqVo.setCopartnerAreaName(returnOrderFranchisee.getCopartnerAreaName());
+        }
+        //业务形式  0门店形式  1批发形式
+        String storeCode = reqVo.getStoreCode();
+        if (!storeCode.equals(null)){
+            reqVo.setBusinessForm(0);
         }
         ReturnOrderInfo record = new ReturnOrderInfo();
         Date now = new Date();
@@ -1597,7 +1611,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public HttpResponse saveWholesaleReturn(ReturnOrderReqVo reqVo) {
+    public HttpResponse saveWholesaleReturn(ReturnWholesaleOrderReqVo reqVo) {
         log.info("发起批发退货--入参"+JSON.toJSONString(reqVo));
         try{
             //查询订单是否存在未处理售后单
@@ -1611,6 +1625,16 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             if(aBoolean){
                 reallyReturn=1;
             }
+            //售后类型
+            reqVo.setReturnOrderType(2);
+            //加盟商和合伙人
+            ReturnOrderFranchisee returnOrderFranchisee = erpOrderInfoDao.selectFranchisee(reqVo.getOrderStoreCode());
+            if (returnOrderFranchisee != null){
+                reqVo.setFranchiseeCode(returnOrderFranchisee.getFranchiseeCode());
+                reqVo.setFranchiseeName(returnOrderFranchisee.getFranchiseeName());
+                reqVo.setCopartnerAreaId(returnOrderFranchisee.getCopartnerAreaId());
+                reqVo.setCopartnerAreaName(returnOrderFranchisee.getCopartnerAreaName());
+            }
             ReturnOrderInfo record = new ReturnOrderInfo();
             Date now = new Date();
             BeanUtils.copyProperties(reqVo, record);
@@ -1620,12 +1644,14 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             record.setReturnOrderCode(afterSaleCode);
             record.setCreateTime(now);
             //判断是ERP还是批发客户发起的退货
-            if ("3".equals(reqVo.getProcessType())){
+            if (reqVo.getTreatmentMethod().equals(1)){
                 record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey());
             }else {
                 //批发客户发起的退货状态为审核中
                 record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey());
             }
+            //业务形式 0是门店业务 1批发任务
+            record.setBusinessForm(1);
             //实退商品数量
             record.setActualProductCount(record.getProductCount());
             //实退商品总金额
@@ -1636,24 +1662,57 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             record.setReturnMoneyType(ConstantData.RETURN_MONEY_TYPE);
             record.setOrderSuccess(1);
             record.setReallyReturn(reallyReturn);
-            log.info("发起批发退货--插入批发退货信息，record={}",record);
-            returnOrderInfoDao.insertSelective(record);
-            List<ReturnOrderDetail> details = reqVo.getDetails().stream().map(detailVo -> {
-                ReturnOrderDetail detail = new ReturnOrderDetail();
+            //退货金额
+            BigDecimal returnOrderAmount = BigDecimal.ZERO;
+//            List<ReturnOrderDetail> details = reqVo.getDetails().stream().map(detailVo -> {
+//                ReturnOrderDetail detail = new ReturnOrderDetail();
+//                //商品属性 0新品1残品
+//                Integer productStatus=0;
+//                if(null!=detailVo.getProductStatus()){
+//                    productStatus=detailVo.getProductStatus();
+//                }
+//                //均摊后的金额乘以退货数量
+//                BigDecimal preferentialAmount = detailVo.getPreferentialAmount();
+//                BigDecimal multiply = preferentialAmount.multiply(BigDecimal.valueOf(detailVo.getReturnProductCount()));
+//                returnOrderAmount = returnOrderAmount.add(multiply);
+//                BeanUtils.copyProperties(detailVo, detail);
+//                detail.setCreateTime(now);
+//                detail.setReturnOrderDetailId(IdUtil.uuid());
+//                detail.setReturnOrderCode(afterSaleCode);
+//                detail.setCreateById(reqVo.getCreateById());
+//                detail.setCreateByName(reqVo.getCreateByName());
+//                detail.setProductStatus(productStatus);
+//                return detail;
+//            }).collect(Collectors.toList());
+
+            //普通循环
+            List<ReturnOrderDetail>  details = new ArrayList<>();
+            List<ReturnWholesaleOrderDetail> details1 = reqVo.getDetails();
+            for (ReturnWholesaleOrderDetail sd : details1) {
+                 ReturnOrderDetail detail = new ReturnOrderDetail();
                 //商品属性 0新品1残品
                 Integer productStatus=0;
-                if(null!=detailVo.getProductStatus()){
-                    productStatus=detailVo.getProductStatus();
+                if(null!=sd.getProductStatus()){
+                    productStatus=sd.getProductStatus();
                 }
-                BeanUtils.copyProperties(detailVo, detail);
+                //均摊后的金额乘以退货数量
+                BigDecimal preferentialAmount = sd.getPreferentialAmount();
+                BigDecimal multiply = preferentialAmount.multiply(BigDecimal.valueOf(sd.getReturnProductCount()));
+                returnOrderAmount = returnOrderAmount.add(multiply);
+                BeanUtils.copyProperties(sd, detail);
                 detail.setCreateTime(now);
                 detail.setReturnOrderDetailId(IdUtil.uuid());
                 detail.setReturnOrderCode(afterSaleCode);
                 detail.setCreateById(reqVo.getCreateById());
                 detail.setCreateByName(reqVo.getCreateByName());
                 detail.setProductStatus(productStatus);
-                return detail;
-            }).collect(Collectors.toList());
+                details.add(detail);
+            }
+
+            //退货金额
+            record.setReturnOrderAmount(returnOrderAmount);
+            log.info("发起批发退货--插入批发退货信息，record={}",record);
+            returnOrderInfoDao.insertSelective(record);
             log.info("发起批发退货--插入批发退货详情，details={}",details);
             returnOrderDetailDao.insertBatch(details);
             //添加日志
@@ -1667,14 +1726,15 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             log.info("发起批发退货--修改原始订单数据结束");
             log.info("审核后-调用发起批发退货开始");
             ReturnOrderReviewReqVo reqVo1 = new ReturnOrderReviewReqVo();
-            reqVo1.setOperateStatus(reqVo.getProcessType());
+            reqVo1.setOperateStatus(reqVo.getTreatmentMethod());
             reqVo1.setReturnOrderCode(afterSaleCode);
             HttpResponse httpResponse = updateReturnStatus(reqVo1);
-            log.info("erp同步供应链，生成退供单结束,httpResponse={}",httpResponse);
+            log.info("erp同步供应链，生成退供单结束,httpResponse={}",JSON.toJSON(httpResponse));
             if(!"0".equals(httpResponse.getCode())){
                 //erp同步供应链，生成退供单失败
                 throw new RuntimeException("erp同步供应链，生成退供单失败");
             }
+            log.info("erp同步供应链，生成退货单成功");
             return HttpResponse.success();
         }catch (Exception e){
             log.error("批发退货-请求：{},{}",reqVo,e);
