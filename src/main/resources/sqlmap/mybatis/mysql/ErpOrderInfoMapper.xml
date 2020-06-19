@@ -829,6 +829,12 @@
         i.store_code
         ) a
     </select>
+    <select id="selectFranchisee"
+            resultType="com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderFranchisee">
+        select franchisee_code as franchiseeCode, franchisee_name as franchiseeName,copartner_area_id as copartnerAreaId,
+               copartner_area_name as copartnerAreaName
+        from order_store_info where order_store_code = #{orderStoreCode,jdbcType=VARCHAR}
+    </select>
 
     <!--通过主订单code查询所有子订单合集-->
     <select id="subOrderList" resultType="java.lang.String">

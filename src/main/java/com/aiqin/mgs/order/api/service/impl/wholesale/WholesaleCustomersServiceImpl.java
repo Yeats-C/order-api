@@ -5,8 +5,10 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.dao.wholesale.WholesaleCustomersDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
+import com.aiqin.mgs.order.api.domain.wholesale.JoinMerchant;
 import com.aiqin.mgs.order.api.domain.wholesale.WholesaleCustomers;
 import com.aiqin.mgs.order.api.domain.wholesale.WholesaleRule;
+import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.service.wholesale.WholesaleCustomersService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
@@ -30,6 +32,9 @@ public class WholesaleCustomersServiceImpl implements WholesaleCustomersService 
 
     @Resource
     private WholesaleCustomersDao wholesaleCustomersDao;
+
+    @Resource
+    private BridgeProductService bridgeProductService;
 
 
     @Override
@@ -109,9 +114,47 @@ public class WholesaleCustomersServiceImpl implements WholesaleCustomersService 
         AuthToken auth = AuthUtil.getCurrentAuth();
         wholesaleCustomers.setCreateBy(auth.getPersonName());
         wholesaleCustomers.setUpdateBy(auth.getPersonName());
+
+        //创建主控账户
+        HttpResponse<JoinMerchant> response = addFranchisee(wholesaleCustomers,auth);
+        wholesaleCustomers.setCustomerAccount(response.getData().getUserName());
         wholesaleCustomersDao.insert(wholesaleCustomers);
         wholesaleCustomersDao.bulkInsertionRules(wholesaleRuleList);
         return httpResponse;
+    }
+
+    private HttpResponse addFranchisee(WholesaleCustomers wholesaleCustomers,AuthToken auth) {
+        JoinMerchant joinMerchant=new JoinMerchant();
+        joinMerchant.setFranchiseeCode(wholesaleCustomers.getCustomerAccount());
+        joinMerchant.setFranchiseeName(wholesaleCustomers.getCustomerName());
+        joinMerchant.setMobile(wholesaleCustomers.getPhoneNumber());
+        joinMerchant.setCardNo(wholesaleCustomers.getIdentityNumber());
+        joinMerchant.setCardType("1");
+        joinMerchant.setCompanyCode(wholesaleCustomers.getCompanyCode());
+        joinMerchant.setCompanyName(wholesaleCustomers.getCompanyName());
+        StringBuffer stringBuffer=new StringBuffer();
+        stringBuffer.append(wholesaleCustomers.getProvinceName());
+        stringBuffer.append(wholesaleCustomers.getCityName());
+        stringBuffer.append(wholesaleCustomers.getDistrictName());
+        stringBuffer.append(wholesaleCustomers.getStreetAddress());
+        joinMerchant.setAddress(stringBuffer.toString());
+        joinMerchant.setProperty(2);
+        joinMerchant.setCreateBy(auth.getPersonName());
+        joinMerchant.setPersonId(auth.getPersonId());
+
+        HttpResponse<JoinMerchant> httpResponse=bridgeProductService.addFranchisee(joinMerchant);
+        JoinMerchant result=httpResponse.getData();
+
+        joinMerchant.setDepartmentCode(result.getDepartmentCode());
+        joinMerchant.setDepartmentName(result.getDepartmentName());
+        joinMerchant.setDepartmentLevel(result.getDepartmentLevel());
+        joinMerchant.setCompanyCode(result.getCompanyCode());
+        joinMerchant.setCompanyName(result.getCompanyName());
+        String[] roleId = {"JS0089"};
+        joinMerchant.setRoleId(roleId);
+
+        HttpResponse<JoinMerchant> response=bridgeProductService.addFranchiseeAccount(joinMerchant);
+        return response;
     }
 
     @Override

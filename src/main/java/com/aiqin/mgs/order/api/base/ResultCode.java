@@ -133,5 +133,6 @@ public interface ResultCode {
 
     /**批发客户相关 start */
     MessageId ACCOUNT_ALREADY_EXISTS = MessageId.create(Project.ORDER_API, 111, "此账户已存在");
+    MessageId FAILED_TO_CREATE_MASTER_ACCOUNT = MessageId.create(Project.ORDER_API, 112, "创建主控账户失败");
     /**批发客户相关 end */
 }

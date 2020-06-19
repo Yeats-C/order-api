@@ -66,6 +66,6 @@ public interface CopartnerAreaService {
 	HttpResponse getCopartnerAreaCompany(String copartnerAreaId);
 	//删除下辖公司
 	HttpResponse delectTwoCompany(List<String> copartnerAreaIds);
-
-
+	//门店id查询区域信息
+	HttpResponse selectCopartnerAreaByStoreId(String storeId);
 }
