@@ -158,7 +158,7 @@
         values
         ( #{customerCode},#{customerName},#{customerAccount},#{contactPerson},#{phoneNumber},#{identityNumber},#{provinceId},
         #{provinceName},#{cityId},#{cityName},#{districtId},#{districtName},#{streetAddress},
-        #{companyCode},#{companyName},0,#{affiliatedCompany},#{invitePeopleCode},#{invitePeopleName},
+        #{companyCode},#{companyName},#{useStatus},#{affiliatedCompany},#{invitePeopleCode},#{invitePeopleName},
         #{createBy},#{updateBy},sysdate(),sysdate()
 	    )
     </insert>

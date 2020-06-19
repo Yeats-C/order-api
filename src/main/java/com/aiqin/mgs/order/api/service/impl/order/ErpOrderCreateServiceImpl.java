@@ -11,10 +11,14 @@ import com.aiqin.mgs.order.api.component.enums.StatusEnum;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayWayEnum;
+import com.aiqin.mgs.order.api.dao.CopartnerAreaDao;
 import com.aiqin.mgs.order.api.dao.OrderGiveApprovalDao;
 import com.aiqin.mgs.order.api.dao.OrderGiveFeeDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
+import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaList;
+import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
+import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo;
 import com.aiqin.mgs.order.api.domain.po.cart.ErpOrderCartInfo;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftQuotasUseDetail;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
@@ -111,6 +115,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
     private GiftPoolService giftPoolService;
     @Resource
     private LogisticsRuleService logisticsRuleService;
+    @Resource
+    private CopartnerAreaDao copartnerAreaDao;
 
 
     @Override
@@ -880,6 +886,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         }else {
             order.setFirstMarketValueGift(0);
         }
+        CopartnerAreaUp copartnerAreaUp=copartnerAreaDao.getCopartnerAreaById(storeInfo.getStoreId());
+        if(null!=copartnerAreaUp){
+            order.setCopartnerAreaId(copartnerAreaUp.getCopartnerAreaId());
+            order.setCopartnerAreaName(copartnerAreaUp.getCopartnerAreaName());
+        }
         log.info("构建订单信息--封装结果,order={}",order);
         return order;
     }
@@ -1604,6 +1615,13 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //生成冲减单状态
         order.setScourSheetStatus(ErpOrderScourSheetStatusEnum.NOT_NEED.getCode());
         order.setIsActivity(YesOrNoEnum.NO.getCode());
+
+        //销售单增加合伙人公司字段
+        CopartnerAreaUp copartnerAreaUp=copartnerAreaDao.getCopartnerAreaById(storeInfo.getStoreId());
+        if(null!=copartnerAreaUp){
+            order.setCopartnerAreaId(copartnerAreaUp.getCopartnerAreaId());
+            order.setCopartnerAreaName(copartnerAreaUp.getCopartnerAreaName());
+        }
         erpOrderInfoService.saveOrder(order, auth);
 
         //保存订单费用信息
@@ -2318,6 +2336,15 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //判断是否减免物流费用
         int logisticsFeeStatus=getLogisticsFeeStatus(orderItemList);
         order.setLogisticsFeeStatus(logisticsFeeStatus);
+
+        //销售单增加合伙人公司字段
+        CopartnerAreaVo copartnerAreaVo=new CopartnerAreaVo();
+        copartnerAreaVo.setCopartnerAreaCompany(wholesaleCustomers.getAffiliatedCompany());
+        List<CopartnerAreaList> copartnerAreaList=copartnerAreaDao.copartnerAreaList(copartnerAreaVo);
+        if(null!=copartnerAreaList &&copartnerAreaList.size()>0){
+            order.setCopartnerAreaId(copartnerAreaList.get(0).getCopartnerAreaId());
+            order.setCopartnerAreaName(copartnerAreaList.get(0).getCopartnerAreaName());
+        }
         erpOrderInfoService.saveOrder(order, auth);
 
         //保存订单费用信息
