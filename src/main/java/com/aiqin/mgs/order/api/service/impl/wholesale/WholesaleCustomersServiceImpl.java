@@ -235,10 +235,6 @@ public class WholesaleCustomersServiceImpl implements WholesaleCustomersService 
         if(null==wholesaleCustomers){
             return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
         }
-        boolean checkAccount=checkAccountExists(wholesaleCustomers.getCustomerAccount()).getData();
-        if(!checkAccount){
-            return HttpResponse.failure(ResultCode.ACCOUNT_ALREADY_EXISTS);
-        }
         HttpResponse httpResponse=HttpResponse.success();
         List<WholesaleRule> wholesaleRuleList=new ArrayList<>();
         if(null!=wholesaleCustomers.getWarehouseList()){
