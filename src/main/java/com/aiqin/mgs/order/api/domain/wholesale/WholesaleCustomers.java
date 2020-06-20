@@ -131,4 +131,8 @@ public class WholesaleCustomers extends PagesRequest implements Serializable {
     @ApiModelProperty(value="开放配送中心")
     @JsonProperty("delivery_center_list")
     private List<String> deliveryCenterList;
+
+    @ApiModelProperty(value="回显品类name")
+    @JsonProperty("category_tag_list")
+    private String categoryTagList;
 }

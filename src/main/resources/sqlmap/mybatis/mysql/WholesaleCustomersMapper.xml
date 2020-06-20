@@ -28,7 +28,8 @@
                 create_by as createBy,
                 update_by as updateBy,
                 DATE_FORMAT( create_time, '%Y-%m-%d %h:%i:%s' ) createTime,
-                DATE_FORMAT( update_time, '%Y-%m-%d %h:%i:%s' ) updateTime
+                DATE_FORMAT( update_time, '%Y-%m-%d %h:%i:%s' ) updateTime,
+                category_tag_list as categoryTagList
             FROM
                 wholesale_customers
             <where>
@@ -153,13 +154,14 @@
             create_by,
             update_by,
             create_time,
-            update_time
+            update_time,
+            category_tag_list
         )
         values
         ( #{customerCode},#{customerName},#{customerAccount},#{contactPerson},#{phoneNumber},#{identityNumber},#{provinceId},
         #{provinceName},#{cityId},#{cityName},#{districtId},#{districtName},#{streetAddress},
         #{companyCode},#{companyName},#{useStatus},#{affiliatedCompany},#{invitePeopleCode},#{invitePeopleName},
-        #{createBy},#{updateBy},sysdate(),sysdate()
+        #{createBy},#{updateBy},sysdate(),sysdate(),#{categoryTagList}
 	    )
     </insert>
 
@@ -242,6 +244,9 @@
                 update_by = #{updateBy,jdbcType=VARCHAR},
             </if>
             update_time = now()
+            <if test="categoryTagList != null">
+                category_tag_list = #{categoryTagList,jdbcType=VARCHAR},
+            </if>
             where customer_code = #{customerCode,jdbcType=VARCHAR}
         </set>
     </update>
