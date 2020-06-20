@@ -1759,7 +1759,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             PageSize = 10;
         }
         PageHelper.startPage(PageNo, PageSize);
-        List<WholesaleReturnList> wholesaleReturnLists = returnOrderInfoDao.selectByCondition(whoVo);
+        List<WholesaleReturnList> wholesaleReturnLists =  returnOrderInfoDao.selectByCondition(whoVo);
         log.info("条件分页查询返回参数对象集合:{}", wholesaleReturnLists);
         if (wholesaleReturnLists != null){
             ResultModel resultModel = new ResultModel();
