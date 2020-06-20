@@ -281,8 +281,7 @@ public class WholesaleCustomersServiceImpl implements WholesaleCustomersService 
         }
         HttpResponse httpResponse=HttpResponse.success();
         WholesaleCustomers wholesaleCustomer=new WholesaleCustomers();
-        wholesaleCustomer.setCustomerName(parameter);
-        wholesaleCustomer.setCustomerAccount(parameter);
+        wholesaleCustomer.setParameter(parameter);
         List<WholesaleCustomers> wholesaleCustomers=wholesaleCustomersDao.list(wholesaleCustomer);
         for(WholesaleCustomers customer:wholesaleCustomers){
             List<WholesaleRule> wholesaleRuleList=wholesaleCustomersDao.getWholesaleRuleList(customer.getCustomerCode());
