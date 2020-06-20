@@ -39,9 +39,13 @@ public class wholesaleReturnOrderSearchVo implements Serializable {
 //    @JsonProperty("area_req")
 //    private AreaReq areaReq;
 
-    @ApiModelProperty("门店名称")
-    @JsonProperty("store_name")
-    private String storeName;
+    @ApiModelProperty("批发客户名称 ")
+    @JsonProperty("customer_name")
+    private String customerName;
+
+    @ApiModelProperty("业务形式 0门店业务 1批发业务 ")
+    @JsonProperty("business_form")
+    private Integer businessForm;
 
     @ApiModelProperty(value="省编码")
     @JsonProperty("province_id")
@@ -62,5 +66,8 @@ public class wholesaleReturnOrderSearchVo implements Serializable {
     @ApiModelProperty(value = "当前页")
     @JsonProperty("page_no")
     private Integer pageNo;
+
+
+
 
 }

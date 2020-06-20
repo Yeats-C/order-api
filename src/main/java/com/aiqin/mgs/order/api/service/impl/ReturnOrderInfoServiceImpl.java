@@ -31,12 +31,14 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
 import com.aiqin.mgs.order.api.domain.request.StoreQuotaRequest;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderStatusVo;
+import com.aiqin.mgs.order.api.domain.response.returnorder.WholesaleReturnList;
 import com.aiqin.mgs.order.api.service.CopartnerAreaService;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderInfoService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
+import com.aiqin.mgs.order.api.util.ResultModel;
 import com.aiqin.platform.flows.client.constant.AjaxJson;
 import com.aiqin.platform.flows.client.constant.FormUpdateUrlType;
 import com.aiqin.platform.flows.client.constant.StatusEnum;
@@ -848,6 +850,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             topCouponDiscountAmount=BigDecimal.ZERO;
         }
         returnOrderInfo.setReturnOrderAmount(returnOrderAmount.add(topCouponDiscountAmount));
+        returnOrderInfo.setReturnOrderAmount(returnOrderAmount.add(returnOrderInfo.getTopCouponDiscountAmount() == null ? BigDecimal.ZERO : returnOrderInfo.getTopCouponDiscountAmount()));
 //        BigDecimal reduce = returnOrderDetails.stream().map(ReturnOrderDetail::getTopCouponDiscountAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
         //查询日志详情
         List<ErpOrderOperationLog> erpOrderOperationLogs = getOrderOperationLogList(returnOrderCode);
@@ -1770,8 +1773,15 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             PageSize = 10;
         }
         PageHelper.startPage(PageNo, PageSize);
-        returnOrderInfoDao.selectByCondition(whoVo);
-        return null;
+        List<WholesaleReturnList> wholesaleReturnLists =  returnOrderInfoDao.selectByCondition(whoVo);
+        log.info("条件分页查询返回参数对象集合:{}", wholesaleReturnLists);
+        if (wholesaleReturnLists != null){
+            ResultModel resultModel = new ResultModel();
+            resultModel.setResult(wholesaleReturnLists);
+            resultModel.setTotal(((Page) wholesaleReturnLists).getTotal());
+            return HttpResponse.success(resultModel);
+        }
+        return HttpResponse.success();
     }
 
 

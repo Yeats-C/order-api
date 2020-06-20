@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.domain.response.returnorder;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -20,9 +21,9 @@ public class WholesaleReturnList {
 //    @JsonProperty("order_store_code")
     private String orderStoreCode;
 
-    @ApiModelProperty(value = "门店名称")
-//    @JsonProperty("store_name")
-    private String storeName;
+    @ApiModelProperty("批发客户名称 ")
+//    @JsonProperty("customer_name")
+    private String customerName;
 
     @ApiModelProperty(value = "退货类型  0客户退货、1缺货退货、2售后退货、3冲减单 ")
 //    @JsonProperty("return_order_type")
