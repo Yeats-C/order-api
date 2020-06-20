@@ -1221,6 +1221,12 @@
     from return_order_info
     <where>
         really_return=1
+        <if test="businessForm != null">
+          and  business_form = #{businessForm,jdbcType=INTEGER}
+        </if>
+        <if test="customerName != null and customerName !=''">
+          and  customer_name = #{customerName,jdbcType=VARCHAR}
+        </if>
         <if test="returnOrderStatus!=null">
           and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
         </if>
@@ -1430,7 +1436,44 @@
     <select id="selectReturnCode" resultType="java.lang.String">
       select return_order_code as returnOrderCode from  return_order_info where store_code = #{storeCode}
     </select>
-  <update id="updateReallyReturn" parameterType="java.util.List">
+    <select id="selectByCondition"
+            resultType="com.aiqin.mgs.order.api.domain.response.returnorder.WholesaleReturnList">
+       SELECT return_order_code as returnOrderCode,
+              order_store_code as orderStoreCode,
+              store_name as storeName,
+              return_good_amount as returnOrderAmount,
+              return_order_type as returnOrderType,
+              return_order_status as returnOrderStatus,
+              create_time as createTime,
+              create_by_name as createByName
+        FROM return_order_info
+        <where>
+          really_return=1
+           <if test="returnOrderCode != null and returnOrderCode != ''">
+             AND return_order_code = #{returnOrderCode}
+           </if>
+           <if test="applyStartTime != null and applyStartTime != ''">
+             AND create_time
+           </if>
+           <if test="returnOrderStatus != null">
+            AND return_order_status = #{returnOrderStatus}
+           </if>
+           <if test="storeName != null and storeName !=''">
+            AND store_name LIKE CONCAT('%',#{storeName},'%')
+           </if>
+           <if test="provinceId != null and != ''">
+             AND province_id = #{provinceId}
+           </if>
+           <if test="cityId != null and cityId != ''" >
+             AND city_id = #{cityId}
+           </if>
+           <if test="districtId != null and districtId !=''">
+             AND district_id = #{districtId}
+           </if>
+        </where>
+
+    </select>
+    <update id="updateReallyReturn" parameterType="java.util.List">
     update return_order_info
     set
     really_return = 1

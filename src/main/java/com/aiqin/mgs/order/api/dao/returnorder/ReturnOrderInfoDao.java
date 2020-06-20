@@ -7,6 +7,7 @@ import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.domain.response.returngoods.QueryReturnOrderManagementRespVO;
 import com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderDetailRespVO;
 import com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderInfoApplyInboundDetailRespVO;
+import com.aiqin.mgs.order.api.domain.response.returnorder.WholesaleReturnList;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -83,5 +84,6 @@ public interface ReturnOrderInfoDao {
     int updateReturnOrder(ReturnOrderInfo returnOrderInfos);
     //查询退货单编码
     String selectReturnCode(String storeCode);
-
+    //查询批发退货列表
+    List<WholesaleReturnList> selectByCondition(wholesaleReturnOrderSearchVo whoVo);
 }
