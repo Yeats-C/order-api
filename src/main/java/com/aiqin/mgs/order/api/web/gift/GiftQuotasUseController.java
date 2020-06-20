@@ -31,8 +31,8 @@ public class GiftQuotasUseController {
      */
     @GetMapping("/getListByStoreId")
     @ApiOperation(value = "通过门店id查询兑换赠品积分账户使用明细")
-    public HttpResponse<List<GiftQuotasUseDetail>> getListByStoreId(String store_id){
-        return giftQuotasUseDetailService.getListByStoreId(store_id);
+    public HttpResponse<List<GiftQuotasUseDetail>> getListByStoreId(String store_id,Integer type){
+        return giftQuotasUseDetailService.getListByStoreId(store_id,type);
     }
 
     /**

@@ -28,11 +28,12 @@ public class GiftQuotasUseDetailServiceImpl implements GiftQuotasUseDetailServic
 
 
     @Override
-    public HttpResponse<List<GiftQuotasUseDetail>> getListByStoreId(String store_id) {
-        LOGGER.info("通过门店id查询兑换赠品积分账户使用明细 getListByStoreId 参数store_id为：{}", store_id);
+    public HttpResponse<List<GiftQuotasUseDetail>> getListByStoreId(String store_id,Integer type) {
+        LOGGER.info("通过门店id查询兑换赠品积分账户使用明细 getListByStoreId 参数store_id为：{}", store_id,type);
         HttpResponse httpResponse=HttpResponse.success();
         GiftQuotasUseDetailPageRequest giftQuotasUseDetail=new GiftQuotasUseDetailPageRequest();
         giftQuotasUseDetail.setStoreId(store_id);
+        giftQuotasUseDetail.setType(type);
         List<GiftQuotasUseDetail> giftQuotasUseDetailServiceList=  giftQuotasUseDetailDao.select(giftQuotasUseDetail);
         httpResponse.setData(giftQuotasUseDetailServiceList);
         return httpResponse;

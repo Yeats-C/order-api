@@ -15,7 +15,7 @@ public interface GiftQuotasUseDetailService {
      * @param store_id
      * @return
      */
-    HttpResponse<List<GiftQuotasUseDetail>> getListByStoreId(String store_id);
+    HttpResponse<List<GiftQuotasUseDetail>> getListByStoreId(String store_id,Integer type);
 
     /**
      * 添加兑换赠品积分账户使用明细
