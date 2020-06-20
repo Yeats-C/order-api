@@ -30,6 +30,7 @@ import com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetail;
 import com.aiqin.mgs.order.api.domain.response.gift.StoreAvailableGiftQuotaResponse;
 import com.aiqin.mgs.order.api.domain.response.order.StoreFranchiseeInfoResponse;
 import com.aiqin.mgs.order.api.domain.wholesale.JoinMerchant;
+import com.aiqin.mgs.order.api.domain.wholesale.MerchantAccount;
 import com.aiqin.mgs.order.api.util.MathUtil;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -55,6 +56,9 @@ public class BridgeProductService<main> {
 
     @Value("${center.main.url}")
     private String centerMainUrl;
+
+    @Value("${center.main.settlement}")
+    private String settlement;
 
     /**
      * 获取低库存畅缺商品明细信息
@@ -675,6 +679,22 @@ public class BridgeProductService<main> {
             return HttpResponse.failure(ResultCode.FAILED_TO_CREATE_MASTER_ACCOUNT);
         }
 
+        return httpResponse;
+    }
+
+    public HttpResponse accountRegister(MerchantAccount merchantAccount) {
+        log.info("加盟商新建结算账户接口  参数 merchantAccount=[{}]"+JsonUtil.toJson(merchantAccount));
+        HttpResponse httpResponse = HttpResponse.success();
+
+        StringBuilder sb = new StringBuilder();
+//        sb.append("http://settlement.api.aiqin.com").append("/merchant/account/register");
+        sb.append(settlement).append("/merchant/account/register");
+        HttpClient httpClient = HttpClient.post(sb.toString()).json(merchantAccount);
+        httpResponse = httpClient.action().result(new TypeReference<HttpResponse>() {
+        });
+        if (!httpResponse.getCode().equals(MessageId.SUCCESS_CODE)) {
+            return HttpResponse.failure(ResultCode.INSERT_FRANCHISEE_ACCOUNT);
+        }
         return httpResponse;
     }
 

@@ -6,6 +6,7 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.dao.wholesale.WholesaleCustomersDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.wholesale.JoinMerchant;
+import com.aiqin.mgs.order.api.domain.wholesale.MerchantAccount;
 import com.aiqin.mgs.order.api.domain.wholesale.WholesaleCustomers;
 import com.aiqin.mgs.order.api.domain.wholesale.WholesaleRule;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
@@ -118,9 +119,24 @@ public class WholesaleCustomersServiceImpl implements WholesaleCustomersService 
         //创建主控账户
         HttpResponse<JoinMerchant> response = addFranchisee(wholesaleCustomers,auth);
         wholesaleCustomers.setCustomerAccount(response.getData().getUserName());
+
+        //将批发客户信息推送到结算
+        accountRegister(wholesaleCustomers);
         wholesaleCustomersDao.insert(wholesaleCustomers);
         wholesaleCustomersDao.bulkInsertionRules(wholesaleRuleList);
         return httpResponse;
+    }
+
+    private void accountRegister(WholesaleCustomers wholesaleCustomers) {
+        MerchantAccount merchantAccount=new MerchantAccount();
+        merchantAccount.setFranchiseeCode(wholesaleCustomers.getCustomerAccount());
+        merchantAccount.setFranchiseeId(wholesaleCustomers.getCustomerCode());
+        merchantAccount.setFranchiseeName(wholesaleCustomers.getCustomerName());
+        merchantAccount.setCompanyCode(wholesaleCustomers.getCompanyCode());
+        merchantAccount.setCompanyName(wholesaleCustomers.getCompanyName());
+        merchantAccount.setRelationType(1);
+
+        bridgeProductService.accountRegister(merchantAccount);
     }
 
     private HttpResponse addFranchisee(WholesaleCustomers wholesaleCustomers,AuthToken auth) {
