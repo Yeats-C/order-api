@@ -8,6 +8,8 @@ import com.aiqin.mgs.order.api.domain.LogisticsRuleInfoList;
 import com.aiqin.mgs.order.api.domain.response.LogisticsAllResponse;
 import com.aiqin.mgs.order.api.util.ResultModel;
 
+import java.util.List;
+
 public interface LogisticsRuleService {
     //新增物流减免
     HttpResponse saveLogistics(LogisticsRuleInfoList logisticsRuleInfoList);
@@ -21,4 +23,11 @@ public interface LogisticsRuleService {
     HttpResponse updateLogistics(LogisticsRuleInfoList logisticsRuleInfoList);
     //多条件查询列表
     HttpResponse<ResultModel<LogisticsAllResponse>> selectLogisticsList(LogisticsRuleRequest logisticsRuleRequest);
+
+    /**
+     * 通过spuList查询规则
+     * @param spuCodes
+     * @return
+     */
+    HttpResponse<List<LogisticsAllResponse>> selectRuleBuSpuCode(List<String> spuCodes);
 }

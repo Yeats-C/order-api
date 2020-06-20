@@ -268,6 +268,8 @@ public class LogisticsRuleServiceImpl implements LogisticsRuleService {
         }
     }
 
+
+
     /**
      * 新增物流免减规则
      *
@@ -352,6 +354,23 @@ public class LogisticsRuleServiceImpl implements LogisticsRuleService {
             LOGGER.error("新增-物流减免规则-请求：{},{}",logisticsRuleInfoList,e);
             return HttpResponse.failure(MessageId.create(Project.ZERO, 01, "保存出现未知异常,请联系系统管理员."));
         }
+    }
+
+    @Override
+    public HttpResponse<List<LogisticsAllResponse>> selectRuleBuSpuCode(List<String> spuCodes) {
+        LOGGER.info("通过spuList查询规则-方法入参：{}",spuCodes);
+        HttpResponse response=HttpResponse.success();
+        try{
+            LogisticsRuleRequest ruleRequest=new LogisticsRuleRequest();
+            ruleRequest.setSpuCodes(spuCodes);
+            List<LogisticsAllResponse> list = logisticsRuleDao.selectAll(ruleRequest);
+            response.setData(list);
+        }catch (Exception e){
+            LOGGER.error("通过spuList查询规则-请求异常：{},{}",spuCodes,e);
+            return HttpResponse.failure(MessageId.create(Project.ZERO, 01, "查询出现未知异常,请联系系统管理员."));
+        }
+
+        return response;
     }
 }
 

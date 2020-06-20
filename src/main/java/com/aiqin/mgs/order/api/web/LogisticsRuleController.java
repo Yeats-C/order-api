@@ -14,6 +14,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/logistics/rule")
 @Api(tags = "物流减免规则")
@@ -56,5 +58,12 @@ public class LogisticsRuleController {
     @ApiOperation("多条件查询列表")
     public HttpResponse<ResultModel<LogisticsAllResponse>> selectLogistics(@RequestBody LogisticsRuleRequest logisticsRuleRequest){
         return logisticsRuleService.selectLogisticsList(logisticsRuleRequest);
+    }
+
+
+    @PostMapping("/selectRuleBuSpuCode")
+    @ApiOperation("通过spuList查询规则")
+    public HttpResponse<List<LogisticsAllResponse>> selectRuleBuSpuCode(@RequestBody List<String> spuCodes){
+        return logisticsRuleService.selectRuleBuSpuCode(spuCodes);
     }
 }

@@ -8,6 +8,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @ApiModel(value = "列表实体信息")
@@ -57,5 +58,14 @@ public class LogisticsAllResponse {
     @ApiModelProperty(value = "操作人名称")
     @JsonProperty("update_by_name")
     private String updateByName;
+
+    @ApiModelProperty(value = "spu编码")
+    @JsonProperty("spu_code")
+    private String spuCode;
+
+    @ApiModelProperty(value = "spu名称")
+    @JsonProperty("spu_name")
+    private String spuName;
+
 
 }

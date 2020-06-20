@@ -82,4 +82,12 @@ public class LogisticsRuleInfo {
 //    @JsonProperty("logistics_list")
 //    private List<LogisticsRuleInfo> logisticsList;
 
+    @ApiModelProperty(value = "spu编码")
+    @JsonProperty("spu_code")
+    private String spuCode;
+
+    @ApiModelProperty(value = "spu名称")
+    @JsonProperty("spu_name")
+    private String spuName;
+
 }
