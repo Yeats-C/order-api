@@ -35,8 +35,32 @@ public class wholesaleReturnOrderSearchVo implements Serializable {
     @JsonProperty("return_order_status")
     private Integer returnOrderStatus;
 
-    @ApiModelProperty("地区层级编码对象")
-    @JsonProperty("area_req")
-    private AreaReq areaReq;
+//    @ApiModelProperty("地区层级编码对象")
+//    @JsonProperty("area_req")
+//    private AreaReq areaReq;
+
+    @ApiModelProperty("门店名称")
+    @JsonProperty("store_name")
+    private String storeName;
+
+    @ApiModelProperty(value="省编码")
+    @JsonProperty("province_id")
+    private String provinceId;
+
+    @ApiModelProperty(value="市编码")
+    @JsonProperty("city_id")
+    private String cityId;
+
+    @ApiModelProperty(value="区编码")
+    @JsonProperty("district_id")
+    private String districtId;
+
+    @ApiModelProperty(value = "每页条数")
+    @JsonProperty("page_size")
+    private Integer pageSize;
+
+    @ApiModelProperty(value = "当前页")
+    @JsonProperty("page_no")
+    private Integer pageNo;
 
 }

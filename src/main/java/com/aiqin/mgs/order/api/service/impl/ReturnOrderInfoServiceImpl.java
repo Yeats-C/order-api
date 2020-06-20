@@ -4,8 +4,6 @@ import com.aiqin.ground.util.exception.GroundRuntimeException;
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.json.JsonUtil;
-import com.aiqin.ground.util.protocol.MessageId;
-import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.*;
 import com.aiqin.mgs.order.api.component.SequenceService;
@@ -48,10 +46,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.asm.Advice;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.logging.log4j.spi.LoggerRegistry;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,12 +56,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
-import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -1728,19 +1722,43 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             ReturnOrderReviewReqVo reqVo1 = new ReturnOrderReviewReqVo();
             reqVo1.setOperateStatus(reqVo.getTreatmentMethod());
             reqVo1.setReturnOrderCode(afterSaleCode);
+            log.info("erp-批发退货-同步供应链-生成退供单开始---");
             HttpResponse httpResponse = updateReturnStatus(reqVo1);
-            log.info("erp同步供应链，生成退供单结束,httpResponse={}",JSON.toJSON(httpResponse));
+            log.info("erp-批发退货-同步供应链，生成退供单结束,httpResponse={}",JSON.toJSON(httpResponse));
             if(!"0".equals(httpResponse.getCode())){
                 //erp同步供应链，生成退供单失败
-                throw new RuntimeException("erp同步供应链，生成退供单失败");
+                throw new RuntimeException("erp-批发退货-同步供应链，生成退供单失败");
             }
-            log.info("erp同步供应链，生成退货单成功");
+            log.info("erp-批发退货-同步供应链，生成退货单成功");
             return HttpResponse.success();
         }catch (Exception e){
             log.error("批发退货-请求：{},{}",reqVo,e);
             throw new GroundRuntimeException("发起批发退货出现未知异常,请联系系统管理员");
         }
 
+    }
+
+    /**
+     * 多条件查询批发退货列表
+     * @param whoVo
+     * @return
+     */
+    @Override
+    public HttpResponse selectAllList(wholesaleReturnOrderSearchVo whoVo) {
+        log.info("多条件查询批发退货列表-入参：{}",whoVo);
+        Integer PageNo = whoVo.getPageNo();
+        Integer PageSize = whoVo.getPageSize();
+        if (PageNo == null && PageSize == null) {
+            PageNo = 1;
+            PageSize = 10;
+        }
+        if (PageNo == 0 && PageSize == 0) {
+            PageNo = 1;
+            PageSize = 10;
+        }
+        PageHelper.startPage(PageNo, PageSize);
+        returnOrderInfoDao.selectByCondition(whoVo);
+        return null;
     }
 
 
