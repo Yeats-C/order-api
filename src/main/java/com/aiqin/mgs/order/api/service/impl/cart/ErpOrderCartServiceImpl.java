@@ -459,8 +459,10 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
             this.setNewestSkuDetail(store.getProvinceId(), store.getCityId(), cartLineList);
             for (ErpOrderCartInfo item :
                     cartLineList) {
-                totalNumber += item.getAmount();
-                accountActualPrice = accountActualPrice.add(item.getPrice().multiply(new BigDecimal(item.getAmount())));
+                if(item.getLineCheckStatus()==1){
+                    totalNumber += item.getAmount();
+                    accountActualPrice = accountActualPrice.add(item.getPrice().multiply(new BigDecimal(item.getAmount())));
+                }
                 //后来新加的
                 BigDecimal totalMoney = item.getPrice().multiply(new BigDecimal(item.getAmount()));
                 item.setActivityPrice(item.getPrice());

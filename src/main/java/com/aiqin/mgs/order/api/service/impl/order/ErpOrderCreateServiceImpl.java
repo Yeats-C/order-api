@@ -2374,7 +2374,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
     private int getLogisticsFeeStatus(List<ErpOrderItem> orderItemList) {
         LogisticsRuleRequest logisticsRuleRequest=new LogisticsRuleRequest();
-        List<LogisticsAllResponse> logisticsAllResponseList =(List<LogisticsAllResponse>)logisticsRuleService.selectLogisticsList(logisticsRuleRequest).getData();
+        List<LogisticsAllResponse> logisticsAllResponseList =(List<LogisticsAllResponse>)logisticsRuleService.selectLogisticsList(logisticsRuleRequest).getData().getResult();
         if(null!=orderItemList&&orderItemList.size()>0&&null!=logisticsAllResponseList && logisticsAllResponseList.size()>0){
             for(LogisticsAllResponse logisticsAllResponse:logisticsAllResponseList){
                 //根据活动类型解析活动
