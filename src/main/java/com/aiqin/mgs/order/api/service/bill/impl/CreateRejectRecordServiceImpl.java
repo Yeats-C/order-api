@@ -19,6 +19,7 @@ import com.aiqin.mgs.order.api.service.bill.OperationLogService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import com.aiqin.mgs.order.api.util.BeanCopyUtils;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -69,6 +70,7 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
                 returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode(), returnOrderCode);
                 //根据退货单号查询退货单和退货明细
                 returnOrder = returnOrderInfoService.detail(returnOrderInfo.getReturnOrderCode());
+                LOGGER.info("根据退货号查询退货单和退货明细-返回结果：{}",returnOrder);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -271,6 +273,7 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
                 HttpClient httpGet = HttpClient.post(url).json(returnOrderReq);
                 HttpResponse<Object> response = httpGet.action().result(new TypeReference<HttpResponse<Object>>() {
                 });
+                LOGGER.info("同步耘链退货-返回结果:{}", JSON.toJSON(response));
                 if (!RequestReturnUtil.validateHttpResponse(response)) {
                     throw new BusinessException(response.getMessage());
                 }
