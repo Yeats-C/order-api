@@ -5,20 +5,20 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.dao.wholesale.WholesaleCustomersDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
-import com.aiqin.mgs.order.api.domain.wholesale.JoinMerchant;
-import com.aiqin.mgs.order.api.domain.wholesale.MerchantAccount;
-import com.aiqin.mgs.order.api.domain.wholesale.WholesaleCustomers;
-import com.aiqin.mgs.order.api.domain.wholesale.WholesaleRule;
+import com.aiqin.mgs.order.api.domain.wholesale.*;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.service.wholesale.WholesaleCustomersService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -337,5 +337,29 @@ public class WholesaleCustomersServiceImpl implements WholesaleCustomersService 
             httpResponse.setData(true);
         }
         return httpResponse;
+    }
+
+    @Override
+    public HttpResponse<WholesaleCustomerVO> getCustomerAndAccountByCode(String customerCode) {
+        HttpResponse response=HttpResponse.success();
+        WholesaleCustomerVO wholesaleCustomerVO=new WholesaleCustomerVO();
+        WholesaleCustomers wholesaleCustomers=getCustomerByCode(customerCode).getData();
+        BeanUtils.copyProperties(wholesaleCustomers,wholesaleCustomerVO);
+
+        //查询批发客户账户余额
+        MerchantPaBalanceRespVO merchantPaBalanceRespVO=(MerchantPaBalanceRespVO)bridgeProductService.accountBalance(customerCode).getData();
+        if(null!=merchantPaBalanceRespVO){
+            if(null!=merchantPaBalanceRespVO.getAvailableBalance()&&merchantPaBalanceRespVO.getAvailableBalance().compareTo(BigDecimal.ZERO)>0){
+                merchantPaBalanceRespVO.setAvailableBalance(merchantPaBalanceRespVO.getAvailableBalance().divide(new BigDecimal(100),2, RoundingMode.HALF_UP));
+            }
+            if(null!=merchantPaBalanceRespVO.getFrozenBalance()&&merchantPaBalanceRespVO.getFrozenBalance().compareTo(BigDecimal.ZERO)>0){
+                merchantPaBalanceRespVO.setFrozenBalance(merchantPaBalanceRespVO.getFrozenBalance().divide(new BigDecimal(100),2, RoundingMode.HALF_UP));
+            }
+            if(null!=merchantPaBalanceRespVO.getCreditAmount()&&merchantPaBalanceRespVO.getCreditAmount().compareTo(BigDecimal.ZERO)>0){
+                merchantPaBalanceRespVO.setCreditAmount(merchantPaBalanceRespVO.getCreditAmount().divide(new BigDecimal(100),2, RoundingMode.HALF_UP));
+            }
+        }
+        wholesaleCustomerVO.setMerchantPaBalanceRespVO(merchantPaBalanceRespVO);
+        return response.setData(wholesaleCustomerVO);
     }
 }

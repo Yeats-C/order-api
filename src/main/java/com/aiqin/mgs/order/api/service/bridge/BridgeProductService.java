@@ -31,6 +31,7 @@ import com.aiqin.mgs.order.api.domain.response.gift.StoreAvailableGiftQuotaRespo
 import com.aiqin.mgs.order.api.domain.response.order.StoreFranchiseeInfoResponse;
 import com.aiqin.mgs.order.api.domain.wholesale.JoinMerchant;
 import com.aiqin.mgs.order.api.domain.wholesale.MerchantAccount;
+import com.aiqin.mgs.order.api.domain.wholesale.MerchantPaBalanceRespVO;
 import com.aiqin.mgs.order.api.util.MathUtil;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -648,6 +649,11 @@ public class BridgeProductService<main> {
         return storeInfo;
     }
 
+    /**
+     * 批发客户添加主控组织架构
+     * @param joinMerchant
+     * @return
+     */
     public HttpResponse<JoinMerchant> addFranchisee(JoinMerchant joinMerchant){
         StringBuilder sb = new StringBuilder();
         sb.append(centerMainUrl).append("/franchisee/add/franchisee");
@@ -659,12 +665,17 @@ public class BridgeProductService<main> {
         });
         if (!httpResponse.getCode().equals(MessageId.SUCCESS_CODE)) {
             log.error("批发客户创建主控架构失败，返回信息 httpResponse ={}"+httpResponse);
-            return HttpResponse.failure(ResultCode.FAILED_TO_CREATE_MASTER_ACCOUNT);
+            return HttpResponse.failure(ResultCode.FAILED_TO_CREATE_MASTER_ACCOUNT_FAILED);
         }
 
         return httpResponse;
     }
 
+    /**
+     * 批发客户添加主控账户
+     * @param joinMerchant
+     * @return
+     */
     public HttpResponse<JoinMerchant> addFranchiseeAccount(JoinMerchant joinMerchant){
         StringBuilder sb = new StringBuilder();
 //        sb.append(centerMainUrl).append("/franchisee/add/franchisee/account");
@@ -676,58 +687,57 @@ public class BridgeProductService<main> {
         });
         if (!httpResponse.getCode().equals(MessageId.SUCCESS_CODE)) {
             log.error("批发客户创建主控账户失败，返回信息 httpResponse ={}"+httpResponse);
-            return HttpResponse.failure(ResultCode.FAILED_TO_CREATE_MASTER_ACCOUNT);
+            return HttpResponse.failure(ResultCode.FAILED_TO_CREATE_MASTER_ACCOUNT_FAILED);
         }
 
         return httpResponse;
     }
 
+    /**
+     * 批发客户新建结算账户接口
+     * @param merchantAccount
+     * @return
+     */
     public HttpResponse accountRegister(MerchantAccount merchantAccount) {
-        log.info("加盟商新建结算账户接口  参数 merchantAccount=[{}]"+JsonUtil.toJson(merchantAccount));
+        log.info("批发客户新建结算账户接口  参数 merchantAccount=[{}]"+JsonUtil.toJson(merchantAccount));
         HttpResponse httpResponse = HttpResponse.success();
 
         StringBuilder sb = new StringBuilder();
-//        sb.append("http://settlement.api.aiqin.com").append("/merchant/account/register");
         sb.append(settlement).append("/merchant/account/register");
         HttpClient httpClient = HttpClient.post(sb.toString()).json(merchantAccount);
         httpResponse = httpClient.action().result(new TypeReference<HttpResponse>() {
         });
         if (!httpResponse.getCode().equals(MessageId.SUCCESS_CODE)) {
-            return HttpResponse.failure(ResultCode.INSERT_FRANCHISEE_ACCOUNT);
+            return HttpResponse.failure(ResultCode.INSERT_FRANCHISEE_ACCOUNT_FAILED);
+        }
+        return httpResponse;
+    }
+
+
+    /**
+     * 批发客户结算账户查询账户余额接口
+     * @param franchiseeId
+     * @return
+     */
+    public HttpResponse<MerchantPaBalanceRespVO> accountBalance(String franchiseeId) {
+        log.info("批发客户结算账户查询账户余额接口  参数 franchiseeId=[{}]"+franchiseeId);
+        HttpResponse<MerchantPaBalanceRespVO> httpResponse = HttpResponse.success();
+
+        HttpClient httpClient = HttpClient.get("http://settlement.api.aiqin.com" + "/cardinfolink/merchant/platform/account/balance?franchiseeId=" + franchiseeId);
+//        HttpClient httpClient = HttpClient.get(settlement + "/cardinfolink/merchant/platform/account/balance?franchiseeId=" + franchiseeId);
+        httpResponse = httpClient.action().result(new TypeReference<HttpResponse<MerchantPaBalanceRespVO>>() {
+        });
+        if (!httpResponse.getCode().equals(MessageId.SUCCESS_CODE)) {
+            return HttpResponse.failure(ResultCode.SELECT_FRANCHISEE_ACCOUNT_FAILED);
         }
         return httpResponse;
     }
 
 
 
-
     public static void main(String[] args) {
         BridgeProductService bridgeProductService=new BridgeProductService();
-        JoinMerchant joinMerchant=new JoinMerchant();
-        joinMerchant.setFranchiseeCode("70000001");
-        joinMerchant.setFranchiseeName("测试新增批发客户");
-        joinMerchant.setMobile("11122246666");
-        joinMerchant.setCardNo("110101199003079032");
-        joinMerchant.setCardType("1");
-        joinMerchant.setCompanyCode("01");
-        joinMerchant.setCompanyName("爱亲科技");
-        StringBuffer stringBuffer=new StringBuffer();
-        stringBuffer.append("北京市");
-        stringBuffer.append("北京市");
-        stringBuffer.append("朝阳区");
-        stringBuffer.append("狂人学院");
-        joinMerchant.setAddress(stringBuffer.toString());
-        joinMerchant.setProperty(2);
-        joinMerchant.setCreateBy("111111测试主控新增批发客户");
-        joinMerchant.setPersonId("111111");
 
-        joinMerchant.setDepartmentCode("160200086");
-        joinMerchant.setDepartmentName("测试新增批发客户(内部)");
-        joinMerchant.setDepartmentLevel(2);
-        joinMerchant.setCompanyCode("16");
-        joinMerchant.setCompanyName("门店管理");
-        String[] roleId = {"JS0089"};
-        joinMerchant.setRoleId(roleId);
-        System.out.println(JsonUtil.toJson(bridgeProductService.addFranchiseeAccount(joinMerchant)));
+        System.out.println(JsonUtil.toJson(bridgeProductService.accountBalance("EBCC55A75ED842CD9B83B7181F789EC4")));
     }
 }
