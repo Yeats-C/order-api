@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.domain.request.returnorder;
 
 import com.aiqin.mgs.order.api.domain.ReturnOrderDetail;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -43,6 +44,30 @@ public class ReturnWholesaleOrderReqVo implements Serializable {
 //    private BigDecimal returnOrderAmount;
 
     //实付金额字段
+
+    @ApiModelProperty(value="省编码 --传")
+//    @JsonProperty("province_id")
+    private String provinceId;
+
+    @ApiModelProperty(value="省名称 --传")
+//    @JsonProperty("province_name")
+    private String provinceName;
+
+    @ApiModelProperty(value="市编码 --传")
+//    @JsonProperty("city_id")
+    private String cityId;
+
+    @ApiModelProperty(value="市名称 --传")
+//    @JsonProperty("city_name")
+    private String cityName;
+
+    @ApiModelProperty(value="区编码 --传")
+//    @JsonProperty("district_id")
+    private String districtId;
+
+    @ApiModelProperty(value="区名称--传")
+//    @JsonProperty("district_name")
+    private String districtName;
 
     //新加加盟商和合伙人
     @ApiModelProperty("加盟商编码 ---不用传")

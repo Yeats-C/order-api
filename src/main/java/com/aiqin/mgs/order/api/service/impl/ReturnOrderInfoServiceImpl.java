@@ -1739,13 +1739,15 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             reqVo1.setOperateStatus(reqVo.getTreatmentMethod());
             reqVo1.setReturnOrderCode(afterSaleCode);
             log.info("erp-批发退货-同步供应链-生成退供单开始---");
-            HttpResponse httpResponse = updateReturnStatus(reqVo1);
-            log.info("erp-批发退货-同步供应链，生成退供单结束,httpResponse={}",JSON.toJSON(httpResponse));
-            if(!"0".equals(httpResponse.getCode())){
-                //erp同步供应链，生成退供单失败
-                throw new RuntimeException("erp-批发退货-同步供应链，生成退供单失败");
-            }
-            log.info("erp-批发退货-同步供应链，生成退货单成功");
+//            HttpResponse httpResponse = updateReturnStatus(reqVo1);
+             updateReturnStatus(reqVo1);
+//            log.info("erp-批发退货-同步供应链，生成退供单结束,httpResponse={}",JSON.toJSON(httpResponse));
+            log.info("erp-批发退货-同步供应链，生成退供单结束");
+//            if(!"0".equals(httpResponse.getCode())){
+//                //erp同步供应链，生成退供单失败
+//                throw new RuntimeException("erp-批发退货-同步供应链，生成退供单失败");
+//            }
+//            log.info("erp-批发退货-同步供应链，生成退货单成功");
             return HttpResponse.success();
         }catch (Exception e){
             log.error("批发退货-请求：{},{}",reqVo,e);
