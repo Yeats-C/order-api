@@ -131,12 +131,12 @@ public class WholesaleCustomerVO implements Serializable {
     @JsonProperty("delivery_center_list")
     private List<String> deliveryCenterList;
 
+    @ApiModelProperty(value="回显品类name")
+    @JsonProperty("category_tag_list")
+    private String categoryTagList;
+
     @ApiModelProperty(value="加盟商平台账户查询响应条目VO")
     @JsonProperty("merchant_pa_balance_resp_vo")
     private MerchantPaBalanceRespVO merchantPaBalanceRespVO;
-
-
-
-
 
 }
