@@ -393,4 +393,7 @@ public class ReturnOrderInfo {
     @ApiModelProperty(value = "本行A品券优惠总额度")
     private BigDecimal topCouponDiscountAmount;
 
+    @ApiModelProperty(value = "是否需要发票 0是 1否 --传")
+    private Integer whetherInvoice;
+
 }
