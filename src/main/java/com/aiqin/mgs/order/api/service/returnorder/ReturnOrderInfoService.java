@@ -173,7 +173,14 @@ public interface ReturnOrderInfoService {
      * @param reqVo
      * @return
      */
-    HttpResponse saveWholesaleReturn(ReturnOrderReqVo reqVo);
+    HttpResponse saveWholesaleReturn(ReturnWholesaleOrderReqVo reqVo);
+
+    /**
+     * 多条件查询批发退货列表
+     * @param whoVo
+     * @return
+     */
+    HttpResponse selectAllList(wholesaleReturnOrderSearchVo whoVo);
 
 
 //    boolean refundPoints(ReturnOrderInfo returnOrderInfo);

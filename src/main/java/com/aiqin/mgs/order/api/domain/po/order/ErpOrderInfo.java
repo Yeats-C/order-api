@@ -438,6 +438,15 @@ public class ErpOrderInfo {
     @JsonProperty("logistics_fee_status")
     private Integer logisticsFeeStatus=0;
 
+    @ApiModelProperty(value="经营区域ID")
+    @JsonProperty("copartner_area_id")
+    private String copartnerAreaId;
+
+
+    @ApiModelProperty(value="经营区域名称")
+    @JsonProperty("copartner_area_name")
+    private String copartnerAreaName;
+
     public String getOrderStatusDesc() {
         return ErpOrderStatusEnum.getEnumDesc(orderStatus);
     }

@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.web.wholesale;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.domain.wholesale.WholesaleCustomerVO;
 import com.aiqin.mgs.order.api.domain.wholesale.WholesaleCustomers;
 import com.aiqin.mgs.order.api.service.wholesale.WholesaleCustomersService;
 import io.swagger.annotations.Api;
@@ -47,8 +48,8 @@ public class WholesaleCustomersController {
      */
     @GetMapping("/getCustomerByCode")
     @ApiOperation(value = "通过code查询批发客户")
-    public HttpResponse<WholesaleCustomers> getCustomerByCode(String customerCode){
-        return wholesaleCustomersService.getCustomerByCode(customerCode);
+    public HttpResponse<WholesaleCustomerVO> getCustomerByCode(String customerCode){
+        return wholesaleCustomersService.getCustomerAndAccountByCode(customerCode);
     }
 
     @ApiOperation("修改批发客户")

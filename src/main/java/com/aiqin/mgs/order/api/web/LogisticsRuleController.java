@@ -6,11 +6,15 @@ import com.aiqin.mgs.order.api.domain.LogisticsRuleInfoList;
 import com.aiqin.mgs.order.api.domain.LogisticsRuleRequest;
 import com.aiqin.mgs.order.api.domain.echoLogisticsRule;
 import com.aiqin.mgs.order.api.domain.logisticsRule.LogisticsRuleInfo;
+import com.aiqin.mgs.order.api.domain.response.LogisticsAllResponse;
 import com.aiqin.mgs.order.api.service.LogisticsRuleService;
+import com.aiqin.mgs.order.api.util.ResultModel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/logistics/rule")
@@ -52,7 +56,14 @@ public class LogisticsRuleController {
 
     @PostMapping("/select/logistics")
     @ApiOperation("多条件查询列表")
-    public HttpResponse selectLogistics(@RequestBody LogisticsRuleRequest logisticsRuleRequest){
+    public HttpResponse<ResultModel<LogisticsAllResponse>> selectLogistics(@RequestBody LogisticsRuleRequest logisticsRuleRequest){
         return logisticsRuleService.selectLogisticsList(logisticsRuleRequest);
+    }
+
+
+    @PostMapping("/selectRuleBuSpuCode")
+    @ApiOperation("通过spuList查询规则")
+    public HttpResponse<List<LogisticsAllResponse>> selectRuleBuSpuCode(@RequestBody List<String> spuCodes){
+        return logisticsRuleService.selectRuleBuSpuCode(spuCodes);
     }
 }

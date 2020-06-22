@@ -362,7 +362,8 @@ public class CopartnerAreaServiceImpl implements  CopartnerAreaService {
 				copartnerAreaDao.saveCopartnerArea(vo);
 			}
 			//下辖公司
-			if(StringUtils.isBlank(param.getCopartnerAreaDetail().getCopartnerAreaId()) && param.getCopartnerAreaDetail().getCopartnerAreaId().equals("0")){
+//			if(StringUtils.isBlank(param.getCopartnerAreaDetail().getCopartnerAreaId()) && param.getCopartnerAreaDetail().getCopartnerAreaId().equals("0")){
+			if (StringUtils.isBlank(copartnerAreaIdOld) && "".equals(copartnerAreaIdOld)) {
 			   if (CollectionUtils.isNotEmpty(param.getDownCompanyList())) {
 			     	List<CopartnerAreaDetail> downCompanyList = param.getDownCompanyList();
 			     	log.info("获取下辖公司集合：{}", downCompanyList);
@@ -732,7 +733,12 @@ public class CopartnerAreaServiceImpl implements  CopartnerAreaService {
 		List<CopartnerAreaUp> list = new ArrayList();
 		//查询人员的所有的区域列表
 		List<CopartnerAreaUp> roleList = copartnerAreaRoleDao.qryCopartnerAreaListBypersonId(personId);
-		return HttpResponse.success(roleList);
+		for (int i= 0; i<roleList.size();i++){
+			if (roleList.get(i)!= null){
+				list.add(roleList.get(i));
+			}
+		}
+		return HttpResponse.success(list);
 	}
 
 
@@ -786,6 +792,24 @@ public class CopartnerAreaServiceImpl implements  CopartnerAreaService {
 		}catch (Exception e){
 			log.error("删除异常：删除下辖公司-请求参数：{},{}",copartnerAreaIds,e);
 			return HttpResponse.failure(MessageId.create(Project.ZERO, 01, "删除出现未知异常,请联系系统管理员."));
+		}
+	}
+
+	/**
+	 * 门店id查询区域信息
+	 * @param storeId
+	 * @return
+	 */
+	@Override
+	public HttpResponse selectCopartnerAreaByStoreId(String storeId) {
+		log.info("门店id-获取区域信息-入参：{}",storeId);
+		CopartnerAreaUp copartnerAreaUp = new CopartnerAreaUp();
+		try{
+			copartnerAreaUp = copartnerAreaDao.getCopartnerAreaById(storeId);
+			return HttpResponse.success(copartnerAreaUp);
+		}catch (Exception e){
+			log.error("查询异常:门店查询区域信息-请求参数{},{}", copartnerAreaUp, e);
+			return HttpResponse.failure(MessageId.create(Project.ZERO, 01, "查询出现未知异常,请联系系统管理员."));
 		}
 	}
 

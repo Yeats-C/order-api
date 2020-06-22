@@ -294,4 +294,14 @@ public class CopartnerAreaController {
     public HttpResponse delectCompany(@RequestBody List<String> copartnerAreaIds ){
         return copartnerAreaService.delectTwoCompany(copartnerAreaIds);
     }
+
+
+    /**
+     * 门店id查询区域信息
+     */
+    @GetMapping("/get/copartner/area")
+    @ApiOperation("门店id-查询区域信息")
+    public HttpResponse getCopartnerArea(@RequestParam(value = "store_id ") String storeId){
+        return  copartnerAreaService.selectCopartnerAreaByStoreId(storeId);
+    }
 }

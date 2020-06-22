@@ -5,17 +5,20 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.dao.wholesale.WholesaleCustomersDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
-import com.aiqin.mgs.order.api.domain.wholesale.WholesaleCustomers;
-import com.aiqin.mgs.order.api.domain.wholesale.WholesaleRule;
+import com.aiqin.mgs.order.api.domain.wholesale.*;
+import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.service.wholesale.WholesaleCustomersService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,13 +34,35 @@ public class WholesaleCustomersServiceImpl implements WholesaleCustomersService 
     @Resource
     private WholesaleCustomersDao wholesaleCustomersDao;
 
+    @Resource
+    private BridgeProductService bridgeProductService;
+
 
     @Override
     public HttpResponse<PageResData<WholesaleCustomers>> list(WholesaleCustomers wholesaleCustomers) {
         LOGGER.info("批发客户列表 参数wholesaleCustomers为{}"+wholesaleCustomers);
         HttpResponse httpResponse=HttpResponse.success();
         PageResData pageResData=new PageResData();
-        pageResData.setDataList(wholesaleCustomersDao.list(wholesaleCustomers));
+        List<WholesaleCustomers> wholesaleCustomersList=wholesaleCustomersDao.list(wholesaleCustomers);
+        for(WholesaleCustomers customer:wholesaleCustomersList){
+            List<WholesaleRule> wholesaleRuleList=wholesaleCustomersDao.getWholesaleRuleList(customer.getCustomerCode());
+            List<String> deliveryCenterList=new ArrayList<>();
+            if(null!=wholesaleRuleList&&wholesaleRuleList.size()>0){
+                for(WholesaleRule rule:wholesaleRuleList){
+                    switch (rule.getType()) {
+                        case 1:
+                            deliveryCenterList.add(rule.getWarehouseName());
+                            break;
+                        default:
+                            //nothing
+                            break;
+
+                    }
+                }
+                customer.setDeliveryCenterList(deliveryCenterList);
+            }
+        }
+        pageResData.setDataList(wholesaleCustomersList);
         pageResData.setTotalCount(wholesaleCustomersDao.totalCount(wholesaleCustomers));
         httpResponse.setData(pageResData);
         return httpResponse;
@@ -90,9 +115,62 @@ public class WholesaleCustomersServiceImpl implements WholesaleCustomersService 
         AuthToken auth = AuthUtil.getCurrentAuth();
         wholesaleCustomers.setCreateBy(auth.getPersonName());
         wholesaleCustomers.setUpdateBy(auth.getPersonName());
+
+        //创建主控账户
+        HttpResponse<JoinMerchant> response = addFranchisee(wholesaleCustomers,auth);
+        wholesaleCustomers.setCustomerAccount(response.getData().getUserName());
+
+        //将批发客户信息推送到结算
+        accountRegister(wholesaleCustomers);
         wholesaleCustomersDao.insert(wholesaleCustomers);
         wholesaleCustomersDao.bulkInsertionRules(wholesaleRuleList);
         return httpResponse;
+    }
+
+    private void accountRegister(WholesaleCustomers wholesaleCustomers) {
+        MerchantAccount merchantAccount=new MerchantAccount();
+        merchantAccount.setFranchiseeCode(wholesaleCustomers.getCustomerAccount());
+        merchantAccount.setFranchiseeId(wholesaleCustomers.getCustomerCode());
+        merchantAccount.setFranchiseeName(wholesaleCustomers.getCustomerName());
+        merchantAccount.setCompanyCode(wholesaleCustomers.getCompanyCode());
+        merchantAccount.setCompanyName(wholesaleCustomers.getCompanyName());
+        merchantAccount.setRelationType(1);
+
+        bridgeProductService.accountRegister(merchantAccount);
+    }
+
+    private HttpResponse addFranchisee(WholesaleCustomers wholesaleCustomers,AuthToken auth) {
+        JoinMerchant joinMerchant=new JoinMerchant();
+        joinMerchant.setFranchiseeCode(wholesaleCustomers.getCustomerAccount());
+        joinMerchant.setFranchiseeName(wholesaleCustomers.getCustomerName());
+        joinMerchant.setMobile(wholesaleCustomers.getPhoneNumber());
+        joinMerchant.setCardNo(wholesaleCustomers.getIdentityNumber());
+        joinMerchant.setCardType("1");
+        joinMerchant.setCompanyCode(wholesaleCustomers.getCompanyCode());
+        joinMerchant.setCompanyName(wholesaleCustomers.getCompanyName());
+        StringBuffer stringBuffer=new StringBuffer();
+        stringBuffer.append(wholesaleCustomers.getProvinceName());
+        stringBuffer.append(wholesaleCustomers.getCityName());
+        stringBuffer.append(wholesaleCustomers.getDistrictName());
+        stringBuffer.append(wholesaleCustomers.getStreetAddress());
+        joinMerchant.setAddress(stringBuffer.toString());
+        joinMerchant.setProperty(2);
+        joinMerchant.setCreateBy(auth.getPersonName());
+        joinMerchant.setPersonId(auth.getPersonId());
+
+        HttpResponse<JoinMerchant> httpResponse=bridgeProductService.addFranchisee(joinMerchant);
+        JoinMerchant result=httpResponse.getData();
+
+        joinMerchant.setDepartmentCode(result.getDepartmentCode());
+        joinMerchant.setDepartmentName(result.getDepartmentName());
+        joinMerchant.setDepartmentLevel(result.getDepartmentLevel());
+        joinMerchant.setCompanyCode(result.getCompanyCode());
+        joinMerchant.setCompanyName(result.getCompanyName());
+        String[] roleId = {"JS0089"};
+        joinMerchant.setRoleId(roleId);
+
+        HttpResponse<JoinMerchant> response=bridgeProductService.addFranchiseeAccount(joinMerchant);
+        return response;
     }
 
     @Override
@@ -134,6 +212,9 @@ public class WholesaleCustomersServiceImpl implements WholesaleCustomersService 
                     case 4:
                         productList.add(rule);
                         break;
+                    default:
+                        //nothing
+                        break;
                 }
             }
             wholesaleCustomer.setWarehouseList(warehouseList);
@@ -153,10 +234,6 @@ public class WholesaleCustomersServiceImpl implements WholesaleCustomersService 
         LOGGER.info("修改批发客户 参数wholesaleCustomers为{}"+wholesaleCustomers);
         if(null==wholesaleCustomers){
             return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
-        }
-        boolean checkAccount=checkAccountExists(wholesaleCustomers.getCustomerAccount()).getData();
-        if(!checkAccount){
-            return HttpResponse.failure(ResultCode.ACCOUNT_ALREADY_EXISTS);
         }
         HttpResponse httpResponse=HttpResponse.success();
         List<WholesaleRule> wholesaleRuleList=new ArrayList<>();
@@ -204,8 +281,7 @@ public class WholesaleCustomersServiceImpl implements WholesaleCustomersService 
         }
         HttpResponse httpResponse=HttpResponse.success();
         WholesaleCustomers wholesaleCustomer=new WholesaleCustomers();
-        wholesaleCustomer.setCustomerName(parameter);
-        wholesaleCustomer.setCustomerAccount(parameter);
+        wholesaleCustomer.setParameter(parameter);
         List<WholesaleCustomers> wholesaleCustomers=wholesaleCustomersDao.list(wholesaleCustomer);
         for(WholesaleCustomers customer:wholesaleCustomers){
             List<WholesaleRule> wholesaleRuleList=wholesaleCustomersDao.getWholesaleRuleList(customer.getCustomerCode());
@@ -261,5 +337,29 @@ public class WholesaleCustomersServiceImpl implements WholesaleCustomersService 
             httpResponse.setData(true);
         }
         return httpResponse;
+    }
+
+    @Override
+    public HttpResponse<WholesaleCustomerVO> getCustomerAndAccountByCode(String customerCode) {
+        HttpResponse response=HttpResponse.success();
+        WholesaleCustomerVO wholesaleCustomerVO=new WholesaleCustomerVO();
+        WholesaleCustomers wholesaleCustomers=getCustomerByCode(customerCode).getData();
+        BeanUtils.copyProperties(wholesaleCustomers,wholesaleCustomerVO);
+
+        //查询批发客户账户余额
+        MerchantPaBalanceRespVO merchantPaBalanceRespVO=(MerchantPaBalanceRespVO)bridgeProductService.accountBalance(customerCode).getData();
+        if(null!=merchantPaBalanceRespVO){
+            if(null!=merchantPaBalanceRespVO.getAvailableBalance()&&merchantPaBalanceRespVO.getAvailableBalance().compareTo(BigDecimal.ZERO)>0){
+                merchantPaBalanceRespVO.setAvailableBalance(merchantPaBalanceRespVO.getAvailableBalance().divide(new BigDecimal(100),2, RoundingMode.HALF_UP));
+            }
+            if(null!=merchantPaBalanceRespVO.getFrozenBalance()&&merchantPaBalanceRespVO.getFrozenBalance().compareTo(BigDecimal.ZERO)>0){
+                merchantPaBalanceRespVO.setFrozenBalance(merchantPaBalanceRespVO.getFrozenBalance().divide(new BigDecimal(100),2, RoundingMode.HALF_UP));
+            }
+            if(null!=merchantPaBalanceRespVO.getCreditAmount()&&merchantPaBalanceRespVO.getCreditAmount().compareTo(BigDecimal.ZERO)>0){
+                merchantPaBalanceRespVO.setCreditAmount(merchantPaBalanceRespVO.getCreditAmount().divide(new BigDecimal(100),2, RoundingMode.HALF_UP));
+            }
+        }
+        wholesaleCustomerVO.setMerchantPaBalanceRespVO(merchantPaBalanceRespVO);
+        return response.setData(wholesaleCustomerVO);
     }
 }

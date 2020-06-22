@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.service.wholesale;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.domain.wholesale.WholesaleCustomerVO;
 import com.aiqin.mgs.order.api.domain.wholesale.WholesaleCustomers;
 
 import java.util.List;
@@ -49,4 +50,11 @@ public interface WholesaleCustomersService {
      * @return
      */
     HttpResponse checkAccountExists(String customerAccount);
+
+    /**
+     * 通过customerCode查询批发客户详情信息
+     * @param customerCode
+     * @return
+     */
+    HttpResponse<WholesaleCustomerVO> getCustomerAndAccountByCode(String customerCode);
 }

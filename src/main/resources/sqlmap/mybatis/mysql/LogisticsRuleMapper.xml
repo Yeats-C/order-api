@@ -16,7 +16,7 @@
     </insert>
     <insert id="saveProduct">
         insert into logistics_relief_product(rult_type,rult_code,product_code,product_name,
-        sales_standard,brand,category,types,fare_sill,create_time)
+        sales_standard,brand,category,types,fare_sill,create_time,spu_code,spu_name)
         values (
           #{rultType,jdbcType=INTEGER},
           #{rultCode,jdbcType=VARCHAR},
@@ -27,13 +27,15 @@
           #{category,jdbcType=VARCHAR},
           #{types,jdbcType=INTEGER},
           #{fareSill,jdbcType=DECIMAL},
-          now()
+          now(),
+          #{spuCode,jdbcType=VARCHAR},
+          #{spuName,jdbcType=VARCHAR}
         )
 
     </insert>
     <insert id="addProduct" parameterType="list">
      insert into logistics_relief_product(rult_type,rult_code,product_code,product_name,
-     sales_standard,brand,category,types,fare_sill,create_time)
+     sales_standard,brand,category,types,fare_sill,create_time,spu_code,spu_name)
      values
         <foreach collection="newlyLogisticsRuleInfo" item="item" index="index" separator=",">
             (
@@ -42,7 +44,9 @@
             #{item.salesStandard,jdbcType=VARCHAR}, #{item.brand,jdbcType=VARCHAR},
             #{item.category,jdbcType=VARCHAR},#{item.types,jdbcType=INTEGER},
             #{item.fareSill,jdbcType=DECIMAL},
-            now()
+            now(),
+            #{spuCode,jdbcType=VARCHAR},
+            #{spuName,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -112,12 +116,16 @@
          brand, category, fare_sill as fareSill, types,effective_status as effectiveStatus,
          update_time as updateTime,
          update_by_name as updateByName,
-         sales_standard as salesStandard
+         sales_standard as salesStandard,
+         spu_code as spuCode,
+         spu_name as spuName
          from logistics_relief_product group by rult_type HAVING rult_type in (2,3)
          union all
          select
          rult_code as rultCode, rult_type as rultType, product_code as productCode, product_name as productName , brand, category, fare_sill as fareSill, types, effective_status as effectiveStatus, update_time as updateTime,
-         update_by_name as updateByName,  sales_standard as salesStandard
+         update_by_name as updateByName,  sales_standard as salesStandard,
+        spu_code as spuCode,
+        spu_name as spuName
         from logistics_relief_product where rult_type  in (0,1)
         )
         logistics_relief_product
@@ -130,6 +138,12 @@
             </if>
             <if test="effectiveStatus != null">
                 and effectiveStatus = #{effectiveStatus,jdbcType=INTEGER}
+            </if>
+            <if test="spuCodes != null and spuCodes.size > 0">
+                and spuCode in
+                <foreach collection="spuCodes" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
             </if>
          order by updateTime desc
     </select>

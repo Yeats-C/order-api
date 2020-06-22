@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @ApiModel(value = "物流减免列表条件信息")
 public class LogisticsRuleRequest {
@@ -28,4 +30,9 @@ public class LogisticsRuleRequest {
     @ApiModelProperty(value = "当前页")
     @JsonProperty("page_no")
     private Integer pageNo;
+
+    @ApiModelProperty(value = "spu集合")
+    @JsonProperty("spu_codes")
+    private List<String> spuCodes;
+
 }

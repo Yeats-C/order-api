@@ -126,11 +126,11 @@ public class LogisticsRuleServiceImpl implements LogisticsRuleService {
         LOGGER.info("编辑物流减免规则-入参：{}", logisticsRuleInfoList);
         try {
 //           if (CollectionUtils.isNotEmpty(logisticsRuleInfoList.getLogisticsList())) {
-               //获取商品物流减免集合
-                List<LogisticsRuleInfo> logisticsList = logisticsRuleInfoList.getLogisticsList();
-                //获取规则唯一编码
-                String rultCode = logisticsRuleInfoList.getLogisticsRuleType().getRultCode();
-             if (LogisticsRuleEnum.SINGLE_BUY_QUANTITY.getkey().equals(logisticsRuleInfoList.getLogisticsRuleType().getRultType())
+            //获取商品物流减免集合
+            List<LogisticsRuleInfo> logisticsList = logisticsRuleInfoList.getLogisticsList();
+            //获取规则唯一编码
+            String rultCode = logisticsRuleInfoList.getLogisticsRuleType().getRultCode();
+            if (LogisticsRuleEnum.SINGLE_BUY_QUANTITY.getkey().equals(logisticsRuleInfoList.getLogisticsRuleType().getRultType())
                     || LogisticsRuleEnum.SINGLE_BUY_AMOUNT.getkey().equals(logisticsRuleInfoList.getLogisticsRuleType().getRultType())){
                 //修改单品的门槛值
                 for (LogisticsRuleInfo lo : logisticsList) {
@@ -143,90 +143,90 @@ public class LogisticsRuleServiceImpl implements LogisticsRuleService {
                     LOGGER.info("编辑-单品免运费-实体：{}", logisticsRuleInfo);
                     logisticsRuleDao.updateSingle(logisticsRuleInfo);
                 }
-             }else {
-                 //组合商品
-                 //原有组合中的商品信息
-                 List<LogisticsRuleInfo> logisticsRule = logisticsRuleDao.getLogisticsRule(rultCode);
-                 //新增商品
-                 if (logisticsList.size() > logisticsRule.size()) {   //如果传的集合大于查的集合，为新增
-                     LOGGER.info("组合规则-传参-新增商品信息-实体:{}",logisticsList);
-                     //将查出来的商品集合转成只有编码的集合
-                     List<String> productCodeList = logisticsRule.stream().map(LogisticsRuleInfo::getProductCode).collect(Collectors.toList());
-                     //将传过来的集合对编码集合进行过滤
-                     List<LogisticsRuleInfo> newlyLogisticsInfo = logisticsList.stream().filter(LogisticsRuleInfo -> !productCodeList.contains(LogisticsRuleInfo.getProductCode())).collect(Collectors.toList());
-                     LOGGER.info("组合规则-新增商品信息-实体：{}",newlyLogisticsInfo);
-                     List<LogisticsRuleInfo> newlyLogisticsRuleInfo = new ArrayList<>();
-                     for (LogisticsRuleInfo logisticsRuleInfo: newlyLogisticsInfo) {
-                         logisticsRuleInfo.setRultCode(rultCode);
-                         logisticsRuleInfo.setRultType(logisticsRuleInfoList.getLogisticsRuleType().getRultType());
-                         logisticsRuleInfo.setBrand("-");
-                         logisticsRuleInfo.setCategory("-");
-                         logisticsRuleInfo.setSalesStandard("-");
-                         Integer rultType = logisticsRuleInfoList.getLogisticsRuleType().getRultType();
-                         if (LogisticsRuleEnum.CONSTITUTE_BUY_QUANTITY.getkey().equals(rultType)){
-                             logisticsRuleInfo.setTypes(LogisticsRuleTypesEnum.LOGISTICS_PIECE.getCode());
-                         }else {
-                             logisticsRuleInfo.setTypes(LogisticsRuleTypesEnum.LOGISTICS_YUAN.getCode());
-                         }
-                         newlyLogisticsRuleInfo.add(logisticsRuleInfo);
-                     }
-                     logisticsRuleDao.addProduct(newlyLogisticsRuleInfo);
-                     //会有新增的同时修改免运费门槛场景
+            }else {
+                //组合商品
+                //原有组合中的商品信息
+                List<LogisticsRuleInfo> logisticsRule = logisticsRuleDao.getLogisticsRule(rultCode);
+                //新增商品
+                if (logisticsList.size() > logisticsRule.size()) {   //如果传的集合大于查的集合，为新增
+                    LOGGER.info("组合规则-传参-新增商品信息-实体:{}",logisticsList);
+                    //将查出来的商品集合转成只有编码的集合
+                    List<String> productCodeList = logisticsRule.stream().map(LogisticsRuleInfo::getProductCode).collect(Collectors.toList());
+                    //将传过来的集合对编码集合进行过滤
+                    List<LogisticsRuleInfo> newlyLogisticsInfo = logisticsList.stream().filter(LogisticsRuleInfo -> !productCodeList.contains(LogisticsRuleInfo.getProductCode())).collect(Collectors.toList());
+                    LOGGER.info("组合规则-新增商品信息-实体：{}",newlyLogisticsInfo);
+                    List<LogisticsRuleInfo> newlyLogisticsRuleInfo = new ArrayList<>();
+                    for (LogisticsRuleInfo logisticsRuleInfo: newlyLogisticsInfo) {
+                        logisticsRuleInfo.setRultCode(rultCode);
+                        logisticsRuleInfo.setRultType(logisticsRuleInfoList.getLogisticsRuleType().getRultType());
+                        logisticsRuleInfo.setBrand("-");
+                        logisticsRuleInfo.setCategory("-");
+                        logisticsRuleInfo.setSalesStandard("-");
+                        Integer rultType = logisticsRuleInfoList.getLogisticsRuleType().getRultType();
+                        if (LogisticsRuleEnum.CONSTITUTE_BUY_QUANTITY.getkey().equals(rultType)){
+                            logisticsRuleInfo.setTypes(LogisticsRuleTypesEnum.LOGISTICS_PIECE.getCode());
+                        }else {
+                            logisticsRuleInfo.setTypes(LogisticsRuleTypesEnum.LOGISTICS_YUAN.getCode());
+                        }
+                        newlyLogisticsRuleInfo.add(logisticsRuleInfo);
+                    }
+                    logisticsRuleDao.addProduct(newlyLogisticsRuleInfo);
+                    //会有新增的同时修改免运费门槛场景
 //                     List<LogisticsRuleInfo> Logisticslist = new ArrayList<>();
-                     for (LogisticsRuleInfo info :logisticsList ) {
-                         LogisticsRuleInfo logisticsRuleInfos = new LogisticsRuleInfo();
-                         BeanUtils.copyProperties(info,logisticsRuleInfos);
-                         logisticsRuleInfos.setRultCode(rultCode);
-                         logisticsRuleInfos.setRultType(logisticsRuleInfoList.getLogisticsRuleType().getRultType());
-                         AuthToken currentAuth = AuthUtil.getCurrentAuth();
-                         logisticsRuleInfos.setUpdateByName(currentAuth.getPersonName());
-                         logisticsRuleDao.updatefareSill(logisticsRuleInfos);
-                     }
+                    for (LogisticsRuleInfo info :logisticsList ) {
+                        LogisticsRuleInfo logisticsRuleInfos = new LogisticsRuleInfo();
+                        BeanUtils.copyProperties(info,logisticsRuleInfos);
+                        logisticsRuleInfos.setRultCode(rultCode);
+                        logisticsRuleInfos.setRultType(logisticsRuleInfoList.getLogisticsRuleType().getRultType());
+                        AuthToken currentAuth = AuthUtil.getCurrentAuth();
+                        logisticsRuleInfos.setUpdateByName(currentAuth.getPersonName());
+                        logisticsRuleDao.updatefareSill(logisticsRuleInfos);
+                    }
 
-                 //删除商品
-                 }else if (logisticsList.size() < logisticsRule.size()) {  //如果传的集合小于查的集合 为删除
-                     LOGGER.info("组合规则-传参-删除商品信息-实体：{}", logisticsList);
-                     List<String> newlyRultCodeList = logisticsList.stream().map(LogisticsRuleInfo::getProductCode).collect(Collectors.toList());
-                     List<LogisticsRuleInfo> deleteLogisticsRuleInfo = logisticsRule.stream().filter(LogisticsRuleInfo -> !newlyRultCodeList.contains(LogisticsRuleInfo.getProductCode())).collect(Collectors.toList());
+                    //删除商品
+                }else if (logisticsList.size() < logisticsRule.size()) {  //如果传的集合小于查的集合 为删除
+                    LOGGER.info("组合规则-传参-删除商品信息-实体：{}", logisticsList);
+                    List<String> newlyRultCodeList = logisticsList.stream().map(LogisticsRuleInfo::getProductCode).collect(Collectors.toList());
+                    List<LogisticsRuleInfo> deleteLogisticsRuleInfo = logisticsRule.stream().filter(LogisticsRuleInfo -> !newlyRultCodeList.contains(LogisticsRuleInfo.getProductCode())).collect(Collectors.toList());
 //                     List<String> deleteProductCodeList = deleteLogisticsRuleInfo.stream().map(LogisticsRuleInfo::getProductCode).collect(Collectors.toList());
-                     List<LogisticsRuleInfo> delecteProductList = new ArrayList<>();
-                     for (LogisticsRuleInfo logisticsRuleInfo : deleteLogisticsRuleInfo) {
-                         logisticsRuleInfo.setRultCode(rultCode);
-                         logisticsRuleInfo.setRultType(logisticsRuleInfoList.getLogisticsRuleType().getRultType());
-                         delecteProductList.add(logisticsRuleInfo);
-                     }
-                     LOGGER.info("组合规则-删除商品信息-实体：{}", delecteProductList);
-                     logisticsRuleDao.deleteProduct(delecteProductList);
-                     //会有删除的同时修改免运费门槛场景
-                     if (logisticsList.size() != 0){
-                         for (LogisticsRuleInfo info :logisticsList ) {
-                             LogisticsRuleInfo logisticsRuleInfos = new LogisticsRuleInfo();
-                             BeanUtils.copyProperties(info,logisticsRuleInfos);
-                             logisticsRuleInfos.setRultCode(rultCode);
-                             logisticsRuleInfos.setRultType(logisticsRuleInfoList.getLogisticsRuleType().getRultType());
-                             AuthToken currentAuth = AuthUtil.getCurrentAuth();
-                             logisticsRuleInfos.setUpdateByName(currentAuth.getPersonName());
-                             logisticsRuleDao.updatefareSill(logisticsRuleInfos);
-                         }
+                    List<LogisticsRuleInfo> delecteProductList = new ArrayList<>();
+                    for (LogisticsRuleInfo logisticsRuleInfo : deleteLogisticsRuleInfo) {
+                        logisticsRuleInfo.setRultCode(rultCode);
+                        logisticsRuleInfo.setRultType(logisticsRuleInfoList.getLogisticsRuleType().getRultType());
+                        delecteProductList.add(logisticsRuleInfo);
+                    }
+                    LOGGER.info("组合规则-删除商品信息-实体：{}", delecteProductList);
+                    logisticsRuleDao.deleteProduct(delecteProductList);
+                    //会有删除的同时修改免运费门槛场景
+                    if (logisticsList.size() != 0){
+                        for (LogisticsRuleInfo info :logisticsList ) {
+                            LogisticsRuleInfo logisticsRuleInfos = new LogisticsRuleInfo();
+                            BeanUtils.copyProperties(info,logisticsRuleInfos);
+                            logisticsRuleInfos.setRultCode(rultCode);
+                            logisticsRuleInfos.setRultType(logisticsRuleInfoList.getLogisticsRuleType().getRultType());
+                            AuthToken currentAuth = AuthUtil.getCurrentAuth();
+                            logisticsRuleInfos.setUpdateByName(currentAuth.getPersonName());
+                            logisticsRuleDao.updatefareSill(logisticsRuleInfos);
+                        }
 
-                     }
-                 }else {
-                     LOGGER.info("组合规则-修改商品属性-未处理属性-实体：{}",logisticsList);
+                    }
+                }else {
+                    LOGGER.info("组合规则-修改商品属性-未处理属性-实体：{}",logisticsList);
 //                     List<LogisticsRuleInfo> logisticsInfoList = new ArrayList<>();
-                     for (LogisticsRuleInfo ruleInfo : logisticsList) {
-                         LogisticsRuleInfo logisticsRuleInfo = new LogisticsRuleInfo();
-                         BeanUtils.copyProperties(ruleInfo,logisticsRuleInfo);
-                         logisticsRuleInfo.setRultCode(rultCode);
-                         logisticsRuleInfo.setRultType(logisticsRuleInfoList.getLogisticsRuleType().getRultType());
+                    for (LogisticsRuleInfo ruleInfo : logisticsList) {
+                        LogisticsRuleInfo logisticsRuleInfo = new LogisticsRuleInfo();
+                        BeanUtils.copyProperties(ruleInfo,logisticsRuleInfo);
+                        logisticsRuleInfo.setRultCode(rultCode);
+                        logisticsRuleInfo.setRultType(logisticsRuleInfoList.getLogisticsRuleType().getRultType());
 //                         logisticsInfoList.add(ruleInfo);
-                         AuthToken currentAuth = AuthUtil.getCurrentAuth();
-                         logisticsRuleInfo.setUpdateByName(currentAuth.getPersonName());
-                         LOGGER.info("组合规则-修改商品属性-实体：{}",logisticsRuleInfo);
-                         logisticsRuleDao.updateSingle(logisticsRuleInfo);
-                     }
-                 }
-             }
-             return HttpResponse.success(true);
+                        AuthToken currentAuth = AuthUtil.getCurrentAuth();
+                        logisticsRuleInfo.setUpdateByName(currentAuth.getPersonName());
+                        LOGGER.info("组合规则-修改商品属性-实体：{}",logisticsRuleInfo);
+                        logisticsRuleDao.updateSingle(logisticsRuleInfo);
+                    }
+                }
+            }
+            return HttpResponse.success(true);
 //           }
 //            return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
         }catch (Exception e){
@@ -241,7 +241,7 @@ public class LogisticsRuleServiceImpl implements LogisticsRuleService {
      * @return
      */
     @Override
-    public HttpResponse<ResultModel> selectLogisticsList(LogisticsRuleRequest logisticsRuleRequest) {
+    public HttpResponse<ResultModel<LogisticsAllResponse>> selectLogisticsList(LogisticsRuleRequest logisticsRuleRequest) {
         LOGGER.info("多条件查询列表-方法入参：{}",logisticsRuleRequest);
         Integer PageNo = logisticsRuleRequest.getPageNo();
         Integer PageSize = logisticsRuleRequest.getPageSize();
@@ -267,6 +267,8 @@ public class LogisticsRuleServiceImpl implements LogisticsRuleService {
             return HttpResponse.failure(MessageId.create(Project.ZERO, 01, "查询出现未知异常,请联系系统管理员."));
         }
     }
+
+
 
     /**
      * 新增物流免减规则
@@ -352,6 +354,23 @@ public class LogisticsRuleServiceImpl implements LogisticsRuleService {
             LOGGER.error("新增-物流减免规则-请求：{},{}",logisticsRuleInfoList,e);
             return HttpResponse.failure(MessageId.create(Project.ZERO, 01, "保存出现未知异常,请联系系统管理员."));
         }
+    }
+
+    @Override
+    public HttpResponse<List<LogisticsAllResponse>> selectRuleBuSpuCode(List<String> spuCodes) {
+        LOGGER.info("通过spuList查询规则-方法入参：{}",spuCodes);
+        HttpResponse response=HttpResponse.success();
+        try{
+            LogisticsRuleRequest ruleRequest=new LogisticsRuleRequest();
+            ruleRequest.setSpuCodes(spuCodes);
+            List<LogisticsAllResponse> list = logisticsRuleDao.selectAll(ruleRequest);
+            response.setData(list);
+        }catch (Exception e){
+            LOGGER.error("通过spuList查询规则-请求异常：{},{}",spuCodes,e);
+            return HttpResponse.failure(MessageId.create(Project.ZERO, 01, "查询出现未知异常,请联系系统管理员."));
+        }
+
+        return response;
     }
 }
 

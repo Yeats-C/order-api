@@ -11,6 +11,7 @@ import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import com.aiqin.platform.flows.client.domain.vo.FormCallBackVo;
 import io.swagger.annotations.*;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
@@ -202,8 +203,14 @@ public class ReturnOrderInfoController {
 
     @ApiOperation("新增批发退货信息")
     @PostMapping("/save/wholesale")
-    public HttpResponse saveWholesale(@RequestBody ReturnOrderReqVo reqVo){
+    public HttpResponse saveWholesale(@RequestBody ReturnWholesaleOrderReqVo reqVo){
         return returnOrderInfoService.saveWholesaleReturn(reqVo);
     }
 
+
+    @PostMapping("/select/list")
+    @ApiOperation("多条件查询批发退货列表")
+    public HttpResponse selectList(@RequestBody wholesaleReturnOrderSearchVo whoVo){
+        return returnOrderInfoService.selectAllList(whoVo);
+    }
 }

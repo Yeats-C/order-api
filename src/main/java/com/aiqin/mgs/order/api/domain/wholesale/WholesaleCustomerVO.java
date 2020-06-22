@@ -1,6 +1,5 @@
 package com.aiqin.mgs.order.api.domain.wholesale;
 
-import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -11,11 +10,11 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @author 批发客户信息bean
+ * @author 批发客户信息详情bean
  */
 @Data
-@ApiModel("批发客户信息bean")
-public class WholesaleCustomers extends PagesRequest implements Serializable {
+@ApiModel("批发客户信息详情bean")
+public class WholesaleCustomerVO implements Serializable {
 
     @ApiModelProperty(value = "批发客户编码（唯一标识）")
     @JsonProperty("customer_code")
@@ -132,13 +131,12 @@ public class WholesaleCustomers extends PagesRequest implements Serializable {
     @JsonProperty("delivery_center_list")
     private List<String> deliveryCenterList;
 
-    @ApiModelProperty(value="回显品类name")
-    @JsonProperty("category_tag_list")
-    private String categoryTagList;
+    @ApiModelProperty(value="加盟商平台账户查询响应条目VO")
+    @JsonProperty("merchant_pa_balance_resp_vo")
+    private MerchantPaBalanceRespVO merchantPaBalanceRespVO;
 
-    @ApiModelProperty(value="账户查找参数（前端不使用）")
-    @JsonProperty("parameter")
-    private String parameter;
+
+
 
 
 }
