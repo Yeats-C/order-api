@@ -17,8 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -274,7 +272,7 @@ public class WholesaleCustomersServiceImpl implements WholesaleCustomersService 
     }
 
     @Override
-    public HttpResponse<List<WholesaleCustomers>> getCustomerByNameOrAccount(String parameter) {
+    public HttpResponse<List<WholesaleCustomerVO>> getCustomerByNameOrAccount(String parameter) {
         LOGGER.info("通过名称或者账户查询批发客户 参数 parameter 为{}"+parameter);
         if(null==parameter){
             return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
@@ -283,6 +281,7 @@ public class WholesaleCustomersServiceImpl implements WholesaleCustomersService 
         WholesaleCustomers wholesaleCustomer=new WholesaleCustomers();
         wholesaleCustomer.setParameter(parameter);
         List<WholesaleCustomers> wholesaleCustomers=wholesaleCustomersDao.list(wholesaleCustomer);
+        List<WholesaleCustomerVO> wholesaleCustomerList=new ArrayList<>();
         for(WholesaleCustomers customer:wholesaleCustomers){
             List<WholesaleRule> wholesaleRuleList=wholesaleCustomersDao.getWholesaleRuleList(customer.getCustomerCode());
             //仓库List
@@ -315,10 +314,18 @@ public class WholesaleCustomersServiceImpl implements WholesaleCustomersService 
                 customer.setCategoryList(categoryList);
                 customer.setProductList(productList);
             }
+            WholesaleCustomerVO wholesaleCustomerVO=new WholesaleCustomerVO();
+            BeanUtils.copyProperties(customer,wholesaleCustomerVO);
+
+            //查询批发客户账户余额
+            MerchantPaBalanceRespVO merchantPaBalanceRespVO=(MerchantPaBalanceRespVO)bridgeProductService.accountBalance(customer.getCustomerCode()).getData();
+
+            wholesaleCustomerVO.setMerchantPaBalanceRespVO(merchantPaBalanceRespVO);
+            wholesaleCustomerList.add(wholesaleCustomerVO);
         }
 
 
-        httpResponse.setData(wholesaleCustomers);
+        httpResponse.setData(wholesaleCustomerList);
 
         return httpResponse;
     }
@@ -348,17 +355,7 @@ public class WholesaleCustomersServiceImpl implements WholesaleCustomersService 
 
         //查询批发客户账户余额
         MerchantPaBalanceRespVO merchantPaBalanceRespVO=(MerchantPaBalanceRespVO)bridgeProductService.accountBalance(customerCode).getData();
-        if(null!=merchantPaBalanceRespVO){
-            if(null!=merchantPaBalanceRespVO.getAvailableBalance()&&merchantPaBalanceRespVO.getAvailableBalance().compareTo(BigDecimal.ZERO)>0){
-                merchantPaBalanceRespVO.setAvailableBalance(merchantPaBalanceRespVO.getAvailableBalance().divide(new BigDecimal(100),2, RoundingMode.HALF_UP));
-            }
-            if(null!=merchantPaBalanceRespVO.getFrozenBalance()&&merchantPaBalanceRespVO.getFrozenBalance().compareTo(BigDecimal.ZERO)>0){
-                merchantPaBalanceRespVO.setFrozenBalance(merchantPaBalanceRespVO.getFrozenBalance().divide(new BigDecimal(100),2, RoundingMode.HALF_UP));
-            }
-            if(null!=merchantPaBalanceRespVO.getCreditAmount()&&merchantPaBalanceRespVO.getCreditAmount().compareTo(BigDecimal.ZERO)>0){
-                merchantPaBalanceRespVO.setCreditAmount(merchantPaBalanceRespVO.getCreditAmount().divide(new BigDecimal(100),2, RoundingMode.HALF_UP));
-            }
-        }
+
         wholesaleCustomerVO.setMerchantPaBalanceRespVO(merchantPaBalanceRespVO);
         return response.setData(wholesaleCustomerVO);
     }

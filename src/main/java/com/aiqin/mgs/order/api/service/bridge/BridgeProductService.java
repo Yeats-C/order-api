@@ -43,6 +43,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -729,6 +730,19 @@ public class BridgeProductService<main> {
         });
         if (!httpResponse.getCode().equals(MessageId.SUCCESS_CODE)) {
             return HttpResponse.failure(ResultCode.SELECT_FRANCHISEE_ACCOUNT_FAILED);
+        }
+
+        MerchantPaBalanceRespVO merchantPaBalanceRespVO=(MerchantPaBalanceRespVO)httpResponse.getData();
+        if(null!=merchantPaBalanceRespVO){
+            if(null!=merchantPaBalanceRespVO.getAvailableBalance()&&merchantPaBalanceRespVO.getAvailableBalance().compareTo(BigDecimal.ZERO)>0){
+                merchantPaBalanceRespVO.setAvailableBalance(merchantPaBalanceRespVO.getAvailableBalance().divide(new BigDecimal(100),2, RoundingMode.HALF_UP));
+            }
+            if(null!=merchantPaBalanceRespVO.getFrozenBalance()&&merchantPaBalanceRespVO.getFrozenBalance().compareTo(BigDecimal.ZERO)>0){
+                merchantPaBalanceRespVO.setFrozenBalance(merchantPaBalanceRespVO.getFrozenBalance().divide(new BigDecimal(100),2, RoundingMode.HALF_UP));
+            }
+            if(null!=merchantPaBalanceRespVO.getCreditAmount()&&merchantPaBalanceRespVO.getCreditAmount().compareTo(BigDecimal.ZERO)>0){
+                merchantPaBalanceRespVO.setCreditAmount(merchantPaBalanceRespVO.getCreditAmount().divide(new BigDecimal(100),2, RoundingMode.HALF_UP));
+            }
         }
         return httpResponse;
     }
