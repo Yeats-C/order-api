@@ -2281,11 +2281,23 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setDistrictName(wholesaleCustomers.getDistrictName());
 
         //收货地址
-        order.setReceiveAddress(wholesaleCustomers.getStreetAddress());
+        if(StringUtils.isNotBlank(erpOrderSaveRequest.getReceiveAddress())){
+            order.setReceiveAddress(erpOrderSaveRequest.getReceiveAddress());
+        }else{
+            order.setReceiveAddress(wholesaleCustomers.getStreetAddress());
+        }
         //收货人
-        order.setReceivePerson(wholesaleCustomers.getCustomerName());
+        if(StringUtils.isNotBlank(erpOrderSaveRequest.getReceivePerson())){
+            order.setReceivePerson(erpOrderSaveRequest.getReceivePerson());
+        }else{
+            order.setReceivePerson(wholesaleCustomers.getCustomerName());
+        }
         //收货人电话
-        order.setReceiveMobile(wholesaleCustomers.getPhoneNumber());
+        if(StringUtils.isNotBlank(erpOrderSaveRequest.getReceiveMobile())){
+            order.setReceiveMobile(erpOrderSaveRequest.getReceiveMobile());
+        }else{
+            order.setReceiveMobile(wholesaleCustomers.getPhoneNumber());
+        }
         //商品总价
         order.setTotalProductAmount(moneyTotal);
         //实际商品总价

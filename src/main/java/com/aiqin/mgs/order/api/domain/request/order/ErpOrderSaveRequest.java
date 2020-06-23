@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**
@@ -56,5 +55,17 @@ public class ErpOrderSaveRequest {
     @ApiModelProperty(value = "配送方式名称")
     @JsonProperty("distribution_mode_name")
     private String distributionModeName;
+
+    @ApiModelProperty(value = "收货地址")
+    @JsonProperty("receive_address")
+    private String receiveAddress;
+
+    @ApiModelProperty(value = "收货人")
+    @JsonProperty("receive_person")
+    private String receivePerson;
+
+    @ApiModelProperty(value = "收货人电话")
+    @JsonProperty("receive_mobile")
+    private String receiveMobile;
 
 }
