@@ -723,6 +723,12 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 }
                 store.setProvinceId(wholesaleCustomers.getProvinceId());
                 store.setCityId(wholesaleCustomers.getCityId());
+                //收货地址
+                store.setAddress(wholesaleCustomers.getStreetAddress());
+                //收货人
+                store.setContacts(wholesaleCustomers.getCustomerName());
+                //收货人电话
+                store.setContactsPhone(wholesaleCustomers.getPhoneNumber());
             }
         }
         //查询A品卷使用规则code Map
