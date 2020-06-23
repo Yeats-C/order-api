@@ -42,7 +42,7 @@ public interface WholesaleCustomersService {
      * @param parameter
      * @return
      */
-    HttpResponse<List<WholesaleCustomers>> getCustomerByNameOrAccount(String parameter);
+    HttpResponse<List<WholesaleCustomerVO>> getCustomerByNameOrAccount(String parameter);
 
     /**
      * 校验账户是否存在

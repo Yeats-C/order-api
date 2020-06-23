@@ -458,4 +458,47 @@ public class ErpOrderInfo {
     public String getOrderLevelDesc() {
         return ErpOrderLevelEnum.getEnumDesc(orderLevel);
     }
+
+
+    /**************************************供应链新需求字段开始**************************************/
+    @ApiModelProperty("业务形式(熙云:批发业务  爱亲母婴:门店业务,批发业务,天猫业务,优选业务  爱亲科技:门店业务,批发业务  小红马:线上业务,线下业务  萌贝树: 门店业务)")
+    @JsonProperty("business_form")
+    private String businessForm;
+
+    @ApiModelProperty("平台(0:爱亲(新系统) 1:DL)")
+    @JsonProperty("platform_type")
+    private String platformType;
+
+    @ApiModelProperty("订单产品类型 0.B2B 1.B2C")
+    @JsonProperty("order_product_type")
+    private String orderProductType;
+
+    @ApiModelProperty("合伙人编码")
+    @JsonProperty("partner_code")
+    private String partnerCode;
+
+    @ApiModelProperty("合伙人名称")
+    @JsonProperty("partner_name")
+    private String partnerName;
+
+    @ApiModelProperty("收货人手机号")
+    @JsonProperty("consignee_phone")
+    private String consigneePhone;
+
+    @ApiModelProperty(value = "服纺券优惠金额")
+    @JsonProperty("suit_coupon_money")
+    private BigDecimal suitCouponMoney;
+
+    @ApiModelProperty(value = "A品券优惠金额")
+    @JsonProperty("top_coupon_money")
+    private BigDecimal topCouponMoney;
+
+    @ApiModelProperty(value = "渠道订单金额")
+    @JsonProperty("channel_order_amount")
+    private BigDecimal channelOrderAmount;
+
+    @ApiModelProperty(value = "商品渠道总金额")
+    @JsonProperty("product_channel_total_amount")
+    private BigDecimal productChannelTotalAmount;
+    /**************************************供应链新需求字段结束**************************************/
 }

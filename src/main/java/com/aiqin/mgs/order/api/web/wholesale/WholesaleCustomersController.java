@@ -65,7 +65,7 @@ public class WholesaleCustomersController {
      */
     @GetMapping("/getCustomerByNameOrAccount")
     @ApiOperation(value = "通过名称或者账户查询批发客户")
-    public HttpResponse<List<WholesaleCustomers>> getCustomerByNameOrAccount(String parameter){
+    public HttpResponse<List<WholesaleCustomerVO>> getCustomerByNameOrAccount(String parameter){
         return wholesaleCustomersService.getCustomerByNameOrAccount(parameter);
     }
 
