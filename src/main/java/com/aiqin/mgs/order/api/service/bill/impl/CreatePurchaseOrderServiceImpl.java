@@ -266,15 +266,16 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
                 ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(orderInfo.getOrderStoreId());
 
                 //耘链销售单需求字段
-                StringBuffer buffer=new StringBuffer(orderInfo.getCompanyName());
-                buffer.append(":");
                 if(ErpOrderCategoryEnum.ORDER_TYPE_51.getCode().equals(orderInfo.getOrderCategoryCode())){
-                    buffer.append("批发业务");
+                    //批发业务
+                    //业务形式
+                    orderInfo.setBusinessForm(1);
                 }else{
-                    buffer.append("门店业务");
+                    //门店业务
+                    //业务形式
+                    orderInfo.setBusinessForm(0);
                 }
-                //业务形式
-                orderInfo.setBusinessForm(buffer.toString());
+
                 //平台(0:爱亲(新系统) 1:DL)
                 orderInfo.setPlatformType("0");
                 //订单产品类型 0.B2B 1.B2C
