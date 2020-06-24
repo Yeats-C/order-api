@@ -2035,6 +2035,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
 //                    item.setPrice(skuDetail.getPriceTax());
                     item.setTagInfoList(skuDetail.getTagInfoList());
                     item.setStockNum(skuDetail.getStockNum());
+                    item.setIsSale(skuDetail.getIsSale());
                 } else {
                     throw new BusinessException("商品" + item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode() + "detail2接口查詢失敗");
                 }
