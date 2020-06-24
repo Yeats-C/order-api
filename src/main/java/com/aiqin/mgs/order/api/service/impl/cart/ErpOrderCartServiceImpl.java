@@ -776,6 +776,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 throw new BusinessException("未获取到商品" + item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode() + "信息");
             }
             item.setStockNum(skuDetail.getStockNum());
+            item.setIsSale(skuDetail.getIsSale());
             if (item.getAmount() > skuDetail.getStockNum()) {
                 throw new BusinessException("商品" + skuDetail.getSkuName() + "库存不足");
             }
