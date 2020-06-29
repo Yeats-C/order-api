@@ -182,7 +182,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     public boolean applyToCancelOrderRequest(String orderCode, AuthToken auth) {
         boolean flag = false;
         try {
-            HttpClient httpClient = HttpClient.get(urlProperties.getScmpApi() + "/order/cancel")
+                HttpClient httpClient = HttpClient.get(urlProperties.getScmpApi() + "/order/cancel")
                     .addParameter("operator_id", auth.getPersonId())
                     .addParameter("operator_name", auth.getPersonName())
                     .addParameter("order_code", orderCode);
@@ -563,13 +563,15 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             if (!RequestReturnUtil.validateHttpResponse(response)) {
                 log.info("解锁库存（根据明细解锁）--调用供应链解锁接口,返回结果--解锁异常");
                 throw new BusinessException(response.getMessage());
-            }
-            log.info("清除本地锁库存记录,入参skuCodes={}",skuCodes);
-            if(skuCodes!=null&&skuCodes.size()>0){
-                for(String skuCode:skuCodes){
-                    erpStoreLockDetailsService.deleteBySkuCode(order.getOrderStoreCode(),skuCode);
+            }else{
+                log.info("清除本地锁库存记录,入参skuCodes={}",skuCodes);
+                if(skuCodes!=null&&skuCodes.size()>0){
+                    for(String skuCode:skuCodes){
+                        erpStoreLockDetailsService.deleteBySkuCode(order.getOrderStoreCode(),skuCode);
+                    }
                 }
             }
+
 
         } catch (BusinessException e) {
             flag = false;
