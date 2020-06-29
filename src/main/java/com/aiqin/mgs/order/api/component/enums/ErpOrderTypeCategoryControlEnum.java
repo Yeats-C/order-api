@@ -34,6 +34,8 @@ public enum ErpOrderTypeCategoryControlEnum {
     PROCESS_8(ErpOrderTypeEnum.ASSIST_PURCHASING, ErpOrderCategoryEnum.ORDER_TYPE_172, true, false, true, true, false, false, false, false),
     /***配送	- 批发订货*/
     PROCESS_9(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_51, false, false, false, false, false, false, true, true),
+     /***辅采直送	- 采购直送*/
+    PROCESS_10(ErpOrderTypeEnum.DIRECT_PURCHASE, ErpOrderCategoryEnum.ORDER_TYPE_147, true, false, true, true, false, false, false, false),
     ;
 
     ErpOrderTypeCategoryControlEnum(ErpOrderTypeEnum orderTypeEnum, ErpOrderCategoryEnum orderCategoryEnum, boolean erpQuery, boolean erpCartCreate, boolean erpRackQuery, boolean erpRackCreate, boolean storeQuery, boolean storeCartCreate,boolean erpWholesaleQuery,boolean erpWholesaleCreate) {

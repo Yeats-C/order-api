@@ -25,7 +25,9 @@ public enum ErpOrderCategoryEnum {
     /***游泳游乐*/
     ORDER_TYPE_172(172, "172", "游泳游乐",false),
     /***批发普通订单*/
-    ORDER_TYPE_51(51, "51", "批发普通订单",false);
+    ORDER_TYPE_51(51, "51", "批发普通订单",false),
+    /***采购直送*/
+    ORDER_TYPE_147(147, "147", "采购直送",false);
 
     /***数字编码*/
     private Integer code;
