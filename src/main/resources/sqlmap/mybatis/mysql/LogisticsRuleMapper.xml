@@ -119,8 +119,6 @@
          sales_standard as salesStandard,
          spu_code as spuCode,
          spu_name as spuName
-         from logistics_relief_product group by rult_type HAVING rult_type in (2,3)
-         sales_standard as salesStandard
          from logistics_relief_product group by rult_code,rult_type HAVING rult_type in (2,3)
          union all
          select
