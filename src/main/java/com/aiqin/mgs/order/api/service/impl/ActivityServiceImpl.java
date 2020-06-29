@@ -668,10 +668,14 @@ public class ActivityServiceImpl implements ActivityService {
             //保存活动主表信息start
             act.setUpdateTime(new Date());
             act.setActivityId(activity.getActivityId());
+            Activity activity1=(Activity) getActivityInformation(activity.getActivityId()).getData();
             if(null!=activity.getActivityStatus() && activity.getActivityStatus()==1){
                 act.setActivityStatus(1);
             }else if(null!=activity.getActivityStatus() && activity.getActivityStatus()==2){
                 act.setActivityStatus(0);
+                if(DateUtil.formatDate(activity1.getBeginTime()).after(new Date())){
+                    act.setBeginTime(DateUtil.sysDate());
+                }
             }
             int activityRecord = activityDao.updateActivity(act);
             if (activityRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
