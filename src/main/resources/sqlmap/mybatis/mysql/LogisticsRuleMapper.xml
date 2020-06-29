@@ -120,6 +120,8 @@
          spu_code as spuCode,
          spu_name as spuName
          from logistics_relief_product group by rult_type HAVING rult_type in (2,3)
+         sales_standard as salesStandard
+         from logistics_relief_product group by rult_code,rult_type HAVING rult_type in (2,3)
          union all
          select
          rult_code as rultCode, rult_type as rultType, product_code as productCode, product_name as productName , brand, category, fare_sill as fareSill, types, effective_status as effectiveStatus, update_time as updateTime,
