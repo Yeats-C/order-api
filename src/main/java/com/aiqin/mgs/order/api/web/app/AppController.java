@@ -54,7 +54,7 @@ public class AppController {
 
     @PostMapping("/verson/list")
     @ApiOperation("版本列表")
-    public HttpResponse<PageResData<AppVersionInfo>> appList( @RequestBody @RequestParam  PagesRequest pagesRequest) {
+    public HttpResponse<PageResData<AppVersionInfo>> appList( @RequestBody  PagesRequest pagesRequest) {
         return appService.appList(pagesRequest);
     }
 
