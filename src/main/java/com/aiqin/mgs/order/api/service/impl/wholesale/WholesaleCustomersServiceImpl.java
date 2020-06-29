@@ -116,7 +116,6 @@ public class WholesaleCustomersServiceImpl implements WholesaleCustomersService 
 
         //创建主控账户
         HttpResponse<JoinMerchant> response = addFranchisee(wholesaleCustomers,auth);
-        wholesaleCustomers.setCustomerAccount(response.getData().getUserName());
 
         //将批发客户信息推送到结算
         accountRegister(wholesaleCustomers);

@@ -19,7 +19,9 @@ public enum ErpOrderTypeEnum {
     /***配送*/
     DISTRIBUTION(2, "2", "配送", ErpRequestPayOriginTypeEnum.TYPE_7, ErpRequestPayOrderTypeEnum.TYPE_14),
     /***辅采直送*/
-    ASSIST_PURCHASING(3, "3", "辅采直送", ErpRequestPayOriginTypeEnum.TYPE_7, ErpRequestPayOrderTypeEnum.TYPE_14);
+    ASSIST_PURCHASING(3, "3", "辅采直送", ErpRequestPayOriginTypeEnum.TYPE_7, ErpRequestPayOrderTypeEnum.TYPE_14),
+    /***采购直送*/
+    DIRECT_PURCHASE(4, "4", "采购直送", ErpRequestPayOriginTypeEnum.TYPE_7, ErpRequestPayOrderTypeEnum.TYPE_14);
 
     private Integer code;
     private String value;
