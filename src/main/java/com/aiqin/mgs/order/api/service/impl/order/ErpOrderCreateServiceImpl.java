@@ -1454,7 +1454,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             //单个商品包装体积(mm³)
             orderItem.setBoxVolume(productInfo.getBoxVolume());
             orderItem.setIsActivity(YesOrNoEnum.NO.getCode());
-
+            orderItem.setActivityDiscountAmount(BigDecimal.ZERO);
             orderItemList.add(orderItem);
         }
 
@@ -1518,6 +1518,19 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         erpOrderItemService.saveOrderItemList(orderItemList, auth);
 
         ErpOrderInfo order = new ErpOrderInfo();
+        ErpOrderFee orderFee = new ErpOrderFee();
+
+        Boolean flag1=false;
+        Boolean flag2=false;
+        //首单赠送--加入了市值赠送金额判断
+        if(ErpOrderTypeEnum.DIRECT_PURCHASE.getCode().equals(erpOrderSaveRequest.getOrderType())&&ErpOrderCategoryEnum.ORDER_TYPE_4.getCode().equals(erpOrderSaveRequest.getOrderCategory())){
+            Map<ErpOrderFee,Boolean> res=firstGivePrice(erpOrderSaveRequest.getApplier(),erpOrderSaveRequest.getDeptCode(),orderCode,storeInfo,orderItemList, erpOrderSaveRequest.getTopCouponCodeList());
+            for(Map.Entry<ErpOrderFee,Boolean> r:res.entrySet()){
+                orderFee = r.getKey();
+                flag1=r.getValue();
+            }
+            flag2=true;
+        }
         //业务id
         order.setOrderStoreId(orderId);
         //订单编码
@@ -1538,10 +1551,17 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         order.setCustomerCode(storeInfo.getStoreCode());
         //客户名称
         order.setCustomerName(storeInfo.getStoreName());
-        //订单状态
-        order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
-        //订单节点流程状态
-        order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_1.getCode());
+        if(flag1){
+            //订单状态
+            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_7.getCode());
+            //订单流程节点状态
+            order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_1.getCode());
+        }else {
+            //订单状态
+            order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_1.getCode());
+            //订单流程节点状态
+            order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_1.getCode());
+        }
         //是否锁定(0是1否）
         order.setOrderLock(StatusEnum.NO.getCode());
         //是否是异常订单(0是1否)
@@ -1615,7 +1635,12 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //生成冲减单状态
         order.setScourSheetStatus(ErpOrderScourSheetStatusEnum.NOT_NEED.getCode());
         order.setIsActivity(YesOrNoEnum.NO.getCode());
-
+        //是否为首单市值赠送订单 0:不是 1:是
+        if(flag1){
+            order.setFirstMarketValueGift(1);
+        }else {
+            order.setFirstMarketValueGift(0);
+        }
         //销售单增加合伙人公司字段
         CopartnerAreaUp copartnerAreaUp=copartnerAreaDao.getCopartnerAreaById(storeInfo.getStoreId());
         if(null!=copartnerAreaUp){
@@ -1624,26 +1649,28 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         }
         erpOrderInfoService.saveOrder(order, auth);
 
-        //保存订单费用信息
-        ErpOrderFee orderFee = new ErpOrderFee();
         //费用id
         orderFee.setFeeId(feeId);
         //订单id
         orderFee.setOrderId(orderId);
-        //支付单id
-        orderFee.setPayId(null);
         //支付状态
         orderFee.setPayStatus(payStatusEnum.getCode());
-        //订单总额
-        orderFee.setTotalMoney(moneyTotal);
-        //活动优惠金额
-        orderFee.setActivityMoney(BigDecimal.ZERO);
-        //服纺券优惠金额
-        orderFee.setSuitCouponMoney(BigDecimal.ZERO);
-        //A品券优惠金额
-        orderFee.setTopCouponMoney(BigDecimal.ZERO);
-        //实付金额
-        orderFee.setPayMoney(orderFee.getTotalMoney().subtract(orderFee.getActivityMoney()).subtract(orderFee.getSuitCouponMoney()).subtract(orderFee.getTopCouponMoney()));
+        //保存订单费用信息 如果非首单，再生成费用信息
+        if(!flag2){
+            //支付单id
+            orderFee.setPayId(null);
+            //订单总额
+            orderFee.setTotalMoney(moneyTotal);
+            //活动优惠金额
+            orderFee.setActivityMoney(BigDecimal.ZERO);
+            //服纺券优惠金额
+            orderFee.setSuitCouponMoney(BigDecimal.ZERO);
+            //A品券优惠金额
+            orderFee.setTopCouponMoney(BigDecimal.ZERO);
+            //实付金额
+            orderFee.setPayMoney(orderFee.getTotalMoney().subtract(orderFee.getActivityMoney()).subtract(orderFee.getSuitCouponMoney()).subtract(orderFee.getTopCouponMoney()));
+        }
+
         erpOrderFeeService.saveOrderFee(orderFee, auth);
 
         return orderCode;
