@@ -108,6 +108,13 @@ public class OrderAfterSaleQuery extends PagesRequest {
 	@ApiModelProperty(value="分销机构编码")
 	@JsonProperty("distributor_code")
 	private String distributorCode="";
+	/**
+	 * 渠道来源
+	 */
+	@JsonProperty("origin_type")
+	@ApiModelProperty("来源类型，0:pos 1：微商城  2：全部  3：web")
+	private Integer originType;
+
 }
 
 
