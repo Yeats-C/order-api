@@ -169,6 +169,13 @@ public class OrderQuery extends PagesRequest {
 	@ApiModelProperty(value="最后更新时间")
 	@JsonProperty("update_time")
 	private Date updateTime;
+	/**
+	 * 渠道来源
+	 */
+	@JsonProperty("origin_type")
+	@ApiModelProperty("来源类型，0:pos 1：微商城  2：全部  3：web")
+	private Integer originType;
+
 
 }
 
