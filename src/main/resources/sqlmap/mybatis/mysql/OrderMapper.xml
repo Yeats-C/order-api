@@ -305,7 +305,7 @@
         <if test="receiveCode!=null and receiveCode!='' ">
             and a.receive_code =#{receiveCode}
         </if>
-        <if test="originType!=null and originType!='' ">
+        <if test="originType!=null  ">
             and a.origin_type =#{originType}
         </if>
         <if test="payType!=null and payType!='' ">
@@ -364,7 +364,7 @@
         <if test="orderStatus!=null ">
             and a.order_status = #{orderStatus}
         </if>
-        <if test="originType!=null and originType!='' ">
+        <if test="originType!=null ">
             and a.origin_type =#{originType}
         </if>
         <if test="orderStatusList != null">
