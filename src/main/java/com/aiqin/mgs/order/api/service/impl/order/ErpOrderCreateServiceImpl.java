@@ -66,6 +66,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 
+import static java.math.BigDecimal.ROUND_HALF_DOWN;
+
 /**
  * 创建订单service
  *
@@ -1698,6 +1700,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         Double marketValue = storeInfo.getMarketValue();
         //赠送市值余额
         Double marketValueBalance = storeInfo.getMarketValueBalance();
+        if(null==marketValueBalance){
+            marketValueBalance=0.00;
+        }
         //赠送费用
         Double freeCost = storeInfo.getFreeCost();
         //赠送费用余额
@@ -1786,7 +1791,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             for(int i=0;i<itemList.size();i++){
                 ErpOrderItem item=itemList.get(i);
                 BigDecimal productAmount = item.getProductAmount();
-                BigDecimal totalPreferentialAmount=productAmount.divide(totalMoneyTotal).multiply(shiFuAmount);
+                BigDecimal totalPreferentialAmount=productAmount.divide(totalMoneyTotal,10,ROUND_HALF_DOWN).multiply(shiFuAmount);
                 fenTanAmount=fenTanAmount.add(totalPreferentialAmount);
                 item.setTotalPreferentialAmount(totalPreferentialAmount);
                 if(i==itemList.size()){
