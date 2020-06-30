@@ -33,6 +33,8 @@ public enum ErpOrderNodeProcessTypeEnum {
     PROCESS_9(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_51, ErpRequestPayTransactionTypeEnum.DIRECT_DELIVERY_REPLENISHMENT, true, false, false, false, false, false, false, false, true, false, false, false),
     /***采购直送	- 采购直送*/
     PROCESS_10(ErpOrderTypeEnum.DIRECT_PURCHASE, ErpOrderCategoryEnum.ORDER_TYPE_147, ErpRequestPayTransactionTypeEnum.DIRECT_DELIVERY_REPLENISHMENT, true, false, false, false, false, false, false, false, true, false, false, false),
+    /***采购直送	- 首单赠送*/
+    PROCESS_11(ErpOrderTypeEnum.DIRECT_PURCHASE, ErpOrderCategoryEnum.ORDER_TYPE_4, ErpRequestPayTransactionTypeEnum.DIRECT_DELIVERY_REPLENISHMENT, true, false, false, false, false, false, false, false, true, false, false, false),
     ;
 
     ErpOrderNodeProcessTypeEnum(ErpOrderTypeEnum orderTypeEnum, ErpOrderCategoryEnum orderCategoryEnum, ErpRequestPayTransactionTypeEnum payTransactionTypeEnum, boolean areaCheck, boolean repertoryCheck, boolean priceCheck, boolean activityCheck, boolean hasActivity, boolean hasCoupon, boolean addProductGift, boolean hasLogisticsFee, boolean autoPay, boolean lockStock, boolean hasGoodsCoupon, boolean splitByRepertory) {
