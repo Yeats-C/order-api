@@ -1530,6 +1530,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 flag1=r.getValue();
             }
             flag2=true;
+        }else if(ErpOrderTypeEnum.DIRECT_PURCHASE.getCode().equals(erpOrderSaveRequest.getOrderType())&&ErpOrderCategoryEnum.ORDER_TYPE_147.getCode().equals(erpOrderSaveRequest.getOrderCategory())){
+            //计算A品券分摊金额
+            orderFee = shareTopCouponPrice(orderItemList, erpOrderSaveRequest.getTopCouponCodeList());
         }
         //业务id
         order.setOrderStoreId(orderId);
@@ -1647,6 +1650,12 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             order.setCopartnerAreaId(copartnerAreaUp.getCopartnerAreaId());
             order.setCopartnerAreaName(copartnerAreaUp.getCopartnerAreaName());
         }
+
+        //配送方式编码
+        order.setDistributionModeCode(erpOrderSaveRequest.getDistributionModeCode());
+        //配送方式名称
+        order.setDistributionModeName(erpOrderSaveRequest.getDistributionModeName());
+
         erpOrderInfoService.saveOrder(order, auth);
 
         //费用id

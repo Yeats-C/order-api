@@ -5,17 +5,18 @@ import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
+import com.aiqin.mgs.order.api.domain.request.product.ProductSkuRequest2;
+import com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetail;
+import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.util.ExcelUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
@@ -29,6 +30,9 @@ import java.util.Map;
 @RequestMapping("/erpOrderExcelUtilController")
 @Api(tags = "ERP订单Excel工具类")
 public class ErpOrderExcelUtilController {
+
+    @Resource
+    private BridgeProductService bridgeProductService;
 
     @GetMapping("/downloadRackOrderProductTempExcel")
     @ApiOperation(value = "下载货架订单商品模板")
@@ -46,24 +50,32 @@ public class ErpOrderExcelUtilController {
 
     @PostMapping("/transformRackOrderProductExcel")
     @ApiOperation(value = "解析货架订单商品模板数据")
-    public HttpResponse transformRackOrderProductExcel(MultipartFile file) {
+    public HttpResponse transformRackOrderProductExcel(@RequestParam("file") MultipartFile file,
+                                                       @RequestParam("provinceId") String provinceId,
+                                                       @RequestParam("cityId") String cityId
+    ) {
         HttpResponse httpResponse = HttpResponse.success();
         try {
             List<String[]> excelData = ExcelUtil.getExcelDataList(file);
-            List<Map<String, String>> resultList = new ArrayList<>();
+            Map<String, String> map = new LinkedHashMap<>(16);
+            List<ProductSkuRequest2> productSkuRequest2List=new ArrayList<>();
             for (String[] item :
                     excelData) {
-                Map<String, String> map = new LinkedHashMap<>(16);
-                map.put("spu_code", item[0]);
-                map.put("spu_name", item[1]);
-                map.put("sku_code", item[2]);
-                map.put("sku_name", item[3]);
-                map.put("tax_price", item[4]);
-                map.put("price", item[5]);
-                map.put("quantity", item[6]);
-                resultList.add(map);
+
+                map.put(item[2], item[6]);
+                ProductSkuRequest2 request2=new ProductSkuRequest2();
+                request2.setSkuCode(item[2]);
+                request2.setWarehouseTypeCode("1");
+                productSkuRequest2List.add(request2);
             }
-            httpResponse.setData(resultList);
+            List<ErpSkuDetail> details=bridgeProductService.getProductSkuDetailList(provinceId,cityId,"14",productSkuRequest2List);
+            for(ErpSkuDetail detail:details){
+                if(map.containsKey(detail.getSkuCode())){
+                    detail.setQuantity(Integer.valueOf(map.get(detail.getSkuCode())));
+                }
+            }
+
+            httpResponse.setData(details);
         } catch (BusinessException e) {
             httpResponse = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {

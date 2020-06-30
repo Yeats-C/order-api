@@ -124,5 +124,7 @@ public class ErpSkuDetail {
     @JsonProperty(value = "batch_list")
     private List<BatchRespVo> batchList;
 
-
+    @ApiModelProperty(value = "导入数量(货架商品导入时使用)")
+    @JsonProperty("quantity")
+    private Integer quantity;
 }
