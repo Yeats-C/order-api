@@ -317,6 +317,22 @@ public class ErpOrderItem extends PagesRequest {
     @JsonProperty("activity_type")
     private Integer activityType;
 
+    @ApiModelProperty(value = "仓库编码")
+    @JsonProperty("transport_center_code")
+    private String transportCenterCode;
+
+    @ApiModelProperty(value = "仓库名称")
+    @JsonProperty("transport_center_name")
+    private String transportCenterName;
+
+    @ApiModelProperty(value = "库房编码")
+    @JsonProperty("warehouse_code")
+    private String warehouseCode;
+
+    @ApiModelProperty(value = "库房名称")
+    @JsonProperty("warehouse_name")
+    private String warehouseName;
+
 
     public String getProductTypeDesc() {
         return ErpProductGiftEnum.getEnumDesc(productType);

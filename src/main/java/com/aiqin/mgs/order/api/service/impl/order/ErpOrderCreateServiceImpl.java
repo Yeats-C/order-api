@@ -893,6 +893,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             order.setCopartnerAreaId(copartnerAreaUp.getCopartnerAreaId());
             order.setCopartnerAreaName(copartnerAreaUp.getCopartnerAreaName());
         }
+        //业务形式 0  门店
+        order.setBusinessForm(0);
         log.info("构建订单信息--封装结果,order={}",order);
         return order;
     }
@@ -1658,6 +1660,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //配送方式名称
         order.setDistributionModeName(erpOrderSaveRequest.getDistributionModeName());
 
+        //业务形式 0  门店
+        order.setBusinessForm(0);
+
         erpOrderInfoService.saveOrder(order, auth);
 
         //费用id
@@ -2398,6 +2403,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             order.setCopartnerAreaId(copartnerAreaList.get(0).getCopartnerAreaId());
             order.setCopartnerAreaName(copartnerAreaList.get(0).getCopartnerAreaName());
         }
+        //业务形式 1 批发
+        order.setBusinessForm(1);
         erpOrderInfoService.saveOrder(order, auth);
 
         //保存订单费用信息
