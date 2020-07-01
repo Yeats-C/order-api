@@ -31,7 +31,6 @@ import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import com.aiqin.mgs.order.api.util.CopyBeanUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
-import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -358,6 +357,13 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                         newOrderItem.setOrderStoreCode(newOrderCode);
                         newOrderItem.setOrderInfoDetailId(OrderPublic.getUUID());
                         newOrderItem.setLineCode(lineCode++);
+
+                        //新拆出来的明细增加仓库信息
+                        newOrderItem.setTransportCenterCode(repertoryDetail.getTransportCenterCode());
+                        newOrderItem.setTransportCenterName(repertoryDetail.getTransportCenterName());
+                        newOrderItem.setWarehouseCode(repertoryDetail.getWarehouseCode());
+                        newOrderItem.setWarehouseName(repertoryDetail.getWarehouseName());
+
                         splitItemList.add(newOrderItem);
 
                         //商品总价
@@ -385,6 +391,22 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 }
 
                 order.setSplitStatus(StatusEnum.YES.getCode());
+            }else{
+                for (Map.Entry<String, List<ErpOrderItem>> entry :
+                        repertorySplitMap.entrySet()) {
+                    for (ErpOrderItem item :
+                            entry.getValue()) {
+
+                        //新拆出来的明细增加仓库信息
+                        String repertoryKey = entry.getKey();
+                        ErpOrderItemSplitGroupResponse repertoryDetail = repertoryDetailMap.get(repertoryKey);
+                        item.setTransportCenterCode(repertoryDetail.getTransportCenterCode());
+                        item.setTransportCenterName(repertoryDetail.getTransportCenterName());
+                        item.setWarehouseCode(repertoryDetail.getWarehouseCode());
+                        item.setWarehouseName(repertoryDetail.getWarehouseName());
+                    }
+                    erpOrderItemService.updateOrderItemList(entry.getValue(),auth);
+                }
             }
 
             if (splitOrderList.size() > 0) {
@@ -490,6 +512,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                         newOrderItem.setOrderStoreCode(newOrderCode);
                         newOrderItem.setOrderInfoDetailId(OrderPublic.getUUID());
                         newOrderItem.setLineCode(lineCode++);
+
                         splitItemList.add(newOrderItem);
 
                         //TODO 如果后续增加了活动和优惠券，就需要考虑这样计算精不精确
