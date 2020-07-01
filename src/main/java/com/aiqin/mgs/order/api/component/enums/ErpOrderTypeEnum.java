@@ -15,9 +15,9 @@ import lombok.Getter;
 public enum ErpOrderTypeEnum {
 
     /***直送*/
-    DIRECT_SEND(1, "1", "直送", ErpRequestPayOriginTypeEnum.TYPE_11, ErpRequestPayOrderTypeEnum.TYPE_2),
+    DIRECT_SEND(2, "2", "直送", ErpRequestPayOriginTypeEnum.TYPE_11, ErpRequestPayOrderTypeEnum.TYPE_2),
     /***配送*/
-    DISTRIBUTION(2, "2", "配送", ErpRequestPayOriginTypeEnum.TYPE_7, ErpRequestPayOrderTypeEnum.TYPE_14),
+    DISTRIBUTION(1, "1", "配送", ErpRequestPayOriginTypeEnum.TYPE_7, ErpRequestPayOrderTypeEnum.TYPE_14),
     /***货架直送*/
     ASSIST_PURCHASING(3, "3", "货架直送", ErpRequestPayOriginTypeEnum.TYPE_7, ErpRequestPayOrderTypeEnum.TYPE_14),
     /***采购直送*/
