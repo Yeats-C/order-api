@@ -8,8 +8,10 @@ import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.util.CollectionUtils;
 
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author 刘
@@ -88,25 +90,5 @@ public class BeanCopyUtils {
         return list;
     }
 
-    public static <T> T copyValueWithoutNull(T source, T target){
-        assert Objects.nonNull(source)||Objects.nonNull(target);
-        Class<?> aClass = target.getClass();
-        Field[] declaredFields = aClass.getDeclaredFields();
-        for (Field declaredField : declaredFields) {
-            try {
-                Field sourceField = source.getClass().getDeclaredField(declaredField.getName());
-                Field targetField = target.getClass().getDeclaredField(declaredField.getName());
-                sourceField.setAccessible(true);
-                targetField.setAccessible(true);
-                Object o = sourceField.get(source);
-                if(Objects.nonNull(o)){
-                    targetField.set(target,o);
-                }
-            } catch (Exception e) {
-                log.error("设置非空转换错误",e);
-            }
-        }
-        return target;
-    }
 }
 

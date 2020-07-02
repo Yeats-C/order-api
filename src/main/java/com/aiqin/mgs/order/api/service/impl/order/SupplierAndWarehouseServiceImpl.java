@@ -37,8 +37,8 @@ public class SupplierAndWarehouseServiceImpl implements SupplierAndWarehouseServ
         log.info("调用供应链系统,查询供应商信息返回结果，result={}", JsonUtil.toJson(httpResponse));
         if (httpResponse.getCode().equals(MessageId.SUCCESS_CODE)) {
 //            proList = JSONArray.parseArray(JSON.toJSONString(res.get("data")), ProvinceAreaResponse.class);
-            log.info("调用供应链系统,查询供应商信息失败");
-            return HttpResponse.success();
+            log.info("调用供应链系统,查询供应商信息成功");
+            return httpResponse;
         } else {
             log.info("调用供应链系统,查询供应商信息失败");
             return HttpResponse.success();
@@ -57,8 +57,8 @@ public class SupplierAndWarehouseServiceImpl implements SupplierAndWarehouseServ
         log.info("调用供应链系统,查询供应商信息返回结果，result={}", JsonUtil.toJson(httpResponse));
         if (httpResponse.getCode().equals(MessageId.SUCCESS_CODE)) {
             //            proList = JSONArray.parseArray(JSON.toJSONString(res.get("data")), ProvinceAreaResponse.class);
-            log.info("调用供应链系统,查询仓库信息失败");
-            return HttpResponse.success();
+            log.info("调用供应链系统,查询仓库信息成功");
+            return httpResponse;
         } else {
             log.info("调用供应链系统,查询仓库信息失败");
             return HttpResponse.success();
