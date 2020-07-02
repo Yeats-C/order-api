@@ -1142,7 +1142,7 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public ProductCategoryAndBrandResponse2 ProductCategoryAndBrandResponse(String conditionCode, String type, String activityId) {
         LOGGER.info("品牌品类对应关系查询接口ProductCategoryAndBrandResponse参数conditionCode为={},参数type为={},参数activityId为={}",conditionCode,type,activityId);
-        HttpResponse res=   bridgeProductService.selectCategoryByBrandCode(conditionCode,type);
+        HttpResponse res=  bridgeProductService.selectCategoryByBrandCode(conditionCode,type);
         ProductCategoryAndBrandResponse2 response2=new ProductCategoryAndBrandResponse2();
         if(null!=res.getData()){
              response2= (ProductCategoryAndBrandResponse2)res.getData();
@@ -1152,7 +1152,7 @@ public class ActivityServiceImpl implements ActivityService {
         activity.setActivityId(activityId);
         List<ActivityProduct> activityProducts=activityProductDao.activityProductList(activity);
         if(null!=activityProducts&&0!=activityProducts.size()){
-            if ("1".equals(type) &&! "2".equals(activityProducts.get(0).getActivityScope())&&! "4".equals(activityProducts.get(0).getActivityScope())){
+            if ("1".equals(type) &&2!=activityProducts.get(0).getActivityScope()&&4!=activityProducts.get(0).getActivityScope()){
                 //type=1 通过品类查品牌
                 List<QueryProductBrandRespVO> queryProductBrandRespVO=new ArrayList<>();
                 Iterator<ActivityProduct> it = activityProducts.iterator();
@@ -1171,7 +1171,7 @@ public class ActivityServiceImpl implements ActivityService {
                 queryProductBrandRespVO.clear();
                 queryProductBrandRespVO.addAll(activitySet);
                 response2.setQueryProductBrandRespVO(queryProductBrandRespVO);
-            }else if("2".equals(type)&&! "3".equals(activityProducts.get(0).getActivityScope())){
+            }else if("2".equals(type)&&3!=activityProducts.get(0).getActivityScope()){
                 //type=2 通过品牌查品类
                 List<ProductCategoryRespVO> productCategoryRespVOList=new ArrayList<>();
                 Iterator<ActivityProduct> it = activityProducts.iterator();
