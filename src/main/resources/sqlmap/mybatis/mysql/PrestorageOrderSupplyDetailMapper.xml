@@ -110,10 +110,10 @@
             and (l.bar_code= #{barCodeAndSku,jdbcType=VARCHAR} or l.sku_code = #{barCodeAndSku,jdbcType=VARCHAR})
         </if>
         <if test="beginTime!=null ">
-            and d.create_time &gt;= #{beginTime}
+            and l.create_time &gt;= #{beginTime}
         </if>
         <if test="endTime!=null ">
-            and d.create_time &lt;= #{endTime}
+            and L.create_time &lt;= #{endTime}
         </if>
     </select>
 
