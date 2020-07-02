@@ -657,6 +657,7 @@ public class ActivityServiceImpl implements ActivityService {
 
 
     @Override
+    @Transactional
     public HttpResponse updateStatus(Activity activity) {
         LOGGER.info("编辑活动生效状态updateStatus参数为：{}", activity);
         try {
