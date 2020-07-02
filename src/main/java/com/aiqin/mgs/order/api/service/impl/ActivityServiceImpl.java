@@ -489,6 +489,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
+    @Transactional
     public HttpResponse<List<Activity>> effectiveActivityList(String storeId) {
         LOGGER.info("通过门店id爱掌柜的促销活动列表（所有生效活动）effectiveActivityList参数为：{}", storeId);
         HttpResponse response = HttpResponse.success();
