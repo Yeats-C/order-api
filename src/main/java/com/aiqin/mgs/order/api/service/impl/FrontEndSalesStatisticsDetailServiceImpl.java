@@ -2,19 +2,14 @@ package com.aiqin.mgs.order.api.service.impl;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
-import com.aiqin.mgs.order.api.dao.FrontEndSalesStatisticsDao;
 import com.aiqin.mgs.order.api.dao.FrontEndSalesStatisticsDetailDao;
 import com.aiqin.mgs.order.api.domain.dto.FrontEndSalesStatisticsByCategoryDTO;
 import com.aiqin.mgs.order.api.domain.dto.FrontEndSalesStatisticsBySkuDTO;
 import com.aiqin.mgs.order.api.domain.dto.FrontEndSalesStatisticsResponse;
-import com.aiqin.mgs.order.api.domain.statistical.FrontEndSalesStatistics;
 import com.aiqin.mgs.order.api.domain.statistical.FrontEndSalesStatisticsDetail;
 import com.aiqin.mgs.order.api.service.FrontEndSalesStatisticsDetailService;
-import com.aiqin.mgs.order.api.service.FrontEndSalesStatisticsService;
-import com.aiqin.mgs.order.api.util.DateUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -67,7 +62,7 @@ public class FrontEndSalesStatisticsDetailServiceImpl implements FrontEndSalesSt
         try {
             specifiedMonth = sdf1.parse(month);
         } catch (ParseException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         Integer formatMonthFirst = Integer.parseInt(sdf0.format(specifiedMonth)+"01");
         Integer formatMonthEnd = Integer.parseInt(sdf0.format(specifiedMonth)+"31");

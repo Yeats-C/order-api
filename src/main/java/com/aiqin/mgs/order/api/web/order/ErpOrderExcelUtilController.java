@@ -13,6 +13,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,6 +32,8 @@ import java.util.Map;
 @RequestMapping("/erpOrderExcelUtilController")
 @Api(tags = "ERP订单Excel工具类")
 public class ErpOrderExcelUtilController {
+
+    private static final Logger log = LoggerFactory.getLogger(ErpOrderExcelUtilController.class);
 
     @Resource
     private BridgeProductService bridgeProductService;
@@ -168,11 +172,11 @@ public class ErpOrderExcelUtilController {
                 workbook.write(out);
                 out.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error(e.getMessage());
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
     }
 

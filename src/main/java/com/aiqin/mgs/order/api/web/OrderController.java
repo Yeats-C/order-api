@@ -15,31 +15,19 @@ import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.request.*;
 import com.aiqin.mgs.order.api.domain.response.LatelyResponse;
-import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
 import com.aiqin.mgs.order.api.domain.response.PartnerPayGateRep;
-import com.aiqin.mgs.order.api.service.CartService;
-import com.aiqin.mgs.order.api.service.OrderDetailService;
 import com.aiqin.mgs.order.api.service.OrderService;
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-//import java.sql.Date;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
+
+//import java.sql.Date;
 
 @RestController
 @RequestMapping("/order")
@@ -678,7 +666,7 @@ public class OrderController {
             LOGGER.info("支付回调修改订单状态和库存: {}",payReq);
             return orderService.callback(payReq);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
             return HttpResponse.failure(MessageId.create(Project.ORDER_API, -1, e.getMessage()));
         }
     }

@@ -5,49 +5,33 @@
  * ****************************************************************************/
 package com.aiqin.mgs.order.api.service.impl;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.*;
-
-import javax.annotation.Resource;
-import javax.validation.Valid;
-
-import com.aiqin.mgs.order.api.dao.*;
-import com.aiqin.mgs.order.api.domain.*;
-
-import com.aiqin.mgs.order.api.domain.request.ProductStoreRequest;
-import com.aiqin.mgs.order.api.domain.response.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
+import com.aiqin.mgs.order.api.dao.*;
+import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
-import com.aiqin.mgs.order.api.domain.request.OrderDetailRequest;
 import com.aiqin.mgs.order.api.domain.request.ProdisorRequest;
-import com.aiqin.mgs.order.api.domain.response.OrderDetailByMemberResponse;
-import com.aiqin.mgs.order.api.domain.response.OrderProductsResponse;
-import com.aiqin.mgs.order.api.domain.response.ProdisorResponse;
-import com.aiqin.mgs.order.api.domain.response.SkuSaleResponse;
-import com.aiqin.mgs.order.api.domain.response.SkuSumResponse;
-import com.aiqin.mgs.order.api.service.CartService;
+import com.aiqin.mgs.order.api.domain.request.ProductStoreRequest;
+import com.aiqin.mgs.order.api.domain.response.*;
 import com.aiqin.mgs.order.api.service.OrderDetailService;
 import com.aiqin.mgs.order.api.service.OrderLogService;
-import com.aiqin.mgs.order.api.service.OrderService;
 import com.aiqin.mgs.order.api.util.DateUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @SuppressWarnings("all")
 @Service
@@ -915,7 +899,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                     }
                 }*/
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage());
             }
 
         }
