@@ -202,7 +202,7 @@ public class OrderServiceAfterImpl implements OrderAfterService {
         PayReq payReq = new PayReq();
         payReq.setStoreId(orderAfterSaleInfo.getDistributorId());
         payReq.setStoreName(orderAfterSaleInfo.getDistributorName());
-        payReq.setOrderNo(orderAfterSaleInfo.getAfterSaleCode());
+        payReq.setOrderNo(orderAfterSaleInfo.getOrderCode());
         payReq.setOrderSource(orderAfterSaleInfo.getOriginType());
         payReq.setOrderTime(orderAfterSaleInfo.getOrderTime());
         payReq.setPayType(orderAfterSaleInfo.getPayType());
