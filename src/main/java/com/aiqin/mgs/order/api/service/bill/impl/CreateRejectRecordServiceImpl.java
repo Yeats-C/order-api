@@ -82,7 +82,7 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
                 return;
             }
 
-            if (returnOrderInfo == null) {
+            if (returnOrderInfo == null || StringUtils.isBlank(returnOrderInfo.getOrderStoreCode())) {
                 LOGGER.error("待生成采购单的ERP退货单为空");
                 return;
             }
