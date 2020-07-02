@@ -757,6 +757,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
+    @Transactional
     public HttpResponse<PageResData<ProductSkuRespVo5>> skuPage(SpuProductReqVO spuProductReqVO) {
         LOGGER.info("活动商品查询（筛选+分页）skuPage参数为：{}", spuProductReqVO);
         HttpResponse res = HttpResponse.success();
