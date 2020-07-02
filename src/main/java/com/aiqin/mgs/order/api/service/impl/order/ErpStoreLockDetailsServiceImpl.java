@@ -1,6 +1,5 @@
 package com.aiqin.mgs.order.api.service.impl.order;
 
-import com.aiqin.mgs.order.api.component.enums.ErpProductGiftEnum;
 import com.aiqin.mgs.order.api.dao.StoreLockDetailsDao;
 import com.aiqin.mgs.order.api.domain.StoreLockDetails;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
@@ -117,7 +116,7 @@ public class ErpStoreLockDetailsServiceImpl implements ErpStoreLockDetailsServic
                             Long cou=Long.valueOf(lockCount.get(transportCenterCode+wa+sk).toString());
                             Long cou2=Long.valueOf(lockCount.get(transportCenterCode2+wa2+sk2).toString());
                             log.info("订单拆单--第一库存是否已全部分配cou={}",cou);
-                            if(cou.equals(0)){//第一库存已全部分配,启用第二仓库
+                            if(cou.equals(0L)){//第一库存已全部分配,启用第二仓库
                                 ErpOrderItemSplitGroupResponse erpOrderItemSplitGroupResponse1=new ErpOrderItemSplitGroupResponse();
                                 BeanUtils.copyProperties(lockDetail.get(transportCenterCode2+wa2+sk2),erpOrderItemSplitGroupResponse1);
                                 erpOrderItemSplitGroupResponse1.setLockCount(count);

@@ -144,7 +144,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         }
         //业务形式  0门店形式  1批发形式
         String storeCode = reqVo.getStoreCode();
-        if (!storeCode.equals(null)){
+        if(storeCode!=null){
             reqVo.setBusinessForm(0);
         }
         ReturnOrderInfo record = new ReturnOrderInfo();
@@ -1728,8 +1728,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //添加日志
             log.info("发起批发退货--插入日志，details={}",details);
             insertLog(afterSaleCode,reqVo.getCreateById(),reqVo.getCreateByName(),ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),
-                    record.getReturnOrderStatus() == ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey() ? record.getReturnOrderStatus() : ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey(),
-                    record.getReturnOrderStatus() == ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey() ? ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getMsg() : ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg());
+                    record.getReturnOrderStatus().equals(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey()) ? record.getReturnOrderStatus() : ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey(),
+                    record.getReturnOrderStatus().equals(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey()) ? ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getMsg() : ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg());
             //修改原始订单数据
             log.info("发起批发退货--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}",record.getOrderStoreCode(), ErpOrderReturnStatusEnum.WAIT,null,record.getCreateById(),record.getCreateByName());
             erpOrderInfoService.updateOrderReturnStatus(record.getOrderStoreCode(), ErpOrderReturnRequestEnum.WAIT,null,record.getCreateById(),record.getCreateByName());

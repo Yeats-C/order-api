@@ -974,7 +974,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 giftAmount=giftAmount.add(erp.getPrice().multiply(new BigDecimal(erp.getAmount().toString()))).setScale(2, RoundingMode.DOWN);
             }
         }
-        if(giftAmount.compareTo(availableGiftQuota)==1){
+        if(giftAmount.compareTo(availableGiftQuota)>0){
             throw new BusinessException("兑换赠品金额---"+giftAmount+"大于门店赠品额度---"+availableGiftQuota+"，请重新选择赠品后下单！");
         }
         response.setErpCartQueryResponse(erpCartQueryResponse);
@@ -1110,7 +1110,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
 
     @Override
     public void deleteMultipleCartLine(ErpCartDeleteMultipleRequest erpCartDeleteMultipleRequest) {
-        if(null==erpCartDeleteMultipleRequest && null==erpCartDeleteMultipleRequest.getCartIds()){
+        if(null==erpCartDeleteMultipleRequest || null==erpCartDeleteMultipleRequest.getCartIds()){
             throw new BusinessException("参数为空");
         }
         for (String cartId:erpCartDeleteMultipleRequest.getCartIds()){
