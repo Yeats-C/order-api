@@ -53,26 +53,27 @@ public class CreatePurchaseOrderTask {
                     throw new RuntimeException();
                 }
             }
-        }
-
-        if (orderInfos != null && orderInfos.size() > 0) {
-            for (ErpOrderInfo orderInfo : orderInfos) {
-                if (orderInfo.getItemList() != null && orderInfo.getItemList().size() > 0) {
-                    StopWatch watch = new StopWatch();//计时器
-                    watch.start();//计时器开始
-                    logger.info("根据订单生成采购单定时任务=====>开始");
-                    try {
-                        //根据ERP订单生成爱亲采购单,采购单明细,修改订单同步状态&根据爱亲采购单，生成耘链销售单,添加操作日志
-                        List<ErpOrderInfo> list = new ArrayList<>();
-                        list.add(orderInfo);
-                        createPurchaseOrderService.addOrderAndDetail(list);
-                    } catch (Exception e) {
-                        logger.error("根据订单生成采购单定时任务=====>失败" + e);
+            if (orderInfos != null && orderInfos.size() > 0) {
+                for (ErpOrderInfo orderInfo : orderInfos) {
+                    if (orderInfo.getItemList() != null && orderInfo.getItemList().size() > 0) {
+                        StopWatch watch = new StopWatch();//计时器
+                        watch.start();//计时器开始
+                        logger.info("根据订单生成采购单定时任务=====>开始");
+                        try {
+                            //根据ERP订单生成爱亲采购单,采购单明细,修改订单同步状态&根据爱亲采购单，生成耘链销售单,添加操作日志
+                            List<ErpOrderInfo> list = new ArrayList<>();
+                            list.add(orderInfo);
+                            createPurchaseOrderService.addOrderAndDetail(list);
+                        } catch (Exception e) {
+                            logger.error("根据订单生成采购单定时任务=====>失败" + e);
+                        }
+                        watch.stop();//计时器结束
+                        logger.info("根据订单生成采购单定时任务=====>结束，本次用时：{}毫秒", watch.getTime() + "，生成：" + orderInfos.size() + "单");
                     }
-                    watch.stop();//计时器结束
-                    logger.info("根据订单生成采购单定时任务=====>结束，本次用时：{}毫秒", watch.getTime() + "，生成：" + erpOrderInfos.size() + "单");
                 }
             }
         }
+
+
     }
 }

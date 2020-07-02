@@ -2,33 +2,33 @@ package com.aiqin.mgs.order.api.service.bill.impl;
 
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
-import com.aiqin.mgs.order.api.component.enums.*;
+import com.aiqin.mgs.order.api.component.enums.OrderSucessEnum;
+import com.aiqin.mgs.order.api.component.enums.RejectRecordStatusEnum;
 import com.aiqin.mgs.order.api.component.returnenums.ReturnOrderStatusEnum;
-import com.aiqin.mgs.order.api.dao.*;
+import com.aiqin.mgs.order.api.dao.RejectRecordDao;
+import com.aiqin.mgs.order.api.dao.RejectRecordDetailBatchDao;
+import com.aiqin.mgs.order.api.dao.RejectRecordDetailDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
+import com.aiqin.mgs.order.api.domain.request.RejectRequest;
 import com.aiqin.mgs.order.api.domain.request.bill.ReturnBatchDetailDLReq;
 import com.aiqin.mgs.order.api.domain.request.bill.ReturnDLReq;
 import com.aiqin.mgs.order.api.domain.request.bill.ReturnOrderDetailDLReq;
 import com.aiqin.mgs.order.api.domain.request.bill.ReturnOrderInfoDLReq;
-import com.aiqin.mgs.order.api.domain.request.RejectRequest;
-import com.aiqin.mgs.order.api.domain.request.purchase.RejectQueryRequest;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailReviewApiReqVo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewApiReqVo;
 import com.aiqin.mgs.order.api.domain.response.RejectResponse;
 import com.aiqin.mgs.order.api.domain.response.RejectVoResponse;
+import com.aiqin.mgs.order.api.service.bill.CreateRejectRecordService;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import com.aiqin.mgs.order.api.util.BeanHelper;
 import com.github.pagehelper.PageHelper;
 import org.apache.commons.collections.CollectionUtils;
-import com.aiqin.mgs.order.api.service.bill.CreateRejectRecordService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +36,8 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 爱亲退供单 实现类
@@ -99,7 +100,7 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                     rejectRecordDetailDao.updateByPrimaryKey(rejectRecordDetail);
 
                     ReturnOrderDetailReviewApiReqVo returnOrderDetailReviewApi = new ReturnOrderDetailReviewApiReqVo();
-                    returnOrderDetailReviewApi.setLineCode(new Long(returnOrderDetail.getLineCode()).intValue());
+                    returnOrderDetailReviewApi.setLineCode(returnOrderDetail.getLineCode().intValue());
                     returnOrderDetailReviewApi.setActualReturnProductCount(returnOrderDetail.getActualReturnProductCount());
                     detailReviewApis.add(returnOrderDetailReviewApi);
                 }

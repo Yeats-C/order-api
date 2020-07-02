@@ -64,12 +64,12 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     @Override
     @Transactional
     public HttpResponse updatePurchaseInfo(OrderIogisticsVo purchaseInfo) {
-        if (purchaseInfo != null
-                && purchaseInfo.getOrderStoreDetail() != null
-                && purchaseInfo.getOrderStoreDetail().size() > 0
-                && purchaseInfo.getOrderBatchStoreDetail() != null
-                && purchaseInfo.getOrderBatchStoreDetail().size() > 0) {
-
+        if (purchaseInfo == null
+                || purchaseInfo.getOrderStoreDetail() == null
+                || purchaseInfo.getOrderStoreDetail().size() <= 0
+                || purchaseInfo.getOrderBatchStoreDetail() == null
+                || purchaseInfo.getOrderBatchStoreDetail().size() <= 0) {
+            return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
         }
         LOGGER.info("耘链销售单回传更新开始 参数purchaseInfo{}" + purchaseInfo);
         try {
