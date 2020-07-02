@@ -716,6 +716,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
+    @Transactional
     public HttpResponse<List<ActivitySales>> comparisonActivitySalesStatistics(List<String> activityIdList) {
         LOGGER.info("活动列表-对比分析柱状图comparisonActivitySalesStatistics参数为：{}", activityIdList);
         HttpResponse res = HttpResponse.success();
