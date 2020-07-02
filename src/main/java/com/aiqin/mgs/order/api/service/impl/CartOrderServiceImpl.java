@@ -664,7 +664,7 @@ public class CartOrderServiceImpl implements CartOrderService {
         try {
             cartInfoList = cartOrderDao.selectCartByStoreId(query);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("取erp端购物车信息，用于生成订单", e.getMessage());
         }
 
         if (cartInfoList != null && cartInfoList.size() > 0) {

@@ -2,11 +2,11 @@ package com.aiqin.mgs.order.api.service.impl.order;
 
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.json.JsonUtil;
+import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.service.order.SupplierAndWarehouseService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -33,12 +33,12 @@ public class SupplierAndWarehouseServiceImpl implements SupplierAndWarehouseServ
         sb.append("?supplierCode="+supplierCode);
         log.info("调用供应链系统,查询供应商信息,请求url={}", sb.toString());
         HttpClient httpClient = HttpClient.get(sb.toString());
-        Map<String, Object> res = httpClient.action().result(new TypeReference<Map<String, Object>>() {});
-        log.info("调用供应链系统,查询供应商信息返回结果，result={}", JsonUtil.toJson(res));
-        if (res!=null&&StringUtils.isNotBlank(res.get("code").toString()) && "0".equals(String.valueOf(res.get("code")))) {
+        HttpResponse httpResponse = httpClient.action().result(new TypeReference<Map<String, Object>>() {});
+        log.info("调用供应链系统,查询供应商信息返回结果，result={}", JsonUtil.toJson(httpResponse));
+        if (httpResponse.getCode().equals(MessageId.SUCCESS_CODE)) {
 //            proList = JSONArray.parseArray(JSON.toJSONString(res.get("data")), ProvinceAreaResponse.class);
-            log.info("调用供应链系统,查询供应商信息失败");
-            return HttpResponse.success();
+            log.info("调用供应链系统,查询供应商信息成功");
+            return httpResponse;
         } else {
             log.info("调用供应链系统,查询供应商信息失败");
             return HttpResponse.success();
@@ -53,16 +53,22 @@ public class SupplierAndWarehouseServiceImpl implements SupplierAndWarehouseServ
         sb.append("?supplierCode="+transportCenterCode);
         log.info("调用供应链系统,查询仓库信息,请求url={}", sb.toString());
         HttpClient httpClient = HttpClient.get(sb.toString());
-        Map<String, Object> res = httpClient.action().result(new TypeReference<Map<String, Object>>() {});
-        log.info("调用供应链系统,查询仓库信息返回结果，result={}", JsonUtil.toJson(res));
-        if (res!=null&&StringUtils.isNotBlank(res.get("code").toString()) && "0".equals(String.valueOf(res.get("code")))) {
-//            proList = JSONArray.parseArray(JSON.toJSONString(res.get("data")), ProvinceAreaResponse.class);
-            log.info("调用供应链系统,查询仓库信息失败");
-            return HttpResponse.success();
+        HttpResponse httpResponse = httpClient.action().result(new TypeReference<Map<String, Object>>() {});
+        log.info("调用供应链系统,查询供应商信息返回结果，result={}", JsonUtil.toJson(httpResponse));
+        if (httpResponse.getCode().equals(MessageId.SUCCESS_CODE)) {
+            //            proList = JSONArray.parseArray(JSON.toJSONString(res.get("data")), ProvinceAreaResponse.class);
+            log.info("调用供应链系统,查询仓库信息成功");
+            return httpResponse;
         } else {
             log.info("调用供应链系统,查询仓库信息失败");
             return HttpResponse.success();
         }
+    }
+
+    public static void main(String[] args) {
+        SupplierAndWarehouseServiceImpl supplierAndWarehouseService=new SupplierAndWarehouseServiceImpl();
+
+        System.out.println(JsonUtil.toJson(supplierAndWarehouseService.getSupplierInfo("EBCC55A75ED842CD9B83B7181F789EC4")));
     }
 
 }

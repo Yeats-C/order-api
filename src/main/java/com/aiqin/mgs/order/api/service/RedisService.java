@@ -5,11 +5,8 @@
 
 package com.aiqin.mgs.order.api.service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.DataType;
@@ -19,8 +16,16 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
 @Service("redisService")
 public class RedisService {
+
+    private static final Logger logger = LoggerFactory.getLogger(RedisService.class);
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -36,7 +41,7 @@ public class RedisService {
 
             return true;
         } catch (Exception var5) {
-            var5.printStackTrace();
+            logger.error(var5.getMessage());
             return false;
         }
     }
@@ -49,7 +54,7 @@ public class RedisService {
         try {
             return this.redisTemplate.hasKey(key);
         } catch (Exception var3) {
-            var3.printStackTrace();
+            logger.error(var3.getMessage());
             return false;
         }
     }
@@ -74,7 +79,7 @@ public class RedisService {
             this.redisTemplate.opsForValue().set(key, value);
             return true;
         } catch (Exception var4) {
-            var4.printStackTrace();
+            logger.error(var4.getMessage());
             return false;
         }
     }
@@ -87,7 +92,7 @@ public class RedisService {
                 this.redisTemplate.opsForValue().set(key, value, time, TimeUnit.SECONDS);
                 return true;
             } catch (Exception var6) {
-                var6.printStackTrace();
+                logger.error(var6.getMessage());
                 return false;
             }
         }
@@ -101,7 +106,7 @@ public class RedisService {
                 this.redisTemplate.opsForValue().set(key, value, time, TimeUnit.MINUTES);
                 return true;
             } catch (Exception var6) {
-                var6.printStackTrace();
+                logger.error(var6.getMessage());
                 return false;
             }
         }
@@ -115,7 +120,7 @@ public class RedisService {
                 this.redisTemplate.opsForValue().set(key, value, time, TimeUnit.HOURS);
                 return true;
             } catch (Exception var6) {
-                var6.printStackTrace();
+                logger.error(var6.getMessage());
                 return false;
             }
         }
@@ -129,7 +134,7 @@ public class RedisService {
                 this.redisTemplate.opsForValue().set(key, value, time, TimeUnit.DAYS);
                 return true;
             } catch (Exception var6) {
-                var6.printStackTrace();
+                logger.error(var6.getMessage());
                 return false;
             }
         }
@@ -164,7 +169,7 @@ public class RedisService {
             this.redisTemplate.opsForHash().putAll(key, map);
             return true;
         } catch (Exception var4) {
-            var4.printStackTrace();
+            logger.error(var4.getMessage());
             return false;
         }
     }
@@ -178,7 +183,7 @@ public class RedisService {
 
             return true;
         } catch (Exception var6) {
-            var6.printStackTrace();
+            logger.error(var6.getMessage());
             return false;
         }
     }
@@ -188,7 +193,7 @@ public class RedisService {
             this.redisTemplate.opsForHash().put(key, item, value);
             return true;
         } catch (Exception var5) {
-            var5.printStackTrace();
+            logger.error(var5.getMessage());
             return false;
         }
     }
@@ -202,7 +207,7 @@ public class RedisService {
 
             return true;
         } catch (Exception var7) {
-            var7.printStackTrace();
+            logger.error(var7.getMessage());
             return false;
         }
     }
@@ -227,7 +232,7 @@ public class RedisService {
         try {
             return this.redisTemplate.opsForSet().members(key);
         } catch (Exception var3) {
-            var3.printStackTrace();
+            logger.error(var3.getMessage());
             return null;
         }
     }
@@ -236,7 +241,7 @@ public class RedisService {
         try {
             return this.redisTemplate.opsForSet().isMember(key, value);
         } catch (Exception var4) {
-            var4.printStackTrace();
+            logger.error(var4.getMessage());
             return false;
         }
     }
@@ -245,7 +250,7 @@ public class RedisService {
         try {
             return this.redisTemplate.opsForSet().add(key, values);
         } catch (Exception var4) {
-            var4.printStackTrace();
+            logger.error(var4.getMessage());
             return 0L;
         }
     }
@@ -259,7 +264,7 @@ public class RedisService {
 
             return count;
         } catch (Exception var6) {
-            var6.printStackTrace();
+            logger.error(var6.getMessage());
             return 0L;
         }
     }
@@ -268,7 +273,7 @@ public class RedisService {
         try {
             return this.redisTemplate.opsForSet().size(key);
         } catch (Exception var3) {
-            var3.printStackTrace();
+            logger.error(var3.getMessage());
             return 0L;
         }
     }
@@ -278,7 +283,7 @@ public class RedisService {
             Long count = this.redisTemplate.opsForSet().remove(key, values);
             return count;
         } catch (Exception var4) {
-            var4.printStackTrace();
+            logger.error(var4.getMessage());
             return 0L;
         }
     }
@@ -287,7 +292,7 @@ public class RedisService {
         try {
             return this.redisTemplate.opsForList().range(key, start, end);
         } catch (Exception var7) {
-            var7.printStackTrace();
+            logger.error(var7.getMessage());
             return null;
         }
     }
@@ -296,7 +301,7 @@ public class RedisService {
         try {
             return this.redisTemplate.opsForList().size(key);
         } catch (Exception var3) {
-            var3.printStackTrace();
+            logger.error(var3.getMessage());
             return 0L;
         }
     }
@@ -305,7 +310,7 @@ public class RedisService {
         try {
             return this.redisTemplate.opsForList().index(key, index);
         } catch (Exception var5) {
-            var5.printStackTrace();
+            logger.error(var5.getMessage());
             return null;
         }
     }
@@ -315,7 +320,7 @@ public class RedisService {
             this.redisTemplate.opsForList().rightPush(key, value);
             return true;
         } catch (Exception var4) {
-            var4.printStackTrace();
+            logger.error(var4.getMessage());
             return false;
         }
     }
@@ -329,7 +334,7 @@ public class RedisService {
 
             return true;
         } catch (Exception var6) {
-            var6.printStackTrace();
+            logger.error(var6.getMessage());
             return false;
         }
     }
@@ -339,7 +344,7 @@ public class RedisService {
             this.redisTemplate.opsForList().rightPushAll(key, value);
             return true;
         } catch (Exception var4) {
-            var4.printStackTrace();
+            logger.error(var4.getMessage());
             return false;
         }
     }
@@ -353,7 +358,7 @@ public class RedisService {
 
             return true;
         } catch (Exception var6) {
-            var6.printStackTrace();
+            logger.error(var6.getMessage());
             return false;
         }
     }
@@ -363,7 +368,7 @@ public class RedisService {
             this.redisTemplate.opsForList().set(key, index, value);
             return true;
         } catch (Exception var6) {
-            var6.printStackTrace();
+            logger.error(var6.getMessage());
             return false;
         }
     }
@@ -373,7 +378,7 @@ public class RedisService {
             Long remove = this.redisTemplate.opsForList().remove(key, count, value);
             return remove;
         } catch (Exception var6) {
-            var6.printStackTrace();
+            logger.error(var6.getMessage());
             return 0L;
         }
     }

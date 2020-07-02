@@ -444,7 +444,7 @@ public class BridgeProductService<main> {
         HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path);
         HttpResponse<ProductCategoryAndBrandResponse2> response = httpClient.action().result(new TypeReference<HttpResponse<ProductCategoryAndBrandResponse2>>() {
         });
-        if (Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0") && type=="2") {
+        if (response.getCode().equals(MessageId.SUCCESS_CODE) && "2".equals(type)) {
             List<ProductCategoryRespVO> lists=response.getData().getProductCategoryRespVOList();
             //门店端不展示物料，德明居，其他，只展示1到12到品类
             Iterator<ProductCategoryRespVO> it = lists.iterator();

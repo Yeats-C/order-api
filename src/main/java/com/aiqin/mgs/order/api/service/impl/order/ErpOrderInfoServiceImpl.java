@@ -759,14 +759,14 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
         logger.info("签收完毕--主订单商品18A类型总金额为commodityAmountOfTop={}",commodityAmountOfTop);
             //判断18A商品金额总和大于0
-        if(commodityAmountOfTop.compareTo(BigDecimal.ZERO)==1){
+        if(commodityAmountOfTop.compareTo(BigDecimal.ZERO)>0){
             //赠品返回额度比例
             Double rebatesProportion=0.00;
             NewStoreGradient gradient=bridgeProductService.selectStoreGiveawayByStoreCode(order.getStoreCode());
 
             if(null!=gradient&&null!=gradient.getStoreGradientList()&&gradient.getStoreGradientList().size()>0){
                 for(StoreGradient storeGradient:gradient.getStoreGradientList()){
-                    if(commodityAmountOfTop.compareTo(BigDecimal.valueOf(storeGradient.getMinimumValue()))==1){
+                    if(commodityAmountOfTop.compareTo(BigDecimal.valueOf(storeGradient.getMinimumValue()))>0){
                         rebatesProportion=storeGradient.getRebatesProportion();
                     }
                 }

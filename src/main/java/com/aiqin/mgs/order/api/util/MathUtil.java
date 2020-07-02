@@ -20,7 +20,7 @@ public class MathUtil {
             } else if( value instanceof BigInteger) {
                 ret = new BigDecimal( (BigInteger) value );
             } else if( value instanceof Number ) {
-                ret = new BigDecimal( ((Number)value).doubleValue() );
+                ret = BigDecimal.valueOf( ((Number)value).doubleValue() );
             } else {
                 throw new ClassCastException("Not possible to coerce ["+value+"] from class "+value.getClass()+" into a BigDecimal.");
             }

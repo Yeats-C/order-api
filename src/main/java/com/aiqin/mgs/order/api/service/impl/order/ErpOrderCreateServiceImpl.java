@@ -266,7 +266,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 giftAmount=giftAmount.add(erp.getPrice().multiply(new BigDecimal(erp.getAmount().toString())));
             }
         }
-        if(giftAmount.compareTo(BigDecimal.ZERO)==1){
+        if(giftAmount.compareTo(BigDecimal.ZERO)>0){
             //查詢門店赠品额度
             BigDecimal availableGiftQuota=bridgeProductService.getStoreAvailableGiftGuota(storeInfo.getStoreId());
             //计算订单使用过后的赠品额度
@@ -1084,7 +1084,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //计算出的18A商品总金额得乘以设置的规则系数
         groupTopProductTotal=groupTopProductTotal.multiply(ruleTop).setScale(2, RoundingMode.DOWN);
         nullifyTopCouponMoneyTotal=nullifyTopCouponMoneyTotal.add(totalCouponSharePrice.subtract(groupTopProductTotal));
-        if(nullifyTopCouponMoneyTotal.compareTo(BigDecimal.ZERO)==-1){
+        if(nullifyTopCouponMoneyTotal.compareTo(BigDecimal.ZERO)<0){
             //A品卷金额小于18A商品总额
             nullifyTopCouponMoneyTotal=BigDecimal.ZERO;
             orderFee.setTopCouponMoney(totalCouponSharePrice);
@@ -1215,7 +1215,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         }
         log.info("A品券计算均摊金额,符合A品卷均摊的商品topProductList={}", topProductList);
         //判断优惠券总金额和从活动的分摊总价取，如果A品卷总金额大于活动分摊总价，则A品券总金额=活动分摊总价
-        if (topCouponMoney.subtract(totalFirstFenAmount).compareTo(BigDecimal.ZERO) == 1) {
+        if (topCouponMoney.subtract(totalFirstFenAmount).compareTo(BigDecimal.ZERO) >0) {
             topCouponMoney = totalFirstFenAmount;
         }
         //商品组实收(商品组价值-A品卷)
@@ -1765,7 +1765,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponDiscountAmount());
         }
         //判断订单总金额是否大于赠送市值
-        if(totalMoneyTotal.compareTo(new BigDecimal(marketValueBalance))==1){//大于赠送市值，走审批
+        if(totalMoneyTotal.compareTo(new BigDecimal(marketValueBalance))>0){//大于赠送市值，走审批
             //TODO 走审批
             flag=true;
             //orderCode 订单编码
@@ -1981,7 +1981,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         }
         log.info("A品券计算均摊金额,符合A品卷均摊的商品topProductList={}", topProductList);
         //判断优惠券总金额和从活动的分摊总价取，如果A品卷总金额大于活动分摊总价，则A品券总金额=活动分摊总价
-        if (topCouponMoney.subtract(totalFirstFenAmount).compareTo(BigDecimal.ZERO) == 1) {
+        if (topCouponMoney.subtract(totalFirstFenAmount).compareTo(BigDecimal.ZERO) >0) {
             topCouponMoney = totalFirstFenAmount;
         }
         //商品组实收(商品组价值-A品卷)

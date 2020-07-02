@@ -9,6 +9,8 @@ import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.service.AppService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.OssUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,8 @@ import java.util.Map;
  */
 @Service
 public class AppServiceImpl implements AppService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppServiceImpl.class);
 
     @Autowired
     private OssUtil ossUtil;
@@ -79,7 +83,7 @@ public class AppServiceImpl implements AppService {
         try {
             stringMap= ossUtil.uploadFile(file);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         if (stringMap!=null){
 

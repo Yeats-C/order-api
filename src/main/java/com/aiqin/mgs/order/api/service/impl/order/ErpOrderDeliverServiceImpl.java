@@ -372,7 +372,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 shareEqually(order.getMainOrderCode());
 
                 //判断是否拆单，是否是子订单
-                if(order.getOrderStoreCode()!=order.getMainOrderCode()){
+                if(!order.getOrderStoreCode().equals(order.getMainOrderCode())){
                     //更新子订单里的均摊金额
                     updateSubOrder(order.getMainOrderCode());
                 }
@@ -396,7 +396,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             boolean flag=false;
             //这两个都走线下支付物流费用
             //配送
-            if(ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(order.getOrderTypeCode())){
+            if(ErpOrderTypeEnum.DISTRIBUTION.getValue().equals(order.getOrderTypeCode())){
                 //首单或首单赠送
                 if(ErpOrderCategoryEnum.ORDER_TYPE_2.getValue().equals(order.getOrderCategoryCode())||ErpOrderCategoryEnum.ORDER_TYPE_4.getValue().equals(order.getOrderCategoryCode())){
                     flag=true;
@@ -434,7 +434,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
         //获取有A品卷均摊数据的明细数据，存入Map
         Map<String,BigDecimal> topMap=new HashMap();
         for(ErpOrderItem item:itemList){
-            if(null!=item.getTopCouponAmount()&&item.getTopCouponAmount().compareTo(BigDecimal.ZERO)==1){
+            if(null!=item.getTopCouponAmount()&&item.getTopCouponAmount().compareTo(BigDecimal.ZERO)>0){
                 topMap.put(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode(),item.getTopCouponAmount());
             }
         }
@@ -650,7 +650,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                             if (curRule != null) {//命中规则
                                 youHuiAmount=curRule.getPreferentialAmount();
                                 //满减活动商品总金额=商品总金额-优惠金额
-                                if(productAmount.compareTo(youHuiAmount)==1){
+                                if(productAmount.compareTo(youHuiAmount)>0){
                                     productAmount=productAmount.subtract(youHuiAmount);
                                 }else{
                                     //优惠金额大于活动商品总价值

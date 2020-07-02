@@ -183,7 +183,7 @@ public class ActivityController {
      */
     @GetMapping("/checkProcuct")
     @ApiOperation(value = "校验商品活动是否过期")
-    Boolean checkProcuct(ActivityParameterRequest activityParameterRequest){
+    public Boolean checkProcuct(ActivityParameterRequest activityParameterRequest){
         return activitesService.checkProcuct(activityParameterRequest);
     }
 
@@ -291,7 +291,7 @@ public class ActivityController {
      */
     @PostMapping("/storeIds")
     @ApiOperation("通过列表id查询门店权限集合")
-    HttpResponse<List<String>> storeIds(String menuCode){
+    public HttpResponse<List<String>> storeIds(String menuCode){
         HttpResponse response = HttpResponse.success();
         response.setData(activitesService.storeIds(menuCode));
         return response;
