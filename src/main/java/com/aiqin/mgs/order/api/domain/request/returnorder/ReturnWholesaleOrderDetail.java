@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -103,10 +104,29 @@ public class ReturnWholesaleOrderDetail {
     @ApiModelProperty(value = "商品数量")
     private Long productCount;
 
+    @ApiModelProperty(value = "退款金额 ----传")
+    private BigDecimal refundAmount;
+
+    @ApiModelProperty(value = "退供金额 ----传")
+    private BigDecimal withdrawAmount;
 
     //未确定已退货数量字段
     @ApiModelProperty(value = "(已退货数量)实退数量")
     private Long actualReturnProductCount;
+
+    @NotBlank(message = "仓库编码不能为空 ----传")
+    @ApiModelProperty("仓库编码")
+    private String warehouseCode;
+
+    @NotBlank(message = "仓库名称不能为空 ----传")
+    @ApiModelProperty("仓库名称")
+    private String warehouseName;
+
+    @ApiModelProperty("配送中心编码 ---传" )
+    private String transportCenterCode;
+
+    @ApiModelProperty("配送中心名称 ---传")
+    private String transportCenterName;
 
 
 

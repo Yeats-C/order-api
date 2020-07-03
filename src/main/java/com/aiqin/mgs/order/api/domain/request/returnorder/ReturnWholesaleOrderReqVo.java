@@ -82,13 +82,14 @@ public class ReturnWholesaleOrderReqVo implements Serializable {
     @ApiModelProperty("合伙人名称 ---不用传")
     private String copartnerAreaName;
 
-    @ApiModelProperty("业务形式 0门店退货 1批发退货 --不用传")
+    @ApiModelProperty("业务形式 0门店退货 1批发退货 --传")
     private Integer businessForm;
 
-    @ApiModelProperty(value = "订单类型(订单类型 0直送、1配送、2辅采 ) --传")
+//    @ApiModelProperty(value = "订单类型(订单类型 0直送、1配送、2辅采 ) --传")
+     @ApiModelProperty(value = "订单类型 1直送 2配送 3货架  --传")
     private Integer orderType;
 
-    @ApiModelProperty(value = "订单类别：1：收单配送 2：首单赠送 3：配送补货 4：首单直送 5：直送补货 51：批发普通订货 --传")
+    @ApiModelProperty(value = "订单类别：1：收单配送 2：首单赠送 3：配送补货 4：首单直送 5：直送补货 51：批发普通订货  17.货架补货  147.采购直送 --传")
     private Integer orderCategory;
 
     @NotBlank(message = "公司编码不能为空")
@@ -99,8 +100,12 @@ public class ReturnWholesaleOrderReqVo implements Serializable {
     private String companyName;
 
     @NotBlank(message = "售后类型不能为空 --- 不用传") //需
-    @ApiModelProperty(value = "退货类型  0客户退货、1缺货退货、2售后退货、3冲减单")
+    @ApiModelProperty(value = "退货类型  0客户退货、1缺货退货、2售后退货、3冲减单 6质量问题")
     private Integer returnOrderType;
+
+    @NotBlank(message = "临时售后类型不能为空 --- 传") //需
+    @ApiModelProperty(value = "退货类型  0客户退货、1缺货退货、2售后退货、3冲减单 6质量问题")
+    private Integer returnOrderTypeTemporary;
 
     @ApiModelProperty(value = "退货金额--前端不用传")
     private BigDecimal returnOrderAmount;

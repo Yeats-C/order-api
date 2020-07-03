@@ -85,4 +85,6 @@ public interface ReturnOrderInfoDao {
     String selectReturnCode(String storeCode);
     //查询批发退货列表
     List<WholesaleReturnList> selectByCondition(wholesaleReturnOrderSearchVo whoVo);
+    //查询退货单order_success
+    Integer selectType(String returnOrderCode);
 }

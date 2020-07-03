@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -130,6 +131,27 @@ public class ReturnOrderDetail {
 
     @ApiModelProperty(value = "条形码")
     private String barCode;
+
+    @ApiModelProperty(value = "退款金额 ----传")
+    private BigDecimal refundAmount;
+
+    @ApiModelProperty(value = "退供金额 ----传")
+    private BigDecimal withdrawAmount;
+
+    @NotBlank(message = "仓库编码不能为空 ----传")
+    @ApiModelProperty("仓库编码")
+    private String warehouseCode;
+
+    @NotBlank(message = "仓库名称不能为空 ----传")
+    @ApiModelProperty("仓库名称")
+    private String warehouseName;
+
+    @ApiModelProperty("配送中心编码 ---传" )
+    private String transportCenterCode;
+
+    @ApiModelProperty("配送中心名称 ---传")
+    private String transportCenterName;
+
 
     /***仅A品优惠金额，用于统计*/
     @ApiModelProperty(value = "本行A品券优惠总额度")

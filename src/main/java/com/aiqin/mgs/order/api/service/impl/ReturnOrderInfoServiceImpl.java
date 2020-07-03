@@ -58,6 +58,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -85,6 +86,10 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 
     @Value("${bridge.url.product-api}")
     private String productHost;
+
+    @Value("${bridge.url.scmp-api}")
+    private String scmpHost;
+
 
     @Autowired
     private ReturnOrderInfoDao returnOrderInfoDao;
@@ -385,9 +390,25 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         }
         if(cancelFlag){
             //通知退供单-撤销
-            log.info("通知退供单-撤销开始，rejectRecordCode={}",reqVo.getReturnOrderCode());
-            rejectRecordService.removeRejectRecordStatus(reqVo.getReturnOrderCode());
-            log.info("通知退供单-撤销结束");
+            //查询退货单是否同步成功
+            Integer integer = returnOrderInfoDao.selectType(reqVo.getReturnOrderCode());
+            if (integer.equals(2)){
+                log.info("通知供应链退货单取消-开始");
+                String returnOrderCode = reqVo.getReturnOrderCode();
+                String url =scmpHost+"/returnGoods/cancel";
+                HttpClient httpClient = HttpClient.get(url).addParameter("return_order_code", returnOrderCode).timeout(30000);
+                AjaxJson result = httpClient.action().result(AjaxJson.class);
+                log.info("通知供应链返回结果：{}",JSON.toJSONString(result));
+                if(result.getSuccess()){
+                   log.info("通知供应链-退货单取消-通知完成");
+                }else {
+                    log.info("通知供应链-退货单取消-通知失败");
+                }
+            }else {
+                log.info("通知退供单-撤销开始，rejectRecordCode={}", reqVo.getReturnOrderCode());
+                rejectRecordService.removeRejectRecordStatus(reqVo.getReturnOrderCode());
+                log.info("通知退供单-撤销结束");
+            }
         }
         //配送且一般退货调用且审核通过，调用门店退货申请-完成(门店)
         if("15".equals(returnOrderInfo.getReturnReasonCode())&&returnOrderInfo.getOrderType().equals(2)&&sysFlag){
@@ -1640,20 +1661,29 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             record.setReturnOrderCode(afterSaleCode);
             record.setCreateTime(now);
             //判断是ERP还是批发客户发起的退货
-            if (reqVo.getTreatmentMethod().equals(1)){
+            if (reqVo.getTreatmentMethod().equals(1) && reqVo.getOrderCategory().equals(51)) {
                 record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey());
+                //退货类型
+                record.setReturnOrderType(2);
+            //对应货架退货补货单
+            }else if (reqVo.getTreatmentMethod().equals(1) && reqVo.getOrderCategory().equals(17)){
+                record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey());
+                //退货类型
+                record.setReturnOrderType(reqVo.getReturnOrderTypeTemporary());
+            //对应普通补货退货单
+            }else if(reqVo.getTreatmentMethod().equals(1) && reqVo.getOrderCategory().equals(147)){
+                record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey());
+                record.setReturnOrderType(reqVo.getReturnOrderTypeTemporary());
             }else {
                 //批发客户发起的退货状态为审核中
                 record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey());
             }
-            //业务形式 0是门店业务 1批发任务
-            record.setBusinessForm(1);
             //实退商品数量
             record.setActualProductCount(record.getProductCount());
             //实退商品总金额
             record.setActualReturnOrderAmount(record.getReturnOrderAmount());
-            //退货类型
-            record.setReturnOrderType(2);
+//            //退货类型
+//            record.setReturnOrderType(2);
             //退货单--退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户
             record.setReturnMoneyType(ConstantData.RETURN_MONEY_TYPE);
             record.setOrderSuccess(1);
@@ -1725,15 +1755,15 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             reqVo1.setOperateStatus(reqVo.getTreatmentMethod());
             reqVo1.setReturnOrderCode(afterSaleCode);
             log.info("erp-批发退货-同步供应链-生成退供单开始---");
-//            HttpResponse httpResponse = updateReturnStatus(reqVo1);
-             updateReturnStatus(reqVo1);
-//            log.info("erp-批发退货-同步供应链，生成退供单结束,httpResponse={}",JSON.toJSON(httpResponse));
-            log.info("erp-批发退货-同步供应链，生成退供单结束");
-//            if(!"0".equals(httpResponse.getCode())){
-//                //erp同步供应链，生成退供单失败
-//                throw new RuntimeException("erp-批发退货-同步供应链，生成退供单失败");
-//            }
-//            log.info("erp-批发退货-同步供应链，生成退货单成功");
+            HttpResponse httpResponse = updateReturnStatus(reqVo1);
+//             updateReturnStatus(reqVo1);
+            log.info("erp-批发退货-同步供应链，生成退供单结束,httpResponse={}",JSON.toJSON(httpResponse));
+//            log.info("erp-批发退货-同步供应链，生成退供单结束");
+            if(!"0".equals(httpResponse.getCode())){
+                //erp同步供应链，生成退供单失败
+                throw new RuntimeException("erp-批发退货-同步供应链，生成退供单失败");
+            }
+            log.info("erp-批发退货-同步供应链，生成退货单成功");
             return HttpResponse.success();
         }catch (Exception e){
             log.error("批发退货-请求：{},{}",reqVo,e);
