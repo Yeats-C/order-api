@@ -18,6 +18,7 @@ import com.aiqin.mgs.order.api.domain.po.cart.ErpOrderCartInfo;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityParameterRequest;
 import com.aiqin.mgs.order.api.domain.request.activity.ActivityRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.*;
+import com.aiqin.mgs.order.api.domain.request.product.ProductSkuRequest2;
 import com.aiqin.mgs.order.api.domain.response.cart.*;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import com.aiqin.mgs.order.api.service.CouponRuleService;
@@ -158,7 +159,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         }
         StoreInfo store = erpOrderRequestService.getStoreInfoByStoreId(erpCartAddRequest.getStoreId());
 
-        List<String> skuCodeList = new ArrayList<>();
+        List<ProductSkuRequest2> productSkuRequest2List=new ArrayList<>();
         for (ErpCartAddSkuItem item :
                 erpCartAddRequest.getProducts()) {
             if (StringUtils.isEmpty(item.getSkuCode())) {
@@ -167,11 +168,18 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
             if (item.getAmount() == null) {
                 throw new BusinessException("缺失sku数量");
             }
-            skuCodeList.add(item.getSkuCode());
+            ProductSkuRequest2 productSkuRequest2=new ProductSkuRequest2();
+            productSkuRequest2.setSkuCode(item.getSkuCode());
+            productSkuRequest2.setBatchInfoCode(item.getBatchInfoCode());
+            if(null==item.getWarehouseTypeCode()){
+                item.setWarehouseTypeCode("1");
+            }
+            productSkuRequest2.setWarehouseTypeCode(item.getWarehouseTypeCode());
+            productSkuRequest2List.add(productSkuRequest2);
         }
 
         //获取商品详情
-        Map<String, ErpSkuDetail> skuDetailMap = getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), skuCodeList);
+        Map<String, ErpSkuDetail> skuDetailMap = bridgeProductService.getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), productSkuRequest2List);
 
         //获取当前门店购物车已有的商品
         Map<String, ErpOrderCartInfo> cartLineMap = new HashMap<>(16);
@@ -182,7 +190,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         if (select != null && select.size() > 0) {
             for (ErpOrderCartInfo item :
                     select) {
-                cartLineMap.put(item.getSkuCode(), item);
+                cartLineMap.put(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode(), item);
             }
         }
 
@@ -194,17 +202,17 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         List<ErpCartAddItemResponse> skuStockList = new ArrayList<>();
         for (ErpCartAddSkuItem item :
                 erpCartAddRequest.getProducts()) {
-            if (!skuDetailMap.containsKey(item.getSkuCode())) {
-                throw new BusinessException("未找到商品" + item.getSkuCode() + "详情");
+            if (!skuDetailMap.containsKey(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode())) {
+                throw new BusinessException("未找到商品" + item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode() + "详情");
             }
-            ErpSkuDetail skuDetail = skuDetailMap.get(item.getSkuCode());
+            ErpSkuDetail skuDetail = skuDetailMap.get(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
 
             //购物车该商品当前数量
             int cartAmount = 0;
 
-            if (cartLineMap.containsKey(item.getSkuCode())) {
+            if (cartLineMap.containsKey(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode())) {
                 //购物车已经存在该商品
-                ErpOrderCartInfo erpOrderCartInfo = cartLineMap.get(item.getSkuCode());
+                ErpOrderCartInfo erpOrderCartInfo = cartLineMap.get(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
                 cartAmount = erpOrderCartInfo.getAmount() + item.getAmount();
                 erpOrderCartInfo.setLineCheckStatus(YesOrNoEnum.YES.getCode());
                 erpOrderCartInfo.setAmount(cartAmount);
@@ -250,11 +258,21 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 erpOrderCartInfo.setProductBrandCode(skuDetail.getProductBrandCode());
                 erpOrderCartInfo.setProductBrandName(skuDetail.getProductBrandName());
 
+                if(null!= skuDetail.getBatchList()&&skuDetail.getBatchList().size()>0&&null!=skuDetail.getBatchList().get(0).getBatchInfoCode()){
+                    //增加批次信息
+                    erpOrderCartInfo.setBatchCode(skuDetail.getBatchList().get(0).getBatchCode());
+                    erpOrderCartInfo.setBatchInfoCode(skuDetail.getBatchList().get(0).getBatchInfoCode());
+                    erpOrderCartInfo.setBatchDate(skuDetail.getBatchList().get(0).getBatchDate());
+                    erpOrderCartInfo.setWarehouseTypeCode(item.getWarehouseTypeCode());
+                    if(!YesOrNoEnum.YES.getCode().equals(erpCartAddRequest.getFirstOrderGift())){
+                        erpOrderCartInfo.setPrice(skuDetail.getBatchList().get(0).getBatchPrice());
+                    }
+                }
                 addList.add(erpOrderCartInfo);
             }
 
             if (cartAmount > skuDetail.getStockNum()) {
-                throw new BusinessException("商品" + skuDetail.getSkuName() + "库存不足");
+                throw new BusinessException("商品" + skuDetail.getSkuName()+"BATCH_INFO_CODE"+item.getBatchInfoCode()+ "库存不足");
             }
 
             //校验数量范围和规则
@@ -281,7 +299,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         }
 
         ErpOrderCartAddResponse addResponse = new ErpOrderCartAddResponse();
-        if (skuCodeList.size() > 0) {
+        if (skuStockList.size() > 0) {
             addResponse.setHasLowStockProduct(YesOrNoEnum.YES.getCode());
             addResponse.setLowStockProductList(skuStockList);
         } else {
@@ -378,7 +396,10 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         ErpOrderCartInfo query = new ErpOrderCartInfo();
         query.setStoreId(erpCartQueryRequest.getStoreId());
         query.setProductType(erpCartQueryRequest.getProductType());
-        query.setLineCheckStatus(YesOrNoEnum.YES.getCode());
+
+        if(null!=erpCartQueryRequest.getLineCheckStatus()){
+            query.setLineCheckStatus(erpCartQueryRequest.getLineCheckStatus());
+        }
         List<ErpOrderCartInfo> cartLineList = this.selectByProperty(query);
 
         //分销价汇总
@@ -439,14 +460,21 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         List<ErpCartGroupInfo> cartGroupList = new ArrayList<>();
 
         if (cartLineList != null && cartLineList.size() > 0) {
-            //商品skuCode集合
-            List<String> skuCodeList = new ArrayList<>();
+            //商品skuCode信息集合
+            List<ProductSkuRequest2> productSkuRequest2List =new ArrayList<>();
             for (ErpOrderCartInfo item :
                     cartLineList) {
-                skuCodeList.add(item.getSkuCode());
+                ProductSkuRequest2 productSkuRequest2=new ProductSkuRequest2();
+                productSkuRequest2.setSkuCode(item.getSkuCode());
+                productSkuRequest2.setBatchInfoCode(item.getBatchInfoCode());
+                if(null==item.getWarehouseTypeCode()){
+                    item.setWarehouseTypeCode("1");
+                }
+                productSkuRequest2.setWarehouseTypeCode(item.getWarehouseTypeCode());
+                productSkuRequest2List.add(productSkuRequest2);
             }
             //查询商品详情集合
-            Map<String, ErpSkuDetail> skuDetailMap = this.getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), skuCodeList);
+            Map<String, ErpSkuDetail> skuDetailMap = bridgeProductService.getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), productSkuRequest2List);
 
             //把库存不足的行变成非选中状态
             uncheckUnderStockLine(cartLineList, skuDetailMap, auth);
@@ -637,7 +665,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         //查询门店信息
         StoreInfo store = erpOrderRequestService.getStoreInfoByStoreId(erpCartQueryRequest.getStoreId());
         //查询A品卷使用规则code Map
-        Map ruleMap=couponRuleService.couponRuleMap();
+        Map<String,BigDecimal> ruleMap=couponRuleService.couponRuleMap();
+        //A品卷规则额度
+        BigDecimal ruleTop=BigDecimal.ZERO;
         ErpOrderCartInfo query = new ErpOrderCartInfo();
         query.setStoreId(erpCartQueryRequest.getStoreId());
         query.setProductType(erpCartQueryRequest.getProductType());
@@ -650,26 +680,33 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         //组装楼层列表
         List<ErpCartGroupInfo> cartGroupList = new ArrayList<>();
 
-        List<String> skuCodeList = new ArrayList<>();
+        List<ProductSkuRequest2> productSkuRequest2List =new ArrayList<>();
         for (ErpOrderCartInfo item :
                 cartLineList) {
-            skuCodeList.add(item.getSkuCode());
+            ProductSkuRequest2 productSkuRequest2=new ProductSkuRequest2();
+            productSkuRequest2.setSkuCode(item.getSkuCode());
+            productSkuRequest2.setBatchInfoCode(item.getBatchInfoCode());
+            if(null==item.getWarehouseTypeCode()){
+                item.setWarehouseTypeCode("1");
+            }
+            productSkuRequest2.setWarehouseTypeCode(item.getWarehouseTypeCode());
+            productSkuRequest2List.add(productSkuRequest2);
         }
         //缓存商品详情信息
-        Map<String, ErpSkuDetail> skuDetailMap = this.getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), skuCodeList);
+        Map<String, ErpSkuDetail> skuDetailMap = bridgeProductService.getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), productSkuRequest2List);
         //缓存当前剩余的库存数量
         Map<String, Integer> skuStockNumMap = new HashMap<>(16);
         for (ErpOrderCartInfo item :
                 cartLineList) {
-            ErpSkuDetail skuDetail = skuDetailMap.get(item.getSkuCode());
+            ErpSkuDetail skuDetail = skuDetailMap.get(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
             if (skuDetail == null) {
-                throw new BusinessException("未获取到商品" + item.getSkuName() + "信息");
+                throw new BusinessException("未获取到商品" + item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode() + "信息");
             }
             item.setStockNum(skuDetail.getStockNum());
             if (item.getAmount() > skuDetail.getStockNum()) {
                 throw new BusinessException("商品" + skuDetail.getSkuName() + "库存不足");
             }
-            skuStockNumMap.put(skuDetail.getSkuCode(), skuDetail.getStockNum() - item.getAmount());
+            skuStockNumMap.put(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode(), skuDetail.getStockNum() - item.getAmount());
         }
 
         //----------开始组装楼层----------
@@ -789,10 +826,18 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         groupProductQuantity += productItem.getAmount();
 
                         if(ruleMap.containsKey(productItem.getProductPropertyCode())){
+                            ruleTop=ruleMap.get(productItem.getProductPropertyCode());
                             //可使用优惠券
                             productItem.setCouponRule(YesOrNoEnum.YES.getCode());
 
                             groupTopCouponMaxTotal=productItem.getLineAmountTotal();
+
+                            if(null!=item.getActivityRule()&&null!=item.getActivityRule().getActivityType()&&item.getActivityRule().getActivityType()==2){
+                                topTotalPrice = topTotalPrice.add(productItem.getLineActivityAmountTotal());
+                            }else{
+                                topTotalPrice = topTotalPrice.add(productItem.getLineAmountAfterActivity());
+                            }
+
                         }
                     }
                 }
@@ -806,6 +851,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                     groupActivityAmount = groupActivityAmount.add(giftItem.getLineActivityAmountTotal());
                     groupActivityDiscountAmount = groupActivityDiscountAmount.add(giftItem.getLineActivityDiscountTotal());
                     groupGiftQuantity += giftItem.getAmount();
+
                 }
             }
 
@@ -827,14 +873,14 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
 
             activityAmountTotal = activityAmountTotal.add(groupActivityAmount);
             totalNumber += groupProductQuantity;
-            topTotalPrice = topTotalPrice.add(groupTopCouponMaxTotal);
+
             activityDiscountAmount = activityDiscountAmount.add(groupActivityDiscountAmount);
         }
 
         ErpStoreCartQueryResponse response = new ErpStoreCartQueryResponse();
         response.setActivityAmountTotal(activityAmountTotal);
         response.setTotalNumber(totalNumber);
-        response.setTopTotalPrice(topTotalPrice);
+        response.setTopTotalPrice(topTotalPrice.multiply(ruleTop).setScale(2, RoundingMode.DOWN));
         response.setCartGroupList(cartGroupList);
         response.setActivityDiscountAmount(activityDiscountAmount);
         response.setStoreAddress(store.getAddress());
@@ -1121,7 +1167,29 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 }
 
                 if (curRule != null) {
+
                     cartGroupInfo.setActivityRule(curRule);
+
+                    //计算满减均摊
+
+                    //当前剩余满减的金额
+                    BigDecimal restPreferentialAmount = curRule.getPreferentialAmount();
+
+                    if (activityAmountTotal.compareTo(BigDecimal.ZERO) > 0) {
+                        for (int i = 0; i < tempList.size(); i++) {
+                            ErpOrderCartInfo item = tempList.get(i);
+                            if (i == tempList.size() - 1) {
+                                //最后一行，用减法避免误差
+                                item.setLineActivityDiscountTotal(restPreferentialAmount);
+                            } else {
+                                //行活动优惠的金额，行根据活动使该行减少的金额，前端不显示 = 行活动价汇总 除以  勾选的商品组活动价汇总，初始等于商品组分销价汇总  乘以   活动规则的优惠金额、优惠件数、折扣点数（百分比）
+                                BigDecimal lineActivityDiscountTotal = item.getLineActivityAmountTotal().divide(activityAmountTotal, 6, RoundingMode.HALF_UP).multiply(curRule.getPreferentialAmount()).setScale(2, RoundingMode.HALF_UP);
+                                item.setLineActivityDiscountTotal(lineActivityDiscountTotal);
+                                restPreferentialAmount = restPreferentialAmount.subtract(lineActivityDiscountTotal);
+                            }
+                            item.setLineAmountAfterActivity(item.getLineActivityAmountTotal().subtract(item.getLineActivityDiscountTotal()).setScale(2, RoundingMode.HALF_UP));
+                        }
+                    }
                 }
                 ;
                 break;
@@ -1189,7 +1257,8 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                             giftList) {
                         //生成赠品行
                         ErpOrderCartInfo giftProductLine = createGiftProductLine(activity, giftItem, store);
-                        ErpSkuDetail skuDetail = skuDetailMap.get(giftProductLine.getSkuCode());
+                        ErpSkuDetail skuDetail = skuDetailMap.get(giftProductLine.getSkuCode()+"BATCH_INFO_CODE"+giftProductLine.getBatchInfoCode()
+                        );
                         if(null==skuDetail){
                             skuDetail=bridgeProductService.getProductSkuDetail(store.getProvinceId(),store.getCityId(),store.getCompanyCode(),giftProductLine.getSkuCode());
                         }
@@ -1531,7 +1600,8 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         //生成赠品行
                         ErpOrderCartInfo giftProductLine = createGiftProductLineWithinStock(activity, giftItem, store, skuDetailMap, skuStockNumMap, true);
                         if (giftProductLine != null) {
-                            ErpSkuDetail skuDetail = skuDetailMap.get(giftProductLine.getSkuCode());
+                            ErpSkuDetail skuDetail = skuDetailMap.get(giftProductLine.getSkuCode()+"BATCH_INFO_CODE"+giftProductLine.getBatchInfoCode()
+                            );
                             if(null==skuDetail){
                                 skuDetail=bridgeProductService.getProductSkuDetail(store.getProvinceId(),store.getCityId(),store.getCompanyCode(),giftProductLine.getSkuCode());
                             }
@@ -1727,6 +1797,12 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         erpOrderCartInfo.setLineActivityDiscountTotal(BigDecimal.ZERO);
         erpOrderCartInfo.setLineAmountAfterActivity(BigDecimal.ZERO);
         erpOrderCartInfo.setGiftGiveType(ErpProductGiftGiveTypeEnum.TYPE_1.getCode());
+
+        if(null!=skuDetail.getBatchList()&&skuDetail.getBatchList().size()>0){
+            erpOrderCartInfo.setBatchCode(skuDetail.getBatchList().get(0).getBatchCode());
+            erpOrderCartInfo.setBatchInfoCode(skuDetail.getBatchList().get(0).getBatchInfoCode());
+            erpOrderCartInfo.setBatchDate(skuDetail.getBatchList().get(0).getBatchDate());
+        }
         return erpOrderCartInfo;
     }
 
@@ -1749,8 +1825,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         } else {
             skuDetail = bridgeProductService.getProductSkuDetail(store.getProvinceId(), store.getCityId(), OrderConstant.SELECT_PRODUCT_COMPANY_CODE, rule.getSkuCode());
             if (skuDetail != null) {
-                skuDetailMap.put(skuDetail.getSkuCode(), skuDetail);
-                skuStockNumMap.put(skuDetail.getSkuCode(), skuDetail.getStockNum());
+                skuDetailMap.put(skuDetail.getSkuCode()+"BATCH_INFO_CODE"+skuDetail.getBatchInfoCode()
+                        , skuDetail);
+                skuStockNumMap.put(skuDetail.getSkuCode()+"BATCH_INFO_CODE"+skuDetail.getBatchInfoCode(), skuDetail.getStockNum());
             }
         }
 
@@ -1758,11 +1835,11 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         if (skuDetail != null) {
             int amount = rule.getNumbers();
             if (withinStock) {
-                int stockNum = skuStockNumMap.get(skuDetail.getSkuCode());
+                int stockNum = skuStockNumMap.get(skuDetail.getSkuCode()+"BATCH_INFO_CODE"+skuDetail.getBatchInfoCode());
                 if (amount > stockNum) {
                     amount = stockNum;
                 }
-                skuStockNumMap.put(skuDetail.getSkuCode(), stockNum - amount);
+                skuStockNumMap.put(skuDetail.getSkuCode()+"BATCH_INFO_CODE"+skuDetail.getBatchInfoCode(), stockNum - amount);
             }
             if (amount > 0) {
                 erpOrderCartInfo = new ErpOrderCartInfo();
@@ -1795,6 +1872,12 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 erpOrderCartInfo.setLineActivityDiscountTotal(BigDecimal.ZERO);
                 erpOrderCartInfo.setLineAmountAfterActivity(BigDecimal.ZERO);
                 erpOrderCartInfo.setGiftGiveType(ErpProductGiftGiveTypeEnum.TYPE_1.getCode());
+
+                if(null!=skuDetail.getBatchList()&&skuDetail.getBatchList().size()>0){
+                    erpOrderCartInfo.setBatchCode(skuDetail.getBatchList().get(0).getBatchCode());
+                    erpOrderCartInfo.setBatchInfoCode(skuDetail.getBatchList().get(0).getBatchInfoCode());
+                    erpOrderCartInfo.setBatchDate(skuDetail.getBatchList().get(0).getBatchDate());
+                }
             }
         }
         return erpOrderCartInfo;
@@ -1813,7 +1896,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         List<ErpOrderCartInfo> updateList = new ArrayList<>();
         for (ErpOrderCartInfo item :
                 cartLineList) {
-            ErpSkuDetail skuDetail = skuDetailMap.get(item.getSkuCode());
+            ErpSkuDetail skuDetail = skuDetailMap.get(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
             if (skuDetail == null || item.getAmount() > skuDetail.getStockNum()) {
                 item.setLineCheckStatus(YesOrNoEnum.NO.getCode());
                 updateList.add(item);
@@ -1826,6 +1909,10 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
             }
             if (skuDetail != null) {
                 item.setStockNum(skuDetail.getStockNum());
+
+                if(null!=skuDetail.getBatchList()&&skuDetail.getBatchList().size()>0&&null!=skuDetail.getBatchList().get(0).getBatchNum()){
+                    item.setStockNum(skuDetail.getBatchList().get(0).getBatchNum().intValue());
+                }
                 item.setIsSale(skuDetail.getIsSale());
             }
         }
@@ -1836,23 +1923,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
 
     }
 
-    /**
-     * 获取sku详情，返回map
-     *
-     * @param provinceCode 省编码
-     * @param cityCode     市编码
-     * @param skuCodeList  sku编码list
-     * @return
-     */
-    private Map<String, ErpSkuDetail> getProductSkuDetailMap(String provinceCode, String cityCode, List<String> skuCodeList) {
-        Map<String, ErpSkuDetail> skuDetailMap = new HashMap<>(16);
-        List<ErpSkuDetail> productSkuDetailList = bridgeProductService.getProductSkuDetailList(provinceCode, cityCode, OrderConstant.SELECT_PRODUCT_COMPANY_CODE, skuCodeList);
-        for (ErpSkuDetail item :
-                productSkuDetailList) {
-            skuDetailMap.put(item.getSkuCode(), item);
-        }
-        return skuDetailMap;
-    }
+
 
     /**
      * 获取最新的商品价格数据
@@ -1864,23 +1935,30 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
     private void setNewestSkuDetail(String provinceCode, String cityCode, List<ErpOrderCartInfo> cartList) {
         if (cartList != null && cartList.size() > 0) {
 
-            List<String> skuCodeList = new ArrayList<>();
+            List<ProductSkuRequest2> productSkuRequest2List =new ArrayList<>();
             for (ErpOrderCartInfo item :
                     cartList) {
-                skuCodeList.add(item.getSkuCode());
+                ProductSkuRequest2 productSkuRequest2=new ProductSkuRequest2();
+                productSkuRequest2.setSkuCode(item.getSkuCode());
+                productSkuRequest2.setBatchInfoCode(item.getBatchInfoCode());
+                if(null==item.getWarehouseTypeCode()){
+                    item.setWarehouseTypeCode("1");
+                }
+                productSkuRequest2.setWarehouseTypeCode(item.getWarehouseTypeCode());
+                productSkuRequest2List.add(productSkuRequest2);
             }
-            Map<String, ErpSkuDetail> skuDetailMap = this.getProductSkuDetailMap(provinceCode, cityCode, skuCodeList);
+            Map<String, ErpSkuDetail> skuDetailMap = bridgeProductService.getProductSkuDetailMap(provinceCode, cityCode, productSkuRequest2List);
 
             for (ErpOrderCartInfo item :
                     cartList) {
-                ErpSkuDetail skuDetail = skuDetailMap.get(item.getSkuCode());
+                ErpSkuDetail skuDetail = skuDetailMap.get(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
                 if (skuDetail != null) {
                     item.setLogo(skuDetail.getProductPicturePath());
 //                    item.setPrice(skuDetail.getPriceTax());
                     item.setTagInfoList(skuDetail.getTagInfoList());
                     item.setStockNum(skuDetail.getStockNum());
                 } else {
-                    //TODO 未查询到商品信息，需要做哪些处理
+                    throw new BusinessException("商品" + item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode() + "detail2接口查詢失敗");
                 }
             }
         }

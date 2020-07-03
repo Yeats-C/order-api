@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.domain.response.cart;
 
 import com.aiqin.mgs.order.api.domain.TagInfo;
+import com.aiqin.mgs.order.api.domain.request.product.BatchRespVo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -101,5 +102,27 @@ public class ErpSkuDetail {
     @ApiModelProperty("厂家指导价")
     @JsonProperty("manufacturer_guide_price")
     private BigDecimal manufacturerGuidePrice;
+
+    @ApiModelProperty("批次号")
+    @JsonProperty(value = "batch_code")
+    private String batchCode;
+
+
+    @ApiModelProperty("批次日期")
+    @JsonProperty(value = "batch_date")
+    private Date batchDate;
+
+    @ApiModelProperty("批次价格")
+    @JsonProperty("batch_price")
+    private BigDecimal batchPrice=new BigDecimal("0");
+
+    @ApiModelProperty("批次编号")
+    @JsonProperty(value = "batch_info_code")
+    private String batchInfoCode;
+
+    @ApiModelProperty("批次信息")
+    @JsonProperty(value = "batch_list")
+    private List<BatchRespVo> batchList;
+
 
 }

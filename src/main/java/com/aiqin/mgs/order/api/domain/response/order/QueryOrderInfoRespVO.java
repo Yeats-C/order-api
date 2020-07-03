@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.domain.response.order;
 
 import com.aiqin.mgs.order.api.base.OrderStatus;
 import com.aiqin.mgs.order.api.domain.OperationLog;
+import com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderInfoItemBatchRespVO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -192,6 +193,9 @@ public class QueryOrderInfoRespVO {
 
     @ApiModelProperty("商品信息")
     private List<QueryOrderInfoItemRespVO> productList;
+
+    @ApiModelProperty("商品批次信息")
+    private List<ReturnOrderInfoItemBatchRespVO> productBatchList;
 
 //    @ApiModelProperty("批次信息")
 //    private List<QueryOrderInfoItemBatchRespVO> batchList;

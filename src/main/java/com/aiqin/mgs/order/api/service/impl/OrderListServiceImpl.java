@@ -6,7 +6,6 @@ import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
-import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.OrderStatusEnum;
 import com.aiqin.mgs.order.api.component.ParamUnit;
 import com.aiqin.mgs.order.api.component.SequenceService;
@@ -22,7 +21,6 @@ import com.aiqin.mgs.order.api.domain.request.orderList.*;
 import com.aiqin.mgs.order.api.domain.request.stock.StockLockReqVo;
 import com.aiqin.mgs.order.api.domain.request.stock.StockLockSkuReqVo;
 import com.aiqin.mgs.order.api.domain.response.StoreMarketValueResponse;
-import com.aiqin.mgs.order.api.domain.response.order.ErpOrderItemSplitGroupResponse;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.FirstOrderTimeRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderSaveRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
@@ -32,8 +30,6 @@ import com.aiqin.mgs.order.api.service.BridgeStockService;
 import com.aiqin.mgs.order.api.service.OrderListService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
-import com.aiqin.mgs.order.api.util.AuthUtil;
-import com.aiqin.mgs.order.api.util.CopyBeanUtil;
 import com.aiqin.mgs.order.api.util.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -255,7 +251,7 @@ public class OrderListServiceImpl implements OrderListService {
 
     @Override
     public Boolean updateOrderStatusDeliver(DeliverVo deliverVo) {
-        log.info("修改订单为发货状态,入参deliverVo={}",JSON.toJSONString(deliverVo));
+        log.info("修改订单为发货状态,入参deliverVo={}",JsonUtil.toJson(deliverVo));
         Boolean br = orderListDao.updateStatusByCode(deliverVo.getOrderCode(), 11);
         List<ActualDeliverVo> actualDeliverVos = deliverVo.getActualDeliverVos();
         for (ActualDeliverVo vo : actualDeliverVos) {
@@ -492,7 +488,7 @@ public class OrderListServiceImpl implements OrderListService {
     @Override
     public OrderSaveRespVo save(OrderReqVo reqVo) {
         log.info("===============保存订单======================");
-        log.info(JSON.toJSONString(reqVo));
+        log.info(JsonUtil.toJson(reqVo));
         Date now = new Date();
         //设置行号
         for (int i = 0; i < reqVo.getProducts().size(); i++) {

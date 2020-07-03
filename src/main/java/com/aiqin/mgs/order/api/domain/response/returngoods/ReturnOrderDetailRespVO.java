@@ -204,6 +204,10 @@ public class ReturnOrderDetailRespVO {
     @JsonProperty("item_list")
     private List<ReturnOrderInfoItemRespVO> itemList;
 
+    @ApiModelProperty("退货订单批次商品")
+    @JsonProperty("item_batch_list")
+    private List<ReturnOrderInfoItemBatchRespVO> itemBatchList;
+
 //    @ApiModelProperty("批次信息")
 //    @JsonProperty("batch_list")
 //    private List<ReturnOrderInfoApplyInboundDetailRespVO> batchList;

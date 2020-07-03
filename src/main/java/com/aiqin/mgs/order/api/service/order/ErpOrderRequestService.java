@@ -33,6 +33,9 @@ public interface ErpOrderRequestService {
     /**
      * 查询sku详情
      *
+     *
+     * @param warehouseTypeCode
+     * @param batchInfoCode
      * @param companyCode 公司编码
      * @param skuCode     sku编码
      * @return com.aiqin.mgs.order.api.domain.ProductInfo
@@ -40,7 +43,7 @@ public interface ErpOrderRequestService {
      * @version: v1.0.0
      * @date 2019/12/23 15:06
      */
-    ProductInfo getSkuDetail(String companyCode, String skuCode);
+    ProductInfo getSkuDetail(String companyCode, String skuCode, String warehouseTypeCode, String batchInfoCode);
 
     /**
      * 根据优惠券编码获取优惠券信息

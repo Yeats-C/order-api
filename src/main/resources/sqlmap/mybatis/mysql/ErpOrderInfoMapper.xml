@@ -691,6 +691,11 @@
         set order_success = #{orderSucess}
         where order_store_code = #{orderStoreCode}
    </update>
+    <update id="updateScourSheetStatus">
+        update order_store_info
+        set scour_sheet_status = 3
+        where  order_store_code = #{orderCode}
+    </update>
     <!--查询订单到采购单同步失败的数据-->
     <select id="selectByOrderSucess" parameterType="java.lang.Integer" resultType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo">
         select

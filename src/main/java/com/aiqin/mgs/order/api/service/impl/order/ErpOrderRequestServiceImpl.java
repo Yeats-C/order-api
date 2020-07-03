@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.service.impl.order;
 
 import com.aiqin.ground.util.http.HttpClient;
+import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderLockStockTypeEnum;
@@ -13,8 +14,12 @@ import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.po.order.*;
 import com.aiqin.mgs.order.api.domain.request.StockVoRequest;
 import com.aiqin.mgs.order.api.domain.request.order.PayRequest;
+import com.aiqin.mgs.order.api.domain.request.product.StockBatchInfoRequest;
+import com.aiqin.mgs.order.api.domain.request.product.StockLockDetailRequest;
 import com.aiqin.mgs.order.api.domain.response.ProductSkuDetailResponse;
 import com.aiqin.mgs.order.api.domain.response.order.*;
+import com.aiqin.mgs.order.api.domain.response.stock.StockChangeRequest;
+import com.aiqin.mgs.order.api.domain.response.stock.StockInfoRequest;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderRequestService;
 import com.aiqin.mgs.order.api.service.order.ErpStoreLockDetailsService;
@@ -81,11 +86,13 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     }
 
     @Override
-    public ProductInfo getSkuDetail(String companyCode, String skuCode) {
-        logger.info("查询sku详情入参,companyCode={},skuCode={}",companyCode,skuCode);
+    public ProductInfo getSkuDetail(String companyCode, String skuCode, String warehouseTypeCode, String batchInfoCode) {
+        logger.info("查询sku详情入参,companyCode={},skuCode={},warehouseTypeCode={},batchInfoCode={}",companyCode,skuCode,warehouseTypeCode,batchInfoCode);
         String url = urlProperties.getProductApi() + "/search/spu/sku/detail";
         url += "?company_code=" + companyCode;
         url += "&sku_code=" + skuCode;
+        url += "&warehouse_type_code=" + warehouseTypeCode;
+        url += "&batch_Info_Code=" + batchInfoCode;
         ProductInfo product = new ProductInfo();
         try {
             logger.info("查询sku详情url={}",url);
@@ -127,6 +134,10 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             if (data.getProductSkuBoxPackings() != null && data.getProductSkuBoxPackings().size() > 0) {
                 product.setBoxGrossWeight(data.getProductSkuBoxPackings().get(0).getBoxGrossWeight());
                 product.setBoxVolume(data.getProductSkuBoxPackings().get(0).getBoxVolume());
+            }
+            //如果批次信息List不为空
+            if(null!=data.getBatchList()&&data.getBatchList().size()>0){
+                product.setPrice(data.getBatchList().get(0).getBatchPrice());
             }
 
         } catch (BusinessException e) {
@@ -178,6 +189,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             AuthUtil.addParameter(httpClient, auth);
             HttpResponse<Boolean> response = httpClient.action().result(new TypeReference<HttpResponse<Boolean>>() {
             });
+            logger.info("取消订单请求回调为：response{}", JsonUtil.toJson(response));
             if (RequestReturnUtil.validateHttpResponse(response)) {
                 if (response.getData()) {
                     flag = true;
@@ -231,15 +243,23 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public boolean lockStockInSupplyChain(ErpOrderInfo order, List<ErpOrderItem> itemList, AuthToken auth) {
-        log.info("创建订单,锁库存入参order={}",order);
-        log.info("创建订单,锁库存入参itemList={}",itemList);
-        log.info("创建订单,锁库存入参auth={}",auth);
+        log.info("创建订单,锁库存入参order={}",JsonUtil.toJson(order));
+        log.info("创建订单,锁库存入参itemList={}",JsonUtil.toJson(itemList));
+        log.info("创建订单,锁库存入参auth={}",JsonUtil.toJson(auth));
         boolean flag = true;
         try {
 
-            //TODO 按照sku汇总数量
-            List<Map<String, Object>> list = new ArrayList<>();
+            // 按照sku汇总数量  但是得增加批次信息
+            //锁库sku信息集合
+            List<StockLockDetailRequest> list = new ArrayList<>();
+            //销售库sku总数量集合
             Map<String,Long> countMap=new HashMap<>();
+            //销售库sku批次信息集合
+            Map<String,List<StockBatchInfoRequest>> productMap=new HashMap<>();
+            //特卖库sku总数量集合
+            Map<String,Long> countMap2=new HashMap<>();
+            //特卖库sku批次信息集合
+            Map<String,List<StockBatchInfoRequest>> productMap2=new HashMap<>();
             //记录skuCode和行号对应关系
             Map<String,Long> skuCodeLineMap=new HashMap<>();
             //赠品
@@ -250,13 +270,55 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             List<ErpOrderItem> integralGiftList=new ArrayList<>();
             //汇总sku
             for(ErpOrderItem item:itemList){
-                Long count=countMap.get(item.getSkuCode());
-                if(null!=countMap.get(item.getSkuCode())){
-                    count=count+item.getProductCount();
-                }else {
-                    count=item.getProductCount();
+                if(null==item.getWarehouseTypeCode()){
+                    item.setWarehouseTypeCode("1");
                 }
-                countMap.put(item.getSkuCode(),count);
+                //TODO 商品批次相关信息还得增加销售库特卖库标识
+                StockBatchInfoRequest stockBatchInfoRequest=new StockBatchInfoRequest();
+                stockBatchInfoRequest.setBatchCode(item.getBatchCode());
+                stockBatchInfoRequest.setBatchInfoCode(item.getBatchInfoCode());
+                stockBatchInfoRequest.setChangeCount(item.getProductCount());
+                stockBatchInfoRequest.setSkuCode(item.getSkuCode());
+                stockBatchInfoRequest.setSkuName(item.getSkuName());
+                stockBatchInfoRequest.setWarehouseType(Integer.valueOf(item.getWarehouseTypeCode()));
+                if(item.getWarehouseTypeCode().equals("1")){
+                    Long count=countMap.get(item.getSkuCode());
+                    List<StockBatchInfoRequest> batchList=productMap.get(item.getSkuCode());
+                    if(null!=countMap.get(item.getSkuCode())){
+                        count=count+item.getProductCount();
+                        if(null!=stockBatchInfoRequest.getBatchInfoCode()){
+                            batchList.add(stockBatchInfoRequest);
+                        }
+                    }else {
+                        count=item.getProductCount();
+                        if(null!=stockBatchInfoRequest.getBatchInfoCode()){
+                            batchList=new ArrayList<>();
+                            batchList.add(stockBatchInfoRequest);
+                        }
+
+                    }
+                    countMap.put(item.getSkuCode(),count);
+                    productMap.put(item.getSkuCode(),batchList);
+                }else if(item.getWarehouseTypeCode().equals("2")){
+                    Long count=countMap2.get(item.getSkuCode());
+                    List<StockBatchInfoRequest> batchList=productMap2.get(item.getSkuCode());
+                    if(null!=countMap2.get(item.getSkuCode())){
+                        count=count+item.getProductCount();
+                        if(null!=stockBatchInfoRequest.getBatchInfoCode()){
+                            batchList.add(stockBatchInfoRequest);
+                        }
+                    }else {
+                        count=item.getProductCount();
+                        if(null!=stockBatchInfoRequest.getBatchInfoCode()){
+                            batchList=new ArrayList<>();
+                            batchList.add(stockBatchInfoRequest);
+                        }
+
+                    }
+                    countMap2.put(item.getSkuCode(),count);
+                    productMap2.put(item.getSkuCode(),batchList);
+                }
+
                 //筛选出商品数据
                 if(ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductType())){
                     productList.add(item);
@@ -270,9 +332,9 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                     integralGiftList.add(item);
                 }
             }
-            log.info("创建订单,锁库存,sku汇总countMap={}",countMap);
-            log.info("创建订单,锁库存,筛选出商品数据productList={}",productList);
-            log.info("创建订单,锁库存,筛选出赠品数据giftList={}",giftList);
+            log.info("创建订单,锁库存,sku汇总countMap={}",JsonUtil.toJson(countMap));
+            log.info("创建订单,锁库存,筛选出商品数据productList={}",JsonUtil.toJson(productList));
+            log.info("创建订单,锁库存,筛选出赠品数据giftList={}",JsonUtil.toJson(giftList));
             //过滤商品和赠品sku和行号的对应关系
             for(ErpOrderItem eoi:productList){
                 if(null==skuCodeLineMap.get(eoi.getSkuCode())){
@@ -289,14 +351,29 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                     skuCodeLineMap.put(eoi.getSkuCode(),eoi.getLineCode());
                 }
             }
+            //销售库数据
             for(Map.Entry<String,Long> data:countMap.entrySet()){
                 String skuCode=data.getKey();
-                Map<String, Object> paramItemMap = new HashMap<>(16);
-                paramItemMap.put("change_count", countMap.get(skuCode));
-                paramItemMap.put("city_code", order.getCityId());
-                paramItemMap.put("province_code", order.getProvinceId());
-                paramItemMap.put("sku_code", skuCode);
-                list.add(paramItemMap);
+                StockLockDetailRequest stockLockDetailRequest=new StockLockDetailRequest();
+                stockLockDetailRequest.setChangeCount(countMap.get(skuCode).intValue());
+                stockLockDetailRequest.setCityCode(order.getCityId());
+                stockLockDetailRequest.setProvinceCode(order.getProvinceId());
+                stockLockDetailRequest.setSkuCode(skuCode);
+                stockLockDetailRequest.setWarehouseTypeCode(1);
+                stockLockDetailRequest.setBatchList(productMap.get(skuCode));
+                list.add(stockLockDetailRequest);
+            }
+            //特卖库数据
+            for(Map.Entry<String,Long> data:countMap2.entrySet()){
+                String skuCode=data.getKey();
+                StockLockDetailRequest stockLockDetailRequest=new StockLockDetailRequest();
+                stockLockDetailRequest.setChangeCount(countMap.get(skuCode).intValue());
+                stockLockDetailRequest.setCityCode(order.getCityId());
+                stockLockDetailRequest.setProvinceCode(order.getProvinceId());
+                stockLockDetailRequest.setSkuCode(skuCode);
+                stockLockDetailRequest.setWarehouseTypeCode(2);
+                stockLockDetailRequest.setBatchList(productMap2.get(skuCode));
+                list.add(stockLockDetailRequest);
             }
 //            for (ErpOrderItem item :
 //                    itemList) {
@@ -317,7 +394,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             paramMap.put("order_type", order.getOrderTypeCode());
             paramMap.put("detail_list", list);
 
-            logger.info("锁库请求参数paramMap={}", paramMap);
+            logger.info("锁库请求参数paramMap={}", JsonUtil.toJson(paramMap));
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/lock/info").json(paramMap);
 
 //            HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
@@ -327,7 +404,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 //                throw new BusinessException(response.getMessage());
 //            }
             Map<String,Object> result1=httpClient.action().result(new TypeReference<Map<String,Object>>() {});
-            log.info("锁库请求返回结果，result1={}", JSON.toJSON(result1));
+            log.info("锁库请求返回结果，result1={}", JsonUtil.toJson(result1));
             if(result1==null){
                 log.info("锁库请求返回失败");
 //                return false;
@@ -349,7 +426,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 }
                 erpStoreLockDetailsService.insertStoreLockDetails(records);
             } else {
-//                log.info("锁库请求返回list结果异常");
+                log.info("锁库请求返回list结果异常");
 //                return false;
                 throw new BusinessException("锁库请求失败");
             }
@@ -382,9 +459,9 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 
     @Override
     public boolean unlockStockInSupplyChainByDetail(ErpOrderInfo order, ErpOrderLockStockTypeEnum orderLockStockTypeEnum, AuthToken auth) {
-        log.info("解锁库存（根据明细解锁）--入参order={}",order);
-        log.info("解锁库存（根据明细解锁）--入参 orderLockStockTypeEnum={}",orderLockStockTypeEnum);
-        log.info("解锁库存（根据明细解锁）--入参 auth={}",auth);
+        log.info("解锁库存（根据明细解锁）--入参order={}",JsonUtil.toJson(order));
+        log.info("解锁库存（根据明细解锁）--入参 orderLockStockTypeEnum={}",JsonUtil.toJson(orderLockStockTypeEnum));
+        log.info("解锁库存（根据明细解锁）--入参 auth={}",JsonUtil.toJson(auth));
         boolean flag = true;
         try {
 
@@ -427,20 +504,62 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
 //                paramItemMap.put("company_name", order.getCompanyName());
 //                list.add(paramItemMap);
 //            }
-            Map<String, Object> paramMap = new HashMap<>();
-            paramMap.put("company_code", order.getCompanyCode());
-            paramMap.put("company_name", order.getCompanyName());
-            paramMap.put("operation_person_id", auth.getPersonId());
-            paramMap.put("operation_person_name", auth.getPersonName());
-            paramMap.put("operation_type", orderLockStockTypeEnum.getCode());
-            paramMap.put("order_code", order.getOrderStoreCode());
-            paramMap.put("order_type", order.getOrderTypeCode());
-            paramMap.put("stock_vo", list);
-            log.info("解锁库存（根据明细解锁）--调用供应链解锁接口,入参 paramMap={}",paramMap);
-            HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/change/stock").json(paramMap);
+//            Map<String, Object> paramMap = new HashMap<>();
+//            paramMap.put("company_code", order.getCompanyCode());
+//            paramMap.put("company_name", order.getCompanyName());
+//            paramMap.put("operation_person_id", auth.getPersonId());
+//            paramMap.put("operation_person_name", auth.getPersonName());
+//            paramMap.put("operation_type", orderLockStockTypeEnum.getCode());
+//            paramMap.put("order_code", order.getOrderStoreCode());
+//            paramMap.put("order_type", order.getOrderTypeCode());
+//            paramMap.put("stock_vo", list);
+
+
+
+
+            StockChangeRequest stockChangeRequest =new StockChangeRequest();
+            //操作类型：3.解锁库存
+            stockChangeRequest.setOperationType(3);
+            //库存集合
+            List<StockInfoRequest> stockList=new ArrayList<>();
+            //批次库存集合
+            List<StockBatchInfoRequest> stockBatchList=new ArrayList<>();
+
+            //修改成从锁库的时候保存的数据获取仓库库房分组信息
+            List<ErpOrderItemSplitGroupResponse> splitGroupResponses=erpStoreLockDetailsService.getNewRepositorySplitGroup(order);
+
+            for(ErpOrderItemSplitGroupResponse item:splitGroupResponses){
+                StockInfoRequest stockInfoRequest=new StockInfoRequest();
+                stockInfoRequest.setCompanyCode(order.getCompanyCode());
+                stockInfoRequest.setCompanyName(order.getCompanyName());
+                stockInfoRequest.setTransportCenterCode(item.getTransportCenterCode());
+                stockInfoRequest.setTransportCenterName(item.getTransportCenterName());
+                stockInfoRequest.setWarehouseCode(item.getWarehouseCode());
+                stockInfoRequest.setWarehouseName(item.getWarehouseName());
+                stockInfoRequest.setWarehouseType(Integer.valueOf(item.getWarehouseType()));
+                stockInfoRequest.setSkuCode(item.getSkuCode());
+                stockInfoRequest.setSkuName(item.getSkuName());
+                stockInfoRequest.setChangeCount(item.getLockCount());
+                stockList.add(stockInfoRequest);
+            }
+
+            for(ErpOrderItem item:order.getItemList()){
+                StockBatchInfoRequest stockBatchInfoRequest=new StockBatchInfoRequest();
+                stockBatchInfoRequest.setBatchCode(item.getBatchCode());
+                stockBatchInfoRequest.setBatchInfoCode(item.getBatchInfoCode());
+                stockBatchInfoRequest.setChangeCount(item.getProductCount());
+                stockBatchInfoRequest.setSkuCode(item.getSkuCode());
+                stockBatchInfoRequest.setSkuName(item.getSkuName());
+                stockBatchList.add(stockBatchInfoRequest);
+            }
+            stockChangeRequest.setStockList(stockList);
+            stockChangeRequest.setStockBatchList(stockBatchList);
+
+            log.info("解锁库存（根据明细解锁）--调用供应链解锁接口,入参 stockChangeRequest={}", JsonUtil.toJson(stockChangeRequest));
+            HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/change/stock").json(stockChangeRequest);
             HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
             });
-            log.info("解锁库存（根据明细解锁）--调用供应链解锁接口,返回结果 response={}",JSON.toJSONString(response));
+            log.info("解锁库存（根据明细解锁）--调用供应链解锁接口,返回结果 response={}",JsonUtil.toJson(response));
             if (!RequestReturnUtil.validateHttpResponse(response)) {
                 log.info("解锁库存（根据明细解锁）--调用供应链解锁接口,返回结果--解锁异常");
                 throw new BusinessException(response.getMessage());
@@ -476,11 +595,11 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             paramMap.put("operation_type", ErpOrderLockStockTypeEnum.UNLOCK.getCode());
             paramMap.put("order_code", order.getOrderStoreCode());
             paramMap.put("order_type", order.getOrderTypeCode());
-
+            log.info("解锁库存参数为 paramMap={}"+ JsonUtil.toJson(paramMap));
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + "/stock/unlock/info").json(paramMap);
             HttpResponse<Object> response = httpClient.action().result(new TypeReference<HttpResponse<Object>>() {
             });
-
+            log.info("解锁库存回调为response={}"+ JsonUtil.toJson(response));
             if (!RequestReturnUtil.validateHttpResponse(response)) {
                 throw new BusinessException(response.getMessage());
             }

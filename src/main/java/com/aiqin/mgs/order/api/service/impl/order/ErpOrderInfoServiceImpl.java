@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.service.impl.order;
 
+import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
@@ -571,7 +572,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         } else {
             list.add(order);
         }
-        logger.info("同步订单到供应链--拆单信息, list={}", JSON.toJSONString(list));
+        logger.info("同步订单到供应链--拆单信息, list={}", JsonUtil.toJson(list));
         List<ErpOrderInfo> newList = new ArrayList<>();
         for (ErpOrderInfo item :
                 list) {
@@ -585,7 +586,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 }
             }
         }
-        logger.info("同步订单到供应链--拆单信息--真正入参, newList={}", JSON.toJSONString(newList));
+        logger.info("同步订单到供应链--拆单信息--真正入参, newList={}", JsonUtil.toJson(newList));
         if(newList!=null&&newList.size()>0){
             //同步订单到供应链，只调用一次接口，不管成功失败都算执行完成这一步
             HttpResponse httpResponse = purchaseOrderService.createPurchaseOrder(newList);
@@ -730,7 +731,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         this.updateOrderByPrimaryKeySelective(order, auth);
 
         /*****************************************签收完毕，发放赠品额度start*****************************************/
-        logger.info("签收结束--判断是否发放赠品额度--主订单信息为 order={}",JSON.toJSONString(order));
+        logger.info("签收结束--判断是否发放赠品额度--主订单信息为 order={}",JsonUtil.toJson(order));
 
 
         logger.info("签收完毕--主订单商品18A类型总金额为commodityAmountOfTop={}",commodityAmountOfTop);

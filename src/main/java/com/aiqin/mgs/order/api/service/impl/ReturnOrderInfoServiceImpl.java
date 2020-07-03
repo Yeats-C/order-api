@@ -4,7 +4,10 @@ import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.base.*;
+import com.aiqin.mgs.order.api.base.ConstantData;
+import com.aiqin.mgs.order.api.base.PageRequestVO;
+import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.component.SequenceService;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOperationTypeEnum;
@@ -13,6 +16,7 @@ import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayTypeEnum;
 import com.aiqin.mgs.order.api.component.returnenums.*;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
+import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderOperationLogDao;
 import com.aiqin.mgs.order.api.dao.returnorder.RefundInfoDao;
@@ -55,6 +59,8 @@ import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -106,12 +112,14 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     private ErpOrderInfoService erpOrderInfoService;
     @Resource
     private CopartnerAreaService copartnerAreaService;
+    @Resource
+    private ErpOrderInfoDao erpOrderInfoDao;
 
 
     @Override
     @Transactional
     public HttpResponse save(ReturnOrderReqVo reqVo) {
-        log.info("发起退货--入参"+JSON.toJSONString(reqVo));
+        log.info("发起退货--入参"+JsonUtil.toJson(reqVo));
         //查询订单是否存在未处理售后单
         List<ReturnOrderInfo> returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndStatus(reqVo.getOrderStoreCode(), 1);
         Assert.isTrue(CollectionUtils.isEmpty(returnOrderInfo), "该订单还有未审核售后单，请稍后提交");
@@ -167,6 +175,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             detail.setProductStatus(productStatus);
             return detail;
         }).collect(Collectors.toList());
+        //增加批次字段
         log.info("发起退货--插入退货详情，details={}",details);
         returnOrderDetailDao.insertBatch(details);
         //添加日志
@@ -230,7 +239,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         po.setMainOrderCode(mainOrderCode);
         List<ErpOrderInfo> list=erpOrderQueryService.select(po);
         if(list!=null&&list.size()>0){
-            log.info("判断子单是否全部发货完成,原始订单集合为 list={}",JSON.toJSONString(list));
+            log.info("判断子单是否全部发货完成,原始订单集合为 list={}",JsonUtil.toJson(list));
             for(ErpOrderInfo eoi:list){
                 Integer orderStatus = eoi.getOrderStatus();
                 //判断订单状态是否是 11:发货完成或者 97:缺货终止
@@ -295,7 +304,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 reqVo.setTreatmentMethod(TreatmentMethodEnum.RETURN_AMOUNT_AND_GOODS_TYPE.getCode());
                 content=ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg();
                 //同步数据到供应链
-                sysFlag = true;
+                 sysFlag= true;
                 break;
             case 2:
                 reqVo.setOperateStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_APPLY.getKey());
@@ -980,6 +989,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //此单号有误，未查到订单数据
             return HttpResponse.failure(ResultCode.NOT_FOUND_ORDER_DATA);
         }
+        //加盟商id
+        String franchiseeId = erpOrderInfo.getFranchiseeId();
         List<ErpOrderItem> itemList=erpOrderInfo.getItemList();
         log.info("发起冲减单,原始订单详情,itemList={}",itemList);
         //冲减单总金额
@@ -987,6 +998,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //兑换赠品累计金额
 //        BigDecimal totalZengAmount=new BigDecimal(0);
         BigDecimal complimentaryAmount=new BigDecimal(0);
+        //A品卷总金额 ----------
+        BigDecimal  topCouponDiscountAmount = new BigDecimal(0);
         //发起冲减单所有商品总数量
         Long totalCount=0L;
         List<ReturnOrderDetail> detailsList=new ArrayList<>();
@@ -999,6 +1012,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 BigDecimal preferentialAmount=eoi.getPreferentialAmount();
                 //数量
                 Long productCount=eoi.getProductCount();
+                //A品卷单品金额
+                BigDecimal topCouponAmount = eoi.getTopCouponAmount() == null ? BigDecimal.ZERO : eoi.getTopCouponAmount();
                 //实发数量
                 Long actualProductCount=eoi.getActualProductCount();
                 if(null==actualProductCount){
@@ -1019,7 +1034,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                         totalAmount=totalAmount.add(amount);
                     }
                     totalCount=totalCount+differenceCount;
-                    //todo 少参数
+                    //实退商品的A品卷金额
+                    if(!"0".equals(topCouponAmount.toString())) {
+                        BigDecimal CommodityA = topCouponAmount.multiply(BigDecimal.valueOf(differenceCount));
+                        topCouponDiscountAmount = topCouponDiscountAmount.add(CommodityA);
+                    }
                     BeanUtils.copyProperties(eoi,returnOrderDetail);
                     returnOrderDetail.setActualReturnProductCount(differenceCount);
                     returnOrderDetail.setActualTotalProductAmount(amount);
@@ -1028,6 +1047,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     returnOrderDetail.setProductCategoryCode(eoi.getProductCategoryCode());
                     returnOrderDetail.setProductCategoryName(eoi.getProductCategoryName());
                     returnOrderDetail.setBarCode(eoi.getBarCode());
+                    //批次
+                    returnOrderDetail.setBatchInfoCode(eoi.getBatchInfoCode());
+//                    returnOrderDetail.setBatchNumber(eoi.getBatchNumber());
+                    returnOrderDetail.setBatchCode(eoi.getBatchCode());
+                    returnOrderDetail.setBatchDate(eoi.getBatchDate());
                     //可用赠品额度
                     returnOrderDetail.setComplimentaryAmount(complimentaryAmount);
                     detailsList.add(returnOrderDetail);
@@ -1040,6 +1064,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                         totalAmount=totalAmount.add(totalPreferentialAmount);
                     }
                     totalCount=totalCount+differenceCount;
+                    //实退商品的A品卷金额
+                    if (!"0".equals(topCouponAmount.toString())) {
+                        BigDecimal AllCommodityA = topCouponAmount.multiply(BigDecimal.valueOf(productCount));
+                        topCouponDiscountAmount = topCouponDiscountAmount.add(AllCommodityA);
+                    }
                     BeanUtils.copyProperties(eoi,returnOrderDetail);
                     returnOrderDetail.setActualReturnProductCount(differenceCount);
                     returnOrderDetail.setActualTotalProductAmount(totalPreferentialAmount);
@@ -1048,6 +1077,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     returnOrderDetail.setProductCategoryCode(eoi.getProductCategoryCode());
                     returnOrderDetail.setProductCategoryName(eoi.getProductCategoryName());
                     returnOrderDetail.setBarCode(eoi.getBarCode());
+                    //批次号
+                    returnOrderDetail.setBatchInfoCode(eoi.getBatchInfoCode());
+//                    returnOrderDetail.setBatchNumber(eoi.getBatchNumber());
+                    returnOrderDetail.setBatchCode(eoi.getBatchCode());
+                    returnOrderDetail.setBatchDate(eoi.getBatchDate());
                     //可用赠品额度
                     returnOrderDetail.setComplimentaryAmount(complimentaryAmount);
                     detailsList.add(returnOrderDetail);
@@ -1063,6 +1097,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 returnOrderInfo.setReturnOrderId(returnOrderId);
                 returnOrderInfo.setReturnOrderCode(returnOrderCode);
                 returnOrderInfo.setCreateTime(new Date());
+                //是否真的发起退货 改为：1-原始订单全部发货完成生成退货单
+                returnOrderInfo.setReallyReturn(1);
                 //退货状态 改为：11-退货完成
                 returnOrderInfo.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_RETURN.getKey());
                 returnOrderInfo.setActualProductCount(totalCount);
@@ -1071,6 +1107,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 //应退赠品总金额
 //                returnOrderInfo.setTotalZengAmount(totalAmount);
                 returnOrderInfo.setComplimentaryAmount(complimentaryAmount);
+                //退A品卷总金额
+//                returnOrderInfo.setTopCouponDiscountAmount(topCouponDiscountAmount);
                 //退货金额=商品冲减金额+赠品退积分金额
                 returnOrderInfo.setReturnOrderAmount(totalAmount.add(complimentaryAmount));
                 //退款方式 5:退到加盟商账户
@@ -1102,10 +1140,32 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 //发起退款
                 refund(returnOrderCode);
                 //发起退积分方法
-                refundPoints(returnOrderInfo);
-                return HttpResponse.success();
+                boolean b = refundPoints(returnOrderInfo);
+                if (!b){
+                    return HttpResponse.failure(ResultCode.ERP_FRANCHISEE_INTEGRAL_ERROR);
+                }
+                //发起退A品卷
+                if(!"0".equals(topCouponDiscountAmount.toString())){
+                   log.info("开始退A品卷");
+                   AGoodsVolumeGenerate(topCouponDiscountAmount, franchiseeId, returnOrderCode);
+//                    HttpResponse httpResponse = AGoodsVolumeGenerate(topCouponDiscountAmount, franchiseeId, returnOrderCode);
+//                    if (httpResponse!=null && "0".equals(httpResponse.getCode()) ){
+//                        log.info("冲减单已完成");
+//                        return HttpResponse.success();
+//                    }
+//                    return HttpResponse.failure(ResultCode.ERP_FRANCHISEE_ERROP);
+                }else {
+                    log.info("未使用A品卷，无需退优惠券");
+                }
+//                return HttpResponse.success();
+                //修改主订单中的冲减单状态
+                int count = erpOrderInfoDao.updateScourSheetStatus(orderCode);
+                if (count != 0){
+                    log.info("修改主订单中冲减单状态成功");
+                    return HttpResponse.success();
+                }
+                return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
             }
-
         }
         return HttpResponse.failure(ResultCode.NOT_FOUND_ORDER_DATA);
     }
@@ -1129,13 +1189,198 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
        Map<String, Object> result = null;
        result = httpClient.action().result(new TypeReference<Map<String, Object>>() {
        });
-       log.info("发起退积分申请结果，request={}",JSON.toJSON(result));
+       log.info("发起退积分申请结果，request={}",JsonUtil.toJson(result));
        if(result!=null&&"0".equals(result.get("code"))){
            log.info("退积分完成");
            return true;
        }
        return false;
    }
+
+
+//    /**
+//     * 封装-A品卷
+//     * @param
+//     * @return
+//     */
+//   public HttpResponse aGoodsVolume(String  orderCode){
+//       log.info("原始订单编码：{}", orderCode);
+//       ErpOrderInfo erpOrderInfo=erpOrderQueryService.getOrderAndItemByOrderCode(orderCode);
+//       if(null==erpOrderInfo){
+//           //此单号有误，未查到订单数据
+//           return HttpResponse.failure(ResultCode.NOT_FOUND_ORDER_DATA);
+//       }
+//       String storeId = erpOrderInfo.getStoreId();
+//       //加盟商id
+//       String franchiseeId = getFranchiseeId(storeId);
+//       log.info("加盟商id: " + franchiseeId);
+//       String storeCode = erpOrderInfo.getStoreCode();
+//       //退货单编码
+//       String returnCode = returnOrderInfoDao.selectReturnCode(storeCode);
+//       if(null == returnCode){
+//           //未查到退货单编码
+//           return HttpResponse.failure(ResultCode.RETURN_ORDER_CODE_ERROP);
+//       }
+//       List<ErpOrderItem> itemList = erpOrderInfo.getItemList();
+//       //总的A品卷金额
+//       BigDecimal topCouponDiscountAmount = BigDecimal.ZERO;
+//       log.info("商品明细：{}" + itemList);
+//       if (CollectionUtils.isNotEmpty(itemList)) {
+//           for (ErpOrderItem orderItem : itemList) {
+//               //商品的数量
+//               Long productCount = orderItem.getProductCount();
+//               String skuCode = orderItem.getSkuCode();
+//               //订单中的单品优惠卷金额
+//               BigDecimal topCouponAmount = orderItem.getTopCouponAmount();
+//               //查出这个商品退货数量
+//               ReturnOrderDetail returnOrderDetail = returnOrderDetailDao.selectReturnOrder(skuCode);
+//               log.info("退货商品明细：{}" + returnOrderDetail);
+//               //实退数量
+//               Long actualReturnProductCount = returnOrderDetail.getActualReturnProductCount();
+//               if (productCount != actualReturnProductCount){ //部分退
+//                   //商品实退数量的A品金额
+//                   BigDecimal bigDecimal = new BigDecimal(actualReturnProductCount);
+//                   BigDecimal productAGoodsAmount = topCouponAmount.multiply(bigDecimal);
+//                   topCouponDiscountAmount = topCouponDiscountAmount.add(productAGoodsAmount);
+//               }else if (productCount == actualReturnProductCount){  //全退
+//                   topCouponDiscountAmount = orderItem.getTopCouponDiscountAmount();
+//               }
+//           }
+//           //调用优惠券服务
+//           AGoodsVolumeGenerate(topCouponDiscountAmount, franchiseeId, returnCode);
+//           ReturnOrderInfo returnOrderInfo = new ReturnOrderInfo();
+//           returnOrderInfo.setTopCouponDiscountAmount(topCouponDiscountAmount);
+//           returnOrderInfo.setOrderStoreCode(orderCode);
+//           //修改退货主订单中的A品优惠券总金额
+//           int count = returnOrderInfoDao.updateReturnOrder(returnOrderInfo);
+//           log.info("修改退货主订单返回结果：{}"+count);
+//           if (count != 0){
+//               HttpResponse.success();
+//           }
+//           HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
+//
+//       }
+//       return HttpResponse.failure(ResultCode.ERP_ORDER_ITEM_ERROP);
+//   }
+
+
+
+    /**
+     * 生成A品卷
+     * @param
+     * @return
+     */
+    public HttpResponse  AGoodsVolumeGenerate(BigDecimal topCouponDiscountAmount,String franchiseeid,String returnCode){
+        log.info("生成A品卷入参：{},{},{}",topCouponDiscountAmount,franchiseeid,returnCode);
+        List<FranchiseeAssetVo> franchiseeAssets=new ArrayList<>();
+        Double totalMoney = topCouponDiscountAmount.doubleValue();
+        if(totalMoney!=null){
+            //计算面值为100的A品券数量
+            int num=(int)(totalMoney/100);
+            //计算剩余钱数
+            double balance=totalMoney%100;
+            //存储A品卷信息
+            List<CouponInfo> couponInfoList=new ArrayList<>();
+            for(int i=0;i<num;i++){
+                CouponInfo couponInfo=new CouponInfo();
+                couponInfo.setCouponName(ConstantData.COUPON_NAME_A);
+                couponInfo.setCouponType(ConstantData.COUPON_TYPE);
+                couponInfo.setFranchiseeId(franchiseeid);
+                couponInfo.setOrderId(returnCode);
+                //开始时间
+                Date date = new Date();
+//                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                String format = simpleDateFormat.format(date);
+                couponInfo.setValidityStartTime(date);
+                couponInfo.setValidityEndTime(obtainDate());
+                couponInfo.setCouponCode(couponCode());
+                couponInfo.setNominalValue(ConstantData.NOMINAL_VALUE);
+                couponInfoList.add(couponInfo);
+                FranchiseeAssetVo franchiseeAsset=new FranchiseeAssetVo();
+                BeanUtils.copyProperties(couponInfo,franchiseeAsset);
+                franchiseeAssets.add(franchiseeAsset);
+            }
+            if(balance>0){
+                CouponInfo couponInfo=new CouponInfo();
+                couponInfo.setCouponName(ConstantData.COUPON_NAME_A);
+                couponInfo.setCouponType(ConstantData.COUPON_TYPE);
+                couponInfo.setFranchiseeId(franchiseeid);
+                couponInfo.setOrderId(returnCode);
+                //开始时间
+                Date date = new Date();
+                couponInfo.setValidityStartTime(date);
+                couponInfo.setValidityEndTime(obtainDate());
+                couponInfo.setCouponCode(couponCode());
+                couponInfo.setNominalValue(BigDecimal.valueOf(balance));
+                couponInfoList.add(couponInfo);
+                FranchiseeAssetVo franchiseeAsset=new FranchiseeAssetVo();
+                BeanUtils.copyProperties(couponInfo,franchiseeAsset);
+                franchiseeAssets.add(franchiseeAsset);
+            }
+            if(CollectionUtils.isNotEmpty(franchiseeAssets)){
+                log.info("A品券同步到虚拟资产开始，franchiseeAssets={}",franchiseeAssets);
+                franchiseeAssets.forEach(p -> p.setFranchiseeId(franchiseeid));
+                franchiseeAssets.forEach(p -> p.setCreateTime(new Date()));
+                String url=slcsHost+"/franchiseeVirtual/VirtualA";
+                JSONObject json=new JSONObject();
+                json.put("list",franchiseeAssets);
+                HttpClient httpClient = HttpClient.post(url).json(json);
+                Map<String ,Object> res=null;
+                res = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+                log.info("同步到虚拟资产:"+res);
+                if(res!=null&&"0".equals(res.get("code"))){
+                    log.info("A品卷完成");
+//                    return HttpResponse.success();
+                    //修改退货总订单中的优惠总金额
+                    ReturnOrderInfo returnOrderInfos = new ReturnOrderInfo();
+                    returnOrderInfos.setTopCouponDiscountAmount(topCouponDiscountAmount);
+                    returnOrderInfos.setReturnOrderCode(returnCode);
+                    //修改退货主订单中的A品优惠券总金额
+                    int count = returnOrderInfoDao.updateReturnOrder(returnOrderInfos);
+                    log.info("修改退货主订单返回结果：{}",count);
+                    if (count != 0){
+                       return HttpResponse.success();
+                    }
+                   return  HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
+                }
+                return HttpResponse.failure(ResultCode.FRANCHISEE_VIRTUAL_ERROP);
+            }
+        }
+        return HttpResponse.failure(ResultCode.A_GOODS_ERROP);
+    }
+
+    /**
+     * 生成A品券编码
+     * @return
+     */
+    public static String couponCode(){
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMddHHmmss");
+        String str=sdf.format(new Date());
+        str="AC"+str+String.format("%04d",new Random().nextInt(9999));
+        return str;
+    }
+
+    /**
+     * 生成当前月份时间+3
+     */
+    public static Date obtainDate(){
+        Calendar instance = Calendar.getInstance();
+        Date date = new Date();
+        instance.setTime(date);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        instance.add(instance.MONTH,3);
+        Date time1 = instance.getTime();
+        String format = simpleDateFormat.format(time1);
+        Date parse = null;
+        try {
+            parse = simpleDateFormat.parse(format);
+            return parse;
+        } catch (ParseException e) {
+            log.info("context",e);
+            return null;
+        }
+
+    }
 
     @Override
     public PageResData<ReturnOrderInfo> getWriteDownOrderList(PageRequestVO<WriteDownOrderSearchVo> searchVo) {

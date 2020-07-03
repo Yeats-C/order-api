@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain.response;
 
+import com.aiqin.mgs.order.api.domain.request.product.BatchRespVo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
@@ -87,4 +88,8 @@ public class ProductSkuDetailResponse {
     /***SKU整包装信息返回*/
     @JsonProperty("productSkuBoxPackings")
     private List<ProductSkuBoxPackings> productSkuBoxPackings;
+
+    @ApiModelProperty("批次信息")
+    @JsonProperty(value = "batch_list")
+    private List<BatchRespVo> batchList;
 }

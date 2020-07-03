@@ -111,4 +111,10 @@ public interface ErpOrderInfoDao {
      * @param activity
      */
     Integer getStoreNum(Activity activity);
+
+    /**
+     * 修改订单中的冲减单状态
+     * @param orderCode
+     */
+    int updateScourSheetStatus(String orderCode);
 }

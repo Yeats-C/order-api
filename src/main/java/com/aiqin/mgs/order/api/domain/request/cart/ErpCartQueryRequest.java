@@ -19,4 +19,8 @@ public class ErpCartQueryRequest {
     @ApiModelProperty(value = "订单类型 1直送 2配送")
     @JsonProperty("product_type")
     private Integer productType;
+
+    @ApiModelProperty(value = "选中状态： 0、不选 1、选中")
+    @JsonProperty("line_check_status")
+    private Integer lineCheckStatus;
 }

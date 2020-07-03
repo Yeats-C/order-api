@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.domain.po.order;
 
 import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.aiqin.mgs.order.api.component.enums.ErpProductGiftEnum;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
@@ -288,6 +289,33 @@ public class ErpOrderItem extends PagesRequest {
     @ApiModelProperty(value = "使用赠品额度【订单详情展示字段】")
     @JsonProperty("used_gift_quota")
     private BigDecimal usedGiftQuota;
+
+    /***批次*/
+    @ApiModelProperty(value = "批次号")
+    @JsonProperty("batch_code")
+    private String batchCode;
+
+    @ApiModelProperty(value = "批次号时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonProperty("batch_date")
+    private Date batchDate;
+
+    @ApiModelProperty(value = "批次编码号")
+    @JsonProperty("batch_info_code")
+    private String batchInfoCode;
+
+//    @ApiModelProperty("批次编号")
+//    @JsonProperty(value = "batch_info_code")
+//    private String batchInfoCode;
+
+    @ApiModelProperty(value = "传入库房编码:1:销售库，2:特卖库")
+    @JsonProperty("warehouse_type_code")
+    private String warehouseTypeCode;
+
+    /**活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单*/
+    @ApiModelProperty(value = "活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单")
+    @JsonProperty("activity_type")
+    private Integer activityType;
 
 
     public String getProductTypeDesc() {

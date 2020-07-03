@@ -5,8 +5,10 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.dao.OperationLogDao;
+import com.aiqin.mgs.order.api.dao.PurchaseBatchDao;
 import com.aiqin.mgs.order.api.dao.PurchaseOrderDao;
 import com.aiqin.mgs.order.api.dao.PurchaseOrderDetailDao;
+import com.aiqin.mgs.order.api.domain.PurchaseBatch;
 import com.aiqin.mgs.order.api.domain.PurchaseOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.purchase.PurchaseApplyRequest;
 import com.aiqin.mgs.order.api.domain.request.purchase.PurchaseOrderProductRequest;
@@ -31,6 +33,8 @@ public class PurchaseManageServiceImpl implements PurchaseManageService {
     private PurchaseOrderDao purchaseOrderDao;
     @Resource
     private PurchaseOrderDetailDao purchaseOrderDetailDao;
+    @Resource
+    private PurchaseBatchDao purchaseBatchDao;
     @Resource
     private OperationLogDao operationLogDao;
 
@@ -69,6 +73,26 @@ public class PurchaseManageServiceImpl implements PurchaseManageService {
         }
         List<PurchaseOrderProduct> list = purchaseOrderDetailDao.purchaseOrderList(request);
         Integer count = purchaseOrderDetailDao.purchaseOrderCount(request);
+        pageResData.setDataList(list);
+        pageResData.setTotalCount(count);
+        return HttpResponse.success(pageResData);
+    }
+
+    @Override
+    public HttpResponse insertBatch(PurchaseBatch purchaseBatch) {
+        purchaseBatchDao.insertSelective(purchaseBatch);
+        return HttpResponse.success();
+    }
+
+    @Override
+    public HttpResponse<PageResData<PurchaseBatch>> purchaseOrderProductBatch(PurchaseOrderProductRequest request) {
+
+        PageResData pageResData = new PageResData();
+        if(StringUtils.isBlank(request.getPurchaseOrderId())){
+            return HttpResponse.success(pageResData);
+        }
+        List<PurchaseBatch> list = purchaseBatchDao.purchaseOrderBatchList(request);
+        Integer count = purchaseBatchDao.purchaseOrderBatchCount(request);
         pageResData.setDataList(list);
         pageResData.setTotalCount(count);
         return HttpResponse.success(pageResData);

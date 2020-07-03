@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -78,12 +79,12 @@ public class CouponRuleServiceImpl implements CouponRuleService {
 //    }
 
     @Override
-    public Map couponRuleMap(){
-        Map dateMap=new HashMap();
+    public Map<String,BigDecimal> couponRuleMap(){
+        Map<String,BigDecimal> dateMap=new HashMap();
         CouponRule couponRule=getCouponRule(2);
         if(null!=couponRule &&null!=couponRule.getCouponRuleDetailList()&&0<couponRule.getCouponRuleDetailList().size()){
             for (CouponRuleDetail detail:couponRule.getCouponRuleDetailList()) {
-                dateMap.put(detail.getProductPropertyCode(),detail.getProductPropertyName());
+                dateMap.put(String.valueOf(Integer.valueOf(detail.getProductPropertyCode())),couponRule.getProportion().divide(new BigDecimal(100)));
             }
         }
         return dateMap;

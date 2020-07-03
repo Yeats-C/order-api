@@ -2,23 +2,25 @@ package com.aiqin.mgs.order.api.service.bill.impl;
 
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.id.IdUtil;
+import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpLogOperationTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpLogStatusTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.OrderSucessEnum;
+import com.aiqin.mgs.order.api.dao.PurchaseBatchDao;
 import com.aiqin.mgs.order.api.dao.PurchaseOrderDao;
 import com.aiqin.mgs.order.api.dao.PurchaseOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
-import com.aiqin.mgs.order.api.domain.PurchaseOrderInfo;
+import com.aiqin.mgs.order.api.domain.PurchaseBatch;
 import com.aiqin.mgs.order.api.domain.PurchaseOrderDetail;
+import com.aiqin.mgs.order.api.domain.PurchaseOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.service.bill.CreatePurchaseOrderService;
 import com.aiqin.mgs.order.api.service.bill.OperationLogService;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +45,8 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
     PurchaseOrderDao purchaseOrderDao;
     @Resource
     PurchaseOrderDetailDao purchaseOrderDetailDao;
+    @Resource
+    PurchaseBatchDao purchaseBatchDao;
     @Resource
     ErpOrderInfoDao erpOrderInfoDao;
     @Resource
@@ -74,6 +78,8 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
                 erpOrderInfoTopurchaseOrder(erpOrderInfo);
                 //根据ERP订单明细生成爱亲采购单明细
                 itemListToPurchaseOrderDetail(erpOrderInfo.getItemList());
+                //根据ERP订单明细生成爱亲采购单批次明细
+                itemListToPurchaseBatch(erpOrderInfo.getItemList());
 
                 //修改ERP订单同步状态
                 erpOrderInfoDao.updateOrderSuccess(OrderSucessEnum.ORDER_SYNCHRO_SUCCESS.getCode(), erpOrderInfo.getOrderStoreCode());
@@ -208,12 +214,51 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
     }
 
     /**
+     * 订单明细转采购单单批次明细
+     *
+     * @param itemList
+     */
+    private void itemListToPurchaseBatch(List<ErpOrderItem> itemList) {
+        for (ErpOrderItem item : itemList) {
+            PurchaseBatch purchaseBatch = new PurchaseBatch();
+            purchaseBatch.setPurchaseOderCode(item.getOrderStoreCode());//采购单号
+            purchaseBatch.setBatchCode(item.getBatchCode());//批次号
+            purchaseBatch.setBatchInfoCode(item.getBatchInfoCode());//批次编号
+            purchaseBatch.setSkuCode(item.getSkuCode());//sku编号
+            purchaseBatch.setSkuName(item.getSkuName());//sku名称
+            purchaseBatch.setSupplierCode(item.getSupplierCode());//供应商编码
+            purchaseBatch.setSupplierName(item.getSupplierName());//供应商名称
+            purchaseBatch.setProductDate(item.getBatchDate());//生产日期
+            purchaseBatch.setTotalCount(item.getProductCount());//最小单位数量
+            purchaseBatch.setActualTotalCount(item.getActualProductCount());//实际最小单位数量
+            purchaseBatch.setLineCode(item.getLineCode());//行号
+            purchaseBatch.setCreateById(item.getCreateById());//创建人编码
+            purchaseBatch.setCreateByName(item.getCreateByName());//创建人名称
+            purchaseBatch.setCreateTime(new Date());//创建时间
+            purchaseBatch.setUpdateById(item.getCreateById());//创建人编码
+            purchaseBatch.setUpdateByName(item.getCreateByName());//创建人名称
+            purchaseBatch.setUpdateTime(new Date());//创建时间
+
+         //   purchaseBatch.setBatchRemark();//批次备注
+         //   purchaseBatch.setBeOverdueDate();//过期日期
+         //   purchaseBatch.setLineCode();//库位号
+            try {
+                //根据ERP订单生成爱亲采购单批次明细
+                purchaseBatchDao.insertSelective(purchaseBatch);
+            } catch (Exception e) {
+                LOGGER.error("根据ERP订单生成爱亲采购单明细异常", e);
+                throw new RuntimeException();
+            }
+        }
+    }
+
+    /**
      * 生成栖耘销售单.
      *
      * @param erpOrderInfo
      */
     private void createSaleOrder(List<ErpOrderInfo> erpOrderInfo) {
-        LOGGER.info("根据爱亲采购单，生成耘链销售单开始，参数为：erpOrderInfo{}",  JSONObject.toJSONString(erpOrderInfo));
+        LOGGER.info("根据爱亲采购单，生成耘链销售单开始，参数为：erpOrderInfo{}",  JsonUtil.toJson(erpOrderInfo));
         try {
             for(ErpOrderInfo orderInfo:erpOrderInfo){
                 String url = purchaseHost + "/order/aiqin/sale";

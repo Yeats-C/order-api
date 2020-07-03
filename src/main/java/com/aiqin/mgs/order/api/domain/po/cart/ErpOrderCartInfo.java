@@ -151,6 +151,23 @@ public class ErpOrderCartInfo {
     @JsonProperty("product_category_code")
     private String productCategoryCode;
 
+    @ApiModelProperty("批次号")
+    @JsonProperty(value = "batch_code")
+    private String batchCode;
+
+
+    @ApiModelProperty("批次日期")
+    @JsonProperty(value = "batch_date")
+    private Date batchDate;
+
+    @ApiModelProperty("批次编号")
+    @JsonProperty(value = "batch_info_code")
+    private String batchInfoCode;
+
+    @ApiModelProperty(value = "传入库房编码:1:销售库，2:特卖库")
+    @JsonProperty("warehouse_type_code")
+    private String warehouseTypeCode;
+
     /***********************************非数据库字段***********************************/
 
     /***活动价*/
@@ -205,5 +222,12 @@ public class ErpOrderCartInfo {
     @ApiModelProperty("是否可售：0为不可售，1为可售")
     @JsonProperty("is_sale")
     private Byte isSale;
+
+    /**活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单*/
+    @ApiModelProperty(value = "活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单")
+    @JsonProperty("activity_type")
+    private Integer activityType;
+
+
 
 }

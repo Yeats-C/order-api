@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.PurchaseBatchDao">
+  <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.PurchaseBatch">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="purchase_order_detail_batch_id" jdbcType="VARCHAR" property="purchaseOrderDetailBatchId" />
+    <result column="purchase_order_code" jdbcType="VARCHAR" property="purchaseOrderCode" />
+    <result column="sku_code" jdbcType="VARCHAR" property="skuCode" />
+    <result column="sku_name" jdbcType="VARCHAR" property="skuName" />
+    <result column="batch_code" jdbcType="VARCHAR" property="batchCode" />
+    <result column="product_date" jdbcType="TIMESTAMP" property="productDate" />
+    <result column="batch_remark" jdbcType="VARCHAR" property="batchRemark" />
+    <result column="unit_code" jdbcType="VARCHAR" property="unitCode" />
+    <result column="unit_name" jdbcType="VARCHAR" property="unitName" />
+    <result column="purchase_whole" jdbcType="BIGINT" property="purchaseWhole" />
+    <result column="purchase_single" jdbcType="BIGINT" property="purchaseSingle" />
+    <result column="base_product_spec" jdbcType="BIGINT" property="baseProductSpec" />
+    <result column="total_count" jdbcType="BIGINT" property="totalCount" />
+    <result column="actual_total_count" jdbcType="BIGINT" property="actualTotalCount" />
+    <result column="line_code" jdbcType="BIGINT" property="lineCode" />
+    <result column="use_status" jdbcType="BIT" property="useStatus" />
+    <result column="create_by_id" jdbcType="VARCHAR" property="createById" />
+    <result column="create_by_name" jdbcType="VARCHAR" property="createByName" />
+    <result column="update_by_id" jdbcType="VARCHAR" property="updateById" />
+    <result column="update_by_name" jdbcType="VARCHAR" property="updateByName" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, purchase_order_detail_batch_id, purchase_order_code, sku_code, sku_name, batch_code, 
+    product_date, batch_remark, unit_code, unit_name, purchase_whole, purchase_single, 
+    base_product_spec, total_count, actual_total_count, line_code, use_status, create_by_id, 
+    create_by_name, update_by_id, update_by_name, create_time, update_time
+  </sql>
+
+  <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.PurchaseBatch">
+    insert into purchase_batch
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="purchaseOderCode != null">
+        purchase_oder_code,
+      </if>
+      <if test="batchCode != null">
+        batch_code,
+      </if>
+      <if test="batchInfoCode != null">
+        batch_info_code,
+      </if>
+      <if test="skuCode != null">
+        sku_code,
+      </if>
+      <if test="skuName != null">
+        sku_name,
+      </if>
+      <if test="supplierCode != null">
+        supplier_code,
+      </if>
+      <if test="supplierName != null">
+        supplier_name,
+      </if>
+      <if test="batchRemark != null">
+        batch_remark,
+      </if>
+      <if test="productDate != null">
+        product_date,
+      </if>
+      <if test="beOverdueDate != null">
+        be_overdue_date,
+      </if>
+      <if test="totalCount != null">
+        total_count,
+      </if>
+      <if test="actualTotalCount != null">
+        actual_total_count,
+      </if>
+      <if test="locationCode != null">
+        location_code,
+      </if>
+      <if test="lineCode != null">
+        line_code,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="createById != null">
+        create_by_id,
+      </if>
+      <if test="updateById != null">
+        update_by_id,
+      </if>
+      <if test="createByName != null">
+        create_by_name,
+      </if>
+      <if test="updateByName != null">
+        update_by_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="purchaseOderCode != null">
+        #{purchaseOderCode},
+      </if>
+      <if test="batchCode != null">
+        #{batchCode},
+      </if>
+      <if test="batchInfoCode != null">
+        #{batchInfoCode},
+      </if>
+      <if test="skuCode != null">
+        #{skuCode},
+      </if>
+      <if test="skuName != null">
+        #{skuName},
+      </if>
+      <if test="supplierCode != null">
+        #{supplierCode},
+      </if>
+      <if test="supplierName != null">
+        #{supplierName},
+      </if>
+      <if test="batchRemark != null">
+        #{batchRemark},
+      </if>
+      <if test="productDate != null">
+        #{productDate},
+      </if>
+      <if test="beOverdueDate != null">
+        #{beOverdueDate},
+      </if>
+      <if test="totalCount != null">
+        #{totalCount},
+      </if>
+      <if test="actualTotalCount != null">
+        #{actualTotalCount},
+      </if>
+      <if test="locationCode != null">
+        #{locationCode},
+      </if>
+      <if test="lineCode != null">
+        #{lineCode},
+      </if>
+      <if test="createTime != null">
+        #{createTime},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime},
+      </if>
+      <if test="createById != null">
+        #{createById},
+      </if>
+      <if test="updateById != null">
+        #{updateById},
+      </if>
+      <if test="createByName != null">
+        #{createByName},
+      </if>
+      <if test="updateByName != null">
+        #{updateByName},
+      </if>
+    </trim>
+  </insert>
+
+  <select id="purchaseOrderBatchList" parameterType="com.aiqin.mgs.order.api.domain.request.purchase.PurchaseOrderProductRequest"
+          resultType="com.aiqin.mgs.order.api.domain.PurchaseBatch">
+    select
+    id,purchase_oder_code purchaseOderCode, batch_code batchCode, batch_info_code batchInfoCode,
+    sku_code skuCode, sku_name skuName, supplier_code supplierCode, supplier_name supplierName,
+    batch_remark batchRemark, product_date productDate, be_overdue_date beOverdueDate,
+    total_count totalCount, actual_total_count actualTotalCount, location_code locationCode,
+    line_code lineCode, create_time createTime,update_time updateTime,
+    create_by_id createById, create_by_name createByName, update_by_id updateById,update_by_name updateByName
+    from purchase_batch
+    <where>
+      purchase_oder_code = #{purchaseOrderId,jdbcType=VARCHAR}
+    </where>
+    <if test="isPage == 0">
+      LIMIT #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </if>
+  </select>
+
+  <select id="purchaseOrderBatchCount" parameterType="com.aiqin.mgs.order.api.domain.request.purchase.PurchaseOrderProductRequest"
+          resultType="java.lang.Integer">
+      select count(1)
+      from purchase_batch
+      <where>
+        purchase_oder_code = #{purchaseOrderId,jdbcType=VARCHAR}
+      </where>
+  </select>
+</mapper>

@@ -147,4 +147,14 @@ public class ReturnOrderDetail {
     @ApiModelProperty(value = "服纺券单品金额")
     private BigDecimal returnClothingSpinning;
 
+    @ApiModelProperty(value = "批次编码")
+    private String batchInfoCode;
+
+    @ApiModelProperty(value = "批次号时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date batchDate;
+
+    @ApiModelProperty(value = "批次号")
+    private String batchCode;
+
 }

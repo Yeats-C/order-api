@@ -9,6 +9,7 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
+import com.aiqin.mgs.order.api.domain.FranchiseeInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.dto.ProductDistributorOrderDTO;
@@ -18,6 +19,7 @@ import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.request.product.NewStoreCategory;
+import com.aiqin.mgs.order.api.domain.request.product.ProductSkuRequest2;
 import com.aiqin.mgs.order.api.domain.request.product.ProductSkuRespVo6;
 import com.aiqin.mgs.order.api.domain.request.product.SkuProductReqVO;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
@@ -25,6 +27,7 @@ import com.aiqin.mgs.order.api.domain.request.stock.ProductSkuStockRespVo;
 import com.aiqin.mgs.order.api.domain.response.NewFranchiseeResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetail;
 import com.aiqin.mgs.order.api.domain.response.gift.StoreAvailableGiftQuotaResponse;
+import com.aiqin.mgs.order.api.domain.response.order.StoreFranchiseeInfoResponse;
 import com.aiqin.mgs.order.api.util.MathUtil;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -104,13 +107,13 @@ public class BridgeProductService<main> {
      * @param provinceCode 省编码
      * @param cityCode     市编码
      * @param companyCode  公司编码
-     * @param skuCodeList  sku编码集合
+     * @param productSkuRequest2List  sku信息集合
      * @return java.util.List<com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetailResponse>
      * @author: Tao.Chen
      * @version: v1.0.0
      * @date 2020/3/10 10:54
      */
-    public List<ErpSkuDetail> getProductSkuDetailList(String provinceCode, String cityCode, String companyCode, List<String> skuCodeList) {
+    public List<ErpSkuDetail> getProductSkuDetailList(String provinceCode, String cityCode, String companyCode, List<ProductSkuRequest2> productSkuRequest2List) {
 
         List<ErpSkuDetail> list = new ArrayList<>();
         try {
@@ -118,7 +121,7 @@ public class BridgeProductService<main> {
             shoppingCartProductRequest.setCityCode(cityCode);
             shoppingCartProductRequest.setProvinceCode(provinceCode);
             shoppingCartProductRequest.setCompanyCode(companyCode);
-            shoppingCartProductRequest.setSkuCodes(skuCodeList);
+            shoppingCartProductRequest.setProductSkuRequest2List(productSkuRequest2List);
             String path = "/search/spu/sku/detail2";
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest);
             HttpResponse<List<ErpSkuDetail>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ErpSkuDetail>>>() {
@@ -156,9 +159,12 @@ public class BridgeProductService<main> {
             shoppingCartProductRequest.setCityCode(cityCode);
             shoppingCartProductRequest.setProvinceCode(provinceCode);
             shoppingCartProductRequest.setCompanyCode(companyCode);
-            List<String> skuCodeList = new ArrayList<>();
-            skuCodeList.add(skuCode);
-            shoppingCartProductRequest.setSkuCodes(skuCodeList);
+            List<ProductSkuRequest2> productSkuRequest2List=new ArrayList<>();
+            ProductSkuRequest2 productSkuRequest2=new ProductSkuRequest2();
+            productSkuRequest2.setSkuCode(skuCode);
+            productSkuRequest2.setWarehouseTypeCode("1");
+            productSkuRequest2List.add(productSkuRequest2);
+            shoppingCartProductRequest.setProductSkuRequest2List(productSkuRequest2List);
             String path = "/search/spu/sku/detail2";
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest);
             HttpResponse<List<ErpSkuDetail>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ErpSkuDetail>>>() {
@@ -305,11 +311,11 @@ public class BridgeProductService<main> {
         });
         if (Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")) {
             List<ProductCategoryRespVO> lists=response.getData();
-            //门店端不展示赠品，物料，德明居，其他，只展示1到11到品类
+            //门店端不展示物料，德明居，其他，只展示1到12到品类
             Iterator<ProductCategoryRespVO> it = lists.iterator();
             while(it.hasNext()){
                 ProductCategoryRespVO str = it.next();
-                if(str.getCategoryId().compareTo("11")>0){
+                if(str.getCategoryId().compareTo("12")>0){
                     it.remove();
                 }
             }
@@ -343,11 +349,11 @@ public class BridgeProductService<main> {
         });
         if (Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")) {
             List<ProductCategoryRespVO> lists=response.getData();
-            //门店端不展示赠品，物料，德明居，其他，只展示1到11到品类
+            //门店端不展示物料，德明居，其他，只展示1到12到品类
             Iterator<ProductCategoryRespVO> it = lists.iterator();
             while(it.hasNext()){
                 ProductCategoryRespVO str = it.next();
-                if(str.getCategoryId().compareTo("11")>0){
+                if(str.getCategoryId().compareTo("12")>0){
                     it.remove();
                 }
             }
@@ -402,11 +408,11 @@ public class BridgeProductService<main> {
         });
         if (Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0")) {
             List<ProductCategoryRespVO> lists=response.getData();
-            //门店端不展示赠品，物料，德明居，其他，只展示1到11到品类
+            //门店端不展示物料，德明居，其他，只展示1到12到品类
             Iterator<ProductCategoryRespVO> it = lists.iterator();
             while(it.hasNext()){
                 ProductCategoryRespVO pro = it.next();
-                if(pro.getCategoryId().compareTo("11")>0){
+                if(pro.getCategoryId().compareTo("12")>0){
                     it.remove();
                 }
             }
@@ -428,11 +434,11 @@ public class BridgeProductService<main> {
         });
         if (Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0") && type=="2") {
             List<ProductCategoryRespVO> lists=response.getData().getProductCategoryRespVOList();
-            //门店端不展示赠品，物料，德明居，其他，只展示1到11到品类
+            //门店端不展示物料，德明居，其他，只展示1到12到品类
             Iterator<ProductCategoryRespVO> it = lists.iterator();
             while(it.hasNext()){
-                ProductCategoryRespVO pro = it.next();
-                if(pro.getCategoryId().compareTo("11")>0){
+                ProductCategoryRespVO str = it.next();
+                if(str.getCategoryId().compareTo("12")>0){
                     it.remove();
                 }
             }
@@ -563,6 +569,73 @@ public class BridgeProductService<main> {
         }
 
         return gradient;
+    }
+
+    /**
+     * 获取sku详情，返回map
+     *
+     * @param provinceCode 省编码
+     * @param cityCode     市编码
+     * @param productSkuRequest2List  sku信息list
+     * @return
+     */
+    public Map<String, ErpSkuDetail> getProductSkuDetailMap(String provinceCode, String cityCode, List<ProductSkuRequest2> productSkuRequest2List) {
+        Map<String, ErpSkuDetail> skuDetailMap = new HashMap<>(16);
+        List<ErpSkuDetail> productSkuDetailList = getProductSkuDetailList(provinceCode, cityCode, OrderConstant.SELECT_PRODUCT_COMPANY_CODE, productSkuRequest2List);
+        for (ErpSkuDetail item : productSkuDetailList) {
+            String batchInfoCode=null;
+            if(null!= item.getBatchList()&&item.getBatchList().size()>0&&null!=item.getBatchList().get(0).getBatchInfoCode()){
+                batchInfoCode=item.getBatchList().get(0).getBatchInfoCode();
+            }
+            skuDetailMap.put(item.getSkuCode()+"BATCH_INFO_CODE"+batchInfoCode, item);
+        }
+        return skuDetailMap;
+    }
+    /**
+     * 获取sku详情，返回map
+     *
+     * @param provinceCode 省编码
+     * @param cityCode     市编码
+     * @param productSkuRequest2List  sku信息list
+     * @return
+     */
+    public Map<String, ErpSkuDetail> getProductSkuDetailMap1(String provinceCode, String cityCode, List<ProductSkuRequest2> productSkuRequest2List) {
+        Map<String, ErpSkuDetail> skuDetailMap = new HashMap<>(16);
+        List<ErpSkuDetail> productSkuDetailList = getProductSkuDetailList(provinceCode, cityCode, OrderConstant.SELECT_PRODUCT_COMPANY_CODE, productSkuRequest2List);
+        for (ErpSkuDetail item : productSkuDetailList) {
+
+            skuDetailMap.put(item.getSkuCode(), item);
+        }
+        return skuDetailMap;
+    }
+
+
+    public StoreInfo getStoreInfoByStoreId(String storeId) {
+        StoreInfo storeInfo = new StoreInfo();
+        try {
+            HttpClient httpClient = HttpClient.get(urlProperties.getSlcsApi() + "/store/info?store_id=" + storeId);
+            HttpResponse<StoreFranchiseeInfoResponse> response = httpClient.action().result(new TypeReference<HttpResponse<StoreFranchiseeInfoResponse>>() {
+            });
+            if (!RequestReturnUtil.validateHttpResponse(response)) {
+                throw new BusinessException("获取门店信息失败");
+            }
+            StoreFranchiseeInfoResponse data = response.getData();
+            if (data == null) {
+                throw new BusinessException("无效的门店");
+            }
+            storeInfo = data.getStoreInfo();
+            FranchiseeInfo franchiseeInfo = data.getFranchiseeInfo();
+            if (storeInfo != null && franchiseeInfo != null) {
+                storeInfo.setFranchiseeName(franchiseeInfo.getFranchiseeName());
+            }
+        } catch (BusinessException e) {
+            log.info("获取门店信息失败：{}", e.getMessage());
+            throw new BusinessException(e.getMessage());
+        } catch (Exception e) {
+            log.info("获取门店信息失败：{}", e);
+            throw new BusinessException("获取门店信息失败");
+        }
+        return storeInfo;
     }
 
 
