@@ -676,7 +676,7 @@
         #{returnMoneyType,jdbcType=BIT},
       </if>
       <if test="orderCategory != null" >
-        #{orderCategory,jdbcType=BIT},
+        #{orderCategory,jdbcType=INTEGER},
       </if>
       <if test="reviewOperatorId != null" >
         #{reviewOperatorId},
@@ -1485,6 +1485,9 @@
            </if>
         </where>
       order by create_time desc
+    </select>
+    <select id="selectType" resultType="java.lang.Integer">
+      select order_success from return_order_info where return_order_code = #{returnOrderCode,jdbcType=VARCHAR}
     </select>
     <update id="updateReallyReturn" parameterType="java.util.List">
     update return_order_info

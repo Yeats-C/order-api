@@ -78,7 +78,7 @@ public class ReturnOrderReqVo implements Serializable {
     @ApiModelProperty("加盟商名称")
     private String franchiseeName;
 
-    @ApiModelProperty("业务形式 0门店退货 1批发退货")
+    @ApiModelProperty("业务形式 0门店退货 1批发")
     private Integer businessForm;
 
     @ApiModelProperty("合伙人编码")

@@ -270,6 +270,7 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
                 String url = rejectHost + "/returnGoods/record/return";
                 //String url = "http://192.168.11.119:80/returnGoods/record/return";
                 LOGGER.info("根据爱亲退供单，生成耘链退货亲求地址url:"+ url +"，请求参数returnOrderReq:"+returnOrderReq);
+                LOGGER.info("熙耘地址请求：{}",JSON.toJSONString(returnOrderReq));
                 HttpClient httpGet = HttpClient.post(url).json(returnOrderReq);
                 HttpResponse<Object> response = httpGet.action().result(new TypeReference<HttpResponse<Object>>() {
                 });

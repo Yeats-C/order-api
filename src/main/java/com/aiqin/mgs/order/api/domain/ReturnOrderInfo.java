@@ -103,7 +103,7 @@ public class ReturnOrderInfo {
     @ApiModelProperty("合伙人名称")
     private String copartnerAreaName;
 
-    @ApiModelProperty("业务形式 0门店退货 1批发退货")
+    @ApiModelProperty("业务形式 0门店退货 1批发退货  ")
     private Integer businessForm;
 
     @ApiModelProperty(value = "是否锁定  0是 1否")
