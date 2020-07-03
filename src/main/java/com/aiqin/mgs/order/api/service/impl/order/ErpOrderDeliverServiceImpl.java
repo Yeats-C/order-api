@@ -676,7 +676,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                         //分销总价=商品价值
                         BigDecimal fenxiaozongjia=eo.getProductAmount().multiply(new BigDecimal(eo.getProductCount()));
                         //分摊总额=商品价值X商品总金额/商品总价值
-                        if(productAmount.compareTo(BigDecimal.ZERO) > 0 && productPriceAmount.compareTo(BigDecimal.ZERO) > 0){
+                        if(productAmount == BigDecimal.ZERO && productPriceAmount == BigDecimal.ZERO){
                             BigDecimal totalPreferentialAmount=fenxiaozongjia.multiply(productAmount).divide(productPriceAmount,2,BigDecimal.ROUND_HALF_UP);
                             //分摊单价
                             BigDecimal preferentialAmount=totalPreferentialAmount.divide(new BigDecimal(eo.getProductCount()),2,BigDecimal.ROUND_HALF_UP);
