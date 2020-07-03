@@ -739,11 +739,16 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
         for(int i=0;i<list.size();i++){
             //本行商品价值
             BigDecimal totalPreferentialAmount = list.get(i).getTotalPreferentialAmount();
-            //分摊总金额=本行商品价值X商品总金额/商品总价值
-            BigDecimal to=totalPreferentialAmount.multiply(list.get(i).getTotalProductAmount()).divide(priceAmount,2,BigDecimal.ROUND_HALF_UP);
+            //分摊总金额
+            BigDecimal to=BigDecimal.ZERO;
             //分摊单价
-            BigDecimal per=to.divide(new BigDecimal(list.get(i).getProductCount()),2,BigDecimal.ROUND_HALF_UP);
-
+            BigDecimal per=BigDecimal.ZERO;
+            if(totalPreferentialAmount.compareTo(BigDecimal.ZERO)>0){
+                //分摊总金额=本行商品价值X商品总金额/商品总价值
+                 to=totalPreferentialAmount.multiply(list.get(i).getTotalProductAmount()).divide(priceAmount,2,BigDecimal.ROUND_HALF_UP);
+                //分摊单价
+                 per=to.divide(new BigDecimal(list.get(i).getProductCount()),2,BigDecimal.ROUND_HALF_UP);
+            }
             BigDecimal at=BigDecimal.ZERO;
             //最后一行做减法
             if(i==list.size()-1){
@@ -796,18 +801,23 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
         List<ErpOrderItem> resList=new ArrayList<>();
         //遍历明细行，进行分摊
         for(ErpOrderItem k:itemList){
-            //分摊总价=商品原始分摊总价X实付金额/商品总价值
-            BigDecimal tper = k.getTotalPreferentialAmount().multiply(payMoney).divide(totalMoney, 2, BigDecimal.ROUND_HALF_UP);
-            //商品类型
-            Integer productType = k.getProductType();
+            BigDecimal tper=BigDecimal.ZERO;
             BigDecimal s=BigDecimal.ZERO;
-            if(ErpProductGiftEnum.PRODUCT.getCode().equals(productType)){
-                //商品分摊单价=分摊总金额/订货数量
-                s=tper.divide(new BigDecimal(k.getProductCount()),2,BigDecimal.ROUND_HALF_UP);
-            }else {
-                //赠品分摊单价=分摊总金额/实发数量
-                s=tper.divide(new BigDecimal(k.getActualProductCount()),2,BigDecimal.ROUND_HALF_UP);
+            if(k.getTotalPreferentialAmount().compareTo(BigDecimal.ZERO)>0){
+                //分摊总价=商品原始分摊总价X实付金额/商品总价值
+                tper = k.getTotalPreferentialAmount().multiply(payMoney).divide(totalMoney, 2, BigDecimal.ROUND_HALF_UP);
+                //商品类型
+                Integer productType = k.getProductType();
+
+                if(ErpProductGiftEnum.PRODUCT.getCode().equals(productType)){
+                    //商品分摊单价=分摊总金额/订货数量
+                    s=tper.divide(new BigDecimal(k.getProductCount()),2,BigDecimal.ROUND_HALF_UP);
+                }else {
+                    //赠品分摊单价=分摊总金额/实发数量
+                    s=tper.divide(new BigDecimal(k.getActualProductCount()),2,BigDecimal.ROUND_HALF_UP);
+                }
             }
+
             k.setTotalPreferentialAmount(tper);
             k.setPreferentialAmount(s);
             ErpOrderItem er=new ErpOrderItem();
