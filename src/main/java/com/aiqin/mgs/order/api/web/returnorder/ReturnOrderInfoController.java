@@ -7,6 +7,7 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
+import com.aiqin.mgs.order.api.domain.response.returnorder.WholesaleReturnList;
 import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import com.aiqin.platform.flows.client.domain.vo.FormCallBackVo;
@@ -210,7 +211,7 @@ public class ReturnOrderInfoController {
 
     @PostMapping("/select/list")
     @ApiOperation("多条件查询批发退货列表")
-    public HttpResponse selectList(@RequestBody wholesaleReturnOrderSearchVo whoVo){
+    public HttpResponse<WholesaleReturnList> selectList(@RequestBody wholesaleReturnOrderSearchVo whoVo){
         return returnOrderInfoService.selectAllList(whoVo);
     }
 }

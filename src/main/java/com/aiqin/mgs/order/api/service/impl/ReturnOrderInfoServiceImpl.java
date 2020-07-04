@@ -148,10 +148,10 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             reqVo.setCopartnerAreaName(returnOrderFranchisee.getCopartnerAreaName());
         }
         //业务形式  0门店形式  1批发形式
-        String storeCode = reqVo.getStoreCode();
-        if(storeCode!=null){
+//        String storeCode = reqVo.getStoreCode();
+//        if (!storeCode.equals(null)){
             reqVo.setBusinessForm(0);
-        }
+//        }
         ReturnOrderInfo record = new ReturnOrderInfo();
         Date now = new Date();
         BeanUtils.copyProperties(reqVo, record);
@@ -866,11 +866,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderCode);
         //退货总金额(赠品金额+商品金额已算好) 加
         BigDecimal returnOrderAmount = returnOrderInfo.getReturnOrderAmount();
-        BigDecimal topCouponDiscountAmount =returnOrderInfo.getTopCouponDiscountAmount();
-        if(null==topCouponDiscountAmount){
-            topCouponDiscountAmount=BigDecimal.ZERO;
-        }
-        returnOrderInfo.setReturnOrderAmount(returnOrderAmount.add(topCouponDiscountAmount));
         returnOrderInfo.setReturnOrderAmount(returnOrderAmount.add(returnOrderInfo.getTopCouponDiscountAmount() == null ? BigDecimal.ZERO : returnOrderInfo.getTopCouponDiscountAmount()));
 //        BigDecimal reduce = returnOrderDetails.stream().map(ReturnOrderDetail::getTopCouponDiscountAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
         //查询日志详情
@@ -1087,7 +1082,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     returnOrderDetail.setBarCode(eoi.getBarCode());
                     //批次
                     returnOrderDetail.setBatchInfoCode(eoi.getBatchInfoCode());
-//                    returnOrderDetail.setBatchNumber(eoi.getBatchNumber());
                     returnOrderDetail.setBatchCode(eoi.getBatchCode());
                     returnOrderDetail.setBatchDate(eoi.getBatchDate());
                     //可用赠品额度
@@ -1227,7 +1221,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
        Map<String, Object> result = null;
        result = httpClient.action().result(new TypeReference<Map<String, Object>>() {
        });
-       log.info("发起退积分申请结果，request={}",JsonUtil.toJson(result));
+       log.info("发起退积分申请结果，request={}",JSON.toJSON(result));
        if(result!=null&&"0".equals(result.get("code"))){
            log.info("退积分完成");
            return true;
