@@ -145,10 +145,10 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             reqVo.setCopartnerAreaName(returnOrderFranchisee.getCopartnerAreaName());
         }
         //业务形式  0门店形式  1批发形式
-        String storeCode = reqVo.getStoreCode();
-        if (!storeCode.equals(null)){
+//        String storeCode = reqVo.getStoreCode();
+//        if (!storeCode.equals(null)){
             reqVo.setBusinessForm(0);
-        }
+//        }
         ReturnOrderInfo record = new ReturnOrderInfo();
         Date now = new Date();
         BeanUtils.copyProperties(reqVo, record);
