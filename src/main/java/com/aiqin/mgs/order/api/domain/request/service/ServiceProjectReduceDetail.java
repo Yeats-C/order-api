@@ -33,7 +33,7 @@ public class ServiceProjectReduceDetail {
     @JsonProperty("order_code")
     private String orderCode;
 
-    @ApiModelProperty(value = "扣减类型，，0为扣减,1为购买,2为退次，3赠次，4延期")
+    @ApiModelProperty(value = "扣减类型，，0为扣减,1为购买,2为退次，3赠次，4延期，5退次")
     @JsonProperty("order_type")
     private Integer orderType;
 
