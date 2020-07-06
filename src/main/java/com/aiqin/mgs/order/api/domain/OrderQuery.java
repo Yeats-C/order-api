@@ -13,6 +13,7 @@ import java.util.List;
 import javax.validation.constraints.NotBlank;
 
 import com.aiqin.mgs.order.api.base.PagesRequest;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
@@ -108,11 +109,13 @@ public class OrderQuery extends PagesRequest {
 	private Date endTime;
 	
 	@ApiModelProperty(value="开始时间String类型、格式YYYY-MM-DD")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonProperty("begin_date")
 	private String beginDate;
 	
 	
 	@ApiModelProperty(value="结束时间String类型、格式YYYY-MM-DD")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonProperty("end_date")
 	private String endDate;
 	
