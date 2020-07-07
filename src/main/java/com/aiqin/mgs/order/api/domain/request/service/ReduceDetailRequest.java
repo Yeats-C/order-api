@@ -54,13 +54,13 @@ public class ReduceDetailRequest extends PagesRequest {
     @ApiModelProperty(value = "活动开始时间")
     @JsonProperty("begin_time")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date beginTime;
 
     @ApiModelProperty(value = "活动结束时间")
     @JsonProperty("finish_time")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private Date finishTime;
 
     @ApiModelProperty(value = "查询时间")
