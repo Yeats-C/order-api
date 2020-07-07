@@ -156,6 +156,10 @@ public class ServiceProjectAsset {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
 
+    @ApiModelProperty(value="支付方式")
+    @JsonProperty("pay_type")
+    private String payType;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {return true;}
