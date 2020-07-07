@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * description: AfterReturnOrderSearchVo
@@ -26,5 +25,9 @@ public class ReturnOrderQueryVo extends AfterReturnOrderSearchVo implements Seri
     @ApiModelProperty(value = "退货类型  0客户退货、1缺货退货、2售后退货、3冲减单")
     @JsonProperty("return_order_type")
     private Integer returnOrderType;
+
+    @ApiModelProperty(value="退款状态 0退款中，1已完成")
+    @JsonProperty("refund_status")
+    private Integer refundStatus;
 
 }

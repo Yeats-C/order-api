@@ -515,7 +515,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
 
         //退货
         if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_13) {
-            if (!orderCategoryEnum.isFirstOrder()) {
+            if (!orderCategoryEnum.isFirstOrder() && !orderCategoryEnum.getValue().equals(ErpOrderCategoryEnum.ORDER_TYPE_16.getValue())) {
                 control.setOrderReturn(StatusEnum.YES.getCode());
             }
         }
