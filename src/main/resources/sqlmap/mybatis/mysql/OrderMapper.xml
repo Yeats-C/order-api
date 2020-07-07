@@ -272,8 +272,8 @@
         <if test="beginTime!=null ">
             and a.create_time &gt;= #{beginTime}
         </if>
-        <if test="beginTime!=null ">
-            and a.create_time &gt;= #{beginTime}
+        <if test="endTime!=null ">
+            and a.create_time &lt;= #{endTime}
         </if>
         <if test="updateTime!=null ">
             and a.update_time &gt;= #{updateTime}

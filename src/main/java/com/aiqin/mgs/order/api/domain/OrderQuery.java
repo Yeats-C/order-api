@@ -97,10 +97,12 @@ public class OrderQuery extends PagesRequest {
 	
 	@ApiModelProperty(value="创建时间",example = "2001-01-01 01:01:01")
 	@JsonProperty("create_time")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date create_time;
 	
 	@ApiModelProperty(value="创建开始时间Date类型",example = "2001-01-01 01:01:01")
 	@JsonProperty("begin_time")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date beginTime;
 	
 	
