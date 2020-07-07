@@ -188,6 +188,8 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
             productSkuRequest2.setBatchInfoCode(item.getBatchInfoCode());
             if(null==item.getWarehouseTypeCode()){
                 item.setWarehouseTypeCode("1");
+            }else{
+                item.setWarehouseTypeCode(item.getWarehouseTypeCode());
             }
 //            if(YesOrNoEnum.YES.getCode().equals(erpCartAddRequest.getIsWholesale())){
 //                if (item.getWarehouseCode() == null) {
