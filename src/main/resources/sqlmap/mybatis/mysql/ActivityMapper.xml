@@ -174,7 +174,7 @@
     </update>
 
     <select id="totalCount" resultType="java.lang.Integer" parameterType="com.aiqin.mgs.order.api.domain.Activity">
-        select count(1) from (select a.activity_id
+        select count(1) from (select distinct(a.activity_id)
         FROM
         activity a
         JOIN activity_store s ON a.activity_id = s.activity_id
@@ -197,7 +197,8 @@
                 and a.begin_time &lt;= now() and finish_time &gt;= now() and activity_status=0
             </if>
             <if test="activityStatus!= null and activityStatus==1">
-                and a.begin_time &gt; now() or ( a.begin_time &lt;= now() and finish_time &gt;= now() and activity_status=1)
+                and a.begin_time &gt; now() or ( a.begin_time &lt;= now() and finish_time &gt;= now() and
+                activity_status=1)
             </if>
             <if test="beginTime!= null">
                 and a.begin_time &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d 00:00:00')
@@ -226,13 +227,8 @@
                     #{item}
                 </foreach>
             </if>
-
-            GROUP BY a.activity_id
-            order by a.create_time desc
-            <if test="pageSize!=null ">
-                limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
-            </if>
         </where>
+        ) l
     </select>
 
     <!--通过门店id爱掌柜的促销活动列表（所有生效活动）-->
