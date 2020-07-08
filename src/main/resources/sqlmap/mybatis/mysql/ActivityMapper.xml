@@ -69,10 +69,10 @@
                 and a.begin_time &gt; now() or ( a.begin_time &lt;= now() and finish_time &gt;= now() and activity_status=1)
             </if>
             <if test="beginTime!= null">
-                and a.begin_time &gt;= #{beginTime}
+                and a.begin_time &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d 00:00:00')
             </if>
             <if test="finishTime!= null">
-                and a.finish_time &lt;= #{finishTime}
+                and a.finish_time &lt;= DATE_FORMAT(#{finishTime},'%Y-%m-%d 23:59:59')
             </if>
             <if test="createBy != '' and createBy!= null">
                 and a.create_by = #{createBy}
@@ -191,19 +191,19 @@
                 and a.activity_type = #{activityType}
             </if>
             <if test="activityStatus!= null and activityStatus==3">
-                and a.finish_time &lt; now() or activity_status=1
+                and a.finish_time &lt; now()
             </if>
             <if test="activityStatus!= null and activityStatus==2">
                 and a.begin_time &lt;= now() and finish_time &gt;= now() and activity_status=0
             </if>
             <if test="activityStatus!= null and activityStatus==1">
-                and a.begin_time &gt; now() and activity_status=0
+                and a.begin_time &gt; now() or ( a.begin_time &lt;= now() and finish_time &gt;= now() and activity_status=1)
             </if>
             <if test="beginTime!= null">
-                and a.begin_time &gt;= #{beginTime}
+                and a.begin_time &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d 00:00:00')
             </if>
             <if test="finishTime!= null">
-                and a.finish_time &lt;= #{finishTime}
+                and a.finish_time &lt;= DATE_FORMAT(#{finishTime},'%Y-%m-%d 23:59:59')
             </if>
             <if test="createBy != '' and createBy!= null">
                 and a.create_by = #{createBy}
@@ -226,7 +226,12 @@
                     #{item}
                 </foreach>
             </if>
-            GROUP BY a.activity_id) f
+
+            GROUP BY a.activity_id
+            order by a.create_time desc
+            <if test="pageSize!=null ">
+                limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+            </if>
         </where>
     </select>
 
