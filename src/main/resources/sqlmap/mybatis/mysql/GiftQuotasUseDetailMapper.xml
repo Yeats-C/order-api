@@ -38,6 +38,9 @@
         <if test="storeId != null and storeId != ''">
             and store_id = #{storeId}
         </if>
+        <if test="type != null">
+            and type = #{type}
+        </if>
     </select>
 
     <!--插入兑换赠品积分账户使用明细信息-->
