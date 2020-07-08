@@ -243,7 +243,7 @@
                 and d.order_id = #{orderId,jdbcType=VARCHAR}
             </if>
             <if test="orderCode!=null">
-                and d.order_code = #{orderCode,jdbcType=VARCHAR}
+                and d.order_code  LIKE concat(#{orderCode,jdbcType=VARCHAR},'%')
             </if>
             <if test="orderType!=null">
                 and d.order_type = #{orderType,jdbcType=VARCHAR}
@@ -294,7 +294,7 @@
                 and d.order_id = #{orderId,jdbcType=VARCHAR}
             </if>
             <if test="orderCode!=null">
-                and d.order_code = #{orderCode,jdbcType=VARCHAR}
+                and d.order_code  LIKE concat(#{orderCode,jdbcType=VARCHAR},'%')
             </if>
             <if test="orderType!=null">
                 and d.order_type = #{orderType,jdbcType=VARCHAR}
