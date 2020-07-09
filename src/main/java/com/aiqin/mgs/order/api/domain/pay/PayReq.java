@@ -41,6 +41,10 @@ public class PayReq implements Serializable {
     @JsonProperty("order_no")
     private String orderNo;
 
+    @ApiModelProperty(value="售后编号")
+    @JsonProperty("after_sale_code")
+    private String afterSaleCode ;
+
     @ApiModelProperty(value = "订单金额")
     @JsonProperty("order_amount")
     private Long orderAmount;
