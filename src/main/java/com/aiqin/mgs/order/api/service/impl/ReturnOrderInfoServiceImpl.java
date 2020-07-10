@@ -1662,22 +1662,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 reqVo.setCopartnerAreaId(returnOrderFranchisee.getCopartnerAreaId());
                 reqVo.setCopartnerAreaName(returnOrderFranchisee.getCopartnerAreaName());
             }
-            //判断实收数量小于退货数量---不能发起退货
-//            List<ReturnWholesaleOrderDetail> details2 = reqVo.getDetails();
-//            for (ReturnWholesaleOrderDetail details : details2) {
-//                //可退货数量为0时 = 申请退货数量
-//                long returnNumber = details.getActualInboundCount() - details.getReturnProductCount();
-//                if ( returnNumber == 0) {
-//                    if (returnNumber == details.getActualReturnProductCount()){
-//                        return HttpResponse.failure(MessageId.create(Project.ZERO, 237, "不可退货"));
-//                    }
-//                }else if(returnNumber < details.getActualReturnProductCount()){
-//                    return HttpResponse.failure(MessageId.create(Project.ZERO, 238, "可退货数量小于申请退货数量"));
-//                }
-//                if (details.getActualReturnProductCount() == 0) {
-//                    return HttpResponse.failure(MessageId.create(Project.ZERO, 237, "不可退货"));
-//                }
-//            }
             ReturnOrderInfo record = new ReturnOrderInfo();
             Date now = new Date();
             BeanUtils.copyProperties(reqVo, record);
@@ -1721,10 +1705,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             List<ReturnWholesaleOrderDetail> details1 = reqVo.getDetails();
             for (ReturnWholesaleOrderDetail sd : details1) {
                 ReturnOrderDetail detail = new ReturnOrderDetail();
-                //如果申请数量为0，说明不需要退货
-                if (sd.getActualReturnProductCount().equals(0L)) {
-                    continue;
-                } else {
                     //商品属性 0新品1残品
                     Integer productStatus = 0;
                     if (null != sd.getProductStatus()) {
@@ -1743,8 +1723,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     detail.setProductStatus(productStatus);
                     details.add(detail);
                 }
-            }
-
             //退货金额
             record.setReturnOrderAmount(returnOrderAmount);
             log.info("发起批发退货--插入批发退货信息，record={}", record);
