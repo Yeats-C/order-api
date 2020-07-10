@@ -243,16 +243,16 @@
                 and d.order_id = #{orderId,jdbcType=VARCHAR}
             </if>
             <if test="orderCode!=null">
-                and d.order_code = #{orderCode,jdbcType=VARCHAR}
+                and d.order_code  LIKE concat(#{orderCode,jdbcType=VARCHAR},'%')
             </if>
             <if test="orderType!=null">
                 and d.order_type = #{orderType,jdbcType=VARCHAR}
             </if>
             <if test="beginTime!=null">
-                and TO_DAYS(#{beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(a.create_time)
+                and d.create_time &gt;= #{beginTime,jdbcType=TIMESTAMP}
             </if>
             <if test="finishTime!=null">
-                and TO_DAYS(#{finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(a.create_time)
+                and d.create_time &lt;= #{finishTime,jdbcType=TIMESTAMP}
             </if>
 
         </where>
@@ -294,17 +294,18 @@
                 and d.order_id = #{orderId,jdbcType=VARCHAR}
             </if>
             <if test="orderCode!=null">
-                and d.order_code = #{orderCode,jdbcType=VARCHAR}
+                and d.order_code  LIKE concat(#{orderCode,jdbcType=VARCHAR},'%')
             </if>
             <if test="orderType!=null">
                 and d.order_type = #{orderType,jdbcType=VARCHAR}
             </if>
             <if test="beginTime!=null">
-                and TO_DAYS(#{beginTime,jdbcType=TIMESTAMP}) &lt;= TO_DAYS(a.create_time)
+                and d.create_time &gt;= #{beginTime,jdbcType=TIMESTAMP}
             </if>
             <if test="finishTime!=null">
-                and TO_DAYS(#{finishTime,jdbcType=TIMESTAMP}) &gt;= TO_DAYS(a.create_time)
+                and d.create_time &lt;= #{finishTime,jdbcType=TIMESTAMP}
             </if>
+
         </where>
     </select>
     <select id="selectReduceDetailByReduceId" parameterType="com.aiqin.mgs.order.api.domain.request.service.ReduceDetailRequest" resultMap="BaseResultMap">

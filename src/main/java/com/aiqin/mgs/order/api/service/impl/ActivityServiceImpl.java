@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.service.impl;
 
 import com.aiqin.ground.util.exception.GroundRuntimeException;
 import com.aiqin.ground.util.id.IdUtil;
+import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
@@ -760,7 +761,7 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     @Transactional
     public HttpResponse<PageResData<ProductSkuRespVo5>> skuPage(SpuProductReqVO spuProductReqVO) {
-        LOGGER.info("活动商品查询（筛选+分页）skuPage参数为：{}", spuProductReqVO);
+        LOGGER.info("活动商品查询（筛选+分页）skuPage参数为：{}", JsonUtil.toJson(spuProductReqVO));
         HttpResponse res = HttpResponse.success();
         if(null==spuProductReqVO.getActivityId() ||null==spuProductReqVO.getStoreId()){
             return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);

@@ -1267,6 +1267,9 @@
       <if test="returnOrderType!=null">
         and return_order_type =#{returnOrderType}
       </if>
+      <if test="refundStatus!=null">
+        and refund_status =#{refundStatus}
+      </if>
     </where>
     order by create_time desc
   </select>

@@ -69,10 +69,10 @@
                 and a.begin_time &gt; now() or ( a.begin_time &lt;= now() and finish_time &gt;= now() and activity_status=1)
             </if>
             <if test="beginTime!= null">
-                and a.begin_time &gt;= #{beginTime}
+                and a.begin_time &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d 00:00:00')
             </if>
             <if test="finishTime!= null">
-                and a.finish_time &lt;= #{finishTime}
+                and a.finish_time &lt;= DATE_FORMAT(#{finishTime},'%Y-%m-%d 23:59:59')
             </if>
             <if test="createBy != '' and createBy!= null">
                 and a.create_by = #{createBy}
@@ -174,7 +174,7 @@
     </update>
 
     <select id="totalCount" resultType="java.lang.Integer" parameterType="com.aiqin.mgs.order.api.domain.Activity">
-        select count(1) from (select a.activity_id
+        select count(1) from (select distinct(a.activity_id)
         FROM
         activity a
         JOIN activity_store s ON a.activity_id = s.activity_id
@@ -191,19 +191,20 @@
                 and a.activity_type = #{activityType}
             </if>
             <if test="activityStatus!= null and activityStatus==3">
-                and a.finish_time &lt; now() or activity_status=1
+                and a.finish_time &lt; now()
             </if>
             <if test="activityStatus!= null and activityStatus==2">
                 and a.begin_time &lt;= now() and finish_time &gt;= now() and activity_status=0
             </if>
             <if test="activityStatus!= null and activityStatus==1">
-                and a.begin_time &gt; now() and activity_status=0
+                and a.begin_time &gt; now() or ( a.begin_time &lt;= now() and finish_time &gt;= now() and
+                activity_status=1)
             </if>
             <if test="beginTime!= null">
-                and a.begin_time &gt;= #{beginTime}
+                and a.begin_time &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d 00:00:00')
             </if>
             <if test="finishTime!= null">
-                and a.finish_time &lt;= #{finishTime}
+                and a.finish_time &lt;= DATE_FORMAT(#{finishTime},'%Y-%m-%d 23:59:59')
             </if>
             <if test="createBy != '' and createBy!= null">
                 and a.create_by = #{createBy}
@@ -226,8 +227,8 @@
                     #{item}
                 </foreach>
             </if>
-            GROUP BY a.activity_id) f
         </where>
+        ) l
     </select>
 
     <!--通过门店id爱掌柜的促销活动列表（所有生效活动）-->

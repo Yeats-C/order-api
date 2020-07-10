@@ -559,10 +559,10 @@
             )
         </if>
         <if test="createTimeStart != null and createTimeStart != ''">
-            and a1.split_status = 1 and date_format(a1.create_time,'%Y-%m-%d') &gt;= #{createTimeStart,jdbcType=VARCHAR}
+            and a1.split_status = 1 and date_format(a1.create_time,'%Y-%m-%d %H:%i:%S') &gt;= #{createTimeStart,jdbcType=VARCHAR}
         </if>
         <if test="createTimeEnd != null and createTimeEnd != ''">
-            and a1.split_status = 1 and date_format(a1.create_time,'%Y-%m-%d') &lt;= #{createTimeEnd,jdbcType=VARCHAR}
+            and a1.split_status = 1 and date_format(a1.create_time,'%Y-%m-%d %H:%i:%S') &lt;= #{createTimeEnd,jdbcType=VARCHAR}
         </if>
         <if test="storeIdList != null and storeIdList.size > 0">
             and a1.store_id in

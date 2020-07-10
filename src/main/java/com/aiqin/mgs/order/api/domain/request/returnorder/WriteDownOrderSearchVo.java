@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * description: AfterReturnOrderSearchVo
@@ -50,5 +49,9 @@ public class WriteDownOrderSearchVo implements Serializable {
     @ApiModelProperty(value = "菜单编码--数据权限使用")
     @JsonProperty("resource_code")
     private String resourceCode;
+
+    @ApiModelProperty(value="退款状态 0退款中，1已完成")
+    @JsonProperty("refund_status")
+    private Integer refundStatus;
 
 }

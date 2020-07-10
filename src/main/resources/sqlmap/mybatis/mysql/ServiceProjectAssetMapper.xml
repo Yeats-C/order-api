@@ -33,6 +33,7 @@
         <result column="use_status" jdbcType="BIT" property="useStatus"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="pay_type" jdbcType="VARCHAR" property="payType"/>
     </resultMap>
     <resultMap id="customerPhoneMap" type="java.lang.String">
         <result column="customer_phone" jdbcType="VARCHAR" property="customerPhone"/>
@@ -360,20 +361,22 @@
     </update>
     <select id="selectServiceProjectAssetByPhone" resultMap="BaseResultMap" resultType="java.util.List">
         select
-        <include refid="Base_Column_List"/>
-        from service_project_asset
+        a.id,a.asset_id,a.customer_id,a.customer_name,a.customer_phone,a.customer_type,a.store_id,a.store_code,a.store_name,a.project_id,a.project_code,a.project_name,
+        a.type_id,a.begin_time,a.finish_time,a.consumption_pattern,a.limit_count,a.remain_count,a.actual_amount,a.cashier_id,a.cashier_name,a.guide_id,a.guide_name,a.order_code,a.order_id,a.order_detail_id,a.is_direct_custom,a.pay_status,a.use_status,a.create_time,a.update_time,o.pay_type
+        from service_project_asset a,order_consumer_info o
         <where>
+            a.order_id=o.order_id
             <if test="store_id!=null">
-                and store_id = #{store_id,jdbcType=VARCHAR} and pay_status = 1
+                and a.store_id = #{store_id,jdbcType=VARCHAR} and a.pay_status = 1
             </if>
             <if test="customer_phone!=null">
-                and customer_phone like concat(#{customer_phone,jdbcType=VARCHAR},'%') and pay_status = 1
+                and a.customer_phone like concat(#{customer_phone,jdbcType=VARCHAR},'%') and a.pay_status = 1
             </if>
             <if test="order_code!=null">
-                and order_code = #{order_code,jdbcType=VARCHAR} and pay_status = 0 and use_status = 0
+                and a.order_code = #{order_code,jdbcType=VARCHAR} and a.pay_status = 0 and a.use_status = 0
             </if>
             <if test="order_id!=null">
-                and order_id = #{order_id,jdbcType=VARCHAR} and pay_status = 1
+                and a.order_id = #{order_id,jdbcType=VARCHAR} and a.pay_status = 1
             </if>
         </where>
         order by id desc
