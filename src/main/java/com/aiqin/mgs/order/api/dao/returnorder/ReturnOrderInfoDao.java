@@ -69,7 +69,8 @@ public interface ReturnOrderInfoDao {
     ReturnOrderInfo selectByOrderCodeAndSuccess(@Param("orderSuccess") Integer orderSuccess, @Param("returnOrderCode")String returnOrderCode);
 
     //修改退货数量和总金额金额
-    Integer updateCountAndAmount(@Param("returnOrderCode") String returnOrderCode, @Param("actualReturnOrderAmount") BigDecimal actualReturnOrderAmount, @Param("actualProductCount") Long actualProductCount);
+//    Integer updateCountAndAmount(@Param("returnOrderCode") String returnOrderCode, @Param("actualReturnOrderAmount") BigDecimal actualReturnOrderAmount, @Param("actualProductCount") Long actualProductCount);
+    Integer updateCountAndAmount(@Param("returnOrderCode") String returnOrderId, @Param("actualReturnOrderAmount") BigDecimal actualReturnOrderAmount, @Param("actualProductCount") Long actualProductCount);
 
     List<QueryReturnOrderManagementRespVO> selectReturnOrderManagementList(QueryReturnOrderManagementReqVO reqVO);
 

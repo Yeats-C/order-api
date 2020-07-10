@@ -445,7 +445,7 @@
 
     <insert id="insertBatch" parameterType="list">
         insert into return_order_detail (return_order_detail_id, return_order_code,product_type,
-        sku_code, sku_name,total_product_amount,return_product_count,model_code,product_status,
+        sku_code, sku_name,total_product_amount,return_product_count,actual_return_product_count,model_code,product_status,
         product_spec,unit_name,color_code,color_name,create_by_id, create_by_name,picture_url,
         create_time,remark,evidence_url,preferential_amount,line_code,unit_code,tax_rate,
         product_amount,product_category_code,product_category_name,bar_code,top_coupon_discount_amount,top_coupon_amount,
@@ -457,7 +457,7 @@
             #{item.returnOrderDetailId,jdbcType=VARCHAR},
             #{item.returnOrderCode,jdbcType=VARCHAR},#{item.productType,jdbcType=BIT},
             #{item.skuCode,jdbcType=VARCHAR}, #{item.skuName,jdbcType=VARCHAR},
-            #{item.totalProductAmount,jdbcType=DECIMAL},#{item.returnProductCount,jdbcType=BIGINT},
+            #{item.totalProductAmount,jdbcType=DECIMAL},#{item.returnProductCount},#{item.actualReturnProductCount},
             #{item.modelCode,jdbcType=VARCHAR},#{item.productStatus,jdbcType=BIT},#{item.productSpec,jdbcType=VARCHAR},
             #{item.unitName,jdbcType=VARCHAR},
             #{item.colorCode,jdbcType=VARCHAR}, #{item.colorName,jdbcType=VARCHAR}, #{item.createById,jdbcType=VARCHAR},
