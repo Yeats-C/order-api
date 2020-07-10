@@ -68,7 +68,11 @@
         batch_code as batchCode,
         batch_date as batchDate,
         warehouse_type_code as warehouseTypeCode,
-        batch_info_code as batchInfoCode
+        batch_info_code as batchInfoCode,
+        transport_center_code as transportCenterCode,
+        transport_center_name as transportCenterName,
+        warehouse_code as warehouseCode,
+        warehouse_name as warehouseName
         from order_store_detail
         where 1 = 1
         <if test=" id != null and id != '' ">
