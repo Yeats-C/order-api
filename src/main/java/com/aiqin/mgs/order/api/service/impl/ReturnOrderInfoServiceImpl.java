@@ -1665,9 +1665,17 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //判断实收数量小于退货数量---不能发起退货
             List<ReturnWholesaleOrderDetail> details2 = reqVo.getDetails();
             for (ReturnWholesaleOrderDetail details : details2) {
-                //可退货数量 小于 申请退货数量
-                if ((details.getActualInboundCount() - details.getReturnProductCount())< details.getActualReturnProductCount()) {
-                    return HttpResponse.failure(MessageId.create(Project.ZERO, 237, "可退货数量小于申请退货数量"));
+                //可退货数量为0时 = 申请退货数量
+                long returnNumber = details.getActualInboundCount() - details.getReturnProductCount();
+                if ( returnNumber == 0) {
+                    if (returnNumber == details.getActualReturnProductCount()){
+                        return HttpResponse.failure(MessageId.create(Project.ZERO, 237, "不可退货"));
+                    }
+                }else if(returnNumber < details.getActualReturnProductCount()){
+                    return HttpResponse.failure(MessageId.create(Project.ZERO, 238, "可退货数量小于申请退货数量"));
+                }
+                if (details.getActualReturnProductCount() == 0) {
+                    return HttpResponse.failure(MessageId.create(Project.ZERO, 237, "不可退货"));
                 }
             }
             ReturnOrderInfo record = new ReturnOrderInfo();
