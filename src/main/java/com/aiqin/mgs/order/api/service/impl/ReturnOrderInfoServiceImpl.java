@@ -1663,21 +1663,21 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 reqVo.setCopartnerAreaName(returnOrderFranchisee.getCopartnerAreaName());
             }
             //判断实收数量小于退货数量---不能发起退货
-            List<ReturnWholesaleOrderDetail> details2 = reqVo.getDetails();
-            for (ReturnWholesaleOrderDetail details : details2) {
-                //可退货数量为0时 = 申请退货数量
-                long returnNumber = details.getActualInboundCount() - details.getReturnProductCount();
-                if ( returnNumber == 0) {
-                    if (returnNumber == details.getActualReturnProductCount()){
-                        return HttpResponse.failure(MessageId.create(Project.ZERO, 237, "不可退货"));
-                    }
-                }else if(returnNumber < details.getActualReturnProductCount()){
-                    return HttpResponse.failure(MessageId.create(Project.ZERO, 238, "可退货数量小于申请退货数量"));
-                }
-                if (details.getActualReturnProductCount() == 0) {
-                    return HttpResponse.failure(MessageId.create(Project.ZERO, 237, "不可退货"));
-                }
-            }
+//            List<ReturnWholesaleOrderDetail> details2 = reqVo.getDetails();
+//            for (ReturnWholesaleOrderDetail details : details2) {
+//                //可退货数量为0时 = 申请退货数量
+//                long returnNumber = details.getActualInboundCount() - details.getReturnProductCount();
+//                if ( returnNumber == 0) {
+//                    if (returnNumber == details.getActualReturnProductCount()){
+//                        return HttpResponse.failure(MessageId.create(Project.ZERO, 237, "不可退货"));
+//                    }
+//                }else if(returnNumber < details.getActualReturnProductCount()){
+//                    return HttpResponse.failure(MessageId.create(Project.ZERO, 238, "可退货数量小于申请退货数量"));
+//                }
+//                if (details.getActualReturnProductCount() == 0) {
+//                    return HttpResponse.failure(MessageId.create(Project.ZERO, 237, "不可退货"));
+//                }
+//            }
             ReturnOrderInfo record = new ReturnOrderInfo();
             Date now = new Date();
             BeanUtils.copyProperties(reqVo, record);
@@ -1721,23 +1721,28 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             List<ReturnWholesaleOrderDetail> details1 = reqVo.getDetails();
             for (ReturnWholesaleOrderDetail sd : details1) {
                 ReturnOrderDetail detail = new ReturnOrderDetail();
-                //商品属性 0新品1残品
-                Integer productStatus = 0;
-                if (null != sd.getProductStatus()) {
-                    productStatus = sd.getProductStatus();
+                //如果申请数量为0，说明不需要退货
+                if (sd.getActualReturnProductCount().equals(0L)) {
+                    continue;
+                } else {
+                    //商品属性 0新品1残品
+                    Integer productStatus = 0;
+                    if (null != sd.getProductStatus()) {
+                        productStatus = sd.getProductStatus();
+                    }
+                    //均摊后的金额乘以退货数量
+                    BigDecimal preferentialAmount = sd.getPreferentialAmount();
+                    BigDecimal multiply = preferentialAmount.multiply(BigDecimal.valueOf(sd.getReturnProductCount()));
+                    returnOrderAmount = returnOrderAmount.add(multiply);
+                    BeanUtils.copyProperties(sd, detail);
+                    detail.setCreateTime(now);
+                    detail.setReturnOrderDetailId(IdUtil.uuid());
+                    detail.setReturnOrderCode(afterSaleCode);
+                    detail.setCreateById(reqVo.getCreateById());
+                    detail.setCreateByName(reqVo.getCreateByName());
+                    detail.setProductStatus(productStatus);
+                    details.add(detail);
                 }
-                //均摊后的金额乘以退货数量
-                BigDecimal preferentialAmount = sd.getPreferentialAmount();
-                BigDecimal multiply = preferentialAmount.multiply(BigDecimal.valueOf(sd.getReturnProductCount()));
-                returnOrderAmount = returnOrderAmount.add(multiply);
-                BeanUtils.copyProperties(sd, detail);
-                detail.setCreateTime(now);
-                detail.setReturnOrderDetailId(IdUtil.uuid());
-                detail.setReturnOrderCode(afterSaleCode);
-                detail.setCreateById(reqVo.getCreateById());
-                detail.setCreateByName(reqVo.getCreateByName());
-                detail.setProductStatus(productStatus);
-                details.add(detail);
             }
 
             //退货金额

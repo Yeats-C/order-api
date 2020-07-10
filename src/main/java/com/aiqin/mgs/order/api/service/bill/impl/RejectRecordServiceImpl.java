@@ -82,6 +82,7 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                 rejectRecord.setActualTotalCount(returnOrderInfo.getActualProductCount());//实退商品数量
                 rejectRecord.setChargePerson(returnOrderInfo.getReturnById());//退货人id
                 rejectRecord.setUpdateTime(new Date());//修改时间
+                 LOGGER.info("退供单：{}",rejectRecord);
                 //修改退货单
                 rejectRecordDao.updateByReturnOrderCode(rejectRecord);
 
@@ -95,6 +96,7 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                     rejectRecordDetail.setSkuCode(returnOrderDetail.getSkuCode());
                     rejectRecordDetail.setSkuName(returnOrderDetail.getSkuName());
                     rejectRecordDetail.setUpdateTime(new Date());
+                    LOGGER.info("退工单明细：{}",rejectRecordDetail);
                     //修改退货单明细
                     rejectRecordDetailDao.updateByPrimaryKey(rejectRecordDetail);
 
@@ -112,6 +114,7 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                 ReturnOrderInfo returnOrderInfo1 = returnOrderInfoDao.selectByReturnOrderCode(returnOrderReviewApi.getReturnOrderCode());
                 LOGGER.info("service 层退货单状态修改********************,returnOrderInfo1={}",returnOrderInfo1);
                 if(!returnOrderInfo1.getRefundStatus().equals(1)){
+                    LOGGER.info("进行退款的入参：{}",returnOrderReviewApi);
                     LOGGER.info("供应链入库完成--回调退货单*********");
                     returnOrderInfoService.updateReturnStatusApi(returnOrderReviewApi);
                 }
