@@ -755,8 +755,10 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 at=lastCouponMoney;
             }else{
                 //A品券单行抵扣总金额=A品券抵扣金额X本行商品价值/商品总价值
-                at = topCouponMoney.multiply(totalPreferentialAmount).divide(priceAmount, 2, BigDecimal.ROUND_HALF_UP);
-                lastCouponMoney=lastCouponMoney.subtract(at);
+                if(totalPreferentialAmount.compareTo(BigDecimal.ZERO)>0) {
+                    at = topCouponMoney.multiply(totalPreferentialAmount).divide(priceAmount, 2, BigDecimal.ROUND_HALF_UP);
+                    lastCouponMoney = lastCouponMoney.subtract(at);
+                }
             }
 
             //A品券单行每个商品抵扣金额
