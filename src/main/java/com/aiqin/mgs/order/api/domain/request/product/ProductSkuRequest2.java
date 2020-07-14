@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * Created by 爱亲 on 2018/11/22.
  */
@@ -24,6 +26,10 @@ public class ProductSkuRequest2 {
     @ApiModelProperty("批次编号")
     @JsonProperty(value = "batch_info_code")
     private String batchInfoCode;
+
+    @ApiModelProperty(value = "库房编码集合code")
+    @JsonProperty("warehouse_codes")
+    List<String> warehouseCodes;
 
 
 

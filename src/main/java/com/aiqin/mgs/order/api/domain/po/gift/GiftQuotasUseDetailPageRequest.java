@@ -23,4 +23,8 @@ public class GiftQuotasUseDetailPageRequest extends PagesRequest {
     @JsonProperty("store_id")
     private String storeId;
 
+    @ApiModelProperty(value = "类型 1 赠品划单 2订单使用 3订单赠送 4过期")
+    @JsonProperty("type")
+    private Integer type;
+
 }

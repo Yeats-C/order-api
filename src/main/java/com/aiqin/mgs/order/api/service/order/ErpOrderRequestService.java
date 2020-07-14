@@ -103,7 +103,7 @@ public interface ErpOrderRequestService {
      * @version: v1.0.0
      * @date 2019/12/10 13:38
      */
-    boolean lockStockInSupplyChain(ErpOrderInfo order, List<ErpOrderItem> itemList, AuthToken auth);
+    boolean  lockStockInSupplyChain(ErpOrderInfo order, List<ErpOrderItem> itemList, AuthToken auth);
 
     /**
      * 解锁库存（根据明细解锁）

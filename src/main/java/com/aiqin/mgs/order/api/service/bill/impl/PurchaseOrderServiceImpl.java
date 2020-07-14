@@ -50,7 +50,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
     @Override
     public HttpResponse createPurchaseOrder(@Valid List<ErpOrderInfo> erpOrderInfos) {
-        LOGGER.info("根据ERP订单生成爱亲采购单，采购单开始，erpOrderInfo{}", erpOrderInfos);
+        LOGGER.info("根据ERP订单生成爱亲采购单，采购单开始，erpOrderInfo{}", JsonUtil.toJson(erpOrderInfos));
         if (CollectionUtils.isNotEmpty(erpOrderInfos)) {
             //异步执行。
             purchaseOrderExecutor(erpOrderInfos);
@@ -64,12 +64,12 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     @Override
     @Transactional
     public HttpResponse updatePurchaseInfo(OrderIogisticsVo purchaseInfo) {
-        if (purchaseInfo != null
-                && purchaseInfo.getOrderStoreDetail() != null
-                && purchaseInfo.getOrderStoreDetail().size() > 0
-                && purchaseInfo.getOrderBatchStoreDetail() != null
-                && purchaseInfo.getOrderBatchStoreDetail().size() > 0) {
-
+        if (purchaseInfo == null
+                || purchaseInfo.getOrderStoreDetail() == null
+                || purchaseInfo.getOrderStoreDetail().size() <= 0
+                || purchaseInfo.getOrderBatchStoreDetail() == null
+                || purchaseInfo.getOrderBatchStoreDetail().size() <= 0) {
+            return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
         }
         LOGGER.info("耘链销售单回传更新开始 参数purchaseInfo{}" + purchaseInfo);
         try {

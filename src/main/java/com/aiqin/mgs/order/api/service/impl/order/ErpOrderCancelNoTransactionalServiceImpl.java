@@ -122,11 +122,14 @@ public class ErpOrderCancelNoTransactionalServiceImpl implements ErpOrderCancelN
             if (processTypeEnum.isLockStock()) {
                 boolean flag = erpOrderRequestService.unlockStockInSupplyChainByOrderCode(order, auth);
                 if (flag) {
-                    //修改订单状态为超时文支付成功
+                    //修改订单状态为  超时未支付成功
                     erpOrderCancelService.cancelOrderStatus(order.getOrderStoreCode(), ErpOrderStatusEnum.ORDER_STATUS_99, ErpOrderNodeStatusEnum.STATUS_31, auth);
                 } else {
                     throw new BusinessException("解锁库存失败");
                 }
+            }else{
+                //修改订单状态为  超时未支付成功
+                erpOrderCancelService.cancelOrderStatus(order.getOrderStoreCode(), ErpOrderStatusEnum.ORDER_STATUS_99, ErpOrderNodeStatusEnum.STATUS_31, auth);
             }
 
         } else if (ErpOrderNodeStatusEnum.STATUS_8 == orderNodeStatusEnum) {

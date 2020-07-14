@@ -6,6 +6,7 @@ import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
@@ -28,16 +29,21 @@ import com.aiqin.mgs.order.api.domain.response.NewFranchiseeResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetail;
 import com.aiqin.mgs.order.api.domain.response.gift.StoreAvailableGiftQuotaResponse;
 import com.aiqin.mgs.order.api.domain.response.order.StoreFranchiseeInfoResponse;
+import com.aiqin.mgs.order.api.domain.wholesale.JoinMerchant;
+import com.aiqin.mgs.order.api.domain.wholesale.MerchantAccount;
+import com.aiqin.mgs.order.api.domain.wholesale.MerchantPaBalanceRespVO;
 import com.aiqin.mgs.order.api.util.MathUtil;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -49,6 +55,12 @@ public class BridgeProductService<main> {
 
     @Resource
     private UrlProperties urlProperties;
+
+    @Value("${center.main.url}")
+    private String centerMainUrl;
+
+    @Value("${center.main.settlement}")
+    private String settlement;
 
     /**
      * 获取低库存畅缺商品明细信息
@@ -432,7 +444,7 @@ public class BridgeProductService<main> {
         HttpClient httpClient = HttpClient.get(urlProperties.getProductApi() + path);
         HttpResponse<ProductCategoryAndBrandResponse2> response = httpClient.action().result(new TypeReference<HttpResponse<ProductCategoryAndBrandResponse2>>() {
         });
-        if (Objects.nonNull(response) && Objects.nonNull(response.getData()) && Objects.equals(response.getCode(), "0") && type=="2") {
+        if (response.getCode().equals(MessageId.SUCCESS_CODE) && "2".equals(type)) {
             List<ProductCategoryRespVO> lists=response.getData().getProductCategoryRespVOList();
             //门店端不展示物料，德明居，其他，只展示1到12到品类
             Iterator<ProductCategoryRespVO> it = lists.iterator();
@@ -638,11 +650,108 @@ public class BridgeProductService<main> {
         return storeInfo;
     }
 
+    /**
+     * 批发客户添加主控组织架构
+     * @param joinMerchant
+     * @return
+     */
+    public HttpResponse<JoinMerchant> addFranchisee(JoinMerchant joinMerchant){
+        StringBuilder sb = new StringBuilder();
+        sb.append(centerMainUrl).append("/franchisee/add/franchisee");
+//        sb.append("http://control.api.aiqin.com").append("/franchisee/add/franchisee");
+        log.info("添加批发客户组织架构[{}]", JsonUtil.toJson(joinMerchant));
+        HttpClient httpClient = HttpClient.post(sb.toString()).json(joinMerchant);
+
+        HttpResponse<JoinMerchant> httpResponse = httpClient.action().result(new TypeReference<HttpResponse<JoinMerchant>>() {
+        });
+        if (!httpResponse.getCode().equals(MessageId.SUCCESS_CODE)) {
+            log.error("批发客户创建主控架构失败，返回信息 httpResponse ={}"+httpResponse);
+            return HttpResponse.failure(ResultCode.FAILED_TO_CREATE_MASTER_ACCOUNT_FAILED);
+        }
+
+        return httpResponse;
+    }
+
+    /**
+     * 批发客户添加主控账户
+     * @param joinMerchant
+     * @return
+     */
+    public HttpResponse<JoinMerchant> addFranchiseeAccount(JoinMerchant joinMerchant){
+        StringBuilder sb = new StringBuilder();
+//        sb.append(centerMainUrl).append("/franchisee/add/franchisee/account");
+        sb.append("http://control.api.aiqin.com").append("/franchisee/add/franchisee/account");
+        log.info("添加批发客户组织架构[{}]", JsonUtil.toJson(joinMerchant));
+        HttpClient httpClient = HttpClient.post(sb.toString()).json(joinMerchant);
+
+        HttpResponse<JoinMerchant> httpResponse = httpClient.action().result(new TypeReference<HttpResponse<JoinMerchant>>() {
+        });
+        if (!httpResponse.getCode().equals(MessageId.SUCCESS_CODE)) {
+            log.error("批发客户创建主控账户失败，返回信息 httpResponse ={}"+httpResponse);
+            return HttpResponse.failure(ResultCode.FAILED_TO_CREATE_MASTER_ACCOUNT_FAILED);
+        }
+
+        return httpResponse;
+    }
+
+    /**
+     * 批发客户新建结算账户接口
+     * @param merchantAccount
+     * @return
+     */
+    public HttpResponse accountRegister(MerchantAccount merchantAccount) {
+        log.info("批发客户新建结算账户接口  参数 merchantAccount=[{}]"+JsonUtil.toJson(merchantAccount));
+        HttpResponse httpResponse = HttpResponse.success();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(settlement).append("/merchant/account/register");
+        HttpClient httpClient = HttpClient.post(sb.toString()).json(merchantAccount);
+        httpResponse = httpClient.action().result(new TypeReference<HttpResponse>() {
+        });
+        if (!httpResponse.getCode().equals(MessageId.SUCCESS_CODE)) {
+            return HttpResponse.failure(ResultCode.INSERT_FRANCHISEE_ACCOUNT_FAILED);
+        }
+        return httpResponse;
+    }
+
+
+    /**
+     * 批发客户结算账户查询账户余额接口
+     * @param franchiseeId
+     * @return
+     */
+    public HttpResponse<MerchantPaBalanceRespVO> accountBalance(String franchiseeId) {
+        log.info("批发客户结算账户查询账户余额接口  参数 franchiseeId=[{}]"+franchiseeId);
+        HttpResponse<MerchantPaBalanceRespVO> httpResponse = HttpResponse.success();
+
+        HttpClient httpClient = HttpClient.get("http://settlement.api.aiqin.com" + "/cardinfolink/merchant/platform/account/balance?franchiseeId=" + franchiseeId);
+//        HttpClient httpClient = HttpClient.get(settlement + "/cardinfolink/merchant/platform/account/balance?franchiseeId=" + franchiseeId);
+        httpResponse = httpClient.action().result(new TypeReference<HttpResponse<MerchantPaBalanceRespVO>>() {
+        });
+        if (!httpResponse.getCode().equals(MessageId.SUCCESS_CODE)) {
+            return HttpResponse.failure(ResultCode.SELECT_FRANCHISEE_ACCOUNT_FAILED);
+        }
+
+        MerchantPaBalanceRespVO merchantPaBalanceRespVO=(MerchantPaBalanceRespVO)httpResponse.getData();
+        if(null!=merchantPaBalanceRespVO){
+            if(null!=merchantPaBalanceRespVO.getAvailableBalance()&&merchantPaBalanceRespVO.getAvailableBalance().compareTo(BigDecimal.ZERO)>0){
+                merchantPaBalanceRespVO.setAvailableBalance(merchantPaBalanceRespVO.getAvailableBalance().divide(new BigDecimal(100),2, RoundingMode.HALF_UP));
+            }
+            if(null!=merchantPaBalanceRespVO.getFrozenBalance()&&merchantPaBalanceRespVO.getFrozenBalance().compareTo(BigDecimal.ZERO)>0){
+                merchantPaBalanceRespVO.setFrozenBalance(merchantPaBalanceRespVO.getFrozenBalance().divide(new BigDecimal(100),2, RoundingMode.HALF_UP));
+            }
+            if(null!=merchantPaBalanceRespVO.getCreditAmount()&&merchantPaBalanceRespVO.getCreditAmount().compareTo(BigDecimal.ZERO)>0){
+                merchantPaBalanceRespVO.setCreditAmount(merchantPaBalanceRespVO.getCreditAmount().divide(new BigDecimal(100),2, RoundingMode.HALF_UP));
+            }
+        }
+        return httpResponse;
+    }
 
 
 
     public static void main(String[] args) {
         BridgeProductService bridgeProductService=new BridgeProductService();
-        System.out.println(bridgeProductService.selectStoreGiveawayByStoreCode("60000011"));
+
+        System.out.println(JsonUtil.toJson(bridgeProductService.accountBalance("EBCC55A75ED842CD9B83B7181F789EC4")));
     }
 }

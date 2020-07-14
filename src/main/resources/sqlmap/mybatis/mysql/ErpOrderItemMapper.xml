@@ -68,7 +68,11 @@
         batch_code as batchCode,
         batch_date as batchDate,
         warehouse_type_code as warehouseTypeCode,
-        batch_info_code as batchInfoCode
+        batch_info_code as batchInfoCode,
+        transport_center_code as transportCenterCode,
+        transport_center_name as transportCenterName,
+        warehouse_code as warehouseCode,
+        warehouse_name as warehouseName
         from order_store_detail
         where 1 = 1
         <if test=" id != null and id != '' ">
@@ -144,6 +148,18 @@
         <if test="topCouponAmount != null ">
             top_coupon_amount = #{topCouponAmount},
         </if>
+        <if test="transportCenterCode != null and transportCenterCode != ''">
+            transport_center_code = #{transportCenterCode},
+        </if>
+        <if test="transportCenterName != null and transportCenterName != ''">
+            transport_center_name = #{transportCenterName},
+        </if>
+        <if test="warehouseCode != null and warehouseCode != ''">
+            warehouse_code = #{warehouseCode},
+        </if>
+        <if test="warehouseName != null and warehouseName != ''">
+            warehouse_name = #{warehouseName},
+        </if>
         update_by_id = #{updateById},
         update_by_name = #{updateByName},
         update_time = sysdate()
@@ -167,7 +183,8 @@
                                        product_brand_code,product_brand_name,product_category_code,product_category_name,activity_id,is_activity,activity_price,
                                        use_status, create_by_id, create_by_name, update_by_id, update_by_name, create_time,
                                        update_time,top_coupon_discount_amount,top_coupon_amount,batch_code,batch_date
-                                       ,warehouse_type_code,batch_info_code)
+                                       ,warehouse_type_code,batch_info_code,transport_center_code,transport_center_name,
+                                       warehouse_code,warehouse_name)
         values (#{orderInfoDetailId}, #{orderStoreId}, #{orderStoreCode}, #{spuCode}, #{spuName},
                 #{skuCode}, #{skuName}, #{productPropertyCode}, #{productPropertyName}, #{supplierCode},
                 #{supplierName},
@@ -181,7 +198,8 @@
                 #{productBrandCode},#{productBrandName},#{productCategoryCode},#{productCategoryName},#{activityId},#{isActivity},#{activityPrice},
                 #{useStatus}, #{createById}, #{createByName}, #{updateById},
                 #{updateByName}, sysdate(), sysdate(),#{topCouponDiscountAmount},#{topCouponAmount},#{batchCode}
-                ,#{batchDate},#{warehouseTypeCode},#{batchInfoCode})
+                ,#{batchDate},#{warehouseTypeCode},#{batchInfoCode},#{transportCenterCode},#{transportCenterName},
+                #{warehouseCode},#{warehouseName})
     </insert>
 
     <select id="getProductSales" resultType="java.math.BigDecimal" parameterType="com.aiqin.mgs.order.api.domain.Activity">

@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 @ApiModel("添加商品到购物车sku行")
 public class ErpCartAddSkuItem {
@@ -28,4 +30,12 @@ public class ErpCartAddSkuItem {
     @ApiModelProperty("批次编号")
     @JsonProperty(value = "batch_info_code")
     private String batchInfoCode;
+
+    @ApiModelProperty(value = "爱亲批发价")
+    @JsonProperty("wholesale_price")
+    private BigDecimal wholesalePrice;
+
+    @ApiModelProperty(value = "仓库编码")
+    @JsonProperty("warehouse_code")
+    private String warehouseCode;
 }

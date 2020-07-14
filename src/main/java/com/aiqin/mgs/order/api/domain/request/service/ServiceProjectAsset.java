@@ -85,7 +85,7 @@ public class ServiceProjectAsset {
     @ApiModelProperty(value = "活动结束时间")
     @JsonProperty("finish_time")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     private Date finishTime;
 
     @ApiModelProperty(value = "消费方式，0为限次，1为不限次")
@@ -155,6 +155,10 @@ public class ServiceProjectAsset {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
+
+    @ApiModelProperty(value="支付方式")
+    @JsonProperty("pay_type")
+    private String payType;
 
     @Override
     public boolean equals(Object o) {

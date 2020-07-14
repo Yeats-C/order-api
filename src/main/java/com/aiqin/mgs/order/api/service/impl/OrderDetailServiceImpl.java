@@ -5,49 +5,34 @@
  * ****************************************************************************/
 package com.aiqin.mgs.order.api.service.impl;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.*;
-
-import javax.annotation.Resource;
-import javax.validation.Valid;
-
-import com.aiqin.mgs.order.api.dao.*;
-import com.aiqin.mgs.order.api.domain.*;
-
-import com.aiqin.mgs.order.api.domain.request.ProductStoreRequest;
-import com.aiqin.mgs.order.api.domain.response.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
+import com.aiqin.mgs.order.api.dao.*;
+import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
-import com.aiqin.mgs.order.api.domain.request.OrderDetailRequest;
+import com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest;
 import com.aiqin.mgs.order.api.domain.request.ProdisorRequest;
-import com.aiqin.mgs.order.api.domain.response.OrderDetailByMemberResponse;
-import com.aiqin.mgs.order.api.domain.response.OrderProductsResponse;
-import com.aiqin.mgs.order.api.domain.response.ProdisorResponse;
-import com.aiqin.mgs.order.api.domain.response.SkuSaleResponse;
-import com.aiqin.mgs.order.api.domain.response.SkuSumResponse;
-import com.aiqin.mgs.order.api.service.CartService;
+import com.aiqin.mgs.order.api.domain.request.ProductStoreRequest;
+import com.aiqin.mgs.order.api.domain.response.*;
 import com.aiqin.mgs.order.api.service.OrderDetailService;
 import com.aiqin.mgs.order.api.service.OrderLogService;
-import com.aiqin.mgs.order.api.service.OrderService;
 import com.aiqin.mgs.order.api.util.DateUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @SuppressWarnings("all")
 @Service
@@ -187,7 +172,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     public HttpResponse selectorderdetailsum(@Valid OrderDetailQuery orderDetailQuery) {
 
         try {
-            OrderDetailInfo orderDetailInfo=orderDetailDao.selectorderdetailsum(orderDetailQuery);
+            OrderDetailInfo orderDetailInfo = orderDetailDao.selectorderdetailsum(orderDetailQuery);
             return HttpResponse.success(orderDetailInfo);
 
         } catch (Exception e) {
@@ -439,14 +424,10 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             }
 
             //为pos端判断是否可退货
-            if (orderInfo.getOrderStatus().intValue()==2||orderInfo.getOrderStatus().intValue()==5){
-                int state=checkTurn(detailList);
-                info.setTurnReturnView(state);
-                info.getOrderInfo().setTurnReturnView(state);
-            }else {
-                info.setTurnReturnView(1);
-                info.getOrderInfo().setTurnReturnView(1);
-            }
+            int state = checkTurn(detailList);
+            info.setTurnReturnView(state);
+            info.getOrderInfo().setTurnReturnView(state);
+
 
             info.setDetailList(detailList);
 
@@ -469,7 +450,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             orderQuery.setOrderId(orderId);
             SettlementInfo settlementInfo = settlementDao.jkselectsettlement(orderQuery);
             if (settlementInfo != null) {
-                settlementInfo.setActivityDiscount(Optional.ofNullable(settlementInfo.getActivityDiscount()).orElse(0)+ Optional.ofNullable(settlementInfo.getFullSum()).orElse(0)+Optional.ofNullable(settlementInfo.getLuckySum()).orElse(0));
+                settlementInfo.setActivityDiscount(Optional.ofNullable(settlementInfo.getActivityDiscount()).orElse(0) + Optional.ofNullable(settlementInfo.getFullSum()).orElse(0) + Optional.ofNullable(settlementInfo.getLuckySum()).orElse(0));
                 settlementInfo.setTotalCouponsDiscount(settlementInfo.getActivityDiscount());
 
                 if (orderInfo.getOrderStatus() == 0) {
@@ -496,7 +477,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             return 1;
         }
         for (OrderDetailInfo orderDetailInfo : detailList) {
-            if (Optional.ofNullable(orderDetailInfo.getAmount()).orElse(0) >Optional.ofNullable(orderDetailInfo.getReturnAmount()).orElse(0)  +Optional.ofNullable(orderDetailInfo.getReturnPrestorageAmount()).orElse(0) ) {
+            if (Optional.ofNullable(orderDetailInfo.getAmount()).orElse(0) > Optional.ofNullable(orderDetailInfo.getReturnAmount()).orElse(0) + Optional.ofNullable(orderDetailInfo.getReturnPrestorageAmount()).orElse(0)) {
                 return 0;
             }
         }
@@ -881,18 +862,18 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
     @Override
     public HttpResponse batchAddOrder(List<OrderodrInfo> cartInfo) {
-        if (cartInfo==null){
+        if (cartInfo == null) {
             return new HttpResponse();
         }
-        for (OrderodrInfo orderodrInfo:cartInfo){
+        for (OrderodrInfo orderodrInfo : cartInfo) {
 
             String orderCode = DateUtil.sysDate() + Global.ORIGIN_COME_3 + String.valueOf(Global.ORDERID_CHANNEL_4) + OrderPublic.randomNumberF();
 
 
-            orderodrInfo.getOrderInfo().setOrderCode( orderCode);
+            orderodrInfo.getOrderInfo().setOrderCode(orderCode);
             try {
                 orderDao.addOrderInfo(orderodrInfo.getOrderInfo());
-                for (OrderDetailInfo orderDetailInfo:orderodrInfo.getDetailList()){
+                for (OrderDetailInfo orderDetailInfo : orderodrInfo.getDetailList()) {
                     orderDetailInfo.setOrderCode(orderCode);
                     orderDetailInfo.setOrderDetailId(OrderPublic.getUUID());
                     orderDetailInfo.setOrderId(orderodrInfo.getOrderInfo().getOrderId());
@@ -905,7 +886,6 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 settlementDao.addSettlement(orderodrInfo.getSettlementInfo());
 
 
-
                 //新增订单支付数据
              /*   if (orderPayList != null && orderPayList.size() > 0) {
                     try {
@@ -915,7 +895,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                     }
                 }*/
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage());
             }
 
         }

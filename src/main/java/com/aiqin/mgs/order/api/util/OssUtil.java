@@ -44,15 +44,24 @@ public class OssUtil {
         Map<String, String> map = new HashMap<>();
         OSSClient ossClient = new OSSClient(endPoint, accessKeyId, accessKeySecret);
         String type = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+        String appBuild=file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("_"));
+        if (appBuild!=null){
+            appBuild=StringUtils.substringBefore(appBuild,".");
+            appBuild=appBuild.substring(1);
+        }
+        Date date1=new Date();
         String fileName = dir + "/" + UUID.randomUUID() + type;
         ossClient.putObject(bucketName, fileName, new ByteArrayInputStream(file.getBytes()));
         ossClient.shutdown();
         Date expiration = new Date(System.currentTimeMillis() + 3600L * 1000 * 24 * 365 * 10);
         String url = ossClient.generatePresignedUrl(bucketName, fileName, expiration).toString();
+        Date date2=new Date();
         log.info("oss文件链接,{}", url);
+        log.info("------------------------------------------------上传开始时间："+date1+"上传结束时间:"+date2+" 上传用时："+(date2.getTime()-date1.getTime()));
         map.put("name", fileName);
         map.put("url", url);
         map.put("dir", dir);
+        map.put("appBuild", appBuild);
         return map;
     }
 

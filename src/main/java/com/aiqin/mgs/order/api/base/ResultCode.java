@@ -130,4 +130,11 @@ public interface ResultCode {
     MessageId GIFT_POOL_ALREADY_EXISTS = MessageId.create(Project.ORDER_API, 110, "赠品池已存在此赠品");
     MessageId PROVINCE_AND_CITY_INFORMATION_IS_EMPTY = MessageId.create(Project.STORE_API, 110, "此门店省市信息为空");
     /**赠品池相关 end */
+
+    /**批发客户相关 start */
+    MessageId ACCOUNT_ALREADY_EXISTS = MessageId.create(Project.ORDER_API, 111, "此账户已存在");
+    MessageId FAILED_TO_CREATE_MASTER_ACCOUNT_FAILED = MessageId.create(Project.ORDER_API, 112, "创建主控账户失败");
+    MessageId INSERT_FRANCHISEE_ACCOUNT_FAILED = MessageId.create(Project.SLCS_API, 310, "新增批发账户结算账户失败");
+    MessageId SELECT_FRANCHISEE_ACCOUNT_FAILED = MessageId.create(Project.SETTLEMENT_API, 311, "查询批发账户结算账户失败");
+    /**批发客户相关 end */
 }

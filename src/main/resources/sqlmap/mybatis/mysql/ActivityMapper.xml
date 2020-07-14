@@ -60,19 +60,19 @@
                 and a.activity_type = #{activityType}
             </if>
             <if test="activityStatus!= null and activityStatus==3">
-                and a.finish_time &lt; now() or activity_status=1
+                and a.finish_time &lt; now()
             </if>
             <if test="activityStatus!= null and activityStatus==2">
                 and a.begin_time &lt;= now() and finish_time &gt;= now() and activity_status=0
             </if>
             <if test="activityStatus!= null and activityStatus==1">
-                and a.begin_time &gt; now() and activity_status=0
+                and a.begin_time &gt; now() or ( a.begin_time &lt;= now() and finish_time &gt;= now() and activity_status=1)
             </if>
             <if test="beginTime!= null">
-                and a.begin_time &gt;= #{beginTime}
+                and a.begin_time &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d 00:00:00')
             </if>
             <if test="finishTime!= null">
-                and a.finish_time &lt;= #{finishTime}
+                and a.finish_time &lt;= DATE_FORMAT(#{finishTime},'%Y-%m-%d 23:59:59')
             </if>
             <if test="createBy != '' and createBy!= null">
                 and a.create_by = #{createBy}
@@ -106,7 +106,8 @@
 
     <select id="getActivityInformation" resultType="com.aiqin.mgs.order.api.domain.Activity"
             parameterType="com.aiqin.mgs.order.api.domain.Activity">
-        select activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization
+        select activity_id,activity_name,activity_type,activity_status,DATE_FORMAT( begin_time, '%Y-%m-%d %h:%i:%s' ) AS begin_time,
+        DATE_FORMAT( finish_time, '%Y-%m-%d %h:%i:%s' ) AS finish_time,publishing_organization
         ,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time,active_store_range
         ,activity_scope
         from activity
@@ -173,7 +174,7 @@
     </update>
 
     <select id="totalCount" resultType="java.lang.Integer" parameterType="com.aiqin.mgs.order.api.domain.Activity">
-        select count(1) from (select a.activity_id
+        select count(1) from (select distinct(a.activity_id)
         FROM
         activity a
         JOIN activity_store s ON a.activity_id = s.activity_id
@@ -190,19 +191,20 @@
                 and a.activity_type = #{activityType}
             </if>
             <if test="activityStatus!= null and activityStatus==3">
-                and a.finish_time &lt; now() or activity_status=1
+                and a.finish_time &lt; now()
             </if>
             <if test="activityStatus!= null and activityStatus==2">
                 and a.begin_time &lt;= now() and finish_time &gt;= now() and activity_status=0
             </if>
             <if test="activityStatus!= null and activityStatus==1">
-                and a.begin_time &gt; now() and activity_status=0
+                and a.begin_time &gt; now() or ( a.begin_time &lt;= now() and finish_time &gt;= now() and
+                activity_status=1)
             </if>
             <if test="beginTime!= null">
-                and a.begin_time &gt;= #{beginTime}
+                and a.begin_time &gt;= DATE_FORMAT(#{beginTime},'%Y-%m-%d 00:00:00')
             </if>
             <if test="finishTime!= null">
-                and a.finish_time &lt;= #{finishTime}
+                and a.finish_time &lt;= DATE_FORMAT(#{finishTime},'%Y-%m-%d 23:59:59')
             </if>
             <if test="createBy != '' and createBy!= null">
                 and a.create_by = #{createBy}
@@ -225,15 +227,16 @@
                     #{item}
                 </foreach>
             </if>
-            GROUP BY a.activity_id) f
         </where>
+        ) l
     </select>
 
     <!--通过门店id爱掌柜的促销活动列表（所有生效活动）-->
     <select id="effectiveActivityList" resultType="com.aiqin.mgs.order.api.domain.Activity" resultMap="ActivityMapping"
             parameterType="java.lang.String">
         SELECT
-        a.activity_id,a.activity_name,a.activity_type,a.activity_status,a.begin_time,a.finish_time,a.publishing_organization,a.activity_brief
+        a.activity_id,a.activity_name,a.activity_type,a.activity_status,DATE_FORMAT( a.begin_time, '%Y-%m-%d %h:%i:%s' ) AS begin_time,
+        DATE_FORMAT( a.finish_time, '%Y-%m-%d %h:%i:%s' ) AS finish_time,a.publishing_organization,a.activity_brief
         ,a.activity_pic_pc,a.activity_pic_app,a.create_by,a.update_by,a.create_time,a.update_time,activity_scope
         FROM
         activity a

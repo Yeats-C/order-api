@@ -95,6 +95,12 @@
     <result column="really_return" property="reallyReturn" jdbcType="BIT" />
     <result column="complimentary_amount" property="complimentaryAmount" jdbcType="DECIMAL" />
     <result column="top_coupon_discount_amount" property="topCouponDiscountAmount" jdbcType="DECIMAL" />
+    <result column="franchisee_code" property="franchiseeCode" jdbcType="VARCHAR" />
+    <result column="franchisee_name" property="franchiseeName" jdbcType="VARCHAR" />
+    <result column="copartner_area_id" property="copartnerAreaId" jdbcType="VARCHAR" />
+    <result column="copartner_area_name" property="copartnerAreaName" jdbcType="VARCHAR" />
+    <result column="business_form" property="businessForm" jdbcType="BIT" />
+    <result column="whether_invoice" property="whetherInvoice" jdbcType="BIT"/>
   </resultMap>
   <sql id="Base_Column_List" >
     id, return_order_id, return_order_code, order_store_code, company_code, company_name,
@@ -113,7 +119,8 @@
     review_remark, review_operator, refund_status, process_type, remark, use_status,
     create_by_id, create_by_name, update_by_id, update_by_name, create_time, update_time,
     source_type, order_success, return_money_type, order_category, review_operator_id, review_time,
-    return_good_amount,actual_return_good_amount,really_return,complimentary_amount,top_coupon_discount_amount
+    return_good_amount,actual_return_good_amount,really_return,complimentary_amount,top_coupon_discount_amount,franchisee_code,
+    franchisee_name,copartner_area_id,copartner_area_name,business_form,whether_invoice
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
@@ -396,6 +403,24 @@
       <if test="complimentaryAmount != null">
         complimentary_amount,
       </if>
+      <if test="franchiseeCode != null">
+        franchisee_code,
+      </if>
+      <if test="franchiseeName != null">
+        franchisee_name,
+      </if>
+      <if test="copartnerAreaId != null">
+        copartner_area_id,
+      </if>
+      <if test="copartnerAreaName != null">
+        copartner_area_name,
+      </if>
+      <if test="businessForm != null">
+        business_form,
+      </if>
+      <if test="whetherInvoice != null ">
+        whether_invoice,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -651,7 +676,7 @@
         #{returnMoneyType,jdbcType=BIT},
       </if>
       <if test="orderCategory != null" >
-        #{orderCategory,jdbcType=BIT},
+        #{orderCategory,jdbcType=INTEGER},
       </if>
       <if test="reviewOperatorId != null" >
         #{reviewOperatorId},
@@ -664,6 +689,24 @@
       </if>
       <if test="complimentaryAmount != null">
         #{complimentaryAmount},
+      </if>
+      <if test="franchiseeCode != null">
+        #{franchiseeCode},
+      </if>
+      <if test="franchiseeName != null">
+        #{franchiseeName},
+      </if>
+      <if test="copartnerAreaId != null">
+        #{copartnerAreaId},
+      </if>
+      <if test="copartnerAreaName != null">
+        #{copartnerAreaName},
+      </if>
+      <if test="businessForm != null">
+        #{businessForm},
+      </if>
+      <if test="whetherInvoice != null">
+        #{whetherInvoice},
       </if>
     </trim>
   </insert>
@@ -948,7 +991,7 @@
         update return_order_info
         <set >
             <if test="operateStatus!=null">
-              return_order_status=#{operateStatus,jdbcType=INTEGER},
+              return_order_status=#{operateStatus},
             </if>
             <if test="operator!=null">
                 review_operator=#{operator,jdbcType=VARCHAR},
@@ -1185,6 +1228,12 @@
     from return_order_info
     <where>
         really_return=1
+        <if test="businessForm != null">
+          and  business_form = #{businessForm,jdbcType=INTEGER}
+        </if>
+        <if test="customerName != null and customerName !=''">
+          and  customer_name = #{customerName,jdbcType=VARCHAR}
+        </if>
         <if test="returnOrderStatus!=null">
           and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
         </if>
@@ -1217,6 +1266,9 @@
       </if>
       <if test="returnOrderType!=null">
         and return_order_type =#{returnOrderType}
+      </if>
+      <if test="refundStatus!=null">
+        and refund_status =#{refundStatus}
       </if>
     </where>
     order by create_time desc
@@ -1274,7 +1326,7 @@
     <include refid="Base_Column_List" />
     from return_order_info
     where
-      return_order_code = #{returnOrderCode} and order_success = #{orderSuccess}
+         return_order_code = #{returnOrderCode} and order_success = #{orderSuccess}
   </select>
 
   <select id="selectByOrderSuccess" resultMap="BaseResultMap" >
@@ -1394,7 +1446,52 @@
     <select id="selectReturnCode" resultType="java.lang.String">
       select return_order_code as returnOrderCode from  return_order_info where store_code = #{storeCode}
     </select>
-
+    <select id="selectByCondition"
+            resultType="com.aiqin.mgs.order.api.domain.response.returnorder.WholesaleReturnList">
+       SELECT return_order_code as returnOrderCode,
+              order_store_code as orderStoreCode,
+              customer_name as customerName,
+              return_good_amount as returnOrderAmount,
+              return_order_type as returnOrderType,
+              return_order_status as returnOrderStatus,
+              create_time as createTime,
+              create_by_name as createByName
+        FROM return_order_info
+        <where>
+          really_return=1
+           <if test="businessForm != null">
+             AND business_form = #{businessForm}
+           </if>
+           <if test="returnOrderCode != null and returnOrderCode != ''">
+             AND return_order_code = #{returnOrderCode}
+           </if>
+           <if test="applyStartTime != null and applyStartTime != ''">
+             AND create_time  &gt;= #{applyStartTime}
+           </if>
+           <if test="applyEndTime !=null and applyEndTime !=''">
+             AND create_time &lt;= #{applyEndTime}
+           </if>
+           <if test="returnOrderStatus != null">
+            AND return_order_status = #{returnOrderStatus}
+           </if>
+           <if test="provinceId != null and provinceId!= ''">
+             AND province_id = #{provinceId}
+           </if>
+           <if test="cityId != null and cityId != ''" >
+             AND city_id = #{cityId}
+           </if>
+           <if test="districtId != null and districtId !=''">
+             AND district_id = #{districtId}
+           </if>
+           <if test="customerName != null and customerName != ''">
+             AND customer_name LIKE CONCAT('%',#{customerName},'%')
+           </if>
+        </where>
+      order by create_time desc
+    </select>
+    <select id="selectType" resultType="java.lang.Integer">
+      select order_success from return_order_info where return_order_code = #{returnOrderCode,jdbcType=VARCHAR}
+    </select>
     <update id="updateReallyReturn" parameterType="java.util.List">
     update return_order_info
     set

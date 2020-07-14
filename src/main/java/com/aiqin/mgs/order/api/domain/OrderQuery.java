@@ -13,6 +13,7 @@ import java.util.List;
 import javax.validation.constraints.NotBlank;
 
 import com.aiqin.mgs.order.api.base.PagesRequest;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
@@ -96,10 +97,12 @@ public class OrderQuery extends PagesRequest {
 	
 	@ApiModelProperty(value="创建时间",example = "2001-01-01 01:01:01")
 	@JsonProperty("create_time")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date create_time;
 	
 	@ApiModelProperty(value="创建开始时间Date类型",example = "2001-01-01 01:01:01")
 	@JsonProperty("begin_time")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date beginTime;
 	
 	
@@ -108,11 +111,13 @@ public class OrderQuery extends PagesRequest {
 	private Date endTime;
 	
 	@ApiModelProperty(value="开始时间String类型、格式YYYY-MM-DD")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonProperty("begin_date")
 	private String beginDate;
 	
 	
 	@ApiModelProperty(value="结束时间String类型、格式YYYY-MM-DD")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonProperty("end_date")
 	private String endDate;
 	
@@ -169,6 +174,13 @@ public class OrderQuery extends PagesRequest {
 	@ApiModelProperty(value="最后更新时间")
 	@JsonProperty("update_time")
 	private Date updateTime;
+	/**
+	 * 渠道来源
+	 */
+	@JsonProperty("origin_type")
+	@ApiModelProperty("来源类型，0:pos 1：微商城  2：全部  3：web")
+	private Integer originType;
+
 
 }
 

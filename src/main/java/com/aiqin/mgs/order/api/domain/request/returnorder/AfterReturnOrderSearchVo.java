@@ -39,12 +39,21 @@ public class AfterReturnOrderSearchVo implements Serializable {
     @JsonProperty("return_order_status")
     private Integer returnOrderStatus;
 
+    @ApiModelProperty("批发客户名称 ")
+    @JsonProperty("customer_name")
+    private String customerName;
+
     @ApiModelProperty("地区层级编码对象")
     @JsonProperty("area_req")
     private AreaReq areaReq;
 
     @ApiModelProperty("所有门店id")
     private List<String> storeIds;
+
+    //用来区分是批发业务还是门店业务
+    @ApiModelProperty("区分业务---0门店业务  1批发业务 ")
+    @JsonProperty("business_form")
+    private Integer businessForm;
 
 //    @ApiModelProperty(value = "订单类型 0直送、1配送、2辅采")
     @ApiModelProperty(value = "订单类型 1直送 2配送 3货架")
