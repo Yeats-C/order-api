@@ -12,6 +12,7 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
+import com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest;
 import com.aiqin.mgs.order.api.domain.request.ProdisorRequest;
 import com.aiqin.mgs.order.api.domain.request.ProductStoreRequest;
 import com.aiqin.mgs.order.api.domain.response.*;
@@ -171,7 +172,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     public HttpResponse selectorderdetailsum(@Valid OrderDetailQuery orderDetailQuery) {
 
         try {
-            OrderDetailInfo orderDetailInfo=orderDetailDao.selectorderdetailsum(orderDetailQuery);
+            OrderDetailInfo orderDetailInfo = orderDetailDao.selectorderdetailsum(orderDetailQuery);
             return HttpResponse.success(orderDetailInfo);
 
         } catch (Exception e) {
@@ -423,14 +424,10 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             }
 
             //为pos端判断是否可退货
-            if (orderInfo.getOrderStatus().intValue()==2||orderInfo.getOrderStatus().intValue()==5){
-                int state=checkTurn(detailList);
-                info.setTurnReturnView(state);
-                info.getOrderInfo().setTurnReturnView(state);
-            }else {
-                info.setTurnReturnView(1);
-                info.getOrderInfo().setTurnReturnView(1);
-            }
+            int state = checkTurn(detailList);
+            info.setTurnReturnView(state);
+            info.getOrderInfo().setTurnReturnView(state);
+
 
             info.setDetailList(detailList);
 
@@ -453,7 +450,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             orderQuery.setOrderId(orderId);
             SettlementInfo settlementInfo = settlementDao.jkselectsettlement(orderQuery);
             if (settlementInfo != null) {
-                settlementInfo.setActivityDiscount(Optional.ofNullable(settlementInfo.getActivityDiscount()).orElse(0)+ Optional.ofNullable(settlementInfo.getFullSum()).orElse(0)+Optional.ofNullable(settlementInfo.getLuckySum()).orElse(0));
+                settlementInfo.setActivityDiscount(Optional.ofNullable(settlementInfo.getActivityDiscount()).orElse(0) + Optional.ofNullable(settlementInfo.getFullSum()).orElse(0) + Optional.ofNullable(settlementInfo.getLuckySum()).orElse(0));
                 settlementInfo.setTotalCouponsDiscount(settlementInfo.getActivityDiscount());
 
                 if (orderInfo.getOrderStatus() == 0) {
@@ -480,7 +477,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             return 1;
         }
         for (OrderDetailInfo orderDetailInfo : detailList) {
-            if (Optional.ofNullable(orderDetailInfo.getAmount()).orElse(0) >Optional.ofNullable(orderDetailInfo.getReturnAmount()).orElse(0)  +Optional.ofNullable(orderDetailInfo.getReturnPrestorageAmount()).orElse(0) ) {
+            if (Optional.ofNullable(orderDetailInfo.getAmount()).orElse(0) > Optional.ofNullable(orderDetailInfo.getReturnAmount()).orElse(0) + Optional.ofNullable(orderDetailInfo.getReturnPrestorageAmount()).orElse(0)) {
                 return 0;
             }
         }
@@ -865,18 +862,18 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
     @Override
     public HttpResponse batchAddOrder(List<OrderodrInfo> cartInfo) {
-        if (cartInfo==null){
+        if (cartInfo == null) {
             return new HttpResponse();
         }
-        for (OrderodrInfo orderodrInfo:cartInfo){
+        for (OrderodrInfo orderodrInfo : cartInfo) {
 
             String orderCode = DateUtil.sysDate() + Global.ORIGIN_COME_3 + String.valueOf(Global.ORDERID_CHANNEL_4) + OrderPublic.randomNumberF();
 
 
-            orderodrInfo.getOrderInfo().setOrderCode( orderCode);
+            orderodrInfo.getOrderInfo().setOrderCode(orderCode);
             try {
                 orderDao.addOrderInfo(orderodrInfo.getOrderInfo());
-                for (OrderDetailInfo orderDetailInfo:orderodrInfo.getDetailList()){
+                for (OrderDetailInfo orderDetailInfo : orderodrInfo.getDetailList()) {
                     orderDetailInfo.setOrderCode(orderCode);
                     orderDetailInfo.setOrderDetailId(OrderPublic.getUUID());
                     orderDetailInfo.setOrderId(orderodrInfo.getOrderInfo().getOrderId());
@@ -887,7 +884,6 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 orderodrInfo.getSettlementInfo().setSettlementId(OrderPublic.getUUID());
 
                 settlementDao.addSettlement(orderodrInfo.getSettlementInfo());
-
 
 
                 //新增订单支付数据
