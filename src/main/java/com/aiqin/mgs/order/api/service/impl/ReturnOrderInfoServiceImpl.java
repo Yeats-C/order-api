@@ -1717,7 +1717,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     //门店实收数量  ----
                     actualInboundCount = sd.getActualInboundCount();
                     //已退数量    ----
-                    returnProductCount = sd.getReturnProductCount();
+                    returnProductCount = sd.getReturnProductCount() == null ? 0L : sd.getReturnProductCount();
                    //均摊后的金额乘以退货数量
                     BigDecimal preferentialAmount = sd.getPreferentialAmount();
                     BigDecimal multiply = preferentialAmount.multiply(BigDecimal.valueOf(sd.getActualReturnProductCount()));
