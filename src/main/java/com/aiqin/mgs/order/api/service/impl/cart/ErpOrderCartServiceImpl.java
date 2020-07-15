@@ -302,9 +302,11 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 }
                 addList.add(erpOrderCartInfo);
             }
-
-            if (cartAmount > skuDetail.getStockNum()) {
-                throw new BusinessException("商品" + skuDetail.getSkuName()+"BATCH_INFO_CODE"+item.getBatchInfoCode()+ "库存不足");
+            //直送商品不校验库存
+            if(!erpCartAddRequest.getProductType().equals(ErpOrderTypeEnum.DIRECT_SEND.getCode())){
+                if (cartAmount > skuDetail.getStockNum()) {
+                    throw new BusinessException("商品" + skuDetail.getSkuName()+"BATCH_INFO_CODE"+item.getBatchInfoCode()+ "库存不足");
+                }
             }
 
             //校验数量范围和规则
