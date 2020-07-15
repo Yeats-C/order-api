@@ -28,6 +28,11 @@ public interface ServiceProjectAssetDao {
 
     List<ServiceProjectAsset> assetOutTime();
 
+    /**
+     * 过期修改状态
+     * @param serviceProjectAssetList
+     * @return
+     */
     Integer updateAssetUseStatus(List<ServiceProjectAsset> serviceProjectAssetList);
 
     Long yesTodayTotalAmount(ReduceDetailRequest reduceDetailRequest);

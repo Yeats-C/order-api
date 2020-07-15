@@ -140,7 +140,7 @@ public class ServiceProjectAsset {
     @JsonProperty("pay_status")
     private Integer payStatus;
 
-    @ApiModelProperty(value = "使用状态，0为是，1为否")
+    @ApiModelProperty(value = "使用状态，0为是，1为否，2已退卡，3已过期")
     @JsonProperty("use_status")
     private Integer useStatus;
 
