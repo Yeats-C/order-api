@@ -519,24 +519,23 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         }
 
         //退货
-        if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_13) {
-            if (!orderCategoryEnum.isFirstOrder() && !orderCategoryEnum.getValue().equals(ErpOrderCategoryEnum.ORDER_TYPE_16.getValue())) {
         if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_13 || StatusEnum.NO.getCode().equals(order.getOrderReturnProcess())) {
-            if (!orderCategoryEnum.isFirstOrder()) {
+            if (!orderCategoryEnum.isFirstOrder() && !orderCategoryEnum.getValue().equals(ErpOrderCategoryEnum.ORDER_TYPE_16.getValue())) {
                 control.setOrderReturn(StatusEnum.YES.getCode());
             }
         }
 
-        //退款
-        if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_97 || orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_98) {
-            control.setRefund(StatusEnum.YES.getCode());
-            //获取退款状态
-            ErpOrderRefund orderRefund = erpOrderRefundService.getOrderRefundByOrderIdAndRefundType(order.getOrderStoreId(), ErpOrderRefundTypeEnum.ORDER_CANCEL);
-            if (orderRefund != null) {
-                order.setOrderRefund(orderRefund);
+                //退款
+                if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_97 || orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_98) {
+                    control.setRefund(StatusEnum.YES.getCode());
+                    //获取退款状态
+                    ErpOrderRefund orderRefund = erpOrderRefundService.getOrderRefundByOrderIdAndRefundType(order.getOrderStoreId(), ErpOrderRefundTypeEnum.ORDER_CANCEL);
+                    if (orderRefund != null) {
+                        order.setOrderRefund(orderRefund);
+                    }
+                }
             }
+
         }
     }
-
-
 }
