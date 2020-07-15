@@ -1,12 +1,16 @@
 package com.aiqin.mgs.order.api.util;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Comparator;
 import java.util.Map;
 
 public class SignUtil {
+
+    private static final Logger logger = LoggerFactory.getLogger(SignUtil.class);
 
     private final static String SECRET_KEY = "SECRET_KEY";
 
@@ -50,7 +54,7 @@ public class SignUtil {
         try {
             result = java.net.URLEncoder.encode(str, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         return result;
     }
@@ -63,7 +67,7 @@ public class SignUtil {
         try {
             result = java.net.URLDecoder.decode(str, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         return result;
     }

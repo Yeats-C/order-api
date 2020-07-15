@@ -60,10 +60,10 @@
           FROM
               gift_pool where 1 = 1
           <if test="skuCode != null and skuCode != ''">
-              and sku_code = #{skuCode}
+              and sku_code like concat('%', #{skuCode,jdbcType=VARCHAR}, '%')
           </if>
           <if test="skuName != null and skuName != ''">
-              and sku_name = #{skuName}
+              and sku_name like concat('%', #{skuName,jdbcType=VARCHAR}, '%')
           </if>
          <if test="pageSize != null and pageSize != ''">
              limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
@@ -76,12 +76,12 @@
             count(0)
           FROM
           gift_pool where 1 = 1
-          <if test="skuCode != null and skuCode != ''">
-               and sku_code = #{skuCode}
-          </if>
-          <if test="skuName != null and skuName != ''">
-               and sku_name = #{skuName}
-          </if>
+         <if test="skuCode != null and skuCode != ''">
+             and sku_code like concat('%', #{skuCode,jdbcType=VARCHAR}, '%')
+         </if>
+         <if test="skuName != null and skuName != ''">
+             and sku_name like concat('%', #{skuName,jdbcType=VARCHAR}, '%')
+         </if>
      </select>
 
     <!--通过仓库code List 查询门店拥有权限的赠品池数据-->

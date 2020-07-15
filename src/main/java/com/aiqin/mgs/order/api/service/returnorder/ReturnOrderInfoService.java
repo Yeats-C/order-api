@@ -168,5 +168,20 @@ public interface ReturnOrderInfoService {
      */
     PageResData<ReturnOrderInfo> azgList(ReturnOrderSearchVo searchVo);
 
+    /**
+     * 发起批发退货
+     * @param reqVo
+     * @return
+     */
+    HttpResponse saveWholesaleReturn(ReturnWholesaleOrderReqVo reqVo);
+
+    /**
+     * 多条件查询批发退货列表
+     * @param whoVo
+     * @return
+     */
+    HttpResponse selectAllList(wholesaleReturnOrderSearchVo whoVo);
+
+
 //    boolean refundPoints(ReturnOrderInfo returnOrderInfo);
 }

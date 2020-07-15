@@ -432,6 +432,7 @@
         <if test="updateTime!=null ">
             and b.update_time &gt;= #{updateTime}
         </if>
+        and b.order_status in (1,2,3,5)
         ORDER BY a.create_time DESC
         <if test="icount!=null ">
             limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
@@ -470,7 +471,7 @@
         <if test="updateTime!=null ">
             and b.update_time &gt;= #{updateTime}
         </if>
-
+        and b.order_status in (1,2,3,5)
     </select>
 
     <!--接口-统计商品在各个渠道的订单数.-->

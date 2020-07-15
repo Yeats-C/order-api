@@ -153,7 +153,7 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
         if(map!=null && map.size()>0){
             for(Entry<String, String> entry:map.entrySet()){
                 //统计总的销售金额
-                BigDecimal totalAmount=new BigDecimal(0);
+                BigDecimal totalAmount=BigDecimal.ZERO;
                 //统计总的销售数量
                 Long totalNum=0L;
                 String storeCode=entry.getKey();
@@ -206,7 +206,7 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                     //各个品牌总金额
                     BigDecimal amount = reportStoreGoodsDetailDao.sumAmountByBrandId(reportStoreGoodsDetailVo);
                     if(amount==null){
-                        amount=new BigDecimal(0);
+                        amount=BigDecimal.ZERO;
                     }
                     totalAmount=totalAmount.add(amount);
                     rsg.setAmount(amount);
@@ -222,8 +222,8 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                     r.setBrandId(productBrandCode);
                     //计算同比
                     ReportStoreGoods reportStoreGoods = reportStoreGoodsDao.selectReportStoreGoods(r);
-                    BigDecimal a=new BigDecimal(1.0000);
-                    BigDecimal b=new BigDecimal(1.0000);
+                    BigDecimal a=BigDecimal.valueOf(1.0000);
+                    BigDecimal b=BigDecimal.valueOf(1.0000);
                     if(reportStoreGoods!=null&&reportStoreGoods.getNum()>0){
                         if(null!=rsg.getAmount()){
                             BigDecimal cha=rsg.getAmount().subtract(reportStoreGoods.getAmount());
@@ -269,8 +269,8 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 vo2.setCountTime(reStr);
                 //计算总同比
                 List<ReportStoreGoods> reportStoreGoods1 = reportStoreGoodsDao.selectList(vo2);
-                BigDecimal a=new BigDecimal(1.0000);
-                BigDecimal b=new BigDecimal(1.0000);
+                BigDecimal a=BigDecimal.valueOf(1.0000);
+                BigDecimal b=BigDecimal.valueOf(1.0000);
                 if(CollectionUtils.isNotEmpty(reportStoreGoods1)){
                     ReportStoreGoods rsg2=reportStoreGoods1.get(0);
                     if(null!=rsg2.getTotalAmount()){
@@ -454,7 +454,7 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
                 BigDecimal am = map.get(rcr.getCategoryCode());
                 ReportCategoryGoods rcg=new ReportCategoryGoods();
                 BigDecimal proportion=BigDecimal.ZERO;
-                if(totalAmount.compareTo(BigDecimal.ZERO)==1){
+                if(totalAmount.compareTo(BigDecimal.ZERO)>0){
                     proportion=am.divide(totalAmount,4,BigDecimal.ROUND_HALF_UP);
                 }
                 rcg.setAmount(am);

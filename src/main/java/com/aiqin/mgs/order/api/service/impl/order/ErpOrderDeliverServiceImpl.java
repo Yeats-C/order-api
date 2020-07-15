@@ -370,6 +370,13 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             if(aBoolean){
                 //三步均摊
                 shareEqually(order.getMainOrderCode());
+
+                //判断是否拆单，是否是子订单
+                if(!order.getOrderStoreCode().equals(order.getMainOrderCode())){
+                    //更新子订单里的均摊金额
+                    updateSubOrder(order.getMainOrderCode());
+                }
+
                 //遍历退货单，查看是否有退单
                 ErpOrderInfo e=new ErpOrderInfo();
                 e.setMainOrderCode(order.getMainOrderCode());
@@ -389,7 +396,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             boolean flag=false;
             //这两个都走线下支付物流费用
             //配送
-            if(ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(order.getOrderTypeCode())){
+            if(ErpOrderTypeEnum.DISTRIBUTION.getValue().equals(order.getOrderTypeCode())){
                 //首单或首单赠送
                 if(ErpOrderCategoryEnum.ORDER_TYPE_2.getValue().equals(order.getOrderCategoryCode())||ErpOrderCategoryEnum.ORDER_TYPE_4.getValue().equals(order.getOrderCategoryCode())){
                     flag=true;
@@ -413,6 +420,51 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             //均摊物流费用
             this.distributeLogisticsFee(orderLogistics.getLogisticsCode());
         }
+    }
+
+    /**
+     * 均摊完毕更新子订单明细
+     * @param mainOrderCode
+     */
+    private void updateSubOrder(String mainOrderCode) {
+        log.info("均摊完毕更新子订单明细--入参 mainOrderCode={}",mainOrderCode);
+        ErpOrderInfo orderAndItemByOrderCode = erpOrderQueryService.getOrderAndItemByOrderCode(mainOrderCode);
+        log.info("均摊完毕更新子订单明细--查询原始主订单及详情返回结果 orderAndItemByOrderCode={}",JsonUtil.toJson(orderAndItemByOrderCode));
+        List<ErpOrderItem> itemList = orderAndItemByOrderCode.getItemList();
+        //获取有A品卷均摊数据的明细数据，存入Map
+        Map<String,BigDecimal> topMap=new HashMap();
+        for(ErpOrderItem item:itemList){
+            if(null!=item.getTopCouponAmount()&&item.getTopCouponAmount().compareTo(BigDecimal.ZERO)>0){
+                topMap.put(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode(),item.getTopCouponAmount());
+            }
+        }
+        //子订单明细集合
+        List<ErpOrderItem> subItemList=new ArrayList<>();
+        //需更新的子订单明细集合
+        List<ErpOrderItem> updateSubItemList=new ArrayList<>();
+        /*********************************通过主订单编码查询子订单code集合**************************/
+        List<String> subOrderCodeList=erpOrderInfoDao.subOrderList(mainOrderCode);
+        for (String orderCode:subOrderCodeList){
+            ErpOrderInfo subOrderAndItemByOrderCode = erpOrderQueryService.getOrderAndItemByOrderCode(orderCode);
+            subItemList.addAll(subOrderAndItemByOrderCode.getItemList());
+        }
+
+        for(ErpOrderItem item:subItemList){
+            if(topMap.containsKey(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode())){
+                BigDecimal topCouponAmount=topMap.get(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
+                item.setTopCouponAmount(topCouponAmount);
+                item.setTopCouponDiscountAmount(topCouponAmount.multiply(new BigDecimal(item.getActualProductCount())));
+                updateSubItemList.add(item);
+            }
+        }
+        /*****************************************子订单数据更新结束，更新明细表*****************************************/
+        log.info("均摊完毕更新子订单明细--所有分摊结束--更新子订单明细集合 resList={}",JsonUtil.toJson(updateSubItemList));
+        AuthToken auth=new AuthToken();
+        auth.setPersonId("系统操作");
+        auth.setPersonName("系统操作");
+        erpOrderItemService.updateOrderItemList(updateSubItemList,auth);
+        log.info("均摊完毕更新子订单明细--更新明细表结束");
+
     }
 
     /**
@@ -598,7 +650,13 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                             if (curRule != null) {//命中规则
                                 youHuiAmount=curRule.getPreferentialAmount();
                                 //满减活动商品总金额=商品总金额-优惠金额
-                                productAmount=productAmount.subtract(youHuiAmount);
+                                if(productAmount.compareTo(youHuiAmount)>0){
+                                    productAmount=productAmount.subtract(youHuiAmount);
+                                }else{
+                                    //优惠金额大于活动商品总价值
+                                    productAmount=BigDecimal.ZERO;
+                                }
+
                             }
                             break;
                         case 2:
@@ -618,11 +676,16 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                         //分销总价=商品价值
                         BigDecimal fenxiaozongjia=eo.getProductAmount().multiply(new BigDecimal(eo.getProductCount()));
                         //分摊总额=商品价值X商品总金额/商品总价值
-                        BigDecimal totalPreferentialAmount=fenxiaozongjia.multiply(productAmount).divide(productPriceAmount,2,BigDecimal.ROUND_HALF_UP);
-                        //分摊单价
-                        BigDecimal preferentialAmount=totalPreferentialAmount.divide(new BigDecimal(eo.getProductCount()),2,BigDecimal.ROUND_HALF_UP);
-                        eo.setTotalPreferentialAmount(totalPreferentialAmount);
-                        eo.setPreferentialAmount(preferentialAmount);
+                        if(productAmount == BigDecimal.ZERO && productPriceAmount == BigDecimal.ZERO){
+                            BigDecimal totalPreferentialAmount=fenxiaozongjia.multiply(productAmount).divide(productPriceAmount,2,BigDecimal.ROUND_HALF_UP);
+                            //分摊单价
+                            BigDecimal preferentialAmount=totalPreferentialAmount.divide(new BigDecimal(eo.getProductCount()),2,BigDecimal.ROUND_HALF_UP);
+                            eo.setTotalPreferentialAmount(totalPreferentialAmount);
+                            eo.setPreferentialAmount(preferentialAmount);
+                        }else {
+                            eo.setTotalPreferentialAmount(BigDecimal.ZERO);
+                            eo.setPreferentialAmount(BigDecimal.ZERO);
+                        }
                         activityAfterMap.put(eo.getOrderInfoDetailId(),eo);
                     }
                 }
@@ -676,19 +739,26 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
         for(int i=0;i<list.size();i++){
             //本行商品价值
             BigDecimal totalPreferentialAmount = list.get(i).getTotalPreferentialAmount();
-            //分摊总金额=本行商品价值X商品总金额/商品总价值
-            BigDecimal to=totalPreferentialAmount.multiply(list.get(i).getTotalProductAmount()).divide(priceAmount,2,BigDecimal.ROUND_HALF_UP);
+            //分摊总金额
+            BigDecimal to=BigDecimal.ZERO;
             //分摊单价
-            BigDecimal per=to.divide(new BigDecimal(list.get(i).getProductCount()),2,BigDecimal.ROUND_HALF_UP);
-
+            BigDecimal per=BigDecimal.ZERO;
+            if(totalPreferentialAmount.compareTo(BigDecimal.ZERO)>0){
+                //分摊总金额=本行商品价值X商品总金额/商品总价值
+                 to=totalPreferentialAmount.multiply(list.get(i).getTotalProductAmount()).divide(priceAmount,2,BigDecimal.ROUND_HALF_UP);
+                //分摊单价
+                 per=to.divide(new BigDecimal(list.get(i).getProductCount()),2,BigDecimal.ROUND_HALF_UP);
+            }
             BigDecimal at=BigDecimal.ZERO;
             //最后一行做减法
             if(i==list.size()-1){
                 at=lastCouponMoney;
             }else{
                 //A品券单行抵扣总金额=A品券抵扣金额X本行商品价值/商品总价值
-                at = topCouponMoney.multiply(totalPreferentialAmount).divide(priceAmount, 2, BigDecimal.ROUND_HALF_UP);
-                lastCouponMoney=lastCouponMoney.subtract(at);
+                if(totalPreferentialAmount.compareTo(BigDecimal.ZERO)>0) {
+                    at = topCouponMoney.multiply(totalPreferentialAmount).divide(priceAmount, 2, BigDecimal.ROUND_HALF_UP);
+                    lastCouponMoney = lastCouponMoney.subtract(at);
+                }
             }
 
             //A品券单行每个商品抵扣金额
@@ -733,18 +803,23 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
         List<ErpOrderItem> resList=new ArrayList<>();
         //遍历明细行，进行分摊
         for(ErpOrderItem k:itemList){
-            //分摊总价=商品原始分摊总价X实付金额/商品总价值
-            BigDecimal tper = k.getTotalPreferentialAmount().multiply(payMoney).divide(totalMoney, 2, BigDecimal.ROUND_HALF_UP);
-            //商品类型
-            Integer productType = k.getProductType();
+            BigDecimal tper=BigDecimal.ZERO;
             BigDecimal s=BigDecimal.ZERO;
-            if(ErpProductGiftEnum.PRODUCT.getCode().equals(productType)){
-                //商品分摊单价=分摊总金额/订货数量
-                s=tper.divide(new BigDecimal(k.getProductCount()),2,BigDecimal.ROUND_HALF_UP);
-            }else {
-                //赠品分摊单价=分摊总金额/实发数量
-                s=tper.divide(new BigDecimal(k.getActualProductCount()),2,BigDecimal.ROUND_HALF_UP);
+            if(k.getTotalPreferentialAmount().compareTo(BigDecimal.ZERO)>0){
+                //分摊总价=商品原始分摊总价X实付金额/商品总价值
+                tper = k.getTotalPreferentialAmount().multiply(payMoney).divide(totalMoney, 2, BigDecimal.ROUND_HALF_UP);
+                //商品类型
+                Integer productType = k.getProductType();
+
+                if(ErpProductGiftEnum.PRODUCT.getCode().equals(productType)){
+                    //商品分摊单价=分摊总金额/订货数量
+                    s=tper.divide(new BigDecimal(k.getProductCount()),2,BigDecimal.ROUND_HALF_UP);
+                }else {
+                    //赠品分摊单价=分摊总金额/实发数量
+                    s=tper.divide(new BigDecimal(k.getActualProductCount()),2,BigDecimal.ROUND_HALF_UP);
+                }
             }
+
             k.setTotalPreferentialAmount(tper);
             k.setPreferentialAmount(s);
             ErpOrderItem er=new ErpOrderItem();
@@ -832,7 +907,9 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             for(ErpOrderInfo eoi:list){
                 Integer orderStatus = eoi.getOrderStatus();
                 //判断订单状态是否是 11:发货完成或者 97:缺货终止
-                if(orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_11.getCode())||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_97.getCode())){
+                if(orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_11.getCode())
+                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_97.getCode())
+                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_4.getCode())){
                 }else{
                     return false;
                 }

@@ -176,12 +176,19 @@ public class GiftPoolServiceImpl implements GiftPoolService {
         queryInfo.setStoreId(store.getStoreId());
         queryInfo.setProductType(erpCartAddRequest.getProductType());
         List<ErpOrderCartInfo> select = erpOrderGiftPoolCartDao.select(queryInfo);
+        //购物车里商品总金额
+        BigDecimal allAmount=BigDecimal.ZERO;
         if (select != null && select.size() > 0) {
             for (ErpOrderCartInfo item :
                     select) {
                 cartLineMap.put(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode(), item);
+                allAmount=allAmount.add(item.getPrice().multiply(BigDecimal.valueOf(item.getAmount())));
             }
         }
+        //查詢門店赠品额度
+        BigDecimal availableGiftQuota=bridgeProductService.getStoreAvailableGiftGuota(store.getStoreId());
+
+
 
         //新增的商品
         List<ErpOrderCartInfo> addList = new ArrayList<>();
@@ -207,6 +214,12 @@ public class GiftPoolServiceImpl implements GiftPoolService {
                 erpOrderCartInfo.setAmount(cartAmount);
                 if (StringUtils.isNotEmpty(item.getActivityId())) {
                     erpOrderCartInfo.setActivityId(item.getActivityId());
+                }
+
+                allAmount=allAmount.add(erpOrderCartInfo.getPrice().multiply(BigDecimal.valueOf(erpOrderCartInfo.getAmount())));
+                //比较当前购物车总金额与赠品额度
+                if(allAmount.compareTo(availableGiftQuota)>0){
+                    throw new BusinessException("超出赠品额度，不可增加");
                 }
                 updateList.add(erpOrderCartInfo);
             } else {
@@ -248,6 +261,11 @@ public class GiftPoolServiceImpl implements GiftPoolService {
                     erpOrderCartInfo.setBatchInfoCode(skuDetail.getBatchList().get(0).getBatchInfoCode());
                     erpOrderCartInfo.setBatchDate(skuDetail.getBatchList().get(0).getBatchDate());
                     erpOrderCartInfo.setWarehouseTypeCode(item.getWarehouseTypeCode());
+                }
+                allAmount=allAmount.add(erpOrderCartInfo.getPrice().multiply(BigDecimal.valueOf(erpOrderCartInfo.getAmount())));
+                //比较当前购物车总金额与赠品额度
+                if(allAmount.compareTo(availableGiftQuota)>0){
+                    throw new BusinessException("超出赠品额度，不可增加");
                 }
                 addList.add(erpOrderCartInfo);
             }
@@ -403,6 +421,8 @@ public class GiftPoolServiceImpl implements GiftPoolService {
                 item.setModelNumber(erpSkuDetail.getModelNumber());
                 item.setSpec(erpSkuDetail.getSpec());
                 item.setBatchList(erpSkuDetail.getBatchList());
+                item.setSpuCode(erpSkuDetail.getSpuCode());
+                item.setSpuName(erpSkuDetail.getSpuName());
                 ShoppingCartRequest shoppingCartRequest=new ShoppingCartRequest();
                 shoppingCartRequest.setStoreId(giftPool.getStoreId());
                 shoppingCartRequest.setProductType(giftPool.getProductType());

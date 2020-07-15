@@ -19,6 +19,7 @@ import com.aiqin.mgs.order.api.service.bill.OperationLogService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import com.aiqin.mgs.order.api.util.BeanCopyUtils;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -69,6 +70,7 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
                 returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndSuccess(OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode(), returnOrderCode);
                 //根据退货单号查询退货单和退货明细
                 returnOrder = returnOrderInfoService.detail(returnOrderInfo.getReturnOrderCode());
+                LOGGER.info("根据退货号查询退货单和退货明细-返回结果：{}",returnOrder);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -80,7 +82,7 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
                 return;
             }
 
-            if (returnOrderInfo == null) {
+            if (returnOrderInfo == null || StringUtils.isBlank(returnOrderInfo.getOrderStoreCode())) {
                 LOGGER.error("待生成采购单的ERP退货单为空");
                 return;
             }
@@ -268,9 +270,11 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
                 String url = rejectHost + "/returnGoods/record/return";
                 //String url = "http://192.168.11.119:80/returnGoods/record/return";
                 LOGGER.info("根据爱亲退供单，生成耘链退货亲求地址url:"+ url +"，请求参数returnOrderReq:"+returnOrderReq);
+                LOGGER.info("熙耘地址请求：{}",JSON.toJSONString(returnOrderReq));
                 HttpClient httpGet = HttpClient.post(url).json(returnOrderReq);
                 HttpResponse<Object> response = httpGet.action().result(new TypeReference<HttpResponse<Object>>() {
                 });
+                LOGGER.info("同步耘链退货-返回结果:{}", JSON.toJSON(response));
                 if (!RequestReturnUtil.validateHttpResponse(response)) {
                     throw new BusinessException(response.getMessage());
                 }

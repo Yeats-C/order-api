@@ -17,24 +17,30 @@ import java.util.List;
 public enum ErpOrderTypeCategoryControlEnum {
 
     /***配送	- 普通首单*/
-    PROCESS_1(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_2, true, true, false, false, true, false),
+    PROCESS_1(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_2, true, true, false, false, true, false, false, false),
     /***配送	- 首单赠送*/
-    PROCESS_2(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_4, true, true, false, false, true, false),
+    PROCESS_2(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_4, true, true, false, false, true, false, false, false),
     /***配送	- 正常补货*/
-    PROCESS_3(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_1, true, false, false, false, true, true),
+    PROCESS_3(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_1, true, false, false, false, true, true, false, false),
     /***直送	- 正常补货*/
-    PROCESS_4(ErpOrderTypeEnum.DIRECT_SEND, ErpOrderCategoryEnum.ORDER_TYPE_1, true, false, false, false, true, true),
+    PROCESS_4(ErpOrderTypeEnum.DIRECT_SEND, ErpOrderCategoryEnum.ORDER_TYPE_1, true, false, false, false, true, true, false, false),
     /***直送	- 普通首单*/
-    PROCESS_5(ErpOrderTypeEnum.DIRECT_SEND, ErpOrderCategoryEnum.ORDER_TYPE_2, true, true, false, false, true, false),
+    PROCESS_5(ErpOrderTypeEnum.DIRECT_SEND, ErpOrderCategoryEnum.ORDER_TYPE_2, true, true, false, false, true, false, false, false),
     /***辅采直送	- 新店货架*/
-    PROCESS_6(ErpOrderTypeEnum.ASSIST_PURCHASING, ErpOrderCategoryEnum.ORDER_TYPE_16, true, false, true, true, false, false),
+    PROCESS_6(ErpOrderTypeEnum.ASSIST_PURCHASING, ErpOrderCategoryEnum.ORDER_TYPE_16, true, false, true, true, false, false, false, false),
     /***辅采直送	- 货架补货*/
-    PROCESS_7(ErpOrderTypeEnum.ASSIST_PURCHASING, ErpOrderCategoryEnum.ORDER_TYPE_17, true, false, true, true, false, false),
+    PROCESS_7(ErpOrderTypeEnum.ASSIST_PURCHASING, ErpOrderCategoryEnum.ORDER_TYPE_17, true, false, true, true, false, false, false, false),
     /***辅采直送	- 游泳游乐*/
-    PROCESS_8(ErpOrderTypeEnum.ASSIST_PURCHASING, ErpOrderCategoryEnum.ORDER_TYPE_172, true, false, true, true, false, false),
+    PROCESS_8(ErpOrderTypeEnum.ASSIST_PURCHASING, ErpOrderCategoryEnum.ORDER_TYPE_172, true, false, true, true, false, false, false, false),
+    /***配送	- 批发订货*/
+    PROCESS_9(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_51, false, false, false, false, false, false, true, true),
+    /***采购直送	- 采购直送*/
+    PROCESS_10(ErpOrderTypeEnum.DIRECT_PURCHASE, ErpOrderCategoryEnum.ORDER_TYPE_147, true, false, true, true, true, false, false, false),
+    /***采购直送	- 首单赠送*/
+    PROCESS_11(ErpOrderTypeEnum.DIRECT_PURCHASE, ErpOrderCategoryEnum.ORDER_TYPE_4, true, false, true, true, true, false, false, false),
     ;
 
-    ErpOrderTypeCategoryControlEnum(ErpOrderTypeEnum orderTypeEnum, ErpOrderCategoryEnum orderCategoryEnum, boolean erpQuery, boolean erpCartCreate, boolean erpRackQuery, boolean erpRackCreate, boolean storeQuery, boolean storeCartCreate) {
+    ErpOrderTypeCategoryControlEnum(ErpOrderTypeEnum orderTypeEnum, ErpOrderCategoryEnum orderCategoryEnum, boolean erpQuery, boolean erpCartCreate, boolean erpRackQuery, boolean erpRackCreate, boolean storeQuery, boolean storeCartCreate,boolean erpWholesaleQuery,boolean erpWholesaleCreate) {
         this.orderTypeEnum = orderTypeEnum;
         this.orderCategoryEnum = orderCategoryEnum;
         this.erpQuery = erpQuery;
@@ -43,6 +49,8 @@ public enum ErpOrderTypeCategoryControlEnum {
         this.erpRackCreate = erpRackCreate;
         this.storeQuery = storeQuery;
         this.storeCartCreate = storeCartCreate;
+        this.erpWholesaleQuery = erpWholesaleQuery;
+        this.erpWholesaleCreate = erpWholesaleCreate;
     }
 
     /***订单类型枚举*/
@@ -61,6 +69,10 @@ public enum ErpOrderTypeCategoryControlEnum {
     private boolean storeQuery;
     /***门店购物车创建*/
     private boolean storeCartCreate;
+    /***erp批发订单查询*/
+    private boolean erpWholesaleQuery;
+    /***erp批发订单创建*/
+    private boolean erpWholesaleCreate;
 
     /**
      * 根据订单类型编码和订单类别编码获取订单类型节点差异控制枚举类

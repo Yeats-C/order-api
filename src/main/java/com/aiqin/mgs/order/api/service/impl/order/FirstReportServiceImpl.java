@@ -168,12 +168,12 @@ public class FirstReportServiceImpl implements FirstReportService {
             firstReportInfo.setZsSalesAmount(aa);
             firstReportInfo.setPsSalesAmount(bb);
             firstReportInfo.setHjSalesAmount(cc);
-            BigDecimal aaa=new BigDecimal(1.0000);
-            BigDecimal bbb=new BigDecimal(1.0000);
-            BigDecimal ccc=new BigDecimal(1.0000);
-            BigDecimal ddd=new BigDecimal(1.0000);
-            BigDecimal eee=new BigDecimal(1.0000);
-            BigDecimal fff=new BigDecimal(1.0000);
+            BigDecimal aaa=BigDecimal.valueOf(1.0000);
+            BigDecimal bbb=BigDecimal.valueOf(1.0000);
+            BigDecimal ccc=BigDecimal.valueOf(1.0000);
+            BigDecimal ddd=BigDecimal.valueOf(1.0000);
+            BigDecimal eee=BigDecimal.valueOf(1.0000);
+            BigDecimal fff=BigDecimal.valueOf(1.0000);
             //"首单配送同期
             BigDecimal PsSamePeriod=new BigDecimal(0);
             //首单配送上期
@@ -419,12 +419,12 @@ public class FirstReportServiceImpl implements FirstReportService {
             firstReportInfo.setZsSalesAmount(aa);
             firstReportInfo.setPsSalesAmount(bb);
             firstReportInfo.setHjSalesAmount(cc);
-            BigDecimal aaa = new BigDecimal(1.0000);
-            BigDecimal bbb = new BigDecimal(1.0000);
-            BigDecimal ccc = new BigDecimal(1.0000);
-            BigDecimal ddd = new BigDecimal(1.0000);
-            BigDecimal eee = new BigDecimal(1.0000);
-            BigDecimal fff = new BigDecimal(1.0000);
+            BigDecimal aaa = BigDecimal.valueOf(1.0000);
+            BigDecimal bbb = BigDecimal.valueOf(1.0000);
+            BigDecimal ccc = BigDecimal.valueOf(1.0000);
+            BigDecimal ddd = BigDecimal.valueOf(1.0000);
+            BigDecimal eee = BigDecimal.valueOf(1.0000);
+            BigDecimal fff = BigDecimal.valueOf(1.0000);
             //"首单配送同期
             BigDecimal PsSamePeriod = new BigDecimal(0);
             //首单配送上期

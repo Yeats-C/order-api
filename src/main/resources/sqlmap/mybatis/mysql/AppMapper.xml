@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.AppVersionDao">
+    <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.AppVersionInfo">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="system_type" jdbcType="INTEGER" property="systemType"/>
+        <result column="app_version" jdbcType="VARCHAR" property="appVersion"/>
+        <result column="app_type" jdbcType="INTEGER" property="appType"/>
+        <result column="app_build" jdbcType="VARCHAR" property="appBuild"/>
+        <result column="update_url" jdbcType="VARCHAR" property="updateUrl"/>
+        <result column="update_desc" jdbcType="VARCHAR" property="updateDesc"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_by_id" jdbcType="VARCHAR" property="createById"/>
+        <result column="update_by_id" jdbcType="VARCHAR" property="updateById"/>
+        <result column="update_by_name" jdbcType="VARCHAR" property="updateByName"/>
+
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="state" jdbcType="INTEGER" property="state"/>
+
+
+    </resultMap>
+    <sql id="Base_Column_List">
+    id,system_type, app_version,app_type, app_build, update_url,update_desc,create_time,create_by,create_by_id,update_by_id,update_by_name,update_time,state
+  </sql>
+
+    <!--批量保存活动对应规则信息List-->
+    <insert id="add" parameterType="com.aiqin.mgs.order.api.domain.AppVersionInfo">
+        insert into app_version_info (system_type, app_version,app_type, app_build, update_url,update_desc,create_time,create_by,create_by_id,update_by_id,update_by_name,update_time,state)
+        values
+            ( #{systemType},
+            #{appVersion},
+            #{appType},
+            #{appBuild},
+            #{updateUrl} ,#{updateDesc}, #{createTime}, #{createBy}, #{createById}, #{updateById}, #{updateByName}, #{updateTime}, #{state})
+    </insert>
+
+    <update id="updateStateAll" parameterType="com.aiqin.mgs.order.api.domain.AppVersionInfo">
+        update app_version_info set state=2 where
+
+             system_type = #{systemType}
+             and state=1
+            <if test=" appType != '' and appType!=null">
+             and app_type=#{appType}
+            </if>
+
+
+    </update>
+    <select id="selectAppList" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.base.PagesRequest">
+        select
+        <include refid="Base_Column_List"/>
+        from app_version_info where  state &gt;0   ORDER BY id DESC
+            limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </select>
+    <select id="selectSize" parameterType="com.aiqin.mgs.order.api.base.PagesRequest" resultType="integer">
+        select
+        count(id)
+        from app_version_info where  state &gt;0
+    </select>
+    <delete id="delete" parameterType="com.aiqin.mgs.order.api.domain.AppVersionInfo">
+       update app_version_info set state=0 where id=#{id} and state !=1;
+    </delete>
+    <select id="selectAppActive" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.AppVersionInfo">
+        select
+        <include refid="Base_Column_List"/>
+        from app_version_info where  state=1
+        <if test=" appType != '' and appType!=null">
+            and app_type=#{appType}
+        </if>
+
+        <if test=" systemType != '' and systemType!=null">
+            and system_type=#{systemType}
+        </if>
+        ORDER BY id DESC limit 1
+    </select>
+    <update id="update" parameterType="com.aiqin.mgs.order.api.domain.AppVersionInfo">
+        update app_version_info set
+        <if test=" systemType != '' and systemType!=null">
+             system_type=#{systemType} ,
+        </if>
+        <if test=" appVersion != '' and appVersion!=null">
+            app_version=#{appVersion} ,
+        </if>
+        <if test=" appType != '' and appType!=null">
+            app_type=#{appType} ,
+        </if>
+        <if test=" updateUrl != '' and updateUrl!=null">
+            update_url=#{updateUrl} ,
+        </if>
+        <if test=" updateDesc != '' and updateDesc!=null">
+            update_desc=#{updateDesc} ,
+        </if>
+        <if test=" updateDesc != '' and updateDesc!=null">
+            update_desc=#{updateDesc} ,
+        </if>
+         update_by_id=#{updateById},
+        update_by_name=#{updateByName},
+        update_time=#{updateTime}
+        where id=#{id}
+    </update>
+</mapper>

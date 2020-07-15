@@ -5,10 +5,7 @@ import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
-import com.aiqin.mgs.order.api.component.enums.ErpLogOperationTypeEnum;
-import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
-import com.aiqin.mgs.order.api.component.enums.ErpLogStatusTypeEnum;
-import com.aiqin.mgs.order.api.component.enums.OrderSucessEnum;
+import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.dao.PurchaseBatchDao;
 import com.aiqin.mgs.order.api.dao.PurchaseOrderDao;
 import com.aiqin.mgs.order.api.dao.PurchaseOrderDetailDao;
@@ -16,10 +13,12 @@ import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.PurchaseBatch;
 import com.aiqin.mgs.order.api.domain.PurchaseOrderDetail;
 import com.aiqin.mgs.order.api.domain.PurchaseOrderInfo;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.service.bill.CreatePurchaseOrderService;
 import com.aiqin.mgs.order.api.service.bill.OperationLogService;
+import com.aiqin.mgs.order.api.service.order.ErpOrderFeeService;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
@@ -51,11 +50,13 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
     ErpOrderInfoDao erpOrderInfoDao;
     @Resource
     OperationLogService operationLogService;
+    @Resource
+    private ErpOrderFeeService erpOrderFeeService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addOrderAndDetail(List<ErpOrderInfo> erpOrderInfos) {
-        LOGGER.info("根据ERP订单生成爱亲采购单&采购单明细&修改订单同步状态，参数为：erpOrderInfo{}", erpOrderInfos);
+        LOGGER.info("根据ERP订单生成爱亲采购单&采购单明细&修改订单同步状态，参数为：erpOrderInfo{}", JsonUtil.toJson(erpOrderInfos));
         PurchaseOrderInfo purchaseOrder = null;
         for(ErpOrderInfo erpOrderInfo:erpOrderInfos){
             try {
@@ -261,6 +262,39 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
         LOGGER.info("根据爱亲采购单，生成耘链销售单开始，参数为：erpOrderInfo{}",  JsonUtil.toJson(erpOrderInfo));
         try {
             for(ErpOrderInfo orderInfo:erpOrderInfo){
+                //查询主订单费用信息
+                ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(orderInfo.getOrderStoreId());
+
+                //耘链销售单需求字段
+                //业务形式
+                if(ErpOrderCategoryEnum.ORDER_TYPE_51.getValue().equals(orderInfo.getOrderCategoryCode())){
+                    //批发业务
+                    orderInfo.setBusinessForm(1);
+                }else{
+                    //门店业务
+                    orderInfo.setBusinessForm(0);
+                }
+
+                //平台(0:爱亲(新系统) 1:DL)
+                orderInfo.setPlatformType(0);
+                //订单产品类型 0.B2B 1.B2C
+                orderInfo.setOrderProductType("0");
+                //合伙人编码
+                orderInfo.setPartnerCode(orderInfo.getCopartnerAreaId());
+                //合伙人名称
+                orderInfo.setPartnerName(orderInfo.getCopartnerAreaName());
+                //收货人手机号
+                orderInfo.setConsigneePhone(orderInfo.getReceiveMobile());
+                //A品券优惠金额
+                orderInfo.setTopCouponMoney(orderFee.getTopCouponMoney());
+                //服纺券优惠金额
+                orderInfo.setSuitCouponMoney(orderFee.getSuitCouponMoney());
+                //渠道订单金额
+                orderInfo.setChannelOrderAmount(orderInfo.getTotalProductAmount());
+                //商品渠道总金额
+                orderInfo.setProductChannelTotalAmount(orderInfo.getTotalProductAmount());
+
+
                 String url = purchaseHost + "/order/aiqin/sale";
                 HttpClient httpGet = HttpClient.post(url).json(orderInfo).timeout(10000);
                 LOGGER.info("根据爱亲采购单，生成耘链销售单开始url:" + url + " httpGet:" + httpGet);

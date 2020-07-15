@@ -92,12 +92,14 @@ public class ExcelUtil {
         //判断文件是否存在
         if (null == file) {
             log.error("文件不存在！");
+            return;
         }
         //获得文件名
         String fileName = file.getOriginalFilename();
         //判断文件是否是excel文件
         if (!fileName.endsWith(SUFFIX_XLS) && !fileName.endsWith(SUFFIX_XLSX)) {
             log.error(fileName + "不是excel文件");
+            return;
         }
     }
 

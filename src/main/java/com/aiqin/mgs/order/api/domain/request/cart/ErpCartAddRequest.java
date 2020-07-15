@@ -11,7 +11,7 @@ import java.util.List;
 @ApiModel("添加商品到购物车请求参数")
 public class ErpCartAddRequest {
 
-    @ApiModelProperty(value = "门店Id")
+    @ApiModelProperty(value = "门店Id/批发客户code")
     @JsonProperty("store_id")
     private String storeId;
 
@@ -34,5 +34,9 @@ public class ErpCartAddRequest {
     @ApiModelProperty(value = "是否是首单赠送 1 是 0 否")
     @JsonProperty("first_order_gift")
     private Integer firstOrderGift;
+
+    @ApiModelProperty(value = "是否是批发销售订单 1 是 0 否")
+    @JsonProperty("is_wholesale")
+    private Integer isWholesale;
 
 }

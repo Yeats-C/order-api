@@ -94,7 +94,11 @@
         update_by_name as updateByName,
         create_time as createTime,
         update_time as updateTime,
-        first_market_value_gift as firstMarketValueGift
+        first_market_value_gift as firstMarketValueGift,
+        logistics_fee_status as logisticsFeeStatus,
+        copartner_area_id as copartnerAreaId,
+        copartner_area_name as copartnerAreaName,
+        business_form as businessForm
         from order_store_info
         where 1 = 1
         <if test="id != null and id != ''">
@@ -368,7 +372,8 @@
                                       transport_code, logistics_id, fee_id, order_return, order_return_process, franchisee_id,
                                       franchisee_code, franchisee_name, order_success, scour_sheet_status, use_status, source_code, source_name,
                                       source_type, activity_id, is_activity, create_by_id, create_by_name, update_by_id, update_by_name,
-                                      create_time, update_time,first_market_value_gift)
+                                      create_time, update_time,first_market_value_gift,logistics_fee_status,copartner_area_id,copartner_area_name,
+                                      business_form)
         values (#{orderStoreId}, #{orderStoreCode}, #{companyCode}, #{companyName},
                 #{orderTypeCode}, #{orderTypeName}, #{orderCategoryCode},
                 #{orderCategoryName}, #{supplierCode}, #{supplierName},
@@ -389,7 +394,7 @@
                 #{transportCode}, #{logisticsId}, #{feeId}, #{orderReturn}, #{orderReturnProcess}, #{franchiseeId},
                 #{franchiseeCode}, #{franchiseeName}, #{orderSuccess}, #{scourSheetStatus}, #{useStatus}, #{sourceCode}, #{sourceName},
                 #{sourceType}, #{activityId}, #{isActivity}, #{createById}, #{createByName}, #{updateById}, #{updateByName},
-                sysdate(), sysdate(),#{firstMarketValueGift})
+                sysdate(), sysdate(),#{firstMarketValueGift},#{logisticsFeeStatus},#{copartnerAreaId},#{copartnerAreaName},#{businessForm})
     </insert>
 
     <select id="findOrderList" parameterType="com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest"
@@ -555,10 +560,10 @@
             )
         </if>
         <if test="createTimeStart != null and createTimeStart != ''">
-            and a1.split_status = 1 and date_format(a1.create_time,'%Y-%m-%d') &gt;= #{createTimeStart,jdbcType=VARCHAR}
+            and a1.split_status = 1 and date_format(a1.create_time,'%Y-%m-%d %H:%i:%S') &gt;= #{createTimeStart,jdbcType=VARCHAR}
         </if>
         <if test="createTimeEnd != null and createTimeEnd != ''">
-            and a1.split_status = 1 and date_format(a1.create_time,'%Y-%m-%d') &lt;= #{createTimeEnd,jdbcType=VARCHAR}
+            and a1.split_status = 1 and date_format(a1.create_time,'%Y-%m-%d %H:%i:%S') &lt;= #{createTimeEnd,jdbcType=VARCHAR}
         </if>
         <if test="storeIdList != null and storeIdList.size > 0">
             and a1.store_id in
@@ -696,6 +701,11 @@
         set scour_sheet_status = 3
         where  order_store_code = #{orderCode}
     </update>
+    <update id="updateOrderStatus">
+        update order_store_info
+        set order_status =
+        where order_store_code = #{orderStoreCode}
+    </update>
     <!--查询订单到采购单同步失败的数据-->
     <select id="selectByOrderSucess" parameterType="java.lang.Integer" resultType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo">
         select
@@ -827,6 +837,23 @@
         GROUP BY
         i.store_code
         ) a
+    </select>
+    <select id="selectFranchisee"
+            resultType="com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderFranchisee">
+        select franchisee_code as franchiseeCode, franchisee_name as franchiseeName,copartner_area_id as copartnerAreaId,
+               copartner_area_name as copartnerAreaName
+        from order_store_info where order_store_code = #{orderStoreCode,jdbcType=VARCHAR}
+    </select>
+
+    <!--通过主订单code查询所有子订单合集-->
+    <select id="subOrderList" resultType="java.lang.String">
+         SELECT
+            order_store_code
+        FROM
+            order_store_info
+        WHERE
+            main_order_code = #{mainOrderCode}
+            AND order_store_code != #{mainOrderCode}
     </select>
 </mapper>
 

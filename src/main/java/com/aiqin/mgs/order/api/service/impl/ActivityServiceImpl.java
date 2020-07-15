@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.service.impl;
 
 import com.aiqin.ground.util.exception.GroundRuntimeException;
 import com.aiqin.ground.util.id.IdUtil;
+import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
@@ -489,6 +490,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
+    @Transactional
     public HttpResponse<List<Activity>> effectiveActivityList(String storeId) {
         LOGGER.info("通过门店id爱掌柜的促销活动列表（所有生效活动）effectiveActivityList参数为：{}", storeId);
         HttpResponse response = HttpResponse.success();
@@ -657,6 +659,7 @@ public class ActivityServiceImpl implements ActivityService {
 
 
     @Override
+    @Transactional
     public HttpResponse updateStatus(Activity activity) {
         LOGGER.info("编辑活动生效状态updateStatus参数为：{}", activity);
         try {
@@ -668,10 +671,14 @@ public class ActivityServiceImpl implements ActivityService {
             //保存活动主表信息start
             act.setUpdateTime(new Date());
             act.setActivityId(activity.getActivityId());
+            Activity activity1=(Activity) getActivityInformation(activity.getActivityId()).getData();
             if(null!=activity.getActivityStatus() && activity.getActivityStatus()==1){
                 act.setActivityStatus(1);
             }else if(null!=activity.getActivityStatus() && activity.getActivityStatus()==2){
                 act.setActivityStatus(0);
+                if(DateUtil.formatDate(activity1.getBeginTime()).after(new Date())){
+                    act.setBeginTime(DateUtil.sysDate());
+                }
             }
             int activityRecord = activityDao.updateActivity(act);
             if (activityRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
@@ -711,6 +718,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
+    @Transactional
     public HttpResponse<List<ActivitySales>> comparisonActivitySalesStatistics(List<String> activityIdList) {
         LOGGER.info("活动列表-对比分析柱状图comparisonActivitySalesStatistics参数为：{}", activityIdList);
         HttpResponse res = HttpResponse.success();
@@ -751,8 +759,9 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
+    @Transactional
     public HttpResponse<PageResData<ProductSkuRespVo5>> skuPage(SpuProductReqVO spuProductReqVO) {
-        LOGGER.info("活动商品查询（筛选+分页）skuPage参数为：{}", spuProductReqVO);
+        LOGGER.info("活动商品查询（筛选+分页）skuPage参数为：{}", JsonUtil.toJson(spuProductReqVO));
         HttpResponse res = HttpResponse.success();
         if(null==spuProductReqVO.getActivityId() ||null==spuProductReqVO.getStoreId()){
             return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
@@ -1135,7 +1144,7 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public ProductCategoryAndBrandResponse2 ProductCategoryAndBrandResponse(String conditionCode, String type, String activityId) {
         LOGGER.info("品牌品类对应关系查询接口ProductCategoryAndBrandResponse参数conditionCode为={},参数type为={},参数activityId为={}",conditionCode,type,activityId);
-        HttpResponse res=   bridgeProductService.selectCategoryByBrandCode(conditionCode,type);
+        HttpResponse res=  bridgeProductService.selectCategoryByBrandCode(conditionCode,type);
         ProductCategoryAndBrandResponse2 response2=new ProductCategoryAndBrandResponse2();
         if(null!=res.getData()){
              response2= (ProductCategoryAndBrandResponse2)res.getData();
@@ -1145,7 +1154,7 @@ public class ActivityServiceImpl implements ActivityService {
         activity.setActivityId(activityId);
         List<ActivityProduct> activityProducts=activityProductDao.activityProductList(activity);
         if(null!=activityProducts&&0!=activityProducts.size()){
-            if ("1".equals(type) &&! "2".equals(activityProducts.get(0).getActivityScope())&&! "4".equals(activityProducts.get(0).getActivityScope())){
+            if ("1".equals(type) &&2!=activityProducts.get(0).getActivityScope()&&4!=activityProducts.get(0).getActivityScope()){
                 //type=1 通过品类查品牌
                 List<QueryProductBrandRespVO> queryProductBrandRespVO=new ArrayList<>();
                 Iterator<ActivityProduct> it = activityProducts.iterator();
@@ -1164,7 +1173,7 @@ public class ActivityServiceImpl implements ActivityService {
                 queryProductBrandRespVO.clear();
                 queryProductBrandRespVO.addAll(activitySet);
                 response2.setQueryProductBrandRespVO(queryProductBrandRespVO);
-            }else if("2".equals(type)&&! "3".equals(activityProducts.get(0).getActivityScope())){
+            }else if("2".equals(type)&&3!=activityProducts.get(0).getActivityScope()){
                 //type=2 通过品牌查品类
                 List<ProductCategoryRespVO> productCategoryRespVOList=new ArrayList<>();
                 Iterator<ActivityProduct> it = activityProducts.iterator();

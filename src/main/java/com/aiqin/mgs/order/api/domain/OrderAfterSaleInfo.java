@@ -117,7 +117,8 @@ public class OrderAfterSaleInfo extends PagesRequest {
 	@ApiModelProperty(value="订单类型 1：TOC订单 2: TOB订单 3：服务商品")
 	@JsonProperty("order_type")
 	private Integer orderType;
-	
+
+
 	@ApiModelProperty(value="申请开始时间",example = "2001-01-01 01:01:01")
 	@JsonProperty("begin_time")
 	private Date beginTime;

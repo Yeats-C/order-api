@@ -117,6 +117,9 @@
         <if test="returnMoneyType!=null ">
             and return_money_type = #{returnMoneyType}
         </if>
+        <if test="originType!=null ">
+            and origin_type = #{originType}
+        </if>
          <if test="originTypeList != null" >
 		     and origin_type in (
 		  <foreach collection="originTypeList" item="origin_type" separator=",">

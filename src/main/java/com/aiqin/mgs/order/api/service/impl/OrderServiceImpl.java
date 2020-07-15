@@ -285,7 +285,7 @@ public class OrderServiceImpl implements OrderService {
                 try {
                     orderDao.updateOrder(orderInfo);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("预存取货失败"+e.getMessage());
                 }
             }
         }
@@ -449,7 +449,7 @@ public class OrderServiceImpl implements OrderService {
         try {
             int i = orderDao.updateOrder(orderInfo);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
         return HttpResponse.success();
     }
@@ -672,7 +672,7 @@ public class OrderServiceImpl implements OrderService {
         try {
             orderDao.updateOrder(orderInfo);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
     }
 

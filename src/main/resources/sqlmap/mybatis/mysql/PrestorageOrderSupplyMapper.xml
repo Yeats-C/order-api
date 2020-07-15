@@ -177,6 +177,9 @@
         <if test="receiveType!=null ">
             and a.receive_type =#{receiveType}
         </if>
+        <if test="originType!=null ">
+            and o.origin_type =#{originType}
+        </if>
         <if test="receiveCode!=null and receiveCode!='' ">
             and a.receive_code =#{receiveCode}
         </if>
@@ -219,7 +222,9 @@
         <if test="memberPhone!=null and memberPhone!=''">
             and a.member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%')
         </if>
-
+        <if test="originType!=null ">
+            and o.origin_type =#{originType}
+        </if>
         <if test="orderStatus!=null ">
             and o.order_status = #{orderStatus}
         </if>

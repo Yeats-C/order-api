@@ -11,6 +11,8 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +25,8 @@ import java.util.List;
 @Api(tags = "首单报表")
 @RequestMapping("/firstReport")
 public class FirstReportController {
+
+    private static final Logger logger = LoggerFactory.getLogger(FirstReportController.class);
 
     @Autowired
     private FirstReportService firstReportService;
@@ -190,7 +194,7 @@ public class FirstReportController {
             workbook.write(out);
             out.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
@@ -314,7 +318,7 @@ public class FirstReportController {
             workbook.write(out);
             out.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 }

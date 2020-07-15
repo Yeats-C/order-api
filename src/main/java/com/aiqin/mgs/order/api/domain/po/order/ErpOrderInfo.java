@@ -434,6 +434,19 @@ public class ErpOrderInfo {
     @JsonProperty("first_market_value_gift")
     private Integer firstMarketValueGift;
 
+    @ApiModelProperty(value = "是否减免物流费用 0否  1是")
+    @JsonProperty("logistics_fee_status")
+    private Integer logisticsFeeStatus=0;
+
+    @ApiModelProperty(value="经营区域ID")
+    @JsonProperty("copartner_area_id")
+    private String copartnerAreaId;
+
+
+    @ApiModelProperty(value="经营区域名称")
+    @JsonProperty("copartner_area_name")
+    private String copartnerAreaName;
+
     public String getOrderStatusDesc() {
         return ErpOrderStatusEnum.getEnumDesc(orderStatus);
     }
@@ -445,4 +458,47 @@ public class ErpOrderInfo {
     public String getOrderLevelDesc() {
         return ErpOrderLevelEnum.getEnumDesc(orderLevel);
     }
+
+
+    /**************************************供应链新需求字段开始**************************************/
+    @ApiModelProperty("业务形式(0门店 ，1批发)")
+    @JsonProperty("business_form")
+    private Integer businessForm;
+
+    @ApiModelProperty("平台(0:爱亲(新系统) 1:DL)")
+    @JsonProperty("platform_type")
+    private Integer platformType;
+
+    @ApiModelProperty("订单产品类型 0.B2B 1.B2C")
+    @JsonProperty("order_product_type")
+    private String orderProductType;
+
+    @ApiModelProperty("合伙人编码")
+    @JsonProperty("partner_code")
+    private String partnerCode;
+
+    @ApiModelProperty("合伙人名称")
+    @JsonProperty("partner_name")
+    private String partnerName;
+
+    @ApiModelProperty("收货人手机号")
+    @JsonProperty("consignee_phone")
+    private String consigneePhone;
+
+    @ApiModelProperty(value = "服纺券优惠金额")
+    @JsonProperty("suit_coupon_money")
+    private BigDecimal suitCouponMoney;
+
+    @ApiModelProperty(value = "A品券优惠金额")
+    @JsonProperty("top_coupon_money")
+    private BigDecimal topCouponMoney;
+
+    @ApiModelProperty(value = "渠道订单金额")
+    @JsonProperty("channel_order_amount")
+    private BigDecimal channelOrderAmount;
+
+    @ApiModelProperty(value = "商品渠道总金额")
+    @JsonProperty("product_channel_total_amount")
+    private BigDecimal productChannelTotalAmount;
+    /**************************************供应链新需求字段结束**************************************/
 }

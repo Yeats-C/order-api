@@ -12,14 +12,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import com.aiqin.mgs.order.api.domain.*;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaListReq;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleList;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleVo;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaSave;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaStoreVo;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
-import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo;
-import com.aiqin.mgs.order.api.domain.copartnerArea.NewStoreTreeResponse;
+import com.aiqin.mgs.order.api.domain.copartnerArea.*;
 import com.aiqin.mgs.order.api.domain.request.*;
 import com.aiqin.mgs.order.api.domain.request.returnorder.AreaReq;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
@@ -67,6 +60,12 @@ public interface CopartnerAreaService {
 	HttpResponse saveAreaStore(CopartnerAreaStoreVo param);
 
 	HttpResponse<CopartnerAreaUp> qryCopartnerAreaListBypersonId(String personId);
-	//新建区域-下辖公司-新增二级公司
-    HttpResponse selcetCompany(String copartnerAreaName);
+	//新建区域-下辖公司-新增二级公司-查询二级公司
+    HttpResponse selcetCompany(String copartnerAreaCompany);
+    //区域合伙人-查询下辖公司
+	HttpResponse getCopartnerAreaCompany(String copartnerAreaId);
+	//删除下辖公司
+	HttpResponse delectTwoCompany(List<String> copartnerAreaIds);
+	//门店id查询区域信息
+	HttpResponse selectCopartnerAreaByStoreId(String storeId);
 }

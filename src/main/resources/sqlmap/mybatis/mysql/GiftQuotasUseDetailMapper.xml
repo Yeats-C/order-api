@@ -22,6 +22,9 @@
         <if test="storeId != null and storeId != ''">
             and store_id = #{storeId}
         </if>
+        <if test="type != null">
+            and type = #{type}
+        </if>
         order by create_time desc
         <if test="pageSize!=null ">
             limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
@@ -34,6 +37,9 @@
         from gift_quotas_use_detail where 1 = 1
         <if test="storeId != null and storeId != ''">
             and store_id = #{storeId}
+        </if>
+        <if test="type != null">
+            and type = #{type}
         </if>
     </select>
 

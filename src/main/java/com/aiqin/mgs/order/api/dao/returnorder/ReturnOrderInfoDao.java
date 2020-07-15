@@ -7,6 +7,7 @@ import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.domain.response.returngoods.QueryReturnOrderManagementRespVO;
 import com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderDetailRespVO;
 import com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderInfoApplyInboundDetailRespVO;
+import com.aiqin.mgs.order.api.domain.response.returnorder.WholesaleReturnList;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -68,7 +69,8 @@ public interface ReturnOrderInfoDao {
     ReturnOrderInfo selectByOrderCodeAndSuccess(@Param("orderSuccess") Integer orderSuccess, @Param("returnOrderCode")String returnOrderCode);
 
     //修改退货数量和总金额金额
-    Integer updateCountAndAmount(@Param("returnOrderCode") String returnOrderCode, @Param("actualReturnOrderAmount") BigDecimal actualReturnOrderAmount, @Param("actualProductCount") Long actualProductCount);
+//    Integer updateCountAndAmount(@Param("returnOrderCode") String returnOrderCode, @Param("actualReturnOrderAmount") BigDecimal actualReturnOrderAmount, @Param("actualProductCount") Long actualProductCount);
+    Integer updateCountAndAmount(@Param("returnOrderCode") String returnOrderId, @Param("actualReturnOrderAmount") BigDecimal actualReturnOrderAmount, @Param("actualProductCount") Long actualProductCount);
 
     List<QueryReturnOrderManagementRespVO> selectReturnOrderManagementList(QueryReturnOrderManagementReqVO reqVO);
 
@@ -83,6 +85,8 @@ public interface ReturnOrderInfoDao {
     int updateReturnOrder(ReturnOrderInfo returnOrderInfos);
     //查询退货单编码
     String selectReturnCode(String storeCode);
-
-
+    //查询批发退货列表
+    List<WholesaleReturnList> selectByCondition(wholesaleReturnOrderSearchVo whoVo);
+    //查询退货单order_success
+    Integer selectType(String returnOrderCode);
 }

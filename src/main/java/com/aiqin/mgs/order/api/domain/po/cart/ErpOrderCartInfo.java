@@ -168,6 +168,10 @@ public class ErpOrderCartInfo {
     @JsonProperty("warehouse_type_code")
     private String warehouseTypeCode;
 
+    @ApiModelProperty(value = "仓库编码")
+    @JsonProperty("warehouse_code")
+    private String warehouseCode;
+
     /***********************************非数据库字段***********************************/
 
     /***活动价*/

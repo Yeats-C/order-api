@@ -28,7 +28,7 @@ public class ReturnOrderReqVo implements Serializable {
     private String orderStoreCode;
 
     @NotNull(message = "订单类型不能为空")
-    @ApiModelProperty(value = "订单类型(订单类型 0直送、1配送、2辅采)")
+    @ApiModelProperty(value = "订单类型(订单类型 0直送、1配送、2辅采 )")
     private Integer orderType;
 
     @NotBlank(message = "公司编码不能为空")
@@ -71,6 +71,22 @@ public class ReturnOrderReqVo implements Serializable {
     @ApiModelProperty("配送中心名称")
     private String transportCenterName;
 
+    //新加加盟商的信息以及业务形式
+    @ApiModelProperty("加盟商编码")
+    private String franchiseeCode;
+
+    @ApiModelProperty("加盟商名称")
+    private String franchiseeName;
+
+    @ApiModelProperty("业务形式 0门店退货 1批发")
+    private Integer businessForm;
+
+    @ApiModelProperty("合伙人编码")
+    private String copartnerAreaId;
+
+    @ApiModelProperty("合伙人名称")
+    private String copartnerAreaName;
+
     @ApiModelProperty(value = "售后备注信息")
     private String remark;
 
@@ -78,7 +94,7 @@ public class ReturnOrderReqVo implements Serializable {
     @ApiModelProperty(value = "退货类型  0客户退货、1缺货退货、2售后退货、3冲减单")
     private Integer returnOrderType;
 
-    @ApiModelProperty(value = "处理方式，0-整单退、1-部分退")
+    @ApiModelProperty(value = "处理方式，0-整单退、1-部分退 3-退货退款(批发使用)")
     private Integer processType;
 
     @ApiModelProperty(value = "收货地址")
@@ -123,7 +139,7 @@ public class ReturnOrderReqVo implements Serializable {
     @ApiModelProperty(value = "来源类型:1-web收银台 2-安卓收银台 3-微信公众号")
     private Integer sourceType;
 
-    @ApiModelProperty(value = "订单类别：1：收单配送 2：首单赠送 3：配送补货 4：首单直送 5：直送补货")
+    @ApiModelProperty(value = "订单类别：1：收单配送 2：首单赠送 3：配送补货 4：首单直送 5：直送补货 51：批发普通订货")
     private Integer orderCategory;
 
     @ApiModelProperty(value = "明细")
