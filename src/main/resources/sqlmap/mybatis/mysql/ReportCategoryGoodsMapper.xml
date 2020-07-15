@@ -25,9 +25,11 @@
     <include refid="Base_Column_List"/>
     from report_category_goods
     <where>
+    1=1
       <if test="type != null">
         and type = #{type}
       </if>
+      and (amount!=0 or proportion!=0)
     </where>
   </select>
 

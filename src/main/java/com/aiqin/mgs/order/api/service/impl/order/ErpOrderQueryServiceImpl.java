@@ -336,7 +336,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         erpOrderQueryRequest.setOrderCategoryQueryList(orderCategoryQueryList);
 
         log.info(ErpOrderTypeCategoryQueryTypeEnum.getEnum(ErpOrderTypeCategoryQueryTypeEnum.STORE_ORDER_LIST_QUERY)
-                +"查询订单列表的订单类别编码集合为"+orderCategoryQueryList);
+                +"查询订单列表的订单类别编码集合为"+JsonUtil.toJson(orderCategoryQueryList));
         //查询主订单列表
         erpOrderQueryRequest.setOrderLevel(ErpOrderLevelEnum.PRIMARY.getCode());
         PagesRequest page = new PagesRequest();
@@ -519,7 +519,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         }
 
         //退货
-        if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_13) {
+        if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_13 && StatusEnum.NO.getCode().equals(order.getOrderReturnProcess())) {
             if (!orderCategoryEnum.isFirstOrder() && !orderCategoryEnum.getValue().equals(ErpOrderCategoryEnum.ORDER_TYPE_16.getValue())) {
                 control.setOrderReturn(StatusEnum.YES.getCode());
             }
@@ -535,6 +535,4 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             }
         }
     }
-
-
 }
