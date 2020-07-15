@@ -421,6 +421,8 @@ public class GiftPoolServiceImpl implements GiftPoolService {
                 item.setModelNumber(erpSkuDetail.getModelNumber());
                 item.setSpec(erpSkuDetail.getSpec());
                 item.setBatchList(erpSkuDetail.getBatchList());
+                item.setSpuCode(erpSkuDetail.getSpuCode());
+                item.setSpuName(erpSkuDetail.getSpuName());
                 ShoppingCartRequest shoppingCartRequest=new ShoppingCartRequest();
                 shoppingCartRequest.setStoreId(giftPool.getStoreId());
                 shoppingCartRequest.setProductType(giftPool.getProductType());
