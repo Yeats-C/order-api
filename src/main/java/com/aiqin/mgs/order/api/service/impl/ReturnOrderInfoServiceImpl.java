@@ -1757,6 +1757,15 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             log.info("发起批发退货--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}", record.getOrderStoreCode(), ErpOrderReturnStatusEnum.WAIT, null, record.getCreateById(), record.getCreateByName());
             erpOrderInfoService.updateOrderReturnStatus(record.getOrderStoreCode(), ErpOrderReturnRequestEnum.WAIT, null, record.getCreateById(), record.getCreateByName());
             log.info("发起批发退货--修改原始订单数据结束");
+            if((actualInboundCount - returnProductCount) != 0 ){ //说明没有可退的商品数量，修改订单状态
+                if(((actualInboundCount - returnProductCount) - actualReturnProductCount) == 0){
+                    log.info("开始-----修改原订单的退货流程节点状态");
+                    erpOrderInfoDao.updateOrderReturnProcess(reqVo.getOrderStoreCode());
+                    log.info("结束------修改原订单的退货流程节点状态");
+                }else {
+                    erpOrderInfoDao.updateOrderReturnProcessStatus(reqVo.getOrderStoreCode());
+                }
+            }
             log.info("审核后-调用发起批发退货开始");
             ReturnOrderReviewReqVo reqVo1 = new ReturnOrderReviewReqVo();
             reqVo1.setOperateStatus(reqVo.getTreatmentMethod());
@@ -1771,14 +1780,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     throw new RuntimeException("erp-批发退货-同步供应链，生成退供单失败");
                 }
                 log.info("erp-批发退货-同步供应链，生成退货单成功");
-
-               if((actualInboundCount - returnProductCount) != 0 ){ //说明没有可退的商品数量，修改订单状态
-                   if(((actualInboundCount - returnProductCount) - actualReturnProductCount) == 0){
-                      log.info("开始-----修改原订单的退货流程节点状态");
-                      erpOrderInfoDao.updateOrderReturnProcess(reqVo.getOrderStoreCode());
-                       log.info("结束------修改原订单的退货流程节点状态");
-                   }
-               }
               }
                  return HttpResponse.success();
             }catch(Exception e){
