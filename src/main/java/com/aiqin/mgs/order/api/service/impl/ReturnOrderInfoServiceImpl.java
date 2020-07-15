@@ -1692,7 +1692,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             record.setActualProductCount(record.getProductCount());
             //实退商品总金额
             record.setActualReturnOrderAmount(record.getReturnOrderAmount());
-//            //退货类型
+            //退货类型
 //            record.setReturnOrderType(2);
             //退货单--退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户
             record.setReturnMoneyType(ConstantData.RETURN_MONEY_TYPE);
@@ -1712,7 +1712,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     }
                     //均摊后的金额乘以退货数量
                     BigDecimal preferentialAmount = sd.getPreferentialAmount();
-                    BigDecimal multiply = preferentialAmount.multiply(BigDecimal.valueOf(sd.getReturnProductCount()));
+                    BigDecimal multiply = preferentialAmount.multiply(BigDecimal.valueOf(sd.getActualReturnProductCount()));
                     returnOrderAmount = returnOrderAmount.add(multiply);
                     BeanUtils.copyProperties(sd, detail);
                     detail.setCreateTime(now);
@@ -1746,11 +1746,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             if (reallyReturn == 0) {  //预生成退货单不同步供应链
             }else {
                 HttpResponse httpResponse = updateReturnStatus(reqVo1);
-//             updateReturnStatus(reqVo1);
+//              updateReturnStatus(reqVo1);
                 log.info("erp-批发退货-同步供应链，生成退供单结束,httpResponse={}", JSON.toJSON(httpResponse));
-//            log.info("erp-批发退货-同步供应链，生成退供单结束");
                 if (!"0".equals(httpResponse.getCode())) {
-                    //erp同步供应链，生成退供单失败
                     throw new RuntimeException("erp-批发退货-同步供应链，生成退供单失败");
                 }
                 log.info("erp-批发退货-同步供应链，生成退货单成功");

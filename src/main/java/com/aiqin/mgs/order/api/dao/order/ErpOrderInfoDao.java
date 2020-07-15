@@ -125,4 +125,9 @@ public interface ErpOrderInfoDao {
      */
      ReturnOrderFranchisee selectFranchisee(String orderStoreCode);
 
+    /**
+     * 退货后修改订单状态
+     * @param orderStoreCode
+     */
+    int updateOrderStatus(String orderStoreCode);
 }
