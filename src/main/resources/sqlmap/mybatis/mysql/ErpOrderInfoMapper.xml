@@ -699,7 +699,7 @@
     </update>
     <update id="updateOrderReturnProcess">
         update order_store_info
-        set order_return_process = 1
+        set order_return_process = 0
         where order_store_code = #{orderStoreCode}
     </update>
     <!--查询订单到采购单同步失败的数据-->
