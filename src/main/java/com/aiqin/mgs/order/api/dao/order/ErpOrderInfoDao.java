@@ -137,4 +137,6 @@ public interface ErpOrderInfoDao {
      * @return
      */
     int updateOrderReturnProcess(String orderStoreCode);
+
+    int updateOrderReturnProcessStatus(String orderStoreCode);
 }

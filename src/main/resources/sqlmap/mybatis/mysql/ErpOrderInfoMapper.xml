@@ -702,6 +702,11 @@
         set order_return_process = 0
         where order_store_code = #{orderStoreCode}
     </update>
+    <update id="updateOrderReturnProcessStatus">
+          update order_store_info
+        set order_return_process = 1
+        where order_store_code = #{orderStoreCode}
+    </update>
     <!--查询订单到采购单同步失败的数据-->
     <select id="selectByOrderSucess" parameterType="java.lang.Integer" resultType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo">
         select
