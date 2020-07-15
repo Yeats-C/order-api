@@ -98,86 +98,86 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
 
     @Override
     public ErpOrderInfo getOrderDetailByOrderCode(String orderCode) {
-        log.info("根据订单编号查询订单详情信息 getOrderDetailByOrderCode 参数为：orderCode={}"+ JsonUtil.toJson(orderCode));
+        log.info("根据订单编号查询订单详情信息 getOrderDetailByOrderCode 参数为：orderCode={}" + JsonUtil.toJson(orderCode));
         ErpOrderInfo order = this.getOrderByOrderCode(orderCode);
-        log.info("根据订单编号查询订单详情信息 getOrderDetailByOrderCode 结果为：order={}"+JsonUtil.toJson(order));
+        log.info("根据订单编号查询订单详情信息 getOrderDetailByOrderCode 结果为：order={}" + JsonUtil.toJson(order));
         if (order != null) {
             Integer orderStatus = order.getOrderStatus();
             List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
-            log.info("查询订单明细结果为 orderItemList={}"+orderItemList);
-            List<String> skuCodeList=new ArrayList<>();
-            for(ErpOrderItem item:orderItemList){
+            log.info("查询订单明细结果为 orderItemList={}" + orderItemList);
+            List<String> skuCodeList = new ArrayList<>();
+            for (ErpOrderItem item : orderItemList) {
                 skuCodeList.add(item.getSkuCode());
             }
-            List<ProductSkuRequest2> productSkuRequest2List=new ArrayList<>();
-            for (ErpOrderItem item :orderItemList) {
+            List<ProductSkuRequest2> productSkuRequest2List = new ArrayList<>();
+            for (ErpOrderItem item : orderItemList) {
                 if (StringUtils.isEmpty(item.getSkuCode())) {
                     throw new BusinessException("缺失sku编码");
                 }
 
-                ProductSkuRequest2 productSkuRequest2=new ProductSkuRequest2();
+                ProductSkuRequest2 productSkuRequest2 = new ProductSkuRequest2();
                 productSkuRequest2.setSkuCode(item.getSkuCode());
                 productSkuRequest2.setBatchInfoCode(item.getBatchInfoCode());
-                if(null==item.getWarehouseTypeCode()){
+                if (null == item.getWarehouseTypeCode()) {
                     item.setWarehouseTypeCode("1");
                 }
                 productSkuRequest2.setWarehouseTypeCode(item.getWarehouseTypeCode());
                 productSkuRequest2List.add(productSkuRequest2);
             }
-            log.info("根据订单明细向供应链查询订单详细信息 参数 productSkuRequest2List ={}"+order.getProvinceId()+order.getCityId()+JsonUtil.toJson(productSkuRequest2List));
-            Map<String, ErpSkuDetail> skuDetailMap=bridgeProductService.getProductSkuDetailMap(order.getProvinceId(),order.getCityId(),productSkuRequest2List);
-            log.info("根据订单明细向供应链查询订单详细信息 结果为 skuDetailMap ={}"+JsonUtil.toJson(skuDetailMap));
-            for(ErpOrderItem item:orderItemList){
-                ErpSkuDetail detail=skuDetailMap.get(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
-                if (null!=detail){
+            log.info("根据订单明细向供应链查询订单详细信息 参数 productSkuRequest2List ={}" + order.getProvinceId() + order.getCityId() + JsonUtil.toJson(productSkuRequest2List));
+            Map<String, ErpSkuDetail> skuDetailMap = bridgeProductService.getProductSkuDetailMap(order.getProvinceId(), order.getCityId(), productSkuRequest2List);
+            log.info("根据订单明细向供应链查询订单详细信息 结果为 skuDetailMap ={}" + JsonUtil.toJson(skuDetailMap));
+            for (ErpOrderItem item : orderItemList) {
+                ErpSkuDetail detail = skuDetailMap.get(item.getSkuCode() + "BATCH_INFO_CODE" + item.getBatchInfoCode());
+                if (null != detail) {
                     item.setPriceTax(detail.getPriceTax());
-                }else{
-                    log.info("订单详情--查询sku分销价--/search/spu/sku/detail2 查询商品详情失败，skuCode为{}"+item.getSkuCode());
+                } else {
+                    log.info("订单详情--查询sku分销价--/search/spu/sku/detail2 查询商品详情失败，skuCode为{}" + item.getSkuCode());
                 }
-                if(ErpProductGiftEnum.JIFEN.getCode().equals(item.getProductType())){
+                if (ErpProductGiftEnum.JIFEN.getCode().equals(item.getProductType())) {
                     item.setUsedGiftQuota(item.getProductAmount().multiply(new BigDecimal(item.getProductCount())).setScale(2, RoundingMode.DOWN));
-                }else{
+                } else {
                     item.setUsedGiftQuota(BigDecimal.ZERO);
                 }
 
             }
             order.setItemList(orderItemList);
-            log.info("根据订单编号查询订单详情信息 子订单详情为：orderItemList={}"+JsonUtil.toJson(orderItemList));
-            ItemOrderFee itemOrderFee=new ItemOrderFee();
+            log.info("根据订单编号查询订单详情信息 子订单详情为：orderItemList={}" + JsonUtil.toJson(orderItemList));
+            ItemOrderFee itemOrderFee = new ItemOrderFee();
             //子订单商品价值：（子订单分销价求和）元
-            BigDecimal totalMoney=BigDecimal.ZERO;
+            BigDecimal totalMoney = BigDecimal.ZERO;
             //子订单活动优惠：活动优惠金额求和）元
-            BigDecimal  activityMoney=BigDecimal.ZERO;
+            BigDecimal activityMoney = BigDecimal.ZERO;
             //A品券抵减：（子订单A品券抵扣分摊求和）元
-            BigDecimal  topCouponMoney=BigDecimal.ZERO;
+            BigDecimal topCouponMoney = BigDecimal.ZERO;
             //服纺券抵减:（子订单服纺券抵扣分摊求和）元
-            BigDecimal  suitCouponMoney=BigDecimal.ZERO;
+            BigDecimal suitCouponMoney = BigDecimal.ZERO;
             //使用赠品额度：（使用赠品额度求和）元
-            BigDecimal  usedGiftQuota=BigDecimal.ZERO;
+            BigDecimal usedGiftQuota = BigDecimal.ZERO;
             //实付金额
-            BigDecimal  payMoney=BigDecimal.ZERO;
-            for(ErpOrderItem item:orderItemList){
-                if(null==item.getTopCouponDiscountAmount()){
+            BigDecimal payMoney = BigDecimal.ZERO;
+            for (ErpOrderItem item : orderItemList) {
+                if (null == item.getTopCouponDiscountAmount()) {
                     item.setTopCouponDiscountAmount(BigDecimal.ZERO);
                 }
-                if(null==item.getActualTotalProductAmount()){
+                if (null == item.getActualTotalProductAmount()) {
                     item.setActualTotalProductAmount(BigDecimal.ZERO);
                 }
-                if(null==item.getPriceTax()){
+                if (null == item.getPriceTax()) {
                     item.setPriceTax(BigDecimal.ZERO);
                 }
-                totalMoney=totalMoney.add(item.getTotalProductAmount()).setScale(2, RoundingMode.DOWN);
-                activityMoney=activityMoney.add(item.getTotalAcivityAmount()).setScale(2, RoundingMode.DOWN);
-                topCouponMoney=topCouponMoney.add(item.getTopCouponDiscountAmount()).setScale(2, RoundingMode.DOWN);
-                if(ErpProductGiftEnum.JIFEN.getCode().equals(item.getProductType())){
-                    usedGiftQuota=usedGiftQuota.add(item.getProductAmount().multiply(new BigDecimal(item.getProductCount()))).setScale(2, RoundingMode.DOWN);
+                totalMoney = totalMoney.add(item.getTotalProductAmount()).setScale(2, RoundingMode.DOWN);
+                activityMoney = activityMoney.add(item.getTotalAcivityAmount()).setScale(2, RoundingMode.DOWN);
+                topCouponMoney = topCouponMoney.add(item.getTopCouponDiscountAmount()).setScale(2, RoundingMode.DOWN);
+                if (ErpProductGiftEnum.JIFEN.getCode().equals(item.getProductType())) {
+                    usedGiftQuota = usedGiftQuota.add(item.getProductAmount().multiply(new BigDecimal(item.getProductCount()))).setScale(2, RoundingMode.DOWN);
                 }
-                payMoney=payMoney.add(item.getActualTotalProductAmount()).setScale(2, RoundingMode.DOWN);
-                if(orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_11.getCode())
-                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_97.getCode())
-                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_13.getCode())
-                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_12.getCode())){
-                }else{
+                payMoney = payMoney.add(item.getActualTotalProductAmount()).setScale(2, RoundingMode.DOWN);
+                if (orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_11.getCode())
+                        || orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_97.getCode())
+                        || orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_13.getCode())
+                        || orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_12.getCode())) {
+                } else {
                     item.setTotalPreferentialAmount(BigDecimal.ZERO);
                 }
 
@@ -190,7 +190,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             itemOrderFee.setPayMoney(payMoney.subtract(topCouponMoney));
             order.setItemOrderFee(itemOrderFee);
 
-            log.info("根据订单编号查询订单详情信息 子订单支付信息为：itemOrderFee={}"+JsonUtil.toJson(itemOrderFee));
+            log.info("根据订单编号查询订单详情信息 子订单支付信息为：itemOrderFee={}" + JsonUtil.toJson(itemOrderFee));
             List<ErpOrderOperationLog> operationLogList = erpOrderOperationLogService.selectOrderOperationLogList(order.getOrderStoreCode());
             Collections.reverse(operationLogList);
             order.setOperationLogList(operationLogList);
@@ -216,16 +216,16 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                 }
             }
             order.setOrderFee(orderFee);
-            log.info("根据订单编号查询订单详情信息 订单支付信息为：orderFee={}"+JsonUtil.toJson(orderFee));
+            log.info("根据订单编号查询订单详情信息 订单支付信息为：orderFee={}" + JsonUtil.toJson(orderFee));
 
             //订单物流信息
             ErpOrderLogistics orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsId(order.getLogisticsId());
             order.setOrderLogistics(orderLogistics);
-            log.info("根据订单编号查询订单详情信息 订单物流信息：orderLogistics={}"+JsonUtil.toJson(orderLogistics));
+            log.info("根据订单编号查询订单详情信息 订单物流信息：orderLogistics={}" + JsonUtil.toJson(orderLogistics));
             //退款信息
             ErpOrderRefund orderRefund = erpOrderRefundService.getOrderRefundByOrderIdAndRefundType(order.getOrderStoreId(), ErpOrderRefundTypeEnum.ORDER_CANCEL);
             order.setOrderRefund(orderRefund);
-            log.info("根据订单编号查询订单详情信息 退款信息：orderRefund={}"+JsonUtil.toJson(orderRefund));
+            log.info("根据订单编号查询订单详情信息 退款信息：orderRefund={}" + JsonUtil.toJson(orderRefund));
             //操作按钮配置
             orderOperationConfig(order);
 
@@ -336,7 +336,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         erpOrderQueryRequest.setOrderCategoryQueryList(orderCategoryQueryList);
 
         log.info(ErpOrderTypeCategoryQueryTypeEnum.getEnum(ErpOrderTypeCategoryQueryTypeEnum.STORE_ORDER_LIST_QUERY)
-                +"查询订单列表的订单类别编码集合为"+orderCategoryQueryList);
+                + "查询订单列表的订单类别编码集合为" + orderCategoryQueryList);
         //查询主订单列表
         erpOrderQueryRequest.setOrderLevel(ErpOrderLevelEnum.PRIMARY.getCode());
         PagesRequest page = new PagesRequest();
@@ -521,22 +521,23 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         //退货
         if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_13) {
             if (!orderCategoryEnum.isFirstOrder() && !orderCategoryEnum.getValue().equals(ErpOrderCategoryEnum.ORDER_TYPE_16.getValue())) {
-        if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_13 || StatusEnum.NO.getCode().equals(order.getOrderReturnProcess())) {
-            if (!orderCategoryEnum.isFirstOrder()) {
-                control.setOrderReturn(StatusEnum.YES.getCode());
-            }
-        }
+                if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_13 || StatusEnum.NO.getCode().equals(order.getOrderReturnProcess())) {
+                    if (!orderCategoryEnum.isFirstOrder()) {
+                        control.setOrderReturn(StatusEnum.YES.getCode());
+                    }
+                }
 
-        //退款
-        if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_97 || orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_98) {
-            control.setRefund(StatusEnum.YES.getCode());
-            //获取退款状态
-            ErpOrderRefund orderRefund = erpOrderRefundService.getOrderRefundByOrderIdAndRefundType(order.getOrderStoreId(), ErpOrderRefundTypeEnum.ORDER_CANCEL);
-            if (orderRefund != null) {
-                order.setOrderRefund(orderRefund);
+                //退款
+                if (orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_97 || orderStatusEnum == ErpOrderStatusEnum.ORDER_STATUS_98) {
+                    control.setRefund(StatusEnum.YES.getCode());
+                    //获取退款状态
+                    ErpOrderRefund orderRefund = erpOrderRefundService.getOrderRefundByOrderIdAndRefundType(order.getOrderStoreId(), ErpOrderRefundTypeEnum.ORDER_CANCEL);
+                    if (orderRefund != null) {
+                        order.setOrderRefund(orderRefund);
+                    }
+                }
             }
+
         }
     }
-
-
 }
