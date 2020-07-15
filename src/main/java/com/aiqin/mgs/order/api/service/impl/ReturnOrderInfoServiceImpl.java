@@ -1707,6 +1707,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             Long actualInboundCount = 0L;
             //已退货数量
             Long returnProductCount = 0L;
+            //申请退货数量
+            Long actualReturnProductCount = 0L;
             for (ReturnWholesaleOrderDetail sd : details1) {
                 ReturnOrderDetail detail = new ReturnOrderDetail();
                     //商品属性 0新品1残品
@@ -1718,6 +1720,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     actualInboundCount = sd.getActualInboundCount();
                     //已退数量    ----
                     returnProductCount = sd.getReturnProductCount() == null ? 0L : sd.getReturnProductCount();
+                    actualReturnProductCount = sd.getActualReturnProductCount();
                    //均摊后的金额乘以退货数量
                     BigDecimal preferentialAmount = sd.getPreferentialAmount();
                     BigDecimal multiply = preferentialAmount.multiply(BigDecimal.valueOf(sd.getActualReturnProductCount()));
@@ -1760,11 +1763,14 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     throw new RuntimeException("erp-批发退货-同步供应链，生成退供单失败");
                 }
                 log.info("erp-批发退货-同步供应链，生成退货单成功");
-               if(actualInboundCount - returnProductCount == 0){ //说明没有可退的商品数量，修改订单状态
-                   log.info("开始-----修改原订单的退货流程节点状态");
-                   erpOrderInfoDao.updateOrderReturnProcess(reqVo.getOrderStoreCode());
-                   log.info("结束------修改原订单的退货流程节点状态");
-                 }
+
+               if((actualInboundCount - returnProductCount) != 0 ){ //说明没有可退的商品数量，修改订单状态
+                   if(((actualInboundCount - returnProductCount) - actualReturnProductCount) == 0){
+                      log.info("开始-----修改原订单的退货流程节点状态");
+                      erpOrderInfoDao.updateOrderReturnProcess(reqVo.getOrderStoreCode());
+                       log.info("结束------修改原订单的退货流程节点状态");
+                   }
+               }
               }
                  return HttpResponse.success();
             }catch(Exception e){
