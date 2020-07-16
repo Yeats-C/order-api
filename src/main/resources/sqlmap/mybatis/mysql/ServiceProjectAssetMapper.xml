@@ -409,7 +409,7 @@
     </select>
     <update id="updateAssetUseStatus" parameterType="java.util.List">
         update service_project_asset
-        set use_status = 1
+        set use_status = 3
         where asset_id in (
         <foreach collection="list" separator="," item="serviceProjectAsset">
             #{serviceProjectAsset.assetId,jdbcType=VARCHAR}

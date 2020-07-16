@@ -137,4 +137,13 @@ public interface ErpOrderInfoDao {
      * @param orderStoreCode
      */
     int updateOrderStatus(String orderStoreCode);
+
+    /**
+     * 修改订单退货流程节点
+     * @param orderStoreCode
+     * @return
+     */
+    int updateOrderReturnProcess(String orderStoreCode);
+
+    int updateOrderReturnProcessStatus(String orderStoreCode);
 }
