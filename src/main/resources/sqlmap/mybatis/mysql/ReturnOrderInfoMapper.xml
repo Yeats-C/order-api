@@ -1492,7 +1492,15 @@
     <select id="selectType" resultType="java.lang.Integer">
       select order_success from return_order_info where return_order_code = #{returnOrderCode,jdbcType=VARCHAR}
     </select>
-    <update id="updateReallyReturn" parameterType="java.util.List">
+  <select id="selectRefundStatus" resultType="com.aiqin.mgs.order.api.domain.response.ReturnRefundStatus">
+       SELECT b.actual_return_product_count as actualReturnProductCount, a.order_store_code as orderStoreCode,a.create_time as createTime,a.refund_status  as refundStatus
+       FROM return_order_info a
+      LEFT JOIN return_order_detail b
+      on a.return_order_code = b.return_order_code
+      WHERE a.order_store_code = #{orderStoreCode} ORDER BY a.create_time  DESC LIMIT 1
+  </select>
+
+  <update id="updateReallyReturn" parameterType="java.util.List">
     update return_order_info
     set
     really_return = 1
