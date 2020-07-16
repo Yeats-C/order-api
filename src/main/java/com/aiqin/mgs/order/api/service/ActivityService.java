@@ -117,11 +117,11 @@ public interface ActivityService {
 
     /**
      *导出--活动详情-销售数据-活动销售列表
-     * @param  erpOrderItem
+     * @param  activityId
      * @param response
      * @return
      */
-    void excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response);
+    void excelActivityItem(String activityId, HttpServletResponse response);
 
     /**
      *活动列表-对比分析柱状图
