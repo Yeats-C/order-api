@@ -134,7 +134,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                     //实际销售数量
                     purchaseOrderDetailBatch.setActualTotalCount(purchaseInfo.getActualTotalCount());
                     //SKU名称
-                    purchaseOrderDetailBatch.setBatchCode(batchStoreDetail.getSkuName());
+                    purchaseOrderDetailBatch.setSkuName(batchStoreDetail.getSkuName());
                     //行号
                     purchaseOrderDetailBatch.setLineCode(batchStoreDetail.getLineCode());
                     purchaseOrderDetailBatch.setCreateById(purchaseInfo.getPersonId());

@@ -757,9 +757,8 @@ public class BridgeProductService<main> {
      * @param order
      * @return
      */
-    public HttpResponse settlementSaveOrder(ErpOrderInfo order) {
+    public void settlementSaveOrder(ErpOrderInfo order) {
         log.info("结算保存erp销售订单  参数 order=[{}]"+JsonUtil.toJson(order));
-        HttpResponse httpResponse = HttpResponse.success();
         ErpOrderVo erpOrderVo=new ErpOrderVo();
         //订单编码
         erpOrderVo.setOrderCode(order.getOrderStoreCode());
@@ -839,18 +838,62 @@ public class BridgeProductService<main> {
                 productInfo.setOrderCode(item.getOrderStoreCode());
                 //sku编号
                 productInfo.setSkuCode(item.getSkuCode());
+                //sku名称
+                productInfo.setSkuName(item.getSkuName());
+                //商品品类编码
+                productInfo.setProductCategoryCode(item.getProductCategoryCode());
+                //商品品类名称
+                productInfo.setProductCategoryName(item.getProductCategoryName());
+                //商品品牌编码
+                productInfo.setProductBrandCode(item.getProductBrandCode());
+                //商品品牌名称
+                productInfo.setProductBrandName(item.getProductBrandName());
+                //商品属性编码
+                productInfo.setProductPropertyCode(item.getProductPropertyCode());
+                //商品属性名称
+                productInfo.setProductPropertyName(item.getProductPropertyName());
+                //商品类型 0商品（本品） 1赠品 2兑换赠品
+                productInfo.setProductType(item.getProductType());
+                //渠道售价（分销价）
+                productInfo.setPriceTax(item.getPriceTax());
+                //活动价
+                productInfo.setActivityPrice(item.getActivityPrice());
+                //渠道采购价
+                productInfo.setPurchaseAmount(item.getPurchaseAmount());
+                //商品数量
+                productInfo.setProductCount(item.getProductCount().intValue());
+                //实发商品数量
+                productInfo.setActualProductCount(item.getActualProductCount().intValue());
+                //商品总价
+                productInfo.setTotalProductAmount(item.getTotalProductAmount());
+                //分摊后金额
+                productInfo.setTotalPreferentialAmount(item.getTotalPreferentialAmount());
+                //分摊后单价
+                productInfo.setPreferentialAmount(item.getPreferentialAmount());
+                //A品券抵扣
+                productInfo.setTopCouponMoney(item.getTopCouponAmount());
+                //服纺劵抵扣
+                productInfo.setSuitCouponMoney(BigDecimal.ZERO);
+                //活动优惠
+                productInfo.setTotalAcivityAmount(item.getTotalAcivityAmount());
+                //使用赠品额度
+                productInfo.setComplimentaryAmount(item.getUsedGiftQuota());
+                //销项税率
+                productInfo.setTaxRate(item.getTaxRate());
+
+                erpOrderProductInfoList.add(productInfo);
             }
+            erpOrderVo.setProdcutList(erpOrderProductInfoList);
         }
 
         StringBuilder sb = new StringBuilder();
         sb.append(settlement).append("/erp/order/save");
         HttpClient httpClient = HttpClient.post(sb.toString()).json(erpOrderVo);
-        httpResponse = httpClient.action().result(new TypeReference<HttpResponse>() {
+        HttpResponse httpResponse = httpClient.action().result(new TypeReference<HttpResponse>() {
         });
         if (!httpResponse.getCode().equals(MessageId.SUCCESS_CODE)) {
-            return HttpResponse.failure(ResultCode.INSERT_FRANCHISEE_ACCOUNT_FAILED);
+            log.error("结算保存erp销售订单失败，返回参数为"+JsonUtil.toJson(httpResponse));
         }
-        return httpResponse;
     }
 
 
