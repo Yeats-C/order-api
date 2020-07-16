@@ -703,6 +703,7 @@ public class ActivityServiceImpl implements ActivityService {
             erpOrderItem.setActivityId(activityId);
             //只查询活动商品
             erpOrderItem.setIsActivity(1);
+            erpOrderItem.setPageSize(null);
             List<ErpOrderItem> select = erpOrderItemDao.getActivityItem(erpOrderItem);
             HSSFWorkbook wb = exportData(select);
             String excelName = "数据列表.xls";

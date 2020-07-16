@@ -217,7 +217,7 @@ public class ActivityController {
      */
     @GetMapping("/excelActivityItem")
     @ApiOperation("导出--活动详情-销售数据-活动销售列表")
-    public void excelActivityItem(@RequestParam(name = "activityId") String activityId, HttpServletResponse response){
+    public void excelActivityItem(@RequestParam(name = "activityId", required = false) String activityId, HttpServletResponse response){
         activitesService.excelActivityItem(activityId,response);
     }
 
