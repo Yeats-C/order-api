@@ -1646,7 +1646,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             ReturnRefundStatus returnRefundStatus = returnOrderInfoDao.selectRefundStatus(reqVo.getOrderStoreCode());
             if (null!=returnRefundStatus){
                 if (returnRefundStatus.getOrderStoreCode().equals(reqVo.getOrderStoreCode()) && returnRefundStatus.getRefundStatus().equals(0)){
-                    return HttpResponse.failure(ResultCode.ERP_RETURN_ERROR);
+                    return HttpResponse.success(ResultCode.ERP_RETURN_ERROR);
                 }
             }
             //查询订单是否存在未处理售后单
