@@ -23,6 +23,7 @@ public interface ResultCode {
     MessageId ERP_ORDER_ITEM_ERROP =MessageId.create(Project.ORDER_API,-6,"商品详情集合为空");
     MessageId ERP_FRANCHISEE_ERROP =MessageId.create(Project.ORDER_API,-7,"冲减单--同步A品卷失败");
     MessageId ERP_FRANCHISEE_INTEGRAL_ERROR =MessageId.create(Project.ORDER_API,-7,"冲减单--退积分失败");
+    MessageId ERP_RETURN_ERROR =MessageId.create(Project.ORDER_API,-19,"上单退款未到账,请到账后再次发起退货");
 
 
     /** 黄祉壹   2018-11-05 开始     */

@@ -29,6 +29,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
 import com.aiqin.mgs.order.api.domain.request.StoreQuotaRequest;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
+import com.aiqin.mgs.order.api.domain.response.ReturnRefundStatus;
 import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderStatusVo;
 import com.aiqin.mgs.order.api.domain.response.returnorder.WholesaleReturnList;
 import com.aiqin.mgs.order.api.service.CopartnerAreaService;
@@ -1641,6 +1642,13 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     public HttpResponse saveWholesaleReturn(ReturnWholesaleOrderReqVo reqVo) {
         log.info("发起批发退货--入参"+JSON.toJSONString(reqVo));
         try {
+            //查询上次发起退货还没退款成功就不让发起退货
+            ReturnRefundStatus returnRefundStatus = returnOrderInfoDao.selectRefundStatus(reqVo.getOrderStoreCode());
+            if (null!=returnRefundStatus){
+                if (returnRefundStatus.getOrderStoreCode().equals(reqVo.getOrderStoreCode()) && returnRefundStatus.getRefundStatus().equals(0)){
+                    return HttpResponse.failure(ResultCode.ERP_RETURN_ERROR);
+                }
+            }
             //查询订单是否存在未处理售后单
             List<ReturnOrderInfo> returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndStatus(reqVo.getOrderStoreCode(), 1);
             Assert.isTrue(CollectionUtils.isEmpty(returnOrderInfo), "该订单还有未审核售后单，请稍后提交");
