@@ -15,6 +15,10 @@ import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.dto.ProductDistributorOrderDTO;
 import com.aiqin.mgs.order.api.domain.po.gift.NewStoreGradient;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderProductInfo;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderVo;
 import com.aiqin.mgs.order.api.domain.request.InventoryDetailRequest;
 import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
@@ -744,6 +748,107 @@ public class BridgeProductService<main> {
             if(null!=merchantPaBalanceRespVO.getCreditAmount()&&merchantPaBalanceRespVO.getCreditAmount().compareTo(BigDecimal.ZERO)>0){
                 merchantPaBalanceRespVO.setCreditAmount(merchantPaBalanceRespVO.getCreditAmount().divide(new BigDecimal(100),2, RoundingMode.HALF_UP));
             }
+        }
+        return httpResponse;
+    }
+
+    /**
+     * 结算保存erp销售订单
+     * @param order
+     * @return
+     */
+    public HttpResponse settlementSaveOrder(ErpOrderInfo order) {
+        log.info("结算保存erp销售订单  参数 order=[{}]"+JsonUtil.toJson(order));
+        HttpResponse httpResponse = HttpResponse.success();
+        ErpOrderVo erpOrderVo=new ErpOrderVo();
+        //订单编码
+        erpOrderVo.setOrderCode(order.getOrderStoreCode());
+        //所属主订单编码
+        erpOrderVo.setMainOrderCode(order.getMainOrderCode());
+        //订单状态  1:已支付 2：已发货
+        erpOrderVo.setOrderStatus(order.getPaymentStatus());
+        //客户编码
+        erpOrderVo.setFranchiseeCode(order.getFranchiseeCode());
+        //客户名称
+        erpOrderVo.setFranchiseeName(order.getFranchiseeName());
+        //门店编码
+        erpOrderVo.setStoreCode(order.getStoreCode());
+        //门店名称
+        erpOrderVo.setStoreName(order.getStoreName());
+        //订单类型编码 2直送 1配送 3辅采直送
+        erpOrderVo.setOrderTypeCode(order.getOrderTypeCode());
+        //订单类型名称
+        erpOrderVo.setOrderTypeName(order.getOrderTypeName());
+        //订单类别编码 1:首单配送 2:首单赠送 3:首单货架 4:货架补货 5:配送补货 6:游乐设备 7:首单直送 8直送补货
+        erpOrderVo.setOrderCategoryCode(order.getOrderCategoryCode());
+        //订单类别名称
+        erpOrderVo.setOrderCategoryName(order.getOrderCategoryName());
+        //订单总额
+        erpOrderVo.setTotalProductAmount(order.getTotalProductAmount());
+        //实付金额
+        erpOrderVo.setActualTotalProductAmount(order.getActualTotalProductAmount());
+        //订单商品总数量
+//        erpOrderVo.setTotalProductCount(order.);
+        //实发商品总数量
+        erpOrderVo.setActualTotalProductCount(Integer.valueOf(order.getActualProductCount().intValue()));
+        //总物流费
+        erpOrderVo.setDeliverAmount(order.getDeliverAmount());
+        //物流券抵减金额
+        erpOrderVo.setGoodsCoupon(order.getGoodsCoupon());
+        //账户抵减物流费
+//        erpOrderVo.setAccountGoodsCoupon(order.);
+        //活动抵减
+//        erpOrderVo.setActivityMoney(order.);
+        //A品券抵减
+        erpOrderVo.setTopCouponMoney(order.getTopCouponMoney());
+        //服纺券抵减
+        erpOrderVo.setSuitCouponMoney(order.getSuitCouponMoney());
+        //仓库编码
+        erpOrderVo.setTransportCenterCode(order.getTransportCenterCode());
+        //仓库名称
+        erpOrderVo.setTransportCenterName(order.getTransportCenterName());
+        //库房编码
+        erpOrderVo.setWarehouseCode(order.getWarehouseCode());
+        //库房名称
+        erpOrderVo.setWarehouseName(order.getWarehouseName());
+        //下单时间
+        erpOrderVo.setOrderTime(order.getCreateTime());
+        //出库时间
+        erpOrderVo.setOutTime(order.getDeliveryTime());
+        //所属渠道
+        erpOrderVo.setCompanyCode(order.getCompanyCode());
+        //所属渠道名称
+        erpOrderVo.setCompanyName(order.getCompanyName());
+        //物流单号
+        erpOrderVo.setTransportCode(order.getTransportCode());
+        //物流公司编码
+        erpOrderVo.setTransportCompanyCode(order.getTransportCompanyCode());
+        //物流公司名称
+        erpOrderVo.setTransportCompanyName(order.getTransportCompanyName());
+        //使用赠品额度
+//        erpOrderVo.setComplimentaryAmount(order.);
+        //A品券作废金额
+//        erpOrderVo.setNullifyTopCouponMoney(order.);
+
+        //商品列表
+        List<ErpOrderProductInfo> erpOrderProductInfoList=new ArrayList<>();
+        if(null!=order.getItemList()&&order.getItemList().size()>0){
+            for(ErpOrderItem item:order.getItemList()){
+                ErpOrderProductInfo productInfo=new ErpOrderProductInfo();
+                //订单编码
+                productInfo.setOrderCode(item.getOrderStoreCode());
+                //sku编号
+                productInfo.setSkuCode(item.getSkuCode());
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(settlement).append("/erp/order/save");
+        HttpClient httpClient = HttpClient.post(sb.toString()).json(erpOrderVo);
+        httpResponse = httpClient.action().result(new TypeReference<HttpResponse>() {
+        });
+        if (!httpResponse.getCode().equals(MessageId.SUCCESS_CODE)) {
+            return HttpResponse.failure(ResultCode.INSERT_FRANCHISEE_ACCOUNT_FAILED);
         }
         return httpResponse;
     }
