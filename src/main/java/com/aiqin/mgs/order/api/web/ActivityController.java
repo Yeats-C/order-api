@@ -211,14 +211,14 @@ public class ActivityController {
 
     /**
      * 导出--活动详情-销售数据-活动销售列表
-     * @param erpOrderItem
+     * @param activityId
      * @param response
      * @return
      */
-    @PostMapping("/excelActivityItem")
+    @GetMapping("/excelActivityItem")
     @ApiOperation("导出--活动详情-销售数据-活动销售列表")
-    public void excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response){
-        activitesService.excelActivityItem(erpOrderItem,response);
+    public void excelActivityItem(@RequestParam(name = "activityId") String activityId, HttpServletResponse response){
+        activitesService.excelActivityItem(activityId,response);
     }
 
     /**

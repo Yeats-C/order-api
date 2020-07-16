@@ -325,6 +325,9 @@
         <if test=" isActivity != null">
             and d.is_activity = #{isActivity}
         </if>
+        <if test=" activityId != null">
+            and d.activity_id = #{activityId}
+        </if>
         order by d.create_time asc
         <if test="pageSize!=null ">
             limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}

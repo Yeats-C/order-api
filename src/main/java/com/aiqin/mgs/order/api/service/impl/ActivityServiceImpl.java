@@ -696,9 +696,11 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public void excelActivityItem(ErpOrderItem erpOrderItem, HttpServletResponse response) {
-        LOGGER.info("导出--活动详情-销售数据-活动销售列表excelActivityItem参数为：{}", erpOrderItem);
+    public void excelActivityItem(String activityId, HttpServletResponse response) {
+        LOGGER.info("导出--活动详情-销售数据-活动销售列表excelActivityItem参数为：{}", activityId);
         try {
+            ErpOrderItem erpOrderItem=new ErpOrderItem();
+            erpOrderItem.setActivityId(activityId);
             //只查询活动商品
             erpOrderItem.setIsActivity(1);
             List<ErpOrderItem> select = erpOrderItemDao.getActivityItem(erpOrderItem);
@@ -909,7 +911,7 @@ public class ActivityServiceImpl implements ActivityService {
         // 把字体 应用到当前样式
         style.setFont(font);
         // 添加表头数据
-        String[] excelHeader = { "门店编码", "门店名称", "订单号", "商品名称", "是否活动商品","订货数量","订货金额","订单状态","订单时间"};
+        String[] excelHeader = { "序号","门店编码", "门店名称", "订单号", "商品名称", "是否活动商品","订货数量","订货金额","订单状态","订单时间"};
         for (int i = 0; i < excelHeader.length; i++) {
             HSSFCell cell = row.createCell(i);
             cell.setCellValue(excelHeader[i]);
@@ -919,48 +921,49 @@ public class ActivityServiceImpl implements ActivityService {
         for (int i = 0; i < list.size(); i++) {
             row = sheet.createRow(i + 1);
             ErpOrderItem item = list.get(i);
+            row.createCell(0).setCellValue(i+1);
             if(StringUtils.isNotBlank(item.getStoreCode())) {
-                row.createCell(0).setCellValue(item.getStoreCode());
-            }else {
-                row.createCell(0).setCellValue("");
-            }
-            if(StringUtils.isNotBlank(item.getStoreName())) {
-                row.createCell(1).setCellValue(item.getStoreName());
+                row.createCell(1).setCellValue(item.getStoreCode());
             }else {
                 row.createCell(1).setCellValue("");
             }
-            if(StringUtils.isNotBlank(item.getOrderStoreCode())) {
-                row.createCell(2).setCellValue(item.getOrderStoreCode());
+            if(StringUtils.isNotBlank(item.getStoreName())) {
+                row.createCell(2).setCellValue(item.getStoreName());
             }else {
                 row.createCell(2).setCellValue("");
             }
-            if(StringUtils.isNotBlank(item.getSkuName())) {
-                row.createCell(3).setCellValue(item.getSkuName());
+            if(StringUtils.isNotBlank(item.getOrderStoreCode())) {
+                row.createCell(3).setCellValue(item.getOrderStoreCode());
             }else {
                 row.createCell(3).setCellValue("");
             }
+            if(StringUtils.isNotBlank(item.getSkuName())) {
+                row.createCell(4).setCellValue(item.getSkuName());
+            }else {
+                row.createCell(4).setCellValue("");
+            }
 
-            row.createCell(4).setCellValue("是");
+            row.createCell(5).setCellValue("是");
 
             if(item.getProductCount()!=null) {
-                row.createCell(5).setCellValue(item.getProductCount());
-            }else {
-                row.createCell(5).setCellValue(0);
-            }
-            if(item.getActualTotalProductAmount()!=null) {
-                row.createCell(6).setCellValue(item.getActualTotalProductAmount().intValue());
+                row.createCell(6).setCellValue(item.getProductCount());
             }else {
                 row.createCell(6).setCellValue(0);
             }
-            if(item.getOrderStatus()!=null) {
-                row.createCell(7).setCellValue(ErpOrderStatusEnum.getEnumDesc(item.getOrderStatus()));
+            if(item.getActualTotalProductAmount()!=null) {
+                row.createCell(7).setCellValue(item.getActualTotalProductAmount().intValue());
             }else {
-                row.createCell(7).setCellValue("");
+                row.createCell(7).setCellValue(0);
             }
-            if(item.getCreateTime()!=null) {
-                row.createCell(8).setCellValue(DateUtil.formatDate(item.getCreateTime()));
+            if(item.getOrderStatus()!=null) {
+                row.createCell(8).setCellValue(ErpOrderStatusEnum.getEnumDesc(item.getOrderStatus()));
             }else {
                 row.createCell(8).setCellValue("");
+            }
+            if(item.getCreateTime()!=null) {
+                row.createCell(9).setCellValue(DateUtil.formatDateLong(item.getCreateTime()));
+            }else {
+                row.createCell(9).setCellValue("");
             }
         }
         return wb;
