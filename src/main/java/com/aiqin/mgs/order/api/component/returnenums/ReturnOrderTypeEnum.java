@@ -21,4 +21,16 @@ public enum ReturnOrderTypeEnum {
 
     private String name;
 
+    public static ReturnOrderTypeEnum getEnum(Object object) {
+        if (object != null) {
+            for (ReturnOrderTypeEnum item :
+                    ReturnOrderTypeEnum.values()) {
+                if (item.getCode().equals(object.toString())) {
+                    return item;
+                }
+            }
+        }
+        return null;
+    }
+
 }

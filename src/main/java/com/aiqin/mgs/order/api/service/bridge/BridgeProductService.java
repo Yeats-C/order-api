@@ -8,17 +8,16 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
+import com.aiqin.mgs.order.api.component.returnenums.ReturnOrderTypeEnum;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.CartOrderInfo;
 import com.aiqin.mgs.order.api.domain.FranchiseeInfo;
+import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.dto.ProductDistributorOrderDTO;
 import com.aiqin.mgs.order.api.domain.po.gift.NewStoreGradient;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderProductInfo;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderVo;
+import com.aiqin.mgs.order.api.domain.po.order.*;
 import com.aiqin.mgs.order.api.domain.request.InventoryDetailRequest;
 import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
@@ -27,6 +26,7 @@ import com.aiqin.mgs.order.api.domain.request.product.NewStoreCategory;
 import com.aiqin.mgs.order.api.domain.request.product.ProductSkuRequest2;
 import com.aiqin.mgs.order.api.domain.request.product.ProductSkuRespVo6;
 import com.aiqin.mgs.order.api.domain.request.product.SkuProductReqVO;
+import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailVO;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
 import com.aiqin.mgs.order.api.domain.request.stock.ProductSkuStockRespVo;
 import com.aiqin.mgs.order.api.domain.response.NewFranchiseeResponse;
@@ -759,78 +759,22 @@ public class BridgeProductService<main> {
      */
     public void settlementSaveOrder(ErpOrderInfo order) {
         log.info("结算保存erp销售订单  参数 order=[{}]"+JsonUtil.toJson(order));
+        if(null==order){
+            log.error("结算保存erp销售订单失败，传入参数为空"+JsonUtil.toJson(order));
+            return;
+        }
+        if(null==order.getItemList()||order.getItemList().size()<=0){
+            log.error("结算保存erp销售订单失败，订单详情数据为空"+JsonUtil.toJson(order));
+            return;
+        }
+        if(null==order.getOrderFee()){
+            log.error("结算保存erp销售订单失败，订单费用数据为空"+JsonUtil.toJson(order));
+            return;
+        }
         ErpOrderVo erpOrderVo=new ErpOrderVo();
-        //订单编码
-        erpOrderVo.setOrderCode(order.getOrderStoreCode());
-        //所属主订单编码
-        erpOrderVo.setMainOrderCode(order.getMainOrderCode());
-        //订单状态  1:已支付 2：已发货
-        erpOrderVo.setOrderStatus(order.getPaymentStatus());
-        //客户编码
-        erpOrderVo.setFranchiseeCode(order.getFranchiseeCode());
-        //客户名称
-        erpOrderVo.setFranchiseeName(order.getFranchiseeName());
-        //门店编码
-        erpOrderVo.setStoreCode(order.getStoreCode());
-        //门店名称
-        erpOrderVo.setStoreName(order.getStoreName());
-        //订单类型编码 2直送 1配送 3辅采直送
-        erpOrderVo.setOrderTypeCode(order.getOrderTypeCode());
-        //订单类型名称
-        erpOrderVo.setOrderTypeName(order.getOrderTypeName());
-        //订单类别编码 1:首单配送 2:首单赠送 3:首单货架 4:货架补货 5:配送补货 6:游乐设备 7:首单直送 8直送补货
-        erpOrderVo.setOrderCategoryCode(order.getOrderCategoryCode());
-        //订单类别名称
-        erpOrderVo.setOrderCategoryName(order.getOrderCategoryName());
-        //订单总额
-        erpOrderVo.setTotalProductAmount(order.getTotalProductAmount());
-        //实付金额
-        erpOrderVo.setActualTotalProductAmount(order.getActualTotalProductAmount());
-        //订单商品总数量
-//        erpOrderVo.setTotalProductCount(order.);
-        //实发商品总数量
-        erpOrderVo.setActualTotalProductCount(Integer.valueOf(order.getActualProductCount().intValue()));
-        //总物流费
-        erpOrderVo.setDeliverAmount(order.getDeliverAmount());
-        //物流券抵减金额
-        erpOrderVo.setGoodsCoupon(order.getGoodsCoupon());
-        //账户抵减物流费
-//        erpOrderVo.setAccountGoodsCoupon(order.);
-        //活动抵减
-//        erpOrderVo.setActivityMoney(order.);
-        //A品券抵减
-        erpOrderVo.setTopCouponMoney(order.getTopCouponMoney());
-        //服纺券抵减
-        erpOrderVo.setSuitCouponMoney(order.getSuitCouponMoney());
-        //仓库编码
-        erpOrderVo.setTransportCenterCode(order.getTransportCenterCode());
-        //仓库名称
-        erpOrderVo.setTransportCenterName(order.getTransportCenterName());
-        //库房编码
-        erpOrderVo.setWarehouseCode(order.getWarehouseCode());
-        //库房名称
-        erpOrderVo.setWarehouseName(order.getWarehouseName());
-        //下单时间
-        erpOrderVo.setOrderTime(order.getCreateTime());
-        //出库时间
-        erpOrderVo.setOutTime(order.getDeliveryTime());
-        //所属渠道
-        erpOrderVo.setCompanyCode(order.getCompanyCode());
-        //所属渠道名称
-        erpOrderVo.setCompanyName(order.getCompanyName());
-        //物流单号
-        erpOrderVo.setTransportCode(order.getTransportCode());
-        //物流公司编码
-        erpOrderVo.setTransportCompanyCode(order.getTransportCompanyCode());
-        //物流公司名称
-        erpOrderVo.setTransportCompanyName(order.getTransportCompanyName());
-        //使用赠品额度
-//        erpOrderVo.setComplimentaryAmount(order.);
-        //A品券作废金额
-//        erpOrderVo.setNullifyTopCouponMoney(order.);
-
         //商品列表
         List<ErpOrderProductInfo> erpOrderProductInfoList=new ArrayList<>();
+        int productCount=0;
         if(null!=order.getItemList()&&order.getItemList().size()>0){
             for(ErpOrderItem item:order.getItemList()){
                 ErpOrderProductInfo productInfo=new ErpOrderProductInfo();
@@ -880,11 +824,150 @@ public class BridgeProductService<main> {
                 productInfo.setComplimentaryAmount(item.getUsedGiftQuota());
                 //销项税率
                 productInfo.setTaxRate(item.getTaxRate());
+                productCount+=item.getProductCount();
 
                 erpOrderProductInfoList.add(productInfo);
             }
             erpOrderVo.setProdcutList(erpOrderProductInfoList);
         }
+        //订单编码
+        erpOrderVo.setOrderCode(order.getOrderStoreCode());
+        //所属主订单编码
+        erpOrderVo.setMainOrderCode(order.getMainOrderCode());
+        //订单状态  1:已支付 2：已发货
+        erpOrderVo.setOrderStatus(order.getPaymentStatus());
+        //客户编码
+        erpOrderVo.setFranchiseeCode(order.getFranchiseeCode());
+        //客户名称
+        erpOrderVo.setFranchiseeName(order.getFranchiseeName());
+        //门店编码
+        erpOrderVo.setStoreCode(order.getStoreCode());
+        //门店名称
+        erpOrderVo.setStoreName(order.getStoreName());
+        //订单类型编码 2直送 1配送 3辅采直送
+        erpOrderVo.setOrderTypeCode(order.getOrderTypeCode());
+        //订单类型名称
+        erpOrderVo.setOrderTypeName(order.getOrderTypeName());
+        //订单类别编码 1:首单配送 2:首单赠送 3:首单货架 4:货架补货 5:配送补货 6:游乐设备 7:首单直送 8直送补货
+        erpOrderVo.setOrderCategoryCode(order.getOrderCategoryCode());
+        //订单类别名称
+        erpOrderVo.setOrderCategoryName(order.getOrderCategoryName());
+        //订单总额
+        erpOrderVo.setTotalProductAmount(order.getTotalProductAmount());
+        //实付金额
+        erpOrderVo.setActualTotalProductAmount(order.getActualTotalProductAmount());
+        //订单商品总数量
+        erpOrderVo.setTotalProductCount(productCount);
+        //实发商品总数量
+        erpOrderVo.setActualTotalProductCount(Integer.valueOf(order.getActualProductCount().intValue()));
+        //总物流费
+        erpOrderVo.setDeliverAmount(order.getDeliverAmount());
+        //物流券抵减金额
+        erpOrderVo.setGoodsCoupon(order.getGoodsCoupon());
+        //账户抵减物流费
+        erpOrderVo.setAccountGoodsCoupon(order.getOrderFee().getGoodsCoupon());
+        //活动抵减
+        erpOrderVo.setActivityMoney(order.getOrderFee().getActivityMoney());
+        //A品券抵减
+        erpOrderVo.setTopCouponMoney(order.getTopCouponMoney());
+        //服纺券抵减
+        erpOrderVo.setSuitCouponMoney(order.getSuitCouponMoney());
+        //仓库编码
+        erpOrderVo.setTransportCenterCode(order.getTransportCenterCode());
+        //仓库名称
+        erpOrderVo.setTransportCenterName(order.getTransportCenterName());
+        //库房编码
+        erpOrderVo.setWarehouseCode(order.getWarehouseCode());
+        //库房名称
+        erpOrderVo.setWarehouseName(order.getWarehouseName());
+        //下单时间
+        erpOrderVo.setOrderTime(order.getCreateTime());
+        //出库时间
+        erpOrderVo.setOutTime(order.getDeliveryTime());
+        //所属渠道
+        erpOrderVo.setCompanyCode(order.getCompanyCode());
+        //所属渠道名称
+        erpOrderVo.setCompanyName(order.getCompanyName());
+        //物流单号
+        erpOrderVo.setTransportCode(order.getTransportCode());
+        //物流公司编码
+        erpOrderVo.setTransportCompanyCode(order.getTransportCompanyCode());
+        //物流公司名称
+        erpOrderVo.setTransportCompanyName(order.getTransportCompanyName());
+        //使用赠品额度
+        erpOrderVo.setComplimentaryAmount(order.getOrderFee().getUsedGiftQuota());
+        //A品券作废金额
+        erpOrderVo.setNullifyTopCouponMoney(order.getOrderFee().getNullifyTopCouponMoney());
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(settlement).append("/erp/order/save");
+        HttpClient httpClient = HttpClient.post(sb.toString()).json(erpOrderVo);
+        HttpResponse httpResponse = httpClient.action().result(new TypeReference<HttpResponse>() {
+        });
+        if (!httpResponse.getCode().equals(MessageId.SUCCESS_CODE)) {
+            log.error("结算保存erp销售订单失败，返回参数为"+JsonUtil.toJson(httpResponse));
+        }
+    }
+
+
+    /**
+     * 结算保存erp退货订单
+     * @param order
+     * @return
+     */
+    public void settlementSaveReturnOrder(ReturnOrderDetailVO order) {
+        log.info("结算保存erp退货订单  参数 order=[{}]"+JsonUtil.toJson(order));
+        ReturnOrderInfo returnOrderInfo=order.getReturnOrderInfo();
+        if(null==order||null==returnOrderInfo){
+            log.error("结算保存erp退货订单失败，传入参数为空"+JsonUtil.toJson(order));
+            return;
+        }
+        if(null==order.getDetails()){
+            log.error("结算保存erp销售退货失败，订单详情数据为空"+JsonUtil.toJson(order));
+            return;
+        }
+
+        ErpReturnOrderVo erpOrderVo=new ErpReturnOrderVo();
+
+        //退货单号
+        erpOrderVo.setReturnOrderCode(order.getReturnOrderCode());
+        //原订单编码
+        erpOrderVo.setOrderCode(returnOrderInfo.getOrderStoreCode());
+        //退货状态 1:已验收
+        erpOrderVo.setOrderStatus(returnOrderInfo.getReturnOrderStatus());
+        //客户编码
+        erpOrderVo.setFranchiseeCode(returnOrderInfo.getFranchiseeCode());
+        //客户名称
+        erpOrderVo.setFranchiseeName(returnOrderInfo.getFranchiseeName());
+        //门店编码
+        erpOrderVo.setStoreCode(returnOrderInfo.getStoreCode());
+        //门店名称
+        erpOrderVo.setStoreName(returnOrderInfo.getStoreName());
+        //退货类型编码 1:售后退货 2:缺货取消 3:客户拒收
+        erpOrderVo.setOrderTypeCode(ReturnOrderTypeEnum.getEnum(returnOrderInfo.getReturnOrderType()).getCode().toString());
+        //退货类型名称
+        erpOrderVo.setOrderTypeName(ReturnOrderTypeEnum.getEnum(returnOrderInfo.getReturnOrderType()).getName());
+        //退货仓库编码
+        erpOrderVo.setTransportCenterCode(returnOrderInfo.getTransportCenterCode());
+        //仓库名称
+        erpOrderVo.setTransportCenterName(returnOrderInfo.getTransportCenterName());
+        //库房编码
+        erpOrderVo.setWarehouseCode(returnOrderInfo.getWarehouseCode());
+        //库房名称
+        erpOrderVo.setWarehouseName(returnOrderInfo.getWarehouseName());
+        //退货总额
+        erpOrderVo.setTotalProductAmount(returnOrderInfo.getReturnOrderAmount());
+        //退A品券总额
+        erpOrderVo.setTopCouponMoney(returnOrderInfo.getTopCouponDiscountAmount());
+        //退服纺券总额
+        erpOrderVo.setSuitCouponMoney(BigDecimal.ZERO);
+        //所属渠道
+        erpOrderVo.setCompanyCode(returnOrderInfo.getCompanyCode());
+        //所属渠道名称
+        erpOrderVo.setCompanyName(returnOrderInfo.getCompanyName());
+
+        //商品列表
+        List<ErpReturnOrderProductInfo> erpReturnOrderProductInfoList=new ArrayList<>();
 
         StringBuilder sb = new StringBuilder();
         sb.append(settlement).append("/erp/order/save");
