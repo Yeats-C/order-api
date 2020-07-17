@@ -10,10 +10,7 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.returnenums.ReturnOrderTypeEnum;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
-import com.aiqin.mgs.order.api.domain.CartOrderInfo;
-import com.aiqin.mgs.order.api.domain.FranchiseeInfo;
-import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
-import com.aiqin.mgs.order.api.domain.StoreInfo;
+import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.dto.ProductDistributorOrderDTO;
 import com.aiqin.mgs.order.api.domain.po.gift.NewStoreGradient;
@@ -922,7 +919,7 @@ public class BridgeProductService<main> {
             log.error("结算保存erp退货订单失败，传入参数为空"+JsonUtil.toJson(order));
             return;
         }
-        if(null==order.getDetails()){
+        if(null==order.getDetails()||order.getDetails().size()<=0){
             log.error("结算保存erp销售退货失败，订单详情数据为空"+JsonUtil.toJson(order));
             return;
         }
@@ -968,6 +965,45 @@ public class BridgeProductService<main> {
 
         //商品列表
         List<ErpReturnOrderProductInfo> erpReturnOrderProductInfoList=new ArrayList<>();
+        for(ReturnOrderDetail detail:order.getDetails()){
+            ErpReturnOrderProductInfo info=new ErpReturnOrderProductInfo();
+            //退货单号
+            info.setReturnOrderCode(detail.getReturnOrderCode());
+            //商品编号
+            info.setSkuCode(detail.getSkuCode());
+            //商品名称
+            info.setSkuName(detail.getSkuName());
+            //商品品类编码
+            info.setProductCategoryCode(detail.getProductCategoryCode());
+            //商品品类名称
+            info.setProductCategoryName(detail.getProductCategoryName());
+            //商品品牌编码
+//            info.setProductBrandCode(detail.getProductBrandCode());
+            //商品品牌名称
+//            info.setProductBrandName(detail.getProductBrandName());
+            //商品属性编码
+//            info.setProductPropertyCode(detail.getProductPropertyCode());
+            //商品属性名称
+//            info.setProductPropertyName(detail.getProductPropertyName());
+            //商品类型 0商品（本品） 1赠品 2兑换赠品
+            info.setProductType(detail.getProductType());
+            //熙耘采购价
+//            info.setScmpPurchaseAmount();
+            //渠道采购价
+//            info.setPurchaseAmount(detail.ca);
+            //退货数量
+            info.setProductCount(detail.getReturnProductCount().intValue());
+            //退货金额
+            info.setTotalProductAmount(detail.getTotalProductAmount());
+            //退货单价
+            info.setPreferentialAmount(detail.getPreferentialAmount());
+            //退还A品券
+            info.setTopCouponMoney(detail.getTopCouponDiscountAmount());
+            //退还服纺金
+            info.setSuitCouponMoney(BigDecimal.ZERO);
+
+        }
+
 
         StringBuilder sb = new StringBuilder();
         sb.append(settlement).append("/erp/order/save");
@@ -975,7 +1011,7 @@ public class BridgeProductService<main> {
         HttpResponse httpResponse = httpClient.action().result(new TypeReference<HttpResponse>() {
         });
         if (!httpResponse.getCode().equals(MessageId.SUCCESS_CODE)) {
-            log.error("结算保存erp销售订单失败，返回参数为"+JsonUtil.toJson(httpResponse));
+            log.error("结算保存erp退货订单失败，返回参数为"+JsonUtil.toJson(httpResponse));
         }
     }
 
