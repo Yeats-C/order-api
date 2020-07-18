@@ -175,6 +175,11 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
             //todo 更新主单明细赠品的实际发货数量
             updateGiftGoodsAutCount(order.getMainOrderCode(),itemList,auth);
+            /*****************************************同步订单数据到结算开始*****************************************/
+            ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(order.getOrderStoreId());
+            order.setOrderFee(orderFee);
+            bridgeProductService.settlementSaveOrder(order);
+            /*****************************************同步订单数据到结算结束*****************************************/
 
         } else {
             throw new BusinessException("只有等待拣货状态且没有出货的订单才能执行该操作");
@@ -376,6 +381,12 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                     //更新子订单里的均摊金额
                     updateSubOrder(order.getMainOrderCode());
                 }
+
+                /*****************************************同步订单数据到结算开始*****************************************/
+                ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(order.getOrderStoreId());
+                order.setOrderFee(orderFee);
+                bridgeProductService.settlementSaveOrder(order);
+                /*****************************************同步订单数据到结算结束*****************************************/
 
                 //遍历退货单，查看是否有退单
                 ErpOrderInfo e=new ErpOrderInfo();
