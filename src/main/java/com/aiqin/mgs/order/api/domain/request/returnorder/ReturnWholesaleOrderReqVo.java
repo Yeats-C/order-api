@@ -134,6 +134,14 @@ public class ReturnWholesaleOrderReqVo implements Serializable {
     @ApiModelProperty(value = "创建人名称")
     private String createByName;
 
+    @ApiModelProperty(value = "供应商编码 -----传")
+//    @JsonProperty("supplier_code")
+    private String supplierCode;
+
+    @ApiModelProperty(value = "供应商名称 -----传")
+//    @JsonProperty("supplier_name")
+    private String supplierName;
+
 
     @ApiModelProperty(value = "门店id ---传")
 //    @JsonProperty("store_id")
