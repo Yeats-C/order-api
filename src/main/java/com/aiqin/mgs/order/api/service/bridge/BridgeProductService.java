@@ -135,10 +135,11 @@ public class BridgeProductService<main> {
             shoppingCartProductRequest.setCompanyCode(companyCode);
             shoppingCartProductRequest.setProductSkuRequest2List(productSkuRequest2List);
             String path = "/search/spu/sku/detail2";
+            log.info("detail2 接口参数为：{}"+JsonUtil.toJson(shoppingCartProductRequest));
             HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest);
             HttpResponse<List<ErpSkuDetail>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ErpSkuDetail>>>() {
             });
-
+            log.info("detail2 接口 请求结果为：{}"+JsonUtil.toJson(response));
             if (!RequestReturnUtil.validateHttpResponse(response)) {
                 throw new BusinessException(response.getMessage());
             }

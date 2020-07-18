@@ -297,9 +297,10 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
 
                 String url = purchaseHost + "/order/aiqin/sale";
                 HttpClient httpGet = HttpClient.post(url).json(orderInfo).timeout(10000);
-                LOGGER.info("根据爱亲采购单，生成耘链销售单开始url:" + url + " httpGet:" + httpGet);
+                LOGGER.info("根据爱亲采购单，生成耘链销售单开始url:" + url + " httpGet:" + httpGet+"order:{}"+JsonUtil.toJson(orderInfo));
                 HttpResponse<Object> response = httpGet.action().result(new TypeReference<HttpResponse<Object>>() {
                 });
+                LOGGER.info("根据爱亲采购单，生成耘链销售单返回结果={}" + JsonUtil.toJson(response));
                 if (!RequestReturnUtil.validateHttpResponse(response)) {
                     throw new BusinessException(response.getMessage());
                 }

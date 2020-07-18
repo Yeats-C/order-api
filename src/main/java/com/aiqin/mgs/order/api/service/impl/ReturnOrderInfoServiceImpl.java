@@ -32,6 +32,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
 import com.aiqin.mgs.order.api.domain.request.StoreQuotaRequest;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
+import com.aiqin.mgs.order.api.domain.response.ReturnRefundStatus;
 import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderStatusVo;
 import com.aiqin.mgs.order.api.domain.response.returnorder.WholesaleReturnList;
 import com.aiqin.mgs.order.api.service.CopartnerAreaService;
@@ -1649,6 +1650,13 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     public HttpResponse saveWholesaleReturn(ReturnWholesaleOrderReqVo reqVo) {
         log.info("发起批发退货--入参"+JSON.toJSONString(reqVo));
         try {
+            //查询上次发起退货还没退款成功就不让发起退货
+            ReturnRefundStatus returnRefundStatus = returnOrderInfoDao.selectRefundStatus(reqVo.getOrderStoreCode());
+            if (null!=returnRefundStatus){
+                if (returnRefundStatus.getOrderStoreCode().equals(reqVo.getOrderStoreCode()) && returnRefundStatus.getRefundStatus().equals(0)){
+                    return HttpResponse.failure(ResultCode.ERP_RETURN_ERROR);
+                }
+            }
             //查询订单是否存在未处理售后单
             List<ReturnOrderInfo> returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndStatus(reqVo.getOrderStoreCode(), 1);
             Assert.isTrue(CollectionUtils.isEmpty(returnOrderInfo), "该订单还有未审核售后单，请稍后提交");
@@ -1700,7 +1708,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             record.setActualProductCount(record.getProductCount());
             //实退商品总金额
             record.setActualReturnOrderAmount(record.getReturnOrderAmount());
-//            //退货类型
+            //退货类型
 //            record.setReturnOrderType(2);
             //退货单--退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户
             record.setReturnMoneyType(ConstantData.RETURN_MONEY_TYPE);
@@ -1711,6 +1719,12 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //普通循环
             List<ReturnOrderDetail> details = new ArrayList<>();
             List<ReturnWholesaleOrderDetail> details1 = reqVo.getDetails();
+            //门店实收数量 ---
+            Long actualInboundCount = 0L;
+            //已退货数量
+            Long returnProductCount = 0L;
+            //申请退货数量
+            Long actualReturnProductCount = 0L;
             for (ReturnWholesaleOrderDetail sd : details1) {
                 ReturnOrderDetail detail = new ReturnOrderDetail();
                     //商品属性 0新品1残品
@@ -1718,9 +1732,14 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     if (null != sd.getProductStatus()) {
                         productStatus = sd.getProductStatus();
                     }
-                    //均摊后的金额乘以退货数量
+                    //门店实收数量  ----
+                    actualInboundCount = sd.getActualInboundCount();
+                    //已退数量    ----
+                    returnProductCount = sd.getReturnProductCount() == null ? 0L : sd.getReturnProductCount();
+                    actualReturnProductCount = sd.getActualReturnProductCount();
+                   //均摊后的金额乘以退货数量
                     BigDecimal preferentialAmount = sd.getPreferentialAmount();
-                    BigDecimal multiply = preferentialAmount.multiply(BigDecimal.valueOf(sd.getReturnProductCount()));
+                    BigDecimal multiply = preferentialAmount.multiply(BigDecimal.valueOf(sd.getActualReturnProductCount()));
                     returnOrderAmount = returnOrderAmount.add(multiply);
                     BeanUtils.copyProperties(sd, detail);
                     detail.setCreateTime(now);
@@ -1746,6 +1765,15 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             log.info("发起批发退货--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}", record.getOrderStoreCode(), ErpOrderReturnStatusEnum.WAIT, null, record.getCreateById(), record.getCreateByName());
             erpOrderInfoService.updateOrderReturnStatus(record.getOrderStoreCode(), ErpOrderReturnRequestEnum.WAIT, null, record.getCreateById(), record.getCreateByName());
             log.info("发起批发退货--修改原始订单数据结束");
+            if((actualInboundCount - returnProductCount) != 0 ){ //说明没有可退的商品数量，修改订单状态
+                if(((actualInboundCount - returnProductCount) - actualReturnProductCount) == 0){
+                    log.info("开始-----修改原订单的退货流程节点状态");
+                    erpOrderInfoDao.updateOrderReturnProcess(reqVo.getOrderStoreCode());
+                    log.info("结束------修改原订单的退货流程节点状态");
+                }else {
+                    erpOrderInfoDao.updateOrderReturnProcessStatus(reqVo.getOrderStoreCode());
+                }
+            }
             log.info("审核后-调用发起批发退货开始");
             ReturnOrderReviewReqVo reqVo1 = new ReturnOrderReviewReqVo();
             reqVo1.setOperateStatus(reqVo.getTreatmentMethod());
@@ -1754,11 +1782,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             if (reallyReturn == 0) {  //预生成退货单不同步供应链
             }else {
                 HttpResponse httpResponse = updateReturnStatus(reqVo1);
-//             updateReturnStatus(reqVo1);
+//              updateReturnStatus(reqVo1);
                 log.info("erp-批发退货-同步供应链，生成退供单结束,httpResponse={}", JSON.toJSON(httpResponse));
-//            log.info("erp-批发退货-同步供应链，生成退供单结束");
                 if (!"0".equals(httpResponse.getCode())) {
-                    //erp同步供应链，生成退供单失败
                     throw new RuntimeException("erp-批发退货-同步供应链，生成退供单失败");
                 }
                 log.info("erp-批发退货-同步供应链，生成退货单成功");
