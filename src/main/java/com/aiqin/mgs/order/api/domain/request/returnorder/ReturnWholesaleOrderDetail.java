@@ -66,8 +66,11 @@ public class ReturnWholesaleOrderDetail {
 //    @ApiModelProperty(value = "(申请退货数量)退货数量")
 //    private Long returnProductCount;
 
-    @ApiModelProperty(value = "(申请退货数量)实退数量 ----传")
+    @ApiModelProperty(value = "实退数量 ")
     private Long actualReturnProductCount;
+
+    @ApiModelProperty(value = "已退货数量 ------传 ")
+    private Long quantityReturnedCount;
 
 
     @ApiModelProperty(value = "商品状态0正品1残品")
@@ -118,7 +121,7 @@ public class ReturnWholesaleOrderDetail {
 //    @ApiModelProperty(value = "(已退货数量)实退数量")
 //    private Long actualReturnProductCount;
 
-     @ApiModelProperty(value = "(已退货数量)退货数量 ----传")
+     @ApiModelProperty(value = "(申请退货数量)退货数量 ----传")
      private Long returnProductCount;
 
     @ApiModelProperty(value = "行号  ----传")
@@ -137,6 +140,13 @@ public class ReturnWholesaleOrderDetail {
 
     @ApiModelProperty("配送中心名称 ---传")
     private String transportCenterName;
+
+
+    @ApiModelProperty(value = "商品单价")
+    private BigDecimal productAmount;
+
+    @ApiModelProperty(value = "商品总价")
+    private BigDecimal totalProductAmount;
 
 
 
