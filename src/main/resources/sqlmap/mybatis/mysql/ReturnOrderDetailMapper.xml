@@ -53,6 +53,7 @@
         <result column="warehouse_name" property="warehouseName" jdbcType="VARCHAR"/>
         <result column="transport_center_code" property="transportCenterCode" jdbcType="VARCHAR"/>
         <result column="transport_center_name" property="transportCenterName" jdbcType="VARCHAR"/>
+        <result column="quantity_returned_count" property="quantityReturnedCount" jdbcType="BIGINT"/>
         <result column="channel_amount" property="channelAmount" jdbcType="DECIMAL"/>
         <result column="channel_total_amount" property="channelTotalAmount" jdbcType="DECIMAL"/>
         <result column="actual_channel_total_amount" property="actualChannelTotalAmount" jdbcType="DECIMAL"/>
@@ -67,7 +68,7 @@
     update_by_id, update_by_name, create_time, update_time, remark, evidence_url, preferential_amount,
     product_category_code,product_category_name,bar_code,top_coupon_discount_amount,top_coupon_amount,complimentary_amount,
     return_clothing_spinning,batch_info_code,batch_date,batch_code,refund_amount,withdraw_amount,warehouse_code,warehouse_name,
-    transport_center_code,transport_center_name
+    transport_center_code,transport_center_name,quantity_returned_count
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
         select
@@ -449,7 +450,7 @@
         create_time,remark,evidence_url,preferential_amount,line_code,unit_code,tax_rate,
         product_amount,product_category_code,product_category_name,bar_code,top_coupon_discount_amount,top_coupon_amount,
         batch_info_code,batch_date,batch_code,refund_amount,withdraw_amount,warehouse_code,warehouse_name,transport_center_code,
-        transport_center_name)
+        transport_center_name,quantity_returned_count)
         values
         <foreach collection="records" item="item" index="index" separator=",">
             (
@@ -466,7 +467,8 @@
             #{item.lineCode},#{item.unitCode},#{item.taxRate},#{item.productAmount},
             #{item.productCategoryCode},#{item.productCategoryName},#{item.barCode},#{item.topCouponDiscountAmount},#{item.topCouponAmount},
             #{item.batchInfoCode},#{item.batchDate},#{item.batchCode},#{item.refundAmount},#{item.withdrawAmount},
-            #{item.warehouseCode},#{item.warehouseName},#{item.transportCenterCode},#{item.transportCenterName}
+            #{item.warehouseCode},#{item.warehouseName},#{item.transportCenterCode},#{item.transportCenterName},
+            #{item.quantityReturnedCount}
             )
         </foreach>
     </insert>
