@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.service.impl.order;
 
+import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.PagesRequest;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
@@ -97,11 +98,13 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
 
     @Override
     public ErpOrderInfo getOrderDetailByOrderCode(String orderCode) {
-        log.info("根据订单编号查询订单详情信息 getOrderDetailByOrderCode 参数为：orderCode={}"+orderCode);
+        log.info("根据订单编号查询订单详情信息 getOrderDetailByOrderCode 参数为：orderCode={}"+ JsonUtil.toJson(orderCode));
         ErpOrderInfo order = this.getOrderByOrderCode(orderCode);
+        log.info("根据订单编号查询订单详情信息 getOrderDetailByOrderCode 结果为：order={}"+JsonUtil.toJson(order));
         if (order != null) {
             Integer orderStatus = order.getOrderStatus();
             List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
+            log.info("查询订单明细结果为 orderItemList={}"+orderItemList);
             List<String> skuCodeList=new ArrayList<>();
             for(ErpOrderItem item:orderItemList){
                 skuCodeList.add(item.getSkuCode());
@@ -121,7 +124,9 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                 productSkuRequest2.setWarehouseTypeCode(item.getWarehouseTypeCode());
                 productSkuRequest2List.add(productSkuRequest2);
             }
+            log.info("根据订单明细向供应链查询订单详细信息 参数 productSkuRequest2List ={}"+order.getProvinceId()+order.getCityId()+JsonUtil.toJson(productSkuRequest2List));
             Map<String, ErpSkuDetail> skuDetailMap=bridgeProductService.getProductSkuDetailMap(order.getProvinceId(),order.getCityId(),productSkuRequest2List);
+            log.info("根据订单明细向供应链查询订单详细信息 结果为 skuDetailMap ={}"+JsonUtil.toJson(skuDetailMap));
             for(ErpOrderItem item:orderItemList){
                 ErpSkuDetail detail=skuDetailMap.get(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
                 if (null!=detail){
@@ -137,7 +142,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
 
             }
             order.setItemList(orderItemList);
-            log.info("根据订单编号查询订单详情信息 子订单详情为：orderItemList={}"+orderItemList);
+            log.info("根据订单编号查询订单详情信息 子订单详情为：orderItemList={}"+JsonUtil.toJson(orderItemList));
             ItemOrderFee itemOrderFee=new ItemOrderFee();
             //子订单商品价值：（子订单分销价求和）元
             BigDecimal totalMoney=BigDecimal.ZERO;
@@ -185,7 +190,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             itemOrderFee.setPayMoney(payMoney.subtract(topCouponMoney));
             order.setItemOrderFee(itemOrderFee);
 
-            log.info("根据订单编号查询订单详情信息 子订单支付信息为：itemOrderFee={}"+itemOrderFee);
+            log.info("根据订单编号查询订单详情信息 子订单支付信息为：itemOrderFee={}"+JsonUtil.toJson(itemOrderFee));
             List<ErpOrderOperationLog> operationLogList = erpOrderOperationLogService.selectOrderOperationLogList(order.getOrderStoreCode());
             Collections.reverse(operationLogList);
             order.setOperationLogList(operationLogList);
@@ -211,16 +216,16 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                 }
             }
             order.setOrderFee(orderFee);
-            log.info("根据订单编号查询订单详情信息 订单支付信息为：orderFee={}"+orderFee);
+            log.info("根据订单编号查询订单详情信息 订单支付信息为：orderFee={}"+JsonUtil.toJson(orderFee));
 
             //订单物流信息
             ErpOrderLogistics orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsId(order.getLogisticsId());
             order.setOrderLogistics(orderLogistics);
-            log.info("根据订单编号查询订单详情信息 订单物流信息：orderLogistics={}"+orderLogistics);
+            log.info("根据订单编号查询订单详情信息 订单物流信息：orderLogistics={}"+JsonUtil.toJson(orderLogistics));
             //退款信息
             ErpOrderRefund orderRefund = erpOrderRefundService.getOrderRefundByOrderIdAndRefundType(order.getOrderStoreId(), ErpOrderRefundTypeEnum.ORDER_CANCEL);
             order.setOrderRefund(orderRefund);
-            log.info("根据订单编号查询订单详情信息 退款信息：orderRefund={}"+orderRefund);
+            log.info("根据订单编号查询订单详情信息 退款信息：orderRefund={}"+JsonUtil.toJson(orderRefund));
             //操作按钮配置
             orderOperationConfig(order);
 
@@ -331,7 +336,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         erpOrderQueryRequest.setOrderCategoryQueryList(orderCategoryQueryList);
 
         log.info(ErpOrderTypeCategoryQueryTypeEnum.getEnum(ErpOrderTypeCategoryQueryTypeEnum.STORE_ORDER_LIST_QUERY)
-                +"查询订单列表的订单类别编码集合为"+orderCategoryQueryList);
+                +"查询订单列表的订单类别编码集合为"+JsonUtil.toJson(orderCategoryQueryList));
         //查询主订单列表
         erpOrderQueryRequest.setOrderLevel(ErpOrderLevelEnum.PRIMARY.getCode());
         PagesRequest page = new PagesRequest();
