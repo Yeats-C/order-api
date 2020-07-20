@@ -527,10 +527,11 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
             }
             //查询商品详情集合
             Map<String, ErpSkuDetail> skuDetailMap = bridgeProductService.getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), productSkuRequest2List);
-
-            //把库存不足的行变成非选中状态
-            uncheckUnderStockLine(cartLineList, skuDetailMap, auth);
-
+            //直送商品不校验库存
+            if(!erpCartQueryRequest.getProductType().equals(ErpOrderTypeEnum.DIRECT_SEND.getCode())) {
+                //把库存不足的行变成非选中状态
+                uncheckUnderStockLine(cartLineList, skuDetailMap, auth);
+            }
             //----------开始组装楼层----------
 
             //活动id 购物车商品行
