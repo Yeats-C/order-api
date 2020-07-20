@@ -1722,9 +1722,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //门店实收数量 ---
             Long actualInboundCount = 0L;
             //已退货数量
-            Long returnProductCount = 0L;
+            Long quantityReturnedCount = 0L;
             //申请退货数量
-            Long actualReturnProductCount = 0L;
+            Long returnProductCount = 0L;
             for (ReturnWholesaleOrderDetail sd : details1) {
                 ReturnOrderDetail detail = new ReturnOrderDetail();
                     //商品属性 0新品1残品
@@ -1735,11 +1735,16 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     //门店实收数量  ----
                     actualInboundCount = sd.getActualInboundCount();
                     //已退数量    ----
-                    returnProductCount = sd.getReturnProductCount() == null ? 0L : sd.getReturnProductCount();
-                    actualReturnProductCount = sd.getActualReturnProductCount();
+                    quantityReturnedCount = sd.getQuantityReturnedCount() == null ? 0L : sd.getQuantityReturnedCount();
+                    //申请退货数量
+                    returnProductCount = sd.getReturnProductCount();
                    //均摊后的金额乘以退货数量
                     BigDecimal preferentialAmount = sd.getPreferentialAmount();
-                    BigDecimal multiply = preferentialAmount.multiply(BigDecimal.valueOf(sd.getActualReturnProductCount()));
+                    BigDecimal multiply = preferentialAmount.multiply(BigDecimal.valueOf(sd.getReturnProductCount()));
+                    //将分摊后单价-赋值为-商品单价
+                    sd.setProductAmount(preferentialAmount);
+                    //将退货金额赋值为商品总价
+                    sd.setTotalProductAmount(multiply);
                     returnOrderAmount = returnOrderAmount.add(multiply);
                     BeanUtils.copyProperties(sd, detail);
                     detail.setCreateTime(now);
@@ -1765,8 +1770,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             log.info("发起批发退货--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}", record.getOrderStoreCode(), ErpOrderReturnStatusEnum.WAIT, null, record.getCreateById(), record.getCreateByName());
             erpOrderInfoService.updateOrderReturnStatus(record.getOrderStoreCode(), ErpOrderReturnRequestEnum.WAIT, null, record.getCreateById(), record.getCreateByName());
             log.info("发起批发退货--修改原始订单数据结束");
-            if((actualInboundCount - returnProductCount) != 0 ){ //说明没有可退的商品数量，修改订单状态
-                if(((actualInboundCount - returnProductCount) - actualReturnProductCount) == 0){
+            if((actualInboundCount - quantityReturnedCount) != 0 ){
+                if(((actualInboundCount - quantityReturnedCount) - returnProductCount) == 0){//说明没有可退的商品数量，修改订单状态
                     log.info("开始-----修改原订单的退货流程节点状态");
                     erpOrderInfoDao.updateOrderReturnProcess(reqVo.getOrderStoreCode());
                     log.info("结束------修改原订单的退货流程节点状态");
