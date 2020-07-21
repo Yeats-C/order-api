@@ -303,7 +303,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 addList.add(erpOrderCartInfo);
             }
             //直送商品不校验库存
-            if(!erpCartAddRequest.getProductType().equals(ErpOrderTypeEnum.DIRECT_SEND.getCode())){
+            if(erpCartAddRequest.getProductType().equals(ErpOrderTypeEnum.DISTRIBUTION.getCode())){
                 if (cartAmount > skuDetail.getStockNum()) {
                     throw new BusinessException("商品" + skuDetail.getSkuName()+"BATCH_INFO_CODE"+item.getBatchInfoCode()+ "库存不足");
                 }
@@ -528,7 +528,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
             //查询商品详情集合
             Map<String, ErpSkuDetail> skuDetailMap = bridgeProductService.getProductSkuDetailMap(store.getProvinceId(), store.getCityId(), productSkuRequest2List);
             //直送商品不校验库存
-            if(!erpCartQueryRequest.getProductType().equals(ErpOrderTypeEnum.DIRECT_SEND.getCode())) {
+            if(erpCartQueryRequest.getProductType().equals(ErpOrderTypeEnum.DISTRIBUTION.getCode())){
                 //把库存不足的行变成非选中状态
                 uncheckUnderStockLine(cartLineList, skuDetailMap, auth);
             }
@@ -782,8 +782,11 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
             }
             item.setStockNum(skuDetail.getStockNum());
             item.setIsSale(skuDetail.getIsSale());
-            if (item.getAmount() > skuDetail.getStockNum()) {
-                throw new BusinessException("商品" + skuDetail.getSkuName() + "库存不足");
+            //直送商品不校验库存
+            if(erpCartQueryRequest.getProductType().equals(ErpOrderTypeEnum.DISTRIBUTION.getCode())){
+                if (item.getAmount() > skuDetail.getStockNum()) {
+                    throw new BusinessException("商品" + skuDetail.getSkuName() + "库存不足");
+                }
             }
             skuStockNumMap.put(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode(), skuDetail.getStockNum() - item.getAmount());
         }
