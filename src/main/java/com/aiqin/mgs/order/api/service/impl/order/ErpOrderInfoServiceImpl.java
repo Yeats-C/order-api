@@ -1,12 +1,12 @@
 package com.aiqin.mgs.order.api.service.impl.order;
 
-import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayWayEnum;
 import com.aiqin.mgs.order.api.dao.OrderSplitsNumDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
+import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.OrderSplitsNum;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftQuotasUseDetail;
@@ -20,6 +20,8 @@ import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCarryOutNextStepRequ
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSignRequest;
+import com.aiqin.mgs.order.api.domain.request.order.*;
+import com.aiqin.mgs.order.api.domain.response.ReturnOrder;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderItemSplitGroupResponse;
 import com.aiqin.mgs.order.api.service.CouponRuleService;
 import com.aiqin.mgs.order.api.service.SequenceGeneratorService;
@@ -80,6 +82,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     private BridgeProductService bridgeProductService;
     @Resource
     private GiftQuotasUseDetailService giftQuotasUseDetailService;
+    @Resource
+    private ReturnOrderInfoDao returnOrderInfoDao;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -984,6 +988,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         boolean returnStartFlag = false;
         //是否全部退货
         boolean returnEndFlag = true;
+        //商品实收数量 ---加
+        Long actualInboundCount = 0L;
         for (ErpOrderItem item :
                 newItemList) {
             if (ErpProductGiftEnum.GIFT.getCode().equals(item.getProductType())) {
@@ -997,6 +1003,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 //如果有一行有退货数量，则算部分退货
                 returnStartFlag = true;
             }
+            //获取门店实收数量 --加
+            actualInboundCount = item.getActualInboundCount();
         }
 
         if (returnEndFlag) {
@@ -1007,6 +1015,22 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             order.setOrderReturn(ErpOrderReturnStatusEnum.NONE.getCode());
         }
         this.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
+        //判断是否还有可退数量-没有就不能发起退货  ---加
+        ReturnOrder returnOrder = returnOrderInfoDao.selectReturnOrderCode(orderCode);
+        Long quantityReturnedCount = 0L;
+        Long returnProductCount = 0L;
+        if (returnOrder == null){
+        }else {
+          quantityReturnedCount = returnOrder.getQuantityReturnedCount() == null? 0L : returnOrder.getQuantityReturnedCount();
+         returnProductCount = returnOrder.getReturnProductCount();
+        }
+       if((returnProductCount + quantityReturnedCount) == actualInboundCount){
+           //修改原订单中的退货流程状态
+           erpOrderInfoDao.updateOrderReturnProcess(orderCode);
+       }else {
+           //修改原订单中的退货流程状态
+           erpOrderInfoDao.updateOrderReturnProcessStatus(orderCode);
+       }
     }
 
     /**

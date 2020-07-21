@@ -4,6 +4,7 @@ import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.orderList.OrderListVo3;
 import com.aiqin.mgs.order.api.domain.request.returngoods.QueryReturnOrderManagementReqVO;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
+import com.aiqin.mgs.order.api.domain.response.ReturnOrder;
 import com.aiqin.mgs.order.api.domain.response.ReturnRefundStatus;
 import com.aiqin.mgs.order.api.domain.response.returngoods.QueryReturnOrderManagementRespVO;
 import com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderDetailRespVO;
@@ -92,4 +93,6 @@ public interface ReturnOrderInfoDao {
     Integer selectType(String returnOrderCode);
     //查询统一订单上次退货是否退款成功
     ReturnRefundStatus selectRefundStatus(String orderStoreCode);
+    //查询退货单编码
+    ReturnOrder selectReturnOrderCode(String orderCode);
 }
