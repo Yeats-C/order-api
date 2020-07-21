@@ -293,7 +293,13 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
                 orderInfo.setChannelOrderAmount(orderInfo.getTotalProductAmount());
                 //商品渠道总金额
                 orderInfo.setProductChannelTotalAmount(orderInfo.getTotalProductAmount());
-
+                if("01".equals(orderInfo.getCompanyCode())){
+                    orderInfo.setChannelCode("1");
+                    orderInfo.setChannelName("爱亲科技");
+                }else if("14".equals(orderInfo.getCompanyCode())){
+                    orderInfo.setChannelCode("4");
+                    orderInfo.setChannelName("爱亲母婴");
+                }
 
                 String url = purchaseHost + "/order/aiqin/sale";
                 HttpClient httpGet = HttpClient.post(url).json(orderInfo).timeout(10000);

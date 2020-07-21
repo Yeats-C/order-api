@@ -500,5 +500,13 @@ public class ErpOrderInfo {
     @ApiModelProperty(value = "商品渠道总金额")
     @JsonProperty("product_channel_total_amount")
     private BigDecimal productChannelTotalAmount;
+
+    @ApiModelProperty(value = "渠道编码")
+    @JsonProperty("channel_code")
+    private String channelCode;
+
+    @ApiModelProperty(value = "渠道名称")
+    @JsonProperty("channel_name")
+    private String channelName;
     /**************************************供应链新需求字段结束**************************************/
 }
