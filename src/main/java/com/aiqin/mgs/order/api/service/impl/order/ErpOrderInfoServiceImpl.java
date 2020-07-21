@@ -901,6 +901,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         this.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
         //判断是否还有可退数量-没有就不能发起退货  ---加
         ReturnOrder returnOrder = returnOrderInfoDao.selectReturnOrderCode(orderCode);
+        logger.info("查询退货数据中-上单-已退货数量和申请退货数量:{}",returnOrder);
         Long quantityReturnedCount = 0L;
         Long returnProductCount = 0L;
         if (returnOrder == null){
