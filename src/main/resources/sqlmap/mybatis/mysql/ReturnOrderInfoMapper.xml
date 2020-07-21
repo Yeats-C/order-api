@@ -1497,12 +1497,13 @@
       WHERE a.order_store_code = #{orderStoreCode} ORDER BY a.create_time  DESC LIMIT 1
   </select>
   <select id="selectReturnOrderCode" resultType="com.aiqin.mgs.order.api.domain.response.ReturnOrder">
-    select b.return_product_count as returnProductCount,b.quantity_returned_count as quantityReturnedCount,
+       select b.return_product_count as returnProductCount,b.quantity_returned_count as quantityReturnedCount,
            b.return_order_code as returnOrderCode
     from return_order_info a LEFT JOIN return_order_detail b
     on a.return_order_code = b.return_order_code
-    where a.order_store_code = #{orderCode}
+    where a.order_store_code = #{orderCode} ORDER BY a.create_time  DESC LIMIT 1
   </select>
+
 
   <update id="updateReallyReturn" parameterType="java.util.List">
     update return_order_info
