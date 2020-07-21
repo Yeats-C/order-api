@@ -336,10 +336,10 @@ public class CopartnerAreaServiceImpl implements  CopartnerAreaService {
 			} else {
 				copartnerAreaId = IdUtil.uuid();
 			}
-			if (!copartnerAreaIdOld.equals("")) {
+//			if (!copartnerAreaIdOld.equals("")) {
 				//修改关联关系
 				copartnerAreaDao.updateUpId(copartnerAreaIdOld, copartnerAreaId, param.getCopartnerAreaDetail().getCopartnerAreaName());
-			}
+//			}
 			//基本信息
 			if (param.getCopartnerAreaDetail() != null) {
 				CopartnerAreaVo vo = new CopartnerAreaVo();
@@ -384,16 +384,18 @@ public class CopartnerAreaServiceImpl implements  CopartnerAreaService {
 					List<String> collect = copartnerAreaTwoCompany.stream().map(CopartnerAreaDetail::getCopartnerAreaId).collect(Collectors.toList());
 					//要新增的集合合伙人公司
 					List<CopartnerAreaDetail> collect1 = param.getDownCompanyList().stream().filter(CopartnerAreaDetail -> !collect.contains(CopartnerAreaDetail.getCopartnerAreaId())).collect(Collectors.toList());
-					log.info("筛选后-要新增的-合伙人公司：{}",collect1);
+					log.info("筛选后-要新增的-合伙人公司：{}", collect1);
 					//转成一个id集合
 					List<String> copartnerAreaIdList = collect1.stream().map(CopartnerAreaDetail::getCopartnerAreaId).collect(Collectors.toList());
-					log.info("筛选后-要新增的-合伙人公司的id：{}",copartnerAreaIdList);
+					log.info("筛选后-要新增的-合伙人公司的id：{}", copartnerAreaIdList);
 					CopartnerAreaDetail copartnerAreaDetail = new CopartnerAreaDetail();
 					copartnerAreaDetail.setCompanyIdList(copartnerAreaIdList);
 					copartnerAreaDetail.setCopartnerAreaIdUp(copartnerAreaId);
 					copartnerAreaDetail.setCopartnerAreaNameUp(param.getCopartnerAreaDetail().getCopartnerAreaName());
-					log.info("编辑新的二级合伙人公司-上级id和名称-实体：{}",copartnerAreaDetail);
+					log.info("编辑新的二级合伙人公司-上级id和名称-实体：{}", copartnerAreaDetail);
 					copartnerAreaDao.updateCopartnerAreaUp(copartnerAreaDetail);
+				}else if(param.getDownCompanyList().size()  == copartnerAreaTwoCompany.size()){  //如果都为0 就不进行操作
+
 				}else {
 					//编辑的时候会删除掉合伙人公司
 					//下辖公司的所有id
