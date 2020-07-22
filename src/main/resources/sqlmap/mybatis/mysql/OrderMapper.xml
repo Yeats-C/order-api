@@ -407,6 +407,9 @@
         <if test="receiveCode!=null and receiveCode!='' ">
             and a.receive_code =#{receiveCode}
         </if>
+        <if test="payType!=null and payType!='' ">
+            and a.pay_type =#{payType}
+        </if>
     </select>
 
 

@@ -153,4 +153,8 @@ public class ReturnOrderReqVo implements Serializable {
 //    @JsonProperty("payment_name")
     private String paymentName;
 
+    @ApiModelProperty("订单产品类型 1.B2B 2.B2C")
+//    @JsonProperty("order_product_type")
+    private String orderProductType;
+
 }

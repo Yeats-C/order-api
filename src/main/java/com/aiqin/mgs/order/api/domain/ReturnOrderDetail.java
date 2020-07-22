@@ -152,6 +152,9 @@ public class ReturnOrderDetail {
     @ApiModelProperty("配送中心名称 ---传")
     private String transportCenterName;
 
+    @ApiModelProperty(value = "已退货数量 ------传 ")
+    private Long quantityReturnedCount;
+
 
     /***仅A品优惠金额，用于统计*/
     @ApiModelProperty(value = "本行A品券优惠总额度")

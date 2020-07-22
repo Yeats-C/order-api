@@ -132,8 +132,8 @@ public class FirstReportController {
             cell3.setCellStyle(cellStyle);
             //第三行
             Row row2 = sheet.createRow(2);
-            String[] titles = {"经营区域", "销售金额", "同期", "上期", "同比", "环比", "销售金额",
-                    "同期", "上期", "同比", "环比", "销售金额", "同期", "上期", "同比", "环比"};
+            String[] titles = {"经营区域", "销售金额", "同期", "上期", "同比", "环比", "本期",
+                    "同期", "上期", "同比", "环比", "本期", "同期", "上期", "同比", "环比"};
             for (int i = 0; i < titles.length; i++) {
                 Cell cell4 = row2.createCell(i);
                 cell4.setCellValue(titles[i]);
@@ -254,8 +254,8 @@ public class FirstReportController {
             cell3.setCellStyle(cellStyle);
             //第三行
             Row row2 = sheet.createRow(2);
-            String[] titles = {"年份","经营区域", "销售金额", "同期", "上期", "同比", "环比", "销售金额",
-                    "同期", "上期", "同比", "环比", "销售金额", "同期", "上期", "同比", "环比"};
+            String[] titles = {"月份","经营区域", "销售金额", "同期", "上期", "同比", "环比", "本期",
+                    "同期", "上期", "同比", "环比", "本期", "同期", "上期", "同比", "环比"};
             for (int i = 0; i < titles.length; i++) {
                 Cell cell4 = row2.createCell(i);
                 cell4.setCellValue(titles[i]);
