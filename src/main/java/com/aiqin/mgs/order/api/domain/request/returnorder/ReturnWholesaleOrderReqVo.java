@@ -155,4 +155,8 @@ public class ReturnWholesaleOrderReqVo implements Serializable {
 //    @JsonProperty("store_code")
     private String storeCode;
 
+    @ApiModelProperty("订单产品类型 1.B2B 2.B2C")
+//    @JsonProperty("order_product_type")
+    private String orderProductType;
+
 }

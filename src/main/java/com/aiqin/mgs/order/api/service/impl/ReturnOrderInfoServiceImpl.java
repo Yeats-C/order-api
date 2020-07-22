@@ -154,6 +154,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 //        String storeCode = reqVo.getStoreCode();
 //        if (!storeCode.equals(null)){
             reqVo.setBusinessForm(0);
+        //订单产品类型 1.B2B 2.B2C
+        reqVo.setOrderProductType("1");
 //        }
         ReturnOrderInfo record = new ReturnOrderInfo();
         Date now = new Date();
@@ -1670,6 +1672,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             }
             //售后类型
             reqVo.setReturnOrderType(2);
+            //订单产品类型 1.B2B 2.B2C'
+            reqVo.setOrderProductType("1");
             //加盟商和合伙人
             ReturnOrderFranchisee returnOrderFranchisee = erpOrderInfoDao.selectFranchisee(reqVo.getOrderStoreCode());
             if (returnOrderFranchisee != null) {
