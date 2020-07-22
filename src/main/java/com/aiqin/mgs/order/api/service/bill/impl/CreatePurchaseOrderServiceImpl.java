@@ -277,8 +277,8 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
 
                 //平台(0:爱亲(新系统) 1:DL)
                 orderInfo.setPlatformType(0);
-                //订单产品类型 0.B2B 1.B2C
-                orderInfo.setOrderProductType("0");
+                //订单产品类型 1.B2B 2.B2C
+                orderInfo.setOrderProductType("1");
                 //合伙人编码
                 orderInfo.setPartnerCode(orderInfo.getCopartnerAreaId());
                 //合伙人名称
