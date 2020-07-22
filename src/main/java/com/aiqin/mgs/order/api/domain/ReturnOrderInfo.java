@@ -396,4 +396,8 @@ public class ReturnOrderInfo {
     @ApiModelProperty(value = "是否需要发票 0是 1否 --传")
     private Integer whetherInvoice;
 
+    @ApiModelProperty("订单产品类型 1.B2B 2.B2C")
+//    @JsonProperty("order_product_type")
+    private String orderProductType;
+
 }
