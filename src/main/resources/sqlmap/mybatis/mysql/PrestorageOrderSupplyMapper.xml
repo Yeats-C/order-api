@@ -183,6 +183,9 @@
         <if test="receiveCode!=null and receiveCode!='' ">
             and a.receive_code =#{receiveCode}
         </if>
+        <if test="payType!=null and payType!='' ">
+            and a.pay_type =#{payType}
+        </if>
         ORDER BY a.create_time DESC
         <if test="icount!=null ">
             limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
@@ -241,6 +244,9 @@
         </if>
         <if test="receiveCode!=null and receiveCode!='' ">
             and a.receive_code =#{receiveCode}
+        </if>
+        <if test="payType!=null and payType!='' ">
+            and a.pay_type =#{payType}
         </if>
     </select>
 </mapper>
