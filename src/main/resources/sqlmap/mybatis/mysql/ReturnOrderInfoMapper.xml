@@ -101,6 +101,7 @@
     <result column="copartner_area_name" property="copartnerAreaName" jdbcType="VARCHAR" />
     <result column="business_form" property="businessForm" jdbcType="BIT" />
     <result column="whether_invoice" property="whetherInvoice" jdbcType="BIT"/>
+    <result column="order_product_type" property="orderProductType" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, return_order_id, return_order_code, order_store_code, company_code, company_name,
@@ -120,7 +121,7 @@
     create_by_id, create_by_name, update_by_id, update_by_name, create_time, update_time,
     source_type, order_success, return_money_type, order_category, review_operator_id, review_time,
     return_good_amount,actual_return_good_amount,really_return,complimentary_amount,top_coupon_discount_amount,franchisee_code,
-    franchisee_name,copartner_area_id,copartner_area_name,business_form,whether_invoice
+    franchisee_name,copartner_area_id,copartner_area_name,business_form,whether_invoice,order_product_type
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
@@ -421,6 +422,9 @@
       <if test="whetherInvoice != null ">
         whether_invoice,
       </if>
+      <if test="orderProductType != null">
+        order_product_type,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -707,6 +711,9 @@
       </if>
       <if test="whetherInvoice != null">
         #{whetherInvoice},
+      </if>
+      <if test="orderProductType != null">
+         #{orderProductType},
       </if>
     </trim>
   </insert>
