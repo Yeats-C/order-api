@@ -184,7 +184,7 @@
             and a.receive_code =#{receiveCode}
         </if>
         <if test="payType!=null and payType!='' ">
-            and a.pay_type =#{payType}
+            and o.pay_type =#{payType}
         </if>
         ORDER BY a.create_time DESC
         <if test="icount!=null ">
@@ -204,7 +204,7 @@
             <foreach collection="listDistributorId" item="distributorId" separator=",">
                 '${distributorId}'
             </foreach>
-            )
+            )prestorageOrderList
         </if>
         <if test="distributorCode!=null and distributorCode!=''">
             and a.distributor_code = #{distributorCode}
@@ -246,7 +246,7 @@
             and a.receive_code =#{receiveCode}
         </if>
         <if test="payType!=null and payType!='' ">
-            and a.pay_type =#{payType}
+            and o.pay_type =#{payType}
         </if>
     </select>
 </mapper>
