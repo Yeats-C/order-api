@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.service.impl;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.dao.StoreMonthDao;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
+import com.aiqin.mgs.order.api.domain.StoreMonthResponse;
 import com.aiqin.mgs.order.api.service.StoreMonthService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -12,8 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,5 +59,40 @@ public class StoreMonthServiceImpl implements StoreMonthService {
             return HttpResponse.success(storeMonthDao.selectStoreByName(storeInfo));
         }
         return null;
+    }
+
+    @Override
+    public HttpResponse selectStoreMonths(List<String> storeAll) {
+        LOGGER.info("查询门店上月销量的入参：{}" + storeAll);
+        List<StoreMonthResponse> storeMonthResponses = new ArrayList<>();
+        List<StoreInfo> storeInfo = new ArrayList<>();
+        if (null != storeAll || !storeAll.isEmpty()) {
+            for (String storeName : storeAll) {
+                StoreInfo storeInfo1 = new StoreInfo();
+                Matcher isNum = NUMBER_PATTERN.matcher(storeName);
+                if (isNum.matches()) {//如果为纯数字，则为门店编码
+                    storeInfo1.setStoreCode(storeName);
+                } else {//门店名称
+                    storeInfo1.setStoreName(storeName);
+                }
+                storeInfo.add(storeInfo1);
+            }
+        }
+        if (null != storeInfo || !storeInfo.isEmpty()) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM");
+            Calendar instance = Calendar.getInstance();
+            Date date = new Date();
+            instance.setTime(date);
+            instance.add(Calendar.MONTH, -1);
+            date = instance.getTime();
+            String format = simpleDateFormat.format(date);
+            for (StoreInfo s : storeInfo) {
+                StoreMonthResponse storeMonthResponse = new StoreMonthResponse();
+                s.setStatYearMonth(format);
+                storeMonthResponse = storeMonthDao.selectStoreByNames(s);
+                storeMonthResponses.add(storeMonthResponse);
+            }
+        }
+        return HttpResponse.success(storeMonthResponses);
     }
 }

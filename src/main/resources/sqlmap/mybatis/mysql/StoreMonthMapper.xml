@@ -17,6 +17,18 @@
             </if>
         </where>
     </select>
-
+    <select id="selectStoreByNames" resultType="com.aiqin.mgs.order.api.domain.StoreMonthResponse">
+        SELECT store_name as storeName,store_code as storeCode,pay_money as payMoney
+        FROM bi_order_payment_month
+        <where>
+            stat_year_month = #{statYearMonth}
+            <if test="storeName != null and storeName != ''">
+                and store_name LIKE CONCAT('%',#{storeName},'%')
+            </if>
+            <if test="storeCode != null and storeCode != ''">
+                and store_code LIKE CONCAT('%',#{storeCode},'%')
+            </if>
+        </where>
+    </select>
 
 </mapper>
