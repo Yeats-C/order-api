@@ -544,6 +544,9 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             }
 
             for(ErpOrderItem item:order.getItemList()){
+                if(null==item.getBatchInfoCode()){
+                    continue;
+                }
                 StockBatchInfoRequest stockBatchInfoRequest=new StockBatchInfoRequest();
                 stockBatchInfoRequest.setBatchCode(item.getBatchCode());
                 stockBatchInfoRequest.setBatchInfoCode(item.getBatchInfoCode());
