@@ -749,6 +749,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             payRequest.setOrderType(ErpRequestPayOperationTypeEnum.TYPE_2.getCode());
             payRequest.setFranchiseeId(order.getFranchiseeId());
             payRequest.setStoreName(order.getStoreName());
+            payRequest.setStoreCode(order.getStoreCode());
             payRequest.setStoreId(order.getStoreId());
             payRequest.setTransactionType(processTypeEnum.getPayTransactionTypeEnum().getValue());
             payRequest.setPayOrderType(orderTypeEnum.getPayOrderType().getCode());
