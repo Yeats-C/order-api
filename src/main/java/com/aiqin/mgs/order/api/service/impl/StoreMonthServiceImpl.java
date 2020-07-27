@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.service.impl;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.dao.StoreMonthDao;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
+import com.aiqin.mgs.order.api.domain.StoreInfoMonthSales;
 import com.aiqin.mgs.order.api.domain.StoreMonthResponse;
 import com.aiqin.mgs.order.api.service.StoreMonthService;
 import lombok.extern.slf4j.Slf4j;
@@ -65,20 +66,7 @@ public class StoreMonthServiceImpl implements StoreMonthService {
     public HttpResponse selectStoreMonths(List<String> storeAll) {
         LOGGER.info("查询门店上月销量的入参：{}" + storeAll);
         List<StoreMonthResponse> storeMonthResponses = new ArrayList<>();
-        List<StoreInfo> storeInfo = new ArrayList<>();
         if (null != storeAll || !storeAll.isEmpty()) {
-            for (String storeName : storeAll) {
-                StoreInfo storeInfo1 = new StoreInfo();
-                Matcher isNum = NUMBER_PATTERN.matcher(storeName);
-                if (isNum.matches()) {//如果为纯数字，则为门店编码
-                    storeInfo1.setStoreCode(storeName);
-                } else {//门店名称
-                    storeInfo1.setStoreName(storeName);
-                }
-                storeInfo.add(storeInfo1);
-            }
-        }
-        if (null != storeInfo || !storeInfo.isEmpty()) {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM");
             Calendar instance = Calendar.getInstance();
             Date date = new Date();
@@ -86,12 +74,11 @@ public class StoreMonthServiceImpl implements StoreMonthService {
             instance.add(Calendar.MONTH, -1);
             date = instance.getTime();
             String format = simpleDateFormat.format(date);
-            for (StoreInfo s : storeInfo) {
-                StoreMonthResponse storeMonthResponse = new StoreMonthResponse();
-                s.setStatYearMonth(format);
-                storeMonthResponse = storeMonthDao.selectStoreByNames(s);
-                storeMonthResponses.add(storeMonthResponse);
-            }
+            StoreInfoMonthSales storeInfoMonthSales = new StoreInfoMonthSales();
+            storeInfoMonthSales.setStatYearMonth(format);
+            storeInfoMonthSales.setStoreCodeList(storeAll);
+            LOGGER.info("查询门店上月销量的参数对象------> " + storeInfoMonthSales);
+            storeMonthResponses = storeMonthDao.selectAllStoreMonth(storeInfoMonthSales);
         }
         return HttpResponse.success(storeMonthResponses);
     }
