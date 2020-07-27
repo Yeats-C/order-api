@@ -158,7 +158,7 @@ public class ErpOrderCartInfo {
 
     @ApiModelProperty("批次日期")
     @JsonProperty(value = "batch_date")
-    private Date batchDate;
+    private String batchDate;
 
     @ApiModelProperty("批次编号")
     @JsonProperty(value = "batch_info_code")

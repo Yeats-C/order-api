@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * 商品信息
@@ -71,7 +70,7 @@ public class ProductInfo {
 
 
     /***批次日期*/
-    private Date batchDate;
+    private String batchDate;
 
     /***批次编号*/
     private String batchInfoCode;
