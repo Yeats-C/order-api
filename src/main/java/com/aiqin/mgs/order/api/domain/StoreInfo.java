@@ -119,4 +119,10 @@ public class StoreInfo {
     @JsonProperty(value = "free_cost_balance")
     private Double freeCostBalance;
 
+
+    //查询门店上月销量用--别删
+    @ApiModelProperty("年月")
+    @JsonProperty(value = "stat_year_month")
+    private String statYearMonth;
+
 }

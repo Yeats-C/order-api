@@ -3,6 +3,8 @@ package com.aiqin.mgs.order.api.service.impl;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.dao.StoreMonthDao;
 import com.aiqin.mgs.order.api.domain.StoreInfo;
+import com.aiqin.mgs.order.api.domain.StoreInfoMonthSales;
+import com.aiqin.mgs.order.api.domain.StoreMonthResponse;
 import com.aiqin.mgs.order.api.service.StoreMonthService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -12,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,5 +60,26 @@ public class StoreMonthServiceImpl implements StoreMonthService {
             return HttpResponse.success(storeMonthDao.selectStoreByName(storeInfo));
         }
         return null;
+    }
+
+    @Override
+    public HttpResponse selectStoreMonths(List<String> storeAll) {
+        LOGGER.info("查询门店上月销量的入参：{}" + storeAll);
+        List<StoreMonthResponse> storeMonthResponses = new ArrayList<>();
+        if (null != storeAll || !storeAll.isEmpty()) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM");
+            Calendar instance = Calendar.getInstance();
+            Date date = new Date();
+            instance.setTime(date);
+            instance.add(Calendar.MONTH, -1);
+            date = instance.getTime();
+            String format = simpleDateFormat.format(date);
+            StoreInfoMonthSales storeInfoMonthSales = new StoreInfoMonthSales();
+            storeInfoMonthSales.setStatYearMonth(format);
+            storeInfoMonthSales.setStoreCodeList(storeAll);
+            LOGGER.info("查询门店上月销量的参数对象------> " + storeInfoMonthSales);
+            storeMonthResponses = storeMonthDao.selectAllStoreMonth(storeInfoMonthSales);
+        }
+        return HttpResponse.success(storeMonthResponses);
     }
 }

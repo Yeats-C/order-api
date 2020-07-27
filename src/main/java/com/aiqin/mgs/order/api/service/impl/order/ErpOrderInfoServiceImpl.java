@@ -21,7 +21,6 @@ import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCarryOutNextStepRequ
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderSignRequest;
-import com.aiqin.mgs.order.api.domain.request.order.*;
 import com.aiqin.mgs.order.api.domain.response.ReturnOrder;
 import com.aiqin.mgs.order.api.domain.response.order.ErpOrderItemSplitGroupResponse;
 import com.aiqin.mgs.order.api.service.CouponRuleService;
@@ -444,10 +443,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_6.getCode());
             this.updateOrderByPrimaryKeySelective(order, auth);
             //删除本地锁库明细
-            for(ErpOrderItemSplitGroupResponse res1:lineSplitGroupList){
-                //删除本地缓存
-                erpStoreLockDetailsService.deleteBySkuCode(orderCode,res1.getSkuCode());
-            }
+//            for(ErpOrderItemSplitGroupResponse res1:lineSplitGroupList){
+//                //删除本地缓存
+//                erpStoreLockDetailsService.deleteBySkuCode(orderCode,res1.getSkuCode());
+//            }
             //根据仓库拆单--添加到子订单发货表中
             if(null!=repertorySplitMap&&repertorySplitMap.size()>0){
                 insertOrderSplitsNum(order.getOrderStoreCode(),repertorySplitMap.size());
