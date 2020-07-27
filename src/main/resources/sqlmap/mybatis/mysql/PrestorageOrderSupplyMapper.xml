@@ -204,7 +204,7 @@
             <foreach collection="listDistributorId" item="distributorId" separator=",">
                 '${distributorId}'
             </foreach>
-            )prestorageOrderList
+            )
         </if>
         <if test="distributorCode!=null and distributorCode!=''">
             and a.distributor_code = #{distributorCode}
