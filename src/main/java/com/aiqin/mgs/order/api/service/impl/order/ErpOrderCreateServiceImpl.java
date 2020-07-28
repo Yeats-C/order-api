@@ -574,7 +574,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             if (!productMap.containsKey(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode())) {
                 // 此处查询单个sku详情增加批次信息【购物车已经选择了批次】和销售库特卖库标识
                 //获取商品详情
-                ProductInfo product = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, item.getSkuCode(),item.getWarehouseTypeCode(),item.getBatchInfoCode());
+                ProductInfo product = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, item.getSkuCode(),item.getWarehouseTypeCode(),item.getBatchInfoCode(),storeInfo.getProvinceId(),storeInfo.getCityId());
                 if (product == null) {
                     throw new BusinessException("未获取到商品" + item.getSpuName() + "的信息");
                 }
@@ -1378,7 +1378,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             }
 
             //获取商品详情
-            ProductInfo product = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, item.getSkuCode(), null,null);
+            ProductInfo product = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, item.getSkuCode(), null,null,storeInfo.getProvinceId(),storeInfo.getCityId());
             if (product == null) {
                 throw new BusinessException("第" + lineIndex + "行商品不存在");
             }
@@ -2114,7 +2114,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             }
 
             //获取商品详情
-            ProductInfo product = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, item.getSkuCode(),item.getWarehouseTypeCode(),item.getBatchInfoCode());
+            ProductInfo product = erpOrderRequestService.getSkuDetail(OrderConstant.SELECT_PRODUCT_COMPANY_CODE, item.getSkuCode(),item.getWarehouseTypeCode(),item.getBatchInfoCode(),wholesaleCustomer.getProvinceId(),wholesaleCustomer.getCityId());
             if (product == null) {
                 throw new BusinessException("第" + lineIndex + "行商品不存在");
             }
