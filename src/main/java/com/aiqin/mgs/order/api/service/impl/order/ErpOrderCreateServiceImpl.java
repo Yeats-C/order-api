@@ -692,6 +692,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             orderItem.setBatchDate(productInfo.getBatchDate());
             orderItem.setBatchInfoCode(productInfo.getBatchInfoCode());
             orderItem.setWarehouseTypeCode(productInfo.getWarehouseTypeCode());
+            orderItem.setBatchType(productInfo.getBatchType());
 
             //活动类型
             orderItem.setActivityType(item.getActivityType());

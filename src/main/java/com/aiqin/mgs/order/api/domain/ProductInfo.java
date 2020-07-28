@@ -78,4 +78,7 @@ public class ProductInfo {
     /***传入库房编码:1:销售库，2:特卖库*/
     private String warehouseTypeCode;
 
+    /***批次类型 0：月份批次 1：非月份批次*/
+    private Integer batchType;
+
 }

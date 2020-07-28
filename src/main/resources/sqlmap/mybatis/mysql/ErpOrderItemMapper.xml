@@ -72,7 +72,8 @@
         transport_center_code as transportCenterCode,
         transport_center_name as transportCenterName,
         warehouse_code as warehouseCode,
-        warehouse_name as warehouseName
+        warehouse_name as warehouseName,
+        batch_type as batchType
         from order_store_detail
         where 1 = 1
         <if test=" id != null and id != '' ">
@@ -184,7 +185,7 @@
                                        use_status, create_by_id, create_by_name, update_by_id, update_by_name, create_time,
                                        update_time,top_coupon_discount_amount,top_coupon_amount,batch_code,batch_date
                                        ,warehouse_type_code,batch_info_code,transport_center_code,transport_center_name,
-                                       warehouse_code,warehouse_name)
+                                       warehouse_code,warehouse_name,batch_type)
         values (#{orderInfoDetailId}, #{orderStoreId}, #{orderStoreCode}, #{spuCode}, #{spuName},
                 #{skuCode}, #{skuName}, #{productPropertyCode}, #{productPropertyName}, #{supplierCode},
                 #{supplierName},
@@ -199,7 +200,7 @@
                 #{useStatus}, #{createById}, #{createByName}, #{updateById},
                 #{updateByName}, sysdate(), sysdate(),#{topCouponDiscountAmount},#{topCouponAmount},#{batchCode}
                 ,#{batchDate},#{warehouseTypeCode},#{batchInfoCode},#{transportCenterCode},#{transportCenterName},
-                #{warehouseCode},#{warehouseName})
+                #{warehouseCode},#{warehouseName},#{batchType})
     </insert>
 
     <select id="getProductSales" resultType="java.math.BigDecimal" parameterType="com.aiqin.mgs.order.api.domain.Activity">

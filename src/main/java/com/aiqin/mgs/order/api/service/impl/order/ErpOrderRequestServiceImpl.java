@@ -138,6 +138,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             //如果批次信息List不为空
             if(null!=data.getBatchList()&&data.getBatchList().size()>0){
                 product.setPrice(data.getBatchList().get(0).getBatchPrice());
+                product.setBatchType(data.getBatchList().get(0).getBatchType());
             }
 
         } catch (BusinessException e) {
@@ -281,6 +282,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 stockBatchInfoRequest.setSkuCode(item.getSkuCode());
                 stockBatchInfoRequest.setSkuName(item.getSkuName());
                 stockBatchInfoRequest.setWarehouseType(Integer.valueOf(item.getWarehouseTypeCode()));
+                stockBatchInfoRequest.setBatchType(item.getBatchType());
                 if(item.getWarehouseTypeCode().equals("1")){
                     Long count=countMap.get(item.getSkuCode());
                     List<StockBatchInfoRequest> batchList=productMap.get(item.getSkuCode());
@@ -553,6 +555,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 stockBatchInfoRequest.setChangeCount(item.getProductCount());
                 stockBatchInfoRequest.setSkuCode(item.getSkuCode());
                 stockBatchInfoRequest.setSkuName(item.getSkuName());
+                stockBatchInfoRequest.setBatchType(item.getBatchType());
                 stockBatchList.add(stockBatchInfoRequest);
             }
             stockChangeRequest.setStockList(stockList);
