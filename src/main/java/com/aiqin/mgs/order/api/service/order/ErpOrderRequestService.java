@@ -43,7 +43,7 @@ public interface ErpOrderRequestService {
      * @version: v1.0.0
      * @date 2019/12/23 15:06
      */
-    ProductInfo getSkuDetail(String companyCode, String skuCode, String warehouseTypeCode, String batchInfoCode);
+    ProductInfo getSkuDetail(String companyCode, String skuCode, String warehouseTypeCode, String batchInfoCode,String provinceCode,String cityCode);
 
     /**
      * 根据优惠券编码获取优惠券信息
