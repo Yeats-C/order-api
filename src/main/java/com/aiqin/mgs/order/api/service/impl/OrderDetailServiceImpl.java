@@ -290,7 +290,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             LOGGER.error("查询接口--会员管理-会员消费记录异常: {}", e1);
         }
 
-        List<String> projectList = new ArrayList();
+       /* List<String> projectList = new ArrayList();
         String project = "";
         OrderDetailByMemberResponse info = new OrderDetailByMemberResponse();
 
@@ -301,8 +301,9 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 projectList.add(project);
             }
 
-        }
+        }*/
 
+/*
 
         StringBuilder sb = new StringBuilder();
         sb.append(product_ip).append(product_cycle);
@@ -347,6 +348,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                     }
                 }
             }
+*/
 
             //计算总数据量
             Integer totalCount = 0;
@@ -358,10 +360,10 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 //              return HttpResponse.success(OrderPublic.getData(list)); 
             return HttpResponse.success(new PageResData(totalCount, list));
 
-        } catch (Exception e) {
+       /* } catch (Exception e) {
             LOGGER.error("查询接口--会员管理-会员消费记录异常", e);
             return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
-        }
+        }*/
 
     }
 
