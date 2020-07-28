@@ -2061,6 +2061,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                 throw new BusinessException("锁库存失败");
             }
         }
+        //删除购物车商品
+//        deleteOrderProductFromCart(cartProductList);
+        deleteOrderProductFromCart(cartProductList);
         //返回订单
         return order;
     }

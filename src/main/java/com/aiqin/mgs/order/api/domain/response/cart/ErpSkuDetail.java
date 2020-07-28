@@ -110,7 +110,7 @@ public class ErpSkuDetail {
 
     @ApiModelProperty("批次日期")
     @JsonProperty(value = "batch_date")
-    private Date batchDate;
+    private String batchDate;
 
     @ApiModelProperty("批次价格")
     @JsonProperty("batch_price")

@@ -1,7 +1,6 @@
 package com.aiqin.mgs.order.api.domain.request.returnorder;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -43,7 +42,7 @@ public class ReturnWholesaleOrderDetail {
 
     @ApiModelProperty(value = "批次号时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date batchDate;
+    private String batchDate;
 
     @ApiModelProperty(value = "批次号")
     private String batchCode;
