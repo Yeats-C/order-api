@@ -665,7 +665,11 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 }
             }
         }
-
+        //同步订单数据到结算开始
+        ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(order.getOrderStoreId());
+        order.setOrderFee(orderFee);
+        bridgeProductService.settlementSaveOrder(order);
+        //同步订单数据到结算结束
     }
 
     @Override
@@ -821,6 +825,12 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
         }
         /*****************************************分摊计算结束，发放赠品额度end*****************************************/
+
+        /*****************************************同步订单数据到结算开始*****************************************/
+        ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(order.getOrderStoreId());
+        order.setOrderFee(orderFee);
+        bridgeProductService.settlementSaveOrder(order);
+        /*****************************************同步订单数据到结算结束*****************************************/
 
         //首单，修改门店状态
         if (processTypeEnum.getOrderCategoryEnum().isFirstOrder()) {
