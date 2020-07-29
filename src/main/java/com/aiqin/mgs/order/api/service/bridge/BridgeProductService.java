@@ -995,6 +995,7 @@ public class BridgeProductService<main> {
         try {
 
             ErpReturnOrderVo erpOrderVo = new ErpReturnOrderVo();
+            List<ErpReturnOrderVo> erpOrderList = new ArrayList<>();
 
             //退货单号
             erpOrderVo.setReturnOrderCode(order.getReturnOrderCode());
@@ -1011,9 +1012,9 @@ public class BridgeProductService<main> {
             //门店名称
             erpOrderVo.setStoreName(returnOrderInfo.getStoreName());
             //退货类型编码 1:售后退货 2:缺货取消 3:客户拒收
-            erpOrderVo.setOrderTypeCode(ReturnOrderTypeEnum.getEnum(returnOrderInfo.getReturnOrderType()).getCode().toString());
+            erpOrderVo.setOrderTypeCode(ReturnOrderTypeEnum.getEnums(returnOrderInfo.getReturnOrderType()).getCode().toString());
             //退货类型名称
-            erpOrderVo.setOrderTypeName(ReturnOrderTypeEnum.getEnum(returnOrderInfo.getReturnOrderType()).getName());
+            erpOrderVo.setOrderTypeName(ReturnOrderTypeEnum.getEnums(returnOrderInfo.getReturnOrderType()).getName());
             //退货仓库编码
             erpOrderVo.setTransportCenterCode(returnOrderInfo.getTransportCenterCode());
             //仓库名称
@@ -1075,12 +1076,15 @@ public class BridgeProductService<main> {
                 }
                 //退还服纺金
                 info.setSuitCouponMoney(BigDecimal.ZERO);
+                erpReturnOrderProductInfoList.add(info);
             }
+            erpOrderVo.setProdcutList(erpReturnOrderProductInfoList);
+            erpOrderList.add(erpOrderVo);
 
-            log.info("结算保存erp退货订单,参数为={}" + JsonUtil.toJson(erpOrderVo));
+            log.info("结算保存erp退货订单,参数为={}" + JsonUtil.toJson(erpOrderList));
             StringBuilder sb = new StringBuilder();
-            sb.append(settlement).append("/erp/order/save");
-            HttpClient httpClient = HttpClient.post(sb.toString()).json(erpOrderVo);
+            sb.append(settlement).append("/erp/return/order/save");
+            HttpClient httpClient = HttpClient.post(sb.toString()).json(erpOrderList);
             HttpResponse httpResponse = httpClient.action().result(new TypeReference<HttpResponse>() {
             });
             log.info("结算保存erp退货订单结束,返回信息为为={}" + JsonUtil.toJson(httpResponse));

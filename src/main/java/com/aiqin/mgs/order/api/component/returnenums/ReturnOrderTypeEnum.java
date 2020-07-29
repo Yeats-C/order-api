@@ -15,7 +15,8 @@ public enum ReturnOrderTypeEnum {
     OUT_OF_STOCK_TYPE(1,"缺货退货"),
     AFTER_SALE_TYPE(2,"售后退货"),
     WRITE_DOWN_ORDER_TYPE(3,"冲减单"),
-    CANCEL_ORDER(4,"客户取消");
+    CANCEL_ORDER(4,"客户取消"),
+    QUALITY_ISSUES(6,"质量问题");
 
     private Integer code;
 
@@ -33,4 +34,15 @@ public enum ReturnOrderTypeEnum {
         return null;
     }
 
+    public static ReturnOrderTypeEnum getEnums(Integer code) {
+        if (code != null) {
+            for (ReturnOrderTypeEnum item :
+                    ReturnOrderTypeEnum.values()) {
+                if (item.getCode().equals(code)) {
+                    return item;
+                }
+            }
+        }
+        return null;
+    }
 }
