@@ -751,219 +751,222 @@ public class BridgeProductService<main> {
 
     /**
      * 结算保存erp销售订单
-     * @param order
+     * @param list
      * @return
      */
-    public void settlementSaveOrder(ErpOrderInfo order) {
-        log.info("结算保存erp销售订单  参数 order=[{}]"+JsonUtil.toJson(order));
-        if(null==order){
-            log.error("结算保存erp销售订单失败，传入参数为空"+JsonUtil.toJson(order));
-            return;
-        }
-        if(null==order.getItemList()||order.getItemList().size()<=0){
-            log.error("结算保存erp销售订单失败，订单详情数据为空"+JsonUtil.toJson(order));
-            return;
-        }
-        if(null==order.getOrderFee()){
-            log.error("结算保存erp销售订单失败，订单费用数据为空"+JsonUtil.toJson(order));
-            return;
-        }
+    public void settlementSaveOrder(List<ErpOrderInfo> list) {
         try {
-
-
-            ErpOrderVo erpOrderVo = new ErpOrderVo();
-            //商品列表
-            List<ErpOrderProductInfo> erpOrderProductInfoList = new ArrayList<>();
-            int productCount = 0;
-            if (null != order.getItemList() && order.getItemList().size() > 0) {
-                for (ErpOrderItem item : order.getItemList()) {
-                    ErpOrderProductInfo productInfo = new ErpOrderProductInfo();
-                    //订单编码
-                    productInfo.setOrderCode(item.getOrderStoreCode());
-                    //sku编号
-                    productInfo.setSkuCode(item.getSkuCode());
-                    //sku名称
-                    productInfo.setSkuName(item.getSkuName());
-                    //商品品类编码
-                    productInfo.setProductCategoryCode(item.getProductCategoryCode());
-                    //商品品类名称
-                    productInfo.setProductCategoryName(item.getProductCategoryName());
-                    //商品品牌编码
-                    productInfo.setProductBrandCode(item.getProductBrandCode());
-                    //商品品牌名称
-                    productInfo.setProductBrandName(item.getProductBrandName());
-                    //商品属性编码
-                    productInfo.setProductPropertyCode(item.getProductPropertyCode());
-                    //商品属性名称
-                    productInfo.setProductPropertyName(item.getProductPropertyName());
-                    //商品类型 0商品（本品） 1赠品 2兑换赠品
-                    productInfo.setProductType(item.getProductType());
-                    //渠道售价（分销价）
-                    productInfo.setPriceTax(item.getPriceTax());
-                    //活动价
-                    productInfo.setActivityPrice(item.getActivityPrice());
-                    //渠道采购价
-                    productInfo.setPurchaseAmount(item.getPurchaseAmount());
-                    //商品数量
-                    productInfo.setProductCount(item.getProductCount().intValue());
-                    //实发商品数量
-                    if (null != item.getActualProductCount()) {
-                        productInfo.setActualProductCount(item.getActualProductCount().intValue());
-                    } else {
-                        productInfo.setActualProductCount(0);
-                    }
-                    //商品总价
-                    productInfo.setTotalProductAmount(item.getTotalProductAmount());
-                    //分摊后金额
-                    if (null != item.getTotalPreferentialAmount()) {
-                        productInfo.setTotalPreferentialAmount(item.getTotalPreferentialAmount());
-                    } else {
-                        productInfo.setTotalPreferentialAmount(BigDecimal.ZERO);
-                    }
-                    //分摊后单价
-                    if (null != item.getPreferentialAmount()) {
-                        productInfo.setPreferentialAmount(item.getPreferentialAmount());
-                    } else {
-                        productInfo.setPreferentialAmount(BigDecimal.ZERO);
-                    }
-                    //A品券抵扣
-                    if (null != item.getTopCouponAmount()) {
-                        productInfo.setTopCouponMoney(item.getTopCouponAmount());
-                    } else {
-                        productInfo.setTopCouponMoney(BigDecimal.ZERO);
-                    }
-                    //服纺劵抵扣
-                    productInfo.setSuitCouponMoney(BigDecimal.ZERO);
-                    //活动优惠
-                    if(null != item.getTotalAcivityAmount()){
-                        productInfo.setTotalAcivityAmount(item.getTotalAcivityAmount());
-                    }else{
-                        productInfo.setTotalAcivityAmount(BigDecimal.ZERO);
-                    }
-                    //使用赠品额度
-                    if(null!=item.getUsedGiftQuota()){
-                        productInfo.setComplimentaryAmount(item.getUsedGiftQuota());
-                    }else{
-                        productInfo.setComplimentaryAmount(BigDecimal.ZERO);
-                    }
-                    //销项税率
-                    productInfo.setTaxRate(item.getTaxRate());
-                    productCount += item.getProductCount();
-
-                    erpOrderProductInfoList.add(productInfo);
+            List<ErpOrderVo> erpOrderVos = new ArrayList<>();
+            for(ErpOrderInfo order:list) {
+                log.info("结算保存erp销售订单  参数 order=[{}]" + JsonUtil.toJson(order));
+                if (null == order) {
+                    log.error("结算保存erp销售订单失败，传入参数为空" + JsonUtil.toJson(order));
+                    return;
                 }
-                erpOrderVo.setProdcutList(erpOrderProductInfoList);
-            }
-            //订单编码
-            erpOrderVo.setOrderCode(order.getOrderStoreCode());
-            //所属主订单编码
-            erpOrderVo.setMainOrderCode(order.getMainOrderCode());
-            //订单状态  1:已支付 2：已发货
-            erpOrderVo.setOrderStatus(order.getPaymentStatus());
-            //客户编码
-            erpOrderVo.setFranchiseeCode(order.getFranchiseeCode());
-            //客户名称
-            erpOrderVo.setFranchiseeName(order.getFranchiseeName());
-            //门店编码
-            erpOrderVo.setStoreCode(order.getStoreCode());
-            //门店名称
-            erpOrderVo.setStoreName(order.getStoreName());
-            //订单类型编码 2直送 1配送 3辅采直送
-            erpOrderVo.setOrderTypeCode(order.getOrderTypeCode());
-            //订单类型名称
-            erpOrderVo.setOrderTypeName(order.getOrderTypeName());
-            //订单类别编码 1:首单配送 2:首单赠送 3:首单货架 4:货架补货 5:配送补货 6:游乐设备 7:首单直送 8直送补货
-            erpOrderVo.setOrderCategoryCode(order.getOrderCategoryCode());
-            //订单类别名称
-            erpOrderVo.setOrderCategoryName(order.getOrderCategoryName());
-            //订单总额
-            erpOrderVo.setTotalProductAmount(order.getTotalProductAmount());
-            //实付金额
-            erpOrderVo.setActualTotalProductAmount(order.getActualTotalProductAmount());
-            //订单商品总数量
-            erpOrderVo.setTotalProductCount(productCount);
-            //实发商品总数量
-            if(null!=order.getActualProductCount()){
-                erpOrderVo.setActualTotalProductCount(order.getActualProductCount().intValue());
-            }else{
-                erpOrderVo.setActualTotalProductCount(0);
-            }
-            //总物流费
-            if(null!=order.getDeliverAmount()){
-                erpOrderVo.setDeliverAmount(order.getDeliverAmount());
-            }else{
-                erpOrderVo.setDeliverAmount(BigDecimal.ZERO);
-            }
-            //物流券抵减金额
-            if (null!=order.getGoodsCoupon()){
-                erpOrderVo.setGoodsCoupon(order.getGoodsCoupon());
-            }else{
-                erpOrderVo.setGoodsCoupon(BigDecimal.ZERO);
-            }
-            //账户抵减物流费
-            if(null!=order.getOrderFee().getGoodsCoupon()){
-                erpOrderVo.setAccountGoodsCoupon(order.getOrderFee().getGoodsCoupon());
-            }else{
-                erpOrderVo.setAccountGoodsCoupon(BigDecimal.ZERO);
-            }
-            //活动抵减
-            if(null!=order.getOrderFee().getActivityMoney()){
-                erpOrderVo.setActivityMoney(order.getOrderFee().getActivityMoney());
-            }else{
-                erpOrderVo.setActivityMoney(BigDecimal.ZERO);
-            }
-            //A品券抵减
-            if(null!=order.getTopCouponMoney()){
-                erpOrderVo.setTopCouponMoney(order.getTopCouponMoney());
-            }else{
-                erpOrderVo.setTopCouponMoney(BigDecimal.ZERO);
-            }
-            //服纺券抵减
-            if(null!=order.getSuitCouponMoney()){
-                erpOrderVo.setSuitCouponMoney(order.getSuitCouponMoney());
-            }else{
-                erpOrderVo.setSuitCouponMoney(BigDecimal.ZERO);
-            }
-            //仓库编码
-            erpOrderVo.setTransportCenterCode(order.getTransportCenterCode());
-            //仓库名称
-            erpOrderVo.setTransportCenterName(order.getTransportCenterName());
-            //库房编码
-            erpOrderVo.setWarehouseCode(order.getWarehouseCode());
-            //库房名称
-            erpOrderVo.setWarehouseName(order.getWarehouseName());
-            //下单时间
-            erpOrderVo.setOrderTime(order.getCreateTime());
-            //出库时间
-            erpOrderVo.setOutTime(order.getDeliveryTime());
-            //所属渠道
-            erpOrderVo.setCompanyCode(order.getCompanyCode());
-            //所属渠道名称
-            erpOrderVo.setCompanyName(order.getCompanyName());
-            //物流单号
-            erpOrderVo.setTransportCode(order.getTransportCode());
-            //物流公司编码
-            erpOrderVo.setTransportCompanyCode(order.getTransportCompanyCode());
-            //物流公司名称
-            erpOrderVo.setTransportCompanyName(order.getTransportCompanyName());
-            //使用赠品额度
-            if(null!=order.getOrderFee().getUsedGiftQuota()){
-                erpOrderVo.setComplimentaryAmount(order.getOrderFee().getUsedGiftQuota());
-            }else{
-                erpOrderVo.setComplimentaryAmount(BigDecimal.ZERO);
-            }
-            //A品券作废金额
-            if(null!=order.getOrderFee().getNullifyTopCouponMoney()){
-                erpOrderVo.setNullifyTopCouponMoney(order.getOrderFee().getNullifyTopCouponMoney());
-            }else{
-                erpOrderVo.setNullifyTopCouponMoney(BigDecimal.ZERO);
+                if (null == order.getItemList() || order.getItemList().size() <= 0) {
+                    log.error("结算保存erp销售订单失败，订单详情数据为空" + JsonUtil.toJson(order));
+                    return;
+                }
+                if (null == order.getOrderFee()) {
+                    log.error("结算保存erp销售订单失败，订单费用数据为空" + JsonUtil.toJson(order));
+                    return;
+                }
+
+                ErpOrderVo erpOrderVo = new ErpOrderVo();
+                //商品列表
+                List<ErpOrderProductInfo> erpOrderProductInfoList = new ArrayList<>();
+                int productCount = 0;
+                if (null != order.getItemList() && order.getItemList().size() > 0) {
+                    for (ErpOrderItem item : order.getItemList()) {
+                        ErpOrderProductInfo productInfo = new ErpOrderProductInfo();
+                        //订单编码
+                        productInfo.setOrderCode(item.getOrderStoreCode());
+                        //sku编号
+                        productInfo.setSkuCode(item.getSkuCode());
+                        //sku名称
+                        productInfo.setSkuName(item.getSkuName());
+                        //商品品类编码
+                        productInfo.setProductCategoryCode(item.getProductCategoryCode());
+                        //商品品类名称
+                        productInfo.setProductCategoryName(item.getProductCategoryName());
+                        //商品品牌编码
+                        productInfo.setProductBrandCode(item.getProductBrandCode());
+                        //商品品牌名称
+                        productInfo.setProductBrandName(item.getProductBrandName());
+                        //商品属性编码
+                        productInfo.setProductPropertyCode(item.getProductPropertyCode());
+                        //商品属性名称
+                        productInfo.setProductPropertyName(item.getProductPropertyName());
+                        //商品类型 0商品（本品） 1赠品 2兑换赠品
+                        productInfo.setProductType(item.getProductType());
+                        //渠道售价（分销价）
+                        productInfo.setPriceTax(item.getPriceTax());
+                        //活动价
+                        productInfo.setActivityPrice(item.getActivityPrice());
+                        //渠道采购价
+                        productInfo.setPurchaseAmount(item.getPurchaseAmount());
+                        //商品数量
+                        productInfo.setProductCount(item.getProductCount().intValue());
+                        //实发商品数量
+                        if (null != item.getActualProductCount()) {
+                            productInfo.setActualProductCount(item.getActualProductCount().intValue());
+                        } else {
+                            productInfo.setActualProductCount(0);
+                        }
+                        //商品总价
+                        productInfo.setTotalProductAmount(item.getTotalProductAmount());
+                        //分摊后金额
+                        if (null != item.getTotalPreferentialAmount()) {
+                            productInfo.setTotalPreferentialAmount(item.getTotalPreferentialAmount());
+                        } else {
+                            productInfo.setTotalPreferentialAmount(BigDecimal.ZERO);
+                        }
+                        //分摊后单价
+                        if (null != item.getPreferentialAmount()) {
+                            productInfo.setPreferentialAmount(item.getPreferentialAmount());
+                        } else {
+                            productInfo.setPreferentialAmount(BigDecimal.ZERO);
+                        }
+                        //A品券抵扣
+                        if (null != item.getTopCouponAmount()) {
+                            productInfo.setTopCouponMoney(item.getTopCouponAmount());
+                        } else {
+                            productInfo.setTopCouponMoney(BigDecimal.ZERO);
+                        }
+                        //服纺劵抵扣
+                        productInfo.setSuitCouponMoney(BigDecimal.ZERO);
+                        //活动优惠
+                        if (null != item.getTotalAcivityAmount()) {
+                            productInfo.setTotalAcivityAmount(item.getTotalAcivityAmount());
+                        } else {
+                            productInfo.setTotalAcivityAmount(BigDecimal.ZERO);
+                        }
+                        //使用赠品额度
+                        if (null != item.getUsedGiftQuota()) {
+                            productInfo.setComplimentaryAmount(item.getUsedGiftQuota());
+                        } else {
+                            productInfo.setComplimentaryAmount(BigDecimal.ZERO);
+                        }
+                        //销项税率
+                        productInfo.setTaxRate(item.getTaxRate());
+                        productCount += item.getProductCount();
+
+                        erpOrderProductInfoList.add(productInfo);
+                    }
+                    erpOrderVo.setProdcutList(erpOrderProductInfoList);
+                }
+                //订单编码
+                erpOrderVo.setOrderCode(order.getOrderStoreCode());
+                //所属主订单编码
+                erpOrderVo.setMainOrderCode(order.getMainOrderCode());
+                //订单状态  1:已支付 2：已发货
+                erpOrderVo.setOrderStatus(order.getPaymentStatus());
+                //客户编码
+                erpOrderVo.setFranchiseeCode(order.getFranchiseeCode());
+                //客户名称
+                erpOrderVo.setFranchiseeName(order.getFranchiseeName());
+                //门店编码
+                erpOrderVo.setStoreCode(order.getStoreCode());
+                //门店名称
+                erpOrderVo.setStoreName(order.getStoreName());
+                //订单类型编码 2直送 1配送 3辅采直送
+                erpOrderVo.setOrderTypeCode(order.getOrderTypeCode());
+                //订单类型名称
+                erpOrderVo.setOrderTypeName(order.getOrderTypeName());
+                //订单类别编码 1:首单配送 2:首单赠送 3:首单货架 4:货架补货 5:配送补货 6:游乐设备 7:首单直送 8直送补货
+                erpOrderVo.setOrderCategoryCode(order.getOrderCategoryCode());
+                //订单类别名称
+                erpOrderVo.setOrderCategoryName(order.getOrderCategoryName());
+                //订单总额
+                erpOrderVo.setTotalProductAmount(order.getTotalProductAmount());
+                //实付金额
+                erpOrderVo.setActualTotalProductAmount(order.getActualTotalProductAmount());
+                //订单商品总数量
+                erpOrderVo.setTotalProductCount(productCount);
+                //实发商品总数量
+                if (null != order.getActualProductCount()) {
+                    erpOrderVo.setActualTotalProductCount(order.getActualProductCount().intValue());
+                } else {
+                    erpOrderVo.setActualTotalProductCount(0);
+                }
+                //总物流费
+                if (null != order.getDeliverAmount()) {
+                    erpOrderVo.setDeliverAmount(order.getDeliverAmount());
+                } else {
+                    erpOrderVo.setDeliverAmount(BigDecimal.ZERO);
+                }
+                //物流券抵减金额
+                if (null != order.getGoodsCoupon()) {
+                    erpOrderVo.setGoodsCoupon(order.getGoodsCoupon());
+                } else {
+                    erpOrderVo.setGoodsCoupon(BigDecimal.ZERO);
+                }
+                //账户抵减物流费
+                if (null != order.getOrderFee().getGoodsCoupon()) {
+                    erpOrderVo.setAccountGoodsCoupon(order.getOrderFee().getGoodsCoupon());
+                } else {
+                    erpOrderVo.setAccountGoodsCoupon(BigDecimal.ZERO);
+                }
+                //活动抵减
+                if (null != order.getOrderFee().getActivityMoney()) {
+                    erpOrderVo.setActivityMoney(order.getOrderFee().getActivityMoney());
+                } else {
+                    erpOrderVo.setActivityMoney(BigDecimal.ZERO);
+                }
+                //A品券抵减
+                if (null != order.getTopCouponMoney()) {
+                    erpOrderVo.setTopCouponMoney(order.getTopCouponMoney());
+                } else {
+                    erpOrderVo.setTopCouponMoney(BigDecimal.ZERO);
+                }
+                //服纺券抵减
+                if (null != order.getSuitCouponMoney()) {
+                    erpOrderVo.setSuitCouponMoney(order.getSuitCouponMoney());
+                } else {
+                    erpOrderVo.setSuitCouponMoney(BigDecimal.ZERO);
+                }
+                //仓库编码
+                erpOrderVo.setTransportCenterCode(order.getTransportCenterCode());
+                //仓库名称
+                erpOrderVo.setTransportCenterName(order.getTransportCenterName());
+                //库房编码
+                erpOrderVo.setWarehouseCode(order.getWarehouseCode());
+                //库房名称
+                erpOrderVo.setWarehouseName(order.getWarehouseName());
+                //下单时间
+                erpOrderVo.setOrderTime(order.getCreateTime());
+                //出库时间
+                erpOrderVo.setOutTime(order.getDeliveryTime());
+                //所属渠道
+                erpOrderVo.setCompanyCode(order.getCompanyCode());
+                //所属渠道名称
+                erpOrderVo.setCompanyName(order.getCompanyName());
+                //物流单号
+                erpOrderVo.setTransportCode(order.getTransportCode());
+                //物流公司编码
+                erpOrderVo.setTransportCompanyCode(order.getTransportCompanyCode());
+                //物流公司名称
+                erpOrderVo.setTransportCompanyName(order.getTransportCompanyName());
+                //使用赠品额度
+                if (null != order.getOrderFee().getUsedGiftQuota()) {
+                    erpOrderVo.setComplimentaryAmount(order.getOrderFee().getUsedGiftQuota());
+                } else {
+                    erpOrderVo.setComplimentaryAmount(BigDecimal.ZERO);
+                }
+                //A品券作废金额
+                if (null != order.getOrderFee().getNullifyTopCouponMoney()) {
+                    erpOrderVo.setNullifyTopCouponMoney(order.getOrderFee().getNullifyTopCouponMoney());
+                } else {
+                    erpOrderVo.setNullifyTopCouponMoney(BigDecimal.ZERO);
+                }
+                erpOrderVos.add(erpOrderVo);
             }
 
-            log.info("结算保存erp销售订单,参数为={}" + JsonUtil.toJson(erpOrderVo));
+            log.info("结算保存erp销售订单,参数为={}" + JsonUtil.toJson(erpOrderVos));
 
             StringBuilder sb = new StringBuilder();
             sb.append(settlement).append("/erp/order/save");
-            HttpClient httpClient = HttpClient.post(sb.toString()).json(erpOrderVo);
+            HttpClient httpClient = HttpClient.post(sb.toString()).json(erpOrderVos);
             HttpResponse httpResponse = httpClient.action().result(new TypeReference<HttpResponse>() {
             });
             log.info("结算保存erp销售订单结束,返回信息为为={}" + JsonUtil.toJson(httpResponse));
@@ -995,6 +998,7 @@ public class BridgeProductService<main> {
         try {
 
             ErpReturnOrderVo erpOrderVo = new ErpReturnOrderVo();
+            List<ErpReturnOrderVo> erpOrderList = new ArrayList<>();
 
             //退货单号
             erpOrderVo.setReturnOrderCode(order.getReturnOrderCode());
@@ -1011,9 +1015,9 @@ public class BridgeProductService<main> {
             //门店名称
             erpOrderVo.setStoreName(returnOrderInfo.getStoreName());
             //退货类型编码 1:售后退货 2:缺货取消 3:客户拒收
-            erpOrderVo.setOrderTypeCode(ReturnOrderTypeEnum.getEnum(returnOrderInfo.getReturnOrderType()).getCode().toString());
+            erpOrderVo.setOrderTypeCode(ReturnOrderTypeEnum.getEnums(returnOrderInfo.getReturnOrderType()).getCode().toString());
             //退货类型名称
-            erpOrderVo.setOrderTypeName(ReturnOrderTypeEnum.getEnum(returnOrderInfo.getReturnOrderType()).getName());
+            erpOrderVo.setOrderTypeName(ReturnOrderTypeEnum.getEnums(returnOrderInfo.getReturnOrderType()).getName());
             //退货仓库编码
             erpOrderVo.setTransportCenterCode(returnOrderInfo.getTransportCenterCode());
             //仓库名称
@@ -1075,12 +1079,15 @@ public class BridgeProductService<main> {
                 }
                 //退还服纺金
                 info.setSuitCouponMoney(BigDecimal.ZERO);
+                erpReturnOrderProductInfoList.add(info);
             }
+            erpOrderVo.setProdcutList(erpReturnOrderProductInfoList);
+            erpOrderList.add(erpOrderVo);
 
-            log.info("结算保存erp退货订单,参数为={}" + JsonUtil.toJson(erpOrderVo));
+            log.info("结算保存erp退货订单,参数为={}" + JsonUtil.toJson(erpOrderList));
             StringBuilder sb = new StringBuilder();
-            sb.append(settlement).append("/erp/order/save");
-            HttpClient httpClient = HttpClient.post(sb.toString()).json(erpOrderVo);
+            sb.append(settlement).append("/erp/return/order/save");
+            HttpClient httpClient = HttpClient.post(sb.toString()).json(erpOrderList);
             HttpResponse httpResponse = httpClient.action().result(new TypeReference<HttpResponse>() {
             });
             log.info("结算保存erp退货订单结束,返回信息为为={}" + JsonUtil.toJson(httpResponse));

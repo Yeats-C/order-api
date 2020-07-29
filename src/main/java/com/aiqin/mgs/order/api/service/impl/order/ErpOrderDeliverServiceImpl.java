@@ -176,9 +176,11 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             //todo 更新主单明细赠品的实际发货数量
             updateGiftGoodsAutCount(order.getMainOrderCode(),itemList,auth);
             /*****************************************同步订单数据到结算开始*****************************************/
-            ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(order.getOrderStoreId());
+            List<ErpOrderInfo> list=new ArrayList<>();
+            ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByFeeId(order.getFeeId());
             order.setOrderFee(orderFee);
-            bridgeProductService.settlementSaveOrder(order);
+            list.add(order);
+            bridgeProductService.settlementSaveOrder(list);
             /*****************************************同步订单数据到结算结束*****************************************/
 
         } else {
@@ -271,9 +273,6 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 throw new BusinessException("缺失物流费用");
             }
             orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsCode(logistics.getLogisticsCode());
-            if(orderLogistics!=null){
-                throw new BusinessException("此物流单号已存在");
-            }
             if (orderLogistics == null) {
                 //新的物流信息，先保存物流信息
 
@@ -383,9 +382,11 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 }
 
                 /*****************************************同步订单数据到结算开始*****************************************/
-                ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(order.getOrderStoreId());
+                List<ErpOrderInfo> list=new ArrayList<>();
+                ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByFeeId(order.getFeeId());
                 order.setOrderFee(orderFee);
-                bridgeProductService.settlementSaveOrder(order);
+                list.add(order);
+                bridgeProductService.settlementSaveOrder(list);
                 /*****************************************同步订单数据到结算结束*****************************************/
 
                 //遍历退货单，查看是否有退单
