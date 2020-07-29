@@ -19,7 +19,8 @@ import java.util.List;
  */
 @Data
 //@JsonInclude(JsonInclude.Include.ALWAYS)
-public class ErpReturnOrderVo extends PagesRequest {
+//extends PagesRequest
+public class ErpReturnOrderVo {
 	
 	@ApiModelProperty(value="退货单号")
 	@JsonProperty("return_order_code")
