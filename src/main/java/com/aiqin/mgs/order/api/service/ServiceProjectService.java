@@ -53,4 +53,5 @@ public interface ServiceProjectService {
 
     HttpResponse insertReduceAndUpdateAsset(ReduceAndAssetRequest reduceDetailAsset);
 
+    HttpResponse selectServiceProjectAssetCodeByOrderCode(String orderCode);
 }

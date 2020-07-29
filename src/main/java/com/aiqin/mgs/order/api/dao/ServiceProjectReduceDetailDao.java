@@ -39,4 +39,6 @@ public interface ServiceProjectReduceDetailDao {
     List<ServiceProjectTransformResponse> totalReturnCountAndAmountByType(ReduceDetailRequest reduceDetailRequest);
 
     List<ServiceProjectTransformResponse> totalReturnCountAndAmountByProject(ReduceDetailRequest reduceDetailRequest);
+
+    String selectServiceProjectAssetCodeByOrderCode(String orderCode);
 }

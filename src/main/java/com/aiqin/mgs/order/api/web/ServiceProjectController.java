@@ -104,6 +104,16 @@ public class ServiceProjectController {
         return serviceProjectService.serviceProjectTopTransformStatistics(reduceDetailRequest);
     }
 
+
+    @ApiOperation("查询服务订单号")
+    @GetMapping("/order/code")
+    @ApiImplicitParam(name = "order_no", value = "订单code", dataType = "String")
+    public HttpResponse selectServiceProjectAssetCodeByOrderCode(@RequestParam(value = "order_no") String orderCode) {
+        LOGGER.info("查询服务订单号......");
+        return serviceProjectService.selectServiceProjectAssetCodeByOrderCode(orderCode);
+    }
+
+
     @ApiOperation("通过门店编号、名称、用户手机号和时间查询订单的信息")
     @PostMapping("/order/list")
     public HttpResponse selectServiceProjectOrder(@RequestBody ReduceDetailRequest reduceDetailRequest) {
