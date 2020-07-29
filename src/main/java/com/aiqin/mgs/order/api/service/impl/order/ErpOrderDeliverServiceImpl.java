@@ -273,9 +273,6 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 throw new BusinessException("缺失物流费用");
             }
             orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsCode(logistics.getLogisticsCode());
-            if(orderLogistics!=null){
-                throw new BusinessException("此物流单号已存在");
-            }
             if (orderLogistics == null) {
                 //新的物流信息，先保存物流信息
 
