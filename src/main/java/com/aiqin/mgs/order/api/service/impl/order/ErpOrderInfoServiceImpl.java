@@ -835,6 +835,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         List<ErpOrderInfo> list=new ArrayList<>();
         ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByFeeId(order.getFeeId());
         order.setOrderFee(orderFee);
+        order.setItemList(itemList);
         list.add(order);
         bridgeProductService.settlementSaveOrder(list);
         /*****************************************同步订单数据到结算结束*****************************************/
