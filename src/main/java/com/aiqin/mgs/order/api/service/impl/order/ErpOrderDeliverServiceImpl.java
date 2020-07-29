@@ -175,6 +175,12 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
             //todo 更新主单明细赠品的实际发货数量
             updateGiftGoodsAutCount(order.getMainOrderCode(),itemList,auth);
+
+            if(order.getOrderTypeCode().equals(ErpOrderTypeEnum.DIRECT_SEND.getValue())){
+                order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_12.getCode());
+                order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_11.getCode());
+                erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
+            }
             /*****************************************同步订单数据到结算开始*****************************************/
             List<ErpOrderInfo> list=new ArrayList<>();
             ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByFeeId(order.getFeeId());
