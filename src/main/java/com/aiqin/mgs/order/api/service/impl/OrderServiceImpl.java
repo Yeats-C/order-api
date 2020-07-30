@@ -519,6 +519,7 @@ public class OrderServiceImpl implements OrderService {
         QueryOrderInfoRespVO queryOrderInfoRespVO = orderDao.selectByOrderCode(orderCode);
         queryOrderInfoRespVO.setProductCount(orderDao.orderProductBySum(orderCode));
         queryOrderInfoRespVO.setProductBatchList(orderDao.orderProductBatchByOrder(orderCode));
+        queryOrderInfoRespVO.setLogs(orderDao.orderProductLogByOrder(orderCode));
         return queryOrderInfoRespVO;
     }
 
