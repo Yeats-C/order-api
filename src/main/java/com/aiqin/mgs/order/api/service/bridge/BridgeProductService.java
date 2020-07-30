@@ -1047,17 +1047,17 @@ public class BridgeProductService<main> {
                 //商品名称
                 info.setSkuName(detail.getSkuName());
                 //商品品类编码
-                info.setProductCategoryCode(detail.getProductCategoryCode());
+                info.setProductCategoryCode(detail.getProductCategoryCodes());
                 //商品品类名称
-                info.setProductCategoryName(detail.getProductCategoryName());
+                info.setProductCategoryName(detail.getProductCategoryNames());
                 //商品品牌编码
-//            info.setProductBrandCode(detail.getProductBrandCode());
-                //商品品牌名称
-//            info.setProductBrandName(detail.getProductBrandName());
+                info.setProductBrandCode(detail.getProductBrandCode());
+              //  商品品牌名称
+                info.setProductBrandName(detail.getProductBrandName());
                 //商品属性编码
-//            info.setProductPropertyCode(detail.getProductPropertyCode());
-                //商品属性名称
-//            info.setProductPropertyName(detail.getProductPropertyName());
+                info.setProductPropertyCode(detail.getProductPropertyCode());
+                // 商品属性名称
+               info.setProductPropertyName(detail.getProductPropertyName());
                 //商品类型 0商品（本品） 1赠品 2兑换赠品
                 info.setProductType(detail.getProductType());
                 //熙耘采购价
