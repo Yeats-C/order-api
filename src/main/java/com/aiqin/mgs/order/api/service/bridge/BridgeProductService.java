@@ -8,6 +8,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.component.returnenums.ReturnOrderTypeEnum;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.*;
@@ -859,8 +860,15 @@ public class BridgeProductService<main> {
                 erpOrderVo.setOrderCode(order.getOrderStoreCode());
                 //所属主订单编码
                 erpOrderVo.setMainOrderCode(order.getMainOrderCode());
-                //订单状态  1:已支付 2：已发货
-                erpOrderVo.setOrderStatus(order.getPaymentStatus());
+                //订单状态  1:已支付 2：已发货  3:已收货
+                if(order.getOrderStatus()>= ErpOrderStatusEnum.ORDER_STATUS_2.getCode()){
+                    erpOrderVo.setOrderStatus(1);
+                }else if(order.getOrderStatus()>= ErpOrderStatusEnum.ORDER_STATUS_11.getCode()){
+                    erpOrderVo.setOrderStatus(2);
+                }else if(order.getOrderStatus()>= ErpOrderStatusEnum.ORDER_STATUS_13.getCode()){
+                    erpOrderVo.setOrderStatus(3);
+                }
+
                 //客户编码
                 erpOrderVo.setFranchiseeCode(order.getFranchiseeCode());
                 //客户名称
