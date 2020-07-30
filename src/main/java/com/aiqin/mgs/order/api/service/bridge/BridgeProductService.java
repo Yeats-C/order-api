@@ -880,7 +880,7 @@ public class BridgeProductService<main> {
                 //订单总额
                 erpOrderVo.setTotalProductAmount(order.getTotalProductAmount());
                 //实付金额
-                erpOrderVo.setActualTotalProductAmount(order.getActualTotalProductAmount());
+                erpOrderVo.setActualTotalProductAmount(order.getOrderFee().getPayMoney());
                 //订单商品总数量
                 erpOrderVo.setTotalProductCount(productCount);
                 //实发商品总数量
@@ -914,8 +914,8 @@ public class BridgeProductService<main> {
                     erpOrderVo.setActivityMoney(BigDecimal.ZERO);
                 }
                 //A品券抵减
-                if (null != order.getTopCouponMoney()) {
-                    erpOrderVo.setTopCouponMoney(order.getTopCouponMoney());
+                if (null != order.getOrderFee().getTopCouponMoney()) {
+                    erpOrderVo.setTopCouponMoney(order.getOrderFee().getTopCouponMoney());
                 } else {
                     erpOrderVo.setTopCouponMoney(BigDecimal.ZERO);
                 }
