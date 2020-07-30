@@ -177,7 +177,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             updateGiftGoodsAutCount(order.getMainOrderCode(),itemList,auth);
 
             if(order.getOrderTypeCode().equals(ErpOrderTypeEnum.DIRECT_SEND.getValue())){
-                order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_12.getCode());
+                order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_11.getCode());
                 order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_11.getCode());
                 erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
             }
