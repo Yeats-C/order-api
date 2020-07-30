@@ -904,17 +904,13 @@ public class BridgeProductService<main> {
                     erpOrderVo.setDeliverAmount(BigDecimal.ZERO);
                 }
                 //物流券抵减金额
-                if (null != order.getGoodsCoupon()) {
-                    erpOrderVo.setGoodsCoupon(order.getGoodsCoupon());
+                if (null != order.getOrderFee().getGoodsCoupon()) {
+                    erpOrderVo.setGoodsCoupon(order.getOrderFee().getGoodsCoupon());
                 } else {
                     erpOrderVo.setGoodsCoupon(BigDecimal.ZERO);
                 }
                 //账户抵减物流费
-                if (null != order.getOrderFee().getGoodsCoupon()) {
-                    erpOrderVo.setAccountGoodsCoupon(order.getOrderFee().getGoodsCoupon());
-                } else {
-                    erpOrderVo.setAccountGoodsCoupon(BigDecimal.ZERO);
-                }
+                erpOrderVo.setAccountGoodsCoupon(erpOrderVo.getDeliverAmount().subtract(erpOrderVo.getGoodsCoupon()));
                 //活动抵减
                 if (null != order.getOrderFee().getActivityMoney()) {
                     erpOrderVo.setActivityMoney(order.getOrderFee().getActivityMoney());
