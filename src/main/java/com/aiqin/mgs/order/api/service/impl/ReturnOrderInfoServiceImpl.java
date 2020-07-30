@@ -233,6 +233,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             }
             body.put("order_return_product_reqs",list);
             log.info("发起门店退货申请-完成(门店)（erp回调）--修改商品库存入参，url={},json={}",url,body);
+            log.info("修改库存入参 ： " + JsonUtil.toJson(body));
             HttpClient httpClient = HttpClient.post(url).json(body);
             Map<String ,Object> result=null;
             try{
@@ -733,7 +734,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //订单号
         returnOrderInfo1.setOrderStoreCode(roi.getOrderStoreCode());
         //退货状态
-        returnOrderInfo1.setReturnOrderStatus(roi.getReturnOrderStatus());
+        returnOrderInfo1.setReturnOrderStatus(1);
         //客户编码
         returnOrderInfo1.setFranchiseeCode(roi.getFranchiseeCode());
         returnOrderInfo1.setFranchiseeName(roi.getFranchiseeName());
@@ -755,14 +756,31 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //公司编码
         returnOrderInfo1.setCompanyCode(roi.getCompanyCode());
         returnOrderInfo1.setCompanyName(roi.getCompanyName());
+        List<ReturnOrderDetail> returnOrderDetailss = new ArrayList<>();
         //商品明细
         List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(roi.getReturnOrderCode());
-        List<ReturnOrderDetail> detailsList = returnOrderDetails.stream().map(detailVos ->{
-            ReturnOrderDetail detail = new ReturnOrderDetail();
-            BeanUtils.copyProperties(detailVos, detail);
-            return detail;
-        }).collect(Collectors.toList());
-        order.setDetails(detailsList);
+        //查询商品的商品信息
+        ErpOrderInfo orderDetailByOrderCode = erpOrderQueryService.getOrderDetailByOrderCode(roi.getOrderStoreCode());
+        List<ErpOrderItem> itemList = orderDetailByOrderCode.getItemList();
+        for (ErpOrderItem e : itemList){
+            for (ReturnOrderDetail  r :returnOrderDetails){
+                if (e.getSkuCode().equals(r.getSkuCode()) && e.getSkuName().equals(r.getSkuName())){
+                    r.setProductBrandCode(e.getProductBrandCode());
+                    r.setProductBrandName(e.getProductBrandName());
+                    r.setProductCategoryCodes(e.getProductCategoryCode());
+                    r.setProductCategoryNames(e.getProductCategoryName());
+                    r.setProductPropertyCode(e.getProductPropertyCode());
+                    r.setProductPropertyName(e.getProductPropertyName());
+                    returnOrderDetailss.add(r);
+                }
+            }
+        }
+//        List<ReturnOrderDetail> detailsList = returnOrderDetails.stream().map(detailVos ->{
+//            ReturnOrderDetail detail = new ReturnOrderDetail();
+//            BeanUtils.copyProperties(detailVos, detail);
+//            return detail;
+//        }).collect(Collectors.toList());
+        order.setDetails(returnOrderDetailss);
         order.setReturnOrderInfo(returnOrderInfo1);
         log.info("批发-货架-普通-同步结算-方法入参： " + JsonUtil.toJson(order) + ",开始");
         bridgeProductService.settlementSaveReturnOrder(order);
