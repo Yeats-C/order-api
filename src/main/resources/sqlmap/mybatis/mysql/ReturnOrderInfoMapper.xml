@@ -121,7 +121,8 @@
     create_by_id, create_by_name, update_by_id, update_by_name, create_time, update_time,
     source_type, order_success, return_money_type, order_category, review_operator_id, review_time,
     return_good_amount,actual_return_good_amount,really_return,complimentary_amount,top_coupon_discount_amount,franchisee_code,
-    franchisee_name,copartner_area_id,copartner_area_name,business_form,whether_invoice,order_product_type
+    franchisee_name,copartner_area_id,copartner_area_name,business_form,whether_invoice,order_product_type,transport_center_code,
+    transport_center_name,warehouse_code,warehouse_name
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select

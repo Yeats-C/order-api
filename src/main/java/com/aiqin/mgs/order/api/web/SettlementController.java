@@ -98,7 +98,7 @@ public class SettlementController {
     
     
     
-//    //1.結算頁面列表  仅支持 购物车跳转结账页面/选择优惠类型.
+//    //1.結算頁面列表  仅支持 跳转结账页面/选择优惠类型.
 //    @GetMapping("/selectsettlement")
 //    @ApiOperation(value = "結算頁面列表")
 //    public HttpResponse selectSettlement(@Valid @RequestParam(name = "member_id", required = true) String memberId,@RequestParam(name = "agio_type", required = true) String agioType) {
