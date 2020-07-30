@@ -1044,6 +1044,8 @@ public class BridgeProductService<main> {
             erpOrderVo.setCompanyCode(returnOrderInfo.getCompanyCode());
             //所属渠道名称
             erpOrderVo.setCompanyName(returnOrderInfo.getCompanyName());
+            //当前时间
+            erpOrderVo.setInputTime(new Date());
 
             //商品列表
             List<ErpReturnOrderProductInfo> erpReturnOrderProductInfoList = new ArrayList<>();
