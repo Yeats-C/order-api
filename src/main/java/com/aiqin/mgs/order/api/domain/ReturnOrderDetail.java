@@ -208,4 +208,7 @@ public class ReturnOrderDetail {
     @JsonProperty("product_property_name")
     private String productPropertyName;
 
+    @ApiModelProperty(value = "含税采购价（元）")
+    @JsonProperty("purchase_amount")
+    private BigDecimal purchaseAmount;
 }

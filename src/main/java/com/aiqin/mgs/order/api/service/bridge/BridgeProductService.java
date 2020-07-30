@@ -1057,13 +1057,13 @@ public class BridgeProductService<main> {
                 //商品属性编码
                 info.setProductPropertyCode(detail.getProductPropertyCode());
                 // 商品属性名称
-               info.setProductPropertyName(detail.getProductPropertyName());
+                info.setProductPropertyName(detail.getProductPropertyName());
                 //商品类型 0商品（本品） 1赠品 2兑换赠品
                 info.setProductType(detail.getProductType());
                 //熙耘采购价
 //            info.setScmpPurchaseAmount();
                 //渠道采购价
-//            info.setPurchaseAmount(detail.ca);
+                info.setPurchaseAmount(detail.getPurchaseAmount() == null ? BigDecimal.ZERO : detail.getPurchaseAmount());
                 //退货数量
                 info.setProductCount(detail.getReturnProductCount().intValue());
                 //退货金额
