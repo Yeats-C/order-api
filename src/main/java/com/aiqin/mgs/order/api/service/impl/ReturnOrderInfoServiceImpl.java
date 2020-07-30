@@ -771,6 +771,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     r.setProductCategoryNames(e.getProductCategoryName());
                     r.setProductPropertyCode(e.getProductPropertyCode());
                     r.setProductPropertyName(e.getProductPropertyName());
+                    r.setPurchaseAmount(e.getPurchaseAmount());
                     returnOrderDetailss.add(r);
                 }
             }
