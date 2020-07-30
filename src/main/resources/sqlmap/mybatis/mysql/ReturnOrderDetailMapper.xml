@@ -575,7 +575,7 @@
          ri.supplier_name supplierName
      from return_order_detail r
      left join return_order_info ri on ri.return_order_code = r.return_order_code
-     where return_order_code = #{returnOrderCode}
+     where r.return_order_code = #{returnOrderCode}
     </select>
     <select id="selectReturnOrder" resultType="com.aiqin.mgs.order.api.domain.ReturnOrderDetail">
          SELECT actual_return_product_count,top_coupon_amount FROM return_order_detail WHERE

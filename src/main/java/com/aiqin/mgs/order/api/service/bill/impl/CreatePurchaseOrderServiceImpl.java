@@ -263,7 +263,7 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
         try {
             for(ErpOrderInfo orderInfo:erpOrderInfo){
                 //查询主订单费用信息
-                ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(orderInfo.getOrderStoreId());
+                ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByFeeId(orderInfo.getFeeId());
 
                 //耘链销售单需求字段
                 //业务形式
@@ -285,10 +285,12 @@ public class CreatePurchaseOrderServiceImpl implements CreatePurchaseOrderServic
                 orderInfo.setPartnerName(orderInfo.getCopartnerAreaName());
                 //收货人手机号
                 orderInfo.setConsigneePhone(orderInfo.getReceiveMobile());
-                //A品券优惠金额
-                orderInfo.setTopCouponMoney(orderFee.getTopCouponMoney());
-                //服纺券优惠金额
-                orderInfo.setSuitCouponMoney(orderFee.getSuitCouponMoney());
+                if(null!=orderFee){
+                    //A品券优惠金额
+                    orderInfo.setTopCouponMoney(orderFee.getTopCouponMoney());
+                    //服纺券优惠金额
+                    orderInfo.setSuitCouponMoney(orderFee.getSuitCouponMoney());
+                }
                 //渠道订单金额
                 orderInfo.setChannelOrderAmount(orderInfo.getTotalProductAmount());
                 //商品渠道总金额
