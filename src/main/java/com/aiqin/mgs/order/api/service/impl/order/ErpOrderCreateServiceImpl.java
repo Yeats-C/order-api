@@ -696,6 +696,8 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
             //活动类型
             orderItem.setActivityType(item.getActivityType());
+            //采购价
+            orderItem.setPurchaseAmount(productInfo.getPurchaseAmount());
             orderItemList.add(orderItem);
         }
         log.info("构建订单商品明细行数据返回结果orderItemList={}",orderItemList);
@@ -2220,6 +2222,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
             //单个商品包装体积(mm³)
             orderItem.setBoxVolume(productInfo.getBoxVolume());
             orderItem.setIsActivity(YesOrNoEnum.NO.getCode());
+
+            //采购价
+            orderItem.setPurchaseAmount(productInfo.getPurchaseAmount());
 
             orderItemList.add(orderItem);
         }

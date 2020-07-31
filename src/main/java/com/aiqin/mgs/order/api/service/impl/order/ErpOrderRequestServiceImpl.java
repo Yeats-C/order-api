@@ -142,6 +142,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 product.setPrice(data.getBatchList().get(0).getBatchPrice());
                 product.setBatchType(data.getBatchList().get(0).getBatchType());
             }
+            product.setPurchaseAmount(data.getPriceTax1());
 
         } catch (BusinessException e) {
             logger.info("获取商品信息失败：{}", e.getMessage());
