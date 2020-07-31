@@ -683,6 +683,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             returnOrderInfo1.setCompanyCode(returnOrderInfo.getCompanyCode());
             returnOrderInfo1.setCompanyName(returnOrderInfo.getCompanyName());
             List<ReturnOrderDetail> returnOrderDetailss = new ArrayList<>();
+            BigDecimal aiqinCosts = BigDecimal.ZERO;
             //商品明细
             List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderInfo.getReturnOrderCode());
             //查询商品的商品信息
@@ -698,10 +699,16 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                         r.setProductPropertyCode(e.getProductPropertyCode());
                         r.setProductPropertyName(e.getProductPropertyName());
                         r.setPurchaseAmount(e.getPurchaseAmount());
+                        //申请退货数量 X 商品单价 = 爱亲成本价
+                        BigDecimal returnProductCount = new  BigDecimal(r.getReturnProductCount().toString());
+                        BigDecimal productAmount = e.getProductAmount();
+                        BigDecimal multiply = returnProductCount.multiply(productAmount);
+                        aiqinCosts.add(multiply);
                         returnOrderDetailss.add(r);
                     }
                 }
             }
+            returnOrderInfo1.setAiqinCost(aiqinCosts);
             order.setDetails(returnOrderDetailss);
             order.setReturnOrderInfo(returnOrderInfo1);
             log.info("批发-货架-普通-同步结算-方法入参： " + JsonUtil.toJson(order) + ",开始");
@@ -770,6 +777,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         returnOrderInfo1.setCompanyCode(roi.getCompanyCode());
         returnOrderInfo1.setCompanyName(roi.getCompanyName());
         List<ReturnOrderDetail> returnOrderDetailss = new ArrayList<>();
+        BigDecimal aiqinCosts = BigDecimal.ZERO;
         //商品明细
         List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(roi.getReturnOrderCode());
         //查询商品的商品信息
@@ -785,6 +793,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     r.setProductPropertyCode(e.getProductPropertyCode());
                     r.setProductPropertyName(e.getProductPropertyName());
                     r.setPurchaseAmount(e.getPurchaseAmount());
+                    //申请退货数量 X 商品单价 = 爱亲成本价
+                    BigDecimal returnProductCount = new  BigDecimal(r.getReturnProductCount().toString());
+                    BigDecimal productAmount = e.getProductAmount();
+                    BigDecimal multiply = returnProductCount.multiply(productAmount);
+                    aiqinCosts.add(multiply);
                     returnOrderDetailss.add(r);
                 }
             }
@@ -794,6 +807,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 //            BeanUtils.copyProperties(detailVos, detail);
 //            return detail;
 //        }).collect(Collectors.toList());
+        returnOrderInfo1.setAiqinCost(aiqinCosts);
         order.setDetails(returnOrderDetailss);
         order.setReturnOrderInfo(returnOrderInfo1);
         log.info("批发-货架-普通-同步结算-方法入参： " + JsonUtil.toJson(order) + ",开始");
