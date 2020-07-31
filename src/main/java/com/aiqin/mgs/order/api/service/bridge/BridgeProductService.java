@@ -1035,6 +1035,8 @@ public class BridgeProductService<main> {
             erpOrderVo.setCompanyName(returnOrderInfo.getCompanyName());
             //当前时间
             erpOrderVo.setInputTime(new Date());
+            //爱亲成本总额
+            erpOrderVo.setAiqinCost(returnOrderInfo.getAiqinCost());
 
             //商品列表
             List<ErpReturnOrderProductInfo> erpReturnOrderProductInfoList = new ArrayList<>();
