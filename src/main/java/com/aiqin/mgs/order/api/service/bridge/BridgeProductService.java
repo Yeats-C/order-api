@@ -33,6 +33,7 @@ import com.aiqin.mgs.order.api.domain.response.order.StoreFranchiseeInfoResponse
 import com.aiqin.mgs.order.api.domain.wholesale.JoinMerchant;
 import com.aiqin.mgs.order.api.domain.wholesale.MerchantAccount;
 import com.aiqin.mgs.order.api.domain.wholesale.MerchantPaBalanceRespVO;
+import com.aiqin.mgs.order.api.service.order.ErpOrderLogisticsService;
 import com.aiqin.mgs.order.api.util.MathUtil;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -62,6 +63,9 @@ private String centerMainUrl;
 
 @Value("${center.main.settlement}")
 private String settlement;
+
+@Resource
+private ErpOrderLogisticsService erpOrderLogisticsService;
 
 /**
  * 获取低库存畅缺商品明细信息
@@ -772,6 +776,9 @@ public void settlementSaveOrder(List<ErpOrderInfo> list,Integer orderStatus) {
                 return;
             }
 
+            //订单物流信息
+            ErpOrderLogistics orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsId(order.getLogisticsId());
+            log.info("根据订单编号查询订单详情信息 订单物流信息：orderLogistics={}"+JsonUtil.toJson(orderLogistics));
             ErpOrderVo erpOrderVo = new ErpOrderVo();
             //商品列表
             List<ErpOrderProductInfo> erpOrderProductInfoList = new ArrayList<>();
@@ -902,19 +909,17 @@ public void settlementSaveOrder(List<ErpOrderInfo> list,Integer orderStatus) {
                 erpOrderVo.setActualTotalProductCount(0);
             }
             //总物流费
-            if (null != order.getDeliverAmount()) {
-                erpOrderVo.setDeliverAmount(order.getDeliverAmount());
+            if (null != orderLogistics) {
+                erpOrderVo.setDeliverAmount(orderLogistics.getLogisticsFee());
+                erpOrderVo.setGoodsCoupon(orderLogistics.getCouponPayFee());
+                erpOrderVo.setAccountGoodsCoupon(orderLogistics.getBalancePayFee());
             } else {
                 erpOrderVo.setDeliverAmount(BigDecimal.ZERO);
-            }
-            //物流券抵减金额
-            if (null != order.getOrderFee().getGoodsCoupon()) {
-                erpOrderVo.setGoodsCoupon(order.getOrderFee().getGoodsCoupon());
-            } else {
                 erpOrderVo.setGoodsCoupon(BigDecimal.ZERO);
+                erpOrderVo.setAccountGoodsCoupon(BigDecimal.ZERO);
             }
-            //账户抵减物流费
-            erpOrderVo.setAccountGoodsCoupon(erpOrderVo.getDeliverAmount().subtract(erpOrderVo.getGoodsCoupon()));
+
+
             //活动抵减
             if (null != order.getOrderFee().getActivityMoney()) {
                 erpOrderVo.setActivityMoney(order.getOrderFee().getActivityMoney());
