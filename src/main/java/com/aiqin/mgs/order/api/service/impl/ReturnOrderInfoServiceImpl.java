@@ -682,14 +682,27 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //公司编码
             returnOrderInfo1.setCompanyCode(returnOrderInfo.getCompanyCode());
             returnOrderInfo1.setCompanyName(returnOrderInfo.getCompanyName());
+            List<ReturnOrderDetail> returnOrderDetailss = new ArrayList<>();
             //商品明细
             List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderInfo.getReturnOrderCode());
-            List<ReturnOrderDetail> detailsList = returnOrderDetails.stream().map(detailVos ->{
-                ReturnOrderDetail detail = new ReturnOrderDetail();
-                BeanUtils.copyProperties(detailVos, detail);
-                return detail;
-            }).collect(Collectors.toList());
-            order.setDetails(detailsList);
+            //查询商品的商品信息
+            ErpOrderInfo orderDetailByOrderCode = erpOrderQueryService.getOrderDetailByOrderCode(returnOrderInfo.getOrderStoreCode());
+            List<ErpOrderItem> itemList = orderDetailByOrderCode.getItemList();
+            for (ErpOrderItem e : itemList){
+                for (ReturnOrderDetail  r :returnOrderDetails){
+                    if (e.getSkuCode().equals(r.getSkuCode()) && e.getSkuName().equals(r.getSkuName())){
+                        r.setProductBrandCode(e.getProductBrandCode());
+                        r.setProductBrandName(e.getProductBrandName());
+                        r.setProductCategoryCodes(e.getProductCategoryCode());
+                        r.setProductCategoryNames(e.getProductCategoryName());
+                        r.setProductPropertyCode(e.getProductPropertyCode());
+                        r.setProductPropertyName(e.getProductPropertyName());
+                        r.setPurchaseAmount(e.getPurchaseAmount());
+                        returnOrderDetailss.add(r);
+                    }
+                }
+            }
+            order.setDetails(returnOrderDetailss);
             order.setReturnOrderInfo(returnOrderInfo1);
             log.info("批发-货架-普通-同步结算-方法入参： " + JsonUtil.toJson(order) + ",开始");
             bridgeProductService.settlementSaveReturnOrder(order);
