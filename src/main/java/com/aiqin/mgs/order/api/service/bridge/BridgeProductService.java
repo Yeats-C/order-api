@@ -852,6 +852,14 @@ public class BridgeProductService<main> {
                         productInfo.setTaxRate(item.getTaxRate());
                         productCount += item.getProductCount();
 
+                        if(null!=item.getBatchInfoCode()){
+                            List<ErpBatchInfo> batchList=new ArrayList<>();
+                            ErpBatchInfo batchInfo=new ErpBatchInfo();
+                            batchInfo.setBatchInfoCode(item.getBatchInfoCode());
+                            batchInfo.setBatchNo(item.getBatchCode());
+                            batchInfo.setTotalProductCount(item.getProductCount().intValue());
+                        }
+
                         erpOrderProductInfoList.add(productInfo);
                     }
                     erpOrderVo.setProdcutList(erpOrderProductInfoList);

@@ -81,4 +81,7 @@ public class ProductInfo {
     /***批次类型 0：月份批次 1：非月份批次*/
     private Integer batchType;
 
+    /***采购价*/
+    private BigDecimal purchaseAmount;
+
 }
