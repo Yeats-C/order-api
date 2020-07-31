@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -403,4 +404,9 @@ public class ReturnOrderInfo {
 //    @JsonProperty("order_product_type")
     private String orderProductType;
 
+
+    //用于同步结算系统
+    @ApiModelProperty(value="爱亲成本总额")
+    @JsonProperty("aiqin_cost")
+    private BigDecimal aiqinCost;
 }

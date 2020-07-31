@@ -1010,44 +1010,46 @@ public void settlementSaveReturnOrder(ReturnOrderDetailVO order) {
         ErpReturnOrderVo erpOrderVo = new ErpReturnOrderVo();
         List<ErpReturnOrderVo> erpOrderList = new ArrayList<>();
 
-        //退货单号
-        erpOrderVo.setReturnOrderCode(order.getReturnOrderCode());
-        //原订单编码
-        erpOrderVo.setOrderCode(returnOrderInfo.getOrderStoreCode());
-        //退货状态 1:已验收
-        erpOrderVo.setOrderStatus(returnOrderInfo.getReturnOrderStatus());
-        //客户编码
-        erpOrderVo.setFranchiseeCode(returnOrderInfo.getFranchiseeCode());
-        //客户名称
-        erpOrderVo.setFranchiseeName(returnOrderInfo.getFranchiseeName());
-        //门店编码
-        erpOrderVo.setStoreCode(returnOrderInfo.getStoreCode());
-        //门店名称
-        erpOrderVo.setStoreName(returnOrderInfo.getStoreName());
-        //退货类型编码 1:售后退货 2:缺货取消 3:客户拒收
-        erpOrderVo.setOrderTypeCode(ReturnOrderTypeEnum.getEnums(returnOrderInfo.getReturnOrderType()).getCode().toString());
-        //退货类型名称
-        erpOrderVo.setOrderTypeName(ReturnOrderTypeEnum.getEnums(returnOrderInfo.getReturnOrderType()).getName());
-        //退货仓库编码
-        erpOrderVo.setTransportCenterCode(returnOrderInfo.getTransportCenterCode());
-        //仓库名称
-        erpOrderVo.setTransportCenterName(returnOrderInfo.getTransportCenterName());
-        //库房编码
-        erpOrderVo.setWarehouseCode(returnOrderInfo.getWarehouseCode());
-        //库房名称
-        erpOrderVo.setWarehouseName(returnOrderInfo.getWarehouseName());
-        //退货总额
-        erpOrderVo.setTotalProductAmount(returnOrderInfo.getReturnOrderAmount());
-        //退A品券总额
-        erpOrderVo.setTopCouponMoney(returnOrderInfo.getTopCouponDiscountAmount());
-        //退服纺券总额
-        erpOrderVo.setSuitCouponMoney(BigDecimal.ZERO);
-        //所属渠道
-        erpOrderVo.setCompanyCode(returnOrderInfo.getCompanyCode());
-        //所属渠道名称
-        erpOrderVo.setCompanyName(returnOrderInfo.getCompanyName());
-        //当前时间
-        erpOrderVo.setInputTime(new Date());
+            //退货单号
+            erpOrderVo.setReturnOrderCode(order.getReturnOrderCode());
+            //原订单编码
+            erpOrderVo.setOrderCode(returnOrderInfo.getOrderStoreCode());
+            //退货状态 1:已验收
+            erpOrderVo.setOrderStatus(returnOrderInfo.getReturnOrderStatus());
+            //客户编码
+            erpOrderVo.setFranchiseeCode(returnOrderInfo.getFranchiseeCode());
+            //客户名称
+            erpOrderVo.setFranchiseeName(returnOrderInfo.getFranchiseeName());
+            //门店编码
+            erpOrderVo.setStoreCode(returnOrderInfo.getStoreCode());
+            //门店名称
+            erpOrderVo.setStoreName(returnOrderInfo.getStoreName());
+            //退货类型编码 1:售后退货 2:缺货取消 3:客户拒收
+            erpOrderVo.setOrderTypeCode(ReturnOrderTypeEnum.getEnums(returnOrderInfo.getReturnOrderType()).getCode().toString());
+            //退货类型名称
+            erpOrderVo.setOrderTypeName(ReturnOrderTypeEnum.getEnums(returnOrderInfo.getReturnOrderType()).getName());
+            //退货仓库编码
+            erpOrderVo.setTransportCenterCode(returnOrderInfo.getTransportCenterCode());
+            //仓库名称
+            erpOrderVo.setTransportCenterName(returnOrderInfo.getTransportCenterName());
+            //库房编码
+            erpOrderVo.setWarehouseCode(returnOrderInfo.getWarehouseCode());
+            //库房名称
+            erpOrderVo.setWarehouseName(returnOrderInfo.getWarehouseName());
+            //退货总额
+            erpOrderVo.setTotalProductAmount(returnOrderInfo.getReturnOrderAmount());
+            //退A品券总额
+            erpOrderVo.setTopCouponMoney(returnOrderInfo.getTopCouponDiscountAmount());
+            //退服纺券总额
+            erpOrderVo.setSuitCouponMoney(BigDecimal.ZERO);
+            //所属渠道
+            erpOrderVo.setCompanyCode(returnOrderInfo.getCompanyCode());
+            //所属渠道名称
+            erpOrderVo.setCompanyName(returnOrderInfo.getCompanyName());
+            //当前时间
+            erpOrderVo.setInputTime(new Date());
+            //爱亲成本总额
+            erpOrderVo.setAiqinCost(returnOrderInfo.getAiqinCost());
 
         //商品列表
         List<ErpReturnOrderProductInfo> erpReturnOrderProductInfoList = new ArrayList<>();
