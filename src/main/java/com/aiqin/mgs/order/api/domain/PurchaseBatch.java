@@ -57,7 +57,7 @@ public class PurchaseBatch implements Serializable {
 
     @ApiModelProperty(value = "生产日期",example = "2001-01-01 01:01:01")
     @JsonProperty("product_date")
-    private Date productDate;
+    private String productDate;
 
     @ApiModelProperty(value="过期日期")
     @JsonProperty("be_overdue_date")

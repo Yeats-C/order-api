@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * @Auther: mamingze
@@ -26,7 +25,7 @@ public class BatchRespVo {
 
     @ApiModelProperty("批次日期")
     @JsonProperty(value = "batch_date")
-    private Date batchDate;
+    private String batchDate;
 
 
     @ApiModelProperty("批次对应库房编号")
@@ -47,4 +46,8 @@ public class BatchRespVo {
     @ApiModelProperty(value = "活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单【爱掌柜使用字段】")
     @JsonProperty("activity_type")
     private Integer activityType;
+
+    @ApiModelProperty("批次类型  0：月份批次  1：非月份批次")
+    @JsonProperty(value = "batch_type")
+    private Integer batchType;
 }

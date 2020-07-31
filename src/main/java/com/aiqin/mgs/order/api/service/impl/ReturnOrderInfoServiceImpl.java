@@ -4,8 +4,6 @@ import com.aiqin.ground.util.exception.GroundRuntimeException;
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.json.JsonUtil;
-import com.aiqin.ground.util.protocol.MessageId;
-import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ConstantData;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
@@ -37,6 +35,7 @@ import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderStatusVo;
 import com.aiqin.mgs.order.api.domain.response.returnorder.WholesaleReturnList;
 import com.aiqin.mgs.order.api.service.CopartnerAreaService;
 import com.aiqin.mgs.order.api.service.bill.RejectRecordService;
+import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderInfoService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
@@ -64,7 +63,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
-import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -96,7 +94,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     @Value("${bridge.url.scmp-api}")
     private String scmpHost;
 
-
+    @Resource
+    private BridgeProductService bridgeProductService;
     @Autowired
     private ReturnOrderInfoDao returnOrderInfoDao;
     @Autowired
@@ -234,6 +233,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             }
             body.put("order_return_product_reqs",list);
             log.info("发起门店退货申请-完成(门店)（erp回调）--修改商品库存入参，url={},json={}",url,body);
+            log.info("修改库存入参 ： " + JsonUtil.toJson(body));
             HttpClient httpClient = HttpClient.post(url).json(body);
             Map<String ,Object> result=null;
             try{
@@ -652,6 +652,68 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         log.info("退款回调--查询退货单,返回结果returnOrderInfo={}",returnOrderInfo);
         //退款状态，0-未退款、1-已退款
         if(returnOrderInfo!=null&&returnOrderInfo.getRefundStatus().equals(ConstantData.REFUND_STATUS)){//1-已退款
+            //将退货单同步到结算系统-----加
+            ReturnOrderDetailVO  order = new ReturnOrderDetailVO();
+            ReturnOrderInfo returnOrderInfo1 = new ReturnOrderInfo();
+            //退货号
+            order.setReturnOrderCode(returnOrderInfo.getReturnOrderCode());
+            //订单号
+            returnOrderInfo1.setOrderStoreCode(returnOrderInfo.getOrderStoreCode());
+            //退货状态
+            returnOrderInfo1.setReturnOrderStatus(returnOrderInfo.getReturnOrderStatus());
+            //客户编码
+            returnOrderInfo1.setFranchiseeCode(returnOrderInfo.getFranchiseeCode());
+            returnOrderInfo1.setFranchiseeName(returnOrderInfo.getFranchiseeName());
+            //门店
+            returnOrderInfo1.setStoreCode(returnOrderInfo.getStoreCode());
+            returnOrderInfo1.setStoreName(returnOrderInfo.getStoreName());
+            //退货类型
+            returnOrderInfo1.setReturnOrderType(returnOrderInfo.getReturnOrderType());
+            //仓库
+            returnOrderInfo1.setTransportCenterCode(returnOrderInfo.getTransportCenterCode());
+            returnOrderInfo1.setTransportCenterName(returnOrderInfo.getTransportCenterName());
+            //库房
+            returnOrderInfo1.setWarehouseCode(returnOrderInfo.getWarehouseCode());
+            returnOrderInfo1.setWarehouseName(returnOrderInfo.getWarehouseName());
+            //退货金额
+            returnOrderInfo1.setReturnOrderAmount(returnOrderInfo.getReturnOrderAmount());
+            //退A品券总额
+            returnOrderInfo1.setTopCouponDiscountAmount(returnOrderInfo.getTopCouponDiscountAmount() == null ? BigDecimal.ZERO : returnOrderInfo.getTopCouponDiscountAmount());
+            //公司编码
+            returnOrderInfo1.setCompanyCode(returnOrderInfo.getCompanyCode());
+            returnOrderInfo1.setCompanyName(returnOrderInfo.getCompanyName());
+            List<ReturnOrderDetail> returnOrderDetailss = new ArrayList<>();
+            BigDecimal aiqinCosts = BigDecimal.ZERO;
+            //商品明细
+            List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderInfo.getReturnOrderCode());
+            //查询商品的商品信息
+            ErpOrderInfo orderDetailByOrderCode = erpOrderQueryService.getOrderDetailByOrderCode(returnOrderInfo.getOrderStoreCode());
+            List<ErpOrderItem> itemList = orderDetailByOrderCode.getItemList();
+            for (ErpOrderItem e : itemList){
+                for (ReturnOrderDetail  r :returnOrderDetails){
+                    if (e.getSkuCode().equals(r.getSkuCode()) && e.getSkuName().equals(r.getSkuName())){
+                        r.setProductBrandCode(e.getProductBrandCode());
+                        r.setProductBrandName(e.getProductBrandName());
+                        r.setProductCategoryCodes(e.getProductCategoryCode());
+                        r.setProductCategoryNames(e.getProductCategoryName());
+                        r.setProductPropertyCode(e.getProductPropertyCode());
+                        r.setProductPropertyName(e.getProductPropertyName());
+                        r.setPurchaseAmount(e.getPurchaseAmount());
+                        //申请退货数量 X 商品单价 = 爱亲成本价
+                        BigDecimal returnProductCount = new  BigDecimal(r.getReturnProductCount().toString());
+                        BigDecimal productAmount = e.getProductAmount();
+                        BigDecimal multiply = returnProductCount.multiply(productAmount);
+                        aiqinCosts.add(multiply);
+                        returnOrderDetailss.add(r);
+                    }
+                }
+            }
+            returnOrderInfo1.setAiqinCost(aiqinCosts);
+            order.setDetails(returnOrderDetailss);
+            order.setReturnOrderInfo(returnOrderInfo1);
+            log.info("批发-货架-普通-同步结算-方法入参： " + JsonUtil.toJson(order) + ",开始");
+            bridgeProductService.settlementSaveReturnOrder(order);
+            log.info("批发-货架-普通-同步结算---结束");
             return true;
         }
         RefundInfo record=new RefundInfo();
@@ -684,6 +746,73 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             log.info("退款回调--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}",roi.getOrderStoreCode(), ErpOrderReturnStatusEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
             erpOrderInfoService.updateOrderReturnStatus(roi.getOrderStoreCode(), ErpOrderReturnRequestEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
         }
+        //将退货单同步到结算系统-----加
+        ReturnOrderDetailVO  order = new ReturnOrderDetailVO();
+        ReturnOrderInfo returnOrderInfo1 = new ReturnOrderInfo();
+        //退货号
+        order.setReturnOrderCode(roi.getReturnOrderCode());
+        //订单号
+        returnOrderInfo1.setOrderStoreCode(roi.getOrderStoreCode());
+        //退货状态
+        returnOrderInfo1.setReturnOrderStatus(1);
+        //客户编码
+        returnOrderInfo1.setFranchiseeCode(roi.getFranchiseeCode());
+        returnOrderInfo1.setFranchiseeName(roi.getFranchiseeName());
+        //门店
+        returnOrderInfo1.setStoreCode(roi.getStoreCode());
+        returnOrderInfo1.setStoreName(roi.getStoreName());
+        //退货类型
+        returnOrderInfo1.setReturnOrderType(roi.getReturnOrderType());
+        //仓库
+        returnOrderInfo1.setTransportCenterCode(roi.getTransportCenterCode());
+        returnOrderInfo1.setTransportCenterName(roi.getTransportCenterName());
+        //库房
+        returnOrderInfo1.setWarehouseCode(roi.getWarehouseCode());
+        returnOrderInfo1.setWarehouseName(roi.getWarehouseName());
+        //退货金额
+        returnOrderInfo1.setReturnOrderAmount(roi.getReturnOrderAmount());
+        //退A品券总额
+        returnOrderInfo1.setTopCouponDiscountAmount(roi.getTopCouponDiscountAmount() == null ? BigDecimal.ZERO : roi.getTopCouponDiscountAmount());
+        //公司编码
+        returnOrderInfo1.setCompanyCode(roi.getCompanyCode());
+        returnOrderInfo1.setCompanyName(roi.getCompanyName());
+        List<ReturnOrderDetail> returnOrderDetailss = new ArrayList<>();
+        BigDecimal aiqinCosts = BigDecimal.ZERO;
+        //商品明细
+        List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(roi.getReturnOrderCode());
+        //查询商品的商品信息
+        ErpOrderInfo orderDetailByOrderCode = erpOrderQueryService.getOrderDetailByOrderCode(roi.getOrderStoreCode());
+        List<ErpOrderItem> itemList = orderDetailByOrderCode.getItemList();
+        for (ErpOrderItem e : itemList){
+            for (ReturnOrderDetail  r :returnOrderDetails){
+                if (e.getSkuCode().equals(r.getSkuCode()) && e.getSkuName().equals(r.getSkuName())){
+                    r.setProductBrandCode(e.getProductBrandCode());
+                    r.setProductBrandName(e.getProductBrandName());
+                    r.setProductCategoryCodes(e.getProductCategoryCode());
+                    r.setProductCategoryNames(e.getProductCategoryName());
+                    r.setProductPropertyCode(e.getProductPropertyCode());
+                    r.setProductPropertyName(e.getProductPropertyName());
+                    r.setPurchaseAmount(e.getPurchaseAmount());
+                    //申请退货数量 X 商品单价 = 爱亲成本价
+                    BigDecimal returnProductCount = new  BigDecimal(r.getReturnProductCount().toString());
+                    BigDecimal productAmount = e.getProductAmount();
+                    BigDecimal multiply = returnProductCount.multiply(productAmount);
+                    aiqinCosts.add(multiply);
+                    returnOrderDetailss.add(r);
+                }
+            }
+        }
+//        List<ReturnOrderDetail> detailsList = returnOrderDetails.stream().map(detailVos ->{
+//            ReturnOrderDetail detail = new ReturnOrderDetail();
+//            BeanUtils.copyProperties(detailVos, detail);
+//            return detail;
+//        }).collect(Collectors.toList());
+        returnOrderInfo1.setAiqinCost(aiqinCosts);
+        order.setDetails(returnOrderDetailss);
+        order.setReturnOrderInfo(returnOrderInfo1);
+        log.info("批发-货架-普通-同步结算-方法入参： " + JsonUtil.toJson(order) + ",开始");
+        bridgeProductService.settlementSaveReturnOrder(order);
+        log.info("批发-货架-普通-同步结算---结束");
         log.info("退款回调结束");
         return true;
     }

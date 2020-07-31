@@ -86,20 +86,22 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
     }
 
     @Override
-    public ProductInfo getSkuDetail(String companyCode, String skuCode, String warehouseTypeCode, String batchInfoCode) {
+    public ProductInfo getSkuDetail(String companyCode, String skuCode, String warehouseTypeCode, String batchInfoCode,String provinceCode,String cityCode) {
         logger.info("查询sku详情入参,companyCode={},skuCode={},warehouseTypeCode={},batchInfoCode={}",companyCode,skuCode,warehouseTypeCode,batchInfoCode);
         String url = urlProperties.getProductApi() + "/search/spu/sku/detail";
         url += "?company_code=" + companyCode;
         url += "&sku_code=" + skuCode;
         url += "&warehouse_type_code=" + warehouseTypeCode;
         url += "&batch_Info_Code=" + batchInfoCode;
+        url += "&province_code=" + provinceCode;
+        url += "&city_code=" + cityCode;
         ProductInfo product = new ProductInfo();
         try {
             logger.info("查询sku详情url={}",url);
             HttpClient httpClient = HttpClient.get(url);
             HttpResponse<ProductSkuDetailResponse> response = httpClient.action().result(new TypeReference<HttpResponse<ProductSkuDetailResponse>>() {
             });
-            logger.info("查询sku详情返回结果response={}",response.toString());
+            logger.info("查询sku详情返回结果response={}",JsonUtil.toJson(response));
             if (!RequestReturnUtil.validateHttpResponse(response)) {
                 throw new BusinessException("获取商品信息失败");
             }
@@ -138,7 +140,9 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             //如果批次信息List不为空
             if(null!=data.getBatchList()&&data.getBatchList().size()>0){
                 product.setPrice(data.getBatchList().get(0).getBatchPrice());
+                product.setBatchType(data.getBatchList().get(0).getBatchType());
             }
+            product.setPurchaseAmount(data.getPriceTax1());
 
         } catch (BusinessException e) {
             logger.info("获取商品信息失败：{}", e.getMessage());
@@ -281,6 +285,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 stockBatchInfoRequest.setSkuCode(item.getSkuCode());
                 stockBatchInfoRequest.setSkuName(item.getSkuName());
                 stockBatchInfoRequest.setWarehouseType(Integer.valueOf(item.getWarehouseTypeCode()));
+                stockBatchInfoRequest.setBatchType(item.getBatchType());
                 if(item.getWarehouseTypeCode().equals("1")){
                     Long count=countMap.get(item.getSkuCode());
                     List<StockBatchInfoRequest> batchList=productMap.get(item.getSkuCode());
@@ -553,6 +558,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                 stockBatchInfoRequest.setChangeCount(item.getProductCount());
                 stockBatchInfoRequest.setSkuCode(item.getSkuCode());
                 stockBatchInfoRequest.setSkuName(item.getSkuName());
+                stockBatchInfoRequest.setBatchType(item.getBatchType());
                 stockBatchList.add(stockBatchInfoRequest);
             }
             stockChangeRequest.setStockList(stockList);

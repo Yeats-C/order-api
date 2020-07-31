@@ -482,4 +482,7 @@
         </where>
         group by project_id
     </select>
+    <select id="selectServiceProjectAssetCodeByOrderCode" resultType="string">
+        select d.order_code from service_project_reduce_detail d ,service_project_asset a where  d.asset_id=a.asset_id  and a.order_code=#{orderCode,jdbcType=VARCHAR} order by a.id limit 1
+    </select>
 </mapper>

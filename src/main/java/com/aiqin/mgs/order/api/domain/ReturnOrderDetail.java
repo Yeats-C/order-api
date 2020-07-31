@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -177,9 +178,37 @@ public class ReturnOrderDetail {
 
     @ApiModelProperty(value = "批次号时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date batchDate;
+    private String batchDate;
 
     @ApiModelProperty(value = "批次号")
     private String batchCode;
 
+    //结算系统使用
+    @ApiModelProperty(value = "商品品牌编码")
+    @JsonProperty("product_brand_code")
+    private String productBrandCode;
+
+    @ApiModelProperty(value = "商品品牌名称")
+    @JsonProperty("product_brand_name")
+    private String productBrandName;
+
+    @ApiModelProperty(value = "商品品类编码")
+    @JsonProperty("product_category_codes")
+    private String productCategoryCodes;
+
+    @ApiModelProperty(value = "商品品类名称")
+    @JsonProperty("product_category_names")
+    private String productCategoryNames;
+
+    @ApiModelProperty(value = "商品属性编码")
+    @JsonProperty("product_property_code")
+    private String productPropertyCode;
+
+    @ApiModelProperty(value = "商品属性名称")
+    @JsonProperty("product_property_name")
+    private String productPropertyName;
+
+    @ApiModelProperty(value = "含税采购价（元）")
+    @JsonProperty("purchase_amount")
+    private BigDecimal purchaseAmount;
 }
