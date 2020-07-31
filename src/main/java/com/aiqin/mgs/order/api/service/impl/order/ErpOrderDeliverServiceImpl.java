@@ -187,7 +187,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             order.setOrderFee(orderFee);
             order.setItemList(itemList);
             list.add(order);
-            bridgeProductService.settlementSaveOrder(list);
+            bridgeProductService.settlementSaveOrder(list,2);
             /*****************************************同步订单数据到结算结束*****************************************/
 
         } else {
@@ -395,7 +395,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 List<ErpOrderItem> itemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
                 order.setItemList(itemList);
                 list.add(order);
-                bridgeProductService.settlementSaveOrder(list);
+                bridgeProductService.settlementSaveOrder(list,2);
                 /*****************************************同步订单数据到结算结束*****************************************/
 
                 //遍历退货单，查看是否有退单
