@@ -202,4 +202,9 @@ public class ErpOrderVo{
 	@ApiModelProperty(value="商品列表")
 	@JsonProperty("prodcut_list")
 	private List<ErpOrderProductInfo> prodcutList;
+
+	@ApiModelProperty(value="收货时间")
+	@JsonProperty("take_time")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+	private Date takeTime;
 }

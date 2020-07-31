@@ -673,7 +673,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             item.setItemList(itemList);
 
         }
-        bridgeProductService.settlementSaveOrder(list);
+        bridgeProductService.settlementSaveOrder(list,1);
         //同步订单数据到结算结束
     }
 
@@ -837,7 +837,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         order.setOrderFee(orderFee);
         order.setItemList(itemList);
         list.add(order);
-        bridgeProductService.settlementSaveOrder(list);
+        bridgeProductService.settlementSaveOrder(list,3);
         /*****************************************同步订单数据到结算结束*****************************************/
 
         //首单，修改门店状态
