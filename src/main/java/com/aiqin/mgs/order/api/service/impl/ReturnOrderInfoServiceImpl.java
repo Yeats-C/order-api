@@ -25,6 +25,7 @@ import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.copartnerArea.PublicAreaStore;
+import com.aiqin.mgs.order.api.domain.po.order.ErpBatchInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
@@ -52,6 +53,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sun.xml.internal.bind.v2.TODO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -682,6 +684,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //公司编码
             returnOrderInfo1.setCompanyCode(returnOrderInfo.getCompanyCode());
             returnOrderInfo1.setCompanyName(returnOrderInfo.getCompanyName());
+            //收获时间
+            returnOrderInfo1.setReceiveTime(returnOrderInfo.getReceiveTime());
             List<ReturnOrderDetail> returnOrderDetailss = new ArrayList<>();
             BigDecimal aiqinCosts = BigDecimal.ZERO;
             //商品明细
@@ -692,6 +696,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             for (ErpOrderItem e : itemList){
                 for (ReturnOrderDetail  r :returnOrderDetails){
                     if (e.getSkuCode().equals(r.getSkuCode()) && e.getSkuName().equals(r.getSkuName())){
+                        //批次信息集合
+                        List<ErpBatchInfo>  batchInfoList = new ArrayList<>();
+                        ErpBatchInfo batchInfo = new ErpBatchInfo();
                         r.setProductBrandCode(e.getProductBrandCode());
                         r.setProductBrandName(e.getProductBrandName());
                         r.setProductCategoryCodes(e.getProductCategoryCode());
@@ -699,11 +706,18 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                         r.setProductPropertyCode(e.getProductPropertyCode());
                         r.setProductPropertyName(e.getProductPropertyName());
                         r.setPurchaseAmount(e.getPurchaseAmount());
+                        //批次信息
+                        batchInfo.setBatchInfoCode(r.getBatchInfoCode());
+                        batchInfo.setBatchNo(r.getBatchCode());
+                        Integer productCount = new Integer(e.getProductCount().intValue());
+                        batchInfo.setTotalProductCount(productCount);
+                        batchInfoList.add(batchInfo);
                         //申请退货数量 X 商品单价 = 爱亲成本价
                         BigDecimal returnProductCount = new  BigDecimal(r.getReturnProductCount().toString());
                         BigDecimal productAmount = e.getProductAmount();
                         BigDecimal multiply = returnProductCount.multiply(productAmount);
-                        aiqinCosts.add(multiply);
+                        aiqinCosts = aiqinCosts.add(multiply);
+                        r.setBatchList(batchInfoList);
                         returnOrderDetailss.add(r);
                     }
                 }
@@ -776,6 +790,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //公司编码
         returnOrderInfo1.setCompanyCode(roi.getCompanyCode());
         returnOrderInfo1.setCompanyName(roi.getCompanyName());
+        //收获时间
+        returnOrderInfo1.setReceiveTime(roi.getReceiveTime());
         List<ReturnOrderDetail> returnOrderDetailss = new ArrayList<>();
         BigDecimal aiqinCosts = BigDecimal.ZERO;
         //商品明细
@@ -786,6 +802,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         for (ErpOrderItem e : itemList){
             for (ReturnOrderDetail  r :returnOrderDetails){
                 if (e.getSkuCode().equals(r.getSkuCode()) && e.getSkuName().equals(r.getSkuName())){
+                    //批次信息集合
+                    List<ErpBatchInfo>  batchInfoList = new ArrayList<>();
+                    ErpBatchInfo batchInfo = new ErpBatchInfo();
                     r.setProductBrandCode(e.getProductBrandCode());
                     r.setProductBrandName(e.getProductBrandName());
                     r.setProductCategoryCodes(e.getProductCategoryCode());
@@ -793,11 +812,18 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     r.setProductPropertyCode(e.getProductPropertyCode());
                     r.setProductPropertyName(e.getProductPropertyName());
                     r.setPurchaseAmount(e.getPurchaseAmount());
+                    //批次信息
+                    batchInfo.setBatchInfoCode(r.getBatchInfoCode());
+                    batchInfo.setBatchNo(r.getBatchCode()) ;
+                    Integer productCount = new Integer(e.getProductCount().intValue());
+                    batchInfo.setTotalProductCount(productCount);
+                    batchInfoList.add(batchInfo);
                     //申请退货数量 X 商品单价 = 爱亲成本价
                     BigDecimal returnProductCount = new  BigDecimal(r.getReturnProductCount().toString());
                     BigDecimal productAmount = e.getProductAmount();
                     BigDecimal multiply = returnProductCount.multiply(productAmount);
-                    aiqinCosts.add(multiply);
+                    aiqinCosts = aiqinCosts.add(multiply);
+                    r.setBatchList(batchInfoList);
                     returnOrderDetailss.add(r);
                 }
             }

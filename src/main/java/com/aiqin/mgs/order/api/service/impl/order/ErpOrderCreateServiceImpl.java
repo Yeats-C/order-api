@@ -1810,9 +1810,9 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 //                item.setTopCouponDiscountAmount(couponShareRequest.getApinCouponAmount());
                 item.setTotalAcivityAmount(item.getActivityDiscountAmount().add(item.getTopCouponDiscountAmount()));
 
-                totalMoneyTotal = totalMoneyTotal.add(item.getTotalProductAmount());
-                activityMoneyTotal = activityMoneyTotal.add(item.getActivityDiscountAmount());
-                topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponDiscountAmount());
+//                totalMoneyTotal = totalMoneyTotal.add(item.getTotalProductAmount());
+//                activityMoneyTotal = activityMoneyTotal.add(item.getActivityDiscountAmount());
+//                topCouponMoneyTotal = topCouponMoneyTotal.add(item.getTopCouponDiscountAmount());
                 if(ErpProductGiftEnum.JIFEN.getCode().equals(item.getProductType())){
                     usedGiftQuota=usedGiftQuota.add(item.getTotalProductAmount());
                 }

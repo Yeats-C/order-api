@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.domain;
 
+import com.aiqin.mgs.order.api.domain.po.order.ErpBatchInfo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
@@ -9,6 +10,7 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @ApiModel("退货单表")
@@ -211,4 +213,8 @@ public class ReturnOrderDetail {
     @ApiModelProperty(value = "含税采购价（元）")
     @JsonProperty("purchase_amount")
     private BigDecimal purchaseAmount;
+
+    @ApiModelProperty(value="批次列表")
+    @JsonProperty("batch_list")
+    private List<ErpBatchInfo> batchList;
 }
