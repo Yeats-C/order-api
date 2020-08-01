@@ -814,7 +814,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     r.setPurchaseAmount(e.getPurchaseAmount());
                     //批次信息
                     batchInfo.setBatchInfoCode(r.getBatchInfoCode());
-                    batchInfo.setBatchNo(r.getBatchCode());
+                    batchInfo.setBatchNo(r.getBatchCode()) ;
                     Integer productCount = new Integer(e.getProductCount().intValue());
                     batchInfo.setTotalProductCount(productCount);
                     batchInfoList.add(batchInfo);

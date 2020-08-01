@@ -1034,7 +1034,7 @@ public class BridgeProductService<main> {
             //所属渠道名称
             erpOrderVo.setCompanyName(returnOrderInfo.getCompanyName());
             //当前时间
-            erpOrderVo.setInputTime(returnOrderInfo.getReceiveTime());
+            erpOrderVo.setInputTime(returnOrderInfo.getReceiveTime() );
             //爱亲成本总额
             erpOrderVo.setAiqinCost(returnOrderInfo.getAiqinCost());
 
