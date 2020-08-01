@@ -1053,7 +1053,7 @@ public void settlementSaveReturnOrder(ReturnOrderDetailVO order) {
             //所属渠道名称
             erpOrderVo.setCompanyName(returnOrderInfo.getCompanyName());
             //当前时间
-            erpOrderVo.setInputTime(new Date());
+            erpOrderVo.setInputTime(returnOrderInfo.getReceiveTime() );
             //爱亲成本总额
             erpOrderVo.setAiqinCost(returnOrderInfo.getAiqinCost());
 
@@ -1083,26 +1083,28 @@ public void settlementSaveReturnOrder(ReturnOrderDetailVO order) {
             info.setProductType(detail.getProductType());
             //熙耘采购价
 //            info.setScmpPurchaseAmount();
-            //渠道采购价
-            info.setPurchaseAmount(detail.getPurchaseAmount() == null ? BigDecimal.ZERO : detail.getPurchaseAmount());
-            //退货数量
-            info.setProductCount(detail.getReturnProductCount().intValue());
-            //退货金额
-            info.setTotalProductAmount(detail.getTotalProductAmount());
-            //退货单价
-            info.setPreferentialAmount(detail.getPreferentialAmount());
-            //退还A品券
-            if(null!=detail.getTopCouponDiscountAmount()){
-                info.setTopCouponMoney(detail.getTopCouponDiscountAmount());
-            }else{
-                info.setTopCouponMoney(BigDecimal.ZERO);
+                //渠道采购价
+                info.setPurchaseAmount(detail.getPurchaseAmount() == null ? BigDecimal.ZERO : detail.getPurchaseAmount());
+                //退货数量
+                info.setProductCount(detail.getReturnProductCount().intValue());
+                //退货金额
+                info.setTotalProductAmount(detail.getTotalProductAmount());
+                //退货单价
+                info.setPreferentialAmount(detail.getPreferentialAmount());
+                //退还A品券
+                if(null!=detail.getTopCouponDiscountAmount()){
+                    info.setTopCouponMoney(detail.getTopCouponDiscountAmount());
+                }else{
+                    info.setTopCouponMoney(BigDecimal.ZERO);
+                }
+                //批次集合
+                info.setBatchList(detail.getBatchList());
+                //退还服纺金
+                info.setSuitCouponMoney(BigDecimal.ZERO);
+                erpReturnOrderProductInfoList.add(info);
             }
-            //退还服纺金
-            info.setSuitCouponMoney(BigDecimal.ZERO);
-            erpReturnOrderProductInfoList.add(info);
-        }
-        erpOrderVo.setProdcutList(erpReturnOrderProductInfoList);
-        erpOrderList.add(erpOrderVo);
+            erpOrderVo.setProdcutList(erpReturnOrderProductInfoList);
+            erpOrderList.add(erpOrderVo);
 
         log.info("结算保存erp退货订单,参数为={}" + JsonUtil.toJson(erpOrderList));
         StringBuilder sb = new StringBuilder();
