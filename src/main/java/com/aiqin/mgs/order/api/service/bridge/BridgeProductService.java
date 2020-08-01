@@ -1034,7 +1034,7 @@ public class BridgeProductService<main> {
             //所属渠道名称
             erpOrderVo.setCompanyName(returnOrderInfo.getCompanyName());
             //当前时间
-            erpOrderVo.setInputTime(new Date());
+            erpOrderVo.setInputTime(returnOrderInfo.getReceiveTime());
             //爱亲成本总额
             erpOrderVo.setAiqinCost(returnOrderInfo.getAiqinCost());
 
@@ -1078,6 +1078,8 @@ public class BridgeProductService<main> {
                 }else{
                     info.setTopCouponMoney(BigDecimal.ZERO);
                 }
+                //批次集合
+                info.setBatchList(detail.getBatchList());
                 //退还服纺金
                 info.setSuitCouponMoney(BigDecimal.ZERO);
                 erpReturnOrderProductInfoList.add(info);
