@@ -653,6 +653,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         log.info("退款回调--查询退货单,返回结果returnOrderInfo={}",returnOrderInfo);
         //退款状态，0-未退款、1-已退款
         if(returnOrderInfo!=null&&returnOrderInfo.getRefundStatus().equals(ConstantData.REFUND_STATUS)){//1-已退款
+            //查询商品的商品信息
+            ErpOrderInfo orderDetailByOrderCode = erpOrderQueryService.getOrderDetailByOrderCode(returnOrderInfo.getOrderStoreCode());
             //将退货单同步到结算系统-----加
             ReturnOrderDetailVO  order = new ReturnOrderDetailVO();
             ReturnOrderInfo returnOrderInfo1 = new ReturnOrderInfo();
@@ -684,13 +686,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             returnOrderInfo1.setCompanyCode(returnOrderInfo.getCompanyCode());
             returnOrderInfo1.setCompanyName(returnOrderInfo.getCompanyName());
             //收获时间
-            returnOrderInfo1.setReceiveTime(returnOrderInfo.getReceiveTime());
+            returnOrderInfo1.setReceiveTime(orderDetailByOrderCode.getReceiveTime());
             List<ReturnOrderDetail> returnOrderDetailss = new ArrayList<>();
             BigDecimal aiqinCosts = BigDecimal.ZERO;
             //商品明细
             List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderInfo.getReturnOrderCode());
-            //查询商品的商品信息
-            ErpOrderInfo orderDetailByOrderCode = erpOrderQueryService.getOrderDetailByOrderCode(returnOrderInfo.getOrderStoreCode());
             List<ErpOrderItem> itemList = orderDetailByOrderCode.getItemList();
             for (ErpOrderItem e : itemList){
                 for (ReturnOrderDetail  r :returnOrderDetails){
@@ -759,6 +759,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             log.info("退款回调--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}",roi.getOrderStoreCode(), ErpOrderReturnStatusEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
             erpOrderInfoService.updateOrderReturnStatus(roi.getOrderStoreCode(), ErpOrderReturnRequestEnum.SUCCESS,returnQuantityList,ConstantData.SYS_OPERTOR,ConstantData.SYS_OPERTOR);
         }
+        //查询商品的商品信息
+        ErpOrderInfo orderDetailByOrderCode = erpOrderQueryService.getOrderDetailByOrderCode(roi.getOrderStoreCode());
         //将退货单同步到结算系统-----加
         ReturnOrderDetailVO  order = new ReturnOrderDetailVO();
         ReturnOrderInfo returnOrderInfo1 = new ReturnOrderInfo();
@@ -790,13 +792,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         returnOrderInfo1.setCompanyCode(roi.getCompanyCode());
         returnOrderInfo1.setCompanyName(roi.getCompanyName());
         //收获时间
-        returnOrderInfo1.setReceiveTime(roi.getReceiveTime());
+        returnOrderInfo1.setReceiveTime(orderDetailByOrderCode.getReceiveTime());
         List<ReturnOrderDetail> returnOrderDetailss = new ArrayList<>();
         BigDecimal aiqinCosts = BigDecimal.ZERO;
         //商品明细
         List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(roi.getReturnOrderCode());
-        //查询商品的商品信息
-        ErpOrderInfo orderDetailByOrderCode = erpOrderQueryService.getOrderDetailByOrderCode(roi.getOrderStoreCode());
         List<ErpOrderItem> itemList = orderDetailByOrderCode.getItemList();
         for (ErpOrderItem e : itemList){
             for (ReturnOrderDetail  r :returnOrderDetails){
