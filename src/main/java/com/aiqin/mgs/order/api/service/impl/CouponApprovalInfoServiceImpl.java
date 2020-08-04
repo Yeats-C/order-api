@@ -12,7 +12,6 @@ import com.aiqin.mgs.order.api.component.enums.ErpOrderReturnRequestEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderReturnStatusEnum;
 import com.aiqin.mgs.order.api.component.returnenums.ReturnOrderStatusEnum;
 import com.aiqin.mgs.order.api.component.returnenums.StoreStatusEnum;
-import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
 import com.aiqin.mgs.order.api.dao.CouponInfoDao;
@@ -26,7 +25,6 @@ import com.aiqin.mgs.order.api.domain.request.returnorder.FranchiseeAssetVo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
 import com.aiqin.mgs.order.api.service.CouponApprovalInfoService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderInfoService;
-import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.platform.flows.client.constant.Indicator;
 import com.aiqin.platform.flows.client.constant.IndicatorStr;
 import com.aiqin.platform.flows.client.constant.StatusEnum;
@@ -81,6 +79,8 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
     private ErpOrderInfoService erpOrderInfoService;
     @Autowired
     private ErpOrderOperationLogDao erpOrderOperationLogDao;
+    @Autowired
+    private FormDetailService  formDetailService;
 
 
 
@@ -247,19 +247,19 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                 }
             }
 
-//            //操作人
-//            String opertor="";
-//            String opertorName = "";
-//            HttpResponse httpResponse=formDetailService.goTaskOperateFormScmp(formCallBackVo.getFormNo(), null);
-//            Map<String,Object> map=(Map<String, Object>) httpResponse.getData();
-//            log.info("门店新增增品比例返还审批回调查询任务节点，返回结果,httpResponse={}", map);
-//            map=(Map<String, Object>) map.get("process");
-//            if(null!=map.get("applierCode")){
-//                opertor=map.get("applierCode").toString();
-//                opertorName=map.get("applierName").toString();
-//            }
+            //操作人
+            String opertor="";
+            String opertorName = "";
+            HttpResponse httpResponse=formDetailService.goTaskOperateFormScmp(formCallBackVo.getFormNo(), null);
+            Map<String,Object> map=(Map<String, Object>) httpResponse.getData();
+            log.info("门店新增增品比例返还审批回调查询任务节点，返回结果,httpResponse={}", map);
+            map=(Map<String, Object>) map.get("process");
+            if(null!=map.get("applierCode")){
+                opertor=map.get("applierCode").toString();
+                opertorName=map.get("applierName").toString();
+            }
             //订单日志
-            insertLog(couponApprovalDetail.getOrderId(),null,null, ErpLogOperationTypeEnum.UPDATE.getCode(), ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg());
+            insertLog(couponApprovalDetail.getOrderId(),opertor,opertorName, ErpLogOperationTypeEnum.UPDATE.getCode(), ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg());
             //更新本地审批表数据
             couponApprovalInfoDao.updateByFormNoSelective(couponApprovalInfo);
         } else {
