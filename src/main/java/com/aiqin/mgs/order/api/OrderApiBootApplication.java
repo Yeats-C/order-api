@@ -40,10 +40,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableScheduling //定时任务
 @SuppressWarnings("ALL")
 @Configuration
-@ComponentScan({"com.aiqin.platform"})
+@ComponentScan
 @GroundBoot
 @GroundDataSource
-@EnableTransactionManagement(proxyTargetClass=true)
+@EnableTransactionManagement
 @MapperScan(basePackages = {"com.aiqin.mgs.order.api.dao"})
 public class OrderApiBootApplication extends SpringBootServletInitializer {
 
