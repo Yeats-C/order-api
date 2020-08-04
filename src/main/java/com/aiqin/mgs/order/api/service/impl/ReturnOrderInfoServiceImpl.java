@@ -371,7 +371,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         reqVo.setReviewTime(new Date());
         Integer review = returnOrderInfoDao.updateReturnStatus(reqVo);
         //添加日志
-        insertLog(reqVo.getReturnOrderCode(),reqVo.getOperator(),reqVo.getOperator(),ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),reqVo.getOperateStatus(),content);
+        insertLog(reqVo.getReturnOrderCode(),reqVo.getOperatorId(),reqVo.getOperator(),ErpLogOperationTypeEnum.UPDATE.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),reqVo.getOperateStatus(),content);
         if (couponFlag) {
             log.info("驳回--进入A品券发放审批");
             //生成审批编码
