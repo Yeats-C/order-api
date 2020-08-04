@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 //@EnableScheduling //定时任务
 @SuppressWarnings("ALL")
 @Configuration
-@ComponentScan
+@ComponentScan(basePackages = {"com.aiqin.platform"})
 @GroundBoot
 @GroundDataSource
 @EnableTransactionManagement
