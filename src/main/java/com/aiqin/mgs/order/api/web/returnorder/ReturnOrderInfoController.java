@@ -7,15 +7,13 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
+import com.aiqin.mgs.order.api.domain.response.ReturnOrderTypeResponse;
 import com.aiqin.mgs.order.api.domain.response.returnorder.WholesaleReturnList;
 import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
-import com.aiqin.platform.flows.client.domain.vo.FormCallBackVo;
 import io.swagger.annotations.*;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.List;
 
@@ -214,4 +212,11 @@ public class ReturnOrderInfoController {
     public HttpResponse<WholesaleReturnList> selectList(@RequestBody wholesaleReturnOrderSearchVo whoVo){
         return returnOrderInfoService.selectAllList(whoVo);
     }
+
+    @GetMapping("/select/return/order/type")
+    @ApiOperation("查询退货类型")
+    public HttpResponse<ReturnOrderTypeResponse> selectReturnOrder(){
+       return returnOrderInfoService.selectReturnOrderAll();
+    }
+
 }
