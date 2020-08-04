@@ -6,20 +6,27 @@ import com.aiqin.mgs.order.api.base.ConstantData;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
+import com.aiqin.mgs.order.api.component.enums.ErpLogOperationTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.ErpLogSourceTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderReturnRequestEnum;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderReturnStatusEnum;
+import com.aiqin.mgs.order.api.component.returnenums.ReturnOrderStatusEnum;
 import com.aiqin.mgs.order.api.component.returnenums.StoreStatusEnum;
+import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
 import com.aiqin.mgs.order.api.dao.CouponInfoDao;
+import com.aiqin.mgs.order.api.dao.order.ErpOrderOperationLogDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
 import com.aiqin.mgs.order.api.domain.request.returnorder.FranchiseeAssetVo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderReviewReqVo;
 import com.aiqin.mgs.order.api.service.CouponApprovalInfoService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderInfoService;
+import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.platform.flows.client.constant.Indicator;
 import com.aiqin.platform.flows.client.constant.IndicatorStr;
 import com.aiqin.platform.flows.client.constant.StatusEnum;
@@ -71,6 +78,8 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
     private ReturnOrderDetailDao returnOrderDetailDao;
     @Resource
     private ErpOrderInfoService erpOrderInfoService;
+    @Autowired
+    private ErpOrderOperationLogDao erpOrderOperationLogDao;
 
 
     @Override
@@ -235,12 +244,44 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
                     updateReturnOrderStatus(ConstantData.RETURN_ORDER_STATUS_WAIT,couponApprovalDetail.getOrderId());
                 }
             }
+            AuthToken currentAuth = AuthUtil.getCurrentAuth();
+            //订单日志
+            insertLog(couponApprovalDetail.getOrderId(),currentAuth.getPersonId(),currentAuth.getPersonName(), ErpLogOperationTypeEnum.UPDATE.getCode(), ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg());
             //更新本地审批表数据
             couponApprovalInfoDao.updateByFormNoSelective(couponApprovalInfo);
         } else {
             //result = "false";
         }
         return result;
+    }
+
+
+    /**
+     * 插入日志表
+     * @param orderCode
+     * @param persionId
+     * @param persionName
+     * @param operationType
+     * @param sourceType
+     * @param status
+     * @param content
+     */
+    public void insertLog(String orderCode,String persionId,String persionName,Integer operationType,Integer sourceType,Integer status,String content){
+        ErpOrderOperationLog operationLog=new ErpOrderOperationLog();
+        operationLog.setOperationCode(orderCode);
+        operationLog.setOperationType(operationType);
+        operationLog.setSourceType(sourceType);
+        operationLog.setOperationStatus(status);
+        operationLog.setOperationContent(content);
+        operationLog.setRemark("");
+        operationLog.setCreateTime(new Date());
+        operationLog.setCreateById(persionId);
+        operationLog.setCreateByName(persionName);
+        operationLog.setUpdateTime(new Date());
+        operationLog.setUpdateById(persionId);
+        operationLog.setUpdateByName(persionName);
+        operationLog.setUseStatus(0);
+        erpOrderOperationLogDao.insert(operationLog);
     }
 
     /**

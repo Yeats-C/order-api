@@ -4,11 +4,14 @@ import com.aiqin.ground.util.exception.GroundRuntimeException;
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.json.JsonUtil;
+import com.aiqin.ground.util.protocol.MessageId;
+import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ConstantData;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
+import com.aiqin.mgs.order.api.component.ReturnOrderEnum.ReturnOrderEnum;
 import com.aiqin.mgs.order.api.component.SequenceService;
 import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOperationTypeEnum;
@@ -31,6 +34,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
 import com.aiqin.mgs.order.api.domain.request.StoreQuotaRequest;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
+import com.aiqin.mgs.order.api.domain.response.ReturnOrderTypeResponse;
 import com.aiqin.mgs.order.api.domain.response.ReturnRefundStatus;
 import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderStatusVo;
 import com.aiqin.mgs.order.api.domain.response.returnorder.WholesaleReturnList;
@@ -1989,6 +1993,23 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             return HttpResponse.success(resultModel);
         }
         return HttpResponse.success();
+    }
+
+    /**
+     * 查询退货类型
+     * @return
+     */
+    @Override
+    public HttpResponse<ReturnOrderTypeResponse> selectReturnOrderAll() {
+        List<ReturnOrderTypeResponse> eumValueList  = new ArrayList<>();
+        try {
+            eumValueList    = ReturnOrderEnum.getEumValueList();
+            log.info("查询枚举值返回结果：" + eumValueList);
+            return HttpResponse.success(eumValueList);
+        }catch (Exception e){
+            log.error("查询枚举值异常{}", e);
+            return HttpResponse.failure(MessageId.create(Project.ZERO, 01, "查询出现未知异常,请联系系统管理员."));
+        }
     }
 
 
