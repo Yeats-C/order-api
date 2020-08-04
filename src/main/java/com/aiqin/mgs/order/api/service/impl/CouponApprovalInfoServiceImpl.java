@@ -79,8 +79,7 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
     private ErpOrderInfoService erpOrderInfoService;
     @Autowired
     private ErpOrderOperationLogDao erpOrderOperationLogDao;
-    @Autowired
-    private FormDetailService  formDetailService;
+
 
 
 
@@ -258,8 +257,9 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
 //                opertor=map.get("applierCode").toString();
 //                opertorName=map.get("applierName").toString();
 //            }
+
             //订单日志
-            insertLog(couponApprovalDetail.getOrderId(),null,null, ErpLogOperationTypeEnum.UPDATE.getCode(), ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg());
+            insertLog(couponApprovalDetail.getOrderId(),couponApprovalInfo.getPreNodeOptUser(),couponApprovalInfo.getPreNodeOptUser(), ErpLogOperationTypeEnum.UPDATE.getCode(), ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg());
             //更新本地审批表数据
             couponApprovalInfoDao.updateByFormNoSelective(couponApprovalInfo);
         } else {
