@@ -5,6 +5,7 @@ import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
+import com.aiqin.mgs.order.api.domain.response.ReturnOrderTypeResponse;
 
 
 /**
@@ -181,6 +182,12 @@ public interface ReturnOrderInfoService {
      * @return
      */
     HttpResponse selectAllList(wholesaleReturnOrderSearchVo whoVo);
+
+    /**
+     * 查询退货类型
+     * @return
+     */
+    HttpResponse<ReturnOrderTypeResponse> selectReturnOrderAll();
 
 
 //    boolean refundPoints(ReturnOrderInfo returnOrderInfo);
