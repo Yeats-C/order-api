@@ -81,7 +81,7 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
     private ErpOrderInfoService erpOrderInfoService;
     @Autowired
     private ErpOrderOperationLogDao erpOrderOperationLogDao;
-    @Autowired
+    @Resource
     private FormDetailService  formDetailService;
 
 
