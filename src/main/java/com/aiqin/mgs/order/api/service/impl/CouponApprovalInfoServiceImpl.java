@@ -259,7 +259,7 @@ public class CouponApprovalInfoServiceImpl implements CouponApprovalInfoService 
 //            }
 
             //订单日志
-            insertLog(couponApprovalDetail.getOrderId(),couponApprovalInfo.getPreNodeOptUser(),couponApprovalInfo.getPreNodeOptUser(), ErpLogOperationTypeEnum.UPDATE.getCode(), ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg());
+            insertLog(couponApprovalDetail.getOrderId(),couponApprovalInfo.getApplierId(),couponApprovalInfo.getApplierName(), ErpLogOperationTypeEnum.UPDATE.getCode(), ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_COM.getMsg());
             //更新本地审批表数据
             couponApprovalInfoDao.updateByFormNoSelective(couponApprovalInfo);
         } else {
