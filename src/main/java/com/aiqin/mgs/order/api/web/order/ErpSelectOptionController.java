@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -31,9 +30,9 @@ public class ErpSelectOptionController {
     @GetMapping("/findOrderTypeList")
     @ApiOperation(value = "获取订单类型选项列表")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "query_type", value = "查询类型 1：运营ERP查询销售单列表； 2：运营ERP查询货架订单列表； 3：运营ERP查询购物车可创建订单类型类别； 4：运营ERP查询货架订单可创建订单类型类别； 5：爱掌柜查询订单列表订单类型类别； 6：爱掌柜查询购物车可创建订单类型类别；", dataType = "int", required = true)
+            @ApiImplicitParam(name = "query_type", value = "查询类型 1：运营ERP查询销售单列表； 2：运营ERP查询货架订单列表； 3：运营ERP查询购物车可创建订单类型类别； 4：运营ERP查询货架订单可创建订单类型类别； 5：爱掌柜查询订单列表订单类型类别； 6：爱掌柜查询购物车可创建订单类型类别；", dataType = "int", required = false)
     })
-    public HttpResponse<List<SelectOptionItem>> findOrderTypeList(@RequestParam("query_type") Integer queryType) {
+    public HttpResponse<List<SelectOptionItem>> findOrderTypeList(@RequestParam(value="query_type",required = false) Integer queryType) {
         HttpResponse response = HttpResponse.success();
         try {
             List<SelectOptionItem> list = ErpOrderTypeCategoryControlEnum.getOrderTypeSelectOptionList(queryType);
@@ -49,10 +48,10 @@ public class ErpSelectOptionController {
     @GetMapping("/findOrderCategoryList")
     @ApiOperation(value = "获取订单类别选项列表")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "query_type", value = "查询类型 1：运营ERP查询销售单列表； 2：运营ERP查询货架订单列表； 3：运营ERP查询购物车可创建订单类型类别； 4：运营ERP查询货架订单可创建订单类型类别； 5：爱掌柜查询订单列表订单类型类别； 6：爱掌柜查询购物车可创建订单类型类别；", dataType = "int", required = true),
-            @ApiImplicitParam(name = "order_type", value = "订单类型", dataType = "int", required = true)
+            @ApiImplicitParam(name = "query_type", value = "查询类型 1：运营ERP查询销售单列表； 2：运营ERP查询货架订单列表； 3：运营ERP查询购物车可创建订单类型类别； 4：运营ERP查询货架订单可创建订单类型类别； 5：爱掌柜查询订单列表订单类型类别； 6：爱掌柜查询购物车可创建订单类型类别；", dataType = "int", required = false),
+            @ApiImplicitParam(name = "order_type", value = "订单类型", dataType = "int", required = false)
     })
-    public HttpResponse<List<SelectOptionItem>> findOrderCategoryList(@RequestParam("query_type") Integer queryType, @RequestParam("order_type") Integer orderType) {
+    public HttpResponse<List<SelectOptionItem>> findOrderCategoryList(@RequestParam(value = "query_type",required = false) Integer queryType, @RequestParam(value = "order_type",required = false) Integer orderType) {
         HttpResponse response = HttpResponse.success();
         try {
             List<SelectOptionItem> list = ErpOrderTypeCategoryControlEnum.getOrderCategorySelectOptionList(queryType, orderType);

@@ -116,7 +116,12 @@ public enum ErpOrderTypeCategoryControlEnum {
             if (containsList.contains(orderTypeEnum.getCode())) {
                 continue;
             }
-            boolean flag = validateQueryType(queryType, item);
+            boolean flag=false;
+            if(queryType!=null){
+                flag= validateQueryType(queryType, item);
+            }else{
+                flag=true;
+            }
             if (flag) {
                 list.add(new SelectOptionItem(orderTypeEnum.getValue(), orderTypeEnum.getDesc()));
                 containsList.add(orderTypeEnum.getCode());
@@ -156,6 +161,13 @@ public enum ErpOrderTypeCategoryControlEnum {
                     list.add(new SelectOptionItem(orderCategoryEnum.getValue(), orderCategoryEnum.getDesc()));
                     containsList.add(orderCategoryEnum.getCode());
                 }
+            }
+        }else{
+            for (ErpOrderTypeCategoryControlEnum item :
+                    ErpOrderTypeCategoryControlEnum.values()) {
+                ErpOrderCategoryEnum orderCategoryEnum = item.getOrderCategoryEnum();
+                list.add(new SelectOptionItem(orderCategoryEnum.getValue(), orderCategoryEnum.getDesc()));
+                containsList.add(orderCategoryEnum.getCode());
             }
         }
 
