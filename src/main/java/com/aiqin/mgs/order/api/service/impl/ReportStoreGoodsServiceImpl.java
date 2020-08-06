@@ -312,10 +312,14 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
     @Override
     public void areaReturnSituation(ReportAreaReturnSituationVo vo) {
         Integer category=1;
+//        `type`'类型 1:直送退货 2:质量退货 3:一般退货' 4采购直送,
         if(vo.getType().equals(OrderTypeEnum.ORDER_TYPE_PS.getCode())&&vo.getReasonCode().equals(ReturnReasonEnum.ORDER_TYPE_ZS.getCode())){//配送质量
             category=2;
         }else if(vo.getType().equals(OrderTypeEnum.ORDER_TYPE_PS.getCode())&&vo.getReasonCode().equals(ReturnReasonEnum.ORDER_TYPE_PS.getCode())){//配送一般
             category=3;
+         //因爱掌柜退货有采购直送退货，加上判断采购直送
+        }else if (vo.getType().equals(OrderTypeEnum.ORDER_TYPE_CG.getCode())){
+            category=4;
         }
         String productUrl=productHost+"/area/province";
         log.info("调用product系统,查询所有省,请求url={}",productUrl);
@@ -404,11 +408,22 @@ public class ReportStoreGoodsServiceImpl implements ReportStoreGoodsService {
 
     @Override
     public void reportCategoryGoods(ReportAreaReturnSituationVo vo) {
+//        Integer insertType=1;
+//        if(vo.getType().equals(2)&&"14".equals(vo.getReasonCode())){
+//            insertType=2;
+//        }else if(vo.getType().equals(2)&&"15".equals(vo.getReasonCode())){
+//            insertType=3;
+//        }
+        //因订单类型改为 配送是1，直送是2，货架直送是3 ，采购直送是4
+//        类型 1:直送退货 2:质量退货 3:一般退货'
         Integer insertType=1;
-        if(vo.getType().equals(2)&&"14".equals(vo.getReasonCode())){
+        if(vo.getType().equals(1)&&"14".equals(vo.getReasonCode())){
             insertType=2;
-        }else if(vo.getType().equals(2)&&"15".equals(vo.getReasonCode())){
+        }else if(vo.getType().equals(1)&&"15".equals(vo.getReasonCode())){
             insertType=3;
+            //加上采购直送
+        }else if (vo.getType().equals(4)){
+            insertType=4;
         }
         //查询所有一级品类的编码集合，然后遍历去查询金额
         String url=productHost+"/search/spu/sku/category";
