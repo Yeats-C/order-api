@@ -428,7 +428,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             }
         }
         //配送且一般退货调用且审核通过，调用门店退货申请-完成(门店)
-        if("15".equals(returnOrderInfo.getReturnReasonCode())&&returnOrderInfo.getOrderType().equals(2)&&sysFlag){
+        if("15".equals(returnOrderInfo.getReturnReasonCode())&&returnOrderInfo.getOrderType().equals(1)&&sysFlag){
             //门店退货申请-完成(门店)（erp回调）--修改商品库存
             String url=productHost+"/order/return/insert";
             JSONObject body=new JSONObject();
