@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.service;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.request.MemberSaleRequest;
+import com.aiqin.mgs.order.api.domain.response.OrderSumResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
  * Description:
  */
 public interface BridgeMemberService {
-    List<OrderbyReceiptSumResponse> cashier( OrderQuery orderQuery);
+    OrderSumResponse cashier(OrderQuery orderQuery);
 
     /**
      * 更新会员消费时间记录

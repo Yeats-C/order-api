@@ -1244,9 +1244,14 @@ public class OrderServiceImpl implements OrderService {
 
             //获取收银员、支付类型金额
             List<OrderbyReceiptSumResponse> list = orderDao.cashier(orderQuery);
-            //统计储值卡充值金额
-            List<OrderbyReceiptSumResponse> list2 =bridgeMemberService.cashier(orderQuery);
-
+            //统计储值卡充值金额    储值金额，增加充值笔数
+            OrderSumResponse orderSumResponse  =bridgeMemberService.cashier(orderQuery);
+            List<OrderbyReceiptSumResponse>   list2=null;
+            if (orderSumResponse!=null){
+                 list2=orderSumResponse.getOrderbyReceiptSumResponses();
+                receiptSumInfo.setRechargeAmount(orderSumResponse.getRechargeAmount());
+                receiptSumInfo.setRechargeOrderAmount(orderSumResponse.getRechargeOrderAmount());
+            }
             if (list != null && list.size() > 0) {
                 for (int i = 0; i < list.size(); i++) {
                     OrderbyReceiptSumResponse info = new OrderbyReceiptSumResponse();

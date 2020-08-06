@@ -6,6 +6,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.OrderQuery;
 import com.aiqin.mgs.order.api.domain.request.MemberSaleRequest;
+import com.aiqin.mgs.order.api.domain.response.OrderSumResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
 import com.aiqin.mgs.order.api.service.BridgeMemberService;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -26,10 +27,10 @@ public class BridgeMemberServiceImpl implements BridgeMemberService {
     @Resource
     private UrlProperties urlProperties;
     @Override
-    public List<OrderbyReceiptSumResponse> cashier(OrderQuery orderQuery) {
+    public OrderSumResponse cashier(OrderQuery orderQuery) {
         log.info("storeValueRecordList:{}", JsonUtil.toJson(orderQuery));
         HttpClient httpClient = HttpClient.post(urlProperties.getMemberApi() + "/store-value/product/statistics").json(orderQuery);
-        HttpResponse<List<OrderbyReceiptSumResponse>> response= httpClient.action().result(new TypeReference<HttpResponse<List<OrderbyReceiptSumResponse>>>() {
+        HttpResponse<OrderSumResponse> response= httpClient.action().result(new TypeReference<HttpResponse<OrderSumResponse>>() {
         });
        return response.getData();
     }
