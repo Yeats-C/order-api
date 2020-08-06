@@ -969,17 +969,20 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //订单类型 0直送、1配送、2辅采
             //1直送 2配送 3货架
             Integer type=returnOrderInfo.getOrderType();
-            if(null!=type&&type.equals(1)){//订单类型 14配送tob 2直送tob
+            if(null!=type&&type.equals(1)){//订单类型 配送
 //                json.put("pay_order_type", PayOrderTypeEnum.PAY_ORDER_TYPE_PEI.getKey());
                 json.put("pay_order_type", PayOrderTypeEnum.PAY_ORDER_TYPE_ZHI.getKey());
 //                json.put("pay_origin_type",PayOriginTypeEnum.DIRECT_SEND_TOB_RETURN.getKey());
                 json.put("pay_origin_type",PayOriginTypeEnum.TOB_RETURN.getKey());
-            }else if(null!=type&&type.equals(2)){
+            }else if(null!=type&&type.equals(2)){ //直送
 //                json.put("pay_order_type",PayOrderTypeEnum.PAY_ORDER_TYPE_ZHI.getKey());
                 json.put("pay_order_type",PayOrderTypeEnum.PAY_ORDER_TYPE_PEI.getKey());
 //                json.put("pay_origin_type",PayOriginTypeEnum.TOB_RETURN.getKey());
                 json.put("pay_origin_type",PayOriginTypeEnum.DIRECT_SEND_TOB_RETURN.getKey());
-            }else if (null!=type&&type.equals(3)){
+            }else if (null!=type&&type.equals(3)){ //货架直送
+                json.put("pay_order_type", PayOrderTypeEnum.PAY_ORDER_TYPE_ZHI.getKey());
+                json.put("pay_origin_type",PayOriginTypeEnum.TOB_RETURN.getKey());
+            }else if(null!=type&&type.equals(4)){  //采购直送
                 json.put("pay_order_type", PayOrderTypeEnum.PAY_ORDER_TYPE_ZHI.getKey());
                 json.put("pay_origin_type",PayOriginTypeEnum.TOB_RETURN.getKey());
             }
