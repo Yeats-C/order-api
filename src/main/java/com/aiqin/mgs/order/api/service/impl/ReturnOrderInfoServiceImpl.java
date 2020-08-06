@@ -216,7 +216,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         erpOrderInfoService.updateOrderReturnStatus(record.getOrderStoreCode(), ErpOrderReturnRequestEnum.WAIT,null,record.getCreateById(),record.getCreateByName());
         log.info("发起退货--修改原始订单数据结束");
         //如果是配送质量退货，请求时调用门店退货申请
-        if(!("15".equals(reqVo.getReturnReasonCode())&&reqVo.getOrderType().equals(2))){
+//        if(!("15".equals(reqVo.getReturnReasonCode())&&reqVo.getOrderType().equals(2))){
+        if(!("15".equals(reqVo.getReturnReasonCode())&&reqVo.getOrderType().equals(1))){
             //门店退货申请-完成(门店)（erp回调）--修改商品库存
             String url=productHost+"/order/return/insert";
             JSONObject body=new JSONObject();
