@@ -129,12 +129,15 @@ public class OrderServiceImpl implements OrderService {
     private PrestorageOrderSupplyLogsDao prestorageOrderSupplyLogsDao;
     @Resource
     private PayService payService;
+
     @Resource
     private OrderAfterService orderAfterService;
     @Resource
     private CashierShiftScheduleDao cashierShiftScheduleDao;
     @Resource
     private BridgePayService bridgePayService;
+    @Resource
+    private BridgeMemberService bridgeMemberService;
     //商品项目地址
     @Value("${slcsIp}")
     public String slcsIp;
@@ -339,7 +342,7 @@ public class OrderServiceImpl implements OrderService {
         memberSaleRequest.setMemberId(orderInfo.getOrderInfo().getMemberId());
         memberSaleRequest.setLastSaleAmount(orderInfo.getSettlementInfo().getOrderReceivable());
 
-        bridgePayService.updateMemberSale(memberSaleRequest);
+        bridgeMemberService.updateMemberSale(memberSaleRequest);
     }
 
     private HttpResponse tocOrderCallback(OrderodrInfo orderInfo) {
@@ -636,6 +639,7 @@ public class OrderServiceImpl implements OrderService {
 
         });
         inventoryDetailRequest.setInventoryRecordRequests(operateStockVos);
+        inventoryDetailRequest.setEnabledProduct(true);
         inventoryDetailRequests.add(inventoryDetailRequest);
         return bridgeProductService.changeStock(inventoryDetailRequests);
     }
@@ -1240,6 +1244,8 @@ public class OrderServiceImpl implements OrderService {
 
             //获取收银员、支付类型金额
             List<OrderbyReceiptSumResponse> list = orderDao.cashier(orderQuery);
+            //统计储值卡充值金额
+            List<OrderbyReceiptSumResponse> list2 =bridgeMemberService.cashier(orderQuery);
 
             if (list != null && list.size() > 0) {
                 for (int i = 0; i < list.size(); i++) {
@@ -1258,6 +1264,26 @@ public class OrderServiceImpl implements OrderService {
                         receiptSumInfo.setBankCard(info.getPayPrice());
                     } else {
                         receiptSumInfo.setCash(info.getPayPrice());
+                    }
+                }
+            }
+
+            if (list2 != null && list2.size() > 0) {
+                for (int i = 0; i < list2.size(); i++) {
+                    OrderbyReceiptSumResponse info = new OrderbyReceiptSumResponse();
+                    info = list2.get(i);
+
+
+                    if (info.getPayType().equals(Global.P_TYPE_3)) {
+                        receiptSumInfo.setCash(Optional.ofNullable(receiptSumInfo.getCash()).orElse(0L)+Optional.ofNullable(info.getPayPrice()).orElse(0L));
+                    } else if (info.getPayType().equals(Global.P_TYPE_4)) {
+                        receiptSumInfo.setWeChat(Optional.ofNullable(receiptSumInfo.getWeChat()).orElse(0L)+Optional.ofNullable(info.getPayPrice()).orElse(0L));
+                    } else if (info.getPayType().equals(Global.P_TYPE_5)) {
+                        receiptSumInfo.setAliPay(Optional.ofNullable(receiptSumInfo.getAliPay()).orElse(0L)+Optional.ofNullable(info.getPayPrice()).orElse(0L));
+                    } else if (info.getPayType().equals(Global.P_TYPE_6)) {
+                        receiptSumInfo.setBankCard(Optional.ofNullable(receiptSumInfo.getBankCard()).orElse(0L)+Optional.ofNullable(info.getPayPrice()).orElse(0L));
+                    } else {
+                        receiptSumInfo.setCash(Optional.ofNullable(receiptSumInfo.getCash()).orElse(0L)+Optional.ofNullable(info.getPayPrice()).orElse(0L));
                     }
                 }
             }
