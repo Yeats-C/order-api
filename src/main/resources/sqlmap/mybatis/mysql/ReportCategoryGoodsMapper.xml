@@ -30,6 +30,7 @@
         and type = #{type}
       </if>
       and (amount!=0 or proportion!=0)
+      AND LENGTH( category_code ) = 2
     </where>
   </select>
 

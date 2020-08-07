@@ -22,9 +22,4 @@ public interface BridgePayService {
      */
     void toRefund(PayReq payReq);
 
-    /**
-     * 更新会员消费时间记录
-     * @param memberSaleRequest
-     */
-    void updateMemberSale(MemberSaleRequest memberSaleRequest);
 }

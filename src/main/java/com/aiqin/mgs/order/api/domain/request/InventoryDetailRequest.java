@@ -64,4 +64,7 @@ public class InventoryDetailRequest {
     public InventoryDetailRequest(){
 
     }
+    @ApiModelProperty(value = "是否允许0库存销售，默认可以")
+    @JsonProperty("enabled_froduct")
+    private boolean enabledProduct;
 }

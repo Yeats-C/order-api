@@ -48,18 +48,5 @@ public class BridgePayServiceImpl implements BridgePayService {
 
     }
 
-    @Override
-    public void updateMemberSale(MemberSaleRequest memberSaleRequest) {
-        HttpClient client = HttpClient.post(urlProperties.getMemberApi() + "/members/updateMemberSaleData").json(memberSaleRequest);
-        try {
-            HttpResponse response = client.action().result(new TypeReference<HttpResponse>() {  });
-            logger.info("updateMemberSale:"+response);
 
-        }catch (Exception e){
-            logger.info("updateMemberSaleErr:"+memberSaleRequest);
-            logger.error(e.toString());
-        }
-
-
-    }
 }

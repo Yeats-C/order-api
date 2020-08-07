@@ -8,6 +8,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
+import com.aiqin.mgs.order.api.component.enums.ErpOrderTypeEnum;
 import com.aiqin.mgs.order.api.component.returnenums.ReturnOrderTypeEnum;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
 import com.aiqin.mgs.order.api.domain.*;
@@ -878,7 +879,12 @@ public HttpResponse<MerchantPaBalanceRespVO> accountBalance(String franchiseeId)
                 erpOrderVo.setMainOrderCode(order.getMainOrderCode());
                 //订单状态  1:已支付 2：已发货  3:已收货
 
-                erpOrderVo.setOrderStatus(orderStatus);
+                if (!ErpOrderTypeEnum.ASSIST_PURCHASING.getValue().equals(order.getOrderTypeCode())) {
+                    erpOrderVo.setOrderStatus(orderStatus);
+                }else{
+                    //如果是货架订单，直接变成已签收状态
+                    erpOrderVo.setOrderStatus(3);
+                }
 
                 //客户编码
                 erpOrderVo.setFranchiseeCode(order.getFranchiseeCode());
@@ -899,7 +905,11 @@ public HttpResponse<MerchantPaBalanceRespVO> accountBalance(String franchiseeId)
                 //订单总额
                 erpOrderVo.setTotalProductAmount(order.getTotalProductAmount());
                 //实付金额
-                erpOrderVo.setActualTotalProductAmount(order.getOrderFee().getPayMoney());
+                if(null!=order.getActualTotalProductAmount()){
+                    erpOrderVo.setActualTotalProductAmount(order.getActualTotalProductAmount());
+                }else{
+                    erpOrderVo.setActualTotalProductAmount(order.getTotalProductAmount());
+                }
                 //订单商品总数量
                 erpOrderVo.setTotalProductCount(productCount);
                 //实发商品总数量

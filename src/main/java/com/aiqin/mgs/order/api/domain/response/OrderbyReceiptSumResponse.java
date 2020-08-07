@@ -10,7 +10,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
+@Data
 @ApiModel("封装-收银员交班收银情况统计")
 public class OrderbyReceiptSumResponse{
     
@@ -53,6 +55,13 @@ public class OrderbyReceiptSumResponse{
     @ApiModelProperty("销售额")
     @JsonProperty("sales_amount")
     private Long salesAmount;
+
+	@ApiModelProperty("储值金额")
+	@JsonProperty("recharge_amount")
+    private Long rechargeAmount;
+	@ApiModelProperty("充值笔数")
+	@JsonProperty("recharge_order_amount")
+	private Long rechargeOrderAmount;
     
     @ApiModelProperty("销售订单数")
     @JsonProperty("sales_order_amount")
@@ -65,111 +74,17 @@ public class OrderbyReceiptSumResponse{
 	@ApiModelProperty("上次交接时间")
 	@JsonProperty("loading_start")
 	private String loadingStart;
-    
 
-	public Long getPayPrice() {
-		return payPrice;
-	}
 
-	public void setPayPrice(Long payPrice) {
-		this.payPrice = payPrice;
-	}
+    @ApiModelProperty("微信退款金额")
+    @JsonProperty("return_we_chat")
+    private Long returnWeChat;
 
-	public String getCashierId() {
-		return cashierId;
-	}
+    @ApiModelProperty("支付宝退款金额")
+    @JsonProperty("return_ali_pay")
+    private Long returnAliPay;
 
-	public void setCashierId(String cashierId) {
-		this.cashierId = cashierId;
-	}
 
-	public String getCashierName() {
-		return cashierName;
-	}
-
-	public void setCashierName(String cashierName) {
-		this.cashierName = cashierName;
-	}
-
-	public Long getCash() {
-		return cash;
-	}
-
-	public void setCash(Long cash) {
-		this.cash = cash;
-	}
-
-	public Long getWeChat() {
-		return weChat;
-	}
-
-	public void setWeChat(Long weChat) {
-		this.weChat = weChat;
-	}
-
-	public Long getAliPay() {
-		return aliPay;
-	}
-
-	public void setAliPay(Long aliPay) {
-		this.aliPay = aliPay;
-	}
-
-	public Long getBankCard() {
-		return bankCard;
-	}
-
-	public void setBankCard(Long bankCard) {
-		this.bankCard = bankCard;
-	}
-
-	public Long getReturnPrice() {
-		return returnPrice;
-	}
-
-	public void setReturnPrice(Long returnPrice) {
-		this.returnPrice = returnPrice;
-	}
-
-	public Long getSalesAmount() {
-		return salesAmount;
-	}
-
-	public void setSalesAmount(Long salesAmount) {
-		this.salesAmount = salesAmount;
-	}
-
-	public Integer getSalesOrderAmount() {
-		return salesOrderAmount;
-	}
-
-	public void setSalesOrderAmount(Integer salesOrderAmount) {
-		this.salesOrderAmount = salesOrderAmount;
-	}
-
-	public Integer getReturnOrderAmount() {
-		return returnOrderAmount;
-	}
-
-	public void setReturnOrderAmount(Integer returnOrderAmount) {
-		this.returnOrderAmount = returnOrderAmount;
-	}
-
-	public Integer getPayType() {
-		return payType;
-	}
-
-	public void setPayType(Integer payType) {
-		this.payType = payType;
-	}
-
-	public String getLoadingStart() {
-		return loadingStart;
-	}
-
-	public void setLoadingStart(String loadingStart) {
-		this.loadingStart = loadingStart;
-	}
 }
 
 
