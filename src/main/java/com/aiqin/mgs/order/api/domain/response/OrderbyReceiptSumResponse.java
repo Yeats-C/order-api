@@ -74,7 +74,16 @@ public class OrderbyReceiptSumResponse{
 	@ApiModelProperty("上次交接时间")
 	@JsonProperty("loading_start")
 	private String loadingStart;
-    
+
+
+    @ApiModelProperty("微信退款金额")
+    @JsonProperty("return_we_chat")
+    private Long returnWeChat;
+
+    @ApiModelProperty("支付宝退款金额")
+    @JsonProperty("return_ali_pay")
+    private Long returnAliPay;
+
 
 }
 

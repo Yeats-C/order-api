@@ -1306,6 +1306,8 @@ public class OrderServiceImpl implements OrderService {
             receiptSumInfo.setReturnOrderAmount(returnReceiptSum.getReturnOrderAmount() != null ? returnReceiptSum.getReturnOrderAmount() : 0);
             receiptSumInfo.setReturnPrice(returnReceiptSum.getReturnPrice() != null ? returnReceiptSum.getReturnPrice() : 0);
             receiptSumInfo.setLoadingStart(beginTime);
+            receiptSumInfo.setReturnAliPay(0L);
+            receiptSumInfo.setReturnWeChat(0L);
             return HttpResponse.success(receiptSumInfo);
         } catch (Exception e) {
             LOGGER.error("接口-收银员交班收银情况统计异常：{}", e);
