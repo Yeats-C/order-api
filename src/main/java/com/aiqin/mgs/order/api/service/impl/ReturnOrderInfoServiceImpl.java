@@ -34,6 +34,7 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
 import com.aiqin.mgs.order.api.domain.request.StoreQuotaRequest;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
+import com.aiqin.mgs.order.api.domain.response.ReturnOrderDetailList;
 import com.aiqin.mgs.order.api.domain.response.ReturnOrderTypeResponse;
 import com.aiqin.mgs.order.api.domain.response.ReturnRefundStatus;
 import com.aiqin.mgs.order.api.domain.response.returnorder.ReturnOrderStatusVo;
@@ -1892,25 +1893,32 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //普通循环
             List<ReturnOrderDetail> details = new ArrayList<>();
             List<ReturnWholesaleOrderDetail> details1 = reqVo.getDetails();
-            //门店实收数量 ---
-            Long actualInboundCount = 0L;
-            //已退货数量
-            Long quantityReturnedCount = 0L;
-            //申请退货数量
-            Long returnProductCount = 0L;
+//            //门店实收数量 ---
+//            Long actualInboundCount = 0L;
+//            //已退货数量
+//            Long quantityReturnedCount = 0L;
+//            //申请退货数量
+//            Long returnProductCount = 0L;
+            //修改退货按钮状态使用---加
+            List<ReturnOrderDetailList> returnButtion = new ArrayList<>();
             for (ReturnWholesaleOrderDetail sd : details1) {
                 ReturnOrderDetail detail = new ReturnOrderDetail();
+                //
+                ReturnOrderDetailList returnOrderDetailList = new ReturnOrderDetailList();
                     //商品属性 0新品1残品
                     Integer productStatus = 0;
                     if (null != sd.getProductStatus()) {
                         productStatus = sd.getProductStatus();
                     }
                     //门店实收数量  ----
-                    actualInboundCount = sd.getActualInboundCount();
+//                    actualInboundCount = sd.getActualInboundCount();
+                    returnOrderDetailList.setActualInboundCount(sd.getActualInboundCount());
                     //已退数量    ----
-                    quantityReturnedCount = sd.getQuantityReturnedCount() == null ? 0L : sd.getQuantityReturnedCount();
+//                    quantityReturnedCount = sd.getQuantityReturnedCount() == null ? 0L : sd.getQuantityReturnedCount();
+                    returnOrderDetailList.setQuantityReturnedCount(sd.getQuantityReturnedCount() == null ? 0L : sd.getQuantityReturnedCount());
                     //申请退货数量
-                    returnProductCount = sd.getReturnProductCount();
+//                    returnProductCount = sd.getReturnProductCount();
+                    returnOrderDetailList.setReturnProductCount(sd.getReturnProductCount());
                    //均摊后的金额乘以退货数量
                     BigDecimal preferentialAmount = sd.getPreferentialAmount();
                     BigDecimal multiply = preferentialAmount.multiply(BigDecimal.valueOf(sd.getReturnProductCount()));
@@ -1926,6 +1934,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     detail.setCreateById(reqVo.getCreateById());
                     detail.setCreateByName(reqVo.getCreateByName());
                     detail.setProductStatus(productStatus);
+                    returnButtion.add(returnOrderDetailList);
                     details.add(detail);
                 }
             //退货金额
@@ -1943,14 +1952,39 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             log.info("发起批发退货--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}", record.getOrderStoreCode(), ErpOrderReturnStatusEnum.WAIT, null, record.getCreateById(), record.getCreateByName());
             erpOrderInfoService.updateOrderReturnStatus(record.getOrderStoreCode(), ErpOrderReturnRequestEnum.WAIT, null, record.getCreateById(), record.getCreateByName());
             log.info("发起批发退货--修改原始订单数据结束");
-            if((actualInboundCount - quantityReturnedCount) != 0 ){
-                if(((actualInboundCount - quantityReturnedCount) - returnProductCount) == 0){//说明没有可退的商品数量，修改订单状态
-                    log.info("开始-----修改原订单的退货流程节点状态");
-                    erpOrderInfoDao.updateOrderReturnProcess(reqVo.getOrderStoreCode());
-                    log.info("结束------修改原订单的退货流程节点状态");
-                }else {
-                    erpOrderInfoDao.updateOrderReturnProcessStatus(reqVo.getOrderStoreCode());
+//            if((actualInboundCount - quantityReturnedCount) != 0 ){
+//                if(((actualInboundCount - quantityReturnedCount) - returnProductCount) == 0){//说明没有可退的商品数量，修改订单状态
+//                    log.info("开始-----修改原订单的退货流程节点状态");
+//                    erpOrderInfoDao.updateOrderReturnProcess(reqVo.getOrderStoreCode());
+//                    log.info("结束------修改原订单的退货流程节点状态");
+//                }else {
+//                    erpOrderInfoDao.updateOrderReturnProcessStatus(reqVo.getOrderStoreCode());
+//                }
+//            }
+            log.info("状态集合： " + returnButtion);
+            List<String> returnButtions = new ArrayList<>();
+            List<String> noRefund = new ArrayList<>();
+            for (ReturnOrderDetailList returnOrderDetailList : returnButtion){
+                Long actualInboundCount = returnOrderDetailList.getActualInboundCount();
+                Long quantityReturnedCount = returnOrderDetailList.getQuantityReturnedCount();
+                Long returnProductCount = returnOrderDetailList.getReturnProductCount();
+                if ((actualInboundCount - quantityReturnedCount) != 0){
+                    if (((actualInboundCount - quantityReturnedCount) - returnProductCount) == 0){//说明没有可退的商品数量，修改订单状态e
+
+                    }else {
+                        returnButtions.add("1");
+                    }
+                }else {//如果减去已退货等于0，表示没有可退货
+                    noRefund.add("2");
                 }
+            }
+            log.info("是否还有可退商品的状态--noRefund： " +  noRefund + ",以及returnButtions： " + returnButtions);
+            if (CollectionUtils.isEmpty(noRefund) || CollectionUtils.isEmpty(returnButtions)){
+                log.info("修改---原订单退货流程节点--正在退货");
+                erpOrderInfoDao.updateOrderReturnProcess(reqVo.getOrderStoreCode());
+            }else {
+                log.info("修改---原订单退货流程节点--无进行退货中");
+                erpOrderInfoDao.updateOrderReturnProcessStatus(reqVo.getOrderStoreCode());
             }
             log.info("审核后-调用发起批发退货开始");
             ReturnOrderReviewReqVo reqVo1 = new ReturnOrderReviewReqVo();

@@ -33,6 +33,7 @@ import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import com.aiqin.mgs.order.api.util.CopyBeanUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -998,8 +999,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         boolean returnStartFlag = false;
         //是否全部退货
         boolean returnEndFlag = true;
-        //商品实收数量 ---加
-        Long actualInboundCount = 0L;
+//        //商品实收数量 ---加
+//        Long actualInboundCount = 0L;
         for (ErpOrderItem item :
                 newItemList) {
             if (ErpProductGiftEnum.GIFT.getCode().equals(item.getProductType())) {
@@ -1013,8 +1014,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 //如果有一行有退货数量，则算部分退货
                 returnStartFlag = true;
             }
-            //获取门店实收数量 --加
-            actualInboundCount = item.getActualInboundCount();
+//            //获取门店实收数量 --加
+//            actualInboundCount = item.getActualInboundCount();
         }
 
         if (returnEndFlag) {
@@ -1026,22 +1027,50 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         }
         this.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
         //判断是否还有可退数量-没有就不能发起退货  ---加
-        ReturnOrder returnOrder = returnOrderInfoDao.selectReturnOrderCode(orderCode);
-        logger.info("查询退货数据中-上单-已退货数量和申请退货数量:{}",returnOrder);
-        Long quantityReturnedCount = 0L;
-        Long returnProductCount = 0L;
-        if (returnOrder == null){
-        }else {
-          quantityReturnedCount = returnOrder.getQuantityReturnedCount() == null? 0L : returnOrder.getQuantityReturnedCount();
-         returnProductCount = returnOrder.getReturnProductCount();
+        List<ReturnOrder> returnOrders = returnOrderInfoDao.selectReturnOrderCode(orderCode);
+        logger.info("查询退货数据中-上单-已退货数量和申请退货数量:{}",returnOrders);
+//        Long quantityReturnedCount = 0L;
+//        Long returnProductCount = 0L;
+//        if (returnOrder == null){
+//        }else {
+//          quantityReturnedCount = returnOrder.getQuantityReturnedCount() == null? 0L : returnOrder.getQuantityReturnedCount();
+//         returnProductCount = returnOrder.getReturnProductCount();
+//        }
+//       if((returnProductCount + quantityReturnedCount) == actualInboundCount){
+//           //修改原订单中的退货流程状态
+//           erpOrderInfoDao.updateOrderReturnProcess(orderCode);
+//       }else {
+//           //修改原订单中的退货流程状态
+//           erpOrderInfoDao.updateOrderReturnProcessStatus(orderCode);
+//       }
+        List<String> returnButtions = new ArrayList<>();
+        List<String> noRefund = new ArrayList<>();
+        for (ErpOrderItem erpOrderItem : newItemList){
+            for (ReturnOrder returnOrder : returnOrders){
+                if (erpOrderItem.getSkuCode().equals(returnOrder.getSkuCode())&& erpOrderItem.getSkuName().equals(returnOrder.getSkuName())){
+                    Long actualInboundCount = erpOrderItem.getActualInboundCount();
+                    Long returnProductCount = returnOrder.getReturnProductCount();
+                    Long quantityReturnedCount = returnOrder.getQuantityReturnedCount() == null ? 0L :returnOrder.getQuantityReturnedCount();
+                    if ((actualInboundCount - quantityReturnedCount) != 0){
+                        if (((actualInboundCount - quantityReturnedCount) - returnProductCount) == 0){//说明没有可退的商品数量，修改订单状态e
+
+                        }else {
+                            returnButtions.add("1");
+                        }
+                    }else { //如果减去已退货等于0，表示没有可退货
+                        noRefund.add("2");
+                    }
+                }
+            }
         }
-       if((returnProductCount + quantityReturnedCount) == actualInboundCount){
-           //修改原订单中的退货流程状态
-           erpOrderInfoDao.updateOrderReturnProcess(orderCode);
-       }else {
-           //修改原订单中的退货流程状态
-           erpOrderInfoDao.updateOrderReturnProcessStatus(orderCode);
-       }
+        logger.info("修改退货流程状态结果-noRefund： " + noRefund + ",--returnButtions: " + returnButtions);
+        if (CollectionUtils.isEmpty(noRefund) || CollectionUtils.isEmpty(returnButtions)){
+            logger.info("修改---原订单退货流程节点--正在退货");
+            erpOrderInfoDao.updateOrderReturnProcess(orderCode);
+        }else {
+            logger.info("修改---原订单退货流程节点--无进行退货中");
+            erpOrderInfoDao.updateOrderReturnProcessStatus(orderCode);
+        }
     }
 
     /**
