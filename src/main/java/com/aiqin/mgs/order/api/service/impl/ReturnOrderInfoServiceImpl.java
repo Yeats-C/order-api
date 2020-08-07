@@ -1979,12 +1979,12 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 }
             }
             log.info("是否还有可退商品的状态--noRefund： " +  noRefund + ",以及returnButtions： " + returnButtions);
-            if (CollectionUtils.isEmpty(noRefund) || CollectionUtils.isEmpty(returnButtions)){
-                log.info("修改---原订单退货流程节点--正在退货");
-                erpOrderInfoDao.updateOrderReturnProcess(reqVo.getOrderStoreCode());
-            }else {
+            if (CollectionUtils.isEmpty(noRefund) && CollectionUtils.isNotEmpty(returnButtions)){
                 log.info("修改---原订单退货流程节点--无进行退货中");
                 erpOrderInfoDao.updateOrderReturnProcessStatus(reqVo.getOrderStoreCode());
+            }else {
+                log.info("修改---原订单退货流程节点--正在退货");
+                erpOrderInfoDao.updateOrderReturnProcess(reqVo.getOrderStoreCode());
             }
             log.info("审核后-调用发起批发退货开始");
             ReturnOrderReviewReqVo reqVo1 = new ReturnOrderReviewReqVo();
