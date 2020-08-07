@@ -1071,12 +1071,12 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             }
         }
         logger.info("修改退货流程状态结果-noRefund： " + noRefund + ",--returnButtions: " + returnButtions);
-        if (CollectionUtils.isEmpty(noRefund) || CollectionUtils.isEmpty(returnButtions)){
-            logger.info("修改---原订单退货流程节点--正在退货");
-            erpOrderInfoDao.updateOrderReturnProcess(orderCode);
-        }else {
+        if (CollectionUtils.isEmpty(noRefund) && CollectionUtils.isNotEmpty(returnButtions)){
             logger.info("修改---原订单退货流程节点--无进行退货中");
             erpOrderInfoDao.updateOrderReturnProcessStatus(orderCode);
+        }else {
+            logger.info("修改---原订单退货流程节点--正在退货");
+            erpOrderInfoDao.updateOrderReturnProcess(orderCode);
         }
     }
 
