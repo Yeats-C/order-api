@@ -1501,7 +1501,8 @@
       select order_success from return_order_info where return_order_code = #{returnOrderCode,jdbcType=VARCHAR}
     </select>
   <select id="selectRefundStatus" resultType="com.aiqin.mgs.order.api.domain.response.ReturnRefundStatus">
-       SELECT b.actual_return_product_count as actualReturnProductCount, a.order_store_code as orderStoreCode,a.create_time as createTime,a.refund_status  as refundStatus
+       SELECT b.actual_return_product_count as actualReturnProductCount, a.order_store_code as orderStoreCode,a.create_time as createTime,a.refund_status  as refundStatus,
+       a.return_order_code as returnOrderCode
        FROM return_order_info a
       LEFT JOIN return_order_detail b
       on a.return_order_code = b.return_order_code
@@ -1509,7 +1510,7 @@
   </select>
   <select id="selectReturnOrderCode" resultType="com.aiqin.mgs.order.api.domain.response.ReturnOrder">
        select b.return_product_count as returnProductCount,b.quantity_returned_count as quantityReturnedCount,
-           b.return_order_code as returnOrderCode
+           b.return_order_code as returnOrderCode, b.sku_code as skuCode, b.sku_name as skuName
     from return_order_info a LEFT JOIN return_order_detail b
     on a.return_order_code = b.return_order_code
     where a.order_store_code = #{orderCode} ORDER BY a.create_time  DESC LIMIT 1
