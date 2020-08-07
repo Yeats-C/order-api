@@ -1258,7 +1258,7 @@ public class OrderServiceImpl implements OrderService {
                     info = list.get(i);
 
                     receiptSumInfo.setCashierId(info.getCashierId());
-                    receiptSumInfo.setCashierName(info.getCashierId());
+                    receiptSumInfo.setCashierName(info.getCashierName());
                     if (info.getPayType().equals(Global.P_TYPE_3)) {
                         receiptSumInfo.setCash(info.getPayPrice());
                     } else if (info.getPayType().equals(Global.P_TYPE_4)) {
