@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.domain.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -25,5 +26,9 @@ public class ReturnRefundStatus {
     @ApiModelProperty(value = "退款状态，0-未退款、1-已退款")
 //    @JsonProperty("refund_status")
     private Integer refundStatus;
+
+    @ApiModelProperty("退货单号")
+//    @JsonProperty("return_order_code")
+    private String returnOrderCode;
 
 }

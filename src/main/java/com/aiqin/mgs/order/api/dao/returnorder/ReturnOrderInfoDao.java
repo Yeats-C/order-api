@@ -94,5 +94,5 @@ public interface ReturnOrderInfoDao {
     //查询统一订单上次退货是否退款成功
     ReturnRefundStatus selectRefundStatus(String orderStoreCode);
     //查询退货单编码
-    ReturnOrder selectReturnOrderCode(String orderCode);
+    List<ReturnOrder> selectReturnOrderCode(String orderCode);
 }
