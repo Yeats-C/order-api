@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.dao.returnorder;
 import com.aiqin.mgs.order.api.domain.ReturnOrderDetail;
 import com.aiqin.mgs.order.api.domain.request.ReportAreaReturnSituationVo;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailReviewApiReqVo;
+import com.aiqin.mgs.order.api.domain.response.ReturnOrderDetailList;
 import com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderInfoItemBatchRespVO;
 import com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderInfoItemRespVO;
 import org.apache.ibatis.annotations.Param;
@@ -41,4 +42,6 @@ public interface ReturnOrderDetailDao {
     ReturnOrderDetail selectReturnOrder(String skuCode);
 
     List<ReturnOrderInfoItemBatchRespVO> selectReturnOrderBatchList(@Param("returnOrderCode") String returnOrderCode);
+
+    List<ReturnOrderDetailList> selectOrderDetailAll(String returnOrderCode);
 }

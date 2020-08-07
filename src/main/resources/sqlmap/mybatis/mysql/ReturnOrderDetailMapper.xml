@@ -581,5 +581,17 @@
          SELECT actual_return_product_count,top_coupon_amount FROM return_order_detail WHERE
          sku_code = #{skuCode}
     </select>
+    <select id="selectOrderDetailAll"
+            resultType="com.aiqin.mgs.order.api.domain.response.ReturnOrderDetailList">
+        select
+            return_order_code as returnOrderCode,
+            sku_code as skuCode,
+            sku_Name as skuName,
+            quantity_returned_count as quantityReturnedCount,
+            return_product_count as returnProductCount
+        from return_order_detail
+        where return_order_code = #{returnOrderCode}
+        order by create_time desc limit 1
+    </select>
 
 </mapper>
