@@ -1,6 +1,10 @@
 package com.aiqin.mgs.order.api.dao;
 
 import com.aiqin.mgs.order.api.domain.ReturnOrderDetailBatch;
+import com.aiqin.mgs.order.api.domain.ReturnOrderbatchInfo;
+import com.aiqin.mgs.order.api.domain.po.order.ErpBatchInfo;
+import com.aiqin.mgs.order.api.domain.response.ReturnErpBatchInfo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -20,4 +24,8 @@ public interface ReturnOrderDetailBatchDao {
     List<ReturnOrderDetailBatch> select(ReturnOrderDetailBatch returnOrderDetailBatch);
 
     List<ReturnOrderDetailBatch> selectListByReturnOrderCode(String returnOrderCode);
+
+    int insertBatchInfo(@Param("barchInfoList") List<ReturnOrderbatchInfo> barchInfoList);
+
+    List<ReturnErpBatchInfo> selectListBatchInfo(String returnOrderCode);
 }
