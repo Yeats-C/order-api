@@ -167,6 +167,21 @@
       </if>
     </trim>
   </insert>
+  <insert id="insertBatchInfo" parameterType="java.util.List">
+     insert into batch_info (
+        basic_id,batch_code,batch_date,warehouse_type_code,batch_type,batch_info_code,product_count,use_status,
+        create_by,create_time,sku_code,sku_name
+      )
+    values
+    <foreach collection="barchInfoList" item="item" index="index" separator=",">
+      (
+       #{item.basicId,jdbcType=VARCHAR}, #{item.batchCode,jdbcType=VARCHAR},#{item.batchDate,jdbcType=TIMESTAMP},
+       #{item.warehouseTypeCode,jdbcType=VARCHAR}, #{item.batchType,jdbcType=INTEGER}, #{item.batchInfoCode,jdbcType=VARCHAR},
+       #{item.productCount,dbcType=BIGINT}, #{item.useStatus,jdbcType=INTEGER}, #{item.createBy,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP},
+       #{item.skuCode,jdbcType=VARCHAR}, #{item.skuName,jdbcType=VARCHAR}
+      )
+    </foreach>
+  </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.ReturnOrderDetailBatch">
     update return_order_detail_batch
     <set>
@@ -306,4 +321,9 @@
     from return_order_detail_batch
     where return_order_code = #{returnOrderCode}
   </select>
+  <select id="selectListBatchInfo" resultType="com.aiqin.mgs.order.api.domain.response.ReturnErpBatchInfo">
+      select batch_info_code as batchInfoCode, batch_no as batchNo, product_count as productCount,
+   sku_code as skuCode, sku_name as skuName
+  </select>
+
 </mapper>
