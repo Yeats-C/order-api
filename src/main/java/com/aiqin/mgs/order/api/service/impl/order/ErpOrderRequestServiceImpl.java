@@ -372,7 +372,7 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             for(Map.Entry<String,Long> data:countMap2.entrySet()){
                 String skuCode=data.getKey();
                 StockLockDetailRequest stockLockDetailRequest=new StockLockDetailRequest();
-                stockLockDetailRequest.setChangeCount(countMap.get(skuCode).intValue());
+                stockLockDetailRequest.setChangeCount(countMap2.get(skuCode).intValue());
                 stockLockDetailRequest.setCityCode(order.getCityId());
                 stockLockDetailRequest.setProvinceCode(order.getProvinceId());
                 stockLockDetailRequest.setSkuCode(skuCode);
