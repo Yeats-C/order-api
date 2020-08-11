@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class ReturnOrderbatchInfo {
+public class BatchInfo {
 
     @ApiModelProperty(value = "关联商品id")
     private String basicId;
@@ -35,10 +35,10 @@ public class ReturnOrderbatchInfo {
     private Integer useStatus;
 
     @ApiModelProperty(value = "创建人编码")
-    private String createById;
+    private String createBy;
 
     @ApiModelProperty(value = "修改人编码")
-    private String updateById;
+    private String updateBy;
 
     @ApiModelProperty(value = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")

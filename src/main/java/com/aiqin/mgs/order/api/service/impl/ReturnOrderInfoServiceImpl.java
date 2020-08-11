@@ -195,11 +195,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         log.info("发起退货--插入退货信息，record={}",record);
         returnOrderInfoDao.insertSelective(record);
         //批次信息
-        List<ReturnOrderbatchInfo> barchInfoList = new ArrayList<>();
+        List<BatchInfo> barchInfoList = new ArrayList<>();
         List<ReturnOrderDetail> details = reqVo.getDetails().stream().map(detailVo -> {
             ReturnOrderDetail detail = new ReturnOrderDetail();
             //商品批次信息
-            ReturnOrderbatchInfo  returnOrderbatchInfo = new ReturnOrderbatchInfo();
+            BatchInfo batchInfo = new BatchInfo();
             //商品属性 0新品1残品
             Integer productStatus=0;
             if(null!=detailVo.getProductStatus()){
@@ -213,18 +213,18 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             detail.setCreateByName(reqVo.getCreateByName());
             detail.setProductStatus(productStatus);
             //商品批次信息
-            returnOrderbatchInfo.setBasicId(afterSaleCode);
-            returnOrderbatchInfo.setBatchCode(detailVo.getBatchCode());
-            returnOrderbatchInfo.setBatchDate(detailVo.getBatchDate());
-            returnOrderbatchInfo.setBatchInfoCode(detailVo.getBatchInfoCode());
+            batchInfo.setBasicId(afterSaleCode);
+            batchInfo.setBatchCode(detailVo.getBatchCode());
+            batchInfo.setBatchDate(detailVo.getBatchDate());
+            batchInfo.setBatchInfoCode(detailVo.getBatchInfoCode());
 //            returnOrderbatchInfo.setWarehouseTypeCode(detailVo.getWarehouseTypeCode());
 //            returnOrderbatchInfo.setProductCount(detailVo.getProductCount());
 //            returnOrderbatchInfo.setBatchType(detailVo.getBatchType());
-            returnOrderbatchInfo.setCreateById(detailVo.getCreateById());
-            returnOrderbatchInfo.setCreateTime(detailVo.getCreateTime());
-            returnOrderbatchInfo.setSkuCode(detailVo.getSkuCode());
-            returnOrderbatchInfo.setSkuName(detailVo.getSkuName());
-            barchInfoList.add(returnOrderbatchInfo);
+            batchInfo.setCreateById(detailVo.getCreateById());
+            batchInfo.setCreateTime(detailVo.getCreateTime());
+            batchInfo.setSkuCode(detailVo.getSkuCode());
+            batchInfo.setSkuName(detailVo.getSkuName());
+            barchInfoList.add(batchInfo);
             //
             return detail;
         }).collect(Collectors.toList());
@@ -1941,13 +1941,13 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 //            Long returnProductCount = 0L;
             //修改退货按钮状态使用---加
             List<ReturnOrderDetailList> returnButtion = new ArrayList<>();
-            List<ReturnOrderbatchInfo> barchInfoList = new ArrayList<>();
+            List<BatchInfo> barchInfoList = new ArrayList<>();
             for (ReturnWholesaleOrderDetail sd : details1) {
                 ReturnOrderDetail detail = new ReturnOrderDetail();
                 //
                 ReturnOrderDetailList returnOrderDetailList = new ReturnOrderDetailList();
                 //商品批次信息
-                ReturnOrderbatchInfo  returnOrderbatchInfo = new ReturnOrderbatchInfo();
+                BatchInfo batchInfo = new BatchInfo();
                     //商品属性 0新品1残品
                     Integer productStatus = 0;
                     if (null != sd.getProductStatus()) {
@@ -1978,18 +1978,18 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     detail.setCreateByName(reqVo.getCreateByName());
                     detail.setProductStatus(productStatus);
                     //商品批次信息
-                    returnOrderbatchInfo.setBasicId(afterSaleCode);
-                    returnOrderbatchInfo.setBatchCode(sd.getBatchCode());
-                    returnOrderbatchInfo.setBatchDate(sd.getBatchDate());
-                    returnOrderbatchInfo.setBatchInfoCode(sd.getBatchInfoCode());
-                    returnOrderbatchInfo.setWarehouseTypeCode(sd.getWarehouseTypeCode());
-                    returnOrderbatchInfo.setProductCount(sd.getProductCount());
-                    returnOrderbatchInfo.setBatchType(sd.getBatchType());
-                    returnOrderbatchInfo.setCreateById(sd.getCreateById());
-                    returnOrderbatchInfo.setCreateTime(sd.getCreateTime());
-                    returnOrderbatchInfo.setSkuCode(sd.getSkuCode());
-                    returnOrderbatchInfo.setSkuName(sd.getSkuName());
-                    barchInfoList.add(returnOrderbatchInfo);
+                    batchInfo.setBasicId(afterSaleCode);
+                    batchInfo.setBatchCode(sd.getBatchCode());
+                    batchInfo.setBatchDate(sd.getBatchDate());
+                    batchInfo.setBatchInfoCode(sd.getBatchInfoCode());
+                    batchInfo.setWarehouseTypeCode(sd.getWarehouseTypeCode());
+                    batchInfo.setProductCount(sd.getProductCount());
+                    batchInfo.setBatchType(sd.getBatchType());
+                    batchInfo.setCreateById(sd.getCreateById());
+                    batchInfo.setCreateTime(sd.getCreateTime());
+                    batchInfo.setSkuCode(sd.getSkuCode());
+                    batchInfo.setSkuName(sd.getSkuName());
+                    barchInfoList.add(batchInfo);
                     returnButtion.add(returnOrderDetailList);
                     details.add(detail);
                 }
