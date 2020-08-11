@@ -177,7 +177,7 @@
       (
        #{item.basicId,jdbcType=VARCHAR}, #{item.batchCode,jdbcType=VARCHAR},#{item.batchDate,jdbcType=TIMESTAMP},
        #{item.warehouseTypeCode,jdbcType=VARCHAR}, #{item.batchType,jdbcType=INTEGER}, #{item.batchInfoCode,jdbcType=VARCHAR},
-       #{item.productCount,dbcType=BIGINT}, #{item.useStatus,jdbcType=INTEGER}, #{item.createBy,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP},
+       #{item.productCount,jdbcType=BIGINT}, #{item.useStatus,jdbcType=INTEGER}, #{item.createBy,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP},
        #{item.skuCode,jdbcType=VARCHAR}, #{item.skuName,jdbcType=VARCHAR}
       )
     </foreach>
