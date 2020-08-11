@@ -1300,13 +1300,14 @@ public class OrderServiceImpl implements OrderService {
             //获取退款金额、退款订单数、
             OrderbyReceiptSumResponse returnReceiptSum = new OrderbyReceiptSumResponse();
             returnReceiptSum = orderDao.returnByCashierSum(orderQuery);
-
+            Long returnCashPrice=orderDao.returnOnlyByCashierSum(orderQuery);
             receiptSumInfo.setSalesAmount(buyReceiptSum.getSalesAmount() != null ? buyReceiptSum.getSalesAmount() : 0);
             receiptSumInfo.setSalesOrderAmount(buyReceiptSum.getSalesOrderAmount() != null ? buyReceiptSum.getSalesOrderAmount() : 0);
             receiptSumInfo.setReturnOrderAmount(returnReceiptSum.getReturnOrderAmount() != null ? returnReceiptSum.getReturnOrderAmount() : 0);
             receiptSumInfo.setReturnPrice(returnReceiptSum.getReturnPrice() != null ? returnReceiptSum.getReturnPrice() : 0);
             receiptSumInfo.setLoadingStart(beginTime);
             receiptSumInfo.setReturnAliPay(0L);
+            receiptSumInfo.setReturnCashPrice(returnCashPrice);
             receiptSumInfo.setReturnWeChat(0L);
             return HttpResponse.success(receiptSumInfo);
         } catch (Exception e) {

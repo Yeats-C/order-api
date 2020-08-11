@@ -237,4 +237,6 @@ public interface OrderDao {
 
     /** 通过编码查询订单日志信息*/
     List<OperationLog> orderProductLogByOrder(String orderCode);
+
+    Long returnOnlyByCashierSum(OrderQuery orderQuery);
 }

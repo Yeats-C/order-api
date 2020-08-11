@@ -51,7 +51,11 @@ public class OrderbyReceiptSumResponse{
     @ApiModelProperty("退款金额")
     @JsonProperty("return_price")
     private Long returnPrice;
-    
+
+    @ApiModelProperty("现金退款金额")
+    @JsonProperty("return_cash_price")
+    private Long returnCashPrice;
+
     @ApiModelProperty("销售额")
     @JsonProperty("sales_amount")
     private Long salesAmount;

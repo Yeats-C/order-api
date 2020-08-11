@@ -117,8 +117,13 @@ public class SettlementInfo extends PagesRequest {
     @ApiModelProperty(value = "订单修改员")
     @JsonProperty("update_by")
     private String updateBy;
-    
 
+    /**
+     * 店长整单优惠金额
+     */
+    @JsonProperty("shop_order_preferential")
+    @ApiModelProperty(value = "店长整单优惠金额")
+    private Long shopOrderPreferential;
 }
 
 

@@ -28,9 +28,9 @@
     <!-- 插入结算信息表 -->
     <insert id="addSettlement" >
         insert into settlement_info 
-        (settlement_id,order_id,product_sum,freight,total_coupons_discount,point_percentage,activity_discount,order_sum,order_receivable,order_actual,order_change,order_abandon,points,point_discount,create_time,update_time,create_by,update_by,full_sum,lucky_sum)
+        (settlement_id,order_id,product_sum,freight,total_coupons_discount,point_percentage,activity_discount,order_sum,order_receivable,order_actual,order_change,order_abandon,points,point_discount,create_time,update_time,create_by,update_by,full_sum,lucky_sum,shop_order_preferential)
 		values(
-		#{settlementId},#{orderId},#{productSum},#{freight},#{totalCouponsDiscount},#{pointPercentage},#{activityDiscount},#{orderSum},#{orderReceivable},#{orderActual},#{orderChange},#{orderAbandon},#{points},#{pointDiscount},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},#{fullSum},#{luckySum})
+		#{settlementId},#{orderId},#{productSum},#{freight},#{totalCouponsDiscount},#{pointPercentage},#{activityDiscount},#{orderSum},#{orderReceivable},#{orderActual},#{orderChange},#{orderAbandon},#{points},#{pointDiscount},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},#{fullSum},#{luckySum},#{shopOrderPreferential})
     </insert>
         
     <!-- 接口-结算数据查询 -->

@@ -995,6 +995,22 @@
         </if>
     </select>
 
+    <select id="returnOnlyByCashierSum" resultType="long">
+        SELECT
+        sum( IFNULL(a.return_price,0)) AS return_price
+        FROM
+        order_after_sale a
+
+        WHERE  a.create_by =#{cashierId}
+          and a.return_money_type=0
+        <if test="beginTime!=null ">
+            AND a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime!=null ">
+            AND a.create_time &lt;= #{endTime}
+        </if>
+    </select>
+
     <!-- 接口-收银员交班收银情况统计 销售额、销售订单数-->
     <select id="buyByCashierSum" resultMap="ReceiptSumMapping">
         SELECT
