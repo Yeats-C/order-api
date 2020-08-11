@@ -175,10 +175,19 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
             //todo 更新主单明细赠品的实际发货数量
             updateGiftGoodsAutCount(order.getMainOrderCode(),itemList,auth);
+
+            if(!order.getOrderTypeCode().equals(ErpOrderTypeEnum.DISTRIBUTION.getValue())){
+                order.setOrderStatus(ErpOrderStatusEnum.ORDER_STATUS_11.getCode());
+                order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_11.getCode());
+                erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
+            }
             /*****************************************同步订单数据到结算开始*****************************************/
-            ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(order.getOrderStoreId());
+            List<ErpOrderInfo> list=new ArrayList<>();
+            ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByFeeId(order.getFeeId());
             order.setOrderFee(orderFee);
-            bridgeProductService.settlementSaveOrder(order);
+            order.setItemList(itemList);
+            list.add(order);
+            bridgeProductService.settlementSaveOrder(list,2);
             /*****************************************同步订单数据到结算结束*****************************************/
 
         } else {
@@ -271,9 +280,6 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 throw new BusinessException("缺失物流费用");
             }
             orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsCode(logistics.getLogisticsCode());
-            if(orderLogistics!=null){
-                throw new BusinessException("此物流单号已存在");
-            }
             if (orderLogistics == null) {
                 //新的物流信息，先保存物流信息
 
@@ -383,9 +389,13 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                 }
 
                 /*****************************************同步订单数据到结算开始*****************************************/
-                ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(order.getOrderStoreId());
+                List<ErpOrderInfo> list=new ArrayList<>();
+                ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByFeeId(order.getFeeId());
                 order.setOrderFee(orderFee);
-                bridgeProductService.settlementSaveOrder(order);
+                List<ErpOrderItem> itemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
+                order.setItemList(itemList);
+                list.add(order);
+                bridgeProductService.settlementSaveOrder(list,2);
                 /*****************************************同步订单数据到结算结束*****************************************/
 
                 //遍历退货单，查看是否有退单
@@ -687,7 +697,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                         //分销总价=商品价值
                         BigDecimal fenxiaozongjia=eo.getProductAmount().multiply(new BigDecimal(eo.getProductCount()));
                         //分摊总额=商品价值X商品总金额/商品总价值
-                        if(productAmount == BigDecimal.ZERO && productPriceAmount == BigDecimal.ZERO){
+                        if(productAmount.compareTo(BigDecimal.ZERO) > 0 && productPriceAmount.compareTo(BigDecimal.ZERO) > 0){
                             BigDecimal totalPreferentialAmount=fenxiaozongjia.multiply(productAmount).divide(productPriceAmount,2,BigDecimal.ROUND_HALF_UP);
                             //分摊单价
                             BigDecimal preferentialAmount=totalPreferentialAmount.divide(new BigDecimal(eo.getProductCount()),2,BigDecimal.ROUND_HALF_UP);

@@ -65,6 +65,7 @@
           <if test="skuName != null and skuName != ''">
               and sku_name like concat('%', #{skuName,jdbcType=VARCHAR}, '%')
           </if>
+          order by create_time desc
          <if test="pageSize != null and pageSize != ''">
              limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
           </if>

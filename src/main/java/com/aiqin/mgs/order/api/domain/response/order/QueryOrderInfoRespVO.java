@@ -39,7 +39,7 @@ public class QueryOrderInfoRespVO {
     @ApiModelProperty("支付方式")
     private String paymentName;
 
-    @ApiModelProperty("类型：1直送、2配送、3首单、4首单赠送.辅采直送")
+    @ApiModelProperty("类型：1配送、2直送、3货架直送、4采购直送")
     private String orderTypeName;
 
     @ApiModelProperty("订单类别编码")

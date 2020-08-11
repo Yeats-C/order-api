@@ -234,4 +234,7 @@ public interface OrderDao {
 
     /** 通过编码查询订单批次商品*/
     List<ReturnOrderInfoItemBatchRespVO> orderProductBatchByOrder(String orderCode);
+
+    /** 通过编码查询订单日志信息*/
+    List<OperationLog> orderProductLogByOrder(String orderCode);
 }

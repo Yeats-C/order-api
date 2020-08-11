@@ -583,5 +583,13 @@ public class ServiceProjectServiceImpl  implements ServiceProjectService {
         }
     }
 
+    @Override
+    public HttpResponse selectServiceProjectAssetCodeByOrderCode(String orderCode) {
+        LOGGER.info("查询服务订单号，请求参数为{}", orderCode);
+        String  code=serviceProjectReduceDetailDao.selectServiceProjectAssetCodeByOrderCode(orderCode);
+        LOGGER.info("查询服务订单号，查询结果为{}", code);
+        return HttpResponse.successGenerics(code);
+    }
+
 
 }

@@ -92,4 +92,8 @@ public class ProductSkuDetailResponse {
     @ApiModelProperty("批次信息")
     @JsonProperty(value = "batch_list")
     private List<BatchRespVo> batchList;
+
+    /***爱亲采购价*/
+    @JsonProperty("price_tax1")
+    private BigDecimal priceTax1;
 }

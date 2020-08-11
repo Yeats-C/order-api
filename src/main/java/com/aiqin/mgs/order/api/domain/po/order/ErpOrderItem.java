@@ -333,6 +333,10 @@ public class ErpOrderItem extends PagesRequest {
     @JsonProperty("warehouse_name")
     private String warehouseName;
 
+    @ApiModelProperty("批次类型  0：月份批次  1：非月份批次")
+    @JsonProperty(value = "batch_type")
+    private Integer batchType;
+
 
     public String getProductTypeDesc() {
         return ErpProductGiftEnum.getEnumDesc(productType);

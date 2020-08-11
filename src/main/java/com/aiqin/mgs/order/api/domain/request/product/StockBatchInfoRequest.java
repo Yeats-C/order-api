@@ -120,4 +120,8 @@ public class StockBatchInfoRequest {
 //    @ApiModelProperty("批次号集合")
 //    @JsonProperty(value = "batch_code")
 //    private List<String> batchCodeList;
+
+    @ApiModelProperty("批次类型  0：月份批次  1：非月份批次")
+    @JsonProperty(value = "batch_type")
+    private Integer batchType;
 }
