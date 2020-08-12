@@ -159,4 +159,6 @@ public class ReturnWholesaleOrderReqVo implements Serializable {
 //    @JsonProperty("order_product_type")
     private String orderProductType;
 
+    @ApiModelProperty("退货的类型 10.ERP退款 11.爱掌柜补货 12.冲减单")
+    private String businessType;
 }
