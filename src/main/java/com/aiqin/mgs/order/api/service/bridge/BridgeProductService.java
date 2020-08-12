@@ -776,6 +776,8 @@ public HttpResponse<MerchantPaBalanceRespVO> accountBalance(String franchiseeId)
                     log.error("结算保存erp销售订单失败，订单费用数据为空" + JsonUtil.toJson(order));
                     return;
                 }
+                //商品map
+                Map<String, Integer> productMap=new HashMap();
 
                 //订单物流信息
                 ErpOrderLogistics orderLogistics = erpOrderLogisticsService.getOrderLogisticsByLogisticsId(order.getLogisticsId());
@@ -786,7 +788,27 @@ public HttpResponse<MerchantPaBalanceRespVO> accountBalance(String franchiseeId)
                 int productCount = 0;
                 if (null != order.getItemList() && order.getItemList().size() > 0) {
                     for (ErpOrderItem item : order.getItemList()) {
+                        if (productMap.containsKey(item.getSkuCode())){
+                            //结算商品list里面已经有此sku，需要合并
+                            ErpBatchInfo batchInfo=new ErpBatchInfo();
+                            batchInfo.setBatchInfoCode(item.getBatchInfoCode());
+                            batchInfo.setBatchNo(item.getBatchCode());
+                            batchInfo.setTotalProductCount(item.getProductCount().intValue());
+
+                            ErpOrderProductInfo orderProductInfo=erpOrderProductInfoList.get(productMap.get(item.getSkuCode()));
+                            orderProductInfo.getBatchList().add(batchInfo);
+                            orderProductInfo.setProductCount(orderProductInfo.getProductCount()+item.getProductCount().intValue());
+                        }
                         ErpOrderProductInfo productInfo = new ErpOrderProductInfo();
+                        if(null!=item.getBatchInfoCode()){
+                            List<ErpBatchInfo> batchList=new ArrayList<>();
+                            ErpBatchInfo batchInfo=new ErpBatchInfo();
+                            batchInfo.setBatchInfoCode(item.getBatchInfoCode());
+                            batchInfo.setBatchNo(item.getBatchCode());
+                            batchInfo.setTotalProductCount(item.getProductCount().intValue());
+                            batchList.add(batchInfo);
+                            productInfo.setBatchList(batchList);
+                        }
                         //订单编码
                         productInfo.setOrderCode(item.getOrderStoreCode());
                         //sku编号
@@ -859,17 +881,8 @@ public HttpResponse<MerchantPaBalanceRespVO> accountBalance(String franchiseeId)
                         productInfo.setTaxRate(item.getTaxRate());
                         productCount += item.getProductCount();
 
-                        if(null!=item.getBatchInfoCode()){
-                            List<ErpBatchInfo> batchList=new ArrayList<>();
-                            ErpBatchInfo batchInfo=new ErpBatchInfo();
-                            batchInfo.setBatchInfoCode(item.getBatchInfoCode());
-                            batchInfo.setBatchNo(item.getBatchCode());
-                            batchInfo.setTotalProductCount(item.getProductCount().intValue());
-                            batchList.add(batchInfo);
-                            productInfo.setBatchList(batchList);
-                        }
-
                         erpOrderProductInfoList.add(productInfo);
+                        productMap.put(item.getSkuCode(),erpOrderProductInfoList.indexOf(productInfo));
                     }
                     erpOrderVo.setProdcutList(erpOrderProductInfoList);
                 }
