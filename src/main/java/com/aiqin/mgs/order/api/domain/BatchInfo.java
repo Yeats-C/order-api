@@ -1,9 +1,11 @@
 package com.aiqin.mgs.order.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
@@ -29,7 +31,7 @@ public class BatchInfo {
     private Integer batchType;
 
     @ApiModelProperty(value = "商品数量")
-    private Long productCount;
+    private Integer productCount;
 
     @ApiModelProperty(value = "0. 启用   1.禁用")
     private Integer useStatus;
@@ -53,5 +55,9 @@ public class BatchInfo {
 
     @ApiModelProperty(value = "sku名称")
     private String skuName;
+
+    @ApiModelProperty("批次价格")
+    @JsonProperty("batch_price")
+    private BigDecimal batchPrice=new BigDecimal("0");
 
 }

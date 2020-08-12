@@ -16,10 +16,11 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
     <result column="sku_name" jdbcType="VARCHAR" property="skuName"/>
+    <result column="batch_price" jdbcType="DECIMAL" property="batchPrice"/>
   </resultMap>
   <sql id="Base_Column_List">
     id, basic_id, batch_code,batch_date, warehouse_type_code, batch_type, batch_info_code, product_count, use_status,
-    create_by,update_by,create_time, update_time, sku_code, sku_name
+    create_by,update_by,create_time, update_time, sku_code, sku_name,batch_price
   </sql>
   <sql id="filter_list">
     <where>
@@ -104,6 +105,9 @@
       <if test="skuName != null">
         sku_name,
       </if>
+      <if test="batchPrice != null">
+        batch_price,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="basicId != null">
@@ -148,20 +152,24 @@
       <if test="skuName != null">
         #{skuName,jdbcType=VARCHAR},
       </if>
+      <if test="batchPrice != null">
+        #{batchPrice,jdbcType=DECIMAL},
+      </if>
     </trim>
   </insert>
   <insert id="insertBatchInfo" parameterType="java.util.List">
      insert into batch_info (
         basic_id,batch_code,batch_date,warehouse_type_code,batch_type,batch_info_code,product_count,use_status,
-        create_by,create_time,create_by,update_time,sku_code,sku_name
+        create_by,create_time,update_by,update_time,sku_code,sku_name,batch_price
       )
     values
     <foreach collection="barchInfoList" item="item" index="index" separator=",">
       (
        #{item.basicId,jdbcType=VARCHAR}, #{item.batchCode,jdbcType=VARCHAR},#{item.batchDate,jdbcType=TIMESTAMP},
        #{item.warehouseTypeCode,jdbcType=VARCHAR}, #{item.batchType,jdbcType=INTEGER}, #{item.batchInfoCode,jdbcType=VARCHAR},
-       #{item.productCount,dbcType=BIGINT}, #{item.useStatus,jdbcType=INTEGER}, #{item.createBy,jdbcType=VARCHAR}, now(),
-       #{item.updateBy,jdbcType=VARCHAR}, now(),#{item.skuCode,jdbcType=VARCHAR}, #{item.skuName,jdbcType=VARCHAR}
+       #{item.productCount,jdbcType=INTEGER}, 0, #{item.createBy,jdbcType=VARCHAR}, now(),
+       #{item.updateBy,jdbcType=VARCHAR}, now(),#{item.skuCode,jdbcType=VARCHAR}, #{item.skuName,jdbcType=VARCHAR},
+       #{item.batchPrice,jdbcType=DECIMAL}
       )
     </foreach>
   </insert>
@@ -207,6 +215,9 @@
       </if>
       <if test="skuName != null">
         sku_name = #{skuName,jdbcType=VARCHAR},
+      </if>
+       <if test="batchPrice != null">
+         batch_price = #{batchPrice,jdbcType=DECIMAL},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}

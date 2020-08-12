@@ -220,7 +220,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 //            returnOrderbatchInfo.setWarehouseTypeCode(detailVo.getWarehouseTypeCode());
 //            returnOrderbatchInfo.setProductCount(detailVo.getProductCount());
 //            returnOrderbatchInfo.setBatchType(detailVo.getBatchType());
-            batchInfo.setCreateById(detailVo.getCreateById());
+            batchInfo.setCreateBy(detailVo.getCreateById());
             batchInfo.setCreateTime(detailVo.getCreateTime());
             batchInfo.setSkuCode(detailVo.getSkuCode());
             batchInfo.setSkuName(detailVo.getSkuName());
@@ -1983,9 +1983,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     batchInfo.setBatchDate(sd.getBatchDate());
                     batchInfo.setBatchInfoCode(sd.getBatchInfoCode());
                     batchInfo.setWarehouseTypeCode(sd.getWarehouseTypeCode());
-                    batchInfo.setProductCount(sd.getProductCount());
+                    batchInfo.setProductCount(sd.getProductCount().intValue());
                     batchInfo.setBatchType(sd.getBatchType());
-                    batchInfo.setCreateById(sd.getCreateById());
+                    batchInfo.setCreateBy(sd.getCreateById());
                     batchInfo.setCreateTime(sd.getCreateTime());
                     batchInfo.setSkuCode(sd.getSkuCode());
                     batchInfo.setSkuName(sd.getSkuName());
