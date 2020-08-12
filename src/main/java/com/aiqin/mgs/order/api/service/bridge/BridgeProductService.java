@@ -798,6 +798,7 @@ public HttpResponse<MerchantPaBalanceRespVO> accountBalance(String franchiseeId)
                             ErpOrderProductInfo orderProductInfo=erpOrderProductInfoList.get(productMap.get(item.getSkuCode()));
                             orderProductInfo.getBatchList().add(batchInfo);
                             orderProductInfo.setProductCount(orderProductInfo.getProductCount()+item.getProductCount().intValue());
+                            continue;
                         }
                         ErpOrderProductInfo productInfo = new ErpOrderProductInfo();
                         if(null!=item.getBatchInfoCode()){
