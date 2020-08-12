@@ -1127,10 +1127,12 @@ public void settlementSaveReturnOrder(ReturnOrderDetailVO order) {
                          }
                     }
                 }
-
                 log.info("退货商品Map集合： " + returnOrderMap);
-                erpReturnOrderProductInfoList.add(info);
+//                erpReturnOrderProductInfoList.add(info);
             }
+           for (Map.Entry<String,ErpReturnOrderProductInfo> returnMap : returnOrderMap.entrySet()){
+               erpReturnOrderProductInfoList.add(returnMap.getValue());
+           }
             erpOrderVo.setProdcutList(erpReturnOrderProductInfoList);
             erpOrderList.add(erpOrderVo);
 

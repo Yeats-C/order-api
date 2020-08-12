@@ -164,6 +164,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             reqVo.setBusinessForm(0);
         //订单产品类型 1.B2B 2.B2C
         reqVo.setOrderProductType("1");
+        //退货类型 10erp退款 11爱掌柜补货 12冲减单
+        reqVo.setBusinessType("11");
 //        }
         ReturnOrderInfo record = new ReturnOrderInfo();
         Date now = new Date();
@@ -1005,6 +1007,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             json.put("franchisee_id",franchiseeId);
             json.put("store_name",returnOrderInfo.getStoreName());
             json.put("store_id",returnOrderInfo.getStoreId());
+            //退货类型
+            json.put("business_type",returnOrderInfo.getBusinessType());
             Integer method=returnOrderInfo.getTreatmentMethod();
             //处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款
             if(null!=method&&method.equals(TreatmentMethodEnum.RETURN_AMOUNT_AND_GOODS_TYPE.getCode())){//RETURN_REFUND 退货退款
@@ -1377,6 +1381,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 returnOrderInfo.setReturnOrderType(ReturnOrderTypeEnum.WRITE_DOWN_ORDER_TYPE.getCode());
                 //处理办法 4--仅退款
                 returnOrderInfo.setTreatmentMethod(TreatmentMethodEnum.RETURN_AMOUNT_TYPE.getCode());
+                //退货类型 10ERP退款 11爱掌柜补货 12冲减单
+                returnOrderInfo.setBusinessType("12");
                 //生成退货单
                 returnOrderInfo.setId(null);
                 returnOrderInfo.setOrderType(Integer.valueOf(erpOrderInfo.getOrderTypeCode()));
@@ -1889,6 +1895,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             reqVo.setReturnOrderType(2);
             //订单产品类型 1.B2B 2.B2C'
             reqVo.setOrderProductType("1");
+            //退货类型
+            reqVo.setBusinessType("10");
             //加盟商和合伙人
             ReturnOrderFranchisee returnOrderFranchisee = erpOrderInfoDao.selectFranchisee(reqVo.getOrderStoreCode());
             if (returnOrderFranchisee != null) {
