@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiqin.mgs.order.api.dao.BatchInfoDao">
+  <resultMap id="BaseResultMap" type="com.aiqin.mgs.order.api.domain.BatchInfo">
+    <result column="basic_id" jdbcType="VARCHAR" property="basicId"/>
+    <result column="batch_info_code" jdbcType="VARCHAR" property="batchInfoCode"/>
+    <result column="batch_date" jdbcType="TIMESTAMP" property="batchDate"/>
+    <result column="batch_code" jdbcType="VARCHAR" property="batchCode"/>
+    <result column="warehouse_type_code" jdbcType="BIGINT" property="warehouseTypeCode"/>
+    <result column="batch_type" jdbcType="BIGINT" property="batchType" />
+    <result column="product_count" jdbcType="BIGINT" property="productCount" />
+    <result column="use_status" jdbcType="INTEGER" property="useStatus" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
+    <result column="sku_name" jdbcType="VARCHAR" property="skuName"/>
+    <result column="batch_price" jdbcType="DECIMAL" property="batchPrice"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, basic_id, batch_code,batch_date, warehouse_type_code, batch_type, batch_info_code, product_count, use_status,
+    create_by,update_by,create_time, update_time, sku_code, sku_name,batch_price
+  </sql>
+  <sql id="filter_list">
+    <where>
+      <if test="basicId != null">
+        AND basic_id = #{basicId,jdbcType=VARCHAR}
+      </if>
+      <if test="batchInfoCode != null">
+        AND batch_info_code = #{batchInfoCode,jdbcType=VARCHAR}
+      </if>
+      <if test="skuCode != null">
+        AND sku_code = #{skuCode,jdbcType=VARCHAR}
+      </if>
+      <if test="useStatus != null">
+        AND use_status = #{useStatus,jdbcType=BIGINT}
+      </if>
+    </where>
+  </sql>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from batch_info
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectBatchInfoList" parameterType="com.aiqin.mgs.order.api.domain.BatchInfo" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from batch_info
+    <include refid="filter_list"/>
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from batch_info
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByBasicId">
+    delete from batch_info
+    where basic_id = #{basicId,jdbcType=VARCHAR}
+  </delete>
+
+  <insert id="insertSelective" parameterType="com.aiqin.mgs.order.api.domain.BatchInfo">
+    insert into batch_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="basicId != null">
+        basic_id,
+      </if>
+      <if test="batchCode != null">
+        batch_code,
+      </if>
+      <if test="batchDate != null">
+        batch_date,
+      </if>
+      <if test="warehouseTypeCode != null">
+        warehouse_type_code,
+      </if>
+      <if test="batchType != null">
+        batch_type,
+      </if>
+      <if test="batchInfoCode != null">
+        batch_info_code,
+      </if>
+      <if test="productCount != null">
+        product_count,
+      </if>
+      <if test="useStatus != null">
+        use_status,
+      </if>
+      <if test="createBy != null">
+        create_by,
+      </if>
+      <if test="updateBy != null">
+        update_by,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="skuCode != null">
+        sku_code,
+      </if>
+      <if test="skuName != null">
+        sku_name,
+      </if>
+      <if test="batchPrice != null">
+        batch_price,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="basicId != null">
+        #{basicId,jdbcType=VARCHAR},
+      </if>
+      <if test="batchCode != null">
+        #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="batchDate != null">
+        #{batchDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="warehouseTypeCode != null">
+        #{warehouseTypeCode,jdbcType=BIGINT},
+      </if>
+      <if test="batchType != null">
+        #{batchType,jdbcType=BIGINT},
+      </if>
+      <if test="batchInfoCode != null">
+        #{batchInfoCode,jdbcType=VARCHAR},
+      </if>
+      <if test="productCount != null">
+        #{productCount,jdbcType=BIGINT},
+      </if>
+      <if test="useStatus != null">
+        #{useStatus,jdbcType=INTEGER},
+      </if>
+      <if test="createBy != null">
+        #{create_by,jdbcType=VARCHAR},
+      </if>
+      <if test="updateBy != null">
+        #{update_by,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{create_time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{update_time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="skuCode != null">
+        #{skuCode,jdbcType=VARCHAR},
+      </if>
+      <if test="skuName != null">
+        #{skuName,jdbcType=VARCHAR},
+      </if>
+      <if test="batchPrice != null">
+        #{batchPrice,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <insert id="insertBatchInfo" parameterType="java.util.List">
+     insert into batch_info (
+        basic_id,batch_code,batch_date,warehouse_type_code,batch_type,batch_info_code,product_count,use_status,
+        create_by,create_time,update_by,update_time,sku_code,sku_name,batch_price
+      )
+    values
+    <foreach collection="barchInfoList" item="item" index="index" separator=",">
+      (
+       #{item.basicId,jdbcType=VARCHAR}, #{item.batchCode,jdbcType=VARCHAR},#{item.batchDate,jdbcType=TIMESTAMP},
+       #{item.warehouseTypeCode,jdbcType=VARCHAR}, #{item.batchType,jdbcType=INTEGER}, #{item.batchInfoCode,jdbcType=VARCHAR},
+       #{item.productCount,jdbcType=INTEGER}, 0, #{item.createBy,jdbcType=VARCHAR}, now(),
+       #{item.updateBy,jdbcType=VARCHAR}, now(),#{item.skuCode,jdbcType=VARCHAR}, #{item.skuName,jdbcType=VARCHAR},
+       #{item.batchPrice,jdbcType=DECIMAL}
+      )
+    </foreach>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.aiqin.mgs.order.api.domain.ReturnOrderDetailBatch">
+    update batch_info
+    <set>
+      <if test="basicId != null">
+        basic_id = #{basicId,jdbcType=VARCHAR},
+      </if>
+      <if test="batchCode != null">
+        batch_code = #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="batchDate != null">
+        batch_date = #{batchDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="warehouseTypeCode != null">
+        warehouse_type_code = #{warehouseTypeCode,jdbcType=BIGINT},
+      </if>
+      <if test="batchType != null">
+        batchType = #{batchType,jdbcType=BIGINT},
+      </if>
+      <if test="batchInfoCode != null">
+        batch_info_code = #{batchInfoCode,jdbcType=VARCHAR},
+      </if>
+      <if test="productCount != null">
+        product_count = #{productCount,jdbcType=BIGINT},
+      </if>
+      <if test="useStatus != null">
+        use_status = #{useStatus,jdbcType=INTEGER},
+      </if>
+      <if test="createBy != null">
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateBy != null">
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      update_time = now(),
+      <if test="skuCode != null">
+        sku_code = #{skuCode,jdbcType=VARCHAR},
+      </if>
+      <if test="skuName != null">
+        sku_name = #{skuName,jdbcType=VARCHAR},
+      </if>
+       <if test="batchPrice != null">
+         batch_price = #{batchPrice,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+
+
+
+</mapper>

@@ -404,6 +404,9 @@ public class ReturnOrderInfo {
 //    @JsonProperty("order_product_type")
     private String orderProductType;
 
+    @ApiModelProperty("退货的类型 10.ERP退款 11.爱掌柜补货 12.冲减单")
+    private String businessType;
+
 
     //用于同步结算系统
     @ApiModelProperty(value="爱亲成本总额")

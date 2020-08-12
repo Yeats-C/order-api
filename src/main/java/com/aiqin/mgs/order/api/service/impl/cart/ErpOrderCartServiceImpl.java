@@ -10,6 +10,7 @@ import com.aiqin.mgs.order.api.component.enums.activity.ActivityRuleUnitEnum;
 import com.aiqin.mgs.order.api.component.enums.activity.ActivityTypeEnum;
 import com.aiqin.mgs.order.api.component.enums.cart.ErpCartLineStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.cart.ErpProductGiftGiveTypeEnum;
+import com.aiqin.mgs.order.api.dao.BatchInfoDao;
 import com.aiqin.mgs.order.api.dao.cart.ErpOrderCartDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
@@ -34,6 +35,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,6 +72,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
 
     @Resource
     private WholesaleCustomersService wholesaleCustomersService;
+
+    @Resource
+    private BatchInfoDao batchInfoDao;
 
     @Override
     public void insertCartLine(ErpOrderCartInfo erpOrderCartInfo, AuthToken authToken) {
@@ -145,6 +150,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
     }
 
     @Override
+    @Transactional
     public ErpOrderCartAddResponse addProduct(ErpCartAddRequest erpCartAddRequest, AuthToken auth) {
 
         if (erpCartAddRequest == null) {
@@ -224,6 +230,8 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         List<ErpOrderCartInfo> updateList = new ArrayList<>();
         //库存不足10个的商品
         List<ErpCartAddItemResponse> skuStockList = new ArrayList<>();
+        //批次信息list
+        List<BatchInfo> barchInfoList=new ArrayList<>();
         for (ErpCartAddSkuItem item :
                 erpCartAddRequest.getProducts()) {
             if (!skuDetailMap.containsKey(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode())) {
@@ -297,6 +305,13 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                         erpOrderCartInfo.setPrice(skuDetail.getBatchList().get(0).getBatchPrice());
 
                     }
+                    BatchInfo batchInfo=new BatchInfo();
+                    BeanUtils.copyProperties(skuDetail.getBatchList().get(0),batchInfo);
+                    batchInfo.setBasicId(erpOrderCartInfo.getCartId());
+                    batchInfo.setCreateBy(auth.getPersonName());
+                    batchInfo.setUpdateBy(auth.getPersonName());
+                    batchInfo.setProductCount(item.getAmount());
+                    barchInfoList.add(batchInfo);
                 }
                 if(null==erpOrderCartInfo.getPrice()){
                     erpOrderCartInfo.setPrice(BigDecimal.ZERO);
@@ -332,6 +347,11 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         if (updateList.size() > 0) {
             updateCartLineList(updateList, auth);
         }
+
+        if (barchInfoList.size() > 0) {
+            batchInfoDao.insertBatchInfo(barchInfoList);
+        }
+
 
         ErpOrderCartAddResponse addResponse = new ErpOrderCartAddResponse();
         if (skuStockList.size() > 0) {
