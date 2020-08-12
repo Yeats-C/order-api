@@ -32,6 +32,7 @@
         <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
         <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
         <result column="sku_sum" jdbcType="INTEGER" property="skuSum"/>
+        <result column="shop_order_preferential" jdbcType="INTEGER" property="shopOrderPreferential"/>
     </resultMap>
     <resultMap id="ReceiptSumMapping" type="com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse">
         <result column="cashier_id" jdbcType="VARCHAR" property="cashierId"/>
@@ -138,7 +139,7 @@
         <if test="totalPrice!=null">
             total_price,
         </if>
-        custom_note,business_note,cashier_id,cashier_name,guide_id,guide_name,order_type,create_time,update_time,create_by,update_by,receive_code,receive_time)
+        custom_note,business_note,cashier_id,cashier_name,guide_id,guide_name,order_type,create_time,update_time,create_by,update_by,receive_code,receive_time,shop_order_preferential)
         values
         (#{orderId},#{orderCode},#{memberId},#{memberName},#{memberPhone},#{distributorId},#{distributorCode},#{distributorName},#{originType},#{receiveType},#{orderStatus},
         <if test="returnStatus!=null">
@@ -151,7 +152,7 @@
         <if test="totalPrice!=null">
             #{totalPrice},
         </if>
-        #{customNote},#{businessNote},#{cashierId},#{cashierName},#{guideId},#{guideName},#{orderType},CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,#{createBy},#{updateBy},#{receiveCode},CURRENT_TIMESTAMP)
+        #{customNote},#{businessNote},#{cashierId},#{cashierName},#{guideId},#{guideName},#{orderType},CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,#{createBy},#{updateBy},#{receiveCode},CURRENT_TIMESTAMP,#{shopOrderPreferential})
     </insert>
 
     <!-- 订单查询byorderid -->

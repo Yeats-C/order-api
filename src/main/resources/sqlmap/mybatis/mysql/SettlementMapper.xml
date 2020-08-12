@@ -1,47 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aiqin.mgs.order.api.dao.SettlementDao">
-<resultMap id="SettlementMapping" type="com.aiqin.mgs.order.api.domain.SettlementInfo">
-<result column="settlement_id" jdbcType="VARCHAR" property="settlementId"/>
-<result column="order_id" jdbcType="VARCHAR" property="orderId"/>
-<result column="product_sum" jdbcType="INTEGER" property="productSum"/>
-<result column="freight" jdbcType="INTEGER" property="freight"/>
-<result column="total_coupons_discount" jdbcType="INTEGER" property="totalCouponsDiscount"/>
-<result column="point_percentage" jdbcType="INTEGER" property="pointPercentage"/>
-<result column="activity_discount" jdbcType="INTEGER" property="activityDiscount"/>
-<result column="order_sum" jdbcType="INTEGER" property="orderSum"/>
-<result column="order_receivable" jdbcType="INTEGER" property="orderReceivable"/>
-<result column="order_actual" jdbcType="INTEGER" property="orderActual"/>
-<result column="order_change" jdbcType="INTEGER" property="orderChange"/>
-<result column="order_abandon" jdbcType="INTEGER" property="orderAbandon"/>
-<result column="points" jdbcType="INTEGER" property="points"/>
-<result column="point_discount" jdbcType="BIGINT" property="pointDiscount"/>
-<result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
-<result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
-<result column="create_by" jdbcType="VARCHAR" property="createBy"/>
-<result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
-<result column="full_sum" jdbcType="INTEGER" property="fullSum"/>
-    <result column="lucky_sum" jdbcType="INTEGER" property="luckySum"/>
-</resultMap>
+    <resultMap id="SettlementMapping" type="com.aiqin.mgs.order.api.domain.SettlementInfo">
+        <result column="settlement_id" jdbcType="VARCHAR" property="settlementId"/>
+        <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
+        <result column="product_sum" jdbcType="INTEGER" property="productSum"/>
+        <result column="freight" jdbcType="INTEGER" property="freight"/>
+        <result column="total_coupons_discount" jdbcType="INTEGER" property="totalCouponsDiscount"/>
+        <result column="point_percentage" jdbcType="INTEGER" property="pointPercentage"/>
+        <result column="activity_discount" jdbcType="INTEGER" property="activityDiscount"/>
+        <result column="order_sum" jdbcType="INTEGER" property="orderSum"/>
+        <result column="order_receivable" jdbcType="INTEGER" property="orderReceivable"/>
+        <result column="order_actual" jdbcType="INTEGER" property="orderActual"/>
+        <result column="order_change" jdbcType="INTEGER" property="orderChange"/>
+        <result column="order_abandon" jdbcType="INTEGER" property="orderAbandon"/>
+        <result column="points" jdbcType="INTEGER" property="points"/>
+        <result column="point_discount" jdbcType="BIGINT" property="pointDiscount"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="full_sum" jdbcType="INTEGER" property="fullSum"/>
+        <result column="lucky_sum" jdbcType="INTEGER" property="luckySum"/>
+        <result column="shop_order_preferential" jdbcType="INTEGER" property="shopOrderPreferential"/>
+    </resultMap>
 
-   
+
     <!-- 插入结算信息表 -->
-    <insert id="addSettlement" >
+    <insert id="addSettlement">
         insert into settlement_info 
         (settlement_id,order_id,product_sum,freight,total_coupons_discount,point_percentage,activity_discount,order_sum,order_receivable,order_actual,order_change,order_abandon,points,point_discount,create_time,update_time,create_by,update_by,full_sum,lucky_sum,shop_order_preferential)
 		values(
 		#{settlementId},#{orderId},#{productSum},#{freight},#{totalCouponsDiscount},#{pointPercentage},#{activityDiscount},#{orderSum},#{orderReceivable},#{orderActual},#{orderChange},#{orderAbandon},#{points},#{pointDiscount},CURRENT_TIMESTAMP,#{updateTime},#{createBy},#{updateBy},#{fullSum},#{luckySum},#{shopOrderPreferential})
     </insert>
-        
+
     <!-- 接口-结算数据查询 -->
-    <select id="jkselectsettlement" resultMap="SettlementMapping" >
-    
-         SELECT * FROM settlement_info  where 1=1
-         
-         <if test="orderId!=null and orderId!=''">
-		 and order_id =#{orderId}
-		 </if>
-		 ORDER BY create_time DESC LIMIT 1 
+    <select id="jkselectsettlement" resultMap="SettlementMapping">
+
+        SELECT * FROM settlement_info where 1=1
+
+        <if test="orderId!=null and orderId!=''">
+            and order_id =#{orderId}
+        </if>
+        ORDER BY create_time DESC LIMIT 1
     </select>
 </mapper>
 

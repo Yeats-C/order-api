@@ -123,7 +123,7 @@ public class SettlementInfo extends PagesRequest {
      */
     @JsonProperty("shop_order_preferential")
     @ApiModelProperty(value = "店长整单优惠金额")
-    private Long shopOrderPreferential;
+    private Integer shopOrderPreferential;
 }
 
 
