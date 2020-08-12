@@ -1069,6 +1069,7 @@ public void settlementSaveReturnOrder(ReturnOrderDetailVO order) {
 
         //商品列表
         List<ErpReturnOrderProductInfo> erpReturnOrderProductInfoList = new ArrayList<>();
+        Map<String,ErpReturnOrderProductInfo> returnOrderMap = new HashMap<>();
         for (ReturnOrderDetail detail : order.getDetails()) {
             ErpReturnOrderProductInfo info = new ErpReturnOrderProductInfo();
             //退货单号
@@ -1111,6 +1112,23 @@ public void settlementSaveReturnOrder(ReturnOrderDetailVO order) {
                 info.setBatchList(detail.getBatchList());
                 //退还服纺金
                 info.setSuitCouponMoney(BigDecimal.ZERO);
+                if (returnOrderMap.isEmpty()){
+                    returnOrderMap.put(info.getSkuCode(),info);
+                }else if (returnOrderMap.size() > 0){
+                    for (Map.Entry<String,ErpReturnOrderProductInfo> maps: returnOrderMap.entrySet()){
+                         if (!info.getSkuCode().equals(maps.getKey())){
+                             returnOrderMap.put(info.getSkuCode(),info);
+                         }else {
+                             ErpReturnOrderProductInfo value = maps.getValue();
+                             Integer productCount = value.getProductCount();
+                             Integer productCount1 = info.getProductCount();
+                             value.setProductCount(productCount + productCount1);
+                             value.setBatchList(info.getBatchList());
+                         }
+                    }
+                }
+
+                log.info("退货商品Map集合： " + returnOrderMap);
                 erpReturnOrderProductInfoList.add(info);
             }
             erpOrderVo.setProdcutList(erpReturnOrderProductInfoList);
