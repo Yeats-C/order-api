@@ -145,6 +145,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //校验原始订单的主订单关联的所有子订单是否发货完成
         ErpOrderInfo orderByOrderCode = erpOrderQueryService.getOrderByOrderCode(reqVo.getOrderStoreCode());
         Boolean aBoolean = checkSendOk(orderByOrderCode.getMainOrderCode());
+        log.info("子订单是否发货完成的返回结果： " + aBoolean);
         //是否真的发起退货 0:预生成退货单 1:原始订单全部发货完成生成退货单
         Integer reallyReturn=0;
         if(aBoolean){
@@ -159,14 +160,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             reqVo.setCopartnerAreaName(returnOrderFranchisee.getCopartnerAreaName());
         }
         //业务形式  0门店形式  1批发形式
-//        String storeCode = reqVo.getStoreCode();
-//        if (!storeCode.equals(null)){
-            reqVo.setBusinessForm(0);
+        reqVo.setBusinessForm(0);
         //订单产品类型 1.B2B 2.B2C
         reqVo.setOrderProductType("1");
         //退货类型 10erp退款 11爱掌柜补货 12冲减单
         reqVo.setBusinessType("11");
-//        }
         ReturnOrderInfo record = new ReturnOrderInfo();
         Date now = new Date();
         BeanUtils.copyProperties(reqVo, record);
@@ -206,6 +204,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             if(null!=detailVo.getProductStatus()){
                 productStatus=detailVo.getProductStatus();
             }
+            //仓库和库房
+            detailVo.setTransportCenterCode(reqVo.getTransportCenterCode());
+            detailVo.setTransportCenterName(reqVo.getTransportCenterName());
+            detailVo.setWarehouseCode(reqVo.getWarehouseCode());
+            detailVo.setWarehouseName(reqVo.getWarehouseName());
             BeanUtils.copyProperties(detailVo, detail);
             detail.setCreateTime(now);
             detail.setReturnOrderDetailId(IdUtil.uuid());
@@ -218,6 +221,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             batchInfo.setBatchCode(detailVo.getBatchCode());
             batchInfo.setBatchDate(detailVo.getBatchDate());
             batchInfo.setBatchInfoCode(detailVo.getBatchInfoCode());
+            //TODO 等再用这个批次信息的时候再页面传参注释字段
 //            batchInfo.setWarehouseTypeCode(detailVo.getWarehouseTypeCode());
 //            batchInfo.setProductCount(detailVo.getProductCount());
 //            batchInfo.setBatchType(detailVo.getBatchType());
@@ -242,7 +246,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         erpOrderInfoService.updateOrderReturnStatus(record.getOrderStoreCode(), ErpOrderReturnRequestEnum.WAIT,null,record.getCreateById(),record.getCreateByName());
         log.info("发起退货--修改原始订单数据结束");
         //如果是配送质量退货，请求时调用门店退货申请
-//        if(!("15".equals(reqVo.getReturnReasonCode())&&reqVo.getOrderType().equals(2))){
         if(!("15".equals(reqVo.getReturnReasonCode())&&reqVo.getOrderType().equals(1))){
             //门店退货申请-完成(门店)（erp回调）--修改商品库存
             String url=productHost+"/order/return/insert";
@@ -1886,6 +1889,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //校验原始订单的主订单关联的所有子订单是否发货完成
             ErpOrderInfo orderByOrderCode = erpOrderQueryService.getOrderByOrderCode(reqVo.getOrderStoreCode());
             Boolean aBoolean = checkSendOk(orderByOrderCode.getMainOrderCode());
+            log.info("子订单是否发货完成的返回结果： " + aBoolean);
             //是否真的发起退货 0:预生成退货单 1:原始订单全部发货完成生成退货单
             Integer reallyReturn = 0;
             if (aBoolean) {
