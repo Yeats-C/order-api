@@ -239,4 +239,7 @@ public interface OrderDao {
     List<OperationLog> orderProductLogByOrder(String orderCode);
 
     Long returnOnlyByCashierSum(OrderQuery orderQuery);
+
+    List<OrderInfo> findListByOrderCode(@Param("orderCodeList") List<String> orderCodeList);
+
 }

@@ -1705,5 +1705,16 @@
         from operation_log o
         where o.source_type = 0 and o.operation_code = #{orderCode}
     </select>
+    <select id="findListByOrderCode" resultType="com.aiqin.mgs.order.api.domain.OrderInfo">
+        SELECT
+            order_id orderId,
+            order_type orderType
+        FROM
+            order_consumer_info
+        WHERE
+            order_code IN (  <foreach collection="orderCodeList" item="item" separator=",">
+        #{item,jdbcType=VARCHAR}
+    </foreach>);
+    </select>
 </mapper>
 

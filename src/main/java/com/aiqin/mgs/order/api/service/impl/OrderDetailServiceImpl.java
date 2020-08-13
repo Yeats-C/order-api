@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -903,6 +904,12 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         }
 
         return HttpResponse.successGenerics(cartInfo);
+    }
+
+    @Override
+    public HttpResponse findListByOrderCode(List<String> orderCodeList) {
+        List<OrderInfo> orderInfoList = orderDao.findListByOrderCode(orderCodeList);
+        return HttpResponse.successGenerics(orderInfoList);
     }
 
     @Override
