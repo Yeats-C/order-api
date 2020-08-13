@@ -1707,6 +1707,7 @@
     </select>
     <select id="findListByOrderCode" resultType="com.aiqin.mgs.order.api.domain.OrderInfo">
         SELECT
+            order_code orderCode,
             order_id orderId,
             order_type orderType
         FROM
