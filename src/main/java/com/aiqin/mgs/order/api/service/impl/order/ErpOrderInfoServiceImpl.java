@@ -704,7 +704,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             if (item.getLineCode() == null) {
                 throw new BusinessException("缺失行号");
             }
-            if (item.getActualInboundCount() == null || item.getActualInboundCount() <= 0) {
+            if (item.getActualInboundCount() == null || item.getActualInboundCount() < 0) {
                 throw new BusinessException("第" + item.getLineCode() + "行签收数量有误");
             }
             orderItemSignMap.put(item.getLineCode(), item);
