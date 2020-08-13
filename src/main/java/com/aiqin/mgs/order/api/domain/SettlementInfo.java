@@ -124,6 +124,10 @@ public class SettlementInfo extends PagesRequest {
     @JsonProperty("shop_order_preferential")
     @ApiModelProperty(value = "店长整单优惠金额")
     private Integer shopOrderPreferential;
+
+    @JsonProperty("receive_points")
+    @ApiModelProperty("获取的积分")
+    private Integer receivePoints;
 }
 
 
