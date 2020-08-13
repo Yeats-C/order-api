@@ -30,7 +30,7 @@ public enum ErpOrderNodeProcessTypeEnum {
     /***辅采直送	- 游泳游乐*/
     PROCESS_8(ErpOrderTypeEnum.ASSIST_PURCHASING, ErpOrderCategoryEnum.ORDER_TYPE_172, ErpRequestPayTransactionTypeEnum.DIRECT_DELIVERY_REPLENISHMENT, true, false, false, false, false, false, false, false, true, false, false, false),
      /***配送	- 批发订货*/
-    PROCESS_9(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_51, ErpRequestPayTransactionTypeEnum.DIRECT_DELIVERY_REPLENISHMENT, true, false, false, false, false, false, false, false, true, true, false, false),
+    PROCESS_9(ErpOrderTypeEnum.DISTRIBUTION, ErpOrderCategoryEnum.ORDER_TYPE_51, ErpRequestPayTransactionTypeEnum.DIRECT_DELIVERY_REPLENISHMENT, true, false, false, false, false, false, false, false, true, true, false, true),
     /***采购直送	- 采购直送*/
     PROCESS_10(ErpOrderTypeEnum.DIRECT_PURCHASE, ErpOrderCategoryEnum.ORDER_TYPE_147, ErpRequestPayTransactionTypeEnum.DIRECT_DELIVERY_REPLENISHMENT, true, false, false, false, false, false, false, false, true, false, false, false),
     /***采购直送	- 首单赠送*/
