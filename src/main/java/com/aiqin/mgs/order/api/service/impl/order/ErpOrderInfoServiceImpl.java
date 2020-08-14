@@ -1053,6 +1053,9 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         List<String> returnButtions = new ArrayList<>();
         List<String> noRefund = new ArrayList<>();
         for (ErpOrderItem erpOrderItem : newItemList){
+            if (ErpProductGiftEnum.GIFT.getCode().equals(erpOrderItem.getProductType())) {
+                continue;
+            }
             for (ReturnOrder returnOrder : returnOrders){
                 if (erpOrderItem.getSkuCode().equals(returnOrder.getSkuCode())&& erpOrderItem.getSkuName().equals(returnOrder.getSkuName())){
                     Long actualInboundCount = erpOrderItem.getActualInboundCount();
