@@ -307,7 +307,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 if(orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_11.getCode())
                         ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_97.getCode())
                         ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_12.getCode())
-                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_13.getCode())){
+                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_13.getCode())
+                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_4.getCode())){
                     return true;
                 }else{
                     return false;
