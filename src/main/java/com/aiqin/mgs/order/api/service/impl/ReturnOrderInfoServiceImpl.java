@@ -682,7 +682,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     @Override
     @Transactional(rollbackFor=Exception.class)
     public Boolean callback(RefundReq reqVo) {
-        log.info("退款回调开始，reqVo={}",reqVo);
+        log.info("退款回调开始，reqVo={}",JsonUtil.toJson(reqVo));
         //查询退货单状态是否修改成功
         ReturnOrderInfo returnOrderInfo=returnOrderInfoDao.selectByReturnOrderCode(reqVo.getOrderNo());
         log.info("退款回调--查询退货单,返回结果returnOrderInfo={}",returnOrderInfo);
@@ -690,6 +690,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         if(returnOrderInfo!=null&&returnOrderInfo.getRefundStatus().equals(ConstantData.REFUND_STATUS)){//1-已退款
             //查询商品的商品信息
             ErpOrderInfo orderDetailByOrderCode = erpOrderQueryService.getOrderDetailByOrderCode(returnOrderInfo.getOrderStoreCode());
+            log.info("查询当前商品主数据返回结果： " + orderDetailByOrderCode);
             //将退货单同步到结算系统-----加
             ReturnOrderDetailVO  order = new ReturnOrderDetailVO();
             ReturnOrderInfo returnOrderInfo1 = new ReturnOrderInfo();
@@ -840,7 +841,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         BigDecimal aiqinCosts = BigDecimal.ZERO;
         //商品明细
         List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(roi.getReturnOrderCode());
+        log.info("查询当前退货单的商品明细返回结果集： " + returnOrderDetails);
         List<ErpOrderItem> itemList = orderDetailByOrderCode.getItemList();
+        log.info("获取到当前订单的订单商品明细结果集： " + itemList);
         for (ReturnOrderDetail  r :returnOrderDetails){
             for (ErpOrderItem e : itemList){
                 if (e.getSkuCode().equals(r.getSkuCode()) && e.getSkuName().equals(r.getSkuName()) && r.getReturnProductCount().equals(e.getReturnProductCount() == null? 0L : e.getReturnProductCount())){

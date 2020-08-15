@@ -95,4 +95,8 @@ public interface ReturnOrderInfoDao {
     ReturnRefundStatus selectRefundStatus(String orderStoreCode);
     //查询退货单编码
     List<ReturnOrder> selectReturnOrderCode(String orderCode);
+    //查询预生成退货单
+    List<ReturnOrderInfo> selectReallyReturn();
+
+    void updateReturnReallyReturn(String returnOrderCode, String orderStoreCode);
 }
