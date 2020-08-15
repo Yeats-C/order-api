@@ -90,4 +90,6 @@ public interface OrderDetailService {
 	HttpResponse productStore(@Valid ProductStoreRequest info);
 
 	HttpResponse batchAddOrder(List<OrderodrInfo> cartInfo);
+
+	HttpResponse findListByOrderCode(List<String> orderCodeList);
 }

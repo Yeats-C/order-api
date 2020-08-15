@@ -14,6 +14,7 @@ import com.aiqin.mgs.order.api.domain.OrderDetailQuery;
 import com.aiqin.mgs.order.api.domain.request.ProdisorRequest;
 import com.aiqin.mgs.order.api.domain.request.ProductStoreRequest;
 import com.aiqin.mgs.order.api.service.OrderDetailService;
+import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -296,5 +297,17 @@ public class OrderDetailController {
 
         LOGGER.info("sku销量统计参数 sukList：{}",orderDetailId);
         return orderDetailService.findOrderDetailById(orderDetailId);
+    }
+
+    /**
+     * 通过多个order code 查询订单
+     */
+    @PostMapping("/findListByOrderCode")
+    @ApiOperation(value = "通过ID查询订单详情")
+    public HttpResponse findListByOrderCode(@RequestBody List<String> orderCodeList) {
+
+        String jsonString = JSON.toJSONString(orderCodeList);
+        LOGGER.info("request data :{}",jsonString);
+        return orderDetailService.findListByOrderCode(orderCodeList);
     }
 }

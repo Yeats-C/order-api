@@ -307,7 +307,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 if(orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_11.getCode())
                         ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_97.getCode())
                         ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_12.getCode())
-                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_13.getCode())){
+                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_13.getCode())
+                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_4.getCode())){
                     return true;
                 }else{
                     return false;
@@ -726,9 +727,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //商品明细
             List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderInfo.getReturnOrderCode());
             List<ErpOrderItem> itemList = orderDetailByOrderCode.getItemList();
-            for (ErpOrderItem e : itemList){
-                for (ReturnOrderDetail  r :returnOrderDetails){
-                    if (e.getSkuCode().equals(r.getSkuCode()) && e.getSkuName().equals(r.getSkuName())){
+            for (ReturnOrderDetail  r :returnOrderDetails){
+                 for (ErpOrderItem e : itemList){
+                    if (e.getSkuCode().equals(r.getSkuCode()) && e.getSkuName().equals(r.getSkuName()) && r.getReturnProductCount().equals(e.getReturnProductCount() == null? 0L : e.getReturnProductCount())){
                         //批次信息集合
                         ErpBatchInfo batchInfo = new ErpBatchInfo();
                         List<ErpBatchInfo>  batchInfoList = new ArrayList<>();
@@ -743,20 +744,13 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                         if(ReturnOrderEnum.RETURN_ORDER_TYPE_3.getCode().equals(returnOrderInfo.getReturnOrderType())){
                             r.setReturnProductCount(r.getActualReturnProductCount());
                         }
-//                        //批次信息
-//                        List<ReturnErpBatchInfo> returnErpBatchInfos = returnOrderDetailBatchDao.selectListBatchInfo(r.getReturnOrderCode());
-//                        for (ReturnErpBatchInfo returnErpBatchInfo : returnErpBatchInfos){
-//                            ErpBatchInfo batchInfo = new ErpBatchInfo();
-//                            Integer productCount = new Integer(returnErpBatchInfo.getProductCount().intValue());
-//                            returnErpBatchInfo.setTotalProductCount(productCount);
-//                            BeanUtils.copyProperties(returnErpBatchInfo,batchInfo);
-//                            batchInfoList.add(batchInfo);
-//                        }
                         //批次信息
                         batchInfo.setBatchInfoCode(r.getBatchInfoCode());
                         batchInfo.setBatchNo(r.getBatchCode());
-                        Integer productCount = new Integer(e.getProductCount().intValue());
-                        batchInfo.setTotalProductCount(productCount);
+                        if (0 == (e.getPreferentialAmount().compareTo(r.getPreferentialAmount()))){
+                            Integer productCount = new Integer(e.getProductCount().intValue());
+                            batchInfo.setTotalProductCount(productCount);
+                        }
                         batchInfo.setSkuCode(r.getSkuCode());
                         batchInfo.setSkuName(r.getSkuName());
                         batchInfoList.add(batchInfo);
@@ -847,9 +841,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //商品明细
         List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(roi.getReturnOrderCode());
         List<ErpOrderItem> itemList = orderDetailByOrderCode.getItemList();
-        for (ErpOrderItem e : itemList){
-            for (ReturnOrderDetail  r :returnOrderDetails){
-                if (e.getSkuCode().equals(r.getSkuCode()) && e.getSkuName().equals(r.getSkuName())){
+        for (ReturnOrderDetail  r :returnOrderDetails){
+            for (ErpOrderItem e : itemList){
+                if (e.getSkuCode().equals(r.getSkuCode()) && e.getSkuName().equals(r.getSkuName()) && r.getReturnProductCount().equals(e.getReturnProductCount() == null? 0L : e.getReturnProductCount())){
                     //批次信息集合
                     ErpBatchInfo batchInfo = new ErpBatchInfo();
                     List<ErpBatchInfo>  batchInfoList = new ArrayList<>();
@@ -864,19 +858,12 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                       r.setReturnProductCount(r.getActualReturnProductCount());
                     }
                     //批次信息
-//                    List<ReturnErpBatchInfo> returnErpBatchInfos = returnOrderDetailBatchDao.selectListBatchInfo(r.getReturnOrderCode());
-//                    for (ReturnErpBatchInfo returnErpBatchInfo : returnErpBatchInfos){
-//                        ErpBatchInfo batchInfo = new ErpBatchInfo();
-//                        Integer productCount = new Integer(returnErpBatchInfo.getProductCount().intValue());
-//                        returnErpBatchInfo.setTotalProductCount(productCount);
-//                        BeanUtils.copyProperties(returnErpBatchInfo,batchInfo);
-//                        batchInfoList.add(batchInfo);
-//                    }
-                    //批次信息
                     batchInfo.setBatchInfoCode(r.getBatchInfoCode());
-                    batchInfo.setBatchNo(r.getBatchCode()) ;
-                    Integer productCount = new Integer(e.getProductCount().intValue());
-                    batchInfo.setTotalProductCount(productCount);
+                    batchInfo.setBatchNo(r.getBatchCode());
+                    if (0 == (e.getPreferentialAmount().compareTo(r.getPreferentialAmount()))){
+                        Integer productCount = new Integer(e.getProductCount().intValue());
+                        batchInfo.setTotalProductCount(productCount);
+                    }
                     batchInfo.setSkuCode(r.getSkuCode());
                     batchInfo.setSkuName(r.getSkuName());
                     batchInfoList.add(batchInfo);
@@ -890,11 +877,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 }
             }
         }
-//        List<ReturnOrderDetail> detailsList = returnOrderDetails.stream().map(detailVos ->{
-//            ReturnOrderDetail detail = new ReturnOrderDetail();
-//            BeanUtils.copyProperties(detailVos, detail);
-//            return detail;
-//        }).collect(Collectors.toList());
         returnOrderInfo1.setAiqinCost(aiqinCosts);
         order.setDetails(returnOrderDetailss);
         order.setReturnOrderInfo(returnOrderInfo1);
