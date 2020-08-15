@@ -1522,6 +1522,13 @@
     on a.return_order_code = b.return_order_code
     where a.order_store_code = #{orderCode} ORDER BY a.create_time  DESC LIMIT 1
   </select>
+  <select id="selectReallyReturn" resultType="com.aiqin.mgs.order.api.domain.ReturnOrderInfo">
+    select
+    <include refid="Base_Column_List" />
+    from return_order_info
+    where
+    really_return=0
+  </select>
 
 
   <update id="updateReallyReturn" parameterType="java.util.List">
