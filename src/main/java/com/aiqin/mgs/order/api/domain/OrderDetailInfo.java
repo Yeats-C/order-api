@@ -251,6 +251,14 @@ public class OrderDetailInfo extends PagesRequest {
 	@JsonProperty("receive_points")
 	@ApiModelProperty("获取的积分")
 	private Integer receivePoints;
+
+	@ApiModelProperty("商品属性code")
+	@JsonProperty("product_property_code")
+	private String productPropertyCode;
+
+	@ApiModelProperty("商品属性名称")
+	@JsonProperty("product_property_name")
+	private String productPropertyName;
 }
 
 

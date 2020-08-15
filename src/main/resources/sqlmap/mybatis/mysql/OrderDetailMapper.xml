@@ -131,7 +131,7 @@
         <if test="memberPrice!=null">
             member_price,
         </if>
-        create_time,update_time,create_by,update_by,package_id,total_price,shop_product_money)
+        create_time,update_time,create_by,update_by,package_id,total_price,shop_product_money,product_property_code,product_property_name)
         values
         (#{orderId},#{orderCode},#{orderDetailId},#{productId},#{productCode},#{productName},#{listName},#{skuCode},#{spuCode},#{barCode},#{spec},#{unit},#{retailPrice},#{actualPrice},#{amount},#{productStatus},#{logo},#{typeId},#{typeName},
         <if test="giftStatus!=null">
@@ -156,7 +156,7 @@
         <if test="memberPrice!=null">
             #{memberPrice},
         </if>
-        CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,#{createBy},#{updateBy},#{packageId},#{totalPrice},#{shopProductMoney})
+        CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,#{createBy},#{updateBy},#{packageId},#{totalPrice},#{shopProductMoney},#{productPropertyCode},#{productPropertyName})
     </insert>
 
     <!-- 修改订单明细退货数据-->
