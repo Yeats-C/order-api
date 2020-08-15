@@ -23,6 +23,7 @@
         <result column="full_sum" jdbcType="INTEGER" property="fullSum"/>
         <result column="lucky_sum" jdbcType="INTEGER" property="luckySum"/>
         <result column="shop_order_preferential" jdbcType="INTEGER" property="shopOrderPreferential"/>
+        <result column="receive_points" jdbcType="INTEGER" property="receivePoints"/>
     </resultMap>
 
 
