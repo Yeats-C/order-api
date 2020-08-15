@@ -730,7 +730,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             List<ErpOrderItem> itemList = orderDetailByOrderCode.getItemList();
             for (ReturnOrderDetail  r :returnOrderDetails){
                  for (ErpOrderItem e : itemList){
-                    if (e.getSkuCode().equals(r.getSkuCode()) && e.getSkuName().equals(r.getSkuName()) && r.getReturnProductCount().equals(e.getReturnProductCount() == null? 0L : e.getReturnProductCount())){
+                    if (e.getSkuCode().equals(r.getSkuCode()) && e.getSkuName().equals(r.getSkuName()) && 0 == r.getPreferentialAmount().compareTo(e.getPreferentialAmount())){
                         //批次信息集合
                         ErpBatchInfo batchInfo = new ErpBatchInfo();
                         List<ErpBatchInfo>  batchInfoList = new ArrayList<>();
@@ -846,7 +846,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         log.info("获取到当前订单的订单商品明细结果集： " + itemList);
         for (ReturnOrderDetail  r :returnOrderDetails){
             for (ErpOrderItem e : itemList){
-                if (e.getSkuCode().equals(r.getSkuCode()) && e.getSkuName().equals(r.getSkuName()) && r.getReturnProductCount().equals(e.getReturnProductCount() == null? 0L : e.getReturnProductCount())){
+                if (e.getSkuCode().equals(r.getSkuCode()) && e.getSkuName().equals(r.getSkuName()) && 0 == r.getPreferentialAmount().compareTo(e.getPreferentialAmount())){
                     //批次信息集合
                     ErpBatchInfo batchInfo = new ErpBatchInfo();
                     List<ErpBatchInfo>  batchInfoList = new ArrayList<>();
