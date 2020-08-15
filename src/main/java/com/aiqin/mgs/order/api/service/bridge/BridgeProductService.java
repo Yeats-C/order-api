@@ -919,7 +919,7 @@ public HttpResponse<MerchantPaBalanceRespVO> accountBalance(String franchiseeId)
                 //订单总额
                 erpOrderVo.setTotalProductAmount(order.getTotalProductAmount());
                 //实付金额
-                erpOrderVo.setActualTotalProductAmount(order.getOrderFee().getPayMoney());
+                erpOrderVo.setActualTotalProductAmount(order.getTotalProductAmount().subtract(order.getDiscountAmount()));
                 //订单商品总数量
                 erpOrderVo.setTotalProductCount(productCount);
                 //实发商品总数量
