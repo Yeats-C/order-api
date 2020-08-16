@@ -148,6 +148,10 @@ public class OrderAfterSaleDetailInfo extends PagesRequest {
 	@JsonProperty("package_id")
 	@ApiModelProperty("套餐包id")
 	private String packageId;
+
+	@JsonProperty("cost_points")
+	@ApiModelProperty("退货返还加盟商的积分")
+	private Long costPoints;
     
 }
 

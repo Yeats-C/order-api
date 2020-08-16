@@ -30,6 +30,7 @@
 <result column="unit" jdbcType="VARCHAR" property="unit"/>
 <result column="create_by_name" jdbcType="VARCHAR" property="createByName"/>
 <result column="update_by_name" jdbcType="VARCHAR" property="updateByName"/>
+<result column="cost_points" jdbcType="INTEGER" property="costPoints"/>
 </resultMap>
 
 <resultMap id="IdAndAmountMapping" type="com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest">
