@@ -151,7 +151,7 @@ public class OrderAfterSaleDetailInfo extends PagesRequest {
 
 	@JsonProperty("cost_points")
 	@ApiModelProperty("退货返还加盟商的积分")
-	private Long costPoints;
+	private Integer costPoints;
     
 }
 
