@@ -422,9 +422,9 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                     }
 
                 }
-            } else {
+            } /*else {
                 detailList = orderDetailDao.selectDetailById(orderDetailQuery);
-            }
+            }*/
 
             //为pos端判断是否可退货
             int state = checkTurn(detailList);
