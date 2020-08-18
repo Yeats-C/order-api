@@ -135,7 +135,16 @@ public class ErpReturnOrderVo {
 	@JsonProperty("company_name")
 	private String companyName;
 
-	
+
+	@ApiModelProperty(value="所属合伙人编码")
+	@JsonProperty("copartner_code")
+	private String copartnerCode;
+
+	@ApiModelProperty(value="所属合伙人名称")
+	@JsonProperty("copartner_name")
+	private String copartnerName;
+
+
 	@ApiModelProperty(value="商品列表")
 	@JsonProperty("prodcut_list")
 	private List<ErpReturnOrderProductInfo> prodcutList;
