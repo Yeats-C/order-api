@@ -1717,5 +1717,63 @@
         #{item,jdbcType=VARCHAR}
     </foreach>);
     </select>
+    <select id="selectGetMoney"
+            resultType="com.aiqin.mgs.order.api.domain.response.stock.ReportForDayResponse">
+        SELECT
+            a.cashier_id cashierId,
+            a.cashier_name cashierName,
+            a.pay_type payType,
+            COUNT(1) saleCount,
+            SUM( a.actual_price ) AS price
+        FROM
+            order_consumer_info a
+        WHERE
+            a.order_status NOT IN ( 0, 4 )
+          AND a.pay_type IN (3,4,5,6)
+          AND a.create_time &gt;= #{startTime}
+          AND a.create_time &lt;= #{endTime}
+          and a.cashier_id in
+            (<foreach collection="cashierIdList" item="item" separator=",">
+            #{item}
+            </foreach>)
+        GROUP BY
+            a.pay_type,
+            a.cashier_id
+    </select>
+    <select id="selectReturnMoney"
+            resultType="com.aiqin.mgs.order.api.domain.response.stock.ReportForDayResponse">
+        SELECT
+        sum( IFNULL(a.return_price,0)) AS price,
+        count(1) returnCount,
+        create_by cashierId
+        FROM
+        order_after_sale a
+        WHERE
+            a.create_time &gt;= #{startTime}
+        AND a.create_time &lt;= #{endTime}
+        and a.create_by in
+        (<foreach collection="cashierIdList" item="item" separator=",">
+        #{item}
+    </foreach>)
+        GROUP BY a.create_by;
+    </select>
+    <select id="selectPointRecord"
+            resultType="com.aiqin.mgs.order.api.domain.response.stock.ReportForDayResponse">
+        SELECT
+            create_by cashierId,
+            sum( a.cost_points ) jiFenGet,
+            SUM( a.receive_points ) jiFenReturn
+        FROM
+            order_consumer_detail a
+        WHERE
+        a.create_time &gt;= #{startTime}
+        AND a.create_time &lt;= #{endTime}
+        and a.create_by in
+            (<foreach collection="cashierIdList" item="item" separator=",">
+                #{item}
+            </foreach>)
+        GROUP BY
+            a.create_by
+    </select>
 </mapper>
 
