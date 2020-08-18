@@ -1081,6 +1081,9 @@ public void settlementSaveReturnOrder(ReturnOrderDetailVO order) {
             erpOrderVo.setInputTime(returnOrderInfo.getReceiveTime() );
             //爱亲成本总额
             erpOrderVo.setAiqinCost(returnOrderInfo.getAiqinCost());
+            //所属合伙人
+            erpOrderVo.setCopartnerCode(returnOrderInfo.getCopartnerAreaId());
+            erpOrderVo.setCopartnerName(returnOrderInfo.getCopartnerAreaName());
 
         //商品列表
         List<ErpReturnOrderProductInfo> erpReturnOrderProductInfoList = new ArrayList<>();
