@@ -127,4 +127,9 @@ public class ErpSkuDetail {
     @ApiModelProperty(value = "导入数量(货架商品导入时使用)")
     @JsonProperty("quantity")
     private Integer quantity;
+
+    @ApiModelProperty("批次对应库房类型")
+    @JsonProperty(value = "warehouse_type")
+    private Integer warehouseType;
+
 }

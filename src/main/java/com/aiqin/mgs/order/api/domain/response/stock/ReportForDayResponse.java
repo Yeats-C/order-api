@@ -7,9 +7,7 @@ import lombok.Data;
 import javax.persistence.Transient;
 
 /**
- * @author jinghaibo
- * Date: 2020/1/3 17:16
- * Description:
+ * @author wanghao
  */
 @Data
 @ApiModel("日结报表响应实体")

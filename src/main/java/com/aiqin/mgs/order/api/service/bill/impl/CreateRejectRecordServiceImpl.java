@@ -281,6 +281,7 @@ public class CreateRejectRecordServiceImpl implements CreateRejectRecordService 
             }
         } catch (Exception e) {
             LOGGER.error("根据爱亲退供单，生成耘链退货单失败",e);
+            e.printStackTrace();
             throw new RuntimeException();
         }
     }

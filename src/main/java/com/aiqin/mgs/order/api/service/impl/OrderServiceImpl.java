@@ -529,7 +529,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public HttpResponse<List<ReportForDayResponse>> reportForDay(ReportForDayReq reportForDayReq) {
         HttpClient httpClient = HttpClient.post(urlProperties.getMemberApi() + "/store-value/cashierId/statistics").json(reportForDayReq);
-        //HttpClient httpClient = HttpClient.post( "http://localhost:9090/store-value/cashierId/statistics").json(reportForDayReq);
         HttpResponse<List<ReportForDayResponse>> httpResponse = httpClient.action().result(new TypeReference<HttpResponse<List<ReportForDayResponse>>>() {
         });
         if (Objects.isNull(httpResponse) || !"0".equals(httpResponse.getCode())) {
@@ -559,18 +558,7 @@ public class OrderServiceImpl implements OrderService {
             // 订单数据
             List<ReportForDayResponse> moneyList = getMoneyMap.get(csahierId);
             if (CollectionUtils.isNotEmpty(moneyList)) {
-                moneyList.forEach(s -> {
-                    Long payPrice = s.getPrice();
-                    if (s.getPayType() == 4) {
-                        reportForDayResponse.setWeiXinGet(payPrice);
-                    } else if (s.getPayType() == 5) {
-                        reportForDayResponse.setZhiFuBaoGet(payPrice);
-                    } else {
-                        reportForDayResponse.setXianJinGet(payPrice);
-                    }
-                });
-                Long saleCount = moneyList.stream().collect(Collectors.summingLong(ReportForDayResponse::getSaleCount));
-                reportForDayResponse.setSaleCount(saleCount);
+                orderDataHandle(reportForDayResponse, moneyList);
             }
 
             // 退货数据
@@ -583,54 +571,81 @@ public class OrderServiceImpl implements OrderService {
             // 储值卡数据
             List<ReportForDayResponse> accountList = accountRecordMap.get(csahierId);
             if (CollectionUtils.isNotEmpty(accountList)) {
-                accountList.forEach(s -> {
-                    Long payPrice = s.getPrice();
-                    if (s.getPayType() == 4) {
-                        reportForDayResponse.setWeiXinGet(reportForDayResponse.getWeiXinGet() + payPrice);
-                    } else if (s.getPayType() == 5) {
-                        reportForDayResponse.setZhiFuBaoGet(reportForDayResponse.getZhiFuBaoGet() + payPrice);
-                    } else {
-                        reportForDayResponse.setXianJinGet(reportForDayResponse.getXianJinGet() + payPrice);
-                    }
-                });
-                long rechargeSale = accountList.stream().collect(Collectors.summingLong(ReportForDayResponse::getRechargeSale));
-                reportForDayResponse.setRechargeSale(rechargeSale);
+                accountDataHandle(reportForDayResponse,accountList);
             }
 
+            // 积分数据
             ReportForDayResponse pointVo = pointMap.get(csahierId);
             if (Objects.nonNull(pointVo)) {
                 reportForDayResponse.setJiFenGet(pointVo.getJiFenGet());
                 reportForDayResponse.setJiFenReturn(pointVo.getJiFenReturn());
             }
 
-            // 现金应交款
-            reportForDayResponse.setXianJinActualGet(reportForDayResponse.getXianJinGet() - reportForDayResponse.getXianJinReturn());
-
-            // 支付宝应交款
-            reportForDayResponse.setZhiFuBaoActualGet(reportForDayResponse.getZhiFuBaoGet() - reportForDayResponse.getZhiFuBaoReturn());
-
-            // 微信应交款
-            reportForDayResponse.setWeiXinGet(reportForDayResponse.getWeiXinGet() - reportForDayResponse.getWeiXinReturn());
-
-            // 积分应交款
-            reportForDayResponse.setXianJinActualGet(reportForDayResponse.getJiFenGet() - reportForDayResponse.getJiFenReturn());
-
-            // 收款合计
-            long collectionTotal = reportForDayResponse.getJiFenGet() + reportForDayResponse.getWeiXinGet() + reportForDayResponse.getZhiFuBaoGet();
-            reportForDayResponse.setCollectionTotal(collectionTotal);
-
-            // 退款合计
-            Long returnTotal = reportForDayResponse.getReturnTotal();
-            reportForDayResponse.setReturnTotal(returnTotal);
-
-            // 应交总金额
-            long total = collectionTotal - returnTotal;
-            reportForDayResponse.setTotal(total);
+            // 数据汇总
+            dataSummary(reportForDayResponse);
 
             return reportForDayResponse;
         }).collect(Collectors.toList());
 
         return HttpResponse.successGenerics(reportForDayResponseList);
+    }
+
+    private void accountDataHandle(ReportForDayResponse reportForDayResponse, List<ReportForDayResponse> accountList) {
+        accountList.forEach(s -> {
+            Long payPrice = s.getPrice();
+            if (s.getPayType() == 4) {
+                reportForDayResponse.setWeiXinGet(reportForDayResponse.getWeiXinGet() + payPrice);
+            } else if (s.getPayType() == 5) {
+                reportForDayResponse.setZhiFuBaoGet(reportForDayResponse.getZhiFuBaoGet() + payPrice);
+            } else {
+                reportForDayResponse.setXianJinGet(reportForDayResponse.getXianJinGet() + payPrice);
+            }
+        });
+        long rechargeSale = accountList.stream().collect(Collectors.summingLong(ReportForDayResponse::getRechargeSale));
+        reportForDayResponse.setRechargeSale(rechargeSale);
+    }
+
+    private void orderDataHandle(ReportForDayResponse reportForDayResponse, List<ReportForDayResponse> moneyList) {
+        moneyList.forEach(s -> {
+            Long payPrice = s.getPrice();
+            if (s.getPayType() == 4) {
+                reportForDayResponse.setWeiXinGet(payPrice);
+            } else if (s.getPayType() == 5) {
+                reportForDayResponse.setZhiFuBaoGet(payPrice);
+            } else {
+                reportForDayResponse.setXianJinGet(payPrice);
+            }
+        });
+        Long saleCount = moneyList.stream().collect(Collectors.summingLong(ReportForDayResponse::getSaleCount));
+        reportForDayResponse.setSaleCount(saleCount);
+    }
+
+    private void dataSummary(ReportForDayResponse reportForDayResponse) {
+
+        // 现金应交款
+        reportForDayResponse.setXianJinActualGet(reportForDayResponse.getXianJinGet() - reportForDayResponse.getXianJinReturn());
+
+        // 支付宝应交款
+        reportForDayResponse.setZhiFuBaoActualGet(reportForDayResponse.getZhiFuBaoGet() - reportForDayResponse.getZhiFuBaoReturn());
+
+        // 微信应交款
+        reportForDayResponse.setWeiXinActualGet(reportForDayResponse.getWeiXinGet() - reportForDayResponse.getWeiXinReturn());
+
+        // 积分应交款
+        reportForDayResponse.setJiFenActualGet(reportForDayResponse.getJiFenGet() - reportForDayResponse.getJiFenReturn());
+
+        // 收款合计
+        long collectionTotal = reportForDayResponse.getXianJinGet() + reportForDayResponse.getWeiXinGet() + reportForDayResponse.getZhiFuBaoGet();
+        reportForDayResponse.setCollectionTotal(collectionTotal);
+
+        // 退款合计
+        long returnTotal = reportForDayResponse.getXianJinReturn() + reportForDayResponse.getZhiFuBaoReturn() + reportForDayResponse.getWeiXinReturn();
+        reportForDayResponse.setReturnTotal(returnTotal);
+
+        // 应交总金额
+        long total = collectionTotal - returnTotal;
+        reportForDayResponse.setTotal(total);
+
     }
 
     private OrderQuery trans(OrderQuery orderQuery) {

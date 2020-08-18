@@ -958,7 +958,7 @@
     <select id="cashier" resultMap="ReceiptSumMapping" resultType="java.util.List">
         SELECT
         b.cashier_id,b.cashier_name,
-        a.pay_type,SUM(pay_price) AS pay_price
+        a.pay_type,SUM(b.actual_price) AS pay_price
         FROM
         order_consumer_info b
         LEFT JOIN order_pay a ON a.order_id = b.order_id
