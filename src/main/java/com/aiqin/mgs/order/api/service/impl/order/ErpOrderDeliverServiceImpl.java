@@ -456,7 +456,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
         Map<String,BigDecimal> topMap=new HashMap();
         for(ErpOrderItem item:itemList){
             if(null!=item.getTopCouponAmount()&&item.getTopCouponAmount().compareTo(BigDecimal.ZERO)>0){
-                topMap.put(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode(),item.getTopCouponAmount());
+                topMap.put(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode(),item.getTopCouponAmount());
             }
         }
         //子订单明细集合
@@ -471,8 +471,8 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
         }
 
         for(ErpOrderItem item:subItemList){
-            if(topMap.containsKey(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode())){
-                BigDecimal topCouponAmount=topMap.get(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
+            if(topMap.containsKey(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode())){
+                BigDecimal topCouponAmount=topMap.get(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
                 item.setTopCouponAmount(topCouponAmount);
                 item.setTopCouponDiscountAmount(topCouponAmount.multiply(new BigDecimal(item.getActualProductCount())));
                 updateSubItemList.add(item);

@@ -20,10 +20,7 @@ import com.aiqin.mgs.order.api.domain.request.InventoryDetailRequest;
 import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
-import com.aiqin.mgs.order.api.domain.request.product.NewStoreCategory;
-import com.aiqin.mgs.order.api.domain.request.product.ProductSkuRequest2;
-import com.aiqin.mgs.order.api.domain.request.product.ProductSkuRespVo6;
-import com.aiqin.mgs.order.api.domain.request.product.SkuProductReqVO;
+import com.aiqin.mgs.order.api.domain.request.product.*;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailVO;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
 import com.aiqin.mgs.order.api.domain.request.stock.ProductSkuStockRespVo;
@@ -603,10 +600,18 @@ public Map<String, ErpSkuDetail> getProductSkuDetailMap(String provinceCode, Str
     List<ErpSkuDetail> productSkuDetailList = getProductSkuDetailList(provinceCode, cityCode, OrderConstant.SELECT_PRODUCT_COMPANY_CODE, productSkuRequest2List);
     for (ErpSkuDetail item : productSkuDetailList) {
         String batchInfoCode=null;
-        if(null!= item.getBatchList()&&item.getBatchList().size()>0&&null!=item.getBatchList().get(0).getBatchInfoCode()){
-            batchInfoCode=item.getBatchList().get(0).getBatchInfoCode();
+        Integer warehouseType=null;
+        if(null!= item.getBatchList()&&item.getBatchList().size()>0){
+            for(BatchRespVo batchRespVo:item.getBatchList()){
+                batchInfoCode=batchRespVo.getBatchInfoCode();
+                warehouseType=batchRespVo.getWarehouseType();
+                skuDetailMap.put(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+warehouseType+"BATCH_INFO_CODE"+batchInfoCode, item);
+            }
+        }else{
+            warehouseType=item.getWarehouseType();
+            skuDetailMap.put(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+warehouseType+"BATCH_INFO_CODE"+batchInfoCode, item);
         }
-        skuDetailMap.put(item.getSkuCode()+"BATCH_INFO_CODE"+batchInfoCode, item);
+
     }
     return skuDetailMap;
 }
