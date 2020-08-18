@@ -220,7 +220,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         if (select != null && select.size() > 0) {
             for (ErpOrderCartInfo item :
                     select) {
-                cartLineMap.put(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode(), item);
+                cartLineMap.put(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode(), item);
             }
         }
 
@@ -234,17 +234,17 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         List<BatchInfo> barchInfoList=new ArrayList<>();
         for (ErpCartAddSkuItem item :
                 erpCartAddRequest.getProducts()) {
-            if (!skuDetailMap.containsKey(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode())) {
-                throw new BusinessException("未找到商品" + item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode() + "详情");
+            if (!skuDetailMap.containsKey(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode())) {
+                throw new BusinessException("未找到商品" + item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode() + "详情");
             }
-            ErpSkuDetail skuDetail = skuDetailMap.get(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
+            ErpSkuDetail skuDetail = skuDetailMap.get(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
 
             //购物车该商品当前数量
             int cartAmount = 0;
 
-            if (cartLineMap.containsKey(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode())) {
+            if (cartLineMap.containsKey(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode())) {
                 //购物车已经存在该商品
-                ErpOrderCartInfo erpOrderCartInfo = cartLineMap.get(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
+                ErpOrderCartInfo erpOrderCartInfo = cartLineMap.get(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
                 cartAmount = erpOrderCartInfo.getAmount() + item.getAmount();
                 erpOrderCartInfo.setLineCheckStatus(YesOrNoEnum.YES.getCode());
                 erpOrderCartInfo.setAmount(cartAmount);
@@ -797,9 +797,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         Map<String, Integer> skuStockNumMap = new HashMap<>(16);
         for (ErpOrderCartInfo item :
                 cartLineList) {
-            ErpSkuDetail skuDetail = skuDetailMap.get(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
+            ErpSkuDetail skuDetail = skuDetailMap.get(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
             if (skuDetail == null) {
-                throw new BusinessException("未获取到商品" + item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode() + "信息");
+                throw new BusinessException("未获取到商品" + item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode() + "信息");
             }
             item.setStockNum(skuDetail.getStockNum());
             item.setIsSale(skuDetail.getIsSale());
@@ -809,7 +809,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                     throw new BusinessException("商品" + skuDetail.getSkuName() + "库存不足");
                 }
             }
-            skuStockNumMap.put(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode(), skuDetail.getStockNum() - item.getAmount());
+            skuStockNumMap.put(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode(), skuDetail.getStockNum() - item.getAmount());
         }
 
         //----------开始组装楼层----------
@@ -1999,7 +1999,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         List<ErpOrderCartInfo> updateList = new ArrayList<>();
         for (ErpOrderCartInfo item :
                 cartLineList) {
-            ErpSkuDetail skuDetail = skuDetailMap.get(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
+            ErpSkuDetail skuDetail = skuDetailMap.get(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
             if (skuDetail == null || item.getAmount() > skuDetail.getStockNum()) {
                 item.setLineCheckStatus(YesOrNoEnum.NO.getCode());
                 updateList.add(item);
@@ -2059,7 +2059,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
 
             for (ErpOrderCartInfo item :
                     cartList) {
-                ErpSkuDetail skuDetail = skuDetailMap.get(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
+                ErpSkuDetail skuDetail = skuDetailMap.get(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
                 if (skuDetail != null) {
                     item.setLogo(skuDetail.getProductPicturePath());
 //                    item.setPrice(skuDetail.getPriceTax());
@@ -2067,7 +2067,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                     item.setStockNum(skuDetail.getStockNum());
                     item.setIsSale(skuDetail.getIsSale());
                 } else {
-                    throw new BusinessException("商品" + item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode() + "detail2接口查詢失敗");
+                    throw new BusinessException("商品" + item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode() + "detail2接口查詢失敗");
                 }
             }
         }
