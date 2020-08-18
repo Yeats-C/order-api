@@ -234,7 +234,7 @@ public class OrderDetailInfo extends PagesRequest {
 
 	@JsonProperty("total_price")
 	@ApiModelProperty("行总金额")
-	private Integer totalPrice;
+	private int totalPrice;
 
 
 	/**
