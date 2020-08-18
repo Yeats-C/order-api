@@ -827,7 +827,7 @@ public class OrderController {
     @ApiOperation(value = "接口-日结报表")
     public HttpResponse<List<ReportForDayResponse>> reportForDay(@RequestBody ReportForDayReq reportForDayReq) {
 
-        LOGGER.info("订单中心获取门店本月销售额：{}", JSON.toJSONString(reportForDayReq));
+        LOGGER.info("接口-日结报表：{}", JSON.toJSONString(reportForDayReq));
         return orderService.reportForDay(reportForDayReq);
     }
 }
