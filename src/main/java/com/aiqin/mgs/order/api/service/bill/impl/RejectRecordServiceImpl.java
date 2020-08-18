@@ -237,10 +237,20 @@ public class RejectRecordServiceImpl implements RejectRecordService {
             @Override
             public void run() {
                 try {
+                    int count = 0;
                     Integer orderSynchroSuccess = OrderSucessEnum.ORDER_SYNCHRO_WAIT.getCode();
                     LOGGER.info("待生成退供单以及退货编码：{},{}",orderSynchroSuccess,returnOrderCode);
                     //查询待ERP退货单，待生成爱亲退供单数据
                     ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndSuccess(orderSynchroSuccess, returnOrderCode);
+                    while(returnOrderInfo == null){
+                       if (count == 5){
+                           break;
+                       }
+                       returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndSuccess(orderSynchroSuccess, returnOrderCode);
+                       count++;
+                       Thread.currentThread().sleep(500);
+                       LOGGER.info("循环第： " + count + "次查询");
+                    }
                     LOGGER.info("查询ERP退货单---返回实体:{}",returnOrderInfo);
                     if (returnOrderInfo != null) {
                         createRejectRecordService.addRejectRecord(returnOrderCode);

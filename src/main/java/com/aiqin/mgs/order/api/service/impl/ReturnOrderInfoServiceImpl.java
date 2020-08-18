@@ -706,6 +706,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //门店
             returnOrderInfo1.setStoreCode(returnOrderInfo.getStoreCode());
             returnOrderInfo1.setStoreName(returnOrderInfo.getStoreName());
+            //所属合伙人
+            returnOrderInfo1.setCopartnerAreaId(returnOrderInfo.getCopartnerAreaId());
+            returnOrderInfo1.setCopartnerAreaName(returnOrderInfo.getCopartnerAreaName());
             //退货类型
             returnOrderInfo1.setReturnOrderType(returnOrderInfo.getReturnOrderType());
             //仓库
@@ -828,6 +831,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //库房
         returnOrderInfo1.setWarehouseCode(roi.getWarehouseCode());
         returnOrderInfo1.setWarehouseName(roi.getWarehouseName());
+        //所属合伙人
+        returnOrderInfo1.setCopartnerAreaId(roi.getCopartnerAreaId());
+        returnOrderInfo1.setCopartnerAreaName(roi.getCopartnerAreaName());
         //退货金额
         returnOrderInfo1.setReturnOrderAmount(roi.getReturnOrderAmount());
         //退A品券总额
