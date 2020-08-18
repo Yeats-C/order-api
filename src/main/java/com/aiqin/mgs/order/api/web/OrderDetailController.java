@@ -310,4 +310,16 @@ public class OrderDetailController {
         LOGGER.info("request data :{}",jsonString);
         return orderDetailService.findListByOrderCode(orderCodeList);
     }
+
+    /**
+     *通过多个 sale code 查询订单
+     */
+    @PostMapping("/findListBySaleCode")
+    @ApiOperation(value = "通过ID查询售后订单详情")
+    public HttpResponse findListBySaleCode(@RequestBody List<String> orderCodeList) {
+
+        String jsonString = JSON.toJSONString(orderCodeList);
+        LOGGER.info("request data :{}",jsonString);
+        return orderDetailService.findListBySaleCode(orderCodeList);
+    }
 }
