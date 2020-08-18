@@ -15,7 +15,7 @@
         <result column="order_change" jdbcType="INTEGER" property="orderChange"/>
         <result column="order_abandon" jdbcType="INTEGER" property="orderAbandon"/>
         <result column="points" jdbcType="INTEGER" property="points"/>
-        <result column="point_discount" jdbcType="BIGINT" property="pointDiscount"/>
+        <result column="point_discount" jdbcType="DECIMAL" property="pointDiscount"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="create_by" jdbcType="VARCHAR" property="createBy"/>

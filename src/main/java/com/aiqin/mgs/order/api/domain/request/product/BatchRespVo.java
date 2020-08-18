@@ -50,4 +50,8 @@ public class BatchRespVo {
     @ApiModelProperty("批次类型  0：月份批次  1：非月份批次")
     @JsonProperty(value = "batch_type")
     private Integer batchType;
+
+    @ApiModelProperty("批次对应库房类型")
+    @JsonProperty(value = "warehouse_type")
+    private Integer warehouseType;
 }
