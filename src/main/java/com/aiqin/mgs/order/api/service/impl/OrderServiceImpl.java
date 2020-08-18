@@ -31,13 +31,12 @@ import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.pay.PayReq;
 import com.aiqin.mgs.order.api.domain.request.*;
 import com.aiqin.mgs.order.api.domain.request.order.QueryOrderListReqVO;
+import com.aiqin.mgs.order.api.domain.request.stock.ReportForDayReq;
 import com.aiqin.mgs.order.api.domain.response.*;
 import com.aiqin.mgs.order.api.domain.response.activity.ActivityPackageProductDTO;
-import com.aiqin.mgs.order.api.domain.response.activity.StoreActivityDetailsResp;
-import com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoItemRespVO;
 import com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoRespVO;
 import com.aiqin.mgs.order.api.domain.response.order.QueryOrderListRespVO;
-import com.aiqin.mgs.order.api.intercepter.UrlInterceptor;
+import com.aiqin.mgs.order.api.domain.response.stock.ReportForDayResponse;
 import com.aiqin.mgs.order.api.service.*;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.util.DayUtil;
@@ -50,7 +49,6 @@ import org.apache.commons.lang.StringUtils;
 import com.aiqin.mgs.order.api.util.DateUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.http.client.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,6 +57,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import com.aiqin.ground.util.exception.GroundRuntimeException;
@@ -288,7 +287,7 @@ public class OrderServiceImpl implements OrderService {
                 try {
                     orderDao.updateOrder(orderInfo);
                 } catch (Exception e) {
-                    log.error("预存取货失败"+e.getMessage());
+                    log.error("预存取货失败" + e.getMessage());
                 }
             }
         }
@@ -333,12 +332,13 @@ public class OrderServiceImpl implements OrderService {
             return HttpResponse.failure(MessageId.create(Project.ORDER_API, -1, vo.getDealMsg()));
         }
     }
+
     //会员消费更新会员消费时间记录
     private void updateMemberSale(OrderodrInfo orderInfo) {
-        if (orderInfo==null||orderInfo.getOrderInfo()==null||orderInfo.getOrderInfo().getMemberId()==null||orderInfo.getOrderInfo().getMemberId().equals("")){
+        if (orderInfo == null || orderInfo.getOrderInfo() == null || orderInfo.getOrderInfo().getMemberId() == null || orderInfo.getOrderInfo().getMemberId().equals("")) {
             return;
         }
-        MemberSaleRequest memberSaleRequest=new MemberSaleRequest();
+        MemberSaleRequest memberSaleRequest = new MemberSaleRequest();
         memberSaleRequest.setMemberId(orderInfo.getOrderInfo().getMemberId());
         memberSaleRequest.setLastSaleAmount(orderInfo.getSettlementInfo().getOrderReceivable());
 
@@ -378,7 +378,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public HttpResponse selectPrestorageOrderList(OrderQuery orderQuery) {
-        if (orderQuery!=null &&orderQuery.getListDistributorId()!=null&&orderQuery.getListDistributorId().size()==0){
+        if (orderQuery != null && orderQuery.getListDistributorId() != null && orderQuery.getListDistributorId().size() == 0) {
             orderQuery.setListDistributorId(null);
         }
         List<PrestorageOrderInfo> prestorageOrderSupplies = prestorageOrderSupplyDao.selectPrestorageOrderList(orderQuery);
@@ -394,14 +394,14 @@ public class OrderServiceImpl implements OrderService {
             //设置不可退货状态
             if (one.getOrderStatus().equals(Global.ORDER_STATUS_0)) {
                 one.setTurnReturnView(1);
-            } else if (one.getOrderStatus().equals(Global.ORDER_STATUS_5) || one.getOrderStatus().equals(Global.ORDER_STATUS_6)|| one.getOrderStatus().equals(Global.ORDER_STATUS_2)) {
+            } else if (one.getOrderStatus().equals(Global.ORDER_STATUS_5) || one.getOrderStatus().equals(Global.ORDER_STATUS_6) || one.getOrderStatus().equals(Global.ORDER_STATUS_2)) {
                 //设置不可退货状态：
                 //可退货 ：已提货-已提货退货 >0
                 //可退货 ：购买数量-已提货退货-未提货退货 >0
                 List<PrestorageOrderSupplyDetail> p = prestorageOrderSupplyDetailDao.selectPrestorageOrderDetailByOrderId(one.getOrderId());
                 one.setTurnReturnView(1);
                 for (PrestorageOrderSupplyDetail prestorageOrderSupplyDetail : p) {
-                    if (prestorageOrderSupplyDetail.getAmount()-prestorageOrderSupplyDetail.getReturnAmount() - prestorageOrderSupplyDetail.getReturnPrestorageAmount()>0) {
+                    if (prestorageOrderSupplyDetail.getAmount() - prestorageOrderSupplyDetail.getReturnAmount() - prestorageOrderSupplyDetail.getReturnPrestorageAmount() > 0) {
                         one.setTurnReturnView(0);
                     }
                 }
@@ -418,7 +418,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public HttpResponse selectPrestorageOrderLogs(OrderQuery orderQuery) {
-        if (orderQuery!=null&&orderQuery.getListDistributorId()!=null&&orderQuery.getListDistributorId().size()==0){
+        if (orderQuery != null && orderQuery.getListDistributorId() != null && orderQuery.getListDistributorId().size() == 0) {
             orderQuery.setListDistributorId(null);
         }
         List<PrestorageOrderLogsInfo> prestorageOrderLogsInfos = prestorageOrderSupplyDetailDao.selectPrestorageOrderLogs(orderQuery);
@@ -500,7 +500,7 @@ public class OrderServiceImpl implements OrderService {
         //1）正常销售订单-已完成状态2）预存订单-未提货状态3）服务订单已完成
         Integer count1 = orderDao.orderPrestorageCount(orderCountReq.getStoreId(), orderCountReq.getStartDay(), orderCountReq.getEndDay());
         Integer count2 = orderDao.orderStoreCount(orderCountReq.getStoreId(), orderCountReq.getStartDay(), orderCountReq.getEndDay());
-        return HttpResponse.successGenerics((count1==null?0:count1) + (count2==null?0:count2));
+        return HttpResponse.successGenerics((count1 == null ? 0 : count1) + (count2 == null ? 0 : count2));
     }
 
     @Override
@@ -508,13 +508,13 @@ public class OrderServiceImpl implements OrderService {
         PageHelper.startPage(reqVO.getPageNo(), reqVO.getPageSize());
         List<QueryOrderListRespVO> list = orderDao.selectListByQueryVO(reqVO);
         // 计算商品数量
-        if(CollectionUtils.isNotEmpty(list)){
-            for (QueryOrderListRespVO vo:list){
+        if (CollectionUtils.isNotEmpty(list)) {
+            for (QueryOrderListRespVO vo : list) {
                 Long productCount = orderDao.orderProductBySum(vo.getOrderCode());
                 vo.setProductCount(productCount);
             }
         }
-        return PageUtil.getPageList(reqVO.getPageNo(),list);
+        return PageUtil.getPageList(reqVO.getPageNo(), list);
     }
 
     @Override
@@ -524,6 +524,113 @@ public class OrderServiceImpl implements OrderService {
         queryOrderInfoRespVO.setProductBatchList(orderDao.orderProductBatchByOrder(orderCode));
         queryOrderInfoRespVO.setLogs(orderDao.orderProductLogByOrder(orderCode));
         return queryOrderInfoRespVO;
+    }
+
+    @Override
+    public HttpResponse<List<ReportForDayResponse>> reportForDay(ReportForDayReq reportForDayReq) {
+        HttpClient httpClient = HttpClient.post(urlProperties.getMemberApi() + "/store-value/cashierId/statistics").json(reportForDayReq);
+        //HttpClient httpClient = HttpClient.post( "http://localhost:9090/store-value/cashierId/statistics").json(reportForDayReq);
+        HttpResponse<List<ReportForDayResponse>> httpResponse = httpClient.action().result(new TypeReference<HttpResponse<List<ReportForDayResponse>>>() {
+        });
+        if (Objects.isNull(httpResponse) || !"0".equals(httpResponse.getCode())) {
+            throw new RuntimeException("远程调用失败");
+        }
+
+        // 储值卡充值
+        List<ReportForDayResponse> accountRecordList = httpResponse.getData();
+        // 下单金额
+        List<ReportForDayResponse> getMoneyList = orderDao.selectGetMoney(reportForDayReq);
+        // 退款金额
+        List<ReportForDayResponse> returnMoneyList = orderDao.selectReturnMoney(reportForDayReq);
+        // 下单赠送积分，下单消耗积分
+        List<ReportForDayResponse> pointList = orderDao.selectPointRecord(reportForDayReq);
+        // 退货返还积分
+        // List<ReportForDayResponse> pointReturnList = orderDao.selectReturnPoint(reportForDayReq);
+
+        Map<String, List<ReportForDayResponse>> getMoneyMap = getMoneyList.stream().collect(Collectors.groupingBy(ReportForDayResponse::getCashierId));
+        Map<String, ReportForDayResponse> returnMoneyMap = returnMoneyList.stream().collect(Collectors.toMap(ReportForDayResponse::getCashierId, a -> a,(o,n)->n));
+        Map<String, List<ReportForDayResponse>> accountRecordMap = accountRecordList.stream().collect(Collectors.groupingBy(ReportForDayResponse::getCashierId));
+        Map<String, ReportForDayResponse> pointMap = pointList.stream().collect(Collectors.toMap(ReportForDayResponse::getCashierId, a -> a, (o, n) -> n));
+
+        List<ReportForDayResponse> reportForDayResponseList = reportForDayReq.getCashierIdList().stream().map(csahierId -> {
+            ReportForDayResponse reportForDayResponse = new ReportForDayResponse();
+            reportForDayResponse.setCashierId(csahierId);
+
+            // 订单数据
+            List<ReportForDayResponse> moneyList = getMoneyMap.get(csahierId);
+            if (CollectionUtils.isNotEmpty(moneyList)) {
+                moneyList.forEach(s -> {
+                    Long payPrice = s.getPrice();
+                    if (s.getPayType() == 4) {
+                        reportForDayResponse.setWeiXinGet(payPrice);
+                    } else if (s.getPayType() == 5) {
+                        reportForDayResponse.setZhiFuBaoGet(payPrice);
+                    } else {
+                        reportForDayResponse.setXianJinGet(payPrice);
+                    }
+                });
+                Long saleCount = moneyList.stream().collect(Collectors.summingLong(ReportForDayResponse::getSaleCount));
+                reportForDayResponse.setSaleCount(saleCount);
+            }
+
+            // 退货数据
+            ReportForDayResponse returnVo = returnMoneyMap.get(csahierId);
+            if(Objects.nonNull(returnVo)){
+                reportForDayResponse.setXianJinReturn(returnVo.getPrice());
+                reportForDayResponse.setReturnCount(returnVo.getReturnCount());
+            }
+
+            // 储值卡数据
+            List<ReportForDayResponse> accountList = accountRecordMap.get(csahierId);
+            if (CollectionUtils.isNotEmpty(accountList)) {
+                accountList.forEach(s -> {
+                    Long payPrice = s.getPrice();
+                    if (s.getPayType() == 4) {
+                        reportForDayResponse.setWeiXinGet(reportForDayResponse.getWeiXinGet() + payPrice);
+                    } else if (s.getPayType() == 5) {
+                        reportForDayResponse.setZhiFuBaoGet(reportForDayResponse.getZhiFuBaoGet() + payPrice);
+                    } else {
+                        reportForDayResponse.setXianJinGet(reportForDayResponse.getXianJinGet() + payPrice);
+                    }
+                });
+                long rechargeSale = accountList.stream().collect(Collectors.summingLong(ReportForDayResponse::getRechargeSale));
+                reportForDayResponse.setRechargeSale(rechargeSale);
+            }
+
+            ReportForDayResponse pointVo = pointMap.get(csahierId);
+            if (Objects.nonNull(pointVo)) {
+                reportForDayResponse.setJiFenGet(pointVo.getJiFenGet());
+                reportForDayResponse.setJiFenReturn(pointVo.getJiFenReturn());
+            }
+
+            // 现金应交款
+            reportForDayResponse.setXianJinActualGet(reportForDayResponse.getXianJinGet() - reportForDayResponse.getXianJinReturn());
+
+            // 支付宝应交款
+            reportForDayResponse.setZhiFuBaoActualGet(reportForDayResponse.getZhiFuBaoGet() - reportForDayResponse.getZhiFuBaoReturn());
+
+            // 微信应交款
+            reportForDayResponse.setWeiXinGet(reportForDayResponse.getWeiXinGet() - reportForDayResponse.getWeiXinReturn());
+
+            // 积分应交款
+            reportForDayResponse.setXianJinActualGet(reportForDayResponse.getJiFenGet() - reportForDayResponse.getJiFenReturn());
+
+            // 收款合计
+            long collectionTotal = reportForDayResponse.getJiFenGet() + reportForDayResponse.getWeiXinGet() + reportForDayResponse.getZhiFuBaoGet();
+            reportForDayResponse.setCollectionTotal(collectionTotal);
+
+            // 退款合计
+            Long returnTotal = reportForDayResponse.getReturnTotal();
+            reportForDayResponse.setReturnTotal(returnTotal);
+
+            // 应交总金额
+            long total = collectionTotal - returnTotal;
+            reportForDayResponse.setTotal(total);
+
+            return reportForDayResponse;
+        }).collect(Collectors.toList());
+
+        return HttpResponse.successGenerics(reportForDayResponseList);
     }
 
     private OrderQuery trans(OrderQuery orderQuery) {
@@ -583,9 +690,9 @@ public class OrderServiceImpl implements OrderService {
 
     private HttpResponse changeProductStock(OrderodrInfo orderInfo) {
         List<OperateStockVo> operateStockVos = Lists.newArrayList();
-        List<InventoryDetailRequest> inventoryDetailRequests=new ArrayList<>();
+        List<InventoryDetailRequest> inventoryDetailRequests = new ArrayList<>();
 
-        InventoryDetailRequest inventoryDetailRequest=new InventoryDetailRequest();
+        InventoryDetailRequest inventoryDetailRequest = new InventoryDetailRequest();
         inventoryDetailRequest.setBillType(BillTypeEnum.DOOR_SALE.getCode());
         inventoryDetailRequest.setCreateByName(orderInfo.getOrderInfo().getCashierName());
         inventoryDetailRequest.setOperator(orderInfo.getOrderInfo().getCashierName());
@@ -595,30 +702,30 @@ public class OrderServiceImpl implements OrderService {
         inventoryDetailRequest.setStorageType(1);
         orderInfo.getDetailList().stream().forEach(input -> {
             //套餐包
-            if (input.getPackageId()!=null){
+            if (input.getPackageId() != null) {
 
-                List<ActivityPackageProductDTO> activityPackageProductDTOS=getPackageDetails(input.getPackageId());
-                if (activityPackageProductDTOS!=null){
-                    activityPackageProductDTOS.stream().forEach(product->{
-                            OperateStockVo stockVo = new OperateStockVo();
-                            stockVo.setStoreCode(orderInfo.getOrderInfo().getDistributorCode());
-                            stockVo.setStoreId(orderInfo.getOrderInfo().getDistributorId());
-                            stockVo.setRecordNumber(Optional.ofNullable(product.getSkuCount()).orElse(0)*Optional.ofNullable(input.getAmount()).orElse(0));
-                            stockVo.setProductSku(product.getSkuCode());
-                            stockVo.setRecordType(StockChangeTypeEnum.OUT_STORAGE.getCode());
-                            stockVo.setBillType(BillTypeEnum.PACKAGE_SALE.getCode());
-                            stockVo.setStorageType(StorageTypeEnum.DOOR_STORE.getCode());
-                            /*stockVo.setStoragePosition(ReturnGoodsToStockEnum.DISPLAY_STOCK.getCode());*/
-                            stockVo.setProductSku(product.getSkuCode());
-                            stockVo.setOperator(orderInfo.getOrderInfo().getCashierName());
-                            stockVo.setCreateByName(orderInfo.getOrderInfo().getCashierName());
-                            stockVo.setStoragePosition(1);
-                            stockVo.setReleaseStatus(ReleaseStatusEnum.RELEASE.getCode());
-                            stockVo.setRelateNumber(orderInfo.getOrderInfo().getOrderCode());
-                            operateStockVos.add(stockVo);
+                List<ActivityPackageProductDTO> activityPackageProductDTOS = getPackageDetails(input.getPackageId());
+                if (activityPackageProductDTOS != null) {
+                    activityPackageProductDTOS.stream().forEach(product -> {
+                        OperateStockVo stockVo = new OperateStockVo();
+                        stockVo.setStoreCode(orderInfo.getOrderInfo().getDistributorCode());
+                        stockVo.setStoreId(orderInfo.getOrderInfo().getDistributorId());
+                        stockVo.setRecordNumber(Optional.ofNullable(product.getSkuCount()).orElse(0) * Optional.ofNullable(input.getAmount()).orElse(0));
+                        stockVo.setProductSku(product.getSkuCode());
+                        stockVo.setRecordType(StockChangeTypeEnum.OUT_STORAGE.getCode());
+                        stockVo.setBillType(BillTypeEnum.PACKAGE_SALE.getCode());
+                        stockVo.setStorageType(StorageTypeEnum.DOOR_STORE.getCode());
+                        /*stockVo.setStoragePosition(ReturnGoodsToStockEnum.DISPLAY_STOCK.getCode());*/
+                        stockVo.setProductSku(product.getSkuCode());
+                        stockVo.setOperator(orderInfo.getOrderInfo().getCashierName());
+                        stockVo.setCreateByName(orderInfo.getOrderInfo().getCashierName());
+                        stockVo.setStoragePosition(1);
+                        stockVo.setReleaseStatus(ReleaseStatusEnum.RELEASE.getCode());
+                        stockVo.setRelateNumber(orderInfo.getOrderInfo().getOrderCode());
+                        operateStockVos.add(stockVo);
                     });
                 }
-            }else {
+            } else {
                 OperateStockVo stockVo = new OperateStockVo();
                 stockVo.setStoreCode(orderInfo.getOrderInfo().getDistributorCode());
                 stockVo.setStoreId(orderInfo.getOrderInfo().getDistributorId());
@@ -650,12 +757,12 @@ public class OrderServiceImpl implements OrderService {
         HttpResponse<List<ActivityPackageProductDTO>> result = httpClient.action().result(new TypeReference<HttpResponse<List<ActivityPackageProductDTO>>>() {
         });
 
-            if (Objects.nonNull(result) && Objects.equals("0", result.getCode())) {
-                List<ActivityPackageProductDTO> data = result.getData();
+        if (Objects.nonNull(result) && Objects.equals("0", result.getCode())) {
+            List<ActivityPackageProductDTO> data = result.getData();
 
-                return data;
-            }
-            return null;
+            return data;
+        }
+        return null;
     }
 
 
@@ -1245,10 +1352,10 @@ public class OrderServiceImpl implements OrderService {
             //获取收银员、支付类型金额
             List<OrderbyReceiptSumResponse> list = orderDao.cashier(orderQuery);
             //统计储值卡充值金额    储值金额，增加充值笔数
-            OrderSumResponse orderSumResponse  =bridgeMemberService.cashier(orderQuery);
-            List<OrderbyReceiptSumResponse>   list2=null;
-            if (orderSumResponse!=null){
-                 list2=orderSumResponse.getOrderbyReceiptSumResponses();
+            OrderSumResponse orderSumResponse = bridgeMemberService.cashier(orderQuery);
+            List<OrderbyReceiptSumResponse> list2 = null;
+            if (orderSumResponse != null) {
+                list2 = orderSumResponse.getOrderbyReceiptSumResponses();
                 receiptSumInfo.setRechargeAmount(orderSumResponse.getRechargeAmount());
                 receiptSumInfo.setRechargeOrderAmount(orderSumResponse.getRechargeOrderAmount());
             }
@@ -1280,15 +1387,15 @@ public class OrderServiceImpl implements OrderService {
 
 
                     if (info.getPayType().equals(Global.P_TYPE_3)) {
-                        receiptSumInfo.setCash(Optional.ofNullable(receiptSumInfo.getCash()).orElse(0L)+Optional.ofNullable(info.getPayPrice()).orElse(0L));
+                        receiptSumInfo.setCash(Optional.ofNullable(receiptSumInfo.getCash()).orElse(0L) + Optional.ofNullable(info.getPayPrice()).orElse(0L));
                     } else if (info.getPayType().equals(Global.P_TYPE_4)) {
-                        receiptSumInfo.setWeChat(Optional.ofNullable(receiptSumInfo.getWeChat()).orElse(0L)+Optional.ofNullable(info.getPayPrice()).orElse(0L));
+                        receiptSumInfo.setWeChat(Optional.ofNullable(receiptSumInfo.getWeChat()).orElse(0L) + Optional.ofNullable(info.getPayPrice()).orElse(0L));
                     } else if (info.getPayType().equals(Global.P_TYPE_5)) {
-                        receiptSumInfo.setAliPay(Optional.ofNullable(receiptSumInfo.getAliPay()).orElse(0L)+Optional.ofNullable(info.getPayPrice()).orElse(0L));
+                        receiptSumInfo.setAliPay(Optional.ofNullable(receiptSumInfo.getAliPay()).orElse(0L) + Optional.ofNullable(info.getPayPrice()).orElse(0L));
                     } else if (info.getPayType().equals(Global.P_TYPE_6)) {
-                        receiptSumInfo.setBankCard(Optional.ofNullable(receiptSumInfo.getBankCard()).orElse(0L)+Optional.ofNullable(info.getPayPrice()).orElse(0L));
+                        receiptSumInfo.setBankCard(Optional.ofNullable(receiptSumInfo.getBankCard()).orElse(0L) + Optional.ofNullable(info.getPayPrice()).orElse(0L));
                     } else {
-                        receiptSumInfo.setCash(Optional.ofNullable(receiptSumInfo.getCash()).orElse(0L)+Optional.ofNullable(info.getPayPrice()).orElse(0L));
+                        receiptSumInfo.setCash(Optional.ofNullable(receiptSumInfo.getCash()).orElse(0L) + Optional.ofNullable(info.getPayPrice()).orElse(0L));
                     }
                 }
             }
@@ -1300,7 +1407,7 @@ public class OrderServiceImpl implements OrderService {
             //获取退款金额、退款订单数、
             OrderbyReceiptSumResponse returnReceiptSum = new OrderbyReceiptSumResponse();
             returnReceiptSum = orderDao.returnByCashierSum(orderQuery);
-            Long returnCashPrice=orderDao.returnOnlyByCashierSum(orderQuery);
+            Long returnCashPrice = orderDao.returnOnlyByCashierSum(orderQuery);
             receiptSumInfo.setSalesAmount(buyReceiptSum.getSalesAmount() != null ? buyReceiptSum.getSalesAmount() : 0);
             receiptSumInfo.setSalesOrderAmount(buyReceiptSum.getSalesOrderAmount() != null ? buyReceiptSum.getSalesOrderAmount() : 0);
             receiptSumInfo.setReturnOrderAmount(returnReceiptSum.getReturnOrderAmount() != null ? returnReceiptSum.getReturnOrderAmount() : 0);
@@ -1494,7 +1601,7 @@ public class OrderServiceImpl implements OrderService {
 //            list = orderDao.selectOrder(orderQuery);
 
             //计算总数据量
-            Integer  totalCount = orderDao.reorerCount(reorerRequest);
+            Integer totalCount = orderDao.reorerCount(reorerRequest);
 
             return HttpResponse.success(new PageResData(totalCount, list));
 
