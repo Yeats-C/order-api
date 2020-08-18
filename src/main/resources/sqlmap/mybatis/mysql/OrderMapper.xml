@@ -1784,6 +1784,7 @@
         WHERE
         after_sale_code IN (  <foreach collection="orderCodeList" item="item" separator=",">
         #{item,jdbcType=VARCHAR}
+    </foreach>);
     </select>
 </mapper>
 
