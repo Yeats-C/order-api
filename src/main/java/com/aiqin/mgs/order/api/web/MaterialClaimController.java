@@ -70,16 +70,25 @@ public class MaterialClaimController {
             Sheet sheet = workbook.createSheet("sheet1");
             //创建第一行
             Row row = sheet.createRow(0);
+            //创建格式
+            CellStyle cellStyle = workbook.createCellStyle();
+            //为字体设置格式
+            Font font = workbook.createFont();
+            font.setFontName("黑体");
+            font.setFontHeightInPoints((short)12);
+            cellStyle.setFont(font);
             if ("1".equals(type)){  //1是普通订单的模板
                 String[] titles = {"商品编码","商品名称","销售库/特卖库(全部0销售库1特卖库2)","是否赠品(赠品请录入1)"};
                 for (int i = 0; i < titles.length; i++) {
                     Cell cell4 = row.createCell(i);
+                    cell4.setCellStyle(cellStyle);
                     cell4.setCellValue(titles[i]);
                 }
             }else { //其他是首单
                 String[] titles = {"商品编码","商品名称","销售库/特卖库(全部0销售库1特卖库2)"};
                 for (int i = 0; i < titles.length; i++) {
                     Cell cell4 = row.createCell(i);
+                    cell4.setCellStyle(cellStyle);
                     cell4.setCellValue(titles[i]);
                 }
             }
