@@ -128,7 +128,7 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
             Map<String, ErpSkuDetail> skuDetailMap=bridgeProductService.getProductSkuDetailMap(order.getProvinceId(),order.getCityId(),productSkuRequest2List);
             log.info("根据订单明细向供应链查询订单详细信息 结果为 skuDetailMap ={}"+JsonUtil.toJson(skuDetailMap));
             for(ErpOrderItem item:orderItemList){
-                ErpSkuDetail detail=skuDetailMap.get(item.getSkuCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
+                ErpSkuDetail detail=skuDetailMap.get(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
                 if (null!=detail){
                     item.setPriceTax(detail.getPriceTax());
                 }else{

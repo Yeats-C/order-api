@@ -140,6 +140,12 @@ public class ReturnWholesaleOrderDetail {
     @ApiModelProperty("配送中心名称 ---传")
     private String transportCenterName;
 
+    //销售库
+    @ApiModelProperty("传入库房编码:1:销售库，2:特卖库")
+    private String warehouseTypeCode;
+
+    @ApiModelProperty("批次类型  0：月份批次  1：非月份批次")
+    private Integer batchType;
 
     @ApiModelProperty(value = "商品单价")
     private BigDecimal productAmount;

@@ -186,7 +186,20 @@ public class OrderInfo extends PagesRequest {
 	@ApiModelProperty("sku编码集合")
 	private List<String> skuCodes;
 
+	/**
+	 * 店长整单优惠金额
+	 */
+	@JsonProperty("shop_order_preferential")
+	@ApiModelProperty(value = "店长整单优惠金额")
+	private Long shopOrderPreferential;
 
+	public Long getShopOrderPreferential() {
+		return shopOrderPreferential;
+	}
+
+	public void setShopOrderPreferential(Long shopOrderPreferential) {
+		this.shopOrderPreferential = shopOrderPreferential;
+	}
 
 	public Integer getTurnReturnView() {
 		return turnReturnView;

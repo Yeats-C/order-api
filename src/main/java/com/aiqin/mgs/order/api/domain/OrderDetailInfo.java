@@ -234,7 +234,31 @@ public class OrderDetailInfo extends PagesRequest {
 
 	@JsonProperty("total_price")
 	@ApiModelProperty("行总金额")
-	private Integer totalPrice;
+	private int totalPrice;
+
+
+	/**
+	 * 店长优惠后该商品总金额
+	 */
+	@JsonProperty("shop_product_money")
+	@ApiModelProperty(value = "店长优惠后该商品总金额。没有优惠不传")
+	private Long shopProductMoney;
+
+	@JsonProperty("cost_points")
+	@ApiModelProperty("消耗的积分")
+	private Integer costPoints;
+
+	@JsonProperty("receive_points")
+	@ApiModelProperty("获取的积分")
+	private Integer receivePoints;
+
+	@ApiModelProperty("商品属性code")
+	@JsonProperty("product_property_code")
+	private String productPropertyCode;
+
+	@ApiModelProperty("商品属性名称")
+	@JsonProperty("product_property_name")
+	private String productPropertyName;
 }
 
 

@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -421,9 +422,9 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                     }
 
                 }
-            } else {
+            } /*else {
                 detailList = orderDetailDao.selectDetailById(orderDetailQuery);
-            }
+            }*/
 
             //为pos端判断是否可退货
             int state = checkTurn(detailList);
@@ -452,9 +453,9 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             orderQuery.setOrderId(orderId);
             SettlementInfo settlementInfo = settlementDao.jkselectsettlement(orderQuery);
             if (settlementInfo != null) {
-                settlementInfo.setActivityDiscount(Optional.ofNullable(settlementInfo.getActivityDiscount()).orElse(0) + Optional.ofNullable(settlementInfo.getFullSum()).orElse(0) + Optional.ofNullable(settlementInfo.getLuckySum()).orElse(0));
+                settlementInfo.setActivityDiscount(Optional.ofNullable(settlementInfo.getActivityDiscount()).orElse(0) + Optional.ofNullable(settlementInfo.getFullSum()).orElse(0) + Optional.ofNullable(settlementInfo.getLuckySum()).orElse(0)+Optional.ofNullable(settlementInfo.getShopOrderPreferential()).orElse(0));
                 settlementInfo.setTotalCouponsDiscount(settlementInfo.getActivityDiscount());
-
+                settlementInfo.setOrderSum(settlementInfo.getOrderSum()+Optional.ofNullable(settlementInfo.getShopOrderPreferential()).orElse(0));
                 if (orderInfo.getOrderStatus() == 0) {
                     settlementInfo.setOrderActual(0);
                     settlementInfo.setOrderReceivable(0);
@@ -903,6 +904,18 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         }
 
         return HttpResponse.successGenerics(cartInfo);
+    }
+
+    @Override
+    public HttpResponse findListByOrderCode(List<String> orderCodeList) {
+        List<OrderInfo> orderInfoList = orderDao.findListByOrderCode(orderCodeList);
+        return HttpResponse.successGenerics(orderInfoList);
+    }
+
+    @Override
+    public HttpResponse findListBySaleCode(List<String> orderCodeList) {
+        List<OrderInfo> orderInfoList = orderDao.findListBySaleCode(orderCodeList);
+        return HttpResponse.successGenerics(orderInfoList);
     }
 
     @Override

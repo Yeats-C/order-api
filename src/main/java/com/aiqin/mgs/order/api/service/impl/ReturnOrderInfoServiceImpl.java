@@ -20,6 +20,7 @@ import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayTypeEnum;
 import com.aiqin.mgs.order.api.component.returnenums.*;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
+import com.aiqin.mgs.order.api.dao.ReturnOrderDetailBatchDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderItemDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderOperationLogDao;
@@ -130,6 +131,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     private CopartnerAreaService copartnerAreaService;
     @Resource
     private ErpOrderInfoDao erpOrderInfoDao;
+    @Resource
+    private ReturnOrderDetailBatchDao returnOrderDetailBatchDao;
 
 
     @Override
@@ -142,6 +145,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //校验原始订单的主订单关联的所有子订单是否发货完成
         ErpOrderInfo orderByOrderCode = erpOrderQueryService.getOrderByOrderCode(reqVo.getOrderStoreCode());
         Boolean aBoolean = checkSendOk(orderByOrderCode.getMainOrderCode());
+        log.info("子订单是否发货完成的返回结果： " + aBoolean);
         //是否真的发起退货 0:预生成退货单 1:原始订单全部发货完成生成退货单
         Integer reallyReturn=0;
         if(aBoolean){
@@ -156,12 +160,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             reqVo.setCopartnerAreaName(returnOrderFranchisee.getCopartnerAreaName());
         }
         //业务形式  0门店形式  1批发形式
-//        String storeCode = reqVo.getStoreCode();
-//        if (!storeCode.equals(null)){
-            reqVo.setBusinessForm(0);
+        reqVo.setBusinessForm(0);
         //订单产品类型 1.B2B 2.B2C
         reqVo.setOrderProductType("1");
-//        }
+        //退货类型 10erp退款 11爱掌柜补货 12冲减单
+        reqVo.setBusinessType("11");
         ReturnOrderInfo record = new ReturnOrderInfo();
         Date now = new Date();
         BeanUtils.copyProperties(reqVo, record);
@@ -190,13 +193,22 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         record.setReallyReturn(reallyReturn);
         log.info("发起退货--插入退货信息，record={}",record);
         returnOrderInfoDao.insertSelective(record);
+        //批次信息
+        List<BatchInfo> barchInfoList = new ArrayList<>();
         List<ReturnOrderDetail> details = reqVo.getDetails().stream().map(detailVo -> {
             ReturnOrderDetail detail = new ReturnOrderDetail();
+            //商品批次信息
+            BatchInfo batchInfo = new BatchInfo();
             //商品属性 0新品1残品
             Integer productStatus=0;
             if(null!=detailVo.getProductStatus()){
                 productStatus=detailVo.getProductStatus();
             }
+            //仓库和库房
+            detailVo.setTransportCenterCode(reqVo.getTransportCenterCode());
+            detailVo.setTransportCenterName(reqVo.getTransportCenterName());
+            detailVo.setWarehouseCode(reqVo.getWarehouseCode());
+            detailVo.setWarehouseName(reqVo.getWarehouseName());
             BeanUtils.copyProperties(detailVo, detail);
             detail.setCreateTime(now);
             detail.setReturnOrderDetailId(IdUtil.uuid());
@@ -204,11 +216,28 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             detail.setCreateById(reqVo.getCreateById());
             detail.setCreateByName(reqVo.getCreateByName());
             detail.setProductStatus(productStatus);
+            //商品批次信息
+            batchInfo.setBasicId(afterSaleCode);
+            batchInfo.setBatchCode(detailVo.getBatchCode());
+            batchInfo.setBatchDate(detailVo.getBatchDate());
+            batchInfo.setBatchInfoCode(detailVo.getBatchInfoCode());
+            //TODO 等再用这个批次信息的时候再页面传参注释字段
+//            batchInfo.setWarehouseTypeCode(detailVo.getWarehouseTypeCode());
+//            batchInfo.setProductCount(detailVo.getProductCount());
+//            batchInfo.setBatchType(detailVo.getBatchType());
+            batchInfo.setCreateBy(detailVo.getCreateById());
+            batchInfo.setCreateTime(detailVo.getCreateTime());
+            batchInfo.setSkuCode(detailVo.getSkuCode());
+            batchInfo.setSkuName(detailVo.getSkuName());
+            barchInfoList.add(batchInfo);
+            //
             return detail;
         }).collect(Collectors.toList());
         //增加批次字段
         log.info("发起退货--插入退货详情，details={}",details);
         returnOrderDetailDao.insertBatch(details);
+        log.info("发起批发退货--插入商品批次表，barchInfoList={}",barchInfoList);
+        returnOrderDetailBatchDao.insertBatchInfo(barchInfoList);
         //添加日志
         log.info("发起退货--插入日志，details={}",details);
         insertLog(afterSaleCode,reqVo.getCreateById(),reqVo.getCreateByName(),ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey(),ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getMsg());
@@ -217,7 +246,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         erpOrderInfoService.updateOrderReturnStatus(record.getOrderStoreCode(), ErpOrderReturnRequestEnum.WAIT,null,record.getCreateById(),record.getCreateByName());
         log.info("发起退货--修改原始订单数据结束");
         //如果是配送质量退货，请求时调用门店退货申请
-//        if(!("15".equals(reqVo.getReturnReasonCode())&&reqVo.getOrderType().equals(2))){
         if(!("15".equals(reqVo.getReturnReasonCode())&&reqVo.getOrderType().equals(1))){
             //门店退货申请-完成(门店)（erp回调）--修改商品库存
             String url=productHost+"/order/return/insert";
@@ -279,7 +307,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 if(orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_11.getCode())
                         ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_97.getCode())
                         ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_12.getCode())
-                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_13.getCode())){
+                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_13.getCode())
+                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_4.getCode())){
                     return true;
                 }else{
                     return false;
@@ -653,7 +682,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     @Override
     @Transactional(rollbackFor=Exception.class)
     public Boolean callback(RefundReq reqVo) {
-        log.info("退款回调开始，reqVo={}",reqVo);
+        log.info("退款回调开始，reqVo={}",JsonUtil.toJson(reqVo));
         //查询退货单状态是否修改成功
         ReturnOrderInfo returnOrderInfo=returnOrderInfoDao.selectByReturnOrderCode(reqVo.getOrderNo());
         log.info("退款回调--查询退货单,返回结果returnOrderInfo={}",returnOrderInfo);
@@ -661,6 +690,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         if(returnOrderInfo!=null&&returnOrderInfo.getRefundStatus().equals(ConstantData.REFUND_STATUS)){//1-已退款
             //查询商品的商品信息
             ErpOrderInfo orderDetailByOrderCode = erpOrderQueryService.getOrderDetailByOrderCode(returnOrderInfo.getOrderStoreCode());
+            log.info("查询当前商品主数据返回结果： " + orderDetailByOrderCode);
             //将退货单同步到结算系统-----加
             ReturnOrderDetailVO  order = new ReturnOrderDetailVO();
             ReturnOrderInfo returnOrderInfo1 = new ReturnOrderInfo();
@@ -669,13 +699,16 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //订单号
             returnOrderInfo1.setOrderStoreCode(returnOrderInfo.getOrderStoreCode());
             //退货状态
-            returnOrderInfo1.setReturnOrderStatus(returnOrderInfo.getReturnOrderStatus());
+            returnOrderInfo1.setReturnOrderStatus(1);
             //客户编码
             returnOrderInfo1.setFranchiseeCode(returnOrderInfo.getFranchiseeCode());
             returnOrderInfo1.setFranchiseeName(returnOrderInfo.getFranchiseeName());
             //门店
             returnOrderInfo1.setStoreCode(returnOrderInfo.getStoreCode());
             returnOrderInfo1.setStoreName(returnOrderInfo.getStoreName());
+            //所属合伙人
+            returnOrderInfo1.setCopartnerAreaId(returnOrderInfo.getCopartnerAreaId());
+            returnOrderInfo1.setCopartnerAreaName(returnOrderInfo.getCopartnerAreaName());
             //退货类型
             returnOrderInfo1.setReturnOrderType(returnOrderInfo.getReturnOrderType());
             //仓库
@@ -698,12 +731,12 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //商品明细
             List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(returnOrderInfo.getReturnOrderCode());
             List<ErpOrderItem> itemList = orderDetailByOrderCode.getItemList();
-            for (ErpOrderItem e : itemList){
-                for (ReturnOrderDetail  r :returnOrderDetails){
-                    if (e.getSkuCode().equals(r.getSkuCode()) && e.getSkuName().equals(r.getSkuName())){
+            for (ReturnOrderDetail  r :returnOrderDetails){
+                 for (ErpOrderItem e : itemList){
+                    if (e.getSkuCode().equals(r.getSkuCode()) && e.getSkuName().equals(r.getSkuName()) && 0 == r.getPreferentialAmount().compareTo(e.getPreferentialAmount())){
                         //批次信息集合
-                        List<ErpBatchInfo>  batchInfoList = new ArrayList<>();
                         ErpBatchInfo batchInfo = new ErpBatchInfo();
+                        List<ErpBatchInfo>  batchInfoList = new ArrayList<>();
                         r.setProductBrandCode(e.getProductBrandCode());
                         r.setProductBrandName(e.getProductBrandName());
                         r.setProductCategoryCodes(e.getProductCategoryCode());
@@ -718,8 +751,12 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                         //批次信息
                         batchInfo.setBatchInfoCode(r.getBatchInfoCode());
                         batchInfo.setBatchNo(r.getBatchCode());
-                        Integer productCount = new Integer(e.getProductCount().intValue());
-                        batchInfo.setTotalProductCount(productCount);
+                        if (0 == (e.getPreferentialAmount().compareTo(r.getPreferentialAmount()))){
+                            Integer productCount = new Integer(e.getProductCount().intValue());
+                            batchInfo.setTotalProductCount(productCount);
+                        }
+                        batchInfo.setSkuCode(r.getSkuCode());
+                        batchInfo.setSkuName(r.getSkuName());
                         batchInfoList.add(batchInfo);
                         //申请退货数量 X 商品单价 = 爱亲成本价
                         BigDecimal returnProductCount = new  BigDecimal(r.getReturnProductCount().toString());
@@ -794,6 +831,9 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //库房
         returnOrderInfo1.setWarehouseCode(roi.getWarehouseCode());
         returnOrderInfo1.setWarehouseName(roi.getWarehouseName());
+        //所属合伙人
+        returnOrderInfo1.setCopartnerAreaId(roi.getCopartnerAreaId());
+        returnOrderInfo1.setCopartnerAreaName(roi.getCopartnerAreaName());
         //退货金额
         returnOrderInfo1.setReturnOrderAmount(roi.getReturnOrderAmount());
         //退A品券总额
@@ -807,13 +847,15 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         BigDecimal aiqinCosts = BigDecimal.ZERO;
         //商品明细
         List<ReturnOrderDetail> returnOrderDetails = returnOrderDetailDao.selectListByReturnOrderCode(roi.getReturnOrderCode());
+        log.info("查询当前退货单的商品明细返回结果集： " + returnOrderDetails);
         List<ErpOrderItem> itemList = orderDetailByOrderCode.getItemList();
-        for (ErpOrderItem e : itemList){
-            for (ReturnOrderDetail  r :returnOrderDetails){
-                if (e.getSkuCode().equals(r.getSkuCode()) && e.getSkuName().equals(r.getSkuName())){
+        log.info("获取到当前订单的订单商品明细结果集： " + itemList);
+        for (ReturnOrderDetail  r :returnOrderDetails){
+            for (ErpOrderItem e : itemList){
+                if (e.getSkuCode().equals(r.getSkuCode()) && e.getSkuName().equals(r.getSkuName()) && 0 == r.getPreferentialAmount().compareTo(e.getPreferentialAmount())){
                     //批次信息集合
-                    List<ErpBatchInfo>  batchInfoList = new ArrayList<>();
                     ErpBatchInfo batchInfo = new ErpBatchInfo();
+                    List<ErpBatchInfo>  batchInfoList = new ArrayList<>();
                     r.setProductBrandCode(e.getProductBrandCode());
                     r.setProductBrandName(e.getProductBrandName());
                     r.setProductCategoryCodes(e.getProductCategoryCode());
@@ -826,9 +868,13 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     }
                     //批次信息
                     batchInfo.setBatchInfoCode(r.getBatchInfoCode());
-                    batchInfo.setBatchNo(r.getBatchCode()) ;
-                    Integer productCount = new Integer(e.getProductCount().intValue());
-                    batchInfo.setTotalProductCount(productCount);
+                    batchInfo.setBatchNo(r.getBatchCode());
+                    if (0 == (e.getPreferentialAmount().compareTo(r.getPreferentialAmount()))){
+                        Integer productCount = new Integer(e.getProductCount().intValue());
+                        batchInfo.setTotalProductCount(productCount);
+                    }
+                    batchInfo.setSkuCode(r.getSkuCode());
+                    batchInfo.setSkuName(r.getSkuName());
                     batchInfoList.add(batchInfo);
                     //申请退货数量 X 商品单价 = 爱亲成本价
                     BigDecimal returnProductCount = new BigDecimal(r.getReturnProductCount().toString());
@@ -840,11 +886,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 }
             }
         }
-//        List<ReturnOrderDetail> detailsList = returnOrderDetails.stream().map(detailVos ->{
-//            ReturnOrderDetail detail = new ReturnOrderDetail();
-//            BeanUtils.copyProperties(detailVos, detail);
-//            return detail;
-//        }).collect(Collectors.toList());
         returnOrderInfo1.setAiqinCost(aiqinCosts);
         order.setDetails(returnOrderDetailss);
         order.setReturnOrderInfo(returnOrderInfo1);
@@ -960,6 +1001,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             json.put("franchisee_id",franchiseeId);
             json.put("store_name",returnOrderInfo.getStoreName());
             json.put("store_id",returnOrderInfo.getStoreId());
+            //退货类型
+            json.put("business_type",returnOrderInfo.getBusinessType());
             Integer method=returnOrderInfo.getTreatmentMethod();
             //处理办法 1--退货退款(通过) 2--挂账 3--不通过(驳回) 4--仅退款
             if(null!=method&&method.equals(TreatmentMethodEnum.RETURN_AMOUNT_AND_GOODS_TYPE.getCode())){//RETURN_REFUND 退货退款
@@ -1332,6 +1375,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 returnOrderInfo.setReturnOrderType(ReturnOrderTypeEnum.WRITE_DOWN_ORDER_TYPE.getCode());
                 //处理办法 4--仅退款
                 returnOrderInfo.setTreatmentMethod(TreatmentMethodEnum.RETURN_AMOUNT_TYPE.getCode());
+                //退货类型 10ERP退款 11爱掌柜补货 12冲减单
+                returnOrderInfo.setBusinessType("12");
                 //生成退货单
                 returnOrderInfo.setId(null);
                 returnOrderInfo.setOrderType(Integer.valueOf(erpOrderInfo.getOrderTypeCode()));
@@ -1835,6 +1880,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             //校验原始订单的主订单关联的所有子订单是否发货完成
             ErpOrderInfo orderByOrderCode = erpOrderQueryService.getOrderByOrderCode(reqVo.getOrderStoreCode());
             Boolean aBoolean = checkSendOk(orderByOrderCode.getMainOrderCode());
+            log.info("子订单是否发货完成的返回结果： " + aBoolean);
             //是否真的发起退货 0:预生成退货单 1:原始订单全部发货完成生成退货单
             Integer reallyReturn = 0;
             if (aBoolean) {
@@ -1844,6 +1890,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             reqVo.setReturnOrderType(2);
             //订单产品类型 1.B2B 2.B2C'
             reqVo.setOrderProductType("1");
+            //退货类型
+            reqVo.setBusinessType("10");
             //加盟商和合伙人
             ReturnOrderFranchisee returnOrderFranchisee = erpOrderInfoDao.selectFranchisee(reqVo.getOrderStoreCode());
             if (returnOrderFranchisee != null) {
@@ -1901,10 +1949,13 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 //            Long returnProductCount = 0L;
             //修改退货按钮状态使用---加
             List<ReturnOrderDetailList> returnButtion = new ArrayList<>();
+            List<BatchInfo> barchInfoList = new ArrayList<>();
             for (ReturnWholesaleOrderDetail sd : details1) {
                 ReturnOrderDetail detail = new ReturnOrderDetail();
                 //
                 ReturnOrderDetailList returnOrderDetailList = new ReturnOrderDetailList();
+                //商品批次信息
+                BatchInfo batchInfo = new BatchInfo();
                     //商品属性 0新品1残品
                     Integer productStatus = 0;
                     if (null != sd.getProductStatus()) {
@@ -1934,6 +1985,19 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     detail.setCreateById(reqVo.getCreateById());
                     detail.setCreateByName(reqVo.getCreateByName());
                     detail.setProductStatus(productStatus);
+                    //商品批次信息
+                    batchInfo.setBasicId(afterSaleCode);
+                    batchInfo.setBatchCode(sd.getBatchCode());
+                    batchInfo.setBatchDate(sd.getBatchDate());
+                    batchInfo.setBatchInfoCode(sd.getBatchInfoCode());
+//                    batchInfo.setWarehouseTypeCode(sd.getWarehouseTypeCode());
+//                    batchInfo.setProductCount(sd.getProductCount());
+//                    batchInfo.setBatchType(sd.getBatchType());
+                    batchInfo.setCreateBy(sd.getCreateById());
+                    batchInfo.setCreateTime(sd.getCreateTime());
+                    batchInfo.setSkuCode(sd.getSkuCode());
+                    batchInfo.setSkuName(sd.getSkuName());
+                    barchInfoList.add(batchInfo);
                     returnButtion.add(returnOrderDetailList);
                     details.add(detail);
                 }
@@ -1943,6 +2007,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             returnOrderInfoDao.insertSelective(record);
             log.info("发起批发退货--插入批发退货详情，details={}", details);
             returnOrderDetailDao.insertBatch(details);
+            log.info("发起批发退货--插入商品批次表，barchInfoList={}",barchInfoList);
+            returnOrderDetailBatchDao.insertBatchInfo(barchInfoList);
             //添加日志
             log.info("发起批发退货--插入日志，details={}",details);
             insertLog(afterSaleCode,reqVo.getCreateById(),reqVo.getCreateByName(),ErpLogOperationTypeEnum.ADD.getCode(),ErpLogSourceTypeEnum.RETURN.getCode(),
@@ -1952,15 +2018,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             log.info("发起批发退货--修改原始订单数据开始,入参orderStoreCode={},orderReturnStatusEnum={},returnQuantityList={},personId={},personName={}", record.getOrderStoreCode(), ErpOrderReturnStatusEnum.WAIT, null, record.getCreateById(), record.getCreateByName());
             erpOrderInfoService.updateOrderReturnStatus(record.getOrderStoreCode(), ErpOrderReturnRequestEnum.WAIT, null, record.getCreateById(), record.getCreateByName());
             log.info("发起批发退货--修改原始订单数据结束");
-//            if((actualInboundCount - quantityReturnedCount) != 0 ){
-//                if(((actualInboundCount - quantityReturnedCount) - returnProductCount) == 0){//说明没有可退的商品数量，修改订单状态
-//                    log.info("开始-----修改原订单的退货流程节点状态");
-//                    erpOrderInfoDao.updateOrderReturnProcess(reqVo.getOrderStoreCode());
-//                    log.info("结束------修改原订单的退货流程节点状态");
-//                }else {
-//                    erpOrderInfoDao.updateOrderReturnProcessStatus(reqVo.getOrderStoreCode());
-//                }
-//            }
             log.info("状态集合： " + returnButtion);
             List<String> returnButtions = new ArrayList<>();
             List<String> noRefund = new ArrayList<>();
@@ -1994,7 +2051,6 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             if (reallyReturn == 0) {  //预生成退货单不同步供应链
             }else {
                 HttpResponse httpResponse = updateReturnStatus(reqVo1);
-//              updateReturnStatus(reqVo1);
                 log.info("erp-批发退货-同步供应链，生成退供单结束,httpResponse={}", JSON.toJSON(httpResponse));
                 if (!"0".equals(httpResponse.getCode())) {
                     throw new RuntimeException("erp-批发退货-同步供应链，生成退供单失败");

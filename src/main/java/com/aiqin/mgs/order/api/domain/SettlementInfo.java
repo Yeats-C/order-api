@@ -97,7 +97,7 @@ public class SettlementInfo extends PagesRequest {
     
     @ApiModelProperty(value = "积分抵扣金额")
     @JsonProperty("point_discount")
-    private Integer pointDiscount=0;
+    private Float pointDiscount=0F;
     
     
     @ApiModelProperty(value = "订单创建时间")
@@ -117,8 +117,17 @@ public class SettlementInfo extends PagesRequest {
     @ApiModelProperty(value = "订单修改员")
     @JsonProperty("update_by")
     private String updateBy;
-    
 
+    /**
+     * 店长整单优惠金额
+     */
+    @JsonProperty("shop_order_preferential")
+    @ApiModelProperty(value = "店长整单优惠金额")
+    private Integer shopOrderPreferential;
+
+    @JsonProperty("receive_points")
+    @ApiModelProperty("获取的积分")
+    private Integer receivePoints;
 }
 
 

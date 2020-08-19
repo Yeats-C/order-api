@@ -704,7 +704,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             if (item.getLineCode() == null) {
                 throw new BusinessException("缺失行号");
             }
-            if (item.getActualInboundCount() == null || item.getActualInboundCount() <= 0) {
+            if (item.getActualInboundCount() == null || item.getActualInboundCount() < 0) {
                 throw new BusinessException("第" + item.getLineCode() + "行签收数量有误");
             }
             orderItemSignMap.put(item.getLineCode(), item);
@@ -1053,6 +1053,9 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         List<String> returnButtions = new ArrayList<>();
         List<String> noRefund = new ArrayList<>();
         for (ErpOrderItem erpOrderItem : newItemList){
+            if (ErpProductGiftEnum.GIFT.getCode().equals(erpOrderItem.getProductType())) {
+                continue;
+            }
             for (ReturnOrder returnOrder : returnOrders){
                 if (erpOrderItem.getSkuCode().equals(returnOrder.getSkuCode())&& erpOrderItem.getSkuName().equals(returnOrder.getSkuName())){
                     Long actualInboundCount = erpOrderItem.getActualInboundCount();
