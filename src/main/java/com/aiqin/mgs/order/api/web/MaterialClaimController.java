@@ -84,7 +84,7 @@ public class MaterialClaimController {
                 }
             }
             //使用输出流
-            String fileName = "申领物资导入模板";
+            String fileName = "订单批量导入模板";
             //文件名称乱码设置
             fileName = URLEncoder.encode(fileName, "UTF8");
             response.setContentType("application/vnd.ms-excel;chartset=utf-8");
