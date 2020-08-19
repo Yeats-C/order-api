@@ -592,8 +592,8 @@ public class OrderServiceImpl implements OrderService {
             // 积分数据
             ReportForDayResponse pointVo = pointMap.get(csahierId);
             if (Objects.nonNull(pointVo)) {
-                reportForDayResponse.setJiFenGet(pointVo.getJiFenGet() * thisRate / 100);
-                reportForDayResponse.setJiFenReturn(pointVo.getJiFenReturn() * thisRate / 100);
+                reportForDayResponse.setJiFenGet(pointVo.getJiFenGet() * thisRate);
+                reportForDayResponse.setJiFenReturn(pointVo.getJiFenReturn() * thisRate);
             }
 
             // 数据汇总
