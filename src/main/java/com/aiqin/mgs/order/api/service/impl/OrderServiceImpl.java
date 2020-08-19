@@ -593,7 +593,7 @@ public class OrderServiceImpl implements OrderService {
             ReportForDayResponse pointVo = pointMap.get(csahierId);
             if (Objects.nonNull(pointVo)) {
                 reportForDayResponse.setJiFenGet(pointVo.getJiFenGet() * thisRate);
-                reportForDayResponse.setJiFenReturn(pointVo.getJiFenReturn() * thisRate);
+                //reportForDayResponse.setJiFenReturn(pointVo.getJiFenReturn() * thisRate);
             }
 
             // 数据汇总
