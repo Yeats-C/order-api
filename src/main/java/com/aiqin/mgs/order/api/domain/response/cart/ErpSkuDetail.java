@@ -132,4 +132,8 @@ public class ErpSkuDetail {
     @JsonProperty(value = "warehouse_type")
     private Integer warehouseType;
 
+
+    @ApiModelProperty(value = "是否赠品 1是赠品")
+    @JsonProperty("is_giveaway")
+    private String isGiveaway;
 }
