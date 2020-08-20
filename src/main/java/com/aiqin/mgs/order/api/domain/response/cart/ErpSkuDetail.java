@@ -127,4 +127,8 @@ public class ErpSkuDetail {
     @ApiModelProperty(value = "导入数量(货架商品导入时使用)")
     @JsonProperty("quantity")
     private Integer quantity;
+
+    @ApiModelProperty(value = "是否赠品 1是赠品")
+    @JsonProperty("is_giveaway")
+    private String isGiveaway;
 }

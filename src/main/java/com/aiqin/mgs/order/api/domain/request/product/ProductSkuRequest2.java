@@ -17,6 +17,14 @@ public class ProductSkuRequest2 {
     @JsonProperty("sku_code")
     private String skuCode;
 
+    @ApiModelProperty(value = "sku名称")
+    @JsonProperty("sku_name")
+    private String skuName;
+
+    @ApiModelProperty(value = "是否赠品 1是赠品")
+    @JsonProperty("is_giveaway")
+    private String isGiveaway;
+
 
     @JsonProperty("warehouse_type_code")
     @ApiModelProperty( value = "传入库房编码:1:销售库，2:特卖库" )
