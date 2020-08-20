@@ -984,10 +984,9 @@
         return_order_amount
         FROM
         order_after_sale a
-
         WHERE 1=1
         AND a.create_by =#{cashierId}
-
+        AND a.return_money_type = 0
         <if test="beginTime!=null ">
             AND a.create_time &gt;= #{beginTime}
         </if>
@@ -1754,7 +1753,8 @@
         and a.create_by in
         (<foreach collection="cashierIdList" item="item" separator=",">
         #{item}
-    </foreach>)
+        </foreach>)
+        and a.return_money_type = 0
         GROUP BY a.create_by;
     </select>
     <select id="selectPointRecord"
@@ -1774,6 +1774,17 @@
             </foreach>)
         GROUP BY
             a.create_by
+    </select>
+    <select id="findListBySaleCode" resultType="com.aiqin.mgs.order.api.domain.OrderInfo">
+        SELECT
+        after_sale_code orderCode,
+        after_sale_id orderId
+        FROM
+        order_after_sale
+        WHERE
+        after_sale_code IN (  <foreach collection="orderCodeList" item="item" separator=",">
+        #{item,jdbcType=VARCHAR}
+    </foreach>);
     </select>
 </mapper>
 

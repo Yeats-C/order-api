@@ -11,6 +11,7 @@ import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderTypeEnum;
 import com.aiqin.mgs.order.api.component.returnenums.ReturnOrderTypeEnum;
 import com.aiqin.mgs.order.api.config.properties.UrlProperties;
+import com.aiqin.mgs.order.api.dao.BatchInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.dto.ProductDistributorOrderDTO;
@@ -64,6 +65,9 @@ private String settlement;
 
 @Resource
 private ErpOrderLogisticsService erpOrderLogisticsService;
+
+@Resource
+private BatchInfoDao batchInfoDao;
 
 /**
  * 获取低库存畅缺商品明细信息
@@ -793,7 +797,7 @@ public HttpResponse<MerchantPaBalanceRespVO> accountBalance(String franchiseeId)
                 int productCount = 0;
                 if (null != order.getItemList() && order.getItemList().size() > 0) {
                     for (ErpOrderItem item : order.getItemList()) {
-                        if (productMap.containsKey(item.getSkuCode())){
+                        if (productMap.containsKey(item.getSkuCode()+"product_type"+item.getProductType())){
                             //结算商品list里面已经有此sku，需要合并
                             ErpBatchInfo batchInfo=new ErpBatchInfo();
                             batchInfo.setBatchInfoCode(item.getBatchInfoCode());
@@ -805,16 +809,32 @@ public HttpResponse<MerchantPaBalanceRespVO> accountBalance(String franchiseeId)
                             orderProductInfo.setProductCount(orderProductInfo.getProductCount()+item.getProductCount().intValue());
                             continue;
                         }
+                        //订单商品实体
                         ErpOrderProductInfo productInfo = new ErpOrderProductInfo();
+                        //批次信息集合
+                        List<ErpBatchInfo> batchList=new ArrayList<>();
+                        ErpBatchInfo batchInfo=null;
                         if(null!=item.getBatchInfoCode()){
-                            List<ErpBatchInfo> batchList=new ArrayList<>();
-                            ErpBatchInfo batchInfo=new ErpBatchInfo();
+                            batchInfo=new ErpBatchInfo();
                             batchInfo.setBatchInfoCode(item.getBatchInfoCode());
                             batchInfo.setBatchNo(item.getBatchCode());
                             batchInfo.setTotalProductCount(item.getProductCount().intValue());
                             batchList.add(batchInfo);
-                            productInfo.setBatchList(batchList);
+                        }else{
+                            BatchInfo batchInfoDate=new BatchInfo();
+                            batchInfoDate.setBasicId(item.getOrderInfoDetailId());
+                            List<BatchInfo> batchInfos= batchInfoDao.selectBatchInfoList(batchInfoDate);
+                            if(null!=batchInfos&&batchInfos.size()>0){
+                                for(BatchInfo batch:batchInfos){
+                                    batchInfo=new ErpBatchInfo();
+                                    batchInfo.setBatchInfoCode(item.getBatchInfoCode());
+                                    batchInfo.setBatchNo(item.getBatchCode());
+                                    batchInfo.setTotalProductCount(item.getProductCount().intValue());
+                                    batchList.add(batchInfo);
+                                }
+                            }
                         }
+                        productInfo.setBatchList(batchList);
                         //订单编码
                         productInfo.setOrderCode(item.getOrderStoreCode());
                         //sku编号
@@ -888,7 +908,7 @@ public HttpResponse<MerchantPaBalanceRespVO> accountBalance(String franchiseeId)
                         productCount += item.getProductCount();
 
                         erpOrderProductInfoList.add(productInfo);
-                        productMap.put(item.getSkuCode(),erpOrderProductInfoList.indexOf(productInfo));
+                        productMap.put(item.getSkuCode()+"product_type"+item.getProductType(),erpOrderProductInfoList.indexOf(productInfo));
                     }
                     erpOrderVo.setProdcutList(erpOrderProductInfoList);
                 }

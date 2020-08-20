@@ -2,32 +2,38 @@ package com.aiqin.mgs.order.api.service.bill.impl;
 
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.json.JsonUtil;
+import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.component.enums.PurchaseOrderStatusEnum;
+import com.aiqin.mgs.order.api.dao.BatchInfoDao;
+import com.aiqin.mgs.order.api.dao.PurchaseOrderDao;
+import com.aiqin.mgs.order.api.dao.PurchaseOrderDetailBatchDao;
+import com.aiqin.mgs.order.api.dao.PurchaseOrderDetailDao;
+import com.aiqin.mgs.order.api.domain.*;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderDeliverItemRequest;
+import com.aiqin.mgs.order.api.domain.request.order.ErpOrderDeliverRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderTransportLogisticsRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderTransportRequest;
 import com.aiqin.mgs.order.api.service.bill.CreatePurchaseOrderService;
-import com.google.common.collect.Lists;
-import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.base.ResultCode;
-import com.aiqin.mgs.order.api.dao.*;
-import com.aiqin.mgs.order.api.domain.*;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
-import com.aiqin.mgs.order.api.domain.request.order.ErpOrderDeliverRequest;
 import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderDeliverService;
+import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
+import com.aiqin.mgs.order.api.util.DateUtil;
+import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.*;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 爱亲采购单 实现类
@@ -44,9 +50,12 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     ErpOrderDeliverService erpOrderDeliverService;
     @Resource
     CreatePurchaseOrderService createPurchaseOrderService;
-
+    @Resource
+    private ErpOrderItemService erpOrderItemService;
     @Resource
     PurchaseOrderDetailBatchDao purchaseOrderDetailBatchDao;
+    @Resource
+    private BatchInfoDao batchInfoDao;
 
     @Override
     public HttpResponse createPurchaseOrder(@Valid List<ErpOrderInfo> erpOrderInfos) {
@@ -69,7 +78,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 || purchaseInfo.getOrderStoreDetail().size() <= 0) {
             return HttpResponse.failure(ResultCode.REQUIRED_PARAMETER);
         }
-        LOGGER.info("耘链销售单回传更新开始 参数purchaseInfo{}" + purchaseInfo);
+        LOGGER.info("耘链销售单回传更新开始 参数purchaseInfo{}" + JsonUtil.toJson(purchaseInfo));
         try {
             //更新订单&订单明细
             ErpOrderDeliverRequest erpOrderDeliverRequest = new ErpOrderDeliverRequest();
@@ -88,6 +97,33 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             }
             erpOrderDeliverRequest.setItemList(orderDeliverItemList);
             erpOrderDeliverService.orderDeliver(erpOrderDeliverRequest);
+
+            //保存商品回传回来的批次
+            if (CollectionUtils.isNotEmpty(purchaseInfo.getOrderBatchStoreDetail())) {
+                //通过订单编码查询订单商品明细
+                List<ErpOrderItem> itemList = erpOrderItemService.selectOrderItemListByOrderCode(erpOrderDeliverRequest.getOrderCode());
+                //商品信息Map
+                Map<Long,String> productMap=new HashMap();
+                //批次信息list
+                List<BatchInfo> barchInfoList=new ArrayList<>();
+                for (ErpOrderItem item:itemList){
+                    productMap.put(item.getLineCode(),item.getOrderInfoDetailId());
+                }
+                for (OrderBatchStoreDetail batchStoreDetail : purchaseInfo.getOrderBatchStoreDetail()) {
+                    BatchInfo batchInfo=new BatchInfo();
+                    BeanUtils.copyProperties(batchStoreDetail,batchInfo);
+                    batchInfo.setBasicId(productMap.get(batchStoreDetail.getLineCode()));
+                    batchInfo.setBatchDate(DateUtil.formatDateLong(batchStoreDetail.getProductDate()));
+                    batchInfo.setCreateBy("发货回调");
+                    batchInfo.setUpdateBy("发货回调");
+                    batchInfo.setProductCount(batchStoreDetail.getActualTotalCount().intValue());
+                    barchInfoList.add(batchInfo);
+                }
+
+                if (barchInfoList.size() > 0) {
+                    batchInfoDao.insertBatchInfo(barchInfoList);
+                }
+            }
 
             //更新采购单
             PurchaseOrderInfo purchaseOrder = new PurchaseOrderInfo();

@@ -250,4 +250,5 @@ public interface OrderDao {
 
     List<ReportForDayResponse> selectPointRecord(ReportForDayReq reportForDayReq);
 
+    List<OrderInfo> findListBySaleCode(@Param("orderCodeList")List<String> orderCodeList);
 }

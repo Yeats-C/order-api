@@ -42,6 +42,7 @@ import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.util.DayUtil;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.AtomicDouble;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -58,6 +59,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import com.aiqin.ground.util.exception.GroundRuntimeException;
@@ -551,6 +553,19 @@ public class OrderServiceImpl implements OrderService {
         Map<String, List<ReportForDayResponse>> accountRecordMap = accountRecordList.stream().collect(Collectors.groupingBy(ReportForDayResponse::getCashierId));
         Map<String, ReportForDayResponse> pointMap = pointList.stream().collect(Collectors.toMap(ReportForDayResponse::getCashierId, a -> a, (o, n) -> n));
 
+
+        double rate = 0f;
+        if (CollectionUtils.isNotEmpty(pointList)) {
+            HttpClient client = HttpClient.get(urlProperties.getSlcsApi() + "/basics/list").addParameter("dictionary_id", "S00000021");
+            HttpResponse<List<Map<String, Object>>> response = client.action().result(new TypeReference<HttpResponse<List<Map<String, Object>>>>() {
+            });
+            if (Objects.nonNull(response) && "0".equals(response.getCode())) {
+                List<Map<String, Object>> data = response.getData();
+                rate = Double.parseDouble(data.get(0).get("convert_ratio").toString());
+            }
+        }
+        long thisRate = new Double(rate * 100).longValue();
+
         List<ReportForDayResponse> reportForDayResponseList = reportForDayReq.getCashierIdList().stream().map(csahierId -> {
             ReportForDayResponse reportForDayResponse = new ReportForDayResponse();
             reportForDayResponse.setCashierId(csahierId);
@@ -577,8 +592,8 @@ public class OrderServiceImpl implements OrderService {
             // 积分数据
             ReportForDayResponse pointVo = pointMap.get(csahierId);
             if (Objects.nonNull(pointVo)) {
-                reportForDayResponse.setJiFenGet(pointVo.getJiFenGet());
-                reportForDayResponse.setJiFenReturn(pointVo.getJiFenReturn());
+                reportForDayResponse.setJiFenGet(pointVo.getJiFenGet() * thisRate);
+                //reportForDayResponse.setJiFenReturn(pointVo.getJiFenReturn() * thisRate);
             }
 
             // 数据汇总
@@ -635,11 +650,11 @@ public class OrderServiceImpl implements OrderService {
         reportForDayResponse.setJiFenActualGet(reportForDayResponse.getJiFenGet() - reportForDayResponse.getJiFenReturn());
 
         // 收款合计
-        long collectionTotal = reportForDayResponse.getXianJinGet() + reportForDayResponse.getWeiXinGet() + reportForDayResponse.getZhiFuBaoGet();
+        long collectionTotal = reportForDayResponse.getXianJinGet() + reportForDayResponse.getWeiXinGet() + reportForDayResponse.getZhiFuBaoGet() + reportForDayResponse.getJiFenGet();
         reportForDayResponse.setCollectionTotal(collectionTotal);
 
         // 退款合计
-        long returnTotal = reportForDayResponse.getXianJinReturn() + reportForDayResponse.getZhiFuBaoReturn() + reportForDayResponse.getWeiXinReturn();
+        long returnTotal = reportForDayResponse.getXianJinReturn() + reportForDayResponse.getZhiFuBaoReturn() + reportForDayResponse.getWeiXinReturn() + reportForDayResponse.getJiFenReturn();
         reportForDayResponse.setReturnTotal(returnTotal);
 
         // 应交总金额

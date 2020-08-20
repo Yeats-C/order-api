@@ -912,6 +912,12 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     }
 
     @Override
+    public HttpResponse findListBySaleCode(List<String> orderCodeList) {
+        List<OrderInfo> orderInfoList = orderDao.findListBySaleCode(orderCodeList);
+        return HttpResponse.successGenerics(orderInfoList);
+    }
+
+    @Override
     public HttpResponse findOrderDetailById(String orderDetailId) {
         return HttpResponse.success(orderDetailDao.findOrderDetailById(orderDetailId));
     }

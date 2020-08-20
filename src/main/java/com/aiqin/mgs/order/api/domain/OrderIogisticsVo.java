@@ -10,7 +10,8 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-public class OrderIogisticsVo implements Serializable {
+public class
+OrderIogisticsVo implements Serializable {
         //订单
         @ApiModelProperty(value = "发货时间",example = "2001-01-01 01:01:01")
         @JsonProperty("delivery_time")
@@ -42,8 +43,8 @@ public class OrderIogisticsVo implements Serializable {
         @JsonProperty("orders_store_detail")
         private List<OrderStoreDetail> orderStoreDetail;
 
-    //订单批次明细（仓卡）
-    @ApiModelProperty(value = "订单批次明细")
-    @JsonProperty("orders_batch_store_detail")
-    private List<OrderBatchStoreDetail> orderBatchStoreDetail;
+            //订单批次明细（仓卡）
+        @ApiModelProperty(value = "订单批次明细")
+        @JsonProperty("orders_batch_store_detail")
+        private List<OrderBatchStoreDetail> orderBatchStoreDetail;
 }

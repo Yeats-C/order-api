@@ -92,4 +92,6 @@ public interface OrderDetailService {
 	HttpResponse batchAddOrder(List<OrderodrInfo> cartInfo);
 
 	HttpResponse findListByOrderCode(List<String> orderCodeList);
+
+	HttpResponse findListBySaleCode(List<String> orderCodeList);
 }
