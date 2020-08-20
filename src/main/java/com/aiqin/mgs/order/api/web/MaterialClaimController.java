@@ -171,7 +171,7 @@ public class MaterialClaimController {
                     productSkuRequest2.setSkuCode(s[0]);
                     productSkuRequest2.setSkuName(s[1]);
                     productSkuRequest2.setWarehouseTypeCode(s[2]);
-                    if (s.length > 2){
+                    if (s.length > 3){
                         productSkuRequest2.setIsGiveaway(s[3]);
                     }else {
                         productSkuRequest2.setIsGiveaway("0");
