@@ -24,6 +24,8 @@ public interface ResultCode {
     MessageId ERP_FRANCHISEE_ERROP =MessageId.create(Project.ORDER_API,-7,"冲减单--同步A品卷失败");
     MessageId ERP_FRANCHISEE_INTEGRAL_ERROR =MessageId.create(Project.ORDER_API,-7,"冲减单--退积分失败");
     MessageId ERP_RETURN_ERROR =MessageId.create(Project.ORDER_API,-19,"上单退款未到账,请到账后再次发起退货");
+    MessageId ERP_EXCEL_ERROR =MessageId.create(Project.ORDER_API,-20,"导入模板部分商品Sku缺失,请填写完成再次导入");
+    MessageId ERP_EXCEL_SKU_NAME_ERROR =MessageId.create(Project.ORDER_API,-20,"导入模板部分商品与商品名称不匹配");
 
 
     /** 黄祉壹   2018-11-05 开始     */
