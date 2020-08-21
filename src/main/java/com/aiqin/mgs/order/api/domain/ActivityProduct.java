@@ -120,9 +120,4 @@ public class ActivityProduct {
     @ApiModelProperty(value = "品类级别")
     @JsonProperty("level")
     private Integer level;
-
-    /**参与活动梯度规则列表集合*/
-    @ApiModelProperty(value = "参与活动梯度规则列表集合")
-    @JsonProperty("activityRules")
-    private List<ActivityRule> activityRules;
 }

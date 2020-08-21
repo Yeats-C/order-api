@@ -2,18 +2,23 @@ package com.aiqin.mgs.order.api.web;
 
 
 import com.aiqin.ground.util.exception.GroundRuntimeException;
+import com.aiqin.ground.util.http.HttpClient;
+import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
-import com.aiqin.mgs.order.api.domain.Activity;
-import com.aiqin.mgs.order.api.domain.ActivityProduct;
-import com.aiqin.mgs.order.api.domain.ActivitySales;
+import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
+import com.aiqin.mgs.order.api.domain.request.product.ProductSkuRequest2;
+import com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetail;
 import com.aiqin.mgs.order.api.service.ActivityService;
+import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
+import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.core.type.TypeReference;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
@@ -21,15 +26,24 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.aiqin.mgs.order.api.web.MaterialClaimController.*;
 
 @RestController
 @RequestMapping("/activity")
@@ -39,6 +53,11 @@ public class ActivityController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ActivityController.class);
     @Resource
     private ActivityService activitesService;
+    @Value("${bridge.url.slcs_api}")
+    private String slcsHost;
+    @Autowired
+    private BridgeProductService bridgeProductService;
+
 
     /**
      * 促销活动管理--活动列表
@@ -303,7 +322,7 @@ public class ActivityController {
 
 
     /**
-     * 下载导入模板
+     * 下载SKU导入用excel模板
      */
     @GetMapping("/download/template")
     @ApiOperation("SKU导入用excel")
@@ -343,6 +362,170 @@ public class ActivityController {
         }catch (Exception e){
             LOGGER.error(e.getMessage());
         }
+    }
+
+    /**
+     * 【买赠】解析SkuExcel表数据
+     */
+    @PostMapping("/uploadSkuExcel")
+    @ApiOperation(value = "【买赠】解析SkuExcel表数据")
+    public HttpResponse<ActivityRequest> getExcel(MultipartFile file, String storeId) throws IOException {
+        checkFile(file);
+        //获得Workbook工作薄对象
+        Workbook workbook = getWorkBook(file);
+        //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
+        List<ProductSkuRequest2> objectList = new ArrayList<>();
+        List<ActivityProduct> activityProductList = new ArrayList<>();
+        List<ActivityRule> activityRuleList = new ArrayList<>();
+        List<ActivityGift> activityGiftList = new ArrayList<>();
+        ActivityRequest activityRequest=new ActivityRequest();
+        Map<String,String> productMap=new HashMap();
+        List<String[]> list = new ArrayList<>();
+        List<Integer> errorList = new ArrayList<>();
+        if (workbook != null) {
+            //getNumberOfSheets() 获取工作薄中的sheet个数
+            for (int sheetNum = 0; sheetNum < workbook.getNumberOfSheets(); sheetNum++) {
+                //获得当前sheet工作表
+                Sheet sheet = workbook.getSheetAt(sheetNum);
+                if (sheet == null) {
+                    continue;
+                }
+                //获得当前sheet的开始行
+                int firstRowNum = sheet.getFirstRowNum();
+                //获得当前sheet的结束行
+                int lastRowNum = sheet.getLastRowNum();
+                //循环除了所有行,如果要循环除第一行以外的就firstRowNum+1
+                for (int rowNum = firstRowNum+1; rowNum <= lastRowNum; rowNum++) {
+                    //获得当前行
+                    Row row = sheet.getRow(rowNum);
+                    if (row == null) {
+                        continue;
+                    }
+                    //获得当前行的开始列
+//                        int firstCellNum = row.getFirstCellNum();
+                    //获得当前行的列数
+                    int lastCellNum = row.getLastCellNum();
+                    //创建列数大小的数组，存放每一行的每列的值
+                    String[] cells = new String[row.getLastCellNum()];
+                    //循环当前行
+                    for (int cellNum = 0; cellNum < lastCellNum; cellNum++) {
+                        Cell cell = row.getCell(cellNum);
+                        String cellValue = getCellValue(cell);
+                        if (cellNum == 0 && "".equals(cellValue)){
+                            errorList.add(rowNum);
+                            break;
+                        }
+                        cells[cellNum] = cellValue;
+                    }
+                    list.add(cells);
+                }
+            }
+        }
+        if (!errorList.isEmpty()){
+            return HttpResponse.success("导入模板部分商品Sku缺失,请填写完成再次导入,行号： " + errorList);
+        }
+        for (String[] s : list){
+            //调用供应链商品查询接口参数组装
+            ProductSkuRequest2 productSkuRequest2 = new ProductSkuRequest2();
+            productSkuRequest2.setSkuCode(s[0]);
+            objectList.add(productSkuRequest2);
+            //解析商品集合
+            if(!productMap.containsKey(s[0])){
+                ActivityProduct activityProduct =new ActivityProduct();
+                activityProduct.setSkuCode(s[0]);
+                activityProductList.add(activityProduct);
+            }
+            //解析活动规则集合
+            ActivityRule activityRule=new ActivityRule();
+            //活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单7.买赠
+            activityRule.setActivityType(7);
+            //商品编码
+            activityRule.setSkuCode(s[0]);
+            //买赠活动sku门槛
+            activityRule.setThreshold(BigDecimal.valueOf(Double.valueOf(s[1])));
+            //优惠单位：0.无条件 1.按数量（件）2.按金额（元）
+            activityRule.setRuleUnit(Integer.valueOf(s[2]));
+            //满足条件(满多少参加活动)
+            activityRule.setMeetingConditions(BigDecimal.valueOf(Double.valueOf(s[3])));
+            activityGiftList.clear();
+            if(null!=s[4]){
+                ActivityGift activityGift=new ActivityGift();
+                activityGift.setSkuCode(s[4]);
+                activityGift.setNumbers(Integer.valueOf(s[5]));
+                activityGiftList.add(activityGift);
+            }
+
+            if(null!= s[6]){
+                ActivityGift activityGift=new ActivityGift();
+                activityGift.setSkuCode(s[6]);
+                activityGift.setNumbers(Integer.valueOf(s[7]));
+                activityGiftList.add(activityGift);
+            }
+
+            if(null!= s[8]){
+                ActivityGift activityGift=new ActivityGift();
+                activityGift.setSkuCode(s[8]);
+                activityGift.setNumbers(Integer.valueOf(s[9]));
+                activityGiftList.add(activityGift);
+            }
+
+            if(null!= s[10]){
+                ActivityGift activityGift=new ActivityGift();
+                activityGift.setSkuCode(s[10]);
+                activityGift.setNumbers(Integer.valueOf(s[11]));
+                activityGiftList.add(activityGift);
+            }
+
+            if(null!= s[12]){
+                ActivityGift activityGift=new ActivityGift();
+                activityGift.setSkuCode(s[12]);
+                activityGift.setNumbers(Integer.valueOf(s[13]));
+                activityGiftList.add(activityGift);
+            }
+            activityRule.setGiftList(activityGiftList);
+            activityRuleList.add(activityRule);
+        }
+
+        LOGGER.info("解析后的数据集合： " + JsonUtil.toJson(activityRequest));
+        StoreBackInfoResponse data = null;
+        Map<String, Object> result;
+        StringBuilder sb = new StringBuilder(slcsHost + "/store/getStoreInfo?store_id=" + storeId);
+        LOGGER.info("通过门店id查询门店信息,请求url为{}", sb);
+        HttpClient httpClient = HttpClient.get(sb.toString());
+        try{
+            result = httpClient.action().result(new TypeReference<Map<String, Object>>() {});
+            LOGGER.info("调用门店系统返回结果result:{}", JSON.toJSON(result));
+            data = JSON.parseObject(JSON.toJSONString(result.get("data")), StoreBackInfoResponse.class);
+            LOGGER.info("获取门店信息：{}", data);
+        }catch (Exception e) {
+            LOGGER.info("查询门店信息失败");
+            throw e;
+        }
+        LOGGER.info(JsonUtil.toJson(objectList));
+        List<ErpSkuDetail> erpSkuDetailList = bridgeProductService.getProductSkuDetailList(data.getProvinceId(), data.getCityId(), data.getCompanyCode(), objectList);
+        LOGGER.info("供应链查询数据返回结果： " + JsonUtil.toJson(erpSkuDetailList));
+        Map<String, ErpSkuDetail> skuDetailMap = new HashMap<>(16);
+        for (ErpSkuDetail item : erpSkuDetailList) {
+            skuDetailMap.put(item.getSkuCode(), item);
+        }
+        for(ActivityProduct activityProduct: activityProductList){
+            if(skuDetailMap.containsKey(activityProduct.getSkuCode())){
+                ErpSkuDetail erpSkuDetail=skuDetailMap.get(activityProduct.getSkuCode());
+                activityProduct.setProductCode(erpSkuDetail.getSkuCode());
+                activityProduct.setProductName(erpSkuDetail.getSkuName());
+                activityProduct.setProductBrandCode(erpSkuDetail.getProductBrandCode());
+                activityProduct.setProductBrandName(erpSkuDetail.getProductBrandName());
+                activityProduct.setProductCategoryCode(erpSkuDetail.getProductCategoryCode());
+                activityProduct.setProductCategoryName(erpSkuDetail.getProductCategoryName());
+                activityProduct.setPriceTax(erpSkuDetail.getPriceTax());
+                activityProduct.setStatus(0);
+                activityProduct.setActivityScope(1);
+            }
+
+        }
+        activityRequest.setActivityProducts(activityProductList);
+        activityRequest.setActivityRules(activityRuleList);
+        return HttpResponse.success(activityRequest);
     }
 
 }
