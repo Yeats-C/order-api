@@ -605,7 +605,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                     Activity activity = activityRequest.getActivity();
                     List<ActivityRule> activityRules = activityRequest.getActivityRules();
 
-                    /**活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单*/
+                    /**活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单7.买赠*/
                     Integer activityType = activity.getActivityType();
                     String activityId= m.getKey();
                     List<ErpOrderItem> li=m.getValue();
