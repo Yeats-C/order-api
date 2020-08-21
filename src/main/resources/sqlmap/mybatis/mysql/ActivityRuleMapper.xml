@@ -6,8 +6,8 @@
         <result column="activity_id" jdbcType="VARCHAR" property="activityId"/>
         <result column="activity_type" jdbcType="BIGINT" property="activityType"/>
         <result column="rule_unit" jdbcType="BIGINT" property="ruleUnit"/>
-        <result column="meeting_conditions" jdbcType="INTEGER" property="meetingConditions"/>
-        <result column="preferential_amount" jdbcType="INTEGER" property="preferentialAmount"/>
+        <result column="meeting_conditions" jdbcType="DECIMAL" property="meetingConditions"/>
+        <result column="preferential_amount" jdbcType="DECIMAL" property="preferentialAmount"/>
         <result column="rule_num" jdbcType="INTEGER" property="ruleNum"/>
         <result column="rule_id" jdbcType="VARCHAR" property="ruleId"/>
         <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
@@ -15,28 +15,29 @@
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
+        <result column="threshold" jdbcType="DECIMAL" property="threshold"/>
     </resultMap>
     <sql id="Base_Column_List">
     id,activity_id, activity_type,rule_unit, meeting_conditions, preferential_amount,rule_num, rule_id,create_by
-    ,update_by,create_time, update_time,sku_code
+    ,update_by,create_time, update_time,sku_code,threshold
   </sql>
 
     <!--批量保存活动对应规则信息List-->
     <insert id="insertList" parameterType="java.util.List">
         insert into activity_rule (activity_id, activity_type,rule_unit, meeting_conditions, preferential_amount,rule_num
-        , rule_id,create_by,update_by,create_time, update_time,sku_code)
+        , rule_id,create_by,update_by,create_time, update_time,sku_code,threshold)
         values
         <foreach collection="list" item="activityRule" separator=",">
             (#{activityRule.activityId,jdbcType=VARCHAR},
             #{activityRule.activityType,jdbcType=INTEGER},
             #{activityRule.ruleUnit,jdbcType=INTEGER},
-            #{activityRule.meetingConditions,jdbcType=INTEGER},
-            #{activityRule.preferentialAmount,jdbcType=INTEGER},
+            #{activityRule.meetingConditions,jdbcType=DECIMAL},
+            #{activityRule.preferentialAmount,jdbcType=DECIMAL},
             #{activityRule.ruleNum,jdbcType=INTEGER},
             #{activityRule.ruleId,jdbcType=VARCHAR},
             #{activityRule.createBy,jdbcType=VARCHAR},
             #{activityRule.updateBy,jdbcType=VARCHAR},
-            now(), now(), #{activityRule.skuCode,jdbcType=VARCHAR})
+            now(), now(), #{activityRule.skuCode,jdbcType=VARCHAR}, #{activityRule.threshold,jdbcType=DECIMAL})
         </foreach>
     </insert>
 

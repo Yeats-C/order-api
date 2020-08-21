@@ -99,4 +99,9 @@ public class ActivityRule {
         }
         return number;
     }
+
+        /**买赠活动sku门槛*/
+    @ApiModelProperty(value = "买赠活动sku门槛")
+    @JsonProperty("threshold")
+    private BigDecimal threshold;
 }
