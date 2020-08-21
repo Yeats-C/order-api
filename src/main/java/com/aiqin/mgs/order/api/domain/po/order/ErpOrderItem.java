@@ -312,8 +312,8 @@ public class ErpOrderItem extends PagesRequest {
     @JsonProperty("warehouse_type_code")
     private String warehouseTypeCode;
 
-    /**活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单*/
-    @ApiModelProperty(value = "活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单")
+    /**活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单7.买赠*/
+    @ApiModelProperty(value = "活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单7.买赠")
     @JsonProperty("activity_type")
     private Integer activityType;
 

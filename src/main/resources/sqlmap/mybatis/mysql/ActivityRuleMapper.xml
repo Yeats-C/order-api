@@ -14,15 +14,17 @@
         <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="sku_code" jdbcType="VARCHAR" property="skuCode"/>
     </resultMap>
     <sql id="Base_Column_List">
-    id,activity_id, activity_type,rule_unit, meeting_conditions, preferential_amount,rule_num, rule_id,create_by,update_by,create_time, update_time
+    id,activity_id, activity_type,rule_unit, meeting_conditions, preferential_amount,rule_num, rule_id,create_by
+    ,update_by,create_time, update_time,sku_code
   </sql>
 
     <!--批量保存活动对应规则信息List-->
     <insert id="insertList" parameterType="java.util.List">
         insert into activity_rule (activity_id, activity_type,rule_unit, meeting_conditions, preferential_amount,rule_num
-        , rule_id,create_by,update_by,create_time, update_time)
+        , rule_id,create_by,update_by,create_time, update_time,sku_code)
         values
         <foreach collection="list" item="activityRule" separator=",">
             (#{activityRule.activityId,jdbcType=VARCHAR},
@@ -34,7 +36,7 @@
             #{activityRule.ruleId,jdbcType=VARCHAR},
             #{activityRule.createBy,jdbcType=VARCHAR},
             #{activityRule.updateBy,jdbcType=VARCHAR},
-            now(), now() )
+            now(), now(), #{activityRule.skuCode,jdbcType=VARCHAR})
         </foreach>
     </insert>
 
