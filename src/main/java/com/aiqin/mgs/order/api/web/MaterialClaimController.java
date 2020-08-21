@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.web;
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.StoreBackInfoResponse;
 import com.aiqin.mgs.order.api.domain.request.product.ProductSkuRequest2;
@@ -16,6 +17,7 @@ import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.aspectj.apache.bcel.generic.LOOKUPSWITCH;
 import org.slf4j.Logger;
@@ -39,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -78,7 +81,7 @@ public class MaterialClaimController {
             font.setFontHeightInPoints((short)12);
             cellStyle.setFont(font);
             if ("1".equals(type)){  //1是普通订单的模板
-                String[] titles = {"商品编码","商品名称","销售库/特卖库(全部0销售库1特卖库2)","是否赠品(赠品请录入1)"};
+                String[] titles = {"商品编码","商品名称","销售库/特卖库(全部0销售库1特卖库2)","是否赠品(赠品请录入1,其他请录入0)"};
                 for (int i = 0; i < titles.length; i++) {
                     Cell cell4 = row.createCell(i);
                     cell4.setCellStyle(cellStyle);
@@ -121,6 +124,7 @@ public class MaterialClaimController {
             //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
             List<ProductSkuRequest2> objectList = new ArrayList<>();
             List<String[]> list = new ArrayList<>();
+            List<Integer> errorList = new ArrayList<>();
             if (workbook != null) {
                 //getNumberOfSheets() 获取工作薄中的sheet个数
                 for (int sheetNum = 0; sheetNum < workbook.getNumberOfSheets(); sheetNum++) {
@@ -141,46 +145,77 @@ public class MaterialClaimController {
                             continue;
                         }
                         //获得当前行的开始列
-                        int firstCellNum = row.getFirstCellNum();
+//                        int firstCellNum = row.getFirstCellNum();
                         //获得当前行的列数
                         int lastCellNum = row.getLastCellNum();
                         //创建列数大小的数组，存放每一行的每列的值
                         String[] cells = new String[row.getLastCellNum()];
                         //循环当前行
-                        for (int cellNum = firstCellNum; cellNum < lastCellNum; cellNum++) {
+                        for (int cellNum = 0; cellNum < lastCellNum; cellNum++) {
                             Cell cell = row.getCell(cellNum);
-                            //将列值放到对应的位置
-                            cells[cellNum] = getCellValue(cell);
+                            String cellValue = getCellValue(cell);
+                            if (cellNum == 0 && "".equals(cellValue)){
+                                errorList.add(rowNum);
+                                break;
+                            }
+                            cells[cellNum] = cellValue;
                         }
                         list.add(cells);
                     }
                 }
             }
-            for (String[] s : list){
-                ProductSkuRequest2 productSkuRequest2 = new ProductSkuRequest2();
-                productSkuRequest2.setSkuCode(s[0]);
-                productSkuRequest2.setWarehouseTypeCode(s[2]);
-                objectList.add(productSkuRequest2);
+            if (!errorList.isEmpty()){
+                return HttpResponse.success("导入模板部分商品Sku缺失,请填写完成再次导入,行号： " + errorList);
             }
-        LOGGER.info("解析后的数据集合： " + objectList);
-        StoreBackInfoResponse data = null;
-        Map<String, Object> result;
-        StringBuilder sb = new StringBuilder(slcsHost + "/store/getStoreInfo?store_id=" + storeId);
-        LOGGER.info("通过门店id查询门店信息,请求url为{}", sb);
-        HttpClient httpClient = HttpClient.get(sb.toString());
-        try{
-             result = httpClient.action().result(new TypeReference<Map<String, Object>>() {});
-             LOGGER.info("调用门店系统返回结果result:{}", JSON.toJSON(result));
-             data = JSON.parseObject(JSON.toJSONString(result.get("data")), StoreBackInfoResponse.class);
-             LOGGER.info("获取门店信息：{}", data);
-        }catch (Exception e) {
-            LOGGER.info("查询门店信息失败");
-            throw e;
-        }
-        LOGGER.info(JsonUtil.toJson(objectList));
-        erpSkuDetailList = bridgeProductService.getProductSkuDetailList(data.getProvinceId(), data.getCityId(), data.getCompanyCode(), objectList);
-        LOGGER.info("供应链查询数据返回结果： " + erpSkuDetailList);
-        return HttpResponse.success(erpSkuDetailList);
+            for (String[] s : list){
+                    ProductSkuRequest2 productSkuRequest2 = new ProductSkuRequest2();
+                    productSkuRequest2.setSkuCode(s[0]);
+                    productSkuRequest2.setSkuName(s[1]);
+                    productSkuRequest2.setWarehouseTypeCode(s[2]);
+                    if (s.length > 3){
+                        productSkuRequest2.setIsGiveaway(s[3]);
+                    }else {
+                        productSkuRequest2.setIsGiveaway("0");
+                    }
+                    objectList.add(productSkuRequest2);
+            }
+           LOGGER.info("解析后的数据集合： " + objectList);
+           StoreBackInfoResponse data = null;
+           Map<String, Object> result;
+           StringBuilder sb = new StringBuilder(slcsHost + "/store/getStoreInfo?store_id=" + storeId);
+           LOGGER.info("通过门店id查询门店信息,请求url为{}", sb);
+           HttpClient httpClient = HttpClient.get(sb.toString());
+           try{
+               result = httpClient.action().result(new TypeReference<Map<String, Object>>() {});
+               LOGGER.info("调用门店系统返回结果result:{}", JSON.toJSON(result));
+               data = JSON.parseObject(JSON.toJSONString(result.get("data")), StoreBackInfoResponse.class);
+               LOGGER.info("获取门店信息：{}", data);
+           }catch (Exception e) {
+               LOGGER.info("查询门店信息失败");
+               throw e;
+           }
+           LOGGER.info(JsonUtil.toJson(objectList));
+           erpSkuDetailList = bridgeProductService.getProductSkuDetailList(data.getProvinceId(), data.getCityId(), data.getCompanyCode(), objectList);
+           LOGGER.info("供应链查询数据返回结果： " + erpSkuDetailList);
+           //将表中解析的数据取出来sku编码
+           List<String> collect = objectList.stream().map(ProductSkuRequest2::getSkuCode).collect(Collectors.toList());
+           //将查询出来的商品筛选出来多余的code
+           List<ErpSkuDetail> collect1 = erpSkuDetailList.stream().filter(ErpSkuDetail -> !collect.contains(ErpSkuDetail.getSkuCode())).collect(Collectors.toList());
+           if (!collect1.isEmpty()){
+               return HttpResponse.success("导入模板部分商品与商品名称不匹配,sku: " + collect1);
+           }
+           //把表中商品是否是赠品返回
+           List<ErpSkuDetail> isGiveawayList = new ArrayList<>();
+           for (ErpSkuDetail er : erpSkuDetailList){
+               for (ProductSkuRequest2 pr : objectList){
+                   if (er.getSkuCode().equals(pr.getSkuCode()) && er.getSkuName().equals(pr.getSkuName())){
+                       er.setIsGiveaway(pr.getIsGiveaway());
+                       isGiveawayList.add(er);
+                   }
+               }
+           }
+           LOGGER.info("是否为赠品集合： " + isGiveawayList);
+           return HttpResponse.success(isGiveawayList);
     }
 
 
