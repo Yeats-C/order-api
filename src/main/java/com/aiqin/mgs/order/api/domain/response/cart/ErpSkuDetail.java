@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.domain.response.cart;
 
 import com.aiqin.mgs.order.api.domain.TagInfo;
 import com.aiqin.mgs.order.api.domain.request.product.BatchRespVo;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Data
 @ApiModel("查询供应链商品详情返回值")
+@JsonInclude(value = JsonInclude.Include.ALWAYS)
 public class ErpSkuDetail {
 
     @ApiModelProperty(value = "sku码")
@@ -107,6 +109,21 @@ public class ErpSkuDetail {
     @JsonProperty(value = "batch_code")
     private String batchCode;
 
+    @ApiModelProperty("仓编码(物流中心编码)")
+    @JsonProperty(value = "transport_center_code")
+    private String transportCenterCode;
+
+    @ApiModelProperty("仓名称(物流中心名称)")
+    @JsonProperty(value = "transport_center_name")
+    private String transportCenterName;
+
+    @ApiModelProperty("库房编码")
+    @JsonProperty(value = "warehouse_code")
+    private String warehouseCode;
+
+    @ApiModelProperty("库房名称")
+    @JsonProperty(value = "warehouse_name")
+    private String warehouseName;
 
     @ApiModelProperty("批次日期")
     @JsonProperty(value = "batch_date")
