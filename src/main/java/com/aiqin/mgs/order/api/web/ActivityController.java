@@ -17,13 +17,17 @@ import com.aiqin.mgs.order.api.service.ActivityService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
@@ -296,5 +300,49 @@ public class ActivityController {
         response.setData(activitesService.storeIds(menuCode));
         return response;
     };
+
+
+    /**
+     * 下载导入模板
+     */
+    @GetMapping("/download/template")
+    @ApiOperation("SKU导入用excel")
+    public void DownloadTemplate(HttpServletResponse response){
+        try {
+            //创建新的Excel工作薄
+            Workbook workbook = new XSSFWorkbook();
+            //创建工作单元
+            Sheet sheet = workbook.createSheet("SKU导入用excel");
+            //创建第一行
+            Row row = sheet.createRow(0);
+            //创建格式
+            CellStyle cellStyle = workbook.createCellStyle();
+            //为字体设置格式
+            Font font = workbook.createFont();
+            font.setFontName("黑体");
+            font.setFontHeightInPoints((short)12);
+            cellStyle.setFont(font);
+            String[] titles = {"sku编码","金额门槛","条件类型","满足条件","赠品1sku编码","赠送数量","赠品2sku编码"
+                    ,"赠送数量","赠品3sku编码","赠送数量","赠品4sku编码","赠送数量","赠品5sku编码","赠送数量"};
+            for (int i = 0; i < titles.length; i++) {
+                Cell cell4 = row.createCell(i);
+                cell4.setCellStyle(cellStyle);
+                cell4.setCellValue(titles[i]);
+            }
+
+            //使用输出流
+            String fileName = "SKU导入用excel";
+            //文件名称乱码设置
+            fileName = URLEncoder.encode(fileName, "UTF8");
+            response.setContentType("application/vnd.ms-excel;chartset=utf-8");
+            response.setHeader("Content-Disposition", "attachment;filename="+fileName + ".xlsx");
+            ServletOutputStream out = response.getOutputStream();
+            //workbook内容写入文件中
+            workbook.write(out);
+            out.close();
+        }catch (Exception e){
+            LOGGER.error(e.getMessage());
+        }
+    }
 
 }
