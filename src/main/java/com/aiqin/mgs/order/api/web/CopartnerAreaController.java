@@ -7,47 +7,20 @@
 * ****************************************************************************/
 package com.aiqin.mgs.order.api.web;
 
-import com.aiqin.ground.util.protocol.MessageId;
-import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
-import com.aiqin.mgs.order.api.base.ResultCode;
-import com.aiqin.mgs.order.api.domain.*;
-import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.copartnerArea.*;
-import com.aiqin.mgs.order.api.domain.request.*;
 import com.aiqin.mgs.order.api.domain.request.returnorder.AreaReq;
-import com.aiqin.mgs.order.api.domain.response.LatelyResponse;
-import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
-import com.aiqin.mgs.order.api.domain.response.PartnerPayGateRep;
-import com.aiqin.mgs.order.api.service.CartService;
 import com.aiqin.mgs.order.api.service.CopartnerAreaService;
-import com.aiqin.mgs.order.api.service.OrderDetailService;
-import com.aiqin.mgs.order.api.service.OrderService;
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-
-import jdk.nashorn.internal.objects.annotations.Getter;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -69,16 +42,18 @@ public class CopartnerAreaController {
         @ApiImplicitParam(name = "copartner_area_company", value = "管理归属", dataType = "String", paramType = "query", required = false),
         @ApiImplicitParam(name = "copartner_area_level", value = "管理层级 1:一级 2：二级", dataType = "Integer", paramType = "query", required = false),
         @ApiImplicitParam(name = "page_no", value = "当前页", dataType = "Integer", paramType = "query", required = false),
-        @ApiImplicitParam(name = "page_size", value = "每页条数", dataType = "Integer", paramType = "query", required = false)
+        @ApiImplicitParam(name = "page_size", value = "每页条数", dataType = "Integer", paramType = "query", required = false),
+        @ApiImplicitParam(name = "page_size", value = "经营区域ID", dataType = "String", paramType = "id", required = false)
     })
     public HttpResponse<CopartnerAreaList> copartnerAreaList(
             @RequestParam(value = "copartner_area_name", required = false) String copartnerAreaName,
             @RequestParam(value = "copartner_area_company", required = false) String copartnerAreaCompany,
             @RequestParam(value = "copartner_area_level", required = false) Integer copartnerAreaLevel,
             @RequestParam(value = "page_no", required = false) Integer pageNo,
-            @RequestParam(value = "page_size", required = false) Integer pageSize) {
+            @RequestParam(value = "page_size", required = false) Integer pageSize,
+            @RequestParam(value = "id", required = false) String id) {
 
-        LOGGER.info("经营区域列表-分页请求参数[[copartnerAreaName={},copartnerAreaCompany={},copartnerAreaLevel={},pageNo={},pageSize={}",copartnerAreaName,copartnerAreaCompany,copartnerAreaLevel,pageNo,pageSize);
+        LOGGER.info("经营区域列表-分页请求参数[[copartnerAreaName={},copartnerAreaCompany={},copartnerAreaLevel={},pageNo={},pageSize={},id={}",copartnerAreaName,copartnerAreaCompany,copartnerAreaLevel,pageNo,pageSize,id);
 
         CopartnerAreaVo vo = new CopartnerAreaVo();
         vo.setCopartnerAreaName(copartnerAreaName);
@@ -86,6 +61,7 @@ public class CopartnerAreaController {
         vo.setCopartnerAreaLevel(copartnerAreaLevel);
         vo.setPageNo(pageNo);
         vo.setPageSize(pageSize);
+        vo.setId(id);
         return copartnerAreaService.copartnerAreaList(vo);
     }
     
