@@ -159,9 +159,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         if (erpCartAddRequest.getProducts() == null || erpCartAddRequest.getProducts().size() == 0) {
             throw new BusinessException("商品不能为空");
         }
-        if (erpCartAddRequest.getSpuCode() == null) {
-            throw new BusinessException("productId为空");
-        }
+//        if (erpCartAddRequest.getSpuCode() == null) {
+//            throw new BusinessException("productId为空");
+//        }
         if (erpCartAddRequest.getStoreId() == null) {
             throw new BusinessException("门店id为空");
         }
@@ -1480,6 +1480,88 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                     }
                 }
 
+                break;
+            case TYPE_7:
+                //买赠
+
+                for (ActivityRule ruleItem :
+                        activityRules) {
+
+                    //筛选最小梯度
+                    if (firstRule == null || ruleItem.getMeetingConditions().compareTo(firstRule.getMeetingConditions()) < 0) {
+                        firstRule = ruleItem;
+                    }
+
+                    //是否把当前梯度作为命中梯度
+                    boolean flag = false;
+
+                    //先校验一层是否满足金额门槛
+//                    if
+                    if (ActivityRuleUnitEnum.BY_NUM.getCode().equals(ruleItem.getRuleUnit())) {
+                        //按照数量
+
+                        if (ruleItem.getMeetingConditions().compareTo(new BigDecimal(quantity)) <= 0) {
+                            if (curRule == null) {
+                                flag = true;
+                            } else {
+                                if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                    flag = true;
+                                }
+                            }
+                        }
+
+                    } else if (ActivityRuleUnitEnum.BY_MONEY.getCode().equals(ruleItem.getRuleUnit())) {
+                        //按照金额
+
+                        if (ruleItem.getMeetingConditions().compareTo(amountTotal) <= 0) {
+                            if (curRule == null) {
+                                flag = true;
+                            } else {
+                                if (ruleItem.getMeetingConditions().compareTo(curRule.getMeetingConditions()) > 0) {
+                                    flag = true;
+                                }
+                            }
+                        }
+
+                    } else {
+                        flag = true;
+                    }
+
+                    if (flag) {
+                        curRule = ruleItem;
+                    }
+                }
+
+                if (curRule != null) {
+
+                    cartGroupInfo.setActivityRule(curRule);
+
+                    //满赠规则组
+                    List<ActivityGift> giftList = curRule.getGiftList();
+
+                    //存放生成的赠品行
+                    List<ErpOrderCartInfo> cartGiftList = new ArrayList<>();
+
+                    //生成赠品行
+                    for (ActivityGift giftItem :
+                            giftList) {
+                        //生成赠品行
+                        ErpOrderCartInfo giftProductLine = createGiftProductLine(activity, giftItem, store);
+                        ErpSkuDetail skuDetail = skuDetailMap.get(giftProductLine.getSkuCode()+"BATCH_INFO_CODE"+giftProductLine.getBatchInfoCode()
+                        );
+                        if(null==skuDetail){
+                            skuDetail=bridgeProductService.getProductSkuDetail(store.getProvinceId(),store.getCityId(),store.getCompanyCode(),giftProductLine.getSkuCode());
+                        }
+                        giftProductLine.setStockNum(skuDetail.getStockNum());
+                        giftProductLine.setIsSale(skuDetail.getIsSale());
+                        giftProductLine.setActivityPrice(BigDecimal.ZERO);
+
+                        cartGiftList.add(giftProductLine);
+                    }
+                    cartGroupInfo.setCartGiftList(cartGiftList);
+                }
+
+                ;
                 break;
             default:
                 ;
