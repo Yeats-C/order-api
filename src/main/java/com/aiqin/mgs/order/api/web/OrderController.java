@@ -14,9 +14,12 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.request.*;
+import com.aiqin.mgs.order.api.domain.request.stock.ReportForDayReq;
 import com.aiqin.mgs.order.api.domain.response.LatelyResponse;
 import com.aiqin.mgs.order.api.domain.response.PartnerPayGateRep;
+import com.aiqin.mgs.order.api.domain.response.stock.ReportForDayResponse;
 import com.aiqin.mgs.order.api.service.OrderService;
+import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -818,5 +821,13 @@ public class OrderController {
 
         LOGGER.info("订单中心获取门店本月销售额：{}",orderCountReq);
         return orderService.orderStoreCount(orderCountReq);
+    }
+
+    @PostMapping("/reportForDay")
+    @ApiOperation(value = "接口-日结报表")
+    public HttpResponse<List<ReportForDayResponse>> reportForDay(@RequestBody ReportForDayReq reportForDayReq) {
+
+        LOGGER.info("接口-日结报表：{}", JSON.toJSONString(reportForDayReq));
+        return orderService.reportForDay(reportForDayReq);
     }
 }

@@ -422,9 +422,9 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                     }
 
                 }
-            } else {
+            } /*else {
                 detailList = orderDetailDao.selectDetailById(orderDetailQuery);
-            }
+            }*/
 
             //为pos端判断是否可退货
             int state = checkTurn(detailList);
@@ -455,7 +455,6 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             if (settlementInfo != null) {
                 settlementInfo.setActivityDiscount(Optional.ofNullable(settlementInfo.getActivityDiscount()).orElse(0) + Optional.ofNullable(settlementInfo.getFullSum()).orElse(0) + Optional.ofNullable(settlementInfo.getLuckySum()).orElse(0)+Optional.ofNullable(settlementInfo.getShopOrderPreferential()).orElse(0));
                 settlementInfo.setTotalCouponsDiscount(settlementInfo.getActivityDiscount());
-
                 if (orderInfo.getOrderStatus() == 0) {
                     settlementInfo.setOrderActual(0);
                     settlementInfo.setOrderReceivable(0);
@@ -909,6 +908,12 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     @Override
     public HttpResponse findListByOrderCode(List<String> orderCodeList) {
         List<OrderInfo> orderInfoList = orderDao.findListByOrderCode(orderCodeList);
+        return HttpResponse.successGenerics(orderInfoList);
+    }
+
+    @Override
+    public HttpResponse findListBySaleCode(List<String> orderCodeList) {
+        List<OrderInfo> orderInfoList = orderDao.findListBySaleCode(orderCodeList);
         return HttpResponse.successGenerics(orderInfoList);
     }
 

@@ -958,7 +958,7 @@
     <select id="cashier" resultMap="ReceiptSumMapping" resultType="java.util.List">
         SELECT
         b.cashier_id,b.cashier_name,
-        a.pay_type,SUM(pay_price) AS pay_price
+        a.pay_type,SUM(b.actual_price) AS pay_price
         FROM
         order_consumer_info b
         LEFT JOIN order_pay a ON a.order_id = b.order_id
@@ -984,10 +984,9 @@
         return_order_amount
         FROM
         order_after_sale a
-
         WHERE 1=1
         AND a.create_by =#{cashierId}
-
+        AND a.return_money_type = 0
         <if test="beginTime!=null ">
             AND a.create_time &gt;= #{beginTime}
         </if>
@@ -1714,6 +1713,76 @@
             order_consumer_info
         WHERE
             order_code IN (  <foreach collection="orderCodeList" item="item" separator=",">
+        #{item,jdbcType=VARCHAR}
+    </foreach>);
+    </select>
+    <select id="selectGetMoney"
+            resultType="com.aiqin.mgs.order.api.domain.response.stock.ReportForDayResponse">
+        SELECT
+            a.cashier_id cashierId,
+            a.cashier_name cashierName,
+            a.pay_type payType,
+            COUNT(1) saleCount,
+            SUM( a.actual_price ) AS price
+        FROM
+            order_consumer_info a
+        WHERE
+            a.order_status NOT IN ( 0, 4 )
+          AND a.pay_type IN (3,4,5,6)
+          AND a.create_time &gt;= #{startTime}
+          AND a.create_time &lt;= #{endTime}
+          and a.cashier_id in
+            (<foreach collection="cashierIdList" item="item" separator=",">
+            #{item}
+            </foreach>)
+        GROUP BY
+            a.pay_type,
+            a.cashier_id
+    </select>
+    <select id="selectReturnMoney"
+            resultType="com.aiqin.mgs.order.api.domain.response.stock.ReportForDayResponse">
+        SELECT
+        sum( IFNULL(a.return_price,0)) AS price,
+        count(1) returnCount,
+        create_by cashierId
+        FROM
+        order_after_sale a
+        WHERE
+            a.create_time &gt;= #{startTime}
+        AND a.create_time &lt;= #{endTime}
+        and a.create_by in
+        (<foreach collection="cashierIdList" item="item" separator=",">
+        #{item}
+        </foreach>)
+        and a.return_money_type = 0
+        GROUP BY a.create_by;
+    </select>
+    <select id="selectPointRecord"
+            resultType="com.aiqin.mgs.order.api.domain.response.stock.ReportForDayResponse">
+        SELECT
+            create_by cashierId,
+            sum( a.cost_points ) jiFenGet,
+            SUM( a.receive_points ) jiFenReturn
+        FROM
+            order_consumer_detail a
+        WHERE
+        a.create_time &gt;= #{startTime}
+        AND a.create_time &lt;= #{endTime}
+        and a.create_by in
+            (<foreach collection="cashierIdList" item="item" separator=",">
+                #{item}
+            </foreach>)
+        GROUP BY
+            a.create_by
+    </select>
+    <select id="findListBySaleCode" resultType="com.aiqin.mgs.order.api.domain.OrderInfo">
+        SELECT
+        after_sale_code orderCode,
+        after_sale_id orderId
+        FROM
+        order_after_sale
+        WHERE
+        after_sale_code IN (  <foreach collection="orderCodeList" item="item" separator=",">
         #{item,jdbcType=VARCHAR}
     </foreach>);
     </select>
