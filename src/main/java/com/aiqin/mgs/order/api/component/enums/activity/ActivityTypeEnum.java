@@ -18,6 +18,7 @@ public enum ActivityTypeEnum {
     TYPE_4(4, "4", "返点"),
     TYPE_5(5, "5", "特价"),
     TYPE_6(6, "6", "整单"),
+    TYPE_7(7, "7", "买赠"),
     ;
 
     /***数字类型状态*/

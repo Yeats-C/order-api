@@ -18,6 +18,7 @@
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="active_store_range" jdbcType="INTEGER" property="activeStoreRange"/>
         <result column="activity_scope" jdbcType="INTEGER" property="activityScope"/>
+        <result column="multiple_give" jdbcType="INTEGER" property="multipleGive"/>
     </resultMap>
 
     <sql id="Base_Column_List">
