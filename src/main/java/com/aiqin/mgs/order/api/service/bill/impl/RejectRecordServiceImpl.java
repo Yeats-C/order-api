@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.service.bill.impl;
 
 import com.aiqin.ground.util.id.IdUtil;
+import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.component.enums.OrderSucessEnum;
@@ -76,6 +77,7 @@ public class RejectRecordServiceImpl implements RejectRecordService {
     @Transactional(rollbackFor = Exception.class)
     public Boolean selectPurchaseInfo(ReturnDLReq returnDLReq) {
         try {
+            LOGGER.info("耘链退货单回传参数： " + JsonUtil.toJson(returnDLReq));
             if (returnDLReq.getReturnOrderInfoDLReq() != null) {
                 RejectRecord rejectRecord = new RejectRecord();
                 ReturnOrderInfoDLReq returnOrderInfo = returnDLReq.getReturnOrderInfoDLReq();
@@ -242,6 +244,7 @@ public class RejectRecordServiceImpl implements RejectRecordService {
                     LOGGER.info("待生成退供单以及退货编码：{},{}",orderSynchroSuccess,returnOrderCode);
                     //查询待ERP退货单，待生成爱亲退供单数据
                     ReturnOrderInfo returnOrderInfo = returnOrderInfoDao.selectByOrderCodeAndSuccess(orderSynchroSuccess, returnOrderCode);
+                    //时间紧张，暂时这样，有时间再去优化
                     while(returnOrderInfo == null){
                        if (count == 5){
                            break;
