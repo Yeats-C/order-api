@@ -38,4 +38,8 @@ public class ErpCartAddSkuItem {
     @ApiModelProperty(value = "仓库编码")
     @JsonProperty("warehouse_code")
     private String warehouseCode;
+
+    @ApiModelProperty(value = "本品或赠品 0本品 1赠品")
+    @JsonProperty("product_gift")
+    private Integer productGift=0;
 }

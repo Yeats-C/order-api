@@ -197,6 +197,9 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
             }else{
                 item.setWarehouseTypeCode(item.getWarehouseTypeCode());
             }
+            if(null==item.getProductGift()){
+                item.setProductGift(0);
+            }
 //            if(YesOrNoEnum.YES.getCode().equals(erpCartAddRequest.getIsWholesale())){
 //                if (item.getWarehouseCode() == null) {
 //                    throw new BusinessException("批次订货缺失sku库房code");
@@ -220,7 +223,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
         if (select != null && select.size() > 0) {
             for (ErpOrderCartInfo item :
                     select) {
-                cartLineMap.put(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode(), item);
+                cartLineMap.put(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode()+"PRODUCT_GIFT"+item.getProductGift(),item);
             }
         }
 
@@ -242,7 +245,7 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
             //购物车该商品当前数量
             int cartAmount = 0;
 
-            if (cartLineMap.containsKey(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode())) {
+            if (cartLineMap.containsKey(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode()+"PRODUCT_GIFT"+item.getProductGift())) {
                 //购物车已经存在该商品
                 ErpOrderCartInfo erpOrderCartInfo = cartLineMap.get(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
                 cartAmount = erpOrderCartInfo.getAmount() + item.getAmount();
@@ -282,7 +285,11 @@ public class ErpOrderCartServiceImpl implements ErpOrderCartService {
                 erpOrderCartInfo.setProductSize(skuDetail.getModelNumber());
                 erpOrderCartInfo.setProductType(erpCartAddRequest.getProductType());
                 erpOrderCartInfo.setCreateSource(erpCartAddRequest.getCreateSource());
-                erpOrderCartInfo.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
+                if(null!=item.getProductGift()){
+                    erpOrderCartInfo.setProductGift(item.getProductGift());
+                }else{
+                    erpOrderCartInfo.setProductGift(ErpProductGiftEnum.PRODUCT.getCode());
+                }
                 erpOrderCartInfo.setLineCheckStatus(YesOrNoEnum.YES.getCode());
                 erpOrderCartInfo.setZeroRemovalCoefficient(skuDetail.getZeroRemovalCoefficient());
                 erpOrderCartInfo.setMaxOrderNum(skuDetail.getMaxOrderNum());
