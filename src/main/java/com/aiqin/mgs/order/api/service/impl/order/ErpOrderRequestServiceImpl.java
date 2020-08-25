@@ -999,8 +999,14 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
                     throw new BusinessException(item.getSkuName() + "商品库存数量查询失败");
                 }
                 Integer data = response.getData();
-                if (item.getProductCount() > data) {
+                if (item.getProductType()==0&&item.getProductCount() > data) {
                     throw new BusinessException(item.getSkuName() + "库存数量不足");
+                }else if(item.getProductType()==1&&item.getProductCount() > data){
+                    if(data<=0){
+                        orderProductItemList.remove(item);
+                    }else{
+                        item.setProductCount(data.longValue());
+                    }
                 }
             }
         } catch (BusinessException e) {
