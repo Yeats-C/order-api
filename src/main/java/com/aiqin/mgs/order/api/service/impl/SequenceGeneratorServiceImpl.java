@@ -38,6 +38,6 @@ public class SequenceGeneratorServiceImpl implements SequenceGeneratorService {
             sequenceGenerator.setSequenceVal(sequenceVal + (sequenceGenerator.getSequenceStep() == null ? 1L : sequenceGenerator.getSequenceStep()));
             sequenceGeneratorDao.updateByPrimaryKeySelective(sequenceGenerator);
         }
-        return curDay + String.format("%06d", sequenceVal);
+        return curDay + String.format("%07d", sequenceVal);
     }
 }
