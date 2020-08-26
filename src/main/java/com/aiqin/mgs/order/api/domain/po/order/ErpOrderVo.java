@@ -207,4 +207,12 @@ public class ErpOrderVo{
 	@JsonProperty("take_time")
 	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date takeTime;
+
+	@ApiModelProperty(value="所属合伙人编码")
+	@JsonProperty("copartner_code")
+	private String copartnerCode;
+
+	@ApiModelProperty(value="所属合伙人名称")
+	@JsonProperty("copartner_name")
+	private String copartnerName;
 }

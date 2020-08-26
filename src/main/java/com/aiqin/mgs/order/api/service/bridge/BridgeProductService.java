@@ -1020,6 +1020,10 @@ public HttpResponse<MerchantPaBalanceRespVO> accountBalance(String franchiseeId)
                 }
                 //收货时间
                 erpOrderVo.setTakeTime(order.getReceiveTime());
+                //所属合伙人编码
+                erpOrderVo.setCopartnerCode(order.getCopartnerAreaId());
+                //所属合伙人名称
+                erpOrderVo.setCopartnerName(order.getCopartnerAreaName());
                 erpOrderVos.add(erpOrderVo);
             }
 
