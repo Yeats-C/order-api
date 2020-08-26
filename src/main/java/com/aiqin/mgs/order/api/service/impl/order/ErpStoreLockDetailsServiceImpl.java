@@ -69,8 +69,8 @@ public class ErpStoreLockDetailsServiceImpl implements ErpStoreLockDetailsServic
         for (String string : skuSet) {
             StoreLockDetails storeLockDetails=new StoreLockDetails();
             storeLockDetails.setSkuCode(string);
-            storeLockDetails.setOrderCode(order.getOrderStoreCode());
-            log.info("订单拆单--查询商品锁库信息，从本地查询商品orderCode={},skuCode={}",order.getOrderStoreCode(),string);
+            storeLockDetails.setOrderCode(order.getMainOrderCode());
+            log.info("订单拆单--查询商品锁库信息，从本地查询商品orderCode={},skuCode={}",order.getMainOrderCode(),string);
             List<StoreLockDetails> storeLockDetails1 = storeLockDetailsDao.selectByOrderCodeAndSkuCode(storeLockDetails);
             log.info("订单拆单--查询商品锁库信息，从本地查询商品单行返回结果storeLockDetails1={}",storeLockDetails1);
             res.put(string,storeLockDetails1);
