@@ -2,7 +2,6 @@ package com.aiqin.mgs.order.api.web;
 
 
 import com.aiqin.ground.util.exception.GroundRuntimeException;
-import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.Project;
@@ -14,11 +13,9 @@ import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartRequest;
 import com.aiqin.mgs.order.api.domain.request.product.ProductSkuRequest2;
-import com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetail;
+import com.aiqin.mgs.order.api.domain.response.order.ProductSkuRespVo2;
 import com.aiqin.mgs.order.api.service.ActivityService;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
-import com.alibaba.fastjson.JSON;
-import com.fasterxml.jackson.core.type.TypeReference;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
@@ -38,10 +35,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.aiqin.mgs.order.api.web.MaterialClaimController.*;
 
@@ -369,12 +363,12 @@ public class ActivityController {
      */
     @PostMapping("/uploadSkuExcel")
     @ApiOperation(value = "【买赠】解析SkuExcel表数据")
-    public HttpResponse<ActivityRequest> getExcel(MultipartFile file, String storeId) throws IOException {
+    public HttpResponse<ActivityRequest> getExcel(MultipartFile file) throws IOException {
         checkFile(file);
         //获得Workbook工作薄对象
         Workbook workbook = getWorkBook(file);
         //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
-        List<ProductSkuRequest2> objectList = new ArrayList<>();
+        Set<ProductSkuRequest2> objectList = new HashSet<>();
         List<ActivityProduct> activityProductList = new ArrayList<>();
         List<ActivityRule> activityRuleList = new ArrayList<>();
         List<ActivityGift> activityGiftList = new ArrayList<>();
@@ -453,6 +447,9 @@ public class ActivityController {
                 activityGift.setSkuCode(s[4]);
                 activityGift.setNumbers(Integer.valueOf(s[5]));
                 activityGiftList.add(activityGift);
+                productSkuRequest2 = new ProductSkuRequest2();
+                productSkuRequest2.setSkuCode(s[4]);
+                objectList.add(productSkuRequest2);
             }
 
             if(null!= s[6]){
@@ -460,6 +457,9 @@ public class ActivityController {
                 activityGift.setSkuCode(s[6]);
                 activityGift.setNumbers(Integer.valueOf(s[7]));
                 activityGiftList.add(activityGift);
+                productSkuRequest2 = new ProductSkuRequest2();
+                productSkuRequest2.setSkuCode(s[6]);
+                objectList.add(productSkuRequest2);
             }
 
             if(null!= s[8]){
@@ -467,6 +467,9 @@ public class ActivityController {
                 activityGift.setSkuCode(s[8]);
                 activityGift.setNumbers(Integer.valueOf(s[9]));
                 activityGiftList.add(activityGift);
+                productSkuRequest2 = new ProductSkuRequest2();
+                productSkuRequest2.setSkuCode(s[8]);
+                objectList.add(productSkuRequest2);
             }
 
             if(null!= s[10]){
@@ -474,6 +477,9 @@ public class ActivityController {
                 activityGift.setSkuCode(s[10]);
                 activityGift.setNumbers(Integer.valueOf(s[11]));
                 activityGiftList.add(activityGift);
+                productSkuRequest2 = new ProductSkuRequest2();
+                productSkuRequest2.setSkuCode(s[10]);
+                objectList.add(productSkuRequest2);
             }
 
             if(null!= s[12]){
@@ -481,36 +487,26 @@ public class ActivityController {
                 activityGift.setSkuCode(s[12]);
                 activityGift.setNumbers(Integer.valueOf(s[13]));
                 activityGiftList.add(activityGift);
+                productSkuRequest2 = new ProductSkuRequest2();
+                productSkuRequest2.setSkuCode(s[12]);
+                objectList.add(productSkuRequest2);
             }
             activityRule.setGiftList(activityGiftList);
             activityRuleList.add(activityRule);
         }
 
         LOGGER.info("解析后的数据集合： " + JsonUtil.toJson(activityRequest));
-        StoreBackInfoResponse data = null;
-        Map<String, Object> result;
-        StringBuilder sb = new StringBuilder(slcsHost + "/store/getStoreInfo?store_id=" + storeId);
-        LOGGER.info("通过门店id查询门店信息,请求url为{}", sb);
-        HttpClient httpClient = HttpClient.get(sb.toString());
-        try{
-            result = httpClient.action().result(new TypeReference<Map<String, Object>>() {});
-            LOGGER.info("调用门店系统返回结果result:{}", JSON.toJSON(result));
-            data = JSON.parseObject(JSON.toJSONString(result.get("data")), StoreBackInfoResponse.class);
-            LOGGER.info("获取门店信息：{}", data);
-        }catch (Exception e) {
-            LOGGER.info("查询门店信息失败");
-            throw e;
-        }
+
         LOGGER.info(JsonUtil.toJson(objectList));
-        List<ErpSkuDetail> erpSkuDetailList = bridgeProductService.getProductSkuDetailList(data.getProvinceId(), data.getCityId(), data.getCompanyCode(), objectList);
+        List<ProductSkuRespVo2> erpSkuDetailList = bridgeProductService.detail4(null, null, "14", new ArrayList<>(objectList));
         LOGGER.info("供应链查询数据返回结果： " + JsonUtil.toJson(erpSkuDetailList));
-        Map<String, ErpSkuDetail> skuDetailMap = new HashMap<>(16);
-        for (ErpSkuDetail item : erpSkuDetailList) {
+        Map<String, ProductSkuRespVo2> skuDetailMap = new HashMap<>(16);
+        for (ProductSkuRespVo2 item : erpSkuDetailList) {
             skuDetailMap.put(item.getSkuCode(), item);
         }
         for(ActivityProduct activityProduct: activityProductList){
             if(skuDetailMap.containsKey(activityProduct.getSkuCode())){
-                ErpSkuDetail erpSkuDetail=skuDetailMap.get(activityProduct.getSkuCode());
+                ProductSkuRespVo2 erpSkuDetail=skuDetailMap.get(activityProduct.getSkuCode());
                 activityProduct.setProductCode(erpSkuDetail.getSkuCode());
                 activityProduct.setProductName(erpSkuDetail.getSkuName());
                 activityProduct.setProductBrandCode(erpSkuDetail.getProductBrandCode());
@@ -522,6 +518,16 @@ public class ActivityController {
                 activityProduct.setActivityScope(1);
             }
 
+        }
+        //赠品需要商品编码 商品名称
+        for(ActivityRule rule:activityRuleList){
+            for(ActivityGift gift:rule.getGiftList()){
+                if(skuDetailMap.containsKey(gift.getSkuCode())){
+                    ProductSkuRespVo2 erpSkuDetail=skuDetailMap.get(gift.getSkuCode());
+                    gift.setProductCode(erpSkuDetail.getSkuCode());
+                    gift.setProductName(erpSkuDetail.getSkuName());
+                }
+            }
         }
         activityRequest.setActivityProducts(activityProductList);
         activityRequest.setActivityRules(activityRuleList);

@@ -28,6 +28,7 @@ import com.aiqin.mgs.order.api.domain.request.stock.ProductSkuStockRespVo;
 import com.aiqin.mgs.order.api.domain.response.NewFranchiseeResponse;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetail;
 import com.aiqin.mgs.order.api.domain.response.gift.StoreAvailableGiftQuotaResponse;
+import com.aiqin.mgs.order.api.domain.response.order.ProductSkuRespVo2;
 import com.aiqin.mgs.order.api.domain.response.order.StoreFranchiseeInfoResponse;
 import com.aiqin.mgs.order.api.domain.wholesale.JoinMerchant;
 import com.aiqin.mgs.order.api.domain.wholesale.MerchantAccount;
@@ -1188,6 +1189,48 @@ public void settlementSaveReturnOrder(ReturnOrderDetailVO order) {
         log.error("结算保存erp退货订单y异常，异常信息为：" + e.getMessage());
     }
 }
+
+    /**
+     * 获取sku详情列表
+     *
+     * @param provinceCode 省编码
+     * @param cityCode     市编码
+     * @param companyCode  公司编码
+     * @param productSkuRequest2List  sku信息集合
+     * @return java.util.List<com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetailResponse>
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2020/3/10 10:54
+     */
+    public List<ProductSkuRespVo2> detail4(String provinceCode, String cityCode, String companyCode, List<ProductSkuRequest2> productSkuRequest2List) {
+
+        List<ProductSkuRespVo2> list = new ArrayList<>();
+        try {
+            ShoppingCartProductRequest shoppingCartProductRequest = new ShoppingCartProductRequest();
+            shoppingCartProductRequest.setCityCode(cityCode);
+            shoppingCartProductRequest.setProvinceCode(provinceCode);
+            shoppingCartProductRequest.setCompanyCode(companyCode);
+            shoppingCartProductRequest.setProductSkuRequest2List(productSkuRequest2List);
+            String path = "/search/spu/sku/detail4";
+            log.info("detail2 接口参数为：{}"+JsonUtil.toJson(shoppingCartProductRequest));
+            HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest);
+            HttpResponse<List<ProductSkuRespVo2>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ProductSkuRespVo2>>>() {
+            });
+            log.info("detail2 接口 请求结果为：{}"+JsonUtil.toJson(response));
+            if (!RequestReturnUtil.validateHttpResponse(response)) {
+                throw new BusinessException(response.getMessage());
+            }
+            list = response.getData();
+
+        } catch (BusinessException e) {
+            log.info("获取商品信息失败：{}", e.getMessage());
+            throw new BusinessException("获取商品信息失败：" + e.getMessage());
+        } catch (Exception e) {
+            log.info("获取商品信息失败：{}", e);
+            throw new BusinessException("获取商品信息失败");
+        }
+        return list;
+    }
 
 
 
