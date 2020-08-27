@@ -200,7 +200,7 @@
     </select>
     <select id="getCopartnerAreaById"
             resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp">
-     SELECT a.copartner_area_id AS copartnerAreaId , a.copartner_area_name AS copartnerAreaName
+     SELECT a.id,a.copartner_area_id AS copartnerAreaId , a.copartner_area_name AS copartnerAreaName
      FROM copartner_area_info a left join copartner_area_store b
      ON a.copartner_area_id = b.copartner_area_id
      WHERE b.store_id  = #{storeId}

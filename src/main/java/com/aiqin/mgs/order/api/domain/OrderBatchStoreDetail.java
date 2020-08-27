@@ -7,7 +7,6 @@ import lombok.Data;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
 @Data
 public class OrderBatchStoreDetail implements Serializable {
     //订单批次明细（仓卡）
@@ -33,7 +32,7 @@ public class OrderBatchStoreDetail implements Serializable {
 
     @ApiModelProperty(value = "生产日期",example = "2001-01-01 01:01:01")
     @JsonProperty("product_date")
-    private Date productDate;
+    private String productDate;
 
     @ApiModelProperty(value="批次编码")
     @JsonProperty("batch_info_code")

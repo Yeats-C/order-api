@@ -895,6 +895,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         if(null!=copartnerAreaUp){
             order.setCopartnerAreaId(copartnerAreaUp.getCopartnerAreaId());
             order.setCopartnerAreaName(copartnerAreaUp.getCopartnerAreaName());
+            order.setCopartnerAreaCode(copartnerAreaUp.getId());
         }
         //业务形式 0  门店
         order.setBusinessForm(0);
@@ -1656,6 +1657,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         if(null!=copartnerAreaUp){
             order.setCopartnerAreaId(copartnerAreaUp.getCopartnerAreaId());
             order.setCopartnerAreaName(copartnerAreaUp.getCopartnerAreaName());
+            order.setCopartnerAreaCode(copartnerAreaUp.getId());
         }
 
         //配送方式编码
@@ -2411,6 +2413,7 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         if(null!=copartnerAreaList &&copartnerAreaList.size()>0){
             order.setCopartnerAreaId(copartnerAreaList.get(0).getCopartnerAreaId());
             order.setCopartnerAreaName(copartnerAreaList.get(0).getCopartnerAreaName());
+            order.setCopartnerAreaCode(copartnerAreaList.get(0).getId());
         }
         //业务形式 1 批发
         order.setBusinessForm(1);

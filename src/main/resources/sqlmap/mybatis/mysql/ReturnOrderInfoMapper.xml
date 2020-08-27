@@ -1125,9 +1125,9 @@
     <if test="treatmentMethod!=null">
       and treatment_method=#{treatmentMethod,jdbcType=INTEGER}
     </if>
-
-      and return_order_type in(0,1,2,4,5,6)
-
+    <if test="returnOrderType!=null">
+      and return_order_type=#{returnOrderType,jdbcType=INTEGER}
+    </if>
     <if test="storeIds!=null">
       and store_id in
       <foreach collection="storeIds"  item="item" open="(" separator="," close=")"  >
@@ -1528,6 +1528,67 @@
     from return_order_info
     where
     really_return=0
+  </select>
+    <select id="pages" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderSearchVo" >
+    select
+    <include refid="Base_Column_List" />
+    from return_order_info
+    where
+    really_return=1
+    <if test="returnOrderStatus!=null">
+      and return_order_status=#{returnOrderStatus,jdbcType=INTEGER}
+    </if>
+    <if test="returnOrderCode!=null and returnOrderCode!=''">
+      and return_order_code=#{returnOrderCode,jdbcType=VARCHAR}
+    </if>
+    <if test="storeName!=null and storeName!=''">
+      and store_name=#{storeName,jdbcType=VARCHAR}
+    </if>
+    <if test="storeId!=null and storeId!=''">
+      and store_id=#{storeId,jdbcType=VARCHAR}
+    </if>
+    <if test="provinceId != null and provinceId!=''" >
+      and province_id = #{provinceId,jdbcType=VARCHAR}
+    </if>
+    <if test="provinceName != null and provinceName!=''" >
+      and province_name = #{provinceName,jdbcType=VARCHAR}
+    </if>
+    <if test="cityId != null and cityId!=''" >
+      and  city_id = #{cityId,jdbcType=VARCHAR}
+    </if>
+    <if test="cityName != null and cityName!=''" >
+      and  city_name = #{cityName,jdbcType=VARCHAR}
+    </if>
+    <if test="districtId != null and districtId!=''" >
+      and   district_id = #{districtId,jdbcType=VARCHAR}
+    </if>
+    <if test="districtName != null and districtName!=''" >
+      and  district_name = #{districtName,jdbcType=VARCHAR}
+    </if>
+    <if test="applyStartTime!=null and applyStartTime!=''">
+      and create_time &gt;= #{applyStartTime}
+    </if>
+    <if test="applyEndTime!=null and applyEndTime!=''">
+      and create_time &lt;= #{applyEndTime}
+    </if>
+    <if test="orderType!=null">
+      and order_type =#{orderType}
+    </if>
+    <if test="orderCategory!=null">
+      and order_category=#{orderCategory,jdbcType=INTEGER}
+    </if>
+    <if test="treatmentMethod!=null">
+      and treatment_method=#{treatmentMethod,jdbcType=INTEGER}
+    </if>
+    and return_order_type in(0,1,2,4,5,6)
+
+    <if test="storeIds!=null">
+      and store_id in
+      <foreach collection="storeIds"  item="item" open="(" separator="," close=")"  >
+        #{item}
+      </foreach>
+    </if>
+    order by create_time desc
   </select>
 
 

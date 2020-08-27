@@ -49,6 +49,8 @@ public interface ReturnOrderInfoDao {
     //后台销售退货单管理列表（搜索）
     List<ReturnOrderInfo> page(ReturnOrderSearchVo searchVo);
 
+    List<ReturnOrderInfo> pages(ReturnOrderSearchVo searchVo);
+
     //后台销售退货单管理列表条数（搜索）
     Integer pageCount(ReturnOrderSearchVo searchVo);
 

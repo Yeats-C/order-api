@@ -271,10 +271,10 @@ public class ErpOrderPayServiceImpl implements ErpOrderPayService {
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_21.getCode());
             ErpOrderNodeProcessTypeEnum processTypeEnum = ErpOrderNodeProcessTypeEnum.getEnum(order.getOrderTypeCode(), order.getOrderCategoryCode());
             if (processTypeEnum.isLockStock()) {
-                boolean flag = erpOrderRequestService.unlockStockInSupplyChainByOrderCode(order, auth);
-                if (!flag) {
-                    throw new BusinessException("解锁库存失败");
-                }
+//                boolean flag = erpOrderRequestService.unlockStockInSupplyChainByOrderCode(order, auth);
+//                if (!flag) {
+//                    throw new BusinessException("解锁库存失败");
+//                }
             }
             erpOrderInfoService.updateOrderByPrimaryKeySelective(order, auth);
         } else if (ErpOrderNodeStatusEnum.STATUS_2.getCode().equals(order.getOrderNodeStatus())) {
