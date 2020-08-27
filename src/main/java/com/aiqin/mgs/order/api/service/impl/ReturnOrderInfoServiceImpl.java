@@ -342,7 +342,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             return pageResData;
         }
         PageHelper.startPage(searchVo.getPageNo(),searchVo.getPageSize());
-        List<ReturnOrderInfo> content = returnOrderInfoDao.page(searchVo);
+//        List<ReturnOrderInfo> content = returnOrderInfoDao.page(searchVo);
+        List<ReturnOrderInfo> content = returnOrderInfoDao.pages(searchVo);
 //        Integer pageCount = returnOrderInfoDao.pageCount(searchVo);
         return new PageResData<>(Integer.valueOf((int)((Page) content).getTotal()), content);
     }
