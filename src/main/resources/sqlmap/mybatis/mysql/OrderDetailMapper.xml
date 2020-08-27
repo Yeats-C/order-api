@@ -43,6 +43,8 @@
         <result column="shop_product_money" jdbcType="VARCHAR" property="shopProductMoney"/>
         <result column="cost_points" jdbcType="INTEGER" property="costPoints"/>
         <result column="receive_points" jdbcType="INTEGER" property="receivePoints"/>
+        <result column="product_property_code" jdbcType="VARCHAR" property="productPropertyCode"/>
+        <result column="product_property_name" jdbcType="VARCHAR" property="productPropertyName"/>
     </resultMap>
 
     <resultMap id="ProductsMapping" type="com.aiqin.mgs.order.api.domain.response.OrderProductsResponse">
