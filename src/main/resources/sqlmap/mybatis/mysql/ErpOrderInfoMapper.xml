@@ -98,7 +98,8 @@
         logistics_fee_status as logisticsFeeStatus,
         copartner_area_id as copartnerAreaId,
         copartner_area_name as copartnerAreaName,
-        business_form as businessForm
+        business_form as businessForm,
+        copartner_area_code as copartnerAreaCode
         from order_store_info
         where 1 = 1
         <if test="id != null and id != ''">
@@ -373,7 +374,7 @@
                                       franchisee_code, franchisee_name, order_success, scour_sheet_status, use_status, source_code, source_name,
                                       source_type, activity_id, is_activity, create_by_id, create_by_name, update_by_id, update_by_name,
                                       create_time, update_time,first_market_value_gift,logistics_fee_status,copartner_area_id,copartner_area_name,
-                                      business_form)
+                                      business_form,copartner_area_code)
         values (#{orderStoreId}, #{orderStoreCode}, #{companyCode}, #{companyName},
                 #{orderTypeCode}, #{orderTypeName}, #{orderCategoryCode},
                 #{orderCategoryName}, #{supplierCode}, #{supplierName},
@@ -394,7 +395,8 @@
                 #{transportCode}, #{logisticsId}, #{feeId}, #{orderReturn}, #{orderReturnProcess}, #{franchiseeId},
                 #{franchiseeCode}, #{franchiseeName}, #{orderSuccess}, #{scourSheetStatus}, #{useStatus}, #{sourceCode}, #{sourceName},
                 #{sourceType}, #{activityId}, #{isActivity}, #{createById}, #{createByName}, #{updateById}, #{updateByName},
-                sysdate(), sysdate(),#{firstMarketValueGift},#{logisticsFeeStatus},#{copartnerAreaId},#{copartnerAreaName},#{businessForm})
+                sysdate(), sysdate(),#{firstMarketValueGift},#{logisticsFeeStatus},#{copartnerAreaId},#{copartnerAreaName}
+                ,#{businessForm},#{copartnerAreaCode})
     </insert>
 
     <select id="findOrderList" parameterType="com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest"
