@@ -1529,7 +1529,7 @@
     where
     really_return=0
   </select>
-  <select id="pages" resultType="com.aiqin.mgs.order.api.domain.ReturnOrderInfo">
+    <select id="pages" resultMap="BaseResultMap" parameterType="com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderSearchVo" >
     select
     <include refid="Base_Column_List" />
     from return_order_info
