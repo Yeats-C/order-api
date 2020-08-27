@@ -48,10 +48,10 @@ public class ErpOrderCancelServiceImpl implements ErpOrderCancelService {
 
             if (!skipStep && processTypeEnum.isLockStock()) {
                 order.setItemList(erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId()));
-                boolean unlockFlag = erpOrderRequestService.unlockStockInSupplyChainByDetail(order, ErpOrderLockStockTypeEnum.REDUCE_AND_UNLOCK, auth);
-                if (!unlockFlag) {
-                    throw new BusinessException("解锁库存失败");
-                }
+//                boolean unlockFlag = erpOrderRequestService.unlockStockInSupplyChainByDetail(order, ErpOrderLockStockTypeEnum.REDUCE_AND_UNLOCK, auth);
+//                if (!unlockFlag) {
+//                    throw new BusinessException("解锁库存失败");
+//                }
             }
             order.setOrderNodeStatus(ErpOrderNodeStatusEnum.STATUS_33.getCode());
             erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(order, auth);
