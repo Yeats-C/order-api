@@ -447,6 +447,10 @@ public class ErpOrderInfo {
     @JsonProperty("copartner_area_name")
     private String copartnerAreaName;
 
+    @ApiModelProperty(value="经营区域code")
+    @JsonProperty("copartner_area_code")
+    private String copartnerAreaCode;
+
     public String getOrderStatusDesc() {
         return ErpOrderStatusEnum.getEnumDesc(orderStatus);
     }
