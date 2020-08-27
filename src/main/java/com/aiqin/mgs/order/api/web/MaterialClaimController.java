@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -164,7 +165,7 @@ public class MaterialClaimController {
                 }
             }
             if (!errorList.isEmpty()){
-                return HttpResponse.failure(ResultCode.ERP_EXCEL_ERROR,"行号： " + errorList);
+                return HttpResponse.success("导入模板部分商品Sku缺失,请填写完成再次导入,行号： " + errorList);
             }
             for (String[] s : list){
                     ProductSkuRequest2 productSkuRequest2 = new ProductSkuRequest2();
@@ -196,6 +197,13 @@ public class MaterialClaimController {
            LOGGER.info(JsonUtil.toJson(objectList));
            erpSkuDetailList = bridgeProductService.getProductSkuDetailList(data.getProvinceId(), data.getCityId(), data.getCompanyCode(), objectList);
            LOGGER.info("供应链查询数据返回结果： " + erpSkuDetailList);
+           //将表中解析的数据取出来sku编码
+           List<String> collect = objectList.stream().map(ProductSkuRequest2::getSkuCode).collect(Collectors.toList());
+           //将查询出来的商品筛选出来多余的code
+           List<ErpSkuDetail> collect1 = erpSkuDetailList.stream().filter(ErpSkuDetail -> !collect.contains(ErpSkuDetail.getSkuCode())).collect(Collectors.toList());
+           if (!collect1.isEmpty()){
+               return HttpResponse.success("导入模板部分商品与商品名称不匹配,sku: " + collect1);
+           }
            //把表中商品是否是赠品返回
            List<ErpSkuDetail> isGiveawayList = new ArrayList<>();
            for (ErpSkuDetail er : erpSkuDetailList){

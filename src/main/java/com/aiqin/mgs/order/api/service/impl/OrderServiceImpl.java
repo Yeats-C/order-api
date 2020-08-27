@@ -561,7 +561,11 @@ public class OrderServiceImpl implements OrderService {
             });
             if (Objects.nonNull(response) && "0".equals(response.getCode())) {
                 List<Map<String, Object>> data = response.getData();
-                rate = Double.parseDouble(data.get(0).get("convert_ratio").toString());
+                if(CollectionUtils.isNotEmpty(data)){
+                    rate = Double.parseDouble(data.get(0).get("convert_ratio").toString());
+                }else {
+                    throw new RuntimeException("获取积分比例失败");
+                }
             }
         }
         long thisRate = new Double(rate * 100).longValue();

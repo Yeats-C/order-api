@@ -26,8 +26,8 @@ public class Activity extends PagesRequest implements Serializable {
     @JsonProperty("activity_name")
     private String activityName="";
 
-    /**活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单*/
-    @ApiModelProperty(value = "活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单")
+    /**活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单7.买赠*/
+    @ApiModelProperty(value = "活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单7.买赠")
     @JsonProperty("activity_type")
     private Integer activityType;
 
@@ -107,4 +107,8 @@ public class Activity extends PagesRequest implements Serializable {
     @ApiModelProperty(value = "数据权限门店集合")
     @JsonProperty("stores_ids")
     private List<String> storesIds;
+
+    @ApiModelProperty(value = "满足赠送条件多次赠送 :0赠一次1赠多次")
+    @JsonProperty("multiple_give")
+    private Integer multipleGive;
 }

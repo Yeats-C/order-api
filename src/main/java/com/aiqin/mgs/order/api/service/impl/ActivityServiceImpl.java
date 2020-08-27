@@ -8,6 +8,7 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.component.enums.ErpOrderStatusEnum;
 import com.aiqin.mgs.order.api.component.enums.YesOrNoEnum;
+import com.aiqin.mgs.order.api.component.enums.activity.ActivityTypeEnum;
 import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.dao.cart.ErpOrderCartDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
@@ -247,6 +248,20 @@ public class ActivityServiceImpl implements ActivityService {
                         }
                     }
                 }
+                //如果规则为买赠，插入赠品信息
+                if(activityRule.getActivityType()==7 && null!=activityRule.getGiftList()){
+                    List<ActivityGift> activityGiftList=new ArrayList<>();
+                    if(null!=activityRule.getGiftList() && 0!=activityRule.getGiftList().size()){
+                        for(ActivityGift gift:activityRule.getGiftList()){
+                            gift.setRuleId(ruleId);
+                            activityGiftList.add(gift);
+                        }
+                        int activityGiftRecord = activityGiftDao.insertList(activityGiftList);
+                        if (activityGiftRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+                            return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
+                        }
+                    }
+                }
             }
             int activityRuleRecord = activityRuleDao.insertList(activityRuleList);
             if (activityRuleRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
@@ -352,7 +367,8 @@ public class ActivityServiceImpl implements ActivityService {
             List<ActivityRule> activityRuleList=activityRuleDao.selectByActivityId(activityId);
             if(null!=activityRuleList){
                 for (ActivityRule rule:activityRuleList){
-                    if(2==rule.getActivityType()){
+                    if(ActivityTypeEnum.TYPE_2.getCode().equals(rule.getActivityType()) ||
+                            ActivityTypeEnum.TYPE_7.getCode().equals(rule.getActivityType())){
                         List<ActivityGift> giftList=activityGiftDao.selectByRuleId(rule.getRuleId());
                         rule.setGiftList(giftList);
                     }
@@ -469,6 +485,20 @@ public class ActivityServiceImpl implements ActivityService {
                         int activityGiftRecord = activityGiftDao.insertList(activityGiftList);
                         if (activityGiftRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
                             return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
+                        }
+                    }
+                    //如果规则为买赠，插入赠品信息
+                    if(activityRule.getActivityType()==7 && null!=activityRule.getGiftList()){
+                        List<ActivityGift> activityGiftList=new ArrayList<>();
+                        if(null!=activityRule.getGiftList() && 0!=activityRule.getGiftList().size()){
+                            for(ActivityGift gift:activityRule.getGiftList()){
+                                gift.setRuleId(ruleId);
+                                activityGiftList.add(gift);
+                            }
+                            int activityGiftRecord = activityGiftDao.insertList(activityGiftList);
+                            if (activityGiftRecord <= Global.CHECK_INSERT_UPDATE_DELETE_SUCCESS) {
+                                return HttpResponse.failure(ResultCode.ADD_ACTIVITY_INFO_EXCEPTION);
+                            }
                         }
                     }
                 }

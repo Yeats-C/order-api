@@ -18,11 +18,13 @@
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="active_store_range" jdbcType="INTEGER" property="activeStoreRange"/>
         <result column="activity_scope" jdbcType="INTEGER" property="activityScope"/>
+        <result column="multiple_give" jdbcType="INTEGER" property="multipleGive"/>
     </resultMap>
 
     <sql id="Base_Column_List">
        activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization,activity_brief
        ,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time,active_store_range,activity_scope
+       ,multiple_give
     </sql>
 
 
@@ -44,7 +46,8 @@
         a.create_time,
         a.update_time,
         active_store_range,
-        activity_scope
+        activity_scope,
+        multiple_give
         FROM
         activity a
         JOIN activity_store s ON a.activity_id = s.activity_id
@@ -109,7 +112,7 @@
         select activity_id,activity_name,activity_type,activity_status,DATE_FORMAT( begin_time, '%Y-%m-%d %h:%i:%s' ) AS begin_time,
         DATE_FORMAT( finish_time, '%Y-%m-%d %h:%i:%s' ) AS finish_time,publishing_organization
         ,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time,active_store_range
-        ,activity_scope
+        ,activity_scope,multiple_give
         from activity
         <where>
             1=1
@@ -122,10 +125,12 @@
     <insert id="insertActivity" parameterType="com.aiqin.mgs.order.api.domain.Activity">
         insert into activity
 			(activity_id,activity_name,activity_type,activity_status,begin_time,finish_time,publishing_organization
-			,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time,active_store_range,activity_scope)
+			,activity_brief,activity_pic_pc,activity_pic_app,create_by,update_by,create_time,update_time
+			,active_store_range,activity_scope,multiple_give)
 		values
 		    (#{activityId},#{activityName},#{activityType},0,#{beginTime},#{finishTime},#{publishingOrganization}
-		    ,#{activityBrief},#{activityPicPc},#{activityPicApp},#{createBy},#{updateBy},#{createTime},#{updateTime},#{activeStoreRange},#{activityScope})
+		    ,#{activityBrief},#{activityPicPc},#{activityPicApp},#{createBy},#{updateBy},#{createTime},#{updateTime}
+		    ,#{activeStoreRange},#{activityScope},#{multipleGive})
 	</insert>
 
     <!--编辑活动主表-->
@@ -167,6 +172,9 @@
             </if>
             <if test="activityScope != null">
                 activity_scope = #{activityScope,jdbcType=BIT},
+            </if>
+            <if test="multipleGive != null">
+                multiple_give = #{multipleGive,jdbcType=BIT},
             </if>
             update_time = now()
             where activity_id = #{activityId,jdbcType=VARCHAR}
@@ -237,7 +245,7 @@
         SELECT
         a.activity_id,a.activity_name,a.activity_type,a.activity_status,DATE_FORMAT( a.begin_time, '%Y-%m-%d %h:%i:%s' ) AS begin_time,
         DATE_FORMAT( a.finish_time, '%Y-%m-%d %h:%i:%s' ) AS finish_time,a.publishing_organization,a.activity_brief
-        ,a.activity_pic_pc,a.activity_pic_app,a.create_by,a.update_by,a.create_time,a.update_time,activity_scope
+        ,a.activity_pic_pc,a.activity_pic_app,a.create_by,a.update_by,a.create_time,a.update_time,activity_scope,a.multiple_give
         FROM
         activity a
         JOIN activity_store s ON a.activity_id = s.activity_id
@@ -270,7 +278,8 @@
         a.create_time,
         a.update_time,
         a.active_store_range,
-        a.activity_scope
+        a.activity_scope,
+        a.multiple_give
         FROM
         activity a
         left JOIN activity_store s ON a.activity_id = s.activity_id
@@ -323,7 +332,8 @@
         a.create_time,
         a.update_time,
         a.active_store_range,
-        a.activity_scope
+        a.activity_scope,
+        a.multiple_give
         FROM
         activity a
         left JOIN activity_store s ON a.activity_id = s.activity_id

@@ -25,8 +25,8 @@ public class ActivityRule {
     @JsonProperty("activity_id")
     private String activityId="";
 
-    /**活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单*/
-    @ApiModelProperty(value = "活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单")
+    /**活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单7.买赠*/
+    @ApiModelProperty(value = "活动类型1.满减2.满赠3.折扣4.返点5.特价6.整单7.买赠")
     @JsonProperty("activity_type")
     private Integer activityType;
 
@@ -85,6 +85,10 @@ public class ActivityRule {
     @JsonProperty("gift_number")
     private Integer giftNumber;
 
+    @ApiModelProperty(value = "商品编码")
+    @JsonProperty("sku_code")
+    private String skuCode="";
+
     public Integer getGiftNumber() {
         int number = 0;
         if (giftList != null && giftList.size() > 0) {
@@ -95,4 +99,9 @@ public class ActivityRule {
         }
         return number;
     }
+
+        /**买赠活动sku门槛*/
+    @ApiModelProperty(value = "买赠活动sku门槛")
+    @JsonProperty("threshold")
+    private BigDecimal threshold;
 }
