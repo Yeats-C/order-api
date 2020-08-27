@@ -20,7 +20,6 @@ import com.aiqin.mgs.order.api.service.bill.CreatePurchaseOrderService;
 import com.aiqin.mgs.order.api.service.bill.PurchaseOrderService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderDeliverService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
-import com.aiqin.mgs.order.api.util.DateUtil;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -113,7 +112,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                     BatchInfo batchInfo=new BatchInfo();
                     BeanUtils.copyProperties(batchStoreDetail,batchInfo);
                     batchInfo.setBasicId(productMap.get(batchStoreDetail.getLineCode()));
-                    batchInfo.setBatchDate(DateUtil.formatDateLong(batchStoreDetail.getProductDate()));
+                    batchInfo.setBatchDate(batchStoreDetail.getProductDate());
                     batchInfo.setCreateBy("发货回调");
                     batchInfo.setUpdateBy("发货回调");
                     batchInfo.setProductCount(batchStoreDetail.getActualTotalCount().intValue());
