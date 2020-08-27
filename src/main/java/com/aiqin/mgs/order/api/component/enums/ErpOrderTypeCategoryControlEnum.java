@@ -4,7 +4,9 @@ import com.aiqin.mgs.order.api.domain.SelectOptionItem;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 订单类型节点差异控制枚举类
@@ -163,12 +165,14 @@ public enum ErpOrderTypeCategoryControlEnum {
                 }
             }
         }else{
+            Set<SelectOptionItem> optionItemSet=new HashSet<>();
             for (ErpOrderTypeCategoryControlEnum item :
                     ErpOrderTypeCategoryControlEnum.values()) {
                 ErpOrderCategoryEnum orderCategoryEnum = item.getOrderCategoryEnum();
-                list.add(new SelectOptionItem(orderCategoryEnum.getValue(), orderCategoryEnum.getDesc()));
+                optionItemSet.add(new SelectOptionItem(orderCategoryEnum.getValue(), orderCategoryEnum.getDesc()));
                 containsList.add(orderCategoryEnum.getCode());
             }
+            list.addAll(new ArrayList<>(optionItemSet));
         }
 
 
