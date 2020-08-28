@@ -3,6 +3,9 @@ package com.aiqin.mgs.order.api.dao;
 import com.aiqin.mgs.order.api.domain.LogisticsRuleRequest;
 import com.aiqin.mgs.order.api.domain.LogisticsRuleType;
 import com.aiqin.mgs.order.api.domain.logisticsRule.LogisticsRuleInfo;
+import com.aiqin.mgs.order.api.domain.logisticsRule.NewAllLogistics;
+import com.aiqin.mgs.order.api.domain.logisticsRule.NewLogisticsInfo;
+import com.aiqin.mgs.order.api.domain.logisticsRule.NewReduceInfo;
 import com.aiqin.mgs.order.api.domain.response.LogisticsAllResponse;
 import org.apache.ibatis.annotations.Param;
 
@@ -33,4 +36,14 @@ public interface LogisticsRuleDao {
     void updatefareSill(LogisticsRuleInfo logisticsRuleInfos);
 
     List<LogisticsAllResponse> selectAll(LogisticsRuleRequest logisticsRuleRequest);
+
+    int addLogistics(NewLogisticsInfo newLogisticsInfo);
+
+    int addLogisticsList(@Param("newReduceInfoList") List<NewReduceInfo> newReduceInfoList);
+
+    List<NewAllLogistics> selectAllLogistics();
+
+    int updateLogisticsStatus(NewAllLogistics newAllLogistics);
+
+    int updateByCodeAndId(@Param("rultCode") String rultCode, @Param("rultId") String rultId);
 }

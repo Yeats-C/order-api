@@ -26,6 +26,9 @@ public interface ResultCode {
     MessageId ERP_RETURN_ERROR =MessageId.create(Project.ORDER_API,-19,"上单退款未到账,请到账后再次发起退货");
     MessageId ERP_EXCEL_ERROR =MessageId.create(Project.ORDER_API,-20,"导入模板部分商品Sku缺失,请填写完成再次导入");
     MessageId ERP_EXCEL_SKU_NAME_ERROR =MessageId.create(Project.ORDER_API,-20,"导入模板部分商品与商品名称不匹配");
+    MessageId ADD_LOGISTICS_INFO_LIST_EXCEPTION = MessageId.create(Project.ORDER_API, -21, "新增物流减免商品类型集合失败");
+    MessageId ADD_LOGISTICS_INFO_EXCEPTION = MessageId.create(Project.ORDER_API, -22, "新增-新规则-物流减免失败");
+
 
 
     /** 黄祉壹   2018-11-05 开始     */
