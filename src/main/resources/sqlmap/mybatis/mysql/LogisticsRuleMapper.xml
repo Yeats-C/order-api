@@ -50,6 +50,42 @@
             )
         </foreach>
     </insert>
+    <insert id="addLogistics" parameterType="com.aiqin.mgs.order.api.domain.logisticsRule.NewLogisticsInfo">
+        insert into logistics_relief_info(rult_type,logistics_explain,amount_required,logistics_proportion,rult_code,logistics_order_type,
+        reduce_scope,create_time,create_by_id,create_by_name)
+        values (
+           #{rultType},
+           #{logisticsExplain},
+           #{amountRequired},
+           #{logisticsProportion},
+           #{rultCode},
+           #{logisticsOrderType},
+           #{reduceScope},
+           now(),
+           #{createById},
+           #{createByName}
+        )
+    </insert>
+    <insert id="addLogisticsList" parameterType="list">
+       insert into logistics_relief_product(rult_code,brand,brand_name,category,category_name,product_type,create_time,
+       create_by_name,effective_status,spu_code,spu_name,rult_id,is_delete)
+       values
+        <foreach collection="newReduceInfoList" item="item" index="index" separator=",">
+            (
+            #{item.rultCode}, #{item.brand},
+            #{item.brandName}, #{item.category},
+            #{item.categoryName}, #{item.productType},
+            now(),
+            #{item.createByName},
+            #{item.effectiveStatus},
+            #{item.spuCode},
+            #{item.spuName},
+            #{item.rultId},
+            #{item.isDelete}
+            )
+        </foreach>
+
+    </insert>
     <update id="updateStatus">
         update logistics_relief_product
         set
@@ -80,6 +116,21 @@
            update_time = now()
         where
            rult_code = #{rultCode,jdbcType=VARCHAR} and rult_type = #{rultType,jdbcType=INTEGER} and product_code = #{productCode,jdbcType=VARCHAR}
+    </update>
+    <update id="updateLogisticsStatus">
+        update logistics_relief_product
+        set
+          effective_status = #{effectiveStatus},
+          update_time = now()
+        where
+           rult_code = #{rultCode} and rult_id = #{rultId}
+    </update>
+    <update id="updateByCodeAndId">
+        update logistics_relief_product
+        set
+          is_delete = 1
+        where
+          rult_code = #{rultCode} and rult_id = #{rultId}
     </update>
     <delete id="deleteLogisticsRule">
         delete from logistics_relief_info where rult_code = #{rultCode,jdbcType=VARCHAR}
@@ -146,5 +197,14 @@
                 </foreach>
             </if>
          order by updateTime desc
+    </select>
+    <select id="selectAllLogistics" resultType="com.aiqin.mgs.order.api.domain.logisticsRule.NewAllLogistics">
+        select  a.logistics_explain as logisticsExplain, a.amount_required as amountRequired, a.logistics_proportion as logisticsProportion,
+        b.effective_status as effectiveStatus, a.create_by_name as createByName, a.create_time as createTime, a.rult_type as rultType, a.rult_code as rultCode,
+        b.rult_id as rultId
+        from
+        logistics_relief_info a left join logistics_relief_product b
+        on a.rult_code = b.rult_code
+        where a.rult_type = 10 and b.is_delete = 2
     </select>
 </mapper>

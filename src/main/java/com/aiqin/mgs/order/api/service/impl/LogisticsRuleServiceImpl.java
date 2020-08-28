@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.service.impl;
 
 
 import com.aiqin.ground.util.exception.GroundRuntimeException;
+import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
@@ -10,7 +11,7 @@ import com.aiqin.mgs.order.api.component.LogisticsRuleEnum;
 import com.aiqin.mgs.order.api.component.LogisticsRuleTypesEnum;
 import com.aiqin.mgs.order.api.dao.LogisticsRuleDao;
 import com.aiqin.mgs.order.api.domain.*;
-import com.aiqin.mgs.order.api.domain.logisticsRule.LogisticsRuleInfo;
+import com.aiqin.mgs.order.api.domain.logisticsRule.*;
 import com.aiqin.mgs.order.api.domain.response.LogisticsAllResponse;
 import com.aiqin.mgs.order.api.service.LogisticsRuleService;
 import com.aiqin.mgs.order.api.util.AuthUtil;
@@ -25,6 +26,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 
 import java.util.*;
@@ -371,6 +373,117 @@ public class LogisticsRuleServiceImpl implements LogisticsRuleService {
         }
 
         return response;
+    }
+
+    /**
+     * 新规则-物流减免规则
+     * @param newLogisticsRequest
+     * @return
+     */
+    @Override
+    @Transactional
+    public HttpResponse addNewLogisticsRule(NewLogisticsRequest newLogisticsRequest) {
+        LOGGER.info("新规则-物流减免规则入参： " + JsonUtil.toJson(newLogisticsRequest));
+        List<NewReduceInfo> newReduceInfoList = newLogisticsRequest.getNewReduceInfoList();
+        LOGGER.info("物流减免商品类型集合： " + newReduceInfoList);
+        Assert.notEmpty(newReduceInfoList,"缺少物流减免规则商品");
+        NewLogisticsInfo newLogisticsInfo = newLogisticsRequest.getNewLogisticsInfo();
+        //生成编码
+        String logisticsCode = createLogisticsCode();
+        //获取创建人
+        AuthToken currentAuth = AuthUtil.getCurrentAuth();
+        String personName = currentAuth.getPersonName();
+        String personId = currentAuth.getPersonId();
+        //因与原物流规则有区分，所以以rultType为区分新旧规则
+        newLogisticsInfo.setRultType(10);
+        newLogisticsInfo.setCreateById(personId);
+        newLogisticsInfo.setCreateByName(personName);
+        newLogisticsInfo.setRultCode(logisticsCode);
+        LOGGER.info("物流减免主表-实体： " + newLogisticsInfo);
+        int count = logisticsRuleDao.addLogistics(newLogisticsInfo);
+        if (count < 0){
+            return HttpResponse.failure(ResultCode.ADD_LOGISTICS_INFO_EXCEPTION);
+        }
+        newReduceInfoList.forEach(item->{
+            item.setEffectiveStatus(1);
+            item.setRultCode(logisticsCode);
+            item.setCreateByName(personName);
+            item.setSpuCode("1");
+            item.setSpuName("1");
+            item.setIsDelete(2);
+            item.setRultId(createLogisticsCode());
+        });
+        LOGGER.info("物流减免商品类型集合： " + JsonUtil.toJson(newReduceInfoList));
+        int counts = logisticsRuleDao.addLogisticsList(newReduceInfoList);
+        if (counts == 0){
+            LOGGER.info("物流减免商品类型集合-新增失败");
+            return HttpResponse.failure(ResultCode.ADD_LOGISTICS_INFO_LIST_EXCEPTION);
+        }
+        LOGGER.info("新增活动成功");
+        return HttpResponse.success();
+    }
+
+    /**
+     * 物流减免规则列表
+     * @return
+     */
+    @Override
+    public HttpResponse selectAll(Integer pageNo, Integer pageSize) {
+        ResultModel resultModel = new ResultModel();
+        if(pageNo==null&&pageSize==null){
+            pageNo=1;
+            pageSize=10;
+        }
+        if(pageNo==0&&pageSize==0){
+            pageNo=1;
+            pageSize=10;
+        }
+        PageHelper.startPage(pageNo,pageSize);
+        List<NewAllLogistics> newAllLogistics = logisticsRuleDao.selectAllLogistics();
+        LOGGER.info("查询物流减免-返回结果： " + newAllLogistics);
+        if (newAllLogistics.isEmpty()){
+            return HttpResponse.success();
+        }
+        resultModel.setResult(newAllLogistics);
+        resultModel.setTotal(((Page)newAllLogistics).getTotal());
+        return HttpResponse.success(resultModel);
+    }
+
+    /**
+     * 修改物流减免生效状态
+     * @param rultCode
+     * @param
+     * @return
+     */
+    @Override
+    public HttpResponse updateStatusByCode(String rultCode,String rultId,Integer effectiveStatus) {
+        LOGGER.info("新规则-物流减免生效状态修改-入参: "+ rultCode + ", " + rultId + "," + effectiveStatus);
+        NewAllLogistics newAllLogistics = new NewAllLogistics();
+        newAllLogistics.setRultCode(rultCode);
+        newAllLogistics.setRultId(rultId);
+        newAllLogistics.setEffectiveStatus(effectiveStatus);
+        LOGGER.info("修改生效状态： " + newAllLogistics);
+        int count = logisticsRuleDao.updateLogisticsStatus(newAllLogistics);
+        if (count < 0){
+            return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
+        }
+        return HttpResponse.success();
+    }
+
+    /**
+     * 删除物流减免
+     * @param rultCode
+     * @param rultId
+     * @return
+     */
+    @Override
+    public HttpResponse deleteLogisticsByCodeAndId(String rultCode, String rultId) {
+        LOGGER.info("删除物流减免-入参： " + rultCode + "," + rultId);
+        int count = logisticsRuleDao.updateByCodeAndId(rultCode, rultId);
+        if (count < 0){
+            return HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
+        }
+        return HttpResponse.success();
     }
 }
 
