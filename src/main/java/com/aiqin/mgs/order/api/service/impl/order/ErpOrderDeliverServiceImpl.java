@@ -766,7 +766,7 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
             BigDecimal per=BigDecimal.ZERO;
             if(totalPreferentialAmount.compareTo(BigDecimal.ZERO)>0){
                 //分摊总金额=本行商品价值X商品总金额/商品总价值
-                 to=totalPreferentialAmount.multiply(list.get(i).getTotalProductAmount()).divide(priceAmount,2,BigDecimal.ROUND_HALF_UP);
+                 to=totalPreferentialAmount.multiply(amount).divide(priceAmount,2,BigDecimal.ROUND_HALF_UP);
                 //分摊单价
                  per=to.divide(new BigDecimal(list.get(i).getProductCount()),2,BigDecimal.ROUND_HALF_UP);
             }
