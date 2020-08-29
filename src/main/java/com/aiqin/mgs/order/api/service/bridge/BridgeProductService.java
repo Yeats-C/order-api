@@ -803,6 +803,7 @@ public HttpResponse<MerchantPaBalanceRespVO> accountBalance(String franchiseeId)
                             //结算商品list里面已经有此sku，需要合并
                             ErpOrderProductInfo orderProductInfo=erpOrderProductInfoList.get(productMap.get(item.getSkuCode()));
                             orderProductInfo.setProductCount(orderProductInfo.getProductCount()+item.getProductCount().intValue());
+                            orderProductInfo.setActualProductCount(orderProductInfo.getActualProductCount()+item.getActualProductCount().intValue());
                             if(null!=item.getBatchInfoCode()) {
                                 ErpBatchInfo batchInfo = new ErpBatchInfo();
                                 batchInfo.setBatchInfoCode(item.getBatchInfoCode());
