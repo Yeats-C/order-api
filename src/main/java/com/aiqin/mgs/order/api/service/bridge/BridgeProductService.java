@@ -798,6 +798,7 @@ public HttpResponse<MerchantPaBalanceRespVO> accountBalance(String franchiseeId)
                 int productCount = 0;
                 if (null != order.getItemList() && order.getItemList().size() > 0) {
                     for (ErpOrderItem item : order.getItemList()) {
+                        productCount += item.getProductCount();
                         if (productMap.containsKey(item.getSkuCode()+"product_type"+item.getProductType())){
                             //结算商品list里面已经有此sku，需要合并
                             ErpBatchInfo batchInfo=new ErpBatchInfo();
@@ -805,7 +806,7 @@ public HttpResponse<MerchantPaBalanceRespVO> accountBalance(String franchiseeId)
                             batchInfo.setBatchNo(item.getBatchCode());
                             batchInfo.setTotalProductCount(item.getProductCount().intValue());
 
-                            ErpOrderProductInfo orderProductInfo=erpOrderProductInfoList.get(productMap.get(item.getSkuCode()+"product_type"+item.getProductType()));
+                            ErpOrderProductInfo orderProductInfo=erpOrderProductInfoList.get(productMap.get(item.getSkuCode()));
                             orderProductInfo.getBatchList().add(batchInfo);
                             orderProductInfo.setProductCount(orderProductInfo.getProductCount()+item.getProductCount().intValue());
                             continue;
@@ -906,7 +907,7 @@ public HttpResponse<MerchantPaBalanceRespVO> accountBalance(String franchiseeId)
                         }
                         //销项税率
                         productInfo.setTaxRate(item.getTaxRate());
-                        productCount += item.getProductCount();
+
 
                         erpOrderProductInfoList.add(productInfo);
                         productMap.put(item.getSkuCode()+"product_type"+item.getProductType(),erpOrderProductInfoList.indexOf(productInfo));
