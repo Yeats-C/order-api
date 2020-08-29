@@ -801,8 +801,14 @@ public HttpResponse<MerchantPaBalanceRespVO> accountBalance(String franchiseeId)
                         productCount += item.getProductCount();
                         if (productMap.containsKey(item.getSkuCode()+"product_type"+item.getProductType())){
                             //结算商品list里面已经有此sku，需要合并
-                            ErpOrderProductInfo orderProductInfo=erpOrderProductInfoList.get(productMap.get(item.getSkuCode()));
+                            ErpOrderProductInfo orderProductInfo=erpOrderProductInfoList.get(productMap.get(item.getSkuCode()+"product_type"+item.getProductType()));
                             orderProductInfo.setProductCount(orderProductInfo.getProductCount()+item.getProductCount().intValue());
+                            if(null==item.getActualProductCount()){
+                                item.setActualProductCount(0L);
+                            }
+                            if(null==orderProductInfo.getActualProductCount()){
+                                orderProductInfo.setActualProductCount(0);
+                            }
                             orderProductInfo.setActualProductCount(orderProductInfo.getActualProductCount()+item.getActualProductCount().intValue());
                             if(null!=item.getBatchInfoCode()) {
                                 ErpBatchInfo batchInfo = new ErpBatchInfo();
