@@ -11,23 +11,23 @@ import java.util.Date;
 @ApiModel(value = "减免类型信息")
 public class NewReduceInfo {
 
-    @ApiModelProperty(value = "物流减免规则唯一编码---前端不用传")
+    @ApiModelProperty(value = "物流减免规则唯一编码---不用传")
     @JsonProperty("rult_code")
     private String rultCode;
 
-    @ApiModelProperty(value = "品牌编码")
+    @ApiModelProperty(value = "品牌编码 ---范围是全部，传“All”")
     @JsonProperty("brand")
     private String brand;
 
-    @ApiModelProperty(value = "品牌编码")
+    @ApiModelProperty(value = "品牌名称 ---范围是全部，传“全部”")
     @JsonProperty("brand_name")
     private String brandName;
 
-    @ApiModelProperty(value = "品类编码")
+    @ApiModelProperty(value = "品类编码 ---范围是全部，传“All”" )
     @JsonProperty("category")
     private String category;
 
-    @ApiModelProperty(value = "品类名称")
+    @ApiModelProperty(value = "品类名称 ---范围是全部，传“全部”")
     @JsonProperty("category_name")
     private String categoryName;
 
@@ -55,7 +55,7 @@ public class NewReduceInfo {
     @JsonProperty("update_by_name")
     private String updateByName;
 
-    @ApiModelProperty(value = "生效状态 0未开 1开启")
+    @ApiModelProperty(value = "生效状态 0未开 1开启  ---不用传")
     @JsonProperty("effective_status")
     private Integer effectiveStatus;
 
@@ -63,19 +63,19 @@ public class NewReduceInfo {
     @JsonProperty("reduce_scope")
     private Integer reduceScope;
 
-    @ApiModelProperty(value = "spu编码")
+    @ApiModelProperty(value = "spu编码 ---不用传")
     @JsonProperty("spu_code")
     private String spuCode;
 
-    @ApiModelProperty(value = "spu名称")
+    @ApiModelProperty(value = "spu名称 ---不用传")
     @JsonProperty("spu_name")
     private String spuName;
 
-    @ApiModelProperty(value = "物流减免商品唯一id---前端不用传")
+    @ApiModelProperty(value = "物流减免商品唯一id---不用传")
     @JsonProperty("rult_id")
     private String rultId;
 
-    @ApiModelProperty(value = "是否删除 1是 2否 --前端不用传")
+    @ApiModelProperty(value = "是否删除 1是 2否 --不用传")
     @JsonProperty("is_delete")
     private Integer isDelete;
 
