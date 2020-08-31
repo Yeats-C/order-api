@@ -181,6 +181,9 @@ public class OrderQuery extends PagesRequest {
 	@ApiModelProperty("来源类型，0:pos 1：微商城  2：全部  3：web")
 	private Integer originType;
 
+	@ApiModelProperty("商品名称")
+	@JsonProperty("sku_name")
+	private String skuName;
 
 }
 

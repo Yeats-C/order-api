@@ -42,7 +42,7 @@ import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.util.DayUtil;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.AtomicDouble;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -58,8 +58,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import com.aiqin.ground.util.exception.GroundRuntimeException;
@@ -163,6 +161,28 @@ public class OrderServiceImpl implements OrderService {
 
             List<OrderInfo> OrderInfolist = orderDao.selectOrder(OrderPublic.getOrderQuery(orderQuery));
             if (OrderInfolist != null && OrderInfolist.size() > 0) {
+
+                // 订单详细数据
+                List<String> orderIdList = OrderInfolist.stream().map(OrderInfo::getOrderId).collect(Collectors.toList());
+                List<OrderDetailInfo> orderDetailInfoList =  orderDetailDao.selectDetailByIdList(orderIdList);
+                Map<String, List<OrderDetailInfo>> orderDetailInfoListMap;
+                if (CollectionUtils.isNotEmpty(orderDetailInfoList)) {
+                    orderDetailInfoListMap = orderDetailInfoList.stream().collect(Collectors.groupingBy(OrderDetailInfo::getOrderId));
+                } else {
+                    orderDetailInfoListMap = Maps.newHashMap();
+                }
+
+                // 查询退货数量
+                List<String> orderCodeList = OrderInfolist.stream().map(OrderInfo::getOrderCode).collect(Collectors.toList());
+                List<OrderIdAndAmountRequest> returnIdAndAmountList = orderAfterDetailDao.returnAmountByOrderCodeList(orderCodeList);
+                Map<String, Integer> returnIdAndAmountListMap;
+                if (CollectionUtils.isNotEmpty(returnIdAndAmountList)) {
+                    returnIdAndAmountListMap = returnIdAndAmountList.stream().collect(Collectors.toMap(OrderIdAndAmountRequest::getId, OrderIdAndAmountRequest::getAmount, (o, n) -> n));
+                } else {
+                    returnIdAndAmountListMap = Maps.newHashMap();
+                }
+
+
                 for (int i = 0; i < OrderInfolist.size(); i++) {
                     OrderInfo info = new OrderInfo();
                     info = OrderInfolist.get(i);
@@ -170,49 +190,55 @@ public class OrderServiceImpl implements OrderService {
                     //订单明细数据
                     OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
                     orderDetailQuery.setOrderId(info.getOrderId());
-                    List<OrderDetailInfo> detailList = orderDetailDao.selectDetailById(orderDetailQuery);
+//                    List<OrderDetailInfo> detailList = orderDetailDao.selectDetailById(orderDetailQuery);
+
                     //未付款的支付金额为空
                     if (info.getOrderStatus() == 0) {
                         info.setActualPrice(0);
                         info.setPayType(null);
 
                     }
+
+                    List<OrderDetailInfo> detailList = orderDetailInfoListMap.get(info.getOrderId());
                     info.setOrderdetailList(detailList);
 
                     //特殊处理   (前端控制退货按钮使用字段:1:订单已全数退完)
-                    ReorerRequest reorerRequest = new ReorerRequest();
-                    reorerRequest.setOrderCode(info.getOrderCode());
+//                    ReorerRequest reorerRequest = new ReorerRequest();
+//                    reorerRequest.setOrderCode(info.getOrderCode());
 
-                    //查询购买数量
-                    List<OrderIdAndAmountRequest> buyIdAndAmounts = new ArrayList();
-                    buyIdAndAmounts = orderDetailDao.buyAmount(reorerRequest);
+//                    //查询购买数量
+//                    List<OrderIdAndAmountRequest> buyIdAndAmounts = new ArrayList();
+//                    buyIdAndAmounts = orderDetailDao.buyAmount(reorerRequest);
 
                     //查询退货数量
-                    List<OrderIdAndAmountRequest> returnIdAndAmounts = new ArrayList();
-                    returnIdAndAmounts = orderAfterDetailDao.returnAmount(reorerRequest);
-
-                    //已完全退货完成订单
-                    if (returnIdAndAmounts != null) {
-                        for (OrderIdAndAmountRequest returnInfo : returnIdAndAmounts) {
-                            for (OrderIdAndAmountRequest buyInfo : buyIdAndAmounts) {
-                                if (returnInfo.getId().equals(buyInfo.getId())) {
-                                    if (returnInfo.getAmount() >= buyInfo.getAmount()) {
-                                        info.setTurnReturnView(1);
-                                    }
-                                }
-                            }
-                        }
+//                    List<OrderIdAndAmountRequest> returnIdAndAmounts = new ArrayList();
+//                    returnIdAndAmounts = orderAfterDetailDao.returnAmount(reorerRequest);
+                    Integer amount = detailList.stream().collect(Collectors.summingLong(OrderDetailInfo::getAmount)).intValue();
+                    Integer returnAmount = returnIdAndAmountListMap.get(info.getOrderCode());
+                    if (Objects.nonNull(returnAmount) && returnAmount >= amount) {
+                        info.setTurnReturnView(1);
                     }
+
+//                    //已完全退货完成订单
+//                    if (orderIdAndAmountRequests != null) {
+//                        for (OrderIdAndAmountRequest returnInfo : orderIdAndAmountRequests) {
+//                            for (OrderDetailInfo orderDetail : detailList) {
+//                                if (returnInfo.getId().equals(orderDetail.getOrderCode())) {
+//                                    if (returnInfo.getAmount() >= orderDetail.getAmount()) {
+//                                        info.setTurnReturnView(1);
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
                     OrderInfolist.set(i, info);
                 }
             }
 
             //计算总数据量
-            Integer totalCount = 0;
-            Integer icount = null;
-            totalCount = orderDao.selectOrderCount(OrderPublic.getOrderQuery(orderQuery));
+            Integer  totalCount = orderDao.selectOrderCount(OrderPublic.getOrderQuery(orderQuery));
 
-            return HttpResponse.success(new PageResData(totalCount, OrderInfolist));
+            return HttpResponse.success(new PageResData(Objects.isNull(totalCount) ? 0 : totalCount, OrderInfolist));
 
         } catch (Exception e) {
             LOGGER.error("模糊查询订单列表异常 {}", e);
@@ -386,9 +412,9 @@ public class OrderServiceImpl implements OrderService {
         List<PrestorageOrderInfo> prestorageOrderSupplies = prestorageOrderSupplyDao.selectPrestorageOrderList(orderQuery);
         //是否可退货
         couldReturn(prestorageOrderSupplies);
-        int totalCount = prestorageOrderSupplyDao.selectPrestorageOrderListCount(orderQuery);
+        Integer totalCount = prestorageOrderSupplyDao.selectPrestorageOrderListCount(orderQuery);
 
-        return HttpResponse.success(new PageResData(totalCount, prestorageOrderSupplies));
+        return HttpResponse.success(new PageResData(Objects.isNull(totalCount) ? 0 : totalCount, prestorageOrderSupplies));
     }
 
     private void couldReturn(List<PrestorageOrderInfo> prestorageOrderSupplies) {

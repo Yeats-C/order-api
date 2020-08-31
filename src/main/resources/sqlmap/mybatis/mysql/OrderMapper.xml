@@ -211,6 +211,9 @@
     <select id="selectOrder" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="OrderInfoMapping"
             resultType="java.util.List">
         SELECT a.* FROM order_consumer_info a
+        <if test="(skuName!=null and skuName!='') or (barCodeAndSku !=null and barCodeAndSku != '')">
+            ,order_consumer_detail b
+        </if>
         WHERE 1=1
         <choose>
             <when test="orderType!=null and orderType!='' ">
@@ -312,6 +315,16 @@
         <if test="payType!=null and payType!='' ">
             and a.pay_type =#{payType}
         </if>
+        <if test="(skuName!=null and skuName!='') or (barCodeAndSku !=null and barCodeAndSku != '')">
+            and a.order_id = b.order_id
+            <if test="skuName!=null and skuName!='' ">
+                and b.sku_name like concat('%',#{skuName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="barCodeAndSku!=null and barCodeAndSku!='' ">
+                and (b.sku_code = #{barCodeAndSku} or b.bar_code =  #{barCodeAndSku})
+            </if>
+            group by a.id
+        </if>
         ORDER BY a.create_time DESC
         <if test="icount!=null ">
             limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
@@ -322,6 +335,9 @@
     <select id="selectOrderCount" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery"
             resultType="java.lang.Integer">
         SELECT count(1) FROM order_consumer_info a
+        <if test="(skuName!=null and skuName!='') or (barCodeAndSku !=null and barCodeAndSku != '')">
+            ,order_consumer_detail b
+        </if>
         WHERE 1=1 and order_type = 1
         <if test="distributorId!=null and distributorId!='' ">
             and a.distributor_id = #{distributorId}
@@ -410,6 +426,16 @@
         </if>
         <if test="payType!=null and payType!='' ">
             and a.pay_type =#{payType}
+        </if>
+        <if test="(skuName!=null and skuName!='') or (barCodeAndSku !=null and barCodeAndSku != '')">
+            and a.order_id = b.order_id
+            <if test="skuName!=null and skuName!='' ">
+                and b.sku_name like concat('%',#{skuName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="barCodeAndSku!=null and barCodeAndSku!='' ">
+                and (b.sku_code = #{barCodeAndSku} or b.bar_code =  #{barCodeAndSku})
+            </if>
+            group by a.id
         </if>
     </select>
 

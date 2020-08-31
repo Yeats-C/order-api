@@ -131,7 +131,11 @@
     </insert>
 
     <select id="selectPrestorageOrderList" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="OrderSupplyInfoMapping">
-        select  o.*, a.distributor_id,a.distributor_name from prestorage_order_supply a ,order_consumer_info o where a.order_id=o.order_id
+        select  o.*, a.distributor_id,a.distributor_name from prestorage_order_supply a ,order_consumer_info o
+        <if test="(skuName!=null and skuName!='') or (barCodeAndSku !=null and barCodeAndSku != '')">
+            ,order_consumer_detail b
+        </if>
+        where a.order_id=o.order_id
         <if test="distributorId!=null and distributorId!='' ">
             and a.distributor_id = #{distributorId}
         </if>
@@ -185,6 +189,16 @@
         </if>
         <if test="payType!=null and payType!='' ">
             and o.pay_type =#{payType}
+        </if>
+        <if test="(skuName!=null and skuName!='') or (barCodeAndSku !=null and barCodeAndSku != '')">
+            and o.order_id = b.order_id
+            <if test="skuName!=null and skuName!='' ">
+                and b.sku_name like concat('%',#{skuName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="barCodeAndSku!=null and barCodeAndSku!='' ">
+                and (b.sku_code = #{barCodeAndSku} or b.bar_code =  #{barCodeAndSku})
+            </if>
+            group by a.id
         </if>
         ORDER BY a.create_time DESC
         <if test="icount!=null ">
@@ -193,9 +207,12 @@
 
     </select>
 
-    <select id="selectPrestorageOrderListCount" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultType="integer">
-        select  count(1) from prestorage_order_supply a  ,order_consumer_info o where a.order_id=o.order_id
-
+    <select id="selectPrestorageOrderListCount" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultType="java.lang.Integer">
+        select  count(1) from prestorage_order_supply a  ,order_consumer_info o
+        <if test="(skuName!=null and skuName!='') or (barCodeAndSku !=null and barCodeAndSku != '')">
+            ,order_consumer_detail b
+        </if>
+        where a.order_id=o.order_id
         <if test="distributorId!=null and distributorId!='' ">
             and a.distributor_id = #{distributorId}
         </if>
@@ -247,6 +264,16 @@
         </if>
         <if test="payType!=null and payType!='' ">
             and o.pay_type =#{payType}
+        </if>
+        <if test="(skuName!=null and skuName!='') or (barCodeAndSku !=null and barCodeAndSku != '')">
+            and o.order_id = b.order_id
+            <if test="skuName!=null and skuName!='' ">
+                and b.sku_name like concat('%',#{skuName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="barCodeAndSku!=null and barCodeAndSku!='' ">
+                and (b.sku_code = #{barCodeAndSku} or b.bar_code =  #{barCodeAndSku})
+            </if>
+            group by o.id
         </if>
     </select>
 </mapper>
