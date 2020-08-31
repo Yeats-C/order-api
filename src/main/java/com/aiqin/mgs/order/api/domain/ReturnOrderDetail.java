@@ -217,4 +217,32 @@ public class ReturnOrderDetail {
     @ApiModelProperty(value="批次列表")
     @JsonProperty("batch_list")
     private List<ErpBatchInfo> batchList;
+
+    @ApiModelProperty(value="子订单编码")
+    @JsonProperty("order_code")
+    private String orderCode;
+
+    @ApiModelProperty(value="渠道售价（分销价）")
+    @JsonProperty("price_tax")
+    private BigDecimal priceTax;
+
+    @ApiModelProperty(value="活动价")
+    @JsonProperty("activity_price")
+    private BigDecimal activityPrice;
+
+    @ApiModelProperty(value="实发商品数量")
+    @JsonProperty("actual_product_count")
+    private Integer actualProductCount;
+
+    @ApiModelProperty(value="分摊后金额")
+    @JsonProperty("total_preferential_amount")
+    private BigDecimal totalPreferentialAmount;
+
+    @ApiModelProperty(value="活动优惠")
+    @JsonProperty("total_acivity_amount")
+    private BigDecimal totalAcivityAmount;
+
+    @ApiModelProperty(value="销项税率")
+    @JsonProperty("output_tax_rate")
+    private BigDecimal outputTaxRate;
 }
