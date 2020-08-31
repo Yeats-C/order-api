@@ -152,6 +152,12 @@
     <delete id="deleteAll" parameterType="java.lang.String">
         delete from logistics_relief_product where rult_code = #{rultCode,jdbcType=VARCHAR}
     </delete>
+    <delete id="deleteOneLogistics">
+        DELETE from logistics_relief_info WHERE rult_code = #{rultCode} and rult_type = #{rultType}
+    </delete>
+    <delete id="deleteOnewLogisticsProduct">
+        DELETE  FROM  logistics_relief_product WHERE rult_code = #{rultCode}
+    </delete>
     <select id="getLogisticsRule" resultType="com.aiqin.mgs.order.api.domain.logisticsRule.LogisticsRuleInfo">
         SELECT product_code as productCode,product_name as productName,fare_sill as fareSill,rult_type as rultType,
         rult_code as rultCode
@@ -206,5 +212,19 @@
         logistics_relief_info a left join logistics_relief_product b
         on a.rult_code = b.rult_code
         where a.rult_type = 10 and b.is_delete = 2
+    </select>
+    <select id="selecLogisticsInfo" resultType="com.aiqin.mgs.order.api.domain.logisticsRule.NewLogisticsInfo">
+        select  rult_type as rultType,logistics_explain as logisticsExplain,amount_required as amountRequired,logistics_proportion as logisticsProportion,rult_code as rultCode,logistics_order_type as logisticsOrderType,
+        reduce_scope as reduceScope,create_time as createTime,create_by_id as createById,create_by_name as createByName
+        from
+        logistics_relief_info
+        where
+        rult_code = #{rultCode} and rult_type = #{rultType}
+    </select>
+    <select id="selectLogisticsDetail" resultType="com.aiqin.mgs.order.api.domain.logisticsRule.NewReduceInfo">
+        select  rult_code as rultCode,brand as brand,brand_name as brandName,category as category,category_name as categoryName,product_type as productType,create_time as createTime,
+       create_by_name as createByName,effective_status as effectiveStatus,spu_code as spuCode,spu_name as spuName,rult_id as rultId,is_delete as isDelete,update_time as updateTime
+        from  logistics_relief_product
+        where rult_code = #{rultCode} and is_delete = 2
     </select>
 </mapper>

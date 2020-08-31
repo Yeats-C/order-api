@@ -28,6 +28,7 @@ public interface ResultCode {
     MessageId ERP_EXCEL_SKU_NAME_ERROR =MessageId.create(Project.ORDER_API,-20,"导入模板部分商品与商品名称不匹配");
     MessageId ADD_LOGISTICS_INFO_LIST_EXCEPTION = MessageId.create(Project.ORDER_API, -21, "新增物流减免商品类型集合失败");
     MessageId ADD_LOGISTICS_INFO_EXCEPTION = MessageId.create(Project.ORDER_API, -22, "新增-新规则-物流减免失败");
+    MessageId LOGISTICS_INFO_EXCEPTION = MessageId.create(Project.ORDER_API, -23, "商品类型传入有误");
 
 
 
