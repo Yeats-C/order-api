@@ -337,6 +337,10 @@ public class ErpOrderItem extends PagesRequest {
     @JsonProperty(value = "batch_type")
     private Integer batchType;
 
+    @ApiModelProperty(value="销项税率")
+    @JsonProperty("output_tax_rate")
+    private BigDecimal outputTaxRate;
+
 
     public String getProductTypeDesc() {
         return ErpProductGiftEnum.getEnumDesc(productType);

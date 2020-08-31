@@ -73,7 +73,8 @@
         transport_center_name as transportCenterName,
         warehouse_code as warehouseCode,
         warehouse_name as warehouseName,
-        batch_type as batchType
+        batch_type as batchType,
+        output_tax_rate as outputTaxRate
         from order_store_detail
         where 1 = 1
         <if test=" id != null and id != '' ">

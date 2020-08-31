@@ -755,7 +755,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                         //活动优惠
                         r.setTotalAcivityAmount(e.getTotalAcivityAmount());
                         //项税税率
-                        r.setOutputTaxRate(null);
+                        r.setOutputTaxRate(e.getOutputTaxRate());
+                        //实发数量
+                        r.setActualProductCount(e.getActualProductCount().intValue());
+                        //分摊后金额
+                        r.setTotalPreferentialAmount(e.getTotalPreferentialAmount());
                         //冲减单字段赋值与退货不一致，需要做处理
                         if(ReturnOrderEnum.RETURN_ORDER_TYPE_3.getCode().equals(returnOrderInfo.getReturnOrderType())){
                             r.setReturnProductCount(r.getActualReturnProductCount());
@@ -878,6 +882,14 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     r.setProductPropertyCode(e.getProductPropertyCode());
                     r.setProductPropertyName(e.getProductPropertyName());
                     r.setPurchaseAmount(e.getPurchaseAmount());
+                    //活动优惠
+                    r.setTotalAcivityAmount(e.getTotalAcivityAmount());
+                    //项税税率
+                    r.setOutputTaxRate(e.getOutputTaxRate());
+                    //实发数量
+                    r.setActualProductCount(e.getActualProductCount().intValue());
+                    //分摊后金额
+                    r.setTotalPreferentialAmount(e.getTotalPreferentialAmount());
                     if(ReturnOrderEnum.RETURN_ORDER_TYPE_3.getCode().equals(roi.getReturnOrderType())){
                       r.setReturnProductCount(r.getActualReturnProductCount());
                     }
