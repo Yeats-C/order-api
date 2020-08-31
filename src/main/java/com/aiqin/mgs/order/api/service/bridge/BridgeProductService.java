@@ -1138,7 +1138,7 @@ public void settlementSaveReturnOrder(ReturnOrderDetailVO order) {
             info.setProductCategoryName(detail.getProductCategoryNames());
             //商品品牌编码
             info.setProductBrandCode(detail.getProductBrandCode());
-          //  商品品牌名称
+            //商品品牌名称
             info.setProductBrandName(detail.getProductBrandName());
             //商品属性编码
             info.setProductPropertyCode(detail.getProductPropertyCode());
@@ -1146,6 +1146,14 @@ public void settlementSaveReturnOrder(ReturnOrderDetailVO order) {
             info.setProductPropertyName(detail.getProductPropertyName());
             //商品类型 0商品（本品） 1赠品 2兑换赠品
             info.setProductType(detail.getProductType());
+            //活动优惠
+            info.setTotalAcivityAmount(detail.getTotalAcivityAmount());
+            //项税税率
+            info.setOutputTaxRate(detail.getOutputTaxRate());
+            //实发数量
+            info.setActualProductCount(detail.getActualProductCount());
+            //分摊后金额
+            info.setTotalPreferentialAmount(detail.getTotalPreferentialAmount());
             //熙耘采购价
 //            info.setScmpPurchaseAmount();
                 //渠道采购价
