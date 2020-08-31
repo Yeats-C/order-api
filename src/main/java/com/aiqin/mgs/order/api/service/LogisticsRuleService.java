@@ -40,4 +40,8 @@ public interface LogisticsRuleService {
     HttpResponse updateStatusByCode(String rultCode, String rultId,Integer effectiveStatus);
     //新规则-删除物流减免
     HttpResponse deleteLogisticsByCodeAndId(String rultCode, String rultId);
+    //新规则-物流减免详情
+    HttpResponse selectLogisticsDetail(String rultCode, String rultType);
+    //新规则-编辑物流减免
+    HttpResponse updateLogisticsByCode(NewLogisticsRequest newLogisticsRequest);
 }

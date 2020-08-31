@@ -96,4 +96,20 @@ public class LogisticsRuleController {
                                         @RequestParam(value = "rult_id") String rultId){
         return logisticsRuleService.deleteLogisticsByCodeAndId(rultCode,rultId);
     }
+
+
+    @GetMapping("/select/logistics")
+    @ApiOperation("新规则-物流减免详情")
+    public HttpResponse<NewLogisticsRequest> selectLogistics(
+                                        @RequestParam(value = "rult_code") String rultCode,
+                                        @RequestParam(value = "rult_type") String rultType){
+        return logisticsRuleService.selectLogisticsDetail(rultCode,rultType);
+
+    }
+
+    @PutMapping("/update/logistics")
+    @ApiOperation("新规则-编辑物流减免")
+    public HttpResponse updateLogistics(@RequestBody NewLogisticsRequest newLogisticsRequest){
+        return logisticsRuleService.updateLogisticsByCode(newLogisticsRequest);
+    }
 }
