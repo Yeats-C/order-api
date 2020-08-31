@@ -66,68 +66,81 @@
     
     <!-- 售后订单查询 -->
     <select id="selectOrderAfter"  resultMap="OrderAfterMapping" resultType="java.util.List">
-         SELECT * FROM order_after_sale
-		 WHERE 1=1 and order_type = 1
+         SELECT * FROM order_after_sale a
+        <if test="(skuName!=null and skuName!='') or (barCodeAndSku !=null and barCodeAndSku != '')">
+            ,order_after_sale_detail b
+        </if>
+		 WHERE 1=1 and a.order_type = 1
 		 <if test="distributorId!=null and distributorId!='' ">
-         and distributor_id = #{distributorId}
+         and a.distributor_id = #{distributorId}
          </if>
         <if test="distributorCode!=null and distributorCode!='' ">
-            and distributor_code = #{distributorCode}
+            and a.distributor_code = #{distributorCode}
         </if>
         <if test="listDistributorId != null">
-            and distributor_id in (
+            and a.distributor_id in (
             <foreach collection="listDistributorId" item="distributorId" separator=",">
                 '${distributorId}'
             </foreach>
             )
         </if>
          <if test="distributorName!=null and distributorName!='' ">
-		 and distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%') 
+		 and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
 		 </if>
          <if test="afterSaleCode!=null and afterSaleCode!='' ">
-		 and after_sale_code like concat('%',#{afterSaleCode,jdbcType=VARCHAR},'%') 
+		 and a.after_sale_code like concat('%',#{afterSaleCode,jdbcType=VARCHAR},'%')
 		 </if>
 		 <if test="afterSaleId!=null and afterSaleId!='' ">
-		 and after_sale_id like concat('%',#{afterSaleId,jdbcType=VARCHAR},'%') 
+		 and a.after_sale_id like concat('%',#{afterSaleId,jdbcType=VARCHAR},'%')
 		 </if>
 		 <if test="orderCode!=null and orderCode!=''">
-		 and order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%') 
+		 and a.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%')
 		 </if>
 		 <if test="memberPhone!=null and memberPhone!=''">
-		 and member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%') 
+		 and a.member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%')
          </if>
          <if test="codeAndPhone!=null and codeAndPhone!=''">
-		 and (member_phone like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%') or after_sale_code like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%'))
+		 and (a.member_phone like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%') or a.after_sale_code like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%'))
          </if>
          <if test="beginTime!=null ">
-         and create_time &gt;= #{beginTime}
+         and a.create_time &gt;= #{beginTime}
          </if>
         <if test="updateTime!=null ">
-            and update_time &gt;= #{updateTime}
+            and a.update_time &gt;= #{updateTime}
         </if>
          <if test="endTime!=null ">
-         and create_time &lt;= #{endTime}
+         and a.create_time &lt;= #{endTime}
          </if>
          <if test="payType!=null ">
-         and pay_type = #{payType}
+         and a.pay_type = #{payType}
          </if>
          <if test="afterSaleStatus!=null ">
-         and after_sale_status = #{afterSaleStatus}
+         and a.after_sale_status = #{afterSaleStatus}
          </if>
         <if test="returnMoneyType!=null ">
-            and return_money_type = #{returnMoneyType}
+            and a.return_money_type = #{returnMoneyType}
         </if>
         <if test="originType!=null ">
-            and origin_type = #{originType}
+            and a.origin_type = #{originType}
         </if>
          <if test="originTypeList != null" >
-		     and origin_type in (
+             a.and origin_type in (
 		  <foreach collection="originTypeList" item="origin_type" separator=",">
 			 '${origin_type}'
 		  </foreach>
 			)
           </if>
-         ORDER BY create_time DESC
+        <if test="(skuName!=null and skuName!='') or (barCodeAndSku !=null and barCodeAndSku != '')">
+            and a.order_code = b.order_code
+            <if test="skuName!=null and skuName!='' ">
+                and b.product_name like concat('%',#{skuName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="barCodeAndSku!=null and barCodeAndSku!='' ">
+                and (b.sku_code = #{barCodeAndSku} or b.bar_code =  #{barCodeAndSku})
+            </if>
+            group by a.id
+        </if>
+         ORDER BY a.create_time DESC
          <if test="icount!=null ">
          limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
          </if>
