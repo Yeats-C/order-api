@@ -124,7 +124,7 @@
             and a.origin_type = #{originType}
         </if>
          <if test="originTypeList != null" >
-             a.and origin_type in (
+             and a.origin_type in (
 		  <foreach collection="originTypeList" item="origin_type" separator=",">
 			 '${origin_type}'
 		  </foreach>
