@@ -1780,6 +1780,7 @@
         #{item}
         </foreach>)
         and a.return_money_type = 0
+        and a.refund_status = 0
         GROUP BY a.create_by;
     </select>
     <select id="selectPointRecord"
@@ -1810,6 +1811,30 @@
         after_sale_code IN (  <foreach collection="orderCodeList" item="item" separator=",">
         #{item,jdbcType=VARCHAR}
     </foreach>);
+    </select>
+    <select id="selectOrderBySettlementType"
+            resultType="com.aiqin.mgs.order.api.domain.response.stock.AmountDetailsResponse">
+        SELECT
+        o.order_id orderId,
+        o.order_code orderCode,
+        o.actual_price thisAmount,
+        o.order_type orderType,
+        o.pay_type payType,
+        SUM(b.cost_points) jiFenDeduction
+        FROM
+            order_consumer_info o LEFT JOIN order_consumer_detail b ON o.order_id = b.order_id
+        WHERE
+        o.cashier_id = #{cashierId}
+        and o.order_status NOT IN ( 0, 4 )
+        AND o.create_time &gt;= #{startTime}
+        AND o.create_time &lt;= #{endTime}
+        <if test="settlementType !=7">
+            AND o.pay_type = #{settlementType}
+        </if>
+        GROUP BY o.id
+        <if test="settlementType =7">
+            HAVING jiFenDeduction > 0
+        </if>
     </select>
 </mapper>
 

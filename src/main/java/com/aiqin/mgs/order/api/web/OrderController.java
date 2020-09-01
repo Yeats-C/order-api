@@ -14,9 +14,11 @@ import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.request.*;
+import com.aiqin.mgs.order.api.domain.request.stock.AmountDetailsRequest;
 import com.aiqin.mgs.order.api.domain.request.stock.ReportForDayReq;
 import com.aiqin.mgs.order.api.domain.response.LatelyResponse;
 import com.aiqin.mgs.order.api.domain.response.PartnerPayGateRep;
+import com.aiqin.mgs.order.api.domain.response.stock.AmountDetailsResponse;
 import com.aiqin.mgs.order.api.domain.response.stock.ReportForDayResponse;
 import com.aiqin.mgs.order.api.service.OrderService;
 import com.alibaba.fastjson.JSON;
@@ -824,10 +826,25 @@ public class OrderController {
     }
 
     @PostMapping("/reportForDay")
-    @ApiOperation(value = "接口-日结报表")
+    @ApiOperation(value = "日结报表")
     public HttpResponse<List<ReportForDayResponse>> reportForDay(@RequestBody ReportForDayReq reportForDayReq) {
-
-        LOGGER.info("接口-日结报表：{}", JSON.toJSONString(reportForDayReq));
+        LOGGER.info("日结报表：{}", JSON.toJSONString(reportForDayReq));
         return orderService.reportForDay(reportForDayReq);
+    }
+
+    @PostMapping("/collectAmount")
+    @ApiOperation(value = "收银员收款详情")
+    public HttpResponse<List<AmountDetailsResponse>> collectAmount(@RequestBody AmountDetailsRequest amountDetailsRequest) {
+        LOGGER.info("收银员收款详情：{}", JSON.toJSONString(amountDetailsRequest));
+        List<AmountDetailsResponse> amountDetailsResponseList =  orderService.collectAmount(amountDetailsRequest);
+        return HttpResponse.successGenerics(amountDetailsResponseList);
+    }
+
+    @PostMapping("/returnAmount")
+    @ApiOperation(value = "收银员退款详情")
+    public HttpResponse<List<AmountDetailsResponse>> returnAmount(@RequestBody AmountDetailsRequest amountDetailsRequest) {
+        LOGGER.info("收银员退款详情：{}", JSON.toJSONString(amountDetailsRequest));
+        List<AmountDetailsResponse> amountDetailsResponseList = orderService.returnAmount(amountDetailsRequest);
+        return HttpResponse.successGenerics(amountDetailsResponseList);
     }
 }
