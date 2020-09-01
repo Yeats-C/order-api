@@ -54,4 +54,8 @@ public interface LogisticsRuleDao {
     int deleteOneLogistics(@Param("rultCode") String rultCode, @Param("rultType") Integer rultType);
 
     int deleteOnewLogisticsProduct(String rultCode);
+
+    List<NewLogisticsInfo> selecLogisticsInfoAll();
+
+    List<NewReduceInfo> selectLogisticsDetailAll(String rultCode);
 }

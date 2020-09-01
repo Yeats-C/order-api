@@ -44,4 +44,6 @@ public interface LogisticsRuleService {
     HttpResponse selectLogisticsDetail(String rultCode, String rultType);
     //新规则-编辑物流减免
     HttpResponse updateLogisticsByCode(NewLogisticsRequest newLogisticsRequest);
+    //新规则-获取所有物流减免规则
+    HttpResponse selectLogisticsAll();
 }
