@@ -56,5 +56,7 @@ public class NewLogisticsInfo {
     @JsonProperty("create_by_name")
     private String createByName;
 
-
+    @ApiModelProperty(value = "标签")
+    @JsonProperty("dev")
+    private String dev;
 }

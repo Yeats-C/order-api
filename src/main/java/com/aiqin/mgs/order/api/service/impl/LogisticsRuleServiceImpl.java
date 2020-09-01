@@ -568,7 +568,6 @@ public class LogisticsRuleServiceImpl implements LogisticsRuleService {
     @Override
     public HttpResponse selectLogisticsAll() {
         List<NewLogisticsRequest> list = new ArrayList<>();
-        NewLogisticsRequest newLogisticsRequest = new NewLogisticsRequest();
         List<NewLogisticsInfo> newLogisticsInfos = logisticsRuleDao.selecLogisticsInfoAll();
         LOGGER.info("查询全部生效且未删除的规则主体返回结果： " + newLogisticsInfos);
         if (newLogisticsInfos.isEmpty()){
@@ -577,12 +576,14 @@ public class LogisticsRuleServiceImpl implements LogisticsRuleService {
         for (NewLogisticsInfo newLogisticsInfo : newLogisticsInfos){
             List<NewReduceInfo> newReduceInfos = logisticsRuleDao.selectLogisticsDetailAll(newLogisticsInfo.getRultCode());
             if (!newReduceInfos.isEmpty()){
+                NewLogisticsRequest newLogisticsRequest = new NewLogisticsRequest();
                 newLogisticsRequest.setNewLogisticsInfo(newLogisticsInfo);
                 newLogisticsRequest.setNewReduceInfoList(newReduceInfos);
+                list.add(newLogisticsRequest);
+            }else {
+                return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
             }
-            return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
         }
-        list.add(newLogisticsRequest);
         LOGGER.info("返回全部物流减免： " + list);
         return HttpResponse.success(list);
     }

@@ -52,7 +52,7 @@
     </insert>
     <insert id="addLogistics" parameterType="com.aiqin.mgs.order.api.domain.logisticsRule.NewLogisticsInfo">
         insert into logistics_relief_info(rult_type,logistics_explain,amount_required,logistics_proportion,rult_code,logistics_order_type,
-        reduce_scope,create_time,create_by_id,create_by_name)
+        reduce_scope,create_time,create_by_id,create_by_name,dev)
         values (
            #{rultType},
            #{logisticsExplain},
@@ -63,7 +63,8 @@
            #{reduceScope},
            now(),
            #{createById},
-           #{createByName}
+           #{createByName},
+           #{dev}
         )
     </insert>
     <insert id="addLogisticsList" parameterType="list">
@@ -215,7 +216,7 @@
     </select>
     <select id="selecLogisticsInfo" resultType="com.aiqin.mgs.order.api.domain.logisticsRule.NewLogisticsInfo">
         select  rult_type as rultType,logistics_explain as logisticsExplain,amount_required as amountRequired,logistics_proportion as logisticsProportion,rult_code as rultCode,logistics_order_type as logisticsOrderType,
-        reduce_scope as reduceScope,create_time as createTime,create_by_id as createById,create_by_name as createByName
+        reduce_scope as reduceScope,create_time as createTime,create_by_id as createById,create_by_name as createByName,dev as dev
         from
         logistics_relief_info
         where
