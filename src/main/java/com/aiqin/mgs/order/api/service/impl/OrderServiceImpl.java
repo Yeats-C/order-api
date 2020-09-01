@@ -869,11 +869,11 @@ public class OrderServiceImpl implements OrderService {
         reportForDayResponse.setYinHangKaActualGet(reportForDayResponse.getYinHangKaGet()- reportForDayResponse.getYinHangKaReturn());
 
         // 收款合计
-        long collectionTotal = reportForDayResponse.getXianJinGet() + reportForDayResponse.getWeiXinGet() + reportForDayResponse.getZhiFuBaoGet() + reportForDayResponse.getJiFenGet();
+        long collectionTotal = reportForDayResponse.getXianJinGet() + reportForDayResponse.getWeiXinGet() + reportForDayResponse.getZhiFuBaoGet() + reportForDayResponse.getJiFenGet() + reportForDayResponse.getYinHangKaGet();
         reportForDayResponse.setCollectionTotal(collectionTotal);
 
         // 退款合计
-        long returnTotal = reportForDayResponse.getXianJinReturn() + reportForDayResponse.getZhiFuBaoReturn() + reportForDayResponse.getWeiXinReturn() + reportForDayResponse.getJiFenReturn();
+        long returnTotal = reportForDayResponse.getXianJinReturn() + reportForDayResponse.getZhiFuBaoReturn() + reportForDayResponse.getWeiXinReturn() + reportForDayResponse.getJiFenReturn() + reportForDayResponse.getYinHangKaReturn();
         reportForDayResponse.setReturnTotal(returnTotal);
 
         // 应交总金额
