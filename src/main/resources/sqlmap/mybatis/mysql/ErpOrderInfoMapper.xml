@@ -867,5 +867,113 @@
             main_order_code = #{mainOrderCode}
             AND order_store_code != #{mainOrderCode}
     </select>
+    <select id="findDownloadOrderList" resultType="com.aiqin.mgs.order.api.domain.po.order.DownloadOrderInfoVo">
+        select
+        a1.store_code as storeCode,
+        a1.store_name as storeName,
+        a1.copartner_area_name as copartnerAreaName,
+
+
+        a2.product_type as productType,
+        a2.product_brand_code as productBrandCode,
+        a2.product_brand_name as productBrandName,
+        a2.product_category_code as productCategoryCode,
+        a2.product_category_name as productCategoryName,
+        a2.product_property_code as productPropertyCode,
+        a2.product_property_name as productPropertyName,
+        a2.sku_code as skuCode,
+        a2.sku_name as skuName,
+        a2.product_amount as productAmount,
+        a2.activity_price as activityPrice,
+        a2.product_count as productCount,
+        a2.actual_product_count as actualProductCount,
+        a2.preferential_amount as preferentialAmount,
+        a2.top_coupon_discount_amount as topCouponDiscountAmount,
+        a2.total_acivity_amount as totalAcivityAmount,
+        a1.main_order_code as mainOrderCode,
+        a1.order_type_code as orderTypeCode,
+        a1.order_type_name as orderTypeName,
+        a1.order_category_code as orderCategoryCode,
+        a1.order_category_name as orderCategoryName,
+        a1.order_status as orderStatus
+        from order_store_info a1
+        left join order_store_detail a2 on a1.order_store_id = a2.order_store_id
+        where 1 = 1
+        <if test="orderStoreCode != null and orderStoreCode != ''">
+            and (
+            (a1.order_level = 0 and a1.order_store_code like concat('%', #{orderStoreCode,jdbcType=VARCHAR}, '%'))
+            or exists(
+            select b1.order_store_code
+            from order_store_info b1
+            where b1.order_level = 1
+            and b1.main_order_code = a1.order_store_code
+            and b1.order_store_code like concat('%', #{orderStoreCode,jdbcType=VARCHAR}, '%')
+            )
+            )
+        </if>
+        <if test="storeId != null and storeId != ''">
+            and a1.store_id = #{storeId,jdbcType=VARCHAR}
+        </if>
+        <if test="storeName != null and storeName != ''">
+            and a1.store_name like concat('%',#{storeName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="createByName != null and createByName != ''">
+            and a1.create_by_name like concat('%',#{createByName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="orderStatus != null and orderStatus != '' or orderStatus == 0 ">
+            and (
+            (a1.split_status = 1 and a1.order_status = #{orderStatus})
+            or ( a1.split_status = 0 and exists(
+            select b1.order_store_code
+            from order_store_info b1
+            where b1.order_level = 1
+            and b1.main_order_code = a1.order_store_code
+            and b1.order_status = #{orderStatus}
+            ))
+            )
+        </if>
+        <if test="orderLevel != null and orderLevel != '' or orderLevel == 0 ">
+            and a1.order_level = #{orderLevel}
+        </if>
+        <if test="paymentStatus != null and paymentStatus != '' or paymentStatus == 0 ">
+            and a1.payment_status = #{paymentStatus}
+        </if>
+        <if test="orderTypeCode != null and orderTypeCode != '' or orderTypeCode == 0 ">
+            and a1.order_type_code = #{orderTypeCode}
+        </if>
+        <if test="orderCategoryCode != null and orderCategoryCode != '' or orderCategoryCode == 0 ">
+            and a1.order_category_code = #{orderCategoryCode}
+        </if>
+        <if test="orderTypeQueryList != null and orderTypeQueryList.size > 0">
+            and a1.order_type_code in (
+            <foreach collection="orderTypeQueryList" item="queryOrderType" separator=",">
+                '${queryOrderType}'
+            </foreach>
+            )
+        </if>
+        <if test="orderCategoryQueryList != null and orderCategoryQueryList.size > 0">
+            and a1.order_category_code in (
+            <foreach collection="orderCategoryQueryList" item="queryOrderCategory" separator=",">
+                '${queryOrderCategory}'
+            </foreach>
+            )
+        </if>
+        <if test="createTimeStart != null and createTimeStart != ''">
+            and a1.split_status = 1 and a1.create_time &gt;= DATE_FORMAT(#{createTimeStart,jdbcType=VARCHAR},'%Y-%m-%d 00:00:00')
+        </if>
+        <if test="createTimeEnd != null and createTimeEnd != ''">
+            and a1.split_status = 1 and a1.create_time &lt;= DATE_FORMAT(#{createTimeEnd,jdbcType=VARCHAR},'%Y-%m-%d 23:59:59')
+        </if>
+        <if test="storeIdList != null and storeIdList.size > 0">
+            and a1.store_id in
+            <foreach collection="storeIdList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="firstMarketValueGift != null">
+            and a1.first_market_value_gift = #{firstMarketValueGift}
+        </if>
+        order by a1.create_time desc
+    </select>
 </mapper>
 

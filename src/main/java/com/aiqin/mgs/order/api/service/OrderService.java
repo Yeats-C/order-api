@@ -17,10 +17,12 @@ import com.aiqin.mgs.order.api.domain.request.*;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.request.order.QueryOrderListReqVO;
+import com.aiqin.mgs.order.api.domain.request.stock.AmountDetailsRequest;
 import com.aiqin.mgs.order.api.domain.request.stock.ReportForDayReq;
 import com.aiqin.mgs.order.api.domain.response.PartnerPayGateRep;
 import com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoRespVO;
 import com.aiqin.mgs.order.api.domain.response.order.QueryOrderListRespVO;
+import com.aiqin.mgs.order.api.domain.response.stock.AmountDetailsResponse;
 import com.aiqin.mgs.order.api.domain.response.stock.ReportForDayResponse;
 
 @SuppressWarnings("all")
@@ -244,5 +246,9 @@ public interface OrderService {
 	QueryOrderInfoRespVO view(String orderCode);
 
 	HttpResponse<List<ReportForDayResponse>> reportForDay(ReportForDayReq reportForDayReq);
+
+	List<AmountDetailsResponse> collectAmount(AmountDetailsRequest amountDetailsRequest);
+
+	List<AmountDetailsResponse> returnAmount(AmountDetailsRequest amountDetailsRequest);
 
 }

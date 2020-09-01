@@ -13,7 +13,8 @@ import javax.validation.Valid;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.*;
-
+import com.aiqin.mgs.order.api.domain.request.stock.AmountDetailsRequest;
+import com.aiqin.mgs.order.api.domain.response.stock.AmountDetailsResponse;
 
 
 public interface OrderAfterDao {
@@ -37,4 +38,6 @@ public interface OrderAfterDao {
      * @throws Exception
      */
     void updateRefundStatus(OrderAfterSaleInfo orderAfterSaleInfo)throws Exception;
+
+    List<AmountDetailsResponse> returnAmount(AmountDetailsRequest amountDetailsRequest);
 }

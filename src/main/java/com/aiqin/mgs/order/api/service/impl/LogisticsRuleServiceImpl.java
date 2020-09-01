@@ -559,6 +559,34 @@ public class LogisticsRuleServiceImpl implements LogisticsRuleService {
             return HttpResponse.failure(MessageId.create(Project.ZERO, 01, "保存出现未知异常,请联系系统管理员."));
         }
     }
+
+
+
+    /**
+     * 获取所有的物流减免规则列表
+     */
+    @Override
+    public HttpResponse selectLogisticsAll() {
+        List<NewLogisticsRequest> list = new ArrayList<>();
+        List<NewLogisticsInfo> newLogisticsInfos = logisticsRuleDao.selecLogisticsInfoAll();
+        LOGGER.info("查询全部生效且未删除的规则主体返回结果： " + newLogisticsInfos);
+        if (newLogisticsInfos.isEmpty()){
+           return HttpResponse.failure(ResultCode.LOGISTICS_INFO_LIST_EXCEPTION);
+        }
+        for (NewLogisticsInfo newLogisticsInfo : newLogisticsInfos){
+            List<NewReduceInfo> newReduceInfos = logisticsRuleDao.selectLogisticsDetailAll(newLogisticsInfo.getRultCode());
+            if (!newReduceInfos.isEmpty()){
+                NewLogisticsRequest newLogisticsRequest = new NewLogisticsRequest();
+                newLogisticsRequest.setNewLogisticsInfo(newLogisticsInfo);
+                newLogisticsRequest.setNewReduceInfoList(newReduceInfos);
+                list.add(newLogisticsRequest);
+            }else {
+                return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+            }
+        }
+        LOGGER.info("返回全部物流减免： " + list);
+        return HttpResponse.success(list);
+    }
 }
 
 
