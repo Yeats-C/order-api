@@ -824,6 +824,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         }
         //查询商品的商品信息
         ErpOrderInfo orderDetailByOrderCode = erpOrderQueryService.getOrderDetailByOrderCode(roi.getOrderStoreCode());
+        log.info("查询原订单-商品明细-返回结果： " + orderDetailByOrderCode);
         //将退货单同步到结算系统-----加
         ReturnOrderDetailVO  order = new ReturnOrderDetailVO();
         ReturnOrderInfo returnOrderInfo1 = new ReturnOrderInfo();
