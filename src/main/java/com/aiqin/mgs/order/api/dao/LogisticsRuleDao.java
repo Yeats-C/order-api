@@ -46,4 +46,12 @@ public interface LogisticsRuleDao {
     int updateLogisticsStatus(NewAllLogistics newAllLogistics);
 
     int updateByCodeAndId(@Param("rultCode") String rultCode, @Param("rultId") String rultId);
+
+    NewLogisticsInfo selecLogisticsInfo(@Param("rultCode") String rultCode, @Param("rultType") String rultType);
+
+    List<NewReduceInfo> selectLogisticsDetail(String rultCode);
+
+    int deleteOneLogistics(@Param("rultCode") String rultCode, @Param("rultType") Integer rultType);
+
+    int deleteOnewLogisticsProduct(String rultCode);
 }

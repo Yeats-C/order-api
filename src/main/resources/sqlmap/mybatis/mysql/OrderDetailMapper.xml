@@ -642,5 +642,14 @@
         </if>
         limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
     </select>
+    <select id="selectDetailByIdList" resultMap="OrderInfoDetailMapping" resultType="java.util.List">
+
+        SELECT a.* FROM order_consumer_detail a where
+         a.order_id in
+        <foreach collection="list" separator="," open="(" close=")" item="item">
+            #{item}
+        </foreach>
+        ORDER BY a.create_time DESC
+    </select>
 </mapper>
 

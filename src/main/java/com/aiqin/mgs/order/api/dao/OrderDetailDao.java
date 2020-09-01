@@ -90,4 +90,7 @@ public interface OrderDetailDao {
     OrderDetailInfo findOrderDetailById(@Param("orderDetailId") String orderDetailId);
    //统计数量
     Integer byMemberOrderCount(OrderDetailQuery orderDetailQuery);
+
+    List<OrderDetailInfo> selectDetailByIdList(@Param("list") List<String> orderIdList);
+
 }

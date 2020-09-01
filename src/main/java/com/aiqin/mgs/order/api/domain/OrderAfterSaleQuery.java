@@ -115,6 +115,14 @@ public class OrderAfterSaleQuery extends PagesRequest {
 	@ApiModelProperty("来源类型，0:pos 1：微商城  2：全部  3：web")
 	private Integer originType;
 
+	@ApiModelProperty(value="条形码/sku码")
+	@JsonProperty("bar_code_and_sku")
+	private String barCodeAndSku;
+
+	@ApiModelProperty(value="商品名称")
+	@JsonProperty("sku_name")
+	private String skuName;
+
 }
 
 
