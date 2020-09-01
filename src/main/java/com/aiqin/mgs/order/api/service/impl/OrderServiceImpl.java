@@ -741,7 +741,7 @@ public class OrderServiceImpl implements OrderService {
         Integer settlementType = amountDetailsRequest.getSettlementType();
 
         HttpClient httpClient = HttpClient.post(urlProperties.getMemberApi() + "/store-value/amount/details").json(amountDetailsRequest);
-        HttpResponse<List<AmountDetailsResponse>> httpResponse = httpClient.action().result(new TypeReference<HttpResponse<List<ReportForDayResponse>>>() {
+        HttpResponse<List<AmountDetailsResponse>> httpResponse = httpClient.action().result(new TypeReference<HttpResponse<List<AmountDetailsResponse>>>() {
         });
         if (Objects.isNull(httpResponse) || !"0".equals(httpResponse.getCode())) {
             throw new RuntimeException("远程调用失败");
