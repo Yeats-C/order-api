@@ -47,6 +47,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -1103,6 +1104,12 @@ public void settlementSaveReturnOrder(ReturnOrderDetailVO order) {
             info.setActualProductCount(detail.getActualProductCount());
             //分摊后金额
             info.setTotalPreferentialAmount(detail.getTotalPreferentialAmount());
+            //活动价
+            info.setActivityPrice(detail.getActivityPrice());
+            //下单时间
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String createTime = format.format(detail.getCreateTime());
+            info.setCreateTime(createTime);
             //熙耘采购价
 //            info.setScmpPurchaseAmount();
                 //渠道采购价
