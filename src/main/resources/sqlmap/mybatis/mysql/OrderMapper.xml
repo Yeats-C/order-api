@@ -1832,7 +1832,7 @@
             AND o.pay_type = #{settlementType}
         </if>
         GROUP BY o.id
-        <if test="settlementType =7">
+        <if test="settlementType ==7">
             HAVING jiFenDeduction > 0
         </if>
     </select>
