@@ -334,7 +334,7 @@
     <!-- 总条数 -->
     <select id="selectOrderCount" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery"
             resultType="java.lang.Integer">
-        SELECT count(1) FROM order_consumer_info a
+        SELECT COUNT(DISTINCT(a.id)) FROM order_consumer_info a
         <if test="(skuName!=null and skuName!='') or (barCodeAndSku !=null and barCodeAndSku != '')">
             ,order_consumer_detail b
         </if>
@@ -435,7 +435,6 @@
             <if test="barCodeAndSku!=null and barCodeAndSku!='' ">
                 and (b.sku_code = #{barCodeAndSku} or b.bar_code =  #{barCodeAndSku})
             </if>
-            group by a.id
         </if>
     </select>
 

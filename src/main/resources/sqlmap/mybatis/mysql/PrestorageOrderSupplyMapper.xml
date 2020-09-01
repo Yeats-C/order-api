@@ -208,7 +208,7 @@
     </select>
 
     <select id="selectPrestorageOrderListCount" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultType="java.lang.Integer">
-        select  count(1) from prestorage_order_supply a  ,order_consumer_info o
+        select  COUNT(DISTINCT(a.id)) from prestorage_order_supply a  ,order_consumer_info o
         <if test="(skuName!=null and skuName!='') or (barCodeAndSku !=null and barCodeAndSku != '')">
             ,order_consumer_detail b
         </if>
@@ -273,7 +273,6 @@
             <if test="barCodeAndSku!=null and barCodeAndSku!='' ">
                 and (b.sku_code = #{barCodeAndSku} or b.bar_code =  #{barCodeAndSku})
             </if>
-            group by o.id
         </if>
     </select>
 </mapper>
