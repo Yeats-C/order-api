@@ -104,7 +104,7 @@ public HttpResponse changeStock(List<InventoryDetailRequest> stockReqVos) {
 public HttpResponse<List<CartOrderInfo>> getProduct(ShoppingCartProductRequest shoppingCartProductRequest){
     shoppingCartProductRequest.setCompanyCode("14");
     String path = "/search/spu/sku/detail2";
-    HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest);
+    HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest).timeout(10000);
     HttpResponse<List<CartOrderInfo>> response = httpClient.action().result(new TypeReference<HttpResponse<List<CartOrderInfo>>>() {
     });
 //        //测试接口
@@ -145,7 +145,7 @@ public List<ErpSkuDetail> getProductSkuDetailList(String provinceCode, String ci
         shoppingCartProductRequest.setProductSkuRequest2List(productSkuRequest2List);
         String path = "/search/spu/sku/detail2";
         log.info("detail2 接口参数为：{}"+JsonUtil.toJson(shoppingCartProductRequest));
-        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest);
+        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest).timeout(10000);
         HttpResponse<List<ErpSkuDetail>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ErpSkuDetail>>>() {
         });
         log.info("detail2 接口 请求结果为：{}"+JsonUtil.toJson(response));
@@ -188,7 +188,7 @@ public ErpSkuDetail getProductSkuDetail(String provinceCode, String cityCode, St
         productSkuRequest2List.add(productSkuRequest2);
         shoppingCartProductRequest.setProductSkuRequest2List(productSkuRequest2List);
         String path = "/search/spu/sku/detail2";
-        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest);
+        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest).timeout(10000);
         HttpResponse<List<ErpSkuDetail>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ErpSkuDetail>>>() {
         });
 
@@ -219,7 +219,7 @@ public CartOrderInfo getCartProductDetail(String provinceId, String cityId, Stri
     skuCodeList.add(skuCode);
     shoppingCartProductRequest.setSkuCodes(skuCodeList);
     String path = "/search/spu/sku/detail2";
-    HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest);
+    HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest).timeout(10000);
     HttpResponse<List<CartOrderInfo>> response = httpClient.action().result(new TypeReference<HttpResponse<List<CartOrderInfo>>>() {
     });
 

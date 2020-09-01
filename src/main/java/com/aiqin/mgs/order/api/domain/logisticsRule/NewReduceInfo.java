@@ -31,9 +31,9 @@ public class NewReduceInfo {
     @JsonProperty("category_name")
     private String categoryName;
 
-    @ApiModelProperty(value = "商品属性 1.18A 2.18B 3.C 4.D")
+    @ApiModelProperty(value = "商品属性")
     @JsonProperty("product_type")
-    private Integer productType;
+    private String productType;
 
     @ApiModelProperty(value = "创建时间")
     @JsonProperty("create_time")

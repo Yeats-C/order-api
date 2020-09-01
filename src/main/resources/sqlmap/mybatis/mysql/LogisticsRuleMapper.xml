@@ -52,7 +52,7 @@
     </insert>
     <insert id="addLogistics" parameterType="com.aiqin.mgs.order.api.domain.logisticsRule.NewLogisticsInfo">
         insert into logistics_relief_info(rult_type,logistics_explain,amount_required,logistics_proportion,rult_code,logistics_order_type,
-        reduce_scope,create_time,create_by_id,create_by_name)
+        reduce_scope,create_time,create_by_id,create_by_name,dev)
         values (
            #{rultType},
            #{logisticsExplain},
@@ -63,7 +63,8 @@
            #{reduceScope},
            now(),
            #{createById},
-           #{createByName}
+           #{createByName},
+           #{dev}
         )
     </insert>
     <insert id="addLogisticsList" parameterType="list">
@@ -215,7 +216,7 @@
     </select>
     <select id="selecLogisticsInfo" resultType="com.aiqin.mgs.order.api.domain.logisticsRule.NewLogisticsInfo">
         select  rult_type as rultType,logistics_explain as logisticsExplain,amount_required as amountRequired,logistics_proportion as logisticsProportion,rult_code as rultCode,logistics_order_type as logisticsOrderType,
-        reduce_scope as reduceScope,create_time as createTime,create_by_id as createById,create_by_name as createByName
+        reduce_scope as reduceScope,create_time as createTime,create_by_id as createById,create_by_name as createByName,dev as dev
         from
         logistics_relief_info
         where
@@ -226,5 +227,20 @@
        create_by_name as createByName,effective_status as effectiveStatus,spu_code as spuCode,spu_name as spuName,rult_id as rultId,is_delete as isDelete,update_time as updateTime
         from  logistics_relief_product
         where rult_code = #{rultCode} and is_delete = 2
+    </select>
+    <select id="selecLogisticsInfoAll"
+            resultType="com.aiqin.mgs.order.api.domain.logisticsRule.NewLogisticsInfo">
+        select  a.rult_type as rultType,a.logistics_explain as logisticsExplain,a.amount_required as amountRequired,a.logistics_proportion as logisticsProportion,a.rult_code as rultCode,a.logistics_order_type as logisticsOrderType,
+        a.reduce_scope as reduceScope,a.create_time as createTime,a.create_by_id as createById,a.create_by_name as createByName
+        from
+        logistics_relief_info a left join logistics_relief_product b on a.rult_code = b.rult_code
+        where b.effective_status = 1 and b.is_delete = 2
+    </select>
+    <select id="selectLogisticsDetailAll"
+            resultType="com.aiqin.mgs.order.api.domain.logisticsRule.NewReduceInfo">
+        select  rult_code as rultCode,brand as brand,brand_name as brandName,category as category,category_name as categoryName,product_type as productType,create_time as createTime,
+        create_by_name as createByName,effective_status as effectiveStatus,spu_code as spuCode,spu_name as spuName,rult_id as rultId,is_delete as isDelete,update_time as updateTime
+        from  logistics_relief_product
+        where rult_code = #{rultCode} and is_delete = 2 and effective_status = 1
     </select>
 </mapper>

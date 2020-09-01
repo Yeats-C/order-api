@@ -112,4 +112,11 @@ public class LogisticsRuleController {
     public HttpResponse updateLogistics(@RequestBody NewLogisticsRequest newLogisticsRequest){
         return logisticsRuleService.updateLogisticsByCode(newLogisticsRequest);
     }
+
+
+    @GetMapping("/all")
+    @ApiOperation("新规则-查询全部生效物流规则")
+    public HttpResponse selectAll(){
+        return logisticsRuleService.selectLogisticsAll();
+    }
 }
