@@ -755,11 +755,13 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                         //活动优惠
                         r.setTotalAcivityAmount(e.getTotalAcivityAmount());
                         //项税税率
-                        r.setOutputTaxRate(e.getOutputTaxRate());
+                        r.setOutputTaxRate(e.getTaxRate());
                         //实发数量
                         r.setActualProductCount(e.getActualProductCount().intValue());
                         //分摊后金额
                         r.setTotalPreferentialAmount(e.getTotalPreferentialAmount());
+                        //活动价
+                        r.setActivityPrice(e.getActivityPrice());
                         //冲减单字段赋值与退货不一致，需要做处理
                         if(ReturnOrderEnum.RETURN_ORDER_TYPE_3.getCode().equals(returnOrderInfo.getReturnOrderType())){
                             r.setReturnProductCount(r.getActualReturnProductCount());
@@ -824,6 +826,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         }
         //查询商品的商品信息
         ErpOrderInfo orderDetailByOrderCode = erpOrderQueryService.getOrderDetailByOrderCode(roi.getOrderStoreCode());
+        log.info("查询原订单-商品明细-返回结果： " + orderDetailByOrderCode);
         //将退货单同步到结算系统-----加
         ReturnOrderDetailVO  order = new ReturnOrderDetailVO();
         ReturnOrderInfo returnOrderInfo1 = new ReturnOrderInfo();
@@ -885,11 +888,13 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     //活动优惠
                     r.setTotalAcivityAmount(e.getTotalAcivityAmount());
                     //项税税率
-                    r.setOutputTaxRate(e.getOutputTaxRate());
+                    r.setOutputTaxRate(e.getTaxRate());
                     //实发数量
                     r.setActualProductCount(e.getActualProductCount().intValue());
                     //分摊后金额
                     r.setTotalPreferentialAmount(e.getTotalPreferentialAmount());
+                    //活动价
+                    r.setActivityPrice(e.getActivityPrice());
                     if(ReturnOrderEnum.RETURN_ORDER_TYPE_3.getCode().equals(roi.getReturnOrderType())){
                       r.setReturnProductCount(r.getActualReturnProductCount());
                     }
