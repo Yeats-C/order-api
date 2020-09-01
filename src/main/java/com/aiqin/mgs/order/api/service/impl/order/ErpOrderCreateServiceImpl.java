@@ -19,6 +19,9 @@ import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaList;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaUp;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo;
+import com.aiqin.mgs.order.api.domain.logisticsRule.NewLogisticsInfo;
+import com.aiqin.mgs.order.api.domain.logisticsRule.NewLogisticsRequest;
+import com.aiqin.mgs.order.api.domain.logisticsRule.NewReduceInfo;
 import com.aiqin.mgs.order.api.domain.po.cart.ErpOrderCartInfo;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftQuotasUseDetail;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
@@ -200,6 +203,11 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //生成订单主体信息
 //        ErpOrderInfo order = generateOrder(erpOrderItemList, storeInfo, erpOrderSaveRequest, orderFee,auth);
         ErpOrderInfo order = generateOrder(flag1,flag2,erpOrderItemList, storeInfo, erpOrderSaveRequest, orderFee,auth);
+        //配送 计算订单物流费用减免比例
+        if(ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(erpOrderSaveRequest.getOrderType())){
+            calculateLogisticsCostReductionRatio(order,erpOrderItemList);
+        }
+
         log.info("创建订单,生成订单主体信息返回结果order={}",order);
         //保存订单、订单明细、订单支付、订单收货人信息、订单日志
         order.setOrderStoreCode(orderCode);
@@ -234,6 +242,80 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
 
         //返回订单信息
         return erpOrderQueryService.getOrderByOrderId(orderId);
+    }
+
+    private void calculateLogisticsCostReductionRatio(ErpOrderInfo order, List<ErpOrderItem> erpOrderItemList) {
+        List<NewLogisticsRequest> list=(List<NewLogisticsRequest>)logisticsRuleService.selectLogisticsAll().getData();
+        if(null!=list){
+            BigDecimal logisticsCostReductionRatio=BigDecimal.ZERO;
+            for(NewLogisticsRequest newLogisticsRequest:list){
+                NewLogisticsInfo newLogisticsInfo=newLogisticsRequest.getNewLogisticsInfo();
+                List<NewReduceInfo> newReduceInfoList=newLogisticsRequest.getNewReduceInfoList();
+                BigDecimal totalAmount=BigDecimal.ZERO;
+                switch (newLogisticsInfo.getLogisticsOrderType()){
+                    case 1:
+                        //1按品类
+                        Map<String,String> categoryMap=new HashMap();
+                        for(NewReduceInfo newReduceInfo: newReduceInfoList){
+                            categoryMap.put(newReduceInfo.getCategory(),newReduceInfo.getCategory());
+                        }
+                        if(categoryMap.containsKey("All")){
+                            for(ErpOrderItem orderItem:erpOrderItemList){
+                                totalAmount=totalAmount.add(orderItem.getProductAmount().multiply(BigDecimal.valueOf(orderItem.getProductCount())));
+                            }
+                        }else{
+                            for(ErpOrderItem orderItem:erpOrderItemList){
+                                if(categoryMap.containsKey(orderItem.getProductCategoryCode())){
+                                    totalAmount=totalAmount.add(orderItem.getProductAmount().multiply(BigDecimal.valueOf(orderItem.getProductCount())));
+                                }
+                            }
+                        }
+                        ;
+                        break;
+                    case 2:
+                        //2按品牌
+                        Map<String,String> brandMap=new HashMap();
+                        for(NewReduceInfo newReduceInfo: newReduceInfoList){
+                            brandMap.put(newReduceInfo.getBrand(),newReduceInfo.getBrand());
+                        }
+                        if(brandMap.containsKey("All")){
+                            for(ErpOrderItem orderItem:erpOrderItemList){
+                                totalAmount=totalAmount.add(orderItem.getProductAmount().multiply(BigDecimal.valueOf(orderItem.getProductCount())));
+                            }
+                        }else{
+                            for(ErpOrderItem orderItem:erpOrderItemList){
+                                if(brandMap.containsKey(orderItem.getProductBrandCode())){
+                                    totalAmount=totalAmount.add(orderItem.getProductAmount().multiply(BigDecimal.valueOf(orderItem.getProductCount())));
+                                }
+                            }
+                        }
+                        ;
+                    case 3:
+                        //3按商品属性
+                        Map<String,String> productTypeMap=new HashMap();
+                        for(NewReduceInfo newReduceInfo: newReduceInfoList){
+                            productTypeMap.put(newReduceInfo.getProductType(),newReduceInfo.getProductType());
+                        }
+
+                        for(ErpOrderItem orderItem:erpOrderItemList){
+                            if(productTypeMap.containsKey(orderItem.getProductPropertyName())){
+                                totalAmount=totalAmount.add(orderItem.getProductAmount().multiply(BigDecimal.valueOf(orderItem.getProductCount())));
+                            }
+                        }
+                        ;
+                        break;
+                    default:
+                        ;
+                        if(totalAmount.compareTo(newLogisticsInfo.getAmountRequired())>0){
+                            if(newLogisticsInfo.getLogisticsProportion().compareTo(logisticsCostReductionRatio)>0){
+                                logisticsCostReductionRatio=newLogisticsInfo.getLogisticsProportion();
+                            }
+                        }
+                }
+            }
+
+            order.setLogisticsCostReductionRatio(logisticsCostReductionRatio);
+        }
     }
 
     /**
