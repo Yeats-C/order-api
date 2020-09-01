@@ -1,6 +1,7 @@
 package com.aiqin.mgs.order.api.service.order;
 
 import com.aiqin.mgs.order.api.base.PageResData;
+import com.aiqin.mgs.order.api.domain.po.order.DownloadOrderInfoVo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest;
 
@@ -175,4 +176,11 @@ public interface ErpOrderQueryService {
      * @return
      */
     PageResData<ErpOrderInfo> findErpWholesaleOrderList(ErpOrderQueryRequest erpOrderQueryRequest);
+
+    /**
+     * 查询导出订单列表信息
+     * @param erpOrderQueryRequest
+     * @return
+     */
+    List<DownloadOrderInfoVo> findDownloadOrderList(ErpOrderQueryRequest erpOrderQueryRequest);
 }
