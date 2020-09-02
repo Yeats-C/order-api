@@ -461,7 +461,7 @@ public class ErpOrderInfo {
 
     @ApiModelProperty(value="是否需要发放物流减免0否1是")
     @JsonProperty("logistics_amount_sent")
-    private BigDecimal logisticsAmountSent;
+    private int logisticsAmountSent;
 
     public String getOrderStatusDesc() {
         return ErpOrderStatusEnum.getEnumDesc(orderStatus);
