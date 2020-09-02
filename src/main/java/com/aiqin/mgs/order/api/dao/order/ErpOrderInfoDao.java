@@ -154,4 +154,17 @@ public interface ErpOrderInfoDao {
      * @return
      */
     List<DownloadOrderInfoVo> findDownloadOrderList(ErpOrderQueryRequest erpOrderQueryRequest);
+
+    /**
+     * 查询需要发放物流减免的订单列表
+     *
+     * @param
+     */
+    List<ErpOrderInfo> getLogisticsSentList();
+
+    /**
+     * 修改物流减免支付状态为0（已支付或无需支付）
+     * @param orderStoreCode
+     */
+    void updateLogisticsAmountSent(String orderStoreCode);
 }

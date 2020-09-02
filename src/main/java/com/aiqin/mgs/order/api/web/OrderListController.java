@@ -6,6 +6,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.OrderListLogistics;
 import com.aiqin.mgs.order.api.domain.request.orderList.*;
+import com.aiqin.mgs.order.api.domain.request.returnorder.RefundReq;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.FirstOrderTimeRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderSaveRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderStockReVo;
@@ -33,6 +34,9 @@ import java.util.List;
 public class OrderListController {
     @Autowired
     private OrderListService orderListService;
+
+    /***HttpResponse中的code 表示成功*/
+    private static final String HTTP_RESPONSE_CODE_SUCCESS = "0";
 
     /**
      * 订单新增
@@ -317,5 +321,14 @@ public class OrderListController {
     public HttpResponse<StatisticalPurchaseAmount> getStatisticalPurchaseAmount(@RequestParam("store_id") String storeId) {
         log.info("/order/list/purchase/statistical [{}]", storeId);
         return HttpResponse.success(orderListService.getStatisticalPurchaseAmount(storeId));
+    }
+
+    @PostMapping("/logisticsAmountSentCallback")
+    @ApiOperation("发放物流减免支付--回调地址")
+    public HttpResponse logisticsAmountSentCallback(@RequestBody RefundReq reqVo) {
+        if(null!=reqVo&&HTTP_RESPONSE_CODE_SUCCESS.equals(reqVo.getReturnCode())){
+            orderListService.logisticsAmountSentCallback(reqVo.getOrderNo());
+        }
+        return HttpResponse.success();
     }
 }

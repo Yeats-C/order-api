@@ -387,6 +387,18 @@ public class ErpOrderDeliverServiceImpl implements ErpOrderDeliverService {
                     //更新子订单里的均摊金额
                     updateSubOrder(order.getMainOrderCode());
                 }
+                //计算是否需要退物流费用
+                if(ErpOrderTypeEnum.DISTRIBUTION.getValue().equals(order.getOrderTypeCode())){
+                    //首单或首单赠送 首单不判断任何活动规则，返利规则。物流费用减免不判断首单（黄强2020-09-01 20：37钉钉）
+                    if(!ErpOrderCategoryEnum.ORDER_TYPE_2.getValue().equals(order.getOrderCategoryCode())&&!ErpOrderCategoryEnum.ORDER_TYPE_4.getValue().equals(order.getOrderCategoryCode())){
+                        if (null!=order.getLogisticsCostReductionRatio()&&order.getLogisticsCostReductionRatio().compareTo(BigDecimal.ZERO)>0){
+                            BigDecimal logisticsCostReductionAmount=logistics.getLogisticsFee().multiply(order.getLogisticsCostReductionRatio());
+                            order.setLogisticsCostReductionAmount(logisticsCostReductionAmount);
+                            order.setLogisticsAmountSent(1);
+                            erpOrderInfoService.updateOrderByPrimaryKeySelectiveNoLog(order,auth);
+                        }
+                    }
+                }
 
                 /*****************************************同步订单数据到结算开始*****************************************/
                 List<ErpOrderInfo> list=new ArrayList<>();

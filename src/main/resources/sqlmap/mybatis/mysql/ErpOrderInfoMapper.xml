@@ -99,7 +99,8 @@
         copartner_area_id as copartnerAreaId,
         copartner_area_name as copartnerAreaName,
         business_form as businessForm,
-        copartner_area_code as copartnerAreaCode
+        copartner_area_code as copartnerAreaCode,
+        logistics_cost_reduction_ratio as logisticsCostReductionRatio
         from order_store_info
         where 1 = 1
         <if test="id != null and id != ''">
@@ -345,6 +346,12 @@
         </if>
         <if test="isActivity != null and isActivity != '' or isActivity == 0 ">
             is_activity = #{isActivity},
+        </if>
+        <if test="logisticsCostReductionAmount != null and logisticsCostReductionAmount != ''">
+            logistics_cost_reduction_amount = #{logisticsCostReductionAmount},
+        </if>
+        <if test="logisticsAmountSent != null and logisticsAmountSent != ''">
+            logistics_amount_sent = #{logisticsAmountSent},
         </if>
         update_by_id = #{updateById},
         update_by_name = #{updateByName},
@@ -975,5 +982,32 @@
         </if>
         order by a1.create_time desc
     </select>
+    <select id="getLogisticsSentList" resultType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo">
+        select
+        order_store_id as orderStoreId,
+        order_store_code as orderStoreCode,
+        logistics_cost_reduction_ratio as logisticsCostReductionRatio,
+        logistics_cost_reduction_amount as logisticsCostReductionAmount,
+        logistics_amount_sent as logisticsAmountSent,
+        create_time as createTime,
+        create_by_id as createById,
+        create_by_name as createByName,
+        franchisee_id as franchiseeId,
+        franchisee_code as franchiseeCode,
+        store_id as storeId,
+        store_code as storeCode,
+        store_name as storeName,
+        order_type_code as orderTypeCode
+        from
+        order_store_info
+        where
+        logistics_amount_sent=1;
+    </select>
+
+    <update id="updateLogisticsAmountSent">
+        update order_store_info
+        set logistics_amount_sent = 0
+        where order_store_code = #{orderStoreCode}
+    </update>
 </mapper>
 

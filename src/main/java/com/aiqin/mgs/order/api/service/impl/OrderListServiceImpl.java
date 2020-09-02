@@ -9,6 +9,11 @@ import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.component.OrderStatusEnum;
 import com.aiqin.mgs.order.api.component.ParamUnit;
 import com.aiqin.mgs.order.api.component.SequenceService;
+import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOperationTypeEnum;
+import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOrderSourceEnum;
+import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayTypeEnum;
+import com.aiqin.mgs.order.api.component.returnenums.PayOrderTypeEnum;
+import com.aiqin.mgs.order.api.component.returnenums.PayOriginTypeEnum;
 import com.aiqin.mgs.order.api.dao.*;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
@@ -54,6 +59,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.aiqin.mgs.order.api.domain.constant.Global.PAY_ORDER_TYPE_5;
+
 /**
  * 描述:
  *
@@ -89,7 +96,8 @@ public class OrderListServiceImpl implements OrderListService {
     private ErpOrderRequestService erpOrderRequestService;
     @Autowired
     private ReturnOrderInfoDao returnOrderInfoDao;
-
+    @Value("${bridge.url.pay-api}")
+    private String paymentHost;
 
 
     //供应链项目地址
@@ -701,6 +709,83 @@ public class OrderListServiceImpl implements OrderListService {
         re.setPurchaseAmount(Optional.ofNullable(amount).orElse(0L).longValue());
         re.setYesterdayPurchaseAmount(Optional.ofNullable(yesterday_amount).orElse(0L).longValue());
         return re;
+    }
+
+    @Override
+    public List<ErpOrderInfo> getLogisticsSentList() {
+        return erpOrderInfoDao.getLogisticsSentList();
+    }
+
+    /**
+     * 封装--发放物流减免
+     * @param info
+     */
+    @Override
+    public Boolean refund(ErpOrderInfo info){
+
+        log.info("发起退款单申请，info={}",info);
+        if(info!=null){
+            //同步至支付流水表
+            String url=paymentHost+"/payment/pay/payTobAll";
+            JSONObject json=new JSONObject();
+            json.put("order_no",info.getOrderStoreCode());
+            BigDecimal amount=info.getLogisticsCostReductionAmount().multiply(BigDecimal.valueOf(100));
+            long amountFen=amount.longValue();
+            json.put("order_amount",amountFen);
+            json.put("fee",0);
+            json.put("order_time",info.getCreateTime());
+            //在线支付
+            json.put("pay_type", ErpRequestPayTypeEnum.PAY_10.getCode());
+            json.put("order_source", ErpRequestPayOrderSourceEnum.WEB.getCode());
+            json.put("create_by",info.getCreateById());
+            json.put("update_by",info.getCreateByName());
+            //4-退款
+            json.put("order_type", ErpRequestPayOperationTypeEnum.TYPE_4.getCode());
+            json.put("franchisee_id",info.getFranchiseeId());
+            json.put("store_name",info.getStoreName());
+            json.put("store_id",info.getStoreId());
+            //退货类型
+            json.put("business_type",PAY_ORDER_TYPE_5);
+            json.put("transactionType","AFTER_SALE_RETURNS");
+
+            //订单类型 0直送、1配送、2辅采
+            //1直送 2配送 3货架
+            Integer type=Integer.valueOf(info.getOrderTypeCode());
+            if(null!=type&&type.equals(1)){//订单类型 配送
+//                json.put("pay_order_type", PayOrderTypeEnum.PAY_ORDER_TYPE_PEI.getKey());
+                json.put("pay_order_type", PayOrderTypeEnum.PAY_ORDER_TYPE_ZHI.getKey());
+//                json.put("pay_origin_type",PayOriginTypeEnum.DIRECT_SEND_TOB_RETURN.getKey());
+                json.put("pay_origin_type", PayOriginTypeEnum.TOB_RETURN.getKey());
+            }else if(null!=type&&type.equals(2)){ //直送
+//                json.put("pay_order_type",PayOrderTypeEnum.PAY_ORDER_TYPE_ZHI.getKey());
+                json.put("pay_order_type",PayOrderTypeEnum.PAY_ORDER_TYPE_PEI.getKey());
+//                json.put("pay_origin_type",PayOriginTypeEnum.TOB_RETURN.getKey());
+                json.put("pay_origin_type",PayOriginTypeEnum.DIRECT_SEND_TOB_RETURN.getKey());
+            }else if (null!=type&&type.equals(3)){ //货架直送
+                json.put("pay_order_type", PayOrderTypeEnum.PAY_ORDER_TYPE_ZHI.getKey());
+                json.put("pay_origin_type",PayOriginTypeEnum.TOB_RETURN.getKey());
+            }else if(null!=type&&type.equals(4)){  //采购直送
+                json.put("pay_order_type", PayOrderTypeEnum.PAY_ORDER_TYPE_ZHI.getKey());
+                json.put("pay_origin_type",PayOriginTypeEnum.TOB_RETURN.getKey());
+            }
+            json.put("back_url","http://order.api.aiqin.com/order/list/logisticsAmountSentCallback");
+            log.info("发放物流减免申请入参，url={},json={}",url,json);
+            HttpClient httpClient = HttpClient.post(url).json(json);
+            Map<String ,Object> result=null;
+            result = httpClient.action().result(new TypeReference<Map<String ,Object>>() {});
+            log.info("发放物流减免申请结果，request={}",result);
+            if(result!=null&&"0".equals(result.get("code"))){
+                log.info("发放物流减免调用支付完成");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void logisticsAmountSentCallback(String orderStoreCode) {
+        log.info("发放物流减免支付回调操作开始，orderNo="+orderStoreCode);
+        erpOrderInfoDao.updateLogisticsAmountSent(orderStoreCode);
     }
 
     /**
