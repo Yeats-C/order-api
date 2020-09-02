@@ -1787,7 +1787,7 @@
     <select id="selectPointRecord"
             resultType="com.aiqin.mgs.order.api.domain.response.stock.ReportForDayResponse">
         SELECT
-            create_by cashierId,
+            a.create_by cashierId,
             sum( a.cost_points ) jiFenGet,
             SUM( a.receive_points ) jiFenReturn
         FROM
