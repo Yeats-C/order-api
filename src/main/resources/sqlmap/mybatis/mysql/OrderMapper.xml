@@ -1780,7 +1780,6 @@
         #{item}
         </foreach>)
         and a.return_money_type = 0
-        and a.refund_status = 0
         GROUP BY a.create_by;
     </select>
     <select id="selectPointRecord"
