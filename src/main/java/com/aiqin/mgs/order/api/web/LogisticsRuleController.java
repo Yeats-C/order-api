@@ -85,16 +85,14 @@ public class LogisticsRuleController {
     @GetMapping("/update/status")
     @ApiOperation("新规则-修改生效状态")
     public HttpResponse updateStatus(@RequestParam(value = "rult_code") String rultCode,
-                                     @RequestParam(value = "rult_id") String rultId,
                                      @RequestParam(value = "effective_status" ) Integer effectiveStatus){
-        return logisticsRuleService.updateStatusByCode(rultCode,rultId,effectiveStatus);
+        return logisticsRuleService.updateStatusByCode(rultCode,effectiveStatus);
     }
 
     @DeleteMapping("/delete")
     @ApiOperation("新规则-删除物流减免")
-    public HttpResponse deleteLogistics(@RequestParam(value = "rult_code") String rultCode,
-                                        @RequestParam(value = "rult_id") String rultId){
-        return logisticsRuleService.deleteLogisticsByCodeAndId(rultCode,rultId);
+    public HttpResponse deleteLogistics(@RequestParam(value = "rult_code") String rultCode){
+        return logisticsRuleService.deleteLogisticsByCodeAndId(rultCode);
     }
 
 

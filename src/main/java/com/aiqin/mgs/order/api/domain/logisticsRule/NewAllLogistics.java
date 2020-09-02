@@ -53,4 +53,5 @@ public class NewAllLogistics {
     @ApiModelProperty(value = "修改时间")
     @JsonProperty("update_time")
     private Date updateTime;
+
 }
