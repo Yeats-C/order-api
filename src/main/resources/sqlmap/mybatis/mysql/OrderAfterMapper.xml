@@ -131,7 +131,7 @@
 			)
           </if>
         <if test="(skuName!=null and skuName!='') or (barCodeAndSku !=null and barCodeAndSku != '')">
-            and a.order_code = b.order_code
+            and a.after_sale_id = b.after_sale_id
             <if test="skuName!=null and skuName!='' ">
                 and b.product_name like concat('%',#{skuName,jdbcType=VARCHAR},'%')
             </if>
