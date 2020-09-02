@@ -1753,6 +1753,7 @@
             order_consumer_info a
         WHERE
             a.order_status NOT IN ( 0, 4 )
+          and a.distributor_id = #{distributorId}
           AND a.pay_type IN (3,4,5,6)
           AND a.create_time &gt;= #{startTime}
           AND a.create_time &lt;= #{endTime}
@@ -1780,6 +1781,7 @@
         #{item}
         </foreach>)
         and a.return_money_type = 0
+        and a.distributor_id = #{distributorId}
         GROUP BY a.create_by;
     </select>
     <select id="selectPointRecord"
@@ -1789,7 +1791,7 @@
             sum( a.cost_points ) jiFenGet,
             SUM( a.receive_points ) jiFenReturn
         FROM
-            order_consumer_detail a
+            order_consumer_detail a ,order_consumer_info b
         WHERE
         a.create_time &gt;= #{startTime}
         AND a.create_time &lt;= #{endTime}
@@ -1797,6 +1799,8 @@
             (<foreach collection="cashierIdList" item="item" separator=",">
                 #{item}
             </foreach>)
+        and a.order_id = b.order_id
+        and b.distributor_id = #{distributorId}
         GROUP BY
             a.create_by
     </select>
@@ -1824,6 +1828,7 @@
             order_consumer_info o LEFT JOIN order_consumer_detail b ON o.order_id = b.order_id
         WHERE
         o.cashier_id = #{cashierId}
+        o.distributor_id = #{distributorId}
         and o.order_status NOT IN ( 0, 4 )
         AND o.create_time &gt;= #{startTime}
         AND o.create_time &lt;= #{endTime}

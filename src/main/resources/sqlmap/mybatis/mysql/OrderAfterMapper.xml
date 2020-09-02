@@ -158,6 +158,7 @@
         AND a.create_time &lt;= #{endTime}
         and a.create_by = #{cashierId}
         and a.return_money_type = 0
+        AND a.distributor_id = #{distributorId}
     </select>
 
     <!-- 个性化接口-通过ID更改售后表退货状态/修改员  -->

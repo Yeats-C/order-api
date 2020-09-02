@@ -20,4 +20,6 @@ public class AmountDetailsRequest {
 
     @ApiModelProperty("结算方式 3:到店支付-现金，4:到店支付-微信，5:到店支付-支付宝，6:到店支付-银行卡 7:积分")
     private Integer settlementType;
+
+    private String distributorId;
 }

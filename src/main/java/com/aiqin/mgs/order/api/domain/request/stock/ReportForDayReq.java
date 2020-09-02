@@ -20,4 +20,6 @@ public class ReportForDayReq {
     @ApiModelProperty("收银员idArray")
     private List<String> cashierIdList;
 
+    private String distributorId;
+
 }
