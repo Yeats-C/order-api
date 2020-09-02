@@ -37,9 +37,9 @@ public interface LogisticsRuleService {
     //新规则-物流减免列表
     HttpResponse selectAll(Integer pageNo,Integer pageSize);
     //新规则-修改生效状态
-    HttpResponse updateStatusByCode(String rultCode, String rultId,Integer effectiveStatus);
+    HttpResponse updateStatusByCode(String rultCode,Integer effectiveStatus);
     //新规则-删除物流减免
-    HttpResponse deleteLogisticsByCodeAndId(String rultCode, String rultId);
+    HttpResponse deleteLogisticsByCodeAndId(String rultCode);
     //新规则-物流减免详情
     HttpResponse selectLogisticsDetail(String rultCode, String rultType);
     //新规则-编辑物流减免

@@ -59,4 +59,15 @@ public class NewLogisticsInfo {
     @ApiModelProperty(value = "标签")
     @JsonProperty("dev")
     private String dev;
+
+
+    @ApiModelProperty(value = "生效状态 0未开 1开启  ---传")
+    @JsonProperty("effective_status")
+    private Integer effectiveStatus;
+
+
+    @ApiModelProperty(value = "是否删除 1是 2否 --传")
+    @JsonProperty("is_delete")
+    private Integer isDelete;
+
 }
