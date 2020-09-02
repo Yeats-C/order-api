@@ -306,15 +306,16 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
                         break;
                     default:
                         ;
-                        if(totalAmount.compareTo(newLogisticsInfo.getAmountRequired())>0){
-                            if(newLogisticsInfo.getLogisticsProportion().compareTo(logisticsCostReductionRatio)>0){
-                                logisticsCostReductionRatio=newLogisticsInfo.getLogisticsProportion();
-                            }
-                        }
+
+                }
+                if(totalAmount.compareTo(newLogisticsInfo.getAmountRequired())>0){
+                    if(newLogisticsInfo.getLogisticsProportion().compareTo(logisticsCostReductionRatio)>0){
+                        logisticsCostReductionRatio=newLogisticsInfo.getLogisticsProportion();
+                    }
                 }
             }
 
-            order.setLogisticsCostReductionRatio(logisticsCostReductionRatio);
+            order.setLogisticsCostReductionRatio(logisticsCostReductionRatio.divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
         }
     }
 

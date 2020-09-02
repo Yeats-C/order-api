@@ -3,6 +3,7 @@ package com.aiqin.mgs.order.api.service;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.OrderList;
 import com.aiqin.mgs.order.api.domain.OrderListLogistics;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.orderList.*;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.FirstOrderTimeRespVo;
 import com.aiqin.mgs.order.api.domain.response.orderlistre.OrderSaveRespVo;
@@ -11,7 +12,6 @@ import com.aiqin.mgs.order.api.domain.response.statistical.StatisticalPurchaseAm
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 描述:
@@ -77,4 +77,22 @@ public interface OrderListService {
      * @return
      */
     StatisticalPurchaseAmount getStatisticalPurchaseAmount(String storeId);
+
+    /**
+     *查询需要发放物流减免的订单列表
+     * @return
+     */
+    List<ErpOrderInfo> getLogisticsSentList();
+
+    /**
+     * 发放物流减免
+     * @param info
+     */
+    Boolean refund(ErpOrderInfo info);
+
+    /**
+     *
+     * @param orderNo
+     */
+    void logisticsAmountSentCallback(String orderNo);
 }
