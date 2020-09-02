@@ -1828,7 +1828,7 @@
             order_consumer_info o LEFT JOIN order_consumer_detail b ON o.order_id = b.order_id
         WHERE
         o.cashier_id = #{cashierId}
-        o.distributor_id = #{distributorId}
+        and o.distributor_id = #{distributorId}
         and o.order_status NOT IN ( 0, 4 )
         AND o.create_time &gt;= #{startTime}
         AND o.create_time &lt;= #{endTime}
