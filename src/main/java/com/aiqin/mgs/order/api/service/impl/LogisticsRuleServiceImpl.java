@@ -530,42 +530,41 @@ public class LogisticsRuleServiceImpl implements LogisticsRuleService {
     public HttpResponse updateLogisticsByCode(NewLogisticsRequest newLogisticsRequest) {
         LOGGER.info("编辑物流减免-方法入参： " + newLogisticsRequest);
         try {
-           NewLogisticsInfo newLogisticsInfo = newLogisticsRequest.getNewLogisticsInfo();
-           LOGGER.info("获取物流规则实体： " + newLogisticsInfo);
-           List<NewReduceInfo> newReduceInfoList = newLogisticsRequest.getNewReduceInfoList();
-           LOGGER.info("获取物流规则商品集合" + newReduceInfoList);
-           String rultCode = newLogisticsInfo.getRultCode();
-           Integer rultType = newLogisticsInfo.getRultType();
-           logisticsRuleDao.deleteOneLogistics(rultCode,rultType);
-           logisticsRuleDao.deleteOnewLogisticsProduct(rultCode);
-           String logisticsCode = createLogisticsCode();
-           //获取创建人
-           AuthToken currentAuth = AuthUtil.getCurrentAuth();
-           String personName = currentAuth.getPersonName();
-           String personId = currentAuth.getPersonId();
-           //因与原物流规则有区分，所以以rultType为区分新旧规则
-           newLogisticsInfo.setRultType(10);
-           newLogisticsInfo.setCreateById(personId);
-           newLogisticsInfo.setCreateByName(personName);
-           newLogisticsInfo.setRultCode(logisticsCode);
-           LOGGER.info("物流减免主表-实体： " + newLogisticsInfo);
-           int count = logisticsRuleDao.addLogistics(newLogisticsInfo);
-            if (count < 0){
+            NewLogisticsInfo newLogisticsInfo = newLogisticsRequest.getNewLogisticsInfo();
+            LOGGER.info("获取物流规则实体： " + newLogisticsInfo);
+            List<NewReduceInfo> newReduceInfoList = newLogisticsRequest.getNewReduceInfoList();
+            LOGGER.info("获取物流规则商品集合" + newReduceInfoList);
+            String rultCode = newLogisticsInfo.getRultCode();
+//            Integer rultType = newLogisticsInfo.getRultType();
+            logisticsRuleDao.deleteOneLogistics(rultCode);
+            logisticsRuleDao.deleteOnewLogisticsProduct(rultCode);
+            //获取创建人
+            AuthToken currentAuth = AuthUtil.getCurrentAuth();
+            String personName = currentAuth.getPersonName();
+            String personId = currentAuth.getPersonId();
+            //因与原物流规则有区分，所以以rultType为区分新旧规则
+            newLogisticsInfo.setRultType(10);
+            newLogisticsInfo.setCreateById(personId);
+            newLogisticsInfo.setCreateByName(personName);
+            newLogisticsInfo.setRultCode(newLogisticsInfo.getRultCode());
+            LOGGER.info("物流减免主表-实体： " + newLogisticsInfo);
+            int count = logisticsRuleDao.addLogistics(newLogisticsInfo);
+            if (count < 0) {
                 return HttpResponse.failure(ResultCode.ADD_LOGISTICS_INFO_EXCEPTION);
             }
-            newReduceInfoList.forEach(item->{
-                item.setEffectiveStatus(1);
-                item.setRultCode(logisticsCode);
+            newReduceInfoList.forEach(item -> {
+                item.setEffectiveStatus(newLogisticsInfo.getEffectiveStatus());
+                item.setRultCode(newLogisticsInfo.getRultCode());
                 item.setCreateByName(personName);
                 item.setSpuCode("1"); //因表中此字段是不能为空，所以随意添加值
                 item.setSpuName("1"); //
-                item.setIsDelete(2);
+                item.setIsDelete(newLogisticsInfo.getIsDelete());
                 item.setRultId(createLogisticsCode());
             });
             LOGGER.info("物流减免商品类型集合： " + JsonUtil.toJson(newReduceInfoList));
             logisticsRuleDao.addLogisticsList(newReduceInfoList);
             return HttpResponse.success(true);
-        }catch (Exception e){
+        } catch (Exception e) {
             LOGGER.info("编辑物流减免规则失败： " + e.getMessage());
             return HttpResponse.failure(MessageId.create(Project.ZERO, 01, "保存出现未知异常,请联系系统管理员."));
         }
