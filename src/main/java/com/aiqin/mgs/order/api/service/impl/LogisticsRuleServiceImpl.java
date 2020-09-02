@@ -6,6 +6,7 @@ import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
+import com.aiqin.mgs.order.api.base.BasePage;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.component.LogisticsRuleEnum;
 import com.aiqin.mgs.order.api.component.LogisticsRuleTypesEnum;
@@ -399,6 +400,8 @@ public class LogisticsRuleServiceImpl implements LogisticsRuleService {
         newLogisticsInfo.setCreateById(personId);
         newLogisticsInfo.setCreateByName(personName);
         newLogisticsInfo.setRultCode(logisticsCode);
+        newLogisticsInfo.setEffectiveStatus(1);
+        newLogisticsInfo.setIsDelete(2);
         LOGGER.info("物流减免主表-实体： " + newLogisticsInfo);
         int count = logisticsRuleDao.addLogistics(newLogisticsInfo);
         if (count < 0){
@@ -440,10 +443,11 @@ public class LogisticsRuleServiceImpl implements LogisticsRuleService {
         }
         PageHelper.startPage(pageNo,pageSize);
         List<NewAllLogistics> newAllLogistics = logisticsRuleDao.selectAllLogistics();
-        LOGGER.info("查询物流减免-返回结果： " + newAllLogistics);
+        LOGGER.info("查询全部规则主体： " + newAllLogistics);
         if (newAllLogistics.isEmpty()){
-            return HttpResponse.success();
+            return HttpResponse.failure(ResultCode.LOGISTICS_INFO_LIST_EXCEPTION);
         }
+        LOGGER.info("查询物流减免-返回结果： " + newAllLogistics);
         resultModel.setResult(newAllLogistics);
         resultModel.setTotal(((Page)newAllLogistics).getTotal());
         return HttpResponse.success(resultModel);
@@ -456,18 +460,20 @@ public class LogisticsRuleServiceImpl implements LogisticsRuleService {
      * @return
      */
     @Override
-    public HttpResponse updateStatusByCode(String rultCode,String rultId,Integer effectiveStatus) {
-        LOGGER.info("新规则-物流减免生效状态修改-入参: "+ rultCode + ", " + rultId + "," + effectiveStatus);
+    public HttpResponse updateStatusByCode(String rultCode,Integer effectiveStatus) {
+        LOGGER.info("新规则-物流减免生效状态修改-入参: "+ rultCode +  "," + effectiveStatus);
         NewAllLogistics newAllLogistics = new NewAllLogistics();
         newAllLogistics.setRultCode(rultCode);
-        newAllLogistics.setRultId(rultId);
         newAllLogistics.setEffectiveStatus(effectiveStatus);
         LOGGER.info("修改生效状态： " + newAllLogistics);
-        int count = logisticsRuleDao.updateLogisticsStatus(newAllLogistics);
-        if (count < 0){
+        try {
+            logisticsRuleDao.updateLogisticsInfo(newAllLogistics);
+            logisticsRuleDao.updateLogisticsStatus(newAllLogistics);
+            return HttpResponse.success();
+        }catch (Exception e){
+            LOGGER.error("修改异常:修改物流减免-请求参数{},{},{}", rultCode,effectiveStatus, e);
             return HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
         }
-        return HttpResponse.success();
     }
 
     /**
@@ -477,13 +483,18 @@ public class LogisticsRuleServiceImpl implements LogisticsRuleService {
      * @return
      */
     @Override
-    public HttpResponse deleteLogisticsByCodeAndId(String rultCode, String rultId) {
-        LOGGER.info("删除物流减免-入参： " + rultCode + "," + rultId);
-        int count = logisticsRuleDao.updateByCodeAndId(rultCode, rultId);
-        if (count < 0){
+    public HttpResponse deleteLogisticsByCodeAndId(String rultCode) {
+        LOGGER.info("删除物流减免-入参： " + rultCode );
+        try
+        {
+            logisticsRuleDao.updateLogisticsInfoByCode(rultCode);
+            logisticsRuleDao.updateByCodeAndId(rultCode);
+            return HttpResponse.success();
+        }catch (Exception e){
+            LOGGER.info("删除异常：删除物流减免-请求参数：{},{}",rultCode,e);
             return HttpResponse.failure(ResultCode.DELETE_EXCEPTION);
         }
-        return HttpResponse.success();
+
     }
 
     /**

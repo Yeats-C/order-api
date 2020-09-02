@@ -451,6 +451,18 @@ public class ErpOrderInfo {
     @JsonProperty("copartner_area_code")
     private String copartnerAreaCode;
 
+    @ApiModelProperty(value="物流费用减免比例")
+    @JsonProperty("logistics_cost_reduction_ratio")
+    private BigDecimal logisticsCostReductionRatio;
+
+    @ApiModelProperty(value="物流费用减免金额")
+    @JsonProperty("logistics_cost_reduction_amount")
+    private BigDecimal logisticsCostReductionAmount;
+
+    @ApiModelProperty(value="是否需要发放物流减免0否1是")
+    @JsonProperty("logistics_amount_sent")
+    private BigDecimal logisticsAmountSent;
+
     public String getOrderStatusDesc() {
         return ErpOrderStatusEnum.getEnumDesc(orderStatus);
     }

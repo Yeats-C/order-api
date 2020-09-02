@@ -45,7 +45,7 @@ public interface LogisticsRuleDao {
 
     int updateLogisticsStatus(NewAllLogistics newAllLogistics);
 
-    int updateByCodeAndId(@Param("rultCode") String rultCode, @Param("rultId") String rultId);
+    int updateByCodeAndId(String rultCode);
 
     NewLogisticsInfo selecLogisticsInfo(@Param("rultCode") String rultCode, @Param("rultType") String rultType);
 
@@ -58,4 +58,10 @@ public interface LogisticsRuleDao {
     List<NewLogisticsInfo> selecLogisticsInfoAll();
 
     List<NewReduceInfo> selectLogisticsDetailAll(String rultCode);
+
+    Integer selectEffective(String rultCode);
+
+    int updateLogisticsInfo(NewAllLogistics newAllLogistics);
+
+    int updateLogisticsInfoByCode(String rultCode);
 }
