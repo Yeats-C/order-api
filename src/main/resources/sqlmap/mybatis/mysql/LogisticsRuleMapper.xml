@@ -150,6 +150,55 @@
         where
           rult_code = #{rultCode}
     </update>
+    <update id="updateInfo">
+        update logistics_relief_info
+        <set>
+            <if test="rultType != null">
+                rult_type = #{rultType},
+            </if>
+            <if test="logisticsExplain != null and logisticsExplain != ''">
+                logistics_explain = #{logisticsExplain},
+            </if>
+            <if test="amountRequired != null">
+                amount_required = #{amountRequired},
+            </if>
+            <if test="logisticsProportion != null">
+                logistics_proportion = #{logisticsProportion},
+            </if>
+            <if test="logisticsOrderType != null">
+                logistics_order_type = #{logisticsOrderType},
+            </if>
+            <if test="reduceScope != null">
+                reduce_scope = #{reduceScope},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+           </if>
+            <if test="createById != null and createById != ''">
+                create_by_id = #{createById},
+            </if>
+            <if test="createByName != null and createByName != ''">
+                create_by_name = #{createByName},
+            </if>
+            update_time = now(),
+            <if test="dev != null and dev != ''">
+                dev = #{dev},
+            </if>
+            <if test="effectiveStatus != null">
+                effective_status = #{effectiveStatus},
+            </if>
+            <if test="isDelete != null">
+                is_delete = #{isDelete}
+            </if>
+            where
+            rult_code = #{rultCode}
+        </set>
+    </update>
+    <update id="updatelogisticsStatus">
+        update logistics_relief_product
+        set is_delete = 1
+        where rult_code = #{rultCode}
+    </update>
     <delete id="deleteLogisticsRule">
         delete from logistics_relief_info where rult_code = #{rultCode,jdbcType=VARCHAR}
     </delete>
@@ -171,12 +220,12 @@
         delete from logistics_relief_product where rult_code = #{rultCode,jdbcType=VARCHAR}
     </delete>
 <delete id="deleteOneLogistics">
-        DELETE from logistics_relief_info WHERE rult_code = #{rultCode} and rult_type = #{rultType}
+        DELETE from logistics_relief_info WHERE rult_code = #{rultCode}
     </delete>
 <delete id="deleteOnewLogisticsProduct">
         DELETE  FROM  logistics_relief_product WHERE rult_code = #{rultCode}
     </delete>
-<select id="getLogisticsRule" resultType="com.aiqin.mgs.order.api.domain.logisticsRule.LogisticsRuleInfo">
+    <select id="getLogisticsRule" resultType="com.aiqin.mgs.order.api.domain.logisticsRule.LogisticsRuleInfo">
         SELECT product_code as productCode,product_name as productName,fare_sill as fareSill,rult_type as rultType,
         rult_code as rultCode
         FROM logistics_relief_product
@@ -235,7 +284,7 @@
         from
         logistics_relief_info
         where
-        rult_code = #{rultCode} and rult_type = #{rultType}
+        rult_code = #{rultCode} and rult_type = #{rultType} and is_delete = 2
     </select>
 <select id="selectLogisticsDetail" resultType="com.aiqin.mgs.order.api.domain.logisticsRule.NewReduceInfo">
         select  rult_code as rultCode,brand as brand,brand_name as brandName,category as category,category_name as categoryName,product_type as productType,create_time as createTime,

@@ -51,7 +51,7 @@ public interface LogisticsRuleDao {
 
     List<NewReduceInfo> selectLogisticsDetail(String rultCode);
 
-    int deleteOneLogistics(@Param("rultCode") String rultCode, @Param("rultType") Integer rultType);
+    int deleteOneLogistics( String rultCode);
 
     int deleteOnewLogisticsProduct(String rultCode);
 
@@ -64,4 +64,8 @@ public interface LogisticsRuleDao {
     int updateLogisticsInfo(NewAllLogistics newAllLogistics);
 
     int updateLogisticsInfoByCode(String rultCode);
+
+    int updateInfo(NewLogisticsInfo newLogisticsInfo);
+
+    int updatelogisticsStatus(String rultCode);
 }
