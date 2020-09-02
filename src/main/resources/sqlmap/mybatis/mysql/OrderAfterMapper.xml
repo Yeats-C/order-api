@@ -150,7 +150,8 @@
             a.after_sale_code orderCode,
             a.after_sale_id oderId,
             a.return_price thisAmount,
-            3 payType
+            3 payType,
+            a.order_type orderType
         FROM
             order_after_sale a
         where
