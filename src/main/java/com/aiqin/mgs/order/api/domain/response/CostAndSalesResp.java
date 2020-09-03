@@ -33,9 +33,10 @@ public class CostAndSalesResp {
     @JsonProperty("total_amount")
     private Long totalAmount;
 
+
     @ApiModelProperty(value = "退货金额")
-    @JsonProperty("total_return_amount")
-    private Long totalReturnAmount;
+    @JsonProperty("return_amount")
+    private Long returnAmount;
 
     @ApiModelProperty(value = "实际销售额")
     @JsonProperty("amount")

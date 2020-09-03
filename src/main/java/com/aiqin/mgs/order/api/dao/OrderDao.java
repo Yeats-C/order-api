@@ -9,6 +9,7 @@ package com.aiqin.mgs.order.api.dao;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -254,11 +255,12 @@ public interface OrderDao {
     List<AmountDetailsResponse> selectOrderBySettlementType(AmountDetailsRequest amountDetailsRequest);
 
 
-    List<CostAndSalesResp> costAndSalesByCategory(CostAndSalesReq costAndSalesReq);
+    //List<CostAndSalesResp> costAndSalesByCategory(CostAndSalesReq costAndSalesReq);
     List<CostAndSalesResp> costAndSalesByCategory0(CostAndSalesReq costAndSalesReq);
     Long costAndSalesByCategory0Count (CostAndSalesReq costAndSalesReq);
 
-    Long costAndSalesByCategoryCount(CostAndSalesReq costAndSalesReq);
+    //Long costAndSalesByCategoryCount(CostAndSalesReq costAndSalesReq);
 
     CostAndSalesSumResp costAndSalesSum(CostAndSalesReq costAndSalesReq);
+
 }

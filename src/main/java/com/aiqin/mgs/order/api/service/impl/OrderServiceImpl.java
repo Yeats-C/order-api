@@ -166,7 +166,7 @@ public class OrderServiceImpl implements OrderService {
 
                 // 订单详细数据
                 List<String> orderIdList = OrderInfolist.stream().map(OrderInfo::getOrderId).collect(Collectors.toList());
-                List<OrderDetailInfo> orderDetailInfoList =  orderDetailDao.selectDetailByIdList(orderIdList);
+                List<OrderDetailInfo> orderDetailInfoList = orderDetailDao.selectDetailByIdList(orderIdList);
                 Map<String, List<OrderDetailInfo>> orderDetailInfoListMap;
                 if (CollectionUtils.isNotEmpty(orderDetailInfoList)) {
                     orderDetailInfoListMap = orderDetailInfoList.stream().collect(Collectors.groupingBy(OrderDetailInfo::getOrderId));
@@ -238,7 +238,7 @@ public class OrderServiceImpl implements OrderService {
             }
 
             //计算总数据量
-            Integer  totalCount = orderDao.selectOrderCount(OrderPublic.getOrderQuery(orderQuery));
+            Integer totalCount = orderDao.selectOrderCount(OrderPublic.getOrderQuery(orderQuery));
 
             return HttpResponse.success(new PageResData(Objects.isNull(totalCount) ? 0 : totalCount, OrderInfolist));
 
@@ -577,7 +577,7 @@ public class OrderServiceImpl implements OrderService {
         // List<ReportForDayResponse> pointReturnList = orderDao.selectReturnPoint(reportForDayReq);
 
         Map<String, List<ReportForDayResponse>> getMoneyMap = getMoneyList.stream().collect(Collectors.groupingBy(ReportForDayResponse::getCashierId));
-        Map<String, ReportForDayResponse> returnMoneyMap = returnMoneyList.stream().collect(Collectors.toMap(ReportForDayResponse::getCashierId, a -> a,(o,n)->n));
+        Map<String, ReportForDayResponse> returnMoneyMap = returnMoneyList.stream().collect(Collectors.toMap(ReportForDayResponse::getCashierId, a -> a, (o, n) -> n));
         Map<String, List<ReportForDayResponse>> accountRecordMap = accountRecordList.stream().collect(Collectors.groupingBy(ReportForDayResponse::getCashierId));
         Map<String, ReportForDayResponse> pointMap = pointList.stream().collect(Collectors.toMap(ReportForDayResponse::getCashierId, a -> a, (o, n) -> n));
 
@@ -596,7 +596,7 @@ public class OrderServiceImpl implements OrderService {
 
             // 退货数据
             ReportForDayResponse returnVo = returnMoneyMap.get(csahierId);
-            if(Objects.nonNull(returnVo)){
+            if (Objects.nonNull(returnVo)) {
                 reportForDayResponse.setXianJinReturn(returnVo.getPrice());
                 reportForDayResponse.setReturnCount(returnVo.getReturnCount());
             }
@@ -604,7 +604,7 @@ public class OrderServiceImpl implements OrderService {
             // 储值卡数据
             List<ReportForDayResponse> accountList = accountRecordMap.get(csahierId);
             if (CollectionUtils.isNotEmpty(accountList)) {
-                accountDataHandle(reportForDayResponse,accountList);
+                accountDataHandle(reportForDayResponse, accountList);
             }
 
             // 积分数据
@@ -780,7 +780,7 @@ public class OrderServiceImpl implements OrderService {
 
     private String getPayTypeValue(Integer payType) {
         // 支付类型 3：到店支付-现金，4：到店支付-微信，5：到店支付-支付宝，6：到店支付-银行卡'
-        switch (payType){
+        switch (payType) {
             case 3:
                 return "现金";
             case 4:
@@ -797,7 +797,7 @@ public class OrderServiceImpl implements OrderService {
 
     private String getOrderTypeValue(Integer orderType) {
         // 订单类型 1：TOC订单 2: TOB订单 3：服务商品，4 预存订单
-        switch (orderType){
+        switch (orderType) {
             case 1:
                 return "正常销售单";
             case 2:
@@ -819,36 +819,20 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public HttpResponse<CostAndSalesTopResp> costAndSales(CostAndSalesReq costAndSalesReq) {
-        CostAndSalesTopResp costAndSalesTopResp=new CostAndSalesTopResp();
+        CostAndSalesTopResp costAndSalesTopResp = new CostAndSalesTopResp();
 
         //品类
-        if (costAndSalesReq.getProductCategory()!=null&&!costAndSalesReq.getProductCategory().equals("")){
-            costAndSalesReq.setProductCategory(costAndSalesReq.getProductCategory()*2);
-            if (costAndSalesReq.getProductCategory()==0){
-                List<CostAndSalesResp> costAndSalesResps=orderDao.costAndSalesByCategory0(costAndSalesReq);
-                Long count=orderDao.costAndSalesByCategory0Count(costAndSalesReq);
 
-                costAndSalesTopResp.setDataList(costAndSalesResps);
-                costAndSalesTopResp.setTotalCount(Math.toIntExact(count));
-            }else {
-                List<CostAndSalesResp> costAndSalesResps=orderDao.costAndSalesByCategory(costAndSalesReq);
-                Long count=orderDao.costAndSalesByCategoryCount(costAndSalesReq);
+        List<CostAndSalesResp> costAndSalesResps = orderDao.costAndSalesByCategory0(costAndSalesReq);
+        Long count = orderDao.costAndSalesByCategory0Count(costAndSalesReq);
 
-                costAndSalesTopResp.setDataList(costAndSalesResps);
-                costAndSalesTopResp.setTotalCount(Math.toIntExact(count));
-            }
+        costAndSalesTopResp.setDataList(costAndSalesResps);
+        costAndSalesTopResp.setTotalCount(Math.toIntExact(count));
 
-        }else {
-            List<CostAndSalesResp> costAndSalesResps=orderDao.costAndSalesByCategory0(costAndSalesReq);
-            Long count=orderDao.costAndSalesByCategory0Count(costAndSalesReq);
-
-            costAndSalesTopResp.setDataList(costAndSalesResps);
-            costAndSalesTopResp.setTotalCount(Math.toIntExact(count));
-        }
         //计算总数
-        CostAndSalesSumResp costAndSalesSumResp=orderDao.costAndSalesSum(costAndSalesReq);
+        CostAndSalesSumResp costAndSalesSumResp = orderDao.costAndSalesSum(costAndSalesReq);
         costAndSalesTopResp.setCostAndSalesSumResp(costAndSalesSumResp);
-        return  HttpResponse.successGenerics(costAndSalesTopResp);
+        return HttpResponse.successGenerics(costAndSalesTopResp);
     }
 
     @Override
@@ -906,7 +890,7 @@ public class OrderServiceImpl implements OrderService {
         reportForDayResponse.setJiFenActualGet(reportForDayResponse.getJiFenGet() - reportForDayResponse.getJiFenReturn());
 
         // 银行卡应交款
-        reportForDayResponse.setYinHangKaActualGet(reportForDayResponse.getYinHangKaGet()- reportForDayResponse.getYinHangKaReturn());
+        reportForDayResponse.setYinHangKaActualGet(reportForDayResponse.getYinHangKaGet() - reportForDayResponse.getYinHangKaReturn());
 
         // 收款合计
         long collectionTotal = reportForDayResponse.getXianJinGet() + reportForDayResponse.getWeiXinGet() + reportForDayResponse.getZhiFuBaoGet() + reportForDayResponse.getJiFenGet() + reportForDayResponse.getYinHangKaGet();
@@ -1622,7 +1606,7 @@ public class OrderServiceImpl implements OrderService {
 
     //接口-收银员交班收银情况统计
     @Override
-    public HttpResponse cashier(@Valid String cashierId, String endTime,String distributorId) {
+    public HttpResponse cashier(@Valid String cashierId, String endTime, String distributorId) {
         try {
 
             // 获取改收银员最后一次交接时间

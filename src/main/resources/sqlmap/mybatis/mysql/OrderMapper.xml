@@ -1876,9 +1876,8 @@
         limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
     </select>
     <select id="costAndSalesSum" resultType="com.aiqin.mgs.order.api.domain.response.CostAndSalesSumResp">
+        SELECT a.saleAllNum,a.totalAmount,a.productAllCost,b.totalReturnAmount from(
         SELECT
-
-
         sum( amount ) saleAllNum,
         sum( d.total_price ) totalAmount,
         sum( cost_price )  productAllCost
@@ -1912,98 +1911,22 @@
         <if test="cashierId !=null and cashierId !=''">
             and o.cashier_id =#{cashierId}
         </if>
-        AND o.pay_status = 1 and o.order_type!=3
-    </select>
-    <select id="costAndSalesByCategory0" resultType="com.aiqin.mgs.order.api.domain.response.CostAndSalesResp">
-        SELECT
-        <if test="productCategory !=null">
-            type_id code,
-        </if>
-        <if test="productPropertyCode !=null">
-            product_property_code code,
-            product_property_name as name,
-        </if>
-        <if test="brandId !=null">
-            d.brand_id code,
-            d.brand_name  as name,
-        </if>
-        <if test="skuCode !=null or skuName!=null">
-            d.sku_code code,
-            d.sku_name  as name,
-        </if>
-        <if test="cashierId !=null">
-            o.cashier_id code,
-            o.cashier_name  as name,
-        </if>
-
-        sum( amount ) saleProductNum,
-        sum( d.total_price ) totalAmount,
-        sum( cost_price )  productCost
+        AND o.pay_status = 1 and o.order_type!=3) a,
+        (SELECT
+        sum( return_price ) totalReturnAmount
         FROM
         order_consumer_detail d,
-        order_consumer_info o
+        order_consumer_info o,
+        order_after_sale_detail a
         WHERE
         o.order_id = d.order_id
+        and  a.order_detail_id = d.order_detail_id
+
         <if test="beginTime !=null">
-            AND o.create_time &gt;= #{beginTime}
+            AND a.create_time &gt;= #{beginTime}
         </if>
         <if test="endTime !=null">
-            AND o.create_time &lt;= #{endTime}
-        </if>
-        AND o.distributor_id = #{distributorId}
-
-        <if test="productPropertyCode !=null and productPropertyCode!=''">
-         and   product_property_code  =#{productPropertyCode}
-        </if>
-        <if test="brandId !=null and brandId!=''">
-            and   d.brand_id  =#{brandId}
-        </if>
-        <if test="skuCode !=null and skuCode!=''">
-            and d.sku_code  =#{skuCode}
-
-        </if>
-        <if test="skuName !=null and skuName!=''">
-
-            and d.sku_name =#{skuName}
-        </if>
-        <if test="cashierId !=null and cashierId !=''">
-            and o.cashier_id =#{cashierId}
-        </if>
-        AND o.pay_status = 1 and o.order_type!=3
-        group by
-        <if test="productCategory !=null">
-            type_id
-        </if>
-        <if test="productPropertyCode !=null">
-            product_property_code
-        </if>
-        <if test="brandId !=null">
-            d.brand_id,d.brand_name
-        </if>
-        <if test="skuCode !=null or skuName!=null">
-            d.sku_code ,
-            d.sku_name
-        </if>
-        <if test="cashierId !=null">
-             o.cashier_id ,
-            o.cashier_name
-        </if>
-        limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
-    </select>
-    <select id="costAndSalesByCategory0Count" resultType="long">
-        select count(* ) FROM (
-        SELECT
-        type_id
-        FROM
-        order_consumer_detail d,
-        order_consumer_info o
-        WHERE
-        o.order_id = d.order_id
-        <if test="beginTime !=null">
-            AND o.create_time &gt;= #{beginTime}
-        </if>
-        <if test="endTime !=null">
-            AND o.create_time &lt;= #{endTime}
+            AND a.create_time &lt;= #{endTime}
         </if>
         AND o.distributor_id = #{distributorId}
 
@@ -2021,13 +1944,77 @@
 
             and d.sku_name =#{skuName}
         </if>
-        <if test="cashierId !=null  and cashierId !='' ">
+        <if test="cashierId !=null and cashierId !=''">
             and o.cashier_id =#{cashierId}
         </if>
-        AND o.pay_status = 1  and o.order_type!=3
+       )b
+    </select>
+
+    <select id="costAndSalesByCategory0" resultType="com.aiqin.mgs.order.api.domain.response.CostAndSalesResp">
+        select  a.code,a.name,a.saleProductNum ,a.totalAmount ,a.productCost,b.returnPrice returnAmount FROM
+        (SELECT
+        <if test="productCategory !=null and productCategory=0">
+            type_id code,
+        </if>
+        <if test="productCategory !=null and productCategory!=0">
+            left(type_id,#{productCategory}) code,
+        </if>
+        <if test="productPropertyCode !=null">
+            product_property_code code,
+            product_property_name as name,
+        </if>
+        <if test="brandId !=null">
+            d.brand_id code,
+            d.brand_name as name,
+        </if>
+        <if test="skuCode !=null or skuName!=null">
+            d.sku_code code,
+            d.sku_name as name,
+        </if>
+        <if test="cashierId !=null">
+            o.cashier_id code,
+            o.cashier_name as name,
+        </if>
+
+        sum( amount ) saleProductNum,
+        sum( d.total_price ) totalAmount,
+        sum( cost_price ) productCost
+        FROM
+        order_consumer_detail d,
+        order_consumer_info o
+        WHERE
+        o.order_id = d.order_id
+        <if test="beginTime !=null">
+            AND o.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime !=null">
+            AND o.create_time &lt;= #{endTime}
+        </if>
+        AND o.distributor_id = #{distributorId}
+        <if test="productPropertyCode !=null and productPropertyCode!=''">and product_property_code
+            =#{ productPropertyCode}
+        </if>
+        <if test="brandId !=null and brandId!=''">
+            and d. brand_id =#{ brandId}
+        </if>
+        <if test="skuCode !=null and skuCode!=''">
+            and d.sku_code =#{ skuCode}
+
+        </if>
+        <if test="skuName !=null and skuName!=''">
+
+            and d.sku_name =#{skuName}
+        </if>
+        <if test="cashierId !=null and cashierId !=''">
+            and o.cashier_id =#{cashierId}
+        </if>
+        AND o.pay_status = 1 and o.order_type!=3
         group by
-        <if test="productCategory !=null">
+        <if test="productCategory !=null and productCategory=0">
             type_id
+        </if>
+        <if test="productCategory !=null and productCategory!=0">
+            left(type_id,#{productCategory})
         </if>
         <if test="productPropertyCode !=null">
             product_property_code
@@ -2040,10 +2027,589 @@
             d.sku_name
         </if>
         <if test="cashierId !=null">
+
             o.cashier_id ,
             o.cashier_name
         </if>
-        ) as a
+        ) a
+        LEFT JOIN
+        (SELECT
+        <if test="productCategory !=null and productCategory=0">
+            type_id code,
+        </if>
+        <if test="productCategory !=null and productCategory!=0">
+            left(type_id,#{productCategory}) code,
+        </if>
+        <if test="productPropertyCode !=null">
+            product_property_code code,
+            product_property_name as name,
+        </if>
+        <if test="brandId !=null">
+            d.brand_id code,
+            d.brand_name as name,
+        </if>
+        <if test="skuCode !=null or skuName!=null">
+            d.sku_code code,
+            d.sku_name as name,
+        </if>
+        <if test="cashierId !=null">
+            o.cashier_id code,
+            o.cashier_name as name,
+        </if>
+
+        sum( return_price )  returnPrice
+        FROM
+        order_consumer_detail d,
+        order_consumer_info o,
+        order_after_sale_detail a
+        WHERE
+        o.order_id = d.order_id
+        and  a.order_detail_id = d.order_detail_id
+        <if test="beginTime !=null">
+            AND a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime !=null">
+            AND a.create_time &lt;= #{endTime}
+        </if>
+        AND o.distributor_id = #{distributorId}
+        <if test="productPropertyCode !=null and productPropertyCode!=''">
+            and product_property_code =#{ productPropertyCode}
+        </if>
+        <if test="brandId !=null and brandId!=''">
+            and d. brand_id =#{ brandId}
+        </if>
+        <if test="skuCode !=null and skuCode!=''">
+            and d.sku_code =#{ skuCode}
+
+        </if>
+        <if test="skuName !=null and skuName!=''">
+
+            and d.sku_name =#{skuName}
+        </if>
+        <if test="cashierId !=null and cashierId !=''">
+            and a.cashier_id =#{cashierId}
+        </if>
+
+        group by
+        <if test="productCategory !=null and productCategory=0">
+            type_id
+        </if>
+        <if test="productCategory !=null and productCategory!=0">
+            left(type_id,#{productCategory})
+        </if>
+        <if test="productPropertyCode !=null">
+            product_property_code
+        </if>
+        <if test="brandId !=null">
+            d.brand_id,d.brand_name
+        </if>
+        <if test="skuCode !=null or skuName!=null">
+            d.sku_code ,
+            d.sku_name
+        </if>
+        <if test="cashierId !=null">
+
+            o.cashier_id ,
+            o.cashier_name
+        </if>) b
+        on a.code=b.code
+
+        union
+
+        select  a.code,a.name,a.saleProductNum ,a.totalAmount ,a.productCost,b.returnPrice FROM
+        (SELECT
+        <if test="productCategory !=null and productCategory=0">
+            type_id code,
+        </if>
+        <if test="productCategory !=null and productCategory!=0">
+            left(type_id,#{productCategory}) code,
+        </if>
+        <if test="productPropertyCode !=null">
+            product_property_code code,
+            product_property_name as name,
+        </if>
+        <if test="brandId !=null">
+            d.brand_id code,
+            d.brand_name as name,
+        </if>
+        <if test="skuCode !=null or skuName!=null">
+            d.sku_code code,
+            d.sku_name as name,
+        </if>
+        <if test="cashierId !=null">
+            o.cashier_id code,
+            o.cashier_name as name,
+        </if>
+
+        sum( amount ) saleProductNum,
+        sum( d.total_price ) totalAmount,
+        sum( cost_price ) productCost
+        FROM
+        order_consumer_detail d,
+        order_consumer_info o
+        WHERE
+        o.order_id = d.order_id
+        <if test="beginTime !=null">
+            AND o.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime !=null">
+            AND o.create_time &lt;= #{endTime}
+        </if>
+        AND o.distributor_id = #{distributorId}
+        <if test="productPropertyCode !=null and productPropertyCode!=''">and product_property_code
+            =#{ productPropertyCode}
+        </if>
+        <if test="brandId !=null and brandId!=''">
+            and d. brand_id =#{ brandId}
+        </if>
+        <if test="skuCode !=null and skuCode!=''">
+            and d.sku_code =#{ skuCode}
+
+        </if>
+        <if test="skuName !=null and skuName!=''">
+
+            and d.sku_name =#{skuName}
+        </if>
+        <if test="cashierId !=null and cashierId !=''">
+            and o.cashier_id =#{cashierId}
+        </if>
+        AND o.pay_status = 1 and o.order_type!=3
+        group by
+        <if test="productCategory !=null and productCategory=0">
+            type_id
+        </if>
+        <if test="productCategory !=null and productCategory!=0">
+            left(type_id,#{productCategory})
+        </if>
+        <if test="productPropertyCode !=null">
+            product_property_code
+        </if>
+        <if test="brandId !=null">
+            d.brand_id,d.brand_name
+        </if>
+        <if test="skuCode !=null or skuName!=null">
+            d.sku_code ,
+            d.sku_name
+        </if>
+        <if test="cashierId !=null">
+            o
+            .cashier_id ,
+            o.cashier_name
+        </if>
+        ) a
+        RIGHT JOIN
+        (SELECT
+        <if test="productCategory !=null and productCategory=0">
+            type_id code,
+        </if>
+        <if test="productCategory !=null and productCategory!=0">
+            left(type_id,#{productCategory}) code,
+        </if>
+        <if test="productPropertyCode !=null">
+            product_property_code code,
+            product_property_name as name,
+        </if>
+        <if test="brandId !=null">
+            d.brand_id code,
+            d.brand_name as name,
+        </if>
+        <if test="skuCode !=null or skuName!=null">
+            d.sku_code code,
+            d.sku_name as name,
+        </if>
+        <if test="cashierId !=null">
+            o.cashier_id code,
+            o.cashier_name as name,
+        </if>
+
+        sum( return_price )  returnPrice
+        FROM
+        order_consumer_detail d,
+        order_consumer_info o,
+        order_after_sale_detail a
+        WHERE
+        o.order_id = d.order_id
+        and  a.order_detail_id = d.order_detail_id
+        <if test="beginTime !=null">
+            AND a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime !=null">
+            AND a.create_time &lt;= #{endTime}
+        </if>
+        AND o.distributor_id = #{distributorId}
+        <if test="productPropertyCode !=null and productPropertyCode!=''">
+            and product_property_code =#{ productPropertyCode}
+        </if>
+        <if test="brandId !=null and brandId!=''">
+            and d. brand_id =#{ brandId}
+        </if>
+        <if test="skuCode !=null and skuCode!=''">
+            and d.sku_code =#{ skuCode}
+
+        </if>
+        <if test="skuName !=null and skuName!=''">
+
+            and d.sku_name =#{skuName}
+        </if>
+        <if test="cashierId !=null and cashierId !=''">
+            and a.cashier_id =#{cashierId}
+        </if>
+
+        group by
+        <if test="productCategory !=null and productCategory=0">
+            type_id
+        </if>
+        <if test="productCategory !=null and productCategory!=0">
+            left(type_id,#{productCategory})
+        </if>
+        <if test="productPropertyCode !=null">
+            product_property_code
+        </if>
+        <if test="brandId !=null">
+            d.brand_id,d.brand_name
+        </if>
+        <if test="skuCode !=null or skuName!=null">
+            d.sku_code ,
+            d.sku_name
+        </if>
+        <if test="cashierId !=null">
+
+            o.cashier_id ,
+            o.cashier_name
+        </if>) b
+        on a.code=b.code
+        limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </select>
+    <select id="costAndSalesByCategory0Count" resultType="long">
+        select count(* ) FROM (
+        select  a.code,a.name,a.saleProductNum ,a.totalAmount ,a.productCost,b.returnPrice FROM
+        (SELECT
+        <if test="productCategory !=null and productCategory=0">
+            type_id code,
+        </if>
+        <if test="productCategory !=null and productCategory!=0">
+            left(type_id,#{productCategory}) code,
+        </if>
+        <if test="productPropertyCode !=null">
+            product_property_code code,
+            product_property_name as name,
+        </if>
+        <if test="brandId !=null">
+            d.brand_id code,
+            d.brand_name as name,
+        </if>
+        <if test="skuCode !=null or skuName!=null">
+            d.sku_code code,
+            d.sku_name as name,
+        </if>
+        <if test="cashierId !=null">
+            o.cashier_id code,
+            o.cashier_name as name,
+        </if>
+
+        sum( amount ) saleProductNum,
+        sum( d.total_price ) totalAmount,
+        sum( cost_price ) productCost
+        FROM
+        order_consumer_detail d,
+        order_consumer_info o
+        WHERE
+        o.order_id = d.order_id
+        <if test="beginTime !=null">
+            AND o.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime !=null">
+            AND o.create_time &lt;= #{endTime}
+        </if>
+        AND o.distributor_id = #{distributorId}
+        <if test="productPropertyCode !=null and productPropertyCode!=''">and product_property_code
+            =#{ productPropertyCode}
+        </if>
+        <if test="brandId !=null and brandId!=''">
+            and d. brand_id =#{ brandId}
+        </if>
+        <if test="skuCode !=null and skuCode!=''">
+            and d.sku_code =#{ skuCode}
+
+        </if>
+        <if test="skuName !=null and skuName!=''">
+
+            and d.sku_name =#{skuName}
+        </if>
+        <if test="cashierId !=null and cashierId !=''">
+            and o.cashier_id =#{cashierId}
+        </if>
+        AND o.pay_status = 1 and o.order_type!=3
+        group by
+        <if test="productCategory !=null and productCategory=0">
+            type_id
+        </if>
+        <if test="productCategory !=null and productCategory!=0">
+            left(type_id,#{productCategory})
+        </if>
+        <if test="productPropertyCode !=null">
+            product_property_code
+        </if>
+        <if test="brandId !=null">
+            d.brand_id,d.brand_name
+        </if>
+        <if test="skuCode !=null or skuName!=null">
+            d.sku_code ,
+            d.sku_name
+        </if>
+        <if test="cashierId !=null">
+            o
+            .cashier_id ,
+            o.cashier_name
+        </if>
+        ) a
+        LEFT JOIN
+        (SELECT
+        <if test="productCategory !=null and productCategory=0">
+            type_id code,
+        </if>
+        <if test="productCategory !=null and productCategory!=0">
+            left(type_id,#{productCategory}) code,
+        </if>
+        <if test="productPropertyCode !=null">
+            product_property_code code,
+            product_property_name as name,
+        </if>
+        <if test="brandId !=null">
+            d.brand_id code,
+            d.brand_name as name,
+        </if>
+        <if test="skuCode !=null or skuName!=null">
+            d.sku_code code,
+            d.sku_name as name,
+        </if>
+        <if test="cashierId !=null">
+            o.cashier_id code,
+            o.cashier_name as name,
+        </if>
+
+        sum( return_price )  returnPrice
+        FROM
+        order_consumer_detail d,
+        order_consumer_info o,
+        order_after_sale_detail a
+        WHERE
+        o.order_id = d.order_id
+        and  a.order_detail_id = d.order_detail_id
+        <if test="beginTime !=null">
+            AND a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime !=null">
+            AND a.create_time &lt;= #{endTime}
+        </if>
+        AND o.distributor_id = #{distributorId}
+        <if test="productPropertyCode !=null and productPropertyCode!=''">
+            and product_property_code =#{ productPropertyCode}
+        </if>
+        <if test="brandId !=null and brandId!=''">
+            and d. brand_id =#{ brandId}
+        </if>
+        <if test="skuCode !=null and skuCode!=''">
+            and d.sku_code =#{ skuCode}
+
+        </if>
+        <if test="skuName !=null and skuName!=''">
+
+            and d.sku_name =#{skuName}
+        </if>
+        <if test="cashierId !=null and cashierId !=''">
+            and a.cashier_id =#{cashierId}
+        </if>
+
+        group by
+        <if test="productCategory !=null and productCategory=0">
+            type_id
+        </if>
+        <if test="productCategory !=null and productCategory!=0">
+            left(type_id,#{productCategory})
+        </if>
+        <if test="productPropertyCode !=null">
+            product_property_code
+        </if>
+        <if test="brandId !=null">
+            d.brand_id,d.brand_name
+        </if>
+        <if test="skuCode !=null or skuName!=null">
+            d.sku_code ,
+            d.sku_name
+        </if>
+        <if test="cashierId !=null">
+
+            o.cashier_id ,
+            o.cashier_name
+        </if>) b
+        on a.code=b.code
+
+        union
+
+        select  a.code,a.name,a.saleProductNum ,a.totalAmount ,a.productCost,b.returnPrice FROM
+        (SELECT
+        <if test="productCategory !=null and productCategory=0">
+            type_id code,
+        </if>
+        <if test="productCategory !=null and productCategory!=0">
+            left(type_id,#{productCategory}) code,
+        </if>
+        <if test="productPropertyCode !=null">
+            product_property_code code,
+            product_property_name as name,
+        </if>
+        <if test="brandId !=null">
+            d.brand_id code,
+            d.brand_name as name,
+        </if>
+        <if test="skuCode !=null or skuName!=null">
+            d.sku_code code,
+            d.sku_name as name,
+        </if>
+        <if test="cashierId !=null">
+            o.cashier_id code,
+            o.cashier_name as name,
+        </if>
+
+        sum( amount ) saleProductNum,
+        sum( d.total_price ) totalAmount,
+        sum( cost_price ) productCost
+        FROM
+        order_consumer_detail d,
+        order_consumer_info o
+        WHERE
+        o.order_id = d.order_id
+        <if test="beginTime !=null">
+            AND o.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime !=null">
+            AND o.create_time &lt;= #{endTime}
+        </if>
+        AND o.distributor_id = #{distributorId}
+        <if test="productPropertyCode !=null and productPropertyCode!=''">and product_property_code
+            =#{ productPropertyCode}
+        </if>
+        <if test="brandId !=null and brandId!=''">
+            and d. brand_id =#{ brandId}
+        </if>
+        <if test="skuCode !=null and skuCode!=''">
+            and d.sku_code =#{ skuCode}
+
+        </if>
+        <if test="skuName !=null and skuName!=''">
+
+            and d.sku_name =#{skuName}
+        </if>
+        <if test="cashierId !=null and cashierId !=''">
+            and o.cashier_id =#{cashierId}
+        </if>
+        AND o.pay_status = 1 and o.order_type!=3
+        group by
+        <if test="productCategory !=null and productCategory=0">
+            type_id
+        </if>
+        <if test="productCategory !=null and productCategory!=0">
+            left(type_id,#{productCategory})
+        </if>
+        <if test="productPropertyCode !=null">
+            product_property_code
+        </if>
+        <if test="brandId !=null">
+            d.brand_id,d.brand_name
+        </if>
+        <if test="skuCode !=null or skuName!=null">
+            d.sku_code ,
+            d.sku_name
+        </if>
+        <if test="cashierId !=null">
+            o
+            .cashier_id ,
+            o.cashier_name
+        </if>
+        ) a
+        RIGHT JOIN
+        (SELECT
+        <if test="productCategory !=null and productCategory=0">
+            type_id code,
+        </if>
+        <if test="productCategory !=null and productCategory!=0">
+            left(type_id,#{productCategory}) code,
+        </if>
+        <if test="productPropertyCode !=null">
+            product_property_code code,
+            product_property_name as name,
+        </if>
+        <if test="brandId !=null">
+            d.brand_id code,
+            d.brand_name as name,
+        </if>
+        <if test="skuCode !=null or skuName!=null">
+            d.sku_code code,
+            d.sku_name as name,
+        </if>
+        <if test="cashierId !=null">
+            o.cashier_id code,
+            o.cashier_name as name,
+        </if>
+
+        sum( return_price )  returnPrice
+        FROM
+        order_consumer_detail d,
+        order_consumer_info o,
+        order_after_sale_detail a
+        WHERE
+        o.order_id = d.order_id
+        and  a.order_detail_id = d.order_detail_id
+        <if test="beginTime !=null">
+            AND a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime !=null">
+            AND a.create_time &lt;= #{endTime}
+        </if>
+        AND o.distributor_id = #{distributorId}
+        <if test="productPropertyCode !=null and productPropertyCode!=''">
+            and product_property_code =#{ productPropertyCode}
+        </if>
+        <if test="brandId !=null and brandId!=''">
+            and d. brand_id =#{ brandId}
+        </if>
+        <if test="skuCode !=null and skuCode!=''">
+            and d.sku_code =#{ skuCode}
+
+        </if>
+        <if test="skuName !=null and skuName!=''">
+
+            and d.sku_name =#{skuName}
+        </if>
+        <if test="cashierId !=null and cashierId !=''">
+            and a.cashier_id =#{cashierId}
+        </if>
+
+        group by
+        <if test="productCategory !=null and productCategory=0">
+            type_id
+        </if>
+        <if test="productCategory !=null and productCategory!=0">
+            left(type_id,#{productCategory})
+        </if>
+        <if test="productPropertyCode !=null">
+            product_property_code
+        </if>
+        <if test="brandId !=null">
+            d.brand_id,d.brand_name
+        </if>
+        <if test="skuCode !=null or skuName!=null">
+            d.sku_code ,
+            d.sku_name
+        </if>
+        <if test="cashierId !=null">
+
+            o.cashier_id ,
+            o.cashier_name
+        </if>) b
+        on a.code=b.code
+        ) as m
     </select>
     <select id="costAndSalesByCategoryCount" resultType="long">
         select count(* ) FROM (
