@@ -253,4 +253,6 @@ public interface OrderService {
 	List<AmountDetailsResponse> returnAmount(AmountDetailsRequest amountDetailsRequest);
 
 	HttpResponse<BasePage<CostAndSalesResp>> costAndSales(CostAndSalesReq costAndSalesReq);
+
+    HttpResponse updateOrder(String storeId);
 }

@@ -844,6 +844,12 @@ public class OrderServiceImpl implements OrderService {
         return  HttpResponse.successGenerics(basePage);
     }
 
+    @Override
+    public HttpResponse updateOrder(String storeId) {
+        //查询出d
+        return null;
+    }
+
     private void accountDataHandle(ReportForDayResponse reportForDayResponse, List<ReportForDayResponse> accountList) {
         accountList.forEach(s -> {
             Long payPrice = s.getPrice();

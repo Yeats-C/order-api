@@ -1916,7 +1916,7 @@
             and   d.brand_id  =#{brandId}
         </if>
         <if test="skuCode !=null and skuCode!=''">
-            and d.sku_code code =#{skuCode}
+            and d.sku_code  =#{skuCode}
 
         </if>
         <if test="skuName !=null and skuName!=''">
@@ -1971,7 +1971,7 @@
             and   d.brand_id  =#{brandId}
         </if>
         <if test="skuCode !=null and skuCode!=''">
-            and d.sku_code code =#{skuCode}
+            and d.sku_code  =#{skuCode}
 
         </if>
         <if test="skuName !=null and skuName!=''">
