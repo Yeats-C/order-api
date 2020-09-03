@@ -1875,6 +1875,45 @@
             group by left(type_id,#{productCategory})
         limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
     </select>
+    <select id="costAndSalesSum" resultType="com.aiqin.mgs.order.api.domain.response.CostAndSalesSumResp">
+        SELECT
+
+
+        sum( amount ) saleAllNum,
+        sum( d.total_price ) totalAmount,
+        sum( cost_price )  productAllCost
+        FROM
+        order_consumer_detail d,
+        order_consumer_info o
+        WHERE
+        o.order_id = d.order_id
+        <if test="beginTime !=null">
+            AND o.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime !=null">
+            AND o.create_time &lt;= #{endTime}
+        </if>
+        AND o.distributor_id = #{distributorId}
+
+        <if test="productPropertyCode !=null and productPropertyCode!=''">
+            and   product_property_code  =#{productPropertyCode}
+        </if>
+        <if test="brandId !=null and brandId!=''">
+            and   d.brand_id  =#{brandId}
+        </if>
+        <if test="skuCode !=null and skuCode!=''">
+            and d.sku_code  =#{skuCode}
+
+        </if>
+        <if test="skuName !=null and skuName!=''">
+
+            and d.sku_name =#{skuName}
+        </if>
+        <if test="cashierId !=null and cashierId !=''">
+            and o.cashier_id =#{cashierId}
+        </if>
+        AND o.pay_status = 1 and o.order_type!=3
+    </select>
     <select id="costAndSalesByCategory0" resultType="com.aiqin.mgs.order.api.domain.response.CostAndSalesResp">
         SELECT
         <if test="productCategory !=null">

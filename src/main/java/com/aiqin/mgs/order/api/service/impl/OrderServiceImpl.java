@@ -818,30 +818,37 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public HttpResponse<BasePage<CostAndSalesResp>> costAndSales(CostAndSalesReq costAndSalesReq) {
-        BasePage basePage = new BasePage();
+    public HttpResponse<CostAndSalesTopResp> costAndSales(CostAndSalesReq costAndSalesReq) {
+        CostAndSalesTopResp costAndSalesTopResp=new CostAndSalesTopResp();
+
         //品类
         if (costAndSalesReq.getProductCategory()!=null&&!costAndSalesReq.getProductCategory().equals("")){
             costAndSalesReq.setProductCategory(costAndSalesReq.getProductCategory()*2);
             if (costAndSalesReq.getProductCategory()==0){
                 List<CostAndSalesResp> costAndSalesResps=orderDao.costAndSalesByCategory0(costAndSalesReq);
                 Long count=orderDao.costAndSalesByCategory0Count(costAndSalesReq);
-                basePage.setTotalCount(count);
-                basePage.setDataList(costAndSalesResps);
+
+                costAndSalesTopResp.setDataList(costAndSalesResps);
+                costAndSalesTopResp.setTotalCount(Math.toIntExact(count));
             }else {
                 List<CostAndSalesResp> costAndSalesResps=orderDao.costAndSalesByCategory(costAndSalesReq);
                 Long count=orderDao.costAndSalesByCategoryCount(costAndSalesReq);
-                basePage.setTotalCount(count);
-                basePage.setDataList(costAndSalesResps);
+
+                costAndSalesTopResp.setDataList(costAndSalesResps);
+                costAndSalesTopResp.setTotalCount(Math.toIntExact(count));
             }
 
         }else {
             List<CostAndSalesResp> costAndSalesResps=orderDao.costAndSalesByCategory0(costAndSalesReq);
             Long count=orderDao.costAndSalesByCategory0Count(costAndSalesReq);
-            basePage.setTotalCount(count);
-            basePage.setDataList(costAndSalesResps);
+
+            costAndSalesTopResp.setDataList(costAndSalesResps);
+            costAndSalesTopResp.setTotalCount(Math.toIntExact(count));
         }
-        return  HttpResponse.successGenerics(basePage);
+        //计算总数
+        CostAndSalesSumResp costAndSalesSumResp=orderDao.costAndSalesSum(costAndSalesReq);
+        costAndSalesTopResp.setCostAndSalesSumResp(costAndSalesSumResp);
+        return  HttpResponse.successGenerics(costAndSalesTopResp);
     }
 
     @Override
