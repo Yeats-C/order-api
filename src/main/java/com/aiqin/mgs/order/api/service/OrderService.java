@@ -19,6 +19,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.request.order.QueryOrderListReqVO;
 import com.aiqin.mgs.order.api.domain.request.stock.AmountDetailsRequest;
 import com.aiqin.mgs.order.api.domain.request.stock.ReportForDayReq;
+import com.aiqin.mgs.order.api.domain.response.CostAndSalesResp;
 import com.aiqin.mgs.order.api.domain.response.PartnerPayGateRep;
 import com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoRespVO;
 import com.aiqin.mgs.order.api.domain.response.order.QueryOrderListRespVO;
@@ -251,4 +252,5 @@ public interface OrderService {
 
 	List<AmountDetailsResponse> returnAmount(AmountDetailsRequest amountDetailsRequest);
 
+	HttpResponse<BasePage<CostAndSalesResp>> costAndSales(CostAndSalesReq costAndSalesReq);
 }

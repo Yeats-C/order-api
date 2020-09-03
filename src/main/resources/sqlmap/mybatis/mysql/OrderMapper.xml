@@ -118,12 +118,12 @@
         <result column="avg_paid_price" jdbcType="BIGINT" property="avgPaidPrice"/>
         <result column="date_tag" jdbcType="VARCHAR" property="dateTag"/>
     </resultMap>
-    
+
     <resultMap id="LatelyResponse" type="com.aiqin.mgs.order.api.domain.response.LatelyResponse">
         <result column="pay_time" property="pay_time"/>
         <result column="price" property="price"/>
     </resultMap>
-    
+
 
     <!-- 插入订单表 -->
     <insert id="addOrderInfo">
@@ -175,7 +175,8 @@
     </select>
 
     <!-- 预存订单查询 -->
-    <select id="selectPrestorageOrder" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="LastPrestorageMapping"
+    <select id="selectPrestorageOrder" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery"
+            resultMap="LastPrestorageMapping"
             resultType="java.util.List">
 
         select d.prestorage_order_supply_detail_id,d.product_name ,d.amount ,d.return_amount ,d.return_prestorage_amount,d.supply_amount ,s.create_time from prestorage_order_supply s,prestorage_order_supply_detail d
@@ -195,7 +196,8 @@
     </select>
 
     <!-- 预存订单详情查询 -->
-    <select id="selectprestorageorderDetails" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery" resultMap="LastPrestorageMapping"
+    <select id="selectprestorageorderDetails" parameterType="com.aiqin.mgs.order.api.domain.OrderQuery"
+            resultMap="LastPrestorageMapping"
             resultType="java.util.List">
 
         select d.prestorage_order_supply_detail_id,d.product_name ,d.amount ,d.return_amount ,d.return_prestorage_amount,d.supply_amount,d.sku_code ,d.prestorage_order_supply_id,s.distributor_code ,s.distributor_id ,s.order_code from prestorage_order_supply s,prestorage_order_supply_detail d
@@ -321,7 +323,7 @@
                 and b.sku_name like concat('%',#{skuName,jdbcType=VARCHAR},'%')
             </if>
             <if test="barCodeAndSku!=null and barCodeAndSku!='' ">
-                and (b.sku_code = #{barCodeAndSku} or b.bar_code =  #{barCodeAndSku})
+                and (b.sku_code = #{barCodeAndSku} or b.bar_code = #{barCodeAndSku})
             </if>
             group by a.id
         </if>
@@ -433,14 +435,14 @@
                 and b.sku_name like concat('%',#{skuName,jdbcType=VARCHAR},'%')
             </if>
             <if test="barCodeAndSku!=null and barCodeAndSku!='' ">
-                and (b.sku_code = #{barCodeAndSku} or b.bar_code =  #{barCodeAndSku})
+                and (b.sku_code = #{barCodeAndSku} or b.bar_code = #{barCodeAndSku})
             </if>
         </if>
     </select>
 
 
-
-    <select id="getUnPayNum" parameterType="com.aiqin.mgs.order.api.domain.request.UnPayVo" resultType="java.lang.Integer">
+    <select id="getUnPayNum" parameterType="com.aiqin.mgs.order.api.domain.request.UnPayVo"
+            resultType="java.lang.Integer">
         SELECT count(distinct a.member_id) FROM order_consumer_info a
         WHERE 1=1
         <if test="distributorId!=null and distributorId!='' ">
@@ -466,7 +468,8 @@
 
     </select>
 
-    <select id="getUnPayMemberIdList" parameterType="com.aiqin.mgs.order.api.domain.request.UnPayVo" resultType="java.lang.String">
+    <select id="getUnPayMemberIdList" parameterType="com.aiqin.mgs.order.api.domain.request.UnPayVo"
+            resultType="java.lang.String">
         SELECT distinct a.member_id FROM order_consumer_info a
         WHERE 1=1
         <if test="distributorId!=null and distributorId!='' ">
@@ -788,7 +791,8 @@
     <select id="selectbByYesdayRetailAmt" resultType="java.lang.Integer">
 
         SELECT CASE WHEN b.return_price IS NULL THEN a.real_amt ELSE a.real_amt-b.return_price END AS real_amt FROM (
-        SELECT '1' AS create_time,COUNT(b.order_id) AS order_acount,SUM(actual_price) AS real_amt FROM order_consumer_info b
+        SELECT '1' AS create_time,COUNT(b.order_id) AS order_acount,SUM(actual_price) AS real_amt FROM
+        order_consumer_info b
         WHERE 1=1 and order_type = 1
         AND b.distributor_id = #{distributorId}
         AND b.order_status NOT IN ('0','4')
@@ -1026,8 +1030,8 @@
         FROM
         order_after_sale a
 
-        WHERE  a.create_by =#{cashierId}
-          and a.return_money_type=0
+        WHERE a.create_by =#{cashierId}
+        and a.return_money_type=0
         <if test="beginTime!=null ">
             AND a.create_time &gt;= #{beginTime}
         </if>
@@ -1085,7 +1089,8 @@
     <select id="reorer" resultMap="OrderInfoMapping" resultType="java.util.List">
 
         SELECT a.* FROM order_consumer_info a
-        LEFT JOIN (SELECT order_id,SUM(IFNULL(amount,0)) AS amount FROM order_consumer_detail GROUP BY order_id) b ON a.order_id
+        LEFT JOIN (SELECT order_id,SUM(IFNULL(amount,0)) AS amount FROM order_consumer_detail GROUP BY order_id) b ON
+        a.order_id
         = b.order_id
         LEFT JOIN (SELECT order_code,SUM(IFNULL(return_amount,0)) AS return_amount FROM `order_after_sale_detail` GROUP
         BY order_code) c ON a.order_code = c.order_code
@@ -1121,10 +1126,11 @@
     </select>
 
     <!-- 接口-可退货的订单查询 总数据量 -->
-    <select id="reorerCount"  resultType="java.lang.Integer">
+    <select id="reorerCount" resultType="java.lang.Integer">
 
         SELECT count(a.id) FROM order_consumer_info a
-        LEFT JOIN (SELECT order_id,SUM(IFNULL(amount,0)) AS amount FROM order_consumer_detail GROUP BY order_id) b ON a.order_id
+        LEFT JOIN (SELECT order_id,SUM(IFNULL(amount,0)) AS amount FROM order_consumer_detail GROUP BY order_id) b ON
+        a.order_id
         = b.order_id
         LEFT JOIN (SELECT order_code,SUM(IFNULL(return_amount,0)) AS return_amount FROM `order_after_sale_detail` GROUP
         BY order_code) c ON a.order_code = c.order_code
@@ -1456,7 +1462,8 @@
         </if>
     </select>
 
-    <select id="queryLast10DaysOrderStatistical" resultType="com.aiqin.mgs.order.api.domain.response.statistical.Last10DaysOrderStatistical">
+    <select id="queryLast10DaysOrderStatistical"
+            resultType="com.aiqin.mgs.order.api.domain.response.statistical.Last10DaysOrderStatistical">
         select date_format(create_time,'%Y-%m-%d') as dateTag,count(*) as finishOrderNum
         from order_consumer_info
         where distributor_id = #{distributorId}
@@ -1472,10 +1479,10 @@
         WHERE distributor_id = #{distributorId}
         ORDER BY create_time LIMIT 1
     </select>
-    
+
     <select id="memberLately" resultMap="LatelyResponse"
             resultType="java.util.List">
-        SELECT  create_time AS pay_time,actual_price as price FROM `order_consumer_info`
+        SELECT create_time AS pay_time,actual_price as price FROM `order_consumer_info`
         WHERE 1=1
         <if test="distributorId!=null">
             and distributor_id = #{distributorId}
@@ -1526,138 +1533,139 @@
         actual_total_product_amount actualTotalProductAmount
         from order_store_info
         <where>
-        <if test="orderType != null">
-            and order_type_code = #{orderType}
-        </if>
-        <if test="companyCode != null">
-            and company_code = #{companyCode}
-        </if>
-        <if test="createDateStart != null">
-            and create_time &gt;=#{createDateStart,jdbcType=TIMESTAMP}
-        </if>
-        <if test="createDateEnd != null">
-            and create_time &lt;=#{createDateEnd,jdbcType=TIMESTAMP}
-        </if>
-        <if test="orderStatus != null and orderStatus != ''">
-            and order_status = #{orderStatus}
-        </if>
-        <if test="transportCenterCode != null and transportCenterCode != ''">
-            and transport_center_code = #{transportCenterCode}
-        </if>
-        <if test="warehouseCode != null and warehouseCode != ''">
-            and warehouse_code = #{warehouseCode}
-        </if>
-        <if test="supplierCode != null and supplierCode != ''">
-            and supplier_code = #{supplierCode}
-        </if>
-        <if test="customerName != null and customerName != ''">
-            and customer_name like CONCAT(#{customerName},'%')
-        </if>
-        <if test="orderCode != null and orderCode != ''">
-            and order_store_code LIKE CONCAT(#{orderCode},'%')
-        </if>
-        <if test="orderLock != null">
-            and order_lock = #{orderLock}
-        </if>
-        <if test="orderException != null">
-            and order_exception = #{orderException}
-        </if>
+            <if test="orderType != null">
+                and order_type_code = #{orderType}
+            </if>
+            <if test="companyCode != null">
+                and company_code = #{companyCode}
+            </if>
+            <if test="createDateStart != null">
+                and create_time &gt;=#{createDateStart,jdbcType=TIMESTAMP}
+            </if>
+            <if test="createDateEnd != null">
+                and create_time &lt;=#{createDateEnd,jdbcType=TIMESTAMP}
+            </if>
+            <if test="orderStatus != null and orderStatus != ''">
+                and order_status = #{orderStatus}
+            </if>
+            <if test="transportCenterCode != null and transportCenterCode != ''">
+                and transport_center_code = #{transportCenterCode}
+            </if>
+            <if test="warehouseCode != null and warehouseCode != ''">
+                and warehouse_code = #{warehouseCode}
+            </if>
+            <if test="supplierCode != null and supplierCode != ''">
+                and supplier_code = #{supplierCode}
+            </if>
+            <if test="customerName != null and customerName != ''">
+                and customer_name like CONCAT(#{customerName},'%')
+            </if>
+            <if test="orderCode != null and orderCode != ''">
+                and order_store_code LIKE CONCAT(#{orderCode},'%')
+            </if>
+            <if test="orderLock != null">
+                and order_lock = #{orderLock}
+            </if>
+            <if test="orderException != null">
+                and order_exception = #{orderException}
+            </if>
         </where>
         order by create_time desc
     </select>
     <resultMap id="selectByOrderCode" type="com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoRespVO">
-        <result column="aorder_code" jdbcType="VARCHAR" property="orderCode" />
-        <result column="aorder_status" jdbcType="INTEGER" property="orderStatus" />
-        <result column="aorder_lock" jdbcType="INTEGER" property="orderLock" />
-        <result column="aorder_exception" jdbcType="INTEGER" property="orderException" />
-        <result column="apayment_status" jdbcType="INTEGER" property="paymentStatus" />
-        <result column="apayment_name" jdbcType="VARCHAR" property="paymentName" />
-        <result column="aorder_type_name" jdbcType="VARCHAR" property="orderTypeName" />
-        <result column="aorder_category_code" jdbcType="VARCHAR" property="orderCategoryCode" />
-        <result column="aorder_category_name" jdbcType="VARCHAR" property="orderCategoryName" />
-        <result column="amain_order_code" jdbcType="VARCHAR" property="mainOrderCode" />
-        <result column="aorder_level" jdbcType="INTEGER" property="orderLevel" />
-        <result column="asupplier_name" jdbcType="VARCHAR" property="supplierName" />
-        <result column="atransport_center_name" jdbcType="VARCHAR" property="transportCenterName" />
-        <result column="awarehouse_name" jdbcType="VARCHAR" property="warehouseName" />
-        <result column="ainvoice_type" jdbcType="VARCHAR" property="invoiceType" />
-        <result column="ainvoice_title" jdbcType="VARCHAR" property="invoiceTitle" />
-        <result column="atransport_company_code" jdbcType="VARCHAR" property="transportCompanyCode" />
-        <result column="atransport_company_name" jdbcType="VARCHAR" property="transportCompanyName" />
-        <result column="atransport_code" jdbcType="VARCHAR" property="transportCode" />
-        <result column="apayment_time" jdbcType="TIMESTAMP" property="paymentTime" />
-        <result column="adelivery_time" jdbcType="TIMESTAMP" property="deliveryTime" />
-        <result column="atransport_time" jdbcType="TIMESTAMP" property="transportTime" />
-        <result column="areceive_time" jdbcType="TIMESTAMP" property="receiveTime" />
-        <result column="aremake" jdbcType="VARCHAR" property="remake" />
-        <result column="acreate_time" jdbcType="TIMESTAMP" property="createTime" />
-        <result column="aupdate_time" jdbcType="TIMESTAMP" property="updateTime" />
-        <result column="acreate_by_name" jdbcType="VARCHAR" property="createByName" />
-        <result column="aupdate_by_name" jdbcType="VARCHAR" property="updateByName" />
-        <result column="acustomer_code" jdbcType="VARCHAR" property="customerCode" />
-        <result column="acustomer_name" jdbcType="VARCHAR" property="customerName" />
-        <result column="adistribution_mode_name" jdbcType="VARCHAR" property="distributionModeName" />
-        <result column="areceive_person" jdbcType="VARCHAR" property="receivePerson" />
-        <result column="areceive_mobile" jdbcType="VARCHAR" property="receiveMobile" />
-        <result column="azip_code" jdbcType="VARCHAR" property="zipCode" />
-        <result column="aprovince_name" jdbcType="VARCHAR" property="provinceName" />
-        <result column="acity_name" jdbcType="VARCHAR" property="cityName" />
-        <result column="adistrict_name" jdbcType="VARCHAR" property="districtName" />
-        <result column="adetail_address" jdbcType="VARCHAR" property="detailAddress" />
-        <result column="aactual_product_count" jdbcType="DECIMAL" property="actualProductCount" />
-        <result column="atotal_volume" jdbcType="BIGINT" property="totalVolume" />
-        <result column="atotal_weight" jdbcType="BIGINT" property="totalWeight" />
-        <result column="aactual_total_volume" jdbcType="BIGINT" property="actualTotalVolume" />
-        <result column="aactual_total_weight" jdbcType="BIGINT" property="actualTotalWeight" />
-        <result column="atotal_product_amount" jdbcType="DECIMAL" property="totalProductAmount" />
-        <result column="aorder_amount" jdbcType="DECIMAL" property="orderAmount" />
-        <result column="adeliver_amount" jdbcType="DECIMAL" property="deliverAmount" />
-        <result column="aactual_total_product_amount" jdbcType="DECIMAL" property="actualTotalProductAmount" />
-        <result column="adiscount_amount" jdbcType="DECIMAL" property="discountAmount" />
-        <result column="asuit_coupon_money" jdbcType="DECIMAL" property="suitCouponMoney" />
-        <result column="atop_coupon_money" jdbcType="DECIMAL" property="topCouponMoney" />
-        <result column="aactual_order_amount" jdbcType="DECIMAL" property="actualOrderAmount" />
-        <result column="aactivity_money" jdbcType="DECIMAL" property="activityDiscount" />
-        <collection property="productList" ofType="com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoItemRespVO">
-            <result column="bsku_code" jdbcType="VARCHAR" property="skuCode" />
-            <result column="bsku_name" jdbcType="VARCHAR" property="skuName" />
-            <result column="bpicture_url" jdbcType="VARCHAR" property="pictureUrl" />
-            <result column="bspec" jdbcType="VARCHAR" property="spec" />
-            <result column="bcolor_name" jdbcType="VARCHAR" property="colorName" />
-            <result column="bmodel" jdbcType="VARCHAR" property="model" />
-            <result column="bunit_name" jdbcType="VARCHAR" property="unitName" />
-            <result column="bzero_disassembly_coefficient" jdbcType="INTEGER" property="zeroDisassemblyCoefficient" />
-            <result column="bproduct_type" jdbcType="INTEGER" property="productType" />
-            <result column="bproduct_amount" jdbcType="DECIMAL" property="productAmount" />
-            <result column="bpurchase_amount" jdbcType="DECIMAL" property="purchaseAmount" />
-            <result column="bproduct_count" jdbcType="BIGINT" property="productCount" />
-            <result column="btotal_product_amount" jdbcType="VARCHAR" property="totalProductAmount" />
-            <result column="bactual_product_count" jdbcType="DECIMAL" property="actualProductCount" />
-            <result column="btotal_preferential_amount" jdbcType="DECIMAL" property="totalPreferentialAmount" />
-            <result column="btotal_acivity_amount" jdbcType="DECIMAL" property="totalAcivityAmount" />
-            <result column="bactivity_code" jdbcType="VARCHAR" property="activityCode" />
-            <result column="bgift_line_code" jdbcType="VARCHAR" property="giftLineCode" />
-            <result column="breturn_product_count" jdbcType="BIGINT" property="returnProductCount" />
-            <result column="btotal_purchase_amount" jdbcType="DECIMAL" property="totalPurchaseAmount" />
-            <result column="bactual_total_product_amount" jdbcType="DECIMAL" property="actualTotalProductAmount" />
-            <result column="bactual_total_purchase_amount" jdbcType="DECIMAL" property="actualTotalPurchaseAmount" />
+        <result column="aorder_code" jdbcType="VARCHAR" property="orderCode"/>
+        <result column="aorder_status" jdbcType="INTEGER" property="orderStatus"/>
+        <result column="aorder_lock" jdbcType="INTEGER" property="orderLock"/>
+        <result column="aorder_exception" jdbcType="INTEGER" property="orderException"/>
+        <result column="apayment_status" jdbcType="INTEGER" property="paymentStatus"/>
+        <result column="apayment_name" jdbcType="VARCHAR" property="paymentName"/>
+        <result column="aorder_type_name" jdbcType="VARCHAR" property="orderTypeName"/>
+        <result column="aorder_category_code" jdbcType="VARCHAR" property="orderCategoryCode"/>
+        <result column="aorder_category_name" jdbcType="VARCHAR" property="orderCategoryName"/>
+        <result column="amain_order_code" jdbcType="VARCHAR" property="mainOrderCode"/>
+        <result column="aorder_level" jdbcType="INTEGER" property="orderLevel"/>
+        <result column="asupplier_name" jdbcType="VARCHAR" property="supplierName"/>
+        <result column="atransport_center_name" jdbcType="VARCHAR" property="transportCenterName"/>
+        <result column="awarehouse_name" jdbcType="VARCHAR" property="warehouseName"/>
+        <result column="ainvoice_type" jdbcType="VARCHAR" property="invoiceType"/>
+        <result column="ainvoice_title" jdbcType="VARCHAR" property="invoiceTitle"/>
+        <result column="atransport_company_code" jdbcType="VARCHAR" property="transportCompanyCode"/>
+        <result column="atransport_company_name" jdbcType="VARCHAR" property="transportCompanyName"/>
+        <result column="atransport_code" jdbcType="VARCHAR" property="transportCode"/>
+        <result column="apayment_time" jdbcType="TIMESTAMP" property="paymentTime"/>
+        <result column="adelivery_time" jdbcType="TIMESTAMP" property="deliveryTime"/>
+        <result column="atransport_time" jdbcType="TIMESTAMP" property="transportTime"/>
+        <result column="areceive_time" jdbcType="TIMESTAMP" property="receiveTime"/>
+        <result column="aremake" jdbcType="VARCHAR" property="remake"/>
+        <result column="acreate_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="aupdate_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="acreate_by_name" jdbcType="VARCHAR" property="createByName"/>
+        <result column="aupdate_by_name" jdbcType="VARCHAR" property="updateByName"/>
+        <result column="acustomer_code" jdbcType="VARCHAR" property="customerCode"/>
+        <result column="acustomer_name" jdbcType="VARCHAR" property="customerName"/>
+        <result column="adistribution_mode_name" jdbcType="VARCHAR" property="distributionModeName"/>
+        <result column="areceive_person" jdbcType="VARCHAR" property="receivePerson"/>
+        <result column="areceive_mobile" jdbcType="VARCHAR" property="receiveMobile"/>
+        <result column="azip_code" jdbcType="VARCHAR" property="zipCode"/>
+        <result column="aprovince_name" jdbcType="VARCHAR" property="provinceName"/>
+        <result column="acity_name" jdbcType="VARCHAR" property="cityName"/>
+        <result column="adistrict_name" jdbcType="VARCHAR" property="districtName"/>
+        <result column="adetail_address" jdbcType="VARCHAR" property="detailAddress"/>
+        <result column="aactual_product_count" jdbcType="DECIMAL" property="actualProductCount"/>
+        <result column="atotal_volume" jdbcType="BIGINT" property="totalVolume"/>
+        <result column="atotal_weight" jdbcType="BIGINT" property="totalWeight"/>
+        <result column="aactual_total_volume" jdbcType="BIGINT" property="actualTotalVolume"/>
+        <result column="aactual_total_weight" jdbcType="BIGINT" property="actualTotalWeight"/>
+        <result column="atotal_product_amount" jdbcType="DECIMAL" property="totalProductAmount"/>
+        <result column="aorder_amount" jdbcType="DECIMAL" property="orderAmount"/>
+        <result column="adeliver_amount" jdbcType="DECIMAL" property="deliverAmount"/>
+        <result column="aactual_total_product_amount" jdbcType="DECIMAL" property="actualTotalProductAmount"/>
+        <result column="adiscount_amount" jdbcType="DECIMAL" property="discountAmount"/>
+        <result column="asuit_coupon_money" jdbcType="DECIMAL" property="suitCouponMoney"/>
+        <result column="atop_coupon_money" jdbcType="DECIMAL" property="topCouponMoney"/>
+        <result column="aactual_order_amount" jdbcType="DECIMAL" property="actualOrderAmount"/>
+        <result column="aactivity_money" jdbcType="DECIMAL" property="activityDiscount"/>
+        <collection property="productList"
+                    ofType="com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoItemRespVO">
+            <result column="bsku_code" jdbcType="VARCHAR" property="skuCode"/>
+            <result column="bsku_name" jdbcType="VARCHAR" property="skuName"/>
+            <result column="bpicture_url" jdbcType="VARCHAR" property="pictureUrl"/>
+            <result column="bspec" jdbcType="VARCHAR" property="spec"/>
+            <result column="bcolor_name" jdbcType="VARCHAR" property="colorName"/>
+            <result column="bmodel" jdbcType="VARCHAR" property="model"/>
+            <result column="bunit_name" jdbcType="VARCHAR" property="unitName"/>
+            <result column="bzero_disassembly_coefficient" jdbcType="INTEGER" property="zeroDisassemblyCoefficient"/>
+            <result column="bproduct_type" jdbcType="INTEGER" property="productType"/>
+            <result column="bproduct_amount" jdbcType="DECIMAL" property="productAmount"/>
+            <result column="bpurchase_amount" jdbcType="DECIMAL" property="purchaseAmount"/>
+            <result column="bproduct_count" jdbcType="BIGINT" property="productCount"/>
+            <result column="btotal_product_amount" jdbcType="VARCHAR" property="totalProductAmount"/>
+            <result column="bactual_product_count" jdbcType="DECIMAL" property="actualProductCount"/>
+            <result column="btotal_preferential_amount" jdbcType="DECIMAL" property="totalPreferentialAmount"/>
+            <result column="btotal_acivity_amount" jdbcType="DECIMAL" property="totalAcivityAmount"/>
+            <result column="bactivity_code" jdbcType="VARCHAR" property="activityCode"/>
+            <result column="bgift_line_code" jdbcType="VARCHAR" property="giftLineCode"/>
+            <result column="breturn_product_count" jdbcType="BIGINT" property="returnProductCount"/>
+            <result column="btotal_purchase_amount" jdbcType="DECIMAL" property="totalPurchaseAmount"/>
+            <result column="bactual_total_product_amount" jdbcType="DECIMAL" property="actualTotalProductAmount"/>
+            <result column="bactual_total_purchase_amount" jdbcType="DECIMAL" property="actualTotalPurchaseAmount"/>
         </collection>
         <!--<collection property="batchList" ofType="com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoItemBatchRespVO">-->
-            <!--<result column="dsku_code" jdbcType="VARCHAR" property="skuCode" />-->
-            <!--<result column="dsku_name" jdbcType="VARCHAR" property="skuName" />-->
-            <!--<result column="ddbatch_code" jdbcType="VARCHAR" property="batchCode" />-->
-            <!--<result column="dproduct_date" jdbcType="TIMESTAMP" property="productDate" />-->
-            <!--<result column="dbatch_remark" jdbcType="VARCHAR" property="batchRemark" />-->
-            <!--<result column="dproduct_count" jdbcType="BIGINT" property="productCount" />-->
-            <!--<result column="dactual_product_count" jdbcType="BIGINT" property="actualProductCount" />-->
+        <!--<result column="dsku_code" jdbcType="VARCHAR" property="skuCode" />-->
+        <!--<result column="dsku_name" jdbcType="VARCHAR" property="skuName" />-->
+        <!--<result column="ddbatch_code" jdbcType="VARCHAR" property="batchCode" />-->
+        <!--<result column="dproduct_date" jdbcType="TIMESTAMP" property="productDate" />-->
+        <!--<result column="dbatch_remark" jdbcType="VARCHAR" property="batchRemark" />-->
+        <!--<result column="dproduct_count" jdbcType="BIGINT" property="productCount" />-->
+        <!--<result column="dactual_product_count" jdbcType="BIGINT" property="actualProductCount" />-->
         <!--</collection>-->
     </resultMap>
     <resultMap id="selectLogByOrderCode" type="com.aiqin.mgs.order.api.domain.OperationLog">
-        <result column="ooperation_type" jdbcType="INTEGER" property="operationType" />
-        <result column="ooperation_content" jdbcType="VARCHAR" property="operationContent" />
-        <result column="oremark" jdbcType="VARCHAR" property="remark" />
-        <result column="ocreate_by_name" jdbcType="VARCHAR" property="createByName" />
-        <result column="ocreate_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="ooperation_type" jdbcType="INTEGER" property="operationType"/>
+        <result column="ooperation_content" jdbcType="VARCHAR" property="operationContent"/>
+        <result column="oremark" jdbcType="VARCHAR" property="remark"/>
+        <result column="ocreate_by_name" jdbcType="VARCHAR" property="createByName"/>
+        <result column="ocreate_time" jdbcType="TIMESTAMP" property="createTime"/>
     </resultMap>
     <select id="selectByOrderCode" resultMap="selectByOrderCode">
       select
@@ -1714,7 +1722,8 @@
       select sum(product_count) from order_store_detail
       where order_store_code = #{orderStoreCode}
     </select>
-    <select id="orderProductBatchByOrder" resultType="com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderInfoItemBatchRespVO">
+    <select id="orderProductBatchByOrder"
+            resultType="com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderInfoItemBatchRespVO">
       select
       line_code lineCode, sku_code skuCode, sku_name skuName,batch_code batchCode, batch_info_code batchInfoCode, supplier_code supplierCode, supplier_name supplierName,
       product_count returnProductCount, actual_inbound_count actualReturnProductCount, return_product_count returnTotalCount,
@@ -1731,13 +1740,13 @@
     </select>
     <select id="findListByOrderCode" resultType="com.aiqin.mgs.order.api.domain.OrderInfo">
         SELECT
-            order_code orderCode,
-            order_id orderId,
-            order_type orderType
+        order_code orderCode,
+        order_id orderId,
+        order_type orderType
         FROM
-            order_consumer_info
+        order_consumer_info
         WHERE
-            order_code IN (  <foreach collection="orderCodeList" item="item" separator=",">
+        order_code IN (  <foreach collection="orderCodeList" item="item" separator=",">
         #{item,jdbcType=VARCHAR}
     </foreach>);
     </select>
@@ -1787,22 +1796,20 @@
     <select id="selectPointRecord"
             resultType="com.aiqin.mgs.order.api.domain.response.stock.ReportForDayResponse">
         SELECT
-            a.create_by cashierId,
-            sum( a.cost_points ) jiFenGet,
-            SUM( a.receive_points ) jiFenReturn
+        create_by cashierId,
+        sum( a.cost_points ) jiFenGet,
+        SUM( a.receive_points ) jiFenReturn
         FROM
-            order_consumer_detail a ,order_consumer_info b
+        order_consumer_detail a
         WHERE
         a.create_time &gt;= #{startTime}
         AND a.create_time &lt;= #{endTime}
         and a.create_by in
-            (<foreach collection="cashierIdList" item="item" separator=",">
-                #{item}
-            </foreach>)
-        and a.order_id = b.order_id
-        and b.distributor_id = #{distributorId}
+        (<foreach collection="cashierIdList" item="item" separator=",">
+        #{item}
+    </foreach>)
         GROUP BY
-            a.create_by
+        a.create_by
     </select>
     <select id="findListBySaleCode" resultType="com.aiqin.mgs.order.api.domain.OrderInfo">
         SELECT
@@ -1839,6 +1846,151 @@
         <if test="settlementType ==7">
             HAVING jiFenDeduction > 0
         </if>
+    </select>
+    <select id="costAndSalesByCategory" resultType="com.aiqin.mgs.order.api.domain.response.CostAndSalesResp">
+        SELECT
+            left(type_id,#{productCategory}) code,
+
+            sum( amount ) saleProductNum,
+            sum( d.total_price ) totalAmount,
+            sum( cost_price )  productCost
+        FROM
+            order_consumer_detail d,
+            order_consumer_info o
+        WHERE
+            o.order_id = d.order_id
+            <if test="beginTime !=null">
+                AND o.create_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime !=null">
+                AND o.create_time &lt;= #{endTime}
+            </if>
+            AND o.distributor_id = #{distributorId}
+            AND o.pay_status = 1
+
+            group by left(type_id,#{productCategory})
+        limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </select>
+    <select id="costAndSalesByCategory0" resultType="com.aiqin.mgs.order.api.domain.response.CostAndSalesResp">
+        SELECT
+        <if test="productCategory !=null">
+            type_id code,
+        </if>
+        <if test="productPropertyCode !=null">
+            product_property_code code,
+            product_property_name as name,
+        </if>
+        <if test="brandId !=null">
+            d.brand_id code,
+            d.brand_name  as name,
+        </if>
+        <if test="skuCode !=null or skuName!=null">
+            d.sku_code code,
+            d.sku_name  as name,
+        </if>
+        sum( amount ) saleProductNum,
+        sum( d.total_price ) totalAmount,
+        sum( cost_price )  productCost
+        FROM
+        order_consumer_detail d,
+        order_consumer_info o
+        WHERE
+        o.order_id = d.order_id
+        <if test="beginTime !=null">
+            AND o.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime !=null">
+            AND o.create_time &lt;= #{endTime}
+        </if>
+        AND o.distributor_id = #{distributorId}
+
+        <if test="productPropertyCode !=null and productPropertyCode!=''">
+         and   product_property_code  =#{productPropertyCode}
+        </if>
+        <if test="brandId !=null and brandId!=''">
+            and   d.brand_id  =#{brandId}
+        </if>
+        <if test="skuCode !=null and skuCode!=''">
+            and d.sku_code code =#{skuCode}
+
+        </if>
+        <if test="skuName !=null  skuName!=''">
+
+            and d.sku_name =#{skuName}
+        </if>
+        AND o.pay_status = 1
+        group by
+        <if test="productCategory !=null">
+            type_id
+        </if>
+        <if test="productPropertyCode !=null">
+            product_property_code
+        </if>
+        <if test="brandId !=null">
+            d.brand_id,d.brand_name
+        </if>
+        <if test="skuCode !=null or skuName!=null">
+            d.sku_code ,
+            d.sku_name
+        </if>
+        limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </select>
+    <select id="costAndSalesByCategory0Count" resultType="long">
+        select count(* ) FROM (
+        SELECT
+        type_id
+        FROM
+        order_consumer_detail d,
+        order_consumer_info o
+        WHERE
+        o.order_id = d.order_id
+        <if test="beginTime !=null">
+            AND o.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime !=null">
+            AND o.create_time &lt;= #{endTime}
+        </if>
+        AND o.distributor_id = #{distributorId}
+
+        <if test="productPropertyCode !=null and productPropertyCode!=''">
+            and   product_property_code  =#{productPropertyCode}
+        </if>
+        <if test="brandId !=null and brandId!=''">
+            and   d.brand_id  =#{brandId}
+        </if>
+        AND o.pay_status = 1
+        group by
+        <if test="productCategory !=null">
+            type_id
+        </if>
+        <if test="productPropertyCode !=null">
+            product_property_code
+        </if>
+        <if test="brandId !=null">
+            d.brand_id,d.brand_name
+        </if>
+        ) as a
+    </select>
+    <select id="costAndSalesByCategoryCount" resultType="long">
+        select count(* ) FROM (
+        SELECT
+        type_id
+        FROM
+        order_consumer_detail d,
+        order_consumer_info o
+        WHERE
+        o.order_id = d.order_id
+        <if test="beginTime !=null">
+            AND o.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime !=null">
+            AND o.create_time &lt;= #{endTime}
+        </if>
+        AND o.distributor_id = #{distributorId}
+        AND o.pay_status = 1
+
+        group by left(type_id,#{productCategory})
+        ) as a
     </select>
 </mapper>
 

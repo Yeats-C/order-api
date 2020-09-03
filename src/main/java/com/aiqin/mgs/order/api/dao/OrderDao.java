@@ -12,7 +12,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import com.aiqin.mgs.order.api.domain.request.UnPayVo;
+import com.aiqin.mgs.order.api.domain.request.*;
 import com.aiqin.mgs.order.api.domain.request.order.QueryOrderListReqVO;
 import com.aiqin.mgs.order.api.domain.request.statistical.BusinessStatisticalRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.SkuSalesRequest;
@@ -30,9 +30,6 @@ import com.aiqin.mgs.order.api.domain.statistical.SkuSales;
 import org.apache.ibatis.annotations.Param;
 
 import com.aiqin.mgs.order.api.domain.*;
-import com.aiqin.mgs.order.api.domain.request.DevelRequest;
-import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
-import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
 import com.aiqin.mgs.order.api.domain.response.SelectByMemberPayCountResponse;
@@ -256,4 +253,10 @@ public interface OrderDao {
 
     List<AmountDetailsResponse> selectOrderBySettlementType(AmountDetailsRequest amountDetailsRequest);
 
+
+    List<CostAndSalesResp> costAndSalesByCategory(CostAndSalesReq costAndSalesReq);
+    List<CostAndSalesResp> costAndSalesByCategory0(CostAndSalesReq costAndSalesReq);
+    Long costAndSalesByCategory0Count (CostAndSalesReq costAndSalesReq);
+
+    Long costAndSalesByCategoryCount(CostAndSalesReq costAndSalesReq);
 }
