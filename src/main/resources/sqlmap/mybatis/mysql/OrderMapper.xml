@@ -1866,7 +1866,7 @@
                 AND o.create_time &lt;= #{endTime}
             </if>
             AND o.distributor_id = #{distributorId}
-            AND o.pay_status = 1
+            AND o.pay_status = 1  and o.order_type!=3
 
             group by left(type_id,#{productCategory})
         limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
@@ -1923,10 +1923,10 @@
 
             and d.sku_name =#{skuName}
         </if>
-        <if test="cashierId !=null">
+        <if test="cashierId !=null and cashierId !=''">
             and o.cashier_id =#{cashierId}
         </if>
-        AND o.pay_status = 1
+        AND o.pay_status = 1 and o.order_type!=3
         group by
         <if test="productCategory !=null">
             type_id
@@ -1978,10 +1978,10 @@
 
             and d.sku_name =#{skuName}
         </if>
-        <if test="cashierId !=null">
+        <if test="cashierId !=null  and cashierId !='' ">
             and o.cashier_id =#{cashierId}
         </if>
-        AND o.pay_status = 1
+        AND o.pay_status = 1  and o.order_type!=3
         group by
         <if test="productCategory !=null">
             type_id
@@ -2018,7 +2018,7 @@
             AND o.create_time &lt;= #{endTime}
         </if>
         AND o.distributor_id = #{distributorId}
-        AND o.pay_status = 1
+        AND o.pay_status = 1  and o.order_type!=3
 
         group by left(type_id,#{productCategory})
         ) as a
