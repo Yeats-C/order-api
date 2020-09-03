@@ -6,6 +6,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.BasePage;
 import com.aiqin.mgs.order.api.domain.request.CostAndSalesReq;
 import com.aiqin.mgs.order.api.domain.response.CostAndSalesResp;
+import com.aiqin.mgs.order.api.domain.response.CostAndSalesTopResp;
 import com.aiqin.mgs.order.api.service.OrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,7 +34,7 @@ public class OrderReportFormController {
 
     @PostMapping("/costAndSales")
     @ApiOperation(value = "销售及成本报表")
-    public HttpResponse<BasePage<CostAndSalesResp>> costAndSales(@RequestBody CostAndSalesReq costAndSalesReq) {
+    public HttpResponse<CostAndSalesTopResp> costAndSales(@RequestBody CostAndSalesReq costAndSalesReq) {
         log.info("销售及成本报表{}", costAndSalesReq);
         try {
             HttpResponse httpResponse = orderService.costAndSales(costAndSalesReq);

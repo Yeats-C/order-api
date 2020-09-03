@@ -259,4 +259,6 @@ public interface OrderDao {
     Long costAndSalesByCategory0Count (CostAndSalesReq costAndSalesReq);
 
     Long costAndSalesByCategoryCount(CostAndSalesReq costAndSalesReq);
+
+    CostAndSalesSumResp costAndSalesSum(CostAndSalesReq costAndSalesReq);
 }
