@@ -1888,6 +1888,11 @@
             d.sku_code code,
             d.sku_name  as name,
         </if>
+        <if test="cashierId !=null">
+            o.cashier_id code,
+            o.cashier_name  as name,
+        </if>
+
         sum( amount ) saleProductNum,
         sum( d.total_price ) totalAmount,
         sum( cost_price )  productCost
@@ -1914,9 +1919,12 @@
             and d.sku_code code =#{skuCode}
 
         </if>
-        <if test="skuName !=null  skuName!=''">
+        <if test="skuName !=null and skuName!=''">
 
             and d.sku_name =#{skuName}
+        </if>
+        <if test="cashierId !=null">
+            and o.cashier_id =#{cashierId}
         </if>
         AND o.pay_status = 1
         group by
@@ -1932,6 +1940,10 @@
         <if test="skuCode !=null or skuName!=null">
             d.sku_code ,
             d.sku_name
+        </if>
+        <if test="cashierId !=null">
+             o.cashier_id ,
+            o.cashier_name
         </if>
         limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
     </select>
@@ -1958,6 +1970,17 @@
         <if test="brandId !=null and brandId!=''">
             and   d.brand_id  =#{brandId}
         </if>
+        <if test="skuCode !=null and skuCode!=''">
+            and d.sku_code code =#{skuCode}
+
+        </if>
+        <if test="skuName !=null and skuName!=''">
+
+            and d.sku_name =#{skuName}
+        </if>
+        <if test="cashierId !=null">
+            and o.cashier_id =#{cashierId}
+        </if>
         AND o.pay_status = 1
         group by
         <if test="productCategory !=null">
@@ -1968,6 +1991,14 @@
         </if>
         <if test="brandId !=null">
             d.brand_id,d.brand_name
+        </if>
+        <if test="skuCode !=null or skuName!=null">
+            d.sku_code ,
+            d.sku_name
+        </if>
+        <if test="cashierId !=null">
+            o.cashier_id ,
+            o.cashier_name
         </if>
         ) as a
     </select>
