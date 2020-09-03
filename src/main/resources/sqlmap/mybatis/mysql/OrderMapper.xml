@@ -992,8 +992,7 @@
         order_consumer_info b
         LEFT JOIN order_pay a ON a.order_id = b.order_id
         WHERE
-        1=1 and order_type = 1
-        AND b.cashier_id =#{cashierId}
+            b.cashier_id =#{cashierId}
         AND b.order_status NOT IN (0,4)
         AND a.pay_type IN (3,4,5,6)
         and b.distributor_id = #{distributorId}
@@ -1050,8 +1049,8 @@
         FROM
         order_consumer_info a
         LEFT JOIN order_pay c ON a.order_id = c.order_id
-        WHERE 1=1 and order_type = 1
-        AND a.cashier_id =#{cashierId}
+        WHERE
+            a.cashier_id =#{cashierId}
         AND a.order_status NOT IN (0,4)
         AND c.pay_type IN (3,4,5,6)
         <if test="beginTime!=null ">
@@ -1068,8 +1067,8 @@
     <select id="last" resultMap="LastBuyMapping" resultType="java.util.List">
          SELECT distinct a.product_name as product,b.create_time as new_consume_time FROM order_consumer_detail a,
          (SELECT order_id,create_time FROM  order_consumer_info
-          WHERE 1=1
-         and member_id=#{memberId} 
+          WHERE
+            member_id=#{memberId}
          AND order_status NOT IN ('0','4')
          AND pay_status='1'
          ORDER BY create_time DESC LIMIT 3) b 
