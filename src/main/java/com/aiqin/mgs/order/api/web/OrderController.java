@@ -435,12 +435,11 @@ public class OrderController {
     @GetMapping("/cashier")
     @ApiOperation(value = "接口-收银员交班收银情况统计(param:cashier_id、begin_time、end_time、 return:list-OrderbyReceiptSumResponse)....")
     public HttpResponse cashier(@Valid @RequestParam(name = "cashier_id", required = true) String cashierId,
-    		@RequestParam(name = "end_time", required = true) String endTime
-    		) {
+    		@RequestParam(name = "end_time", required = true) String endTime, @RequestParam(value = "distributorId") String distributorId) {
         
     	
-    	LOGGER.info("接口-收银员交班收银情况统计参数 cashierId:{},endTime:{}",cashierId,endTime);
-        return orderService.cashier(cashierId,endTime);
+    	LOGGER.info("接口-收银员交班收银情况统计参数 cashierId:{},endTime:{},distributorId:{}",cashierId,endTime,distributorId);
+        return orderService.cashier(cashierId,endTime,distributorId);
     }
 
     /**

@@ -992,6 +992,7 @@
         AND b.cashier_id =#{cashierId}
         AND b.order_status NOT IN (0,4)
         AND a.pay_type IN (3,4,5,6)
+        and a.distributor_id = #{distributor_id}
         <if test="beginTime!=null ">
             AND b.create_time &gt;= #{beginTime}
         </if>
@@ -1018,6 +1019,7 @@
         <if test="endTime!=null ">
             AND a.create_time &lt;= #{endTime}
         </if>
+        and a.distributor_id = #{distributorId}
     </select>
 
     <select id="returnOnlyByCashierSum" resultType="long">
@@ -1034,6 +1036,7 @@
         <if test="endTime!=null ">
             AND a.create_time &lt;= #{endTime}
         </if>
+        and a.distributor_id = #{distributorId}
     </select>
 
     <!-- 接口-收银员交班收银情况统计 销售额、销售订单数-->
@@ -1053,6 +1056,7 @@
         <if test="endTime!=null ">
             and a.create_time &lt;= #{endTime}
         </if>
+        and a.distributor_id = #{distributorId}
     </select>
 
 

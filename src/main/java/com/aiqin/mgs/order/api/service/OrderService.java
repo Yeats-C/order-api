@@ -83,7 +83,7 @@ public interface OrderService {
 	HttpResponse onlyStatus(@Valid String orderId, Integer orderStatus, String updateBy);
 
 	//接口-收银员交班收银情况统计
-	HttpResponse cashier(@Valid String cashierId, String endTime);
+	HttpResponse cashier(@Valid String cashierId, String endTime,String distributorId);
 
 	//接口-通过会员查询最后一次的消费记录.
 	HttpResponse last(@Valid String memberId);
