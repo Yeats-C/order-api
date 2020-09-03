@@ -1622,11 +1622,11 @@ public class OrderServiceImpl implements OrderService {
 
     //接口-收银员交班收银情况统计
     @Override
-    public HttpResponse cashier(@Valid String cashierId, String endTime) {
+    public HttpResponse cashier(@Valid String cashierId, String endTime,String distributorId) {
         try {
 
             // 获取改收银员最后一次交接时间
-            String beginTime = cashierShiftScheduleDao.selectTimeByCashierId(cashierId);
+            String beginTime = cashierShiftScheduleDao.selectTimeByCashierId(cashierId, distributorId);
             if (StringUtils.isEmpty(beginTime)) {
                 beginTime = DayUtil.getYearStr();
             }
@@ -1637,6 +1637,7 @@ public class OrderServiceImpl implements OrderService {
             orderQuery.setCashierId(cashierId);
             orderQuery.setBeginTime(formatter.parse(beginTime));
             orderQuery.setEndTime(formatter.parse(endTime));
+            orderQuery.setDistributorId(distributorId);
 
             //获取收银员、支付类型金额
             List<OrderbyReceiptSumResponse> list = orderDao.cashier(orderQuery);
