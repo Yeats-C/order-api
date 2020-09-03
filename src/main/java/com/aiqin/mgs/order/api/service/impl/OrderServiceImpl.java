@@ -817,6 +817,39 @@ public class OrderServiceImpl implements OrderService {
         return dataPublicHandle(amountDetailsResponseList, false);
     }
 
+    @Override
+    public HttpResponse<BasePage<CostAndSalesResp>> costAndSales(CostAndSalesReq costAndSalesReq) {
+        BasePage basePage = new BasePage();
+        //品类
+        if (costAndSalesReq.getProductCategory()!=null&&!costAndSalesReq.getProductCategory().equals("")){
+            costAndSalesReq.setProductCategory(costAndSalesReq.getProductCategory()*2);
+            if (costAndSalesReq.getProductCategory()==0){
+                List<CostAndSalesResp> costAndSalesResps=orderDao.costAndSalesByCategory0(costAndSalesReq);
+                Long count=orderDao.costAndSalesByCategory0Count(costAndSalesReq);
+                basePage.setTotalCount(count);
+                basePage.setDataList(costAndSalesResps);
+            }else {
+                List<CostAndSalesResp> costAndSalesResps=orderDao.costAndSalesByCategory(costAndSalesReq);
+                Long count=orderDao.costAndSalesByCategoryCount(costAndSalesReq);
+                basePage.setTotalCount(count);
+                basePage.setDataList(costAndSalesResps);
+            }
+
+        }else {
+            List<CostAndSalesResp> costAndSalesResps=orderDao.costAndSalesByCategory0(costAndSalesReq);
+            Long count=orderDao.costAndSalesByCategory0Count(costAndSalesReq);
+            basePage.setTotalCount(count);
+            basePage.setDataList(costAndSalesResps);
+        }
+        return  HttpResponse.successGenerics(basePage);
+    }
+
+    @Override
+    public HttpResponse updateOrder(String storeId) {
+        //查询出d
+        return null;
+    }
+
     private void accountDataHandle(ReportForDayResponse reportForDayResponse, List<ReportForDayResponse> accountList) {
         accountList.forEach(s -> {
             Long payPrice = s.getPrice();

@@ -846,4 +846,21 @@ public class OrderController {
         List<AmountDetailsResponse> amountDetailsResponseList = orderService.returnAmount(amountDetailsRequest);
         return HttpResponse.successGenerics(amountDetailsResponseList);
     }
+
+
+    /**
+     * 刷新订单中品牌数据
+     * @param skuCode
+     * @param storeId
+     * @param day
+     * @return
+     */
+    @GetMapping ("/update/detail")
+    @ApiOperation(value = "接口-刷新订单中品牌数据")
+    public HttpResponse updateOrder(
+                                   @Valid @RequestParam(name = "store_id") String storeId) {
+
+        LOGGER.info("刷新订单中品牌数据：{}",storeId);
+        return orderService.updateOrder(storeId);
+    }
 }
