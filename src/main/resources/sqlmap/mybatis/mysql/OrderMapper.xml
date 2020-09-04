@@ -1972,8 +1972,8 @@
             d.sku_name as name,
         </if>
         <if test="cashierId !=null">
-            o.cashier_id code,
-            o.cashier_name as name,
+            o.guide_id code,
+            o.guide_name as name,
         </if>
 
         sum( amount ) saleProductNum,
@@ -2006,7 +2006,7 @@
             and d.sku_name =#{skuName}
         </if>
         <if test="cashierId !=null and cashierId !=''">
-            and o.cashier_id =#{cashierId}
+            and o.guide_id =#{cashierId}
         </if>
         AND o.pay_status = 1 and o.order_type!=3
         group by
@@ -2028,8 +2028,8 @@
         </if>
         <if test="cashierId !=null">
 
-            o.cashier_id ,
-            o.cashier_name
+            o.guide_id ,
+            o.guide_name
         </if>
         union
         SELECT
@@ -2052,8 +2052,8 @@
             d.sku_name as name,
         </if>
         <if test="cashierId !=null">
-            o.cashier_id code,
-            o.cashier_name as name,
+            o.guide_id code,
+            o.guide_name as name,
         </if>
         - sum( a.return_amount  ) saleProductNum,
        - sum( a.return_price ) totalAmount,
@@ -2087,7 +2087,7 @@
             and d.sku_name =#{skuName}
         </if>
         <if test="cashierId !=null and cashierId !=''">
-            and o.cashier_id =#{cashierId}
+            and o.guide_id =#{cashierId}
         </if>
 
         group by
@@ -2109,8 +2109,8 @@
         </if>
         <if test="cashierId !=null">
 
-            o.cashier_id ,
-            o.cashier_name
+            o.guide_id ,
+            o.guide_name
         </if>
   )as t
 
@@ -2172,7 +2172,7 @@
             and d.sku_name =#{skuName}
         </if>
         <if test="cashierId !=null and cashierId !=''">
-            and o.cashier_id =#{cashierId}
+            and o.guide_id =#{cashierId}
         </if>
         AND o.pay_status = 1 and o.order_type!=3
         group by
@@ -2194,8 +2194,8 @@
         </if>
         <if test="cashierId !=null">
 
-            o.cashier_id ,
-            o.cashier_name
+            o.guide_id ,
+            o.guide_name
         </if>
         union
         SELECT
@@ -2253,7 +2253,7 @@
             and d.sku_name =#{skuName}
         </if>
         <if test="cashierId !=null and cashierId !=''">
-            and o.cashier_id =#{cashierId}
+            and o.guide_id =#{cashierId}
         </if>
 
         group by
@@ -2275,8 +2275,8 @@
         </if>
         <if test="cashierId !=null">
 
-            o.cashier_id ,
-            o.cashier_name
+            o.guide_id ,
+            o.guide_name
         </if>
         )as t
 
