@@ -17,10 +17,14 @@ import com.aiqin.mgs.order.api.domain.request.*;
 
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.domain.request.order.QueryOrderListReqVO;
+import com.aiqin.mgs.order.api.domain.request.stock.AmountDetailsRequest;
 import com.aiqin.mgs.order.api.domain.request.stock.ReportForDayReq;
+import com.aiqin.mgs.order.api.domain.response.CostAndSalesResp;
+import com.aiqin.mgs.order.api.domain.response.CostAndSalesTopResp;
 import com.aiqin.mgs.order.api.domain.response.PartnerPayGateRep;
 import com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoRespVO;
 import com.aiqin.mgs.order.api.domain.response.order.QueryOrderListRespVO;
+import com.aiqin.mgs.order.api.domain.response.stock.AmountDetailsResponse;
 import com.aiqin.mgs.order.api.domain.response.stock.ReportForDayResponse;
 
 @SuppressWarnings("all")
@@ -81,7 +85,7 @@ public interface OrderService {
 	HttpResponse onlyStatus(@Valid String orderId, Integer orderStatus, String updateBy);
 
 	//接口-收银员交班收银情况统计
-	HttpResponse cashier(@Valid String cashierId, String endTime);
+	HttpResponse cashier(@Valid String cashierId, String endTime,String distributorId);
 
 	//接口-通过会员查询最后一次的消费记录.
 	HttpResponse last(@Valid String memberId);
@@ -245,4 +249,11 @@ public interface OrderService {
 
 	HttpResponse<List<ReportForDayResponse>> reportForDay(ReportForDayReq reportForDayReq);
 
+	List<AmountDetailsResponse> collectAmount(AmountDetailsRequest amountDetailsRequest);
+
+	List<AmountDetailsResponse> returnAmount(AmountDetailsRequest amountDetailsRequest);
+
+	HttpResponse<CostAndSalesTopResp> costAndSales(CostAndSalesReq costAndSalesReq);
+
+    HttpResponse updateOrder(String storeId);
 }

@@ -189,12 +189,13 @@ public class MaterialClaimController {
                result = httpClient.action().result(new TypeReference<Map<String, Object>>() {});
                LOGGER.info("调用门店系统返回结果result:{}", JSON.toJSON(result));
                data = JSON.parseObject(JSON.toJSONString(result.get("data")), StoreBackInfoResponse.class);
-               LOGGER.info("获取门店信息：{}", data);
+               LOGGER.info("上传文件功能,获取门店信息：{}", data);
            }catch (Exception e) {
                LOGGER.info("查询门店信息失败");
                throw e;
            }
            LOGGER.info(JsonUtil.toJson(objectList));
+           LOGGER.info("调用detail2接口入参：" + data.getProvinceId() + "," +  data.getCityId() + "," + data.getCompanyCode() + "," + objectList );
            erpSkuDetailList = bridgeProductService.getProductSkuDetailList(data.getProvinceId(), data.getCityId(), data.getCompanyCode(), objectList);
            LOGGER.info("供应链查询数据返回结果： " + erpSkuDetailList);
            //将表中解析的数据取出来sku编码

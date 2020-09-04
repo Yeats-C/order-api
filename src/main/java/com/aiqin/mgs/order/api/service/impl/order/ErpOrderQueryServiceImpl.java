@@ -424,6 +424,54 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         return this.findOrderList(erpOrderQueryRequest);
     }
 
+    @Override
+    public List<DownloadOrderInfoVo> findDownloadOrderList(ErpOrderQueryRequest erpOrderQueryRequest) {
+        //增加查询类型类别范围
+        ErpOrderTypeCategoryQueryTypeEnum queryTypeEnum = erpOrderQueryRequest.getQueryTypeEnum();
+        List<Integer> orderTypeQueryList = new ArrayList<>();
+        List<Integer> orderCategoryQueryList = new ArrayList<>();
+        for (ErpOrderTypeCategoryControlEnum item :
+                ErpOrderTypeCategoryControlEnum.values()) {
+            if (queryTypeEnum == ErpOrderTypeCategoryQueryTypeEnum.ERP_ORDER_LIST_QUERY) {
+                if (!item.isErpQuery()) {
+                    continue;
+                }
+            } else if (queryTypeEnum == ErpOrderTypeCategoryQueryTypeEnum.ERP_RACK_ORDER_LIST_QUERY) {
+                if (!item.isErpRackQuery()) {
+                    continue;
+                }
+            } else if (queryTypeEnum == ErpOrderTypeCategoryQueryTypeEnum.STORE_ORDER_LIST_QUERY) {
+                if (!item.isStoreQuery()) {
+                    continue;
+                }
+            } else if (queryTypeEnum == ErpOrderTypeCategoryQueryTypeEnum.ERP_WHOLESALE_ORDER_LIST_QUERY) {
+                if (!item.isErpWholesaleQuery()) {
+                    continue;
+                }
+            } else {
+                continue;
+            }
+            if (!orderTypeQueryList.contains(item.getOrderTypeEnum().getCode())) {
+                orderTypeQueryList.add(item.getOrderTypeEnum().getCode());
+            }
+            if (!orderCategoryQueryList.contains(item.getOrderCategoryEnum().getCode())) {
+                orderCategoryQueryList.add(item.getOrderCategoryEnum().getCode());
+            }
+        }
+        erpOrderQueryRequest.setOrderTypeQueryList(orderTypeQueryList);
+        erpOrderQueryRequest.setOrderCategoryQueryList(orderCategoryQueryList);
+
+        log.info(ErpOrderTypeCategoryQueryTypeEnum.getEnum(ErpOrderTypeCategoryQueryTypeEnum.STORE_ORDER_LIST_QUERY)
+                +"查询订单列表的订单类别编码集合为"+JsonUtil.toJson(orderCategoryQueryList));
+        //查询主订单列表
+        erpOrderQueryRequest.setOrderLevel(ErpOrderLevelEnum.PRIMARY.getCode());
+        PagesRequest page = new PagesRequest();
+        page.setPageNo(erpOrderQueryRequest.getPageNo() == null ? 1 : erpOrderQueryRequest.getPageNo());
+        page.setPageSize(erpOrderQueryRequest.getPageSize() == null ? 10 : erpOrderQueryRequest.getPageSize());
+        PageResData<DownloadOrderInfoVo> pageResData = PageAutoHelperUtil.generatePageRes(() -> erpOrderInfoDao.findDownloadOrderList(erpOrderQueryRequest), page);
+        return pageResData.getDataList();
+    }
+
     /**
      * 设置订单按钮控制参数
      *
@@ -536,3 +584,4 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
         }
     }
 }
+

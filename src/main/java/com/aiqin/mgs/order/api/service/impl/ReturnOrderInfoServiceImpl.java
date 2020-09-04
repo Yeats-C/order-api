@@ -18,6 +18,7 @@ import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOperationTypeEnu
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayOrderSourceEnum;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpRequestPayTypeEnum;
 import com.aiqin.mgs.order.api.component.returnenums.*;
+import com.aiqin.mgs.order.api.dao.CopartnerAreaDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalDetailDao;
 import com.aiqin.mgs.order.api.dao.CouponApprovalInfoDao;
 import com.aiqin.mgs.order.api.dao.ReturnOrderDetailBatchDao;
@@ -28,6 +29,7 @@ import com.aiqin.mgs.order.api.dao.returnorder.RefundInfoDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderDetailDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
+import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.PublicAreaStore;
 import com.aiqin.mgs.order.api.domain.po.order.ErpBatchInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
@@ -133,6 +135,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
     private ErpOrderInfoDao erpOrderInfoDao;
     @Resource
     private ReturnOrderDetailBatchDao returnOrderDetailBatchDao;
+    @Resource
+    private CopartnerAreaDao copartnerAreaDao;
 
 
     @Override
@@ -708,8 +712,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             returnOrderInfo1.setStoreCode(returnOrderInfo.getStoreCode());
             returnOrderInfo1.setStoreName(returnOrderInfo.getStoreName());
             //所属合伙人
-            returnOrderInfo1.setCopartnerAreaId(returnOrderInfo.getCopartnerAreaId());
-            returnOrderInfo1.setCopartnerAreaName(returnOrderInfo.getCopartnerAreaName());
+            CopartnerAreaVo copartnerAreaVo = copartnerAreaDao.selectCopartnerAreaInfo(returnOrderInfo.getCopartnerAreaId());
+            if (null != copartnerAreaVo&&null!= copartnerAreaVo.getId()){
+                returnOrderInfo1.setCopartnerAreaId(copartnerAreaVo.getId());
+                returnOrderInfo1.setCopartnerAreaName(returnOrderInfo.getCopartnerAreaName());
+            }
             //退货类型
             returnOrderInfo1.setReturnOrderType(returnOrderInfo.getReturnOrderType());
             //仓库
@@ -745,6 +752,16 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                         r.setProductPropertyCode(e.getProductPropertyCode());
                         r.setProductPropertyName(e.getProductPropertyName());
                         r.setPurchaseAmount(e.getPurchaseAmount());
+                        //活动优惠
+                        r.setTotalAcivityAmount(e.getTotalAcivityAmount());
+                        //项税税率
+                        r.setOutputTaxRate(e.getTaxRate());
+                        //实发数量
+                        r.setActualProductCount(e.getActualProductCount().intValue());
+                        //分摊后金额
+                        r.setTotalPreferentialAmount(e.getTotalPreferentialAmount());
+                        //活动价
+                        r.setActivityPrice(e.getActivityPrice());
                         //冲减单字段赋值与退货不一致，需要做处理
                         if(ReturnOrderEnum.RETURN_ORDER_TYPE_3.getCode().equals(returnOrderInfo.getReturnOrderType())){
                             r.setReturnProductCount(r.getActualReturnProductCount());
@@ -809,6 +826,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         }
         //查询商品的商品信息
         ErpOrderInfo orderDetailByOrderCode = erpOrderQueryService.getOrderDetailByOrderCode(roi.getOrderStoreCode());
+        log.info("查询原订单-商品明细-返回结果： " + orderDetailByOrderCode);
         //将退货单同步到结算系统-----加
         ReturnOrderDetailVO  order = new ReturnOrderDetailVO();
         ReturnOrderInfo returnOrderInfo1 = new ReturnOrderInfo();
@@ -833,8 +851,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         returnOrderInfo1.setWarehouseCode(roi.getWarehouseCode());
         returnOrderInfo1.setWarehouseName(roi.getWarehouseName());
         //所属合伙人
-        returnOrderInfo1.setCopartnerAreaId(roi.getCopartnerAreaId());
-        returnOrderInfo1.setCopartnerAreaName(roi.getCopartnerAreaName());
+        CopartnerAreaVo copartnerAreaVo = copartnerAreaDao.selectCopartnerAreaInfo(roi.getCopartnerAreaId());
+        if (null != copartnerAreaVo&&null!= copartnerAreaVo.getId()){
+            returnOrderInfo1.setCopartnerAreaId(copartnerAreaVo.getId());
+            returnOrderInfo1.setCopartnerAreaName(roi.getCopartnerAreaName());
+        }
         //退货金额
         returnOrderInfo1.setReturnOrderAmount(roi.getReturnOrderAmount());
         //退A品券总额
@@ -864,6 +885,16 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                     r.setProductPropertyCode(e.getProductPropertyCode());
                     r.setProductPropertyName(e.getProductPropertyName());
                     r.setPurchaseAmount(e.getPurchaseAmount());
+                    //活动优惠
+                    r.setTotalAcivityAmount(e.getTotalAcivityAmount());
+                    //项税税率
+                    r.setOutputTaxRate(e.getTaxRate());
+                    //实发数量
+                    r.setActualProductCount(e.getActualProductCount().intValue());
+                    //分摊后金额
+                    r.setTotalPreferentialAmount(e.getTotalPreferentialAmount());
+                    //活动价
+                    r.setActivityPrice(e.getActivityPrice());
                     if(ReturnOrderEnum.RETURN_ORDER_TYPE_3.getCode().equals(roi.getReturnOrderType())){
                       r.setReturnProductCount(r.getActualReturnProductCount());
                     }

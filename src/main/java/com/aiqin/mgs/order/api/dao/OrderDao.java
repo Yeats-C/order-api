@@ -9,28 +9,28 @@ package com.aiqin.mgs.order.api.dao;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
-import com.aiqin.mgs.order.api.domain.request.UnPayVo;
+import com.aiqin.mgs.order.api.domain.request.*;
 import com.aiqin.mgs.order.api.domain.request.order.QueryOrderListReqVO;
 import com.aiqin.mgs.order.api.domain.request.statistical.BusinessStatisticalRequest;
 import com.aiqin.mgs.order.api.domain.request.statistical.SkuSalesRequest;
+import com.aiqin.mgs.order.api.domain.request.stock.AmountDetailsRequest;
 import com.aiqin.mgs.order.api.domain.request.stock.ReportForDayReq;
 import com.aiqin.mgs.order.api.domain.response.*;
 import com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoRespVO;
 import com.aiqin.mgs.order.api.domain.response.order.QueryOrderListRespVO;
 import com.aiqin.mgs.order.api.domain.response.returngoods.ReturnOrderInfoItemBatchRespVO;
 import com.aiqin.mgs.order.api.domain.response.statistical.Last10DaysOrderStatistical;
+import com.aiqin.mgs.order.api.domain.response.stock.AmountDetailsResponse;
 import com.aiqin.mgs.order.api.domain.response.stock.ReportForDayResponse;
 import com.aiqin.mgs.order.api.domain.statistical.BusinessStatistical;
 import com.aiqin.mgs.order.api.domain.statistical.SkuSales;
 import org.apache.ibatis.annotations.Param;
 
 import com.aiqin.mgs.order.api.domain.*;
-import com.aiqin.mgs.order.api.domain.request.DevelRequest;
-import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
-import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderResponse;
 import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
 import com.aiqin.mgs.order.api.domain.response.SelectByMemberPayCountResponse;
@@ -251,4 +251,16 @@ public interface OrderDao {
     List<ReportForDayResponse> selectPointRecord(ReportForDayReq reportForDayReq);
 
     List<OrderInfo> findListBySaleCode(@Param("orderCodeList")List<String> orderCodeList);
+
+    List<AmountDetailsResponse> selectOrderBySettlementType(AmountDetailsRequest amountDetailsRequest);
+
+
+    //List<CostAndSalesResp> costAndSalesByCategory(CostAndSalesReq costAndSalesReq);
+    List<CostAndSalesResp> costAndSalesByCategory0(CostAndSalesReq costAndSalesReq);
+    Long costAndSalesByCategory0Count (CostAndSalesReq costAndSalesReq);
+
+    //Long costAndSalesByCategoryCount(CostAndSalesReq costAndSalesReq);
+
+    CostAndSalesSumResp costAndSalesSum(CostAndSalesReq costAndSalesReq);
+
 }

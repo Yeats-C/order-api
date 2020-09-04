@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aiqin.mgs.order.api.dao.LogisticsRuleDao">
 
-    <insert id="saveRule">
+<insert id="saveRule">
         insert into logistics_relief_info (rult_type,rult_type_name,rult_code,
         create_time,create_by_id,create_by_name)
         values (
@@ -14,7 +14,7 @@
         #{createByName,jdbcType=VARCHAR}
         )
     </insert>
-    <insert id="saveProduct">
+<insert id="saveProduct">
         insert into logistics_relief_product(rult_type,rult_code,product_code,product_name,
         sales_standard,brand,category,types,fare_sill,create_time,spu_code,spu_name)
         values (
@@ -33,46 +33,85 @@
         )
 
     </insert>
-    <insert id="addProduct" parameterType="list">
-     insert into logistics_relief_product(rult_type,rult_code,product_code,product_name,
-     sales_standard,brand,category,types,fare_sill,create_time,spu_code,spu_name)
-     values
-        <foreach collection="newlyLogisticsRuleInfo" item="item" index="index" separator=",">
-            (
-            #{item.rultType,jdbcType=INTEGER}, #{item.rultCode,jdbcType=VARCHAR},
-            #{item.productCode,jdbcType=VARCHAR}, #{item.productName,jdbcType=VARCHAR},
-            #{item.salesStandard,jdbcType=VARCHAR}, #{item.brand,jdbcType=VARCHAR},
-            #{item.category,jdbcType=VARCHAR},#{item.types,jdbcType=INTEGER},
-            #{item.fareSill,jdbcType=DECIMAL},
-            now(),
-            #{spuCode,jdbcType=VARCHAR},
-            #{spuName,jdbcType=VARCHAR}
-            )
-        </foreach>
+<insert id="addProduct" parameterType="list">
+    insert into logistics_relief_product(rult_type,rult_code,product_code,product_name,
+    sales_standard,brand,category,types,fare_sill,create_time,spu_code,spu_name)
+    values
+    <foreach collection="newlyLogisticsRuleInfo" item="item" index="index" separator=",">
+        (
+        #{item.rultType,jdbcType=INTEGER}, #{item.rultCode,jdbcType=VARCHAR},
+        #{item.productCode,jdbcType=VARCHAR}, #{item.productName,jdbcType=VARCHAR},
+        #{item.salesStandard,jdbcType=VARCHAR}, #{item.brand,jdbcType=VARCHAR},
+        #{item.category,jdbcType=VARCHAR},#{item.types,jdbcType=INTEGER},
+        #{item.fareSill,jdbcType=DECIMAL},
+        now(),
+        #{spuCode,jdbcType=VARCHAR},
+        #{spuName,jdbcType=VARCHAR}
+        )
+    </foreach>
+</insert>
+<insert id="addLogistics" parameterType="com.aiqin.mgs.order.api.domain.logisticsRule.NewLogisticsInfo">
+        insert into logistics_relief_info(rult_type,logistics_explain,amount_required,logistics_proportion,rult_code,logistics_order_type,
+        reduce_scope,create_time,create_by_id,create_by_name,dev,effective_status,is_delete)
+        values (
+           #{rultType},
+           #{logisticsExplain},
+           #{amountRequired},
+           #{logisticsProportion},
+           #{rultCode},
+           #{logisticsOrderType},
+           #{reduceScope},
+           now(),
+           #{createById},
+           #{createByName},
+           #{dev},
+           #{effectiveStatus},
+           #{isDelete}
+        )
     </insert>
-    <update id="updateStatus">
-        update logistics_relief_product
-        set
-        <if test="effectiveStatus != null">
-            effective_status = #{effectiveStatus,jdbcType=INTEGER},
-        </if>
-        <if test="updateByName != null and updateByName != ''">
-            update_by_name = #{updateByName,jdbcType=VARCHAR},
-        </if>
-        update_time = now()
-        where rult_code = #{rultCode,jdbcType=VARCHAR}
-    </update>
-    <update id="updateSingle">
-        update logistics_relief_product
-        set
-        <if test="fareSill != null">
-            fare_sill = #{fareSill,jdbcType=DECIMAL},
-        </if>
+<insert id="addLogisticsList" parameterType="list">
+    insert into logistics_relief_product(rult_code,brand,brand_name,category,category_name,product_type,create_time,
+    create_by_name,effective_status,spu_code,spu_name,rult_id,is_delete)
+    values
+    <foreach collection="newReduceInfoList" item="item" index="index" separator=",">
+        (
+        #{item.rultCode}, #{item.brand},
+        #{item.brandName}, #{item.category},
+        #{item.categoryName}, #{item.productType},
+        now(),
+        #{item.createByName},
+        #{item.effectiveStatus},
+        #{item.spuCode},
+        #{item.spuName},
+        #{item.rultId},
+        #{item.isDelete}
+        )
+    </foreach>
+
+</insert>
+<update id="updateStatus">
+    update logistics_relief_product
+    set
+    <if test="effectiveStatus != null">
+        effective_status = #{effectiveStatus,jdbcType=INTEGER},
+    </if>
+    <if test="updateByName != null and updateByName != ''">
         update_by_name = #{updateByName,jdbcType=VARCHAR},
-        update_time = now()
-        where rult_code = #{rultCode,jdbcType=VARCHAR} and product_code = #{productCode,jdbcType=VARCHAR} and rult_type = #{rultType,jdbcType=INTEGER}
-    </update>
-    <update id="updatefareSill">
+    </if>
+    update_time = now()
+    where rult_code = #{rultCode,jdbcType=VARCHAR}
+</update>
+<update id="updateSingle">
+    update logistics_relief_product
+    set
+    <if test="fareSill != null">
+        fare_sill = #{fareSill,jdbcType=DECIMAL},
+    </if>
+    update_by_name = #{updateByName,jdbcType=VARCHAR},
+    update_time = now()
+    where rult_code = #{rultCode,jdbcType=VARCHAR} and product_code = #{productCode,jdbcType=VARCHAR} and rult_type = #{rultType,jdbcType=INTEGER}
+</update>
+<update id="updatefareSill">
         update logistics_relief_product
         set
            fare_sill = #{fareSill,jdbcType=DECIMAL},
@@ -81,25 +120,110 @@
         where
            rult_code = #{rultCode,jdbcType=VARCHAR} and rult_type = #{rultType,jdbcType=INTEGER} and product_code = #{productCode,jdbcType=VARCHAR}
     </update>
+<update id="updateLogisticsStatus">
+        update logistics_relief_product
+        set
+          effective_status = #{effectiveStatus},
+          update_time = now()
+        where
+           rult_code = #{rultCode}
+    </update>
+<update id="updateByCodeAndId">
+        update logistics_relief_product
+        set
+          is_delete = 1
+        where
+          rult_code = #{rultCode}
+    </update>
+    <update id="updateLogisticsInfo">
+        update logistics_relief_info
+        set
+          effective_status = #{effectiveStatus},
+          update_time = now()
+        where
+          rult_code = #{rultCode}
+    </update>
+    <update id="updateLogisticsInfoByCode">
+        update logistics_relief_info
+        set
+         is_delete = 1
+        where
+          rult_code = #{rultCode}
+    </update>
+    <update id="updateInfo">
+        update logistics_relief_info
+        <set>
+            <if test="rultType != null">
+                rult_type = #{rultType},
+            </if>
+            <if test="logisticsExplain != null and logisticsExplain != ''">
+                logistics_explain = #{logisticsExplain},
+            </if>
+            <if test="amountRequired != null">
+                amount_required = #{amountRequired},
+            </if>
+            <if test="logisticsProportion != null">
+                logistics_proportion = #{logisticsProportion},
+            </if>
+            <if test="logisticsOrderType != null">
+                logistics_order_type = #{logisticsOrderType},
+            </if>
+            <if test="reduceScope != null">
+                reduce_scope = #{reduceScope},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+           </if>
+            <if test="createById != null and createById != ''">
+                create_by_id = #{createById},
+            </if>
+            <if test="createByName != null and createByName != ''">
+                create_by_name = #{createByName},
+            </if>
+            update_time = now(),
+            <if test="dev != null and dev != ''">
+                dev = #{dev},
+            </if>
+            <if test="effectiveStatus != null">
+                effective_status = #{effectiveStatus},
+            </if>
+            <if test="isDelete != null">
+                is_delete = #{isDelete}
+            </if>
+            where
+            rult_code = #{rultCode}
+        </set>
+    </update>
+    <update id="updatelogisticsStatus">
+        update logistics_relief_product
+        set is_delete = 1
+        where rult_code = #{rultCode}
+    </update>
     <delete id="deleteLogisticsRule">
         delete from logistics_relief_info where rult_code = #{rultCode,jdbcType=VARCHAR}
     </delete>
-    <delete id="deleteLogisticsProduct">
+<delete id="deleteLogisticsProduct">
         delete from  logistics_relief_product where rult_code = #{rultCode,jdbcType=VARCHAR}
     </delete>
-    <delete id="deleteProduct" parameterType="java.util.List">
-        delete from  logistics_relief_product
-        where
-        <foreach collection="delecteProductList" item="item" index="index"  separator="or" >
-            (
-            rult_code =  #{item.rultCode,jdbcType=VARCHAR} and
-            rult_type =  #{item.rultType,jdbcType=INTEGER} and
-            product_code =  #{item.productCode,jdbcType=VARCHAR}
-            )
-        </foreach>
-    </delete>
-    <delete id="deleteAll" parameterType="java.lang.String">
+<delete id="deleteProduct" parameterType="java.util.List">
+    delete from  logistics_relief_product
+    where
+    <foreach collection="delecteProductList" item="item" index="index"  separator="or" >
+        (
+        rult_code =  #{item.rultCode,jdbcType=VARCHAR} and
+        rult_type =  #{item.rultType,jdbcType=INTEGER} and
+        product_code =  #{item.productCode,jdbcType=VARCHAR}
+        )
+    </foreach>
+</delete>
+<delete id="deleteAll" parameterType="java.lang.String">
         delete from logistics_relief_product where rult_code = #{rultCode,jdbcType=VARCHAR}
+    </delete>
+<delete id="deleteOneLogistics">
+        DELETE from logistics_relief_info WHERE rult_code = #{rultCode}
+    </delete>
+<delete id="deleteOnewLogisticsProduct">
+        DELETE  FROM  logistics_relief_product WHERE rult_code = #{rultCode}
     </delete>
     <select id="getLogisticsRule" resultType="com.aiqin.mgs.order.api.domain.logisticsRule.LogisticsRuleInfo">
         SELECT product_code as productCode,product_name as productName,fare_sill as fareSill,rult_type as rultType,
@@ -107,44 +231,86 @@
         FROM logistics_relief_product
         WHERE rult_code = #{rultCode,jdbcType=VARCHAR}
     </select>
-    <select id="selectAll" resultType="com.aiqin.mgs.order.api.domain.response.LogisticsAllResponse">
-         select * from (
-         select
-         rult_code as rultCode, rult_type as rultType,
-         GROUP_CONCAT(product_code) as productCode,
-         GROUP_CONCAT(product_name) as productName,
-         brand, category, fare_sill as fareSill, types,effective_status as effectiveStatus,
-         update_time as updateTime,
-         update_by_name as updateByName,
-         sales_standard as salesStandard,
-         spu_code as spuCode,
-         spu_name as spuName
-         from logistics_relief_product group by rult_code,rult_type HAVING rult_type in (2,3)
-         union all
-         select
-         rult_code as rultCode, rult_type as rultType, product_code as productCode, product_name as productName , brand, category, fare_sill as fareSill, types, effective_status as effectiveStatus, update_time as updateTime,
-         update_by_name as updateByName,  sales_standard as salesStandard,
-        spu_code as spuCode,
-        spu_name as spuName
-        from logistics_relief_product where rult_type  in (0,1)
-        )
-        logistics_relief_product
-        where 1=1
-            <if test="productCode != null and productCode !=''">
-                and productCode like CONCAT('%',#{productCode},'%')
-            </if>
-            <if test="productName != null and productName != ''">
-                and productName like CONCAT('%',#{productName},'%')
-            </if>
-            <if test="effectiveStatus != null">
-                and effectiveStatus = #{effectiveStatus,jdbcType=INTEGER}
-            </if>
-            <if test="spuCodes != null and spuCodes.size > 0">
-                and spuCode in
-                <foreach collection="spuCodes" item="item" open="(" separator="," close=")">
-                    #{item}
-                </foreach>
-            </if>
-         order by updateTime desc
+<select id="selectAll" resultType="com.aiqin.mgs.order.api.domain.response.LogisticsAllResponse">
+    select * from (
+    select
+    rult_code as rultCode, rult_type as rultType,
+    GROUP_CONCAT(product_code) as productCode,
+    GROUP_CONCAT(product_name) as productName,
+    brand, category, fare_sill as fareSill, types,effective_status as effectiveStatus,
+    update_time as updateTime,
+    update_by_name as updateByName,
+    sales_standard as salesStandard,
+    spu_code as spuCode,
+    spu_name as spuName
+    from logistics_relief_product group by rult_code,rult_type HAVING rult_type in (2,3)
+    union all
+    select
+    rult_code as rultCode, rult_type as rultType, product_code as productCode, product_name as productName , brand, category, fare_sill as fareSill, types, effective_status as effectiveStatus, update_time as updateTime,
+    update_by_name as updateByName,  sales_standard as salesStandard,
+    spu_code as spuCode,
+    spu_name as spuName
+    from logistics_relief_product where rult_type  in (0,1)
+    )
+    logistics_relief_product
+    where 1=1
+    <if test="productCode != null and productCode !=''">
+        and productCode like CONCAT('%',#{productCode},'%')
+    </if>
+    <if test="productName != null and productName != ''">
+        and productName like CONCAT('%',#{productName},'%')
+    </if>
+    <if test="effectiveStatus != null">
+        and effectiveStatus = #{effectiveStatus,jdbcType=INTEGER}
+    </if>
+    <if test="spuCodes != null and spuCodes.size > 0">
+        and spuCode in
+        <foreach collection="spuCodes" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </if>
+    order by updateTime desc
+</select>
+<select id="selectAllLogistics" resultType="com.aiqin.mgs.order.api.domain.logisticsRule.NewAllLogistics">
+        select  logistics_explain as logisticsExplain, amount_required as amountRequired, logistics_proportion as logisticsProportion,
+        effective_status as effectiveStatus, create_by_name as createByName, create_time as createTime, rult_type as rultType, rult_code as rultCode
+        from
+        logistics_relief_info
+        where rult_type = 10 and is_delete = 2
+    </select>
+<select id="selecLogisticsInfo" resultType="com.aiqin.mgs.order.api.domain.logisticsRule.NewLogisticsInfo">
+        select  rult_type as rultType,logistics_explain as logisticsExplain,amount_required as amountRequired,logistics_proportion as logisticsProportion,rult_code as rultCode,logistics_order_type as logisticsOrderType,
+        reduce_scope as reduceScope,create_time as createTime,create_by_id as createById,create_by_name as createByName,dev as dev, effective_status as effectiveStatus, is_delete as isDelete
+        from
+        logistics_relief_info
+        where
+        rult_code = #{rultCode} and rult_type = #{rultType} and is_delete = 2
+    </select>
+<select id="selectLogisticsDetail" resultType="com.aiqin.mgs.order.api.domain.logisticsRule.NewReduceInfo">
+        select  rult_code as rultCode,brand as brand,brand_name as brandName,category as category,category_name as categoryName,product_type as productType,create_time as createTime,
+       create_by_name as createByName,effective_status as effectiveStatus,spu_code as spuCode,spu_name as spuName,rult_id as rultId,is_delete as isDelete,update_time as updateTime
+        from  logistics_relief_product
+        where rult_code = #{rultCode} and is_delete = 2
+    </select>
+<select id="selecLogisticsInfoAll"
+        resultType="com.aiqin.mgs.order.api.domain.logisticsRule.NewLogisticsInfo">
+        select  a.rult_type as rultType,a.logistics_explain as logisticsExplain,a.amount_required as amountRequired,a.logistics_proportion as logisticsProportion,a.rult_code as rultCode,a.logistics_order_type as logisticsOrderType,
+        a.reduce_scope as reduceScope,a.create_time as createTime,a.create_by_id as createById,a.create_by_name as createByName
+        from
+        logistics_relief_info a left join logistics_relief_product b on a.rult_code = b.rult_code
+        where b.effective_status = 1 and b.is_delete = 2
+    </select>
+<select id="selectLogisticsDetailAll"
+        resultType="com.aiqin.mgs.order.api.domain.logisticsRule.NewReduceInfo">
+        select  rult_code as rultCode,brand as brand,brand_name as brandName,category as category,category_name as categoryName,product_type as productType,create_time as createTime,
+        create_by_name as createByName,effective_status as effectiveStatus,spu_code as spuCode,spu_name as spuName,rult_id as rultId,is_delete as isDelete,update_time as updateTime
+        from  logistics_relief_product
+        where rult_code = #{rultCode} and is_delete = 2 and effective_status = 1
+    </select>
+<select id="selectEffective" resultType="java.lang.Integer">
+        select effective_status as effectiveStatus
+        from logistics_relief_product
+        where rult_code = #{rultCode} and is_delete = 2
+        limit 1
     </select>
 </mapper>

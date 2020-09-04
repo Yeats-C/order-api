@@ -19,6 +19,7 @@ import lombok.Data;
 @Data
 @ApiModel("订单明细实体类")
 public class OrderDetailInfo extends PagesRequest {
+	private Integer id;
 	
 	@ApiModelProperty(value="排序")
 	@JsonProperty("rowno")
@@ -259,6 +260,14 @@ public class OrderDetailInfo extends PagesRequest {
 	@ApiModelProperty("商品属性名称")
 	@JsonProperty("product_property_name")
 	private String productPropertyName;
+
+	@ApiModelProperty(value = "品牌类型id")
+	@JsonProperty("brand_id")
+	private String brandId;
+
+	@ApiModelProperty(value = "品牌类型名称")
+	@JsonProperty("brand_name")
+	private String brandName;
 }
 
 

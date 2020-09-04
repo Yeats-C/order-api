@@ -66,7 +66,9 @@ public class OrderAfterDetailServiceImpl implements OrderAfterDetailService{
 				//订单售后ID、订单售后明细ID
 				info.setAfterSaleId(afterSaleId);
 				info.setAfterSaleDetailId(OrderPublic.getUUID());
-				info.setCostPoints(0);
+				if (info.getCostPoints()==null){
+					info.setCostPoints(0);
+				}
 				//保存售后数据
 				orderAfterDetailDao.addAfterOrderDetail(info);
 			}

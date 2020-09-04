@@ -6,6 +6,8 @@ import com.aiqin.mgs.order.api.domain.LogisticsRuleInfoList;
 import com.aiqin.mgs.order.api.domain.LogisticsRuleRequest;
 import com.aiqin.mgs.order.api.domain.echoLogisticsRule;
 import com.aiqin.mgs.order.api.domain.logisticsRule.LogisticsRuleInfo;
+import com.aiqin.mgs.order.api.domain.logisticsRule.NewAllLogistics;
+import com.aiqin.mgs.order.api.domain.logisticsRule.NewLogisticsRequest;
 import com.aiqin.mgs.order.api.domain.response.LogisticsAllResponse;
 import com.aiqin.mgs.order.api.service.LogisticsRuleService;
 import com.aiqin.mgs.order.api.util.ResultModel;
@@ -65,5 +67,54 @@ public class LogisticsRuleController {
     @ApiOperation("通过spuList查询规则")
     public HttpResponse<List<LogisticsAllResponse>> selectRuleBuSpuCode(@RequestBody List<String> spuCodes){
         return logisticsRuleService.selectRuleBuSpuCode(spuCodes);
+    }
+
+
+    @PostMapping("/add/new")
+    @ApiOperation("新规则-物流减免规则")
+    public HttpResponse addNewLogistics(@RequestBody NewLogisticsRequest newLogisticsRequest){
+        return logisticsRuleService.addNewLogisticsRule(newLogisticsRequest);
+    }
+
+    @GetMapping("/getList")
+    @ApiOperation("新规则-物流减免列表")
+    public HttpResponse<List<NewAllLogistics>> selectList(Integer pageNo, Integer pageSize){
+        return logisticsRuleService.selectAll(pageNo,pageSize);
+    }
+
+    @GetMapping("/update/status")
+    @ApiOperation("新规则-修改生效状态")
+    public HttpResponse updateStatus(@RequestParam(value = "rult_code") String rultCode,
+                                     @RequestParam(value = "effective_status" ) Integer effectiveStatus){
+        return logisticsRuleService.updateStatusByCode(rultCode,effectiveStatus);
+    }
+
+    @DeleteMapping("/delete")
+    @ApiOperation("新规则-删除物流减免")
+    public HttpResponse deleteLogistics(@RequestParam(value = "rult_code") String rultCode){
+        return logisticsRuleService.deleteLogisticsByCodeAndId(rultCode);
+    }
+
+
+    @GetMapping("/select/logistics")
+    @ApiOperation("新规则-物流减免详情")
+    public HttpResponse<NewLogisticsRequest> selectLogistics(
+                                        @RequestParam(value = "rult_code") String rultCode,
+                                        @RequestParam(value = "rult_type") String rultType){
+        return logisticsRuleService.selectLogisticsDetail(rultCode,rultType);
+
+    }
+
+    @PutMapping("/update/logistics")
+    @ApiOperation("新规则-编辑物流减免")
+    public HttpResponse updateLogistics(@RequestBody NewLogisticsRequest newLogisticsRequest){
+        return logisticsRuleService.updateLogisticsByCode(newLogisticsRequest);
+    }
+
+
+    @GetMapping("/all")
+    @ApiOperation("新规则-查询全部生效物流规则")
+    public HttpResponse selectAll(){
+        return logisticsRuleService.selectLogisticsAll();
     }
 }

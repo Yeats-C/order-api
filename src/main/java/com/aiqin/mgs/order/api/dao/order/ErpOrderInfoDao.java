@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.dao.order;
 
 import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.ActivitySales;
+import com.aiqin.mgs.order.api.domain.po.order.DownloadOrderInfoVo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest;
 import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderFranchisee;
@@ -146,4 +147,24 @@ public interface ErpOrderInfoDao {
     int updateOrderReturnProcess(String orderStoreCode);
 
     int updateOrderReturnProcessStatus(String orderStoreCode);
+
+    /**
+     * 查询导出订单列表信息
+     * @param erpOrderQueryRequest
+     * @return
+     */
+    List<DownloadOrderInfoVo> findDownloadOrderList(ErpOrderQueryRequest erpOrderQueryRequest);
+
+    /**
+     * 查询需要发放物流减免的订单列表
+     *
+     * @param
+     */
+    List<ErpOrderInfo> getLogisticsSentList();
+
+    /**
+     * 修改物流减免支付状态为0（已支付或无需支付）
+     * @param orderStoreCode
+     */
+    void updateLogisticsAmountSent(String orderStoreCode);
 }

@@ -84,7 +84,17 @@
 		  and order_code =#{orderCode}
 		  </if>
           GROUP BY order_code) a WHERE a.amount>0
-    </select>  
-    
+    </select>
+    <select id="returnAmountByOrderCodeList"
+            resultMap="IdAndAmountMapping" resultType="java.util.List">
+        SELECT id,amount FROM (
+        SELECT order_code AS id,SUM(a.return_amount) AS amount FROM  `order_after_sale_detail` a
+        WHERE
+              order_code in
+            <foreach collection="list" separator="," open="(" close=")" item="item">
+             #{item}
+            </foreach>
+        GROUP BY order_code) a WHERE a.amount>0
+    </select>
 </mapper>
 

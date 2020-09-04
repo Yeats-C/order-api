@@ -14,7 +14,7 @@ import javax.validation.Valid;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
-
+import org.apache.ibatis.annotations.Param;
 
 
 public interface OrderAfterDetailDao {
@@ -29,7 +29,8 @@ public interface OrderAfterDetailDao {
 
     //查询退货数量
 	List<OrderIdAndAmountRequest> returnAmount(@Valid ReorerRequest reorerRequest)throws Exception;
-    
-    
+
+
+    List<OrderIdAndAmountRequest> returnAmountByOrderCodeList(@Param("list") List<String> orderCodeList);
 
 }

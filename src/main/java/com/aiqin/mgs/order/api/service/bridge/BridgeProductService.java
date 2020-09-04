@@ -17,6 +17,7 @@ import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.dto.ProductDistributorOrderDTO;
 import com.aiqin.mgs.order.api.domain.po.gift.NewStoreGradient;
 import com.aiqin.mgs.order.api.domain.po.order.*;
+import com.aiqin.mgs.order.api.domain.request.CalculateReqVo;
 import com.aiqin.mgs.order.api.domain.request.InventoryDetailRequest;
 import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
@@ -26,6 +27,7 @@ import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailVO;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
 import com.aiqin.mgs.order.api.domain.request.stock.ProductSkuStockRespVo;
 import com.aiqin.mgs.order.api.domain.response.NewFranchiseeResponse;
+import com.aiqin.mgs.order.api.domain.response.ProductRespVO;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetail;
 import com.aiqin.mgs.order.api.domain.response.gift.StoreAvailableGiftQuotaResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ProductSkuRespVo2;
@@ -46,6 +48,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -103,7 +106,7 @@ public HttpResponse changeStock(List<InventoryDetailRequest> stockReqVos) {
 public HttpResponse<List<CartOrderInfo>> getProduct(ShoppingCartProductRequest shoppingCartProductRequest){
     shoppingCartProductRequest.setCompanyCode("14");
     String path = "/search/spu/sku/detail2";
-    HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest);
+    HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest).timeout(10000);
     HttpResponse<List<CartOrderInfo>> response = httpClient.action().result(new TypeReference<HttpResponse<List<CartOrderInfo>>>() {
     });
 //        //测试接口
@@ -144,7 +147,7 @@ public List<ErpSkuDetail> getProductSkuDetailList(String provinceCode, String ci
         shoppingCartProductRequest.setProductSkuRequest2List(productSkuRequest2List);
         String path = "/search/spu/sku/detail2";
         log.info("detail2 接口参数为：{}"+JsonUtil.toJson(shoppingCartProductRequest));
-        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest);
+        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest).timeout(10000);
         HttpResponse<List<ErpSkuDetail>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ErpSkuDetail>>>() {
         });
         log.info("detail2 接口 请求结果为：{}"+JsonUtil.toJson(response));
@@ -187,7 +190,7 @@ public ErpSkuDetail getProductSkuDetail(String provinceCode, String cityCode, St
         productSkuRequest2List.add(productSkuRequest2);
         shoppingCartProductRequest.setProductSkuRequest2List(productSkuRequest2List);
         String path = "/search/spu/sku/detail2";
-        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest);
+        HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest).timeout(10000);
         HttpResponse<List<ErpSkuDetail>> response = httpClient.action().result(new TypeReference<HttpResponse<List<ErpSkuDetail>>>() {
         });
 
@@ -218,7 +221,7 @@ public CartOrderInfo getCartProductDetail(String provinceId, String cityId, Stri
     skuCodeList.add(skuCode);
     shoppingCartProductRequest.setSkuCodes(skuCodeList);
     String path = "/search/spu/sku/detail2";
-    HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest);
+    HttpClient httpClient = HttpClient.post(urlProperties.getProductApi() + path).json(shoppingCartProductRequest).timeout(10000);
     HttpResponse<List<CartOrderInfo>> response = httpClient.action().result(new TypeReference<HttpResponse<List<CartOrderInfo>>>() {
     });
 
@@ -798,16 +801,27 @@ public HttpResponse<MerchantPaBalanceRespVO> accountBalance(String franchiseeId)
                 int productCount = 0;
                 if (null != order.getItemList() && order.getItemList().size() > 0) {
                     for (ErpOrderItem item : order.getItemList()) {
+                        productCount += item.getProductCount();
                         if (productMap.containsKey(item.getSkuCode()+"product_type"+item.getProductType())){
                             //结算商品list里面已经有此sku，需要合并
-                            ErpBatchInfo batchInfo=new ErpBatchInfo();
-                            batchInfo.setBatchInfoCode(item.getBatchInfoCode());
-                            batchInfo.setBatchNo(item.getBatchCode());
-                            batchInfo.setTotalProductCount(item.getProductCount().intValue());
-
                             ErpOrderProductInfo orderProductInfo=erpOrderProductInfoList.get(productMap.get(item.getSkuCode()+"product_type"+item.getProductType()));
-                            orderProductInfo.getBatchList().add(batchInfo);
                             orderProductInfo.setProductCount(orderProductInfo.getProductCount()+item.getProductCount().intValue());
+                            if(null==item.getActualProductCount()){
+                                item.setActualProductCount(0L);
+                            }
+                            if(null==orderProductInfo.getActualProductCount()){
+                                orderProductInfo.setActualProductCount(0);
+                            }
+                            orderProductInfo.setActualProductCount(orderProductInfo.getActualProductCount()+item.getActualProductCount().intValue());
+                            if(null!=item.getBatchInfoCode()) {
+                                ErpBatchInfo batchInfo = new ErpBatchInfo();
+                                batchInfo.setBatchInfoCode(item.getBatchInfoCode());
+                                batchInfo.setBatchNo(item.getBatchCode());
+                                batchInfo.setTotalProductCount(item.getProductCount().intValue());
+                                orderProductInfo.getBatchList().add(batchInfo);
+
+                            }
+
                             continue;
                         }
                         //订单商品实体
@@ -906,7 +920,7 @@ public HttpResponse<MerchantPaBalanceRespVO> accountBalance(String franchiseeId)
                         }
                         //销项税率
                         productInfo.setTaxRate(item.getTaxRate());
-                        productCount += item.getProductCount();
+
 
                         erpOrderProductInfoList.add(productInfo);
                         productMap.put(item.getSkuCode()+"product_type"+item.getProductType(),erpOrderProductInfoList.indexOf(productInfo));
@@ -1127,7 +1141,7 @@ public void settlementSaveReturnOrder(ReturnOrderDetailVO order) {
             info.setProductCategoryName(detail.getProductCategoryNames());
             //商品品牌编码
             info.setProductBrandCode(detail.getProductBrandCode());
-          //  商品品牌名称
+            //商品品牌名称
             info.setProductBrandName(detail.getProductBrandName());
             //商品属性编码
             info.setProductPropertyCode(detail.getProductPropertyCode());
@@ -1135,6 +1149,20 @@ public void settlementSaveReturnOrder(ReturnOrderDetailVO order) {
             info.setProductPropertyName(detail.getProductPropertyName());
             //商品类型 0商品（本品） 1赠品 2兑换赠品
             info.setProductType(detail.getProductType());
+            //活动优惠
+            info.setTotalAcivityAmount(detail.getTotalAcivityAmount());
+            //项税税率
+            info.setOutputTaxRate(detail.getOutputTaxRate());
+            //实发数量
+            info.setActualProductCount(detail.getActualProductCount());
+            //分摊后金额
+            info.setTotalPreferentialAmount(detail.getTotalPreferentialAmount());
+            //活动价
+            info.setActivityPrice(detail.getActivityPrice());
+            //下单时间
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String createTime = format.format(detail.getCreateTime());
+            info.setCreateTime(createTime);
             //熙耘采购价
 //            info.setScmpPurchaseAmount();
                 //渠道采购价
@@ -1243,4 +1271,16 @@ public static void main(String[] args) {
 
     System.out.println(JsonUtil.toJson(bridgeProductService.accountBalance("EBCC55A75ED842CD9B83B7181F789EC4")));
 }
+
+    public List<ProductRespVO> selectProductInfo(CalculateReqVo reqVo) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(urlProperties.getProductApi()).append("/product/find/product/by");
+        HttpClient httpClient = HttpClient.post(sb.toString()).json(reqVo);
+        HttpResponse<List<ProductRespVO>> result = httpClient.action().result(new TypeReference<HttpResponse<List<ProductRespVO>>>() {
+        });
+        if (Objects.nonNull(result) && Objects.equals(result.getCode(), "0")) {
+            return result.getData();
+        }
+        return Lists.newArrayList();
+    }
 }

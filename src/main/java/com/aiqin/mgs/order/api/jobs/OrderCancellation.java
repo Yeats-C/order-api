@@ -1,7 +1,10 @@
 package com.aiqin.mgs.order.api.jobs;
 
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.service.OrderListService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.lang.time.StopWatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -20,6 +23,8 @@ import java.util.List;
 @Component
 @Transactional
 public class OrderCancellation {
+
+    private static final Logger log = LoggerFactory.getLogger(OrderCancellation.class);
     @Resource
     private OrderListService orderListService;
 
@@ -36,5 +41,28 @@ public class OrderCancellation {
             Boolean br = orderListService.updateOrderCancellation(codeString, 99);
         }
         return;
+    }
+
+    /**
+     * 发放物流减免费用定时任务
+     */
+    @Scheduled(cron = "0 0 14 * * ? ") //每天凌晨两点执行
+//    @Scheduled(cron = "0 0/1 * * * ? ") //每五分钟执行
+    public void getTasks(){
+        //计时器
+        StopWatch watch = new StopWatch();
+        log.info("开始执行发放物流减免费用定时任务");
+        //计时器开始
+        watch.start();
+        List<ErpOrderInfo> list=orderListService.getLogisticsSentList();
+        if(null!=list){
+            for (ErpOrderInfo info:list){
+                orderListService.refund(info);
+            }
+        }
+
+        //计时器结束
+        watch.stop();
+        log.info("执行发放物流减免费用定时任务============>结束，本次用时：{}毫秒", watch.getTime());
     }
 }

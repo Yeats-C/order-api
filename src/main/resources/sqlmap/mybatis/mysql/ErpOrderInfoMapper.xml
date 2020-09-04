@@ -99,7 +99,8 @@
         copartner_area_id as copartnerAreaId,
         copartner_area_name as copartnerAreaName,
         business_form as businessForm,
-        copartner_area_code as copartnerAreaCode
+        copartner_area_code as copartnerAreaCode,
+        logistics_cost_reduction_ratio as logisticsCostReductionRatio
         from order_store_info
         where 1 = 1
         <if test="id != null and id != ''">
@@ -346,6 +347,12 @@
         <if test="isActivity != null and isActivity != '' or isActivity == 0 ">
             is_activity = #{isActivity},
         </if>
+        <if test="logisticsCostReductionAmount != null and logisticsCostReductionAmount != ''">
+            logistics_cost_reduction_amount = #{logisticsCostReductionAmount},
+        </if>
+        <if test="logisticsAmountSent != null and logisticsAmountSent != ''">
+            logistics_amount_sent = #{logisticsAmountSent},
+        </if>
         update_by_id = #{updateById},
         update_by_name = #{updateByName},
         update_time = sysdate()
@@ -374,7 +381,7 @@
                                       franchisee_code, franchisee_name, order_success, scour_sheet_status, use_status, source_code, source_name,
                                       source_type, activity_id, is_activity, create_by_id, create_by_name, update_by_id, update_by_name,
                                       create_time, update_time,first_market_value_gift,logistics_fee_status,copartner_area_id,copartner_area_name,
-                                      business_form,copartner_area_code)
+                                      business_form,copartner_area_code,logistics_cost_reduction_ratio)
         values (#{orderStoreId}, #{orderStoreCode}, #{companyCode}, #{companyName},
                 #{orderTypeCode}, #{orderTypeName}, #{orderCategoryCode},
                 #{orderCategoryName}, #{supplierCode}, #{supplierName},
@@ -396,7 +403,7 @@
                 #{franchiseeCode}, #{franchiseeName}, #{orderSuccess}, #{scourSheetStatus}, #{useStatus}, #{sourceCode}, #{sourceName},
                 #{sourceType}, #{activityId}, #{isActivity}, #{createById}, #{createByName}, #{updateById}, #{updateByName},
                 sysdate(), sysdate(),#{firstMarketValueGift},#{logisticsFeeStatus},#{copartnerAreaId},#{copartnerAreaName}
-                ,#{businessForm},#{copartnerAreaCode})
+                ,#{businessForm},#{copartnerAreaCode},#{logisticsCostReductionRatio})
     </insert>
 
     <select id="findOrderList" parameterType="com.aiqin.mgs.order.api.domain.request.order.ErpOrderQueryRequest"
@@ -867,5 +874,140 @@
             main_order_code = #{mainOrderCode}
             AND order_store_code != #{mainOrderCode}
     </select>
+    <select id="findDownloadOrderList" resultType="com.aiqin.mgs.order.api.domain.po.order.DownloadOrderInfoVo">
+        select
+        a1.store_code as storeCode,
+        a1.store_name as storeName,
+        a1.copartner_area_name as copartnerAreaName,
+
+
+        a2.product_type as productType,
+        a2.product_brand_code as productBrandCode,
+        a2.product_brand_name as productBrandName,
+        a2.product_category_code as productCategoryCode,
+        a2.product_category_name as productCategoryName,
+        a2.product_property_code as productPropertyCode,
+        a2.product_property_name as productPropertyName,
+        a2.sku_code as skuCode,
+        a2.sku_name as skuName,
+        a2.product_amount as productAmount,
+        a2.activity_price as activityPrice,
+        a2.product_count as productCount,
+        a2.actual_product_count as actualProductCount,
+        a2.preferential_amount as preferentialAmount,
+        a2.top_coupon_discount_amount as topCouponDiscountAmount,
+        a2.total_acivity_amount as totalAcivityAmount,
+        a1.main_order_code as mainOrderCode,
+        a1.order_type_code as orderTypeCode,
+        a1.order_type_name as orderTypeName,
+        a1.order_category_code as orderCategoryCode,
+        a1.order_category_name as orderCategoryName,
+        a1.order_status as orderStatus
+        from order_store_info a1
+        left join order_store_detail a2 on a1.order_store_id = a2.order_store_id
+        where 1 = 1
+        <if test="orderStoreCode != null and orderStoreCode != ''">
+            and (
+            (a1.order_level = 0 and a1.order_store_code like concat('%', #{orderStoreCode,jdbcType=VARCHAR}, '%'))
+            or exists(
+            select b1.order_store_code
+            from order_store_info b1
+            where b1.order_level = 1
+            and b1.main_order_code = a1.order_store_code
+            and b1.order_store_code like concat('%', #{orderStoreCode,jdbcType=VARCHAR}, '%')
+            )
+            )
+        </if>
+        <if test="storeId != null and storeId != ''">
+            and a1.store_id = #{storeId,jdbcType=VARCHAR}
+        </if>
+        <if test="storeName != null and storeName != ''">
+            and a1.store_name like concat('%',#{storeName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="createByName != null and createByName != ''">
+            and a1.create_by_name like concat('%',#{createByName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="orderStatus != null and orderStatus != '' or orderStatus == 0 ">
+            and (
+            (a1.split_status = 1 and a1.order_status = #{orderStatus})
+            or ( a1.split_status = 0 and exists(
+            select b1.order_store_code
+            from order_store_info b1
+            where b1.order_level = 1
+            and b1.main_order_code = a1.order_store_code
+            and b1.order_status = #{orderStatus}
+            ))
+            )
+        </if>
+        <if test="orderLevel != null and orderLevel != '' or orderLevel == 0 ">
+            and a1.order_level = #{orderLevel}
+        </if>
+        <if test="paymentStatus != null and paymentStatus != '' or paymentStatus == 0 ">
+            and a1.payment_status = #{paymentStatus}
+        </if>
+        <if test="orderTypeCode != null and orderTypeCode != '' or orderTypeCode == 0 ">
+            and a1.order_type_code = #{orderTypeCode}
+        </if>
+        <if test="orderCategoryCode != null and orderCategoryCode != '' or orderCategoryCode == 0 ">
+            and a1.order_category_code = #{orderCategoryCode}
+        </if>
+        <if test="orderTypeQueryList != null and orderTypeQueryList.size > 0">
+            and a1.order_type_code in (
+            <foreach collection="orderTypeQueryList" item="queryOrderType" separator=",">
+                '${queryOrderType}'
+            </foreach>
+            )
+        </if>
+        <if test="orderCategoryQueryList != null and orderCategoryQueryList.size > 0">
+            and a1.order_category_code in (
+            <foreach collection="orderCategoryQueryList" item="queryOrderCategory" separator=",">
+                '${queryOrderCategory}'
+            </foreach>
+            )
+        </if>
+        <if test="createTimeStart != null and createTimeStart != ''">
+            and a1.split_status = 1 and a1.create_time &gt;= DATE_FORMAT(#{createTimeStart,jdbcType=VARCHAR},'%Y-%m-%d 00:00:00')
+        </if>
+        <if test="createTimeEnd != null and createTimeEnd != ''">
+            and a1.split_status = 1 and a1.create_time &lt;= DATE_FORMAT(#{createTimeEnd,jdbcType=VARCHAR},'%Y-%m-%d 23:59:59')
+        </if>
+        <if test="storeIdList != null and storeIdList.size > 0">
+            and a1.store_id in
+            <foreach collection="storeIdList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="firstMarketValueGift != null">
+            and a1.first_market_value_gift = #{firstMarketValueGift}
+        </if>
+        order by a1.create_time desc
+    </select>
+    <select id="getLogisticsSentList" resultType="com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo">
+        select
+        order_store_id as orderStoreId,
+        order_store_code as orderStoreCode,
+        logistics_cost_reduction_ratio as logisticsCostReductionRatio,
+        logistics_cost_reduction_amount as logisticsCostReductionAmount,
+        logistics_amount_sent as logisticsAmountSent,
+        create_time as createTime,
+        create_by_id as createById,
+        create_by_name as createByName,
+        franchisee_id as franchiseeId,
+        franchisee_code as franchiseeCode,
+        store_id as storeId,
+        store_code as storeCode,
+        store_name as storeName,
+        order_type_code as orderTypeCode
+        from
+        order_store_info
+        where
+        logistics_amount_sent=1;
+    </select>
+
+    <update id="updateLogisticsAmountSent">
+        update order_store_info
+        set logistics_amount_sent = 0
+        where order_store_code = #{orderStoreCode}
+    </update>
 </mapper>
 

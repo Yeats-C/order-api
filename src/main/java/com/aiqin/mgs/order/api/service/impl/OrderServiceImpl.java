@@ -31,18 +31,20 @@ import com.aiqin.mgs.order.api.domain.constant.Global;
 import com.aiqin.mgs.order.api.domain.pay.PayReq;
 import com.aiqin.mgs.order.api.domain.request.*;
 import com.aiqin.mgs.order.api.domain.request.order.QueryOrderListReqVO;
+import com.aiqin.mgs.order.api.domain.request.stock.AmountDetailsRequest;
 import com.aiqin.mgs.order.api.domain.request.stock.ReportForDayReq;
 import com.aiqin.mgs.order.api.domain.response.*;
 import com.aiqin.mgs.order.api.domain.response.activity.ActivityPackageProductDTO;
 import com.aiqin.mgs.order.api.domain.response.order.QueryOrderInfoRespVO;
 import com.aiqin.mgs.order.api.domain.response.order.QueryOrderListRespVO;
+import com.aiqin.mgs.order.api.domain.response.stock.AmountDetailsResponse;
 import com.aiqin.mgs.order.api.domain.response.stock.ReportForDayResponse;
 import com.aiqin.mgs.order.api.service.*;
 import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
 import com.aiqin.mgs.order.api.util.DayUtil;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.AtomicDouble;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -58,8 +60,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import com.aiqin.ground.util.exception.GroundRuntimeException;
@@ -163,6 +163,28 @@ public class OrderServiceImpl implements OrderService {
 
             List<OrderInfo> OrderInfolist = orderDao.selectOrder(OrderPublic.getOrderQuery(orderQuery));
             if (OrderInfolist != null && OrderInfolist.size() > 0) {
+
+                // 订单详细数据
+                List<String> orderIdList = OrderInfolist.stream().map(OrderInfo::getOrderId).collect(Collectors.toList());
+                List<OrderDetailInfo> orderDetailInfoList = orderDetailDao.selectDetailByIdList(orderIdList);
+                Map<String, List<OrderDetailInfo>> orderDetailInfoListMap;
+                if (CollectionUtils.isNotEmpty(orderDetailInfoList)) {
+                    orderDetailInfoListMap = orderDetailInfoList.stream().collect(Collectors.groupingBy(OrderDetailInfo::getOrderId));
+                } else {
+                    orderDetailInfoListMap = Maps.newHashMap();
+                }
+
+                // 查询退货数量
+                List<String> orderCodeList = OrderInfolist.stream().map(OrderInfo::getOrderCode).collect(Collectors.toList());
+                List<OrderIdAndAmountRequest> returnIdAndAmountList = orderAfterDetailDao.returnAmountByOrderCodeList(orderCodeList);
+                Map<String, Integer> returnIdAndAmountListMap;
+                if (CollectionUtils.isNotEmpty(returnIdAndAmountList)) {
+                    returnIdAndAmountListMap = returnIdAndAmountList.stream().collect(Collectors.toMap(OrderIdAndAmountRequest::getId, OrderIdAndAmountRequest::getAmount, (o, n) -> n));
+                } else {
+                    returnIdAndAmountListMap = Maps.newHashMap();
+                }
+
+
                 for (int i = 0; i < OrderInfolist.size(); i++) {
                     OrderInfo info = new OrderInfo();
                     info = OrderInfolist.get(i);
@@ -170,49 +192,55 @@ public class OrderServiceImpl implements OrderService {
                     //订单明细数据
                     OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
                     orderDetailQuery.setOrderId(info.getOrderId());
-                    List<OrderDetailInfo> detailList = orderDetailDao.selectDetailById(orderDetailQuery);
+//                    List<OrderDetailInfo> detailList = orderDetailDao.selectDetailById(orderDetailQuery);
+
                     //未付款的支付金额为空
                     if (info.getOrderStatus() == 0) {
                         info.setActualPrice(0);
                         info.setPayType(null);
 
                     }
+
+                    List<OrderDetailInfo> detailList = orderDetailInfoListMap.get(info.getOrderId());
                     info.setOrderdetailList(detailList);
 
                     //特殊处理   (前端控制退货按钮使用字段:1:订单已全数退完)
-                    ReorerRequest reorerRequest = new ReorerRequest();
-                    reorerRequest.setOrderCode(info.getOrderCode());
+//                    ReorerRequest reorerRequest = new ReorerRequest();
+//                    reorerRequest.setOrderCode(info.getOrderCode());
 
-                    //查询购买数量
-                    List<OrderIdAndAmountRequest> buyIdAndAmounts = new ArrayList();
-                    buyIdAndAmounts = orderDetailDao.buyAmount(reorerRequest);
+//                    //查询购买数量
+//                    List<OrderIdAndAmountRequest> buyIdAndAmounts = new ArrayList();
+//                    buyIdAndAmounts = orderDetailDao.buyAmount(reorerRequest);
 
                     //查询退货数量
-                    List<OrderIdAndAmountRequest> returnIdAndAmounts = new ArrayList();
-                    returnIdAndAmounts = orderAfterDetailDao.returnAmount(reorerRequest);
-
-                    //已完全退货完成订单
-                    if (returnIdAndAmounts != null) {
-                        for (OrderIdAndAmountRequest returnInfo : returnIdAndAmounts) {
-                            for (OrderIdAndAmountRequest buyInfo : buyIdAndAmounts) {
-                                if (returnInfo.getId().equals(buyInfo.getId())) {
-                                    if (returnInfo.getAmount() >= buyInfo.getAmount()) {
-                                        info.setTurnReturnView(1);
-                                    }
-                                }
-                            }
-                        }
+//                    List<OrderIdAndAmountRequest> returnIdAndAmounts = new ArrayList();
+//                    returnIdAndAmounts = orderAfterDetailDao.returnAmount(reorerRequest);
+                    Integer amount = detailList.stream().collect(Collectors.summingLong(OrderDetailInfo::getAmount)).intValue();
+                    Integer returnAmount = returnIdAndAmountListMap.get(info.getOrderCode());
+                    if (Objects.nonNull(returnAmount) && returnAmount >= amount) {
+                        info.setTurnReturnView(1);
                     }
+
+//                    //已完全退货完成订单
+//                    if (orderIdAndAmountRequests != null) {
+//                        for (OrderIdAndAmountRequest returnInfo : orderIdAndAmountRequests) {
+//                            for (OrderDetailInfo orderDetail : detailList) {
+//                                if (returnInfo.getId().equals(orderDetail.getOrderCode())) {
+//                                    if (returnInfo.getAmount() >= orderDetail.getAmount()) {
+//                                        info.setTurnReturnView(1);
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
                     OrderInfolist.set(i, info);
                 }
             }
 
             //计算总数据量
-            Integer totalCount = 0;
-            Integer icount = null;
-            totalCount = orderDao.selectOrderCount(OrderPublic.getOrderQuery(orderQuery));
+            Integer totalCount = orderDao.selectOrderCount(OrderPublic.getOrderQuery(orderQuery));
 
-            return HttpResponse.success(new PageResData(totalCount, OrderInfolist));
+            return HttpResponse.success(new PageResData(Objects.isNull(totalCount) ? 0 : totalCount, OrderInfolist));
 
         } catch (Exception e) {
             LOGGER.error("模糊查询订单列表异常 {}", e);
@@ -386,9 +414,9 @@ public class OrderServiceImpl implements OrderService {
         List<PrestorageOrderInfo> prestorageOrderSupplies = prestorageOrderSupplyDao.selectPrestorageOrderList(orderQuery);
         //是否可退货
         couldReturn(prestorageOrderSupplies);
-        int totalCount = prestorageOrderSupplyDao.selectPrestorageOrderListCount(orderQuery);
+        Integer totalCount = prestorageOrderSupplyDao.selectPrestorageOrderListCount(orderQuery);
 
-        return HttpResponse.success(new PageResData(totalCount, prestorageOrderSupplies));
+        return HttpResponse.success(new PageResData(Objects.isNull(totalCount) ? 0 : totalCount, prestorageOrderSupplies));
     }
 
     private void couldReturn(List<PrestorageOrderInfo> prestorageOrderSupplies) {
@@ -549,27 +577,13 @@ public class OrderServiceImpl implements OrderService {
         // List<ReportForDayResponse> pointReturnList = orderDao.selectReturnPoint(reportForDayReq);
 
         Map<String, List<ReportForDayResponse>> getMoneyMap = getMoneyList.stream().collect(Collectors.groupingBy(ReportForDayResponse::getCashierId));
-        Map<String, ReportForDayResponse> returnMoneyMap = returnMoneyList.stream().collect(Collectors.toMap(ReportForDayResponse::getCashierId, a -> a,(o,n)->n));
+        Map<String, ReportForDayResponse> returnMoneyMap = returnMoneyList.stream().collect(Collectors.toMap(ReportForDayResponse::getCashierId, a -> a, (o, n) -> n));
         Map<String, List<ReportForDayResponse>> accountRecordMap = accountRecordList.stream().collect(Collectors.groupingBy(ReportForDayResponse::getCashierId));
         Map<String, ReportForDayResponse> pointMap = pointList.stream().collect(Collectors.toMap(ReportForDayResponse::getCashierId, a -> a, (o, n) -> n));
 
+        long thisRate = getRateValue();
 
-        double rate = 0f;
-        if (CollectionUtils.isNotEmpty(pointList)) {
-            HttpClient client = HttpClient.get(urlProperties.getSlcsApi() + "/basics/list").addParameter("dictionary_id", "S00000021");
-            HttpResponse<List<Map<String, Object>>> response = client.action().result(new TypeReference<HttpResponse<List<Map<String, Object>>>>() {
-            });
-            if (Objects.nonNull(response) && "0".equals(response.getCode())) {
-                List<Map<String, Object>> data = response.getData();
-                if(CollectionUtils.isNotEmpty(data)){
-                    rate = Double.parseDouble(data.get(0).get("convert_ratio").toString());
-                }else {
-                    throw new RuntimeException("获取积分比例失败");
-                }
-            }
-        }
-        long thisRate = new Double(rate * 100).longValue();
-
+        ReportForDayResponse lastSummary = new ReportForDayResponse();
         List<ReportForDayResponse> reportForDayResponseList = reportForDayReq.getCashierIdList().stream().map(csahierId -> {
             ReportForDayResponse reportForDayResponse = new ReportForDayResponse();
             reportForDayResponse.setCashierId(csahierId);
@@ -582,7 +596,7 @@ public class OrderServiceImpl implements OrderService {
 
             // 退货数据
             ReportForDayResponse returnVo = returnMoneyMap.get(csahierId);
-            if(Objects.nonNull(returnVo)){
+            if (Objects.nonNull(returnVo)) {
                 reportForDayResponse.setXianJinReturn(returnVo.getPrice());
                 reportForDayResponse.setReturnCount(returnVo.getReturnCount());
             }
@@ -590,7 +604,7 @@ public class OrderServiceImpl implements OrderService {
             // 储值卡数据
             List<ReportForDayResponse> accountList = accountRecordMap.get(csahierId);
             if (CollectionUtils.isNotEmpty(accountList)) {
-                accountDataHandle(reportForDayResponse,accountList);
+                accountDataHandle(reportForDayResponse, accountList);
             }
 
             // 积分数据
@@ -603,10 +617,262 @@ public class OrderServiceImpl implements OrderService {
             // 数据汇总
             dataSummary(reportForDayResponse);
 
+            // 所有数据汇总
+            allDataSummary(reportForDayResponse, lastSummary);
+
             return reportForDayResponse;
         }).collect(Collectors.toList());
 
+        lastSummary.setCashierName("合计");
+        reportForDayResponseList.add(lastSummary);
         return HttpResponse.successGenerics(reportForDayResponseList);
+    }
+
+    private long getRateValue() {
+        HttpClient client = HttpClient.get(urlProperties.getSlcsApi() + "/basics/list").addParameter("dictionary_id", "S00000021");
+        HttpResponse<List<Map<String, Object>>> response = client.action().result(new TypeReference<HttpResponse<List<Map<String, Object>>>>() {
+        });
+        if (Objects.nonNull(response) && "0".equals(response.getCode())) {
+            List<Map<String, Object>> data = response.getData();
+            if (CollectionUtils.isNotEmpty(data)) {
+                double rate = Double.parseDouble(data.get(0).get("convert_ratio").toString());
+                return new Double(rate * 100).longValue();
+            } else {
+                throw new RuntimeException("获取积分比例失败");
+            }
+        } else {
+            throw new RuntimeException("获取积分比例失败");
+        }
+    }
+
+    private void allDataSummary(ReportForDayResponse reportForDayResponse, ReportForDayResponse lastSummary) {
+        Long saleCount = reportForDayResponse.getSaleCount();
+        if (0 != saleCount) {
+            lastSummary.setSaleCount(lastSummary.getSaleCount() + saleCount);
+        }
+        Long returnCount = reportForDayResponse.getReturnCount();
+        if (0 != returnCount) {
+            lastSummary.setReturnCount(lastSummary.getReturnCount() + returnCount);
+        }
+        Long rechargeSale = reportForDayResponse.getRechargeSale();
+        if (0 != rechargeSale) {
+            lastSummary.setRechargeSale(lastSummary.getRechargeSale() + rechargeSale);
+        }
+
+        Long xianJinGet = reportForDayResponse.getXianJinGet();
+        if (0 != xianJinGet) {
+            lastSummary.setXianJinGet(lastSummary.getXianJinGet() + xianJinGet);
+        }
+        Long weiXinGet = reportForDayResponse.getWeiXinGet();
+        if (0 != weiXinGet) {
+            lastSummary.setWeiXinGet(lastSummary.getWeiXinGet() + weiXinGet);
+        }
+        Long zhiFuBaoGet = reportForDayResponse.getZhiFuBaoGet();
+        if (0 != zhiFuBaoGet) {
+            lastSummary.setZhiFuBaoGet(lastSummary.getZhiFuBaoGet() + zhiFuBaoGet);
+        }
+        Long jiFenGet = reportForDayResponse.getJiFenGet();
+        if (0 != jiFenGet) {
+            lastSummary.setJiFenGet(lastSummary.getJiFenGet() + jiFenGet);
+        }
+        Long yinHangKaGet = reportForDayResponse.getYinHangKaGet();
+        if (0 != yinHangKaGet) {
+            lastSummary.setYinHangKaGet(lastSummary.getYinHangKaGet() + yinHangKaGet);
+        }
+
+        Long xianJinReturn = reportForDayResponse.getXianJinReturn();
+        if (0 != xianJinReturn) {
+            lastSummary.setXianJinReturn(lastSummary.getXianJinReturn() + xianJinReturn);
+        }
+        Long weiXinReturn = reportForDayResponse.getWeiXinReturn();
+        if (0 != weiXinReturn) {
+            lastSummary.setWeiXinReturn(lastSummary.getWeiXinReturn() + weiXinReturn);
+        }
+        Long zhiFuBaoReturn = reportForDayResponse.getZhiFuBaoReturn();
+        if (0 != zhiFuBaoReturn) {
+            lastSummary.setZhiFuBaoReturn(lastSummary.getZhiFuBaoReturn() + zhiFuBaoReturn);
+        }
+        Long jiFenReturn = reportForDayResponse.getJiFenReturn();
+        if (0 != jiFenReturn) {
+            lastSummary.setJiFenReturn(lastSummary.getJiFenReturn() + jiFenReturn);
+        }
+        Long yinHangKaReturn = reportForDayResponse.getYinHangKaReturn();
+        if (0 != yinHangKaReturn) {
+            lastSummary.setYinHangKaReturn(lastSummary.getYinHangKaReturn() + yinHangKaReturn);
+        }
+
+        Long xianJinActualGet = reportForDayResponse.getXianJinActualGet();
+        if (0 != xianJinActualGet) {
+            lastSummary.setXianJinActualGet(lastSummary.getXianJinActualGet() + xianJinActualGet);
+        }
+        Long weiXinActualGet = reportForDayResponse.getWeiXinActualGet();
+        if (0 != weiXinActualGet) {
+            lastSummary.setWeiXinActualGet(lastSummary.getWeiXinActualGet() + weiXinActualGet);
+        }
+        Long zhiFuBaoActualGet = reportForDayResponse.getZhiFuBaoActualGet();
+        if (0 != zhiFuBaoActualGet) {
+            lastSummary.setZhiFuBaoActualGet(lastSummary.getZhiFuBaoActualGet() + zhiFuBaoActualGet);
+        }
+        Long jiFenActualGet = reportForDayResponse.getJiFenActualGet();
+        if (0 != jiFenActualGet) {
+            lastSummary.setJiFenActualGet(lastSummary.getJiFenActualGet() + jiFenActualGet);
+        }
+        Long yinHangKaActualGet = reportForDayResponse.getYinHangKaActualGet();
+        if (0 != yinHangKaActualGet) {
+            lastSummary.setYinHangKaActualGet(lastSummary.getYinHangKaActualGet() + yinHangKaActualGet);
+        }
+
+        Long collectionTotal = reportForDayResponse.getCollectionTotal();
+        if (0 != collectionTotal) {
+            lastSummary.setCollectionTotal(lastSummary.getCollectionTotal() + collectionTotal);
+        }
+        Long returnTotal = reportForDayResponse.getReturnTotal();
+        if (0 != returnTotal) {
+            lastSummary.setReturnTotal(lastSummary.getReturnTotal() + returnTotal);
+        }
+        Long total = reportForDayResponse.getTotal();
+        if (0 != total) {
+            lastSummary.setTotal(lastSummary.getTotal() + total);
+        }
+    }
+
+    @Override
+    public List<AmountDetailsResponse> collectAmount(AmountDetailsRequest amountDetailsRequest) {
+        Integer settlementType = amountDetailsRequest.getSettlementType();
+
+        HttpClient httpClient = HttpClient.post(urlProperties.getMemberApi() + "/store-value/amount/details").json(amountDetailsRequest);
+        HttpResponse<List<AmountDetailsResponse>> httpResponse = httpClient.action().result(new TypeReference<HttpResponse<List<AmountDetailsResponse>>>() {
+        });
+        if (Objects.isNull(httpResponse) || !"0".equals(httpResponse.getCode())) {
+            throw new RuntimeException("远程调用失败");
+        }
+
+        // 储值卡充值收款
+        List<AmountDetailsResponse> responseData = httpResponse.getData();
+
+        // 订单内收款
+        List<AmountDetailsResponse> amountDetailsResponseList = orderDao.selectOrderBySettlementType(amountDetailsRequest);
+        amountDetailsResponseList.addAll(responseData);
+
+        return dataPublicHandle(amountDetailsResponseList, true);
+    }
+
+    private List<AmountDetailsResponse> dataPublicHandle(List<AmountDetailsResponse> amountDetailsResponseList, boolean isOrder) {
+        long rateValue = getRateValue();
+        amountDetailsResponseList.forEach(amountDetail -> {
+            Integer orderType = amountDetail.getOrderType();
+            if (Objects.nonNull(orderType)) {
+                amountDetail.setOrderTypeValue(getOrderTypeValue(orderType));
+                if (isOrder) {
+                    Long jiFenDeduction = amountDetail.getJiFenDeduction();
+                    amountDetail.setJiFenDeduction(jiFenDeduction * rateValue);
+                    amountDetail.setOrderCategoryValue("订单");
+                }
+            } else {
+                amountDetail.setOrderTypeValue("—");
+                amountDetail.setOrderCategoryValue("充值");
+                amountDetail.setOrderId("");
+            }
+            amountDetail.setPayTypeValue(getPayTypeValue(amountDetail.getPayType()));
+        });
+        return amountDetailsResponseList;
+    }
+
+    private String getPayTypeValue(Integer payType) {
+        // 支付类型 3：到店支付-现金，4：到店支付-微信，5：到店支付-支付宝，6：到店支付-银行卡'
+        switch (payType) {
+            case 3:
+                return "现金";
+            case 4:
+                return "微信";
+            case 5:
+                return "支付宝";
+            case 6:
+                return "银行卡";
+            default:
+                return "";
+
+        }
+    }
+
+    private String getOrderTypeValue(Integer orderType) {
+        // 订单类型 1：TOC订单 2: TOB订单 3：服务商品，4 预存订单
+        switch (orderType) {
+            case 1:
+                return "正常销售单";
+            case 2:
+                return "TOB订单";
+            case 3:
+                return "服务订单";
+            case 4:
+                return "预存订单";
+            default:
+                return "";
+        }
+    }
+
+    @Override
+    public List<AmountDetailsResponse> returnAmount(AmountDetailsRequest amountDetailsRequest) {
+        List<AmountDetailsResponse> amountDetailsResponseList = orderAfterDao.returnAmount(amountDetailsRequest);
+        return dataPublicHandle(amountDetailsResponseList, false);
+    }
+
+    @Override
+    public HttpResponse<CostAndSalesTopResp> costAndSales(CostAndSalesReq costAndSalesReq) {
+        CostAndSalesTopResp costAndSalesTopResp = new CostAndSalesTopResp();
+
+        //品类
+        if (costAndSalesReq.getProductCategory()!=null&&!costAndSalesReq.getProductCategory().equals("")){
+            costAndSalesReq.setProductCategory(costAndSalesReq.getProductCategory()*2);
+        }
+
+
+        List<CostAndSalesResp> costAndSalesResps = orderDao.costAndSalesByCategory0(costAndSalesReq);
+        Long count = orderDao.costAndSalesByCategory0Count(costAndSalesReq);
+
+        costAndSalesTopResp.setDataList(costAndSalesResps);
+        costAndSalesTopResp.setTotalCount(Math.toIntExact(count));
+
+        //计算总数
+       // CostAndSalesSumResp costAndSalesSumResp = orderDao.costAndSalesSum(costAndSalesReq);
+
+        return HttpResponse.successGenerics(costAndSalesTopResp);
+    }
+
+    @Override
+    public HttpResponse updateOrder(String storeId) {
+        //查询出所有订单中品牌为空或者成本价为空的sku
+        log.info("刷新订单商品品牌成本价开始："+storeId);
+        List<OrderDetailInfo> list=orderDetailDao.selectDetailByStoreId(storeId);
+        log.info("刷新订单商品品牌需要刷新的sku数为："+list.size());
+        CalculateReqVo calculateReqVo = new CalculateReqVo();
+        calculateReqVo.setDistributorId(storeId);
+        calculateReqVo.setSkuCodeList(list.stream().map(OrderDetailInfo::getSkuCode).collect(Collectors.toList()));
+        List<ProductRespVO> respVOS = bridgeProductService.selectProductInfo(calculateReqVo);
+        Map<String,ProductRespVO> productRespVOMap=new HashMap<>(respVOS.size());
+        log.info("刷新订单商品品牌查询到的商品数为："+respVOS.size());
+        int updateNum=0;
+        if (respVOS.size()>0){
+            for (ProductRespVO productRespVO :respVOS){
+                productRespVOMap.put(productRespVO.getSkuCode(),productRespVO);
+
+            }
+
+            for (OrderDetailInfo orderDetailInfo:list){
+                if (orderDetailInfo.getBrandId()==null){
+                    orderDetailInfo.setBrandId(productRespVOMap.get(orderDetailInfo.getSkuCode())==null?null:productRespVOMap.get(orderDetailInfo.getSkuCode()).getBrandId());
+                    orderDetailInfo.setBrandName(productRespVOMap.get(orderDetailInfo.getSkuCode())==null?null:productRespVOMap.get(orderDetailInfo.getSkuCode()).getBrandName());
+                }
+                if (orderDetailInfo.getCostPrice()==0){
+                    orderDetailInfo.setCostPrice(Math.toIntExact(productRespVOMap.get(orderDetailInfo.getSkuCode()) == null ? 0 : productRespVOMap.get(orderDetailInfo.getSkuCode()).getProductAvgCost()));
+                }
+
+                int i= orderDetailDao.updateOrderDetailById(orderDetailInfo);
+                updateNum=updateNum+i;
+            }
+        }
+        log.info("刷新订单商品品牌结束，修改总条数："+updateNum);
+        return HttpResponse.successGenerics(updateNum);
     }
 
     private void accountDataHandle(ReportForDayResponse reportForDayResponse, List<ReportForDayResponse> accountList) {
@@ -616,6 +882,8 @@ public class OrderServiceImpl implements OrderService {
                 reportForDayResponse.setWeiXinGet(reportForDayResponse.getWeiXinGet() + payPrice);
             } else if (s.getPayType() == 5) {
                 reportForDayResponse.setZhiFuBaoGet(reportForDayResponse.getZhiFuBaoGet() + payPrice);
+            } else if (s.getPayType() == 6) {
+                reportForDayResponse.setYinHangKaGet(reportForDayResponse.getYinHangKaGet() + payPrice);
             } else {
                 reportForDayResponse.setXianJinGet(reportForDayResponse.getXianJinGet() + payPrice);
             }
@@ -631,6 +899,8 @@ public class OrderServiceImpl implements OrderService {
                 reportForDayResponse.setWeiXinGet(payPrice);
             } else if (s.getPayType() == 5) {
                 reportForDayResponse.setZhiFuBaoGet(payPrice);
+            } else if (s.getPayType() == 6) {
+                reportForDayResponse.setYinHangKaGet(payPrice);
             } else {
                 reportForDayResponse.setXianJinGet(payPrice);
             }
@@ -653,12 +923,15 @@ public class OrderServiceImpl implements OrderService {
         // 积分应交款
         reportForDayResponse.setJiFenActualGet(reportForDayResponse.getJiFenGet() - reportForDayResponse.getJiFenReturn());
 
+        // 银行卡应交款
+        reportForDayResponse.setYinHangKaActualGet(reportForDayResponse.getYinHangKaGet() - reportForDayResponse.getYinHangKaReturn());
+
         // 收款合计
-        long collectionTotal = reportForDayResponse.getXianJinGet() + reportForDayResponse.getWeiXinGet() + reportForDayResponse.getZhiFuBaoGet() + reportForDayResponse.getJiFenGet();
+        long collectionTotal = reportForDayResponse.getXianJinGet() + reportForDayResponse.getWeiXinGet() + reportForDayResponse.getZhiFuBaoGet() + reportForDayResponse.getJiFenGet() + reportForDayResponse.getYinHangKaGet();
         reportForDayResponse.setCollectionTotal(collectionTotal);
 
         // 退款合计
-        long returnTotal = reportForDayResponse.getXianJinReturn() + reportForDayResponse.getZhiFuBaoReturn() + reportForDayResponse.getWeiXinReturn() + reportForDayResponse.getJiFenReturn();
+        long returnTotal = reportForDayResponse.getXianJinReturn() + reportForDayResponse.getZhiFuBaoReturn() + reportForDayResponse.getWeiXinReturn() + reportForDayResponse.getJiFenReturn() + reportForDayResponse.getYinHangKaReturn();
         reportForDayResponse.setReturnTotal(returnTotal);
 
         // 应交总金额
@@ -1367,11 +1640,11 @@ public class OrderServiceImpl implements OrderService {
 
     //接口-收银员交班收银情况统计
     @Override
-    public HttpResponse cashier(@Valid String cashierId, String endTime) {
+    public HttpResponse cashier(@Valid String cashierId, String endTime, String distributorId) {
         try {
 
             // 获取改收银员最后一次交接时间
-            String beginTime = cashierShiftScheduleDao.selectTimeByCashierId(cashierId);
+            String beginTime = cashierShiftScheduleDao.selectTimeByCashierId(cashierId, distributorId);
             if (StringUtils.isEmpty(beginTime)) {
                 beginTime = DayUtil.getYearStr();
             }
@@ -1382,6 +1655,7 @@ public class OrderServiceImpl implements OrderService {
             orderQuery.setCashierId(cashierId);
             orderQuery.setBeginTime(formatter.parse(beginTime));
             orderQuery.setEndTime(formatter.parse(endTime));
+            orderQuery.setDistributorId(distributorId);
 
             //获取收银员、支付类型金额
             List<OrderbyReceiptSumResponse> list = orderDao.cashier(orderQuery);

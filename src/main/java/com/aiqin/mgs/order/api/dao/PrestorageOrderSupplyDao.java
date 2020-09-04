@@ -31,5 +31,5 @@ public interface PrestorageOrderSupplyDao {
      */
     List<PrestorageOrderInfo> selectPrestorageOrderList(OrderQuery trans);
 
-    int selectPrestorageOrderListCount(OrderQuery trans);
+    Integer selectPrestorageOrderListCount(OrderQuery trans);
 }

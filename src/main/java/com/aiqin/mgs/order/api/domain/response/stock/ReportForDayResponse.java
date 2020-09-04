@@ -25,6 +25,9 @@ public class ReportForDayResponse {
     @ApiModelProperty("积分收款")
     private Long jiFenGet = 0L;
 
+    @ApiModelProperty("银行卡收款")
+    private Long yinHangKaGet = 0L;
+
     @ApiModelProperty("现金退款")
     private Long xianJinReturn = 0L;
 
@@ -37,6 +40,9 @@ public class ReportForDayResponse {
     @ApiModelProperty("积分退款")
     private Long jiFenReturn = 0L;
 
+    @ApiModelProperty("银行卡退款")
+    private Long yinHangKaReturn = 0L;
+
     @ApiModelProperty("现金实际收款")
     private Long xianJinActualGet = 0L;
 
@@ -48,6 +54,9 @@ public class ReportForDayResponse {
 
     @ApiModelProperty("积分实际收款")
     private Long jiFenActualGet = 0L;
+
+    @ApiModelProperty("银行卡实际收款")
+    private Long yinHangKaActualGet = 0L;
 
     @ApiModelProperty("收银员id")
     private String cashierId;

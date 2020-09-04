@@ -3,6 +3,9 @@ package com.aiqin.mgs.order.api.dao;
 import com.aiqin.mgs.order.api.domain.LogisticsRuleRequest;
 import com.aiqin.mgs.order.api.domain.LogisticsRuleType;
 import com.aiqin.mgs.order.api.domain.logisticsRule.LogisticsRuleInfo;
+import com.aiqin.mgs.order.api.domain.logisticsRule.NewAllLogistics;
+import com.aiqin.mgs.order.api.domain.logisticsRule.NewLogisticsInfo;
+import com.aiqin.mgs.order.api.domain.logisticsRule.NewReduceInfo;
 import com.aiqin.mgs.order.api.domain.response.LogisticsAllResponse;
 import org.apache.ibatis.annotations.Param;
 
@@ -33,4 +36,36 @@ public interface LogisticsRuleDao {
     void updatefareSill(LogisticsRuleInfo logisticsRuleInfos);
 
     List<LogisticsAllResponse> selectAll(LogisticsRuleRequest logisticsRuleRequest);
+
+    int addLogistics(NewLogisticsInfo newLogisticsInfo);
+
+    int addLogisticsList(@Param("newReduceInfoList") List<NewReduceInfo> newReduceInfoList);
+
+    List<NewAllLogistics> selectAllLogistics();
+
+    int updateLogisticsStatus(NewAllLogistics newAllLogistics);
+
+    int updateByCodeAndId(String rultCode);
+
+    NewLogisticsInfo selecLogisticsInfo(@Param("rultCode") String rultCode, @Param("rultType") String rultType);
+
+    List<NewReduceInfo> selectLogisticsDetail(String rultCode);
+
+    int deleteOneLogistics( String rultCode);
+
+    int deleteOnewLogisticsProduct(String rultCode);
+
+    List<NewLogisticsInfo> selecLogisticsInfoAll();
+
+    List<NewReduceInfo> selectLogisticsDetailAll(String rultCode);
+
+    Integer selectEffective(String rultCode);
+
+    int updateLogisticsInfo(NewAllLogistics newAllLogistics);
+
+    int updateLogisticsInfoByCode(String rultCode);
+
+    int updateInfo(NewLogisticsInfo newLogisticsInfo);
+
+    int updatelogisticsStatus(String rultCode);
 }
