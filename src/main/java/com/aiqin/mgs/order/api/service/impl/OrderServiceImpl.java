@@ -867,9 +867,8 @@ public class OrderServiceImpl implements OrderService {
                 updateNum=updateNum+i;
             }
         }
-
-        //查询套餐包
-        return null;
+        log.info("刷新订单商品品牌结束，修改总条数："+updateNum);
+        return HttpResponse.successGenerics(updateNum);
     }
 
     private void accountDataHandle(ReportForDayResponse reportForDayResponse, List<ReportForDayResponse> accountList) {
