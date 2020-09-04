@@ -822,6 +822,10 @@ public class OrderServiceImpl implements OrderService {
         CostAndSalesTopResp costAndSalesTopResp = new CostAndSalesTopResp();
 
         //品类
+        if (costAndSalesReq.getProductCategory()!=null&&!costAndSalesReq.getProductCategory().equals("")){
+            costAndSalesReq.setProductCategory(costAndSalesReq.getProductCategory()*2);
+        }
+
 
         List<CostAndSalesResp> costAndSalesResps = orderDao.costAndSalesByCategory0(costAndSalesReq);
         Long count = orderDao.costAndSalesByCategory0Count(costAndSalesReq);
