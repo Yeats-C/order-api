@@ -723,7 +723,7 @@ public class OrderListServiceImpl implements OrderListService {
     @Override
     public Boolean refund(ErpOrderInfo info){
 
-        log.info("发起退款单申请，info={}",info);
+        log.info("发放物流减免申请，info={}",info);
         if(info!=null){
             //同步至支付流水表
             String url=paymentHost+"/payment/pay/payTobAll";

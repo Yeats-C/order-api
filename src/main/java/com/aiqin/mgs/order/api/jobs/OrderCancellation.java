@@ -46,7 +46,8 @@ public class OrderCancellation {
     /**
      * 发放物流减免费用定时任务
      */
-    @Scheduled(cron = "0 0 2 * * ? ") //每天凌晨两点执行
+    @Scheduled(cron = "0 0 14 * * ? ") //每天凌晨两点执行
+//    @Scheduled(cron = "0 0/1 * * * ? ") //每五分钟执行
     public void getTasks(){
         //计时器
         StopWatch watch = new StopWatch();
@@ -56,7 +57,7 @@ public class OrderCancellation {
         List<ErpOrderInfo> list=orderListService.getLogisticsSentList();
         if(null!=list){
             for (ErpOrderInfo info:list){
-                Boolean check= orderListService.refund(info);
+                orderListService.refund(info);
             }
         }
 
