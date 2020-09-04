@@ -14,6 +14,7 @@ import com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest;
 import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
 import com.aiqin.mgs.order.api.domain.response.OrderDetailByMemberResponse;
 import com.aiqin.mgs.order.api.domain.response.ProdisorResponse;
+import com.aiqin.mgs.order.api.domain.response.ProductRespVO;
 import com.aiqin.mgs.order.api.domain.response.SkuSaleResponse;
 import org.apache.ibatis.annotations.Param;
 
@@ -61,7 +62,7 @@ public interface OrderDetailDao {
     //接口--会员管理-会员消费记录
     List<OrderDetailByMemberResponse> byMemberOrder(@Valid OrderDetailQuery orderDetailQuery) throws Exception;
 
-    //接口-统计商品在各个渠道的订单数.
+    //接口-统计商品在各个渠道的订单数.4
     List<ProdisorResponse> prodisor(@Valid OrderDetailQuery orderDetailQuery) throws Exception;
 
     //订单中商品sku数量
@@ -93,4 +94,8 @@ public interface OrderDetailDao {
 
     List<OrderDetailInfo> selectDetailByIdList(@Param("list") List<String> orderIdList);
 
+    List<OrderDetailInfo> selectDetailByStoreId(@Param("storeId") String storeId);
+
+
+    int updateOrderDetailById(OrderDetailInfo orderDetailInfo);
 }

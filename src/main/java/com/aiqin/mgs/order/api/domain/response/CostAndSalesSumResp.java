@@ -28,9 +28,15 @@ public class CostAndSalesSumResp {
     @JsonProperty("product_all_maori")
     private Long productAllMaori=0L;
 
-    @ApiModelProperty(value = "退货金额")
+    @ApiModelProperty(value = "退货数量")
     @JsonProperty("total_return_amount")
     private Long totalReturnAmount;
+
+
+
+    @ApiModelProperty(value = "退货金额")
+    @JsonProperty("total_return_price")
+    private Long totalReturnPrice;
 
     @JsonProperty("gross_profit_all_rate")
     @ApiModelProperty("毛利率")

@@ -831,13 +831,47 @@ public class OrderServiceImpl implements OrderService {
 
         //计算总数
         CostAndSalesSumResp costAndSalesSumResp = orderDao.costAndSalesSum(costAndSalesReq);
+        if (costAndSalesSumResp==null){
+            costAndSalesSumResp=new CostAndSalesSumResp();
+        }
         costAndSalesTopResp.setCostAndSalesSumResp(costAndSalesSumResp);
         return HttpResponse.successGenerics(costAndSalesTopResp);
     }
 
     @Override
     public HttpResponse updateOrder(String storeId) {
-        //查询出d
+        //查询出所有订单中品牌为空或者成本价为空的sku
+        log.info("刷新订单商品品牌成本价开始："+storeId);
+        List<OrderDetailInfo> list=orderDetailDao.selectDetailByStoreId(storeId);
+        log.info("刷新订单商品品牌需要刷新的sku数为："+list.size());
+        CalculateReqVo calculateReqVo = new CalculateReqVo();
+        calculateReqVo.setDistributorId(storeId);
+        calculateReqVo.setSkuCodeList(list.stream().map(OrderDetailInfo::getSkuCode).collect(Collectors.toList()));
+        List<ProductRespVO> respVOS = bridgeProductService.selectProductInfo(calculateReqVo);
+        Map<String,ProductRespVO> productRespVOMap=new HashMap<>(respVOS.size());
+        log.info("刷新订单商品品牌查询到的商品数为："+respVOS.size());
+        int updateNum=0;
+        if (respVOS.size()>0){
+            for (ProductRespVO productRespVO :respVOS){
+                productRespVOMap.put(productRespVO.getSkuCode(),productRespVO);
+
+            }
+
+            for (OrderDetailInfo orderDetailInfo:list){
+                if (orderDetailInfo.getBrandId()==null){
+                    orderDetailInfo.setBrandId(productRespVOMap.get(orderDetailInfo.getSkuCode())==null?null:productRespVOMap.get(orderDetailInfo.getSkuCode()).getBrandId());
+                    orderDetailInfo.setBrandName(productRespVOMap.get(orderDetailInfo.getSkuCode())==null?null:productRespVOMap.get(orderDetailInfo.getSkuCode()).getBrandName());
+                }
+                if (orderDetailInfo.getCostPrice()==0){
+                    orderDetailInfo.setCostPrice(Math.toIntExact(productRespVOMap.get(orderDetailInfo.getSkuCode()) == null ? 0 : productRespVOMap.get(orderDetailInfo.getSkuCode()).getProductAvgCost()));
+                }
+
+                int i= orderDetailDao.updateOrderDetailById(orderDetailInfo);
+                updateNum=updateNum+i;
+            }
+        }
+
+        //查询套餐包
         return null;
     }
 
