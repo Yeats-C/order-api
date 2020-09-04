@@ -830,11 +830,8 @@ public class OrderServiceImpl implements OrderService {
         costAndSalesTopResp.setTotalCount(Math.toIntExact(count));
 
         //计算总数
-        CostAndSalesSumResp costAndSalesSumResp = orderDao.costAndSalesSum(costAndSalesReq);
-        if (costAndSalesSumResp==null){
-            costAndSalesSumResp=new CostAndSalesSumResp();
-        }
-        costAndSalesTopResp.setCostAndSalesSumResp(costAndSalesSumResp);
+       // CostAndSalesSumResp costAndSalesSumResp = orderDao.costAndSalesSum(costAndSalesReq);
+
         return HttpResponse.successGenerics(costAndSalesTopResp);
     }
 
