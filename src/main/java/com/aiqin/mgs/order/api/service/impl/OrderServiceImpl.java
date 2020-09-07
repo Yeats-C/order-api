@@ -60,6 +60,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import com.aiqin.ground.util.exception.GroundRuntimeException;
@@ -841,38 +842,99 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public HttpResponse updateOrder(String storeId) {
+
         //查询出所有订单中品牌为空或者成本价为空的sku
-        log.info("刷新订单商品品牌成本价开始："+storeId);
-        List<OrderDetailInfo> list=orderDetailDao.selectDetailByStoreId(storeId);
-        log.info("刷新订单商品品牌需要刷新的sku数为："+list.size());
+        log.info("刷新订单商品品牌成本价开始：" + storeId);
+
+        int pageNo = 1;
+        int pageSize = 2000;
+
+        List<OrderDetailInfo> list;
+        Set<String> skuSet;
+        List<ProductRespVO> respVOS;
+        Map<String, ProductRespVO> respVOSMap;
+
         CalculateReqVo calculateReqVo = new CalculateReqVo();
         calculateReqVo.setDistributorId(storeId);
-        calculateReqVo.setSkuCodeList(list.stream().map(OrderDetailInfo::getSkuCode).collect(Collectors.toList()));
-        List<ProductRespVO> respVOS = bridgeProductService.selectProductInfo(calculateReqVo);
-        Map<String,ProductRespVO> productRespVOMap=new HashMap<>(respVOS.size());
-        log.info("刷新订单商品品牌查询到的商品数为："+respVOS.size());
-        int updateNum=0;
-        if (respVOS.size()>0){
-            for (ProductRespVO productRespVO :respVOS){
-                productRespVOMap.put(productRespVO.getSkuCode(),productRespVO);
 
+        AtomicInteger updateResult = new AtomicInteger(0);
+        while (pageNo > 0) {
+            list = orderDetailDao.selectDetailByStoreId(storeId);
+            if (CollectionUtils.isEmpty(list)) {
+                break;
             }
 
-            for (OrderDetailInfo orderDetailInfo:list){
-                if (orderDetailInfo.getBrandId()==null){
-                    orderDetailInfo.setBrandId(productRespVOMap.get(orderDetailInfo.getSkuCode())==null?null:productRespVOMap.get(orderDetailInfo.getSkuCode()).getBrandId());
-                    orderDetailInfo.setBrandName(productRespVOMap.get(orderDetailInfo.getSkuCode())==null?null:productRespVOMap.get(orderDetailInfo.getSkuCode()).getBrandName());
-                }
-                if (orderDetailInfo.getCostPrice()==0){
-                    orderDetailInfo.setCostPrice(Math.toIntExact(productRespVOMap.get(orderDetailInfo.getSkuCode()) == null ? 0 : productRespVOMap.get(orderDetailInfo.getSkuCode()).getProductAvgCost()));
+            if (list.size() < pageSize) {
+                pageNo = 0;
+            } else {
+                ++pageNo;
+            }
+
+            skuSet = list.stream().map(OrderDetailInfo::getSkuCode).collect(Collectors.toSet());
+            calculateReqVo.setSkuCodeList(Lists.newArrayList(skuSet));
+            respVOS = bridgeProductService.selectProductInfo(calculateReqVo);
+            respVOSMap = respVOS.stream().collect(Collectors.toMap(ProductRespVO::getSkuCode, value -> value, (o, n) -> n));
+
+            for (int i = 0; i < list.size(); i++) {
+                OrderDetailInfo orderDetailInfo = list.get(i);
+                ProductRespVO productRespVO = respVOSMap.get(orderDetailInfo.getSkuCode());
+                if (Objects.nonNull(productRespVO)) {
+                    if (orderDetailInfo.getBrandId() == null) {
+                        orderDetailInfo.setBrandId(productRespVO.getBrandId());
+                        orderDetailInfo.setBrandName(productRespVO.getBrandName());
+                    }
+                    if (orderDetailInfo.getCostPrice() == 0) {
+                        orderDetailInfo.setCostPrice(Math.toIntExact(productRespVO.getProductAvgCost()));
+                    }
+                    int result = orderDetailDao.updateOrderDetailById(orderDetailInfo);
+                    updateResult.addAndGet(result);
                 }
 
-                int i= orderDetailDao.updateOrderDetailById(orderDetailInfo);
-                updateNum=updateNum+i;
+                if (i % 200 == 0) {
+                    try {
+                        Thread.sleep(20);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
-        log.info("刷新订单商品品牌结束，修改总条数："+updateNum);
-        return HttpResponse.successGenerics(updateNum);
+
+        int update = updateResult.get();
+        log.info("刷新订单商品品牌结束，修改总条数：" + update);
+        return HttpResponse.successGenerics(update);
+
+          // GC overhead limit exceeded
+
+//        log.info("刷新订单商品品牌需要刷新的sku数为："+list.size());
+//        CalculateReqVo calculateReqVo = new CalculateReqVo();
+//        calculateReqVo.setDistributorId(storeId);
+//        calculateReqVo.setSkuCodeList(list.stream().map(OrderDetailInfo::getSkuCode).collect(Collectors.toList()));
+//        List<ProductRespVO> respVOS = bridgeProductService.selectProductInfo(calculateReqVo);
+//        Map<String,ProductRespVO> productRespVOMap=new HashMap<>(respVOS.size());
+//        log.info("刷新订单商品品牌查询到的商品数为："+respVOS.size());
+//        int updateNum=0;
+//        if (respVOS.size()>0){
+//            for (ProductRespVO productRespVO :respVOS){
+//                productRespVOMap.put(productRespVO.getSkuCode(),productRespVO);
+//
+//            }
+//
+//            for (OrderDetailInfo orderDetailInfo:list){
+//                if (orderDetailInfo.getBrandId()==null){
+//                    orderDetailInfo.setBrandId(productRespVOMap.get(orderDetailInfo.getSkuCode())==null?null:productRespVOMap.get(orderDetailInfo.getSkuCode()).getBrandId());
+//                    orderDetailInfo.setBrandName(productRespVOMap.get(orderDetailInfo.getSkuCode())==null?null:productRespVOMap.get(orderDetailInfo.getSkuCode()).getBrandName());
+//                }
+//                if (orderDetailInfo.getCostPrice()==0){
+//                    orderDetailInfo.setCostPrice(Math.toIntExact(productRespVOMap.get(orderDetailInfo.getSkuCode()) == null ? 0 : productRespVOMap.get(orderDetailInfo.getSkuCode()).getProductAvgCost()));
+//                }
+//
+//                int i= orderDetailDao.updateOrderDetailById(orderDetailInfo);
+//                updateNum=updateNum+i;
+//            }
+//        }
+//        log.info("刷新订单商品品牌结束，修改总条数：" + updateNum);
+//        return HttpResponse.successGenerics(updateNum);
     }
 
     private void accountDataHandle(ReportForDayResponse reportForDayResponse, List<ReportForDayResponse> accountList) {
