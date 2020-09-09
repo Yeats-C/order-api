@@ -216,7 +216,7 @@ public class OrderServiceImpl implements OrderService {
                     //查询退货数量
 //                    List<OrderIdAndAmountRequest> returnIdAndAmounts = new ArrayList();
 //                    returnIdAndAmounts = orderAfterDetailDao.returnAmount(reorerRequest);
-                    Integer amount = detailList.stream().collect(Collectors.summingLong(OrderDetailInfo::getAmount)).intValue();
+                    Integer amount = detailList.stream().filter(a -> Objects.nonNull(a.getAmount())).collect(Collectors.summingLong(OrderDetailInfo::getAmount)).intValue();
                     Integer returnAmount = returnIdAndAmountListMap.get(info.getOrderCode());
                     if (Objects.nonNull(returnAmount) && returnAmount >= amount) {
                         info.setTurnReturnView(1);
