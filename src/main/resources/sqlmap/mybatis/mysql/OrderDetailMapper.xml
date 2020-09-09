@@ -45,6 +45,8 @@
         <result column="receive_points" jdbcType="INTEGER" property="receivePoints"/>
         <result column="product_property_code" jdbcType="VARCHAR" property="productPropertyCode"/>
         <result column="product_property_name" jdbcType="VARCHAR" property="productPropertyName"/>
+        <result column="brand_id" jdbcType="VARCHAR" property="brandId"/>
+        <result column="brand_name" jdbcType="VARCHAR" property="brandName"/>
     </resultMap>
 
     <resultMap id="ProductsMapping" type="com.aiqin.mgs.order.api.domain.response.OrderProductsResponse">

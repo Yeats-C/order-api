@@ -875,19 +875,31 @@ public class OrderServiceImpl implements OrderService {
             respVOS = bridgeProductService.selectProductInfo(calculateReqVo);
             respVOSMap = respVOS.stream().collect(Collectors.toMap(ProductRespVO::getSkuCode, value -> value, (o, n) -> n));
 
+            boolean isUpdate = false;
             for (int i = 0; i < list.size(); i++) {
                 OrderDetailInfo orderDetailInfo = list.get(i);
                 ProductRespVO productRespVO = respVOSMap.get(orderDetailInfo.getSkuCode());
                 if (Objects.nonNull(productRespVO)) {
                     if (orderDetailInfo.getBrandId() == null) {
-                        orderDetailInfo.setBrandId(productRespVO.getBrandId());
-                        orderDetailInfo.setBrandName(productRespVO.getBrandName());
+                        String brandId = productRespVO.getBrandId();
+                        if(StringUtils.isNotBlank(brandId)){
+                            orderDetailInfo.setBrandId(brandId);
+                            orderDetailInfo.setBrandName(productRespVO.getBrandName());
+                            isUpdate = true;
+                        }
                     }
                     if (orderDetailInfo.getCostPrice() == 0) {
-                        orderDetailInfo.setCostPrice(Math.toIntExact(productRespVO.getProductAvgCost()));
+                        int costPrice = Math.toIntExact(productRespVO.getProductAvgCost());
+                        if(0 != costPrice){
+                            orderDetailInfo.setCostPrice(costPrice);
+                            isUpdate = true;
+                        }
                     }
-                    int result = orderDetailDao.updateOrderDetailById(orderDetailInfo);
-                    updateResult.addAndGet(result);
+                    if (isUpdate) {
+                        int result = orderDetailDao.updateOrderDetailById(orderDetailInfo);
+                        updateResult.addAndGet(result);
+                        isUpdate = !isUpdate;
+                    }
                 }
 
                 if (i % 200 == 0) {
