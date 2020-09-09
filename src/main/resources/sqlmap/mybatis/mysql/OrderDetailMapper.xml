@@ -656,11 +656,11 @@
         select  d.* from order_consumer_info o,order_consumer_detail d
         WHERE o.order_id=d.order_id
         and o.distributor_id=#{storeId}
-        and d.total_price is null or d.total_price=0 or d.brand_id is null ;
+        and (d.total_price is null or d.total_price=0 or d.brand_id is null) ;
     </select>
 
     <update id="updateOrderDetailById" parameterType="com.aiqin.mgs.order.api.domain.OrderDetailInfo">
-        update order_consumer_detail set d.brand_id=#{brandId},d.brand_name=#{brandName},d.cost_price=#{costPrice} where id =#{id}
+        update order_consumer_detail set brand_id=#{brandId},brand_name=#{brandName},cost_price=#{costPrice} where id =#{id}
     </update>
 </mapper>
 
