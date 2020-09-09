@@ -1274,8 +1274,7 @@ public static void main(String[] args) {
 
     public List<ProductRespVO> selectProductInfo(CalculateReqVo reqVo) {
         StringBuilder sb = new StringBuilder();
-//        sb.append(urlProperties.getProductApi()).append("/product/find/product/by");
-        sb.append("http://localhost:9021").append("/product/find/product/by");
+        sb.append(urlProperties.getProductApi()).append("/product/find/product/by");
         HttpClient httpClient = HttpClient.post(sb.toString()).json(reqVo);
         HttpResponse<List<ProductRespVO>> result = httpClient.action().result(new TypeReference<HttpResponse<List<ProductRespVO>>>() {
         });
