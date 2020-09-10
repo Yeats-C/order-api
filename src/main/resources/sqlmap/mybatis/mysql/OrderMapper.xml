@@ -2057,7 +2057,7 @@
         </if>
         - sum( a.return_amount  ) saleProductNum,
        - sum( a.return_price ) totalAmount,
-        sum( cost_price ) productCost
+        - sum( cost_price ) productCost
         FROM
         order_consumer_detail d,
         order_consumer_info o,
