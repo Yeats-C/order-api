@@ -205,6 +205,7 @@
         <if test="status != null and status == 1">
             and product_label_code=2
         </if>
+        group by sku_code
         limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
     </select>
     <select id="storeProductSkuCount" parameterType="com.aiqin.mgs.order.api.domain.request.ProductSeachSkuReq"
@@ -217,6 +218,7 @@
         <if test="status != null and status == 1">
             and product_label_code=2
         </if>
+        group by sku_code
     </select>
     <select id="productStoreSaleoutDgree" parameterType="com.aiqin.mgs.order.api.domain.request.ProductOverViewReq"
             resultType="com.aiqin.mgs.order.api.domain.response.ProductBaseUnResp">
