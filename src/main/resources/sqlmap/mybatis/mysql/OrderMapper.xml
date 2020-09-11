@@ -179,7 +179,7 @@
             resultMap="LastPrestorageMapping"
             resultType="java.util.List">
 
-        select d.prestorage_order_supply_detail_id,d.product_name ,d.amount ,d.return_amount ,d.return_prestorage_amount,d.supply_amount ,s.create_time from prestorage_order_supply s,prestorage_order_supply_detail d
+        select d.sku_code, d.prestorage_order_supply_detail_id,d.product_name ,d.amount ,d.return_amount ,d.return_prestorage_amount,d.supply_amount ,s.create_time from prestorage_order_supply s,prestorage_order_supply_detail d
         where  s.prestorage_order_supply_id=d.prestorage_order_supply_id and s.distributor_id = #{distributorId} and s.member_id =#{memberId}
 
 
