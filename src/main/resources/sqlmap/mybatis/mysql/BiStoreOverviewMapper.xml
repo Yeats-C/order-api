@@ -169,7 +169,7 @@
     </select>
 
     <select id="selectProductCountByStoreId" resultType="com.aiqin.mgs.order.api.domain.response.ProductLabelStatusResp">
-        select count(1) as bestMember,(select count(1) from bi_product_overview where product_label_code=2 and store_id = #{storeId}) as unsalableMember
+        select count(distinct sku_code) as bestMember,(select count(distinct sku_code) from bi_product_overview where product_label_code=2 and store_id = #{storeId}) as unsalableMember
         from bi_product_overview
         where product_label_code=0 and store_id = #{storeId}
     </select>
