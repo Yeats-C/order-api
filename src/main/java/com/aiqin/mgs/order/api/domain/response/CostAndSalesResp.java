@@ -58,4 +58,8 @@ public class CostAndSalesResp {
     @JsonProperty("gross_profit_rate")
     @ApiModelProperty("毛利率")
     private Integer grossProfitRate;
+
+    @JsonProperty("cost_points")
+    @ApiModelProperty("积分")
+    private Integer costPoints;
 }
