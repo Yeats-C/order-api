@@ -2008,7 +2008,7 @@
         <if test="cashierId !=null and cashierId !=''">
             and o.guide_id =#{cashierId}
         </if>
-        AND o.pay_status = 1 and o.order_type!=3
+        AND o.order_status not in (0,4) and o.order_type!=3
         group by
         <if test="productCategory !=null and productCategory==0">
             d.type_id
@@ -2114,8 +2114,6 @@
         </if>
   )as t
 
-
-        limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
     </select>
     <select id="costAndSalesByCategory0Count" resultType="long">
         select count(* ) FROM (SELECT

@@ -830,10 +830,10 @@ public class OrderServiceImpl implements OrderService {
 
 
         List<CostAndSalesResp> costAndSalesResps = orderDao.costAndSalesByCategory0(costAndSalesReq);
-        Long count = orderDao.costAndSalesByCategory0Count(costAndSalesReq);
+//        Long count = orderDao.costAndSalesByCategory0Count(costAndSalesReq);
 
         costAndSalesTopResp.setDataList(costAndSalesResps);
-        costAndSalesTopResp.setTotalCount(Math.toIntExact(count));
+        costAndSalesTopResp.setTotalCount(Math.toIntExact(costAndSalesResps.size()));
 
         //计算总数
        // CostAndSalesSumResp costAndSalesSumResp = orderDao.costAndSalesSum(costAndSalesReq);
