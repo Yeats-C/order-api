@@ -1803,7 +1803,8 @@
         sum( a.cost_points ) jiFenGet,
         SUM( a.receive_points ) jiFenReturn
         FROM
-        order_consumer_detail a
+        order_consumer_detail a,
+        order_consumer_info b
         WHERE
         a.create_time &gt;= #{startTime}
         AND a.create_time &lt;= #{endTime}
@@ -1811,6 +1812,8 @@
         (<foreach collection="cashierIdList" item="item" separator=",">
         #{item}
     </foreach>)
+        AND a.order_id = b.order_id
+        and b.distributor_id = #{distributorId}
         GROUP BY
         a.create_by
     </select>
