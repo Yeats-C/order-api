@@ -9,6 +9,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @ApiModel("退货商品信息表")
@@ -412,4 +413,8 @@ public class ReturnOrderInfo {
     @ApiModelProperty(value="爱亲成本总额")
     @JsonProperty("aiqin_cost")
     private BigDecimal aiqinCost;
+
+
+    @ApiModelProperty("退货商品list")
+    private List<ReturnOrderDetail> details;
 }
