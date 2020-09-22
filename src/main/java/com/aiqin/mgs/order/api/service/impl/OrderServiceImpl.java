@@ -151,7 +151,7 @@ public class OrderServiceImpl implements OrderService {
     public HttpResponse selectOrder(OrderQuery orderQuery) {
 
         //根据支付类型查询订单
-        payOrderIdList(OrderPublic.getOrderQuery(orderQuery));
+         payOrderIdList(OrderPublic.getOrderQuery(orderQuery));
 
         if (orderQuery.getPayType() != null && !orderQuery.getPayType().equals("") && orderQuery.getOrderCode() != null && !orderQuery.getOrderCode().equals("")) {
             if (orderQuery.getOrderIdList() != null && orderQuery.getOrderIdList().size() > 0) {
@@ -948,6 +948,23 @@ public class OrderServiceImpl implements OrderService {
 //        }
 //        log.info("刷新订单商品品牌结束，修改总条数：" + updateNum);
 //        return HttpResponse.successGenerics(updateNum);
+    }
+
+    @Override
+    public OrderStatisticsRespVo statistics(OrderQuery orderQuery) {
+        // 根据支付类型查询订单
+        payOrderIdList(OrderPublic.getOrderQuery(orderQuery));
+        if (orderQuery.getPayType() != null && !"".equals(orderQuery.getPayType()) && orderQuery.getOrderCode() != null && !"".equals(orderQuery.getOrderCode())) {
+            if (orderQuery.getOrderIdList() != null && orderQuery.getOrderIdList().size() > 0) {
+            } else {
+                return new OrderStatisticsRespVo();
+            }
+        }
+        OrderStatisticsRespVo orderStatisticsRespVo = orderDao.statistics(OrderPublic.getOrderQuery(orderQuery));
+        long rateValue = getRateValue();
+
+        orderStatisticsRespVo.setPointsDeductionAmount(rateValue * orderStatisticsRespVo.getPointsDeductionAmount());
+        return orderStatisticsRespVo;
     }
 
     private void accountDataHandle(ReportForDayResponse reportForDayResponse, List<ReportForDayResponse> accountList) {

@@ -2305,5 +2305,130 @@
         group by left(type_id,#{productCategory})
         ) as a
     </select>
+    <select id="statistics" resultType="com.aiqin.mgs.order.api.domain.OrderStatisticsRespVo">
+        SELECT
+            sum(count) saleTotal,
+            sum(sum1) pointsDeductionAmount,
+            sum(sum2) actualPaymentAmount
+        FROM
+        (
+        SELECT
+            1 count,
+            sum( b.cost_points ) sum1,
+            sum( a.actual_price ) sum2
+        FROM
+        order_consumer_info a left join order_consumer_detail b on a.order_id = b.order_id
+        <if test="(skuName!=null and skuName!='') or (barCodeAndSku !=null and barCodeAndSku != '')">
+            and a.order_id = b.order_id
+            <if test="skuName!=null and skuName!='' ">
+                and b.sku_name like concat('%',#{skuName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="barCodeAndSku!=null and barCodeAndSku!='' ">
+                and (b.sku_code = #{barCodeAndSku} or b.bar_code = #{barCodeAndSku})
+            </if>
+        </if>
+        WHERE 1=1
+        <choose>
+            <when test="orderType!=null and orderType!='' ">
+                and a.order_type = #{orderType}
+            </when>
+            <otherwise>
+                and (order_type = 1 or order_type = 4)
+            </otherwise>
+        </choose>
+        <if test="distributorId!=null and distributorId!='' ">
+            and a.distributor_id = #{distributorId}
+        </if>
+        <if test="distributorCode!=null and distributorCode!='' ">
+            and a.distributor_code = #{distributorCode}
+        </if>
+
+        <if test="listDistributorId != null">
+            and a.distributor_id in (
+            <foreach collection="listDistributorId" item="distributorId" separator=",">
+                '${distributorId}'
+            </foreach>
+            )
+        </if>
+        <if test="distributorName!=null and distributorName!=''">
+            and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="orderId!=null and orderId!=''">
+            and a.order_id = #{orderId}
+        </if>
+        <if test="orderCode!=null and orderCode!=''">
+            and a.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="memberId!=null and memberId!=''">
+            and a.member_id =#{memberId}
+        </if>
+        <if test="memberidList != null">
+            and a.member_id in (
+            <foreach collection="memberidList" item="member_id" separator=",">
+                '${member_id}'
+            </foreach>
+            )
+        </if>
+        <if test="memberPhone!=null and memberPhone!=''">
+            and a.member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="codeAndPhone!=null and codeAndPhone!=''">
+            and (a.member_phone like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%') or a.order_code like
+            concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%'))
+        </if>
+        <if test="orderStatus!=null ">
+            and a.order_status = #{orderStatus}
+        </if>
+        <if test="orderStatusList != null">
+            and a.order_status in (
+            <foreach collection="orderStatusList" item="order_status" separator=",">
+                '${order_status}'
+            </foreach>
+            )
+        </if>
+        <if test="beginTime!=null ">
+            and a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime!=null ">
+            and a.create_time &lt;= #{endTime}
+        </if>
+        <if test="updateTime!=null ">
+            and a.update_time &gt;= #{updateTime}
+        </if>
+        <if test="originTypeList != null">
+            and a.origin_type in (
+            <foreach collection="originTypeList" item="origin_type" separator=",">
+                '${origin_type}'
+            </foreach>
+            )
+        </if>
+        <if test="orderIdList != null">
+            and a.order_id in (
+            <foreach collection="orderIdList" item="order_id" separator=",">
+                '${order_id}'
+            </foreach>
+            )
+        </if>
+        <if test="noExistOrderCodeList != null">
+            and a.order_code not in (
+            <foreach collection="noExistOrderCodeList" item="order_code" separator=",">
+                '${order_code}'
+            </foreach>
+            )
+        </if>
+        <if test="receiveType!=null ">
+            and a.receive_type =#{receiveType}
+        </if>
+        <if test="receiveCode!=null and receiveCode!='' ">
+            and a.receive_code =#{receiveCode}
+        </if>
+        <if test="originType!=null  ">
+            and a.origin_type =#{originType}
+        </if>
+        <if test="payType!=null and payType!='' ">
+            and a.pay_type =#{payType}
+        </if>
+        group by a.id)c
+    </select>
 </mapper>
 

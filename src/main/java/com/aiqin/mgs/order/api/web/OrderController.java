@@ -32,8 +32,6 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
 
-//import java.sql.Date;
-
 @RestController
 @RequestMapping("/order")
 @Api(tags = "订单相关操作接口")
@@ -230,8 +228,15 @@ public class OrderController {
     	LOGGER.info("查询订单列表参数：{}",orderQuery);    	
         return orderService.selectOrder(orderQuery);
     }
-    
-    
+
+    @PostMapping("/statistics")
+    @ApiOperation(value = "订单统计")
+    public HttpResponse<OrderStatisticsRespVo> statistics(@RequestBody OrderQuery orderQuery) {
+    	LOGGER.info("订单统计表参数：{}",orderQuery);
+        OrderStatisticsRespVo orderStatisticsRespVo = orderService.statistics(orderQuery);
+        return HttpResponse.successGenerics(orderStatisticsRespVo);
+    }
+
     /**
      * 导出订单列表
      * @param 
