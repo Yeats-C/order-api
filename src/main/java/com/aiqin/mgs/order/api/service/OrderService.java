@@ -256,4 +256,6 @@ public interface OrderService {
 	HttpResponse<CostAndSalesTopResp> costAndSales(CostAndSalesReq costAndSalesReq);
 
     HttpResponse updateOrder(String storeId);
+
+    OrderStatisticsRespVo statistics(OrderQuery orderQuery);
 }

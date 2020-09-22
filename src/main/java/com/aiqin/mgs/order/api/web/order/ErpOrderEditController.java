@@ -6,6 +6,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
 import com.aiqin.mgs.order.api.domain.AuthToken;
+import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCarryOutNextStepRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderEditRequest;
 import com.aiqin.mgs.order.api.service.order.ErpOrderInfoService;
@@ -72,6 +73,23 @@ public class ErpOrderEditController {
             response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
         } catch (Exception e) {
             logger.error("订单流程校正失败：{}", e);
+            response = HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
+        }
+        return response;
+    }
+
+    @PostMapping("/synchronizeOrders")
+    @ApiOperation(value = "DL同步订单信息")
+    public HttpResponse synchronizeOrders(@RequestBody ErpOrderInfo erpOrderInfo) {
+        logger.info("DL同步订单信息：{}", erpOrderInfo);
+        HttpResponse response = HttpResponse.success();
+        try {
+            erpOrderInfoService.synchronizeOrders(erpOrderInfo);
+        } catch (BusinessException e) {
+            logger.error("DL同步订单信息失败：{}", e);
+            response = HttpResponse.failure(MessageId.create(Project.ORDER_API, 99, e.getMessage()));
+        } catch (Exception e) {
+            logger.error("DL同步订单信息-失败：{}", e);
             response = HttpResponse.failure(ResultCode.UPDATE_EXCEPTION);
         }
         return response;

@@ -169,7 +169,7 @@
     </select>
 
     <select id="selectProductCountByStoreId" resultType="com.aiqin.mgs.order.api.domain.response.ProductLabelStatusResp">
-        select count(1) as bestMember,(select count(1) from bi_product_overview where product_label_code=2 and store_id = #{storeId}) as unsalableMember
+        select count(distinct sku_code) as bestMember,(select count(distinct sku_code) from bi_product_overview where product_label_code=2 and store_id = #{storeId}) as unsalableMember
         from bi_product_overview
         where product_label_code=0 and store_id = #{storeId}
     </select>
@@ -205,11 +205,12 @@
         <if test="status != null and status == 1">
             and product_label_code=2
         </if>
+        group by sku_code
         limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
     </select>
     <select id="storeProductSkuCount" parameterType="com.aiqin.mgs.order.api.domain.request.ProductSeachSkuReq"
             resultType="java.lang.Integer">
-        select count(1) from bi_product_overview
+        select count(DISTINCT sku_code) from bi_product_overview
         where store_id = #{storeId}
         <if test="status != null and status == 0">
             and product_label_code=0

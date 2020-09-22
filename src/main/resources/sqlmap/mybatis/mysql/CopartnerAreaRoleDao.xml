@@ -7,7 +7,9 @@
       person_id as personId,
       person_name as personName,
       REPLACE(GROUP_CONCAT(role_code),',','、') as roleCode,
-      REPLACE(GROUP_CONCAT(role_name),',','、') as roleName
+      REPLACE(GROUP_CONCAT(role_name),',','、') as roleName,
+      role_store_code as roleStoreCode,
+      role_store_name as roleStoreName
     from copartner_area_role
     where 1=1
     <if test=" copartnerAreaId !=null and copartnerAreaId !='' ">
@@ -46,7 +48,9 @@
           role_code,
           role_name,
           role_type,
-          memo
+          memo,
+          role_store_code,
+          role_store_name
        )values(
           #{copartnerAreaId},
           #{personId},
@@ -54,7 +58,9 @@
           #{roleCode},
           #{roleName},
           #{roleType},
-          #{memo}
+          #{memo},
+          #{roleStoreCode},
+          #{roleStoreName}
        )
     </insert>
     <select id="selectRoleMainPageList"  resultType="com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaRoleList">
@@ -63,7 +69,9 @@
         person_id as personId,
         person_name as personName,
         role_code as roleCode,
-        role_name as roleName
+        role_name as roleName,
+        role_store_code as roleStoreCode,
+        role_store_name as roleStoreName
         from copartner_area_role
         where 1=1
         <if test=" copartnerAreaId !=null and copartnerAreaId !='' ">
@@ -86,7 +94,9 @@
         person_id as personId,
         person_name as personName,
         role_code as roleCode,
-        role_name as roleName
+        role_name as roleName,
+        role_store_code as roleStoreCode,
+        role_store_name as roleStoreName
         from copartner_area_role
         where 1=1
         <if test=" copartnerAreaId !=null and copartnerAreaId !='' ">

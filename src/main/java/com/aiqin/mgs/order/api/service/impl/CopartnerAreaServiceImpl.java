@@ -8,42 +8,25 @@
 package com.aiqin.mgs.order.api.service.impl;
 
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
-
 import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.id.IdUtil;
 import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.Project;
-import com.aiqin.mgs.order.api.component.*;
-import com.aiqin.mgs.order.api.component.PayTypeEnum;
-import com.aiqin.mgs.order.api.config.properties.UrlProperties;
-import com.aiqin.mgs.order.api.dao.*;
-import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageResData;
-import com.aiqin.mgs.order.api.base.ResultCode;
-import com.aiqin.mgs.order.api.domain.constant.Global;
+import com.aiqin.mgs.order.api.dao.CopartnerAreaDao;
+import com.aiqin.mgs.order.api.dao.CopartnerAreaRoleDao;
+import com.aiqin.mgs.order.api.dao.CopartnerAreaStoreDao;
+import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.copartnerArea.*;
-import com.aiqin.mgs.order.api.domain.logisticsRule.LogisticsRuleInfo;
-import com.aiqin.mgs.order.api.domain.pay.PayReq;
-import com.aiqin.mgs.order.api.domain.request.*;
-import com.aiqin.mgs.order.api.domain.response.*;
-import com.aiqin.mgs.order.api.service.*;
-import com.aiqin.mgs.order.api.service.bridge.BridgeProductService;
-import com.aiqin.mgs.order.api.util.DayUtil;
-import com.google.common.collect.Lists;
+import com.aiqin.mgs.order.api.domain.request.returnorder.AreaReq;
+import com.aiqin.mgs.order.api.service.CopartnerAreaService;
+import com.aiqin.mgs.order.api.util.AuthUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-
-import com.aiqin.mgs.order.api.util.AuthUtil;
-import com.aiqin.mgs.order.api.util.DateUtil;
-import com.aiqin.mgs.order.api.util.OrderPublic;
-import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.http.client.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -53,29 +36,12 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
+import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.stream.Collectors;
-
-import com.aiqin.ground.util.exception.GroundRuntimeException;
-import com.aiqin.mgs.order.api.domain.request.DevelRequest;
-import com.aiqin.mgs.order.api.domain.request.DistributorMonthRequest;
-import com.aiqin.mgs.order.api.domain.request.MemberByDistributorRequest;
-import com.aiqin.mgs.order.api.domain.request.OrderAndSoOnRequest;
-import com.aiqin.mgs.order.api.domain.request.OrderIdAndAmountRequest;
-import com.aiqin.mgs.order.api.domain.request.ReorerRequest;
-import com.aiqin.mgs.order.api.domain.request.returnorder.AreaReq;
-import com.aiqin.mgs.order.api.domain.response.OrderOverviewMonthResponse;
-import com.aiqin.mgs.order.api.domain.response.OrderResponse;
-import com.aiqin.mgs.order.api.domain.response.OrderbyReceiptSumResponse;
-import com.aiqin.mgs.order.api.domain.response.SelectByMemberPayCountResponse;
-import com.aiqin.mgs.order.api.domain.response.WscSaleResponse;
-import com.aiqin.mgs.order.api.domain.response.WscWorkViewResponse;
-import com.aiqin.mgs.order.api.domain.response.DistributorMonthResponse;
-import com.aiqin.mgs.order.api.domain.response.LastBuyResponse;
-import com.aiqin.mgs.order.api.domain.response.LatelyResponse;
-import com.aiqin.mgs.order.api.domain.response.MevBuyResponse;
-import com.aiqin.mgs.order.api.domain.response.OradskuResponse;
 
 @SuppressWarnings("all")
 @Slf4j
@@ -114,6 +80,9 @@ public class CopartnerAreaServiceImpl implements  CopartnerAreaService {
 					//统计合伙人公司下的门店个数
 					int storeAmount = copartnerAreaStoreDao.countStoreByArea(copartnerArea.getCopartnerAreaId());
 					copartnerArea.setStoreAmount(storeAmount);
+					if(null==copartnerArea.getCopartnerAreaNameUp()){
+						copartnerArea.setCopartnerAreaUp(1);
+					}
 					list.set(i, copartnerArea);
 				}
 			}
@@ -318,7 +287,7 @@ public class CopartnerAreaServiceImpl implements  CopartnerAreaService {
 	@Transactional(isolation = Isolation.REPEATABLE_READ, propagation = Propagation.REQUIRED, readOnly = false, rollbackFor = Exception.class)
 	public HttpResponse saveCopartnerArea(@Valid CopartnerAreaSave param) {
 
-		LOGGER.info("保存区域请求参数{}", param);
+		LOGGER.info("保存区域请求参数{}", JsonUtil.toJson(param));
 
 		try {
 

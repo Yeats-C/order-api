@@ -29,7 +29,7 @@ public class ErpOrderFee {
     private String feeId;
 
     @ApiModelProperty(value = "关联订单id")
-    @JsonProperty("关联订单id")
+    @JsonProperty("order_id")
     private String orderId;
 
     @ApiModelProperty(value = "支付单id")

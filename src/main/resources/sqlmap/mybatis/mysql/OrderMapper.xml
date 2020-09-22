@@ -179,7 +179,7 @@
             resultMap="LastPrestorageMapping"
             resultType="java.util.List">
 
-        select d.prestorage_order_supply_detail_id,d.product_name ,d.amount ,d.return_amount ,d.return_prestorage_amount,d.supply_amount ,s.create_time from prestorage_order_supply s,prestorage_order_supply_detail d
+        select d.sku_code, d.prestorage_order_supply_detail_id,d.product_name ,d.amount ,d.return_amount ,d.return_prestorage_amount,d.supply_amount ,s.create_time from prestorage_order_supply s,prestorage_order_supply_detail d
         where  s.prestorage_order_supply_id=d.prestorage_order_supply_id and s.distributor_id = #{distributorId} and s.member_id =#{memberId}
 
 
@@ -1799,11 +1799,12 @@
     <select id="selectPointRecord"
             resultType="com.aiqin.mgs.order.api.domain.response.stock.ReportForDayResponse">
         SELECT
-        create_by cashierId,
+        a.create_by cashierId,
         sum( a.cost_points ) jiFenGet,
         SUM( a.receive_points ) jiFenReturn
         FROM
-        order_consumer_detail a
+        order_consumer_detail a,
+        order_consumer_info b
         WHERE
         a.create_time &gt;= #{startTime}
         AND a.create_time &lt;= #{endTime}
@@ -1811,6 +1812,8 @@
         (<foreach collection="cashierIdList" item="item" separator=",">
         #{item}
     </foreach>)
+        AND a.order_id = b.order_id
+        and b.distributor_id = #{distributorId}
         GROUP BY
         a.create_by
     </select>
@@ -1978,7 +1981,8 @@
 
         sum( amount ) saleProductNum,
         sum( d.total_price ) totalAmount,
-        sum( cost_price ) productCost
+        sum( cost_price * amount) productCost,
+        sum( d.cost_points) costPoints
         FROM
         order_consumer_detail d,
         order_consumer_info o
@@ -2008,7 +2012,7 @@
         <if test="cashierId !=null and cashierId !=''">
             and o.guide_id =#{cashierId}
         </if>
-        AND o.pay_status = 1 and o.order_type!=3
+        AND o.order_status not in (0,4) and o.order_type!=3
         group by
         <if test="productCategory !=null and productCategory==0">
             d.type_id
@@ -2057,7 +2061,8 @@
         </if>
         - sum( a.return_amount  ) saleProductNum,
        - sum( a.return_price ) totalAmount,
-        sum( cost_price ) productCost
+        - sum( cost_price * a.return_amount ) productCost,
+         0 costPoints
         FROM
         order_consumer_detail d,
         order_consumer_info o,
@@ -2114,8 +2119,6 @@
         </if>
   )as t
 
-
-        limit #{beginIndex,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
     </select>
     <select id="costAndSalesByCategory0Count" resultType="long">
         select count(* ) FROM (SELECT
@@ -2301,6 +2304,131 @@
 
         group by left(type_id,#{productCategory})
         ) as a
+    </select>
+    <select id="statistics" resultType="com.aiqin.mgs.order.api.domain.OrderStatisticsRespVo">
+        SELECT
+            sum(count) saleTotal,
+            sum(sum1) pointsDeductionAmount,
+            sum(sum2) actualPaymentAmount
+        FROM
+        (
+        SELECT
+            1 count,
+            sum( b.cost_points ) sum1,
+            sum( a.actual_price ) sum2
+        FROM
+        order_consumer_info a left join order_consumer_detail b on a.order_id = b.order_id
+        <if test="(skuName!=null and skuName!='') or (barCodeAndSku !=null and barCodeAndSku != '')">
+            and a.order_id = b.order_id
+            <if test="skuName!=null and skuName!='' ">
+                and b.sku_name like concat('%',#{skuName,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="barCodeAndSku!=null and barCodeAndSku!='' ">
+                and (b.sku_code = #{barCodeAndSku} or b.bar_code = #{barCodeAndSku})
+            </if>
+        </if>
+        WHERE 1=1
+        <choose>
+            <when test="orderType!=null and orderType!='' ">
+                and a.order_type = #{orderType}
+            </when>
+            <otherwise>
+                and (order_type = 1 or order_type = 4)
+            </otherwise>
+        </choose>
+        <if test="distributorId!=null and distributorId!='' ">
+            and a.distributor_id = #{distributorId}
+        </if>
+        <if test="distributorCode!=null and distributorCode!='' ">
+            and a.distributor_code = #{distributorCode}
+        </if>
+
+        <if test="listDistributorId != null">
+            and a.distributor_id in (
+            <foreach collection="listDistributorId" item="distributorId" separator=",">
+                '${distributorId}'
+            </foreach>
+            )
+        </if>
+        <if test="distributorName!=null and distributorName!=''">
+            and a.distributor_name like concat('%',#{distributorName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="orderId!=null and orderId!=''">
+            and a.order_id = #{orderId}
+        </if>
+        <if test="orderCode!=null and orderCode!=''">
+            and a.order_code like concat('%',#{orderCode,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="memberId!=null and memberId!=''">
+            and a.member_id =#{memberId}
+        </if>
+        <if test="memberidList != null">
+            and a.member_id in (
+            <foreach collection="memberidList" item="member_id" separator=",">
+                '${member_id}'
+            </foreach>
+            )
+        </if>
+        <if test="memberPhone!=null and memberPhone!=''">
+            and a.member_phone like concat('%',#{memberPhone,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="codeAndPhone!=null and codeAndPhone!=''">
+            and (a.member_phone like concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%') or a.order_code like
+            concat('%',#{codeAndPhone,jdbcType=VARCHAR},'%'))
+        </if>
+        <if test="orderStatus!=null ">
+            and a.order_status = #{orderStatus}
+        </if>
+        <if test="orderStatusList != null">
+            and a.order_status in (
+            <foreach collection="orderStatusList" item="order_status" separator=",">
+                '${order_status}'
+            </foreach>
+            )
+        </if>
+        <if test="beginTime!=null ">
+            and a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime!=null ">
+            and a.create_time &lt;= #{endTime}
+        </if>
+        <if test="updateTime!=null ">
+            and a.update_time &gt;= #{updateTime}
+        </if>
+        <if test="originTypeList != null">
+            and a.origin_type in (
+            <foreach collection="originTypeList" item="origin_type" separator=",">
+                '${origin_type}'
+            </foreach>
+            )
+        </if>
+        <if test="orderIdList != null">
+            and a.order_id in (
+            <foreach collection="orderIdList" item="order_id" separator=",">
+                '${order_id}'
+            </foreach>
+            )
+        </if>
+        <if test="noExistOrderCodeList != null">
+            and a.order_code not in (
+            <foreach collection="noExistOrderCodeList" item="order_code" separator=",">
+                '${order_code}'
+            </foreach>
+            )
+        </if>
+        <if test="receiveType!=null ">
+            and a.receive_type =#{receiveType}
+        </if>
+        <if test="receiveCode!=null and receiveCode!='' ">
+            and a.receive_code =#{receiveCode}
+        </if>
+        <if test="originType!=null  ">
+            and a.origin_type =#{originType}
+        </if>
+        <if test="payType!=null and payType!='' ">
+            and a.pay_type =#{payType}
+        </if>
+        group by a.id)c
     </select>
 </mapper>
 

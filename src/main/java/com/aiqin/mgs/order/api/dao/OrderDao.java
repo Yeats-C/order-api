@@ -263,4 +263,5 @@ public interface OrderDao {
 
     CostAndSalesSumResp costAndSalesSum(CostAndSalesReq costAndSalesReq);
 
+    OrderStatisticsRespVo statistics(OrderQuery orderQuery);
 }
