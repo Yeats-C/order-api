@@ -123,6 +123,10 @@ public class ServiceProjectReduceDetail {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
+    @ApiModelProperty(value="支付方式")
+    @JsonProperty("pay_type")
+    private String payType;
+
     @ApiModelProperty(value = "购买订单的商品信息")
     @JsonProperty("project_list")
     private List<ServiceProjectAsset> serviceProjectAssetList;

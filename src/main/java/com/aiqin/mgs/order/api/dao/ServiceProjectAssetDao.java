@@ -64,4 +64,6 @@ public interface ServiceProjectAssetDao {
     List<ServiceProjectTransformResponse> totalCountAndAmountByType(ReduceDetailRequest reduceDetailRequest);
 
     List<ServiceProjectTransformResponse> totalCountAndAmountByProject(ReduceDetailRequest reduceDetailRequest);
+
+    List<ServiceProjectAsset> selectServiceProjectAssetByAssetId(@Param("assetId")String assetId);
 }

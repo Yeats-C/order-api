@@ -412,6 +412,7 @@ public class ServiceProjectServiceImpl  implements ServiceProjectService {
                 serviceProjectReduceDetail.setGuideName(serviceProjectAsset.getGuideName());
                 serviceProjectReduceDetail.setCreateTime(serviceProjectAsset.getCreateTime());
                 serviceProjectReduceDetail.setTypeId(serviceProjectAsset.getTypeId());
+                serviceProjectReduceDetail.setPayType(serviceProjectAsset.getPayType());
                 for (ServiceProjectAsset serviceProjectAsset1 : serviceProjectAssetList) {
                     if (serviceProjectAsset.getConsumptionPattern().equals(0) && serviceProjectAsset.getIsDirectCustom().equals(0)) {
                         serviceProjectAsset1.setRemainCount(serviceProjectAsset1.getLimitCount() - 1);
@@ -431,6 +432,12 @@ public class ServiceProjectServiceImpl  implements ServiceProjectService {
                     LOGGER.info("未查询到对应的订单信息");
                     return HttpResponse.failure(ResultCode.SELECT_ASSET_BY_ORDER_Id_FAIL);
                 }
+                List<ServiceProjectAsset> serviceProjectAssetList = serviceProjectAssetDao.selectServiceProjectAssetByAssetId(serviceProjectReduceDetail.getAssetId());
+
+                if (!CollectionUtils.isEmpty(serviceProjectAssetList)) {
+                    serviceProjectReduceDetail.setPayType(serviceProjectAssetList.get(0).getPayType());
+                }
+
                 LOGGER.info("根据订单id和订单类型查询订单信息完成,查询结果为{}", serviceProjectReduceDetail);
             }
             return HttpResponse.success(serviceProjectReduceDetail);
