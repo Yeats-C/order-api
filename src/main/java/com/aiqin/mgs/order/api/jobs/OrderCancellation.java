@@ -46,9 +46,9 @@ public class OrderCancellation {
     /**
      * 发放物流减免费用定时任务
      */
-    @Scheduled(cron = "0 0 14 * * ? ") //每天凌晨两点执行
-//    @Scheduled(cron = "0 0/1 * * * ? ") //每五分钟执行
-    public void getTasks(){
+//    @Scheduled(cron = "0 0 14 * * ? ")
+//    @Scheduled(cron = "0 0/1 * * * ? ")
+        public void getTasks(){
         //计时器
         StopWatch watch = new StopWatch();
         log.info("开始执行发放物流减免费用定时任务");

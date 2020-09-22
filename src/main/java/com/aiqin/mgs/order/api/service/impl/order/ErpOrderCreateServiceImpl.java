@@ -203,10 +203,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         //生成订单主体信息
 //        ErpOrderInfo order = generateOrder(erpOrderItemList, storeInfo, erpOrderSaveRequest, orderFee,auth);
         ErpOrderInfo order = generateOrder(flag1,flag2,erpOrderItemList, storeInfo, erpOrderSaveRequest, orderFee,auth);
-        //配送 计算订单物流费用减免比例
+        /*//配送 计算订单物流费用减免比例
         if(ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(erpOrderSaveRequest.getOrderType())){
             calculateLogisticsCostReductionRatio(order,erpOrderItemList);
-        }
+        }*/
 
         log.info("创建订单,生成订单主体信息返回结果order={}",order);
         //保存订单、订单明细、订单支付、订单收货人信息、订单日志
@@ -222,10 +222,10 @@ public class ErpOrderCreateServiceImpl implements ErpOrderCreateService {
         }
 
 
-        //扣除订单积分兑换赠品额度并插入赠品额度明细使用记录
-        integralGift(cartProductList,storeInfo,order.getOrderStoreCode(),auth);
+        /*//扣除订单积分兑换赠品额度并插入赠品额度明细使用记录
+        integralGift(cartProductList,storeInfo,order.getOrderStoreCode(),auth);*/
 
-        //锁库存
+        //锁库存 TODO 此处得改为调用DL接口锁库并同步 待DL提供接口
         if (processTypeEnum.isLockStock()) {
             //TODO 修改成实时获取锁库结果并新建表保存
             boolean flag = erpOrderRequestService.lockStockInSupplyChain(order, erpOrderItemList, auth);
