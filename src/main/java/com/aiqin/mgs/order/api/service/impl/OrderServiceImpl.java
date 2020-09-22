@@ -60,6 +60,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import com.aiqin.ground.util.exception.GroundRuntimeException;
@@ -215,12 +216,13 @@ public class OrderServiceImpl implements OrderService {
                     //查询退货数量
 //                    List<OrderIdAndAmountRequest> returnIdAndAmounts = new ArrayList();
 //                    returnIdAndAmounts = orderAfterDetailDao.returnAmount(reorerRequest);
-                    Integer amount = detailList.stream().collect(Collectors.summingLong(OrderDetailInfo::getAmount)).intValue();
-                    Integer returnAmount = returnIdAndAmountListMap.get(info.getOrderCode());
-                    if (Objects.nonNull(returnAmount) && returnAmount >= amount) {
-                        info.setTurnReturnView(1);
+                    if (CollectionUtils.isNotEmpty(detailList)) {
+                        Integer amount = detailList.stream().filter(a -> Objects.nonNull(a.getAmount())).collect(Collectors.summingLong(OrderDetailInfo::getAmount)).intValue();
+                        Integer returnAmount = returnIdAndAmountListMap.get(info.getOrderCode());
+                        if (Objects.nonNull(returnAmount) && returnAmount >= amount) {
+                            info.setTurnReturnView(1);
+                        }
                     }
-
 //                    //已完全退货完成订单
 //                    if (orderIdAndAmountRequests != null) {
 //                        for (OrderIdAndAmountRequest returnInfo : orderIdAndAmountRequests) {
@@ -822,23 +824,130 @@ public class OrderServiceImpl implements OrderService {
         CostAndSalesTopResp costAndSalesTopResp = new CostAndSalesTopResp();
 
         //品类
+        if (costAndSalesReq.getProductCategory()!=null&&!costAndSalesReq.getProductCategory().equals("")){
+            costAndSalesReq.setProductCategory(costAndSalesReq.getProductCategory()*2);
+        }
+
 
         List<CostAndSalesResp> costAndSalesResps = orderDao.costAndSalesByCategory0(costAndSalesReq);
-        Long count = orderDao.costAndSalesByCategory0Count(costAndSalesReq);
+//        Long count = orderDao.costAndSalesByCategory0Count(costAndSalesReq);
 
         costAndSalesTopResp.setDataList(costAndSalesResps);
-        costAndSalesTopResp.setTotalCount(Math.toIntExact(count));
+        costAndSalesTopResp.setTotalCount(Math.toIntExact(costAndSalesResps.size()));
 
         //计算总数
-        CostAndSalesSumResp costAndSalesSumResp = orderDao.costAndSalesSum(costAndSalesReq);
-        costAndSalesTopResp.setCostAndSalesSumResp(costAndSalesSumResp);
+       // CostAndSalesSumResp costAndSalesSumResp = orderDao.costAndSalesSum(costAndSalesReq);
+
         return HttpResponse.successGenerics(costAndSalesTopResp);
     }
 
     @Override
     public HttpResponse updateOrder(String storeId) {
-        //查询出d
-        return null;
+
+        //查询出所有订单中品牌为空或者成本价为空的sku
+        log.info("刷新订单商品品牌成本价开始：" + storeId);
+
+        int pageNo = 1;
+        int pageSize = 2000;
+
+        List<OrderDetailInfo> list;
+        Set<String> skuSet;
+        List<ProductRespVO> respVOS;
+        Map<String, ProductRespVO> respVOSMap;
+
+        CalculateReqVo calculateReqVo = new CalculateReqVo();
+        calculateReqVo.setDistributorId(storeId);
+
+        AtomicInteger updateResult = new AtomicInteger(0);
+        while (pageNo > 0) {
+            list = orderDetailDao.selectDetailByStoreId(storeId);
+            if (CollectionUtils.isEmpty(list)) {
+                break;
+            }
+
+            if (list.size() < pageSize) {
+                pageNo = 0;
+            } else {
+                ++pageNo;
+            }
+
+            skuSet = list.stream().map(OrderDetailInfo::getSkuCode).collect(Collectors.toSet());
+            calculateReqVo.setSkuCodeList(Lists.newArrayList(skuSet));
+            respVOS = bridgeProductService.selectProductInfo(calculateReqVo);
+            respVOSMap = respVOS.stream().collect(Collectors.toMap(ProductRespVO::getSkuCode, value -> value, (o, n) -> n));
+
+            boolean isUpdate = false;
+            for (int i = 0; i < list.size(); i++) {
+                OrderDetailInfo orderDetailInfo = list.get(i);
+                ProductRespVO productRespVO = respVOSMap.get(orderDetailInfo.getSkuCode());
+                if (Objects.nonNull(productRespVO)) {
+                    if (orderDetailInfo.getBrandId() == null) {
+                        String brandId = productRespVO.getBrandId();
+                        if(StringUtils.isNotBlank(brandId)){
+                            orderDetailInfo.setBrandId(brandId);
+                            orderDetailInfo.setBrandName(productRespVO.getBrandName());
+                            isUpdate = true;
+                        }
+                    }
+                    if (orderDetailInfo.getCostPrice() == 0) {
+                        int costPrice = Math.toIntExact(productRespVO.getProductAvgCost());
+                        if(0 != costPrice){
+                            orderDetailInfo.setCostPrice(costPrice);
+                            isUpdate = true;
+                        }
+                    }
+                    if (isUpdate) {
+                        int result = orderDetailDao.updateOrderDetailById(orderDetailInfo);
+                        updateResult.addAndGet(result);
+                        isUpdate = !isUpdate;
+                    }
+                }
+
+                if (i % 200 == 0) {
+                    try {
+                        Thread.sleep(20);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        int update = updateResult.get();
+        log.info("刷新订单商品品牌结束，修改总条数：" + update);
+        return HttpResponse.successGenerics(update);
+
+          // GC overhead limit exceeded
+
+//        log.info("刷新订单商品品牌需要刷新的sku数为："+list.size());
+//        CalculateReqVo calculateReqVo = new CalculateReqVo();
+//        calculateReqVo.setDistributorId(storeId);
+//        calculateReqVo.setSkuCodeList(list.stream().map(OrderDetailInfo::getSkuCode).collect(Collectors.toList()));
+//        List<ProductRespVO> respVOS = bridgeProductService.selectProductInfo(calculateReqVo);
+//        Map<String,ProductRespVO> productRespVOMap=new HashMap<>(respVOS.size());
+//        log.info("刷新订单商品品牌查询到的商品数为："+respVOS.size());
+//        int updateNum=0;
+//        if (respVOS.size()>0){
+//            for (ProductRespVO productRespVO :respVOS){
+//                productRespVOMap.put(productRespVO.getSkuCode(),productRespVO);
+//
+//            }
+//
+//            for (OrderDetailInfo orderDetailInfo:list){
+//                if (orderDetailInfo.getBrandId()==null){
+//                    orderDetailInfo.setBrandId(productRespVOMap.get(orderDetailInfo.getSkuCode())==null?null:productRespVOMap.get(orderDetailInfo.getSkuCode()).getBrandId());
+//                    orderDetailInfo.setBrandName(productRespVOMap.get(orderDetailInfo.getSkuCode())==null?null:productRespVOMap.get(orderDetailInfo.getSkuCode()).getBrandName());
+//                }
+//                if (orderDetailInfo.getCostPrice()==0){
+//                    orderDetailInfo.setCostPrice(Math.toIntExact(productRespVOMap.get(orderDetailInfo.getSkuCode()) == null ? 0 : productRespVOMap.get(orderDetailInfo.getSkuCode()).getProductAvgCost()));
+//                }
+//
+//                int i= orderDetailDao.updateOrderDetailById(orderDetailInfo);
+//                updateNum=updateNum+i;
+//            }
+//        }
+//        log.info("刷新订单商品品牌结束，修改总条数：" + updateNum);
+//        return HttpResponse.successGenerics(updateNum);
     }
 
     private void accountDataHandle(ReportForDayResponse reportForDayResponse, List<ReportForDayResponse> accountList) {

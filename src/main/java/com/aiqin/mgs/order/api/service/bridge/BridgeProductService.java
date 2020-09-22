@@ -17,6 +17,7 @@ import com.aiqin.mgs.order.api.domain.constant.OrderConstant;
 import com.aiqin.mgs.order.api.domain.dto.ProductDistributorOrderDTO;
 import com.aiqin.mgs.order.api.domain.po.gift.NewStoreGradient;
 import com.aiqin.mgs.order.api.domain.po.order.*;
+import com.aiqin.mgs.order.api.domain.request.CalculateReqVo;
 import com.aiqin.mgs.order.api.domain.request.InventoryDetailRequest;
 import com.aiqin.mgs.order.api.domain.request.activity.*;
 import com.aiqin.mgs.order.api.domain.request.cart.ShoppingCartProductRequest;
@@ -26,6 +27,7 @@ import com.aiqin.mgs.order.api.domain.request.returnorder.ReturnOrderDetailVO;
 import com.aiqin.mgs.order.api.domain.request.statistical.ProductDistributorOrderRequest;
 import com.aiqin.mgs.order.api.domain.request.stock.ProductSkuStockRespVo;
 import com.aiqin.mgs.order.api.domain.response.NewFranchiseeResponse;
+import com.aiqin.mgs.order.api.domain.response.ProductRespVO;
 import com.aiqin.mgs.order.api.domain.response.cart.ErpSkuDetail;
 import com.aiqin.mgs.order.api.domain.response.gift.StoreAvailableGiftQuotaResponse;
 import com.aiqin.mgs.order.api.domain.response.order.ProductSkuRespVo2;
@@ -1269,4 +1271,16 @@ public static void main(String[] args) {
 
     System.out.println(JsonUtil.toJson(bridgeProductService.accountBalance("EBCC55A75ED842CD9B83B7181F789EC4")));
 }
+
+    public List<ProductRespVO> selectProductInfo(CalculateReqVo reqVo) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(urlProperties.getProductApi()).append("/product/find/product/by");
+        HttpClient httpClient = HttpClient.post(sb.toString()).json(reqVo);
+        HttpResponse<List<ProductRespVO>> result = httpClient.action().result(new TypeReference<HttpResponse<List<ProductRespVO>>>() {
+        });
+        if (Objects.nonNull(result) && Objects.equals(result.getCode(), "0")) {
+            return result.getData();
+        }
+        return Lists.newArrayList();
+    }
 }

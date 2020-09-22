@@ -849,7 +849,7 @@ public class OrderController {
 
 
     /**
-     * 刷新订单中品牌数据
+     * 刷新订单中品牌数据 ，平均成本价
      * @param skuCode
      * @param storeId
      * @param day

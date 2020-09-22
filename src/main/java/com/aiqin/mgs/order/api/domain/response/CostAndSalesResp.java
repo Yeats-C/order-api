@@ -23,11 +23,11 @@ public class CostAndSalesResp {
 
     @ApiModelProperty(value = "销售商品数量")
     @JsonProperty("sale_product_num")
-    private Integer saleProductNum;
+    private Long saleProductNum;
 
     @ApiModelProperty(value = "退货商品数量")
     @JsonProperty("return_product_num")
-    private Integer returnProductNum;
+    private Long returnProductNum;
 
     @ApiModelProperty(value = "销售金额")
     @JsonProperty("total_amount")
@@ -35,6 +35,11 @@ public class CostAndSalesResp {
 
 
     @ApiModelProperty(value = "退货金额")
+    @JsonProperty("return_price")
+    private Long returnPrice;
+
+
+    @ApiModelProperty(value = "退货数量")
     @JsonProperty("return_amount")
     private Long returnAmount;
 
@@ -44,7 +49,7 @@ public class CostAndSalesResp {
 
     @ApiModelProperty("商品成本")
     @JsonProperty("product_cost")
-    private Integer productCost;
+    private Long productCost;
 
     @ApiModelProperty(value = "毛利额")
     @JsonProperty("product_maori")
@@ -53,4 +58,8 @@ public class CostAndSalesResp {
     @JsonProperty("gross_profit_rate")
     @ApiModelProperty("毛利率")
     private Integer grossProfitRate;
+
+    @JsonProperty("cost_points")
+    @ApiModelProperty("积分")
+    private Integer costPoints;
 }

@@ -19,6 +19,7 @@ import lombok.Data;
 @Data
 @ApiModel("订单明细实体类")
 public class OrderDetailInfo extends PagesRequest {
+	private Integer id;
 	
 	@ApiModelProperty(value="排序")
 	@JsonProperty("rowno")
