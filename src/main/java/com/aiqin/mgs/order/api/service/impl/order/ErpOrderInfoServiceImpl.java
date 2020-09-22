@@ -1111,10 +1111,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         ErpOrderInfo order = erpOrderQueryService.getOrderAndItemByOrderCode(orderInfo.getOrderStoreCode());
         if(null==order){
             //此订单在本地不存在，新增订单
-            saveOrder(order, auth);
+            saveOrder(orderInfo, auth);
             if(null!=orderInfo.getItemList()&&orderInfo.getItemList().size()>0){
                 //保存订单明细行
-                erpOrderItemService.saveOrderItemList(order.getItemList(), auth);
+                erpOrderItemService.saveOrderItemList(orderInfo.getItemList(), auth);
             }
             if(null!=orderInfo.getOperationLogList()&&orderInfo.getOperationLogList().size()>0){
                 for(ErpOrderOperationLog log:orderInfo.getOperationLogList()){
@@ -1125,7 +1125,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             updateOrderByPrimaryKeySelective(order, auth);
             if(null!=orderInfo.getItemList()&&orderInfo.getItemList().size()>0){
                 //保存订单明细行
-                erpOrderItemService.updateOrderItemList(order.getItemList(), auth);
+                erpOrderItemService.updateOrderItemList(orderInfo.getItemList(), auth);
             }
         }
 
