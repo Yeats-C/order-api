@@ -140,4 +140,9 @@ public interface ErpOrderInfoService {
     void updateOrderReturnStatus(String orderCode, ErpOrderReturnRequestEnum orderReturnRequestEnum, List<ErpOrderItem> returnQuantityList, String personId, String personName);
 
 
+    /**
+     * DL同步订单信息
+     * @param orderInfo
+     */
+    void synchronizeOrders(ErpOrderInfo orderInfo);
 }
