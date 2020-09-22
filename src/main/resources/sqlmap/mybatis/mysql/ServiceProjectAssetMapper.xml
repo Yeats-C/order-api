@@ -381,6 +381,17 @@
         </where>
         order by id desc
     </select>
+    <select id="selectServiceProjectAssetByAssetId"  resultMap="BaseResultMap" resultType="java.util.List">
+        select
+        a.id,a.asset_id,a.customer_id,a.customer_name,a.customer_phone,a.customer_type,a.store_id,a.store_code,a.store_name,a.project_id,a.project_code,a.project_name,
+        a.type_id,a.begin_time,a.finish_time,a.consumption_pattern,a.limit_count,a.remain_count,a.actual_amount,a.cashier_id,a.cashier_name,a.guide_id,a.guide_name,a.order_code,a.order_id,a.order_detail_id,a.is_direct_custom,a.pay_status,a.use_status,a.create_time,a.update_time,o.pay_type
+        from service_project_asset a,order_consumer_info o
+        <where>
+            a.order_id=o.order_id
+            and a.asset_id = #{assetId,jdbcType=VARCHAR} and a.pay_status = 1
+        </where>
+        order by id desc
+    </select>
     <select id="selectServiceProjectAssetBySourceId" parameterType="java.lang.String" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
