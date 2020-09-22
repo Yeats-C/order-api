@@ -2315,7 +2315,7 @@
         SELECT
             1 count,
             sum( b.cost_points ) sum1,
-            sum( a.actual_price ) sum2
+            sum( b.total_price ) sum2
         FROM
         order_consumer_info a left join order_consumer_detail b on a.order_id = b.order_id
         <if test="(skuName!=null and skuName!='') or (barCodeAndSku !=null and barCodeAndSku != '')">
