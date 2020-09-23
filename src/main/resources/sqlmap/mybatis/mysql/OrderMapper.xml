@@ -2069,6 +2069,7 @@
         order_after_sale_detail a
         WHERE
         o.order_id = d.order_id
+        and o.order_type != 3
         and a. order_detail_id = d.order_detail_id
         <if test="beginTime !=null">
             AND a.create_time &gt;= #{beginTime}
