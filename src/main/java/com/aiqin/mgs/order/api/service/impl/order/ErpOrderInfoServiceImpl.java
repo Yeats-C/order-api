@@ -7,6 +7,7 @@ import com.aiqin.mgs.order.api.component.enums.*;
 import com.aiqin.mgs.order.api.component.enums.pay.ErpPayWayEnum;
 import com.aiqin.mgs.order.api.dao.OrderSplitsNumDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderInfoDao;
+import com.aiqin.mgs.order.api.dao.order.ErpOrderLogisticsDao;
 import com.aiqin.mgs.order.api.dao.order.ErpOrderOperationLogDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
@@ -85,6 +86,8 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     private ReturnOrderInfoDao returnOrderInfoDao;
     @Resource
     private ErpOrderOperationLogDao erpOrderOperationLogDao;
+    @Resource
+    private ErpOrderLogisticsDao erpOrderLogisticsDao;
 
 
     @Override
@@ -1121,8 +1124,11 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                     erpOrderOperationLogDao.insert(log);
                 }
             }
+            if(null!=orderInfo.getOrderLogistics()){
+                erpOrderLogisticsDao.insert(orderInfo.getOrderLogistics());
+            }
         }else{
-            updateOrderByPrimaryKeySelective(order, auth);
+            updateOrderByPrimaryKeySelective(orderInfo, auth);
             if(null!=orderInfo.getItemList()&&orderInfo.getItemList().size()>0){
                 //保存订单明细行
                 erpOrderItemService.updateOrderItemList(orderInfo.getItemList(), auth);
