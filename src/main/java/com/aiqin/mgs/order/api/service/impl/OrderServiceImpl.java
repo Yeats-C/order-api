@@ -1094,7 +1094,7 @@ public class OrderServiceImpl implements OrderService {
         InventoryDetailRequest inventoryDetailRequest = new InventoryDetailRequest();
         inventoryDetailRequest.setBillType(BillTypeEnum.DOOR_SALE.getCode());
         inventoryDetailRequest.setCreateByName(orderInfo.getOrderInfo().getCashierName());
-        inventoryDetailRequest.setOperator(orderInfo.getOrderInfo().getCashierName());
+        inventoryDetailRequest.setOperator(orderInfo.getOrderInfo().getCashierId());
         inventoryDetailRequest.setRecordType(StockChangeTypeEnum.OUT_STORAGE.getCode());
         inventoryDetailRequest.setRelateNumber(orderInfo.getOrderInfo().getOrderCode());
         inventoryDetailRequest.setStoragePosition(1);
@@ -1116,7 +1116,7 @@ public class OrderServiceImpl implements OrderService {
                         stockVo.setStorageType(StorageTypeEnum.DOOR_STORE.getCode());
                         /*stockVo.setStoragePosition(ReturnGoodsToStockEnum.DISPLAY_STOCK.getCode());*/
                         stockVo.setProductSku(product.getSkuCode());
-                        stockVo.setOperator(orderInfo.getOrderInfo().getCashierName());
+                        stockVo.setOperator(orderInfo.getOrderInfo().getCashierId());
                         stockVo.setCreateByName(orderInfo.getOrderInfo().getCashierName());
                         stockVo.setStoragePosition(1);
                         stockVo.setReleaseStatus(ReleaseStatusEnum.RELEASE.getCode());
@@ -1135,7 +1135,7 @@ public class OrderServiceImpl implements OrderService {
                 stockVo.setStorageType(StorageTypeEnum.DOOR_STORE.getCode());
                 /*stockVo.setStoragePosition(ReturnGoodsToStockEnum.DISPLAY_STOCK.getCode());*/
                 stockVo.setProductSku(input.getSkuCode());
-                stockVo.setOperator(orderInfo.getOrderInfo().getCashierName());
+                stockVo.setOperator(orderInfo.getOrderInfo().getCashierId());
                 stockVo.setCreateByName(orderInfo.getOrderInfo().getCashierName());
                 stockVo.setStoragePosition(1);
                 stockVo.setReleaseStatus(ReleaseStatusEnum.RELEASE.getCode());
