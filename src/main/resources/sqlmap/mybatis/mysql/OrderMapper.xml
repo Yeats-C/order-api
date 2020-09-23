@@ -2177,7 +2177,7 @@
         <if test="cashierId !=null and cashierId !=''">
             and o.guide_id =#{cashierId}
         </if>
-        AND o.pay_status = 1 and o.order_type!=3
+        AND o.order_status not in (0,4) and o.order_type!=3
         group by
         <if test="productCategory !=null and productCategory==0">
             d.type_id
@@ -2327,7 +2327,7 @@
         SELECT
         a.order_code,
         sum( b.cost_points ) sum1,
-        a.actual_price sum2
+        if(a.order_status in (0,4),0,a.actual_price) sum2
         FROM
         order_consumer_info a left join order_consumer_detail b on a.order_id = b.order_id
         <if test="(skuName!=null and skuName!='') or (barCodeAndSku !=null and barCodeAndSku != '')">
@@ -2445,6 +2445,12 @@
         ) d
         ) e
         LEFT JOIN order_after_sale f ON e.order_code = f.order_code
+        <if test="beginTime!=null ">
+            and f.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime!=null ">
+            and f.create_time &lt;= #{endTime}
+        </if>
         GROUP BY
         e.order_code
         ) g
