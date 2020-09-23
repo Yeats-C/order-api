@@ -435,7 +435,11 @@ public class ServiceProjectServiceImpl  implements ServiceProjectService {
                 List<ServiceProjectAsset> serviceProjectAssetList = serviceProjectAssetDao.selectServiceProjectAssetByAssetId(serviceProjectReduceDetail.getAssetId());
 
                 if (!CollectionUtils.isEmpty(serviceProjectAssetList)) {
-                    serviceProjectReduceDetail.setPayType(serviceProjectAssetList.get(0).getPayType());
+                    ServiceProjectAsset serviceProjectAsset = serviceProjectAssetList.get(0);
+                    serviceProjectReduceDetail.setPayType(serviceProjectAsset.getPayType());
+                    if(Global.ORDER_TYPE_DELAY.equals(orderType)){
+                        serviceProjectReduceDetail.setFinishTime(serviceProjectAsset.getFinishTime());
+                    }
                 }
 
                 LOGGER.info("根据订单id和订单类型查询订单信息完成,查询结果为{}", serviceProjectReduceDetail);

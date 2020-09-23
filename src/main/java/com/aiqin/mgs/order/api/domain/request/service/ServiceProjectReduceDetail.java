@@ -131,5 +131,10 @@ public class ServiceProjectReduceDetail {
     @JsonProperty("project_list")
     private List<ServiceProjectAsset> serviceProjectAssetList;
 
+    @ApiModelProperty(value="有效期截止时间")
+    @JsonProperty("finish_time")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date finishTime;
 
 }
