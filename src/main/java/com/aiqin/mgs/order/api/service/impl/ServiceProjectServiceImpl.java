@@ -107,7 +107,7 @@ public class ServiceProjectServiceImpl  implements ServiceProjectService {
     public HttpResponse selectServiceProjectAssetByPhone(String customerPhone, String storeId) {
         try {
             LOGGER.info("根据用户手机号查询用户服务项目资产list，请求参数customerPhone为{},storeId为{}", customerPhone, storeId);
-            List<ServiceProjectAsset> serviceProjectAssetList = serviceProjectAssetDao.selectServiceProjectAssetByPhone(customerPhone, storeId, null, null);
+            List<ServiceProjectAsset> serviceProjectAssetList = serviceProjectAssetDao.selectServiceProjectAssetByPhone(customerPhone, storeId, null, null,null);
             LOGGER.info("根据用户手机号查询用户服务项目资产list，请求参数customerPhone为{},storeId为{},查询结果为{}", customerPhone, storeId, serviceProjectAssetList);
             return HttpResponse.success(serviceProjectAssetList);
         } catch (Exception e) {
@@ -383,7 +383,7 @@ public class ServiceProjectServiceImpl  implements ServiceProjectService {
             ServiceProjectReduceDetail serviceProjectReduceDetail = new ServiceProjectReduceDetail();
             if (Global.ORDER_TYPE_BUY.equals(orderType)) {
                 //购买订单查询
-                List<ServiceProjectAsset> serviceProjectAssetList = serviceProjectAssetDao.selectServiceProjectAssetByPhone(null, storeId, null, orderId);
+                List<ServiceProjectAsset> serviceProjectAssetList = serviceProjectAssetDao.selectServiceProjectAssetByPhone(null, storeId, null, orderId,null);
                 if (CollectionUtils.isEmpty(serviceProjectAssetList)) {
                     LOGGER.info("未查询到对应的订单信息");
                     return HttpResponse.failure(ResultCode.SELECT_ASSET_BY_ORDER_Id_FAIL);
@@ -536,7 +536,7 @@ public class ServiceProjectServiceImpl  implements ServiceProjectService {
     public HttpResponse selectAssetByOrderCode(String orderCode) {
         try {
             LOGGER.info("根据订单编号查询用户服务项目资产list，请求参数orderCode为{}", orderCode);
-            List<ServiceProjectAsset> serviceProjectAssetList = serviceProjectAssetDao.selectServiceProjectAssetByPhone(null, null, orderCode, null);
+            List<ServiceProjectAsset> serviceProjectAssetList = serviceProjectAssetDao.selectServiceProjectAssetByPhone(null, null, orderCode, null,null);
             LOGGER.info("根据订单编号查询用户服务项目资产list，请求参数orderCode为{},查询结果为{}", orderCode, serviceProjectAssetList);
             return HttpResponse.success(serviceProjectAssetList);
         } catch (Exception e) {

@@ -378,6 +378,9 @@
             <if test="order_id!=null">
                 and a.order_id = #{order_id,jdbcType=VARCHAR} and a.pay_status = 1
             </if>
+            <if test="customer_id!=null">
+                and a.customer_id = #{customer_id,jdbcType=VARCHAR} and a.pay_status = 1
+            </if>
         </where>
         order by id desc
     </select>

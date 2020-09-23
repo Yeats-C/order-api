@@ -18,7 +18,7 @@ public interface ServiceProjectAssetDao {
 
     Integer updateSource(ServiceProjectAsset serviceProjectAsset);
 
-    List<ServiceProjectAsset> selectServiceProjectAssetByPhone(@Param("customer_phone") String customerPhone, @Param("store_id") String storeId, @Param("order_code") String orderCode, @Param("order_id") String orderId);
+    List<ServiceProjectAsset> selectServiceProjectAssetByPhone(@Param("customer_phone") String customerPhone, @Param("store_id") String storeId, @Param("order_code") String orderCode, @Param("order_id") String orderId,@Param("customer_id") String customerId);
 
     ServiceProjectAsset selectServiceProjectAssetBySourceId(String assetId);
 
