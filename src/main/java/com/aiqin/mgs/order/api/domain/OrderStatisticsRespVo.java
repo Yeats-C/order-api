@@ -20,4 +20,7 @@ public class OrderStatisticsRespVo {
     @ApiModelProperty(value = "销售笔数")
     private Long saleTotal = 0L;
 
+    @ApiModelProperty(value = "总退款金额")
+    private Long returnAmount = 0L;
+
 }

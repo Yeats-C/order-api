@@ -2307,15 +2307,27 @@
     </select>
     <select id="statistics" resultType="com.aiqin.mgs.order.api.domain.OrderStatisticsRespVo">
         SELECT
-            sum(count) saleTotal,
-            sum(sum1) pointsDeductionAmount,
-            sum(sum2) actualPaymentAmount
+        count( 1 ) saleTotal,
+        sum( pointsDeductionAmount ) pointsDeductionAmount,
+        sum( actualPaymentAmount ) actualPaymentAmount,
+        sum( returnAmount ) returnAmount
         FROM
         (
         SELECT
-            1 count,
-            sum( b.cost_points ) sum1,
-            sum( b.total_price ) sum2
+        e.*,
+        SUM( f.return_price ) returnAmount
+        FROM
+        (
+        SELECT
+        order_code,
+        sum1 pointsDeductionAmount,
+        sum2 actualPaymentAmount
+        FROM
+        (
+        SELECT
+        a.order_code,
+        sum( b.cost_points ) sum1,
+        a.actual_price sum2
         FROM
         order_consumer_info a left join order_consumer_detail b on a.order_id = b.order_id
         <if test="(skuName!=null and skuName!='') or (barCodeAndSku !=null and barCodeAndSku != '')">
@@ -2428,7 +2440,14 @@
         <if test="payType!=null and payType!='' ">
             and a.pay_type =#{payType}
         </if>
-        group by a.id)c
+        GROUP BY
+        a.id
+        ) d
+        ) e
+        LEFT JOIN order_after_sale f ON e.order_code = f.order_code
+        GROUP BY
+        e.order_code
+        ) g
     </select>
 </mapper>
 
