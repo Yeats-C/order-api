@@ -112,11 +112,7 @@ public class ErpOrderCancelNoTransactionalServiceImpl implements ErpOrderCancelN
         if (order == null) {
             throw new BusinessException("无效的订单编号");
         }
-//        order.setItemList(erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId()));
-        boolean flag = erpOrderRequestService.applyToCancelOrderRequest(order.getOrderStoreCode(), auth);
-        if (!flag) {
-            throw new BusinessException("订单取消失败");
-        }
+        order.setItemList(erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId()));
 
         ErpOrderNodeStatusEnum orderNodeStatusEnum = ErpOrderNodeStatusEnum.getEnum(order.getOrderNodeStatus());
         ErpOrderNodeProcessTypeEnum processTypeEnum = ErpOrderNodeProcessTypeEnum.getEnum(order.getOrderTypeCode(), order.getOrderCategoryCode());
@@ -126,8 +122,8 @@ public class ErpOrderCancelNoTransactionalServiceImpl implements ErpOrderCancelN
             if (processTypeEnum.isLockStock()) {
 //                boolean flag = erpOrderRequestService.unlockStockInSupplyChainByOrderCode(order, auth);
 //                if (flag) {
-                    //修改订单状态为  超时未支付成功
-                    erpOrderCancelService.cancelOrderStatus(order.getOrderStoreCode(), ErpOrderStatusEnum.ORDER_STATUS_99, ErpOrderNodeStatusEnum.STATUS_31, auth);
+                //修改订单状态为  超时未支付成功
+                erpOrderCancelService.cancelOrderStatus(order.getOrderStoreCode(), ErpOrderStatusEnum.ORDER_STATUS_99, ErpOrderNodeStatusEnum.STATUS_31, auth);
 //                } else {
 //                    throw new BusinessException("解锁库存失败");
 //                }
@@ -138,11 +134,16 @@ public class ErpOrderCancelNoTransactionalServiceImpl implements ErpOrderCancelN
 
         } else if (ErpOrderNodeStatusEnum.STATUS_8 == orderNodeStatusEnum) {
 
+            boolean flag = erpOrderRequestService.applyToCancelOrderRequest(order.getOrderStoreCode(), auth);
+            if (!flag) {
+                throw new BusinessException("订单不能取消");
+            }
+
             //修改订单状态为交易异常终止
             erpOrderCancelService.cancelOrderStatus(order.getOrderStoreCode(), ErpOrderStatusEnum.ORDER_STATUS_98, ErpOrderNodeStatusEnum.STATUS_31, auth);
 
             //取消后续流程
-//            this.cancelOrderRequestGroup(order.getOrderStoreCode(), auth);
+            this.cancelOrderRequestGroup(order.getOrderStoreCode(), auth);
 
         } else {
             throw new BusinessException("当前状态的订单不能申请取消");
