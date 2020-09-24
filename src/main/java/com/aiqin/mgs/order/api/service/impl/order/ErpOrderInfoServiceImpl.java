@@ -12,6 +12,9 @@ import com.aiqin.mgs.order.api.dao.order.ErpOrderOperationLogDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.OrderSplitsNum;
+import com.aiqin.mgs.order.api.domain.po.gift.GiftQuotasUseDetail;
+import com.aiqin.mgs.order.api.domain.po.gift.NewStoreGradient;
+import com.aiqin.mgs.order.api.domain.po.gift.StoreGradient;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
@@ -737,9 +740,9 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         List<ErpOrderItem> itemList = erpOrderItemService.selectOrderItemListByOrderId(order.getOrderStoreId());
         List<ErpOrderItem> updateItemList = new ArrayList<>();
         //只有18A商品会发放赠品额度
-//        BigDecimal commodityAmountOfTop=BigDecimal.ZERO;
+        BigDecimal commodityAmountOfTop=BigDecimal.ZERO;
         //查询A品卷使用规则code Map
-//        Map ruleMap=couponRuleService.couponRuleMap();
+        Map ruleMap=couponRuleService.couponRuleMap();
 
         for (ErpOrderItem item :
                 itemList) {
@@ -754,12 +757,12 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             updateItemList.add(updateItem);
 
             //订单类型为配送    订单类别为普通补货  【只有这个组合类型调物流卷和发放赠品额度】
-//            if(ErpOrderTypeEnum.DISTRIBUTION.getCode().toString().equals(order.getOrderTypeCode())
-//                    && ErpOrderCategoryEnum.ORDER_TYPE_1.getCode().toString().equals(order.getOrderCategoryCode())
-//                    &&ruleMap.containsKey(item.getProductPropertyCode())
-//                    && ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductType())){
-//                commodityAmountOfTop=commodityAmountOfTop.add(item.getTotalPreferentialAmount());
-//            }
+            if(ErpOrderTypeEnum.DISTRIBUTION.getCode().toString().equals(order.getOrderTypeCode())
+                    && ErpOrderCategoryEnum.ORDER_TYPE_1.getCode().toString().equals(order.getOrderCategoryCode())
+                    &&ruleMap.containsKey(item.getProductPropertyCode())
+                    && ErpProductGiftEnum.PRODUCT.getCode().equals(item.getProductType())){
+                commodityAmountOfTop=commodityAmountOfTop.add(item.getTotalPreferentialAmount());
+            }
 
 
         }
@@ -771,77 +774,77 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         this.updateOrderByPrimaryKeySelective(order, auth);
 
         /*****************************************签收完毕，发放赠品额度start*****************************************/
-//        logger.info("签收结束--判断是否发放赠品额度--主订单信息为 order={}",JsonUtil.toJson(order));
-//
-//
-//        logger.info("签收完毕--主订单商品18A类型总金额为commodityAmountOfTop={}",commodityAmountOfTop);
-//            //判断18A商品金额总和大于0
-//        if(commodityAmountOfTop.compareTo(BigDecimal.ZERO)>0){
-//            //赠品返回额度比例
-//            Double rebatesProportion=0.00;
-//            NewStoreGradient gradient=bridgeProductService.selectStoreGiveawayByStoreCode(order.getStoreCode());
-//
-//            if(null!=gradient&&null!=gradient.getStoreGradientList()&&gradient.getStoreGradientList().size()>0){
-//                for(StoreGradient storeGradient:gradient.getStoreGradientList()){
-//                    if(commodityAmountOfTop.compareTo(BigDecimal.valueOf(storeGradient.getMinimumValue()))>0){
-//                        rebatesProportion=storeGradient.getRebatesProportion();
-//                    }
-//                }
-//                logger.info("签收完毕--赠品比例为 rebatesProportion={}",rebatesProportion);
-//                if(rebatesProportion>0){
-//                    //18A主商品金额总和乘以赠品比例
-//                    commodityAmountOfTop=commodityAmountOfTop.multiply(BigDecimal.valueOf(rebatesProportion)).divide(new BigDecimal(100)).setScale(2, RoundingMode.DOWN);
-//
-//                    //查詢門店员赠品额度
-//                    BigDecimal availableGiftQuota=bridgeProductService.getStoreAvailableGiftGuota(order.getStoreId());
-//                    //计算订单赠品额度发放后的赠品额度
-//                    BigDecimal newAvailableGiftQuota=availableGiftQuota.add(commodityAmountOfTop);
-//                    //更新订单使用过后的赠品额度
-//                    bridgeProductService.updateAvailableGiftQuota(order.getStoreId(),newAvailableGiftQuota);
-//                    logger.info("签收完毕--赠品额度更新信息为：应发放赠品额度 commodityAmountOfTop={}",commodityAmountOfTop
-//                            +"查詢門店员赠品额度 availableGiftQuota={}"+availableGiftQuota+"计算订单赠品额度发放后的赠品额度 newAvailableGiftQuota={}"+newAvailableGiftQuota);
-//                    //新建一个赠品额度使用明细对象
-//                    GiftQuotasUseDetail giftQuotasUseDetail=new GiftQuotasUseDetail();
-//                    giftQuotasUseDetail.setStoreId(order.getStoreId());
-//                    giftQuotasUseDetail.setChangeInGiftQuota("+"+commodityAmountOfTop);
-//                    giftQuotasUseDetail.setBillCode(order.getOrderStoreCode());
-//                    giftQuotasUseDetail.setType(3);
-//                    giftQuotasUseDetail.setCreateBy(auth.getPersonName());
-//                    giftQuotasUseDetail.setUpdateBy(auth.getPersonName());
-//                    //插入一条赠品明细使用记录
-//                    giftQuotasUseDetailService.add(giftQuotasUseDetail);
-//
-//                    //更新订单费用信息表-发放赠品额度字段
-//                    ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(order.getOrderStoreId());
-//                    if(null!=orderFee){
-//                        if(null!=orderFee.getComplimentaryAmount()){
-//                            BigDecimal complimentaryAmount=orderFee.getComplimentaryAmount();
-//                            complimentaryAmount=complimentaryAmount.add(commodityAmountOfTop);
-//                            orderFee.setComplimentaryAmount(complimentaryAmount);
-//                        }else{
-//                            orderFee.setComplimentaryAmount(commodityAmountOfTop);
-//                        }
-//
-//                        erpOrderFeeService.updateOrderFeeByPrimaryKeySelective(orderFee,auth);
-//                    }else{
-//                        logger.info("分摊计算结束，发放赠品额度-查询支付信息异常，查询订单号为"+order.getOrderStoreCode());
-//                    }
-//
-//                }
-//
-//            }
-//
-//
-//        }
+        logger.info("签收结束--判断是否发放赠品额度--主订单信息为 order={}",JsonUtil.toJson(order));
+
+
+        logger.info("签收完毕--主订单商品18A类型总金额为commodityAmountOfTop={}",commodityAmountOfTop);
+            //判断18A商品金额总和大于0
+        if(commodityAmountOfTop.compareTo(BigDecimal.ZERO)>0){
+            //赠品返回额度比例
+            Double rebatesProportion=0.00;
+            NewStoreGradient gradient=bridgeProductService.selectStoreGiveawayByStoreCode(order.getStoreCode());
+
+            if(null!=gradient&&null!=gradient.getStoreGradientList()&&gradient.getStoreGradientList().size()>0){
+                for(StoreGradient storeGradient:gradient.getStoreGradientList()){
+                    if(commodityAmountOfTop.compareTo(BigDecimal.valueOf(storeGradient.getMinimumValue()))>0){
+                        rebatesProportion=storeGradient.getRebatesProportion();
+                    }
+                }
+                logger.info("签收完毕--赠品比例为 rebatesProportion={}",rebatesProportion);
+                if(rebatesProportion>0){
+                    //18A主商品金额总和乘以赠品比例
+                    commodityAmountOfTop=commodityAmountOfTop.multiply(BigDecimal.valueOf(rebatesProportion)).divide(new BigDecimal(100)).setScale(2, RoundingMode.DOWN);
+
+                    //查詢門店员赠品额度
+                    BigDecimal availableGiftQuota=bridgeProductService.getStoreAvailableGiftGuota(order.getStoreId());
+                    //计算订单赠品额度发放后的赠品额度
+                    BigDecimal newAvailableGiftQuota=availableGiftQuota.add(commodityAmountOfTop);
+                    //更新订单使用过后的赠品额度
+                    bridgeProductService.updateAvailableGiftQuota(order.getStoreId(),newAvailableGiftQuota);
+                    logger.info("签收完毕--赠品额度更新信息为：应发放赠品额度 commodityAmountOfTop={}",commodityAmountOfTop
+                            +"查詢門店员赠品额度 availableGiftQuota={}"+availableGiftQuota+"计算订单赠品额度发放后的赠品额度 newAvailableGiftQuota={}"+newAvailableGiftQuota);
+                    //新建一个赠品额度使用明细对象
+                    GiftQuotasUseDetail giftQuotasUseDetail=new GiftQuotasUseDetail();
+                    giftQuotasUseDetail.setStoreId(order.getStoreId());
+                    giftQuotasUseDetail.setChangeInGiftQuota("+"+commodityAmountOfTop);
+                    giftQuotasUseDetail.setBillCode(order.getOrderStoreCode());
+                    giftQuotasUseDetail.setType(3);
+                    giftQuotasUseDetail.setCreateBy(auth.getPersonName());
+                    giftQuotasUseDetail.setUpdateBy(auth.getPersonName());
+                    //插入一条赠品明细使用记录
+                    giftQuotasUseDetailService.add(giftQuotasUseDetail);
+
+                    //更新订单费用信息表-发放赠品额度字段
+                    ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByOrderId(order.getOrderStoreId());
+                    if(null!=orderFee){
+                        if(null!=orderFee.getComplimentaryAmount()){
+                            BigDecimal complimentaryAmount=orderFee.getComplimentaryAmount();
+                            complimentaryAmount=complimentaryAmount.add(commodityAmountOfTop);
+                            orderFee.setComplimentaryAmount(complimentaryAmount);
+                        }else{
+                            orderFee.setComplimentaryAmount(commodityAmountOfTop);
+                        }
+
+                        erpOrderFeeService.updateOrderFeeByPrimaryKeySelective(orderFee,auth);
+                    }else{
+                        logger.info("分摊计算结束，发放赠品额度-查询支付信息异常，查询订单号为"+order.getOrderStoreCode());
+                    }
+
+                }
+
+            }
+
+
+        }
         /*****************************************分摊计算结束，发放赠品额度end*****************************************/
 
         /*****************************************同步订单数据到结算开始*****************************************/
-//        List<ErpOrderInfo> list=new ArrayList<>();
-//        ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByFeeId(order.getFeeId());
-//        order.setOrderFee(orderFee);
-//        order.setItemList(itemList);
-//        list.add(order);
-//        bridgeProductService.settlementSaveOrder(list,3);
+        List<ErpOrderInfo> list=new ArrayList<>();
+        ErpOrderFee orderFee = erpOrderFeeService.getOrderFeeByFeeId(order.getFeeId());
+        order.setOrderFee(orderFee);
+        order.setItemList(itemList);
+        list.add(order);
+        bridgeProductService.settlementSaveOrder(list,3);
         /*****************************************同步订单数据到结算结束*****************************************/
 
         // TODO 此处需调用DL接口，将订单状态同步给DL

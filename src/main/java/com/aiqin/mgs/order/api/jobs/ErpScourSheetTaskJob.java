@@ -7,6 +7,7 @@ import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -29,7 +30,7 @@ public class ErpScourSheetTaskJob {
     @Resource
     private ErpOrderInfoService erpOrderInfoService;
 
-//    @Scheduled(cron = "0 0/5 * * * ? ")
+    @Scheduled(cron = "0 0/5 * * * ? ")
     public void getTask() {
         //计时器
         StopWatch watch = new StopWatch();
