@@ -74,6 +74,8 @@ public interface OrderDetailDao {
 
     //删除订单明细数据
     void deleteOrderDetailInfo(OrderInfo orderInfo) throws Exception;
+    //删除订单明细数据
+    void deleteOrderDetailInfoPre(OrderInfo orderInfo) throws Exception;
 
     //sku销量统计
     Integer getSkuAmount(@Param("skuCode") String skuCode, @Param("nextDate") String nextDate) throws Exception;

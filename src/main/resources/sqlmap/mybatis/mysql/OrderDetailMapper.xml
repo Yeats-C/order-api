@@ -593,7 +593,10 @@
     <delete id="deleteOrderDetailInfo">
 		delete from order_consumer_detail WHERE order_id =#{orderId}
     </delete>
-
+    <!-- 删除订单明细数据 -->
+    <delete id="deleteOrderDetailInfoPre">
+		delete from order_consumer_detail_pre WHERE order_id =#{orderId}
+    </delete>
 
     <!--sku销量统计：包含退货、不包含取消、未付款的订单-->
     <select id="getSkuAmount" resultType="java.lang.Integer">
