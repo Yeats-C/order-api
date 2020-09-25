@@ -2285,7 +2285,7 @@ public class OrderServiceImpl implements OrderService {
 
                     //新增订单明细数据
                     if (detailList != null && detailList.size() > 0) {
-                        detailList = orderDetailService.addDetailList(detailList, orderId, orderCode);
+                        detailList = orderDetailService.addDetailListPre(detailList, orderId, orderCode);
                     }
 
                     //删除购物车数据
