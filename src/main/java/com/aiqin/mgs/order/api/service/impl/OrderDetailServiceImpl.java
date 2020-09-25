@@ -514,7 +514,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 info.setOrderCode(orderCode);
                 info.setOrderDetailId(OrderPublic.getUUID());
                 //保存
-                orderDetailDao.addDetailList(info);
+                orderDetailDao.addDetailPreList(info);
                 list.add(info);
             }
         } else {
@@ -755,7 +755,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         try {
             //订单主数据
             OrderInfo orderInfo = new OrderInfo();
-            orderInfo = orderDao.selecOrderById(orderDetailQuery);
+            orderInfo = orderDao.selecOrderPreById(orderDetailQuery);
             if (orderInfo != null && orderInfo.getOrderId() != null) {
                 orderId = orderInfo.getOrderId();
                 orderDetailQuery.setOrderId(orderInfo.getOrderId());
@@ -776,7 +776,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
         try {
             //订单明细数据
-            List<OrderDetailInfo> detailList = orderDetailDao.selectDetailById(orderDetailQuery);
+            List<OrderDetailInfo> detailList = orderDetailDao.selectDetailPreById(orderDetailQuery);
 
             if (detailList != null && detailList.size() > 0) {
                 info.setDetailList(detailList);

@@ -1261,7 +1261,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         //订单主数据
-        orderDao.addOrderInfo(orderInfo);
+        orderDao.addOrderPreInfo(orderInfo);
 
         return orderInfo;
     }
@@ -2360,7 +2360,7 @@ public class OrderServiceImpl implements OrderService {
                     if (orderInfo.getOrderType().equals(Global.ORDER_TYPE_4)) {
                         orderDetailQuery.setOrderType(Global.ORDER_TYPE_4);
                     }
-                    detailQueryInfo = orderDao.selecOrderById(orderDetailQuery);
+                    detailQueryInfo = orderDao.selecOrderPreById(orderDetailQuery);
                     if (detailQueryInfo != null) {
                         orderId = detailQueryInfo.getOrderId();
                     }
@@ -2380,7 +2380,7 @@ public class OrderServiceImpl implements OrderService {
 
                     //删除订单主数据
                     try {
-                        orderDao.deleteOrderInfo(orderInfo);
+                        orderDao.deleteOrderInfoPre(orderInfo);
                     } catch (Exception e) {
                         LOGGER.error("orderDao.deleteOrderInfo(orderInfo)：{}", e);
                     }
