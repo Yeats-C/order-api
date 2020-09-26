@@ -506,6 +506,78 @@ public class OrderNoCodeServiceImpl implements OrderNoCodeService{
 			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
 		}	
 	}
+
+	//编号查询订单.
+	@Override
+	public HttpResponse selectorderPreByCode(@Valid String orderCode) {
+
+		//返回数据
+		OrderodrInfo info = new OrderodrInfo();
+
+		//查询条件
+		OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
+		orderDetailQuery.setOrderCode(orderCode);
+		//服务商品
+		orderDetailQuery.setOrderType(Global.ORDER_TYPE_3);
+
+		//组装订单主数据
+		OrderInfo orderInfo = new OrderInfo();
+		try {
+			orderInfo = orderDao.selecOrderPreById(orderDetailQuery);
+			if(orderInfo !=null && orderInfo.getOrderId() !=null ) {
+				orderDetailQuery.setOrderId(orderInfo.getOrderId());
+			}else {
+				return HttpResponse.success(null);
+			}
+			info.setOrderInfo(orderInfo);
+		} catch (Exception e) {
+			LOGGER.error("查询BYorderid-返回订单主数据 {}",e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}
+
+
+		//组装订单明细数据
+		try {
+			List<OrderDetailInfo> detailList = orderDetailDao.selectDetailPreById(orderDetailQuery);
+
+			if(detailList !=null && detailList.size()>0) {
+				info.setDetailList(detailList);
+			}
+		} catch (Exception e) {
+			LOGGER.error("组装订单明细数据失败 {}",e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}
+
+		//组装订单结算数据
+		try {
+			OrderQuery orderQuery = new OrderQuery();
+			orderQuery.setOrderId(orderInfo.getOrderId());
+			SettlementInfo settlementInfo = settlementDao.jkselectsettlement(orderQuery);
+			if(settlementInfo !=null) {
+				info.setSettlementInfo(settlementInfo);
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("组装订单结算数据失败 {}",e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}
+
+		//组装订单支付数据
+		try {
+			OrderPayInfo orderPayInfo = new OrderPayInfo();
+			orderPayInfo.setOrderId(orderInfo.getOrderId());
+			List<OrderPayInfo> payList = orderPayDao.pay(orderPayInfo);
+			if(payList !=null && payList.size()>0) {
+				info.setPayList(payList);
+			}
+
+			return HttpResponse.success(info);
+
+		} catch (Exception e) {
+			LOGGER.error("组装订单支付数据失败 {}",e);
+			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+		}
+	}
 }
 
 

@@ -47,4 +47,6 @@ public interface OrderNoCodeService {
 	//编号查询订单.
 	HttpResponse selectorderByCode(@Valid String orderCode);
 
+	//编号查询订单.
+	HttpResponse selectorderPreByCode(@Valid String orderCode);
 	}

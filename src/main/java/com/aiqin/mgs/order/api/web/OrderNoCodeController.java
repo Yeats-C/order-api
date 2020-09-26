@@ -121,5 +121,18 @@ public class OrderNoCodeController {
     	LOGGER.info("编号查询订单参数：{}",orderCode);    	
         return orderNoCodeService.selectorderByCode(orderCode);
     }
-    
+
+    /**
+     * 编号查询订单
+     * @param
+     * @return
+     */
+    @GetMapping("/ncdssPre")
+    @ApiOperation(value = "编号查询订单.")
+    public HttpResponse<OrderInfo> seldePre(@Valid @RequestParam(name = "order_code", required = true) String orderCode) {
+
+
+        LOGGER.info("编号查询订单参数：{}",orderCode);
+        return orderNoCodeService.selectorderPreByCode(orderCode);
+    }
 }
