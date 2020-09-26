@@ -78,7 +78,7 @@ public class OrderDetailController {
         
     	
     	LOGGER.info("查询BYorderid-返回订单明细数据、订单数据、收货信息参数：{}",orderCode);    	
-        return orderDetailService.selectorderSelde(orderCode);
+        return orderDetailService.selectorderSeldePre(orderCode);
     }
     
     
