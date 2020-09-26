@@ -52,6 +52,8 @@ public interface OrderDetailService {
 	//添加新的订单明细数据
 	public List<OrderDetailInfo> addDetailList(@Valid List<OrderDetailInfo> detailList, @Valid String orderId,@Valid String orderCode) throws Exception;
 
+	//添加新的订单明细数据
+	public List<OrderDetailInfo> addDetailListPre(@Valid List<OrderDetailInfo> detailList, @Valid String orderId,@Valid String orderCode) throws Exception;
 	public List<OrderDetailInfo> updateDetailList(@Valid List<OrderDetailInfo> detailList, @Valid String orderId,@Valid String orderCode) throws Exception;
 
 //	//查询会员下的所有订单ID下的商品集合...
@@ -77,7 +79,9 @@ public interface OrderDetailService {
 
 	//查询BYordercode-返回订单明细数据、订单数据、收货信息、结算数据
 	HttpResponse selectorderSelde(@Valid String orderCode);
-	
+
+	//查询BYordercode-返回订单明细数据、订单数据、收货信息、结算数据
+	HttpResponse selectorderSeldePre(@Valid String orderCode);
 	//查询SKU+销量
 	List<SkuSaleResponse> selectSkuSale(@Valid List<String> orderList);
 

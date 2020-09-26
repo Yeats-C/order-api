@@ -51,8 +51,14 @@ public interface OrderDao {
     //唯一订单查询
     OrderInfo selecOrderById(OrderDetailQuery orderDetailQuery) throws Exception;
 
+    //唯一订单查询
+    OrderInfo selecOrderPreById(OrderDetailQuery orderDetailQuery) throws Exception;
+
     //添加新的订单主数据
     public void addOrderInfo(@Valid OrderInfo orderInfo) throws Exception;
+
+    //添加新的订单主数据
+    public void addOrderPreInfo(@Valid OrderInfo orderInfo) throws Exception;
 
     //接口-分销机构维度-总销售额 返回INT
     Integer selectOrderAmt(@Param("distributorId") String distributorId, @Param("originTypeList") List<Integer> originTypeList) throws Exception;
@@ -125,6 +131,8 @@ public interface OrderDao {
     //删除订单主数据
     void deleteOrderInfo(@Valid OrderInfo orderInfo) throws Exception;
 
+    //删除订单主数据
+    void deleteOrderInfoPre(@Valid OrderInfo orderInfo) throws Exception;
     //订单数
     Integer selectAcountByEcshop(@Valid OrderQuery orderQuery) throws Exception;
 

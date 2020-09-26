@@ -1261,7 +1261,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         //订单主数据
-        orderDao.addOrderInfo(orderInfo);
+        orderDao.addOrderPreInfo(orderInfo);
 
         return orderInfo;
     }
@@ -1520,7 +1520,7 @@ public class OrderServiceImpl implements OrderService {
 
                 //新增订单明细数据
                 if (detailList != null && detailList.size() > 0) {
-                    detailList = orderDetailService.addDetailList(detailList, orderId, orderCode);
+                    detailList = orderDetailService.addDetailListPre(detailList, orderId, orderCode);
                 }
                 //新增订单结算数据
                 if (settlementInfo != null) {
@@ -2285,7 +2285,7 @@ public class OrderServiceImpl implements OrderService {
 
                     //新增订单明细数据
                     if (detailList != null && detailList.size() > 0) {
-                        detailList = orderDetailService.addDetailList(detailList, orderId, orderCode);
+                        detailList = orderDetailService.addDetailListPre(detailList, orderId, orderCode);
                     }
 
                     //删除购物车数据
@@ -2360,7 +2360,7 @@ public class OrderServiceImpl implements OrderService {
                     if (orderInfo.getOrderType().equals(Global.ORDER_TYPE_4)) {
                         orderDetailQuery.setOrderType(Global.ORDER_TYPE_4);
                     }
-                    detailQueryInfo = orderDao.selecOrderById(orderDetailQuery);
+                    detailQueryInfo = orderDao.selecOrderPreById(orderDetailQuery);
                     if (detailQueryInfo != null) {
                         orderId = detailQueryInfo.getOrderId();
                     }
@@ -2380,7 +2380,7 @@ public class OrderServiceImpl implements OrderService {
 
                     //删除订单主数据
                     try {
-                        orderDao.deleteOrderInfo(orderInfo);
+                        orderDao.deleteOrderInfoPre(orderInfo);
                     } catch (Exception e) {
                         LOGGER.error("orderDao.deleteOrderInfo(orderInfo)：{}", e);
                     }
@@ -2407,14 +2407,14 @@ public class OrderServiceImpl implements OrderService {
                     }
                     //删除订单明细数据
                     try {
-                        //    orderDetailDao.deleteOrderDetailInfo(orderInfo);
+                            orderDetailDao.deleteOrderDetailInfoPre(orderInfo);
                     } catch (Exception e) {
                         LOGGER.error("删除订单明细数据异常：{}", e);
                     }
                     //新增订单明细数据
                     if (detailList != null && detailList.size() > 0) {
                         try {
-                            detailList = orderDetailService.updateDetailList(detailList, orderId, orderCode);
+                            detailList = orderDetailService.addDetailList(detailList, orderId, orderCode);
                         } catch (Exception e) {
                             LOGGER.error("新增订单明细数据异常：{}", e);
                         }

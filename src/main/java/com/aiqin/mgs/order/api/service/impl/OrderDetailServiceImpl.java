@@ -523,6 +523,28 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         return list;
     }
 
+
+    @Override
+    @Transactional
+    public List<OrderDetailInfo> addDetailListPre(@Valid List<OrderDetailInfo> detailList, @Valid String orderId, @Valid String orderCode) throws Exception {
+
+        List<OrderDetailInfo> list = new ArrayList();
+        if (detailList != null && detailList.size() > 0) {
+            for (OrderDetailInfo info : detailList) {
+
+                //订单ID、订单明细ID
+                info.setOrderId(orderId);
+                info.setOrderCode(orderCode);
+                info.setOrderDetailId(OrderPublic.getUUID());
+                //保存
+                orderDetailDao.addDetailPreList(info);
+                list.add(info);
+            }
+        } else {
+            LOGGER.warn("未获取订单明细数据.orderId: {}", orderId);
+        }
+        return list;
+    }
     @Override
     @Transactional
     public List<OrderDetailInfo> updateDetailList(@Valid List<OrderDetailInfo> detailList, @Valid String orderId, @Valid String orderCode) throws Exception {
@@ -786,19 +808,65 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             LOGGER.error("查询BYorderid-返回订单明细数据 {}", e);
             return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
         }
-		/*try {
-		//收货信息
-	    OrderReceivingInfo orderReceivingInfo = new OrderReceivingInfo();
-	    orderReceivingInfo=orderReceivingDao.selecReceivingById(orderDetailQuery);
 
-	    if(orderReceivingInfo !=null ) {
-	    	info.setReceivingInfo(orderReceivingInfo);
-	    }
-	     
-		} catch (Exception e) {
-			LOGGER.error("查询BYorderid-返回订单收货信息异常 {}",e);
-			return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
-		}*/
+        try {
+            //结算信息
+            OrderQuery orderQuery = new OrderQuery();
+            orderQuery.setOrderId(orderId);
+            info.setSettlementInfo(settlementDao.jkselectsettlement(orderQuery));
+
+            return HttpResponse.success(info);
+        } catch (Exception e) {
+            LOGGER.error("查询BYorderid-返回订单结算信息异常 {}", e);
+            return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+    }
+    @Override
+    public HttpResponse selectorderSeldePre(@Valid String orderCode) {
+
+        //返回数据
+        OrderodrInfo info = new OrderodrInfo();
+
+        //查询条件
+        OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
+        orderDetailQuery.setOrderCode(orderCode);
+        String orderId = "";
+
+        try {
+            //订单主数据
+            OrderInfo orderInfo = new OrderInfo();
+            orderInfo = orderDao.selecOrderPreById(orderDetailQuery);
+            if (orderInfo != null && orderInfo.getOrderId() != null) {
+                orderId = orderInfo.getOrderId();
+                orderDetailQuery.setOrderId(orderInfo.getOrderId());
+                orderDetailQuery.setOrderCode(orderInfo.getOrderCode());
+            }
+
+            //获取SKU数量
+            Integer skuSum = null;
+            skuSum = getSkuSum(orderId);
+            orderInfo.setSkuSum(skuSum != null ? skuSum : 0);
+            if (orderInfo != null) {
+                info.setOrderInfo(orderInfo);
+            }
+        } catch (Exception e) {
+            LOGGER.error("查询BYorderid-返回订单主数据 {}", e);
+            return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+
+        try {
+            //订单明细数据
+            List<OrderDetailInfo> detailList = orderDetailDao.selectDetailPreById(orderDetailQuery);
+
+            if (detailList != null && detailList.size() > 0) {
+                info.setDetailList(detailList);
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("查询BYorderid-返回订单明细数据 {}", e);
+            return HttpResponse.failure(ResultCode.SELECT_EXCEPTION);
+        }
+
         try {
             //结算信息
             OrderQuery orderQuery = new OrderQuery();

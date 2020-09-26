@@ -44,6 +44,8 @@ public interface OrderDetailDao {
 
     //查询订单明细Byorderid
     List<OrderDetailInfo> selectDetailById(@Valid OrderDetailQuery orderDetailQuery) throws Exception;
+    List<OrderDetailInfo> selectDetailPreById(@Valid OrderDetailQuery orderDetailQuery) throws Exception;
+
 	//接口--商品概览产品销量、销售额-前5名
 	List<OrderDetailInfo> productFrontTop10(@Param("distributorId")String distributorId,@Param("dayBegin")Date dayBegin,@Param("dayEnd")Date dayEnd,@Param("categoryId") String categoryId) throws Exception;
 
@@ -53,6 +55,8 @@ public interface OrderDetailDao {
     //插入订单明细表
     void addDetailList(@Valid OrderDetailInfo orderDetailInfo) throws Exception;
 
+    //插入订单明细表
+    void addDetailPreList(@Valid OrderDetailInfo orderDetailInfo) throws Exception;
 //	//查询会员下的所有订单ID下的商品集合...
 //	List<OrderProductsResponse> selectproductbyorders(@Valid List<String> orderidslList, @Param("memberId")String memberId)throws Exception;
 
@@ -70,6 +74,8 @@ public interface OrderDetailDao {
 
     //删除订单明细数据
     void deleteOrderDetailInfo(OrderInfo orderInfo) throws Exception;
+    //删除订单明细数据
+    void deleteOrderDetailInfoPre(OrderInfo orderInfo) throws Exception;
 
     //sku销量统计
     Integer getSkuAmount(@Param("skuCode") String skuCode, @Param("nextDate") String nextDate) throws Exception;
