@@ -672,6 +672,7 @@ public class OrderController {
     @ApiOperation("支付回调修改订单状态和库存")
     public HttpResponse callback(@RequestBody PartnerPayGateRep payReq) {
         try {
+            Thread.sleep(200);
             LOGGER.info("支付回调修改订单状态和库存: {}",payReq);
             return orderService.callback(payReq);
         } catch (Exception e) {
