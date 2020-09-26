@@ -2378,12 +2378,7 @@ public class OrderServiceImpl implements OrderService {
                         }
                     }
 
-                    //删除订单主数据
-                    try {
-                        orderDao.deleteOrderInfoPre(orderInfo);
-                    } catch (Exception e) {
-                        LOGGER.error("orderDao.deleteOrderInfo(orderInfo)：{}", e);
-                    }
+
 
                     //新增订单主数据
                     try {
@@ -2405,12 +2400,7 @@ public class OrderServiceImpl implements OrderService {
                     } catch (Exception e) {
                         LOGGER.error("生成订单日志异常：{}", e);
                     }
-                    //删除订单明细数据
-                    try {
-                            orderDetailDao.deleteOrderDetailInfoPre(orderInfo);
-                    } catch (Exception e) {
-                        LOGGER.error("删除订单明细数据异常：{}", e);
-                    }
+
                     //新增订单明细数据
                     if (detailList != null && detailList.size() > 0) {
                         try {
