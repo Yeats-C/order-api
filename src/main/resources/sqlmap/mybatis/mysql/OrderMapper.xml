@@ -364,6 +364,7 @@
         <if test="payType!=null and payType!='' ">
             and a.pay_type =#{payType}
         </if>
+        and a.pay_status=1
         <if test="(skuName!=null and skuName!='') or (barCodeAndSku !=null and barCodeAndSku != '')">
             and a.order_id = b.order_id
             <if test="skuName!=null and skuName!='' ">
@@ -476,6 +477,7 @@
         <if test="payType!=null and payType!='' ">
             and a.pay_type =#{payType}
         </if>
+        and a.pay_status=1
         <if test="(skuName!=null and skuName!='') or (barCodeAndSku !=null and barCodeAndSku != '')">
             and a.order_id = b.order_id
             <if test="skuName!=null and skuName!='' ">
