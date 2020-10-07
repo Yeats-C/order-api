@@ -2391,7 +2391,7 @@
                 and (b.sku_code = #{barCodeAndSku} or b.bar_code = #{barCodeAndSku})
             </if>
         </if>
-        WHERE 1=1
+        WHERE  a.pay_status = 1
         <choose>
             <when test="orderType!=null and orderType!='' ">
                 and a.order_type = #{orderType}
