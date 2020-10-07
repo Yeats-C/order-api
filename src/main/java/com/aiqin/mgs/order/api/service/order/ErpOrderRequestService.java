@@ -292,4 +292,15 @@ public interface ErpOrderRequestService {
      * @date 2020/1/17 14:41
      */
     void accountRole(String franchiseeCode);
+
+    /**
+     * 根据DL门店id查询门店信息
+     *
+     * @param originStoreId 门店id
+     * @return com.aiqin.mgs.order.api.domain.StoreInfo
+     * @author: Tao.Chen
+     * @version: v1.0.0
+     * @date 2019/12/2 15:36
+     */
+    StoreInfo getStoreInfoByOriginStoreId(String originStoreId);
 }

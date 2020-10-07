@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.web.order;
 
+import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
@@ -81,7 +82,7 @@ public class ErpOrderSignController {
     @PostMapping("/orderSign")
     @ApiOperation(value = "订单签收")
     public HttpResponse orderSign(@RequestBody ErpOrderSignRequest erpOrderSignRequest) {
-        logger.info("订单签收：{}", erpOrderSignRequest);
+        logger.info("订单签收：{}", JsonUtil.toJson(erpOrderSignRequest));
         HttpResponse response = HttpResponse.success();
         try {
             erpOrderInfoService.orderSign(erpOrderSignRequest);

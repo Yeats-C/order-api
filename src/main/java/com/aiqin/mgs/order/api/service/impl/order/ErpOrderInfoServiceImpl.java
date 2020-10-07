@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.service.impl.order;
 
+import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
@@ -12,13 +13,11 @@ import com.aiqin.mgs.order.api.dao.order.ErpOrderOperationLogDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.OrderSplitsNum;
+import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftQuotasUseDetail;
 import com.aiqin.mgs.order.api.domain.po.gift.NewStoreGradient;
 import com.aiqin.mgs.order.api.domain.po.gift.StoreGradient;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
+import com.aiqin.mgs.order.api.domain.po.order.*;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCarryOutNextStepRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
@@ -33,6 +32,7 @@ import com.aiqin.mgs.order.api.service.gift.GiftQuotasUseDetailService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import com.aiqin.mgs.order.api.util.CopyBeanUtil;
+import com.aiqin.mgs.order.api.util.DLRequestUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -848,10 +848,40 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         /*****************************************同步订单数据到结算结束*****************************************/
 
         // TODO 此处需调用DL接口，将订单状态同步给DL
+        syncToDL(order,itemList,orderItemSignMap);
+
         //首单，修改门店状态
         if (processTypeEnum.getOrderCategoryEnum().isFirstOrder()) {
             erpOrderRequestService.updateStoreStatus(order.getStoreId(), "010201");
         }
+    }
+
+    private void syncToDL(ErpOrderInfo order, List<ErpOrderItem> itemList, Map<Long, ErpOrderProductItemRequest> orderItemSignMap) {
+        OrderToDL orderToDL=new OrderToDL();
+        List<ImplData> implData=new ArrayList();
+
+        for (ErpOrderItem item :
+                itemList) {
+            ImplData data=new ImplData();
+            data.setDetailId(item.getOrderInfoDetailId());
+            data.setImpQty(orderItemSignMap.get(item.getLineCode()).getActualInboundCount().toString());
+            implData.add(data);
+        }
+        orderToDL.setImpData(implData);
+        orderToDL.setMethod("orderImp");
+        orderToDL.setOrderType(order.getOrderTypeCode());
+        orderToDL.setOrderStoreCode(order.getOrderStoreCode());
+
+        logger.info("签收信息同步到DL开始，参数为{}"+JsonUtil.toJson(orderToDL));
+
+        String sign = DLRequestUtil.EncoderByMd5("0122db92c57511eab0eb7cd30adaed42", JsonUtil.toJson(orderToDL));
+        HttpClient httpClient = HttpClient.post("http://39.98.253.157:7070/azg/api", "utf-8");
+        httpClient.setHeader("Content-Encoding", "UTF-8");
+        httpClient.setHeader("key", "0122db92c57511eab0eb7cd30adaed42");//双方约定的密钥
+        httpClient.setHeader("sign", sign);
+        httpClient.addParameter("data", JsonUtil.toJson(orderToDL));
+        DLResponse response=httpClient.timeout(200000).action().result(DLResponse.class);
+        logger.info("订单签收信息同步到DL的回调为{}"+JsonUtil.toJson(orderToDL));
     }
 
     @Override
@@ -1110,6 +1140,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         if (StringUtils.isEmpty(orderInfo.getOrderStoreCode())) {
             throw new BusinessException("缺失订单号");
         }
+
+        StoreInfo storeInfo=erpOrderRequestService.getStoreInfoByOriginStoreId(orderInfo.getStoreId());
+
+        orderInfo.setStoreId(storeInfo.getStoreId());
 
         AuthToken auth=new AuthToken();
         auth.setPersonId("DL同步");
