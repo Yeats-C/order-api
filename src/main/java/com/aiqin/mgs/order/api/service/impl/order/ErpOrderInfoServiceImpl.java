@@ -870,7 +870,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         orderToDL.setImpData(implData);
         orderToDL.setMethod("orderImp");
         orderToDL.setOrderType(order.getOrderTypeCode());
-        orderToDL.setOrderStoreCode(order.getOrderStoreCode());
+        orderToDL.setOrderStoreCode(order.getOrderStoreId());
 
         logger.info("签收信息同步到DL开始，参数为{}"+JsonUtil.toJson(orderToDL));
 
