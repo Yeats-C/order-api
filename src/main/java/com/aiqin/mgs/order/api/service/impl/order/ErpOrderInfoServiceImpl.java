@@ -881,7 +881,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         httpClient.setHeader("sign", sign);
         httpClient.addParameter("data", JsonUtil.toJson(orderToDL));
         DLResponse response=httpClient.timeout(200000).action().result(DLResponse.class);
-        logger.info("订单签收信息同步到DL的回调为{}"+JsonUtil.toJson(orderToDL));
+        logger.info("订单签收信息同步到DL的回调为{}"+JsonUtil.toJson(response));
     }
 
     @Override
