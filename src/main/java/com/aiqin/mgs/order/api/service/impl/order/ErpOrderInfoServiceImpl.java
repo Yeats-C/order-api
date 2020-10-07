@@ -847,7 +847,7 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         bridgeProductService.settlementSaveOrder(list,3);
         /*****************************************同步订单数据到结算结束*****************************************/
 
-        // TODO 此处需调用DL接口，将订单状态同步给DL
+        //此处调用DL接口，将订单签收信息同步给DL
         syncToDL(order,itemList,orderItemSignMap);
 
         //首单，修改门店状态
