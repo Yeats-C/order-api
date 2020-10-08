@@ -336,16 +336,18 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         if(list!=null&&list.size()>0){
             log.info("判断子单是否全部发货完成,原始订单集合为 list={}",JsonUtil.toJson(list));
             for(ErpOrderInfo eoi:list){
-                Integer orderStatus = eoi.getOrderStatus();
-                //判断订单状态是否是 11:发货完成或者 97:缺货终止
-                if(orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_11.getCode())
-                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_97.getCode())
-                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_12.getCode())
-                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_13.getCode())
-                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_4.getCode())){
-                    return true;
-                }else{
-                    return false;
+                if(null!=eoi.getOrderStatus()){
+                    Integer orderStatus = eoi.getOrderStatus();
+                    //判断订单状态是否是 11:发货完成或者 97:缺货终止
+                    if(orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_11.getCode())
+                            ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_97.getCode())
+                            ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_12.getCode())
+                            ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_13.getCode())
+                            ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_4.getCode())){
+                        return true;
+                    }else{
+                        return false;
+                    }
                 }
             }
             return true;
