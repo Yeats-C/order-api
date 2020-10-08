@@ -170,6 +170,9 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                 if(null==item.getPriceTax()){
                     item.setPriceTax(BigDecimal.ZERO);
                 }
+                if(null==item.getTotalAcivityAmount()){
+                    item.setTotalAcivityAmount(BigDecimal.ZERO);
+                }
                 totalMoney=totalMoney.add(item.getTotalProductAmount()).setScale(2, RoundingMode.DOWN);
                 activityMoney=activityMoney.add(item.getTotalAcivityAmount()).setScale(2, RoundingMode.DOWN);
                 topCouponMoney=topCouponMoney.add(item.getTopCouponDiscountAmount()).setScale(2, RoundingMode.DOWN);
