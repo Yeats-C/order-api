@@ -2934,7 +2934,12 @@ public class OrderServiceImpl implements OrderService {
                 productCount += orderDetailInfo.getAmount();
                 orderDetailInfo.setUpdateBy(updateBy);
 
-                orderDetailInfo.setActualPrice(orderDetailInfo.getActualPrice() * orderInfo.getActualPrice() / storeValueOrderPayRequest.getActualPrice());
+                if (storeValueOrderPayRequest.getActualPrice()==0){
+                    orderDetailInfo.setActualPrice(0);
+                }else {
+                    orderDetailInfo.setActualPrice(orderDetailInfo.getActualPrice() * orderInfo.getActualPrice() / storeValueOrderPayRequest.getActualPrice());
+                }
+
 
 
                 // orderDetailDao.updateOrderDetail(orderDetailInfo);
@@ -2950,6 +2955,7 @@ public class OrderServiceImpl implements OrderService {
             LOGGER.error("储值支付成功,更新订单异常:{}", e.getMessage());
             throw new GroundRuntimeException(e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             throw new GroundRuntimeException("");
         }
     }
