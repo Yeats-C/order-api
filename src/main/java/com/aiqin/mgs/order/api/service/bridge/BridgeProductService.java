@@ -36,6 +36,7 @@ import com.aiqin.mgs.order.api.domain.wholesale.JoinMerchant;
 import com.aiqin.mgs.order.api.domain.wholesale.MerchantAccount;
 import com.aiqin.mgs.order.api.domain.wholesale.MerchantPaBalanceRespVO;
 import com.aiqin.mgs.order.api.service.order.ErpOrderLogisticsService;
+import com.aiqin.mgs.order.api.util.DLRequestUtil;
 import com.aiqin.mgs.order.api.util.MathUtil;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -66,6 +67,12 @@ private String centerMainUrl;
 
 @Value("${center.main.settlement}")
 private String settlement;
+
+@Value("${bridge.url.dl}")
+private String dlUrl;
+
+@Value("${bridge.key.dl}")
+private String dlKey;
 
 @Resource
 private ErpOrderLogisticsService erpOrderLogisticsService;
@@ -1264,7 +1271,21 @@ public void settlementSaveReturnOrder(ReturnOrderDetailVO order) {
         return list;
     }
 
+    /**
+     * 调用DL接口
+     * @param data
+     * @return
+     */
+    public DLResponse transferDL(String data) {
+        String sign = DLRequestUtil.EncoderByMd5(dlKey, data);
+        HttpClient httpClient = HttpClient.post(dlUrl, "utf-8");
+        httpClient.setHeader("Content-Encoding", "UTF-8");
+        httpClient.setHeader("key", dlKey);//双方约定的密钥
+        httpClient.setHeader("sign", sign);
+        httpClient.addParameter("data", data);
+       return httpClient.timeout(200000).action().result(DLResponse.class);
 
+    }
 
 public static void main(String[] args) {
     BridgeProductService bridgeProductService=new BridgeProductService();
@@ -1283,4 +1304,6 @@ public static void main(String[] args) {
         }
         return Lists.newArrayList();
     }
+
+
 }

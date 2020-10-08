@@ -31,10 +31,7 @@ import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.PublicAreaStore;
-import com.aiqin.mgs.order.api.domain.po.order.ErpBatchInfo;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
+import com.aiqin.mgs.order.api.domain.po.order.*;
 import com.aiqin.mgs.order.api.domain.request.StoreQuotaRequest;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.domain.response.ReturnOrderDetailList;
@@ -290,6 +287,39 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 throw e;
             }
         }
+
+        //退货单同步结算
+        DLReturnOrderReqVo dlReturnOrderReqVo=new DLReturnOrderReqVo();
+        dlReturnOrderReqVo.setMethod("saveReturn");
+        dlReturnOrderReqVo.setOrderType(record.getOrderType());
+        dlReturnOrderReqVo.setCustomerCode(record.getStoreCode());
+        dlReturnOrderReqVo.setReturnOrderCode(record.getReturnOrderCode());
+        dlReturnOrderReqVo.setSupplierCode(record.getSupplierCode());
+        dlReturnOrderReqVo.setTransportCenterCode(record.getTransportCenterCode());
+        dlReturnOrderReqVo.setOrder_store_id(orderByOrderCode.getOrderStoreId());
+
+        List<DLReturnOrderDetail> dlReturnOrderDetails=new ArrayList<>();
+
+        List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(orderByOrderCode.getOrderStoreId());
+        Map<Long,ErpOrderItem> itemMap=orderItemList.stream().collect(Collectors.toMap(ErpOrderItem :: getLineCode, x -> x, (k1, k2) -> k2));
+
+        for(ReturnOrderDetail detail:details){
+            DLReturnOrderDetail dlReturnOrderDetail=new DLReturnOrderDetail();
+            ErpOrderItem item=itemMap.get(detail.getLineCode());
+            dlReturnOrderDetail.setOrderDetailId(item.getOrderInfoDetailId());
+            dlReturnOrderDetail.setSkuCode(detail.getSkuCode());
+            dlReturnOrderDetail.setReturnProductCount(detail.getReturnProductCount());
+            dlReturnOrderDetail.setLineCode(detail.getLineCode());
+            dlReturnOrderDetail.setProductAmount(detail.getProductAmount());
+            dlReturnOrderDetail.setOutputTaxRate(detail.getOutputTaxRate());
+            dlReturnOrderDetail.setProductType(detail.getProductType());
+            dlReturnOrderDetails.add(dlReturnOrderDetail);
+        }
+        dlReturnOrderReqVo.setDetails(dlReturnOrderDetails);
+        log.info("退货单同步DL参数为："+JsonUtil.toJson(dlReturnOrderReqVo));
+        DLResponse response=bridgeProductService.transferDL(JsonUtil.toJson(dlReturnOrderReqVo));
+        log.info("退货单同步DL回调为："+JsonUtil.toJson(response));
+
         return HttpResponse.success();
     }
 
