@@ -23,7 +23,7 @@ public class DLReturnOrderReqVo{
     private String method;
 
     @NotNull(message = "订单类型不能为空")
-    @ApiModelProperty(value = "订单类型(订单类型 0直送、1配送、2辅采 )")
+    @ApiModelProperty(value = "订单类型(1直送  2配送)")
     private Integer orderType;
 
     @NotBlank(message = "门店编号不能为空")

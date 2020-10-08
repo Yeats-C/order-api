@@ -291,7 +291,13 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         //退货单同步结算
         DLReturnOrderReqVo dlReturnOrderReqVo=new DLReturnOrderReqVo();
         dlReturnOrderReqVo.setMethod("saveReturn");
-        dlReturnOrderReqVo.setOrderType(record.getOrderType());
+        if(ErpOrderTypeEnum.DIRECT_SEND.getCode().equals(record.getOrderType())){
+            dlReturnOrderReqVo.setOrderType(1);
+        }else if(ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(record.getOrderType())){
+            dlReturnOrderReqVo.setOrderType(2);
+        }else{
+            dlReturnOrderReqVo.setOrderType(record.getOrderType());
+        }
         dlReturnOrderReqVo.setCustomerCode(record.getStoreCode());
         dlReturnOrderReqVo.setReturnOrderCode(record.getReturnOrderCode());
         dlReturnOrderReqVo.setSupplierCode(record.getSupplierCode());
