@@ -8,7 +8,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * 描述:
@@ -65,5 +64,13 @@ public class CopartnerAreaRoleVo extends PagesRequest{
 	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonProperty("update_time")
 	private Date updateTime;
+
+	@ApiModelProperty(value = "权限编码")
+	@JsonProperty("role_store_code")
+	private String roleStoreCode;
+
+	@ApiModelProperty(value = "权限名称")
+	@JsonProperty("role_store_name")
+	private String roleStoreName;
 	
 }
