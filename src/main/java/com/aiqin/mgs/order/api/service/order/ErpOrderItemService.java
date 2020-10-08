@@ -96,4 +96,10 @@ public interface ErpOrderItemService {
      */
     List<ErpOrderItem> selectOrderItemListByOrderCode(String orderCode);
 
+    /**
+     * 根据业务id删除订单详情
+     */
+    void deleteItemByOrderCode(String orderCode);
+
+
 }

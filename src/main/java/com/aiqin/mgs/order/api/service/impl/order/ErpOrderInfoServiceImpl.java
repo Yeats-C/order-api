@@ -1164,12 +1164,15 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             if(null!=orderInfo.getOrderLogistics()){
                 erpOrderLogisticsDao.insert(orderInfo.getOrderLogistics());
             }
-        }else{
-            updateOrderByPrimaryKeySelective(orderInfo, auth);
-            if(null!=orderInfo.getItemList()&&orderInfo.getItemList().size()>0){
-                //保存订单明细行
-                erpOrderItemService.updateOrderItemList(orderInfo.getItemList(), auth);
+            if(null!=orderInfo.getOrderFee()){
+                erpOrderFeeService.saveOrderFee(orderInfo.getOrderFee(),auth);
             }
+        }else{
+            updateOrderByOrderStoreId(orderInfo, auth);
+            //删除原有订单明细
+            erpOrderItemService.deleteItemByOrderCode(order.getOrderStoreCode());
+            //保存订单明细行
+            erpOrderItemService.saveOrderItemList(orderInfo.getItemList(), auth);
         }
 
         //递归保存子订单信息
@@ -1193,5 +1196,18 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         record.setNum(num);
         record.setOrderCode(orderCode);
         orderSplitsNumDao.insertSelective(record);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void updateOrderByOrderStoreId(ErpOrderInfo po, AuthToken auth) {
+
+        //更新订单数据
+        po.setUpdateById(auth.getPersonId());
+        po.setUpdateByName(auth.getPersonName());
+        Integer integer = erpOrderInfoDao.updateOrderByOrderStoreId(po);
+
+        //保存订单操作日志
+        erpOrderOperationLogService.saveOrderOperationLog(po.getOrderStoreCode(), ErpLogOperationTypeEnum.ADD, po.getOrderStatus(), null, auth);
+
     }
 }
