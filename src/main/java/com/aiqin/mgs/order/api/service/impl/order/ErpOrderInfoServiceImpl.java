@@ -1168,7 +1168,12 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
                 erpOrderFeeService.saveOrderFee(orderInfo.getOrderFee(),auth);
             }
         }else{
-            updateOrderByOrderStoreId(orderInfo, auth);
+            if(!ErpOrderStatusEnum.ORDER_STATUS_13.getCode().equals(orderInfo.getOrderStatus())){
+                updateOrderByOrderStoreId(orderInfo, auth);
+            }else{
+                updateOrderByOrderStoreId1(orderInfo, auth);
+            }
+
             //删除原有订单明细
             erpOrderItemService.deleteItemByOrderCode(order.getOrderStoreCode());
             //保存订单明细行
@@ -1184,6 +1189,16 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
 
 
+    }
+
+    private void updateOrderByOrderStoreId1(ErpOrderInfo orderInfo, AuthToken auth) {
+        //更新订单数据
+        orderInfo.setUpdateById(auth.getPersonId());
+        orderInfo.setUpdateByName(auth.getPersonName());
+        Integer integer = erpOrderInfoDao.updateOrderByOrderStoreId1(orderInfo);
+
+        //保存订单操作日志
+        erpOrderOperationLogService.saveOrderOperationLog(orderInfo.getOrderStoreCode(), ErpLogOperationTypeEnum.ADD, orderInfo.getOrderStatus(), null, auth);
     }
 
     /**

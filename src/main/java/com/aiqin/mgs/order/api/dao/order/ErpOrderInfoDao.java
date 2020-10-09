@@ -169,4 +169,6 @@ public interface ErpOrderInfoDao {
     void updateLogisticsAmountSent(String orderStoreCode);
 
     Integer updateOrderByOrderStoreId(ErpOrderInfo po);
+
+    Integer updateOrderByOrderStoreId1(ErpOrderInfo orderInfo);
 }
