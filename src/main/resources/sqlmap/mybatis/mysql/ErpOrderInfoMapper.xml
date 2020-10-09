@@ -1184,7 +1184,7 @@
         update_by_id = #{updateById},
         update_by_name = #{updateByName},
         update_time = sysdate()
-        where order_store_id = #{id}
+        where order_store_id = #{orderStoreId}
     </update>
 </mapper>
 
