@@ -96,4 +96,9 @@ public class ErpOrderItemServiceImpl implements ErpOrderItemService {
         return list;
     }
 
+    @Override
+    public void deleteItemByOrderCode(String orderCode) {
+        erpOrderItemDao.deleteItemByOrderCode(orderCode);
+    }
+
 }

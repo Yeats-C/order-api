@@ -2,6 +2,7 @@ package com.aiqin.mgs.order.api.dao.order;
 
 import com.aiqin.mgs.order.api.domain.Activity;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
+import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -68,4 +69,6 @@ public interface ErpOrderItemDao {
      * @return
      */
     List<ErpOrderItem> getActivityItem(ErpOrderItem erpOrderItem);
+
+    int deleteItemByOrderCode(@Param("orderCode") String orderCode);
 }

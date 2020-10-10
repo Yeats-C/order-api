@@ -1164,12 +1164,20 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             if(null!=orderInfo.getOrderLogistics()){
                 erpOrderLogisticsDao.insert(orderInfo.getOrderLogistics());
             }
-        }else{
-            updateOrderByPrimaryKeySelective(orderInfo, auth);
-            if(null!=orderInfo.getItemList()&&orderInfo.getItemList().size()>0){
-                //保存订单明细行
-                erpOrderItemService.updateOrderItemList(orderInfo.getItemList(), auth);
+            if(null!=orderInfo.getOrderFee()){
+                erpOrderFeeService.saveOrderFee(orderInfo.getOrderFee(),auth);
             }
+        }else{
+            if(!ErpOrderStatusEnum.ORDER_STATUS_13.getCode().equals(orderInfo.getOrderStatus())){
+                updateOrderByOrderStoreId(orderInfo, auth);
+            }else{
+                updateOrderByOrderStoreId1(orderInfo, auth);
+            }
+
+            //删除原有订单明细
+            erpOrderItemService.deleteItemByOrderCode(order.getOrderStoreCode());
+            //保存订单明细行
+            erpOrderItemService.saveOrderItemList(orderInfo.getItemList(), auth);
         }
 
         //递归保存子订单信息
@@ -1183,6 +1191,16 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
     }
 
+    private void updateOrderByOrderStoreId1(ErpOrderInfo orderInfo, AuthToken auth) {
+        //更新订单数据
+        orderInfo.setUpdateById(auth.getPersonId());
+        orderInfo.setUpdateByName(auth.getPersonName());
+        Integer integer = erpOrderInfoDao.updateOrderByOrderStoreId1(orderInfo);
+
+        //保存订单操作日志
+        erpOrderOperationLogService.saveOrderOperationLog(orderInfo.getOrderStoreCode(), ErpLogOperationTypeEnum.ADD, orderInfo.getOrderStatus(), null, auth);
+    }
+
     /**
      * 将拆单数量存入拆单数量表中
      * @param num
@@ -1193,5 +1211,18 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         record.setNum(num);
         record.setOrderCode(orderCode);
         orderSplitsNumDao.insertSelective(record);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void updateOrderByOrderStoreId(ErpOrderInfo po, AuthToken auth) {
+
+        //更新订单数据
+        po.setUpdateById(auth.getPersonId());
+        po.setUpdateByName(auth.getPersonName());
+        Integer integer = erpOrderInfoDao.updateOrderByOrderStoreId(po);
+
+        //保存订单操作日志
+        erpOrderOperationLogService.saveOrderOperationLog(po.getOrderStoreCode(), ErpLogOperationTypeEnum.ADD, po.getOrderStatus(), null, auth);
+
     }
 }

@@ -339,5 +339,8 @@
         </if>
     </select>
 
+    <delete id="deleteItemByOrderCode">
+        DELETE FROM order_store_detail WHERE order_store_code=#{orderCode}
+    </delete>
 </mapper>
 
