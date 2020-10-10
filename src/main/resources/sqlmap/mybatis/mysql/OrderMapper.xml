@@ -2379,7 +2379,8 @@
         SELECT
         a.order_code,
         sum( b.cost_points ) sum1,
-        if(a.order_status in (0,4),0,a.actual_price) sum2
+        <!-- if(a.order_status in (0,4),0,a.actual_price) sum2 -->
+        a.actual_price sum2
         FROM
         order_consumer_info a left join order_consumer_detail b on a.order_id = b.order_id
         <if test="(skuName!=null and skuName!='') or (barCodeAndSku !=null and barCodeAndSku != '')">
