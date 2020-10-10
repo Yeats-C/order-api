@@ -2194,6 +2194,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         }
     }
 
+    @Override
+    public DLResponse transferDL(String data) {
+        return bridgeProductService.transferDL(data);
+    }
+
 
     /**
      * 插入日志表

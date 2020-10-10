@@ -39,6 +39,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,6 +92,12 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
     private ErpOrderOperationLogDao erpOrderOperationLogDao;
     @Resource
     private ErpOrderLogisticsDao erpOrderLogisticsDao;
+
+    @Value("${bridge.url.dl}")
+    private String dlUrl;
+
+    @Value("${bridge.key.dl}")
+    private String dlKey;
 
 
     @Override
@@ -874,10 +881,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
         logger.info("签收信息同步到DL开始，参数为{}"+JsonUtil.toJson(orderToDL));
 
-        String sign = DLRequestUtil.EncoderByMd5("0122db92c57511eab0eb7cd30adaed42", JsonUtil.toJson(orderToDL));
-        HttpClient httpClient = HttpClient.post("http://39.98.253.157:7070/azg/api", "utf-8");
+        String sign = DLRequestUtil.EncoderByMd5(dlKey, JsonUtil.toJson(orderToDL));
+        HttpClient httpClient = HttpClient.post(dlUrl, "utf-8");
         httpClient.setHeader("Content-Encoding", "UTF-8");
-        httpClient.setHeader("key", "0122db92c57511eab0eb7cd30adaed42");//双方约定的密钥
+        httpClient.setHeader("key", dlKey);//双方约定的密钥
         httpClient.setHeader("sign", sign);
         httpClient.addParameter("data", JsonUtil.toJson(orderToDL));
         DLResponse response=httpClient.timeout(200000).action().result(DLResponse.class);

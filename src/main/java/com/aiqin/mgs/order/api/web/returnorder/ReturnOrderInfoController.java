@@ -5,6 +5,7 @@ import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.base.ResultCode;
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
+import com.aiqin.mgs.order.api.domain.po.order.DLResponse;
 import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.domain.response.ReturnOrderTypeResponse;
@@ -217,6 +218,12 @@ public class ReturnOrderInfoController {
     @ApiOperation("查询退货类型")
     public HttpResponse<ReturnOrderTypeResponse> selectReturnOrder(){
        return returnOrderInfoService.selectReturnOrderAll();
+    }
+
+    @ApiOperation("新增退货信息")
+    @PostMapping("/transferDL")
+    public DLResponse transferDL(String data) {
+        return returnOrderInfoService.transferDL(data);
     }
 
 }

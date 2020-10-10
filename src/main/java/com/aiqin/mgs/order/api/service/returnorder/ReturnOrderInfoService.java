@@ -4,6 +4,7 @@ import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.PageRequestVO;
 import com.aiqin.mgs.order.api.base.PageResData;
 import com.aiqin.mgs.order.api.domain.ReturnOrderInfo;
+import com.aiqin.mgs.order.api.domain.po.order.DLResponse;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.domain.response.ReturnOrderTypeResponse;
 
@@ -188,6 +189,8 @@ public interface ReturnOrderInfoService {
      * @return
      */
     HttpResponse<ReturnOrderTypeResponse> selectReturnOrderAll();
+
+    DLResponse transferDL(String data);
 
 
 //    boolean refundPoints(ReturnOrderInfo returnOrderInfo);
