@@ -175,18 +175,18 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         record.setReturnOrderCode(afterSaleCode);
         record.setCreateTime(now);
         switch (reqVo.getReturnOrderType()) {
-            case 0:
-                record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getKey());
-                record.setActualProductCount(record.getProductCount());
-                record.setActualReturnOrderAmount(record.getReturnOrderAmount());
-                break;
-            case 1:
-
-            case 2:
-                record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey());
-                break;
+//            case 0:
+//                record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getKey());
+//                record.setActualProductCount(record.getProductCount());
+//                record.setActualReturnOrderAmount(record.getReturnOrderAmount());
+//                break;
+//            case 1:
+//
+//            case 2:
+//                record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey());
+//                break;
             default:
-                record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey());
+                record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_CHECK.getKey());
         }
         //退货单--退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户
         record.setReturnMoneyType(ConstantData.RETURN_MONEY_TYPE);
@@ -247,7 +247,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         erpOrderInfoService.updateOrderReturnStatus(record.getOrderStoreCode(), ErpOrderReturnRequestEnum.WAIT,null,record.getCreateById(),record.getCreateByName());
         log.info("发起退货--修改原始订单数据结束");
         //如果是配送质量退货，请求时调用门店退货申请
-        if(!("15".equals(reqVo.getReturnReasonCode())&&reqVo.getOrderType().equals(1))){
+        /*if(!("15".equals(reqVo.getReturnReasonCode())&&reqVo.getOrderType().equals(1))){
             //门店退货申请-完成(门店)（erp回调）--修改商品库存
             String url=productHost+"/order/return/insert";
             JSONObject body=new JSONObject();
@@ -286,7 +286,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存失败");
                 throw e;
             }
-        }
+        }*/
 
         //退货单同步结算
         DLReturnOrderReqVo dlReturnOrderReqVo=new DLReturnOrderReqVo();
@@ -300,8 +300,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         }
         dlReturnOrderReqVo.setCustomerCode(record.getStoreCode());
         dlReturnOrderReqVo.setReturnOrderCode(record.getReturnOrderCode());
-        dlReturnOrderReqVo.setSupplierCode(record.getSupplierCode());
-        dlReturnOrderReqVo.setTransportCenterCode(record.getTransportCenterCode());
+        dlReturnOrderReqVo.setSupplierCode(orderByOrderCode.getSupplierCode());
+        dlReturnOrderReqVo.setTransportCenterCode(orderByOrderCode.getTransportCenterCode());
         dlReturnOrderReqVo.setOrder_store_id(orderByOrderCode.getOrderStoreId());
 
         List<DLReturnOrderDetail> dlReturnOrderDetails=new ArrayList<>();

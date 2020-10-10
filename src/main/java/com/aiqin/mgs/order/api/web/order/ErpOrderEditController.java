@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.web.order;
 
+import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.MessageId;
 import com.aiqin.ground.util.protocol.Project;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
@@ -81,7 +82,7 @@ public class ErpOrderEditController {
     @PostMapping("/synchronizeOrders")
     @ApiOperation(value = "DL同步订单信息")
     public HttpResponse synchronizeOrders(@RequestBody ErpOrderInfo erpOrderInfo) {
-        logger.info("DL同步订单信息：{}", erpOrderInfo);
+        logger.info("DL同步订单信息：{}", JsonUtil.toJson(erpOrderInfo));
         HttpResponse response = HttpResponse.success();
         try {
             erpOrderInfoService.synchronizeOrders(erpOrderInfo);
