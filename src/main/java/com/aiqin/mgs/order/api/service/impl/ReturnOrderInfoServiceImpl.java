@@ -321,7 +321,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             dlReturnOrderDetail.setReturnProductCount(detail.getReturnProductCount());
             dlReturnOrderDetail.setLineCode(detail.getLineCode());
             dlReturnOrderDetail.setProductAmount(detail.getProductAmount());
-            dlReturnOrderDetail.setOutputTaxRate(detail.getOutputTaxRate());
+            dlReturnOrderDetail.setOutputTaxRate(item.getOutputTaxRate());
             dlReturnOrderDetail.setProductType(detail.getProductType());
             dlReturnOrderDetails.add(dlReturnOrderDetail);
             if(null==item.getReturnProductCount()){
