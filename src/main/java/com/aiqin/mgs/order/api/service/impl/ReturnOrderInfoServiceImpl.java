@@ -213,6 +213,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             detailVo.setTransportCenterName(reqVo.getTransportCenterName());
             detailVo.setWarehouseCode(reqVo.getWarehouseCode());
             detailVo.setWarehouseName(reqVo.getWarehouseName());
+            detailVo.setActualTotalProductAmount(new BigDecimal(detailVo.getActualReturnProductCount()).multiply(detailVo.getPreferentialAmount()));
             BeanUtils.copyProperties(detailVo, detail);
             detail.setCreateTime(now);
             detail.setReturnOrderDetailId(IdUtil.uuid());
