@@ -46,6 +46,7 @@ import com.aiqin.mgs.order.api.service.order.ErpOrderInfoService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
+import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.ResultModel;
 import com.aiqin.platform.flows.client.constant.AjaxJson;
 import com.aiqin.platform.flows.client.constant.FormUpdateUrlType;
@@ -291,6 +292,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         }*/
 
         //退货单同步结算
+        AuthToken auth = AuthUtil.getCurrentAuth();
         DLReturnOrderReqVo dlReturnOrderReqVo=new DLReturnOrderReqVo();
         dlReturnOrderReqVo.setMethod("saveReturn");
         if(ErpOrderTypeEnum.DIRECT_SEND.getCode().equals(record.getOrderType())){
@@ -322,6 +324,14 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             dlReturnOrderDetail.setOutputTaxRate(detail.getOutputTaxRate());
             dlReturnOrderDetail.setProductType(detail.getProductType());
             dlReturnOrderDetails.add(dlReturnOrderDetail);
+            if(null==item.getReturnProductCount()){
+                item.setReturnProductCount(detail.getReturnProductCount());
+            }else{
+                item.setReturnProductCount(item.getReturnProductCount()+detail.getReturnProductCount());
+            }
+
+            erpOrderItemService.updateOrderItem(item,auth);
+
         }
         dlReturnOrderReqVo.setDetails(dlReturnOrderDetails);
         log.info("退货单同步DL参数为："+JsonUtil.toJson(dlReturnOrderReqVo));
