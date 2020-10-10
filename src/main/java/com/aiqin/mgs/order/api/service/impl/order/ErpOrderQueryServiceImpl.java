@@ -124,22 +124,26 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                 productSkuRequest2.setWarehouseTypeCode(item.getWarehouseTypeCode());
                 productSkuRequest2List.add(productSkuRequest2);
             }
-            log.info("根据订单明细向供应链查询订单详细信息 参数 productSkuRequest2List ={}"+order.getProvinceId()+order.getCityId()+JsonUtil.toJson(productSkuRequest2List));
-            Map<String, ErpSkuDetail> skuDetailMap=bridgeProductService.getProductSkuDetailMap(order.getProvinceId(),order.getCityId(),productSkuRequest2List);
-            log.info("根据订单明细向供应链查询订单详细信息 结果为 skuDetailMap ={}"+JsonUtil.toJson(skuDetailMap));
-            for(ErpOrderItem item:orderItemList){
-                ErpSkuDetail detail=skuDetailMap.get(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
-                if (null!=detail){
-                    item.setPriceTax(detail.getPriceTax());
-                }else{
-                    log.info("订单详情--查询sku分销价--/search/spu/sku/detail2 查询商品详情失败，skuCode为{}"+item.getSkuCode());
-                }
-                if(ErpProductGiftEnum.JIFEN.getCode().equals(item.getProductType())){
-                    item.setUsedGiftQuota(item.getProductAmount().multiply(new BigDecimal(item.getProductCount())).setScale(2, RoundingMode.DOWN));
-                }else{
-                    item.setUsedGiftQuota(BigDecimal.ZERO);
-                }
+            try{
+                log.info("根据订单明细向供应链查询订单详细信息 参数 productSkuRequest2List ={}"+order.getProvinceId()+order.getCityId()+JsonUtil.toJson(productSkuRequest2List));
+                Map<String, ErpSkuDetail> skuDetailMap=bridgeProductService.getProductSkuDetailMap(order.getProvinceId(),order.getCityId(),productSkuRequest2List);
+                log.info("根据订单明细向供应链查询订单详细信息 结果为 skuDetailMap ={}"+JsonUtil.toJson(skuDetailMap));
+                for(ErpOrderItem item:orderItemList){
+                    ErpSkuDetail detail=skuDetailMap.get(item.getSkuCode()+"WAREHOUSE_TYPE_CODE"+item.getWarehouseTypeCode()+"BATCH_INFO_CODE"+item.getBatchInfoCode());
+                    if (null!=detail){
+                        item.setPriceTax(detail.getPriceTax());
+                    }else{
+                        log.info("订单详情--查询sku分销价--/search/spu/sku/detail2 查询商品详情失败，skuCode为{}"+item.getSkuCode());
+                    }
+                    if(ErpProductGiftEnum.JIFEN.getCode().equals(item.getProductType())){
+                        item.setUsedGiftQuota(item.getProductAmount().multiply(new BigDecimal(item.getProductCount())).setScale(2, RoundingMode.DOWN));
+                    }else{
+                        item.setUsedGiftQuota(BigDecimal.ZERO);
+                    }
 
+                }
+            }catch (Exception e){
+                log.error("根据订单明细向供应链查询订单详细信息(detail2)请求失败"+e.getMessage());
             }
             order.setItemList(orderItemList);
             log.info("根据订单编号查询订单详情信息 子订单详情为：orderItemList={}"+JsonUtil.toJson(orderItemList));
@@ -165,6 +169,9 @@ public class ErpOrderQueryServiceImpl implements ErpOrderQueryService {
                 }
                 if(null==item.getPriceTax()){
                     item.setPriceTax(BigDecimal.ZERO);
+                }
+                if(null==item.getTotalAcivityAmount()){
+                    item.setTotalAcivityAmount(BigDecimal.ZERO);
                 }
                 totalMoney=totalMoney.add(item.getTotalProductAmount()).setScale(2, RoundingMode.DOWN);
                 activityMoney=activityMoney.add(item.getTotalAcivityAmount()).setScale(2, RoundingMode.DOWN);

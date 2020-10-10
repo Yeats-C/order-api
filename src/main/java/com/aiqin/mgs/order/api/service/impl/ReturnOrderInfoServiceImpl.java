@@ -31,10 +31,7 @@ import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.*;
 import com.aiqin.mgs.order.api.domain.copartnerArea.CopartnerAreaVo;
 import com.aiqin.mgs.order.api.domain.copartnerArea.PublicAreaStore;
-import com.aiqin.mgs.order.api.domain.po.order.ErpBatchInfo;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
+import com.aiqin.mgs.order.api.domain.po.order.*;
 import com.aiqin.mgs.order.api.domain.request.StoreQuotaRequest;
 import com.aiqin.mgs.order.api.domain.request.returnorder.*;
 import com.aiqin.mgs.order.api.domain.response.ReturnOrderDetailList;
@@ -178,18 +175,20 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         record.setReturnOrderCode(afterSaleCode);
         record.setCreateTime(now);
         switch (reqVo.getReturnOrderType()) {
-            case 0:
-                record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getKey());
+//            case 0:
+//                record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getKey());
+//                record.setActualProductCount(record.getProductCount());
+//                record.setActualReturnOrderAmount(record.getReturnOrderAmount());
+//                break;
+//            case 1:
+//
+//            case 2:
+//                record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey());
+//                break;
+            default:
                 record.setActualProductCount(record.getProductCount());
                 record.setActualReturnOrderAmount(record.getReturnOrderAmount());
-                break;
-            case 1:
-
-            case 2:
-                record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey());
-                break;
-            default:
-                record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey());
+                record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getKey());
         }
         //退货单--退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户
         record.setReturnMoneyType(ConstantData.RETURN_MONEY_TYPE);
@@ -250,7 +249,7 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         erpOrderInfoService.updateOrderReturnStatus(record.getOrderStoreCode(), ErpOrderReturnRequestEnum.WAIT,null,record.getCreateById(),record.getCreateByName());
         log.info("发起退货--修改原始订单数据结束");
         //如果是配送质量退货，请求时调用门店退货申请
-        if(!("15".equals(reqVo.getReturnReasonCode())&&reqVo.getOrderType().equals(1))){
+        /*if(!("15".equals(reqVo.getReturnReasonCode())&&reqVo.getOrderType().equals(1))){
             //门店退货申请-完成(门店)（erp回调）--修改商品库存
             String url=productHost+"/order/return/insert";
             JSONObject body=new JSONObject();
@@ -289,7 +288,46 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存失败");
                 throw e;
             }
+        }*/
+
+        //退货单同步结算
+        DLReturnOrderReqVo dlReturnOrderReqVo=new DLReturnOrderReqVo();
+        dlReturnOrderReqVo.setMethod("saveReturn");
+        if(ErpOrderTypeEnum.DIRECT_SEND.getCode().equals(record.getOrderType())){
+            dlReturnOrderReqVo.setOrderType(1);
+        }else if(ErpOrderTypeEnum.DISTRIBUTION.getCode().equals(record.getOrderType())){
+            dlReturnOrderReqVo.setOrderType(2);
+        }else{
+            dlReturnOrderReqVo.setOrderType(record.getOrderType());
         }
+        dlReturnOrderReqVo.setCustomerCode(record.getStoreCode());
+        dlReturnOrderReqVo.setReturnOrderCode(record.getReturnOrderCode());
+        dlReturnOrderReqVo.setSupplierCode(orderByOrderCode.getSupplierCode());
+        dlReturnOrderReqVo.setTransportCenterCode(orderByOrderCode.getTransportCenterCode());
+        dlReturnOrderReqVo.setOrder_store_id(orderByOrderCode.getOrderStoreId());
+
+        List<DLReturnOrderDetail> dlReturnOrderDetails=new ArrayList<>();
+
+        List<ErpOrderItem> orderItemList = erpOrderItemService.selectOrderItemListByOrderId(orderByOrderCode.getOrderStoreId());
+        Map<Long,ErpOrderItem> itemMap=orderItemList.stream().collect(Collectors.toMap(ErpOrderItem :: getLineCode, x -> x, (k1, k2) -> k2));
+
+        for(ReturnOrderDetail detail:details){
+            DLReturnOrderDetail dlReturnOrderDetail=new DLReturnOrderDetail();
+            ErpOrderItem item=itemMap.get(detail.getLineCode());
+            dlReturnOrderDetail.setOrderDetailId(item.getOrderInfoDetailId());
+            dlReturnOrderDetail.setSkuCode(detail.getSkuCode());
+            dlReturnOrderDetail.setReturnProductCount(detail.getReturnProductCount());
+            dlReturnOrderDetail.setLineCode(detail.getLineCode());
+            dlReturnOrderDetail.setProductAmount(detail.getProductAmount());
+            dlReturnOrderDetail.setOutputTaxRate(detail.getOutputTaxRate());
+            dlReturnOrderDetail.setProductType(detail.getProductType());
+            dlReturnOrderDetails.add(dlReturnOrderDetail);
+        }
+        dlReturnOrderReqVo.setDetails(dlReturnOrderDetails);
+        log.info("退货单同步DL参数为："+JsonUtil.toJson(dlReturnOrderReqVo));
+        DLResponse response=bridgeProductService.transferDL(JsonUtil.toJson(dlReturnOrderReqVo));
+        log.info("退货单同步DL回调为："+JsonUtil.toJson(response));
+
         return HttpResponse.success();
     }
 
@@ -306,16 +344,18 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         if(list!=null&&list.size()>0){
             log.info("判断子单是否全部发货完成,原始订单集合为 list={}",JsonUtil.toJson(list));
             for(ErpOrderInfo eoi:list){
-                Integer orderStatus = eoi.getOrderStatus();
-                //判断订单状态是否是 11:发货完成或者 97:缺货终止
-                if(orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_11.getCode())
-                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_97.getCode())
-                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_12.getCode())
-                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_13.getCode())
-                        ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_4.getCode())){
-                    return true;
-                }else{
-                    return false;
+                if(null!=eoi.getOrderStatus()){
+                    Integer orderStatus = eoi.getOrderStatus();
+                    //判断订单状态是否是 11:发货完成或者 97:缺货终止
+                    if(orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_11.getCode())
+                            ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_97.getCode())
+                            ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_12.getCode())
+                            ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_13.getCode())
+                            ||orderStatus.equals(ErpOrderStatusEnum.ORDER_STATUS_4.getCode())){
+                        return true;
+                    }else{
+                        return false;
+                    }
                 }
             }
             return true;

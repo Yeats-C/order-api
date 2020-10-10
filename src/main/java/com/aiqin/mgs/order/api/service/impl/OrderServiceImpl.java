@@ -2472,6 +2472,7 @@ public class OrderServiceImpl implements OrderService {
 
             return HttpResponse.success();
         } catch (Exception e) {
+            e.printStackTrace();
             LOGGER.error("添加新的订单主数据以及其他订单关联数据异常：{}", e);
             throw new RuntimeException("添加新的订单主数据以及其他订单关联数据异常");
         }
@@ -2934,7 +2935,12 @@ public class OrderServiceImpl implements OrderService {
                 productCount += orderDetailInfo.getAmount();
                 orderDetailInfo.setUpdateBy(updateBy);
 
-                orderDetailInfo.setActualPrice(orderDetailInfo.getActualPrice() * orderInfo.getActualPrice() / storeValueOrderPayRequest.getActualPrice());
+                if (storeValueOrderPayRequest.getActualPrice()==0){
+                    orderDetailInfo.setActualPrice(0);
+                }else {
+                    orderDetailInfo.setActualPrice(orderDetailInfo.getActualPrice() * orderInfo.getActualPrice() / storeValueOrderPayRequest.getActualPrice());
+                }
+
 
 
                 // orderDetailDao.updateOrderDetail(orderDetailInfo);
@@ -2950,6 +2956,7 @@ public class OrderServiceImpl implements OrderService {
             LOGGER.error("储值支付成功,更新订单异常:{}", e.getMessage());
             throw new GroundRuntimeException(e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             throw new GroundRuntimeException("");
         }
     }

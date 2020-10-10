@@ -1,5 +1,6 @@
 package com.aiqin.mgs.order.api.service.impl.order;
 
+import com.aiqin.ground.util.http.HttpClient;
 import com.aiqin.ground.util.json.JsonUtil;
 import com.aiqin.ground.util.protocol.http.HttpResponse;
 import com.aiqin.mgs.order.api.base.exception.BusinessException;
@@ -12,13 +13,11 @@ import com.aiqin.mgs.order.api.dao.order.ErpOrderOperationLogDao;
 import com.aiqin.mgs.order.api.dao.returnorder.ReturnOrderInfoDao;
 import com.aiqin.mgs.order.api.domain.AuthToken;
 import com.aiqin.mgs.order.api.domain.OrderSplitsNum;
+import com.aiqin.mgs.order.api.domain.StoreInfo;
 import com.aiqin.mgs.order.api.domain.po.gift.GiftQuotasUseDetail;
 import com.aiqin.mgs.order.api.domain.po.gift.NewStoreGradient;
 import com.aiqin.mgs.order.api.domain.po.gift.StoreGradient;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderFee;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderInfo;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderItem;
-import com.aiqin.mgs.order.api.domain.po.order.ErpOrderOperationLog;
+import com.aiqin.mgs.order.api.domain.po.order.*;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderCarryOutNextStepRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderPayRequest;
 import com.aiqin.mgs.order.api.domain.request.order.ErpOrderProductItemRequest;
@@ -33,6 +32,7 @@ import com.aiqin.mgs.order.api.service.gift.GiftQuotasUseDetailService;
 import com.aiqin.mgs.order.api.service.order.*;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
 import com.aiqin.mgs.order.api.util.CopyBeanUtil;
+import com.aiqin.mgs.order.api.util.DLRequestUtil;
 import com.aiqin.mgs.order.api.util.OrderPublic;
 import com.aiqin.mgs.order.api.util.RequestReturnUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -847,11 +847,41 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         bridgeProductService.settlementSaveOrder(list,3);
         /*****************************************同步订单数据到结算结束*****************************************/
 
-        // TODO 此处需调用DL接口，将订单状态同步给DL
+        //此处调用DL接口，将订单签收信息同步给DL
+        syncToDL(order,itemList,orderItemSignMap);
+
         //首单，修改门店状态
         if (processTypeEnum.getOrderCategoryEnum().isFirstOrder()) {
             erpOrderRequestService.updateStoreStatus(order.getStoreId(), "010201");
         }
+    }
+
+    private void syncToDL(ErpOrderInfo order, List<ErpOrderItem> itemList, Map<Long, ErpOrderProductItemRequest> orderItemSignMap) {
+        OrderToDL orderToDL=new OrderToDL();
+        List<ImplData> implData=new ArrayList();
+
+        for (ErpOrderItem item :
+                itemList) {
+            ImplData data=new ImplData();
+            data.setDetailId(item.getOrderInfoDetailId());
+            data.setImpQty(orderItemSignMap.get(item.getLineCode()).getActualInboundCount().toString());
+            implData.add(data);
+        }
+        orderToDL.setImpData(implData);
+        orderToDL.setMethod("orderImp");
+        orderToDL.setOrderType(order.getOrderTypeCode());
+        orderToDL.setOrderStoreCode(order.getOrderStoreId());
+
+        logger.info("签收信息同步到DL开始，参数为{}"+JsonUtil.toJson(orderToDL));
+
+        String sign = DLRequestUtil.EncoderByMd5("0122db92c57511eab0eb7cd30adaed42", JsonUtil.toJson(orderToDL));
+        HttpClient httpClient = HttpClient.post("http://39.98.253.157:7070/azg/api", "utf-8");
+        httpClient.setHeader("Content-Encoding", "UTF-8");
+        httpClient.setHeader("key", "0122db92c57511eab0eb7cd30adaed42");//双方约定的密钥
+        httpClient.setHeader("sign", sign);
+        httpClient.addParameter("data", JsonUtil.toJson(orderToDL));
+        DLResponse response=httpClient.timeout(200000).action().result(DLResponse.class);
+        logger.info("订单签收信息同步到DL的回调为{}"+JsonUtil.toJson(response));
     }
 
     @Override
@@ -1111,6 +1141,10 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             throw new BusinessException("缺失订单号");
         }
 
+        StoreInfo storeInfo=erpOrderRequestService.getStoreInfoByOriginStoreId(orderInfo.getStoreId());
+
+        orderInfo.setStoreId(storeInfo.getStoreId());
+
         AuthToken auth=new AuthToken();
         auth.setPersonId("DL同步");
         auth.setPersonName("DL同步");
@@ -1130,12 +1164,20 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
             if(null!=orderInfo.getOrderLogistics()){
                 erpOrderLogisticsDao.insert(orderInfo.getOrderLogistics());
             }
-        }else{
-            updateOrderByPrimaryKeySelective(orderInfo, auth);
-            if(null!=orderInfo.getItemList()&&orderInfo.getItemList().size()>0){
-                //保存订单明细行
-                erpOrderItemService.updateOrderItemList(orderInfo.getItemList(), auth);
+            if(null!=orderInfo.getOrderFee()){
+                erpOrderFeeService.saveOrderFee(orderInfo.getOrderFee(),auth);
             }
+        }else{
+            if(!ErpOrderStatusEnum.ORDER_STATUS_13.getCode().equals(orderInfo.getOrderStatus())){
+                updateOrderByOrderStoreId(orderInfo, auth);
+            }else{
+                updateOrderByOrderStoreId1(orderInfo, auth);
+            }
+
+            //删除原有订单明细
+            erpOrderItemService.deleteItemByOrderCode(order.getOrderStoreCode());
+            //保存订单明细行
+            erpOrderItemService.saveOrderItemList(orderInfo.getItemList(), auth);
         }
 
         //递归保存子订单信息
@@ -1149,6 +1191,16 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
 
     }
 
+    private void updateOrderByOrderStoreId1(ErpOrderInfo orderInfo, AuthToken auth) {
+        //更新订单数据
+        orderInfo.setUpdateById(auth.getPersonId());
+        orderInfo.setUpdateByName(auth.getPersonName());
+        Integer integer = erpOrderInfoDao.updateOrderByOrderStoreId1(orderInfo);
+
+        //保存订单操作日志
+        erpOrderOperationLogService.saveOrderOperationLog(orderInfo.getOrderStoreCode(), ErpLogOperationTypeEnum.ADD, orderInfo.getOrderStatus(), null, auth);
+    }
+
     /**
      * 将拆单数量存入拆单数量表中
      * @param num
@@ -1159,5 +1211,18 @@ public class ErpOrderInfoServiceImpl implements ErpOrderInfoService {
         record.setNum(num);
         record.setOrderCode(orderCode);
         orderSplitsNumDao.insertSelective(record);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void updateOrderByOrderStoreId(ErpOrderInfo po, AuthToken auth) {
+
+        //更新订单数据
+        po.setUpdateById(auth.getPersonId());
+        po.setUpdateByName(auth.getPersonName());
+        Integer integer = erpOrderInfoDao.updateOrderByOrderStoreId(po);
+
+        //保存订单操作日志
+        erpOrderOperationLogService.saveOrderOperationLog(po.getOrderStoreCode(), ErpLogOperationTypeEnum.ADD, po.getOrderStatus(), null, auth);
+
     }
 }

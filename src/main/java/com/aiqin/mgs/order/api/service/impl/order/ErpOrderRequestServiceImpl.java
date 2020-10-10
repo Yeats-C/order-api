@@ -1077,4 +1077,29 @@ public class ErpOrderRequestServiceImpl implements ErpOrderRequestService {
             logger.error("首单修改加盟商角色-权限失败：{}", e);
         }
     }
+
+    @Override
+    public StoreInfo getStoreInfoByOriginStoreId(String originStoreId) {
+        StoreInfo  storeInfo=new StoreInfo();
+        try {
+            HttpClient httpClient = HttpClient.get(urlProperties.getSlcsApi() + "/store/getStoreIDByDLStoreId?origin_store_id=" + originStoreId);
+            HttpResponse<StoreInfo> response = httpClient.action().result(new TypeReference<HttpResponse<StoreInfo>>() {
+            });
+            if (!RequestReturnUtil.validateHttpResponse(response)) {
+                throw new BusinessException("获取门店信息失败");
+            }
+            storeInfo = response.getData();
+            if (storeInfo == null) {
+                throw new BusinessException("无效的门店");
+            }
+
+        } catch (BusinessException e) {
+            logger.info("获取门店信息失败：{}", e.getMessage());
+            throw new BusinessException(e.getMessage());
+        } catch (Exception e) {
+            logger.info("获取门店信息失败：{}", e);
+            throw new BusinessException("获取门店信息失败");
+        }
+        return storeInfo;
+    }
 }
