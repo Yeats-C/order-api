@@ -46,6 +46,7 @@ import com.aiqin.mgs.order.api.service.order.ErpOrderInfoService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderItemService;
 import com.aiqin.mgs.order.api.service.order.ErpOrderQueryService;
 import com.aiqin.mgs.order.api.service.returnorder.ReturnOrderInfoService;
+import com.aiqin.mgs.order.api.util.AuthUtil;
 import com.aiqin.mgs.order.api.util.ResultModel;
 import com.aiqin.platform.flows.client.constant.AjaxJson;
 import com.aiqin.platform.flows.client.constant.FormUpdateUrlType;
@@ -249,7 +250,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
         erpOrderInfoService.updateOrderReturnStatus(record.getOrderStoreCode(), ErpOrderReturnRequestEnum.WAIT,null,record.getCreateById(),record.getCreateByName());
         log.info("发起退货--修改原始订单数据结束");
         //如果是配送质量退货，请求时调用门店退货申请
-        /*if(!("15".equals(reqVo.getReturnReasonCode())&&reqVo.getOrderType().equals(1))){
+//        if(!("15".equals(reqVo.getReturnReasonCode())&&reqVo.getOrderType().equals(1))){
+        if(reqVo.getOrderType().equals(1)){
             //门店退货申请-完成(门店)（erp回调）--修改商品库存
             String url=productHost+"/order/return/insert";
             JSONObject body=new JSONObject();
@@ -288,9 +290,10 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存失败");
                 throw e;
             }
-        }*/
+        }
 
         //退货单同步结算
+        AuthToken auth = AuthUtil.getCurrentAuth();
         DLReturnOrderReqVo dlReturnOrderReqVo=new DLReturnOrderReqVo();
         dlReturnOrderReqVo.setMethod("saveReturn");
         if(ErpOrderTypeEnum.DIRECT_SEND.getCode().equals(record.getOrderType())){
@@ -319,9 +322,17 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
             dlReturnOrderDetail.setReturnProductCount(detail.getReturnProductCount());
             dlReturnOrderDetail.setLineCode(detail.getLineCode());
             dlReturnOrderDetail.setProductAmount(detail.getProductAmount());
-            dlReturnOrderDetail.setOutputTaxRate(detail.getOutputTaxRate());
+            dlReturnOrderDetail.setOutputTaxRate(item.getOutputTaxRate());
             dlReturnOrderDetail.setProductType(detail.getProductType());
             dlReturnOrderDetails.add(dlReturnOrderDetail);
+            if(null==item.getReturnProductCount()){
+                item.setReturnProductCount(detail.getReturnProductCount());
+            }else{
+                item.setReturnProductCount(item.getReturnProductCount()+detail.getReturnProductCount());
+            }
+
+            erpOrderItemService.updateOrderItem(item,auth);
+
         }
         dlReturnOrderReqVo.setDetails(dlReturnOrderDetails);
         log.info("退货单同步DL参数为："+JsonUtil.toJson(dlReturnOrderReqVo));

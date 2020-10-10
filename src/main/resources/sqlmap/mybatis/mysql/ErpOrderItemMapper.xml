@@ -186,7 +186,7 @@
                                        use_status, create_by_id, create_by_name, update_by_id, update_by_name, create_time,
                                        update_time,top_coupon_discount_amount,top_coupon_amount,batch_code,batch_date
                                        ,warehouse_type_code,batch_info_code,transport_center_code,transport_center_name,
-                                       warehouse_code,warehouse_name,batch_type)
+                                       warehouse_code,warehouse_name,batch_type,output_tax_rate)
         values (#{orderInfoDetailId}, #{orderStoreId}, #{orderStoreCode}, #{spuCode}, #{spuName},
                 #{skuCode}, #{skuName}, #{productPropertyCode}, #{productPropertyName}, #{supplierCode},
                 #{supplierName},
@@ -201,7 +201,7 @@
                 #{useStatus}, #{createById}, #{createByName}, #{updateById},
                 #{updateByName}, sysdate(), sysdate(),#{topCouponDiscountAmount},#{topCouponAmount},#{batchCode}
                 ,#{batchDate},#{warehouseTypeCode},#{batchInfoCode},#{transportCenterCode},#{transportCenterName},
-                #{warehouseCode},#{warehouseName},#{batchType})
+                #{warehouseCode},#{warehouseName},#{batchType},#{outputTaxRate})
     </insert>
 
     <select id="getProductSales" resultType="java.math.BigDecimal" parameterType="com.aiqin.mgs.order.api.domain.Activity">
