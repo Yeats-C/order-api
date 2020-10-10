@@ -186,6 +186,8 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
 //                record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_WAIT.getKey());
 //                break;
             default:
+                record.setActualProductCount(record.getProductCount());
+                record.setActualReturnOrderAmount(record.getReturnOrderAmount());
                 record.setReturnOrderStatus(ReturnOrderStatusEnum.RETURN_ORDER_STATUS_REFUND.getKey());
         }
         //退货单--退款方式 1:现金 2:微信 3:支付宝 4:银联 5:退到加盟商账户
