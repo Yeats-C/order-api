@@ -451,7 +451,7 @@
         create_time,remark,evidence_url,preferential_amount,line_code,unit_code,tax_rate,
         product_amount,product_category_code,product_category_name,bar_code,top_coupon_discount_amount,top_coupon_amount,
         batch_info_code,batch_date,batch_code,refund_amount,withdraw_amount,warehouse_code,warehouse_name,transport_center_code,
-        transport_center_name,quantity_returned_count)
+        transport_center_name,quantity_returned_count,actual_total_product_amount)
         values
         <foreach collection="records" item="item" index="index" separator=",">
             (
@@ -469,7 +469,8 @@
             #{item.productCategoryCode},#{item.productCategoryName},#{item.barCode},#{item.topCouponDiscountAmount},#{item.topCouponAmount},
             #{item.batchInfoCode},#{item.batchDate},#{item.batchCode},#{item.refundAmount},#{item.withdrawAmount},
             #{item.warehouseCode},#{item.warehouseName},#{item.transportCenterCode},#{item.transportCenterName},
-            #{item.quantityReturnedCount}
+            #{item.quantityReturnedCount},
+            #{item.actualTotalProductAmount}
             )
         </foreach>
     </insert>
