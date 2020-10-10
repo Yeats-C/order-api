@@ -2371,13 +2371,15 @@
         FROM
         (
         SELECT
-        order_code,
+        id,
+        order_id,
         sum1 pointsDeductionAmount,
         sum2 actualPaymentAmount
         FROM
         (
         SELECT
-        a.order_code,
+        a.id,
+        a.order_id,
         sum( b.cost_points ) sum1,
         <!-- if(a.order_status in (0,4),0,a.actual_price) sum2 -->
         a.actual_price sum2
@@ -2497,9 +2499,9 @@
         a.id
         ) d
         ) e
-        LEFT JOIN order_after_sale f ON e.order_code = f.order_code
+        LEFT JOIN order_after_sale f ON e.order_id = f.order_id
         GROUP BY
-        e.order_code
+        e.id
         ) g
     </select>
 </mapper>
