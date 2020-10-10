@@ -2472,6 +2472,7 @@ public class OrderServiceImpl implements OrderService {
 
             return HttpResponse.success();
         } catch (Exception e) {
+            e.printStackTrace();
             LOGGER.error("添加新的订单主数据以及其他订单关联数据异常：{}", e);
             throw new RuntimeException("添加新的订单主数据以及其他订单关联数据异常");
         }

@@ -89,6 +89,6 @@ public class NewFranchiseeResponse {
 
     @ApiModelProperty(value = "创建人")
     @JsonProperty("create_by")
-    private Integer createBy;
+    private String createBy;
 
 }
