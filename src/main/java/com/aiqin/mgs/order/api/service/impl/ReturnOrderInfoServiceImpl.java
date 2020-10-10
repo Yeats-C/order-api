@@ -282,14 +282,11 @@ public class ReturnOrderInfoServiceImpl implements ReturnOrderInfoService {
                 log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存结果，request={}",result);
                 if(result!=null&&"0".equals(result.get("code"))){
                     log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存完成");
-                    return HttpResponse.success();
                 }else {
-                    log.info("发起发起门店退货申请-完成(门店)（erp回调）--第三方修改商品库存失败");
-                    throw new RuntimeException();
+                    log.error("发起发起门店退货申请-完成(门店)（erp回调）--第三方修改商品库存失败");
                 }
             }catch (Exception e){
-                log.info("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存失败");
-                throw e;
+                log.error("发起发起门店退货申请-完成(门店)（erp回调）--修改商品库存失败"+e.getMessage());
             }
         }
 
